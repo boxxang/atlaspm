@@ -3,6 +3,7 @@
 import { phaseOfStage, stageMilestone } from '@/data/scheduleProfiles';
 import type { JourneyStage } from '@/data/types';
 import { fmtW, fromISO, toISO } from '@/lib/schedule';
+import { useModalStore } from '@/store/modalStore';
 import { useAppStore } from '@/store/useAppStore';
 import { Board } from './Board';
 import { InlineArea } from './InlineArea';
@@ -65,6 +66,7 @@ export function StagePanel({ stage, index }: { stage: JourneyStage; index: numbe
   const inline = useAppStore((s) => s.inline[stage.id]);
   const openInline = useAppStore((s) => s.openInline);
   const closeInline = useAppStore((s) => s.closeInline);
+  const openBoard = useModalStore((m) => m.openBoard);
   const num = String(stage.stage).padStart(2, '0');
   const phase = phaseOfStage[stage.id];
   const detailOpen = !!inline;
@@ -97,12 +99,29 @@ export function StagePanel({ stage, index }: { stage: JourneyStage; index: numbe
         <LeaderRow stage={stage} />
         <DatesRow stage={stage} />
         <div className="facts">
-          <Board stageId={stage.id} kind="keyinfo" title="Key Information" />
-          <Board stageId={stage.id} kind="activities" title="Activity" />
+          <Board
+            stageId={stage.id}
+            kind="keyinfo"
+            title="Key Information"
+            onOpenItem={(id) => openBoard(stage.id, 'keyinfo', 'item', id, 'board')}
+            onAdd={() => openBoard(stage.id, 'keyinfo', 'edit', null, 'add')}
+            onShowMore={() => openBoard(stage.id, 'keyinfo', 'board')}
+          />
+          <Board
+            stageId={stage.id}
+            kind="activities"
+            title="Activity"
+            onOpenItem={(id) => openBoard(stage.id, 'activities', 'item', id, 'board')}
+            onAdd={() => openBoard(stage.id, 'activities', 'edit', null, 'add')}
+            onShowMore={() => openBoard(stage.id, 'activities', 'board')}
+          />
           <Board
             stageId={stage.id}
             kind="risks"
             title="Risk"
+            onOpenItem={(id) => openBoard(stage.id, 'risks', 'item', id, 'board')}
+            onAdd={() => openBoard(stage.id, 'risks', 'edit', null, 'add')}
+            onShowMore={() => openBoard(stage.id, 'risks', 'board')}
             extraBtns={
               <button
                 className="board-btn"

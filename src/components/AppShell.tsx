@@ -3,7 +3,9 @@
 import { useEffect, useState } from 'react';
 import { journeyData } from '@/data/journey';
 import { fmtDate, fromISO, toISO } from '@/lib/schedule';
+import { useModalStore } from '@/store/modalStore';
 import { useAppStore } from '@/store/useAppStore';
+import { BoardModal } from './BoardModal';
 import { Roadmap } from './Roadmap';
 import { StagePanel } from './StagePanel';
 import { Toolbar, type ViewMode } from './Toolbar';
@@ -53,6 +55,8 @@ function App() {
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if (e.key !== 'Escape') return;
+      /* ESC layering: pop-up first, then the dashboard, then inline sheets */
+      if (useModalStore.getState().open) return;
       setMode('journey');
       closeAllInline();
     };
@@ -96,6 +100,8 @@ function App() {
           </p>
         </div>
       </section>
+
+      <BoardModal />
 
       <Tooltip />
     </>

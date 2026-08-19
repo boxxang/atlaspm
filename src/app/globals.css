@@ -602,6 +602,55 @@ body.col-resizing{user-select:none;cursor:col-resize}
 /* leader editor reuses ie-field */
 
 /* ============================================================
+   MODAL — full board / item / editor pop-up
+   ============================================================ */
+#modal-scrim{
+  position:fixed;inset:0;z-index:130;background:rgba(11,11,11,.28);
+  opacity:0;visibility:hidden;transition:opacity .2s,visibility .2s;
+}
+#modal{
+  position:fixed;inset:0;z-index:135;display:flex;align-items:center;justify-content:center;
+  pointer-events:none;padding:4vh 3vw;
+  opacity:0;visibility:hidden;transition:opacity .22s,visibility .22s;
+}
+body.modal-open #modal-scrim{opacity:1;visibility:visible}
+body.modal-open #modal{opacity:1;visibility:visible}
+.modal-win{
+  pointer-events:auto;background:var(--surface);border:1px solid var(--line);border-radius:8px;
+  box-shadow:0 24px 80px rgba(11,11,11,.20);
+  width:min(1120px,96vw);height:88vh;display:flex;flex-direction:column;
+  transform:translateY(10px);transition:transform .22s;
+}
+body.modal-open .modal-win{transform:none}
+.modal-head{
+  display:flex;align-items:baseline;gap:14px;padding:18px 26px 14px;border-bottom:1px solid var(--line);flex-wrap:wrap;
+}
+.modal-head h3{font-size:1.15em;font-weight:650;letter-spacing:-.01em;text-transform:uppercase}
+.modal-head .meta{font-family:var(--mono);font-size:.72em;color:var(--ink-3)}
+.modal-head .spacer{flex:1}
+#modal-close{
+  font-family:var(--mono);font-size:.72em;color:var(--ink-3);
+  border:1px solid var(--line);border-radius:4px;padding:3px 9px;
+}
+#modal-close:hover{color:var(--ink);border-color:var(--ink-3)}
+.modal-body{padding:18px 26px 30px;overflow-y:auto}
+.modal-body .item-view,.modal-body .item-editor,.modal-body .su-sec{max-width:none}
+.mb-back{
+  font-family:var(--mono);font-size:.66em;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-3);
+  border:1px solid var(--line);border-radius:3px;padding:3px 9px;
+}
+.mb-back:hover{color:var(--ink);border-color:var(--ink-3)}
+
+/* status-update board rows in the pop-up */
+.su-cols,.su-brow{display:grid;grid-template-columns:var(--bc-date) minmax(0,1fr);gap:14px}
+.su-brow{width:100%;text-align:left;padding:10px 0;border-bottom:1px solid var(--line)}
+.su-brow:hover,.su-brow:focus-visible{background:linear-gradient(to right,transparent,var(--page))}
+.su-brow .b-date{font-family:var(--mono);font-size:.75em;color:var(--ink-3);white-space:nowrap}
+.su-brow .t1{display:block;font-size:.92em;color:var(--ink);font-weight:600}
+.su-brow .t1 .b-stage{margin-right:8px}
+.su-brow .t2{display:block;font-size:.9em;color:var(--accent);margin-top:3px}
+
+/* ============================================================
    TOOLTIP — cursor-following, shared by every [data-tip] element
    ============================================================ */
 .g-tip{

@@ -68,6 +68,27 @@ export interface AppState {
   deleteContact: (stageId: StageId, id: string) => void;
   saveLeader: (stageId: StageId, l: Omit<Leader, 'short'>) => void;
   adoptPotentialRisk: (stageId: StageId, title: string) => void;
+
+  /** Returns the saved item so the modal can drill into a freshly added one. */
+  saveItem: (stageId: StageId, kind: ItemKind, itemId: string | null, f: ItemFields) => Item;
+  deleteItem: (stageId: StageId, kind: ItemKind, itemId: string) => void;
+  postUpdate: (stageId: StageId, kind: ItemKind, itemId: string, text: string) => void;
+  saveUpdate: (
+    stageId: StageId,
+    kind: ItemKind,
+    itemId: string,
+    suId: string,
+    text: string,
+  ) => void;
+  deleteUpdate: (stageId: StageId, kind: ItemKind, itemId: string, suId: string) => void;
+}
+
+/** The four fields the item editor writes. */
+export interface ItemFields {
+  title: string;
+  owner: string;
+  body: string;
+  due: Date | null;
 }
 
 /** Runtime ids for anything created after the seed. */
@@ -261,7 +282,86 @@ export const useAppStore = create<AppState>()((set, get) => ({
         },
       };
     }),
+
+  saveItem: (stageId, kind, itemId, f) => {
+    const existing = itemId
+      ? get().content[stageId][kind].find((x) => x.id === itemId)
+      : undefined;
+    const saved: Item = existing
+      ? { ...existing, ...f, updated: new Date() }
+      : { id: uid(), ...f, done: false, updated: new Date(), updates: [] };
+    set((s) => ({
+      content: {
+        ...s.content,
+        [stageId]: {
+          ...s.content[stageId],
+          [kind]: existing
+            ? s.content[stageId][kind].map((x) => (x.id === itemId ? saved : x))
+            : [...s.content[stageId][kind], saved],
+        },
+      },
+    }));
+    return saved;
+  },
+
+  deleteItem: (stageId, kind, itemId) =>
+    set((s) => ({
+      content: {
+        ...s.content,
+        [stageId]: {
+          ...s.content[stageId],
+          [kind]: s.content[stageId][kind].filter((x) => x.id !== itemId),
+        },
+      },
+    })),
+
+  postUpdate: (stageId, kind, itemId, text) =>
+    set((s) => ({
+      content: mapItem(s.content, stageId, kind, itemId, (it) => ({
+        ...it,
+        updates: [...it.updates, { id: uid(), text, date: new Date() }],
+        updated: new Date(),
+      })),
+    })),
+
+  /* editing keeps the update's original timestamp — the thread stays honest */
+  saveUpdate: (stageId, kind, itemId, suId, text) =>
+    set((s) =>
+      text
+        ? {
+            content: mapItem(s.content, stageId, kind, itemId, (it) => ({
+              ...it,
+              updates: it.updates.map((u) => (u.id === suId ? { ...u, text } : u)),
+            })),
+          }
+        : s,
+    ),
+
+  deleteUpdate: (stageId, kind, itemId, suId) =>
+    set((s) => ({
+      content: mapItem(s.content, stageId, kind, itemId, (it) => ({
+        ...it,
+        updates: it.updates.filter((u) => u.id !== suId),
+      })),
+    })),
 }));
+
+/** Replace one item inside the content map, leaving every other stage alone. */
+function mapItem(
+  content: Record<StageId, StageContent>,
+  stageId: StageId,
+  kind: ItemKind,
+  itemId: string,
+  fn: (it: Item) => Item,
+): Record<StageId, StageContent> {
+  return {
+    ...content,
+    [stageId]: {
+      ...content[stageId],
+      [kind]: content[stageId][kind].map((it) => (it.id === itemId ? fn(it) : it)),
+    },
+  };
+}
 
 /** Newest first — the order every board renders in. */
 export const sortedItems = (content: StageContent, kind: ItemKind): Item[] =>
