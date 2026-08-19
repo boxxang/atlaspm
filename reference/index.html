@@ -1,0 +1,2916 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AtlasPM</title>
+<style>
+/* ============================================================
+   DESIGN TOKENS
+   Secondary type is em-based, so the Text-size step (±5)
+   rescales the whole information layer coherently.
+   ============================================================ */
+:root{
+  --page:#f9f9f7;
+  --surface:#fcfcfb;
+  --ink:#0b0b0b;
+  --ink-2:#52514e;
+  --ink-3:#898781;
+  --line:#e1e0d9;
+  --line-strong:#c3c2b7;
+  --accent:#256abf;
+  --accent-soft:#e7effa;
+  --risk:#d03b3b;
+  /* adjustable via settings (each default ±5 steps) */
+  --fs-base:18px;
+  --icon-scale:2;
+  --gbar-h:16px;
+  --cp-fs:11px;            /* milestone / checkpoint text */
+  /* board column widths — per-board, drag the header grips to change */
+  --bc-date:9.5rem;          /* generic fallback (status-update board) */
+  --bc-owner:7.5rem;
+  --bc-due:7.5rem;
+  --bck-keyinfo-date:9.5rem;    --bck-keyinfo-owner:7.5rem;
+  --bck-activities-date:9.5rem; --bck-activities-owner:7.5rem; --bck-activities-due:7.5rem;
+  --bck-risks-date:9.5rem;      --bck-risks-owner:7.5rem;      --bck-risks-due:7.5rem;
+  --dash-row-h:36px;         /* dashboard schedule row height */
+  --dlv-due:8.5rem;          /* deliverables table columns */
+  --dlv-comp:10.5rem;
+  /* layout */
+  --toolbar-h:58px;
+  --viz-h:clamp(220px,38vh,380px);
+  --title-size:2.6rem;   /* fixed — the title is the last thing to shrink (media steps below) */
+  --line-w:1.25px;
+  --dur:.3s;
+  --mono:ui-monospace,"SF Mono","Cascadia Mono",Menlo,monospace;
+  --sans:system-ui,-apple-system,"Segoe UI",sans-serif;
+  --serif:Georgia,"Times New Roman",serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{
+  background:var(--page);color:var(--ink);
+  font-family:var(--sans);font-size:var(--fs-base);line-height:1.55;
+  -webkit-font-smoothing:antialiased;
+}
+::selection{background:var(--accent-soft)}
+button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
+ul{list-style:none}
+input,select,textarea{font:inherit;color:inherit}
+.mono{font-family:var(--mono)}
+.cap{font-size:.7em;font-weight:600;letter-spacing:.13em;text-transform:uppercase;color:var(--ink-3)}
+
+/* ============================================================
+   TOOLBAR
+   ============================================================ */
+#toolbar{
+  position:sticky;top:0;z-index:70;height:var(--toolbar-h);
+  display:flex;align-items:center;gap:20px;padding:0 24px;
+  background:rgba(249,249,247,.92);backdrop-filter:blur(8px);
+  border-bottom:1px solid var(--line);
+}
+@media (max-width:1760px){.tb-field.tb-opt2{display:none}}
+@media (max-width:1560px){.tb-field.tb-opt1{display:none}}
+@media (max-width:1460px){#toolbar{gap:14px}.tb-field label,.tb-field .k{letter-spacing:.08em}}
+#project-name{
+  font-family:var(--mono);font-size:.95em;letter-spacing:.12em;font-weight:700;white-space:nowrap;
+  border-bottom:1px dashed transparent;padding-bottom:1px;
+}
+#project-name:hover,#project-name:focus-visible{border-bottom-color:var(--line-strong)}
+#project-name-input{
+  font-family:var(--mono);font-size:.95em;letter-spacing:.12em;font-weight:700;
+  border:none;border-bottom:1px solid var(--accent);background:none;width:9em;padding-bottom:1px;
+}
+#project-name-input:focus-visible{outline:none}
+#brand-badge{
+  position:fixed;right:14px;bottom:12px;z-index:120;pointer-events:none;
+  font-family:var(--mono);font-size:.66em;letter-spacing:.18em;color:var(--ink-3);
+  background:rgba(249,249,247,.85);padding:3px 9px;border-radius:4px;border:1px solid var(--line);
+}
+.tb-field{display:flex;align-items:center;gap:8px;white-space:nowrap;flex:none}
+.tb-field label,.tb-field .k{font-size:.65em;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-3)}
+.tb-field input[type="date"],.tb-field select{
+  border:1px solid var(--line);border-radius:4px;background:var(--surface);
+  padding:4px 7px;font-family:var(--mono);font-size:.8em;
+}
+.tb-field input:focus-visible,.tb-field select:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+.tb-field .v{font-family:var(--mono);font-size:.8em}
+.tb-spacer{flex:1}
+.pop-note{position:relative;display:inline-flex;align-items:center;flex:none}
+.pop-btn{
+  min-width:19px;height:19px;border:1px solid var(--line-strong);border-radius:50%;
+  font-size:.7em;font-family:var(--mono);color:var(--ink-3);
+  display:inline-flex;align-items:center;justify-content:center;padding:0 3px;
+}
+.pop-btn:hover,.pop-btn:focus-visible{color:var(--ink);border-color:var(--ink-3)}
+.pop-btn.gear{min-width:32px;height:32px;border-radius:7px;color:var(--ink-2)}
+.pop-btn.gear svg{width:19px;height:19px}
+.pop-panel{
+  position:absolute;right:0;top:30px;z-index:90;width:360px;
+  background:var(--surface);border:1px solid var(--line);border-radius:6px;
+  box-shadow:0 8px 28px rgba(11,11,11,.09);padding:14px 16px;
+  font-size:.85em;color:var(--ink-2);line-height:1.6;
+  opacity:0;visibility:hidden;transform:translateY(-4px);
+  transition:opacity .18s,transform .18s,visibility .18s;
+}
+.pop-note.open .pop-panel{opacity:1;visibility:visible;transform:none}
+#info-note:hover .pop-panel,#info-note:focus-within .pop-panel{opacity:1;visibility:visible;transform:none}
+.set-scope{display:flex;border:1px solid var(--line);border-radius:5px;overflow:hidden;margin:10px 0 6px}
+.set-scope button{
+  flex:1;padding:5px 0;font-size:.66em;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-3);
+}
+.set-scope button[aria-pressed="true"]{background:var(--ink);color:var(--page)}
+.set-row{display:grid;grid-template-columns:110px 1fr 74px;align-items:center;gap:10px;padding:7px 0}
+.set-row[hidden]{display:none}
+.set-row .k{font-size:.68em;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3)}
+.set-row input[type="range"]{width:100%;accent-color:var(--accent)}
+.set-row .val{font-family:var(--mono);font-size:.72em;text-align:right;color:var(--ink)}
+.set-actions{display:flex;gap:10px;margin-top:12px;padding-top:12px;border-top:1px solid var(--line);flex-wrap:wrap}
+.set-actions button{
+  font-family:var(--mono);font-size:.66em;letter-spacing:.12em;text-transform:uppercase;
+  border:1px solid var(--line);border-radius:4px;padding:5px 10px;color:var(--ink-2);
+}
+.set-actions button:hover{color:var(--ink);border-color:var(--ink-3)}
+#mode-toggle{display:flex;border:1px solid var(--line);border-radius:5px;overflow:hidden;flex:none}
+#mode-toggle button{
+  padding:5px 14px;font-size:.68em;font-weight:600;letter-spacing:.12em;text-transform:uppercase;
+  color:var(--ink-3);
+}
+#mode-toggle button[aria-pressed="true"]{background:var(--ink);color:var(--page)}
+#mode-toggle button:focus-visible{outline:2px solid var(--accent);outline-offset:-2px}
+.edited-flag{
+  font-family:var(--mono);font-size:.6em;letter-spacing:.1em;color:var(--accent);
+  text-transform:uppercase;display:none;
+}
+body.has-overrides .edited-flag{display:inline}
+
+/* ============================================================
+   ROADMAP
+   ============================================================ */
+#roadmap{
+  position:sticky;top:var(--toolbar-h);z-index:60;
+  padding:18px 56px 10px;
+  border-bottom:1px solid var(--line);
+  background:var(--surface);
+}
+#rm-regions{display:flex;height:22px;margin:0 0 6px}
+.rm-region{
+  position:relative;display:flex;align-items:center;justify-content:center;
+  font-family:var(--mono);font-size:var(--cp-fs);letter-spacing:.16em;color:var(--ink-3);
+  text-transform:uppercase;white-space:nowrap;overflow:hidden;
+  transition:color .2s;
+}
+.rm-region+.rm-region::before{content:"";position:absolute;left:0;top:3px;bottom:3px;width:1px;background:var(--line)}
+.rm-region.current{color:var(--ink);font-weight:600}
+#rm-line-wrap{position:relative;height:94px}
+#rm-line{position:absolute;left:4px;right:4px;top:30px;height:var(--line-w);background:var(--line-strong)}
+#rm-line::after{
+  content:"";position:absolute;right:-2px;top:50%;
+  border:4px solid transparent;border-left:6px solid var(--line-strong);
+  transform:translateY(-50%);
+}
+#rm-progress{position:absolute;left:4px;top:30px;height:var(--line-w);background:var(--accent);width:0;transition:width .25s ease}
+#rm-stations{position:absolute;left:4px;right:4px;top:0;height:100%}
+.rm-station{
+  position:absolute;top:0;transform:translateX(-50%);
+  display:flex;flex-direction:column;align-items:center;
+  padding-top:24px;cursor:pointer;
+}
+.rm-station .dot{
+  width:calc(11px * var(--icon-scale));height:calc(11px * var(--icon-scale));
+  border-radius:50%;border:1.5px solid var(--ink-2);
+  background:var(--surface);transition:all .18s;
+  margin-top:calc((11px - 11px * var(--icon-scale)) / 2);
+}
+.rm-station .code{
+  margin-top:8px;font-family:var(--mono);font-size:calc(var(--cp-fs) * 1.15);letter-spacing:.1em;
+  color:var(--ink-2);text-transform:uppercase;transition:color .18s;white-space:nowrap;
+}
+.rm-station .date{
+  margin-top:2px;font-family:var(--mono);font-size:var(--cp-fs);color:var(--ink-3);white-space:nowrap;
+}
+.rm-station:hover .dot{border-color:var(--ink);transform:scale(1.15)}
+.rm-station.selected .dot{background:var(--accent);border-color:var(--accent);box-shadow:0 0 0 4px var(--accent-soft)}
+.rm-station.selected .code{color:var(--ink);font-weight:600}
+.rm-station:focus-visible{outline:2px solid var(--accent);outline-offset:3px;border-radius:4px}
+.rm-station.past .dot{border-color:var(--line-strong);background:var(--line)}
+.rm-station.past .code,.rm-station.past .date{color:var(--ink-3)}
+.rm-station.moment .dot{border-width:2px;border-color:var(--ink)}
+/* today marker on the station line */
+#rm-today{
+  position:absolute;top:8px;transform:translateX(-50%);z-index:2;
+  display:flex;flex-direction:column;align-items:center;gap:2px;pointer-events:none;
+}
+#rm-today .ty-lbl{font-family:var(--mono);font-size:calc(var(--cp-fs) * 0.85);letter-spacing:.14em;color:var(--accent);font-weight:700;line-height:1}
+#rm-today .ty-tick{width:0;height:0;border:4.5px solid transparent;border-top:6.5px solid var(--accent)}
+.rm-station.moment.selected .dot{background:var(--ink);border-color:var(--ink);box-shadow:0 0 0 4px var(--accent-soft)}
+.rm-station.terminal .dot{
+  border-radius:0;
+  width:calc(10px * var(--icon-scale));height:calc(10px * var(--icon-scale));
+  transform:rotate(45deg);
+  background:var(--ink);border-color:var(--ink);
+}
+.rm-station.terminal:hover .dot{transform:rotate(45deg) scale(1.15)}
+.rm-station.terminal.selected .dot{background:var(--ink);border-color:var(--ink);box-shadow:0 0 0 4px var(--accent-soft)}
+.rm-ms{
+  position:absolute;top:30.5px;
+  width:calc(7px * var(--icon-scale));height:calc(7px * var(--icon-scale));
+  transform:translate(-50%,-50%) rotate(45deg);
+  background:var(--surface);border:1.5px solid var(--ink);
+}
+.rm-ms.major{width:calc(9px * var(--icon-scale));height:calc(9px * var(--icon-scale));background:var(--ink)}
+.rm-ms-label{
+  position:absolute;top:2px;transform:translateX(-50%);
+  font-family:var(--mono);font-size:calc(var(--cp-fs) * 0.85);letter-spacing:.1em;color:var(--ink);
+  text-transform:uppercase;white-space:nowrap;font-weight:600;
+}
+#rm-gantt-cap{display:flex;gap:12px;align-items:baseline;margin:2px 0 4px}
+#rm-gantt-cap .cap{font-size:.56em}
+#rm-gantt-cap .note{font-size:.64em;color:var(--ink-3)}
+#rm-gantt{margin-bottom:2px}
+
+/* ============================================================
+   GANTT
+   ============================================================ */
+.gantt{position:relative;font-family:var(--mono)}
+.g-months{position:relative;height:20px;margin-left:180px}
+.g-month{position:absolute;top:0;font-size:var(--cp-fs);color:var(--ink-3);letter-spacing:.08em;text-transform:uppercase;transform:translateX(2px);white-space:nowrap}
+.g-body{position:relative}
+.g-gridlines{position:absolute;top:0;bottom:0;left:180px;right:0;pointer-events:none}
+.g-gridline{position:absolute;top:0;bottom:0;width:1px;background:var(--line)}
+.g-mlane{position:relative;height:28px;margin-left:180px;margin-bottom:2px}
+.g-ms{position:absolute;top:50%;transform:translate(-50%,-50%) rotate(45deg);width:calc(7px * var(--icon-scale));height:calc(7px * var(--icon-scale));background:var(--surface);border:1.5px solid var(--ink);cursor:default}
+.g-ms.major{width:calc(9px * var(--icon-scale));height:calc(9px * var(--icon-scale));background:var(--ink)}
+.g-ms-label{position:absolute;top:-4px;font-size:.56em;letter-spacing:.06em;color:var(--ink);text-transform:uppercase;white-space:nowrap}
+.g-row{display:flex;align-items:center;height:26px}
+.g-row-label{
+  width:180px;flex:none;font-size:calc(var(--cp-fs) * 1.1);color:var(--ink-2);letter-spacing:.05em;
+  text-transform:uppercase;padding-right:14px;text-align:right;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+.g-row-track{flex:1;position:relative;height:100%}
+.g-bar{
+  position:absolute;top:50%;transform:translateY(-50%);height:var(--gbar-h);border-radius:2px;
+  background:var(--accent);opacity:.82;min-width:4px;cursor:pointer;transition:opacity .15s;
+  overflow:hidden;
+}
+.g-bar.risky{background:var(--risk)}
+.g-bar .past-seg{position:absolute;left:0;top:0;bottom:0;background:var(--line-strong)}
+.g-bar:hover{opacity:1}
+.g-today{position:absolute;top:0;bottom:0;width:1.5px;background:var(--accent);opacity:.7;pointer-events:none}
+.g-today-label{
+  position:absolute;top:-15px;transform:translateX(-50%);
+  font-size:calc(var(--cp-fs) * 0.85);letter-spacing:.12em;color:var(--accent);font-weight:700;text-transform:uppercase;white-space:nowrap;
+}
+.g-row.current .g-bar{opacity:1;box-shadow:0 0 0 2px var(--accent-soft)}
+.g-row.current .g-row-label{color:var(--ink);font-weight:600}
+.gantt.mini .g-months{height:15px;margin-left:46px}
+.gantt.mini .g-month{font-size:calc(var(--cp-fs) * 0.8)}
+.gantt.mini .g-gridlines{left:46px}
+.gantt.mini .g-mlane{display:none}
+.gantt.mini .g-row{height:calc(var(--gbar-h) * 0.66 + 7px)}
+.gantt.mini .g-row-label{width:52px;font-size:calc(var(--cp-fs) * 0.8);padding-right:8px}
+.gantt.mini .g-bar{height:calc(var(--gbar-h) * 0.66);border-radius:1.5px;opacity:.55}
+.gantt.mini .g-row.current .g-bar{opacity:1;box-shadow:none}
+.g-tip{
+  position:fixed;z-index:100;pointer-events:none;background:var(--ink);color:#fff;
+  font-family:var(--mono);font-size:.72em;line-height:1.5;padding:7px 10px;border-radius:4px;
+  opacity:0;transition:opacity .12s;white-space:nowrap;
+}
+.g-tip small{color:#c3c2b7;display:block;font-size:.88em}
+
+/* ============================================================
+   STAGE PANELS
+   ============================================================ */
+#stage-panels{max-width:1280px;margin:0 auto;padding:32px 40px 60px}
+.stage-panel{display:none}
+.stage-panel.selected{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:24px 60px;align-items:start}
+.stage-panel.selected .panel-info,
+.stage-panel.selected .viz{animation:panelIn var(--dur) ease}
+@keyframes panelIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.phase-cap{font-family:var(--mono);font-size:.68em;letter-spacing:.18em;color:var(--ink-3);text-transform:uppercase}
+.stage-meta{display:flex;align-items:baseline;gap:12px;margin:8px 0 8px}
+.stage-num{font-family:var(--mono);font-size:.8em;color:var(--accent);letter-spacing:.08em}
+.stage-short{font-family:var(--mono);font-size:.65em;color:var(--ink-3);letter-spacing:.16em;border:1px solid var(--line);border-radius:3px;padding:2px 6px}
+.stage-panel.moment .stage-short{background:var(--ink);color:var(--page);border-color:var(--ink)}
+.stage-panel h2{
+  font-size:var(--title-size);font-weight:650;letter-spacing:-.018em;line-height:1.02;
+  text-transform:uppercase;
+}
+.stage-panel .tagline{color:var(--ink-2);margin-top:8px;font-size:1.05em;max-width:46ch}
+/* leader row */
+.leader-row{
+  display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;
+  margin-top:14px;font-size:.95em;
+}
+.leader-row .l-name{font-weight:600}
+.leader-row .l-contact{font-family:var(--mono);font-size:.8em;color:var(--ink-2)}
+.leader-row .l-edit{
+  font-family:var(--mono);font-size:.62em;letter-spacing:.12em;color:var(--ink-3);
+  border:1px solid var(--line);border-radius:3px;padding:2px 8px;text-transform:uppercase;
+}
+.leader-row .l-edit:hover{color:var(--accent);border-color:var(--accent)}
+/* editable dates row */
+.dates-row{
+  display:flex;align-items:center;gap:12px;font-family:var(--mono);
+  margin:18px 0 4px;padding:12px 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line);
+}
+.dates-row .d-edit{
+  border:none;border-bottom:1px dashed var(--line-strong);background:none;
+  font-family:var(--mono);font-size:.9em;padding:2px 0;width:9.2em;color:var(--ink);
+}
+.dates-row .d-edit:hover{border-bottom-color:var(--ink-3)}
+.dates-row .d-edit:focus-visible{outline:none;border-bottom:1px solid var(--accent)}
+.dates-row .sep{color:var(--line-strong)}
+.dates-row .tat{font-size:.72em;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-2);white-space:nowrap}
+.dates-row .mslbl{margin-left:auto;font-size:.66em;letter-spacing:.12em;color:var(--ink);font-weight:600;text-transform:uppercase;white-space:nowrap}
+.dates-row .mslbl::before{content:"◆ "}
+/* ===== boards (Activity / Risk) ===== */
+.board{margin-top:18px}
+.board-head{display:flex;align-items:baseline;gap:12px;padding-bottom:8px}
+.board-head .note{font-size:.66em;color:var(--ink-3)}
+.board-head .spacer{flex:1}
+.board-btn{
+  font-family:var(--mono);font-size:.62em;letter-spacing:.12em;color:var(--ink-3);
+  border:1px dashed var(--line-strong);border-radius:3px;padding:3px 9px;text-transform:uppercase;
+}
+.board-btn:hover,.board-btn:focus-visible{color:var(--accent);border-color:var(--accent)}
+/* shared grid: header and rows use the same resizable column vars */
+.board-cols,.b-row{
+  display:grid;grid-template-columns:var(--bc-date) minmax(0,1fr) var(--bc-owner) var(--bc-due);
+  gap:14px;align-items:baseline;
+}
+/* each board kind resolves the shared grid vars to its own set */
+.board[data-kind="keyinfo"]{--bc-date:var(--bck-keyinfo-date);--bc-owner:var(--bck-keyinfo-owner)}
+.board[data-kind="activities"]{--bc-date:var(--bck-activities-date);--bc-owner:var(--bck-activities-owner);--bc-due:var(--bck-activities-due)}
+.board[data-kind="risks"]{--bc-date:var(--bck-risks-date);--bc-owner:var(--bck-risks-owner);--bc-due:var(--bck-risks-due)}
+/* key information has no DUE column */
+.board[data-kind="keyinfo"] .board-cols,
+.board[data-kind="keyinfo"] .b-row{grid-template-columns:var(--bc-date) minmax(0,1fr) var(--bc-owner)}
+.board-cols>span{position:relative}
+.col-grip{position:absolute;top:-7px;bottom:-7px;right:-9px;width:16px;cursor:col-resize;z-index:5}
+.col-grip::after{
+  content:"";position:absolute;left:7px;top:2px;bottom:2px;width:2px;
+  background:var(--line);border-radius:1px;transition:background .15s;
+}
+.col-grip:hover::after,.col-grip.active::after{background:var(--accent)}
+body.col-resizing{user-select:none;cursor:col-resize}
+.board-foot{display:flex;align-items:center;gap:10px;padding:8px 0}
+.board-foot .board-btn{border-style:solid}
+.pager{display:flex;gap:4px;align-items:center;margin-left:auto}
+.pager button{
+  font-family:var(--mono);font-size:.66em;min-width:2em;padding:3px 6px;
+  border:1px solid var(--line);border-radius:3px;color:var(--ink-2);
+}
+.pager button:hover{border-color:var(--ink-3);color:var(--ink)}
+.pager button[aria-current="true"]{background:var(--ink);color:var(--page);border-color:var(--ink)}
+.pager button:disabled{color:var(--line-strong);border-color:var(--line);cursor:default}
+.board-cols{
+  font-size:.6em;font-weight:600;letter-spacing:.13em;text-transform:uppercase;color:var(--ink-3);
+  padding:6px 0;border-top:1px solid var(--line-strong);border-bottom:1px solid var(--line);
+}
+.b-row{
+  width:100%;text-align:left;padding:9px 0;border-bottom:1px solid var(--line);
+  font-size:.9em;color:var(--ink-2);
+}
+.b-row:hover,.b-row:focus-visible{color:var(--ink);background:linear-gradient(to right,transparent,var(--surface))}
+.b-row .b-date{font-family:var(--mono);font-size:.78em;color:var(--ink-3);white-space:nowrap}
+.b-row .b-title{display:flex;align-items:center;gap:8px;min-width:0}
+.b-row .b-title .t{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.b-row.risk .b-title::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--risk);flex:none}
+.b-row .b-owner{font-family:var(--mono);font-size:.75em;color:var(--ink-2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.b-row .b-due{font-family:var(--mono);font-size:.75em;color:var(--ink-3);white-space:nowrap}
+.b-row .b-due.overdue{color:var(--risk);font-weight:600}
+/* latest status update preview under the title */
+.b-row .b-latest{
+  grid-column:2 / -1;margin-top:2px;font-size:.78em;color:var(--ink-3);
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+}
+.b-row .b-latest .lu-date{font-family:var(--mono);font-size:.9em}
+.b-row .b-latest::before{content:"↳ ";color:var(--line-strong)}
+.b-row .b-stage{
+  font-family:var(--mono);font-size:.68em;letter-spacing:.08em;color:var(--accent);
+  border:1px solid var(--accent-soft);background:var(--accent-soft);border-radius:3px;
+  padding:1px 6px;flex:none;text-transform:uppercase;
+}
+.board-foot [data-more]{color:var(--accent)}
+.board-foot [data-more]:hover{color:#1d55a0;border-color:var(--accent)}
+.b-empty{font-size:.8em;color:var(--ink-3);padding:10px 0;border-bottom:1px solid var(--line)}
+.details-btn{
+  margin-top:22px;display:inline-flex;align-items:center;gap:10px;
+  font-family:var(--mono);font-size:.82em;font-weight:600;letter-spacing:.14em;text-transform:uppercase;
+  background:var(--accent);color:#fff;border-radius:6px;padding:11px 22px;
+  box-shadow:0 2px 8px rgba(37,106,191,.25);transition:background .15s,transform .15s;
+}
+.details-btn:hover,.details-btn:focus-visible{background:#1d55a0;transform:translateY(-1px)}
+.details-btn:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
+.details-btn::after{content:"+";font-size:1.2em;font-weight:400}
+.stage-panel.detail-open .details-btn::after{content:"−"}
+/* viz */
+.viz{height:var(--viz-h)}
+.viz svg{width:100%;height:100%;display:block}
+.viz svg .s{stroke:var(--ink-2);stroke-width:var(--line-w);fill:none}
+.viz svg .g{stroke:var(--line-strong);stroke-width:1;fill:none}
+.viz svg .gl{stroke:var(--line);stroke-width:1;fill:none}
+.viz svg .a{stroke:var(--accent);stroke-width:var(--line-w);fill:none}
+.viz svg .sf{fill:var(--accent-soft);stroke:var(--accent);stroke-width:var(--line-w)}
+.viz svg .fi{fill:var(--ink)}
+.viz svg text{font-family:var(--mono);font-size:9.5px;fill:var(--ink-3);letter-spacing:.08em;text-transform:uppercase}
+.viz svg text.tk{fill:var(--ink)}
+.viz svg text.big{font-size:11.5px}
+
+/* ============================================================
+   INLINE DETAIL AREA
+   ============================================================ */
+.inline-area{
+  grid-column:1 / -1;border-top:1px solid var(--line);
+  padding:26px 0 8px;animation:panelIn .25s ease;
+}
+.inline-head{display:flex;align-items:baseline;gap:14px;margin-bottom:6px;flex-wrap:wrap}
+.inline-head h3{font-size:1.25em;font-weight:650;letter-spacing:-.01em;text-transform:uppercase}
+.inline-head .meta{font-family:var(--mono);font-size:.72em;color:var(--ink-3)}
+.inline-close{
+  margin-left:auto;font-family:var(--mono);font-size:.72em;color:var(--ink-3);
+  border:1px solid var(--line);border-radius:4px;padding:3px 9px;
+}
+.inline-close:hover{color:var(--ink);border-color:var(--ink-3)}
+.sheet-what{color:var(--ink-2);max-width:64ch;margin:8px 0 22px;font-size:.98em}
+.sheet-grid{display:grid;grid-template-columns:1.2fr 1fr;gap:44px}
+.view-toggle{display:inline-flex;border:1px solid var(--line);border-radius:5px;overflow:hidden;margin-bottom:14px}
+.view-toggle button{padding:6px 16px;font-size:.68em;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-3)}
+.view-toggle button[aria-pressed="true"]{background:var(--ink);color:var(--page)}
+.view-list li{display:flex;gap:10px;align-items:baseline;font-size:.95em;color:var(--ink-2);padding:4px 0}
+.view-list li::before{content:"—";color:var(--line-strong);font-family:var(--mono);flex:none}
+.view-foot{margin-top:14px;padding-top:10px;border-top:1px solid var(--line);font-size:.8em;color:var(--ink-2)}
+.view-foot .cap{margin-right:8px}
+.view-foot .mono{font-size:.95em}
+.sheet-side .cap{display:block;margin-bottom:8px}
+.sheet-side ul li{font-size:.92em;color:var(--ink-2);padding:3px 0}
+.sheet-side ul{margin-bottom:22px}
+.sheet-persp{border-left:2px solid var(--line-strong);padding-left:16px}
+.sheet-persp p{font-family:var(--serif);font-style:italic;font-size:.98em;color:var(--ink-2)}
+/* deliverables checklist */
+.dlv-note{font-size:.66em;color:var(--ink-3);font-weight:400;letter-spacing:.04em;margin-left:8px}
+.dlv-cols{
+  display:grid;grid-template-columns:minmax(0,1fr) var(--dlv-due) var(--dlv-comp) 2.2rem;gap:10px;
+  font-size:.58em;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-3);
+  padding:6px 0;border-top:1px solid var(--line-strong);border-bottom:1px solid var(--line);margin-top:8px;
+}
+.dlv-cols>span{position:relative}
+.dlv-list li{display:grid;grid-template-columns:minmax(0,1fr) var(--dlv-due) var(--dlv-comp) 2.2rem;gap:10px;align-items:center;padding:5px 0!important;border-bottom:1px solid var(--line)}
+.dlv-list label{display:flex;gap:10px;align-items:center;cursor:pointer;min-width:0}
+.dlv-list .dlv-due{
+  border:none;border-bottom:1px dashed var(--line-strong);background:none;
+  font-family:var(--mono);font-size:.72em;padding:1px 0;width:100%;color:var(--ink-2);
+}
+.dlv-list .dlv-due:focus-visible{outline:none;border-bottom:1px solid var(--accent)}
+.dlv-list .dlv-due.overdue{color:var(--risk);font-weight:600}
+.dlv-list .dlv-comp{font-family:var(--mono);font-size:.72em;color:var(--ink-3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.dlv-list input[type="checkbox"]{width:16px;height:16px;accent-color:var(--accent);flex:none;cursor:pointer}
+.dlv-list .dlv-t{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.dlv-list .dlv-t.done{text-decoration:line-through;color:var(--ink-3)}
+.dlv-list [data-dlv-del]{
+  font-family:var(--mono);font-size:.62em;border:1px solid var(--line);border-radius:3px;
+  padding:1px 6px;color:var(--ink-3);flex:none;opacity:0;transition:opacity .15s;
+}
+.dlv-list li:hover [data-dlv-del]{opacity:1}
+.dlv-list [data-dlv-del]:hover{color:var(--risk);border-color:var(--risk)}
+.dlv-add{display:flex;gap:8px;margin:10px 0 22px}
+.dlv-add input{
+  flex:1;border:none;border-bottom:1px dashed var(--line-strong);background:none;
+  font-size:.88em;padding:3px 0;
+}
+.dlv-add input:focus-visible{outline:none;border-bottom:1px solid var(--accent)}
+.dlv-add button{
+  font-family:var(--mono);font-size:.62em;letter-spacing:.12em;text-transform:uppercase;
+  border:1px dashed var(--line-strong);border-radius:3px;padding:3px 10px;color:var(--accent);
+}
+.dlv-add button:hover{border-color:var(--accent)}
+.view-pane.enter{animation:panelIn .22s ease}
+/* item view mode */
+.item-view{max-width:720px}
+.item-view .iv-title{font-size:1.3em;font-weight:650;margin:6px 0 8px}
+.item-view .iv-meta{display:flex;gap:20px;font-family:var(--mono);font-size:.75em;color:var(--ink-2);margin-bottom:16px;flex-wrap:wrap}
+.item-view .iv-meta .cap{font-size:.85em;margin-right:6px}
+.item-view .iv-body{font-size:.95em;color:var(--ink-2);white-space:pre-wrap;max-width:64ch}
+.item-view .iv-body.empty{color:var(--ink-3);font-style:italic}
+/* status update thread */
+.su-sec{margin-top:26px;max-width:720px}
+.su-sec>.cap{display:block;padding-bottom:8px;border-bottom:1px solid var(--line-strong)}
+.su-item{display:flex;gap:16px;align-items:baseline;padding:10px 0;border-bottom:1px solid var(--line)}
+.su-item .su-acts{margin-left:auto;display:flex;gap:6px;flex:none;opacity:0;transition:opacity .15s}
+.su-item:hover .su-acts,.su-item:focus-within .su-acts{opacity:1}
+.su-item .su-acts button{
+  font-family:var(--mono);font-size:.6em;letter-spacing:.1em;text-transform:uppercase;
+  border:1px solid var(--line);border-radius:3px;padding:2px 7px;color:var(--ink-3);
+}
+.su-item .su-acts button:hover{color:var(--ink);border-color:var(--ink-3)}
+.su-item .su-acts button[data-su-del]:hover{color:var(--risk);border-color:var(--risk)}
+.su-edit-form{flex:1;display:flex;gap:10px;align-items:flex-start}
+.su-edit-form textarea{
+  flex:1;min-height:40px;border:1px solid var(--accent);border-radius:5px;
+  background:var(--surface);padding:6px 10px;font-size:.9em;color:var(--ink-2);resize:vertical;
+}
+.su-item .su-date{font-family:var(--mono);font-size:.72em;color:var(--ink-3);flex:none;width:9.5em}
+.su-item .su-text{font-size:.92em;color:var(--ink-2);white-space:pre-wrap}
+.su-empty{font-size:.82em;color:var(--ink-3);padding:10px 0;border-bottom:1px solid var(--line);font-style:italic}
+.su-form{display:flex;gap:10px;margin-top:14px;align-items:flex-start}
+.su-form textarea{
+  flex:1;min-height:44px;border:1px solid var(--line);border-radius:5px;
+  background:var(--surface);padding:8px 11px;font-size:.9em;color:var(--ink-2);resize:vertical;
+}
+.su-form textarea:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+.su-form button{
+  font-family:var(--mono);font-size:.66em;letter-spacing:.14em;text-transform:uppercase;
+  border:1px solid var(--ink);border-radius:4px;padding:8px 14px;background:var(--ink);color:var(--page);
+}
+.su-form button:hover{opacity:.85}
+/* item editor */
+.item-editor{max-width:720px}
+.item-editor .ie-title{
+  display:block;width:100%;border:none;border-bottom:1px solid var(--line-strong);
+  background:none;font-size:1.15em;font-weight:650;padding:4px 0;margin:6px 0 14px;
+}
+.item-editor .ie-title:focus-visible{outline:none;border-bottom-color:var(--accent)}
+.ie-field{display:flex;align-items:baseline;gap:12px;margin-bottom:14px}
+.ie-field .cap{width:5.5em;flex:none}
+.ie-field input{
+  border:none;border-bottom:1px dashed var(--line-strong);background:none;
+  font-family:var(--mono);font-size:.85em;padding:2px 0;min-width:16em;
+}
+.ie-field input:focus-visible{outline:none;border-bottom:1px solid var(--accent)}
+.item-editor .ie-body{
+  display:block;width:100%;min-height:110px;border:1px solid var(--line);border-radius:5px;
+  background:var(--surface);padding:10px 12px;font-size:.92em;color:var(--ink-2);resize:vertical;
+}
+.item-editor .ie-body:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+.ie-actions{display:flex;gap:10px;margin-top:14px}
+.ie-actions button,.iv-actions button{
+  font-family:var(--mono);font-size:.66em;letter-spacing:.14em;text-transform:uppercase;
+  border:1px solid var(--line);border-radius:4px;padding:6px 14px;color:var(--ink-2);
+}
+.ie-actions button[data-save],.iv-actions button[data-edit]{background:var(--ink);color:var(--page);border-color:var(--ink)}
+.ie-actions button:hover,.iv-actions button:hover{border-color:var(--ink-3);color:var(--ink)}
+.ie-actions button[data-save]:hover,.iv-actions button[data-edit]:hover{color:var(--page)}
+.ie-actions button[data-del]:hover{color:var(--risk);border-color:var(--risk)}
+.iv-actions{display:flex;gap:10px;margin-top:18px}
+.session-note{font-size:.66em;color:var(--ink-3);margin-top:10px}
+/* potential risk library */
+.pr-list{max-width:760px}
+.pr-row{
+  display:flex;align-items:baseline;gap:12px;padding:9px 0;border-bottom:1px solid var(--line);
+  font-size:.92em;color:var(--ink-2);
+}
+.pr-row::before{content:"";width:6px;height:6px;border:1.2px solid var(--risk);border-radius:50%;flex:none;align-self:center}
+.pr-row .t{flex:1}
+.pr-row .pr-add{
+  font-family:var(--mono);font-size:.66em;letter-spacing:.1em;color:var(--ink-3);
+  border:1px dashed var(--line-strong);border-radius:3px;padding:2px 8px;text-transform:uppercase;white-space:nowrap;
+}
+.pr-row .pr-add:hover{color:var(--accent);border-color:var(--accent)}
+.pr-row .pr-add:disabled{color:var(--line-strong);border-color:var(--line);cursor:default}
+/* engineering contacts (stage details) */
+.contacts-sec{margin-top:30px}
+.contacts-sec .c-head{display:flex;align-items:baseline;gap:12px;padding-bottom:8px}
+.contacts-sec .c-head .spacer{flex:1}
+.c-cols,.c-row{display:grid;grid-template-columns:11rem minmax(0,1fr) 15rem 11rem 7rem;gap:12px;align-items:center}
+.c-cols{
+  font-size:.6em;font-weight:600;letter-spacing:.13em;text-transform:uppercase;color:var(--ink-3);
+  padding:6px 0;border-top:1px solid var(--line-strong);border-bottom:1px solid var(--line);
+}
+.c-row{padding:8px 0;border-bottom:1px solid var(--line);font-size:.88em;color:var(--ink-2)}
+.c-row .c-name{font-weight:600;color:var(--ink)}
+.c-row .mono{font-size:.85em}
+.c-row .c-acts{display:flex;gap:6px;justify-content:flex-end}
+.c-row .c-acts button{
+  font-family:var(--mono);font-size:.6em;letter-spacing:.1em;text-transform:uppercase;
+  border:1px solid var(--line);border-radius:3px;padding:2px 7px;color:var(--ink-3);
+}
+.c-row .c-acts button:hover{color:var(--ink);border-color:var(--ink-3)}
+.c-row .c-acts button[data-c-del]:hover{color:var(--risk);border-color:var(--risk)}
+.c-row.editing{grid-template-columns:11rem minmax(0,1fr) 15rem 11rem 7rem}
+.c-row input{
+  border:none;border-bottom:1px dashed var(--line-strong);background:none;
+  font-size:.95em;padding:2px 0;width:100%;
+}
+.c-row input:focus-visible{outline:none;border-bottom:1px solid var(--accent)}
+/* checkpoint markers in dashboard rows: the diamond sits EXACTLY on its date;
+   the label chip hangs beside it */
+.g-msdot{
+  position:absolute;top:50%;width:8px;height:8px;z-index:3;
+  transform:translate(-50%,-50%) rotate(45deg);
+  background:var(--surface);border:1.4px solid var(--ink);cursor:default;
+}
+.g-msdot.major{width:10px;height:10px;background:var(--ink)}
+.g-cp{
+  position:absolute;top:50%;transform:translate(12px,-50%);z-index:2;
+  display:inline-flex;align-items:center;
+  background:var(--surface);border:1.2px solid var(--ink-3);border-radius:3px;
+  padding:1px 7px;font-size:var(--cp-fs);letter-spacing:.04em;color:var(--ink-2);white-space:nowrap;cursor:default;
+}
+.g-cp.flip{transform:translate(calc(-100% - 12px),-50%)}
+.g-cp.major{border-color:var(--ink);color:var(--ink);font-weight:600}
+/* leader editor reuses ie-field */
+/* ============================================================
+   MODAL — full board / item / editor pop-up
+   ============================================================ */
+#modal-scrim{
+  position:fixed;inset:0;z-index:130;background:rgba(11,11,11,.28);
+  opacity:0;visibility:hidden;transition:opacity .2s,visibility .2s;
+}
+#modal{
+  position:fixed;inset:0;z-index:135;display:flex;align-items:center;justify-content:center;
+  pointer-events:none;padding:4vh 3vw;
+  opacity:0;visibility:hidden;transition:opacity .22s,visibility .22s;
+}
+body.modal-open #modal-scrim{opacity:1;visibility:visible}
+body.modal-open #modal{opacity:1;visibility:visible}
+.modal-win{
+  pointer-events:auto;background:var(--surface);border:1px solid var(--line);border-radius:8px;
+  box-shadow:0 24px 80px rgba(11,11,11,.20);
+  width:min(1120px,96vw);height:88vh;display:flex;flex-direction:column;
+  transform:translateY(10px);transition:transform .22s;
+}
+body.modal-open .modal-win{transform:none}
+.modal-head{
+  display:flex;align-items:baseline;gap:14px;padding:18px 26px 14px;border-bottom:1px solid var(--line);flex-wrap:wrap;
+}
+.modal-head h3{font-size:1.15em;font-weight:650;letter-spacing:-.01em;text-transform:uppercase}
+.modal-head .meta{font-family:var(--mono);font-size:.72em;color:var(--ink-3)}
+.modal-head .spacer{flex:1}
+#modal-close{
+  font-family:var(--mono);font-size:.72em;color:var(--ink-3);
+  border:1px solid var(--line);border-radius:4px;padding:3px 9px;
+}
+#modal-close:hover{color:var(--ink);border-color:var(--ink-3)}
+.modal-body{padding:18px 26px 30px;overflow-y:auto}
+.modal-body .item-view,.modal-body .item-editor,.modal-body .su-sec{max-width:none}
+.mb-back{
+  font-family:var(--mono);font-size:.66em;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-3);
+  border:1px solid var(--line);border-radius:3px;padding:3px 9px;
+}
+.mb-back:hover{color:var(--ink);border-color:var(--ink-3)}
+
+/* ============================================================
+   SCHEDULE VIEW
+   ============================================================ */
+#schedule-view{
+  position:fixed;left:0;right:0;top:var(--toolbar-h);bottom:0;z-index:65;
+  background:var(--page);overflow-y:auto;
+  font-size:var(--fs-base);   /* anchors the Dashboard-scoped text setting */
+  opacity:0;visibility:hidden;transform:translateY(12px);
+  transition:opacity .3s,transform .3s,visibility .3s;
+}
+body.schedule-mode #schedule-view{opacity:1;visibility:visible;transform:none}
+#schedule-view .inner{max-width:1240px;margin:0 auto;padding:44px 32px 60px}
+#schedule-view h2{font-size:clamp(1.3rem,2vw,1.7rem);font-weight:650;letter-spacing:-.01em;text-transform:uppercase}
+#schedule-view .note{font-size:.8em;color:var(--ink-3);margin:6px 0 30px}
+#schedule-view .gantt .g-row{height:var(--dash-row-h)}   /* adjustable in Settings */
+#schedule-view .g-months{height:26px}
+/* ===== dashboard ===== */
+#dash{margin:6px 0 44px}
+.stat-row{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:30px}
+.stat{border:1px solid var(--line);border-radius:6px;background:var(--surface);padding:16px 18px}
+.stat .k{display:block;margin-bottom:6px}
+.stat .v{font-size:1.8em;font-weight:650;letter-spacing:-.01em;font-variant-numeric:tabular-nums}
+.stat .sub{display:block;font-size:.7em;color:var(--ink-3);margin-top:3px}
+.stat.alert .v{color:var(--risk)}
+.stat .v-link{
+  display:inline-block;padding:0;border-bottom:2px solid transparent;cursor:pointer;
+  transition:border-color .15s;
+}
+.stat .v-link:hover,.stat .v-link:focus-visible{border-bottom-color:currentColor}
+.dash-grid{display:grid;grid-template-columns:1fr 1fr;gap:36px}
+.dash-col .cap{display:block;padding-bottom:8px;border-bottom:1px solid var(--line-strong)}
+.dash-item{display:flex;gap:14px;align-items:baseline;padding:9px 0;border-bottom:1px solid var(--line);font-size:.9em;color:var(--ink-2)}
+.dash-item .d{font-family:var(--mono);font-size:.75em;color:var(--ink-3);flex:none;width:9.5em}
+.dash-item .t{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.dash-item .dday{margin-left:auto;font-family:var(--mono);font-size:.75em;color:var(--accent);white-space:nowrap;flex:none}
+.dash-item.risk::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--risk);flex:none;align-self:center}
+.dash-empty{font-size:.82em;color:var(--ink-3);font-style:italic;padding:10px 0}
+/* two-line status-update rows (dashboard + pop-up) */
+.dash-su{
+  display:flex;gap:14px;align-items:flex-start;width:100%;text-align:left;
+  padding:10px 0;border-bottom:1px solid var(--line);
+}
+.dash-su:hover,.dash-su:focus-visible{background:linear-gradient(to right,transparent,var(--surface))}
+.dash-su .d{font-family:var(--mono);font-size:.72em;color:var(--ink-3);flex:none;width:9.5em;padding-top:2px}
+.dash-su .su2{min-width:0;flex:1}
+.dash-su .t1{display:block;font-size:.92em;color:var(--ink);font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.dash-su .t1 .b-stage{margin-right:8px;vertical-align:1px}
+.dash-su .t2{display:block;font-size:.88em;color:var(--accent);margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.dash-head-row{display:flex;align-items:baseline;gap:12px;padding-bottom:8px;border-bottom:1px solid var(--line-strong)}
+.dash-head-row .cap{padding-bottom:0;border-bottom:none}
+.dash-head-row .spacer{flex:1}
+/* status-update board rows in the pop-up */
+.su-cols,.su-brow{display:grid;grid-template-columns:var(--bc-date) minmax(0,1fr);gap:14px}
+.su-brow{width:100%;text-align:left;padding:10px 0;border-bottom:1px solid var(--line)}
+.su-brow:hover,.su-brow:focus-visible{background:linear-gradient(to right,transparent,var(--page))}
+.su-brow .b-date{font-family:var(--mono);font-size:.75em;color:var(--ink-3);white-space:nowrap}
+.su-brow .t1{display:block;font-size:.92em;color:var(--ink);font-weight:600}
+.su-brow .t1 .b-stage{margin-right:8px}
+.su-brow .t2{display:block;font-size:.9em;color:var(--accent);margin-top:3px}
+.dash-flight{display:flex;flex-wrap:wrap;gap:8px;padding:12px 0 4px}
+.dash-flight span{
+  font-family:var(--mono);font-size:.7em;letter-spacing:.08em;text-transform:uppercase;
+  border:1px solid var(--line-strong);border-radius:100px;padding:4px 12px;color:var(--ink-2);
+}
+.dash-flight span.risky{border-color:var(--risk);color:var(--risk)}
+#sched-cap{margin-top:44px}
+@media (max-width:900px){.stat-row{grid-template-columns:1fr 1fr}.dash-grid{grid-template-columns:1fr}}
+
+/* ============================================================
+   RESPONSIVE — panel stacks before anything can overlap;
+   the stage title only shrinks at the last two steps.
+   ============================================================ */
+@media (max-width:1280px){
+  .stage-panel.selected{grid-template-columns:1fr;gap:10px}
+  .stage-panel.selected .viz{order:-1;max-width:560px;height:clamp(180px,28vh,280px)}
+  .inline-area{grid-column:auto}
+}
+@media (max-width:1100px){
+  :root{
+    --bc-date:8rem;--bc-owner:6rem;--bc-due:6.5rem;
+    --bck-keyinfo-date:8rem;--bck-keyinfo-owner:6rem;
+    --bck-activities-date:8rem;--bck-activities-owner:6rem;--bck-activities-due:6.5rem;
+    --bck-risks-date:8rem;--bck-risks-owner:6rem;--bck-risks-due:6.5rem;
+  }
+  .board-cols,.b-row{gap:10px}
+  .c-cols,.c-row,.c-row.editing{grid-template-columns:9rem minmax(0,1fr) 12rem 9rem 6rem;gap:10px}
+  :root{--title-size:2.2rem}
+}
+@media (max-width:640px){
+  :root{--title-size:1.8rem}
+}
+
+/* ============================================================
+   MOBILE
+   ============================================================ */
+@media (max-width:900px){
+  #toolbar{position:static;height:auto;flex-wrap:wrap;gap:10px 20px;padding:12px 20px}
+  #roadmap{position:static;overflow-x:auto;padding:14px 20px 8px}
+  #roadmap .rm-scroll{min-width:860px}
+  #stage-panels{padding:10px 20px 40px}
+  .stage-panel{display:block;border-top:1px solid var(--line);padding:28px 0}
+  .stage-panel:first-child{border-top:none}
+  .stage-panel.selected{display:block}
+  .stage-panel .viz{margin-top:18px;height:auto;aspect-ratio:440/260;max-height:300px}
+  .stage-panel.selected .panel-info,.stage-panel.selected .viz{animation:none}
+  .dates-row{flex-wrap:wrap}
+  .sheet-grid{grid-template-columns:1fr;gap:26px}
+  .board-cols,.b-row{grid-template-columns:4.6em 1fr 6.5em}
+}
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{transition-duration:.01ms!important;animation-duration:.01ms!important}
+}
+</style>
+</head>
+<body>
+
+<!-- ============ TOOLBAR ============ -->
+<header id="toolbar">
+  <button id="project-name" title="Click to rename project">AtlasEX</button>
+  <div class="tb-field">
+    <label for="kickoff-input">Kickoff</label>
+    <input type="date" id="kickoff-input" value="2027-05-12">
+  </div>
+  <div class="tb-field">
+    <label for="profile-select">Profile</label>
+    <select id="profile-select">
+      <option value="typicalSoC" selected>Typical SoC</option>
+      <option value="complexSoC" disabled>Complex SoC — soon</option>
+      <option value="fastPrototype" disabled>Fast Prototype — soon</option>
+      <option value="hpcAiSoC" disabled>HPC / AI SoC — soon</option>
+    </select>
+  </div>
+  <div class="tb-field"><span class="k">Tapeout</span><span class="v" data-computed="tapeout">—</span></div>
+  <div class="tb-field tb-opt1"><span class="k">First Silicon</span><span class="v" data-computed="firstSilicon">—</span></div>
+  <div class="tb-field tb-opt2"><span class="k">Production</span><span class="v" data-computed="production">—</span></div>
+  <span class="edited-flag" data-tip="Schedule has manual date edits — reset in Settings|">EDITED</span>
+  <div class="pop-note" id="info-note">
+    <button class="pop-btn" id="info-btn" aria-expanded="false" title="Baseline Planning Assumptions">i</button>
+    <div class="pop-panel" role="tooltip">
+      <strong>Baseline Planning Assumptions.</strong> These durations represent simplified planning
+      assumptions for visualization purposes. Actual semiconductor development schedules vary
+      significantly depending on product complexity, process node, IP reuse, verification
+      requirements, design resources, foundry capacity, packaging technology, and qualification
+      requirements.
+    </div>
+  </div>
+  <div class="tb-spacer"></div>
+  <div class="pop-note" id="settings-note">
+    <button class="pop-btn gear" id="settings-btn" aria-expanded="false" title="Display settings" aria-label="Display settings">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <circle cx="12" cy="12" r="3.2"/>
+        <path d="M19.4 15a1.7 1.7 0 0 0 .34 1.87l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.7 1.7 0 0 0-1.87-.34 1.7 1.7 0 0 0-1.03 1.56V21a2 2 0 1 1-4 0v-.09a1.7 1.7 0 0 0-1.12-1.56 1.7 1.7 0 0 0-1.87.34l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.7 1.7 0 0 0 .34-1.87 1.7 1.7 0 0 0-1.56-1.03H3a2 2 0 1 1 0-4h.09a1.7 1.7 0 0 0 1.56-1.12 1.7 1.7 0 0 0-.34-1.87l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.7 1.7 0 0 0 1.87.34h.01A1.7 1.7 0 0 0 10 3.09V3a2 2 0 1 1 4 0v.09a1.7 1.7 0 0 0 1.03 1.56 1.7 1.7 0 0 0 1.87-.34l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.7 1.7 0 0 0-.34 1.87v.01c.26.63.87 1.04 1.55 1.03H21a2 2 0 1 1 0 4h-.09a1.7 1.7 0 0 0-1.51.95z"/>
+      </svg>
+    </button>
+    <div class="pop-panel" id="settings-panel">
+      <span class="cap">Display Settings</span>
+      <div class="set-scope" id="set-scope" role="group" aria-label="Settings scope">
+        <button data-scope="main" aria-pressed="true">Main</button>
+        <button data-scope="dash" aria-pressed="false">Dashboard</button>
+      </div>
+      <div class="set-row" data-key="font">
+        <span class="k">Text size</span>
+        <input type="range" id="set-font" min="13" max="23" step="1" value="18">
+        <span class="val" id="set-font-val">18px</span>
+      </div>
+      <div class="set-row" data-key="icon">
+        <span class="k">Icon size</span>
+        <input type="range" id="set-icon" min="0.75" max="3.25" step="0.25" value="2">
+        <span class="val" id="set-icon-val">2.0×</span>
+      </div>
+      <div class="set-row" data-key="bar">
+        <span class="k">Bar thickness</span>
+        <input type="range" id="set-bar" min="11" max="21" step="1" value="16">
+        <span class="val" id="set-bar-val">16px</span>
+      </div>
+      <div class="set-row" data-key="cp">
+        <span class="k">Milestone text</span>
+        <input type="range" id="set-cp" min="6" max="16" step="1" value="11">
+        <span class="val" id="set-cp-val">11px</span>
+      </div>
+      <div class="set-row" data-key="drow">
+        <span class="k">Row height</span>
+        <input type="range" id="set-drow" min="24" max="96" step="4" value="36">
+        <span class="val" id="set-drow-val">36px</span>
+      </div>
+      <div class="set-actions">
+        <button id="set-reset">Reset display</button>
+        <button id="sched-reset">Reset schedule to baseline</button>
+      </div>
+    </div>
+  </div>
+  <div id="mode-toggle" role="group" aria-label="View mode">
+    <button data-mode="journey" aria-pressed="true">Main</button>
+    <button data-mode="schedule" aria-pressed="false">Dashboard</button>
+  </div>
+</header>
+
+<div id="brand-badge">AtlasPM</div>
+
+<!-- ============ ROADMAP ============ -->
+<section id="roadmap" aria-label="Development roadmap">
+  <div class="rm-scroll">
+    <div id="rm-regions"></div>
+    <div id="rm-line-wrap">
+      <div id="rm-line"></div>
+      <div id="rm-progress"></div>
+      <div id="rm-stations" role="tablist" aria-label="Stages"></div>
+      <div id="rm-today" hidden><span class="ty-lbl">TODAY</span><span class="ty-tick"></span></div>
+    </div>
+    <div id="rm-gantt-cap">
+      <span class="cap">Concurrency</span>
+      <span class="note">stages overlap by design — hover any bar</span>
+    </div>
+    <div class="gantt mini" id="rm-gantt"></div>
+  </div>
+</section>
+
+<!-- ============ STAGE PANELS ============ -->
+<main id="stage-panels" aria-live="polite"></main>
+
+<!-- ============ DASHBOARD ============ -->
+<section id="schedule-view" aria-label="Dashboard" aria-hidden="true">
+  <div class="inner">
+    <h2 id="dash-title">Dashboard</h2>
+    <p class="note" id="dash-sub">Program status at a glance.</p>
+    <div id="dash"></div>
+    <h2 id="sched-cap" style="font-size:1.1em">Program Schedule</h2>
+    <p class="note">Baseline planning assumptions — semiconductor development is highly concurrent; stages overlap by design.</p>
+    <div class="gantt" id="gantt-b"></div>
+  </div>
+</section>
+
+<!-- ============ MODAL ============ -->
+<div id="modal-scrim"></div>
+<div id="modal" role="dialog" aria-modal="true" aria-label="Board">
+  <div class="modal-win">
+    <div class="modal-head" id="modal-head"></div>
+    <div class="modal-body" id="modal-body"></div>
+  </div>
+</div>
+
+<div class="g-tip" id="g-tip"></div>
+
+<script>
+/* ============================================================
+   /data/scheduleProfiles.ts
+   ============================================================ */
+const scheduleProfiles = {
+  typicalSoC: {
+    id: "typicalSoC",
+    label: "Typical SoC",
+    stages: {
+      productDefinition: { startOffsetWeeks: 0,  durationWeeks: 4  },
+      architecture:      { startOffsetWeeks: 3,  durationWeeks: 6  },
+      rtl:               { startOffsetWeeks: 7,  durationWeeks: 12 },
+      verification:      { startOffsetWeeks: 10, durationWeeks: 16 },
+      synthesis:         { startOffsetWeeks: 20, durationWeeks: 4  },
+      physicalDesign:    { startOffsetWeeks: 22, durationWeeks: 12 },
+      signoff:           { startOffsetWeeks: 31, durationWeeks: 6  },
+      tapeout:           { startOffsetWeeks: 37, durationWeeks: 1  },
+      fabrication:       { startOffsetWeeks: 38, durationWeeks: 8  },
+      packaging:         { startOffsetWeeks: 46, durationWeeks: 4  },
+      bringup:           { startOffsetWeeks: 50, durationWeeks: 6  },
+      qualification:     { startOffsetWeeks: 54, durationWeeks: 12 },
+    },
+  },
+};
+
+const milestoneDefs = [
+  { id: "archFreeze",     label: "Arch Freeze",     anchor: { stage: "architecture",  at: "end" } },
+  { id: "rtlFreeze",      label: "RTL Freeze",      anchor: { stage: "rtl",           at: "end" } },
+  { id: "dvClosure",      label: "DV Closure",      anchor: { stage: "verification",  at: "end" } },
+  { id: "designFreeze",   label: "Design Freeze",   anchor: { stage: "signoff",       at: "end" } },
+  { id: "tapeout",        label: "Tapeout",         anchor: { stage: "tapeout",       at: "end" }, major: true },
+  { id: "firstSilicon",   label: "First Silicon",   anchor: { stage: "fabrication",   at: "end" }, major: true },
+  { id: "massProduction", label: "Mass Production", anchor: { stage: "qualification", at: "end" }, major: true },
+];
+
+const lifecyclePhases = [
+  { id: "define",       label: "Define",          stages: ["productDefinition", "architecture"] },
+  { id: "designVerify", label: "Design & Verify", stages: ["rtl", "verification"] },
+  { id: "implement",    label: "Implement",       stages: ["synthesis", "physicalDesign", "signoff"] },
+  { id: "manufacture",  label: "Manufacture",     stages: ["tapeout", "fabrication"] },
+  { id: "integrate",    label: "Integrate",       stages: ["packaging"] },
+  { id: "validateRamp", label: "Validate & Ramp", stages: ["bringup", "qualification"] },
+];
+
+/* ============================================================
+   /data/journey.ts — content model
+   potentialRisks: PM must-check library per stage (example content)
+   leader: example stage leader (editable in UI)
+   ============================================================ */
+const journeyData = [
+  {
+    id: "productDefinition", stage: 1, title: "Product Definition", shortTitle: "DEF",
+    tagline: "Setting the boundaries of the program.",
+    description: "Define what the product needs to achieve and establish the technical, business, cost, and schedule boundaries of the program before any design work begins.",
+    activities: ["Market requirements analysis", "PPA target definition", "Cost target modeling", "Technology node selection", "Feasibility study", "Competitive benchmarking", "Customer requirement interviews", "Die size estimation", "Memory bandwidth requirements", "Program schedule drafting", "Business case preparation"],
+    deliverables: ["Product requirements document", "Target specification", "Feasibility report"],
+    risks: ["Specification instability", "Unrealistic PPA targets", "Technology availability"],
+    potentialRisks: ["Requirements not signed off by all stakeholders", "Business case sensitive to cost assumptions", "Process node / PDK maturity uncertainty", "Competitive window shifts during definition", "Staffing and budget plan not committed", "Third-party IP licensing terms still open"],
+    leader: { name: "Daniel Kim", short: "D. Kim", phone: "+1 (408) 555-0142", email: "daniel.kim@example.com" },
+    collaboration: ["Product", "Architecture", "Program Management", "Foundry"],
+    tools: ["Requirements management", "Cost modeling", "Feasibility analysis"],
+    engineeringView: ["Performance / power / area target modeling", "Candidate technology node evaluation", "Early die size & cost estimation", "Interface & memory bandwidth requirements", "Initial feasibility assessment"],
+    programView: ["Business case approval", "Program charter & budget", "Kickoff decision gate", "Resource & staffing plan", "Top-level schedule commitment"],
+    perspective: "A short engineering or program-management insight will appear here.",
+  },
+  {
+    id: "architecture", stage: 2, title: "Architecture", shortTitle: "ARCH",
+    tagline: "The decisions that shape everything downstream.",
+    description: "Translate product requirements into a system architecture and make the major technical decisions — partitioning, IP strategy, memory, interfaces — that shape the rest of the development program.",
+    activities: ["System architecture", "Partitioning", "IP strategy", "PPA tradeoffs"],
+    deliverables: ["Architecture specification", "IP make/buy plan", "Interface definitions"],
+    risks: ["Late architecture changes", "IP availability", "Underestimated complexity"],
+    potentialRisks: ["Architecture not validated against key workloads", "IP make/buy decisions sliding late", "Memory bandwidth margin insufficient", "Interface standard revision still in flux", "PPA budget allocation not agreed across blocks", "Feature creep channels left open after freeze"],
+    leader: { name: "Priya Sharma", short: "P. Sharma", phone: "+1 (408) 555-0177", email: "priya.sharma@example.com" },
+    collaboration: ["Product", "RTL", "Verification", "Physical Design", "Program Management"],
+    tools: ["Architecture modeling", "Performance simulation", "Power estimation"],
+    engineeringView: ["System-level modeling & workload analysis", "Compute / memory / interconnect partitioning", "Interface & protocol selection", "IP evaluation and selection", "Architecture specification authoring"],
+    programView: ["Architecture Freeze milestone", "IP procurement decisions & lead times", "Cross-team dependency mapping", "PPA target signoff", "Risk register established"],
+    perspective: "A short engineering or program-management insight will appear here.",
+  },
+  {
+    id: "rtl", stage: 3, title: "IP & RTL Development", shortTitle: "RTL",
+    tagline: "Implementing the architecture in logic.",
+    description: "Develop and integrate the digital logic and reusable IP that implement the system architecture, from block-level RTL through full-chip integration.",
+    activities: ["RTL development", "IP integration", "Lint & CDC", "Configuration mgmt"],
+    deliverables: ["Block & top-level RTL", "Integration testbench", "IP integration reports"],
+    risks: ["Late IP readiness", "Integration issues", "Spec churn"],
+    potentialRisks: ["Third-party IP delivery dates unconfirmed", "Integration environment not ready when blocks land", "CDC / RDC methodology gaps across teams", "Weak specification change control", "Block owners over-allocated across projects", "Configuration / version management discipline"],
+    leader: { name: "Minho Lee", short: "M. Lee", phone: "+82 10-5550-2211", email: "minho.lee@example.com" },
+    collaboration: ["Architecture", "Verification", "DFT", "Analog", "IP vendors"],
+    tools: ["SystemVerilog", "Lint / CDC", "Version control", "Build automation"],
+    engineeringView: ["Block-level RTL implementation", "Third-party & internal IP integration", "Clock / reset / power intent (UPF)", "Lint, CDC, RDC closure", "Continuous integration & regression build"],
+    programView: ["RTL Freeze milestone", "IP delivery tracking", "Integration readiness reviews", "Block completion metrics", "Verification handoff criteria"],
+    perspective: "A short engineering or program-management insight will appear here.",
+  },
+  {
+    id: "verification", stage: 4, title: "Verification", shortTitle: "DV",
+    tagline: "Building confidence before silicon.",
+    description: "Build confidence that the design behaves according to specification before committing the product to silicon — the longest and most schedule-critical pre-silicon activity.",
+    activities: ["UVM testbench", "Regression & coverage", "Formal", "System-level tests"],
+    deliverables: ["Verification plan", "Coverage reports", "Verification signoff"],
+    risks: ["Coverage closure", "Late bug discovery", "Spec changes"],
+    potentialRisks: ["Verification plan has coverage holes vs spec", "Testbench bring-up slower than planned", "Regression compute capacity shortfall", "Coverage closure criteria not agreed", "Late RTL churn invalidating test content", "AMS co-simulation readiness"],
+    leader: { name: "Sofia Alvarez", short: "S. Alvarez", phone: "+1 (512) 555-0193", email: "sofia.alvarez@example.com" },
+    collaboration: ["RTL", "Architecture", "Analog", "Software", "Program Management"],
+    tools: ["UVM", "Simulation", "Formal", "Emulation", "Coverage analysis"],
+    engineeringView: ["UVM environment & sequence development", "Constrained-random + directed testing", "Formal property verification", "Coverage-driven closure", "Gate-level simulation"],
+    programView: ["Verification closure milestone", "Bug discovery & closure rate trends", "Coverage dashboard by block", "Regression stability metrics", "Tapeout readiness contribution"],
+    perspective: "A short engineering or program-management insight will appear here.",
+  },
+  {
+    id: "synthesis", stage: 5, title: "Logic Synthesis", shortTitle: "SYN",
+    tagline: "From RTL to gates.",
+    description: "Convert the verified RTL into a technology-mapped gate-level implementation optimized for timing, power, and area, with test structures inserted.",
+    activities: ["Synthesis", "Constraints (SDC)", "DFT insertion", "PPA optimization"],
+    deliverables: ["Gate-level netlist", "Timing constraints (SDC)", "DFT-inserted design"],
+    risks: ["Timing infeasibility", "Constraint quality", "Area / power overshoot"],
+    potentialRisks: ["SDC constraints incomplete or unvalidated", "Library / PDK version mismatches across teams", "DFT architecture decisions arriving late", "Frequency target unrealistic vs trial synthesis", "Congestion signals ignored until placement"],
+    leader: { name: "Ethan Chen", short: "E. Chen", phone: "+1 (408) 555-0126", email: "ethan.chen@example.com" },
+    collaboration: ["RTL", "Physical Design", "DFT", "Timing"],
+    tools: ["Synthesis (e.g. Genus)", "Constraint validation", "Scan insertion"],
+    engineeringView: ["Technology mapping & optimization", "SDC constraint development", "Scan chain & MBIST insertion", "Early timing / area / power reports", "Netlist-vs-RTL equivalence checking"],
+    programView: ["Netlist handoff milestone", "PPA status vs targets", "Constraint completeness review", "Physical design readiness gate"],
+    perspective: "A short engineering or program-management insight will appear here.",
+  },
+  {
+    id: "physicalDesign", stage: 6, title: "Physical Design", shortTitle: "PD",
+    tagline: "Making the design physically real.",
+    description: "Transform the synthesized design into a physically realizable implementation — floorplan, power grid, placement, clocks, routing — ready for manufacturing signoff.",
+    activities: ["Floorplanning", "Placement & CTS", "Routing", "Timing closure"],
+    deliverables: ["Routed database", "Timing closure reports", "Physical implementation"],
+    risks: ["Timing convergence", "Congestion", "Power grid weaknesses"],
+    potentialRisks: ["Floorplan not converged before placement starts", "Power delivery network margin unproven", "Macro placement churn from late spec changes", "Late ECO storm consuming closure schedule", "Tool license / compute capacity bottlenecks", "Package co-design inputs arriving late"],
+    leader: { name: "Grace Park", short: "G. Park", phone: "+82 10-5550-3388", email: "grace.park@example.com" },
+    collaboration: ["Synthesis", "Signoff", "Package", "DFT", "Foundry"],
+    tools: ["P&R (e.g. Innovus)", "STA", "Power analysis", "ECO flows"],
+    engineeringView: ["Floorplan & macro placement", "Power delivery network design", "Clock tree synthesis & skew balancing", "Detailed routing & DRC convergence", "Multi-corner timing closure"],
+    programView: ["Design Freeze trajectory", "Timing closure burn-down", "ECO budget & change control", "Signoff readiness reviews", "Package co-design checkpoints"],
+    perspective: "A short engineering or program-management insight will appear here.",
+  },
+  {
+    id: "signoff", stage: 7, title: "Signoff", shortTitle: "SO",
+    tagline: "Proving the design is manufacturable.",
+    description: "Verify that the final physical implementation satisfies electrical, timing, reliability, and manufacturing requirements across all corners and modes.",
+    activities: ["STA", "DRC / LVS", "EM / IR", "Final closure"],
+    deliverables: ["Signoff reports", "Clean DRC / LVS", "Final timing closure"],
+    risks: ["Late violations", "IR drop hotspots", "Signoff iteration loops"],
+    potentialRisks: ["Signoff corner list not agreed with foundry", "Waiver review process undefined", "IR / EM hotspots discovered late", "Timing closure schedule compressed by upstream slips", "Physical verification runtime underestimated"],
+    leader: { name: "Tomas Rivera", short: "T. Rivera", phone: "+1 (971) 555-0164", email: "tomas.rivera@example.com" },
+    collaboration: ["Physical Design", "Foundry", "Package", "Reliability"],
+    tools: ["STA (e.g. Tempus)", "Physical verification", "EM/IR (e.g. Voltus)"],
+    engineeringView: ["Multi-corner multi-mode STA", "Full-chip DRC / LVS / antenna", "EM and IR-drop signoff", "Power & signal integrity analysis", "Final netlist / GDS consistency"],
+    programView: ["Design Freeze milestone", "Violation burn-down tracking", "Waiver review board", "Tapeout checklist completion", "Go / No-Go preparation"],
+    perspective: "A short engineering or program-management insight will appear here.",
+  },
+  {
+    id: "tapeout", stage: 8, title: "Tapeout", shortTitle: "TO", moment: true,
+    tagline: "Design becomes manufacturing data.",
+    description: "Freeze and formally release the design for mask generation and semiconductor manufacturing — the single most consequential decision gate of the program.",
+    activities: ["Final release", "GDS generation", "Checklist", "Go / No-Go"],
+    deliverables: ["GDSII / OASIS database", "Tapeout checklist", "Mask order release"],
+    risks: ["Escaped bugs", "Checklist gaps", "Mask schedule slips"],
+    potentialRisks: ["Checklist items waived without formal risk review", "Open bug risk assessment incomplete at Go / No-Go", "Mask order lead time vs fab slot mismatch", "Final GDS assembly flow not dry-run in advance", "Decision owners and criteria unclear in the room"],
+    leader: { name: "Hana Yoon", short: "H. Yoon", phone: "+82 10-5550-7702", email: "hana.yoon@example.com" },
+    collaboration: ["All engineering teams", "Foundry", "Program Management", "Executive"],
+    tools: ["GDS assembly", "Final verification", "Release management"],
+    engineeringView: ["Final GDS assembly & verification", "STA / DRC / LVS / EM-IR final runs", "Chip finishing (seal ring, dummy fill)", "Mask data preparation handoff"],
+    programView: ["Go / No-Go decision meeting", "Design maturity assessment", "Open issue risk acceptance", "Foundry & mask readiness", "Decision owners & criteria"],
+    perspective: "A short engineering or program-management insight will appear here.",
+  },
+  {
+    id: "fabrication", stage: 9, title: "Fabrication", shortTitle: "FAB", moment: true,
+    tagline: "Hundreds of steps, weeks of patience.",
+    description: "Manufacture the silicon through hundreds of wafer-processing steps — lithography, deposition, etch, CMP — at the semiconductor foundry.",
+    activities: ["Mask preparation", "Wafer processing", "Process monitoring", "Wafer test prep"],
+    deliverables: ["Processed wafers", "Process control data", "First silicon dies"],
+    risks: ["Fab cycle time variation", "Process excursions", "Hot lot priority"],
+    potentialRisks: ["Fab slot / hot-lot priority not confirmed in writing", "No contingency plan for process excursions", "Wafer acceptance criteria not agreed with foundry", "Wafer-out forecast volatility not communicated", "Shipping / logistics timing for first wafers"],
+    leader: { name: "Marcus Webb", short: "M. Webb", phone: "+1 (480) 555-0139", email: "marcus.webb@example.com" },
+    collaboration: ["Foundry", "Test", "Product Engineering", "Program Management"],
+    tools: ["Foundry WIP tracking", "Process monitoring", "Yield analysis"],
+    engineeringView: ["Mask set fabrication", "Front-end & back-end wafer processing", "Inline metrology & defect inspection", "Wafer acceptance testing", "E-test / PCM data review"],
+    programView: ["Wafer-out forecast tracking", "Hot lot vs standard flow decisions", "First Silicon milestone", "Bring-up readiness in parallel", "Risk buffer management"],
+    perspective: "A short engineering or program-management insight will appear here.",
+  },
+  {
+    id: "packaging", stage: 10, title: "Advanced Packaging", shortTitle: "PKG",
+    tagline: "The journey leaves the die.",
+    description: "Integrate silicon dies into the package — 2.5D interposers, 3D stacking, HBM — while managing electrical, mechanical, thermal, and manufacturing constraints.",
+    activities: ["2.5D / 3DIC integration", "HBM stacking", "Thermal solution", "Assembly test"],
+    deliverables: ["Assembled packages", "Package qualification vehicles", "Assembly yield data"],
+    risks: ["Package readiness", "Assembly yield", "Warpage & thermal"],
+    potentialRisks: ["Substrate lead times longer than fab cycle", "Interposer supply constrained", "Known-good-die test coverage insufficient", "Warpage / co-planarity margins unproven", "OSAT capacity commitments not secured", "Thermal solution validation scheduled too late"],
+    leader: { name: "Yuki Tanaka", short: "Y. Tanaka", phone: "+81 90-5550-4416", email: "yuki.tanaka@example.com" },
+    collaboration: ["Package", "Foundry / OSAT", "Physical Design", "Thermal", "Test"],
+    tools: ["Package co-design", "Thermal analysis", "SI/PI analysis"],
+    engineeringView: ["Interposer / substrate integration", "Die-to-die interface validation", "Chip-package-board SI/PI", "Thermal & mechanical analysis", "Assembly process qualification"],
+    programView: ["Package readiness milestone", "OSAT capacity & scheduling", "Known-good-die strategy", "Assembly yield ramp plan", "Material lead-time tracking"],
+    perspective: "A short engineering or program-management insight will appear here.",
+  },
+  {
+    id: "bringup", stage: 11, title: "Silicon Bring-up", shortTitle: "BU",
+    tagline: "The moment of truth.",
+    description: "Validate the first physical silicon in the lab, identify unexpected behavior, and determine whether the product meets its intended specifications.",
+    activities: ["Lab bring-up", "Characterization", "Debug & FA", "Performance measurement"],
+    deliverables: ["Bring-up report", "Characterization data", "Errata list"],
+    risks: ["Silicon bugs", "Debug cycle time", "Respin decision"],
+    potentialRisks: ["Evaluation boards not ready when silicon arrives", "Lab equipment and staffing not reserved", "Debug access (JTAG / trace) gaps found late", "Sample allocation & logistics not planned", "Respin decision criteria undefined before data"],
+    leader: { name: "Alex Novak", short: "A. Novak", phone: "+1 (503) 555-0181", email: "alex.novak@example.com" },
+    collaboration: ["Validation", "Design", "Test", "Software", "Failure Analysis"],
+    tools: ["Lab instrumentation", "ATE", "Debug infrastructure", "Characterization suites"],
+    engineeringView: ["Power-on & boot sequence validation", "Interface & speed-path characterization", "Shmoo plots across V/F/T", "Silicon debug & failure analysis", "Errata documentation"],
+    programView: ["First Silicon health assessment", "Respin vs metal-fix decision framework", "Customer sampling readiness", "Qualification entry criteria", "Bug disposition board"],
+    perspective: "A short engineering or program-management insight will appear here.",
+  },
+  {
+    id: "qualification", stage: 12, title: "Qualification & Production", shortTitle: "MP", moment: true,
+    tagline: "Engineering becomes a product.",
+    description: "Demonstrate product reliability, improve manufacturing yield, complete production readiness, and ramp the product into volume manufacturing.",
+    activities: ["Reliability qual", "Yield learning", "Test optimization", "Volume ramp"],
+    deliverables: ["Qualification report", "Production test program", "Ramp plan"],
+    risks: ["Qualification failures", "Yield shortfall", "Supply constraints"],
+    potentialRisks: ["Qualification vehicles not ready on time", "No contingency plan for reliability failures", "Yield model gap vs product cost target", "Test time reduction path undefined", "Production guard-bands not validated", "Supply chain ramp commitments unsecured"],
+    leader: { name: "Sarah Osei", short: "S. Osei", phone: "+1 (737) 555-0155", email: "sarah.osei@example.com" },
+    collaboration: ["Reliability", "Test", "Foundry / OSAT", "Quality", "Operations"],
+    tools: ["Reliability stress systems", "ATE", "Yield management", "SPC"],
+    engineeringView: ["HTOL / temp-cycle / ESD / latch-up quals", "Yield learning & failure pareto", "Test time & coverage optimization", "Process corner validation", "Production test release"],
+    programView: ["Qualification Complete milestone", "Yield vs cost model tracking", "Production readiness review", "Ramp commitment to customers", "Mass Production milestone"],
+    perspective: "A short engineering or program-management insight will appear here.",
+  },
+];
+
+/* ============================================================
+   /components/stageViz.ts
+   ============================================================ */
+const VB = 'viewBox="0 0 440 260" preserveAspectRatio="xMidYMid meet"';
+const arrow = (x, y) => `<path class="s" d="M${x} ${y} h22"/><path class="fi" d="M${x + 22} ${y - 4} l8 4 -8 4 z"/>`;
+
+const stageViz = {
+  productDefinition: () => `<svg ${VB}>
+    ${[["MARKET",46],["PERFORMANCE",92],["POWER",138],["COST",184],["SCHEDULE",230]].map(([t,y],i)=>`
+      <text x="18" y="${y-8}">${t}</text>
+      <path class="g" d="M18 ${y} C 110 ${y}, 150 ${130 + (i-2)*6}, 208 ${130 + (i-2)*4}"/>`).join("")}
+    ${arrow(216,130)}
+    <rect class="s" x="258" y="82" width="160" height="96"/>
+    <text class="tk big" x="270" y="106">PPA TARGETS</text>
+    <text class="tk big" x="270" y="130">COST TARGET</text>
+    <text class="tk big" x="270" y="154">SCHEDULE</text>
+    <text x="258" y="72">TARGET SPECIFICATION</text>
+  </svg>`,
+
+  architecture: () => `<svg ${VB}>
+    <rect class="s" x="90" y="28" width="260" height="204"/>
+    <rect class="g" x="104" y="42" width="130" height="86"/><text class="tk" x="112" y="60">CPU</text>
+    <rect class="g" x="248" y="42" width="88" height="86"/><text class="tk" x="256" y="60">NPU</text>
+    <rect class="g" x="104" y="142" width="76" height="76"/><text class="tk" x="112" y="160">MEM CTRL</text>
+    <rect class="a" x="194" y="142" width="142" height="30"/><text class="tk" x="202" y="161">NOC</text>
+    <rect class="g" x="194" y="186" width="142" height="32"/><text class="tk" x="202" y="205">IO / SERDES</text>
+    <text x="90" y="18">SYSTEM PARTITIONING</text>
+  </svg>`,
+
+  rtl: () => `<svg ${VB}>
+    <text class="tk" x="20" y="40">module top;</text>
+    ${[58,74,90,106,122,138,154,170].map((y,i)=>`<path class="g" d="M32 ${y} h${[96,72,110,60,88,104,54,80][i]}"/>`).join("")}
+    <text x="20" y="196">RTL SOURCE</text>
+    ${arrow(178,120)}
+    <rect class="gl" x="240" y="36" width="180" height="188" stroke-dasharray="4 4"/>
+    <rect class="s" x="254" y="50" width="72" height="62"/><text class="tk" x="262" y="68">CPU</text>
+    <rect class="s" x="338" y="50" width="68" height="62"/><text class="tk" x="346" y="68">NPU</text>
+    <rect class="s" x="254" y="126" width="72" height="62"/><text class="tk" x="262" y="144">MEM</text>
+    <rect class="s" x="338" y="126" width="68" height="62"/><text class="tk" x="346" y="144">IO</text>
+    <text x="240" y="246">INTEGRATED BLOCKS</text>
+  </svg>`,
+
+  verification: () => `<svg ${VB}>
+    <rect class="gl" x="66" y="34" width="308" height="152" stroke-dasharray="5 4"/>
+    <text x="66" y="26">UVM TESTBENCH</text>
+    <rect class="s" x="182" y="76" width="80" height="64"/><text class="tk" x="196" y="112">DUT</text>
+    ${[92,108,124].map(y=>`<path class="g" d="M88 ${y} h78"/><path class="fi" d="M166 ${y-3} l7 3 -7 3 z"/>`).join("")}
+    <text x="88" y="82">STIMULUS</text>
+    ${[92,110,128].map(y=>`<text class="tk" x="286" y="${y+3}">✓ CHECK</text>`).join("")}
+    <text x="66" y="212">FUNCTIONAL COVERAGE</text>
+    <rect class="g" x="66" y="220" width="308" height="10"/>
+    <rect class="sf" x="66" y="220" width="226" height="10"/>
+    <text class="tk" x="382" y="229">73%</text>
+  </svg>`,
+
+  synthesis: () => `<svg ${VB}>
+    <text class="tk" x="20" y="72">always @(posedge clk)</text>
+    <text class="tk" x="20" y="92">&#160;&#160;q &lt;= a &amp; b | c;</text>
+    <text x="20" y="130">RTL</text>
+    ${arrow(176,110)}
+    <path class="s" d="M250 60 h22 a20 20 0 0 1 0 40 h-22 z"/>
+    <path class="s" d="M250 130 q18 0 30 20 q-12 20 -30 20 q8 -20 0 -40 z"/>
+    <path class="s" d="M340 92 l30 18 -30 18 z"/><circle class="s" cx="375" cy="110" r="4"/>
+    <path class="g" d="M230 70 h20 M230 90 h20 M230 140 h20 M230 160 h20 M294 80 h30 v22 M280 150 h44 v-32 M383 110 h30"/>
+    <text x="250" y="216">TECHNOLOGY-MAPPED GATES</text>
+    <text class="tk" x="250" y="240">TIMING · POWER · AREA</text>
+  </svg>`,
+
+  physicalDesign: () => `<svg ${VB}>
+    <path class="s" d="M140 28 h172 l18 18 v186 h-190 z"/>
+    <rect class="g" x="156" y="44" width="70" height="58"/>
+    <rect class="g" x="240" y="44" width="72" height="58"/>
+    <rect class="g" x="156" y="116" width="70" height="98"/>
+    <rect class="g" x="240" y="116" width="72" height="44"/>
+    <path class="a" d="M226 73 h14 M226 150 h14 M276 102 v14 M191 102 v14 M276 160 v22 h-36"/>
+    <path class="a" d="M312 73 h10 v100"/>
+    <text x="140" y="18">DIE FLOORPLAN</text>
+    <text x="140" y="250">FLOORPLAN → PLACE → CTS → ROUTE</text>
+  </svg>`,
+
+  signoff: () => `<svg ${VB}>
+    <path class="g" d="M150 48 h124 l16 16 v132 h-140 z"/>
+    <rect class="gl" x="164" y="62" width="50" height="42"/><rect class="gl" x="226" y="62" width="50" height="42"/>
+    <rect class="gl" x="164" y="116" width="50" height="64"/><rect class="gl" x="226" y="116" width="50" height="34"/>
+    <path class="gl" d="M60 62 h74 M380 62 h-74 M60 198 h74 M380 198 h-74"/>
+    <text class="tk" x="24" y="58">STA ✓</text>
+    <text class="tk" x="386" y="58">DRC ✓</text>
+    <text class="tk" x="24" y="202">LVS ✓</text>
+    <text class="tk" x="386" y="202">EM/IR ✓</text>
+    <text x="150" y="236">ALL CORNERS · ALL MODES</text>
+  </svg>`,
+
+  tapeout: () => `<svg ${VB}>
+    <path class="sf" d="M156 52 h112 l16 16 v140 h-128 z"/>
+    <path class="a" d="M172 84 h96 M172 116 h96 M172 148 h96 M172 180 h96" opacity=".45"/>
+    <path class="fi" d="M220 14 l9 9 -9 9 -9 -9 z"/>
+    <text class="tk big" x="240" y="27">TAPEOUT</text>
+    <text class="tk" x="156" y="236">GDSII RELEASED — GO</text>
+    <text x="156" y="252">DESIGN BECOMES MANUFACTURING DATA</text>
+  </svg>`,
+
+  fabrication: () => `<svg ${VB}>
+    <circle class="s" cx="220" cy="126" r="100"/>
+    <path class="s" d="M172 214 h96"/>
+    <g clip-path="url(#wclip)">
+      ${[-80,-58,-36,-14,8,30,52,74].map(o=>`<path class="gl" d="M${220+o} 26 v200"/><path class="gl" d="M120 ${126+o} h200"/>`).join("")}
+      <rect class="sf" x="208" y="92" width="22" height="22"/>
+      <rect class="sf" x="164" y="136" width="22" height="22"/>
+      <rect class="sf" x="252" y="158" width="22" height="22"/>
+    </g>
+    <defs><clipPath id="wclip"><circle cx="220" cy="126" r="99"/></clipPath></defs>
+    <text x="20" y="30">WAFER PROCESSING</text>
+    <text class="tk" x="20" y="250">WAFER OUT → FIRST SILICON</text>
+  </svg>`,
+
+  packaging: () => `<svg ${VB}>
+    <rect class="g" x="120" y="70" width="54" height="44"/><text x="120" y="62">HBM</text>
+    <rect class="sf" x="192" y="60" width="106" height="54"/><text x="192" y="52">LOGIC DIE</text>
+    <rect class="g" x="316" y="70" width="54" height="44"/><text x="316" y="62">HBM</text>
+    ${[132,152,204,232,260,288,328,348].map(x=>`<path class="g" d="M${x} 114 v14"/>`).join("")}
+    <rect class="s" x="104" y="128" width="282" height="30"/><text class="tk" x="196" y="147">INTERPOSER</text>
+    ${[120,150,180,210,240,270,300,330,360].map(x=>`<circle class="g" cx="${x}" cy="166" r="2.6"/>`).join("")}
+    <rect class="s" x="76" y="174" width="338" height="34"/><text class="tk" x="180" y="195">PACKAGE SUBSTRATE</text>
+    ${[110,160,210,260,310,360].map(x=>`<circle class="g" cx="${x}" cy="216" r="3.4"/>`).join("")}
+    <text x="76" y="250">2.5D INTEGRATION — THE JOURNEY LEAVES THE DIE</text>
+  </svg>`,
+
+  bringup: () => `<svg ${VB}>
+    <rect class="s" x="56" y="148" width="328" height="62"/>
+    <text class="tk" x="72" y="196">EVALUATION BOARD</text>
+    <rect class="sf" x="150" y="108" width="84" height="40"/><text x="150" y="100">PACKAGED PART</text>
+    <path class="g" d="M234 128 h36 v-58"/>
+    <path class="a" d="M280 70 h16 v-26 h18 v26 h18 v-26 h18 v26 h16"/>
+    <text x="280" y="86">MEASURE</text>
+    <text class="tk" x="56" y="244">POWER-ON ✓ · BOOT ✓ · CHARACTERIZE</text>
+  </svg>`,
+
+  qualification: () => `<svg ${VB}>
+    ${Array.from({length:12},(_,i)=>{
+      const c=i%4, r=(i/4)|0;
+      const x=36+c*54, y=48+r*54;
+      const cl = i<7 ? "sf" : "s";
+      return `<rect class="${cl}" x="${x}" y="${y}" width="38" height="30"/>`;
+    }).join("")}
+    <text x="36" y="234">VOLUME UNITS</text>
+    <path class="gl" d="M282 210 h132 M282 210 v-160"/>
+    <path class="a" d="M282 204 L316 192 342 168 366 122 392 62"/>
+    <path class="fi" d="M392 62 l-2 12 10 -6 z"/>
+    <text x="300" y="234">YIELD / RAMP</text>
+    <text class="tk" x="300" y="46">MASS PRODUCTION</text>
+  </svg>`,
+};
+
+/* ============================================================
+   /lib/scheduleCalculator.ts
+   ============================================================ */
+const DAY = 864e5;
+function addWeeks(date, weeks) {
+  const d = new Date(date);
+  d.setDate(d.getDate() + Math.round(weeks * 7));
+  return d;
+}
+/* single date format everywhere: MM/DD/YYYY */
+const p2 = (n) => String(n).padStart(2, "0");
+const fmtDate = (d) => `${p2(d.getMonth() + 1)}/${p2(d.getDate())}/${d.getFullYear()}`;
+const fmtDateShort = fmtDate;
+const toISO = (d) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+const fmtW = (w) => { const r = Math.round(w * 10) / 10; return (Number.isInteger(r) ? r : r.toFixed(1)) + "W"; };
+const fmtTime = (d) => `${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}`;
+const fmtDT = (d) => `${fmtDateShort(d)} · ${fmtTime(d)}`;
+const fmtDTFull = (d) => `${fmtDate(d)} · ${fmtTime(d)}`;
+const esc = (s) => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/"/g, "&quot;");
+
+function computeSchedule(kickoff, profile, overrides = {}) {
+  const stages = {};
+  let totalWeeks = 0;
+  for (const [id, base] of Object.entries(profile.stages)) {
+    const p = { ...base, ...(overrides[id] || {}) };
+    const start = addWeeks(kickoff, p.startOffsetWeeks);
+    const end = addWeeks(start, p.durationWeeks);
+    stages[id] = { ...p, start, end };
+    totalWeeks = Math.max(totalWeeks, p.startOffsetWeeks + p.durationWeeks);
+  }
+  const milestones = milestoneDefs.map((m) => {
+    const s = stages[m.anchor.stage];
+    const week = m.anchor.at === "end" ? s.startOffsetWeeks + s.durationWeeks : s.startOffsetWeeks;
+    return { ...m, week, date: m.anchor.at === "end" ? s.end : s.start };
+  });
+  return {
+    stages, totalWeeks, milestones,
+    firstSilicon: stages.fabrication.end,
+    production: stages.qualification.end,
+    tapeout: stages.tapeout.end,
+  };
+}
+
+function materializeOverrides() {
+  const prof = scheduleProfiles[state.profileId].stages;
+  journeyData.forEach((s) => {
+    const eff = { ...prof[s.id], ...(state.overrides[s.id] || {}) };
+    state.overrides[s.id] = { startOffsetWeeks: eff.startOffsetWeeks, durationWeeks: eff.durationWeeks };
+  });
+}
+function applyDateEdit(stageId, which, newDate) {
+  const idx = journeyData.findIndex((s) => s.id === stageId);
+  const cur = state.schedule.stages[stageId];
+  materializeOverrides();
+  if (which === "start") {
+    const dw = (newDate - cur.start) / (7 * DAY);
+    for (let i = idx; i < journeyData.length; i++)
+      state.overrides[journeyData[i].id].startOffsetWeeks += dw;
+  } else {
+    const dw = (newDate - cur.end) / (7 * DAY);
+    const o = state.overrides[stageId];
+    o.durationWeeks = Math.max(1 / 7, o.durationWeeks + dw);
+    for (let i = idx + 1; i < journeyData.length; i++)
+      state.overrides[journeyData[i].id].startOffsetWeeks += dw;
+  }
+  document.body.classList.add("has-overrides");
+  recompute(); updateDates(); updateGanttCurrent();
+}
+function resetSchedule() {
+  state.overrides = {};
+  document.body.classList.remove("has-overrides");
+  recompute(); updateDates(); updateGanttCurrent();
+}
+
+/* ============================================================
+   App state + user content (in-memory in this prototype)
+   ============================================================ */
+const TODAY = (() => { const d = new Date(); d.setHours(0, 0, 0, 0); return d; })();
+const state = {
+  projectName: "AtlasEX",
+  /* default kickoff = 30 weeks before today, so "today" sits mid-program */
+  kickoff: addWeeks(TODAY, -30),
+  profileId: "typicalSoC",
+  overrides: {},
+  currentStage: 0,
+  schedule: null,
+  leaders: {},
+};
+let _uid = 0;
+const uid = () => "u" + (++_uid);
+const userContent = {};
+/* Key information the TPM must know — example seeds per stage */
+const KEYINFO_SEEDS = {
+  productDefinition: ["Baseline assumes an N4-class node — a node change resets the cost model", "PRD sign-off gate requires executive staff review", "Target BOM cost locked against Q3 market forecast", "Two anchor customers committed to early access program", "Feasibility gate review scheduled in week 3", "Package technology decision deferred to Architecture", "Competitor launch expected two quarters after our MP", "Initial die size estimate carries ±15% uncertainty", "IP licensing budget pending legal review", "Program staffing plan approved at 80% of request", "Schedule baseline uses Typical SoC profile assumptions"],
+  architecture: ["NoC topology decision locks the memory bandwidth ceiling", "Two IP vendors shortlisted — decision due before Arch Freeze"],
+  rtl: ["IP vendor drop 2 carries the critical CDC fixes", "Top-level integration builds run nightly at 02:00", "Block-level freeze order: MEM → CPU → NPU → IO"],
+  verification: ["Regression farm capacity doubles next quarter", "Coverage signoff criteria: 100% code / 95% functional"],
+  synthesis: ["Reference library v1.2 frozen for all trial runs", "MBIST is inserted at synthesis, not at P&R"],
+  physicalDesign: ["PDN target: <5% dynamic IR drop at TT corner", "Two-week ECO budget reserved ahead of signoff"],
+  signoff: ["Foundry-approved corner list rev C is in effect", "Waiver board meets twice weekly during closure"],
+  tapeout: ["Mask order window: 3 business days after Go decision", "Full-chip GDS dry-run completed at Design Freeze"],
+  fabrication: ["Hot-lot priority confirmed for the first three lots", "Wafer acceptance criteria agreed with foundry (rev B)"],
+  packaging: ["Substrate PO placed 20 weeks ahead of need date", "KGD test coverage target: 98% before stacking"],
+  bringup: ["Two board revisions budgeted before qualification entry", "Debug access: JTAG + on-die trace enabled in silicon"],
+  qualification: ["Qualification plan follows JEDEC-based stress conditions", "Ramp commitment staged over three quarters"],
+};
+
+/* Working-level engineering contacts — example seeds per stage (fictional) */
+const TEAM_SEEDS = {
+  productDefinition: [["Nora Feld", "Market & requirements analysis"], ["Ian Brooks", "Cost / die-size modeling"], ["Seojin Ha", "Feasibility studies"]],
+  architecture: [["Leo Martins", "System modeling & workloads"], ["Aisha Bello", "Interconnect / NoC architecture"], ["Tim Nguyen", "Memory subsystem"], ["Rhea Kapoor", "IP evaluation"]],
+  rtl: [["Jae Song", "Top-level integration"], ["Mira Patel", "Lint / CDC / RDC"], ["Ken Watanabe", "Third-party IP interface"], ["Olga Petrova", "Build & CI infrastructure"]],
+  verification: [["Diego Ruiz", "UVM environment"], ["Hana Cho", "Coverage & regression"], ["Sam Okafor", "Formal verification"], ["Lena Vogel", "Gate-level simulation"], ["Arjun Mehta", "Emulation platform"]],
+  synthesis: [["Petra Kral", "Synthesis flow & constraints"], ["Yusuf Demir", "DFT / scan insertion"], ["Claire Fontaine", "PPA analysis"]],
+  physicalDesign: [["Marco Bianchi", "Floorplan & placement"], ["Jiwoo Park", "Clock tree synthesis"], ["Nate Coleman", "Routing & DRC convergence"], ["Ingrid Berg", "Power delivery network"]],
+  signoff: [["Ravi Iyer", "STA / timing signoff"], ["Sofia Marin", "Physical verification"], ["Tom Eriksen", "EM / IR analysis"]],
+  tapeout: [["Elena Sokolov", "GDS assembly & release"], ["Brian Walsh", "Tapeout checklist & QA"], ["Mai Tran", "Mask data preparation"]],
+  fabrication: [["Kurt Weiss", "Foundry program interface"], ["Priti Rao", "Process & WAT data"], ["Josh Adler", "Wafer logistics"]],
+  packaging: [["Aya Nakamura", "Interposer integration"], ["Carlos Vega", "SI / PI analysis"], ["Femi Ade", "Thermal & mechanical"], ["Lucy Zhang", "OSAT program"]],
+  bringup: [["Max Richter", "Board & lab infrastructure"], ["Dana Levi", "Functional validation"], ["Vik Sharma", "Characterization"], ["Emma Toth", "Failure analysis"]],
+  qualification: [["Owen Price", "Reliability stress testing"], ["Sunita Nair", "Yield analysis"], ["Greg Holt", "Production test"], ["Ines Duarte", "Quality & ramp"]],
+};
+
+const mkItem = (t, owner) => ({ id: uid(), title: t, body: "", owner, due: null, updated: new Date(), updates: [] });
+journeyData.forEach((s, si) => {
+  state.leaders[s.id] = { ...s.leader };
+  userContent[s.id] = {
+    activities: s.activities.map((t) => mkItem(t, s.leader.short)),
+    /* example data: only RTL carries open risks; other stages start clean */
+    risks: s.id === "rtl" ? s.risks.map((t) => mkItem(t, s.leader.short)) : [],
+    keyinfo: (KEYINFO_SEEDS[s.id] || []).map((t) => mkItem(t, s.leader.short)),
+  };
+  state.deliverables = state.deliverables || {};
+  state.deliverables[s.id] = s.deliverables.map((t) => ({ id: uid(), title: t, done: false }));
+  state.team = state.team || {};
+  state.team[s.id] = (TEAM_SEEDS[s.id] || []).map(([name, role], i) => ({
+    id: uid(), name, role,
+    email: name.toLowerCase().replace(/[^a-z ]/g, "").replace(/\s+/g, ".") + "@example.com",
+    phone: `+1 (408) 555-0${String(2 * si + i + 10).padStart(3, "0")}`,
+  }));
+});
+const KIND_LABELS = { activities: "Activity", risks: "Risk", keyinfo: "Key Info" };
+const boardState = {};
+const getBS = (stageId, kind) => {
+  const k = stageId + ":" + kind;
+  return boardState[k] || (boardState[k] = { expanded: false, page: 0 });
+};
+const hasOpenRisks = (stageId) => userContent[stageId].risks.length > 0;
+
+
+
+const stageMilestone = {};
+milestoneDefs.forEach((m) => { if (m.anchor.at === "end") stageMilestone[m.anchor.stage] = m; });
+const phaseOfStage = {};
+lifecyclePhases.forEach((p, pi) => p.stages.forEach((s) => (phaseOfStage[s] = { ...p, index: pi })));
+
+function recompute() {
+  state.schedule = computeSchedule(state.kickoff, scheduleProfiles[state.profileId], state.overrides);
+}
+
+/* ============================================================
+   Roadmap
+   ============================================================ */
+function buildRoadmap() {
+  document.getElementById("rm-regions").innerHTML = lifecyclePhases.map((p) =>
+    `<div class="rm-region" data-phase="${p.id}" style="flex:${p.stages.length}">${p.label}</div>`).join("");
+
+  const n = journeyData.length;
+  const stations = journeyData.map((s, i) => `
+    <button class="rm-station ${s.moment ? "moment" : ""} ${i === n - 1 ? "terminal" : ""}" role="tab" style="left:${(i / (n - 1)) * 100}%"
+      data-index="${i}" data-tip="${s.title}|" aria-label="Stage ${s.stage}: ${s.title}">
+      <span class="dot"></span>
+      <span class="code">${String(s.stage).padStart(2, "0")} ${s.shortTitle}</span>
+      <span class="date" data-role="st-date">—</span>
+    </button>`).join("");
+  const ms = milestoneDefs.map((m) => {
+    const i = journeyData.findIndex((s) => s.id === m.anchor.stage);
+    const isTerminal = i === n - 1;
+    const pct = isTerminal ? 100 : Math.min((i + 0.5) / (n - 1), 0.995) * 100;
+    const shift = pct > 92 ? "translateX(-100%)" : "translateX(-50%)";
+    return (isTerminal ? "" : `<span class="rm-ms ${m.major ? "major" : ""}" style="left:${pct}%" data-tip="${m.label}|" data-msid="${m.id}"></span>`) +
+      (m.major ? `<span class="rm-ms-label" style="left:${pct}%;transform:${shift}">${m.label}</span>` : "");
+  }).join("");
+  document.getElementById("rm-stations").innerHTML = stations + ms;
+
+  const wrap = document.getElementById("rm-stations");
+  wrap.addEventListener("pointerover", (e) => {
+    const st = e.target.closest(".rm-station");
+    if (st) selectStage(+st.dataset.index);
+  });
+  wrap.addEventListener("click", (e) => {
+    const st = e.target.closest(".rm-station");
+    if (st) selectStage(+st.dataset.index);
+  });
+  wrap.addEventListener("focusin", (e) => {
+    const st = e.target.closest(".rm-station");
+    if (st) selectStage(+st.dataset.index);
+  });
+  wrap.addEventListener("keydown", (e) => {
+    if (e.key !== "ArrowRight" && e.key !== "ArrowLeft") return;
+    e.preventDefault();
+    const next = Math.min(Math.max(state.currentStage + (e.key === "ArrowRight" ? 1 : -1), 0), journeyData.length - 1);
+    selectStage(next);
+    wrap.querySelector(`.rm-station[data-index="${next}"]`).focus();
+  });
+}
+
+function updateRoadmapState() {
+  document.querySelectorAll(".rm-station").forEach((el, i) =>
+    el.classList.toggle("selected", i === state.currentStage));
+  const curPhase = phaseOfStage[journeyData[state.currentStage].id].id;
+  document.querySelectorAll(".rm-region").forEach((el) =>
+    el.classList.toggle("current", el.dataset.phase === curPhase));
+  const line = document.getElementById("rm-line");
+  const p = state.currentStage / (journeyData.length - 1);
+  document.getElementById("rm-progress").style.width = (line.clientWidth * p) + "px";
+}
+
+/* ============================================================
+   Stage panels
+   ============================================================ */
+function buildPanels() {
+  const root = document.getElementById("stage-panels");
+  root.innerHTML = journeyData.map((s, i) => {
+    const num = String(s.stage).padStart(2, "0");
+    const phase = phaseOfStage[s.id];
+    const ms = stageMilestone[s.id];
+    return `
+    <article class="stage-panel ${s.moment ? "moment" : ""}" data-id="${s.id}" data-index="${i}" role="tabpanel" aria-label="Stage ${num}: ${s.title}">
+      <div class="panel-info">
+        <span class="phase-cap">Phase ${phase.index + 1} — ${phase.label}</span>
+        <div class="stage-meta">
+          <span class="stage-num">${num} / 12</span>
+          <span class="stage-short">${s.shortTitle}</span>
+        </div>
+        <h2>${s.title}</h2>
+        <p class="tagline">${s.tagline}</p>
+        <div class="leader-row" data-role="leader"></div>
+        <div class="dates-row">
+          <input type="date" class="d-edit" data-role="start-edit" aria-label="Planned start" title="Edit planned start — later stages shift with it">
+          <span class="sep">━</span>
+          <span class="tat" data-role="tat">—</span>
+          <span class="sep">━</span>
+          <input type="date" class="d-edit" data-role="end-edit" aria-label="Expected completion" title="Edit completion — TAT and later stages adjust">
+          ${ms && ms.major ? `<span class="mslbl">${ms.label}</span>` : ""}
+        </div>
+        <div class="facts"></div>
+        <button class="details-btn" data-toggle-detail>Stage Details</button>
+      </div>
+      <div class="viz" aria-hidden="true">${stageViz[s.id]()}</div>
+    </article>`;
+  }).join("");
+
+  journeyData.forEach((s) => { renderLeader(s.id); renderFacts(s.id); });
+
+  root.addEventListener("click", (e) => {
+    const panel = e.target.closest(".stage-panel");
+    if (!panel) return;
+    const id = panel.dataset.id;
+    if (e.target.closest("[data-toggle-detail]")) {
+      const open = panel.classList.contains("detail-open") &&
+        panel.querySelector('.inline-area[data-kind="stage"]');
+      open ? closeInline(panel) : openStageDetail(panel, id);
+    }
+    /* board interactions live in the pop-up */
+    const row = e.target.closest(".b-row");
+    if (row) openBoardModal(id, row.dataset.kind, "item", row.dataset.itemId, "board");
+    const add = e.target.closest(".board-btn[data-add]");
+    if (add) openBoardModal(id, add.dataset.add, "edit", null, "add");
+    const more = e.target.closest("[data-more]");
+    if (more) openBoardModal(id, more.dataset.more, "board");
+    if (e.target.closest("[data-potential]")) openPotentialRisks(panel, id);
+    const adopt = e.target.closest(".pr-add");
+    if (adopt && !adopt.disabled) adoptPotentialRisk(panel, id, +adopt.dataset.prIndex);
+    if (e.target.closest(".inline-close")) closeInline(panel);
+    if (e.target.closest("[data-c-add]")) openStageDetail(panel, id, "new");
+    const cEdit = e.target.closest("[data-c-edit]");
+    if (cEdit) openStageDetail(panel, id, cEdit.dataset.cEdit);
+    const cDel = e.target.closest("[data-c-del]");
+    if (cDel) {
+      state.team[id] = state.team[id].filter((c) => c.id !== cDel.dataset.cDel);
+      openStageDetail(panel, id, null);
+    }
+    if (e.target.closest("[data-c-cancel]")) openStageDetail(panel, id, null);
+    if (e.target.closest("[data-c-save]")) saveContact(panel, id);
+    const dDel = e.target.closest("[data-dlv-del]");
+    if (dDel) {
+      state.deliverables[id] = state.deliverables[id].filter((d) => d.id !== dDel.dataset.dlvDel);
+      openStageDetail(panel, id, null);
+      if (document.body.classList.contains("schedule-mode")) renderDashboard();
+    }
+    if (e.target.closest("[data-dlv-add]")) {
+      const input = panel.querySelector(".dlv-input");
+      const title = input.value.trim();
+      if (!title) { input.focus(); return; }
+      const dueRaw = panel.querySelector(".dlv-input-due").value;
+      const due = dueRaw ? (() => { const [y, m, dy] = dueRaw.split("-").map(Number); return new Date(y, m - 1, dy); })() : null;
+      state.deliverables[id].push({ id: uid(), title, done: false, due, completedAt: null });
+      openStageDetail(panel, id, null);
+      if (document.body.classList.contains("schedule-mode")) renderDashboard();
+    }
+    if (e.target.closest("[data-leader-edit]")) openLeaderEditor(panel, id);
+    if (e.target.closest("[data-leader-save]")) saveLeader(panel, id);
+  });
+  root.addEventListener("change", (e) => {
+    const chk = e.target.closest("[data-dlv-check]");
+    if (chk) {
+      const panel = chk.closest(".stage-panel");
+      const d = state.deliverables[panel.dataset.id].find((x) => x.id === chk.dataset.dlvCheck);
+      d.done = chk.checked;
+      d.completedAt = d.done ? new Date() : null;   /* completion timestamp is automatic */
+      /* in-place updates — no panel re-render, no scroll jump */
+      chk.nextElementSibling.classList.toggle("done", d.done);
+      const comp = panel.querySelector(`[data-comp="${d.id}"]`);
+      if (comp) comp.textContent = d.completedAt ? fmtDT(d.completedAt) : "—";
+      const dueEl = panel.querySelector(`[data-dlv-due="${d.id}"]`);
+      if (dueEl) dueEl.classList.toggle("overdue", !d.done && d.due && d.due < TODAY);
+      const list = state.deliverables[panel.dataset.id];
+      panel.querySelector(".dlv-note").textContent = `${list.filter((x) => x.done).length} / ${list.length} complete`;
+      renderDashboard();
+      return;
+    }
+    const dd = e.target.closest("[data-dlv-due]");
+    if (dd) {
+      const panel = dd.closest(".stage-panel");
+      const d = state.deliverables[panel.dataset.id].find((x) => x.id === dd.dataset.dlvDue);
+      d.due = dd.value ? (() => { const [y, m, dy] = dd.value.split("-").map(Number); return new Date(y, m - 1, dy); })() : null;
+      dd.classList.toggle("overdue", !d.done && d.due && d.due < TODAY);
+      return;
+    }
+    const input = e.target.closest(".d-edit");
+    if (!input || !input.value) return;
+    const panel = input.closest(".stage-panel");
+    const [y, m, d] = input.value.split("-").map(Number);
+    applyDateEdit(panel.dataset.id, input.dataset.role === "start-edit" ? "start" : "end", new Date(y, m - 1, d));
+  });
+}
+
+function renderLeader(stageId) {
+  const panel = document.querySelector(`.stage-panel[data-id="${stageId}"]`);
+  const l = state.leaders[stageId];
+  panel.querySelector('[data-role="leader"]').innerHTML = `
+    <span class="cap">Stage Leader</span>
+    <span class="l-name">${esc(l.name)}</span>
+    <span class="l-contact">${esc(l.phone)} · ${esc(l.email)}</span>
+    <button class="l-edit" data-leader-edit>Edit</button>`;
+}
+
+const PAGE_SIZE = 10;
+const sortedList = (stageId, kind) => [...userContent[stageId][kind]].sort((a, b) => b.updated - a.updated);
+const dueCell = (it) => !it.due
+  ? `<span class="b-due">—</span>`
+  : `<span class="b-due ${!it.done && it.due < TODAY ? "overdue" : ""}">${fmtDate(it.due)}</span>`;
+const bRow = (it, kind, opts = {}) => {
+  const max = opts.updates || 1;
+  const latest = [...it.updates].sort((a, b) => b.date - a.date).slice(0, max);
+  return `
+  <button class="b-row ${kind === "risks" ? "risk" : ""}" data-kind="${kind}" data-item-id="${it.id}"
+    ${opts.stageId ? `data-stage-id="${opts.stageId}"` : ""}>
+    <span class="b-date">${fmtDT(it.updated)}</span>
+    <span class="b-title">${opts.stageTag ? `<span class="b-stage">${opts.stageTag}</span>` : ""}<span class="t">${esc(it.title)}</span></span>
+    <span class="b-owner">${esc(it.owner || "—")}</span>
+    ${kind === "keyinfo" ? "" : dueCell(it)}
+    ${latest.map((u) => `<span class="b-latest"><span class="lu-date">${fmtDT(u.date)}</span> — ${esc(u.text)}</span>`).join("")}
+  </button>`;
+};
+/* each grip drags the boundary it sits on; the cursor follows the boundary.
+   Widths are stored per board kind (--bck-<kind>-<col>). */
+const grip = (col, dir, cell) =>
+  `<span class="col-grip" data-col="${col}" data-dir="${dir}" data-cell="${cell}" title="Drag to resize"></span>`;
+const boardColsHtml = (kind) => kind === "keyinfo" ? `
+  <div class="board-cols">
+    <span>Updated${grip("date", 1, 0)}</span>
+    <span>Title${grip("owner", -1, 2)}</span>
+    <span>Owner</span>
+  </div>` : `
+  <div class="board-cols">
+    <span>Updated${grip("date", 1, 0)}</span>
+    <span>Title${grip("owner", -1, 2)}</span>
+    <span>Owner${grip("due", -1, 3)}</span>
+    <span>Due</span>
+  </div>`;
+const boardNote = (stageId, kind) => {
+  const list = userContent[stageId][kind];
+  const total = list.length;
+  const upd = list.reduce((n, it) => n + it.updates.length, 0);
+  const base = kind === "risks" ? `${total} open` : `${total} item${total === 1 ? "" : "s"}`;
+  return upd ? `${base} · ${upd} update${upd === 1 ? "" : "s"}` : base;
+};
+
+/* main-page board: latest 3 + Show more (always) → pop-up */
+function boardHtml(stageId, kind, title, extraBtns = "") {
+  const list = sortedList(stageId, kind);
+  return `
+    <div class="board" data-kind="${kind}">
+      <div class="board-head">
+        <span class="cap">${title}</span><span class="note">${boardNote(stageId, kind)}</span>
+        <span class="spacer"></span>
+        ${extraBtns}
+        <button class="board-btn" data-add="${kind}">+ Add</button>
+      </div>
+      ${boardColsHtml(kind)}
+      ${list.length ? list.slice(0, 3).map((it) => bRow(it, kind)).join("") : `<div class="b-empty">Nothing here yet.</div>`}
+      <div class="board-foot">
+        <button class="board-btn" data-more="${kind}">Show more</button>
+      </div>
+    </div>`;
+}
+function renderFacts(stageId) {
+  const panel = document.querySelector(`.stage-panel[data-id="${stageId}"]`);
+  panel.querySelector(".facts").innerHTML =
+    boardHtml(stageId, "keyinfo", "Key Information") +
+    boardHtml(stageId, "activities", "Activity") +
+    boardHtml(stageId, "risks", "Risk", `<button class="board-btn" data-potential>Potential Risks</button>`);
+  /* risk state may color gantt bars — keep charts in sync */
+  renderGantt(document.getElementById("rm-gantt"), { short: true });
+  renderGantt(document.getElementById("gantt-b"));
+  updateGanttCurrent();
+  alignRmToday();
+  if (document.body.classList.contains("schedule-mode")) renderDashboard();
+}
+
+/* ============================================================
+   Shared item mutations (used by inline view and modal)
+   ============================================================ */
+function readEditorFields(root) {
+  const dueRaw = root.querySelector(".ie-due").value;
+  return {
+    title: root.querySelector(".ie-title").value.trim(),
+    owner: root.querySelector(".ie-owner").value.trim(),
+    body: root.querySelector(".ie-body").value.trim(),
+    due: dueRaw ? (() => { const [y, m, d] = dueRaw.split("-").map(Number); return new Date(y, m - 1, d); })() : null,
+  };
+}
+function mutateSaveItem(stageId, kind, itemId, f) {
+  const list = userContent[stageId][kind];
+  let saved;
+  if (itemId) {
+    saved = list.find((x) => x.id === itemId);
+    Object.assign(saved, f, { updated: new Date() });
+  } else {
+    saved = { id: uid(), ...f, updated: new Date(), updates: [] };
+    list.push(saved);
+  }
+  renderFacts(stageId);
+  return saved;
+}
+function mutateDeleteItem(stageId, kind, itemId) {
+  userContent[stageId][kind] = userContent[stageId][kind].filter((x) => x.id !== itemId);
+  renderFacts(stageId);
+}
+function suPost(stageId, kind, itemId, text) {
+  const item = userContent[stageId][kind].find((x) => x.id === itemId);
+  item.updates.push({ id: uid(), text, date: new Date() });
+  item.updated = new Date();
+  renderFacts(stageId);
+}
+function suSave(stageId, kind, itemId, suId, text) {
+  const item = userContent[stageId][kind].find((x) => x.id === itemId);
+  const u = item.updates.find((x) => x.id === suId);
+  if (u && text) u.text = text;
+}
+function suDelete(stageId, kind, itemId, suId) {
+  const item = userContent[stageId][kind].find((x) => x.id === itemId);
+  item.updates = item.updates.filter((x) => x.id !== suId);
+}
+
+/* ============================================================
+   Shared HTML builders (inline + modal)
+   ============================================================ */
+function suSectionHtml(item, label, editingSuId) {
+  const updates = [...item.updates].sort((a, b) => b.date - a.date);
+  return `
+    <div class="su-sec">
+      <span class="cap">Status Updates — History</span>
+      ${updates.length
+        ? updates.map((u) => u.id === editingSuId ? `
+          <div class="su-item">
+            <span class="su-date">${fmtDT(u.date)}</span>
+            <span class="su-edit-form">
+              <textarea class="su-edit-input">${esc(u.text)}</textarea>
+            </span>
+            <span class="su-acts" style="opacity:1">
+              <button data-su-save="${u.id}">Save</button>
+              <button data-su-cancel>Cancel</button>
+            </span>
+          </div>` : `
+          <div class="su-item">
+            <span class="su-date">${fmtDT(u.date)}</span>
+            <span class="su-text">${esc(u.text)}</span>
+            <span class="su-acts">
+              <button data-su-edit="${u.id}">Edit</button>
+              <button data-su-del="${u.id}">✕</button>
+            </span>
+          </div>`).join("")
+        : `<div class="su-empty">No status updates yet — the history of this ${label.toLowerCase()} will build up here.</div>`}
+      <div class="su-form">
+        <textarea class="su-input" placeholder="Write a status update…"></textarea>
+        <button data-post>Post</button>
+      </div>
+    </div>`;
+}
+function itemViewHtml(item, kind, editingSuId) {
+  const label = KIND_LABELS[kind];
+  const dueOver = item.due && item.due < TODAY;
+  return `
+    <div class="item-view">
+      <div class="iv-title">${esc(item.title)}</div>
+      <div class="iv-meta">
+        <span><span class="cap">Owner</span>${esc(item.owner || "—")}</span>
+        <span><span class="cap">Target Due</span><span style="${dueOver ? "color:var(--risk);font-weight:600" : ""}">${item.due ? fmtDate(item.due) : "—"}</span></span>
+        <span><span class="cap">Updated</span>${fmtDTFull(item.updated)}</span>
+      </div>
+      <p class="iv-body ${item.body ? "" : "empty"}">${item.body ? esc(item.body) : "No details recorded yet."}</p>
+      <div class="iv-actions">
+        <button data-edit>Edit</button>
+      </div>
+      ${suSectionHtml(item, label, editingSuId)}
+    </div>`;
+}
+function itemEditorHtml(item, kind) {
+  const label = KIND_LABELS[kind];
+  return `
+    <div class="item-editor">
+      <input class="ie-title" placeholder="${label} title" value="${item ? esc(item.title) : ""}">
+      <div class="ie-field">
+        <span class="cap">Owner</span>
+        <input class="ie-owner" placeholder="Owner name" value="${item ? esc(item.owner || "") : ""}">
+      </div>
+      <div class="ie-field">
+        <span class="cap">Target Due</span>
+        <input class="ie-due" type="date" value="${item && item.due ? toISO(item.due) : ""}">
+      </div>
+      <textarea class="ie-body" placeholder="Details — status, owners, next steps, mitigation…">${item ? esc(item.body) : ""}</textarea>
+      <div class="ie-actions">
+        <button data-save>Save</button>
+        ${item ? `<button data-del>Delete</button>` : ""}
+      </div>
+      <p class="session-note">Entries live in this browser session (prototype) — persistence arrives with the production build.</p>
+    </div>`;
+}
+
+/* ============================================================
+   Modal — full board / item / editor pop-up
+   ============================================================ */
+const modal = { stageId: null, kind: null, view: "board", itemId: null, page: 0, origin: "board", editingSuId: null, agg: null };
+function openBoardModal(stageId, kind, view = "board", itemId = null, origin = "board") {
+  Object.assign(modal, { stageId, kind, view, itemId, origin, editingSuId: null, agg: null });
+  if (view === "board") modal.page = 0;
+  renderModal();
+  document.body.classList.add("modal-open");
+}
+/* every status update across all stages, newest first */
+function allUpdates() {
+  const out = [];
+  journeyData.forEach((s) => ["keyinfo", "activities", "risks"].forEach((k) =>
+    userContent[s.id][k].forEach((it) =>
+      it.updates.forEach((u) => out.push({ u, it, kind: k, stage: s })))));
+  return out.sort((a, b) => b.u.date - a.u.date);
+}
+/* cross-stage aggregate boards (opened from dashboard) */
+const AGG_TITLES = {
+  risks: "Open Risks — All Stages",
+  overdue: "Overdue Activities — All Stages",
+  updates: "Status Updates — All Stages",
+};
+function openAggModal(type) {
+  Object.assign(modal, {
+    stageId: null,
+    kind: type === "risks" ? "risks" : type === "overdue" ? "activities" : null,
+    view: "board", itemId: null, page: 0, origin: "agg", editingSuId: null,
+    agg: { type, title: AGG_TITLES[type] },
+  });
+  renderModal();
+  document.body.classList.add("modal-open");
+}
+function modalBoardEntries() {
+  const { kind } = modal;
+  if (!modal.agg) return sortedList(modal.stageId, kind).map((it) => ({ it, stage: null }));
+  const out = [];
+  journeyData.forEach((s) => userContent[s.id][kind].forEach((it) => {
+    if (modal.agg.type === "overdue" && !(!it.done && it.due && it.due < TODAY)) return;
+    out.push({ it, stage: s });
+  }));
+  return out.sort((a, b) => b.it.updated - a.it.updated);
+}
+function closeModal() {
+  document.body.classList.remove("modal-open");
+}
+function renderModal() {
+  const { stageId, kind, view, itemId } = modal;
+  const s = stageId ? journeyData.find((x) => x.id === stageId) : null;
+  const label = KIND_LABELS[kind];
+  const item = itemId ? userContent[stageId][kind].find((x) => x.id === itemId) : null;
+  const head = document.getElementById("modal-head");
+  const body = document.getElementById("modal-body");
+  const backBtn = view !== "board" && (modal.origin === "board" || modal.origin === "agg")
+    ? `<button class="mb-back" data-back>‹ Board</button>` : "";
+  const boardTitle = modal.agg ? modal.agg.title : label + " Board";
+  head.innerHTML = `
+    ${backBtn}
+    <h3>${view === "edit" ? (item ? "Edit " + label : "New " + label) : view === "item" ? label : boardTitle}</h3>
+    <span class="meta">${view === "board" && modal.agg ? state.projectName : (s ? s.title : "")}</span>
+    <span class="spacer"></span>
+    ${view === "board" && !modal.agg ? `<button class="board-btn" data-add="${kind}">+ Add</button>` : ""}
+    <button id="modal-close" aria-label="Close">ESC ✕</button>`;
+  if (view === "board") {
+    const isSu = modal.agg && modal.agg.type === "updates";
+    const entries = isSu ? allUpdates() : modalBoardEntries();
+    const pages = Math.max(Math.ceil(entries.length / PAGE_SIZE), 1);
+    modal.page = Math.min(modal.page, pages - 1);
+    const visible = entries.slice(modal.page * PAGE_SIZE, modal.page * PAGE_SIZE + PAGE_SIZE);
+    const pager = pages > 1 ? `
+      <div class="board-foot">
+        <span class="note" style="font-size:.7em;color:var(--ink-3)">${entries.length} entries</span>
+        <span class="pager">
+          <button data-page-m="${modal.page - 1}" ${modal.page === 0 ? "disabled" : ""}>‹</button>
+          ${Array.from({ length: pages }, (_, p) =>
+            `<button data-page-m="${p}" aria-current="${p === modal.page}">${p + 1}</button>`).join("")}
+          <button data-page-m="${modal.page + 1}" ${modal.page === pages - 1 ? "disabled" : ""}>›</button>
+        </span>
+      </div>` : "";
+    if (isSu) {
+      body.innerHTML = `
+        <div class="board-cols su-cols"><span>Posted</span><span>Item — Update</span></div>
+        ${visible.length ? visible.map((e) => `
+          <button class="su-brow b-row" data-stage-id="${e.stage.id}" data-kind="${e.kind}" data-item-id="${e.it.id}">
+            <span class="b-date">${fmtDT(e.u.date)}</span>
+            <span class="su2">
+              <span class="t1"><span class="b-stage">${e.stage.shortTitle}</span>${esc(e.it.title)}</span>
+              <span class="t2">${esc(e.u.text)}</span>
+            </span>
+          </button>`).join("") : `<div class="b-empty">No status updates yet.</div>`}
+        ${pager}`;
+    } else {
+      body.innerHTML = `<div class="board" data-kind="${kind}">
+        ${boardColsHtml(kind)}
+        ${visible.length
+          ? visible.map((e) => bRow(e.it, kind, {
+              updates: 3,
+              stageTag: e.stage ? e.stage.shortTitle : null,
+              stageId: e.stage ? e.stage.id : null,
+            })).join("")
+          : `<div class="b-empty">Nothing here yet.</div>`}
+        ${pager}</div>`;
+    }
+  } else if (view === "item" && item) {
+    body.innerHTML = itemViewHtml(item, kind, modal.editingSuId);
+  } else {
+    body.innerHTML = itemEditorHtml(item, kind);
+    requestAnimationFrame(() => body.querySelector(".ie-title")?.focus());
+  }
+}
+document.getElementById("schedule-view").addEventListener("click", (e) => {
+  const btn = e.target.closest("[data-dash-open]");
+  if (btn) return openAggModal(btn.dataset.dashOpen);
+  const su = e.target.closest(".dash-su");
+  if (su) openBoardModal(su.dataset.suStage, su.dataset.suKind, "item", su.dataset.suItem, "direct");
+});
+/* drag-to-resize board columns (main + pop-up boards share the vars) */
+document.addEventListener("pointerdown", (e) => {
+  const grip = e.target.closest(".col-grip");
+  if (!grip) return;
+  e.preventDefault();
+  e.stopPropagation();
+  const board = grip.closest(".board");
+  const kind = board ? board.dataset.kind : "activities";
+  /* a grip either names a full CSS var (--dlv-*) or a per-board column key */
+  const col = grip.dataset.col;
+  const varName = col.startsWith("--") ? col : `--bck-${kind}-${col}`;
+  const dir = +grip.dataset.dir || 1;
+  const startX = e.clientX;
+  /* measure the column this grip controls (not necessarily its own cell) */
+  const cells = grip.closest(".board-cols, .dlv-cols").children;
+  const startW = cells[+grip.dataset.cell].getBoundingClientRect().width;
+  document.body.classList.add("col-resizing");
+  grip.classList.add("active");
+  const move = (ev) => {
+    const w = Math.min(Math.max(startW + dir * (ev.clientX - startX), 56), 420);
+    document.documentElement.style.setProperty(varName, w + "px");
+  };
+  const up = () => {
+    document.body.classList.remove("col-resizing");
+    grip.classList.remove("active");
+    window.removeEventListener("pointermove", move);
+    window.removeEventListener("pointerup", up);
+  };
+  window.addEventListener("pointermove", move);
+  window.addEventListener("pointerup", up);
+});
+document.getElementById("modal-scrim").addEventListener("click", closeModal);
+document.getElementById("modal").addEventListener("click", (e) => {
+  const { stageId, kind } = modal;
+  if (e.target.closest("#modal-close")) return closeModal();
+  if (e.target.closest("[data-back]")) { modal.view = "board"; modal.editingSuId = null; return renderModal(); }
+  const row = e.target.closest(".b-row");
+  if (row) {
+    if (row.dataset.stageId) modal.stageId = row.dataset.stageId;   /* aggregate rows carry their stage */
+    if (row.dataset.kind) modal.kind = row.dataset.kind;            /* update rows carry their kind */
+    modal.view = "item"; modal.itemId = row.dataset.itemId; modal.editingSuId = null;
+    return renderModal();
+  }
+  if (e.target.closest("[data-add]")) { modal.view = "edit"; modal.itemId = null; return renderModal(); }
+  if (e.target.closest("[data-edit]")) { modal.view = "edit"; return renderModal(); }
+  const pg = e.target.closest("[data-page-m]");
+  if (pg && !pg.disabled) { modal.page = +pg.dataset.pageM; return renderModal(); }
+  if (e.target.closest("[data-save]")) {
+    const f = readEditorFields(document.getElementById("modal-body"));
+    if (!f.title) { document.querySelector("#modal-body .ie-title").focus(); return; }
+    const saved = mutateSaveItem(stageId, kind, modal.itemId, f);
+    if (modal.origin === "add") return closeModal();      /* +Add from main: save lands on main page */
+    modal.view = "item"; modal.itemId = saved.id;
+    return renderModal();
+  }
+  if (e.target.closest("[data-del]")) {
+    mutateDeleteItem(stageId, kind, modal.itemId);
+    if (modal.origin === "add") return closeModal();
+    modal.view = "board"; modal.itemId = null;
+    return renderModal();
+  }
+  if (e.target.closest("[data-post]")) {
+    const input = document.querySelector("#modal-body .su-input");
+    const text = input.value.trim();
+    if (!text) { input.focus(); return; }
+    suPost(stageId, kind, modal.itemId, text);
+    return renderModal();
+  }
+  const suE = e.target.closest("[data-su-edit]");
+  if (suE) { modal.editingSuId = suE.dataset.suEdit; return renderModal(); }
+  const suS = e.target.closest("[data-su-save]");
+  if (suS) {
+    suSave(stageId, kind, modal.itemId, suS.dataset.suSave,
+      document.querySelector("#modal-body .su-edit-input").value.trim());
+    modal.editingSuId = null; renderFacts(stageId);
+    return renderModal();
+  }
+  if (e.target.closest("[data-su-cancel]")) { modal.editingSuId = null; return renderModal(); }
+  const suD = e.target.closest("[data-su-del]");
+  if (suD) { suDelete(modal.stageId, modal.kind, modal.itemId, suD.dataset.suDel); renderFacts(modal.stageId); return renderModal(); }
+});
+
+/* ============================================================
+   Inline detail area
+   ============================================================ */
+function inlineArea(panel) {
+  let area = panel.querySelector(".inline-area");
+  if (!area) {
+    area = document.createElement("div");
+    area.className = "inline-area";
+    panel.appendChild(area);
+  }
+  return area;
+}
+function closeInline(panel) {
+  const area = panel.querySelector(".inline-area");
+  if (area) area.remove();
+  panel.classList.remove("detail-open");
+}
+function showInline(panel, kind, html, opts = {}) {
+  const area = inlineArea(panel);
+  area.dataset.kind = kind;
+  area.innerHTML = html;
+  panel.classList.add("detail-open");
+  if (opts.scroll !== false)
+    requestAnimationFrame(() =>
+      area.scrollIntoView({ behavior: "smooth", block: "nearest" }));
+}
+
+function contactsHtml(id, editId) {
+  const team = state.team[id];
+  const formRow = (c) => `
+    <div class="c-row editing" data-cid="${c ? c.id : ""}">
+      <span><input class="cf-name" placeholder="Name" value="${c ? esc(c.name) : ""}"></span>
+      <span><input class="cf-role" placeholder="Responsibility" value="${c ? esc(c.role) : ""}"></span>
+      <span><input class="cf-email" type="email" placeholder="email@example.com" value="${c ? esc(c.email) : ""}"></span>
+      <span><input class="cf-phone" placeholder="+1 (000) 000-0000" value="${c ? esc(c.phone) : ""}"></span>
+      <span class="c-acts">
+        <button data-c-save>Save</button>
+        <button data-c-cancel>✕</button>
+      </span>
+    </div>`;
+  const rows = team.map((c) => c.id === editId ? formRow(c) : `
+    <div class="c-row">
+      <span class="c-name">${esc(c.name)}</span>
+      <span>${esc(c.role)}</span>
+      <span class="mono">${esc(c.email)}</span>
+      <span class="mono">${esc(c.phone)}</span>
+      <span class="c-acts">
+        <button data-c-edit="${c.id}">Edit</button>
+        <button data-c-del="${c.id}">✕</button>
+      </span>
+    </div>`).join("");
+  return `
+    <div class="contacts-sec">
+      <div class="c-head">
+        <span class="cap">Engineering Contacts</span>
+        <span class="note" style="font-size:.66em;color:var(--ink-3)">${team.length} member${team.length === 1 ? "" : "s"}</span>
+        <span class="spacer"></span>
+        <button class="board-btn" data-c-add>+ Add Member</button>
+      </div>
+      <div class="c-cols"><span>Name</span><span>Responsibility</span><span>Email</span><span>Phone</span><span></span></div>
+      ${rows}
+      ${editId === "new" ? formRow(null) : ""}
+    </div>`;
+}
+function saveContact(panel, id) {
+  const row = panel.querySelector(".c-row.editing");
+  if (!row) return;
+  const name = row.querySelector(".cf-name").value.trim();
+  const role = row.querySelector(".cf-role").value.trim();
+  const email = row.querySelector(".cf-email").value.trim();
+  const phone = row.querySelector(".cf-phone").value.trim();
+  if (!name) { row.querySelector(".cf-name").focus(); return; }
+  const cid = row.dataset.cid;
+  if (cid) {
+    const c = state.team[id].find((x) => x.id === cid);
+    Object.assign(c, { name, role, email, phone });
+  } else {
+    state.team[id].push({ id: uid(), name, role, email, phone });
+  }
+  openStageDetail(panel, id, null);
+}
+
+function openStageDetail(panel, id, editContact = null, opts = {}) {
+  const s = journeyData.find((x) => x.id === id);
+  showInline(panel, "stage", `
+    <div class="inline-head">
+      <h3>Stage Details</h3>
+      <span class="meta">${s.title}</span>
+      <button class="inline-close">✕ CLOSE</button>
+    </div>
+    <p class="sheet-what">${s.description}</p>
+    <div class="sheet-grid">
+      <div>
+        <div class="view-toggle" role="group">
+          <button aria-pressed="true" data-view="eng">Engineering</button>
+          <button aria-pressed="false" data-view="prog">Program</button>
+        </div>
+        <div class="view-pane" data-pane="eng">
+          <ul class="view-list">${s.engineeringView.map((x) => `<li>${x}</li>`).join("")}</ul>
+          <div class="view-foot"><span class="cap">Tools</span><span class="mono">${s.tools.join(" · ")}</span></div>
+        </div>
+        <div class="view-pane" data-pane="prog" hidden>
+          <ul class="view-list">${s.programView.map((x) => `<li>${x}</li>`).join("")}</ul>
+          <div class="view-foot"><span class="cap">Teams</span><span class="mono">${s.collaboration.join(" · ")}</span></div>
+        </div>
+      </div>
+      <div class="sheet-side">
+        ${deliverablesHtml(id)}
+      </div>
+    </div>
+    ${contactsHtml(id, editContact)}`, opts);
+}
+function deliverablesHtml(id) {
+  const list = state.deliverables[id];
+  const done = list.filter((d) => d.done).length;
+  return `
+    <span class="cap">Key Deliverables<span class="dlv-note">${done} / ${list.length} complete</span></span>
+    <div class="dlv-cols">
+      <span>Deliverable${grip("--dlv-due", -1, 1)}</span>
+      <span>Due${grip("--dlv-comp", -1, 2)}</span>
+      <span>Completed</span><span></span>
+    </div>
+    <ul class="dlv-list">
+      ${list.map((d) => `
+        <li>
+          <label>
+            <input type="checkbox" data-dlv-check="${d.id}" ${d.done ? "checked" : ""}>
+            <span class="dlv-t ${d.done ? "done" : ""}">${esc(d.title)}</span>
+          </label>
+          <input type="date" class="dlv-due ${!d.done && d.due && d.due < TODAY ? "overdue" : ""}"
+            data-dlv-due="${d.id}" value="${d.due ? toISO(d.due) : ""}" title="Target due date">
+          <span class="dlv-comp" data-comp="${d.id}">${d.completedAt ? fmtDT(d.completedAt) : "—"}</span>
+          <button data-dlv-del="${d.id}" aria-label="Delete deliverable">✕</button>
+        </li>`).join("")}
+    </ul>
+    <div class="dlv-add">
+      <input class="dlv-input" placeholder="New deliverable…">
+      <input type="date" class="dlv-due dlv-input-due" title="Target due date" style="max-width:9.5rem">
+      <button data-dlv-add>+ Add</button>
+    </div>`;
+}
+
+/* ----- potential risk library (PM checklist) ----- */
+function openPotentialRisks(panel, stageId) {
+  const s = journeyData.find((x) => x.id === stageId);
+  const existing = new Set(userContent[stageId].risks.map((r) => r.title));
+  showInline(panel, "potential", `
+    <div class="inline-head">
+      <h3>Potential Risks</h3>
+      <span class="meta">${s.title} — PM checklist · add any to the risk board</span>
+      <button class="inline-close">✕ CLOSE</button>
+    </div>
+    <div class="pr-list">
+      ${s.potentialRisks.map((t, i) => `
+        <div class="pr-row">
+          <span class="t">${esc(t)}</span>
+          <button class="pr-add" data-pr-index="${i}" ${existing.has(t) ? "disabled" : ""}>
+            ${existing.has(t) ? "Added" : "+ Track"}
+          </button>
+        </div>`).join("")}
+    </div>`);
+}
+function adoptPotentialRisk(panel, stageId, prIndex) {
+  const s = journeyData.find((x) => x.id === stageId);
+  const title = s.potentialRisks[prIndex];
+  userContent[stageId].risks.push({
+    id: uid(), title, body: "", owner: state.leaders[stageId].short, due: null, updated: new Date(), updates: [],
+  });
+  renderFacts(stageId);
+  openPotentialRisks(panel, stageId);   /* re-render list with Added state */
+}
+
+/* ----- leader editor ----- */
+function openLeaderEditor(panel, stageId) {
+  const l = state.leaders[stageId];
+  showInline(panel, "leader", `
+    <div class="inline-head">
+      <h3>Stage Leader</h3>
+      <span class="meta">${journeyData.find((x) => x.id === stageId).title}</span>
+      <button class="inline-close">✕ CLOSE</button>
+    </div>
+    <div class="item-editor">
+      <div class="ie-field"><span class="cap">Name</span><input class="ie-l-name" value="${esc(l.name)}"></div>
+      <div class="ie-field"><span class="cap">Phone</span><input class="ie-l-phone" value="${esc(l.phone)}"></div>
+      <div class="ie-field"><span class="cap">Email</span><input class="ie-l-email" type="email" value="${esc(l.email)}"></div>
+      <div class="ie-actions"><button data-leader-save>Save</button></div>
+      <p class="session-note">Entries live in this browser session (prototype) — persistence arrives with the production build.</p>
+    </div>`);
+}
+function saveLeader(panel, stageId) {
+  const name = panel.querySelector(".ie-l-name").value.trim();
+  const phone = panel.querySelector(".ie-l-phone").value.trim();
+  const email = panel.querySelector(".ie-l-email").value.trim();
+  if (!name) { panel.querySelector(".ie-l-name").focus(); return; }
+  const parts = name.split(/\s+/);
+  state.leaders[stageId] = {
+    name, phone, email,
+    short: parts.length > 1 ? parts[0][0] + ". " + parts.slice(1).join(" ") : name,
+  };
+  renderLeader(stageId);
+  closeInline(panel);
+}
+
+/* view toggle works in any inline area */
+document.addEventListener("click", (e) => {
+  const btn = e.target.closest(".view-toggle button");
+  if (!btn) return;
+  const wrap = btn.closest(".sheet-grid") || btn.closest(".inline-area");
+  wrap.querySelectorAll(".view-toggle button").forEach((b) =>
+    b.setAttribute("aria-pressed", b === btn ? "true" : "false"));
+  wrap.querySelectorAll(".view-pane").forEach((p) => {
+    const show = p.dataset.pane === btn.dataset.view;
+    p.hidden = !show;
+    if (show) { p.classList.remove("enter"); void p.offsetWidth; p.classList.add("enter"); }
+  });
+});
+
+function selectStage(i) {
+  if (i === state.currentStage) return;
+  state.currentStage = i;
+  document.querySelectorAll(".stage-panel").forEach((el, idx) =>
+    el.classList.toggle("selected", idx === i));
+  /* stage details are visible by default on the newly selected stage */
+  const panel = document.querySelectorAll(".stage-panel")[i];
+  if (!panel.querySelector(".inline-area"))
+    openStageDetail(panel, panel.dataset.id, null, { scroll: false });
+  updateRoadmapState();
+  updateGanttCurrent();
+}
+
+/* ============================================================
+   Dates
+   ============================================================ */
+function updateDates() {
+  const sc = state.schedule;
+  document.querySelectorAll(".stage-panel").forEach((el) => {
+    const s = sc.stages[el.dataset.id];
+    el.querySelector('[data-role="start-edit"]').value = toISO(s.start);
+    el.querySelector('[data-role="end-edit"]').value = toISO(s.end);
+    el.querySelector('[data-role="tat"]').textContent = fmtW(s.durationWeeks) + " TAT";
+  });
+  document.querySelectorAll(".rm-station").forEach((el) => {
+    const idx = +el.dataset.index;
+    const s = sc.stages[journeyData[idx].id];
+    el.querySelector('[data-role="st-date"]').textContent = fmtDateShort(s.start);
+    el.dataset.tip = `${journeyData[idx].title}|${fmtDateShort(s.start)} → ${fmtDateShort(s.end)} · ${fmtW(s.durationWeeks)}`;
+    el.classList.toggle("past", s.end < TODAY);
+  });
+  const map = { tapeout: sc.tapeout, firstSilicon: sc.firstSilicon, production: sc.production };
+  document.querySelectorAll("[data-computed]").forEach((el) => {
+    const d = map[el.dataset.computed];
+    if (d) el.textContent = fmtDate(d);
+  });
+  document.querySelectorAll("[data-msid]").forEach((el) => {
+    const m = sc.milestones.find((x) => x.id === el.dataset.msid);
+    if (m) el.dataset.tip = `${m.label}|${fmtDate(m.date)}`;
+  });
+  renderGantt(document.getElementById("rm-gantt"), { short: true });
+  renderGantt(document.getElementById("gantt-b"));
+  alignRmToday();
+  if (document.body.classList.contains("schedule-mode")) renderDashboard();
+}
+
+/* ============================================================
+   Gantt renderer
+   ============================================================ */
+function renderGantt(root, opts = {}) {
+  if (!root || !state.schedule) return;
+  const sc = state.schedule;
+  const minWeek = Math.min(0, ...journeyData.map((s) => sc.stages[s.id].startOffsetWeeks));
+  const total = sc.totalWeeks - minWeek + 2;
+  let months = "", grid = "";
+  const origin = addWeeks(state.kickoff, minWeek);
+  const end = addWeeks(origin, total);
+  const cursor = new Date(origin.getFullYear(), origin.getMonth() + 1, 1);
+  let mIdx = 0;
+  while (cursor < end) {
+    const wk = (cursor - origin) / (7 * DAY);
+    const pct = (wk / total) * 100;
+    const showLabel = !opts.short || mIdx % 2 === 0;
+    if (showLabel) months += `<span class="g-month" style="left:${pct}%">${cursor.toLocaleDateString("en-US", { month: "short" })}${cursor.getMonth() === 0 ? " ’" + String(cursor.getFullYear()).slice(2) : ""}</span>`;
+    grid += `<span class="g-gridline" style="left:${pct}%"></span>`;
+    cursor.setMonth(cursor.getMonth() + 1);
+    mIdx++;
+  }
+  /* checkpoints live on their own stage's row (full gantt only) */
+  const msByStage = {};
+  if (!opts.short) sc.milestones.forEach((m) => {
+    (msByStage[m.anchor.stage] = msByStage[m.anchor.stage] || []).push(m);
+  });
+  /* today marker: vertical line through the chart */
+  const todayWk = (TODAY - origin) / (7 * DAY);
+  const todayPct = (todayWk / total) * 100;
+  const todayLine = (todayWk >= 0 && todayWk <= total)
+    ? `<span class="g-today" style="left:${todayPct}%"></span><span class="g-today-label" style="left:${todayPct}%">Today</span>`
+    : "";
+  const rows = journeyData.map((s, i) => {
+    const st = sc.stages[s.id];
+    const left = ((st.startOffsetWeeks - minWeek) / total) * 100;
+    const width = (st.durationWeeks / total) * 100;
+    /* past portion of the bar renders gray; future keeps its color */
+    const pastFrac = Math.min(Math.max((TODAY - st.start) / (st.end - st.start), 0), 1);
+    const risky = hasOpenRisks(s.id) ? "risky" : "";
+    /* risk color wins over past-gray — an open risk must stay visible */
+    const pastSeg = (pastFrac > 0 && !risky) ? `<span class="past-seg" style="width:${(pastFrac * 100).toFixed(1)}%"></span>` : "";
+    const cps = (msByStage[s.id] || []).map((m) => {
+      const pct = ((m.week - minWeek) / total) * 100;
+      const flip = pct > 78;   /* near the right edge the label hangs to the left */
+      return `<span class="g-msdot ${m.major ? "major" : ""}" style="left:${pct}%" data-tip="${m.label}|${fmtDate(m.date)}"></span>` +
+        `<span class="g-cp ${m.major ? "major" : ""} ${flip ? "flip" : ""}" style="left:${pct}%"
+        data-tip="${m.label}|${fmtDate(m.date)}">${m.label} · ${fmtDateShort(m.date)}</span>`;
+    }).join("");
+    return `
+    <div class="g-row ${i === state.currentStage ? "current" : ""}" data-index="${i}">
+      <span class="g-row-label" title="${s.title}">${opts.short ? s.shortTitle : s.title}</span>
+      <span class="g-row-track">
+        <span class="g-bar ${risky}" style="left:${left}%;width:${width}%" data-index="${i}"
+          data-tip="${s.title}${hasOpenRisks(s.id) ? " ⚠" : ""}|${fmtDate(st.start)} → ${fmtDate(st.end)} · ${fmtW(st.durationWeeks)}">${pastSeg}</span>
+        ${cps}
+      </span>
+    </div>`;
+  }).join("");
+  root.innerHTML = `
+    <div class="g-months">${months}</div>
+    <div class="g-body">
+      <div class="g-gridlines">${grid}${todayLine}</div>
+      ${rows}
+    </div>`;
+}
+/* the station-line TODAY marker aligns pixel-exact with the gantt's today line */
+function alignRmToday() {
+  const ty = document.getElementById("rm-today");
+  if (!ty) return;
+  const line = document.querySelector("#rm-gantt .g-today");
+  if (!line) { ty.hidden = true; return; }
+  const lr = line.getBoundingClientRect();
+  const wr = document.getElementById("rm-line-wrap").getBoundingClientRect();
+  ty.hidden = false;
+  ty.style.left = (lr.left - wr.left + lr.width / 2) + "px";
+}
+function updateGanttCurrent() {
+  document.querySelectorAll(".g-row").forEach((r) =>
+    r.classList.toggle("current", +r.dataset.index === state.currentStage));
+}
+document.addEventListener("pointerover", (e) => {
+  const bar = e.target.closest("#rm-gantt .g-bar");
+  if (bar) selectStage(+bar.dataset.index);
+});
+
+/* tooltip */
+const tip = document.getElementById("g-tip");
+document.addEventListener("mousemove", (e) => {
+  const t = e.target.closest("[data-tip]");
+  if (t) {
+    const [head, sub] = t.dataset.tip.split("|");
+    tip.innerHTML = head + (sub ? `<small>${sub}</small>` : "");
+    tip.style.opacity = 1;
+    const pad = 14;
+    let x = e.clientX + pad, y = e.clientY - 10;
+    if (x + tip.offsetWidth > innerWidth - 8) x = e.clientX - tip.offsetWidth - pad;
+    if (y + tip.offsetHeight > innerHeight - 8) y = innerHeight - tip.offsetHeight - 8;
+    tip.style.left = x + "px"; tip.style.top = y + "px";
+  } else tip.style.opacity = 0;
+});
+
+/* ============================================================
+   Mode toggle, settings, controls
+   ============================================================ */
+function setMode(mode) {
+  document.body.classList.toggle("schedule-mode", mode === "schedule");
+  document.getElementById("schedule-view").setAttribute("aria-hidden", mode !== "schedule");
+  document.querySelectorAll("#mode-toggle button").forEach((b) =>
+    b.setAttribute("aria-pressed", b.dataset.mode === mode ? "true" : "false"));
+  document.documentElement.style.overflow = mode === "schedule" ? "hidden" : "";
+  if (mode === "schedule") renderDashboard();
+}
+
+/* ============================================================
+   Dashboard — program status at a glance
+   ============================================================ */
+const daysTo = (d) => Math.ceil((d - TODAY) / DAY);
+const dday = (d) => { const n = daysTo(d); return n >= 0 ? "D−" + n : "D+" + Math.abs(n); };
+function renderDashboard() {
+  const root = document.getElementById("dash");
+  if (!root || !state.schedule) return;
+  const sc = state.schedule;
+  document.getElementById("dash-title").textContent = `${state.projectName} — Dashboard`;
+
+  /* progress = completed deliverables across the whole flow */
+  const allDlv = journeyData.flatMap((s) => state.deliverables[s.id]);
+  const dlvDone = allDlv.filter((d) => d.done).length;
+  const progress = allDlv.length ? Math.round((dlvDone / allDlv.length) * 100) : 0;
+  const openRisks = journeyData.reduce((n, s) => n + userContent[s.id].risks.length, 0);
+  const riskStages = journeyData.filter((s) => userContent[s.id].risks.length).map((s) => s.title);
+  const overdue = journeyData.reduce((n, s) =>
+    n + userContent[s.id].activities.filter((a) => !a.done && a.due && a.due < TODAY).length, 0);
+  const inFlight = journeyData.filter((s) => {
+    const st = sc.stages[s.id];
+    return st.start <= TODAY && TODAY <= st.end;
+  });
+  const upcoming = sc.milestones.filter((m) => m.date >= TODAY)
+    .sort((a, b) => a.date - b.date).slice(0, 4);
+  const recent = allUpdates();
+
+  root.innerHTML = `
+    <div class="stat-row">
+      <div class="stat">
+        <span class="k cap">Program Progress</span>
+        <span class="v">${progress}%</span>
+        <span class="sub">${dlvDone} of ${allDlv.length} deliverables complete</span>
+      </div>
+      <div class="stat">
+        <span class="k cap">Tapeout</span>
+        <span class="v mono">${dday(sc.tapeout)}</span>
+        <span class="sub">${fmtDate(sc.tapeout)}</span>
+      </div>
+      <div class="stat ${openRisks ? "alert" : ""}">
+        <span class="k cap">Open Risks</span>
+        <button class="v v-link" data-dash-open="risks" title="View all open risks">${openRisks}</button>
+        <span class="sub">${riskStages.length ? riskStages.join(", ") : "no stages flagged"}</span>
+      </div>
+      <div class="stat ${overdue ? "alert" : ""}">
+        <span class="k cap">Overdue Activities</span>
+        <button class="v v-link" data-dash-open="overdue" title="View all overdue activities">${overdue}</button>
+        <span class="sub">past target due date</span>
+      </div>
+    </div>
+    <div class="dash-grid">
+      <div class="dash-col">
+        <span class="cap">Upcoming Milestones</span>
+        ${upcoming.length ? upcoming.map((m) => `
+          <div class="dash-item">
+            <span class="d">${fmtDate(m.date)}</span>
+            <span class="t">${m.major ? "◆ " : "◇ "}${m.label}</span>
+            <span class="dday">${dday(m.date)}</span>
+          </div>`).join("") : `<div class="dash-empty">No upcoming milestones.</div>`}
+        <span class="cap" style="margin-top:22px">In Flight Today</span>
+        <div class="dash-flight">
+          ${inFlight.length ? inFlight.map((s) =>
+            `<span class="${userContent[s.id].risks.length ? "risky" : ""}">${s.shortTitle} · ${s.title}</span>`).join("")
+            : `<span>No stage active today</span>`}
+        </div>
+      </div>
+      <div class="dash-col">
+        <div class="dash-head-row">
+          <span class="cap">Recent Status Updates</span>
+          <span class="spacer"></span>
+          <button class="board-btn" style="color:var(--accent)" data-dash-open="updates">Show more</button>
+        </div>
+        ${recent.length ? recent.slice(0, 6).map((r) => `
+          <button class="dash-su" data-su-stage="${r.stage.id}" data-su-kind="${r.kind}" data-su-item="${r.it.id}">
+            <span class="d">${fmtDT(r.u.date)}</span>
+            <span class="su2">
+              <span class="t1"><span class="b-stage">${r.stage.shortTitle}</span>${esc(r.it.title)}</span>
+              <span class="t2">${esc(r.u.text)}</span>
+            </span>
+          </button>`).join("") : `<div class="dash-empty">No status updates yet — post one from any activity or risk.</div>`}
+      </div>
+    </div>`;
+}
+
+/* ============================================================
+   Project name (editable) — AtlasPM is the product, this is the project
+   ============================================================ */
+function initProjectName() {
+  const btn = document.getElementById("project-name");
+  btn.textContent = state.projectName;
+  btn.addEventListener("click", () => {
+    const input = document.createElement("input");
+    input.id = "project-name-input";
+    input.value = state.projectName;
+    btn.replaceWith(input);
+    input.focus();
+    input.select();
+    const commit = () => {
+      state.projectName = input.value.trim() || state.projectName;
+      btn.textContent = state.projectName;
+      input.replaceWith(btn);
+      if (document.body.classList.contains("schedule-mode")) renderDashboard();
+    };
+    input.addEventListener("blur", commit);
+    input.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") input.blur();
+      if (e.key === "Escape") { input.value = state.projectName; input.blur(); }
+    });
+  });
+}
+
+/* Display settings — Main and Dashboard hold independent values.
+   Main writes the root vars; Dashboard overrides the same vars
+   scoped on #schedule-view (custom properties inherit downward). */
+const px = (v) => v + "px";
+const DISP_DEFS = [
+  { key: "font", input: "set-font", valEl: "set-font-val", varName: "--fs-base", unit: "px", fmt: px, scopes: ["main", "dash"] },
+  { key: "icon", input: "set-icon", valEl: "set-icon-val", varName: "--icon-scale", unit: "", scopes: ["main"],
+    fmt: (v) => (+v).toFixed(2).replace(/0+$/, "").replace(/\.$/, "") + "×" },
+  { key: "bar", input: "set-bar", valEl: "set-bar-val", varName: "--gbar-h", unit: "px", fmt: px, scopes: ["main", "dash"] },
+  { key: "cp", input: "set-cp", valEl: "set-cp-val", varName: "--cp-fs", unit: "px", fmt: px, scopes: ["main", "dash"] },
+  { key: "drow", input: "set-drow", valEl: "set-drow-val", varName: "--dash-row-h", unit: "px", fmt: px, scopes: ["dash"] },
+];
+const DISP_DEFAULTS = {
+  main: { font: 18, icon: 2, bar: 16, cp: 11 },
+  dash: { font: 18, bar: 16, cp: 11, drow: 36 },
+};
+const disp = JSON.parse(JSON.stringify(DISP_DEFAULTS));
+let dispScope = "main";
+function applyDisplay() {
+  const root = document.documentElement.style;
+  const sv = document.getElementById("schedule-view").style;
+  DISP_DEFS.forEach((d) => {
+    if (d.scopes.includes("main") && disp.main[d.key] !== undefined)
+      root.setProperty(d.varName, disp.main[d.key] + d.unit);
+    if (d.scopes.includes("dash") && disp.dash[d.key] !== undefined)
+      sv.setProperty(d.varName, disp.dash[d.key] + d.unit);
+  });
+}
+function refreshDispUI() {
+  DISP_DEFS.forEach((d) => {
+    const row = document.querySelector(`.set-row[data-key="${d.key}"]`);
+    const inScope = d.scopes.includes(dispScope);
+    row.hidden = !inScope;
+    if (inScope) {
+      const el = document.getElementById(d.input);
+      el.value = disp[dispScope][d.key];
+      document.getElementById(d.valEl).textContent = d.fmt(el.value);
+    }
+  });
+  document.querySelectorAll("#set-scope button").forEach((b) =>
+    b.setAttribute("aria-pressed", b.dataset.scope === dispScope ? "true" : "false"));
+}
+function initSettings() {
+  DISP_DEFS.forEach((d) => {
+    const el = document.getElementById(d.input);
+    el.addEventListener("input", () => {
+      disp[dispScope][d.key] = el.value;
+      document.getElementById(d.valEl).textContent = d.fmt(el.value);
+      applyDisplay();
+    });
+  });
+  document.getElementById("set-scope").addEventListener("click", (e) => {
+    const btn = e.target.closest("button");
+    if (!btn) return;
+    dispScope = btn.dataset.scope;
+    refreshDispUI();
+  });
+  document.getElementById("set-reset").addEventListener("click", () => {
+    Object.assign(disp.main, DISP_DEFAULTS.main);
+    Object.assign(disp.dash, DISP_DEFAULTS.dash);
+    applyDisplay();
+    refreshDispUI();
+    /* also restore board + deliverables column widths */
+    ["keyinfo", "activities", "risks"].forEach((k) =>
+      ["date", "owner", "due"].forEach((c) =>
+        document.documentElement.style.removeProperty(`--bck-${k}-${c}`)));
+    ["--dlv-due", "--dlv-comp"].forEach((v) =>
+      document.documentElement.style.removeProperty(v));
+  });
+  document.getElementById("sched-reset").addEventListener("click", resetSchedule);
+  applyDisplay();
+  refreshDispUI();
+}
+
+function initPopover(noteId, btnId) {
+  const note = document.getElementById(noteId);
+  const btn = document.getElementById(btnId);
+  btn.addEventListener("click", (e) => {
+    e.stopPropagation();
+    const open = note.classList.toggle("open");
+    btn.setAttribute("aria-expanded", open);
+  });
+  document.addEventListener("click", (e) => {
+    if (!note.contains(e.target)) { note.classList.remove("open"); btn.setAttribute("aria-expanded", "false"); }
+  });
+}
+
+function initControls() {
+  document.getElementById("mode-toggle").addEventListener("click", (e) => {
+    const btn = e.target.closest("button");
+    if (btn) setMode(btn.dataset.mode);
+  });
+  const input = document.getElementById("kickoff-input");
+  input.addEventListener("input", () => {
+    if (!input.value) return;
+    const [y, m, d] = input.value.split("-").map(Number);
+    state.kickoff = new Date(y, m - 1, d);
+    recompute(); updateDates(); updateGanttCurrent();
+  });
+  document.getElementById("profile-select").addEventListener("change", (e) => {
+    state.profileId = e.target.value;
+    state.overrides = {};
+    document.body.classList.remove("has-overrides");
+    recompute(); updateDates(); updateGanttCurrent();
+  });
+  initPopover("info-note", "info-btn");
+  initPopover("settings-note", "settings-btn");
+  initSettings();
+  initProjectName();
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") {
+      if (document.body.classList.contains("modal-open")) return closeModal();
+      setMode("journey");
+      document.querySelectorAll(".stage-panel.detail-open").forEach((p) => closeInline(p));
+    }
+  });
+  window.addEventListener("resize", () => { updateRoadmapState(); alignRmToday(); });
+}
+
+/* ============================================================
+   /data/projectSeed.ts — AtlasAX1
+   4nm-class AI inference accelerator, 2.5D + 2× HBM3.
+   Program is mid-PnR today; earlier stages closed, signoff
+   ramping, manufacturing/packaging logistics in flight.
+   All content is generic industry practice — nothing confidential.
+   ============================================================ */
+function applyProjectSeed() {
+  state.projectName = "AtlasAX1";
+  document.getElementById("project-name").textContent = state.projectName;
+
+  const sc = state.schedule.stages;
+  const ago = (days, hrs = 0) => { const d = new Date(); d.setDate(d.getDate() - days); d.setHours(d.getHours() - hrs); return d; };
+  const W = (stage, weeks) => addWeeks(sc[stage].start, weeks);
+  const E = (stage) => new Date(sc[stage].end);
+  const U = (days, text, hrs = 0) => ({ id: uid(), text, date: ago(days, hrs) });
+  /* item factory: newest update first in `ups` */
+  const I = (stage, t, { o, due = null, dn = false, ups = [], body = "" } = {}) => ({
+    id: uid(), title: t, owner: o || state.leaders[stage].short, body,
+    due, done: dn,
+    updates: ups,
+    updated: ups.length ? ups[0].date : (dn ? E(stage) : ago(6)),
+  });
+
+  const seed = (stage, { ki = [], acts = [], risks = [], dlv = [] }) => {
+    userContent[stage] = { keyinfo: ki, activities: acts, risks };
+    /* dlv entry: [title, done, due?, completedAt?] — due defaults to stage end,
+       completedAt defaults to stage end for items seeded as done */
+    state.deliverables[stage] = dlv.map(([title, done, due, comp]) => ({
+      id: uid(), title, done,
+      due: due !== undefined ? due : E(stage),
+      completedAt: done ? (comp !== undefined ? comp : E(stage)) : null,
+    }));
+  };
+
+  /* ---- 01 Product Definition — CLOSED ---- */
+  seed("productDefinition", {
+    ki: [
+      I("productDefinition", "AtlasAX1: 4nm-class AI inference accelerator — 2.5D package, 2× HBM3, PCIe Gen5 x16 host"),
+      I("productDefinition", "Program targets: 250 TOPS (INT8) at 75 W board power; ES samples committed to two anchor customers"),
+      I("productDefinition", "Business case approved at exec review; BOM cost ceiling locked against Q3 forecast"),
+    ],
+    acts: [
+      I("productDefinition", "Market & customer requirements analysis", { o: "N. Feld", due: W("productDefinition", 3), dn: true,
+        ups: [U(203, "PRD v1.0 signed off by all stakeholders — requirements baseline frozen.")] }),
+      I("productDefinition", "PPA & cost target definition", { o: "I. Brooks", due: E("productDefinition"), dn: true }),
+      I("productDefinition", "Technology node & package feasibility", { o: "Seojin Ha", due: E("productDefinition"), dn: true }),
+      I("productDefinition", "Program schedule baseline (Typical SoC profile)", { due: E("productDefinition"), dn: true }),
+    ],
+    risks: [],
+    dlv: [["PRD v1.0 (signed off)", true], ["Target specification — PPA & cost", true], ["Feasibility & die-size report", true], ["Program charter & budget", true]],
+  });
+
+  /* ---- 02 Architecture — CLOSED ---- */
+  seed("architecture", {
+    ki: [
+      I("architecture", "16-cluster NPU (≈16 TOPS/cluster) + dual-core management CPU + LPDDR5X sideband"),
+      I("architecture", "NoC: 2D mesh, 512-bit links @ 1.2 GHz; HBM3 2 stacks — 819 GB/s aggregate bandwidth"),
+      I("architecture", "Arch Freeze held with zero open P1 issues; PPA budgets allocated to all blocks"),
+    ],
+    acts: [
+      I("architecture", "Workload modeling — LLM inference traces", { o: "L. Martins", due: W("architecture", 3), dn: true }),
+      I("architecture", "Compute / memory partitioning & NoC topology", { o: "A. Bello", due: W("architecture", 4), dn: true }),
+      I("architecture", "HBM3 + PCIe Gen5 IP selection", { o: "R. Kapoor", due: W("architecture", 5), dn: true,
+        ups: [U(175, "IP contracts executed; PHY delivery schedule attached to vendor SOW.")] }),
+      I("architecture", "Architecture specification v2.0", { due: E("architecture"), dn: true }),
+    ],
+    risks: [],
+    dlv: [["Architecture spec v2.0", true], ["IP make/buy decision record", true], ["Interface & bandwidth budgets", true], ["Per-block PPA budgets", true]],
+  });
+
+  /* ---- 03 IP & RTL — CLOSED ---- */
+  seed("rtl", {
+    ki: [
+      I("rtl", "Final top level: ~148M placeable instances, 41 clock domains, 212 memory instances"),
+      I("rtl", "All third-party IP received — PCIe Gen5 PHY drop 3 (final) integrated"),
+      I("rtl", "RTL Freeze declared week 19; ECO-only change control since"),
+    ],
+    acts: [
+      I("rtl", "NPU cluster RTL & top integration", { o: "Jae Song", due: W("rtl", 9), dn: true }),
+      I("rtl", "NoC & coherency fabric implementation", { due: W("rtl", 10), dn: true }),
+      I("rtl", "Lint / CDC / RDC closure", { o: "M. Patel", due: W("rtl", 11), dn: true,
+        ups: [U(112, "CDC closure complete — 0 waiver-pending crossings; report archived.")] }),
+      I("rtl", "UPF power intent v1.2", { due: E("rtl"), dn: true }),
+    ],
+    risks: [],
+    dlv: [["Block & top RTL (frozen)", true], ["Integration testbench", true], ["CDC / RDC closure reports", true], ["UPF v1.2", true]],
+  });
+
+  /* ---- 04 Verification — CLOSED ---- */
+  seed("verification", {
+    ki: [
+      I("verification", "Coverage closure: 100% code / 96.4% functional (all waivers reviewed by arch)"),
+      I("verification", "Regression: 14.2k tests nightly at peak; farm peaked at 5,800 slots"),
+      I("verification", "3 late RTL bugs found post-freeze — all metal-fixable, none tapeout-blocking"),
+    ],
+    acts: [
+      I("verification", "UVM env & sequences — NPU / NoC / HBM ctrl", { o: "D. Ruiz", due: W("verification", 8), dn: true }),
+      I("verification", "Formal verification — arbiters & CSR blocks", { o: "S. Okafor", due: W("verification", 12), dn: true }),
+      I("verification", "Gate-level simulation @ SS corner", { o: "L. Vogel", due: W("verification", 15), dn: true }),
+      I("verification", "DV closure review & signoff", { due: E("verification"), dn: true,
+        ups: [U(14, "DV signoff review complete; scoreboard archived. Two functional-coverage waivers approved by architecture.")] }),
+    ],
+    risks: [],
+    dlv: [["Verification plan & closure report", true], ["Final coverage dashboard", true], ["GLS report (SS corner)", true], ["DV signoff memo", true]],
+  });
+
+  /* ---- 05 Synthesis — CLOSED ---- */
+  seed("synthesis", {
+    ki: [
+      I("synthesis", "Netlist handoff week 24: 0 unmapped cells; −12 ns TNS budgeted for PD recovery"),
+      I("synthesis", "Scan stitching 99.2% coverage; MBIST inserted on all 212 memories"),
+    ],
+    acts: [
+      I("synthesis", "SDC v3 constraint set", { o: "P. Kral", due: W("synthesis", 2), dn: true }),
+      I("synthesis", "DFT insertion — scan & MBIST", { o: "Y. Demir", due: W("synthesis", 3), dn: true }),
+      I("synthesis", "Formal equivalence RTL ↔ netlist", { due: E("synthesis"), dn: true,
+        ups: [U(42, "LEC clean on all partitions; handoff package delivered to PD.")] }),
+    ],
+    risks: [],
+    dlv: [["Gate-level netlist r2", true], ["SDC v3", true], ["DFT insertion report", true], ["LEC report", true]],
+  });
+
+  /* ---- 06 Physical Design — IN PROGRESS (today) ---- */
+  seed("physicalDesign", {
+    ki: [
+      I("physicalDesign", "Die 19.6 × 18.1 mm; 11 metal + RDL; utilization 68% post-CTS"),
+      I("physicalDesign", "Timing today: NPU domain 1.2 GHz @ SS 0.675 V — WNS −41 ps / TNS −3.8 ns and improving"),
+      I("physicalDesign", "Block-level closure: 14 of 16 NPU clusters closed; top-level route 82% complete"),
+      I("physicalDesign", "ECO budget: two metal-only drops reserved before signoff (weeks 32 and 34)"),
+    ],
+    acts: [
+      I("physicalDesign", "Floorplan rev C & macro placement", { o: "M. Bianchi", due: W("physicalDesign", 4), dn: true,
+        ups: [U(21, "Rev C frozen — HBM PHY keep-outs finalized with the package team.")] }),
+      I("physicalDesign", "Clock tree synthesis — compute clusters", { o: "J. Park", due: W("physicalDesign", 7), dn: true,
+        ups: [U(9, "Global skew 38 ps → 22 ps after mesh rebalance on clusters 12–15.")] }),
+      I("physicalDesign", "Top-level detailed routing", { o: "N. Coleman", due: W("physicalDesign", 10),
+        body: "Full-chip detail route to DRC-clean. Crossbar region is the watch item.",
+        ups: [U(2, "82% routed. NoC crossbar overflow down to 1.1% after link re-bundling — DRC-clean ETA Friday."),
+              U(5, "Initial global route: 3.2% overflow concentrated in NoC crossbar; re-bundling NoC links with arch.")] }),
+      I("physicalDesign", "Multi-corner timing closure", { o: "M. Bianchi", due: W("physicalDesign", 11),
+        ups: [U(0, "WNS −86 → −41 ps at SS 0.675 V after CTS rebalance; hold clean at FF −40 °C.", 5)] }),
+      I("physicalDesign", "PDN IR-drop analysis rev 2", { o: "I. Berg", due: ago(3),
+        body: "Rev 2 with final package ball map. Blocking item for signoff entry.",
+        ups: [U(3, "Blocked on updated package ball map — expected from package team today; escalated at PD standup.")] }),
+      I("physicalDesign", "ECO drop 1 planning with DV / SYN", { due: W("physicalDesign", 11) }),
+    ],
+    risks: [
+      I("physicalDesign", "Routing congestion — NoC crossbar region", { o: "N. Coleman",
+        body: "Congestion could push DRC-clean past the ECO-1 window and compress signoff.",
+        ups: [U(2, "Overflow 3.2% → 1.1% after NoC link re-bundling; monitoring daily during detail route.")] }),
+      I("physicalDesign", "Hold closure at SS / −40 °C after CTS rework", { o: "J. Park",
+        ups: [U(1, "Hold clean on 14/16 clusters after buffer insertion; remaining 2 clusters re-running tonight.")] }),
+      I("physicalDesign", "IR-drop hotspot under compute clusters 9–12", { o: "I. Berg",
+        body: "Worst dynamic IR 4.8% vs 5% budget — margin too thin for signoff.",
+        ups: [U(3, "Interim mesh straps added: 4.8% → 4.1% in sims. Final answer needs the updated ball map.")] }),
+    ],
+    dlv: [
+      ["Floorplan rev C", true, W("physicalDesign", 4), ago(21)],
+      ["CTS implementation report", true, W("physicalDesign", 7), ago(9)],
+      ["Routed database (DRC clean)", false, W("physicalDesign", 10)],
+      ["Multi-corner timing closure report", false, W("physicalDesign", 11)],
+      ["Pre-signoff IR/EM report", false, E("physicalDesign")],
+    ],
+  });
+
+  /* ---- 07 Signoff — RAMPING ---- */
+  seed("signoff", {
+    ki: [
+      I("signoff", "Corner list rev C agreed with foundry — 9 corners × 3 modes"),
+      I("signoff", "Waiver review board scheduled Tue/Thu through the closure window"),
+    ],
+    acts: [
+      I("signoff", "Signoff STA environment bring-up", { o: "R. Iyer", due: W("signoff", 2),
+        ups: [U(4, "Signoff STA env validated against PD timing on 3 blocks — deltas under 5 ps.")] }),
+      I("signoff", "Physical verification runset validation", { o: "S. Marin", due: W("signoff", 2) }),
+      I("signoff", "EM / IR signoff preparation", { o: "T. Eriksen", due: W("signoff", 3) }),
+    ],
+    risks: [
+      I("signoff", "Closure window compresses if PD route slips past week 32", { o: "T. Rivera",
+        body: "Six-week signoff window assumes DRC-clean route at ECO-1. One week slip consumes the schedule buffer.",
+        ups: [U(2, "Tracking PD route daily; go/no-go checkpoint with PD lead set for Monday.")] }),
+    ],
+    dlv: [
+      ["Signoff STA env validation memo", true, W("signoff", 1), ago(4)],
+      ["Full-chip DRC/LVS clean report", false, W("signoff", 4)],
+      ["EM/IR signoff report", false, W("signoff", 5)],
+      ["Timing signoff report", false, E("signoff")],
+    ],
+  });
+
+  /* ---- 08 Tapeout — PLANNED ---- */
+  seed("tapeout", {
+    ki: [
+      I("tapeout", "Mask order window: 3 business days after Go decision; foundry slot reserved"),
+      I("tapeout", "Full-chip GDS assembly dry run scheduled week 33"),
+    ],
+    acts: [
+      I("tapeout", "Tapeout checklist v0.9 baseline", { o: "B. Walsh", due: W("tapeout", -3),
+        ups: [U(6, "Checklist v0.9 circulated — 12 items still owner-less; chasing in Friday program review.")] }),
+      I("tapeout", "GDS assembly dry run", { o: "E. Sokolov", due: W("tapeout", -4) }),
+    ],
+    risks: [
+      I("tapeout", "Mask slot vs closure schedule alignment", { o: "H. Yoon",
+        body: "Reserved mask slot assumes Go decision on plan. Slip >1 week likely means requeueing." }),
+    ],
+    dlv: [["Tapeout checklist (all items closed)", false], ["GDSII release", false], ["Mask order confirmation", false]],
+  });
+
+  /* ---- 09 Fabrication — PLANNED ---- */
+  seed("fabrication", {
+    ki: [
+      I("fabrication", "Hot-lot priority confirmed in writing for the first three lots"),
+      I("fabrication", "Wafer acceptance (WAT) criteria rev B agreed with foundry"),
+    ],
+    acts: [
+      I("fabrication", "Wafer logistics & export documentation", { o: "J. Adler", due: W("fabrication", 1) }),
+      I("fabrication", "Weekly bring-up readiness sync (with BU team)", { o: "K. Weiss" }),
+    ],
+    risks: [],
+    dlv: [["First-silicon wafers out", false], ["WAT / PCM data report", false], ["Wafer acceptance memo", false]],
+  });
+
+  /* ---- 10 Advanced Packaging — LOGISTICS IN FLIGHT ---- */
+  seed("packaging", {
+    ki: [
+      I("packaging", "Substrate PO placed week 12 (20-week lead) — arrival aligned to wafer-out"),
+      I("packaging", "Interposer test-vehicle assembly passed; warpage within spec"),
+    ],
+    acts: [
+      I("packaging", "Known-good-die test program", { o: "L. Zhang", due: W("packaging", -6),
+        ups: [U(7, "KGD coverage at 96.8% — closing the last scan chains to hit the 98% gate before stacking.")] }),
+      I("packaging", "Thermal solution validation (TIM selection)", { o: "F. Ade", due: W("packaging", 2) }),
+    ],
+    risks: [
+      I("packaging", "HBM3 allocation for qual builds unconfirmed", { o: "Y. Tanaka",
+        body: "ES build quantities are covered; qualification build allocation is still verbal only.",
+        ups: [U(1, "Supplier call: allocation letter expected next week; qual quantities committed verbally.")] }),
+      I("packaging", "Substrate arrival buffer only 1 week vs wafer-out", { o: "Y. Tanaka" }),
+    ],
+    dlv: [["Assembled ES units", false], ["KGD test program (98% gate)", false], ["Assembly yield report", false], ["Thermal validation report", false]],
+  });
+
+  /* ---- 11 Bring-up — PREP ---- */
+  seed("bringup", {
+    ki: [
+      I("bringup", "Evaluation board rev A at CM — delivery aligned 6 weeks before first packaged parts"),
+      I("bringup", "Lab slots and instruments reserved for the full bring-up window"),
+    ],
+    acts: [
+      I("bringup", "Bring-up plan & smoke test suite", { o: "D. Levi", due: W("bringup", -4) }),
+      I("bringup", "Debug access validation — JTAG & on-die trace", { o: "M. Richter", due: W("bringup", -2) }),
+    ],
+    risks: [],
+    dlv: [["Bring-up report", false], ["Characterization data pack", false], ["Errata list r0", false]],
+  });
+
+  /* ---- 12 Qualification & Production — PLANNED ---- */
+  seed("qualification", {
+    ki: [
+      I("qualification", "Qualification per JEDEC-based plan — HTOL 1000 h, TC 700 cycles"),
+      I("qualification", "Ramp staged over three quarters; capacity LOI signed with foundry/OSAT"),
+    ],
+    acts: [
+      I("qualification", "Qualification vehicle build plan", { o: "O. Price", due: W("qualification", -4) }),
+      I("qualification", "Production test time budget", { o: "G. Holt", due: W("qualification", 2) }),
+    ],
+    risks: [],
+    dlv: [["Qualification report", false], ["Production test release", false], ["Ramp readiness review", false]],
+  });
+}
+
+/* ---------- Boot ---------- */
+buildRoadmap();
+buildPanels();
+recompute();
+applyProjectSeed();   /* AtlasAX1 — AI accelerator program, currently in PnR */
+document.getElementById("kickoff-input").value = toISO(state.kickoff);
+journeyData.forEach((s) => renderFacts(s.id));   /* re-render with dues */
+updateDates();
+document.querySelector(".stage-panel").classList.add("selected");
+openStageDetail(document.querySelector(".stage-panel"), journeyData[0].id, null, { scroll: false });
+updateRoadmapState();
+updateGanttCurrent();
+initControls();
+</script>
+</body>
+</html>
