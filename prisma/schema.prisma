@@ -1,0 +1,125 @@
+// AtlasPM — domain model per CLAUDE.md.
+//
+// Provider is sqlite for local dev; the models stay Postgres-compatible so
+// production can switch the datasource without touching a model:
+//  - no SQLite-only types, no native type attributes
+//  - `kind` and `profileId` are String rather than enum (SQLite has no enums,
+//    and a String column migrates to Postgres unchanged)
+//  - ids are supplied by the caller (client-generated at mutation time, seed
+//    values at seed time) so optimistic UI and the database agree on them
+
+// Prisma 7 keeps the connection URL out of the schema: Migrate reads it from
+// prisma.config.ts, and PrismaClient gets a driver adapter (see src/lib/db.ts).
+datasource db {
+  provider = "sqlite"
+}
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
+}
+
+model Project {
+  id        String   @id
+  name      String
+  kickoff   DateTime
+  profileId String
+
+  overrides    StageOverride[]
+  items        Item[]
+  deliverables Deliverable[]
+  leaders      Leader[]
+  contacts     Contact[]
+}
+
+/// The ONLY schedule mutation surface — baseline profiles are immutable code.
+/// Rows hold the effective offsets/durations for every stage once any edit
+/// lands, so reading them back needs no replay of the edit history.
+model StageOverride {
+  id        String @id
+  projectId String
+  stageId   String
+
+  startOffsetWeeks Float
+  durationWeeks    Float
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@unique([projectId, stageId])
+}
+
+model Item {
+  id        String    @id
+  projectId String
+  stageId   String
+  /// keyinfo | activity | risk
+  kind      String
+  title     String
+  body      String    @default("")
+  owner     String
+  due       DateTime?
+  done      Boolean   @default(false)
+  updatedAt DateTime
+
+  project Project        @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  updates StatusUpdate[]
+
+  @@index([projectId, stageId, kind])
+}
+
+model StatusUpdate {
+  id        String   @id
+  itemId    String
+  text      String
+  createdAt DateTime
+
+  item Item @relation(fields: [itemId], references: [id], onDelete: Cascade)
+
+  @@index([itemId])
+}
+
+model Deliverable {
+  id          String    @id
+  projectId   String
+  stageId     String
+  title       String
+  due         DateTime?
+  done        Boolean   @default(false)
+  completedAt DateTime?
+  /// Preserves seed / insertion order within a stage.
+  position    Int
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@index([projectId, stageId])
+}
+
+model Leader {
+  id        String @id
+  projectId String
+  stageId   String
+  name      String
+  short     String
+  phone     String
+  email     String
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@unique([projectId, stageId])
+}
+
+model Contact {
+  id        String @id
+  projectId String
+  stageId   String
+  name      String
+  role      String
+  email     String
+  phone     String
+  /// Preserves seed / insertion order within a stage.
+  position  Int
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@index([projectId, stageId])
+}

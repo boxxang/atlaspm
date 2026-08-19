@@ -1,4 +1,4 @@
-import { expect, test, type Page } from '@playwright/test';
+import { expect, test, type Page } from './fixtures';
 
 const selectedPanel = (page: Page) => page.locator('.stage-panel.selected');
 const hoverStation = (page: Page, num: string) =>

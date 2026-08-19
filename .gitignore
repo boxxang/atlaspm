@@ -49,3 +49,5 @@ next-env.d.ts
 # local database (Phase 6)
 *.db
 *.db-journal
+/src/generated/
+test.db

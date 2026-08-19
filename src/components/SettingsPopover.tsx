@@ -1,10 +1,12 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import {
   COLUMN_VARS,
   DISP_DEFS,
+  STORAGE_KEY,
   cloneDefaults,
+  readStored,
   type DisplayScope,
   type DisplayValues,
 } from '@/lib/displaySettings';
@@ -20,7 +22,22 @@ const GEAR_PATH =
  */
 export function SettingsPopover({ onResetSchedule }: { onResetSchedule?: () => void }) {
   const [scope, setScope] = useState<DisplayScope>('main');
-  const [disp, setDisp] = useState<Record<DisplayScope, DisplayValues>>(cloneDefaults);
+  /* Restored from localStorage, not the DB; see lib/displaySettings.ts. */
+  const [disp, setDisp] = useState<Record<DisplayScope, DisplayValues>>(() =>
+    typeof window === 'undefined'
+      ? cloneDefaults()
+      : (readStored(localStorage.getItem(STORAGE_KEY))?.scopes ?? cloneDefaults()),
+  );
+  const loaded = useRef(false);
+
+  /* Column widths are DOM writes rather than state, so they restore here. */
+  useEffect(() => {
+    const stored = readStored(localStorage.getItem(STORAGE_KEY));
+    for (const [name, width] of Object.entries(stored?.columns ?? {})) {
+      document.documentElement.style.setProperty(name, width);
+    }
+    loaded.current = true;
+  }, []);
 
   // applyDisplay(): main → :root, dash → #schedule-view
   useEffect(() => {
@@ -34,10 +51,25 @@ export function SettingsPopover({ onResetSchedule }: { onResetSchedule?: () => v
     }
   }, [disp]);
 
+  /* Persist after the restore pass, so mount does not overwrite what it read. */
+  useEffect(() => {
+    if (!loaded.current) return;
+    const columns: Record<string, string> = {};
+    for (const v of COLUMN_VARS) {
+      const width = document.documentElement.style.getPropertyValue(v);
+      if (width) columns[v] = width;
+    }
+    localStorage.setItem(STORAGE_KEY, JSON.stringify({ scopes: disp, columns }));
+  }, [disp]);
+
   const resetDisplay = () => {
     setDisp(cloneDefaults());
     // also restore board + deliverables column widths
     for (const v of COLUMN_VARS) document.documentElement.style.removeProperty(v);
+    localStorage.setItem(
+      STORAGE_KEY,
+      JSON.stringify({ scopes: cloneDefaults(), columns: {} }),
+    );
   };
 
   return (

@@ -64,6 +64,46 @@ export const cloneDefaults = (): Record<DisplayScope, DisplayValues> => ({
   dash: { ...DISP_DEFAULTS.dash },
 });
 
+/**
+ * Where display settings live (Phase 6 decision): localStorage, not the
+ * database.
+ *
+ * They are per-browser preferences — text size, icon scale, bar thickness,
+ * dashboard row height, and the dragged board column widths. This pass has no
+ * auth (see PORTING_PLAN Phase 8), so a DisplaySettings table would be global
+ * to the database: one viewer bumping the font would resize it for everyone.
+ * localStorage keeps them where they belong and costs nothing to run.
+ *
+ * The tradeoff: settings do not follow a user across browsers or devices, and
+ * clearing site data resets them. When auth arrives, move this to a
+ * DisplaySettings row keyed by user id — the shape below is already
+ * { scope, json }, so the migration is a read/write swap, not a redesign.
+ */
+export const STORAGE_KEY = 'atlaspm.display.v1';
+
+export interface StoredDisplay {
+  scopes: Record<DisplayScope, DisplayValues>;
+  /** Column vars dragged off their defaults, as CSS var name → width. */
+  columns: Record<string, string>;
+}
+
+export const readStored = (raw: string | null): StoredDisplay | null => {
+  if (!raw) return null;
+  try {
+    const parsed = JSON.parse(raw) as Partial<StoredDisplay>;
+    if (!parsed || typeof parsed !== 'object' || !parsed.scopes) return null;
+    return {
+      scopes: {
+        main: { ...DISP_DEFAULTS.main, ...parsed.scopes.main },
+        dash: { ...DISP_DEFAULTS.dash, ...parsed.scopes.dash },
+      },
+      columns: parsed.columns ?? {},
+    };
+  } catch {
+    return null;
+  }
+};
+
 /** The board / deliverable column vars "Reset display" clears off :root. */
 export const COLUMN_VARS: readonly string[] = [
   ...(['keyinfo', 'activities', 'risks'] as const).flatMap((k) =>

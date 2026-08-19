@@ -1,4 +1,4 @@
-import { expect, test, type Page } from '@playwright/test';
+import { expect, test, type Page } from './fixtures';
 
 const openDash = async (page: Page) => {
   await page.locator('#mode-toggle button[data-mode="schedule"]').click();

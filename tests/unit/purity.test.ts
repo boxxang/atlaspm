@@ -3,10 +3,13 @@ import { join, resolve } from 'node:path';
 import { describe, expect, it } from 'vitest';
 
 /**
- * Phase 2 acceptance: /src/lib and /src/data are pure. They may not touch the
- * DOM, and data must never import UI (CLAUDE.md: "UI renders data; data never
- * imports UI"). displaySettings.ts names DOM ids as strings — that is data
- * about the UI, not a DOM call, so only real global access is rejected.
+ * /src/lib and /src/data may not touch the DOM, and data must never import UI
+ * (CLAUDE.md: "UI renders data; data never imports UI").
+ *
+ * /src/lib holds server-side modules too (db, queries) — those are DOM-free by
+ * the same rule, which is what this guards. displaySettings.ts names DOM ids as
+ * strings: data about the UI, not a DOM call, so only real global access is
+ * rejected.
  */
 const ROOT = resolve(import.meta.dirname, '../..');
 const PURE_DIRS = ['src/lib', 'src/data'];

@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { journeyData } from '@/data/journey';
 import { fmtDate, fromISO, toISO } from '@/lib/schedule';
+import type { ProjectState } from '@/lib/projectState';
 import { useModalStore } from '@/store/modalStore';
 import { useAppStore } from '@/store/useAppStore';
 import { BoardModal } from './BoardModal';
@@ -13,17 +14,18 @@ import { Toolbar, type ViewMode } from './Toolbar';
 import { Tooltip } from './Tooltip';
 
 /**
- * Phase 3 shell. All state lives in the Zustand store, which seeds itself from
- * projectSeed on mount — the seed reads a clock, so running it during SSR would
- * not survive hydration.
+ * All state lives in the Zustand store, hydrated on mount from the DB state the
+ * server component read. Hydration waits for mount because "today" has to come
+ * from the viewer's clock, not the server's — TODAY markers and overdue counts
+ * would otherwise be computed in the server's timezone.
  */
-export function AppShell() {
+export function AppShell({ initial }: { initial: ProjectState }) {
   const hydrated = useAppStore((s) => s.hydrated);
   const hydrate = useAppStore((s) => s.hydrate);
 
   useEffect(() => {
-    hydrate();
-  }, [hydrate]);
+    hydrate(initial);
+  }, [hydrate, initial]);
 
   return hydrated ? <App /> : null;
 }

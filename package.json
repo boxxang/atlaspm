@@ -10,12 +10,23 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "e2e": "playwright test",
-    "typecheck": "next typegen && tsc --noEmit"
+    "typecheck": "next typegen && tsc --noEmit",
+    "db:push": "prisma db push",
+    "db:seed": "prisma db seed",
+    "db:reset": "rm -f dev.db && prisma db push && prisma db seed",
+    "db:studio": "prisma studio",
+    "e2e:db": "rm -f test.db test.db-journal && prisma db push"
   },
   "dependencies": {
+    "@prisma/adapter-better-sqlite3": "^7.9.1",
+    "@prisma/client": "^7.9.1",
+    "dotenv": "^17.4.2",
     "next": "16.3.1",
+    "prisma": "^7.9.1",
     "react": "19.2.8",
     "react-dom": "19.2.8",
+    "server-only": "^0.0.1",
+    "tsx": "^4.23.12",
     "zustand": "^5.0.15"
   },
   "devDependencies": {

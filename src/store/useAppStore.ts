@@ -1,9 +1,10 @@
 'use client';
 
 import { create } from 'zustand';
+import * as api from '@/app/actions';
 import { journeyData } from '@/data/journey';
-import { createProjectSeed } from '@/data/projectSeed';
 import { STAGE_ORDER, scheduleProfiles } from '@/data/scheduleProfiles';
+import type { ProjectState } from '@/lib/projectState';
 import type {
   Contact,
   Deliverable,
@@ -14,10 +15,10 @@ import type {
   StageId,
 } from '@/data/types';
 import {
-  addWeeks,
   applyDateEdit,
   computeSchedule,
   hasOverrides,
+  materializeOverrides,
   startOfDay,
   type Schedule,
   type StageOverrides,
@@ -47,7 +48,7 @@ export interface AppState {
   contacts: Record<StageId, Contact[]>;
   inline: Partial<Record<StageId, InlineState | null>>;
 
-  hydrate: (now?: Date) => void;
+  hydrate: (initial: ProjectState, now?: Date) => void;
   setProjectName: (name: string) => void;
   setKickoff: (d: Date) => void;
   setProfile: (id: keyof typeof scheduleProfiles) => void;
@@ -91,9 +92,24 @@ export interface ItemFields {
   due: Date | null;
 }
 
-/** Runtime ids for anything created after the seed. */
-let _uid = 0;
-export const uid = () => 'r' + ++_uid;
+/**
+ * Ids are minted on the client and sent to the server, so the optimistic row
+ * and the stored row share an identity — editing a just-created item still
+ * finds it server-side.
+ */
+export const uid = () =>
+  typeof crypto !== 'undefined' && crypto.randomUUID
+    ? crypto.randomUUID()
+    : 'r' + Math.random().toString(36).slice(2);
+
+/**
+ * Mutations are optimistic: the store updates first, then the server action
+ * runs. A rejected write leaves the two out of step until the next load — there
+ * is no rollback in this pass, so failures are surfaced loudly instead.
+ */
+const sync = (p: Promise<unknown>) => {
+  void p.catch((e) => console.error('[atlaspm] server action failed', e));
+};
 
 const emptyMap = <T,>(make: () => T) =>
   Object.fromEntries(STAGE_ORDER.map((id) => [id, make()])) as Record<StageId, T>;
@@ -121,43 +137,51 @@ export const useAppStore = create<AppState>()((set, get) => ({
   contacts: emptyMap<Contact[]>(() => []),
   inline: {},
 
-  hydrate: (now = new Date()) => {
+  /* Server-rendered DB state in, client clock applied here: "today" belongs to
+     the viewer's timezone, so it cannot come from the server render. */
+  hydrate: (initial, now = new Date()) => {
     if (get().hydrated) return;
-    const today = startOfDay(now);
-    /* default kickoff = 30 weeks before today, so "today" sits mid-program */
-    const kickoff = addWeeks(today, -30);
-    const schedule = computeSchedule(kickoff, scheduleProfiles.typicalSoC, {});
-    const seed = createProjectSeed({ schedule, now });
+    const profile = scheduleProfiles[initial.profileId] ?? scheduleProfiles.typicalSoC;
     set({
       hydrated: true,
-      today,
-      kickoff,
-      schedule,
-      projectName: seed.projectName,
-      content: seed.content,
-      deliverables: seed.deliverables,
-      leaders: seed.leaders,
-      contacts: seed.contacts,
+      today: startOfDay(now),
+      projectName: initial.projectName,
+      kickoff: initial.kickoff,
+      profileId: initial.profileId,
+      overrides: initial.overrides,
+      edited: hasOverrides(profile, initial.overrides),
+      schedule: computeSchedule(initial.kickoff, profile, initial.overrides),
+      content: initial.content,
+      deliverables: initial.deliverables,
+      leaders: initial.leaders,
+      contacts: initial.contacts,
       /* stage details are open by default on the first stage */
       inline: { [STAGE_ORDER[0]]: { kind: 'stage', editContact: null } },
     });
   },
 
-  setProjectName: (projectName) => set({ projectName }),
+  setProjectName: (projectName) => {
+    set({ projectName });
+    sync(api.renameProject(projectName));
+  },
 
-  setKickoff: (kickoff) =>
+  setKickoff: (kickoff) => {
     set((s) => ({
       kickoff,
       schedule: computeSchedule(kickoff, scheduleProfiles[s.profileId], s.overrides),
-    })),
+    }));
+    sync(api.setKickoff(kickoff));
+  },
 
-  setProfile: (profileId) =>
+  setProfile: (profileId) => {
     set((s) => ({
       profileId,
       overrides: {},
       edited: false,
       schedule: computeSchedule(s.kickoff, scheduleProfiles[profileId], {}),
-    })),
+    }));
+    sync(api.setProfile(profileId));
+  },
 
   selectStage: (i) =>
     set((s) => {
@@ -172,23 +196,27 @@ export const useAppStore = create<AppState>()((set, get) => ({
       };
     }),
 
-  editStageDate: (stageId, which, date) =>
-    set((s) => {
-      const profile = scheduleProfiles[s.profileId];
-      const overrides = applyDateEdit(profile, s.overrides, s.schedule, stageId, which, date);
-      return {
-        overrides,
-        edited: hasOverrides(profile, overrides),
-        schedule: computeSchedule(s.kickoff, profile, overrides),
-      };
-    }),
+  editStageDate: (stageId, which, date) => {
+    const s = get();
+    const profile = scheduleProfiles[s.profileId];
+    const overrides = applyDateEdit(profile, s.overrides, s.schedule, stageId, which, date);
+    set({
+      overrides,
+      edited: hasOverrides(profile, overrides),
+      schedule: computeSchedule(s.kickoff, profile, overrides),
+    });
+    /* the stored rows are the effective values, not a replay of the edits */
+    sync(api.saveOverrides(materializeOverrides(profile, overrides)));
+  },
 
-  resetSchedule: () =>
+  resetSchedule: () => {
     set((s) => ({
       overrides: {},
       edited: false,
       schedule: computeSchedule(s.kickoff, scheduleProfiles[s.profileId], {}),
-    })),
+    }));
+    sync(api.resetOverrides());
+  },
 
   openInline: (stageId, kind, editContact = null) =>
     set((s) => ({ inline: { ...s.inline, [stageId]: { kind, editContact } } })),
@@ -198,90 +226,100 @@ export const useAppStore = create<AppState>()((set, get) => ({
 
   closeAllInline: () => set({ inline: {} }),
 
-  toggleDeliverable: (stageId, id, done) =>
+  toggleDeliverable: (stageId, id, done) => {
+    const completedAt = done ? new Date() : null;
     set((s) => ({
       deliverables: {
         ...s.deliverables,
         [stageId]: s.deliverables[stageId].map((d) =>
-          d.id === id
-            ? /* completion timestamp is automatic */
-              { ...d, done, completedAt: done ? new Date() : null }
-            : d,
+          /* completion timestamp is automatic */
+          d.id === id ? { ...d, done, completedAt } : d,
         ),
       },
-    })),
+    }));
+    sync(api.setDeliverableDone(id, done, completedAt));
+  },
 
-  setDeliverableDue: (stageId, id, due) =>
+  setDeliverableDue: (stageId, id, due) => {
     set((s) => ({
       deliverables: {
         ...s.deliverables,
         [stageId]: s.deliverables[stageId].map((d) => (d.id === id ? { ...d, due } : d)),
       },
-    })),
+    }));
+    sync(api.setDeliverableDue(id, due));
+  },
 
-  addDeliverable: (stageId, title, due) =>
+  addDeliverable: (stageId, title, due) => {
+    const id = uid();
     set((s) => ({
       deliverables: {
         ...s.deliverables,
         [stageId]: [
           ...s.deliverables[stageId],
-          { id: uid(), title, done: false, due, completedAt: null },
+          { id, title, done: false, due, completedAt: null },
         ],
       },
-    })),
+    }));
+    sync(api.addDeliverable({ id, stageId, title, due }));
+  },
 
-  deleteDeliverable: (stageId, id) =>
+  deleteDeliverable: (stageId, id) => {
     set((s) => ({
       deliverables: {
         ...s.deliverables,
         [stageId]: s.deliverables[stageId].filter((d) => d.id !== id),
       },
-    })),
+    }));
+    sync(api.deleteDeliverable(id));
+  },
 
-  saveContact: (stageId, c) =>
+  saveContact: (stageId, c) => {
+    const id = c.id ?? uid();
     set((s) => {
       const list = s.contacts[stageId];
       const next = c.id
-        ? list.map((x) => (x.id === c.id ? { ...x, ...c, id: x.id } : x))
-        : [...list, { ...c, id: uid() }];
+        ? list.map((x) => (x.id === c.id ? { ...x, ...c, id } : x))
+        : [...list, { ...c, id }];
       return { contacts: { ...s.contacts, [stageId]: next } };
-    }),
+    });
+    const { name, role, email, phone } = c;
+    sync(api.saveContact({ id, stageId, name, role, email, phone }));
+  },
 
-  deleteContact: (stageId, id) =>
+  deleteContact: (stageId, id) => {
     set((s) => ({
       contacts: { ...s.contacts, [stageId]: s.contacts[stageId].filter((c) => c.id !== id) },
-    })),
+    }));
+    sync(api.deleteContact(id));
+  },
 
-  saveLeader: (stageId, l) =>
-    set((s) => {
-      const parts = l.name.split(/\s+/);
-      const short =
-        parts.length > 1 ? parts[0][0] + '. ' + parts.slice(1).join(' ') : l.name;
-      return { leaders: { ...s.leaders, [stageId]: { ...l, short } } };
-    }),
+  saveLeader: (stageId, l) => {
+    const parts = l.name.split(/\s+/);
+    const short = parts.length > 1 ? parts[0][0] + '. ' + parts.slice(1).join(' ') : l.name;
+    set((s) => ({ leaders: { ...s.leaders, [stageId]: { ...l, short } } }));
+    sync(api.saveLeader(stageId, { ...l, short }));
+  },
 
-  adoptPotentialRisk: (stageId, title) =>
-    set((s) => {
-      const risk: Item = {
-        id: uid(),
-        title,
-        body: '',
-        owner: s.leaders[stageId].short,
-        due: null,
-        done: false,
-        updated: new Date(),
-        updates: [],
-      };
-      return {
-        content: {
-          ...s.content,
-          [stageId]: {
-            ...s.content[stageId],
-            risks: [...s.content[stageId].risks, risk],
-          },
-        },
-      };
-    }),
+  adoptPotentialRisk: (stageId, title) => {
+    const risk: Item = {
+      id: uid(),
+      title,
+      body: '',
+      owner: get().leaders[stageId].short,
+      due: null,
+      done: false,
+      updated: new Date(),
+      updates: [],
+    };
+    set((s) => ({
+      content: {
+        ...s.content,
+        [stageId]: { ...s.content[stageId], risks: [...s.content[stageId].risks, risk] },
+      },
+    }));
+    sync(api.saveItem({ ...risk, stageId, kind: 'risks', updatedAt: risk.updated }));
+  },
 
   saveItem: (stageId, kind, itemId, f) => {
     const existing = itemId
@@ -301,10 +339,11 @@ export const useAppStore = create<AppState>()((set, get) => ({
         },
       },
     }));
+    sync(api.saveItem({ ...saved, stageId, kind, updatedAt: saved.updated }));
     return saved;
   },
 
-  deleteItem: (stageId, kind, itemId) =>
+  deleteItem: (stageId, kind, itemId) => {
     set((s) => ({
       content: {
         ...s.content,
@@ -313,37 +352,43 @@ export const useAppStore = create<AppState>()((set, get) => ({
           [kind]: s.content[stageId][kind].filter((x) => x.id !== itemId),
         },
       },
-    })),
+    }));
+    sync(api.deleteItem(itemId));
+  },
 
-  postUpdate: (stageId, kind, itemId, text) =>
+  postUpdate: (stageId, kind, itemId, text) => {
+    const su = { id: uid(), text, date: new Date() };
     set((s) => ({
       content: mapItem(s.content, stageId, kind, itemId, (it) => ({
         ...it,
-        updates: [...it.updates, { id: uid(), text, date: new Date() }],
-        updated: new Date(),
+        updates: [...it.updates, su],
+        updated: su.date,
       })),
-    })),
+    }));
+    sync(api.postUpdate({ id: su.id, itemId, text, createdAt: su.date }));
+  },
 
   /* editing keeps the update's original timestamp — the thread stays honest */
-  saveUpdate: (stageId, kind, itemId, suId, text) =>
-    set((s) =>
-      text
-        ? {
-            content: mapItem(s.content, stageId, kind, itemId, (it) => ({
-              ...it,
-              updates: it.updates.map((u) => (u.id === suId ? { ...u, text } : u)),
-            })),
-          }
-        : s,
-    ),
+  saveUpdate: (stageId, kind, itemId, suId, text) => {
+    if (!text) return;
+    set((s) => ({
+      content: mapItem(s.content, stageId, kind, itemId, (it) => ({
+        ...it,
+        updates: it.updates.map((u) => (u.id === suId ? { ...u, text } : u)),
+      })),
+    }));
+    sync(api.editUpdate(suId, text));
+  },
 
-  deleteUpdate: (stageId, kind, itemId, suId) =>
+  deleteUpdate: (stageId, kind, itemId, suId) => {
     set((s) => ({
       content: mapItem(s.content, stageId, kind, itemId, (it) => ({
         ...it,
         updates: it.updates.filter((u) => u.id !== suId),
       })),
-    })),
+    }));
+    sync(api.deleteUpdate(suId));
+  },
 }));
 
 /** Replace one item inside the content map, leaving every other stage alone. */
