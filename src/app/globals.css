@@ -82,6 +82,7 @@ input,select,textarea{font:inherit;color:inherit}
 @media (max-width:1760px){.tb-field.tb-opt2{display:none}}
 @media (max-width:1560px){.tb-field.tb-opt1{display:none}}
 @media (max-width:1460px){#toolbar{gap:14px}.tb-field label,.tb-field .k{letter-spacing:.08em}}
+#to-programs{flex:none;text-decoration:none;white-space:nowrap}
 #project-name{
   font-family:var(--mono);font-size:.95em;letter-spacing:.12em;font-weight:700;white-space:nowrap;
   border-bottom:1px dashed transparent;padding-bottom:1px;
@@ -303,6 +304,7 @@ body.has-overrides .edited-flag{display:inline}
   margin-top:14px;font-size:.95em;
 }
 .leader-row .l-name{font-weight:600}
+.leader-row .l-name.none{font-weight:400;font-style:italic;color:var(--ink-3)}
 .leader-row .l-contact{font-family:var(--mono);font-size:.8em;color:var(--ink-2)}
 .leader-row .l-edit{
   font-family:var(--mono);font-size:.62em;letter-spacing:.12em;color:var(--ink-3);
@@ -657,6 +659,88 @@ body.modal-open .modal-win{transform:none}
 .su-brow .t1{display:block;font-size:.92em;color:var(--ink);font-weight:600}
 .su-brow .t1 .b-stage{margin-right:8px}
 .su-brow .t2{display:block;font-size:.9em;color:var(--accent);margin-top:3px}
+
+/* ============================================================
+   PROGRAM LIST — the landing page
+   Same vocabulary as the dashboard tiles: surface card, hairline
+   border, mono caps labels, accent for links, risk red for alerts.
+   ============================================================ */
+#program-list{max-width:1240px;margin:0 auto;padding:56px 32px 80px}
+.pl-head{display:flex;align-items:baseline;gap:16px;flex-wrap:wrap;margin-bottom:6px}
+.pl-head h1{font-size:clamp(1.4rem,2.4vw,2rem);font-weight:650;letter-spacing:-.015em;text-transform:uppercase}
+.pl-head .count{font-family:var(--mono);font-size:.74em;color:var(--ink-3)}
+.pl-sub{font-size:.82em;color:var(--ink-3);margin:0 0 30px}
+.pl-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));gap:18px}
+
+.pl-card{
+  position:relative;display:flex;flex-direction:column;
+  border:1px solid var(--line);border-radius:6px;background:var(--surface);
+  padding:18px 20px 16px;transition:border-color .15s,box-shadow .15s,transform .15s;
+}
+.pl-card:hover{border-color:var(--line-strong);box-shadow:0 4px 16px rgba(11,11,11,.06)}
+.pl-card:focus-within{border-color:var(--accent)}
+.pl-open{position:absolute;inset:0;z-index:1;border-radius:6px}
+.pl-open:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.pl-title{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+.pl-name{font-family:var(--mono);font-size:1.02em;letter-spacing:.1em;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pl-flag{font-family:var(--mono);font-size:.6em;letter-spacing:.1em;color:var(--accent);text-transform:uppercase}
+.pl-profile{display:block;margin-top:4px}
+.pl-stage{
+  display:inline-block;margin-top:12px;font-family:var(--mono);font-size:.68em;letter-spacing:.08em;
+  text-transform:uppercase;border:1px solid var(--line-strong);border-radius:100px;padding:3px 11px;color:var(--ink-2);
+}
+.pl-stage.risky{border-color:var(--risk);color:var(--risk)}
+.pl-stage.idle{color:var(--ink-3)}
+/* progress */
+.pl-bar{height:4px;border-radius:2px;background:var(--line);margin:14px 0 6px;overflow:hidden}
+.pl-bar span{display:block;height:100%;background:var(--accent);transition:width .25s ease}
+.pl-pct{display:flex;align-items:baseline;gap:8px;font-family:var(--mono);font-size:.74em;color:var(--ink-2)}
+.pl-pct .n{font-size:1.35em;font-weight:650;color:var(--ink);letter-spacing:-.01em}
+/* fact rows */
+.pl-facts{display:grid;grid-template-columns:1fr 1fr;gap:8px 14px;margin-top:14px;padding-top:12px;border-top:1px solid var(--line)}
+.pl-fact{display:flex;flex-direction:column;gap:2px;min-width:0}
+.pl-fact .k{font-size:.58em;font-weight:600;letter-spacing:.13em;text-transform:uppercase;color:var(--ink-3)}
+.pl-fact .v{font-family:var(--mono);font-size:.78em;color:var(--ink);white-space:nowrap}
+.pl-fact .v.alert{color:var(--risk);font-weight:600}
+.pl-fact .v.muted{color:var(--ink-3)}
+/* delete */
+.pl-acts{position:relative;z-index:2;display:flex;gap:8px;justify-content:flex-end;margin-top:14px}
+.pl-acts button{
+  font-family:var(--mono);font-size:.62em;letter-spacing:.1em;text-transform:uppercase;
+  border:1px solid var(--line);border-radius:3px;padding:3px 9px;color:var(--ink-3);
+}
+.pl-acts button:hover{color:var(--ink);border-color:var(--ink-3)}
+.pl-acts button[data-confirm-del]{color:var(--risk);border-color:var(--risk)}
+.pl-confirm{position:relative;z-index:2;display:flex;align-items:center;gap:10px;margin-top:14px;font-size:.78em;color:var(--risk)}
+.pl-confirm .spacer{flex:1}
+/* new program */
+.pl-card.new{border-style:dashed;justify-content:center;align-items:center;min-height:210px}
+.pl-card.new.editing{align-items:stretch;justify-content:flex-start;border-style:solid}
+.pl-new-btn{
+  font-family:var(--mono);font-size:.76em;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);
+  display:flex;flex-direction:column;align-items:center;gap:8px;padding:20px;width:100%;
+}
+.pl-new-btn .plus{font-size:1.9em;line-height:1;font-weight:300}
+.pl-form label{display:block;margin-bottom:12px}
+.pl-form .k{display:block;font-size:.58em;font-weight:600;letter-spacing:.13em;text-transform:uppercase;color:var(--ink-3);margin-bottom:4px}
+.pl-form input,.pl-form select{
+  width:100%;border:1px solid var(--line);border-radius:4px;background:var(--page);
+  padding:6px 8px;font-family:var(--mono);font-size:.8em;
+}
+.pl-form input:focus-visible,.pl-form select:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+.pl-form .err{font-size:.72em;color:var(--risk);margin-bottom:10px}
+.pl-form .row{display:flex;gap:8px;margin-top:2px}
+.pl-form .row button{
+  font-family:var(--mono);font-size:.66em;letter-spacing:.12em;text-transform:uppercase;
+  border:1px solid var(--line);border-radius:4px;padding:6px 12px;color:var(--ink-2);
+}
+.pl-form .row button[data-create]{background:var(--ink);color:var(--page);border-color:var(--ink)}
+.pl-form .row button:disabled{opacity:.5;cursor:default}
+.pl-empty{border:1px dashed var(--line-strong);border-radius:6px;padding:40px;text-align:center;color:var(--ink-3);font-size:.9em}
+@media (max-width:640px){
+  #program-list{padding:32px 20px 60px}
+  .pl-grid{grid-template-columns:1fr}
+}
 
 /* ============================================================
    TOOLTIP — cursor-following, shared by every [data-tip] element

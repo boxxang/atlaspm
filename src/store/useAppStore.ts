@@ -34,6 +34,7 @@ export interface InlineState {
 
 export interface AppState {
   hydrated: boolean;
+  projectId: string;
   today: Date;
   projectName: string;
   kickoff: Date;
@@ -121,6 +122,7 @@ export const useAppStore = create<AppState>()((set, get) => ({
   /* Pre-hydration placeholders: the real values need a clock, and a clock read
      during SSR would not survive hydration. AppShell calls hydrate() on mount. */
   hydrated: false,
+  projectId: '',
   today: BOOT_TODAY,
   projectName: 'AtlasEX',
   kickoff: BOOT_KICKOFF,
@@ -144,6 +146,7 @@ export const useAppStore = create<AppState>()((set, get) => ({
     const profile = scheduleProfiles[initial.profileId] ?? scheduleProfiles.typicalSoC;
     set({
       hydrated: true,
+      projectId: initial.projectId,
       today: startOfDay(now),
       projectName: initial.projectName,
       kickoff: initial.kickoff,
@@ -162,7 +165,7 @@ export const useAppStore = create<AppState>()((set, get) => ({
 
   setProjectName: (projectName) => {
     set({ projectName });
-    sync(api.renameProject(projectName));
+    sync(api.renameProject(get().projectId, projectName));
   },
 
   setKickoff: (kickoff) => {
@@ -170,7 +173,7 @@ export const useAppStore = create<AppState>()((set, get) => ({
       kickoff,
       schedule: computeSchedule(kickoff, scheduleProfiles[s.profileId], s.overrides),
     }));
-    sync(api.setKickoff(kickoff));
+    sync(api.setKickoff(get().projectId, kickoff));
   },
 
   setProfile: (profileId) => {
@@ -180,7 +183,7 @@ export const useAppStore = create<AppState>()((set, get) => ({
       edited: false,
       schedule: computeSchedule(s.kickoff, scheduleProfiles[profileId], {}),
     }));
-    sync(api.setProfile(profileId));
+    sync(api.setProfile(get().projectId, profileId));
   },
 
   selectStage: (i) =>
@@ -206,7 +209,7 @@ export const useAppStore = create<AppState>()((set, get) => ({
       schedule: computeSchedule(s.kickoff, profile, overrides),
     });
     /* the stored rows are the effective values, not a replay of the edits */
-    sync(api.saveOverrides(materializeOverrides(profile, overrides)));
+    sync(api.saveOverrides(s.projectId, materializeOverrides(profile, overrides)));
   },
 
   resetSchedule: () => {
@@ -215,7 +218,7 @@ export const useAppStore = create<AppState>()((set, get) => ({
       edited: false,
       schedule: computeSchedule(s.kickoff, scheduleProfiles[s.profileId], {}),
     }));
-    sync(api.resetOverrides());
+    sync(api.resetOverrides(get().projectId));
   },
 
   openInline: (stageId, kind, editContact = null) =>
@@ -237,7 +240,7 @@ export const useAppStore = create<AppState>()((set, get) => ({
         ),
       },
     }));
-    sync(api.setDeliverableDone(id, done, completedAt));
+    sync(api.setDeliverableDone(get().projectId, id, done, completedAt));
   },
 
   setDeliverableDue: (stageId, id, due) => {
@@ -247,7 +250,7 @@ export const useAppStore = create<AppState>()((set, get) => ({
         [stageId]: s.deliverables[stageId].map((d) => (d.id === id ? { ...d, due } : d)),
       },
     }));
-    sync(api.setDeliverableDue(id, due));
+    sync(api.setDeliverableDue(get().projectId, id, due));
   },
 
   addDeliverable: (stageId, title, due) => {
@@ -261,7 +264,7 @@ export const useAppStore = create<AppState>()((set, get) => ({
         ],
       },
     }));
-    sync(api.addDeliverable({ id, stageId, title, due }));
+    sync(api.addDeliverable({ projectId: get().projectId, id, stageId, title, due }));
   },
 
   deleteDeliverable: (stageId, id) => {
@@ -271,7 +274,7 @@ export const useAppStore = create<AppState>()((set, get) => ({
         [stageId]: s.deliverables[stageId].filter((d) => d.id !== id),
       },
     }));
-    sync(api.deleteDeliverable(id));
+    sync(api.deleteDeliverable(get().projectId, id));
   },
 
   saveContact: (stageId, c) => {
@@ -284,21 +287,21 @@ export const useAppStore = create<AppState>()((set, get) => ({
       return { contacts: { ...s.contacts, [stageId]: next } };
     });
     const { name, role, email, phone } = c;
-    sync(api.saveContact({ id, stageId, name, role, email, phone }));
+    sync(api.saveContact({ projectId: get().projectId, id, stageId, name, role, email, phone }));
   },
 
   deleteContact: (stageId, id) => {
     set((s) => ({
       contacts: { ...s.contacts, [stageId]: s.contacts[stageId].filter((c) => c.id !== id) },
     }));
-    sync(api.deleteContact(id));
+    sync(api.deleteContact(get().projectId, id));
   },
 
   saveLeader: (stageId, l) => {
     const parts = l.name.split(/\s+/);
     const short = parts.length > 1 ? parts[0][0] + '. ' + parts.slice(1).join(' ') : l.name;
     set((s) => ({ leaders: { ...s.leaders, [stageId]: { ...l, short } } }));
-    sync(api.saveLeader(stageId, { ...l, short }));
+    sync(api.saveLeader(get().projectId, stageId, { ...l, short }));
   },
 
   adoptPotentialRisk: (stageId, title) => {
@@ -318,7 +321,7 @@ export const useAppStore = create<AppState>()((set, get) => ({
         [stageId]: { ...s.content[stageId], risks: [...s.content[stageId].risks, risk] },
       },
     }));
-    sync(api.saveItem({ ...risk, stageId, kind: 'risks', updatedAt: risk.updated }));
+    sync(api.saveItem({ projectId: get().projectId, ...risk, stageId, kind: 'risks', updatedAt: risk.updated }));
   },
 
   saveItem: (stageId, kind, itemId, f) => {
@@ -339,7 +342,7 @@ export const useAppStore = create<AppState>()((set, get) => ({
         },
       },
     }));
-    sync(api.saveItem({ ...saved, stageId, kind, updatedAt: saved.updated }));
+    sync(api.saveItem({ projectId: get().projectId, ...saved, stageId, kind, updatedAt: saved.updated }));
     return saved;
   },
 
@@ -353,7 +356,7 @@ export const useAppStore = create<AppState>()((set, get) => ({
         },
       },
     }));
-    sync(api.deleteItem(itemId));
+    sync(api.deleteItem(get().projectId, itemId));
   },
 
   postUpdate: (stageId, kind, itemId, text) => {
@@ -365,7 +368,7 @@ export const useAppStore = create<AppState>()((set, get) => ({
         updated: su.date,
       })),
     }));
-    sync(api.postUpdate({ id: su.id, itemId, text, createdAt: su.date }));
+    sync(api.postUpdate({ projectId: get().projectId, id: su.id, itemId, text, createdAt: su.date }));
   },
 
   /* editing keeps the update's original timestamp — the thread stays honest */
@@ -377,7 +380,7 @@ export const useAppStore = create<AppState>()((set, get) => ({
         updates: it.updates.map((u) => (u.id === suId ? { ...u, text } : u)),
       })),
     }));
-    sync(api.editUpdate(suId, text));
+    sync(api.editUpdate(get().projectId, suId, text));
   },
 
   deleteUpdate: (stageId, kind, itemId, suId) => {
@@ -387,7 +390,7 @@ export const useAppStore = create<AppState>()((set, get) => ({
         updates: it.updates.filter((u) => u.id !== suId),
       })),
     }));
-    sync(api.deleteUpdate(suId));
+    sync(api.deleteUpdate(get().projectId, suId));
   },
 }));
 

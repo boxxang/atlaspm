@@ -1,4 +1,4 @@
-import { expect, test, type Page } from './fixtures';
+import { expect, test, type Page, SEED_PROJECT_PATH } from './fixtures';
 
 const cssVar = (page: Page, name: string) =>
   page.evaluate(
@@ -8,7 +8,7 @@ const cssVar = (page: Page, name: string) =>
 
 test.describe('design tokens', () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto('/');
+    await page.goto(SEED_PROJECT_PATH);
   });
 
   test('root carries the reference token values', async ({ page }) => {
@@ -32,7 +32,7 @@ test.describe('design tokens', () => {
 
 test.describe('toolbar layout', () => {
   test('is sticky, 58px tall, and pinned to the top', async ({ page }) => {
-    await page.goto('/');
+    await page.goto(SEED_PROJECT_PATH);
     const toolbar = page.locator('#toolbar');
     await expect(toolbar).toHaveCSS('position', 'sticky');
     const box = await toolbar.boundingBox();
@@ -47,7 +47,7 @@ test.describe('toolbar layout', () => {
   ] as const) {
     test(`shows the right computed fields at ${width}px`, async ({ page }) => {
       await page.setViewportSize({ width, height: 900 });
-      await page.goto('/');
+      await page.goto(SEED_PROJECT_PATH);
       // Tapeout is never dropped; First Silicon / Production shed at 1560/1760.
       await expect(page.locator('[data-computed="tapeout"]')).toBeVisible();
       await expect(page.locator('.tb-opt1')).toBeVisible({ visible: opt1 });
@@ -58,7 +58,7 @@ test.describe('toolbar layout', () => {
   }
 
   test('brand badge sits bottom-right and ignores pointers', async ({ page }) => {
-    await page.goto('/');
+    await page.goto(SEED_PROJECT_PATH);
     const badge = page.locator('#brand-badge');
     await expect(badge).toHaveText('AtlasPM');
     await expect(badge).toHaveCSS('position', 'fixed');
@@ -66,7 +66,7 @@ test.describe('toolbar layout', () => {
   });
 
   test('EDITED flag is hidden until the schedule has overrides', async ({ page }) => {
-    await page.goto('/');
+    await page.goto(SEED_PROJECT_PATH);
     await expect(page.locator('.edited-flag')).toBeHidden();
     await page.evaluate(() => document.body.classList.add('has-overrides'));
     await expect(page.locator('.edited-flag')).toBeVisible();
@@ -75,7 +75,7 @@ test.describe('toolbar layout', () => {
 
 test.describe('toolbar controls', () => {
   test('project name edits inline, Enter commits and Escape reverts', async ({ page }) => {
-    await page.goto('/');
+    await page.goto(SEED_PROJECT_PATH);
     await page.locator('#project-name').click();
     await page.locator('#project-name-input').fill('AtlasAX1');
     await page.keyboard.press('Enter');
@@ -88,7 +88,7 @@ test.describe('toolbar controls', () => {
   });
 
   test('kickoff and profile round-trip their values', async ({ page }) => {
-    await page.goto('/');
+    await page.goto(SEED_PROJECT_PATH);
     // The store seeds kickoff 30 weeks before today, so "today" sits mid-program.
     const expected = new Date();
     expected.setHours(0, 0, 0, 0);
@@ -109,7 +109,7 @@ test.describe('toolbar controls', () => {
   });
 
   test('mode toggle drives body.schedule-mode and the dashboard overlay', async ({ page }) => {
-    await page.goto('/');
+    await page.goto(SEED_PROJECT_PATH);
     const main = page.locator('#mode-toggle button[data-mode="journey"]');
     const dash = page.locator('#mode-toggle button[data-mode="schedule"]');
     await expect(main).toHaveAttribute('aria-pressed', 'true');
@@ -127,7 +127,7 @@ test.describe('toolbar controls', () => {
   });
 
   test('info popover opens on click and closes on outside click', async ({ page }) => {
-    await page.goto('/');
+    await page.goto(SEED_PROJECT_PATH);
     const panel = page.locator('#info-note .pop-panel');
     await expect(panel).toBeHidden();
     await page.locator('#info-btn').click();
@@ -140,7 +140,7 @@ test.describe('toolbar controls', () => {
 
 test.describe('display settings', () => {
   test('text size writes --fs-base on :root for the Main scope', async ({ page }) => {
-    await page.goto('/');
+    await page.goto(SEED_PROJECT_PATH);
     await page.locator('#settings-btn').click();
     await expect(page.locator('#settings-panel')).toBeVisible();
 
@@ -157,7 +157,7 @@ test.describe('display settings', () => {
   test('scopes hold independent rows — icon is Main-only, row height Dashboard-only', async ({
     page,
   }) => {
-    await page.goto('/');
+    await page.goto(SEED_PROJECT_PATH);
     await page.locator('#settings-btn').click();
     await expect(page.locator('.set-row[data-key="icon"]')).toBeVisible();
     await expect(page.locator('.set-row[data-key="drow"]')).toBeHidden();
@@ -173,7 +173,7 @@ test.describe('display settings', () => {
   });
 
   test('icon multiplier renders trimmed', async ({ page }) => {
-    await page.goto('/');
+    await page.goto(SEED_PROJECT_PATH);
     await page.locator('#settings-btn').click();
     await expect(page.locator('#set-icon-val')).toHaveText('2×');
     await page.locator('#set-icon').fill('2.25');

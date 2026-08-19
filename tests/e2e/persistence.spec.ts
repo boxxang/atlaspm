@@ -1,4 +1,4 @@
-import { expect, test, type Page } from './fixtures';
+import { expect, test, type Page, SEED_PROJECT_PATH } from './fixtures';
 
 /**
  * Phase 6 acceptance: every mutation survives a hard refresh.
@@ -20,7 +20,7 @@ const hardRefresh = async (page: Page) => {
 };
 
 test.beforeEach(async ({ page }) => {
-  await page.goto('/');
+  await page.goto(SEED_PROJECT_PATH);
   await expect(page.locator('.stage-panel.selected')).toBeVisible();
 });
 

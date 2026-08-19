@@ -24,6 +24,8 @@ model Project {
   name      String
   kickoff   DateTime
   profileId String
+  /// Orders the program list; ids are caller-supplied, so they sort by nothing.
+  createdAt DateTime @default(now())
 
   overrides    StageOverride[]
   items        Item[]

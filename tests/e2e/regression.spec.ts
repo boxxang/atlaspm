@@ -1,4 +1,4 @@
-import { expect, test, type Page } from './fixtures';
+import { expect, test, type Page, SEED_PROJECT_PATH } from './fixtures';
 
 /**
  * The prototype's own check list, ported. These are the measurements that
@@ -21,7 +21,7 @@ const centerX = async (page: Page, sel: string) => {
 };
 
 test.beforeEach(async ({ page }) => {
-  await page.goto('/');
+  await page.goto(SEED_PROJECT_PATH);
   await expect(page.locator('.stage-panel.selected')).toBeVisible();
 });
 

@@ -31,6 +31,29 @@ mid-program (in Physical Design), the way the prototype boots.
 | `npm run e2e` | Playwright — see *Testing* below |
 | `npm run db:push` / `db:seed` / `db:reset` / `db:studio` | Prisma |
 
+## Programs
+
+`/` lists every program as a card — progress, kickoff, Tapeout with its D-day,
+open risks, overdue count and the stage in flight today. Opening a card goes to
+`/p/[projectId]`, which is the program view; `‹ Programs` in the toolbar comes
+back.
+
+Creating a program asks for a name, an expected kickoff and a schedule profile.
+Only `typicalSoC` is modelled, so the other three profiles are listed disabled
+exactly as the prototype lists them — adding a real one means adding its stage
+offsets and durations to `src/data/scheduleProfiles.ts`, nothing more.
+
+A new program starts with **empty boards** — no key information, activities or
+risks — and no leaders or contacts, because those would be someone else's
+example data. What it does get is the stage scaffolding: each stage's standard
+deliverables from `/src/data/journey.ts`, dated to that stage's end. Milestones
+need no rows at all; they fall out of kickoff + profile offsets like every other
+date in the app.
+
+Every stage definition is shared across programs (they live in code). Per
+program the database holds only kickoff, profile, schedule overrides, items,
+deliverables, leaders and contacts.
+
 ## Layout
 
 ```
@@ -38,7 +61,7 @@ src/data/      schedule profiles, journey content, project seed — pure, no DOM
 src/lib/       schedule math, derivations, DB access, DB↔store mapping
 src/store/     Zustand stores (app state, modal state)
 src/components/ UI, ported 1:1 from the prototype
-src/app/       route, server actions
+src/app/       routes (/ program list, /p/[projectId] program), server actions
 prisma/        schema, seed
 ```
 
@@ -82,7 +105,7 @@ that is a read/write swap rather than a redesign.
 
 ```bash
 npm test          # 76 unit tests: schedule engine, derivations, purity guard
-npm run e2e       # 97 Playwright tests
+npm run e2e       # 108 Playwright tests
 ```
 
 The e2e suite runs against its own database (`test.db`) on port 3100, so it never

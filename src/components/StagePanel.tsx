@@ -15,10 +15,11 @@ function LeaderRow({ stage }: { stage: JourneyStage }) {
   return (
     <div className="leader-row" data-role="leader">
       <span className="cap">Stage Leader</span>
-      <span className="l-name">{l.name}</span>
-      <span className="l-contact">
-        {l.phone} · {l.email}
-      </span>
+      {/* a new program has no leaders until someone names them */}
+      <span className={`l-name${l.name ? '' : ' none'}`}>{l.name || 'Unassigned'}</span>
+      {(l.phone || l.email) && (
+        <span className="l-contact">{[l.phone, l.email].filter(Boolean).join(' · ')}</span>
+      )}
       <button className="l-edit" data-leader-edit onClick={() => openInline(stage.id, 'leader')}>
         Edit
       </button>

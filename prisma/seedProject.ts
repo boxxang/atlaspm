@@ -28,8 +28,9 @@ export async function seedProject(prisma: PrismaClient, now = new Date()): Promi
   const schedule = computeSchedule(kickoff, scheduleProfiles.typicalSoC, {});
   const seed = createProjectSeed({ schedule, now });
 
-  /* Cascades clear items, updates, deliverables, leaders and contacts. */
-  await prisma.project.deleteMany({});
+  /* Scoped to this one project: other programs in the database are left alone.
+     Cascades clear its items, updates, deliverables, leaders and contacts. */
+  await prisma.project.deleteMany({ where: { id: PROJECT_ID } });
 
   await prisma.project.create({
     data: {

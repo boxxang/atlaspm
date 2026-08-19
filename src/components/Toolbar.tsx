@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import { Popover } from './Popover';
 import { ProjectName } from './ProjectName';
 import { SettingsPopover } from './SettingsPopover';
@@ -45,6 +46,9 @@ export function Toolbar({
 }) {
   return (
     <header id="toolbar">
+      <Link className="mb-back" id="to-programs" href="/" title="All programs">
+        ‹ Programs
+      </Link>
       <ProjectName value={projectName} onChange={onProjectNameChange} />
       <div className="tb-field">
         <label htmlFor="kickoff-input">Kickoff</label>

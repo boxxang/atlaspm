@@ -11,6 +11,10 @@ import { seedProject } from '../../prisma/seedProject';
  */
 export const TEST_DATABASE_URL = 'file:./test.db';
 
+/** The seeded program, and the route its detail view lives at. */
+export const SEED_PROJECT_ID = 'atlasax1';
+export const SEED_PROJECT_PATH = `/p/${SEED_PROJECT_ID}`;
+
 let client: PrismaClient | null = null;
 const prisma = () =>
   (client ??= new PrismaClient({
@@ -20,6 +24,10 @@ const prisma = () =>
 export const test = base.extend<{ seeded: void }>({
   seeded: [
     async ({}, use) => {
+      /* seedProject only replaces its own program, so that `prisma db seed`
+         never wipes programs someone else created. A test wants the whole
+         database back, including anything a previous test created. */
+      await prisma().project.deleteMany({});
       await seedProject(prisma());
       await use();
     },

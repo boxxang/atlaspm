@@ -1,4 +1,4 @@
-import { expect, test, type Page } from './fixtures';
+import { expect, test, type Page, SEED_PROJECT_PATH } from './fixtures';
 
 const openDash = async (page: Page) => {
   await page.locator('#mode-toggle button[data-mode="schedule"]').click();
@@ -16,7 +16,7 @@ const cssVar = (page: Page, name: string) =>
   );
 
 test.beforeEach(async ({ page }) => {
-  await page.goto('/');
+  await page.goto(SEED_PROJECT_PATH);
   await expect(page.locator('.stage-panel.selected')).toBeVisible();
 });
 

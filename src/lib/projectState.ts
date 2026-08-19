@@ -146,6 +146,10 @@ export function buildProjectState(project: {
     if (!isStage(l.stageId)) continue;
     leaders[l.stageId] = { name: l.name, short: l.short, phone: l.phone, email: l.email };
   }
+  /* A new program has no leader rows until someone fills them in. */
+  for (const id of STAGE_ORDER) {
+    leaders[id] ??= { name: '', short: '', phone: '', email: '' };
+  }
 
   const contacts = emptyLists<Contact>();
   for (const c of project.contacts) {

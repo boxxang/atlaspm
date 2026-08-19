@@ -1,4 +1,4 @@
-import { expect, test, type Page } from './fixtures';
+import { expect, test, type Page, SEED_PROJECT_PATH } from './fixtures';
 
 const selectedPanel = (page: Page) => page.locator('.stage-panel.selected');
 const hoverStation = (page: Page, num: string) =>
@@ -13,7 +13,7 @@ const openAgg = async (page: Page, type: 'risks' | 'overdue' | 'updates') => {
 };
 
 test.beforeEach(async ({ page }) => {
-  await page.goto('/');
+  await page.goto(SEED_PROJECT_PATH);
   await expect(page.locator('.stage-panel.selected')).toBeVisible();
 });
 
