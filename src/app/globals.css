@@ -767,6 +767,57 @@ body.modal-open .modal-win{transform:none}
 .b-row .b-title .mail-wrap{margin-left:auto}
 
 /* ============================================================
+   SCHEDULE PREVIEW — staged dates, shown against the saved ones
+   A bottom action bar so the roadmap and gantt stay visible: the
+   whole point is comparing the two schedules on the timeline.
+   ============================================================ */
+#sched-preview{
+  position:fixed;left:0;right:0;bottom:0;z-index:110;
+  background:var(--surface);border-top:2px solid var(--accent);
+  box-shadow:0 -8px 28px rgba(11,11,11,.10);
+  animation:panelIn .22s ease;
+}
+.sp-inner{max-width:1400px;margin:0 auto;padding:12px 24px 14px;display:flex;align-items:flex-start;gap:22px;flex-wrap:wrap}
+.sp-lead{display:flex;flex-direction:column;gap:3px;flex:none;padding-top:2px}
+.sp-tag{
+  font-family:var(--mono);font-size:.66em;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);
+}
+.sp-note{font-size:.74em;color:var(--ink-3);max-width:22em}
+.sp-scroll{flex:1;min-width:0;max-height:30vh;overflow:auto}
+.sp-table{border-collapse:collapse;width:100%;font-size:.76em}
+.sp-table th{
+  text-align:left;font-size:.72em;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-3);
+  padding:0 14px 5px 0;border-bottom:1px solid var(--line-strong);white-space:nowrap;position:sticky;top:0;background:var(--surface);
+}
+.sp-table td{padding:5px 14px 5px 0;border-bottom:1px solid var(--line);white-space:nowrap}
+.sp-table tr.sp-ms .sp-name{color:var(--ink);font-weight:600}
+.sp-name{color:var(--ink-2)}
+.sp-was{font-family:var(--mono);font-size:.92em;color:var(--ink-3)}
+.sp-now{font-family:var(--mono);font-size:.92em;color:var(--accent);font-weight:600}
+.sp-delta{font-family:var(--mono);font-size:.92em;color:var(--risk);font-weight:600;text-align:right}
+.sp-acts{display:flex;gap:10px;flex:none;align-items:center;padding-top:2px}
+.sp-acts button{
+  font-family:var(--mono);font-size:.68em;letter-spacing:.13em;text-transform:uppercase;
+  border:1px solid var(--line);border-radius:4px;padding:8px 16px;color:var(--ink-2);white-space:nowrap;
+}
+.sp-acts button:hover{border-color:var(--ink-3);color:var(--ink)}
+.sp-acts button[data-apply-schedule]{background:var(--accent);color:#fff;border-color:var(--accent)}
+.sp-acts button[data-apply-schedule]:hover{background:#1d55a0;color:#fff}
+/* the saved schedule, drawn under the proposal */
+.g-bar.ghost{
+  background:none;border:1.25px dashed var(--ink-3);opacity:.75;box-shadow:none;pointer-events:none;z-index:0;
+}
+.g-msdot.ghost{background:var(--page);border-style:dashed;border-color:var(--ink-3);z-index:1}
+.g-row.current .g-bar.ghost{opacity:.75;box-shadow:none}
+/* clear the fixed bar so nothing sits permanently underneath it */
+body.sched-preview-open #stage-panels{padding-bottom:calc(60px + var(--sp-h,0px))}
+body.sched-preview-open #schedule-view .inner{padding-bottom:calc(60px + var(--sp-h,0px))}
+@media (max-width:900px){
+  .sp-inner{gap:12px;padding:10px 16px 12px}
+  .sp-scroll{max-height:24vh}
+}
+
+/* ============================================================
    TOOLTIP — cursor-following, shared by every [data-tip] element
    ============================================================ */
 .g-tip{

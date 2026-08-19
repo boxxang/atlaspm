@@ -56,6 +56,11 @@ export function Gantt({
   const today = useAppStore((s) => s.today);
   const content = useAppStore((s) => s.content);
   const currentStage = useAppStore((s) => s.currentStage);
+  /* While dates are staged, the saved schedule is drawn underneath as a dashed
+     outline so both can be read off the same axis. */
+  const draftOverrides = useAppStore((s) => s.draftOverrides);
+  const committed = useAppStore((s) => s.committedSchedule);
+  const ghost = draftOverrides ? committed : null;
   const { minWeek, total, months, todayPct, todayVisible } = useGanttGeometry(
     schedule,
     kickoff,
@@ -108,6 +113,9 @@ export function Gantt({
             1,
           );
           const risky = hasOpenRisks(content, s.id);
+          const was = ghost?.stages[s.id];
+          const moved =
+            was && (was.start.getTime() !== st.start.getTime() || was.end.getTime() !== st.end.getTime());
           /* risk color wins over past-gray — an open risk must stay visible */
           const showPast = pastFrac > 0 && !risky;
           return (
@@ -120,6 +128,17 @@ export function Gantt({
                 {short ? s.shortTitle : s.title}
               </span>
               <span className="g-row-track">
+                {moved && was && (
+                  <span
+                    className="g-bar ghost"
+                    aria-hidden="true"
+                    data-ghost-index={i}
+                    style={{
+                      left: `${((was.startOffsetWeeks - minWeek) / total) * 100}%`,
+                      width: `${(was.durationWeeks / total) * 100}%`,
+                    }}
+                  />
+                )}
                 <span
                   className={`g-bar${risky ? ' risky' : ''}`}
                   style={{ left: `${left}%`, width: `${width}%` }}
@@ -133,11 +152,21 @@ export function Gantt({
                 </span>
                 {(msByStage[s.id] ?? []).map((m) => {
                   const pct = ((m.week - minWeek) / total) * 100;
+                  const wasMs = ghost?.milestones.find((x) => x.id === m.id);
+                  const msMoved = wasMs && wasMs.week !== m.week;
                   /* near the right edge the label hangs to the left */
                   const flip = pct > 78;
                   const tip = `${m.label}|${fmtDate(m.date)}`;
                   return (
                     <span key={m.id}>
+                      {msMoved && wasMs && (
+                        <span
+                          className={`g-msdot ghost${m.major ? ' major' : ''}`}
+                          aria-hidden="true"
+                          data-ghost-ms={m.id}
+                          style={{ left: `${((wasMs.week - minWeek) / total) * 100}%` }}
+                        />
+                      )}
                       <span
                         className={`g-msdot${m.major ? ' major' : ''}`}
                         style={{ left: `${pct}%` }}

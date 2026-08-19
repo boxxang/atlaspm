@@ -9,6 +9,7 @@ import { useAppStore } from '@/store/useAppStore';
 import { BoardModal } from './BoardModal';
 import { Dashboard } from './Dashboard';
 import { Roadmap } from './Roadmap';
+import { SchedulePreview } from './SchedulePreview';
 import { StagePanel } from './StagePanel';
 import { Toolbar, type ViewMode } from './Toolbar';
 import { Tooltip } from './Tooltip';
@@ -110,6 +111,7 @@ function App() {
       <Dashboard hidden={mode !== 'schedule'} />
 
       <BoardModal />
+      <SchedulePreview />
 
       <Tooltip />
     </>

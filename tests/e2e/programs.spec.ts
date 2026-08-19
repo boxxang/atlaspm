@@ -66,6 +66,7 @@ test.describe('program list', () => {
     await panel
       .locator('[data-role="end-edit"]')
       .fill(`${moved.getFullYear()}-${p2(moved.getMonth() + 1)}-${p2(moved.getDate())}`);
+    await page.locator('[data-apply-schedule]').click();
     await expect(page.locator('.edited-flag')).toBeVisible();
 
     await page.locator('#to-programs').click();

@@ -40,7 +40,12 @@ export interface AppState {
   kickoff: Date;
   profileId: ProfileId;
   overrides: StageOverrides;
+  /** What the UI draws — the proposal while a draft is open. */
   schedule: Schedule;
+  /** What is actually saved, so a preview can show both at once. */
+  committedSchedule: Schedule;
+  /** Non-null while schedule edits are staged for review. */
+  draftOverrides: StageOverrides | null;
   edited: boolean;
   currentStage: number;
   content: Record<StageId, StageContent>;
@@ -55,6 +60,10 @@ export interface AppState {
   setProfile: (id: ProfileId) => void;
   selectStage: (i: number) => void;
   editStageDate: (stageId: StageId, which: 'start' | 'end', date: Date) => void;
+  /** Commit the staged dates. */
+  applyScheduleDraft: () => void;
+  /** Throw the staged dates away. */
+  discardScheduleDraft: () => void;
   resetSchedule: () => void;
 
   openInline: (stageId: StageId, kind: InlineKind, editContact?: string | null) => void;
@@ -129,6 +138,8 @@ export const useAppStore = create<AppState>()((set, get) => ({
   profileId: 'typicalSoC',
   overrides: {},
   schedule: computeSchedule(BOOT_KICKOFF, scheduleProfiles.typicalSoC, {}),
+  committedSchedule: computeSchedule(BOOT_KICKOFF, scheduleProfiles.typicalSoC, {}),
+  draftOverrides: null,
   edited: false,
   currentStage: 0,
   content: emptyMap<StageContent>(() => ({ keyinfo: [], activities: [], risks: [] })),
@@ -160,6 +171,8 @@ export const useAppStore = create<AppState>()((set, get) => ({
       overrides: initial.overrides,
       edited: hasOverrides(profile, initial.overrides),
       schedule: computeSchedule(initial.kickoff, profile, initial.overrides),
+      committedSchedule: computeSchedule(initial.kickoff, profile, initial.overrides),
+      draftOverrides: null,
       content: initial.content,
       deliverables: initial.deliverables,
       leaders: initial.leaders,
@@ -177,20 +190,26 @@ export const useAppStore = create<AppState>()((set, get) => ({
   },
 
   setKickoff: (kickoff) => {
-    set((s) => ({
-      kickoff,
-      schedule: computeSchedule(kickoff, scheduleProfiles[s.profileId], s.overrides),
-    }));
+    set((s) => {
+      const schedule = computeSchedule(kickoff, scheduleProfiles[s.profileId], s.overrides);
+      /* moving kickoff re-bases everything, so any staged stage edit is stale */
+      return { kickoff, schedule, committedSchedule: schedule, draftOverrides: null };
+    });
     sync(api.setKickoff(get().projectId, kickoff));
   },
 
   setProfile: (profileId) => {
-    set((s) => ({
-      profileId,
-      overrides: {},
-      edited: false,
-      schedule: computeSchedule(s.kickoff, scheduleProfiles[profileId], {}),
-    }));
+    set((s) => {
+      const schedule = computeSchedule(s.kickoff, scheduleProfiles[profileId], {});
+      return {
+        profileId,
+        overrides: {},
+        edited: false,
+        schedule,
+        committedSchedule: schedule,
+        draftOverrides: null,
+      };
+    });
     sync(api.setProfile(get().projectId, profileId));
   },
 
@@ -207,25 +226,54 @@ export const useAppStore = create<AppState>()((set, get) => ({
       };
     }),
 
+  /**
+   * Stages the edit instead of committing it. A stage date ripples through
+   * every later stage and every milestone, so the change is held as a draft
+   * until someone has compared it against the saved schedule and applied it.
+   * Further edits compound on the draft, so several stages can move together.
+   */
   editStageDate: (stageId, which, date) => {
     const s = get();
     const profile = scheduleProfiles[s.profileId];
-    const overrides = applyDateEdit(profile, s.overrides, s.schedule, stageId, which, date);
+    const base = s.draftOverrides ?? s.overrides;
+    const draftOverrides = applyDateEdit(profile, base, s.schedule, stageId, which, date);
+    set({ draftOverrides, schedule: computeSchedule(s.kickoff, profile, draftOverrides) });
+  },
+
+  applyScheduleDraft: () => {
+    const s = get();
+    if (!s.draftOverrides) return;
+    const profile = scheduleProfiles[s.profileId];
+    const overrides = s.draftOverrides;
+    const schedule = computeSchedule(s.kickoff, profile, overrides);
     set({
       overrides,
+      draftOverrides: null,
+      schedule,
+      committedSchedule: schedule,
       edited: hasOverrides(profile, overrides),
-      schedule: computeSchedule(s.kickoff, profile, overrides),
     });
     /* the stored rows are the effective values, not a replay of the edits */
     sync(api.saveOverrides(s.projectId, materializeOverrides(profile, overrides)));
   },
 
-  resetSchedule: () => {
+  discardScheduleDraft: () =>
     set((s) => ({
-      overrides: {},
-      edited: false,
-      schedule: computeSchedule(s.kickoff, scheduleProfiles[s.profileId], {}),
-    }));
+      draftOverrides: null,
+      schedule: computeSchedule(s.kickoff, scheduleProfiles[s.profileId], s.overrides),
+    })),
+
+  resetSchedule: () => {
+    set((s) => {
+      const schedule = computeSchedule(s.kickoff, scheduleProfiles[s.profileId], {});
+      return {
+        overrides: {},
+        draftOverrides: null,
+        edited: false,
+        schedule,
+        committedSchedule: schedule,
+      };
+    });
     sync(api.resetOverrides(get().projectId));
   },
 

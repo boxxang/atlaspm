@@ -197,6 +197,7 @@ test.describe('program schedule gantt', () => {
     await panel
       .locator('[data-role="end-edit"]')
       .fill(`${moved.getFullYear()}-${p2(moved.getMonth() + 1)}-${p2(moved.getDate())}`);
+    await page.locator('[data-apply-schedule]').click();
 
     await openDash(page);
     const row = page.locator('#gantt-b .g-row[data-index="3"]');

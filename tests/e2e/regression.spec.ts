@@ -143,6 +143,7 @@ test.describe('marker registration', () => {
     await panel
       .locator('[data-role="end-edit"]')
       .fill(`${moved.getFullYear()}-${p2(moved.getMonth() + 1)}-${p2(moved.getDate())}`);
+    await page.locator('[data-apply-schedule]').click();
     expect(
       (await centerX(page, '#rm-today')) - (await centerX(page, '#rm-gantt .g-today')),
     ).toBe(0);

@@ -135,6 +135,8 @@ test('a DV end-date edit persists as effective overrides', async ({ page }) => {
   const iso = `${moved.getFullYear()}-${p2(moved.getMonth() + 1)}-${p2(moved.getDate())}`;
   await panel.locator('[data-role="end-edit"]').fill(iso);
   await expect(panel.locator('[data-role="tat"]')).toHaveText('20W TAT');
+  await page.locator('[data-apply-schedule]').click();
+  await expect(page.locator('#sched-preview')).toHaveCount(0);
   const shifted = await tapeout.textContent();
   expect(shifted).not.toBe(before);
 

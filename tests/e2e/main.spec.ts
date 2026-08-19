@@ -137,7 +137,11 @@ test.describe('stage panel', () => {
     const iso = isoPlusDays(end, 28);
     await panel.locator('[data-role="end-edit"]').fill(iso);
 
+    // the edit is staged: review it, then apply
+    await expect(page.locator('#sched-preview')).toBeVisible();
     await expect(panel.locator('[data-role="tat"]')).toHaveText('20W TAT');
+    await page.locator('[data-apply-schedule]').click();
+    await expect(page.locator('#sched-preview')).toHaveCount(0);
     await expect(panel.locator('[data-role="end-edit"]')).toHaveValue(iso);
 
     // Tapeout lands exactly 28 calendar days later (compared as dates, not ms:
@@ -158,6 +162,7 @@ test.describe('stage panel', () => {
     const tat = await panel.locator('[data-role="tat"]').textContent();
     const start = await panel.locator('[data-role="start-edit"]').inputValue();
     await panel.locator('[data-role="start-edit"]').fill(isoPlusDays(start, 7));
+    await page.locator('[data-apply-schedule]').click();
     await expect(panel.locator('[data-role="tat"]')).toHaveText(tat!);
     await expect(panel.locator('[data-role="start-edit"]')).toHaveValue(isoPlusDays(start, 7));
   });
