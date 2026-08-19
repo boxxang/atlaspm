@@ -1,0 +1,135 @@
+'use client';
+
+import { phaseOfStage, stageMilestone } from '@/data/scheduleProfiles';
+import type { JourneyStage } from '@/data/types';
+import { fmtW, fromISO, toISO } from '@/lib/schedule';
+import { useAppStore } from '@/store/useAppStore';
+import { Board } from './Board';
+import { InlineArea } from './InlineArea';
+import { stageViz } from './stageViz';
+
+function LeaderRow({ stage }: { stage: JourneyStage }) {
+  const l = useAppStore((s) => s.leaders[stage.id]);
+  const openInline = useAppStore((s) => s.openInline);
+  return (
+    <div className="leader-row" data-role="leader">
+      <span className="cap">Stage Leader</span>
+      <span className="l-name">{l.name}</span>
+      <span className="l-contact">
+        {l.phone} · {l.email}
+      </span>
+      <button className="l-edit" data-leader-edit onClick={() => openInline(stage.id, 'leader')}>
+        Edit
+      </button>
+    </div>
+  );
+}
+
+/** Editing either date ripples the rest of the program — see applyDateEdit. */
+function DatesRow({ stage }: { stage: JourneyStage }) {
+  const st = useAppStore((s) => s.schedule.stages[stage.id]);
+  const editStageDate = useAppStore((s) => s.editStageDate);
+  const ms = stageMilestone[stage.id];
+  return (
+    <div className="dates-row">
+      <input
+        type="date"
+        className="d-edit"
+        data-role="start-edit"
+        aria-label="Planned start"
+        title="Edit planned start — later stages shift with it"
+        value={toISO(st.start)}
+        onChange={(e) => e.target.value && editStageDate(stage.id, 'start', fromISO(e.target.value))}
+      />
+      <span className="sep">━</span>
+      <span className="tat" data-role="tat">
+        {fmtW(st.durationWeeks)} TAT
+      </span>
+      <span className="sep">━</span>
+      <input
+        type="date"
+        className="d-edit"
+        data-role="end-edit"
+        aria-label="Expected completion"
+        title="Edit completion — TAT and later stages adjust"
+        value={toISO(st.end)}
+        onChange={(e) => e.target.value && editStageDate(stage.id, 'end', fromISO(e.target.value))}
+      />
+      {ms?.major && <span className="mslbl">{ms.label}</span>}
+    </div>
+  );
+}
+
+export function StagePanel({ stage, index }: { stage: JourneyStage; index: number }) {
+  const selected = useAppStore((s) => s.currentStage === index);
+  const inline = useAppStore((s) => s.inline[stage.id]);
+  const openInline = useAppStore((s) => s.openInline);
+  const closeInline = useAppStore((s) => s.closeInline);
+  const num = String(stage.stage).padStart(2, '0');
+  const phase = phaseOfStage[stage.id];
+  const detailOpen = !!inline;
+
+  return (
+    <article
+      className={[
+        'stage-panel',
+        stage.moment ? 'moment' : '',
+        selected ? 'selected' : '',
+        detailOpen ? 'detail-open' : '',
+      ]
+        .filter(Boolean)
+        .join(' ')}
+      data-id={stage.id}
+      data-index={index}
+      role="tabpanel"
+      aria-label={`Stage ${num}: ${stage.title}`}
+    >
+      <div className="panel-info">
+        <span className="phase-cap">
+          Phase {phase.index + 1} — {phase.label}
+        </span>
+        <div className="stage-meta">
+          <span className="stage-num">{num} / 12</span>
+          <span className="stage-short">{stage.shortTitle}</span>
+        </div>
+        <h2>{stage.title}</h2>
+        <p className="tagline">{stage.tagline}</p>
+        <LeaderRow stage={stage} />
+        <DatesRow stage={stage} />
+        <div className="facts">
+          <Board stageId={stage.id} kind="keyinfo" title="Key Information" />
+          <Board stageId={stage.id} kind="activities" title="Activity" />
+          <Board
+            stageId={stage.id}
+            kind="risks"
+            title="Risk"
+            extraBtns={
+              <button
+                className="board-btn"
+                data-potential
+                onClick={() => openInline(stage.id, 'potential')}
+              >
+                Potential Risks
+              </button>
+            }
+          />
+        </div>
+        <button
+          className="details-btn"
+          data-toggle-detail
+          onClick={() =>
+            inline?.kind === 'stage' ? closeInline(stage.id) : openInline(stage.id, 'stage')
+          }
+        >
+          Stage Details
+        </button>
+      </div>
+      <div
+        className="viz"
+        aria-hidden="true"
+        dangerouslySetInnerHTML={{ __html: stageViz[stage.id]() }}
+      />
+      {inline && <InlineArea stageId={stage.id} state={inline} scroll={false} />}
+    </article>
+  );
+}

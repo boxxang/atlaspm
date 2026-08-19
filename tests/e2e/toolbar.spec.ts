@@ -89,9 +89,18 @@ test.describe('toolbar controls', () => {
 
   test('kickoff and profile round-trip their values', async ({ page }) => {
     await page.goto('/');
-    await expect(page.locator('#kickoff-input')).toHaveValue('2027-05-12');
+    // The store seeds kickoff 30 weeks before today, so "today" sits mid-program.
+    const expected = new Date();
+    expected.setHours(0, 0, 0, 0);
+    expected.setDate(expected.getDate() - 210);
+    const p2 = (n: number) => String(n).padStart(2, '0');
+    await expect(page.locator('#kickoff-input')).toHaveValue(
+      `${expected.getFullYear()}-${p2(expected.getMonth() + 1)}-${p2(expected.getDate())}`,
+    );
     await page.locator('#kickoff-input').fill('2028-01-03');
     await expect(page.locator('#kickoff-input')).toHaveValue('2028-01-03');
+    // changing kickoff moves the whole program
+    await expect(page.locator('[data-computed="tapeout"]')).toHaveText('09/25/2028');
 
     const profile = page.locator('#profile-select');
     await expect(profile).toHaveValue('typicalSoC');
