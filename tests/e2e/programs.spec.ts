@@ -179,6 +179,139 @@ test.describe('creating a program', () => {
   });
 });
 
+/**
+ * The store is a module singleton, so client-side navigation between programs
+ * is the case that breaks: nothing tears it down between routes. Every test
+ * here navigates by clicking, never by page.goto — a full load would rebuild
+ * the store and hide the bug.
+ */
+test.describe('switching programs without a page load', () => {
+  test('a program created after opening another shows its own data', async ({ page }) => {
+    // open the seeded program first, so the store is full of it
+    await card(page, 'AtlasAX1').locator('.pl-open').click();
+    await expect(page.locator('#project-name')).toHaveText('AtlasAX1');
+    await page.locator('#to-programs').click();
+
+    await createProgram(page, 'ZetaX1', '2029-06-04');
+    const panel = page.locator('.stage-panel.selected');
+
+    await expect(page.locator('#project-name')).toHaveText('ZetaX1');
+    await expect(page.locator('#kickoff-input')).toHaveValue('2029-06-04');
+    // milestones follow the kickoff that was just typed in
+    await expect(page.locator('[data-computed="tapeout"]')).toHaveText('02/25/2030');
+    await expect(page.locator('[data-computed="firstSilicon"]')).toHaveText('04/22/2030');
+    await expect(panel.locator('[data-role="start-edit"]')).toHaveValue('2029-06-04');
+    // and none of AtlasAX1's content came along
+    await expect(panel.locator('.board[data-kind="keyinfo"] .b-row')).toHaveCount(0);
+    await expect(panel.locator('.board[data-kind="activities"] .b-row')).toHaveCount(0);
+    await expect(panel.locator('.l-name')).toHaveText('Unassigned');
+    await expect(panel.locator('.contacts-sec .c-row')).toHaveCount(0);
+    await expect(panel.locator('.dlv-note')).toHaveText('0 / 3 complete');
+    await expect(page.locator('.edited-flag')).toBeHidden();
+  });
+
+  test('clicking between two programs swaps every panel', async ({ page }) => {
+    await createProgram(page, 'ZetaX2', '2029-06-04');
+    await page.locator('#to-programs').click();
+    await card(page, 'AtlasAX1').locator('.pl-open').click();
+    await expect(page.locator('#project-name')).toHaveText('AtlasAX1');
+    await expect(page.locator('#kickoff-input')).not.toHaveValue('2029-06-04');
+
+    await page.locator('#to-programs').click();
+    await card(page, 'ZetaX2').locator('.pl-open').click();
+    await expect(page.locator('#project-name')).toHaveText('ZetaX2');
+    await expect(page.locator('#kickoff-input')).toHaveValue('2029-06-04');
+    await expect(page.locator('[data-computed="tapeout"]')).toHaveText('02/25/2030');
+    await expect(
+      page.locator('.stage-panel.selected .board[data-kind="activities"] .b-row'),
+    ).toHaveCount(0);
+  });
+
+  test('the dashboard follows the switch too', async ({ page }) => {
+    await card(page, 'AtlasAX1').locator('.pl-open').click();
+    await page.locator('#mode-toggle button[data-mode="schedule"]').click();
+    await expect(page.locator('.stat').first().locator('.v')).toHaveText('51%');
+    await page.locator('#mode-toggle button[data-mode="journey"]').click();
+
+    await page.locator('#to-programs').click();
+    await createProgram(page, 'ZetaX3', '2029-06-04');
+    await page.locator('#mode-toggle button[data-mode="schedule"]').click();
+    await expect(page.locator('#dash-title')).toHaveText('ZetaX3 — Dashboard');
+    await expect(page.locator('.stat').first().locator('.v')).toHaveText('0%');
+    await expect(page.locator('.dash-flight span')).toHaveText('No stage active today');
+  });
+
+  test('the view resets: selected stage and open sheets do not carry over', async ({ page }) => {
+    await card(page, 'AtlasAX1').locator('.pl-open').click();
+    await page.locator('.rm-station', { hasText: /^09 / }).hover();
+    await expect(page.locator('.stage-panel.selected')).toHaveAttribute('data-id', 'fabrication');
+
+    await page.locator('#to-programs').click();
+    await createProgram(page, 'ZetaX4', '2029-06-04');
+    // back to stage 1 with its details open, as on a fresh load
+    await expect(page.locator('.stage-panel.selected')).toHaveAttribute(
+      'data-id',
+      'productDefinition',
+    );
+    await expect(
+      page.locator('.stage-panel.selected .inline-area[data-kind="stage"]'),
+    ).toBeVisible();
+  });
+
+  test('leaving with a pop-up open does not strand the page lock', async ({ page }) => {
+    await card(page, 'AtlasAX1').locator('.pl-open').click();
+    await page.locator('.stage-panel.selected .board[data-kind="keyinfo"] [data-more]').click();
+    await expect(page.locator('#modal .modal-win')).toBeVisible();
+    await expect(page.locator('body')).toHaveClass(/modal-open/);
+
+    /* the scrim covers the toolbar on purpose, so browser back is the only way
+       out of a pop-up without closing it */
+    await page.goBack();
+    await expect(page.locator('.pl-card').first()).toBeVisible();
+    await expect(page.locator('body')).not.toHaveClass(/modal-open/);
+
+    // and the pop-up does not reappear over a different program
+    await createProgram(page, 'ZetaX5', '2029-06-04');
+    await expect(page.locator('#modal .modal-win')).toBeHidden();
+    await expect(page.locator('body')).not.toHaveClass(/modal-open/);
+  });
+
+  test('leaving from the dashboard leaves the program list scrollable', async ({ page }) => {
+    await card(page, 'AtlasAX1').locator('.pl-open').click();
+    await page.locator('#mode-toggle button[data-mode="schedule"]').click();
+    await expect(page.locator('html')).toHaveCSS('overflow', 'hidden');
+
+    await page.locator('#to-programs').click();
+    await expect(page.locator('.pl-card').first()).toBeVisible();
+    await expect(page.locator('html')).not.toHaveCSS('overflow', 'hidden');
+    await expect(page.locator('body')).not.toHaveClass(/schedule-mode/);
+  });
+
+  test('editing one program after switching writes to that program', async ({ page }) => {
+    await card(page, 'AtlasAX1').locator('.pl-open').click();
+    await page.locator('#to-programs').click();
+    await createProgram(page, 'ZetaX6', '2029-06-04');
+
+    await page.locator('.stage-panel.selected .board[data-kind="risks"] [data-add]').click();
+    await page.locator('.ie-title').fill('Written to the new program');
+    await page.locator('[data-save]').click();
+    await expect(
+      page.locator('.stage-panel.selected .board[data-kind="risks"] .b-row'),
+    ).toHaveCount(1);
+
+    // the write landed on ZetaX6, not on the program the store was holding
+    await page.reload();
+    await expect(page.locator('#project-name')).toHaveText('ZetaX6');
+    await expect(
+      page.locator('.stage-panel.selected .board[data-kind="risks"] .b-row'),
+    ).toHaveCount(1);
+    await page.goto('/p/atlasax1');
+    await expect(page.locator('.stage-panel.selected .board[data-kind="risks"] .b-row')).toHaveCount(
+      0,
+    );
+  });
+});
+
 test.describe('deleting a program', () => {
   test('asks first, and Cancel keeps it', async ({ page }) => {
     await card(page, 'AtlasAX1').locator('[data-del-project]').click();

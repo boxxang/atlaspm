@@ -24,7 +24,12 @@ export function AppShell({ initial }: { initial: ProjectState }) {
   const hydrate = useAppStore((s) => s.hydrate);
 
   useEffect(() => {
+    /* A pop-up belongs to the program it was opened from. Only close it on an
+       actual switch — `initial` is a fresh object after every revalidatePath,
+       and closing then would shut the pop-up out from under a mutation. */
+    const switching = useAppStore.getState().projectId !== initial.projectId;
     hydrate(initial);
+    if (switching) useModalStore.getState().close();
   }, [hydrate, initial]);
 
   return hydrated ? <App /> : null;
@@ -43,16 +48,24 @@ function App() {
   const closeAllInline = useAppStore((s) => s.closeAllInline);
   const [mode, setMode] = useState<ViewMode>('journey');
 
-  /* setMode(): the dashboard is a fixed overlay, so the page behind it locks. */
+  /* setMode(): the dashboard is a fixed overlay, so the page behind it locks.
+     The cleanup matters on navigation: leaving a program in dashboard mode used
+     to strand overflow:hidden on <html>, which left the program list unable to
+     scroll. */
   useEffect(() => {
     const dash = mode === 'schedule';
     document.body.classList.toggle('schedule-mode', dash);
     document.documentElement.style.overflow = dash ? 'hidden' : '';
+    return () => {
+      document.body.classList.remove('schedule-mode');
+      document.documentElement.style.overflow = '';
+    };
   }, [mode]);
 
   /* EDITED flag is CSS-driven off the body class, as in the reference. */
   useEffect(() => {
     document.body.classList.toggle('has-overrides', edited);
+    return () => document.body.classList.remove('has-overrides');
   }, [edited]);
 
   useEffect(() => {

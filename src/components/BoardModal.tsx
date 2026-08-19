@@ -102,9 +102,12 @@ export function BoardModal() {
   const saveUpdate = useAppStore((s) => s.saveUpdate);
   const deleteUpdate = useAppStore((s) => s.deleteUpdate);
 
-  /* the page behind the pop-up locks while it is open */
+  /* The page behind the pop-up locks while it is open. Unmounting has to give
+     that back — navigating away with a pop-up open otherwise left body.modal-open
+     stranded on the next page. */
   useEffect(() => {
     document.body.classList.toggle('modal-open', m.open);
+    return () => document.body.classList.remove('modal-open');
   }, [m.open]);
 
   useEffect(() => {

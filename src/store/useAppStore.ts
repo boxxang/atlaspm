@@ -140,9 +140,15 @@ export const useAppStore = create<AppState>()((set, get) => ({
   inline: {},
 
   /* Server-rendered DB state in, client clock applied here: "today" belongs to
-     the viewer's timezone, so it cannot come from the server render. */
+     the viewer's timezone, so it cannot come from the server render.
+     
+     The store is a module singleton and client-side navigation does not tear it
+     down, so re-hydrate whenever the route points at a different program —
+     otherwise opening one program and then switching would keep showing the
+     first one's name, schedule and boards until a full page load. */
   hydrate: (initial, now = new Date()) => {
-    if (get().hydrated) return;
+    const prev = get();
+    if (prev.hydrated && prev.projectId === initial.projectId) return;
     const profile = scheduleProfiles[initial.profileId] ?? scheduleProfiles.typicalSoC;
     set({
       hydrated: true,
@@ -158,6 +164,8 @@ export const useAppStore = create<AppState>()((set, get) => ({
       deliverables: initial.deliverables,
       leaders: initial.leaders,
       contacts: initial.contacts,
+      /* view state belongs to the program you were looking at, not the next one */
+      currentStage: 0,
       /* stage details are open by default on the first stage */
       inline: { [STAGE_ORDER[0]]: { kind: 'stage', editContact: null } },
     });
