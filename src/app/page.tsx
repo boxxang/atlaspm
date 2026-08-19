@@ -2,6 +2,13 @@ import { AppShell } from '@/components/AppShell';
 import { getProjectState } from '@/lib/queries';
 
 /**
+ * The program comes out of the database, so this route has to render per
+ * request. Without this the build prerenders it and every deploy would serve
+ * whatever the database held at build time until something revalidated it.
+ */
+export const dynamic = 'force-dynamic';
+
+/**
  * Reads the program on the server so the client store boots from the RSC
  * payload rather than a round trip. "Today" is still applied on the client —
  * see AppShell.

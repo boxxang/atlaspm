@@ -105,7 +105,7 @@ export function Roadmap() {
                   style={{ left: `${(i / (N - 1)) * 100}%` }}
                   data-index={i}
                   data-tip={`${s.title}|${fmtDateShort(st.start)} → ${fmtDateShort(st.end)} · ${fmtW(st.durationWeeks)}`}
-                  aria-label={`Stage ${s.stage}: ${s.title}`}
+                  aria-label={`${String(s.stage).padStart(2, '0')} ${s.shortTitle}, ${fmtDateShort(st.start)} — Stage ${s.stage}: ${s.title}`}
                   key={s.id}
                   onPointerOver={() => selectStage(i)}
                   onClick={() => selectStage(i)}
@@ -115,6 +115,10 @@ export function Roadmap() {
                   <span className="code">
                     {String(s.stage).padStart(2, '0')} {s.shortTitle}
                   </span>
+                  {/* Whitespace-only node between flex items renders as nothing,
+                      but keeps the visible text readable as "01 DEF 01/21/2026"
+                      so the aria-label below can contain it (WCAG 2.5.3). */}
+                  {' '}
                   <span className="date" data-role="st-date">
                     {fmtDateShort(st.start)}
                   </span>

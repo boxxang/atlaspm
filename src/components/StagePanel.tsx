@@ -72,7 +72,7 @@ export function StagePanel({ stage, index }: { stage: JourneyStage; index: numbe
   const detailOpen = !!inline;
 
   return (
-    <article
+    <div
       className={[
         'stage-panel',
         stage.moment ? 'moment' : '',
@@ -149,6 +149,6 @@ export function StagePanel({ stage, index }: { stage: JourneyStage; index: numbe
         dangerouslySetInnerHTML={{ __html: stageViz[stage.id]() }}
       />
       {inline && <InlineArea stageId={stage.id} state={inline} scroll={false} />}
-    </article>
+    </div>
   );
 }

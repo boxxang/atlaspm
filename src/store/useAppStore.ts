@@ -3,7 +3,7 @@
 import { create } from 'zustand';
 import * as api from '@/app/actions';
 import { journeyData } from '@/data/journey';
-import { STAGE_ORDER, scheduleProfiles } from '@/data/scheduleProfiles';
+import { STAGE_ORDER, scheduleProfiles, type ProfileId } from '@/data/scheduleProfiles';
 import type { ProjectState } from '@/lib/projectState';
 import type {
   Contact,
@@ -37,7 +37,7 @@ export interface AppState {
   today: Date;
   projectName: string;
   kickoff: Date;
-  profileId: keyof typeof scheduleProfiles;
+  profileId: ProfileId;
   overrides: StageOverrides;
   schedule: Schedule;
   edited: boolean;
@@ -51,7 +51,7 @@ export interface AppState {
   hydrate: (initial: ProjectState, now?: Date) => void;
   setProjectName: (name: string) => void;
   setKickoff: (d: Date) => void;
-  setProfile: (id: keyof typeof scheduleProfiles) => void;
+  setProfile: (id: ProfileId) => void;
   selectStage: (i: number) => void;
   editStageDate: (stageId: StageId, which: 'start' | 'end', date: Date) => void;
   resetSchedule: () => void;

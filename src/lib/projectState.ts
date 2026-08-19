@@ -1,4 +1,4 @@
-import { STAGE_ORDER, scheduleProfiles } from '@/data/scheduleProfiles';
+import { STAGE_ORDER, scheduleProfiles, type ProfileId } from '@/data/scheduleProfiles';
 import type {
   Contact,
   Deliverable,
@@ -14,7 +14,7 @@ export interface ProjectState {
   projectId: string;
   projectName: string;
   kickoff: Date;
-  profileId: keyof typeof scheduleProfiles;
+  profileId: ProfileId;
   overrides: StageOverrides;
   content: Record<StageId, StageContent>;
   deliverables: Record<StageId, Deliverable[]>;
@@ -174,7 +174,7 @@ export function buildProjectState(project: {
     kickoff: project.kickoff,
     profileId: (project.profileId in scheduleProfiles
       ? project.profileId
-      : 'typicalSoC') as keyof typeof scheduleProfiles,
+      : 'typicalSoC') as ProfileId,
     overrides,
     content,
     deliverables,
