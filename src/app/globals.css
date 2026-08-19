@@ -743,6 +743,30 @@ body.modal-open .modal-win{transform:none}
 }
 
 /* ============================================================
+   MAIL — envelope buttons that compose a draft
+   ============================================================ */
+.mail-wrap{position:relative;display:inline-flex;align-items:center;flex:none}
+.mail-btn{
+  display:inline-flex;align-items:center;gap:7px;flex:none;cursor:pointer;text-decoration:none;
+  border:1px solid var(--line);border-radius:4px;padding:3px 9px;color:var(--ink-3);
+  font-family:var(--mono);font-size:.62em;letter-spacing:.12em;text-transform:uppercase;
+}
+.mail-btn svg{width:1.35em;height:1.35em;flex:none}
+.mail-btn:hover,.mail-btn:focus-visible{color:var(--accent);border-color:var(--accent)}
+/* bare icon, for a board row */
+.mail-btn.icon{border:none;padding:2px 4px;border-radius:3px}
+.mail-btn.icon svg{width:15px;height:15px}
+.b-row .mail-btn.icon,.dlv-list .mail-btn.icon{opacity:0;transition:opacity .15s}
+.b-row:hover .mail-btn.icon,.b-row:focus-within .mail-btn.icon{opacity:1}
+.mail-note{
+  position:absolute;right:0;top:calc(100% + 6px);z-index:95;white-space:nowrap;
+  background:var(--ink);color:#fff;border-radius:4px;padding:5px 9px;
+  font-family:var(--mono);font-size:.62em;letter-spacing:.04em;
+}
+/* the row's envelope sits in the title cell, pushed to its right edge */
+.b-row .b-title .mail-wrap{margin-left:auto}
+
+/* ============================================================
    TOOLTIP — cursor-following, shared by every [data-tip] element
    ============================================================ */
 .g-tip{
@@ -764,6 +788,7 @@ body.modal-open .modal-win{transform:none}
 }
 body.schedule-mode #schedule-view{opacity:1;visibility:visible;transform:none}
 #schedule-view .inner{max-width:1240px;margin:0 auto;padding:44px 32px 60px}
+.dash-title-row{display:flex;align-items:center;gap:16px;flex-wrap:wrap}
 #schedule-view h2{font-size:clamp(1.3rem,2vw,1.7rem);font-weight:650;letter-spacing:-.01em;text-transform:uppercase}
 #schedule-view .note{font-size:.8em;color:var(--ink-3);margin:6px 0 30px}
 #schedule-view .gantt .g-row{height:var(--dash-row-h)}   /* adjustable in Settings */

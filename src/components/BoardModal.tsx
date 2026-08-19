@@ -215,6 +215,7 @@ export function BoardModal() {
                       updates={3}
                       stageTag={e.stage?.shortTitle}
                       stageId={e.stage?.id}
+                      mailStageId={e.stage?.id ?? stageId ?? undefined}
                       onOpen={() =>
                         e.stage
                           ? m.drillInto(e.stage.id, kind, e.it.id)
@@ -234,6 +235,7 @@ export function BoardModal() {
                 key={item.id}
                 item={item}
                 kind={kind}
+                stageId={stageId}
                 editingSuId={m.editingSuId}
                 onEdit={() => m.setView('edit')}
                 onSuEdit={m.setEditingSu}

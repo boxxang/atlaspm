@@ -112,6 +112,7 @@ export function StagePanel({ stage, index }: { stage: JourneyStage; index: numbe
             stageId={stage.id}
             kind="activities"
             title="Activity"
+            mailWholeList
             onOpenItem={(id) => openBoard(stage.id, 'activities', 'item', id, 'board')}
             onAdd={() => openBoard(stage.id, 'activities', 'edit', null, 'add')}
             onShowMore={() => openBoard(stage.id, 'activities', 'board')}

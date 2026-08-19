@@ -1,9 +1,20 @@
 'use client';
 
+import { useMemo } from 'react';
 import type { Item, ItemKind, StageContent, StageId } from '@/data/types';
+import { activityListDraft, itemDraft } from '@/lib/mailDrafts';
+import { buildDirectory, resolveEmail } from '@/lib/people';
 import { fmtDT, fmtDate } from '@/lib/schedule';
 import { sortedItems, useAppStore } from '@/store/useAppStore';
 import { ColGrip } from './ColGrip';
+import { MailButton } from './MailButton';
+
+/** The program's own address book, used to route an item to its owner. */
+export function useDirectory() {
+  const leaders = useAppStore((s) => s.leaders);
+  const contacts = useAppStore((s) => s.contacts);
+  return useMemo(() => buildDirectory(leaders, contacts), [leaders, contacts]);
+}
 
 /** Board rows show the newest N status updates under the title. */
 export function BoardRow({
@@ -13,6 +24,7 @@ export function BoardRow({
   stageTag,
   updates = 1,
   onOpen,
+  mailStageId,
 }: {
   it: Item;
   kind: ItemKind;
@@ -20,8 +32,12 @@ export function BoardRow({
   stageTag?: string;
   updates?: number;
   onOpen?: () => void;
+  /** Set to show the row's envelope; needs to know which stage it belongs to. */
+  mailStageId?: StageId;
 }) {
   const today = useAppStore((s) => s.today);
+  const projectName = useAppStore((s) => s.projectName);
+  const dir = useDirectory();
   const latest = [...it.updates]
     .sort((a, b) => b.date.getTime() - a.date.getTime())
     .slice(0, updates);
@@ -38,6 +54,21 @@ export function BoardRow({
       <span className="b-title">
         {stageTag && <span className="b-stage">{stageTag}</span>}
         <span className="t">{it.title}</span>
+        {mailStageId && (
+          <MailButton
+            className="mail-btn icon"
+            title={`Email ${it.owner || 'the owner'} about this ${kind === 'risks' ? 'risk' : kind === 'keyinfo' ? 'item' : 'activity'}`}
+            noRecipientHint="owner not in this program's contacts"
+            draft={itemDraft({
+              projectName,
+              stageId: mailStageId,
+              kind,
+              item: it,
+              today,
+              ownerEmail: resolveEmail(dir, it.owner),
+            })}
+          />
+        )}
       </span>
       <span className="b-owner">{it.owner || '—'}</span>
       {/* key information has no DUE column */}
@@ -95,6 +126,7 @@ export function Board({
   onOpenItem,
   onAdd,
   onShowMore,
+  mailWholeList = false,
 }: {
   stageId: StageId;
   kind: ItemKind;
@@ -103,8 +135,13 @@ export function Board({
   onOpenItem?: (itemId: string) => void;
   onAdd?: () => void;
   onShowMore?: () => void;
+  /** Adds an envelope in the header addressed to everyone on the list. */
+  mailWholeList?: boolean;
 }) {
   const content = useAppStore((s) => s.content[stageId]);
+  const projectName = useAppStore((s) => s.projectName);
+  const today = useAppStore((s) => s.today);
+  const dir = useDirectory();
   const list = sortedItems(content, kind);
 
   return (
@@ -113,6 +150,22 @@ export function Board({
         <span className="cap">{title}</span>
         <span className="note">{boardNote(content, kind)}</span>
         <span className="spacer" />
+        {mailWholeList && list.length > 0 && (
+          <MailButton
+            title="Email this activity list to its owners"
+            draft={activityListDraft({
+              projectName,
+              stageId,
+              items: list,
+              today,
+              recipients: [
+                ...new Set(
+                  list.map((i) => resolveEmail(dir, i.owner)).filter((e): e is string => !!e),
+                ),
+              ],
+            })}
+          />
+        )}
         {extraBtns}
         <button className="board-btn" data-add={kind} onClick={onAdd}>
           + Add
@@ -127,6 +180,7 @@ export function Board({
               it={it}
               kind={kind}
               key={it.id}
+              mailStageId={stageId}
               onOpen={onOpenItem ? () => onOpenItem(it.id) : undefined}
             />
           ))

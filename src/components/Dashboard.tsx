@@ -14,9 +14,11 @@ import {
   upcomingMilestones,
 } from '@/lib/derive';
 import { fmtDT, fmtDate } from '@/lib/schedule';
+import { programSummaryDraft } from '@/lib/mailDrafts';
 import { useModalStore } from '@/store/modalStore';
 import { useAppStore } from '@/store/useAppStore';
 import { Gantt } from './Gantt';
+import { MailButton } from './MailButton';
 
 const titleOf = (id: StageId) => journeyData.find((s) => s.id === id)!;
 
@@ -43,7 +45,14 @@ export function Dashboard({ hidden }: { hidden: boolean }) {
   return (
     <section id="schedule-view" aria-label="Dashboard" aria-hidden={hidden}>
       <div className="inner">
-        <h2 id="dash-title">{projectName} — Dashboard</h2>
+        <div className="dash-title-row">
+          <h2 id="dash-title">{projectName} — Dashboard</h2>
+          <MailButton
+            title="Email this summary"
+            label="Email summary"
+            draft={programSummaryDraft({ projectName, schedule, today, content, deliverables })}
+          />
+        </div>
         <p className="note" id="dash-sub">
           Program status at a glance.
         </p>

@@ -1,10 +1,14 @@
 'use client';
 
 import { useState } from 'react';
-import type { Item, ItemKind } from '@/data/types';
+import type { Item, ItemKind, StageId } from '@/data/types';
+import { itemDraft } from '@/lib/mailDrafts';
+import { resolveEmail } from '@/lib/people';
 import { fmtDT, fmtDTFull, fmtDate, toISO } from '@/lib/schedule';
 import { KIND_LABELS } from '@/store/modalStore';
 import { useAppStore, type ItemFields } from '@/store/useAppStore';
+import { useDirectory } from './Board';
+import { MailButton } from './MailButton';
 
 /** Status update thread — post, edit in place, delete. */
 function StatusUpdates({
@@ -106,6 +110,7 @@ function StatusUpdates({
 export function ItemView({
   item,
   kind,
+  stageId,
   editingSuId,
   onEdit,
   onSuEdit,
@@ -115,6 +120,7 @@ export function ItemView({
 }: {
   item: Item;
   kind: ItemKind;
+  stageId: StageId;
   editingSuId: string | null;
   onEdit: () => void;
   onSuEdit: (id: string | null) => void;
@@ -123,6 +129,8 @@ export function ItemView({
   onSuPost: (text: string) => void;
 }) {
   const today = useAppStore((s) => s.today);
+  const projectName = useAppStore((s) => s.projectName);
+  const dir = useDirectory();
   const label = KIND_LABELS[kind];
   const dueOver = !!item.due && item.due < today;
 
@@ -152,6 +160,19 @@ export function ItemView({
         <button data-edit onClick={onEdit}>
           Edit
         </button>
+        <MailButton
+          title={`Email ${item.owner || 'the owner'} about this ${label.toLowerCase()}`}
+          label="Email owner"
+          noRecipientHint="owner not in this program's contacts"
+          draft={itemDraft({
+            projectName,
+            stageId,
+            kind,
+            item,
+            today,
+            ownerEmail: resolveEmail(dir, item.owner),
+          })}
+        />
       </div>
       <StatusUpdates
         item={item}
