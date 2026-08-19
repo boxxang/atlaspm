@@ -13,6 +13,7 @@ export async function getProjectState(projectId: string): Promise<ProjectState |
       items: { include: { updates: true } },
       deliverables: { orderBy: { position: 'asc' } },
       contacts: { orderBy: { position: 'asc' } },
+      stageDetails: true,
     },
   });
   return project ? buildProjectState(project) : null;

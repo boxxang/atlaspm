@@ -8,6 +8,7 @@ import type {
   StageId,
 } from '@/data/types';
 import type { StageOverrides } from '@/lib/schedule';
+import type { StageDetailOverride } from '@/lib/stageDetail';
 
 /** Everything the client store needs to boot, as one serialisable payload. */
 export interface ProjectState {
@@ -20,6 +21,8 @@ export interface ProjectState {
   deliverables: Record<StageId, Deliverable[]>;
   leaders: Record<StageId, Leader>;
   contacts: Record<StageId, Contact[]>;
+  /** Per-program edits to the shared stage text, by stage. */
+  stageDetails: Partial<Record<StageId, StageDetailOverride>>;
 }
 
 /**
@@ -95,6 +98,9 @@ interface OverrideRow {
   startOffsetWeeks: number;
   durationWeeks: number;
 }
+interface StageDetailRow extends StageDetailOverride {
+  stageId: string;
+}
 
 const isStage = (id: string): id is StageId => (STAGE_ORDER as readonly string[]).includes(id);
 
@@ -109,6 +115,7 @@ export function buildProjectState(project: {
   deliverables: DeliverableRow[];
   leaders: LeaderRow[];
   contacts: ContactRow[];
+  stageDetails: StageDetailRow[];
 }): ProjectState {
   const content = emptyContent();
   for (const row of project.items) {
@@ -172,6 +179,18 @@ export function buildProjectState(project: {
     };
   }
 
+  const stageDetails: Partial<Record<StageId, StageDetailOverride>> = {};
+  for (const d of project.stageDetails) {
+    if (!isStage(d.stageId)) continue;
+    stageDetails[d.stageId] = {
+      description: d.description,
+      engineeringView: d.engineeringView,
+      programView: d.programView,
+      tools: d.tools,
+      collaboration: d.collaboration,
+    };
+  }
+
   return {
     projectId: project.id,
     projectName: project.name,
@@ -184,5 +203,6 @@ export function buildProjectState(project: {
     deliverables,
     leaders,
     contacts,
+    stageDetails,
   };
 }

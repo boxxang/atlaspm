@@ -302,3 +302,35 @@ export async function deleteProject(projectId: string) {
   await prisma.project.delete({ where: { id: await assertProject(projectId) } });
   revalidatePath('/');
 }
+
+/* ---------- stage detail ---------- */
+
+/**
+ * Overrides one program's copy of a stage's descriptive text. Null fields fall
+ * back to the shared definition in /data/journey.ts, so clearing every field
+ * drops the row and restores the default rather than freezing a copy of it.
+ */
+export async function saveStageDetail(
+  projectId: string,
+  stageId: StageId,
+  detail: {
+    description: string | null;
+    engineeringView: string | null;
+    programView: string | null;
+    tools: string | null;
+    collaboration: string | null;
+  },
+) {
+  const pid = await assertProject(projectId);
+  const empty = !Object.values(detail).some(Boolean);
+  if (empty) {
+    await prisma.stageDetail.deleteMany({ where: { projectId: pid, stageId } });
+  } else {
+    await prisma.stageDetail.upsert({
+      where: { projectId_stageId: { projectId: pid, stageId } },
+      create: { id: `${pid}:detail:${stageId}`, projectId: pid, stageId, ...detail },
+      update: detail,
+    });
+  }
+  touch(projectId);
+}

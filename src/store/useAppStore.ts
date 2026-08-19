@@ -5,6 +5,7 @@ import * as api from '@/app/actions';
 import { journeyData } from '@/data/journey';
 import { STAGE_ORDER, scheduleProfiles, type ProfileId } from '@/data/scheduleProfiles';
 import type { ProjectState } from '@/lib/projectState';
+import { isEmptyOverride, type StageDetailOverride } from '@/lib/stageDetail';
 import type {
   Contact,
   Deliverable,
@@ -52,6 +53,7 @@ export interface AppState {
   deliverables: Record<StageId, Deliverable[]>;
   leaders: Record<StageId, Leader>;
   contacts: Record<StageId, Contact[]>;
+  stageDetails: Partial<Record<StageId, StageDetailOverride>>;
   inline: Partial<Record<StageId, InlineState | null>>;
 
   hydrate: (initial: ProjectState, now?: Date) => void;
@@ -78,6 +80,7 @@ export interface AppState {
   saveContact: (stageId: StageId, contact: Omit<Contact, 'id'> & { id?: string }) => void;
   deleteContact: (stageId: StageId, id: string) => void;
   saveLeader: (stageId: StageId, l: Omit<Leader, 'short'>) => void;
+  saveStageDetail: (stageId: StageId, detail: StageDetailOverride) => void;
   adoptPotentialRisk: (stageId: StageId, title: string) => void;
 
   /** Returns the saved item so the modal can drill into a freshly added one. */
@@ -148,6 +151,7 @@ export const useAppStore = create<AppState>()((set, get) => ({
     journeyData.map((s) => [s.id, { ...s.leader }]),
   ) as Record<StageId, Leader>,
   contacts: emptyMap<Contact[]>(() => []),
+  stageDetails: {},
   inline: {},
 
   /* Server-rendered DB state in, client clock applied here: "today" belongs to
@@ -177,6 +181,7 @@ export const useAppStore = create<AppState>()((set, get) => ({
       deliverables: initial.deliverables,
       leaders: initial.leaders,
       contacts: initial.contacts,
+      stageDetails: initial.stageDetails,
       /* view state belongs to the program you were looking at, not the next one */
       currentStage: 0,
       /* stage details are open by default on the first stage */
@@ -358,6 +363,26 @@ export const useAppStore = create<AppState>()((set, get) => ({
     const short = parts.length > 1 ? parts[0][0] + '. ' + parts.slice(1).join(' ') : l.name;
     set((s) => ({ leaders: { ...s.leaders, [stageId]: { ...l, short } } }));
     sync(api.saveLeader(get().projectId, stageId, { ...l, short }));
+  },
+
+  saveStageDetail: (stageId, detail) => {
+    set((s) => ({
+      stageDetails: {
+        ...s.stageDetails,
+        /* an override with nothing in it is no override — the stage falls back
+           to the shared text rather than keeping a frozen copy of it */
+        [stageId]: isEmptyOverride(detail) ? undefined : detail,
+      },
+    }));
+    sync(
+      api.saveStageDetail(get().projectId, stageId, {
+        description: detail.description ?? null,
+        engineeringView: detail.engineeringView ?? null,
+        programView: detail.programView ?? null,
+        tools: detail.tools ?? null,
+        collaboration: detail.collaboration ?? null,
+      }),
+    );
   },
 
   adoptPotentialRisk: (stageId, title) => {

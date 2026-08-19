@@ -32,6 +32,7 @@ model Project {
   deliverables Deliverable[]
   leaders      Leader[]
   contacts     Contact[]
+  stageDetails StageDetail[]
 }
 
 /// The ONLY schedule mutation surface — baseline profiles are immutable code.
@@ -94,6 +95,27 @@ model Deliverable {
   project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
 
   @@index([projectId, stageId])
+}
+
+/// Per-program edits to a stage's descriptive text. Stage definitions live in
+/// code and are shared by every program; a row here overrides one program's
+/// copy. A null column means "use the shared default", so restoring a field is
+/// a delete rather than a re-copy. List columns are newline-separated: SQLite
+/// has no array type and a String column moves to Postgres unchanged.
+model StageDetail {
+  id        String @id
+  projectId String
+  stageId   String
+
+  description     String?
+  engineeringView String?
+  programView     String?
+  tools           String?
+  collaboration   String?
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@unique([projectId, stageId])
 }
 
 model Leader {

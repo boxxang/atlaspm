@@ -3,6 +3,12 @@
 import { useEffect, useRef, useState } from 'react';
 import { journeyData } from '@/data/journey';
 import type { StageId } from '@/data/types';
+import {
+  fromLines,
+  normaliseOverride,
+  resolveStageDetail,
+  type ResolvedStageDetail,
+} from '@/lib/stageDetail';
 import { useAppStore, type InlineState } from '@/store/useAppStore';
 import { Contacts } from './Contacts';
 import { Deliverables } from './Deliverables';
@@ -29,9 +35,25 @@ function InlineHead({
   );
 }
 
+function PencilIcon() {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      <path d="M4 20h4L19.5 8.5a2.1 2.1 0 0 0-3-3L5 17v3Z" />
+      <path d="M14.5 6.5l3 3" />
+    </svg>
+  );
+}
+
 /** Engineering | Program — the two readings of the same stage. */
-function ViewToggle({ stageId }: { stageId: StageId }) {
-  const s = stageOf(stageId);
+function ViewToggle({ detail }: { detail: ResolvedStageDetail }) {
   const [view, setView] = useState<'eng' | 'prog'>('eng');
   return (
     <div>
@@ -45,26 +67,107 @@ function ViewToggle({ stageId }: { stageId: StageId }) {
       </div>
       <div className="view-pane enter" data-pane="eng" hidden={view !== 'eng'} key={`eng-${view}`}>
         <ul className="view-list">
-          {s.engineeringView.map((x) => (
+          {detail.engineeringView.map((x) => (
             <li key={x}>{x}</li>
           ))}
         </ul>
         <div className="view-foot">
           <span className="cap">Tools</span>
-          <span className="mono">{s.tools.join(' · ')}</span>
+          <span className="mono">{detail.tools.join(' · ')}</span>
         </div>
       </div>
       <div className="view-pane enter" data-pane="prog" hidden={view !== 'prog'} key={`prog-${view}`}>
         <ul className="view-list">
-          {s.programView.map((x) => (
+          {detail.programView.map((x) => (
             <li key={x}>{x}</li>
           ))}
         </ul>
         <div className="view-foot">
           <span className="cap">Teams</span>
-          <span className="mono">{s.collaboration.join(' · ')}</span>
+          <span className="mono">{detail.collaboration.join(' · ')}</span>
         </div>
       </div>
+    </div>
+  );
+}
+
+/**
+ * The stage text is shared code; a program edits its own copy. Clearing a field
+ * restores the shared default rather than freezing a copy of it, which is why
+ * the form starts blank-means-default and offers "Restore defaults".
+ */
+function StageDetailEditor({
+  stageId,
+  detail,
+  onDone,
+}: {
+  stageId: StageId;
+  detail: ResolvedStageDetail;
+  onDone: () => void;
+}) {
+  const save = useAppStore((st) => st.saveStageDetail);
+  const [f, setF] = useState({
+    description: detail.description,
+    engineeringView: fromLines(detail.engineeringView),
+    programView: fromLines(detail.programView),
+    tools: fromLines(detail.tools),
+    collaboration: fromLines(detail.collaboration),
+  });
+  const set = (k: keyof typeof f) => (e: React.ChangeEvent<HTMLTextAreaElement>) =>
+    setF((prev) => ({ ...prev, [k]: e.target.value }));
+
+  return (
+    <div className="sd-edit">
+      <label className="sd-field">
+        <span className="k">What happens in this stage</span>
+        <textarea className="sd-description" value={f.description} onChange={set('description')} autoFocus />
+      </label>
+      <div className="sd-cols">
+        <label className="sd-field">
+          <span className="k">Engineering view — one per line</span>
+          <textarea className="sd-eng" value={f.engineeringView} onChange={set('engineeringView')} />
+        </label>
+        <label className="sd-field">
+          <span className="k">Program view — one per line</span>
+          <textarea className="sd-prog" value={f.programView} onChange={set('programView')} />
+        </label>
+        <label className="sd-field">
+          <span className="k">Tools — one per line</span>
+          <textarea className="sd-tools" value={f.tools} onChange={set('tools')} />
+        </label>
+        <label className="sd-field">
+          <span className="k">Teams — one per line</span>
+          <textarea className="sd-teams" value={f.collaboration} onChange={set('collaboration')} />
+        </label>
+      </div>
+      <div className="sd-acts">
+        <button
+          data-sd-save
+          onClick={() => {
+            save(stageId, normaliseOverride(f, stageOf(stageId)));
+            onDone();
+          }}
+        >
+          Save
+        </button>
+        <button data-sd-cancel onClick={onDone}>
+          Cancel
+        </button>
+        <span className="spacer" />
+        <button
+          data-sd-restore
+          title="Drop this program's edits and use the shared stage text"
+          onClick={() => {
+            save(stageId, {});
+            onDone();
+          }}
+        >
+          Restore defaults
+        </button>
+      </div>
+      <p className="session-note">
+        Edits apply to this program only. An empty field falls back to the shared stage text.
+      </p>
     </div>
   );
 }
@@ -72,12 +175,44 @@ function ViewToggle({ stageId }: { stageId: StageId }) {
 function StageDetail({ stageId, editContact }: { stageId: StageId; editContact: string | null }) {
   const s = stageOf(stageId);
   const close = useAppStore((st) => st.closeInline);
+  const override = useAppStore((st) => st.stageDetails[stageId]);
+  const detail = resolveStageDetail(s, override);
+  const [editing, setEditing] = useState(false);
+
   return (
     <>
-      <InlineHead title="Stage Details" meta={s.title} onClose={() => close(stageId)} />
-      <p className="sheet-what">{s.description}</p>
+      <div className="inline-head">
+        <h3>Stage Details</h3>
+        <span className="meta">{s.title}</span>
+        {detail.overridden.size > 0 && (
+          <span className="sd-flag" title="This program has edited the stage text">
+            EDITED
+          </span>
+        )}
+        {!editing && (
+          <button
+            className="sd-pencil"
+            data-sd-edit
+            title="Edit this stage's text"
+            aria-label="Edit this stage's text"
+            onClick={() => setEditing(true)}
+          >
+            <PencilIcon />
+          </button>
+        )}
+        <button className="inline-close" onClick={() => close(stageId)}>
+          ✕ CLOSE
+        </button>
+      </div>
+
+      {editing ? (
+        <StageDetailEditor stageId={stageId} detail={detail} onDone={() => setEditing(false)} />
+      ) : (
+        <p className="sheet-what">{detail.description}</p>
+      )}
+
       <div className="sheet-grid">
-        <ViewToggle stageId={stageId} />
+        <ViewToggle detail={detail} />
         <div className="sheet-side">
           <Deliverables stageId={stageId} />
         </div>
