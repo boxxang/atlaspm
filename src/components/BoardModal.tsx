@@ -101,6 +101,8 @@ export function BoardModal() {
   const postUpdate = useAppStore((s) => s.postUpdate);
   const saveUpdate = useAppStore((s) => s.saveUpdate);
   const deleteUpdate = useAppStore((s) => s.deleteUpdate);
+  const attachFiles = useAppStore((s) => s.attachFiles);
+  const removeAttachment = useAppStore((s) => s.removeAttachment);
 
   /* The page behind the pop-up locks while it is open. Unmounting has to give
      that back — navigating away with a pop-up open otherwise left body.modal-open
@@ -245,6 +247,12 @@ export function BoardModal() {
                 }}
                 onSuDelete={(suId) => deleteUpdate(stageId, kind, item.id, suId)}
                 onSuPost={(text) => postUpdate(stageId, kind, item.id, text)}
+                onAttach={(files, statusUpdateId) =>
+                  attachFiles(stageId, kind, item.id, { statusUpdateId }, files)
+                }
+                onDetach={(attachmentId, statusUpdateId) =>
+                  removeAttachment(stageId, kind, item.id, attachmentId, statusUpdateId)
+                }
               />
             )}
 

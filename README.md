@@ -68,6 +68,32 @@ prisma/        schema, seed
 Pure logic never imports UI, and `/src/lib` + `/src/data` never touch the DOM —
 `tests/unit/purity.test.ts` enforces both.
 
+## Working features beyond the prototype
+
+- **Email export.** Envelope buttons compose a draft and hand it to the OS mail
+  client. The dashboard exports a program summary; each activity, risk and key
+  information row exports itself addressed to its owner, and an activity board
+  exports the whole list to everyone on it. Owner addresses are matched
+  best-effort against the program's leaders and contacts — `Item.owner` is free
+  text, so `src/lib/people.ts` tries the full name, the short form and a
+  surname. `mailto:` URLs are capped near 2 KB, so bodies are trimmed with a
+  note rather than losing their tail.
+- **Schedule preview.** Editing a stage date stages the change instead of saving
+  it. The roadmap and both gantts draw the proposal with the saved schedule
+  ghosted underneath, and a bar lists every stage and milestone that moves with
+  its shift in days. Apply commits, Discard reverts, a reload throws it away.
+- **Stage detail editing.** The pencil in the Stage Details header edits that
+  program's copy of the stage text. A field only becomes an override when it
+  differs from the shared definition, so emptying it restores the default.
+- **Attachments.** Files and images attach to an item or to a status update.
+  Bytes live in the database (`Attachment.data`), because the documented deploy
+  target has a read-only filesystem and `Bytes` maps to BLOB on SQLite and
+  bytea on Postgres. That caps a file at 5 MB — moving to object storage means
+  replacing that column with a URL and nothing else. Only PNG, JPEG, GIF and
+  WebP render inline; everything else, SVG included, is served as a download
+  with `nosniff`, because inline user content from our own origin is an XSS
+  vector.
+
 ## Persistence
 
 Prisma + SQLite locally (`DATABASE_URL=file:./dev.db`). The schema stays
@@ -104,8 +130,8 @@ that is a read/write swap rather than a redesign.
 ## Testing
 
 ```bash
-npm test          # 76 unit tests: schedule engine, derivations, purity guard
-npm run e2e       # 108 Playwright tests
+npm test          # 119 unit tests: schedule engine, derivations, mail, purity guard
+npm run e2e       # 154 Playwright tests
 ```
 
 The e2e suite runs against its own database (`test.db`) on port 3100, so it never

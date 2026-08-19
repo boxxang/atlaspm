@@ -6,6 +6,11 @@ import { scheduleProfiles, type ProfileId } from '@/data/scheduleProfiles';
 import type { ItemKind, StageBaseline, StageId } from '@/data/types';
 import { prisma } from '@/lib/db';
 import { DB_KIND } from '@/lib/projectState';
+import {
+  MAX_ATTACHMENT_BYTES,
+  safeFilename,
+  type AttachmentMeta,
+} from '@/lib/attachments';
 import { computeSchedule } from '@/lib/schedule';
 
 /**
@@ -332,5 +337,55 @@ export async function saveStageDetail(
       update: detail,
     });
   }
+  touch(projectId);
+}
+
+/* ---------- attachments ---------- */
+
+/**
+ * Stores files against an item or one of its status updates.
+ *
+ * Ids come from the client like everywhere else, so the optimistic chip and the
+ * stored row are the same thing. Oversized files are rejected here as well as
+ * in the browser — a server action is reachable by direct POST.
+ */
+export async function uploadAttachments(form: FormData): Promise<AttachmentMeta[]> {
+  const projectId = String(form.get('projectId') ?? '');
+  const itemId = String(form.get('itemId') ?? '') || null;
+  const statusUpdateId = String(form.get('statusUpdateId') ?? '') || null;
+  if (!itemId && !statusUpdateId) throw new Error('An attachment needs an item or an update.');
+  await assertProject(projectId);
+
+  const ids = form.getAll('ids').map(String);
+  const files = form.getAll('files').filter((f): f is File => f instanceof File);
+  const saved: AttachmentMeta[] = [];
+
+  for (const [i, file] of files.entries()) {
+    if (file.size === 0 || file.size > MAX_ATTACHMENT_BYTES) continue;
+    const id = ids[i];
+    if (!id) continue;
+    const meta = {
+      id,
+      filename: safeFilename(file.name),
+      mimeType: file.type || 'application/octet-stream',
+      size: file.size,
+    };
+    await prisma.attachment.create({
+      data: {
+        ...meta,
+        itemId,
+        statusUpdateId,
+        data: Buffer.from(await file.arrayBuffer()),
+        createdAt: new Date(),
+      },
+    });
+    saved.push(meta);
+  }
+  touch(projectId);
+  return saved;
+}
+
+export async function deleteAttachment(projectId: string, id: string) {
+  await prisma.attachment.delete({ where: { id } });
   touch(projectId);
 }

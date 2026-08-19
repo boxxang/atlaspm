@@ -76,10 +76,18 @@ export interface JourneyStage {
 
 export type ItemKind = 'keyinfo' | 'activities' | 'risks';
 
+export interface AttachmentRef {
+  id: string;
+  filename: string;
+  mimeType: string;
+  size: number;
+}
+
 export interface StatusUpdate {
   id: string;
   text: string;
   date: Date;
+  attachments: AttachmentRef[];
 }
 
 export interface Item {
@@ -93,6 +101,7 @@ export interface Item {
   updated: Date;
   /** Newest first. */
   updates: StatusUpdate[];
+  attachments: AttachmentRef[];
 }
 
 export type StageContent = Record<ItemKind, Item[]>;

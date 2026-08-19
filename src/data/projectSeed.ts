@@ -80,6 +80,7 @@ export function createProjectSeed({
     id: uid(),
     text,
     date: ago(days, hrs),
+    attachments: [],
   });
   /* item factory: newest update first in `ups` */
   const I = (
@@ -94,6 +95,7 @@ export function createProjectSeed({
     due,
     done: dn,
     updates: ups,
+    attachments: [],
     updated: ups.length ? ups[0].date : dn ? E(stage) : ago(6),
   });
 

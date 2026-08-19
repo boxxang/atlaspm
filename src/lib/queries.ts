@@ -1,6 +1,8 @@
 import 'server-only';
 import { prisma } from './db';
 import { buildProjectState, type ProjectState } from './projectState';
+
+const ATTACHMENT_META = { id: true, filename: true, mimeType: true, size: true } as const;
 import type { ProfileId } from '@/data/scheduleProfiles';
 import type { StageBaseline, StageId } from '@/data/types';
 
@@ -10,7 +12,13 @@ export async function getProjectState(projectId: string): Promise<ProjectState |
     include: {
       overrides: true,
       leaders: true,
-      items: { include: { updates: true } },
+      /* metadata only — the bytes are streamed by /api/attachments/[id] */
+      items: {
+        include: {
+          updates: { include: { attachments: { select: ATTACHMENT_META } } },
+          attachments: { select: ATTACHMENT_META },
+        },
+      },
       deliverables: { orderBy: { position: 'asc' } },
       contacts: { orderBy: { position: 'asc' } },
       stageDetails: true,

@@ -64,8 +64,9 @@ model Item {
   done      Boolean   @default(false)
   updatedAt DateTime
 
-  project Project        @relation(fields: [projectId], references: [id], onDelete: Cascade)
-  updates StatusUpdate[]
+  project     Project        @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  updates     StatusUpdate[]
+  attachments Attachment[]
 
   @@index([projectId, stageId, kind])
 }
@@ -76,9 +77,34 @@ model StatusUpdate {
   text      String
   createdAt DateTime
 
-  item Item @relation(fields: [itemId], references: [id], onDelete: Cascade)
+  item        Item         @relation(fields: [itemId], references: [id], onDelete: Cascade)
+  attachments Attachment[]
 
   @@index([itemId])
+}
+
+/// Files attached to an item or to one of its status updates.
+///
+/// Bytes live in the database rather than on disk: the documented deploy target
+/// is Vercel, whose filesystem is read-only, and `Bytes` maps to BLOB on SQLite
+/// and bytea on Postgres, so the column travels with the rest of the schema.
+/// That caps the sensible file size (see MAX_ATTACHMENT_BYTES); moving to object
+/// storage later means replacing `data` with a URL and nothing else.
+model Attachment {
+  id             String   @id
+  itemId         String?
+  statusUpdateId String?
+  filename       String
+  mimeType       String
+  size           Int
+  data           Bytes
+  createdAt      DateTime
+
+  item   Item?         @relation(fields: [itemId], references: [id], onDelete: Cascade)
+  update StatusUpdate? @relation(fields: [statusUpdateId], references: [id], onDelete: Cascade)
+
+  @@index([itemId])
+  @@index([statusUpdateId])
 }
 
 model Deliverable {

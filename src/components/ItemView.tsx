@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { AttachmentList, AttachmentPicker, AttachmentProblems } from './Attachments';
 import type { Item, ItemKind, StageId } from '@/data/types';
 import { itemDraft } from '@/lib/mailDrafts';
 import { resolveEmail } from '@/lib/people';
@@ -19,6 +20,8 @@ function StatusUpdates({
   onSave,
   onDelete,
   onPost,
+  onAttach,
+  onDetach,
 }: {
   item: Item;
   label: string;
@@ -26,10 +29,14 @@ function StatusUpdates({
   onEdit: (id: string | null) => void;
   onSave: (id: string, text: string) => void;
   onDelete: (id: string) => void;
-  onPost: (text: string) => void;
+  onPost: (text: string) => string;
+  onAttach: (files: File[], statusUpdateId?: string) => Promise<string[]>;
+  onDetach: (attachmentId: string, statusUpdateId?: string) => void;
 }) {
   const [draft, setDraft] = useState('');
   const [edit, setEdit] = useState('');
+  const [pending, setPending] = useState<File[]>([]);
+  const [problems, setProblems] = useState<string[]>([]);
   const updates = [...item.updates].sort((a, b) => b.date.getTime() - a.date.getTime());
 
   return (
@@ -61,7 +68,16 @@ function StatusUpdates({
           ) : (
             <div className="su-item" key={u.id}>
               <span className="su-date">{fmtDT(u.date)}</span>
-              <span className="su-text">{u.text}</span>
+              {/* .su-text is white-space:pre-wrap, so the attachments live
+                  beside it rather than inside it */}
+              <span className="su-body">
+                <span className="su-text">{u.text}</span>
+                <AttachmentList files={u.attachments} onRemove={(id) => onDetach(id, u.id)} />
+                <AttachmentPicker
+                  label="Attach"
+                  onPick={async (files) => setProblems(await onAttach(files, u.id))}
+                />
+              </span>
               <span className="su-acts">
                 <button
                   data-su-edit={u.id}
@@ -93,15 +109,37 @@ function StatusUpdates({
         />
         <button
           data-post
-          onClick={() => {
+          onClick={async () => {
             const t = draft.trim();
             if (!t) return;
-            onPost(t);
+            /* the update has to exist before files can hang off it */
+            const suId = onPost(t);
             setDraft('');
+            if (pending.length) {
+              setProblems(await onAttach(pending, suId));
+              setPending([]);
+            }
           }}
         >
           Post
         </button>
+      </div>
+      <div className="su-attach">
+        <AttachmentPicker
+          label={pending.length ? `${pending.length} file(s) ready` : 'Attach files'}
+          onPick={(files) => setPending((prev) => [...prev, ...files])}
+        />
+        {pending.length > 0 && (
+          <>
+            <span className="att-pending">
+              {pending.map((f) => f.name).join(', ')} — attached when you post
+            </span>
+            <button className="att-clear" data-clear-pending onClick={() => setPending([])}>
+              Clear
+            </button>
+          </>
+        )}
+        <AttachmentProblems problems={problems} />
       </div>
     </div>
   );
@@ -117,6 +155,8 @@ export function ItemView({
   onSuSave,
   onSuDelete,
   onSuPost,
+  onAttach,
+  onDetach,
 }: {
   item: Item;
   kind: ItemKind;
@@ -126,11 +166,14 @@ export function ItemView({
   onSuEdit: (id: string | null) => void;
   onSuSave: (id: string, text: string) => void;
   onSuDelete: (id: string) => void;
-  onSuPost: (text: string) => void;
+  onSuPost: (text: string) => string;
+  onAttach: (files: File[], statusUpdateId?: string) => Promise<string[]>;
+  onDetach: (attachmentId: string, statusUpdateId?: string) => void;
 }) {
   const today = useAppStore((s) => s.today);
   const projectName = useAppStore((s) => s.projectName);
   const dir = useDirectory();
+  const [attachProblems, setAttachProblems] = useState<string[]>([]);
   const label = KIND_LABELS[kind];
   const dueOver = !!item.due && item.due < today;
 
@@ -156,6 +199,11 @@ export function ItemView({
       <p className={`iv-body${item.body ? '' : ' empty'}`}>
         {item.body || 'No details recorded yet.'}
       </p>
+      <div className="iv-attach">
+        <AttachmentList files={item.attachments} onRemove={(id) => onDetach(id)} />
+        <AttachmentPicker onPick={async (files) => setAttachProblems(await onAttach(files))} />
+        <AttachmentProblems problems={attachProblems} />
+      </div>
       <div className="iv-actions">
         <button data-edit onClick={onEdit}>
           Edit
@@ -182,6 +230,8 @@ export function ItemView({
         onSave={onSuSave}
         onDelete={onSuDelete}
         onPost={onSuPost}
+        onAttach={onAttach}
+        onDetach={onDetach}
       />
     </div>
   );

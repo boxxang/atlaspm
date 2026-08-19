@@ -5,8 +5,10 @@ import * as api from '@/app/actions';
 import { journeyData } from '@/data/journey';
 import { STAGE_ORDER, scheduleProfiles, type ProfileId } from '@/data/scheduleProfiles';
 import type { ProjectState } from '@/lib/projectState';
+import { rejectFile, rejectionMessage } from '@/lib/attachments';
 import { isEmptyOverride, type StageDetailOverride } from '@/lib/stageDetail';
 import type {
+  AttachmentRef,
   Contact,
   Deliverable,
   Item,
@@ -14,6 +16,7 @@ import type {
   Leader,
   StageContent,
   StageId,
+  StatusUpdate,
 } from '@/data/types';
 import {
   applyDateEdit,
@@ -81,12 +84,27 @@ export interface AppState {
   deleteContact: (stageId: StageId, id: string) => void;
   saveLeader: (stageId: StageId, l: Omit<Leader, 'short'>) => void;
   saveStageDetail: (stageId: StageId, detail: StageDetailOverride) => void;
+  attachFiles: (
+    stageId: StageId,
+    kind: ItemKind,
+    itemId: string,
+    target: { statusUpdateId?: string },
+    files: File[],
+  ) => Promise<string[]>;
+  removeAttachment: (
+    stageId: StageId,
+    kind: ItemKind,
+    itemId: string,
+    attachmentId: string,
+    statusUpdateId?: string,
+  ) => void;
   adoptPotentialRisk: (stageId: StageId, title: string) => void;
 
   /** Returns the saved item so the modal can drill into a freshly added one. */
   saveItem: (stageId: StageId, kind: ItemKind, itemId: string | null, f: ItemFields) => Item;
   deleteItem: (stageId: StageId, kind: ItemKind, itemId: string) => void;
-  postUpdate: (stageId: StageId, kind: ItemKind, itemId: string, text: string) => void;
+  /** Returns the new update's id, so attachments can reference it. */
+  postUpdate: (stageId: StageId, kind: ItemKind, itemId: string, text: string) => string;
   saveUpdate: (
     stageId: StageId,
     kind: ItemKind,
@@ -365,6 +383,78 @@ export const useAppStore = create<AppState>()((set, get) => ({
     sync(api.saveLeader(get().projectId, stageId, { ...l, short }));
   },
 
+  /**
+   * Uploads first, then records what came back. Bytes have to reach the server
+   * before the chip means anything, so this one is not optimistic — it returns
+   * the messages for whatever the server refused.
+   */
+  attachFiles: async (stageId, kind, itemId, target, files) => {
+    const accepted: File[] = [];
+    const problems: string[] = [];
+    const existing = (() => {
+      const item = get().content[stageId][kind].find((x) => x.id === itemId);
+      if (!item) return 0;
+      return target.statusUpdateId
+        ? (item.updates.find((u) => u.id === target.statusUpdateId)?.attachments.length ?? 0)
+        : item.attachments.length;
+    })();
+
+    for (const file of files) {
+      const reason = rejectFile(file, existing + accepted.length);
+      if (reason) problems.push(rejectionMessage(reason, file.name));
+      else accepted.push(file);
+    }
+    if (!accepted.length) return problems;
+
+    const form = new FormData();
+    form.set('projectId', get().projectId);
+    form.set('itemId', itemId);
+    if (target.statusUpdateId) form.set('statusUpdateId', target.statusUpdateId);
+    for (const file of accepted) {
+      form.append('files', file);
+      form.append('ids', uid());
+    }
+
+    try {
+      const saved = await api.uploadAttachments(form);
+      set((s) => ({
+        content: mapItem(s.content, stageId, kind, itemId, (it) =>
+          target.statusUpdateId
+            ? {
+                ...it,
+                updates: it.updates.map((u) =>
+                  u.id === target.statusUpdateId
+                    ? { ...u, attachments: [...u.attachments, ...saved] }
+                    : u,
+                ),
+              }
+            : { ...it, attachments: [...it.attachments, ...saved] },
+        ),
+      }));
+    } catch (e) {
+      console.error('[atlaspm] attachment upload failed', e);
+      problems.push('Upload failed — the files were not attached.');
+    }
+    return problems;
+  },
+
+  removeAttachment: (stageId, kind, itemId, attachmentId, statusUpdateId) => {
+    const drop = (list: AttachmentRef[]) => list.filter((a) => a.id !== attachmentId);
+    set((s) => ({
+      content: mapItem(s.content, stageId, kind, itemId, (it) =>
+        statusUpdateId
+          ? {
+              ...it,
+              updates: it.updates.map((u) =>
+                u.id === statusUpdateId ? { ...u, attachments: drop(u.attachments) } : u,
+              ),
+            }
+          : { ...it, attachments: drop(it.attachments) },
+      ),
+    }));
+    sync(api.deleteAttachment(get().projectId, attachmentId));
+  },
+
   saveStageDetail: (stageId, detail) => {
     set((s) => ({
       stageDetails: {
@@ -395,6 +485,7 @@ export const useAppStore = create<AppState>()((set, get) => ({
       done: false,
       updated: new Date(),
       updates: [],
+      attachments: [],
     };
     set((s) => ({
       content: {
@@ -411,7 +502,7 @@ export const useAppStore = create<AppState>()((set, get) => ({
       : undefined;
     const saved: Item = existing
       ? { ...existing, ...f, updated: new Date() }
-      : { id: uid(), ...f, done: false, updated: new Date(), updates: [] };
+      : { id: uid(), ...f, done: false, updated: new Date(), updates: [], attachments: [] };
     set((s) => ({
       content: {
         ...s.content,
@@ -441,7 +532,7 @@ export const useAppStore = create<AppState>()((set, get) => ({
   },
 
   postUpdate: (stageId, kind, itemId, text) => {
-    const su = { id: uid(), text, date: new Date() };
+    const su: StatusUpdate = { id: uid(), text, date: new Date(), attachments: [] };
     set((s) => ({
       content: mapItem(s.content, stageId, kind, itemId, (it) => ({
         ...it,
@@ -450,6 +541,7 @@ export const useAppStore = create<AppState>()((set, get) => ({
       })),
     }));
     sync(api.postUpdate({ projectId: get().projectId, id: su.id, itemId, text, createdAt: su.date }));
+    return su.id;
   },
 
   /* editing keeps the update's original timestamp — the thread stays honest */

@@ -68,7 +68,19 @@ interface ItemRow {
   due: Date | null;
   done: boolean;
   updatedAt: Date;
-  updates: { id: string; text: string; createdAt: Date }[];
+  updates: {
+    id: string;
+    text: string;
+    createdAt: Date;
+    attachments?: AttachmentRow[];
+  }[];
+  attachments?: AttachmentRow[];
+}
+interface AttachmentRow {
+  id: string;
+  filename: string;
+  mimeType: string;
+  size: number;
 }
 interface DeliverableRow {
   id: string;
@@ -130,8 +142,14 @@ export function buildProjectState(project: {
       done: row.done,
       /* DB column is updatedAt (CLAUDE.md); the UI type calls it updated */
       updated: row.updatedAt,
+      attachments: row.attachments ?? [],
       updates: row.updates
-        .map((u) => ({ id: u.id, text: u.text, date: u.createdAt }))
+        .map((u) => ({
+          id: u.id,
+          text: u.text,
+          date: u.createdAt,
+          attachments: u.attachments ?? [],
+        }))
         .sort((a, b) => b.date.getTime() - a.date.getTime()),
     });
   }
