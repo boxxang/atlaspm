@@ -1,26 +1,191 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+/* ============================================================
+   DESIGN TOKENS
+   Ported 1:1 from reference/index.html :root — same names.
+   Secondary type is em-based, so the Text-size step (±5)
+   rescales the whole information layer coherently.
+   ============================================================ */
+:root{
+  --page:#f9f9f7;
+  --surface:#fcfcfb;
+  --ink:#0b0b0b;
+  --ink-2:#52514e;
+  --ink-3:#898781;
+  --line:#e1e0d9;
+  --line-strong:#c3c2b7;
+  --accent:#256abf;
+  --accent-soft:#e7effa;
+  --risk:#d03b3b;
+  /* adjustable via settings (each default ±5 steps) */
+  --fs-base:18px;
+  --icon-scale:2;
+  --gbar-h:16px;
+  --cp-fs:11px;            /* milestone / checkpoint text */
+  /* board column widths — per-board, drag the header grips to change */
+  --bc-date:9.5rem;          /* generic fallback (status-update board) */
+  --bc-owner:7.5rem;
+  --bc-due:7.5rem;
+  --bck-keyinfo-date:9.5rem;    --bck-keyinfo-owner:7.5rem;
+  --bck-activities-date:9.5rem; --bck-activities-owner:7.5rem; --bck-activities-due:7.5rem;
+  --bck-risks-date:9.5rem;      --bck-risks-owner:7.5rem;      --bck-risks-due:7.5rem;
+  --dash-row-h:36px;         /* dashboard schedule row height */
+  --dlv-due:8.5rem;          /* deliverables table columns */
+  --dlv-comp:10.5rem;
+  /* layout */
+  --toolbar-h:58px;
+  --viz-h:clamp(220px,38vh,380px);
+  --title-size:2.6rem;   /* fixed — the title is the last thing to shrink (media steps below) */
+  --line-w:1.25px;
+  --dur:.3s;
+  --mono:ui-monospace,"SF Mono","Cascadia Mono",Menlo,monospace;
+  --sans:system-ui,-apple-system,"Segoe UI",sans-serif;
+  --serif:Georgia,"Times New Roman",serif;
 }
-
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+*{box-sizing:border-box;margin:0;padding:0}
+body{
+  background:var(--page);color:var(--ink);
+  font-family:var(--sans);font-size:var(--fs-base);line-height:1.55;
+  -webkit-font-smoothing:antialiased;
 }
+::selection{background:var(--accent-soft)}
+button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
+ul{list-style:none}
+input,select,textarea{font:inherit;color:inherit}
+.mono{font-family:var(--mono)}
+.cap{font-size:.7em;font-weight:600;letter-spacing:.13em;text-transform:uppercase;color:var(--ink-3)}
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+/* ============================================================
+   TOOLBAR
+   ============================================================ */
+#toolbar{
+  position:sticky;top:0;z-index:70;height:var(--toolbar-h);
+  display:flex;align-items:center;gap:20px;padding:0 24px;
+  background:rgba(249,249,247,.92);backdrop-filter:blur(8px);
+  border-bottom:1px solid var(--line);
+}
+@media (max-width:1760px){.tb-field.tb-opt2{display:none}}
+@media (max-width:1560px){.tb-field.tb-opt1{display:none}}
+@media (max-width:1460px){#toolbar{gap:14px}.tb-field label,.tb-field .k{letter-spacing:.08em}}
+#project-name{
+  font-family:var(--mono);font-size:.95em;letter-spacing:.12em;font-weight:700;white-space:nowrap;
+  border-bottom:1px dashed transparent;padding-bottom:1px;
+}
+#project-name:hover,#project-name:focus-visible{border-bottom-color:var(--line-strong)}
+#project-name-input{
+  font-family:var(--mono);font-size:.95em;letter-spacing:.12em;font-weight:700;
+  border:none;border-bottom:1px solid var(--accent);background:none;width:9em;padding-bottom:1px;
+}
+#project-name-input:focus-visible{outline:none}
+#brand-badge{
+  position:fixed;right:14px;bottom:12px;z-index:120;pointer-events:none;
+  font-family:var(--mono);font-size:.66em;letter-spacing:.18em;color:var(--ink-3);
+  background:rgba(249,249,247,.85);padding:3px 9px;border-radius:4px;border:1px solid var(--line);
+}
+.tb-field{display:flex;align-items:center;gap:8px;white-space:nowrap;flex:none}
+.tb-field label,.tb-field .k{font-size:.65em;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-3)}
+.tb-field input[type="date"],.tb-field select{
+  border:1px solid var(--line);border-radius:4px;background:var(--surface);
+  padding:4px 7px;font-family:var(--mono);font-size:.8em;
+}
+.tb-field input:focus-visible,.tb-field select:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+.tb-field .v{font-family:var(--mono);font-size:.8em}
+.tb-spacer{flex:1}
+.pop-note{position:relative;display:inline-flex;align-items:center;flex:none}
+.pop-btn{
+  min-width:19px;height:19px;border:1px solid var(--line-strong);border-radius:50%;
+  font-size:.7em;font-family:var(--mono);color:var(--ink-3);
+  display:inline-flex;align-items:center;justify-content:center;padding:0 3px;
+}
+.pop-btn:hover,.pop-btn:focus-visible{color:var(--ink);border-color:var(--ink-3)}
+.pop-btn.gear{min-width:32px;height:32px;border-radius:7px;color:var(--ink-2)}
+.pop-btn.gear svg{width:19px;height:19px}
+.pop-panel{
+  position:absolute;right:0;top:30px;z-index:90;width:360px;
+  background:var(--surface);border:1px solid var(--line);border-radius:6px;
+  box-shadow:0 8px 28px rgba(11,11,11,.09);padding:14px 16px;
+  font-size:.85em;color:var(--ink-2);line-height:1.6;
+  opacity:0;visibility:hidden;transform:translateY(-4px);
+  transition:opacity .18s,transform .18s,visibility .18s;
+}
+.pop-note.open .pop-panel{opacity:1;visibility:visible;transform:none}
+#info-note:hover .pop-panel,#info-note:focus-within .pop-panel{opacity:1;visibility:visible;transform:none}
+.set-scope{display:flex;border:1px solid var(--line);border-radius:5px;overflow:hidden;margin:10px 0 6px}
+.set-scope button{
+  flex:1;padding:5px 0;font-size:.66em;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-3);
+}
+.set-scope button[aria-pressed="true"]{background:var(--ink);color:var(--page)}
+.set-row{display:grid;grid-template-columns:110px 1fr 74px;align-items:center;gap:10px;padding:7px 0}
+.set-row[hidden]{display:none}
+.set-row .k{font-size:.68em;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3)}
+.set-row input[type="range"]{width:100%;accent-color:var(--accent)}
+.set-row .val{font-family:var(--mono);font-size:.72em;text-align:right;color:var(--ink)}
+.set-actions{display:flex;gap:10px;margin-top:12px;padding-top:12px;border-top:1px solid var(--line);flex-wrap:wrap}
+.set-actions button{
+  font-family:var(--mono);font-size:.66em;letter-spacing:.12em;text-transform:uppercase;
+  border:1px solid var(--line);border-radius:4px;padding:5px 10px;color:var(--ink-2);
+}
+.set-actions button:hover{color:var(--ink);border-color:var(--ink-3)}
+#mode-toggle{display:flex;border:1px solid var(--line);border-radius:5px;overflow:hidden;flex:none}
+#mode-toggle button{
+  padding:5px 14px;font-size:.68em;font-weight:600;letter-spacing:.12em;text-transform:uppercase;
+  color:var(--ink-3);
+}
+#mode-toggle button[aria-pressed="true"]{background:var(--ink);color:var(--page)}
+#mode-toggle button:focus-visible{outline:2px solid var(--accent);outline-offset:-2px}
+.edited-flag{
+  font-family:var(--mono);font-size:.6em;letter-spacing:.1em;color:var(--accent);
+  text-transform:uppercase;display:none;
+}
+body.has-overrides .edited-flag{display:inline}
+
+/* ============================================================
+   TOOLTIP — cursor-following, shared by every [data-tip] element
+   ============================================================ */
+.g-tip{
+  position:fixed;z-index:100;pointer-events:none;background:var(--ink);color:#fff;
+  font-family:var(--mono);font-size:.72em;line-height:1.5;padding:7px 10px;border-radius:4px;
+  opacity:0;transition:opacity .12s;white-space:nowrap;
+}
+.g-tip small{color:#c3c2b7;display:block;font-size:.88em}
+
+/* ============================================================
+   SCHEDULE VIEW (shell only — contents land in Phase 5)
+   ============================================================ */
+#schedule-view{
+  position:fixed;left:0;right:0;top:var(--toolbar-h);bottom:0;z-index:65;
+  background:var(--page);overflow-y:auto;
+  font-size:var(--fs-base);   /* anchors the Dashboard-scoped text setting */
+  opacity:0;visibility:hidden;transform:translateY(12px);
+  transition:opacity .3s,transform .3s,visibility .3s;
+}
+body.schedule-mode #schedule-view{opacity:1;visibility:visible;transform:none}
+#schedule-view .inner{max-width:1240px;margin:0 auto;padding:44px 32px 60px}
+#schedule-view h2{font-size:clamp(1.3rem,2vw,1.7rem);font-weight:650;letter-spacing:-.01em;text-transform:uppercase}
+#schedule-view .note{font-size:.8em;color:var(--ink-3);margin:6px 0 30px}
+
+/* ============================================================
+   RESPONSIVE TOKEN STEPS
+   ============================================================ */
+@media (max-width:1100px){
+  :root{
+    --bc-date:8rem;--bc-owner:6rem;--bc-due:6.5rem;
+    --bck-keyinfo-date:8rem;--bck-keyinfo-owner:6rem;
+    --bck-activities-date:8rem;--bck-activities-owner:6rem;--bck-activities-due:6.5rem;
+    --bck-risks-date:8rem;--bck-risks-owner:6rem;--bck-risks-due:6.5rem;
   }
+  :root{--title-size:2.2rem}
+}
+@media (max-width:640px){
+  :root{--title-size:1.8rem}
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+/* ============================================================
+   MOBILE
+   ============================================================ */
+@media (max-width:900px){
+  #toolbar{position:static;height:auto;flex-wrap:wrap;gap:10px 20px;padding:12px 20px}
+}
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{transition-duration:.01ms!important;animation-duration:.01ms!important}
 }
