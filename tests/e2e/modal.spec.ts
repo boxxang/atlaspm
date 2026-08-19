@@ -4,12 +4,13 @@ const selectedPanel = (page: Page) => page.locator('.stage-panel.selected');
 const hoverStation = (page: Page, num: string) =>
   page.locator('.rm-station', { hasText: new RegExp(`^${num} `) }).hover();
 
-/** Aggregate boards get their dashboard tiles in Phase 5; this is the hook. */
-const openAgg = (page: Page, type: 'risks' | 'overdue' | 'updates') =>
-  page.evaluate(
-    (t) => (window as unknown as { __atlasOpenAgg: (t: string) => void }).__atlasOpenAgg(t),
-    type,
-  );
+/** The aggregate boards are reached from the dashboard's stat tiles. */
+const openAgg = async (page: Page, type: 'risks' | 'overdue' | 'updates') => {
+  await page.locator('#mode-toggle button[data-mode="schedule"]').click();
+  await expect(page.locator('#schedule-view')).toBeVisible();
+  await page.locator(`[data-dash-open="${type}"]`).click();
+  await expect(page.locator('#modal .modal-win')).toBeVisible();
+};
 
 test.beforeEach(async ({ page }) => {
   await page.goto('/');

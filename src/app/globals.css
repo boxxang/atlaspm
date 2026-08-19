@@ -661,7 +661,7 @@ body.modal-open .modal-win{transform:none}
 .g-tip small{color:#c3c2b7;display:block;font-size:.88em}
 
 /* ============================================================
-   SCHEDULE VIEW (shell only — contents land in Phase 5)
+   SCHEDULE VIEW
    ============================================================ */
 #schedule-view{
   position:fixed;left:0;right:0;top:var(--toolbar-h);bottom:0;z-index:65;
@@ -674,6 +674,52 @@ body.schedule-mode #schedule-view{opacity:1;visibility:visible;transform:none}
 #schedule-view .inner{max-width:1240px;margin:0 auto;padding:44px 32px 60px}
 #schedule-view h2{font-size:clamp(1.3rem,2vw,1.7rem);font-weight:650;letter-spacing:-.01em;text-transform:uppercase}
 #schedule-view .note{font-size:.8em;color:var(--ink-3);margin:6px 0 30px}
+#schedule-view .gantt .g-row{height:var(--dash-row-h)}   /* adjustable in Settings */
+#schedule-view .g-months{height:26px}
+/* ===== dashboard ===== */
+#dash{margin:6px 0 44px}
+.stat-row{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:30px}
+.stat{border:1px solid var(--line);border-radius:6px;background:var(--surface);padding:16px 18px}
+.stat .k{display:block;margin-bottom:6px}
+.stat .v{font-size:1.8em;font-weight:650;letter-spacing:-.01em;font-variant-numeric:tabular-nums}
+.stat .sub{display:block;font-size:.7em;color:var(--ink-3);margin-top:3px}
+.stat.alert .v{color:var(--risk)}
+.stat .v-link{
+  display:inline-block;padding:0;border-bottom:2px solid transparent;cursor:pointer;
+  transition:border-color .15s;
+}
+.stat .v-link:hover,.stat .v-link:focus-visible{border-bottom-color:currentColor}
+.dash-grid{display:grid;grid-template-columns:1fr 1fr;gap:36px}
+.dash-col .cap{display:block;padding-bottom:8px;border-bottom:1px solid var(--line-strong)}
+.dash-item{display:flex;gap:14px;align-items:baseline;padding:9px 0;border-bottom:1px solid var(--line);font-size:.9em;color:var(--ink-2)}
+.dash-item .d{font-family:var(--mono);font-size:.75em;color:var(--ink-3);flex:none;width:9.5em}
+.dash-item .t{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.dash-item .dday{margin-left:auto;font-family:var(--mono);font-size:.75em;color:var(--accent);white-space:nowrap;flex:none}
+.dash-item.risk::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--risk);flex:none;align-self:center}
+.dash-empty{font-size:.82em;color:var(--ink-3);font-style:italic;padding:10px 0}
+/* two-line status-update rows (dashboard + pop-up) */
+.dash-su{
+  display:flex;gap:14px;align-items:flex-start;width:100%;text-align:left;
+  padding:10px 0;border-bottom:1px solid var(--line);
+}
+.dash-su:hover,.dash-su:focus-visible{background:linear-gradient(to right,transparent,var(--surface))}
+.dash-su .d{font-family:var(--mono);font-size:.72em;color:var(--ink-3);flex:none;width:9.5em;padding-top:2px}
+.dash-su .su2{min-width:0;flex:1}
+.dash-su .t1{display:block;font-size:.92em;color:var(--ink);font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.dash-su .t1 .b-stage{margin-right:8px;vertical-align:1px}
+.dash-su .t2{display:block;font-size:.88em;color:var(--accent);margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.dash-head-row{display:flex;align-items:baseline;gap:12px;padding-bottom:8px;border-bottom:1px solid var(--line-strong)}
+.dash-head-row .cap{padding-bottom:0;border-bottom:none}
+.dash-head-row .spacer{flex:1}
+/* status-update board rows in the pop-up */
+.dash-flight{display:flex;flex-wrap:wrap;gap:8px;padding:12px 0 4px}
+.dash-flight span{
+  font-family:var(--mono);font-size:.7em;letter-spacing:.08em;text-transform:uppercase;
+  border:1px solid var(--line-strong);border-radius:100px;padding:4px 12px;color:var(--ink-2);
+}
+.dash-flight span.risky{border-color:var(--risk);color:var(--risk)}
+#sched-cap{margin-top:44px}
+@media (max-width:900px){.stat-row{grid-template-columns:1fr 1fr}.dash-grid{grid-template-columns:1fr}}
 
 /* ============================================================
    RESPONSIVE — panel stacks before anything can overlap;

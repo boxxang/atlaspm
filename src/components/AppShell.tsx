@@ -6,6 +6,7 @@ import { fmtDate, fromISO, toISO } from '@/lib/schedule';
 import { useModalStore } from '@/store/modalStore';
 import { useAppStore } from '@/store/useAppStore';
 import { BoardModal } from './BoardModal';
+import { Dashboard } from './Dashboard';
 import { Roadmap } from './Roadmap';
 import { StagePanel } from './StagePanel';
 import { Toolbar, type ViewMode } from './Toolbar';
@@ -91,15 +92,7 @@ function App() {
         ))}
       </main>
 
-      {/* Dashboard body lands in Phase 5. */}
-      <section id="schedule-view" aria-label="Dashboard" aria-hidden={mode !== 'schedule'}>
-        <div className="inner">
-          <h2 id="dash-title">{projectName} — Dashboard</h2>
-          <p className="note" id="dash-sub">
-            Program status at a glance.
-          </p>
-        </div>
-      </section>
+      <Dashboard hidden={mode !== 'schedule'} />
 
       <BoardModal />
 

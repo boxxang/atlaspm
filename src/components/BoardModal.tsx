@@ -107,15 +107,6 @@ export function BoardModal() {
     document.body.classList.toggle('modal-open', m.open);
   }, [m.open]);
 
-  /* The dashboard stat tiles that open the aggregate boards arrive in Phase 5.
-     Until then this is the only entry point, so expose it outside production
-     builds for the e2e suite. */
-  useEffect(() => {
-    if (process.env.NODE_ENV === 'production') return;
-    (window as unknown as { __atlasOpenAgg?: unknown }).__atlasOpenAgg =
-      useModalStore.getState().openAgg;
-  }, []);
-
   useEffect(() => {
     if (!m.open) return;
     const onKey = (e: KeyboardEvent) => {
