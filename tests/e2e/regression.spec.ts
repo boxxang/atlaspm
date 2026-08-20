@@ -99,7 +99,10 @@ test.describe('form control metrics', () => {
     /* Tailwind's preflight zeroes ::-webkit-datetime-edit* padding, which makes
        every date input 2px shorter than the reference and shifts the whole page
        with it. globals.css reverts that; this pins it. */
-    for (const sel of ['#kickoff-input', '.stage-panel.selected [data-role="end-edit"]']) {
+    for (const sel of [
+      '.stage-panel.selected [data-role="start-edit"]',
+      '.stage-panel.selected [data-role="end-edit"]',
+    ]) {
       const m = await page.locator(sel).evaluate((el) => {
         const cs = getComputedStyle(el);
         const n = (v: string) => parseFloat(v);
@@ -149,9 +152,30 @@ test.describe('marker registration', () => {
       .locator('[data-role="end-edit"]')
       .fill(`${moved.getFullYear()}-${p2(moved.getMonth() + 1)}-${p2(moved.getDate())}`);
     await page.locator('[data-apply-schedule]').click();
+
+    /* The two charts share a scale only while the chart is open: folded, it is
+       drawn at the scale of one stage, on purpose. Come back into it first. */
+    await page.locator('#roadmap').hover({ position: { x: 8, y: 8 } });
+    await settleLayout(page);
     expect(
       (await centerX(page, '#rm-today')) - (await centerX(page, '#rm-gantt .g-today')),
     ).toBe(0);
+  });
+
+  test('folded, the chart is a stage-sized window rather than the program', async ({ page }) => {
+    await selectStage(page, '03');
+    const wide = (await page.locator('#rm-gantt .g-row.current .g-bar').boundingBox())!.width;
+
+    const box = (await page.locator('#roadmap').boundingBox())!;
+    await page.mouse.move(box.x + box.width / 2, box.y + box.height + 40);
+    await settleLayout(page);
+
+    const zoomed = (await page.locator('#rm-gantt .g-row.current .g-bar').boundingBox())!;
+    const track = (await page.locator('#rm-gantt .g-row.current .g-row-track').boundingBox())!;
+    expect(zoomed.width).toBeGreaterThan(wide * 2);
+    expect(zoomed.width / track.width).toBeCloseTo(0.7, 1);
+    // the milestone axis above is untouched — it still reads the whole program
+    await expect(page.locator('.rm-ms')).toHaveCount(8);
   });
 
 });

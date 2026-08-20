@@ -1,4 +1,11 @@
-import { expect, test, type Page, SEED_PROJECT_PATH, selectStage } from './fixtures';
+import {
+  expect,
+  test,
+  type Page,
+  SEED_PROJECT_PATH,
+  selectStage,
+  tapeoutDate,
+} from './fixtures';
 
 const openDash = async (page: Page) => {
   await page.locator('#mode-toggle button[data-mode="schedule"]').click();
@@ -32,7 +39,7 @@ test.describe('stat tiles', () => {
     const tapeout = stat(page, 'Tapeout');
     await expect(tapeout.locator('.v')).toHaveText(/^D−\d+$/);
     await expect(tapeout.locator('.sub')).toHaveText(
-      await page.locator('[data-computed="tapeout"]').textContent() as string,
+      await tapeoutDate(page) as string,
     );
     // D-day is derived, so recompute it rather than pinning a calendar date
     const date = (await tapeout.locator('.sub').textContent())!;

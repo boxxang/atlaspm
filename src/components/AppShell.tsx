@@ -1,7 +1,6 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { fmtDate, fromISO, toISO } from '@/lib/schedule';
 import type { ProfileSummary } from '@/data/types';
 import type { ProjectState } from '@/lib/projectState';
 import { useModalStore } from '@/store/modalStore';
@@ -46,12 +45,9 @@ export function AppShell({
 function App({ profiles }: { profiles: ProfileSummary[] }) {
   const projectName = useAppStore((s) => s.projectName);
   const setProjectName = useAppStore((s) => s.setProjectName);
-  const kickoff = useAppStore((s) => s.kickoff);
-  const setKickoff = useAppStore((s) => s.setKickoff);
   const profile = useAppStore((s) => s.profile);
   const stages = useAppStore((s) => s.stages);
   const setProfile = useAppStore((s) => s.setProfile);
-  const schedule = useAppStore((s) => s.schedule);
   const edited = useAppStore((s) => s.edited);
   const resetSchedule = useAppStore((s) => s.resetSchedule);
   const closeAllInline = useAppStore((s) => s.closeAllInline);
@@ -96,15 +92,10 @@ function App({ profiles }: { profiles: ProfileSummary[] }) {
       <Toolbar
         projectName={projectName}
         onProjectNameChange={setProjectName}
-        kickoff={toISO(kickoff)}
-        onKickoffChange={(iso) => iso && setKickoff(fromISO(iso))}
         profile={profile}
         profiles={profiles}
         onProfileChange={setProfile}
         onEditStages={() => setStagesOpen(true)}
-        tapeout={fmtDate(schedule.tapeout)}
-        firstSilicon={fmtDate(schedule.firstSilicon)}
-        production={fmtDate(schedule.production)}
         mode={mode}
         onModeChange={setMode}
         onResetSchedule={resetSchedule}

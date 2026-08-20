@@ -1,7 +1,7 @@
 'use client';
 
 import { useMemo, useRef, useState } from 'react';
-import { fmtDate, fmtMD } from '@/lib/schedule';
+import { fmtDate, fmtMD, fromISO, toISO } from '@/lib/schedule';
 import { stageBands } from '@/lib/stages';
 import { useAppStore } from '@/store/useAppStore';
 import { Gantt, useGanttGeometry } from './Gantt';
@@ -22,6 +22,10 @@ export function Roadmap() {
   const today = useAppStore((s) => s.today);
   const currentStage = useAppStore((s) => s.currentStage);
   const stages = useAppStore((s) => s.stages);
+  const setKickoff = useAppStore((s) => s.setKickoff);
+  /* Kickoff is a date like the milestones are, so it is edited where it is
+     drawn rather than from a field in the toolbar. */
+  const [editingKickoff, setEditingKickoff] = useState(false);
   const selectStage = useAppStore((s) => s.selectStage);
   const { minWeek, total, todayPct, todayVisible } = useGanttGeometry(schedule, kickoff, today);
 
@@ -45,6 +49,19 @@ export function Roadmap() {
   };
 
   const pctOfWeek = (week: number) => ((week - minWeek) / total) * 100;
+
+  /* Folded, the chart is about one stage, so it is drawn at the scale of one
+     stage: the bar takes ~70% of the width and sits in the middle, and the
+     months come along at the same scale. The axis above stays whole-program —
+     one reads the flow, the other reads the detail. */
+  const zoom = useMemo(() => {
+    if (!isFolded || currentStage === null) return undefined;
+    const st = schedule.stages[stages[currentStage]?.id];
+    if (!st) return undefined;
+    const span = Math.max(st.durationWeeks, 0.5);
+    const window = span / 0.7;
+    return { minWeek: st.startOffsetWeeks - (window - span) / 2, total: window };
+  }, [isFolded, currentStage, schedule, stages]);
 
   /**
    * Phases overlap in time — stages are concurrent by design — so a phase band
@@ -70,11 +87,13 @@ export function Roadmap() {
   }, [schedule, stages, minWeek, total]);
 
   /* Seven milestones on one axis collide — Design Freeze and Tapeout are a week
-     apart — so labels alternate between two rows. */
+     apart — so labels alternate between two rows. A date already behind us is
+     drawn filled, one still ahead hollow: the axis reads as a progress bar. */
   const marks = schedule.milestones.map((m, i) => ({
     ...m,
     pct: pctOfWeek(m.week),
     row: i % 2,
+    past: m.date <= today,
   }));
 
   const currentPhase = currentStage === null ? null : stages[currentStage]?.phaseId ?? null;
@@ -104,10 +123,46 @@ export function Roadmap() {
           </div>
 
           <div id="rm-line-wrap">
+            {/* Kickoff is the first mark on the axis — the program starts
+                somewhere, and that date has to be visible and editable. */}
+            <span key="kickoff">
+              <span
+                className={`rm-ms-label kickoff${kickoff <= today ? ' past' : ''}`}
+                style={{ left: `${pctOfWeek(0)}%` }}
+                data-row={1}
+                data-ms-label="kickoff"
+              >
+                Kick-off
+              </span>
+              <button
+                className={`rm-ms kickoff${kickoff <= today ? ' past' : ''}`}
+                style={{ left: `${pctOfWeek(0)}%` }}
+                data-tip={`Kick-off|${fmtDate(kickoff)} · click to change`}
+                data-msid="kickoff"
+                aria-label={`Kick-off ${fmtDate(kickoff)} — change`}
+                onClick={() => setEditingKickoff((v) => !v)}
+              >
+                <span className="rm-ms-date">{fmtMD(kickoff)}</span>
+              </button>
+              {editingKickoff && (
+                <span className="rm-kickoff-edit" style={{ left: `${pctOfWeek(0)}%` }}>
+                  <input
+                    type="date"
+                    id="kickoff-input"
+                    autoFocus
+                    value={toISO(kickoff)}
+                    aria-label="Kickoff date"
+                    onChange={(e) => e.target.value && setKickoff(fromISO(e.target.value))}
+                    onBlur={() => setEditingKickoff(false)}
+                    onKeyDown={(e) => e.key === 'Enter' && setEditingKickoff(false)}
+                  />
+                </span>
+              )}
+            </span>
             {marks.map((m) => (
               <span key={m.id}>
                 <span
-                  className={`rm-ms-label${m.major ? ' major' : ''}`}
+                  className={`rm-ms-label${m.major ? ' major' : ''}${m.past ? ' past' : ''}`}
                   style={{ left: `${m.pct}%` }}
                   data-row={m.row}
                   data-ms-label={m.id}
@@ -117,7 +172,7 @@ export function Roadmap() {
                 {/* the date rides inside the diamond rather than waiting for
                     a hover — the axis is read at a glance */}
                 <span
-                  className={`rm-ms${m.major ? ' major' : ''}`}
+                  className={`rm-ms${m.major ? ' major' : ''}${m.past ? ' past' : ''}`}
                   style={{ left: `${m.pct}%` }}
                   data-tip={`${m.label}|${fmtDate(m.date)}`}
                   data-msid={m.id}
@@ -140,7 +195,7 @@ export function Roadmap() {
           <span className="cap">Concurrency</span>
           <span className="note">stages overlap by design — select a bar to open it</span>
         </div>
-        <Gantt id="rm-gantt" short folded={isFolded} onSelectStage={selectStage} />
+        <Gantt id="rm-gantt" short folded={isFolded} zoom={zoom} onSelectStage={selectStage} />
       </div>
     </section>
   );

@@ -20,7 +20,10 @@ test.beforeEach(async ({ page }) => {
 
 test.describe('the engineering table', () => {
   test('lists each activity with its man-months and a stage total', async ({ page }) => {
-    await expect(panel(page).locator('.mm-head .cap')).toHaveText('Engineering Activity');
+    /* One header row per table, so the two tables' columns line up: the
+       engineering switch rides with the Engineering | Program toggle. */
+    await expect(panel(page).locator('.sheet-head .view-toggle')).toBeVisible();
+    await expect(panel(page).locator('.sheet-head [data-mm-edit]')).toBeVisible();
     await expect(panel(page).locator('.mm-cols > span').first()).toHaveText('Activity');
     await expect(panel(page).locator('.mm-cols > span').nth(1)).toHaveText('M/M');
     const rows = panel(page).locator('.mm-list li');

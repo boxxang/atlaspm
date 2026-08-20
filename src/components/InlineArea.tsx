@@ -66,14 +66,15 @@ function PencilIcon() {
 function EngineeringTable({
   stageId,
   detail,
+  editing,
 }: {
   stageId: StageId;
   detail: ResolvedStageDetail;
+  /** Owned by the pane header, so the switch sits on the same row as the
+      deliverables' one and the two tables line up. */
+  editing: boolean;
 }) {
   const setLines = useAppStore((st) => st.setEngineeringLines);
-  /* Its own edit mode: this list and the stage text are edited independently,
-     and the deliverables table has its own too. */
-  const [editing, setEditing] = useState(false);
   const [draft, setDraft] = useState('');
   const [draftMm, setDraftMm] = useState('');
 
@@ -94,18 +95,6 @@ function EngineeringTable({
 
   return (
     <>
-      <div className="mm-head">
-        <span className="cap">Engineering Activity</span>
-        <button
-          className="tbl-edit"
-          data-mm-edit
-          aria-pressed={editing}
-          title={editing ? 'Done editing the engineering list' : 'Edit the engineering list'}
-          onClick={() => setEditing((v) => !v)}
-        >
-          {editing ? 'Done' : 'Edit'}
-        </button>
-      </div>
       <div className={`mm-cols${editing ? '' : ' read'}`}>
         <span>Activity</span>
         <span>M/M</span>
@@ -205,20 +194,35 @@ function EngineeringTable({
 /** Engineering | Program — the two readings of the same stage. */
 function ViewToggle({ stageId, detail }: { stageId: StageId; detail: ResolvedStageDetail }) {
   const [view, setView] = useState<'eng' | 'prog'>('eng');
+  /* The engineering list has its own edit mode, independent of the stage text
+     and of the deliverables; its switch lives up here so both tables carry
+     exactly one header row and their columns line up. */
+  const [editing, setEditing] = useState(false);
   return (
     <div>
       <div className="sheet-head">
-      <div className="view-toggle" role="group">
-        <button aria-pressed={view === 'eng'} data-view="eng" onClick={() => setView('eng')}>
-          Engineering
-        </button>
-        <button aria-pressed={view === 'prog'} data-view="prog" onClick={() => setView('prog')}>
-          Program
-        </button>
-      </div>
+        <div className="view-toggle" role="group">
+          <button aria-pressed={view === 'eng'} data-view="eng" onClick={() => setView('eng')}>
+            Engineering
+          </button>
+          <button aria-pressed={view === 'prog'} data-view="prog" onClick={() => setView('prog')}>
+            Program
+          </button>
+        </div>
+        {view === 'eng' && (
+          <button
+            className="tbl-edit"
+            data-mm-edit
+            aria-pressed={editing}
+            title={editing ? 'Done editing the engineering list' : 'Edit the engineering list'}
+            onClick={() => setEditing((v) => !v)}
+          >
+            {editing ? 'Done' : 'Edit'}
+          </button>
+        )}
       </div>
       <div className="view-pane enter" data-pane="eng" hidden={view !== 'eng'} key={`eng-${view}`}>
-        <EngineeringTable stageId={stageId} detail={detail} />
+        <EngineeringTable stageId={stageId} detail={detail} editing={editing} />
         <div className="view-foot">
           <span className="cap">Tools</span>
           <span className="mono">{detail.tools.join(' · ')}</span>

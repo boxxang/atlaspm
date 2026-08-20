@@ -9,19 +9,26 @@ import { DAY, addWeeks, fmtDate, fmtDateShort, fmtMD, fmtW, type Schedule } from
 import { useAppStore } from '@/store/useAppStore';
 
 /** Geometry shared by the mini roadmap gantt and the dashboard gantt. */
+/** A window onto the schedule, in weeks from kickoff — used to zoom in. */
+export interface GanttZoom {
+  minWeek: number;
+  total: number;
+}
+
 export function useGanttGeometry(
   schedule: Schedule,
   kickoff: Date,
   today: Date,
   /** Extra weeks past the end, to park checkpoint labels in. */
   tailWeeks = 0,
+  /** Draw this window instead of the whole program. */
+  zoom?: GanttZoom,
 ) {
   return useMemo(() => {
-    const minWeek = Math.min(
-      0,
-      ...Object.values(schedule.stages).map((st) => st.startOffsetWeeks),
-    );
-    const total = schedule.totalWeeks - minWeek + 2 + tailWeeks;
+    const minWeek =
+      zoom?.minWeek ??
+      Math.min(0, ...Object.values(schedule.stages).map((st) => st.startOffsetWeeks));
+    const total = zoom ? zoom.total : schedule.totalWeeks - minWeek + 2 + tailWeeks;
     const origin = addWeeks(kickoff, minWeek);
     const end = addWeeks(origin, total);
     const months: { pct: number; label: string; index: number }[] = [];
@@ -47,23 +54,26 @@ export function useGanttGeometry(
       todayPct: (todayWk / total) * 100,
       todayVisible: todayWk >= 0 && todayWk <= total,
     };
-  }, [schedule, kickoff, today, tailWeeks]);
+  }, [schedule, kickoff, today, tailWeeks, zoom]);
 }
 
 export function Gantt({
   id,
   short = false,
   folded = false,
+  zoom,
   onSelectStage,
 }: {
   id?: string;
   /** Mini variant: short row labels, no checkpoints. */
   short?: boolean;
   /**
-   * Folded down to the open stage and its neighbours. The open stage's row
-   * grows, and its deliverables are drawn on the bar as dated markers.
+   * Folded down to the open stage alone. Its row grows, and its deliverables
+   * are drawn on the bar as dated markers.
    */
   folded?: boolean;
+  /** Zoomed window, so one stage can be read at the scale of one stage. */
+  zoom?: GanttZoom;
   /** Makes each row a target that opens its stage below. */
   onSelectStage?: (index: number | null) => void;
 }) {
@@ -97,6 +107,7 @@ export function Gantt({
     kickoff,
     today,
     short ? 0 : 14,
+    zoom,
   );
 
   /* checkpoints live on their own stage's row (full gantt only) */
@@ -152,9 +163,7 @@ export function Gantt({
           const showPast = pastFrac > 0 && !risky;
           return (
             <div
-              className={`g-row${i === currentStage ? ' current' : ''}${
-                currentStage !== null && Math.abs(i - currentStage) === 1 ? ' near' : ''
-              }`}
+              className={`g-row${i === currentStage ? ' current' : ''}`}
               data-index={i}
               data-stage={s.id}
               key={s.id}
@@ -234,9 +243,13 @@ export function Gantt({
                 {folded &&
                   i === currentStage &&
                   (deliverables[s.id] ?? [])
-                    .filter((d) => d.due)
-                    .map((d, di) => {
-                      const wk = (d.due!.getTime() - kickoff.getTime()) / (7 * DAY);
+                    /* A finished deliverable is marked on the day it was
+                       finished, not the day it was due — the marker moves when
+                       the box is ticked, which is the point of ticking it. */
+                    .map((d) => ({ d, when: d.done ? d.completedAt ?? d.due : d.due }))
+                    .filter((x) => x.when)
+                    .map(({ d, when }, di) => {
+                      const wk = (when!.getTime() - kickoff.getTime()) / (7 * DAY);
                       const pct = Math.min(Math.max(((wk - minWeek) / total) * 100, 0), 100);
                       return (
                         <span
@@ -248,11 +261,17 @@ export function Gantt({
                              unreadable */
                           data-row={di % 2}
                           style={{ left: `${pct}%` }}
-                          data-tip={`${d.title}|${fmtDate(d.due!)}${d.done ? ' · complete' : ''}`}
+                          data-tip={
+                            d.done
+                              ? `${d.title}|Completed ${fmtDate(when!)}${
+                                  d.due ? ` · due ${fmtDate(d.due)}` : ''
+                                }`
+                              : `${d.title}|Due ${fmtDate(when!)}`
+                          }
                         >
                           <span className="g-dlv-name">{d.title}</span>
                           <span className="g-dlv-dot">
-                            <span className="g-dlv-date">{fmtMD(d.due!)}</span>
+                            <span className="g-dlv-date">{fmtMD(when!)}</span>
                           </span>
                         </span>
                       );

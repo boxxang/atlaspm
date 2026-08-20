@@ -18,7 +18,7 @@ import {
   stageProgress,
   upcomingMilestones,
 } from '@/lib/derive';
-import { addWeeks, computeSchedule, startOfDay } from '@/lib/schedule';
+import { DAY, addWeeks, computeSchedule, startOfDay } from '@/lib/schedule';
 
 /* The prototype boots with kickoff = 30 weeks before today, so "today" lands
    mid-program (Physical Design). Fixed clock keeps the assertions stable. */
@@ -77,11 +77,23 @@ describe('project seed', () => {
     expect(seed.contacts.verification).toHaveLength(5);
   });
 
-  it('defaults deliverable due and completedAt to the stage end', () => {
-    const dlv = seed.deliverables.productDefinition[0];
-    expect(dlv.done).toBe(true);
-    expect(dlv.due).toEqual(schedule.stages.productDefinition.end);
-    expect(dlv.completedAt).toEqual(schedule.stages.productDefinition.end);
+  it('dates deliverables across their stage, not all on its last day', () => {
+    const pd = seed.deliverables.productDefinition;
+    const stage = schedule.stages.productDefinition;
+    expect(pd).toHaveLength(4);
+
+    // four of them land at a quarter, half, three quarters and the end
+    const dues = pd.map((d) => d.due!.getTime());
+    expect([...dues].sort((a, b) => a - b)).toEqual(dues); // in order
+    expect(new Set(dues).size).toBe(4); // and no two share a date
+    expect(dues[0]).toBeGreaterThan(stage.start.getTime());
+    expect(pd[3].due).toEqual(stage.end);
+
+    // a finished one is stamped near its due date, not on the stage end
+    expect(pd[0].done).toBe(true);
+    const gap = Math.abs(pd[0].completedAt!.getTime() - pd[0].due!.getTime()) / DAY;
+    expect(gap).toBeLessThanOrEqual(4);
+
     const open = seed.deliverables.tapeout[0];
     expect(open.done).toBe(false);
     expect(open.completedAt).toBeNull();

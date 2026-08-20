@@ -1,4 +1,4 @@
-import { expect, test, type Page, selectStage } from './fixtures';
+import { expect, test, type Page, selectStage, milestoneDate } from './fixtures';
 
 /**
  * The landing page: one card per program, create and delete, and the contract
@@ -98,11 +98,12 @@ test.describe('creating a program', () => {
 
   test('milestones fall out of the kickoff and the profile TATs', async ({ page }) => {
     await createProgram(page, 'AtlasBX3', '2027-03-01');
-    await expect(page.locator('#kickoff-input')).toHaveValue('2027-03-01');
+    // kickoff is a mark on the axis now, not a field in the toolbar
+    await expect(page.locator('.rm-ms[data-msid="kickoff"] .rm-ms-date')).toHaveText('3/1');
     // Tapeout ends 38 weeks after kickoff, First Silicon 46, Production 66
-    await expect(page.locator('[data-computed="tapeout"]')).toHaveText('11/22/2027');
-    await expect(page.locator('[data-computed="firstSilicon"]')).toHaveText('01/17/2028');
-    await expect(page.locator('[data-computed="production"]')).toHaveText('06/05/2028');
+    expect(await milestoneDate(page, 'tapeout')).toBe('11/22/2027');
+    expect(await milestoneDate(page, 'firstSilicon')).toBe('01/17/2028');
+    expect(await milestoneDate(page, 'massProduction')).toBe('06/05/2028');
     await expect(page.locator('.rm-ms-label')).toContainText([
       'Arch Freeze',
       'RTL Freeze',
@@ -117,7 +118,7 @@ test.describe('creating a program', () => {
     await expect(page.locator('.stage-panel.selected [data-role="start-edit"]')).toHaveValue(
       '2027-03-01',
     );
-    await expect(page.locator('.stage-panel.selected [data-role="tat"]')).toHaveText('4W TAT');
+    await expect(page.locator('.stage-panel.selected [data-role="tat-edit"]')).toHaveValue('4');
   });
 
   test('starts with empty boards but keeps the stage deliverables', async ({ page }) => {
@@ -142,8 +143,13 @@ test.describe('creating a program', () => {
       'Feasibility report',
     ]);
     await expect(panel.locator('.dlv-note')).toHaveText('0 / 3 complete');
-    // dated to the stage end under this program's own schedule
-    await expect(panel.locator('[data-dlv-due-text]').first()).toHaveText('03/29/2027');
+    /* dated across the stage under this program's own schedule: three of them
+       at a third, two thirds and the end of a four-week stage from 03/01 */
+    await expect(panel.locator('[data-dlv-due-text]')).toHaveText([
+      '03/10/2027',
+      '03/20/2027',
+      '03/29/2027',
+    ]);
 
     // leaders and contacts are the program's to fill in
     await expect(panel.locator('.l-name')).toHaveText('Unassigned');
@@ -205,10 +211,10 @@ test.describe('switching programs without a page load', () => {
     const panel = page.locator('.stage-panel.selected');
 
     await expect(page.locator('#project-name')).toHaveText('ZetaX1');
-    await expect(page.locator('#kickoff-input')).toHaveValue('2029-06-04');
+    await expect(page.locator('.rm-ms[data-msid="kickoff"] .rm-ms-date')).toHaveText('6/4');
     // milestones follow the kickoff that was just typed in
-    await expect(page.locator('[data-computed="tapeout"]')).toHaveText('02/25/2030');
-    await expect(page.locator('[data-computed="firstSilicon"]')).toHaveText('04/22/2030');
+    expect(await milestoneDate(page, 'tapeout')).toBe('02/25/2030');
+    expect(await milestoneDate(page, 'firstSilicon')).toBe('04/22/2030');
     await expect(panel.locator('[data-role="start-edit"]')).toHaveValue('2029-06-04');
     // and none of AtlasAX1's content came along
     await expect(panel.locator('.board[data-kind="keyinfo"] .b-row')).toHaveCount(0);
@@ -224,13 +230,13 @@ test.describe('switching programs without a page load', () => {
     await page.locator('#to-programs').click();
     await card(page, 'AtlasAX1').locator('.pl-open').click();
     await expect(page.locator('#project-name')).toHaveText('AtlasAX1');
-    await expect(page.locator('#kickoff-input')).not.toHaveValue('2029-06-04');
+    await expect(page.locator('.rm-ms[data-msid="kickoff"] .rm-ms-date')).not.toHaveText('6/4');
 
     await page.locator('#to-programs').click();
     await card(page, 'ZetaX2').locator('.pl-open').click();
     await expect(page.locator('#project-name')).toHaveText('ZetaX2');
-    await expect(page.locator('#kickoff-input')).toHaveValue('2029-06-04');
-    await expect(page.locator('[data-computed="tapeout"]')).toHaveText('02/25/2030');
+    await expect(page.locator('.rm-ms[data-msid="kickoff"] .rm-ms-date')).toHaveText('6/4');
+    expect(await milestoneDate(page, 'tapeout')).toBe('02/25/2030');
     await expect(
       page.locator('.stage-panel.selected .board[data-kind="activities"] .b-row'),
     ).toHaveCount(0);
@@ -361,6 +367,6 @@ test.describe('deleting a program', () => {
 
     await page.goto('/p/atlasax1');
     await expect(page.locator('#project-name')).toHaveText('AtlasAX1');
-    await expect(page.locator('[data-computed="tapeout"]')).not.toBeEmpty();
+    expect(await milestoneDate(page, 'tapeout')).not.toBe('');
   });
 });

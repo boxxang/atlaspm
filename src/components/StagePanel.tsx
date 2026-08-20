@@ -2,7 +2,10 @@
 
 import { lifecyclePhases, phaseById, stageMilestone } from '@/data/scheduleProfiles';
 import type { Stage } from '@/data/types';
-import { fmtW, fromISO, toISO } from '@/lib/schedule';
+import { addWeeks, fromISO, toISO } from '@/lib/schedule';
+
+/** Weeks as the field shows them: one decimal at most, never a float artefact. */
+const roundW = (weeks: number) => Math.round(weeks * 10) / 10;
 import { useModalStore } from '@/store/modalStore';
 import { useAppStore } from '@/store/useAppStore';
 import { Board } from './Board';
@@ -45,8 +48,25 @@ function DatesRow({ stage }: { stage: Stage }) {
         onChange={(e) => e.target.value && editStageDate(stage.id, 'start', fromISO(e.target.value))}
       />
       <span className="sep">━</span>
+      {/* The middle field is editable too: with a start fixed, typing the
+          number of weeks is how a completion date is usually decided. */}
       <span className="tat" data-role="tat">
-        {fmtW(st.durationWeeks)} TAT
+        <input
+          type="number"
+          className="tat-edit"
+          data-role="tat-edit"
+          min={0.5}
+          step={0.5}
+          aria-label="Duration in weeks"
+          title="Edit the duration — the completion date follows, and later stages shift"
+          value={roundW(st.durationWeeks)}
+          onChange={(e) => {
+            const weeks = Number.parseFloat(e.target.value);
+            if (!Number.isFinite(weeks) || weeks <= 0) return;
+            editStageDate(stage.id, 'end', addWeeks(st.start, weeks));
+          }}
+        />
+        <span className="tat-unit">W TAT</span>
       </span>
       <span className="sep">━</span>
       <input

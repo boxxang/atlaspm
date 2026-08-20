@@ -11,7 +11,7 @@ import {
   safeFilename,
   type AttachmentMeta,
 } from '@/lib/attachments';
-import { computeSchedule } from '@/lib/schedule';
+import { addWeeks, computeSchedule } from '@/lib/schedule';
 
 /**
  * Server actions for every mutation the UI makes.
@@ -480,17 +480,24 @@ export async function createProject(input: {
       kickoff: input.kickoff,
       profileId: input.profileId,
       deliverables: {
-        create: stages.flatMap((stage) =>
-          stage.deliverables.map((title, position) => ({
+        /* Dated across the stage rather than all on its last day: a stage's
+           deliverables are steps through it, so they land at even fractions of
+           its span with the last one on the end date. */
+        create: stages.flatMap((stage) => {
+          const st = schedule.stages[stage.id];
+          return stage.deliverables.map((title, position) => ({
             id: `${input.id}:dlv:${stage.id}:${position}`,
             stageId: stage.id,
             title,
-            due: schedule.stages[stage.id].end,
+            due: addWeeks(
+              st.start,
+              (st.durationWeeks * (position + 1)) / stage.deliverables.length,
+            ),
             done: false,
             completedAt: null,
             position,
-          })),
-        ),
+          }));
+        }),
       },
     },
   });

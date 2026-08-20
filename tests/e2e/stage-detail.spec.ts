@@ -119,6 +119,21 @@ test.describe('read mode versus edit mode', () => {
     await expect(first.locator('[data-dlv-due-text]')).toHaveText('01/15/2027');
   });
 
+  test('the two tables end on the same line', async ({ page }) => {
+    /* Engineering activity on the left, key deliverables on the right: they are
+       read side by side, so the columns are the same height whatever they hold. */
+    const [engineering, deliverables] = await panel(page)
+      .locator('.sheet-grid > *')
+      .evaluateAll((els) => els.map((e) => Math.round(e.getBoundingClientRect().height)));
+    expect(engineering).toBe(deliverables);
+
+    // one header row each, so the column heads line up too
+    const heads = await panel(page)
+      .locator('.mm-cols, .dlv-cols')
+      .evaluateAll((els) => els.map((e) => Math.round(e.getBoundingClientRect().top)));
+    expect(heads[0]).toBe(heads[1]);
+  });
+
   test('a deliverable with no date is asked about, then reads TBD', async ({ page }) => {
     await editDeliverables(page);
     await panel(page).locator('.dlv-input').fill('Vendor quote');

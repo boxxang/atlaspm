@@ -5,6 +5,8 @@ import {
   SEED_PROJECT_PATH,
   selectStage,
   editDeliverables,
+  tapeoutDate,
+  setKickoffDate,
 } from './fixtures';
 
 /**
@@ -128,8 +130,7 @@ test('checking a deliverable persists with its completion stamp', async ({ page 
 });
 
 test('a DV end-date edit persists as effective overrides', async ({ page }) => {
-  const tapeout = page.locator('[data-computed="tapeout"]');
-  const before = await tapeout.textContent();
+  const before = await tapeoutDate(page);
 
   await selectStage(page, '04');
   const panel = selectedPanel(page);
@@ -140,25 +141,25 @@ test('a DV end-date edit persists as effective overrides', async ({ page }) => {
   const p2 = (n: number) => String(n).padStart(2, '0');
   const iso = `${moved.getFullYear()}-${p2(moved.getMonth() + 1)}-${p2(moved.getDate())}`;
   await panel.locator('[data-role="end-edit"]').fill(iso);
-  await expect(panel.locator('[data-role="tat"]')).toHaveText('20W TAT');
+  await expect(panel.locator('[data-role="tat-edit"]')).toHaveValue('20');
   await page.locator('[data-apply-schedule]').click();
   await expect(page.locator('#sched-preview')).toHaveCount(0);
-  const shifted = await tapeout.textContent();
+  const shifted = await tapeoutDate(page);
   expect(shifted).not.toBe(before);
 
   await hardRefresh(page);
-  await expect(tapeout).toHaveText(shifted!);
+  await expect.poll(() => tapeoutDate(page)).toBe(shifted);
   await expect(page.locator('.edited-flag')).toBeVisible();
   await selectStage(page, '04');
-  await expect(selectedPanel(page).locator('[data-role="tat"]')).toHaveText('20W TAT');
+  await expect(selectedPanel(page).locator('[data-role="tat-edit"]')).toHaveValue('20');
   await expect(selectedPanel(page).locator('[data-role="end-edit"]')).toHaveValue(iso);
 
   // reset clears the stored overrides too
   await page.locator('#settings-btn').click();
   await page.locator('#sched-reset').click();
-  await expect(tapeout).toHaveText(before!);
+  await expect.poll(() => tapeoutDate(page)).toBe(before);
   await hardRefresh(page);
-  await expect(tapeout).toHaveText(before!);
+  await expect.poll(() => tapeoutDate(page)).toBe(before);
   await expect(page.locator('.edited-flag')).toBeHidden();
 });
 
@@ -183,11 +184,11 @@ test('renaming the project persists', async ({ page }) => {
 
 test('kickoff, leader, contact and deliverable edits persist', async ({ page }) => {
   // kickoff moves the whole program
-  await page.locator('#kickoff-input').fill('2028-01-03');
-  await expect(page.locator('[data-computed="tapeout"]')).toHaveText('09/25/2028');
+  await setKickoffDate(page, '2028-01-03');
+  await expect.poll(() => tapeoutDate(page)).toBe('09/25/2028');
   await hardRefresh(page);
-  await expect(page.locator('#kickoff-input')).toHaveValue('2028-01-03');
-  await expect(page.locator('[data-computed="tapeout"]')).toHaveText('09/25/2028');
+  await expect(page.locator('.rm-ms[data-msid="kickoff"] .rm-ms-date')).toHaveText('1/3');
+  await expect.poll(() => tapeoutDate(page)).toBe('09/25/2028');
 
   // leader
   const panel = selectedPanel(page);
@@ -225,7 +226,8 @@ test('kickoff, leader, contact and deliverable edits persist', async ({ page }) 
   await selectedPanel(page).locator('[data-leader-edit]').click();
   await selectedPanel(page).locator('.ie-l-name').fill('Daniel Kim');
   await selectedPanel(page).locator('[data-leader-save]').click();
-  await page.locator('#kickoff-input').fill(
+  await setKickoffDate(
+    page,
     await page.evaluate(() => {
       const d = new Date();
       d.setHours(0, 0, 0, 0);

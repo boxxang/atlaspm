@@ -1,4 +1,6 @@
-import { expect, test, type Page, SEED_PROJECT_PATH, selectStage } from './fixtures';
+import { expect, test, type Page, SEED_PROJECT_PATH, selectStage,
+  tapeoutDate,
+} from './fixtures';
 
 /**
  * Stages are rows, not code. Editing them is about the program in front of you:
@@ -220,7 +222,7 @@ test.describe('editing the list', () => {
   });
 
   test('a longer stage moves everything downstream', async ({ page }) => {
-    const before = await page.locator('[data-computed="tapeout"]').textContent();
+    const before = await tapeoutDate(page);
     await openEditor(page);
     await editor(page).locator('.se-row[data-stage="rtl"] .se-dur').fill('16');
     await save(page);
@@ -229,7 +231,7 @@ test.describe('editing the list', () => {
     await expect(page.locator('.se-win')).toHaveCount(0);
     const rtl = page.locator('#rm-gantt .g-row[data-index="2"] .g-bar');
     await expect(rtl).toBeVisible();
-    expect(await page.locator('[data-computed="tapeout"]').textContent()).toBe(before);
+    expect(await tapeoutDate(page)).toBe(before);
   });
 });
 

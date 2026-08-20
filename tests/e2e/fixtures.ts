@@ -133,6 +133,27 @@ export const editEngineering = (page: Page, on = true) =>
 export const editDeliverables = (page: Page, on = true) =>
   toggleTable(page, '[data-dlv-edit]', on);
 
+/**
+ * The toolbar carries no dates any more — the milestone axis does, and each
+ * marker states its own in the tooltip it already had.
+ */
+export async function milestoneDate(page: Page, id: string): Promise<string> {
+  const tip = await page.locator(`.rm-ms[data-msid="${id}"]`).getAttribute('data-tip');
+  return (tip ?? '').split('|')[1]?.split(' ')[0] ?? '';
+}
+
+export const tapeoutDate = (page: Page) => milestoneDate(page, 'tapeout');
+
+/** Kickoff is edited where it is drawn: click the diamond, type the date. */
+export async function setKickoffDate(page: Page, iso: string) {
+  await page.locator('.rm-ms[data-msid="kickoff"]').click();
+  const input = page.locator('#kickoff-input');
+  await expect(input).toBeVisible();
+  await input.fill(iso);
+  await page.keyboard.press('Enter');
+  await expect(input).toHaveCount(0);
+}
+
 export async function selectStage(page: Page, num: string) {
   const id = STAGE_BY_NUMBER[num];
   /* The store hydrates on mount and opens the stage today falls in, so wait

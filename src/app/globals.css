@@ -213,8 +213,23 @@ body.has-overrides .edited-flag{display:inline}
   transform:rotate(-45deg);font-family:var(--mono);
   font-size:calc(var(--cp-fs) * 0.82);line-height:1;color:var(--ink-2);white-space:nowrap;
 }
-.rm-ms.major{background:var(--ink);border-color:var(--ink)}
-.rm-ms.major .rm-ms-date{color:var(--page);font-weight:700}
+/* One rule for every marker on the axis: a date already behind us is filled,
+   one still ahead is hollow. Major milestones say so with weight, not colour. */
+.rm-ms.past{background:var(--ink);border-color:var(--ink)}
+.rm-ms.past .rm-ms-date{color:var(--page)}
+.rm-ms.major{border-width:2px}
+.rm-ms.major .rm-ms-date{font-weight:700}
+.rm-ms.kickoff{border-style:dashed;cursor:pointer}
+.rm-ms.kickoff:hover,.rm-ms.kickoff:focus-visible{border-color:var(--accent);outline:none}
+.rm-ms.kickoff:hover .rm-ms-date{color:var(--accent)}
+.rm-ms.kickoff.past:hover .rm-ms-date{color:var(--page)}
+.rm-ms-label.kickoff{color:var(--ink-2)}
+.rm-kickoff-edit{position:absolute;top:86px;transform:translateX(-50%);z-index:6}
+.rm-kickoff-edit input{
+  font-family:var(--mono);font-size:.72em;border:1px solid var(--line-strong);border-radius:4px;
+  padding:3px 6px;background:var(--surface);color:var(--ink);
+}
+.rm-kickoff-edit input:focus{outline:none;border-color:var(--accent)}
 .rm-ms-label{
   position:absolute;transform:translateX(-50%);
   font-family:var(--mono);font-size:var(--cp-fs);letter-spacing:.06em;color:var(--ink-2);
@@ -244,8 +259,7 @@ body.has-overrides .edited-flag{display:inline}
   transition:max-height var(--dur) ease,height var(--dur) ease,opacity var(--dur) ease;
 }
 #roadmap.folded{padding-bottom:6px}
-#roadmap.folded #rm-gantt .g-row:not(.current):not(.near){max-height:0;opacity:0;pointer-events:none}
-#roadmap.folded #rm-gantt .g-row.near{opacity:.55}
+#roadmap.folded #rm-gantt .g-row:not(.current){max-height:0;opacity:0;pointer-events:none}
 #roadmap.folded #rm-gantt .g-row.current{height:96px;max-height:96px}
 #roadmap.folded #rm-gantt .g-row.current .g-bar{height:calc(var(--gbar-h) * 1.6)}
 /* the effort tag would land in the middle of the deliverable markers, and the
@@ -416,7 +430,21 @@ body.has-overrides .edited-flag{display:inline}
 .dates-row .d-edit:hover{border-bottom-color:var(--ink-3)}
 .dates-row .d-edit:focus-visible{outline:none;border-bottom:1px solid var(--accent)}
 .dates-row .sep{color:var(--line-strong)}
-.dates-row .tat{font-size:.72em;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-2);white-space:nowrap}
+.dates-row .tat{
+  font-size:.72em;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-2);
+  white-space:nowrap;display:inline-flex;align-items:baseline;gap:4px;
+}
+.dates-row .tat-edit{
+  width:3.4em;border:none;border-bottom:1px dashed var(--line-strong);background:none;
+  font-family:var(--mono);font-size:1.05em;letter-spacing:normal;color:var(--ink);
+  padding:2px 0;text-align:right;
+}
+.dates-row .tat-edit:hover{border-bottom-color:var(--ink-3)}
+.dates-row .tat-edit:focus-visible{outline:none;border-bottom:1px solid var(--accent)}
+/* the spinner arrows crowd a 3-character field */
+.dates-row .tat-edit::-webkit-outer-spin-button,
+.dates-row .tat-edit::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+.dates-row .tat-edit{appearance:textfield}
 .dates-row .mslbl{margin-left:auto;font-size:.66em;letter-spacing:.12em;color:var(--ink);font-weight:600;text-transform:uppercase;white-space:nowrap}
 .dates-row .mslbl::before{content:"◆ "}
 /* ===== boards (Activity / Risk) ===== */
@@ -431,8 +459,8 @@ body.has-overrides .edited-flag{display:inline}
 .facts .board[data-kind="keyinfo"]{grid-column:2;grid-row:1}
 .facts .board[data-kind="risks"]{grid-column:2;grid-row:2}
 .facts .board{display:flex;flex-direction:column;min-height:0}
-/* Each board is a window that grows with its list up to a ceiling — 400px for
-   Activity, 300px for key information, 100px for risk — and scrolls past it.
+/* Each board is a window that grows with its list up to a ceiling — 600px for
+   Activity, 300px each for key information and risk — and scrolls past it.
    Growing rather than reserving keeps "Show more" directly under the last
    entry instead of stranded at the bottom of an empty window. */
 .facts .board-rows{
@@ -447,9 +475,9 @@ body.has-overrides .edited-flag{display:inline}
   border:2px solid var(--surface);background-clip:padding-box;
 }
 .facts .board-rows::-webkit-scrollbar-thumb:hover{background:var(--ink-3);background-clip:padding-box}
-.facts .board[data-kind="activities"] .board-rows{max-height:400px}
+.facts .board[data-kind="activities"] .board-rows{max-height:600px}
 .facts .board[data-kind="keyinfo"] .board-rows{max-height:300px}
-.facts .board[data-kind="risks"] .board-rows{max-height:100px}
+.facts .board[data-kind="risks"] .board-rows{max-height:300px}
 .board{margin-top:0}
 .board-head{display:flex;align-items:baseline;gap:12px;padding-bottom:8px}
 .board-head .note{font-size:.66em;color:var(--ink-3)}
@@ -561,7 +589,17 @@ body.col-resizing{user-select:none;cursor:col-resize}
 }
 .inline-close:hover{color:var(--ink);border-color:var(--ink-3)}
 .sheet-what{color:var(--ink-2);max-width:64ch;margin:8px 0 22px;font-size:.98em}
-.sheet-grid{display:grid;grid-template-columns:1.2fr 1fr;gap:44px}
+/* The two tables are read side by side, so they end on the same line: each
+   column is a flex stack and the list inside it takes up the slack, scrolling
+   when its own content runs past the taller column. */
+.sheet-grid{display:grid;grid-template-columns:1.2fr 1fr;gap:44px;align-items:stretch}
+.sheet-grid>*{display:flex;flex-direction:column;min-height:0}
+.view-pane{flex:1;display:flex;flex-direction:column;min-height:0}
+.view-pane[hidden]{display:none}
+.mm-list,.dlv-list{
+  flex:1;min-height:120px;overflow-y:auto;overscroll-behavior:contain;
+  scrollbar-width:thin;scrollbar-color:var(--line-strong) transparent;
+}
 /* Both columns of the sheet open with a header block of the same height, so the
    deliverables table's column heads line up with the engineering table's. */
 .sheet-head{min-height:33px;display:flex;align-items:center;margin-bottom:14px}
@@ -1275,12 +1313,14 @@ body.schedule-mode #schedule-view{opacity:1;visibility:visible;transform:none}
 /* ============================================================
    Stage editor — the profile's stage list, opened from the toolbar
    ============================================================ */
+/* A named action in the toolbar now, not a footnote to the select. */
 #stages-btn{
-  font-family:var(--mono);font-size:.62em;letter-spacing:.1em;text-transform:uppercase;
-  color:var(--ink-3);border:1px solid var(--line);border-radius:3px;padding:3px 8px;margin-left:8px;
-  transition:color .15s,border-color .15s;
+  flex:none;white-space:nowrap;
+  font-family:var(--mono);font-size:.66em;font-weight:600;letter-spacing:.12em;text-transform:uppercase;
+  color:var(--ink-2);border:1px solid var(--line-strong);border-radius:4px;padding:5px 11px;
+  transition:color .15s,border-color .15s,background .15s;
 }
-#stages-btn:hover,#stages-btn:focus-visible{color:var(--ink);border-color:var(--ink-3)}
+#stages-btn:hover,#stages-btn:focus-visible{color:var(--page);background:var(--ink);border-color:var(--ink)}
 
 #stage-editor{position:fixed;inset:0;z-index:140;display:flex;align-items:center;justify-content:center;padding:4vh 3vw}
 #se-scrim{position:absolute;inset:0;background:rgba(11,11,11,.28)}
@@ -1377,8 +1417,6 @@ body.schedule-mode #schedule-view{opacity:1;visibility:visible;transform:none}
 }
 .tbl-edit:hover,.tbl-edit:focus-visible{color:var(--ink);border-color:var(--ink-3)}
 .tbl-edit[aria-pressed="true"]{background:var(--ink);color:var(--page);border-color:var(--ink)}
-.mm-head{min-height:33px;display:flex;align-items:center;gap:12px;margin-bottom:14px}
-.mm-head .cap{font-family:var(--mono);font-size:.66em;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-3)}
 
 /* A deliverable with no date is allowed, but asked about first. */
 .dlv-tbd{

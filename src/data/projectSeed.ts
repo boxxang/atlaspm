@@ -136,15 +136,28 @@ export function createProjectSeed({
     }: { ki?: Item[]; acts?: Item[]; risks?: Item[]; dlv?: DlvSeed[] },
   ) => {
     content[stage] = { keyinfo: ki, activities: acts, risks };
-    /* dlv entry: [title, done, due?, completedAt?] — due defaults to stage end,
-       completedAt defaults to stage end for items seeded as done */
-    deliverables[stage] = dlv.map(([title, done, due, comp]) => ({
-      id: uid(),
-      title,
-      done,
-      due: due !== undefined ? due : E(stage),
-      completedAt: done ? (comp !== undefined ? comp : E(stage)) : null,
-    }));
+    /* dlv entry: [title, done, due?, completedAt?].
+       Left to itself, a deliverable is dated across the stage rather than on
+       its last day: four of them land at a quarter, half, three quarters and
+       the end of the span, which is what a stage that actually ran looks like.
+       A completed one is stamped a few days either side of its due date —
+       deterministic, so the seed is the same program every time. */
+    const span = sc[stage].durationWeeks;
+    const drift = [-4, 2, -1, 3, -2, 1, -3, 0];
+    deliverables[stage] = dlv.map(([title, done, due, comp], i) => {
+      const dueDate = due !== undefined ? due : W(stage, (span * (i + 1)) / dlv.length);
+      let completedAt: Date | null = null;
+      if (done) {
+        if (comp !== undefined) completedAt = comp;
+        else {
+          const c = new Date(dueDate);
+          c.setDate(c.getDate() + drift[i % drift.length]);
+          c.setHours(16, 30, 0, 0);
+          completedAt = c;
+        }
+      }
+      return { id: uid(), title, done, due: dueDate, completedAt };
+    });
   };
 
     /* ---- 01 Product Definition — CLOSED ----

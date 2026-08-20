@@ -11,33 +11,21 @@ export type ViewMode = 'journey' | 'schedule';
 export function Toolbar({
   projectName,
   onProjectNameChange,
-  kickoff,
-  onKickoffChange,
   profile,
   profiles,
   onProfileChange,
   onEditStages,
-  tapeout = '—',
-  firstSilicon = '—',
-  production = '—',
   mode,
   onModeChange,
   onResetSchedule,
 }: {
   projectName: string;
   onProjectNameChange: (name: string) => void;
-  /** ISO yyyy-mm-dd, the value the date input round-trips. */
-  kickoff: string;
-  onKickoffChange: (iso: string) => void;
   /** The profile this program runs on, and every profile it could run on. */
   profile: ScheduleProfile;
   profiles: readonly ProfileSummary[];
   onProfileChange: (id: string) => void;
   onEditStages: () => void;
-  /** Derived in Phase 2 — the toolbar only displays what it is handed. */
-  tapeout?: string;
-  firstSilicon?: string;
-  production?: string;
   mode: ViewMode;
   onModeChange: (mode: ViewMode) => void;
   onResetSchedule?: () => void;
@@ -48,19 +36,13 @@ export function Toolbar({
         <span aria-hidden="true">‹</span> Programs
       </Link>
 
+      {/* Program, the template it runs on, and the way into editing that
+          template. Dates are not here: the milestone axis below carries them,
+          kickoff included, and it carries them positioned in time. */}
       <div className="tb-centre">
         <ProjectName value={projectName} onChange={onProjectNameChange} />
         <div className="tb-field">
-          <label htmlFor="kickoff-input">Kickoff</label>
-          <input
-            type="date"
-            id="kickoff-input"
-            value={kickoff}
-            onChange={(e) => onKickoffChange(e.target.value)}
-          />
-        </div>
-        <div className="tb-field">
-          <label htmlFor="profile-select">Profile</label>
+          <label htmlFor="profile-select">Milestone template</label>
           <select
             id="profile-select"
             value={profile.id}
@@ -78,29 +60,16 @@ export function Toolbar({
               </option>
             ))}
           </select>
-          {/* the profile is a list of stages, so editing them lives beside it */}
-          <button id="stages-btn" data-edit-stages onClick={onEditStages} title="Add, reorder or remove stages">
-            Stages
-          </button>
         </div>
-        <div className="tb-field">
-          <span className="k">Tapeout</span>
-          <span className="v" data-computed="tapeout">
-            {tapeout}
-          </span>
-        </div>
-        <div className="tb-field tb-opt1">
-          <span className="k">First Silicon</span>
-          <span className="v" data-computed="firstSilicon">
-            {firstSilicon}
-          </span>
-        </div>
-        <div className="tb-field tb-opt2">
-          <span className="k">Production</span>
-          <span className="v" data-computed="production">
-            {production}
-          </span>
-        </div>
+        {/* the template is a list of stages, so editing them lives beside it */}
+        <button
+          id="stages-btn"
+          data-edit-stages
+          onClick={onEditStages}
+          title="Add, reorder or remove stages"
+        >
+          Edit template
+        </button>
         <span className="edited-flag" data-tip="Schedule has manual date edits — reset in Settings|">
           EDITED
         </span>

@@ -1,4 +1,7 @@
-import { expect, test, type Page, SEED_PROJECT_PATH, selectStage } from './fixtures';
+import { expect, test, type Page, SEED_PROJECT_PATH, selectStage,
+  tapeoutDate,
+  setKickoffDate,
+} from './fixtures';
 
 /**
  * A stage date ripples through every later stage and every milestone, so edits
@@ -37,19 +40,19 @@ test.describe('staging a schedule change', () => {
   });
 
   test('an edit opens the preview and leaves the saved schedule alone', async ({ page }) => {
-    const tapeoutBefore = await page.locator('[data-computed="tapeout"]').textContent();
+    const tapeoutBefore = await tapeoutDate(page);
     await stageEdit(page, '04', 28);
 
     // the view shows the proposal
-    await expect(panel(page).locator('[data-role="tat"]')).toHaveText('20W TAT');
-    await expect(page.locator('[data-computed="tapeout"]')).not.toHaveText(tapeoutBefore!);
+    await expect(panel(page).locator('[data-role="tat-edit"]')).toHaveValue('20');
+    await expect.poll(() => tapeoutDate(page)).not.toBe(tapeoutBefore!);
     // …but nothing is saved: the EDITED flag only turns on once applied
     await expect(page.locator('.edited-flag')).toBeHidden();
 
     // a reload throws the draft away
     await page.reload();
     await expect(page.locator('#sched-preview')).toHaveCount(0);
-    await expect(page.locator('[data-computed="tapeout"]')).toHaveText(tapeoutBefore!);
+    await expect.poll(() => tapeoutDate(page)).toBe(tapeoutBefore!);
   });
 
   test('both schedules are on the timeline at once', async ({ page }) => {
@@ -122,35 +125,35 @@ test.describe('staging a schedule change', () => {
 
 test.describe('resolving the review', () => {
   test('Discard puts the saved dates back', async ({ page }) => {
-    const before = await page.locator('[data-computed="tapeout"]').textContent();
+    const before = await tapeoutDate(page);
     const dvEnd = await stageEdit(page, '04', 28);
 
     await page.locator('[data-discard-schedule]').click();
     await expect(page.locator('#sched-preview')).toHaveCount(0);
     await expect(page.locator('.g-bar.ghost')).toHaveCount(0);
-    await expect(page.locator('[data-computed="tapeout"]')).toHaveText(before!);
+    await expect.poll(() => tapeoutDate(page)).toBe(before!);
     await expect(panel(page).locator('[data-role="end-edit"]')).toHaveValue(dvEnd);
-    await expect(panel(page).locator('[data-role="tat"]')).toHaveText('16W TAT');
+    await expect(panel(page).locator('[data-role="tat-edit"]')).toHaveValue('16');
     await expect(page.locator('.edited-flag')).toBeHidden();
   });
 
   test('Apply update commits it, and it survives a reload', async ({ page }) => {
-    const before = await page.locator('[data-computed="tapeout"]').textContent();
+    const before = await tapeoutDate(page);
     await stageEdit(page, '04', 28);
-    const proposed = await page.locator('[data-computed="tapeout"]').textContent();
+    const proposed = await tapeoutDate(page);
     expect(proposed).not.toBe(before);
 
     await page.locator('[data-apply-schedule]').click();
     await expect(page.locator('#sched-preview')).toHaveCount(0);
     await expect(page.locator('.g-bar.ghost')).toHaveCount(0);
-    await expect(page.locator('[data-computed="tapeout"]')).toHaveText(proposed!);
+    await expect.poll(() => tapeoutDate(page)).toBe(proposed!);
     await expect(page.locator('.edited-flag')).toBeVisible();
 
     await page.reload();
-    await expect(page.locator('[data-computed="tapeout"]')).toHaveText(proposed!);
+    await expect.poll(() => tapeoutDate(page)).toBe(proposed!);
     await expect(page.locator('.edited-flag')).toBeVisible();
     await selectStage(page, '04');
-    await expect(panel(page).locator('[data-role="tat"]')).toHaveText('20W TAT');
+    await expect(panel(page).locator('[data-role="tat-edit"]')).toHaveValue('20');
   });
 
   test('applying twice compares against the newly saved schedule', async ({ page }) => {
@@ -167,7 +170,7 @@ test.describe('resolving the review', () => {
   });
 
   test('Reset schedule clears a draft along with the saved overrides', async ({ page }) => {
-    const before = await page.locator('[data-computed="tapeout"]').textContent();
+    const before = await tapeoutDate(page);
     await stageEdit(page, '04', 28);
     await page.locator('[data-apply-schedule]').click();
     await stageEdit(page, '06', 14);
@@ -176,15 +179,15 @@ test.describe('resolving the review', () => {
     await page.locator('#settings-btn').click();
     await page.locator('#sched-reset').click();
     await expect(page.locator('#sched-preview')).toHaveCount(0);
-    await expect(page.locator('[data-computed="tapeout"]')).toHaveText(before!);
+    await expect.poll(() => tapeoutDate(page)).toBe(before!);
     await expect(page.locator('.edited-flag')).toBeHidden();
   });
 
   test('changing kickoff drops a stale draft', async ({ page }) => {
     await stageEdit(page, '04', 28);
-    await page.locator('#kickoff-input').fill('2028-01-03');
+    await setKickoffDate(page, '2028-01-03');
     await expect(page.locator('#sched-preview')).toHaveCount(0);
-    await expect(page.locator('[data-computed="tapeout"]')).toHaveText('09/25/2028');
+    await expect.poll(() => tapeoutDate(page)).toBe('09/25/2028');
   });
 
   test('the bar leaves room for the page underneath it', async ({ page }) => {

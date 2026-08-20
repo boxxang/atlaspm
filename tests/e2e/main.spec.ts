@@ -8,6 +8,8 @@ import {
   selectStage,
   editDeliverables,
   settleLayout,
+  tapeoutDate,
+  setKickoffDate,
 } from './fixtures';
 
 const cssVar = (page: Page, name: string) =>
@@ -132,9 +134,12 @@ test.describe('roadmap', () => {
     // the old station row is gone; the axis carries the seven milestones
     await expect(page.locator('.rm-station')).toHaveCount(0);
     await expect(page.locator('#rm-progress')).toHaveCount(0);
-    await expect(page.locator('.rm-ms')).toHaveCount(7);
+    // kickoff plus the seven milestones
+    await expect(page.locator('.rm-ms')).toHaveCount(8);
+    await expect(page.locator('.rm-ms[data-msid="kickoff"]')).toHaveCount(1);
     await expect(page.locator('.rm-ms.major')).toHaveCount(3);
     await expect(page.locator('.rm-ms-label')).toHaveText([
+      'Kick-off',
       'Arch Freeze',
       'RTL Freeze',
       'DV Closure',
@@ -220,14 +225,13 @@ test.describe('roadmap', () => {
 });
 
 test.describe('stage panel', () => {
-  test('DV end-date edit ripples to the toolbar Tapeout', async ({ page }) => {
-    const tapeout = page.locator('[data-computed="tapeout"]');
-    const before = await tapeout.textContent();
+  test('DV end-date edit ripples to the Tapeout milestone', async ({ page }) => {
+    const before = await tapeoutDate(page);
 
     await selectStage(page, '04');
     const panel = selectedPanel(page);
     await expect(panel).toHaveAttribute('data-id', 'verification');
-    await expect(panel.locator('[data-role="tat"]')).toHaveText('16W TAT');
+    await expect(panel.locator('[data-role="tat-edit"]')).toHaveValue('16');
 
     const end = await panel.locator('[data-role="end-edit"]').inputValue();
     const iso = isoPlusDays(end, 28);
@@ -235,31 +239,31 @@ test.describe('stage panel', () => {
 
     // the edit is staged: review it, then apply
     await expect(page.locator('#sched-preview')).toBeVisible();
-    await expect(panel.locator('[data-role="tat"]')).toHaveText('20W TAT');
+    await expect(panel.locator('[data-role="tat-edit"]')).toHaveValue('20');
     await page.locator('[data-apply-schedule]').click();
     await expect(page.locator('#sched-preview')).toHaveCount(0);
     await expect(panel.locator('[data-role="end-edit"]')).toHaveValue(iso);
 
     // Tapeout lands exactly 28 calendar days later (compared as dates, not ms:
     // a DST transition inside the window makes the raw ms delta 28d + 1h).
-    await expect(tapeout).toHaveText(fmtUS(plusDays(parseUS(before!), 28)));
+    await expect.poll(() => tapeoutDate(page)).toBe(fmtUS(plusDays(parseUS(before), 28)));
     await expect(page.locator('.edited-flag')).toBeVisible();
 
     // reset restores the baseline and clears the flag
     await page.locator('#settings-btn').click();
     await page.locator('#sched-reset').click();
-    await expect(tapeout).toHaveText(before!);
+    await expect.poll(() => tapeoutDate(page)).toBe(before);
     await expect(page.locator('.edited-flag')).toBeHidden();
   });
 
   test('a start-date edit shifts the stage without changing its TAT', async ({ page }) => {
     await selectStage(page, '07');
     const panel = selectedPanel(page);
-    const tat = await panel.locator('[data-role="tat"]').textContent();
+    const tat = await panel.locator('[data-role="tat-edit"]').inputValue();
     const start = await panel.locator('[data-role="start-edit"]').inputValue();
     await panel.locator('[data-role="start-edit"]').fill(isoPlusDays(start, 7));
     await page.locator('[data-apply-schedule]').click();
-    await expect(panel.locator('[data-role="tat"]')).toHaveText(tat!);
+    await expect(panel.locator('[data-role="tat-edit"]')).toHaveValue(tat);
     await expect(panel.locator('[data-role="start-edit"]')).toHaveValue(isoPlusDays(start, 7));
   });
 
@@ -340,9 +344,9 @@ test.describe('stage panel', () => {
     const panel = selectedPanel(page);
 
     for (const [kind, ceiling] of [
-      ['activities', 400],
+      ['activities', 600],
       ['keyinfo', 300],
-      ['risks', 100],
+      ['risks', 300],
     ] as const) {
       const board = panel.locator(`.board[data-kind="${kind}"]`);
       const rows = (await board.locator('.board-rows').boundingBox())!;
@@ -621,9 +625,7 @@ test.describe('the stage in flight', () => {
     expect(dayOffset).toBeGreaterThan(0);
 
     await page.goto(SEED_PROJECT_PATH);
-    await page
-      .locator('#kickoff-input')
-      .fill(toISO(plusDays(startOfDay(new Date()), -dayOffset)));
+    await setKickoffDate(page, toISO(plusDays(startOfDay(new Date()), -dayOffset)));
     await page.reload();
 
     // read the overlap off the chart: the bars the TODAY line crosses
@@ -673,13 +675,18 @@ test.describe('the chart folds away', () => {
     await expect(page.locator('#rm-gantt .g-months .g-month').first()).toBeVisible();
     await expect(page.locator('.rm-ms').first()).toBeVisible();
 
-    // what collapses is the bar chart, down to the open stage and its neighbours
+    // what collapses is the bar chart, down to the open stage alone
     await expect(page.locator('#rm-gantt .g-row.current .g-bar')).toBeVisible();
     await expect(page.locator('#rm-gantt .g-row[data-index="5"]')).toBeVisible();
-    await expect(page.locator('#rm-gantt .g-row[data-index="4"]')).toBeVisible(); // above
-    await expect(page.locator('#rm-gantt .g-row[data-index="6"]')).toBeVisible(); // below
-    await expect(page.locator('#rm-gantt .g-row[data-index="3"]')).toBeHidden();
+    await expect(page.locator('#rm-gantt .g-row[data-index="4"]')).toBeHidden();
+    await expect(page.locator('#rm-gantt .g-row[data-index="6"]')).toBeHidden();
     await expect(page.locator('#rm-gantt .g-row[data-index="0"]')).toBeHidden();
+
+    // and it is drawn at the scale of that stage: the bar takes ~70%, centred
+    const bar = (await page.locator('#rm-gantt .g-row.current .g-bar').boundingBox())!;
+    const track = (await page.locator('#rm-gantt .g-row.current .g-row-track').boundingBox())!;
+    expect(bar.width / track.width).toBeCloseTo(0.7, 1);
+    expect(bar.x + bar.width / 2 - (track.x + track.width / 2)).toBeCloseTo(0, 0);
 
     // the open row grows, so its deliverables have somewhere to sit
     const rowH = (await page.locator('#rm-gantt .g-row.current').boundingBox())!.height;
@@ -710,13 +717,13 @@ test.describe('the folded chart carries its dates', () => {
   test('every milestone diamond shows its own date, hover or not', async ({ page }) => {
     await selectStage(page, '06');
     const dots = page.locator('.rm-ms');
-    await expect(dots).toHaveCount(7);
+    await expect(dots).toHaveCount(8); // kickoff and the seven milestones
     for (const text of await dots.locator('.rm-ms-date').allTextContents()) {
       expect(text).toMatch(/^\d{1,2}\/\d{1,2}$/);
     }
     // Tapeout's diamond says what the toolbar says
     const tapeout = await page.locator('.rm-ms[data-msid="tapeout"] .rm-ms-date').textContent();
-    const toolbar = (await page.locator('[data-computed="tapeout"]').textContent())!;
+    const toolbar = (await tapeoutDate(page))!;
     const [m, d] = toolbar.split('/');
     expect(tapeout).toBe(`${Number(m)}/${Number(d)}`);
 
@@ -724,15 +731,20 @@ test.describe('the folded chart carries its dates', () => {
     await expect(page.locator('.rm-ms[data-msid="tapeout"] .rm-ms-date')).toBeVisible();
   });
 
-  test('the month scale keeps every month', async ({ page }) => {
+  test('the month scale keeps every month, and follows the zoom', async ({ page }) => {
     await selectStage(page, '06');
     const before = await page.locator('#rm-gantt .g-month').allTextContents();
     // consecutive months, no gaps: Feb, Mar, Apr…
     expect(before.length).toBeGreaterThan(12);
     expect(before.slice(0, 4)).toEqual(['Feb', 'Mar', 'Apr', 'May']);
 
+    /* Folded, the chart is one stage wide, so the calendar comes with it:
+       fewer months, still every one of them, still in order. */
     await fold(page);
-    expect(await page.locator('#rm-gantt .g-month').allTextContents()).toEqual(before);
+    const zoomed = await page.locator('#rm-gantt .g-month').allTextContents();
+    expect(zoomed.length).toBeLessThan(before.length);
+    expect(zoomed.length).toBeGreaterThan(1);
+    expect(before.join(' ')).toContain(zoomed.join(' '));
   });
 
   test('the open stage wears its deliverables, and a new date moves one', async ({ page }) => {
@@ -742,8 +754,15 @@ test.describe('the folded chart carries its dates', () => {
 
     const marks = page.locator('#rm-gantt .g-row.current .g-dlv');
     await expect(marks).toHaveCount(5); // Physical Design's five deliverables
-    await expect(marks.first().locator('.g-dlv-name')).toHaveText('Floorplan rev C');
-    await expect(marks.first().locator('.g-dlv-date')).toHaveText('7/23');
+    /* A finished deliverable is marked on the day it was finished — this one
+       was due 7/23 and closed a week later. */
+    const first = marks.filter({ hasText: 'Floorplan rev C' });
+    await expect(first.locator('.g-dlv-date')).toHaveText('7/30');
+    await expect(first).toHaveClass(/done/);
+    // an open one still shows what it is due
+    await expect(
+      marks.filter({ hasText: 'Routed database' }).locator('.g-dlv-date'),
+    ).toHaveText('9/3');
 
     // markers are placed by date: later date, further right
     const xs = await marks.evaluateAll((els) =>
@@ -752,16 +771,84 @@ test.describe('the folded chart carries its dates', () => {
     expect([...xs].sort((a, b) => a - b)).toEqual(xs);
 
     // move a due date in the sheet below and the marker follows
-    const before = xs[0];
+    const open = marks.filter({ hasText: 'Routed database' });
+    const before = (await open.boundingBox())!.x;
     await editDeliverables(page);
-    await selectedPanel(page).locator('.dlv-list li').first().locator('input.dlv-due').fill('2026-10-05');
+    await selectedPanel(page)
+      .locator('.dlv-list li')
+      .filter({ hasText: 'Routed database' })
+      .locator('input.dlv-due')
+      .fill('2026-09-24');
     await page.locator('#roadmap').hover({ position: { x: 8, y: 8 } });
     await fold(page);
-    const moved = page.locator('#rm-gantt .g-row.current .g-dlv[data-dlv]').filter({
-      hasText: 'Floorplan rev C',
+    const moved = page.locator('#rm-gantt .g-row.current .g-dlv').filter({
+      hasText: 'Routed database',
     });
-    await expect(moved.locator('.g-dlv-date')).toHaveText('10/5');
+    await expect(moved.locator('.g-dlv-date')).toHaveText('9/24');
     expect((await moved.boundingBox())!.x).toBeGreaterThan(before);
+  });
+});
+
+test.describe('marks tell past from future', () => {
+  test('a date behind us is filled, one ahead is hollow', async ({ page }) => {
+    const marks = await page.locator('.rm-ms').evaluateAll((els) =>
+      els.map((el) => ({
+        id: (el as HTMLElement).dataset.msid,
+        past: el.classList.contains('past'),
+        filled: getComputedStyle(el).backgroundColor,
+      })),
+    );
+    const ink = marks.find((m) => m.past)!.filled;
+    const paper = marks.find((m) => !m.past)!.filled;
+    expect(ink).not.toBe(paper);
+    // and it is the date that decides, not whether the milestone is a major one
+    for (const m of marks) expect(m.filled, m.id).toBe(m.past ? ink : paper);
+
+    // kickoff is 30 weeks back in the seed, tapeout still ahead
+    expect(marks.find((m) => m.id === 'kickoff')!.past).toBe(true);
+    expect(marks.find((m) => m.id === 'tapeout')!.past).toBe(false);
+  });
+
+  test('ticking a deliverable moves its marker onto the day it was finished', async ({
+    page,
+  }) => {
+    await selectStage(page, '06');
+    const row = selectedPanel(page)
+      .locator('.dlv-list li')
+      .filter({ hasText: 'Routed database' });
+    await row.locator('input[type="checkbox"]').check();
+    await expect(row.locator('.dlv-comp')).not.toHaveText('—');
+
+    const box = (await page.locator('#roadmap').boundingBox())!;
+    await page.mouse.move(box.x + box.width / 2, box.y + box.height + 40);
+    await settleLayout(page);
+
+    const mark = page.locator('#rm-gantt .g-row.current .g-dlv').filter({
+      hasText: 'Routed database',
+    });
+    await expect(mark).toHaveClass(/done/);
+    const today = new Date();
+    await expect(mark.locator('.g-dlv-date')).toHaveText(
+      `${today.getMonth() + 1}/${today.getDate()}`,
+    );
+  });
+});
+
+test.describe('the stage duration is a field', () => {
+  test('typing weeks moves the completion date and ripples on', async ({ page }) => {
+    await selectStage(page, '04');
+    const panel = selectedPanel(page);
+    const start = await panel.locator('[data-role="start-edit"]').inputValue();
+    await expect(panel.locator('[data-role="tat-edit"]')).toHaveValue('16');
+
+    await panel.locator('[data-role="tat-edit"]').fill('20');
+    // the start stays put and the end lands four weeks later
+    await expect(panel.locator('[data-role="start-edit"]')).toHaveValue(start);
+    await expect(panel.locator('[data-role="end-edit"]')).toHaveValue(isoPlusDays(start, 140));
+    // and it is staged like any other date edit, not saved behind your back
+    await expect(page.locator('#sched-preview')).toBeVisible();
+    await page.locator('[data-discard-schedule]').click();
+    await expect(panel.locator('[data-role="tat-edit"]')).toHaveValue('16');
   });
 });
 
@@ -773,7 +860,7 @@ test.describe('board windows', () => {
     );
 
   test('a board is the size of its list until the ceiling stops it', async ({ page }) => {
-    const CEILING = { activities: 400, keyinfo: 300, risks: 100 } as const;
+    const CEILING = { activities: 600, keyinfo: 300, risks: 300 } as const;
     const measure = async (kind: keyof typeof CEILING) =>
       selectedPanel(page)
         .locator(`.board[data-kind="${kind}"] .board-rows`)
@@ -783,11 +870,14 @@ test.describe('board windows', () => {
         }));
 
     // Product Definition is seeded full — twelve entries on each board
-    for (const kind of ['activities', 'keyinfo', 'risks'] as const) {
+    for (const kind of ['keyinfo', 'risks'] as const) {
       const m = await measure(kind);
       expect(m.height, kind).toBe(CEILING[kind]);
       expect(m.content, kind).toBeGreaterThan(CEILING[kind]);
     }
+    // twelve activities with their update lines do not reach 600px
+    const acts = await measure('activities');
+    expect(acts.height).toBe(Math.min(acts.content, CEILING.activities));
 
     // Physical Design holds a handful, and its windows shrink to fit them
     await selectStage(page, '06');

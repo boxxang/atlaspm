@@ -1,4 +1,11 @@
-import { expect, test, type Page, SEED_PROJECT_PATH } from './fixtures';
+import {
+  expect,
+  test,
+  type Page,
+  SEED_PROJECT_PATH,
+  tapeoutDate,
+  setKickoffDate,
+} from './fixtures';
 
 const cssVar = (page: Page, name: string) =>
   page.evaluate(
@@ -40,18 +47,16 @@ test.describe('toolbar layout', () => {
     expect(box?.y).toBe(0);
   });
 
-  for (const [width, opt1, opt2] of [
-    [1920, true, true],
-    [1440, false, false],
-    [1280, false, false],
-  ] as const) {
-    test(`shows the right computed fields at ${width}px`, async ({ page }) => {
+  for (const width of [1920, 1440, 1280] as const) {
+    test(`carries the program, its template and the way in at ${width}px`, async ({ page }) => {
       await page.setViewportSize({ width, height: 900 });
       await page.goto(SEED_PROJECT_PATH);
-      // Tapeout is never dropped; First Silicon / Production shed at 1560/1760.
-      await expect(page.locator('[data-computed="tapeout"]')).toBeVisible();
-      await expect(page.locator('.tb-opt1')).toBeVisible({ visible: opt1 });
-      await expect(page.locator('.tb-opt2')).toBeVisible({ visible: opt2 });
+      // Dates are not in the toolbar any more — the milestone axis carries them.
+      await expect(page.locator('[data-computed]')).toHaveCount(0);
+      await expect(page.locator('#kickoff-input')).toHaveCount(0);
+      await expect(page.locator('#project-name')).toBeVisible();
+      await expect(page.locator('#profile-select')).toBeVisible();
+      await expect(page.locator('#stages-btn')).toBeVisible();
       // The toolbar stays on one row at every desktop stop.
       expect((await page.locator('#toolbar').boundingBox())?.height).toBe(58);
     });
@@ -87,26 +92,28 @@ test.describe('toolbar controls', () => {
     await expect(page.locator('#project-name')).toHaveText('AtlasAX1');
   });
 
-  test('kickoff and profile round-trip their values', async ({ page }) => {
+  test('kickoff is edited on the axis, and the template select round-trips', async ({ page }) => {
     await page.goto(SEED_PROJECT_PATH);
     // The store seeds kickoff 30 weeks before today, so "today" sits mid-program.
     const expected = new Date();
     expected.setHours(0, 0, 0, 0);
     expected.setDate(expected.getDate() - 210);
-    const p2 = (n: number) => String(n).padStart(2, '0');
-    await expect(page.locator('#kickoff-input')).toHaveValue(
-      `${expected.getFullYear()}-${p2(expected.getMonth() + 1)}-${p2(expected.getDate())}`,
+    await expect(page.locator('.rm-ms[data-msid="kickoff"] .rm-ms-date')).toHaveText(
+      `${expected.getMonth() + 1}/${expected.getDate()}`,
     );
-    await page.locator('#kickoff-input').fill('2028-01-03');
-    await expect(page.locator('#kickoff-input')).toHaveValue('2028-01-03');
+
+    await setKickoffDate(page, '2028-01-03');
+    await expect(page.locator('.rm-ms[data-msid="kickoff"] .rm-ms-date')).toHaveText('1/3');
     // changing kickoff moves the whole program
-    await expect(page.locator('[data-computed="tapeout"]')).toHaveText('09/25/2028');
+    await expect.poll(() => tapeoutDate(page)).toBe('09/25/2028');
 
     const profile = page.locator('#profile-select');
+    await expect(page.locator('label[for="profile-select"]')).toHaveText('Milestone template');
     await expect(profile).toHaveValue('typicalSoC');
     // Profiles are rows now: a fresh database ships with the built-in one only.
     await expect(profile.locator('option')).toHaveCount(1);
     await expect(profile.locator('option')).toHaveText('Typical SoC');
+    await expect(page.locator('#stages-btn')).toHaveText('Edit template');
   });
 
   test('mode toggle drives body.schedule-mode and the dashboard overlay', async ({ page }) => {
