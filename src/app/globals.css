@@ -539,6 +539,12 @@ body.col-resizing{user-select:none;cursor:col-resize}
   font-family:var(--mono);font-size:.85em;padding:2px 0;min-width:16em;
 }
 .ie-field input:focus-visible{outline:none;border-bottom:1px solid var(--accent)}
+/* owner comes from the stage's people, so it is a picker not a text field */
+.ie-field select.ie-owner{
+  border:1px solid var(--line);border-radius:4px;background:var(--surface);
+  font-family:var(--mono);font-size:.85em;padding:3px 6px;min-width:18em;max-width:100%;
+}
+.ie-field select.ie-owner:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
 .item-editor .ie-body{
   display:block;width:100%;min-height:110px;border:1px solid var(--line);border-radius:5px;
   background:var(--surface);padding:10px 12px;font-size:.92em;color:var(--ink-2);resize:vertical;

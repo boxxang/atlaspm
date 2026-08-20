@@ -9,6 +9,7 @@ import { fmtDT, fmtDTFull, fmtDate, toISO } from '@/lib/schedule';
 import { KIND_LABELS } from '@/store/modalStore';
 import { useAppStore, type ItemFields } from '@/store/useAppStore';
 import { useDirectory } from './Board';
+import { OwnerSelect } from './OwnerSelect';
 import { MailButton } from './MailButton';
 
 /** Status update thread — post, edit in place, delete. */
@@ -240,11 +241,13 @@ export function ItemView({
 export function ItemEditor({
   item,
   kind,
+  stageId,
   onSave,
   onDelete,
 }: {
   item: Item | null;
   kind: ItemKind;
+  stageId: StageId;
   onSave: (f: ItemFields) => void;
   onDelete?: () => void;
 }) {
@@ -267,11 +270,10 @@ export function ItemEditor({
       />
       <div className="ie-field">
         <span className="cap">Owner</span>
-        <input
-          className="ie-owner"
-          placeholder="Owner name"
+        <OwnerSelect
+          stageId={stageId}
           value={f.owner}
-          onChange={(e) => setF({ ...f, owner: e.target.value })}
+          onChange={(owner) => setF({ ...f, owner })}
         />
       </div>
       <div className="ie-field">

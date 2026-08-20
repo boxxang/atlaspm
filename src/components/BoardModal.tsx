@@ -261,6 +261,7 @@ export function BoardModal() {
                 key={item?.id ?? 'new'}
                 item={item}
                 kind={kind}
+                stageId={stageId}
                 onSave={(f) => {
                   const saved = saveItem(stageId, kind, itemId, f);
                   /* +Add from main: the save lands on the main page */

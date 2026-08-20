@@ -170,7 +170,7 @@ test.describe('item editor', () => {
     await expect(page.locator('[data-back]')).toHaveCount(0);
 
     await page.locator('.ie-title').fill('Package ball map review');
-    await page.locator('.ie-owner').fill('I. Berg');
+    await page.locator('.ie-owner').selectOption('I. Berg');
     await page.locator('.ie-due').fill('2030-04-01');
     await page.locator('.ie-body').fill('Blocking PDN rev 2.');
     await page.locator('[data-save]').click();

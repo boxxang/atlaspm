@@ -29,7 +29,7 @@ test('creating an activity persists', async ({ page }) => {
   const board = selectedPanel(page).locator('.board[data-kind="activities"]');
   await board.locator('[data-add]').click();
   await page.locator('.ie-title').fill('Persisted ECO review');
-  await page.locator('.ie-owner').fill('I. Berg');
+  await page.locator('.ie-owner').selectOption('I. Berg');
   await page.locator('.ie-due').fill('2031-03-04');
   await page.locator('.ie-body').fill('Written straight to SQLite.');
   await page.locator('[data-save]').click();

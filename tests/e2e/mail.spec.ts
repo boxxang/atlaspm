@@ -153,11 +153,17 @@ test.describe('activity export', () => {
     ).toHaveCount(1);
   });
 
-  test('an unknown owner leaves the recipient blank rather than guessing', async ({ page }) => {
+  test('an owner with no address on file leaves the recipient blank', async ({ page }) => {
     const panel = page.locator('.stage-panel.selected');
+    // a contact can be recorded without an email; owning something is still fine
+    await panel.locator('[data-c-add]').click();
+    await page.locator('.c-row.editing .cf-name').fill('Unlisted Person');
+    await page.locator('.c-row.editing .cf-role').fill('No address on file');
+    await page.locator('.c-row.editing [data-c-save]').click();
+
     await panel.locator('.board[data-kind="activities"] [data-add]').click();
     await page.locator('.ie-title').fill('Owned by nobody on file');
-    await page.locator('.ie-owner').fill('Someone Unlisted');
+    await page.locator('.ie-owner').selectOption('U. Person');
     await page.locator('[data-save]').click();
 
     const row = panel
@@ -169,7 +175,7 @@ test.describe('activity export', () => {
       '.b-row:has-text("Owned by nobody on file") [data-mail]',
     );
     expect(m.to).toBe('');
-    expect(m.body).toContain('Owner          Someone Unlisted');
+    expect(m.body).toContain('Owner          U. Person');
   });
 
   test('clicking an envelope does not open the row behind it', async ({ page }) => {
