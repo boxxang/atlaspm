@@ -2,11 +2,22 @@
 
 import { useState } from 'react';
 import type { StageId } from '@/data/types';
-import { fmtDT, fromISO, toISO } from '@/lib/schedule';
+import { fmtDT, fmtDate, fromISO, toISO } from '@/lib/schedule';
 import { useAppStore } from '@/store/useAppStore';
 import { ColGrip } from './ColGrip';
 
-export function Deliverables({ stageId }: { stageId: StageId }) {
+/**
+ * Ticking a deliverable off is day-to-day work, so the checkbox is always live.
+ * Changing a due date, adding a line or removing one changes what the stage
+ * owes, so those wait for edit mode.
+ */
+export function Deliverables({
+  stageId,
+  editing = false,
+}: {
+  stageId: StageId;
+  editing?: boolean;
+}) {
   const list = useAppStore((s) => s.deliverables[stageId]);
   const today = useAppStore((s) => s.today);
   const toggle = useAppStore((s) => s.toggleDeliverable);
@@ -57,28 +68,44 @@ export function Deliverables({ stageId }: { stageId: StageId }) {
               />
               <span className={`dlv-t${d.done ? ' done' : ''}`}>{d.title}</span>
             </label>
-            <input
-              type="date"
-              className={`dlv-due${!d.done && d.due && d.due < today ? ' overdue' : ''}`}
-              data-dlv-due={d.id}
-              value={d.due ? toISO(d.due) : ''}
-              title="Target due date"
-              onChange={(e) => setDue(stageId, d.id, e.target.value ? fromISO(e.target.value) : null)}
-            />
+            {editing ? (
+              <input
+                type="date"
+                className={`dlv-due${!d.done && d.due && d.due < today ? ' overdue' : ''}`}
+                data-dlv-due={d.id}
+                value={d.due ? toISO(d.due) : ''}
+                title="Target due date"
+                onChange={(e) =>
+                  setDue(stageId, d.id, e.target.value ? fromISO(e.target.value) : null)
+                }
+              />
+            ) : (
+              <span
+                className={`dlv-due read${!d.done && d.due && d.due < today ? ' overdue' : ''}`}
+                data-dlv-due-text={d.id}
+              >
+                {d.due ? fmtDate(d.due) : '—'}
+              </span>
+            )}
             {/* completion timestamp is automatic */}
             <span className="dlv-comp" data-comp={d.id}>
               {d.completedAt ? fmtDT(d.completedAt) : '—'}
             </span>
-            <button
-              data-dlv-del={d.id}
-              aria-label="Delete deliverable"
-              onClick={() => del(stageId, d.id)}
-            >
-              ✕
-            </button>
+            {editing ? (
+              <button
+                data-dlv-del={d.id}
+                aria-label="Delete deliverable"
+                onClick={() => del(stageId, d.id)}
+              >
+                ✕
+              </button>
+            ) : (
+              <span />
+            )}
           </li>
         ))}
       </ul>
+      {editing && (
       <div className="dlv-add">
         <input
           className="dlv-input"
@@ -99,6 +126,7 @@ export function Deliverables({ stageId }: { stageId: StageId }) {
           + Add
         </button>
       </div>
+      )}
     </>
   );
 }

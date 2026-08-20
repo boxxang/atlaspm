@@ -1,4 +1,4 @@
-import { expect, test, type Page, SEED_PROJECT_PATH, selectStage } from './fixtures';
+import { expect, test, type Page, SEED_PROJECT_PATH, selectStage, editStageDetail } from './fixtures';
 
 const cssVar = (page: Page, name: string) =>
   page.evaluate(
@@ -145,6 +145,22 @@ test.describe('roadmap', () => {
     await page.keyboard.press('ArrowUp');
     await page.keyboard.press('Enter');
     await expect(selectedPanel(page)).toHaveAttribute('data-id', 'rtl');
+  });
+
+  test('a selected row stays legible — the highlight sits behind its text', async ({ page }) => {
+    await selectStage(page, '06');
+    const row = page.locator('#rm-gantt .g-row[data-index="5"]');
+    await expect(row).toHaveAttribute('aria-selected', 'true');
+
+    // the hit target on top is transparent; the wash is behind the content
+    await expect(row.locator('.g-row-hit')).toHaveCSS('background-color', 'rgba(0, 0, 0, 0)');
+    await expect(row.locator('.g-row-label')).toHaveCSS('z-index', '1');
+    await expect(row.locator('.g-row-track')).toHaveCSS('z-index', '1');
+
+    // and a selected row reads heavier, not lighter
+    await expect(row.locator('.g-row-label')).toHaveCSS('font-weight', '700');
+    await expect(row.locator('.g-row-label')).toHaveCSS('color', 'rgb(11, 11, 11)');
+    await expect(row.locator('.g-mm-tag')).toHaveCSS('font-weight', '700');
   });
 
   test('TODAY marker aligns pixel-exact with the gantt today line', async ({ page }) => {
@@ -338,6 +354,10 @@ test.describe('stage details', () => {
     const panel = selectedPanel(page);
     const rows = panel.locator('.dlv-list li');
     await expect(rows).toHaveCount(4);
+    // the table is a read-out until the sheet is opened for editing
+    await expect(panel.locator('.dlv-add')).toHaveCount(0);
+    await expect(panel.locator('input.dlv-due')).toHaveCount(0);
+    await editStageDetail(page);
     await panel.locator('.dlv-input').fill('Cost model refresh');
     await panel.locator('[data-dlv-add]').click();
     await expect(rows).toHaveCount(5);

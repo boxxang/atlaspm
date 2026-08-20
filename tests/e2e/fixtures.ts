@@ -58,6 +58,18 @@ export const STAGE_BY_NUMBER: Record<string, string> = {
  * selected until you pick one — so most tests open a stage before asserting on
  * the panel below.
  */
+/**
+ * The engineering table and the deliverables table are read-outs until the
+ * stage sheet is in edit mode; the pencil opens it.
+ */
+export async function editStageDetail(page: Page) {
+  const panel = page.locator('.stage-panel.selected');
+  if (!(await panel.locator('.sd-edit').count())) {
+    await panel.locator('[data-sd-edit]').click();
+  }
+  await expect(panel.locator('.sd-edit')).toBeVisible();
+}
+
 export async function selectStage(page: Page, num: string) {
   const id = STAGE_BY_NUMBER[num];
   /* Idempotent: picking the selected bar again closes it, so only click when

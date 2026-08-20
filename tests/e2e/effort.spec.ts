@@ -1,4 +1,4 @@
-import { expect, test, type Page, SEED_PROJECT_PATH, selectStage } from './fixtures';
+import { expect, test, type Page, SEED_PROJECT_PATH, selectStage, editStageDetail } from './fixtures';
 
 /**
  * Man-months are recorded per engineering line, summed into a stage figure that
@@ -25,15 +25,20 @@ test.describe('the engineering table', () => {
     await expect(panel(page).locator('.mm-cols > span').nth(1)).toHaveText('M/M');
     const rows = panel(page).locator('.mm-list li');
     await expect(rows).toHaveCount(5);
-    // each line is editable, so its title is an input
-    await expect(rows.first().locator('.mm-t')).toHaveValue(
+    // read-only until the sheet is opened for editing
+    await expect(rows.first().locator('.mm-t')).toHaveText(
       'Performance / power / area target modeling',
     );
-    expect(await effortValues(page)).toEqual(['2', '2', '1.5', '1.5', '1']);
+    await expect(panel(page).locator('.mm-input:not(.read)')).toHaveCount(0);
+    await expect(panel(page).locator('.mm-add')).toHaveCount(0);
+    expect(await page.locator('[data-mm-text]').allTextContents()).toEqual([
+      '2', '2', '1.5', '1.5', '1',
+    ]);
     await expect(panel(page).locator('[data-stage-mm]')).toHaveText('8 MM');
   });
 
   test('editing a figure moves the stage total straight away', async ({ page }) => {
+    await editStageDetail(page);
     await panel(page).locator('.mm-input').first().fill('6');
     await expect(panel(page).locator('[data-stage-mm]')).toHaveText('12 MM');
 
@@ -42,10 +47,14 @@ test.describe('the engineering table', () => {
   });
 
   test('a figure persists across a reload', async ({ page }) => {
+    await editStageDetail(page);
     await panel(page).locator('.mm-input').first().fill('6');
     await expect(panel(page).locator('[data-stage-mm]')).toHaveText('12 MM');
     await page.reload();
     await selectStage(page, '01');
+    // it reads back without needing edit mode
+    await expect(panel(page).locator('[data-mm-text="0"]')).toHaveText('6');
+    await editStageDetail(page);
     await expect(panel(page).locator('.mm-input').first()).toHaveValue('6');
     await expect(panel(page).locator('[data-stage-mm]')).toHaveText('12 MM');
   });
@@ -66,12 +75,15 @@ test.describe('the engineering table', () => {
     await panel(page).locator('[data-sd-save]').click();
     await expect(panel(page).locator('.sheet-what')).toHaveText('Reworded, same effort.');
     await expect(panel(page).locator('[data-stage-mm]')).toHaveText('8 MM');
-    expect(await effortValues(page)).toEqual(['2', '2', '1.5', '1.5', '1']);
+    expect(await page.locator('[data-mm-text]').allTextContents()).toEqual([
+      '2', '2', '1.5', '1.5', '1',
+    ]);
   });
 });
 
 test.describe('managing the engineering list', () => {
   test('an activity can be added with its man-months', async ({ page }) => {
+    await editStageDetail(page);
     await expect(panel(page).locator('.mm-list li')).toHaveCount(5);
     await panel(page).locator('.mm-new').fill('Package feasibility study');
     await panel(page).locator('.mm-new-mm').fill('3');
@@ -88,6 +100,7 @@ test.describe('managing the engineering list', () => {
   });
 
   test('an activity can be renamed and deleted', async ({ page }) => {
+    await editStageDetail(page);
     await panel(page).locator('.mm-t').first().fill('PPA modelling, our wording');
     await expect(panel(page).locator('.mm-t').first()).toHaveValue('PPA modelling, our wording');
 
@@ -98,6 +111,7 @@ test.describe('managing the engineering list', () => {
   });
 
   test('the list and its figures survive a reload', async ({ page }) => {
+    await editStageDetail(page);
     await panel(page).locator('.mm-new').fill('Extra study');
     await panel(page).locator('.mm-new-mm').fill('4');
     await panel(page).locator('[data-mm-add]').click();
@@ -107,15 +121,19 @@ test.describe('managing the engineering list', () => {
     await page.reload();
     await selectStage(page, '01');
     await expect(panel(page).locator('.mm-list li')).toHaveCount(5);
-    await expect(panel(page).locator('.mm-t').last()).toHaveValue('Extra study');
+    await expect(panel(page).locator('.mm-t').last()).toHaveText('Extra study');
     await expect(panel(page).locator('[data-stage-mm]')).toHaveText('10 MM');
   });
 
   test('emptying the list leaves it empty rather than restoring the default', async ({
     page,
   }) => {
-    for (let i = 0; i < 5; i++) {
-      await panel(page).locator('.mm-list li').first().locator('[data-mm-del]').click();
+    await editStageDetail(page);
+    /* wait for each delete to land before the next: five clicks fired back to
+       back race the re-render and the writes behind it */
+    for (let left = 5; left > 0; left--) {
+      await panel(page).locator('[data-mm-del]').first().click();
+      await expect(panel(page).locator('[data-mm-del]')).toHaveCount(left - 1);
     }
     await expect(panel(page).locator('.mm-empty')).toBeVisible();
     await expect(panel(page).locator('[data-stage-mm]')).toHaveText('0 MM');
@@ -125,6 +143,7 @@ test.describe('managing the engineering list', () => {
   });
 
   test('a nameless activity will not be added', async ({ page }) => {
+    await editStageDetail(page);
     await panel(page).locator('.mm-new-mm').fill('5');
     await panel(page).locator('[data-mm-add]').click();
     await expect(panel(page).locator('.mm-list li')).toHaveCount(5);
@@ -132,6 +151,7 @@ test.describe('managing the engineering list', () => {
   });
 
   test('it belongs to one stage of one program', async ({ page }) => {
+    await editStageDetail(page);
     await panel(page).locator('.mm-new').fill('Only here');
     await panel(page).locator('.mm-new-mm').fill('2');
     await panel(page).locator('[data-mm-add]').click();
@@ -159,6 +179,7 @@ test.describe('effort on the schedule', () => {
 
   test('a changed figure reaches the bars', async ({ page }) => {
     await selectStage(page, '04');
+    await editStageDetail(page);
     await panel(page).locator('.mm-input').first().fill('80');
     await expect(page.locator('#rm-gantt [data-stage-mm="verification"]')).toHaveText('200 MM');
   });
@@ -173,7 +194,7 @@ test.describe('effort on the schedule', () => {
     await expect(page.locator('#rm-gantt .g-mm-tag')).toHaveCount(0);
     await selectStage(page, '01');
     await expect(panel(page).locator('[data-stage-mm]')).toHaveText('0 MM');
-    await expect(panel(page).locator('.mm-input').first()).toHaveValue('');
+    await expect(panel(page).locator('[data-mm-text="0"]')).toHaveText('—');
   });
 });
 
@@ -204,6 +225,7 @@ test.describe('effort and cost for the program', () => {
 
   test('a changed stage figure moves the program total', async ({ page }) => {
     await selectStage(page, '04');
+    await editStageDetail(page);
     await panel(page).locator('.mm-input').first().fill('80');
     await page.locator('#mode-toggle button[data-mode="schedule"]').click();
     await expect(page.locator('[data-total-mm]')).toHaveText('729 MM');
@@ -223,6 +245,7 @@ test.describe('effort and cost for the program', () => {
 
   test('the card follows an edit made inside the program', async ({ page }) => {
     await selectStage(page, '04');
+    await editStageDetail(page);
     await panel(page).locator('.mm-input').first().fill('80');
     await page.locator('#to-programs').click();
     const card = page.locator('.pl-card').filter({ hasText: 'AtlasAX1' });

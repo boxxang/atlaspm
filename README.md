@@ -95,7 +95,9 @@ Pure logic never imports UI, and `/src/lib` + `/src/data` never touch the DOM �
   (`M. Bianchi`), which keeps the Owner column consistent and lets the envelope
   button resolve an address.
 - **Effort and cost.** A stage's engineering activities are a board — add,
-  rename, delete — and each line carries man-months; the
+  rename, delete, each line carrying man-months — behind the sheet's edit mode,
+  as are deliverable due dates. Ticking a deliverable off stays always
+  available, since that is day-to-day work rather than editing the stage. The
   stage's total rides on its gantt bar, and the program's total drives an
   estimate on the program card. The rate is a program setting, edited on the
   dashboard, and defaults to 0 so no cost is invented. AtlasAX1 is seeded with
@@ -147,7 +149,7 @@ that is a read/write swap rather than a redesign.
 
 ```bash
 npm test          # 136 unit tests: schedule engine, derivations, effort, mail, purity
-npm run e2e       # 183 Playwright tests
+npm run e2e       # 188 Playwright tests
 ```
 
 The e2e suite runs against its own database (`test.db`) on port 3100, so it never

@@ -1,4 +1,4 @@
-import { expect, test, type Page, selectStage } from './fixtures';
+import { expect, test, type Page, selectStage, editStageDetail } from './fixtures';
 
 /**
  * The landing page: one card per program, create and delete, and the contract
@@ -143,7 +143,7 @@ test.describe('creating a program', () => {
     ]);
     await expect(panel.locator('.dlv-note')).toHaveText('0 / 3 complete');
     // dated to the stage end under this program's own schedule
-    await expect(panel.locator('.dlv-due').first()).toHaveValue('2027-03-29');
+    await expect(panel.locator('[data-dlv-due-text]').first()).toHaveText('03/29/2027');
 
     // leaders and contacts are the program's to fill in
     await expect(panel.locator('.l-name')).toHaveText('Unassigned');

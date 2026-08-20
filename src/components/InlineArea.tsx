@@ -66,9 +66,12 @@ function PencilIcon() {
 function EngineeringTable({
   stageId,
   detail,
+  editing,
 }: {
   stageId: StageId;
   detail: ResolvedStageDetail;
+  /** Outside edit mode the table is a read-out, not a form. */
+  editing: boolean;
 }) {
   const setLines = useAppStore((st) => st.setEngineeringLines);
   const [draft, setDraft] = useState('');
@@ -91,53 +94,68 @@ function EngineeringTable({
 
   return (
     <>
-      <div className="mm-cols">
+      <div className={`mm-cols${editing ? '' : ' read'}`}>
         <span>Engineering activity</span>
         <span>M/M</span>
-        <span />
+        {editing && <span />}
       </div>
-      <ul className="mm-list">
+      <ul className={`mm-list${editing ? '' : ' read'}`}>
         {lines.map((line, i) => (
           <li key={`${i}-${line.label}`}>
-            <input
-              className="mm-t"
-              data-mm-label={i}
-              value={line.label}
-              aria-label={`Engineering activity ${i + 1}`}
-              onChange={(e) =>
-                write(lines.map((l, j) => (j === i ? { ...l, label: e.target.value } : l)))
-              }
-            />
-            <input
-              type="number"
-              className="mm-input"
-              data-mm={i}
-              min="0"
-              step="0.5"
-              inputMode="decimal"
-              aria-label={`Man-months for ${line.label}`}
-              value={line.manMonths || ''}
-              placeholder="0"
-              onChange={(e) => {
-                const n = Number.parseFloat(e.target.value);
-                write(
-                  lines.map((l, j) =>
-                    j === i ? { ...l, manMonths: Number.isFinite(n) && n >= 0 ? n : 0 } : l,
-                  ),
-                );
-              }}
-            />
-            <button
-              data-mm-del={i}
-              aria-label={`Delete ${line.label}`}
-              onClick={() => write(lines.filter((_, j) => j !== i))}
-            >
-              ✕
-            </button>
+            {editing ? (
+              <input
+                className="mm-t"
+                data-mm-label={i}
+                value={line.label}
+                aria-label={`Engineering activity ${i + 1}`}
+                onChange={(e) =>
+                  write(lines.map((l, j) => (j === i ? { ...l, label: e.target.value } : l)))
+                }
+              />
+            ) : (
+              <span className="mm-t read" data-mm-label-text={i}>
+                {line.label}
+              </span>
+            )}
+            {editing ? (
+              <input
+                type="number"
+                className="mm-input"
+                data-mm={i}
+                min="0"
+                step="0.5"
+                inputMode="decimal"
+                aria-label={`Man-months for ${line.label}`}
+                value={line.manMonths || ''}
+                placeholder="0"
+                onChange={(e) => {
+                  const n = Number.parseFloat(e.target.value);
+                  write(
+                    lines.map((l, j) =>
+                      j === i ? { ...l, manMonths: Number.isFinite(n) && n >= 0 ? n : 0 } : l,
+                    ),
+                  );
+                }}
+              />
+            ) : (
+              <span className="mm-input read" data-mm-text={i}>
+                {line.manMonths || '—'}
+              </span>
+            )}
+            {editing && (
+              <button
+                data-mm-del={i}
+                aria-label={`Delete ${line.label}`}
+                onClick={() => write(lines.filter((_, j) => j !== i))}
+              >
+                ✕
+              </button>
+            )}
           </li>
         ))}
         {lines.length === 0 && <li className="mm-empty">No engineering activities yet.</li>}
       </ul>
+      {editing && (
       <div className="mm-add">
         <input
           className="mm-new"
@@ -161,6 +179,7 @@ function EngineeringTable({
           + Add
         </button>
       </div>
+      )}
       <div className="mm-total">
         <span className="k">Stage effort</span>
         <span className="v" data-stage-mm>
@@ -172,7 +191,15 @@ function EngineeringTable({
 }
 
 /** Engineering | Program — the two readings of the same stage. */
-function ViewToggle({ stageId, detail }: { stageId: StageId; detail: ResolvedStageDetail }) {
+function ViewToggle({
+  stageId,
+  detail,
+  editing,
+}: {
+  stageId: StageId;
+  detail: ResolvedStageDetail;
+  editing: boolean;
+}) {
   const [view, setView] = useState<'eng' | 'prog'>('eng');
   return (
     <div>
@@ -185,7 +212,7 @@ function ViewToggle({ stageId, detail }: { stageId: StageId; detail: ResolvedSta
         </button>
       </div>
       <div className="view-pane enter" data-pane="eng" hidden={view !== 'eng'} key={`eng-${view}`}>
-        <EngineeringTable stageId={stageId} detail={detail} />
+        <EngineeringTable stageId={stageId} detail={detail} editing={editing} />
         <div className="view-foot">
           <span className="cap">Tools</span>
           <span className="mono">{detail.tools.join(' · ')}</span>
@@ -308,8 +335,8 @@ function StageDetail({ stageId, editContact }: { stageId: StageId; editContact: 
           <button
             className="sd-pencil"
             data-sd-edit
-            title="Edit this stage's text"
-            aria-label="Edit this stage's text"
+            title="Edit this stage — text, engineering activities and deliverables"
+            aria-label="Edit this stage"
             onClick={() => setEditing(true)}
           >
             <PencilIcon />
@@ -332,9 +359,9 @@ function StageDetail({ stageId, editContact }: { stageId: StageId; editContact: 
       )}
 
       <div className="sheet-grid">
-        <ViewToggle stageId={stageId} detail={detail} />
+        <ViewToggle stageId={stageId} detail={detail} editing={editing} />
         <div className="sheet-side">
-          <Deliverables stageId={stageId} />
+          <Deliverables stageId={stageId} editing={editing} />
         </div>
       </div>
       <Contacts stageId={stageId} editId={editContact} />

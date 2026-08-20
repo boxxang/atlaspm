@@ -15,6 +15,65 @@ test.beforeEach(async ({ page }) => {
   await selectStage(page, '01');
 });
 
+test.describe('read mode versus edit mode', () => {
+  test('the tables are read-outs until the pencil is pressed', async ({ page }) => {
+    // engineering: values shown, nothing to type into
+    await expect(panel(page).locator('[data-mm-text]')).toHaveCount(5);
+    await expect(panel(page).locator('.mm-input:not(.read)')).toHaveCount(0);
+    await expect(panel(page).locator('.mm-t.read')).toHaveCount(5);
+    await expect(panel(page).locator('[data-mm-del]')).toHaveCount(0);
+    await expect(panel(page).locator('.mm-add')).toHaveCount(0);
+
+    // deliverables: due dates read as text, no add row, no delete
+    await expect(panel(page).locator('[data-dlv-due-text]')).toHaveCount(4);
+    await expect(panel(page).locator('input.dlv-due')).toHaveCount(0);
+    await expect(panel(page).locator('[data-dlv-del]')).toHaveCount(0);
+    await expect(panel(page).locator('.dlv-add')).toHaveCount(0);
+
+    // …but ticking one off is day-to-day work, not editing
+    await expect(panel(page).locator('.dlv-list input[type="checkbox"]')).toHaveCount(4);
+    await expect(panel(page).locator('.dlv-list input[type="checkbox"]').first()).toBeEnabled();
+  });
+
+  test('the pencil turns both tables into forms, and Save turns them back', async ({ page }) => {
+    await panel(page).locator('[data-sd-edit]').click();
+    await expect(panel(page).locator('.mm-input:not(.read)')).toHaveCount(5);
+    await expect(panel(page).locator('.mm-add')).toHaveCount(1);
+    await expect(panel(page).locator('[data-mm-del]')).toHaveCount(5);
+    await expect(panel(page).locator('input.dlv-due')).toHaveCount(5); // 4 rows + the add row
+    await expect(panel(page).locator('.dlv-add')).toHaveCount(1);
+
+    await panel(page).locator('[data-sd-save]').click();
+    await expect(panel(page).locator('.mm-input:not(.read)')).toHaveCount(0);
+    await expect(panel(page).locator('input.dlv-due')).toHaveCount(0);
+    await expect(panel(page).locator('[data-mm-text]')).toHaveCount(5);
+  });
+
+  test('the read-out shows the same numbers the form holds', async ({ page }) => {
+    await expect(panel(page).locator('[data-mm-text="0"]')).toHaveText('2');
+    await expect(panel(page).locator('[data-stage-mm]')).toHaveText('8 MM');
+
+    await panel(page).locator('[data-sd-edit]').click();
+    await panel(page).locator('[data-mm="0"]').fill('7');
+    await expect(panel(page).locator('[data-stage-mm]')).toHaveText('13 MM');
+    await panel(page).locator('[data-sd-cancel]').click();
+
+    // the table saves as it is typed, so Cancel on the text form does not undo it
+    await expect(panel(page).locator('[data-mm-text="0"]')).toHaveText('7');
+    await expect(panel(page).locator('[data-stage-mm]')).toHaveText('13 MM');
+  });
+
+  test('a deliverable due date is only editable in edit mode', async ({ page }) => {
+    const first = panel(page).locator('.dlv-list li').first();
+    await expect(first.locator('[data-dlv-due-text]')).toHaveText(/^\d{2}\/\d{2}\/\d{4}$/);
+
+    await panel(page).locator('[data-sd-edit]').click();
+    await first.locator('input.dlv-due').fill('2027-01-15');
+    await panel(page).locator('[data-sd-save]').click();
+    await expect(first.locator('[data-dlv-due-text]')).toHaveText('01/15/2027');
+  });
+});
+
 test.describe('editing stage detail', () => {
   test('the pencil opens an editor seeded with the current text', async ({ page }) => {
     await expect(panel(page).locator('.sheet-what')).toHaveText(SHARED_DESCRIPTION);
