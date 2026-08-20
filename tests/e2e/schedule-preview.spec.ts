@@ -1,4 +1,4 @@
-import { expect, test, type Page, SEED_PROJECT_PATH } from './fixtures';
+import { expect, test, type Page, SEED_PROJECT_PATH, selectStage } from './fixtures';
 
 /**
  * A stage date ripples through every later stage and every milestone, so edits
@@ -6,8 +6,6 @@ import { expect, test, type Page, SEED_PROJECT_PATH } from './fixtures';
  */
 
 const panel = (page: Page) => page.locator('.stage-panel.selected');
-const hoverStation = (page: Page, num: string) =>
-  page.locator('.rm-station', { hasText: new RegExp(`^${num} `) }).hover();
 
 const p2 = (n: number) => String(n).padStart(2, '0');
 const isoPlusDays = (iso: string, n: number) => {
@@ -19,7 +17,7 @@ const isoPlusDays = (iso: string, n: number) => {
 
 /** Move a stage's end date by n days without committing it. */
 const stageEdit = async (page: Page, station: string, days: number) => {
-  await hoverStation(page, station);
+  await selectStage(page, station);
   const input = panel(page).locator('[data-role="end-edit"]');
   const before = await input.inputValue();
   await input.fill(isoPlusDays(before, days));
@@ -29,7 +27,7 @@ const stageEdit = async (page: Page, station: string, days: number) => {
 
 test.beforeEach(async ({ page }) => {
   await page.goto(SEED_PROJECT_PATH);
-  await expect(page.locator('.stage-panel.selected')).toBeVisible();
+  await selectStage(page, '01');
 });
 
 test.describe('staging a schedule change', () => {
@@ -101,7 +99,7 @@ test.describe('staging a schedule change', () => {
     await stageEdit(page, '04', 28);
     await expect(page.locator('#sched-preview tr[data-stage]')).toHaveCount(9);
 
-    await hoverStation(page, '07'); // Signoff, downstream of DV
+    await selectStage(page, '07'); // Signoff, downstream of DV
     const input = panel(page).locator('[data-role="end-edit"]');
     await input.fill(isoPlusDays(await input.inputValue(), 7));
 
@@ -112,7 +110,7 @@ test.describe('staging a schedule change', () => {
   });
 
   test('a start-date edit is staged the same way', async ({ page }) => {
-    await hoverStation(page, '06');
+    await selectStage(page, '06');
     const input = panel(page).locator('[data-role="start-edit"]');
     await input.fill(isoPlusDays(await input.inputValue(), 14));
     await expect(page.locator('#sched-preview')).toBeVisible();
@@ -151,7 +149,7 @@ test.describe('resolving the review', () => {
     await page.reload();
     await expect(page.locator('[data-computed="tapeout"]')).toHaveText(proposed!);
     await expect(page.locator('.edited-flag')).toBeVisible();
-    await hoverStation(page, '04');
+    await selectStage(page, '04');
     await expect(panel(page).locator('[data-role="tat"]')).toHaveText('20W TAT');
   });
 
@@ -160,6 +158,7 @@ test.describe('resolving the review', () => {
     await page.locator('[data-apply-schedule]').click();
     await expect(page.locator('#sched-preview')).toHaveCount(0);
 
+    /* selecting the same stage again would close it, so reopen deliberately */
     await stageEdit(page, '04', 7);
     // the "current" column is now the 20W schedule, not the original 16W one
     const dv = page.locator('#sched-preview tr[data-stage="verification"]');

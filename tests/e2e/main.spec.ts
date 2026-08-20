@@ -1,4 +1,4 @@
-import { expect, test, type Page, SEED_PROJECT_PATH } from './fixtures';
+import { expect, test, type Page, SEED_PROJECT_PATH, selectStage } from './fixtures';
 
 const cssVar = (page: Page, name: string) =>
   page.evaluate(
@@ -8,10 +8,6 @@ const cssVar = (page: Page, name: string) =>
 
 const selectedPanel = (page: Page) => page.locator('.stage-panel.selected');
 
-/** Hover the roadmap station whose label starts with this two-digit number. */
-const hoverStation = async (page: Page, num: string) => {
-  await page.locator('.rm-station', { hasText: new RegExp(`^${num} `) }).hover();
-};
 
 /** MM/DD/YYYY → Date at local midnight, so day arithmetic survives DST. */
 const parseUS = (s: string) => {
@@ -59,35 +55,96 @@ const centerX = async (page: Page, sel: string) => {
 
 test.beforeEach(async ({ page }) => {
   await page.goto(SEED_PROJECT_PATH);
-  await expect(page.locator('.stage-panel.selected')).toBeVisible();
+  await selectStage(page, '01');
 });
 
 test.describe('roadmap', () => {
-  test('hovering station 6 selects Physical Design', async ({ page }) => {
-    await expect(selectedPanel(page)).toHaveAttribute('data-id', 'productDefinition');
-    await hoverStation(page, '06');
+  test('nothing is open until a bar is selected', async ({ page }) => {
+    await page.goto(SEED_PROJECT_PATH);
+    await expect(page.locator('.stage-panel.selected')).toHaveCount(0);
+    await expect(page.locator('.panel-hint')).toBeVisible();
+    await expect(page.locator('#rm-gantt .g-row[aria-selected="true"]')).toHaveCount(0);
+  });
+
+  test('selecting a bar opens that stage, and selecting it again closes it', async ({ page }) => {
+    await selectStage(page, '06');
     await expect(selectedPanel(page)).toHaveAttribute('data-id', 'physicalDesign');
     await expect(selectedPanel(page).locator('h2')).toHaveText('Physical Design');
-    await expect(
-      page.locator('.rm-station', { hasText: /^06 / }),
-    ).toHaveClass(/selected/);
-    // the lifecycle region above the line follows the selection
+    await expect(page.locator('#rm-gantt .g-row[data-index="5"]')).toHaveAttribute(
+      'aria-selected',
+      'true',
+    );
+    // the lifecycle band above the axis follows the selection
     await expect(page.locator('.rm-region.current')).toHaveText('Implement');
+
+    await page.locator('#rm-gantt [data-select-stage="physicalDesign"]').click();
+    await expect(page.locator('.stage-panel.selected')).toHaveCount(0);
+    await expect(page.locator('.panel-hint')).toBeVisible();
   });
 
-  test('clicking and arrow keys move the selection', async ({ page }) => {
-    await page.locator('.rm-station', { hasText: /^03 / }).click();
-    await expect(selectedPanel(page)).toHaveAttribute('data-id', 'rtl');
-    await page.keyboard.press('ArrowRight');
+  test('the stages are the y-axis, and nothing but milestones is on the x-axis', async ({
+    page,
+  }) => {
+    // twelve rows down the side, labelled and legible
+    const labels = page.locator('#rm-gantt .g-row-label');
+    await expect(labels).toHaveCount(12);
+    await expect(labels).toHaveText([
+      'DEF', 'ARCH', 'RTL', 'DV', 'SYN', 'PD', 'SO', 'TO', 'FAB', 'PKG', 'BU', 'MP',
+    ]);
+    const size = await labels.first().evaluate((el) => parseFloat(getComputedStyle(el).fontSize));
+    expect(size).toBeGreaterThanOrEqual(12);
+
+    // the old station row is gone; the axis carries the seven milestones
+    await expect(page.locator('.rm-station')).toHaveCount(0);
+    await expect(page.locator('#rm-progress')).toHaveCount(0);
+    await expect(page.locator('.rm-ms')).toHaveCount(7);
+    await expect(page.locator('.rm-ms.major')).toHaveCount(3);
+    await expect(page.locator('.rm-ms-label')).toHaveText([
+      'Arch Freeze',
+      'RTL Freeze',
+      'DV Closure',
+      'Design Freeze',
+      'Tapeout',
+      'First Silicon',
+      'Mass Production',
+    ]);
+  });
+
+  test('each diamond sits exactly over the bar end it marks', async ({ page }) => {
+    const centre = async (sel: string) => {
+      const b = (await page.locator(sel).boundingBox())!;
+      return b.x + b.width / 2;
+    };
+    const barEnd = async (index: string) => {
+      const b = (await page.locator(`#rm-gantt .g-row[data-index="${index}"] .g-bar`).boundingBox())!;
+      return b.x + b.width;
+    };
+    for (const [milestone, index] of [
+      ['archFreeze', '1'],
+      ['rtlFreeze', '2'],
+      ['dvClosure', '3'],
+      ['designFreeze', '6'],
+      ['tapeout', '7'],
+      ['firstSilicon', '8'],
+      ['massProduction', '11'],
+    ] as const) {
+      expect(
+        Math.abs((await centre(`[data-msid="${milestone}"]`)) - (await barEnd(index))),
+        milestone,
+      ).toBeLessThanOrEqual(1);
+    }
+  });
+
+  test('arrow keys walk the y-axis', async ({ page }) => {
+    await selectStage(page, '03');
+    await page.locator('#rm-gantt [data-select-stage="rtl"]').focus();
+    await page.keyboard.press('ArrowDown');
+    await page.keyboard.press('Enter');
     await expect(selectedPanel(page)).toHaveAttribute('data-id', 'verification');
-    await page.keyboard.press('ArrowLeft');
+    await page.locator('#rm-gantt [data-select-stage="verification"]').focus();
+    await page.keyboard.press('ArrowUp');
+    await page.keyboard.press('Enter');
     await expect(selectedPanel(page)).toHaveAttribute('data-id', 'rtl');
-  });
-
-  test('hovering a mini-gantt bar selects that stage', async ({ page }) => {
-    await page.locator('#rm-gantt .g-row[data-index="8"] .g-bar').hover();
-    await expect(selectedPanel(page)).toHaveAttribute('data-id', 'fabrication');
-    await expect(page.locator('#rm-gantt .g-row.current')).toHaveAttribute('data-index', '8');
   });
 
   test('TODAY marker aligns pixel-exact with the gantt today line', async ({ page }) => {
@@ -98,18 +155,7 @@ test.describe('roadmap', () => {
     expect(Math.abs(marker! - line!)).toBeLessThanOrEqual(1);
   });
 
-  test('milestone diamonds render, majors carry labels', async ({ page }) => {
-    // 7 milestones; Mass Production is terminal so it draws no separate diamond
-    await expect(page.locator('.rm-ms')).toHaveCount(6);
-    await expect(page.locator('.rm-ms.major')).toHaveCount(2);
-    await expect(page.locator('.rm-ms-label')).toHaveText([
-      'Tapeout',
-      'First Silicon',
-      'Mass Production',
-    ]);
-  });
-
-  test('past stages render gray and risky bars render red', async ({ page }) => {
+  test('past bars render gray and risky bars render red', async ({ page }) => {
     // RTL closed long ago; its bar is fully past and carries no open risk
     const past = page.locator('#rm-gantt .g-row[data-index="2"] .g-bar');
     await expect(past).not.toHaveClass(/risky/);
@@ -119,7 +165,6 @@ test.describe('roadmap', () => {
     await expect(risky).toHaveClass(/risky/);
     await expect(risky).toHaveCSS('background-color', 'rgb(208, 59, 59)');
     await expect(risky.locator('.past-seg')).toHaveCount(0);
-    await expect(page.locator('.rm-station', { hasText: /^03 / })).toHaveClass(/past/);
   });
 });
 
@@ -128,7 +173,7 @@ test.describe('stage panel', () => {
     const tapeout = page.locator('[data-computed="tapeout"]');
     const before = await tapeout.textContent();
 
-    await hoverStation(page, '04');
+    await selectStage(page, '04');
     const panel = selectedPanel(page);
     await expect(panel).toHaveAttribute('data-id', 'verification');
     await expect(panel.locator('[data-role="tat"]')).toHaveText('16W TAT');
@@ -157,7 +202,7 @@ test.describe('stage panel', () => {
   });
 
   test('a start-date edit shifts the stage without changing its TAT', async ({ page }) => {
-    await hoverStation(page, '07');
+    await selectStage(page, '07');
     const panel = selectedPanel(page);
     const tat = await panel.locator('[data-role="tat"]').textContent();
     const start = await panel.locator('[data-role="start-edit"]').inputValue();
@@ -185,7 +230,7 @@ test.describe('stage panel', () => {
   });
 
   test('boards show the latest 3 with an update preview', async ({ page }) => {
-    await hoverStation(page, '06');
+    await selectStage(page, '06');
     const panel = selectedPanel(page);
     const acts = panel.locator('.board[data-kind="activities"]');
     await expect(acts.locator('.b-row')).toHaveCount(3);
@@ -198,7 +243,7 @@ test.describe('stage panel', () => {
   });
 
   test('overdue activity dues render red', async ({ page }) => {
-    await hoverStation(page, '06');
+    await selectStage(page, '06');
     await expect(
       selectedPanel(page).locator('.board[data-kind="activities"] .b-due.overdue'),
     ).toHaveCSS('color', 'rgb(208, 59, 59)');
@@ -245,7 +290,7 @@ test.describe('stage details', () => {
     page,
   }) => {
     await expect(selectedPanel(page).locator('.inline-area[data-kind="stage"]')).toBeVisible();
-    await hoverStation(page, '09');
+    await selectStage(page, '09');
     await expect(selectedPanel(page).locator('.inline-area[data-kind="stage"]')).toBeVisible();
   });
 
@@ -271,7 +316,7 @@ test.describe('stage details', () => {
   test('checking a deliverable stamps completedAt and updates the counter', async ({
     page,
   }) => {
-    await hoverStation(page, '06');
+    await selectStage(page, '06');
     const panel = selectedPanel(page);
     await expect(panel.locator('.dlv-note')).toHaveText('2 / 5 complete');
 
@@ -335,7 +380,7 @@ test.describe('stage details', () => {
 
 test.describe('risk library and leader', () => {
   test('a potential risk can be tracked onto the risk board', async ({ page }) => {
-    await hoverStation(page, '02');
+    await selectStage(page, '02');
     const panel = selectedPanel(page);
     await expect(panel.locator('.board[data-kind="risks"] .b-row')).toHaveCount(0);
     await expect(panel.locator('.b-empty')).toBeVisible();

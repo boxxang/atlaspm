@@ -47,6 +47,7 @@ function App() {
   const edited = useAppStore((s) => s.edited);
   const resetSchedule = useAppStore((s) => s.resetSchedule);
   const closeAllInline = useAppStore((s) => s.closeAllInline);
+  const currentStage = useAppStore((s) => s.currentStage);
   const [mode, setMode] = useState<ViewMode>('journey');
 
   /* setMode(): the dashboard is a fixed overlay, so the page behind it locks.
@@ -106,6 +107,11 @@ function App() {
         {journeyData.map((s, i) => (
           <StagePanel stage={s} index={i} key={s.id} />
         ))}
+        {currentStage === null && (
+          <p className="panel-hint">
+            Select a stage on the concurrency chart above to open it.
+          </p>
+        )}
       </main>
 
       <Dashboard hidden={mode !== 'schedule'} />

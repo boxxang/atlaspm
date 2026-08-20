@@ -100,3 +100,23 @@ describe('line helpers', () => {
     expect(toLines('')).toEqual([]);
   });
 });
+
+describe('the engineering list is a board, not a text field', () => {
+  it('null inherits the shared activities', () => {
+    expect(resolveStageDetail(pd, null).engineeringView).toEqual([...pd.engineeringView]);
+    expect(resolveStageDetail(pd, {}).engineeringView).toEqual([...pd.engineeringView]);
+  });
+
+  it('an empty string means the program emptied it, not that it wants defaults', () => {
+    const r = resolveStageDetail(pd, { engineeringView: '' });
+    expect(r.engineeringView).toEqual([]);
+    expect(r.manMonths).toBe(0);
+    expect(r.overridden.has('engineeringView')).toBe(true);
+  });
+
+  it('keeps the row alive for an emptied list', () => {
+    expect(isEmptyOverride({ engineeringView: '' })).toBe(false);
+    expect(isEmptyOverride({ engineeringView: null })).toBe(true);
+    expect(isEmptyOverride({})).toBe(true);
+  });
+});

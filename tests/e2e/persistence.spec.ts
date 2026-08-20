@@ -1,4 +1,4 @@
-import { expect, test, type Page, SEED_PROJECT_PATH } from './fixtures';
+import { expect, test, type Page, SEED_PROJECT_PATH, selectStage } from './fixtures';
 
 /**
  * Phase 6 acceptance: every mutation survives a hard refresh.
@@ -10,22 +10,21 @@ import { expect, test, type Page, SEED_PROJECT_PATH } from './fixtures';
 test.describe.configure({ mode: 'serial' });
 
 const selectedPanel = (page: Page) => page.locator('.stage-panel.selected');
-const hoverStation = (page: Page, num: string) =>
-  page.locator('.rm-station', { hasText: new RegExp(`^${num} `) }).hover();
 
 /** Full document reload — nothing survives in memory. */
 const hardRefresh = async (page: Page) => {
   await page.reload({ waitUntil: 'load' });
-  await expect(page.locator('.stage-panel.selected')).toBeVisible();
+  /* a reload clears the stage selection, so reopen the first stage */
+  await selectStage(page, '01');
 };
 
 test.beforeEach(async ({ page }) => {
   await page.goto(SEED_PROJECT_PATH);
-  await expect(page.locator('.stage-panel.selected')).toBeVisible();
+  await selectStage(page, '01');
 });
 
 test('creating an activity persists', async ({ page }) => {
-  await hoverStation(page, '06');
+  await selectStage(page, '06');
   const board = selectedPanel(page).locator('.board[data-kind="activities"]');
   await board.locator('[data-add]').click();
   await page.locator('.ie-title').fill('Persisted ECO review');
@@ -36,7 +35,7 @@ test('creating an activity persists', async ({ page }) => {
   await expect(page.locator('#modal .modal-win')).toBeHidden();
 
   await hardRefresh(page);
-  await hoverStation(page, '06');
+  await selectStage(page, '06');
   const top = selectedPanel(page).locator('.board[data-kind="activities"] .b-row').first();
   await expect(top.locator('.t')).toHaveText('Persisted ECO review');
   await expect(top.locator('.b-owner')).toHaveText('I. Berg');
@@ -51,14 +50,14 @@ test('creating an activity persists', async ({ page }) => {
   await page.locator('[data-del]').click();
   await page.locator('#modal-close').click();
   await hardRefresh(page);
-  await hoverStation(page, '06');
+  await selectStage(page, '06');
   await expect(
     selectedPanel(page).locator('.board[data-kind="activities"] .b-row').first().locator('.t'),
   ).not.toHaveText('Persisted ECO review');
 });
 
 test('posting a status update persists, and editing keeps its timestamp', async ({ page }) => {
-  await hoverStation(page, '06');
+  await selectStage(page, '06');
   await selectedPanel(page).locator('.board[data-kind="activities"] [data-more]').click();
   await page.locator('#modal-body .b-row', { hasText: 'ECO drop 1 planning' }).click();
   await page.locator('.su-input').fill('Persisted through a reload.');
@@ -66,7 +65,7 @@ test('posting a status update persists, and editing keeps its timestamp', async 
   const stamp = await page.locator('.su-item .su-date').textContent();
 
   await hardRefresh(page);
-  await hoverStation(page, '06');
+  await selectStage(page, '06');
   await selectedPanel(page).locator('.board[data-kind="activities"] [data-more]').click();
   await page.locator('#modal-body .b-row', { hasText: 'ECO drop 1 planning' }).click();
   await expect(page.locator('.su-item')).toHaveCount(1);
@@ -78,7 +77,7 @@ test('posting a status update persists, and editing keeps its timestamp', async 
   await page.locator('.su-edit-input').fill('Edited, then reloaded.');
   await page.locator('[data-su-save]').click();
   await hardRefresh(page);
-  await hoverStation(page, '06');
+  await selectStage(page, '06');
   await selectedPanel(page).locator('.board[data-kind="activities"] [data-more]').click();
   await page.locator('#modal-body .b-row', { hasText: 'ECO drop 1 planning' }).click();
   await expect(page.locator('.su-item .su-text')).toHaveText('Edited, then reloaded.');
@@ -87,14 +86,14 @@ test('posting a status update persists, and editing keeps its timestamp', async 
   await page.locator('[data-su-del]').click();
   await expect(page.locator('.su-empty')).toBeVisible();
   await hardRefresh(page);
-  await hoverStation(page, '06');
+  await selectStage(page, '06');
   await selectedPanel(page).locator('.board[data-kind="activities"] [data-more]').click();
   await page.locator('#modal-body .b-row', { hasText: 'ECO drop 1 planning' }).click();
   await expect(page.locator('.su-empty')).toBeVisible();
 });
 
 test('checking a deliverable persists with its completion stamp', async ({ page }) => {
-  await hoverStation(page, '06');
+  await selectStage(page, '06');
   const panel = selectedPanel(page);
   const row = panel.locator('.dlv-list li').nth(2);
   await expect(row.locator('.dlv-comp')).toHaveText('—');
@@ -103,7 +102,7 @@ test('checking a deliverable persists with its completion stamp', async ({ page 
   await expect(panel.locator('.dlv-note')).toHaveText('3 / 5 complete');
 
   await hardRefresh(page);
-  await hoverStation(page, '06');
+  await selectStage(page, '06');
   const after = selectedPanel(page).locator('.dlv-list li').nth(2);
   await expect(after.locator('input[type="checkbox"]')).toBeChecked();
   await expect(after.locator('.dlv-comp')).toHaveText(stamped!);
@@ -115,7 +114,7 @@ test('checking a deliverable persists with its completion stamp', async ({ page 
 
   await after.locator('input[type="checkbox"]').uncheck();
   await hardRefresh(page);
-  await hoverStation(page, '06');
+  await selectStage(page, '06');
   await expect(
     selectedPanel(page).locator('.dlv-list li').nth(2).locator('.dlv-comp'),
   ).toHaveText('—');
@@ -125,7 +124,7 @@ test('a DV end-date edit persists as effective overrides', async ({ page }) => {
   const tapeout = page.locator('[data-computed="tapeout"]');
   const before = await tapeout.textContent();
 
-  await hoverStation(page, '04');
+  await selectStage(page, '04');
   const panel = selectedPanel(page);
   const end = await panel.locator('[data-role="end-edit"]').inputValue();
   const [y, m, d] = end.split('-').map(Number);
@@ -143,7 +142,7 @@ test('a DV end-date edit persists as effective overrides', async ({ page }) => {
   await hardRefresh(page);
   await expect(tapeout).toHaveText(shifted!);
   await expect(page.locator('.edited-flag')).toBeVisible();
-  await hoverStation(page, '04');
+  await selectStage(page, '04');
   await expect(selectedPanel(page).locator('[data-role="tat"]')).toHaveText('20W TAT');
   await expect(selectedPanel(page).locator('[data-role="end-edit"]')).toHaveValue(iso);
 

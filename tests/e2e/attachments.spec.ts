@@ -1,7 +1,7 @@
 import { writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { tmpdir } from 'node:os';
-import { expect, test, type Page, SEED_PROJECT_PATH } from './fixtures';
+import { expect, test, type Page, SEED_PROJECT_PATH, selectStage } from './fixtures';
 
 /** A 32×32 PNG and a plain text file, written once for the suite. */
 const dir = tmpdir();
@@ -19,7 +19,7 @@ writeFileSync(TXT, 'PDN rev 2 notes\nball map pending');
 writeFileSync(BIG, Buffer.alloc(6 * 1024 * 1024, 1)); // over the 5MB ceiling
 
 const openItem = async (page: Page, title: string) => {
-  await page.locator('.rm-station', { hasText: /^06 / }).hover();
+  await selectStage(page, '06');
   await page
     .locator('.stage-panel.selected .board[data-kind="activities"] [data-more]')
     .click();
@@ -29,7 +29,7 @@ const openItem = async (page: Page, title: string) => {
 
 test.beforeEach(async ({ page }) => {
   await page.goto(SEED_PROJECT_PATH);
-  await expect(page.locator('.stage-panel.selected')).toBeVisible();
+  await selectStage(page, '01');
 });
 
 test.describe('attaching to an item', () => {

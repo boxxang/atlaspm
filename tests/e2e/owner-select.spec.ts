@@ -1,12 +1,10 @@
-import { expect, test, type Page, SEED_PROJECT_PATH } from './fixtures';
+import { expect, test, type Page, SEED_PROJECT_PATH, selectStage } from './fixtures';
 
 /**
  * Owners come from the people recorded on the stage — its leader and its
  * engineering contacts — rather than from free text.
  */
 const panel = (page: Page) => page.locator('.stage-panel.selected');
-const hoverStation = (page: Page, num: string) =>
-  page.locator('.rm-station', { hasText: new RegExp(`^${num} `) }).hover();
 
 const openEditor = async (page: Page, kind: string) => {
   await panel(page).locator(`.board[data-kind="${kind}"] [data-add]`).click();
@@ -15,7 +13,7 @@ const openEditor = async (page: Page, kind: string) => {
 
 test.beforeEach(async ({ page }) => {
   await page.goto(SEED_PROJECT_PATH);
-  await expect(page.locator('.stage-panel.selected')).toBeVisible();
+  await selectStage(page, '01');
 });
 
 test.describe('picking an owner', () => {
@@ -64,7 +62,7 @@ test.describe('picking an owner', () => {
   });
 
   test('the list follows the stage you are on', async ({ page }) => {
-    await hoverStation(page, '06');
+    await selectStage(page, '06');
     await openEditor(page, 'risks');
     await expect(page.locator('.ie-owner optgroup[label="Stage leader"] option')).toHaveText([
       'Grace Park (G. Park)',
@@ -94,7 +92,7 @@ test.describe('picking an owner', () => {
   test('an existing owner stays selected even when they left the contact list', async ({
     page,
   }) => {
-    await hoverStation(page, '06');
+    await selectStage(page, '06');
     // "M. Bianchi" owns a seeded activity; remove the contact behind them
     const rows = panel(page).locator('.contacts-sec .c-row:not(.editing)');
     await rows.filter({ hasText: 'Marco Bianchi' }).locator('[data-c-del]').click();
@@ -130,6 +128,7 @@ test.describe('picking an owner', () => {
     await page.locator('.pf-kickoff').fill('2029-02-05');
     await page.locator('[data-create]').click();
     await page.waitForURL(/\/p\/ownerx1-/);
+    await selectStage(page, '01');
 
     await openEditor(page, 'activities');
     await expect(page.locator('.ie-owner option')).toHaveText([

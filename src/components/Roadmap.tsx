@@ -1,164 +1,113 @@
 'use client';
 
-import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { useMemo } from 'react';
 import { journeyData } from '@/data/journey';
-import { lifecyclePhases, milestoneDefs, phaseOfStage } from '@/data/scheduleProfiles';
-import { fmtDate, fmtDateShort, fmtW } from '@/lib/schedule';
+import { lifecyclePhases, phaseOfStage } from '@/data/scheduleProfiles';
+import { fmtDate } from '@/lib/schedule';
 import { useAppStore } from '@/store/useAppStore';
-import { Gantt } from './Gantt';
+import { Gantt, useGanttGeometry } from './Gantt';
 
-const N = journeyData.length;
-
-/** Milestone diamonds sit between stations; the terminal one is the station. */
-const milestoneMarks = milestoneDefs.map((m) => {
-  const i = journeyData.findIndex((s) => s.id === m.anchor.stage);
-  const isTerminal = i === N - 1;
-  const pct = isTerminal ? 100 : Math.min((i + 0.5) / (N - 1), 0.995) * 100;
-  return { ...m, isTerminal, pct, shift: pct > 92 ? 'translateX(-100%)' : 'translateX(-50%)' };
-});
-
+/**
+ * The roadmap is one date axis read twice.
+ *
+ * Across the top: the lifecycle phases and the milestone diamonds, positioned
+ * by date. Down the side: the twelve stages, as bars on the concurrency chart.
+ * Both share the geometry from useGanttGeometry and the same left gutter, so a
+ * diamond sits exactly above the bar end it marks.
+ *
+ * Picking a bar opens that stage below; picking it again closes it.
+ */
 export function Roadmap() {
   const schedule = useAppStore((s) => s.schedule);
+  const kickoff = useAppStore((s) => s.kickoff);
   const today = useAppStore((s) => s.today);
   const currentStage = useAppStore((s) => s.currentStage);
   const selectStage = useAppStore((s) => s.selectStage);
+  const { minWeek, total, todayPct, todayVisible } = useGanttGeometry(schedule, kickoff, today);
 
-  const lineRef = useRef<HTMLDivElement>(null);
-  const wrapRef = useRef<HTMLDivElement>(null);
-  const stationsRef = useRef<HTMLDivElement>(null);
-  const [progressPx, setProgressPx] = useState(0);
-  const [todayLeft, setTodayLeft] = useState<number | null>(null);
+  const pctOfWeek = (week: number) => ((week - minWeek) / total) * 100;
 
-  /* The station-line TODAY marker aligns pixel-exact with the gantt's today
-     line, and the progress fill tracks the station line's measured width. */
-  const measure = useCallback(() => {
-    const line = lineRef.current;
-    if (line) setProgressPx((line.clientWidth * currentStage) / (N - 1));
-    const g = document.querySelector('#rm-gantt .g-today');
-    const wrap = wrapRef.current;
-    if (!g || !wrap) {
-      setTodayLeft(null);
-      return;
-    }
-    const lr = g.getBoundingClientRect();
-    const wr = wrap.getBoundingClientRect();
-    setTodayLeft(lr.left - wr.left + lr.width / 2);
-  }, [currentStage]);
+  /**
+   * Phases overlap in time — stages are concurrent by design — so a phase band
+   * cannot be its own span without covering its neighbours. Each band instead
+   * runs from where its phase starts to where the next one does, which is what
+   * a band above a date axis actually communicates: the program enters Define
+   * here, Design & Verify here.
+   */
+  const bands = useMemo(() => {
+    const starts = lifecyclePhases.map((p) =>
+      Math.min(...p.stages.map((id) => schedule.stages[id].startOffsetWeeks)),
+    );
+    return lifecyclePhases.map((p, i) => {
+      const from = pctOfWeek(starts[i]);
+      const to = i + 1 < starts.length ? pctOfWeek(starts[i + 1]) : 100;
+      return { id: p.id, label: p.label, left: from, width: Math.max(to - from, 0) };
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [schedule, minWeek, total]);
 
-  useLayoutEffect(measure, [measure, schedule, today]);
-  useEffect(() => {
-    window.addEventListener('resize', measure);
-    return () => window.removeEventListener('resize', measure);
-  }, [measure]);
+  /* Seven milestones on one axis collide — Design Freeze and Tapeout are a week
+     apart — so labels alternate between two rows. */
+  const marks = schedule.milestones.map((m, i) => ({
+    ...m,
+    pct: pctOfWeek(m.week),
+    row: i % 2,
+  }));
 
-  const onKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key !== 'ArrowRight' && e.key !== 'ArrowLeft') return;
-    e.preventDefault();
-    const next = Math.min(Math.max(currentStage + (e.key === 'ArrowRight' ? 1 : -1), 0), N - 1);
-    selectStage(next);
-    stationsRef.current
-      ?.querySelector<HTMLButtonElement>(`.rm-station[data-index="${next}"]`)
-      ?.focus();
-  };
-
-  const curPhase = phaseOfStage[journeyData[currentStage].id].id;
+  const currentPhase =
+    currentStage === null ? null : phaseOfStage[journeyData[currentStage].id].id;
 
   return (
     <section id="roadmap" aria-label="Development roadmap">
       <div className="rm-scroll">
-        <div id="rm-regions">
-          {lifecyclePhases.map((p) => (
-            <div
-              className={`rm-region${p.id === curPhase ? ' current' : ''}`}
-              data-phase={p.id}
-              style={{ flex: p.stages.length }}
-              key={p.id}
-            >
-              {p.label}
-            </div>
-          ))}
-        </div>
-        <div id="rm-line-wrap" ref={wrapRef}>
-          <div id="rm-line" ref={lineRef} />
-          <div id="rm-progress" style={{ width: `${progressPx}px` }} />
-          <div
-            id="rm-stations"
-            role="tablist"
-            aria-label="Stages"
-            ref={stationsRef}
-            onKeyDown={onKeyDown}
-          >
-            {journeyData.map((s, i) => {
-              const st = schedule.stages[s.id];
-              return (
-                <button
-                  className={[
-                    'rm-station',
-                    s.moment ? 'moment' : '',
-                    i === N - 1 ? 'terminal' : '',
-                    i === currentStage ? 'selected' : '',
-                    st.end < today ? 'past' : '',
-                  ]
-                    .filter(Boolean)
-                    .join(' ')}
-                  role="tab"
-                  style={{ left: `${(i / (N - 1)) * 100}%` }}
-                  data-index={i}
-                  data-tip={`${s.title}|${fmtDateShort(st.start)} → ${fmtDateShort(st.end)} · ${fmtW(st.durationWeeks)}`}
-                  aria-label={`${String(s.stage).padStart(2, '0')} ${s.shortTitle}, ${fmtDateShort(st.start)} — Stage ${s.stage}: ${s.title}`}
-                  key={s.id}
-                  onPointerOver={() => selectStage(i)}
-                  onClick={() => selectStage(i)}
-                  onFocus={() => selectStage(i)}
+        <div id="rm-axis">
+          <div id="rm-regions">
+            {bands.map((b) => (
+              <div
+                className={`rm-region${b.id === currentPhase ? ' current' : ''}`}
+                data-phase={b.id}
+                style={{ left: `${b.left}%`, width: `${b.width}%` }}
+                key={b.id}
+              >
+                <span>{b.label}</span>
+              </div>
+            ))}
+          </div>
+
+          <div id="rm-line-wrap">
+            {marks.map((m) => (
+              <span key={m.id}>
+                <span
+                  className={`rm-ms-label${m.major ? ' major' : ''}`}
+                  style={{ left: `${m.pct}%` }}
+                  data-row={m.row}
+                  data-ms-label={m.id}
                 >
-                  <span className="dot" />
-                  <span className="code">
-                    {String(s.stage).padStart(2, '0')} {s.shortTitle}
-                  </span>
-                  {/* Whitespace-only node between flex items renders as nothing,
-                      but keeps the visible text readable as "01 DEF 01/21/2026"
-                      so the aria-label below can contain it (WCAG 2.5.3). */}
-                  {' '}
-                  <span className="date" data-role="st-date">
-                    {fmtDateShort(st.start)}
-                  </span>
-                </button>
-              );
-            })}
-            {milestoneMarks.map((m) => {
-              const date = schedule.milestones.find((x) => x.id === m.id)?.date;
-              return (
-                <span key={m.id}>
-                  {!m.isTerminal && (
-                    <span
-                      className={`rm-ms${m.major ? ' major' : ''}`}
-                      style={{ left: `${m.pct}%` }}
-                      data-tip={`${m.label}|${date ? fmtDate(date) : ''}`}
-                      data-msid={m.id}
-                    />
-                  )}
-                  {m.major && (
-                    <span
-                      className="rm-ms-label"
-                      style={{ left: `${m.pct}%`, transform: m.shift }}
-                    >
-                      {m.label}
-                    </span>
-                  )}
+                  {m.label}
                 </span>
-              );
-            })}
-          </div>
-          <div id="rm-today" hidden={todayLeft === null} style={{ left: `${todayLeft ?? 0}px` }}>
-            <span className="ty-lbl">TODAY</span>
-            <span className="ty-tick" />
+                <span
+                  className={`rm-ms${m.major ? ' major' : ''}`}
+                  style={{ left: `${m.pct}%` }}
+                  data-tip={`${m.label}|${fmtDate(m.date)}`}
+                  data-msid={m.id}
+                />
+              </span>
+            ))}
+            <div id="rm-line" />
+            {todayVisible && (
+              <div id="rm-today" style={{ left: `${todayPct}%` }}>
+                <span className="ty-lbl">TODAY</span>
+                <span className="ty-tick" />
+              </div>
+            )}
           </div>
         </div>
+
         <div id="rm-gantt-cap">
           <span className="cap">Concurrency</span>
-          <span className="note">stages overlap by design — hover any bar</span>
+          <span className="note">stages overlap by design — select a bar to open it</span>
         </div>
-        <Gantt id="rm-gantt" short onHoverStage={selectStage} />
+        <Gantt id="rm-gantt" short onSelectStage={selectStage} />
       </div>
     </section>
   );

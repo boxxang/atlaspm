@@ -1,4 +1,4 @@
-import { expect, test, type Page, SEED_PROJECT_PATH } from './fixtures';
+import { expect, test, type Page, SEED_PROJECT_PATH, selectStage } from './fixtures';
 
 /**
  * The prototype's own check list, ported. These are the measurements that
@@ -7,8 +7,6 @@ import { expect, test, type Page, SEED_PROJECT_PATH } from './fixtures';
  */
 
 const selectedPanel = (page: Page) => page.locator('.stage-panel.selected');
-const hoverStation = (page: Page, num: string) =>
-  page.locator('.rm-station', { hasText: new RegExp(`^${num} `) }).hover();
 
 const lefts = (page: Page, selector: string) =>
   page.locator(selector).evaluateAll((els) =>
@@ -22,13 +20,13 @@ const centerX = async (page: Page, sel: string) => {
 
 test.beforeEach(async ({ page }) => {
   await page.goto(SEED_PROJECT_PATH);
-  await expect(page.locator('.stage-panel.selected')).toBeVisible();
+  await selectStage(page, '01');
 });
 
 test.describe('column alignment', () => {
   test('every board header cell sits exactly over its row cells', async ({ page }) => {
     // Physical Design carries rows on all three boards
-    await hoverStation(page, '06');
+    await selectStage(page, '06');
     for (const kind of ['keyinfo', 'activities', 'risks'] as const) {
       const board = `.stage-panel.selected .board[data-kind="${kind}"]`;
       const head = await lefts(page, `${board} .board-cols > span`);
@@ -73,7 +71,7 @@ test.describe('column alignment', () => {
   });
 
   test('alignment survives a column resize', async ({ page }) => {
-    await hoverStation(page, '06');
+    await selectStage(page, '06');
     const board = '.stage-panel.selected .board[data-kind="activities"]';
     await dragGrip(page, page.locator(`${board} .col-grip[data-col="date"]`), 40);
     const head = await lefts(page, `${board} .board-cols > span`);
@@ -133,7 +131,7 @@ test.describe('marker registration', () => {
       (await centerX(page, '#rm-today')) - (await centerX(page, '#rm-gantt .g-today')),
     ).toBe(0);
 
-    await hoverStation(page, '04');
+    await selectStage(page, '04');
     const panel = selectedPanel(page);
     const end = await panel.locator('[data-role="end-edit"]').inputValue();
     const [y, m, d] = end.split('-').map(Number);
@@ -149,20 +147,6 @@ test.describe('marker registration', () => {
     ).toBe(0);
   });
 
-  test('the roadmap progress fill tracks the selected station', async ({ page }) => {
-    const width = async () => (await page.locator('#rm-progress').boundingBox())!.width;
-    const line = (await page.locator('#rm-line').boundingBox())!.width;
-    expect(await width()).toBeLessThanOrEqual(1);
-
-    await hoverStation(page, '12');
-    /* the fill is a 0.25s width transition, so poll it to its resting value */
-    await expect.poll(async () => Math.round(await width())).toBe(Math.round(line));
-
-    await hoverStation(page, '07');
-    await expect
-      .poll(async () => Math.round(await width()))
-      .toBe(Math.round((line * 6) / 11));
-  });
 });
 
 /** Drag a grip by dx, with the grip scrolled clear of the sticky roadmap. */
@@ -183,7 +167,7 @@ async function dragGrip(page: Page, grip: ReturnType<Page['locator']>, dx: numbe
 
 test.describe('boundary drags', () => {
   test('the boundary follows the cursor, pixel for pixel', async ({ page }) => {
-    await hoverStation(page, '06');
+    await selectStage(page, '06');
     const board = '.stage-panel.selected .board[data-kind="activities"]';
     const ownerLeft = async () => (await lefts(page, `${board} .board-cols > span`))[2];
 
@@ -254,7 +238,7 @@ test.describe('pagination', () => {
     // deleting entries until page 2 empties clamps the pager back to page 1
     await page.locator('#modal-close').click();
     await page.locator('#mode-toggle button[data-mode="journey"]').click();
-    await hoverStation(page, '06');
+    await selectStage(page, '06');
     await selectedPanel(page).locator('.board[data-kind="activities"] [data-more]').click();
     await expect(page.locator('#modal-body .b-row')).toHaveCount(6);
     await expect(page.locator('.pager')).toHaveCount(0); // 6 entries, one page
@@ -374,7 +358,8 @@ test.describe('reduced motion', () => {
   test.beforeEach(async ({ page }) => {
     await page.emulateMedia({ reducedMotion: 'reduce' });
     await page.reload();
-    await expect(page.locator('.stage-panel.selected')).toBeVisible();
+    /* a reload clears the selection, so open a stage again */
+    await selectStage(page, '01');
     expect(
       await page.evaluate(() => matchMedia('(prefers-reduced-motion: reduce)').matches),
     ).toBe(true);
@@ -407,12 +392,12 @@ test.describe('reduced motion', () => {
     // without the preference these are the real durations
     await page.emulateMedia({ reducedMotion: 'no-preference' });
     await page.reload();
-    await expect(page.locator('.stage-panel.selected')).toBeVisible();
+    await selectStage(page, '01');
     expect((await durations('#modal-scrim', 'transitionDuration'))[0]).toBeCloseTo(0.2, 2);
   });
 
   test('the app still works with motion off', async ({ page }) => {
-    await hoverStation(page, '06');
+    await selectStage(page, '06');
     await expect(selectedPanel(page)).toHaveAttribute('data-id', 'physicalDesign');
     await selectedPanel(page).locator('.board[data-kind="risks"] [data-more]').click();
     await expect(page.locator('#modal .modal-win')).toBeVisible();

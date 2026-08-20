@@ -1,12 +1,10 @@
-import { expect, test, type Page, SEED_PROJECT_PATH } from './fixtures';
+import { expect, test, type Page, SEED_PROJECT_PATH, selectStage } from './fixtures';
 
 /**
  * Man-months are recorded per engineering line, summed into a stage figure that
  * the gantt bars carry, and summed again into the program's effort and cost.
  */
 const panel = (page: Page) => page.locator('.stage-panel.selected');
-const hoverStation = (page: Page, num: string) =>
-  page.locator('.rm-station', { hasText: new RegExp(`^${num} `) }).hover();
 
 /** toHaveValue takes one value; the table has an input per line. */
 const effortValues = (page: Page) =>
@@ -16,18 +14,19 @@ const effortValues = (page: Page) =>
 
 test.beforeEach(async ({ page }) => {
   await page.goto(SEED_PROJECT_PATH);
-  await expect(page.locator('.stage-panel.selected')).toBeVisible();
+  await selectStage(page, '01');
 });
 
 test.describe('the engineering table', () => {
   test('lists each activity with its man-months and a stage total', async ({ page }) => {
-    await expect(panel(page).locator('.mm-cols > span')).toHaveText([
+    await expect(panel(page).locator('.mm-cols > span').first()).toHaveText(
       'Engineering activity',
-      'M/M',
-    ]);
+    );
+    await expect(panel(page).locator('.mm-cols > span').nth(1)).toHaveText('M/M');
     const rows = panel(page).locator('.mm-list li');
     await expect(rows).toHaveCount(5);
-    await expect(rows.first().locator('.mm-t')).toHaveText(
+    // each line is editable, so its title is an input
+    await expect(rows.first().locator('.mm-t')).toHaveValue(
       'Performance / power / area target modeling',
     );
     expect(await effortValues(page)).toEqual(['2', '2', '1.5', '1.5', '1']);
@@ -46,16 +45,17 @@ test.describe('the engineering table', () => {
     await panel(page).locator('.mm-input').first().fill('6');
     await expect(panel(page).locator('[data-stage-mm]')).toHaveText('12 MM');
     await page.reload();
+    await selectStage(page, '01');
     await expect(panel(page).locator('.mm-input').first()).toHaveValue('6');
     await expect(panel(page).locator('[data-stage-mm]')).toHaveText('12 MM');
   });
 
   test('every stage keeps its own figures', async ({ page }) => {
-    await hoverStation(page, '04');
+    await selectStage(page, '04');
     await expect(panel(page).locator('[data-stage-mm]')).toHaveText('180 MM');
-    await hoverStation(page, '06');
+    await selectStage(page, '06');
     await expect(panel(page).locator('[data-stage-mm]')).toHaveText('140 MM');
-    await hoverStation(page, '08');
+    await selectStage(page, '08');
     await expect(panel(page).locator('.mm-list li')).toHaveCount(4);
     await expect(panel(page).locator('[data-stage-mm]')).toHaveText('10 MM');
   });
@@ -67,6 +67,79 @@ test.describe('the engineering table', () => {
     await expect(panel(page).locator('.sheet-what')).toHaveText('Reworded, same effort.');
     await expect(panel(page).locator('[data-stage-mm]')).toHaveText('8 MM');
     expect(await effortValues(page)).toEqual(['2', '2', '1.5', '1.5', '1']);
+  });
+});
+
+test.describe('managing the engineering list', () => {
+  test('an activity can be added with its man-months', async ({ page }) => {
+    await expect(panel(page).locator('.mm-list li')).toHaveCount(5);
+    await panel(page).locator('.mm-new').fill('Package feasibility study');
+    await panel(page).locator('.mm-new-mm').fill('3');
+    await panel(page).locator('[data-mm-add]').click();
+
+    const rows = panel(page).locator('.mm-list li');
+    await expect(rows).toHaveCount(6);
+    await expect(rows.last().locator('.mm-t')).toHaveValue('Package feasibility study');
+    await expect(rows.last().locator('.mm-input')).toHaveValue('3');
+    await expect(panel(page).locator('[data-stage-mm]')).toHaveText('11 MM');
+    // the inputs clear for the next one
+    await expect(panel(page).locator('.mm-new')).toHaveValue('');
+    await expect(panel(page).locator('.mm-new-mm')).toHaveValue('');
+  });
+
+  test('an activity can be renamed and deleted', async ({ page }) => {
+    await panel(page).locator('.mm-t').first().fill('PPA modelling, our wording');
+    await expect(panel(page).locator('.mm-t').first()).toHaveValue('PPA modelling, our wording');
+
+    await panel(page).locator('.mm-list li').first().locator('[data-mm-del]').click();
+    await expect(panel(page).locator('.mm-list li')).toHaveCount(4);
+    // deleting takes its man-months with it
+    await expect(panel(page).locator('[data-stage-mm]')).toHaveText('6 MM');
+  });
+
+  test('the list and its figures survive a reload', async ({ page }) => {
+    await panel(page).locator('.mm-new').fill('Extra study');
+    await panel(page).locator('.mm-new-mm').fill('4');
+    await panel(page).locator('[data-mm-add]').click();
+    await panel(page).locator('.mm-list li').first().locator('[data-mm-del]').click();
+    await expect(panel(page).locator('[data-stage-mm]')).toHaveText('10 MM');
+
+    await page.reload();
+    await selectStage(page, '01');
+    await expect(panel(page).locator('.mm-list li')).toHaveCount(5);
+    await expect(panel(page).locator('.mm-t').last()).toHaveValue('Extra study');
+    await expect(panel(page).locator('[data-stage-mm]')).toHaveText('10 MM');
+  });
+
+  test('emptying the list leaves it empty rather than restoring the default', async ({
+    page,
+  }) => {
+    for (let i = 0; i < 5; i++) {
+      await panel(page).locator('.mm-list li').first().locator('[data-mm-del]').click();
+    }
+    await expect(panel(page).locator('.mm-empty')).toBeVisible();
+    await expect(panel(page).locator('[data-stage-mm]')).toHaveText('0 MM');
+    await page.reload();
+    await selectStage(page, '01');
+    await expect(panel(page).locator('.mm-empty')).toBeVisible();
+  });
+
+  test('a nameless activity will not be added', async ({ page }) => {
+    await panel(page).locator('.mm-new-mm').fill('5');
+    await panel(page).locator('[data-mm-add]').click();
+    await expect(panel(page).locator('.mm-list li')).toHaveCount(5);
+    await expect(panel(page).locator('[data-stage-mm]')).toHaveText('8 MM');
+  });
+
+  test('it belongs to one stage of one program', async ({ page }) => {
+    await panel(page).locator('.mm-new').fill('Only here');
+    await panel(page).locator('.mm-new-mm').fill('2');
+    await panel(page).locator('[data-mm-add]').click();
+    await expect(panel(page).locator('.mm-list li')).toHaveCount(6);
+
+    await selectStage(page, '06');
+    await expect(panel(page).locator('.mm-list li')).toHaveCount(5);
+    await expect(panel(page).locator('[data-stage-mm]')).toHaveText('140 MM');
   });
 });
 
@@ -85,7 +158,7 @@ test.describe('effort on the schedule', () => {
   });
 
   test('a changed figure reaches the bars', async ({ page }) => {
-    await hoverStation(page, '04');
+    await selectStage(page, '04');
     await panel(page).locator('.mm-input').first().fill('80');
     await expect(page.locator('#rm-gantt [data-stage-mm="verification"]')).toHaveText('200 MM');
   });
@@ -98,6 +171,7 @@ test.describe('effort on the schedule', () => {
     await page.locator('[data-create]').click();
     await page.waitForURL(/\/p\/effortx1-/);
     await expect(page.locator('#rm-gantt .g-mm-tag')).toHaveCount(0);
+    await selectStage(page, '01');
     await expect(panel(page).locator('[data-stage-mm]')).toHaveText('0 MM');
     await expect(panel(page).locator('.mm-input').first()).toHaveValue('');
   });
@@ -129,7 +203,7 @@ test.describe('effort and cost for the program', () => {
   });
 
   test('a changed stage figure moves the program total', async ({ page }) => {
-    await hoverStation(page, '04');
+    await selectStage(page, '04');
     await panel(page).locator('.mm-input').first().fill('80');
     await page.locator('#mode-toggle button[data-mode="schedule"]').click();
     await expect(page.locator('[data-total-mm]')).toHaveText('729 MM');
@@ -148,7 +222,7 @@ test.describe('effort and cost for the program', () => {
   });
 
   test('the card follows an edit made inside the program', async ({ page }) => {
-    await hoverStation(page, '04');
+    await selectStage(page, '04');
     await panel(page).locator('.mm-input').first().fill('80');
     await page.locator('#to-programs').click();
     const card = page.locator('.pl-card').filter({ hasText: 'AtlasAX1' });

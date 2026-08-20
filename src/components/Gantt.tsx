@@ -46,12 +46,13 @@ export function useGanttGeometry(schedule: Schedule, kickoff: Date, today: Date)
 export function Gantt({
   id,
   short = false,
-  onHoverStage,
+  onSelectStage,
 }: {
   id?: string;
   /** Mini variant: short row labels, every other month, no checkpoints. */
   short?: boolean;
-  onHoverStage?: (index: number) => void;
+  /** Makes each row a target that opens its stage below. */
+  onSelectStage?: (index: number | null) => void;
 }) {
   const schedule = useAppStore((s) => s.schedule);
   const kickoff = useAppStore((s) => s.kickoff);
@@ -134,7 +135,34 @@ export function Gantt({
               className={`g-row${i === currentStage ? ' current' : ''}`}
               data-index={i}
               key={s.id}
+              role={onSelectStage ? 'tab' : undefined}
+              aria-selected={onSelectStage ? i === currentStage : undefined}
             >
+              {/* A hit target over the whole row rather than only the bar: a
+                  one-week stage is a few pixels wide. It carries the bar's
+                  tooltip so hovering anywhere on the row still explains it. */}
+              {onSelectStage && (
+                <button
+                  className="g-row-hit"
+                  data-select-stage={s.id}
+                  aria-label={`${s.title} — ${fmtDate(st.start)} to ${fmtDate(st.end)}`}
+                  data-tip={`${s.title}${risky ? ' ⚠' : ''}|${fmtDate(st.start)} → ${fmtDate(st.end)} · ${fmtW(st.durationWeeks)}`}
+                  onClick={() => onSelectStage(i)}
+                  onKeyDown={(e) => {
+                    if (e.key !== 'ArrowDown' && e.key !== 'ArrowUp') return;
+                    e.preventDefault();
+                    const next = Math.min(
+                      Math.max(i + (e.key === 'ArrowDown' ? 1 : -1), 0),
+                      journeyData.length - 1,
+                    );
+                    document
+                      .querySelector<HTMLButtonElement>(
+                        `.g-row[data-index="${next}"] .g-row-hit`,
+                      )
+                      ?.focus();
+                  }}
+                />
+              )}
               <span className="g-row-label" title={s.title}>
                 {short ? s.shortTitle : s.title}
               </span>
@@ -154,8 +182,11 @@ export function Gantt({
                   className={`g-bar${risky ? ' risky' : ''}`}
                   style={{ left: `${left}%`, width: `${width}%` }}
                   data-index={i}
-                  data-tip={`${s.title}${risky ? ' ⚠' : ''}|${fmtDate(st.start)} → ${fmtDate(st.end)} · ${fmtW(st.durationWeeks)}`}
-                  onPointerOver={onHoverStage ? () => onHoverStage(i) : undefined}
+                  data-tip={
+                    onSelectStage
+                      ? undefined
+                      : `${s.title}${risky ? ' ⚠' : ''}|${fmtDate(st.start)} → ${fmtDate(st.end)} · ${fmtW(st.durationWeeks)}`
+                  }
                 >
                   {showPast && (
                     <span className="past-seg" style={{ width: `${(pastFrac * 100).toFixed(1)}%` }} />

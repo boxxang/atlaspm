@@ -1,4 +1,4 @@
-import { expect, test, type Page, SEED_PROJECT_PATH } from './fixtures';
+import { expect, test, type Page, SEED_PROJECT_PATH, selectStage } from './fixtures';
 
 /**
  * Stage definitions live in code and are shared by every program. A program
@@ -6,15 +6,13 @@ import { expect, test, type Page, SEED_PROJECT_PATH } from './fixtures';
  * than freezing a copy of it.
  */
 const panel = (page: Page) => page.locator('.stage-panel.selected');
-const hoverStation = (page: Page, num: string) =>
-  page.locator('.rm-station', { hasText: new RegExp(`^${num} `) }).hover();
 
 const SHARED_DESCRIPTION =
   'Define what the product needs to achieve and establish the technical, business, cost, and schedule boundaries of the program before any design work begins.';
 
 test.beforeEach(async ({ page }) => {
   await page.goto(SEED_PROJECT_PATH);
-  await expect(page.locator('.stage-panel.selected')).toBeVisible();
+  await selectStage(page, '01');
 });
 
 test.describe('editing stage detail', () => {
@@ -26,12 +24,11 @@ test.describe('editing stage detail', () => {
     await expect(panel(page).locator('.sd-edit')).toBeVisible();
     await expect(panel(page).locator('.sd-description')).toHaveValue(SHARED_DESCRIPTION);
     // lists arrive one per line
-    await expect(panel(page).locator('.sd-eng')).toHaveValue(
-      /Performance \/ power \/ area target modeling\nCandidate technology node evaluation/,
-    );
     await expect(panel(page).locator('.sd-tools')).toHaveValue(
       'Requirements management\nCost modeling\nFeasibility analysis',
     );
+    // the engineering list is managed in its own table, not in this form
+    await expect(panel(page).locator('.sd-eng')).toHaveCount(0);
     // the pencil hides while editing
     await expect(panel(page).locator('[data-sd-edit]')).toHaveCount(0);
   });
@@ -39,16 +36,10 @@ test.describe('editing stage detail', () => {
   test('saving rewrites the sheet and marks the stage edited', async ({ page }) => {
     await panel(page).locator('[data-sd-edit]').click();
     await panel(page).locator('.sd-description').fill('Our own framing of definition.');
-    await panel(page).locator('.sd-eng').fill('Workload-driven PPA modelling\nHBM3 budget');
     await panel(page).locator('[data-sd-save]').click();
 
     await expect(panel(page).locator('.sd-edit')).toHaveCount(0);
     await expect(panel(page).locator('.sheet-what')).toHaveText('Our own framing of definition.');
-    // the engineering side is a man-month table, not a plain list
-    await expect(panel(page).locator('[data-pane="eng"] .mm-list .mm-t')).toHaveText([
-      'Workload-driven PPA modelling',
-      'HBM3 budget',
-    ]);
     await expect(panel(page).locator('.sd-flag')).toHaveText('EDITED');
     // untouched fields still come from the shared definition
     await expect(panel(page).locator('[data-pane="eng"] .view-foot .mono')).toHaveText(
@@ -87,6 +78,7 @@ test.describe('editing stage detail', () => {
     await expect(panel(page).locator('.sheet-what')).toHaveText('Persisted framing.');
 
     await page.reload();
+    await selectStage(page, '01');
     await expect(panel(page).locator('.sheet-what')).toHaveText('Persisted framing.');
     await expect(panel(page).locator('.sd-flag')).toHaveText('EDITED');
   });
@@ -107,17 +99,17 @@ test.describe('editing stage detail', () => {
   test('Restore defaults drops every edit on the stage', async ({ page }) => {
     await panel(page).locator('[data-sd-edit]').click();
     await panel(page).locator('.sd-description').fill('Custom.');
-    await panel(page).locator('.sd-eng').fill('Only this');
+    await panel(page).locator('.sd-prog').fill('Only this');
     await panel(page).locator('[data-sd-save]').click();
     await expect(panel(page).locator('.sd-flag')).toBeVisible();
 
     await panel(page).locator('[data-sd-edit]').click();
     await panel(page).locator('[data-sd-restore]').click();
     await expect(panel(page).locator('.sheet-what')).toHaveText(SHARED_DESCRIPTION);
-    await expect(panel(page).locator('[data-pane="eng"] .mm-list li')).toHaveCount(5);
     await expect(panel(page).locator('.sd-flag')).toHaveCount(0);
 
     await page.reload();
+    await selectStage(page, '01');
     await expect(panel(page).locator('.sheet-what')).toHaveText(SHARED_DESCRIPTION);
   });
 
@@ -127,7 +119,7 @@ test.describe('editing stage detail', () => {
     await panel(page).locator('[data-sd-save]').click();
 
     // another stage of the same program keeps the shared text
-    await hoverStation(page, '06');
+    await selectStage(page, '06');
     await expect(panel(page).locator('.sheet-what')).toContainText(
       'Transform the synthesized design into a physically realizable implementation',
     );
@@ -140,6 +132,7 @@ test.describe('editing stage detail', () => {
     await page.locator('.pf-kickoff').fill('2029-01-08');
     await page.locator('[data-create]').click();
     await page.waitForURL(/\/p\/detailx1-/);
+    await selectStage(page, '01');
     await expect(panel(page).locator('.sheet-what')).toHaveText(SHARED_DESCRIPTION);
     await expect(panel(page).locator('.sd-flag')).toHaveCount(0);
   });

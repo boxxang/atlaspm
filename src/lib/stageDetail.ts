@@ -66,7 +66,17 @@ export function resolveStageDetail(
     return toLines(v);
   };
 
-  const engineeringView = list('engineeringView', stage.engineeringView);
+  /**
+   * engineeringView is the one field with a third state. The pencil form treats
+   * a blank as "restore the shared text", but the engineering board is a list
+   * the program owns: emptying it means the stage has no engineering activities,
+   * not that it should inherit five again. So null means "not overridden" and an
+   * empty string means "deliberately empty".
+   */
+  const rawView = override?.engineeringView;
+  const engineeringView =
+    rawView === null || rawView === undefined ? [...stage.engineeringView] : toLines(rawView);
+  if (rawView !== null && rawView !== undefined) overridden.add('engineeringView');
   /* Effort is data this program recorded, not a divergence from the shared
      stage text, so it deliberately does not count towards `overridden`. */
   const engineeringEffort = parseEffort(override?.engineeringEffort, engineeringView.length);
@@ -129,7 +139,8 @@ export function normaliseOverride(
 /** True when nothing is overridden any more, so the row can be dropped. */
 export const isEmptyOverride = (o: StageDetailOverride) =>
   !o.description &&
-  !o.engineeringView &&
+  /* '' is a real value here — see resolveStageDetail */
+  o.engineeringView == null &&
   !o.engineeringEffort &&
   !o.programView &&
   !o.tools &&

@@ -58,6 +58,11 @@ function PencilIcon() {
  * man-months it takes, and their sum is what the stage costs in effort. That
  * total is what the gantt bars and the program's cost estimate are built on.
  */
+/**
+ * The engineering activities are a board of their own: add a line, rename it,
+ * give it man-months, delete it. That is why the pencil form no longer carries
+ * an "engineering view" textarea — this is where the list is managed.
+ */
 function EngineeringTable({
   stageId,
   detail,
@@ -65,12 +70,23 @@ function EngineeringTable({
   stageId: StageId;
   detail: ResolvedStageDetail;
 }) {
-  const setStageEffort = useAppStore((st) => st.setStageEffort);
-  const update = (index: number, raw: string) => {
-    const n = Number.parseFloat(raw);
-    const next = [...detail.engineeringEffort];
-    next[index] = Number.isFinite(n) && n >= 0 ? n : 0;
-    setStageEffort(stageId, next);
+  const setLines = useAppStore((st) => st.setEngineeringLines);
+  const [draft, setDraft] = useState('');
+  const [draftMm, setDraftMm] = useState('');
+
+  const lines = detail.engineeringView.map((label, i) => ({
+    label,
+    manMonths: detail.engineeringEffort[i] ?? 0,
+  }));
+  const write = (next: { label: string; manMonths: number }[]) => setLines(stageId, next);
+
+  const add = () => {
+    const label = draft.trim();
+    if (!label) return;
+    const n = Number.parseFloat(draftMm);
+    write([...lines, { label, manMonths: Number.isFinite(n) && n >= 0 ? n : 0 }]);
+    setDraft('');
+    setDraftMm('');
   };
 
   return (
@@ -78,11 +94,20 @@ function EngineeringTable({
       <div className="mm-cols">
         <span>Engineering activity</span>
         <span>M/M</span>
+        <span />
       </div>
       <ul className="mm-list">
-        {detail.engineeringView.map((label, i) => (
-          <li key={label}>
-            <span className="mm-t">{label}</span>
+        {lines.map((line, i) => (
+          <li key={`${i}-${line.label}`}>
+            <input
+              className="mm-t"
+              data-mm-label={i}
+              value={line.label}
+              aria-label={`Engineering activity ${i + 1}`}
+              onChange={(e) =>
+                write(lines.map((l, j) => (j === i ? { ...l, label: e.target.value } : l)))
+              }
+            />
             <input
               type="number"
               className="mm-input"
@@ -90,14 +115,52 @@ function EngineeringTable({
               min="0"
               step="0.5"
               inputMode="decimal"
-              aria-label={`Man-months for ${label}`}
-              value={detail.engineeringEffort[i] || ''}
+              aria-label={`Man-months for ${line.label}`}
+              value={line.manMonths || ''}
               placeholder="0"
-              onChange={(e) => update(i, e.target.value)}
+              onChange={(e) => {
+                const n = Number.parseFloat(e.target.value);
+                write(
+                  lines.map((l, j) =>
+                    j === i ? { ...l, manMonths: Number.isFinite(n) && n >= 0 ? n : 0 } : l,
+                  ),
+                );
+              }}
             />
+            <button
+              data-mm-del={i}
+              aria-label={`Delete ${line.label}`}
+              onClick={() => write(lines.filter((_, j) => j !== i))}
+            >
+              ✕
+            </button>
           </li>
         ))}
+        {lines.length === 0 && <li className="mm-empty">No engineering activities yet.</li>}
       </ul>
+      <div className="mm-add">
+        <input
+          className="mm-new"
+          placeholder="New engineering activity…"
+          value={draft}
+          onChange={(e) => setDraft(e.target.value)}
+          onKeyDown={(e) => e.key === 'Enter' && add()}
+        />
+        <input
+          type="number"
+          className="mm-new-mm"
+          min="0"
+          step="0.5"
+          placeholder="M/M"
+          aria-label="Man-months for the new activity"
+          value={draftMm}
+          onChange={(e) => setDraftMm(e.target.value)}
+          onKeyDown={(e) => e.key === 'Enter' && add()}
+        />
+        <button data-mm-add onClick={add}>
+          + Add
+        </button>
+      </div>
       <div className="mm-total">
         <span className="k">Stage effort</span>
         <span className="v" data-stage-mm>
@@ -163,6 +226,7 @@ function StageDetailEditor({
   const save = useAppStore((st) => st.saveStageDetail);
   const [f, setF] = useState({
     description: detail.description,
+    /* the engineering list is managed in its own table, not here */
     engineeringView: fromLines(detail.engineeringView),
     programView: fromLines(detail.programView),
     tools: fromLines(detail.tools),
@@ -178,10 +242,6 @@ function StageDetailEditor({
         <textarea className="sd-description" value={f.description} onChange={set('description')} autoFocus />
       </label>
       <div className="sd-cols">
-        <label className="sd-field">
-          <span className="k">Engineering view — one per line</span>
-          <textarea className="sd-eng" value={f.engineeringView} onChange={set('engineeringView')} />
-        </label>
         <label className="sd-field">
           <span className="k">Program view — one per line</span>
           <textarea className="sd-prog" value={f.programView} onChange={set('programView')} />

@@ -1,4 +1,4 @@
-import { expect, test, type Page, SEED_PROJECT_PATH } from './fixtures';
+import { expect, test, type Page, SEED_PROJECT_PATH, selectStage } from './fixtures';
 
 const openDash = async (page: Page) => {
   await page.locator('#mode-toggle button[data-mode="schedule"]').click();
@@ -17,7 +17,7 @@ const cssVar = (page: Page, name: string) =>
 
 test.beforeEach(async ({ page }) => {
   await page.goto(SEED_PROJECT_PATH);
-  await expect(page.locator('.stage-panel.selected')).toBeVisible();
+  await selectStage(page, '01');
 });
 
 test.describe('stat tiles', () => {
@@ -57,7 +57,7 @@ test.describe('stat tiles', () => {
 
   test('the counters follow the data', async ({ page }) => {
     // complete one deliverable on Physical Design: 23/45 → 24/45 = 53%
-    await page.locator('.rm-station', { hasText: /^06 / }).hover();
+    await selectStage(page, '06');
     const panel = page.locator('.stage-panel.selected');
     await panel.locator('.dlv-list li').nth(2).locator('input[type="checkbox"]').check();
     await openDash(page);
@@ -68,7 +68,7 @@ test.describe('stat tiles', () => {
   });
 
   test('a stage with no open risks drops out of the risk list', async ({ page }) => {
-    await page.locator('.rm-station', { hasText: /^02 / }).hover();
+    await selectStage(page, '02');
     const panel = page.locator('.stage-panel.selected');
     await panel.locator('[data-potential]').click();
     await panel.locator('.pr-add').first().click();
@@ -187,7 +187,7 @@ test.describe('program schedule gantt', () => {
   });
 
   test('a date edit moves the bar and its diamond together', async ({ page }) => {
-    await page.locator('.rm-station', { hasText: /^04 / }).hover();
+    await selectStage(page, '04');
     const panel = page.locator('.stage-panel.selected');
     const end = await panel.locator('[data-role="end-edit"]').inputValue();
     const [y, m, d] = end.split('-').map(Number);

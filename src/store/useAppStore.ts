@@ -54,7 +54,8 @@ export interface AppState {
   /** Non-null while schedule edits are staged for review. */
   draftOverrides: StageOverrides | null;
   edited: boolean;
-  currentStage: number;
+  /** null until a bar is picked on the concurrency chart. */
+  currentStage: number | null;
   content: Record<StageId, StageContent>;
   deliverables: Record<StageId, Deliverable[]>;
   leaders: Record<StageId, Leader>;
@@ -66,7 +67,8 @@ export interface AppState {
   setProjectName: (name: string) => void;
   setKickoff: (d: Date) => void;
   setProfile: (id: ProfileId) => void;
-  selectStage: (i: number) => void;
+  /** Picking the selected stage again clears it. */
+  selectStage: (i: number | null) => void;
   editStageDate: (stageId: StageId, which: 'start' | 'end', date: Date) => void;
   /** Commit the staged dates. */
   applyScheduleDraft: () => void;
@@ -89,6 +91,11 @@ export interface AppState {
   saveStageDetail: (stageId: StageId, detail: StageDetailOverride) => void;
   /** One man-month figure per engineering line of the stage. */
   setStageEffort: (stageId: StageId, effort: number[]) => void;
+  /** Rewrites the stage's engineering list — titles and their man-months. */
+  setEngineeringLines: (
+    stageId: StageId,
+    lines: { label: string; manMonths: number }[],
+  ) => void;
   setCostRate: (rate: number, currency: string) => void;
   attachFiles: (
     stageId: StageId,
@@ -170,7 +177,7 @@ export const useAppStore = create<AppState>()((set, get) => ({
   committedSchedule: computeSchedule(BOOT_KICKOFF, scheduleProfiles.typicalSoC, {}),
   draftOverrides: null,
   edited: false,
-  currentStage: 0,
+  currentStage: null,
   content: emptyMap<StageContent>(() => ({ keyinfo: [], activities: [], risks: [] })),
   deliverables: emptyMap<Deliverable[]>(() => []),
   leaders: Object.fromEntries(
@@ -211,9 +218,8 @@ export const useAppStore = create<AppState>()((set, get) => ({
       contacts: initial.contacts,
       stageDetails: initial.stageDetails,
       /* view state belongs to the program you were looking at, not the next one */
-      currentStage: 0,
-      /* stage details are open by default on the first stage */
-      inline: { [STAGE_ORDER[0]]: { kind: 'stage', editContact: null } },
+      currentStage: null,
+      inline: {},
     });
   },
 
@@ -248,7 +254,8 @@ export const useAppStore = create<AppState>()((set, get) => ({
 
   selectStage: (i) =>
     set((s) => {
-      if (i === s.currentStage) return s;
+      /* picking the same bar again closes the panel */
+      if (i === null || i === s.currentStage) return { currentStage: null };
       const stageId = STAGE_ORDER[i];
       return {
         currentStage: i,
@@ -474,6 +481,36 @@ export const useAppStore = create<AppState>()((set, get) => ({
       },
     }));
     sync(api.setStageEffort(get().projectId, stageId, serialised));
+  },
+
+  setEngineeringLines: (stageId, lines) => {
+    const stage = journeyData.find((x) => x.id === stageId)!;
+    const labels = lines.map((l) => l.label.trim()).filter(Boolean);
+    const effort = lines.filter((l) => l.label.trim()).map((l) => l.manMonths);
+    /* A list identical to the shared default is not an override, so the stage
+       keeps tracking /data/journey.ts. An emptied list stores '' rather than
+       null, which is what tells resolveStageDetail the program meant it. */
+    const view = labels.join('\n');
+    const engineeringView = view === stage.engineeringView.join('\n') ? null : view;
+    const engineeringEffort = serialiseEffort(effort);
+
+    set((s) => ({
+      stageDetails: {
+        ...s.stageDetails,
+        [stageId]: { ...s.stageDetails[stageId], engineeringView, engineeringEffort },
+      },
+    }));
+    const detail = get().stageDetails[stageId] ?? {};
+    sync(
+      api.saveStageDetail(get().projectId, stageId, {
+        description: detail.description ?? null,
+        engineeringView,
+        engineeringEffort,
+        programView: detail.programView ?? null,
+        tools: detail.tools ?? null,
+        collaboration: detail.collaboration ?? null,
+      }),
+    );
   },
 
   setCostRate: (costPerManMonth, currency) => {

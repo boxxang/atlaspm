@@ -1,4 +1,4 @@
-import { expect, test, type Page, SEED_PROJECT_PATH } from './fixtures';
+import { expect, test, type Page, SEED_PROJECT_PATH, selectStage } from './fixtures';
 
 /**
  * The envelope buttons are real mailto links, so the assertions read the href
@@ -16,12 +16,10 @@ const draft = async (page: Page, selector: string) => {
   };
 };
 
-const hoverStation = (page: Page, num: string) =>
-  page.locator('.rm-station', { hasText: new RegExp(`^${num} `) }).hover();
 
 test.beforeEach(async ({ page }) => {
   await page.goto(SEED_PROJECT_PATH);
-  await expect(page.locator('.stage-panel.selected')).toBeVisible();
+  await selectStage(page, '01');
 });
 
 test.describe('dashboard summary export', () => {
@@ -53,7 +51,7 @@ test.describe('dashboard summary export', () => {
   });
 
   test('it tracks the data — checking a deliverable moves the summary', async ({ page }) => {
-    await hoverStation(page, '06');
+    await selectStage(page, '06');
     await page
       .locator('.stage-panel.selected .dlv-list li')
       .nth(2)
@@ -67,7 +65,7 @@ test.describe('dashboard summary export', () => {
 
 test.describe('activity export', () => {
   test('a row addresses its own owner and carries the activity', async ({ page }) => {
-    await hoverStation(page, '06');
+    await selectStage(page, '06');
     const row = page
       .locator('.stage-panel.selected .board[data-kind="activities"] .b-row')
       .filter({ hasText: 'Top-level detailed routing' });
@@ -90,7 +88,7 @@ test.describe('activity export', () => {
   });
 
   test('an overdue activity says so in the draft', async ({ page }) => {
-    await hoverStation(page, '06');
+    await selectStage(page, '06');
     const m = await draft(
       page,
       '.b-row:has-text("PDN IR-drop analysis rev 2") [data-mail]',
@@ -100,7 +98,7 @@ test.describe('activity export', () => {
   });
 
   test('the board header emails the whole list to everyone on it', async ({ page }) => {
-    await hoverStation(page, '06');
+    await selectStage(page, '06');
     const m = await draft(
       page,
       '.stage-panel.selected .board[data-kind="activities"] .board-head [data-mail]',
@@ -125,7 +123,7 @@ test.describe('activity export', () => {
   });
 
   test('the item view offers the same draft', async ({ page }) => {
-    await hoverStation(page, '06');
+    await selectStage(page, '06');
     await page
       .locator('.stage-panel.selected .board[data-kind="activities"] .b-row')
       .filter({ hasText: 'Top-level detailed routing' })
@@ -137,7 +135,7 @@ test.describe('activity export', () => {
   });
 
   test('risks and key info get an envelope too', async ({ page }) => {
-    await hoverStation(page, '06');
+    await selectStage(page, '06');
     const risk = await draft(
       page,
       '.stage-panel.selected .board[data-kind="risks"] .b-row [data-mail]',
@@ -179,7 +177,7 @@ test.describe('activity export', () => {
   });
 
   test('clicking an envelope does not open the row behind it', async ({ page }) => {
-    await hoverStation(page, '06');
+    await selectStage(page, '06');
     const row = page
       .locator('.stage-panel.selected .board[data-kind="activities"] .b-row')
       .first();

@@ -1,8 +1,6 @@
-import { expect, test, type Page, SEED_PROJECT_PATH } from './fixtures';
+import { expect, test, type Page, SEED_PROJECT_PATH, selectStage } from './fixtures';
 
 const selectedPanel = (page: Page) => page.locator('.stage-panel.selected');
-const hoverStation = (page: Page, num: string) =>
-  page.locator('.rm-station', { hasText: new RegExp(`^${num} `) }).hover();
 
 /** The aggregate boards are reached from the dashboard's stat tiles. */
 const openAgg = async (page: Page, type: 'risks' | 'overdue' | 'updates') => {
@@ -14,12 +12,12 @@ const openAgg = async (page: Page, type: 'risks' | 'overdue' | 'updates') => {
 
 test.beforeEach(async ({ page }) => {
   await page.goto(SEED_PROJECT_PATH);
-  await expect(page.locator('.stage-panel.selected')).toBeVisible();
+  await selectStage(page, '01');
 });
 
 test.describe('board pop-up', () => {
   test('Show more opens the full board, ESC and the scrim close it', async ({ page }) => {
-    await hoverStation(page, '06');
+    await selectStage(page, '06');
     await selectedPanel(page)
       .locator('.board[data-kind="activities"] [data-more]')
       .click();
@@ -63,7 +61,7 @@ test.describe('board pop-up', () => {
   });
 
   test('clicking a main-page row drills straight into the item', async ({ page }) => {
-    await hoverStation(page, '06');
+    await selectStage(page, '06');
     const row = selectedPanel(page)
       .locator('.board[data-kind="risks"] .b-row')
       .first();
@@ -79,7 +77,7 @@ test.describe('board pop-up', () => {
 
 test.describe('status update thread', () => {
   test('post, edit and delete an update', async ({ page }) => {
-    await hoverStation(page, '06');
+    await selectStage(page, '06');
     await selectedPanel(page)
       .locator('.board[data-kind="activities"] [data-more]')
       .click();
@@ -125,7 +123,7 @@ test.describe('status update thread', () => {
   });
 
   test('editing a seeded update keeps its original timestamp', async ({ page }) => {
-    await hoverStation(page, '06');
+    await selectStage(page, '06');
     await selectedPanel(page)
       .locator('.board[data-kind="activities"] .b-row')
       .filter({ hasText: 'Top-level detailed routing' })
@@ -141,7 +139,7 @@ test.describe('status update thread', () => {
   });
 
   test('a posted update surfaces on the main board preview', async ({ page }) => {
-    await hoverStation(page, '02');
+    await selectStage(page, '02');
     const board = selectedPanel(page).locator('.board[data-kind="activities"]');
     await board.locator('.b-row').first().click();
     await page.locator('.su-input').fill('Bandwidth budget re-checked against final NoC.');
@@ -160,7 +158,7 @@ test.describe('item editor', () => {
   test('+ Add from the main page closes on save and lands as the first row', async ({
     page,
   }) => {
-    await hoverStation(page, '06');
+    await selectStage(page, '06');
     const board = selectedPanel(page).locator('.board[data-kind="activities"]');
     await expect(board.locator('.board-head .note')).toHaveText('6 items · 6 updates');
 
@@ -195,7 +193,7 @@ test.describe('item editor', () => {
   test('editing from the item view returns to the item, and Delete returns to the board', async ({
     page,
   }) => {
-    await hoverStation(page, '06');
+    await selectStage(page, '06');
     await selectedPanel(page).locator('.board[data-kind="risks"] [data-more]').click();
     await expect(page.locator('#modal-body .b-row')).toHaveCount(3);
 

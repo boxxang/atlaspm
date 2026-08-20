@@ -85,11 +85,17 @@ Pure logic never imports UI, and `/src/lib` + `/src/data` never touch the DOM �
 - **Stage detail editing.** The pencil in the Stage Details header edits that
   program's copy of the stage text. A field only becomes an override when it
   differs from the shared definition, so emptying it restores the default.
+- **One date axis, read twice.** The roadmap carries the lifecycle bands and the
+  milestone diamonds across the top, positioned by date; the twelve stages are
+  the concurrency chart's y-axis. Both share the same geometry and gutter, so a
+  diamond sits exactly over the bar end it marks. Nothing is open until you pick
+  a bar; picking it again closes it.
 - **Owner picker.** An item's owner is chosen from the stage's leader and its
   engineering contacts rather than typed. It stores the short form
   (`M. Bianchi`), which keeps the Owner column consistent and lets the envelope
   button resolve an address.
-- **Effort and cost.** Each engineering line of a stage carries man-months; the
+- **Effort and cost.** A stage's engineering activities are a board — add,
+  rename, delete — and each line carries man-months; the
   stage's total rides on its gantt bar, and the program's total drives an
   estimate on the program card. The rate is a program setting, edited on the
   dashboard, and defaults to 0 so no cost is invented. AtlasAX1 is seeded with
@@ -140,8 +146,8 @@ that is a read/write swap rather than a redesign.
 ## Testing
 
 ```bash
-npm test          # 133 unit tests: schedule engine, derivations, effort, mail, purity
-npm run e2e       # 177 Playwright tests
+npm test          # 136 unit tests: schedule engine, derivations, effort, mail, purity
+npm run e2e       # 183 Playwright tests
 ```
 
 The e2e suite runs against its own database (`test.db`) on port 3100, so it never

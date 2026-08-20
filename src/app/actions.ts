@@ -328,7 +328,10 @@ export async function saveStageDetail(
   },
 ) {
   const pid = await assertProject(projectId);
-  const empty = !Object.values(detail).some(Boolean);
+  /* engineeringView === '' is a deliberately empty list, not an absent one */
+  const empty = !Object.entries(detail).some(([k, v]) =>
+    k === 'engineeringView' ? v !== null : Boolean(v),
+  );
   if (empty) {
     await prisma.stageDetail.deleteMany({ where: { projectId: pid, stageId } });
   } else {
@@ -404,7 +407,7 @@ export async function setStageEffort(
     where: { projectId_stageId: { projectId: pid, stageId } },
   });
 
-  if (!effort && existing && !existing.description && !existing.engineeringView &&
+  if (!effort && existing && !existing.description && existing.engineeringView === null &&
       !existing.programView && !existing.tools && !existing.collaboration) {
     /* nothing left on the row once the effort goes */
     await prisma.stageDetail.delete({ where: { id: existing.id } });
