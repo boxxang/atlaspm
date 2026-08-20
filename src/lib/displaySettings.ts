@@ -55,7 +55,7 @@ const centred = (value: number, span: number, step: number): DisplayRange => ({
 export const DISP_DEFS: readonly DisplayDef[] = [
   { key: 'font', input: 'set-font', valEl: 'set-font-val', label: 'Text size',
     varName: '--fs-base', unit: 'px', scopes: ['main', 'dash'], fmt: px,
-    ranges: { main: centred(18, 5, 1), dash: centred(16, 5, 1) } },
+    ranges: { main: centred(16, 5, 1), dash: centred(16, 5, 1) } },
   { key: 'icon', input: 'set-icon', valEl: 'set-icon-val', label: 'Icon size',
     varName: '--icon-scale', unit: '', scopes: ['main'], fmt: fmtIcon,
     ranges: { main: centred(2, 1.25, 0.25) } },

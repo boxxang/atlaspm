@@ -26,6 +26,7 @@ export function BoardRow({
   withTime = false,
   onOpen,
   mailStageId,
+  selected = false,
 }: {
   it: Item;
   kind: ItemKind;
@@ -37,6 +38,8 @@ export function BoardRow({
   onOpen?: () => void;
   /** Set to show the row's envelope; needs to know which stage it belongs to. */
   mailStageId?: StageId;
+  /** The row the pop-up's pane is showing, marked in the list. */
+  selected?: boolean;
 }) {
   const today = useAppStore((s) => s.today);
   const projectName = useAppStore((s) => s.projectName);
@@ -52,6 +55,7 @@ export function BoardRow({
       data-kind={kind}
       data-item-id={it.id}
       data-stage-id={stageId}
+      aria-current={selected || undefined}
       onClick={onOpen}
     >
       <span className="b-date">{withTime ? fmtDT(it.updated) : fmtDate(it.updated)}</span>

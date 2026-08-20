@@ -363,9 +363,9 @@ test.describe('responsive stops', () => {
         name,
       );
     };
-    expect(await varAt(1200, '--bck-activities-date')).toBe('9.5rem');
-    expect(await varAt(1100, '--bck-activities-date')).toBe('8rem');
-    expect(await varAt(1100, '--bck-risks-due')).toBe('6.5rem');
+    expect(await varAt(1200, '--bck-activities-date')).toBe('6.6rem');
+    expect(await varAt(1100, '--bck-activities-date')).toBe('6.2rem');
+    expect(await varAt(1100, '--bck-risks-due')).toBe('6rem');
     // contacts drop from five wide columns to the narrow set
     await page.setViewportSize({ width: 1100, height: 900 });
     const cols = await selectedPanel(page)

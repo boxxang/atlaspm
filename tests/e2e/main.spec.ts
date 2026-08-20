@@ -339,26 +339,26 @@ test.describe('stage panel', () => {
     expect(contacts.y).toBeGreaterThan(act.y + act.height);
   });
 
-  test('a board fits its list, with Show more right under the last entry', async ({ page }) => {
+  test('the three boards end level, the right pair splitting the left 60/40', async ({
+    page,
+  }) => {
     await selectStage(page, '06');
     const panel = selectedPanel(page);
+    const box = async (kind: string) =>
+      (await panel.locator(`.board[data-kind="${kind}"]`).boundingBox())!;
 
-    for (const [kind, ceiling] of [
-      ['activities', 600],
-      ['keyinfo', 300],
-      ['risks', 300],
-    ] as const) {
+    const [act, ki, risk] = [await box('activities'), await box('keyinfo'), await box('risks')];
+    // Activity down the left, the other two stacked down the right
+    expect(Math.round(ki.y)).toBe(Math.round(act.y));
+    expect(Math.round(risk.y + risk.height)).toBe(Math.round(act.y + act.height));
+    // 60/40 of the Activity height, give or take the gap between them
+    expect(ki.height / (ki.height + risk.height)).toBeCloseTo(0.6, 1);
+
+    for (const kind of ['activities', 'keyinfo', 'risks'] as const) {
       const board = panel.locator(`.board[data-kind="${kind}"]`);
       const rows = (await board.locator('.board-rows').boundingBox())!;
       const foot = (await board.locator('.board-foot').boundingBox())!;
-      const content = await board
-        .locator('.board-rows')
-        .evaluate((el) => ({ scroll: el.scrollHeight, client: el.clientHeight }));
-
-      // the window is the list's own height until the ceiling stops it
-      expect(Math.round(rows.height), kind).toBeLessThanOrEqual(ceiling);
-      expect(Math.round(rows.height), kind).toBe(Math.min(content.scroll, ceiling));
-      // and "Show more" sits directly beneath, not at the bottom of the column
+      // "Show more" sits directly under the window, not at the column's foot
       expect(foot.y - (rows.y + rows.height), kind).toBeLessThanOrEqual(1);
       await expect(board.locator('[data-more]')).toBeVisible();
       await expect(board.locator('.board-rows')).toHaveCSS('overflow-y', 'auto');
@@ -379,18 +379,19 @@ test.describe('stage panel', () => {
   test('a board past its window scrolls instead of growing', async ({ page }) => {
     // Product Definition carries a full dozen on each board
     await selectStage(page, '01');
-    const board = selectedPanel(page).locator('.board[data-kind="keyinfo"]');
-    await expect(board.locator('.b-row')).toHaveCount(12);
-    expect((await board.locator('.board-rows').boundingBox())!.height).toBe(300);
-    expect(
-      await board.locator('.board-rows').evaluate((el) => el.scrollHeight > el.clientHeight),
-    ).toBe(true);
+    const panel = selectedPanel(page);
+    const act = panel.locator('.board[data-kind="activities"]');
+    await expect(act.locator('.b-row')).toHaveCount(12);
+    // the Activity window stops at its ceiling and scrolls from there
+    expect(Math.round((await act.locator('.board-rows').boundingBox())!.height)).toBe(600);
 
-    // and the risk window is short enough that even a few entries scroll
-    const risks = selectedPanel(page).locator('.board[data-kind="risks"]');
-    expect(
-      await risks.locator('.board-rows').evaluate((el) => el.scrollHeight > el.clientHeight),
-    ).toBe(true);
+    for (const kind of ['activities', 'keyinfo', 'risks'] as const) {
+      const rows = panel.locator(`.board[data-kind="${kind}"] .board-rows`);
+      expect(
+        await rows.evaluate((el) => el.scrollHeight > el.clientHeight),
+        kind,
+      ).toBe(true);
+    }
   });
 
   test('the visual stops at the dates row rather than running past it', async ({ page }) => {
@@ -708,6 +709,9 @@ test.describe('the chart folds away', () => {
 
 test.describe('the folded chart carries its dates', () => {
   const fold = async (page: Page) => {
+    /* measure once the unfold has finished: a box taken mid-animation is
+       shorter than the chart ends up, and the pointer lands inside it */
+    await settleLayout(page);
     const box = (await page.locator('#roadmap').boundingBox())!;
     await page.mouse.move(box.x + box.width / 2, box.y + box.height + 40);
     await settleLayout(page);
@@ -789,6 +793,46 @@ test.describe('the folded chart carries its dates', () => {
   });
 });
 
+test.describe('the pin holds the chart open', () => {
+  test('pinned it never folds; unpinned it folds again', async ({ page }) => {
+    await selectStage(page, '06');
+    const roadmap = page.locator('#roadmap');
+    const leave = async () => {
+      await settleLayout(page);
+      const box = (await roadmap.boundingBox())!;
+      await page.mouse.move(box.x + box.width / 2, box.y + box.height + 40);
+      await settleLayout(page);
+    };
+
+    await page.locator('[data-pin]').click();
+    await expect(page.locator('[data-pin]')).toHaveAttribute('aria-pressed', 'true');
+    await leave();
+    await expect(roadmap).not.toHaveClass(/folded/);
+    await expect(page.locator('#rm-gantt .g-row')).toHaveCount(12);
+
+    // it is a preference, so it survives a reload
+    await page.reload();
+    await expect(page.locator('[data-pin]')).toHaveAttribute('aria-pressed', 'true');
+    await leave();
+    await expect(roadmap).not.toHaveClass(/folded/);
+
+    // unpinned, the fold comes back
+    await page.locator('[data-pin]').click();
+    await leave();
+    await expect(roadmap).toHaveClass(/folded/);
+  });
+
+  test('the folded bar is drawn no thicker than the others', async ({ page }) => {
+    await selectStage(page, '06');
+    const bar = page.locator('#rm-gantt .g-row.current .g-bar');
+    const before = (await bar.boundingBox())!.height;
+    const box = (await page.locator('#roadmap').boundingBox())!;
+    await page.mouse.move(box.x + box.width / 2, box.y + box.height + 40);
+    await settleLayout(page);
+    expect((await bar.boundingBox())!.height).toBe(before);
+  });
+});
+
 test.describe('marks tell past from future', () => {
   test('a date behind us is filled, one ahead is hollow', async ({ page }) => {
     const marks = await page.locator('.rm-ms').evaluateAll((els) =>
@@ -801,6 +845,15 @@ test.describe('marks tell past from future', () => {
     const ink = marks.find((m) => m.past)!.filled;
     const paper = marks.find((m) => !m.past)!.filled;
     expect(ink).not.toBe(paper);
+
+    // one shape for all of them: same border, same weight
+    const shape = await page.locator('.rm-ms').evaluateAll((els) =>
+      els.map((el) => {
+        const c = getComputedStyle(el);
+        return `${c.borderTopWidth}|${getComputedStyle(el.firstElementChild!).fontWeight}`;
+      }),
+    );
+    expect(new Set(shape).size).toBe(1);
     // and it is the date that decides, not whether the milestone is a major one
     for (const m of marks) expect(m.filled, m.id).toBe(m.past ? ink : paper);
 
@@ -859,9 +912,8 @@ test.describe('board windows', () => {
         .height,
     );
 
-  test('a board is the size of its list until the ceiling stops it', async ({ page }) => {
-    const CEILING = { activities: 600, keyinfo: 300, risks: 300 } as const;
-    const measure = async (kind: keyof typeof CEILING) =>
+  test('the Activity ceiling holds, and the right pair follow its height', async ({ page }) => {
+    const measure = async (kind: string) =>
       selectedPanel(page)
         .locator(`.board[data-kind="${kind}"] .board-rows`)
         .evaluate((el) => ({
@@ -870,21 +922,15 @@ test.describe('board windows', () => {
         }));
 
     // Product Definition is seeded full — twelve entries on each board
-    for (const kind of ['keyinfo', 'risks'] as const) {
-      const m = await measure(kind);
-      expect(m.height, kind).toBe(CEILING[kind]);
-      expect(m.content, kind).toBeGreaterThan(CEILING[kind]);
-    }
-    // twelve activities with their update lines do not reach 600px
     const acts = await measure('activities');
-    expect(acts.height).toBe(Math.min(acts.content, CEILING.activities));
+    expect(acts.height).toBe(600);
+    expect(acts.content).toBeGreaterThan(600);
 
-    // Physical Design holds a handful, and its windows shrink to fit them
+    // Physical Design holds a handful; Activity shrinks to its list and the
+    // right-hand pair shrink with it rather than reserving 600px of nothing
     await selectStage(page, '06');
-    for (const kind of ['activities', 'keyinfo', 'risks'] as const) {
-      const m = await measure(kind);
-      expect(m.height, kind).toBe(Math.min(m.content, CEILING[kind]));
-    }
+    const short = await measure('activities');
+    expect(short.height).toBe(Math.min(short.content, 600));
     expect(await boardHeight(page, 'keyinfo')).toBeLessThan(300);
   });
 

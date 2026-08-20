@@ -18,6 +18,7 @@ export function Deliverables({ stageId }: { stageId: StageId }) {
   const today = useAppStore((s) => s.today);
   const toggle = useAppStore((s) => s.toggleDeliverable);
   const setDue = useAppStore((s) => s.setDeliverableDue);
+  const setCompleted = useAppStore((s) => s.setDeliverableCompleted);
   const add = useAppStore((s) => s.addDeliverable);
   const del = useAppStore((s) => s.deleteDeliverable);
   const [title, setTitle] = useState('');
@@ -108,10 +109,24 @@ export function Deliverables({ stageId }: { stageId: StageId }) {
                 {d.due ? fmtDate(d.due) : 'TBD'}
               </span>
             )}
-            {/* completion timestamp is automatic */}
-            <span className="dlv-comp" data-comp={d.id}>
-              {d.completedAt ? fmtDT(d.completedAt) : '—'}
-            </span>
+            {/* The checkbox stamps the completion date; edit mode corrects it,
+                because a thing is often ticked off some days after it was done. */}
+            {editing && d.done ? (
+              <input
+                type="date"
+                className="dlv-comp-edit"
+                data-comp-edit={d.id}
+                aria-label={`Completed date for ${d.title}`}
+                value={d.completedAt ? toISO(d.completedAt) : ''}
+                onChange={(e) =>
+                  setCompleted(stageId, d.id, e.target.value ? fromISO(e.target.value) : null)
+                }
+              />
+            ) : (
+              <span className="dlv-comp" data-comp={d.id}>
+                {d.completedAt ? fmtDT(d.completedAt) : '—'}
+              </span>
+            )}
             {editing ? (
               <button
                 data-dlv-del={d.id}

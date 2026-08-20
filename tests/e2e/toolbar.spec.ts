@@ -24,16 +24,16 @@ test.describe('design tokens', () => {
     expect(await cssVar(page, '--accent')).toBe('#256abf');
     expect(await cssVar(page, '--risk')).toBe('#d03b3b');
     expect(await cssVar(page, '--line')).toBe('#e1e0d9');
-    expect(await cssVar(page, '--fs-base')).toBe('18px');
+    expect(await cssVar(page, '--fs-base')).toBe('16px');
     expect(await cssVar(page, '--toolbar-h')).toBe('58px');
     expect(await cssVar(page, '--dash-row-h')).toBe('36px');
-    expect(await cssVar(page, '--bck-risks-due')).toBe('7.5rem');
+    expect(await cssVar(page, '--bck-risks-due')).toBe('6.6rem');
   });
 
   test('body uses the page background and base font size', async ({ page }) => {
     const body = page.locator('body');
     await expect(body).toHaveCSS('background-color', 'rgb(249, 249, 247)');
-    await expect(body).toHaveCSS('font-size', '18px');
+    await expect(body).toHaveCSS('font-size', '16px');
   });
 });
 
@@ -152,14 +152,15 @@ test.describe('display settings', () => {
     await page.locator('#settings-btn').click();
     await expect(page.locator('#settings-panel')).toBeVisible();
 
-    await page.locator('#set-font').fill('22');
-    expect(await cssVar(page, '--fs-base')).toBe('22px');
-    await expect(page.locator('#set-font-val')).toHaveText('22px');
-    await expect(page.locator('body')).toHaveCSS('font-size', '22px');
+    /* the slider is centred on 16, so 20 is inside its range */
+    await page.locator('#set-font').fill('20');
+    expect(await cssVar(page, '--fs-base')).toBe('20px');
+    await expect(page.locator('#set-font-val')).toHaveText('20px');
+    await expect(page.locator('body')).toHaveCSS('font-size', '20px');
 
     await page.locator('#set-reset').click();
-    expect(await cssVar(page, '--fs-base')).toBe('18px');
-    await expect(page.locator('#set-font-val')).toHaveText('18px');
+    expect(await cssVar(page, '--fs-base')).toBe('16px');
+    await expect(page.locator('#set-font-val')).toHaveText('16px');
   });
 
   test('Programs leads the bar, the program fields sit centred between the controls', async ({
@@ -209,9 +210,9 @@ test.describe('display settings', () => {
     await expect(page.locator('.set-row[data-key="icon"]')).toHaveCount(0);
     await expect(page.locator('.set-row[data-key="drow"]')).toBeVisible();
 
-    // Dashboard text size writes onto #schedule-view, leaving Main at 18px.
+    // Dashboard text size writes onto #schedule-view, leaving Main at 16px.
     await page.locator('#set-font').fill('15');
-    expect(await cssVar(page, '--fs-base')).toBe('18px');
+    expect(await cssVar(page, '--fs-base')).toBe('16px');
     await expect(page.locator('#schedule-view')).toHaveCSS('font-size', '15px');
   });
 

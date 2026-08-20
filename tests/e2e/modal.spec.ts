@@ -74,18 +74,61 @@ test.describe('board pop-up', () => {
     await expect(selectedPanel(page).locator('.inline-area')).toHaveCount(0);
   });
 
-  test('clicking a main-page row drills straight into the item', async ({ page }) => {
+  test('clicking a main-page row opens it in the pane, list still above', async ({ page }) => {
     await selectStage(page, '06');
     const row = selectedPanel(page)
       .locator('.board[data-kind="risks"] .b-row')
       .first();
     const title = await row.locator('.t').textContent();
     await row.click();
-    await expect(page.locator('#modal-head h3')).toHaveText('Risk');
-    await expect(page.locator('.iv-title')).toHaveText(title!);
-    // origin "board" offers the way back
-    await page.locator('[data-back]').click();
     await expect(page.locator('#modal-head h3')).toHaveText('Risk Board');
+    await expect(page.locator('.mb-pane-head > .cap')).toHaveText('Risk');
+    await expect(page.locator('.iv-title')).toHaveText(title!);
+    /* the list never goes away — the entry opens under it, and the row it is
+       showing is marked */
+    await expect(page.locator('#modal-list .b-row').first()).toHaveAttribute(
+      'aria-current',
+      'true',
+    );
+    await page.locator('[data-close-pane]').click();
+    await expect(page.locator('#modal-pane')).toHaveCount(0);
+    await expect(page.locator('#modal-list .b-row').first()).toBeVisible();
+  });
+});
+
+test.describe('one window', () => {
+  test('reading, writing and editing all happen under the list', async ({ page }) => {
+    await selectStage(page, '06');
+    await selectedPanel(page).locator('.board[data-kind="activities"] [data-more]').click();
+    const list = page.locator('#modal-list .b-row');
+    await expect(list).toHaveCount(6);
+    await expect(page.locator('#modal-pane')).toHaveCount(0);
+
+    // + Add writes in the pane, with the board still listed above it
+    await page.locator('#modal-head [data-add]').click();
+    await expect(page.locator('.mb-pane-head > .cap')).toHaveText('New Activity');
+    await expect(list).toHaveCount(6);
+    await page.locator('.ie-title').fill('Package ball map review');
+    await page.locator('[data-save]').click();
+    await expect(list).toHaveCount(7);
+    // the saved entry reads in the pane, and its row is marked in the list
+    await expect(page.locator('.iv-title')).toHaveText('Package ball map review');
+    await expect(page.locator('#modal-list .b-row[aria-current="true"] .t')).toHaveText(
+      'Package ball map review',
+    );
+
+    // editing it stays in the same window too
+    await page.locator('#modal-pane [data-edit]').click();
+    await expect(page.locator('.mb-pane-head > .cap')).toHaveText('Edit Activity');
+    await expect(list).toHaveCount(7);
+    await page.locator('.ie-title').fill('Package ball map review v2');
+    await page.locator('[data-save]').click();
+    await expect(page.locator('.iv-title')).toHaveText('Package ball map review v2');
+
+    // and another row swaps what the pane shows without touching the list
+    await list.nth(3).click();
+    await expect(page.locator('.iv-title')).not.toHaveText('Package ball map review v2');
+    await expect(list).toHaveCount(7);
   });
 });
 
@@ -177,9 +220,9 @@ test.describe('item editor', () => {
     await expect(board.locator('.board-head .note')).toHaveText('6 items · 6 updates');
 
     await board.locator('[data-add]').click();
-    await expect(page.locator('#modal-head h3')).toHaveText('New Activity');
-    // opened with +Add, so there is no way back to a board
-    await expect(page.locator('[data-back]')).toHaveCount(0);
+    await expect(page.locator('.mb-pane-head > .cap')).toHaveText('New Activity');
+    // the board is listed above the form, whatever the form was opened for
+    await expect(page.locator('#modal-list .b-row')).toHaveCount(6);
 
     await page.locator('.ie-title').fill('Package ball map review');
     await page.locator('.ie-owner').selectOption('I. Berg');
@@ -241,7 +284,7 @@ test.describe('item editor', () => {
     await expect(page.locator('#modal .modal-win')).toBeHidden();
 
     await board.locator('[data-add]').click();
-    await expect(page.locator('#modal-head h3')).toHaveText('New Activity');
+    await expect(page.locator('.mb-pane-head > .cap')).toHaveText('New Activity');
     await expect(page.locator('.ie-title')).toHaveValue('');
     await expect(page.locator('.ie-owner')).toHaveValue('');
     await expect(page.locator('.ie-body')).toHaveValue('');
@@ -281,12 +324,13 @@ test.describe('item editor', () => {
 
     await page.locator('#modal-body .b-row').first().click();
     await page.locator('[data-edit]').click();
-    await expect(page.locator('#modal-head h3')).toHaveText('Edit Risk');
+    await expect(page.locator('.mb-pane-head > .cap')).toHaveText('Edit Risk');
     await page.locator('.ie-title').fill('Routing congestion — crossbar (revised)');
     await page.locator('[data-save]').click();
 
     // save from a drilled-in item returns to the item view
-    await expect(page.locator('#modal-head h3')).toHaveText('Risk');
+    await expect(page.locator('#modal-head h3')).toHaveText('Risk Board');
+    await expect(page.locator('.mb-pane-head > .cap')).toHaveText('Risk');
     await expect(page.locator('.iv-title')).toHaveText('Routing congestion — crossbar (revised)');
 
     await page.locator('[data-edit]').click();
@@ -319,11 +363,16 @@ test.describe('aggregate boards', () => {
     // newest-updated first, regardless of stage
     await expect(rows.locator('.b-stage').first()).toHaveText('PD');
 
-    // row click drills into that row's own stage, and ‹ Board comes back
-    await rows.nth(3).click();
-    await expect(page.locator('#modal-head h3')).toHaveText('Risk');
-    await page.locator('[data-back]').click();
+    /* Opening a row from an aggregate shows that row's own stage in the pane
+       and leaves the aggregate list exactly where it was. */
+    await expect(rows.first().locator('.b-stage')).toHaveText('PD');
+    await rows.first().click();
     await expect(page.locator('#modal-head h3')).toHaveText('Open Risks — All Stages');
+    await expect(page.locator('.mb-pane-head > .cap')).toHaveText('Risk');
+    await expect(page.locator('.mb-pane-head > .meta')).toHaveText('Physical Design');
+    await expect(page.locator('#modal-list .b-row')).toHaveCount(10);
+    await page.locator('[data-close-pane]').click();
+    await expect(page.locator('#modal-pane')).toHaveCount(0);
     await expect(page.locator('#modal-body .b-row')).toHaveCount(10);
   });
 
@@ -357,11 +406,11 @@ test.describe('aggregate boards', () => {
     await expect(page.locator('.pager button').last()).toBeDisabled();
 
     await rows.first().click();
-    await expect(page.locator('#modal-head h3')).toBeVisible();
     await expect(page.locator('.iv-title')).toBeVisible();
-    // ‹ Board returns to the page you drilled in from, not to page 1
-    await page.locator('[data-back]').click();
+    // the list keeps the page you were on while the entry reads below it
     await expect(page.locator('#modal-body .su-brow')).toHaveCount(2);
     await expect(page.locator('.pager button[aria-current="true"]')).toHaveText('3');
+    await page.locator('[data-close-pane]').click();
+    await expect(page.locator('#modal-body .su-brow')).toHaveCount(2);
   });
 });

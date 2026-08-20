@@ -6,6 +6,7 @@ import {
   selectStage,
   editEngineering,
   editDeliverables,
+  settleLayout,
 } from './fixtures';
 
 /**
@@ -119,19 +120,61 @@ test.describe('read mode versus edit mode', () => {
     await expect(first.locator('[data-dlv-due-text]')).toHaveText('01/15/2027');
   });
 
-  test('the two tables end on the same line', async ({ page }) => {
-    /* Engineering activity on the left, key deliverables on the right: they are
-       read side by side, so the columns are the same height whatever they hold. */
-    const [engineering, deliverables] = await panel(page)
-      .locator('.sheet-grid > *')
-      .evaluateAll((els) => els.map((e) => Math.round(e.getBoundingClientRect().height)));
-    expect(engineering).toBe(deliverables);
-
-    // one header row each, so the column heads line up too
+  test('the two tables share one window', async ({ page }) => {
+    /* the pane animates in — measure once it has landed */
+    await settleLayout(page);
+    /* Engineering activity on the left, key deliverables on the right: read
+       side by side, so they start and end on the same lines whatever sits
+       under them. */
     const heads = await panel(page)
       .locator('.mm-cols, .dlv-cols')
       .evaluateAll((els) => els.map((e) => Math.round(e.getBoundingClientRect().top)));
     expect(heads[0]).toBe(heads[1]);
+
+    const lists = await panel(page)
+      .locator('.mm-list, .dlv-list')
+      .evaluateAll((els) =>
+        els.map((e) => ({
+          top: Math.round(e.getBoundingClientRect().top),
+          bottom: Math.round(e.getBoundingClientRect().bottom),
+        })),
+      );
+    expect(lists[0]).toEqual(lists[1]);
+  });
+
+  test('the completion date is the checkbox stamp, and edit mode corrects it', async ({
+    page,
+  }) => {
+    /* Product Definition's four are all closed in the seed, so tick one off
+       from a stage that is still running. */
+    await selectStage(page, '06');
+    const row = panel(page).locator('.dlv-list li').filter({ hasText: 'Routed database' });
+    await expect(row.locator('.dlv-comp')).toHaveText('—');
+
+    // ticking it stamps today
+    await row.locator('input[type="checkbox"]').check();
+    const today = new Date();
+    const p2 = (n: number) => String(n).padStart(2, '0');
+    const iso = `${today.getFullYear()}-${p2(today.getMonth() + 1)}-${p2(today.getDate())}`;
+    await expect(row.locator('.dlv-comp')).toContainText(
+      `${p2(today.getMonth() + 1)}/${p2(today.getDate())}/${today.getFullYear()}`,
+    );
+
+    // and the stamp is a date like any other once the table is open
+    await editDeliverables(page);
+    await expect(row.locator('[data-comp-edit]')).toHaveValue(iso);
+    await row.locator('[data-comp-edit]').fill('2026-05-04');
+    await editDeliverables(page, false);
+    await expect(row.locator('.dlv-comp')).toContainText('05/04/2026');
+
+    await page.reload();
+    await selectStage(page, '06');
+    await expect(
+      panel(page)
+        .locator('.dlv-list li')
+        .filter({ hasText: 'Routed database' })
+        .locator('.dlv-comp'),
+    ).toContainText('05/04/2026');
   });
 
   test('a deliverable with no date is asked about, then reads TBD', async ({ page }) => {

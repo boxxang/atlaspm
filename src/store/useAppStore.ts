@@ -86,6 +86,8 @@ export interface AppState {
 
   toggleDeliverable: (stageId: StageId, id: string, done: boolean) => void;
   setDeliverableDue: (stageId: StageId, id: string, due: Date | null) => void;
+  /** Corrects the stamp the checkbox wrote — see setDeliverableCompleted. */
+  setDeliverableCompleted: (stageId: StageId, id: string, completedAt: Date | null) => void;
   addDeliverable: (stageId: StageId, title: string, due: Date | null) => void;
   deleteDeliverable: (stageId: StageId, id: string) => void;
 
@@ -384,6 +386,18 @@ export const useAppStore = create<AppState>()((set, get) => ({
       },
     }));
     sync(api.setDeliverableDone(get().projectId, id, done, completedAt));
+  },
+
+  setDeliverableCompleted: (stageId, id, completedAt) => {
+    set((s) => ({
+      deliverables: {
+        ...s.deliverables,
+        [stageId]: s.deliverables[stageId].map((d) =>
+          d.id === id ? { ...d, completedAt } : d,
+        ),
+      },
+    }));
+    sync(api.setDeliverableCompleted(get().projectId, id, completedAt));
   },
 
   setDeliverableDue: (stageId, id, due) => {

@@ -18,17 +18,19 @@
   --accent-soft:#e7effa;
   --risk:#d03b3b;
   /* adjustable via settings (each default ±5 steps) */
-  --fs-base:18px;
+  --fs-base:16px;
   --icon-scale:2;
   --gbar-h:16px;
+  /* the shared height of the engineering and deliverables tables */
+  --sheet-list-h:300px;
   --cp-fs:11px;            /* milestone / checkpoint text */
   /* board column widths — per-board, drag the header grips to change */
   --bc-date:9.5rem;          /* generic fallback (status-update board) */
   --bc-owner:7.5rem;
   --bc-due:7.5rem;
-  --bck-keyinfo-date:9.5rem;    --bck-keyinfo-owner:7.5rem;
-  --bck-activities-date:9.5rem; --bck-activities-owner:7.5rem; --bck-activities-due:7.5rem;
-  --bck-risks-date:9.5rem;      --bck-risks-owner:7.5rem;      --bck-risks-due:7.5rem;
+  --bck-keyinfo-date:6.6rem;    --bck-keyinfo-owner:6rem;
+  --bck-activities-date:6.6rem; --bck-activities-owner:6rem; --bck-activities-due:6.6rem;
+  --bck-risks-date:6.6rem;      --bck-risks-owner:6rem;      --bck-risks-due:6.6rem;
   --dash-row-h:36px;         /* dashboard schedule row height */
   --dlv-due:8.5rem;          /* deliverables table columns */
   --dlv-comp:10.5rem;
@@ -217,8 +219,7 @@ body.has-overrides .edited-flag{display:inline}
    one still ahead is hollow. Major milestones say so with weight, not colour. */
 .rm-ms.past{background:var(--ink);border-color:var(--ink)}
 .rm-ms.past .rm-ms-date{color:var(--page)}
-.rm-ms.major{border-width:2px}
-.rm-ms.major .rm-ms-date{font-weight:700}
+.rm-ms{border-width:1.5px}
 .rm-ms.kickoff{border-style:dashed;cursor:pointer}
 .rm-ms.kickoff:hover,.rm-ms.kickoff:focus-visible{border-color:var(--accent);outline:none}
 .rm-ms.kickoff:hover .rm-ms-date{color:var(--accent)}
@@ -235,7 +236,7 @@ body.has-overrides .edited-flag{display:inline}
   font-family:var(--mono);font-size:var(--cp-fs);letter-spacing:.06em;color:var(--ink-2);
   text-transform:uppercase;white-space:nowrap;
 }
-.rm-ms-label.major{color:var(--ink);font-weight:700}
+.rm-ms-label.major{color:var(--ink)}
 .rm-ms-label::after{
   content:"";position:absolute;left:50%;top:calc(100% + 1px);width:1px;background:var(--line);
 }
@@ -261,7 +262,6 @@ body.has-overrides .edited-flag{display:inline}
 #roadmap.folded{padding-bottom:6px}
 #roadmap.folded #rm-gantt .g-row:not(.current){max-height:0;opacity:0;pointer-events:none}
 #roadmap.folded #rm-gantt .g-row.current{height:96px;max-height:96px}
-#roadmap.folded #rm-gantt .g-row.current .g-bar{height:calc(var(--gbar-h) * 1.6)}
 /* the effort tag would land in the middle of the deliverable markers, and the
    stage panel right below states the same number */
 #roadmap.folded #rm-gantt .g-row.current .g-mm-tag{opacity:0}
@@ -451,9 +451,14 @@ body.has-overrides .edited-flag{display:inline}
 /* Activity down the left at the height of ten entries; key information over
    risk down the right, the two grid rows splitting that same height between
    them so five and five come out level with the ten. */
+/* Activity runs the full height down the left; key information and risk share
+   that height down the right, 60/40, so the three boards end level whatever
+   they hold. */
 .facts{
   display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);
-  grid-template-rows:auto auto;gap:24px 60px;align-items:start;
+  /* minmax(0,…) so the rows split the Activity board's height rather than
+     growing to their own content */
+  grid-template-rows:minmax(0,3fr) minmax(0,2fr);gap:24px 60px;align-items:stretch;
 }
 .facts .board[data-kind="activities"]{grid-column:1;grid-row:1 / 3}
 .facts .board[data-kind="keyinfo"]{grid-column:2;grid-row:1}
@@ -476,10 +481,15 @@ body.has-overrides .edited-flag{display:inline}
 }
 .facts .board-rows::-webkit-scrollbar-thumb:hover{background:var(--ink-3);background-clip:padding-box}
 .facts .board[data-kind="activities"] .board-rows{max-height:600px}
-.facts .board[data-kind="keyinfo"] .board-rows{max-height:300px}
-.facts .board[data-kind="risks"] .board-rows{max-height:300px}
+/* The right-hand pair take whatever their grid row gives them — basis 0, so
+   their own content never decides how tall the column is. */
+.facts .board[data-kind="keyinfo"] .board-rows,
+.facts .board[data-kind="risks"] .board-rows{flex:1 1 0;min-height:0}
 .board{margin-top:0}
 .board-head{display:flex;align-items:baseline;gap:12px;padding-bottom:8px}
+.board-head .cap{
+  font-size:.92em;font-weight:700;letter-spacing:.1em;color:var(--accent);
+}
 .board-head .note{font-size:.66em;color:var(--ink-3)}
 .board-head .spacer{flex:1}
 .board-btn{
@@ -490,7 +500,7 @@ body.has-overrides .edited-flag{display:inline}
 /* shared grid: header and rows use the same resizable column vars */
 .board-cols,.b-row{
   display:grid;grid-template-columns:var(--bc-date) minmax(0,1fr) var(--bc-owner) var(--bc-due);
-  gap:14px;align-items:baseline;
+  gap:10px;align-items:baseline;
 }
 /* each board kind resolves the shared grid vars to its own set */
 .board[data-kind="keyinfo"]{--bc-date:var(--bck-keyinfo-date);--bc-owner:var(--bck-keyinfo-owner)}
@@ -596,8 +606,11 @@ body.col-resizing{user-select:none;cursor:col-resize}
 .sheet-grid>*{display:flex;flex-direction:column;min-height:0}
 .view-pane{flex:1;display:flex;flex-direction:column;min-height:0}
 .view-pane[hidden]{display:none}
+/* Both tables get the same window, so they start and end on the same lines
+   whatever sits under them — the engineering total and tools on one side, the
+   add row on the other. */
 .mm-list,.dlv-list{
-  flex:1;min-height:120px;overflow-y:auto;overscroll-behavior:contain;
+  flex:0 0 auto;height:var(--sheet-list-h);overflow-y:auto;overscroll-behavior:contain;
   scrollbar-width:thin;scrollbar-color:var(--line-strong) transparent;
 }
 /* Both columns of the sheet open with a header block of the same height, so the
@@ -619,7 +632,7 @@ body.col-resizing{user-select:none;cursor:col-resize}
 .dlv-cols{
   display:grid;grid-template-columns:minmax(0,1fr) var(--dlv-due) var(--dlv-comp) 2.2rem;gap:10px;
   font-size:.58em;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-3);
-  padding:6px 0;border-top:1px solid var(--line-strong);border-bottom:1px solid var(--line);margin-top:8px;
+  padding:6px 0;border-top:1px solid var(--line-strong);border-bottom:1px solid var(--line);
 }
 .dlv-cols>span{position:relative}
 .dlv-list li{display:grid;grid-template-columns:minmax(0,1fr) var(--dlv-due) var(--dlv-comp) 2.2rem;gap:10px;align-items:center;padding:5px 0!important;border-bottom:1px solid var(--line)}
@@ -632,6 +645,11 @@ body.col-resizing{user-select:none;cursor:col-resize}
 .dlv-list .dlv-due.read{border:none;font-family:var(--mono);font-size:.72em;color:var(--ink-2);display:block}
 .dlv-list .dlv-due.overdue{color:var(--risk);font-weight:600}
 .dlv-list .dlv-comp{font-family:var(--mono);font-size:.72em;color:var(--ink-3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.dlv-list .dlv-comp-edit{
+  border:none;border-bottom:1px dashed var(--line-strong);background:none;
+  font-family:var(--mono);font-size:.72em;color:var(--ink-2);padding:2px 0;width:100%;min-width:0;
+}
+.dlv-list .dlv-comp-edit:focus-visible{outline:none;border-bottom:1px solid var(--accent)}
 .dlv-list input[type="checkbox"]{width:16px;height:16px;accent-color:var(--accent);flex:none;cursor:pointer}
 .dlv-list .dlv-t{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .dlv-list .dlv-t.done{text-decoration:line-through;color:var(--ink-3)}
@@ -826,7 +844,35 @@ body.modal-open .modal-win{transform:none}
   border:1px solid var(--line);border-radius:4px;padding:3px 9px;
 }
 #modal-close:hover{color:var(--ink);border-color:var(--ink-3)}
-.modal-body{padding:18px 26px 30px;overflow-y:auto}
+/* The pop-up prints the clock as well as the day, so its date column is wider
+   than the board's — the board reads the day alone. */
+#modal-body .board{--bc-date:11rem}
+#modal-body .su-cols,#modal-body .su-brow{grid-template-columns:11rem minmax(0,1fr)}
+
+/* One window: the list keeps the top and whatever is open — an entry, the
+   editor — fills the space under it instead of replacing the list. */
+.modal-body{padding:18px 26px 30px;overflow-y:auto;min-height:0}
+.modal-body.split{
+  display:grid;grid-template-rows:minmax(0,1fr) minmax(0,1.15fr);
+  gap:14px;overflow:hidden;padding-bottom:18px;
+}
+.modal-body.split .mb-list{overflow-y:auto;min-height:0;padding-right:4px}
+.mb-pane{
+  min-height:0;overflow-y:auto;border-top:1px solid var(--line-strong);padding-top:12px;
+}
+.mb-pane-head{display:flex;align-items:baseline;gap:12px;margin-bottom:8px}
+.mb-pane-head .cap{font-size:.8em;font-weight:700;letter-spacing:.1em;color:var(--accent)}
+.mb-pane-head .meta{font-family:var(--mono);font-size:.68em;color:var(--ink-3)}
+.mb-pane-head .spacer{flex:1}
+.mb-pane-close{
+  font-family:var(--mono);font-size:.7em;color:var(--ink-3);
+  border:1px solid var(--line);border-radius:3px;padding:2px 8px;
+}
+.mb-pane-close:hover{color:var(--ink);border-color:var(--ink-3)}
+/* the row the pane is showing, marked in the list */
+.modal-body .b-row[aria-current="true"],.modal-body .su-brow[aria-current="true"]{
+  background:var(--accent-soft);
+}
 .modal-body .item-view,.modal-body .item-editor,.modal-body .su-sec{max-width:none}
 .mb-back{
   font-family:var(--mono);font-size:.66em;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-3);
@@ -1273,9 +1319,9 @@ body.schedule-mode #schedule-view{opacity:1;visibility:visible;transform:none}
 @media (max-width:1100px){
   :root{
     --bc-date:8rem;--bc-owner:6rem;--bc-due:6.5rem;
-    --bck-keyinfo-date:8rem;--bck-keyinfo-owner:6rem;
-    --bck-activities-date:8rem;--bck-activities-owner:6rem;--bck-activities-due:6.5rem;
-    --bck-risks-date:8rem;--bck-risks-owner:6rem;--bck-risks-due:6.5rem;
+    --bck-keyinfo-date:6.2rem;--bck-keyinfo-owner:5.2rem;
+    --bck-activities-date:6.2rem;--bck-activities-owner:5.2rem;--bck-activities-due:6rem;
+    --bck-risks-date:6.2rem;--bck-risks-owner:5.2rem;--bck-risks-due:6rem;
   }
   .board-cols,.b-row{gap:10px}
   .c-cols,.c-row,.c-row.editing{grid-template-columns:9rem minmax(0,1fr) 12rem 9rem 6rem;gap:10px}
@@ -1431,3 +1477,13 @@ body.schedule-mode #schedule-view{opacity:1;visibility:visible;transform:none}
 .dlv-tbd button[data-dlv-tbd-ok]{background:var(--ink);color:var(--page);border-color:var(--ink)}
 .dlv-tbd button[data-dlv-tbd-cancel]:hover{color:var(--ink);border-color:var(--ink-3)}
 .dlv-due.read:not(.overdue){color:var(--ink-2)}
+
+/* Pin: hold the chart open, whatever the pointer does. */
+#rm-gantt-cap .spacer{flex:1}
+#rm-pin{
+  display:inline-flex;align-items:center;justify-content:center;
+  width:24px;height:22px;border:1px solid var(--line);border-radius:4px;color:var(--ink-3);
+  transition:color .15s,border-color .15s,background .15s;
+}
+#rm-pin:hover,#rm-pin:focus-visible{color:var(--ink);border-color:var(--ink-3);outline:none}
+#rm-pin[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--page)}

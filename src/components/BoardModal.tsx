@@ -137,8 +137,15 @@ export function BoardModal() {
   const stages = useAppStore((s) => s.stages);
   const stage = stageId ? stages.find((s) => s.id === stageId) ?? null : null;
   const label = kind ? KIND_LABELS[kind] : '';
+  /* The pane's own scope: the list's, unless a row from another stage was
+     opened out of an aggregate board. */
+  const paneStageId = m.selStageId ?? stageId;
+  const paneKind = m.selKind ?? kind;
+  const paneStage = paneStageId ? stages.find((s) => s.id === paneStageId) ?? null : null;
   const item =
-    itemId && stageId && kind ? content[stageId][kind].find((x) => x.id === itemId) ?? null : null;
+    itemId && paneStageId && paneKind
+      ? content[paneStageId][paneKind].find((x) => x.id === itemId) ?? null
+      : null;
 
   const isSu = agg?.type === 'updates';
   const entries = isSu ? updateEntries(content, stages) : boardEntries(m, content, stages, today);
@@ -146,10 +153,9 @@ export function BoardModal() {
   const page = Math.min(m.page, pages - 1);
   const visible = entries.slice(page * PAGE_SIZE, page * PAGE_SIZE + PAGE_SIZE);
 
-  const showBack = view !== 'board' && (origin === 'board' || origin === 'agg');
   const boardTitle = agg ? agg.title : label + ' Board';
-  const heading =
-    view === 'edit' ? (item ? 'Edit ' : 'New ') + label : view === 'item' ? label : boardTitle;
+  const paneLabel = paneKind ? KIND_LABELS[paneKind] : label;
+  const paneOpen = view !== 'board';
 
   return (
     <>
@@ -157,17 +163,10 @@ export function BoardModal() {
       <div id="modal" role="dialog" aria-modal="true" aria-label="Board" aria-hidden={!m.open}>
         <div className="modal-win">
           <div className="modal-head" id="modal-head">
-            {showBack && (
-              <button className="mb-back" data-back onClick={m.back}>
-                ‹ Board
-              </button>
-            )}
-            <h3>{heading}</h3>
-            <span className="meta">
-              {view === 'board' && agg ? projectName : stage ? stage.title : ''}
-            </span>
+            <h3>{boardTitle}</h3>
+            <span className="meta">{agg ? projectName : stage ? stage.title : ''}</span>
             <span className="spacer" />
-            {view === 'board' && !agg && kind && (
+            {!agg && kind && (
               <button
                 className="board-btn"
                 data-add={kind}
@@ -180,8 +179,16 @@ export function BoardModal() {
               ESC ✕
             </button>
           </div>
-          <div className="modal-body" id="modal-body">
-            {view === 'board' && isSu && (
+          {/* The list stays put and the pane below it holds whatever is open,
+              so reading an entry, writing one and editing one are all this one
+              window rather than three screens of it. */}
+          <div
+            className={`modal-body${paneOpen ? ' split' : ''}`}
+            id="modal-body"
+            data-pane={view}
+          >
+            <div className="mb-list" id="modal-list">
+            {isSu && (
               <>
                 <div className="board-cols su-cols">
                   <span>Posted</span>
@@ -195,6 +202,7 @@ export function BoardModal() {
                       data-stage-id={e.stage!.id}
                       data-kind={e.kind}
                       data-item-id={e.it.id}
+                      aria-current={e.it.id === itemId || undefined}
                       onClick={() => m.drillInto(e.stage!.id, e.kind, e.it.id)}
                     >
                       <span className="b-date">{fmtDT(e.u.date)}</span>
@@ -214,7 +222,7 @@ export function BoardModal() {
               </>
             )}
 
-            {view === 'board' && !isSu && kind && (
+            {!isSu && kind && (
               <div className="board" data-kind={kind}>
                 <BoardCols kind={kind} />
                 {visible.length ? (
@@ -228,6 +236,7 @@ export function BoardModal() {
                       stageTag={e.stage?.shortTitle}
                       stageId={e.stage?.id}
                       mailStageId={e.stage?.id ?? stageId ?? undefined}
+                      selected={e.it.id === itemId}
                       onOpen={() =>
                         e.stage
                           ? m.drillInto(e.stage.id, kind, e.it.id)
@@ -242,57 +251,74 @@ export function BoardModal() {
               </div>
             )}
 
-            {view === 'item' && item && kind && stageId && (
+            </div>
+
+            {paneOpen && (
+              <div className="mb-pane" id="modal-pane">
+                <div className="mb-pane-head">
+                  <span className="cap">
+                    {view === 'edit' ? (item ? 'Edit ' : 'New ') + paneLabel : paneLabel}
+                  </span>
+                  {paneStage && agg && <span className="meta">{paneStage.title}</span>}
+                  <span className="spacer" />
+                  <button className="mb-pane-close" data-close-pane onClick={m.back}>
+                    ✕
+                  </button>
+                </div>
+
+            {view === 'item' && item && paneKind && paneStageId && (
               <ItemView
                 key={item.id}
                 item={item}
-                kind={kind}
-                stageId={stageId}
+                kind={paneKind}
+                stageId={paneStageId}
                 editingSuId={m.editingSuId}
                 onEdit={() => m.setView('edit')}
                 onSuEdit={m.setEditingSu}
                 onSuSave={(suId, text) => {
-                  saveUpdate(stageId, kind, item.id, suId, text);
+                  saveUpdate(paneStageId, paneKind, item.id, suId, text);
                   m.setEditingSu(null);
                 }}
-                onSuDelete={(suId) => deleteUpdate(stageId, kind, item.id, suId)}
-                onSuPost={(text) => postUpdate(stageId, kind, item.id, text)}
+                onSuDelete={(suId) => deleteUpdate(paneStageId, paneKind, item.id, suId)}
+                onSuPost={(text) => postUpdate(paneStageId, paneKind, item.id, text)}
                 onAttach={(files, statusUpdateId) =>
-                  attachFiles(stageId, kind, item.id, { statusUpdateId }, files)
+                  attachFiles(paneStageId, paneKind, item.id, { statusUpdateId }, files)
                 }
                 onDetach={(attachmentId, statusUpdateId) =>
-                  removeAttachment(stageId, kind, item.id, attachmentId, statusUpdateId)
+                  removeAttachment(paneStageId, paneKind, item.id, attachmentId, statusUpdateId)
                 }
               />
             )}
 
-            {view === 'edit' && kind && stageId && (
+            {view === 'edit' && paneKind && paneStageId && (
               <ItemEditor
                 /* keyed by session so each open starts on a clean form */
                 key={`${item?.id ?? 'new'}-${m.session}`}
                 item={item}
-                kind={kind}
-                stageId={stageId}
+                kind={paneKind}
+                stageId={paneStageId}
                 onSave={async (f, files) => {
-                  const saved = saveItem(stageId, kind, itemId, f);
+                  const saved = saveItem(paneStageId, paneKind, itemId, f);
                   /* the item has to be stored before files can hang off it */
                   if (files.length) {
                     await flushWrites();
-                    await attachFiles(stageId, kind, saved.id, {}, files);
+                    await attachFiles(paneStageId, paneKind, saved.id, {}, files);
                   }
                   /* +Add from main: the save lands on the main page */
                   if (origin === 'add') return m.close();
                   m.setView('item', saved.id);
                 }}
                 onDetach={(attachmentId) =>
-                  removeAttachment(stageId, kind, item!.id, attachmentId)
+                  removeAttachment(paneStageId, paneKind, item!.id, attachmentId)
                 }
                 onDelete={() => {
-                  deleteItem(stageId, kind, itemId!);
+                  deleteItem(paneStageId, paneKind, itemId!);
                   if (origin === 'add') return m.close();
                   m.setView('board', null);
                 }}
               />
+            )}
+              </div>
             )}
           </div>
         </div>

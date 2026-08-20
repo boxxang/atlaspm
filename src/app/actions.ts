@@ -169,6 +169,20 @@ export async function setDeliverableDone(
   touch(projectId);
 }
 
+/**
+ * The completion stamp is written when the box is ticked, but it is a date like
+ * any other after that: a deliverable finished last week and ticked off today
+ * should say last week.
+ */
+export async function setDeliverableCompleted(
+  projectId: string,
+  id: string,
+  completedAt: Date | null,
+) {
+  await prisma.deliverable.update({ where: { id }, data: { completedAt } });
+  touch(projectId);
+}
+
 export async function setDeliverableDue(projectId: string, id: string, due: Date | null) {
   await prisma.deliverable.update({ where: { id }, data: { due } });
   touch(projectId);

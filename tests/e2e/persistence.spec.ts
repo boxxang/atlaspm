@@ -255,7 +255,7 @@ test('display settings persist in localStorage, not the database', async ({ page
 
   await page.locator('#settings-btn').click();
   await page.locator('#set-reset').click();
-  await expect(page.locator('body')).toHaveCSS('font-size', '18px');
+  await expect(page.locator('body')).toHaveCSS('font-size', '16px');
   await hardRefresh(page);
-  await expect(page.locator('body')).toHaveCSS('font-size', '18px');
+  await expect(page.locator('body')).toHaveCSS('font-size', '16px');
 });

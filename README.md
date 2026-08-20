@@ -119,15 +119,18 @@ Pure logic never imports UI, and `/src/lib` + `/src/data` never touch the DOM �
   pass through the text form untouched.
 - **A deliverable without a date.** Adding one with the due date left blank asks
   first, and saves it as **TBD** if that is what was meant. It reads TBD on the
-  board and takes a date whenever one is known.
+  board and takes a date whenever one is known. Ticking one off stamps the day
+  it was finished; edit mode makes that stamp a date like any other, because a
+  thing is often ticked off some days after it was done.
 - **Stage panel layout.** Title, leader and dates sit beside the stage's
   drawing, which stretches to end on the dates row rather than running past it.
   The stage-details sheet is directly below them; then the boards — Activity
   down the left, key information over risk down the right — and engineering
   contacts last. The engineering table and the deliverables table are read side
-  by side, so they are the same height whatever they hold. Each board is a
-  window that grows with its list up to a ceiling — 600px for Activity, 300px
-  each for key information and risk — and scrolls past it, so *Show more* sits
+  by side, so they share one window and start and end on the same lines. Below
+  them, Activity runs the full height down the left (600px, then it scrolls)
+  and key information and risk split that same height down the right, 60/40, so
+  the three boards end level. A board shorter than its ceiling keeps *Show more*
   directly under the last entry instead of stranded at the bottom of an empty
   window.
 - **One date axis, read twice.** The roadmap carries the lifecycle bands and the
@@ -136,8 +139,9 @@ Pure logic never imports UI, and `/src/lib` + `/src/data` never touch the DOM �
   diamond sits exactly over the bar end it marks. Opening a program opens the
   stage today falls in — the lowest of them where stages overlap — and picking
   its bar again closes it.
-- **The chart folds into one stage.** Move the pointer down out of the
-  concurrency chart and the bar chart collapses to the open stage alone,
+- **The chart folds into one stage — unless it is pinned.** The pin beside the
+  Concurrency caption holds the whole chart open; unpinned, move the pointer
+  down out of it and the bar chart collapses to the open stage alone,
   animated, and redraws at the scale of that stage: its bar takes about 70% of
   the width, centred, with the calendar rescaled to match. What never folds is
   the date axis above — lifecycle bands, milestone diamonds, every month — so
@@ -149,9 +153,10 @@ Pure logic never imports UI, and `/src/lib` + `/src/data` never touch the DOM �
   was finished and fills in.
 - **Dates on the diamonds.** Every mark on the axis carries its own date
   (`10/15`) inside the diamond rather than waiting for a hover — kickoff
-  included, which is also where the kickoff date is edited. A date already
-  behind us is filled, one still ahead is hollow, so the axis reads as a
-  progress bar; major milestones say so with weight rather than colour.
+  included, which is also where the kickoff date is edited. They are all the
+  same shape and weight; the only thing that varies is the fill, and that says
+  time: a date already behind us is filled, one still ahead is hollow, so the
+  axis reads as a progress bar.
 - **Owner picker.** An item's owner is chosen from the stage's leader and its
   engineering contacts rather than typed. It stores the short form
   (`M. Bianchi`), which keeps the Owner column consistent and lets the envelope
@@ -180,6 +185,13 @@ Pure logic never imports UI, and `/src/lib` + `/src/data` never touch the DOM �
   WebP render inline; everything else, SVG included, is served as a download
   with `nosniff`, because inline user content from our own origin is an XSS
   vector.
+
+- **One pop-up, not three screens.** *Show more* opens the board in a window
+  that keeps the list at the top; opening an entry, writing a new one and
+  editing an existing one all happen in the pane under it, with the row it is
+  showing marked in the list. Opening a row from a cross-stage board — open
+  risks, overdue, status updates — shows that row's own stage in the pane and
+  leaves the list exactly where it was, page and all.
 
 ## Persistence
 
@@ -228,7 +240,7 @@ that is a read/write swap rather than a redesign.
 
 ```bash
 npm test          # 154 unit tests: schedule engine, stages/profiles, derivations, effort, mail, purity
-npm run e2e       # 233 Playwright tests
+npm run e2e       # 237 Playwright tests
 ```
 
 The e2e suite runs against its own database (`test.db`) on port 3100, so it never

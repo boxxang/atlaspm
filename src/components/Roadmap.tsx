@@ -16,6 +16,20 @@ import { Gantt, useGanttGeometry } from './Gantt';
  *
  * Picking a bar opens that stage below; picking it again closes it.
  */
+/** Per-browser, like the display settings — see /lib/displaySettings.ts. */
+const PIN_KEY = 'atlaspm.roadmap.pinned.v1';
+
+function PinIcon() {
+  return (
+    <svg viewBox="0 0 16 16" width="13" height="13" aria-hidden="true">
+      <path
+        d="M9.6 1.2 14.8 6.4l-1.4 1.4-1-1-2.6 2.6.2 3.2-1.3 1.3-3-3-3.4 3.4-.9-.9 3.4-3.4-3-3L3.1 5.7l3.2.2 2.6-2.6-1-1z"
+        fill="currentColor"
+      />
+    </svg>
+  );
+}
+
 export function Roadmap() {
   const schedule = useAppStore((s) => s.schedule);
   const kickoff = useAppStore((s) => s.kickoff);
@@ -38,12 +52,26 @@ export function Roadmap() {
    * it: leaving upward means going to the toolbar, not to the stage.
    */
   const [folded, setFolded] = useState(false);
+  /* Pinned, the chart stays open whatever the pointer does. It is a per-browser
+     preference like the display settings, so it survives a reload. */
+  /* Read once on mount rather than in an effect: the roadmap renders only
+     after the store has hydrated, so there is no server render to mismatch. */
+  const [pinned, setPinned] = useState(
+    () => typeof localStorage !== 'undefined' && localStorage.getItem(PIN_KEY) === '1',
+  );
+  const togglePin = () =>
+    setPinned((was) => {
+      const next = !was;
+      localStorage.setItem(PIN_KEY, next ? '1' : '0');
+      if (next) setFolded(false);
+      return next;
+    });
   const ref = useRef<HTMLElement>(null);
   /* derived rather than synced: with nothing open there is nothing to fold to */
-  const isFolded = folded && currentStage !== null;
+  const isFolded = folded && currentStage !== null && !pinned;
 
   const onLeave = (e: React.PointerEvent) => {
-    if (currentStage === null) return;
+    if (currentStage === null || pinned) return;
     const rect = ref.current?.getBoundingClientRect();
     if (rect && e.clientY >= rect.bottom - 1) setFolded(true);
   };
@@ -194,6 +222,23 @@ export function Roadmap() {
         <div id="rm-gantt-cap">
           <span className="cap">Concurrency</span>
           <span className="note">stages overlap by design — select a bar to open it</span>
+          <span className="spacer" />
+          {/* Pinned, the whole chart stays put; unpinned, it folds to the open
+              stage as soon as the pointer moves past it. */}
+          <button
+            id="rm-pin"
+            data-pin
+            aria-pressed={pinned}
+            title={
+              pinned
+                ? 'Unpin — the chart folds to the open stage again'
+                : 'Pin the chart open — it will not fold away'
+            }
+            aria-label={pinned ? 'Unpin the chart' : 'Pin the chart open'}
+            onClick={togglePin}
+          >
+            <PinIcon />
+          </button>
         </div>
         <Gantt id="rm-gantt" short folded={isFolded} zoom={zoom} onSelectStage={selectStage} />
       </div>

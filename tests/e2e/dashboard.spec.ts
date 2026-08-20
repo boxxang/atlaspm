@@ -134,8 +134,9 @@ test.describe('milestones, in-flight and updates', () => {
     await expect(page.locator('#modal .modal-win')).toBeVisible();
     await expect(page.locator('.iv-title')).toHaveText('Multi-corner timing closure');
     await expect(page.locator('#modal-head .meta')).toHaveText('Physical Design');
-    // opened directly, so there is no board to go back to
-    await expect(page.locator('[data-back]')).toHaveCount(0);
+    // the entry reads in the pane, with its stage's board listed above it
+    await expect(page.locator('#modal-pane')).toBeVisible();
+    await expect(page.locator('#modal-list .b-row').first()).toBeVisible();
     await page.locator('#modal-close').click();
 
     await page.locator('[data-dash-open="updates"]').click();
@@ -243,7 +244,7 @@ test.describe('program schedule gantt', () => {
 });
 
 test.describe('scoped display settings', () => {
-  test('a Dashboard font change leaves Main at 18px', async ({ page }) => {
+  test('a Dashboard font change leaves Main at 16px', async ({ page }) => {
     await openDash(page);
     await page.locator('#settings-btn').click();
     // opened from the dashboard, so it is the dashboard being adjusted
@@ -253,11 +254,11 @@ test.describe('scoped display settings', () => {
     await expect(page.locator('#schedule-view')).toHaveCSS('font-size', '13px');
     await expect(page.locator('#dash-title')).toHaveCSS('font-size', /px/);
     // :root and the main page are untouched
-    expect(await cssVar(page, '--fs-base')).toBe('18px');
-    await expect(page.locator('body')).toHaveCSS('font-size', '18px');
+    expect(await cssVar(page, '--fs-base')).toBe('16px');
+    await expect(page.locator('body')).toHaveCSS('font-size', '16px');
     await page.locator('#mode-toggle button[data-mode="journey"]').click();
     await expect(page.locator('.stage-panel.selected h2')).toBeVisible();
-    await expect(page.locator('body')).toHaveCSS('font-size', '18px');
+    await expect(page.locator('body')).toHaveCSS('font-size', '16px');
   });
 
   test('a Main font change leaves the Dashboard on its own default', async ({ page }) => {
@@ -265,9 +266,9 @@ test.describe('scoped display settings', () => {
     // opened from the main page, so only main settings are offered
     await expect(page.locator('.set-scope-note')).toHaveAttribute('data-scope', 'main');
     await expect(page.locator('.set-row[data-key="drow"]')).toHaveCount(0);
-    await page.locator('#set-font').fill('22');
-    expect(await cssVar(page, '--fs-base')).toBe('22px');
-    await expect(page.locator('body')).toHaveCSS('font-size', '22px');
+    await page.locator('#set-font').fill('20');
+    expect(await cssVar(page, '--fs-base')).toBe('20px');
+    await expect(page.locator('body')).toHaveCSS('font-size', '20px');
     // the dashboard keeps its own 16px
     await expect(page.locator('#schedule-view')).toHaveCSS('font-size', '16px');
   });
