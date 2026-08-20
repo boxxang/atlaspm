@@ -1,11 +1,11 @@
 'use server';
 
 import { revalidatePath } from 'next/cache';
-import { journeyData } from '@/data/journey';
-import { scheduleProfiles, type ProfileId } from '@/data/scheduleProfiles';
-import type { ItemKind, StageBaseline, StageId } from '@/data/types';
+import { stageMilestone } from '@/data/scheduleProfiles';
+import type { ItemKind, ScheduleProfile, StageBaseline, StageId } from '@/data/types';
 import { prisma } from '@/lib/db';
 import { DB_KIND } from '@/lib/projectState';
+import { resolveStages } from '@/lib/stages';
 import {
   MAX_ATTACHMENT_BYTES,
   safeFilename,
@@ -250,6 +250,162 @@ export async function deleteContact(projectId: string, id: string) {
   touch(projectId);
 }
 
+/* ---------- profiles ---------- */
+
+/** Read a stored profile in the shape the schedule engine takes. */
+async function loadProfile(profileId: string): Promise<ScheduleProfile> {
+  const row = await prisma.profile.findUnique({
+    where: { id: profileId },
+    include: { stages: { orderBy: { order: 'asc' } } },
+  });
+  if (!row) throw new Error(`Unknown profile: ${profileId}`);
+  return { id: row.id, label: row.name, builtin: row.builtin, stages: row.stages };
+}
+
+export interface StageInput {
+  key: string;
+  title: string;
+  shortTitle: string;
+  phaseId: string;
+  baseKey: string | null;
+  startOffsetWeeks: number;
+  durationWeeks: number;
+}
+
+/**
+ * Rewrite the stages a program runs on.
+ *
+ * Built-in profiles are immutable and a shared profile belongs to every program
+ * on it, so the edit forks: a new profile is written, named by the caller, and
+ * only this program moves to it. A profile this program is the sole user of —
+ * one it forked earlier — is edited in place instead, so routine tweaking does
+ * not breed "(copy) (copy)".
+ *
+ * Stage keys survive the fork, which is what lets the boards, deliverables,
+ * contacts and leaders come along. Content on a stage that was removed is
+ * deleted with it; overrides survive only where the baseline did not move,
+ * since an override is a manual edit of that baseline.
+ */
+export async function saveProjectStages(input: {
+  projectId: string;
+  /** Id to mint the forked profile under; ignored when editing in place. */
+  newProfileId: string;
+  profileName: string;
+  stages: StageInput[];
+}) {
+  const project = await prisma.project.findUnique({
+    where: { id: input.projectId },
+    select: { id: true, profileId: true },
+  });
+  if (!project) throw new Error(`No such program: ${input.projectId}`);
+
+  const current = await loadProfile(project.profileId);
+  const name = input.profileName.trim();
+  if (!name) throw new Error('A profile needs a name.');
+  if (!input.stages.length) throw new Error('A program needs at least one stage.');
+
+  const keys = new Set<string>();
+  for (const st of input.stages) {
+    if (!st.title.trim()) throw new Error('Every stage needs a title.');
+    if (keys.has(st.key)) throw new Error(`Duplicate stage: ${st.key}`);
+    keys.add(st.key);
+    if (st.durationWeeks < 1 / 7) throw new Error(`${st.title} is shorter than a day.`);
+    if (st.startOffsetWeeks < 0) throw new Error(`${st.title} starts before kickoff.`);
+  }
+  /* Milestones are anchored to stages, so a stage carrying one cannot leave
+     without taking Tapeout, First Silicon or Production with it. */
+  for (const st of current.stages) {
+    const ms = stageMilestone[st.key];
+    if (ms && !keys.has(st.key)) {
+      throw new Error(`${st.title} carries the ${ms.label} milestone and cannot be deleted.`);
+    }
+  }
+
+  const others = await prisma.project.count({
+    where: { profileId: current.id, id: { not: project.id } },
+  });
+  const fork = current.builtin || others > 0;
+  const profileId = fork ? input.newProfileId : current.id;
+
+  if (fork) {
+    await prisma.profile.create({ data: { id: profileId, name, builtin: false } });
+  } else {
+    await prisma.profile.update({ where: { id: profileId }, data: { name } });
+    await prisma.profileStage.deleteMany({
+      where: { profileId, key: { notIn: [...keys] } },
+    });
+  }
+
+  await prisma.$transaction(
+    input.stages.map((st, order) =>
+      prisma.profileStage.upsert({
+        where: { profileId_key: { profileId, key: st.key } },
+        create: {
+          id: `${profileId}:${st.key}`,
+          profileId,
+          key: st.key,
+          order,
+          title: st.title.trim(),
+          shortTitle: st.shortTitle.trim(),
+          phaseId: st.phaseId,
+          baseKey: st.baseKey,
+          startOffsetWeeks: st.startOffsetWeeks,
+          durationWeeks: st.durationWeeks,
+        },
+        update: {
+          order,
+          title: st.title.trim(),
+          shortTitle: st.shortTitle.trim(),
+          phaseId: st.phaseId,
+          startOffsetWeeks: st.startOffsetWeeks,
+          durationWeeks: st.durationWeeks,
+        },
+      }),
+    ),
+  );
+
+  /* Content of stages that are gone, and overrides that no longer describe an
+     edit of the baseline they were made against. */
+  const dropped = current.stages.map((st) => st.key).filter((key) => !keys.has(key));
+  const moved = input.stages
+    .filter((st) => {
+      const was = current.stages.find((c) => c.key === st.key);
+      return (
+        was &&
+        (was.startOffsetWeeks !== st.startOffsetWeeks ||
+          was.durationWeeks !== st.durationWeeks)
+      );
+    })
+    .map((st) => st.key);
+
+  const where = { projectId: project.id, stageId: { in: dropped } };
+  await prisma.$transaction([
+    prisma.item.deleteMany({ where }),
+    prisma.deliverable.deleteMany({ where }),
+    prisma.leader.deleteMany({ where }),
+    prisma.contact.deleteMany({ where }),
+    prisma.stageDetail.deleteMany({ where }),
+    prisma.stageOverride.deleteMany({
+      where: { projectId: project.id, stageId: { in: [...dropped, ...moved] } },
+    }),
+    prisma.project.update({ where: { id: project.id }, data: { profileId } }),
+  ]);
+
+  touch(project.id);
+  return { profileId, forked: fork };
+}
+
+/** Rename a forked profile. The built-in one is code and keeps its name. */
+export async function renameProfile(profileId: string, name: string) {
+  const profile = await prisma.profile.findUnique({ where: { id: profileId } });
+  if (!profile) throw new Error(`Unknown profile: ${profileId}`);
+  if (profile.builtin) throw new Error('The built-in profile cannot be renamed.');
+  const label = name.trim();
+  if (!label) throw new Error('A profile needs a name.');
+  await prisma.profile.update({ where: { id: profileId }, data: { name: label } });
+  revalidatePath('/');
+}
+
 /* ---------- programs ---------- */
 
 /**
@@ -270,12 +426,12 @@ export async function createProject(input: {
   kickoff: Date;
   profileId: string;
 }) {
-  const profile = scheduleProfiles[input.profileId as ProfileId];
-  if (!profile) throw new Error(`Unknown profile: ${input.profileId}`);
+  const profile = await loadProfile(input.profileId);
   const name = input.name.trim();
   if (!name) throw new Error('A program needs a name.');
 
   const schedule = computeSchedule(input.kickoff, profile, {});
+  const stages = resolveStages(profile);
 
   await prisma.project.create({
     data: {
@@ -284,7 +440,7 @@ export async function createProject(input: {
       kickoff: input.kickoff,
       profileId: input.profileId,
       deliverables: {
-        create: journeyData.flatMap((stage) =>
+        create: stages.flatMap((stage) =>
           stage.deliverables.map((title, position) => ({
             id: `${input.id}:dlv:${stage.id}:${position}`,
             stageId: stage.id,

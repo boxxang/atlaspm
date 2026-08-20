@@ -9,7 +9,6 @@
  *
  * Pure: no DOM.
  */
-import { STAGE_ORDER } from '@/data/scheduleProfiles';
 import type { Contact, Leader, StageId } from '@/data/types';
 
 /** The short form the app writes when saving a leader: "Grace Park" → "G. Park". */
@@ -42,7 +41,7 @@ export function buildDirectory(
     if (sn && !bySurname.has(sn)) bySurname.set(sn, email);
   };
 
-  for (const id of STAGE_ORDER) {
+  for (const id of new Set([...Object.keys(leaders), ...Object.keys(contacts)])) {
     const l = leaders[id];
     if (l) {
       add(l.name, l.email);

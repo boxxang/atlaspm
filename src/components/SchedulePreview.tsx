@@ -1,13 +1,12 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
-import { journeyData } from '@/data/journey';
-import { STAGE_ORDER } from '@/data/scheduleProfiles';
+
 import type { StageId } from '@/data/types';
 import { DAY, fmtDate, fmtW } from '@/lib/schedule';
 import { useAppStore } from '@/store/useAppStore';
 
-const stageOf = (id: StageId) => journeyData.find((s) => s.id === id)!;
+
 /** Whole days between two local-midnight dates, DST included. */
 const shiftDays = (a: Date, b: Date) => Math.round((a.getTime() - b.getTime()) / DAY);
 const signed = (n: number) => (n > 0 ? `+${n}d` : n < 0 ? `${n}d` : '—');
@@ -20,6 +19,7 @@ const signed = (n: number) => (n > 0 ? `+${n}d` : n < 0 ? `${n}d` : '—');
  */
 export function SchedulePreview() {
   const draftOverrides = useAppStore((s) => s.draftOverrides);
+  const stages = useAppStore((s) => s.stages);
   const proposed = useAppStore((s) => s.schedule);
   const current = useAppStore((s) => s.committedSchedule);
   const apply = useAppStore((s) => s.applyScheduleDraft);
@@ -46,11 +46,14 @@ export function SchedulePreview() {
 
   if (!draftOverrides) return null;
 
-  const movedStages = STAGE_ORDER.filter(
+  const stageOf = (id: StageId) => stages.find((s) => s.id === id) ?? { title: id };
+  const movedStages = stages
+    .map((s) => s.id)
+    .filter(
     (id) =>
       shiftDays(proposed.stages[id].start, current.stages[id].start) !== 0 ||
       shiftDays(proposed.stages[id].end, current.stages[id].end) !== 0,
-  );
+    );
   const movedMilestones = proposed.milestones
     .map((m) => {
       const before = current.milestones.find((x) => x.id === m.id)!;

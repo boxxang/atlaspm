@@ -176,6 +176,7 @@ export function ItemView({
 }) {
   const today = useAppStore((s) => s.today);
   const projectName = useAppStore((s) => s.projectName);
+  const stages = useAppStore((s) => s.stages);
   const dir = useDirectory();
   const [attachProblems, setAttachProblems] = useState<string[]>([]);
   const label = KIND_LABELS[kind];
@@ -218,6 +219,7 @@ export function ItemView({
           noRecipientHint="owner not in this program's contacts"
           draft={itemDraft({
             projectName,
+            stages,
             stageId,
             kind,
             item,

@@ -40,6 +40,7 @@ export function BoardRow({
 }) {
   const today = useAppStore((s) => s.today);
   const projectName = useAppStore((s) => s.projectName);
+  const stages = useAppStore((s) => s.stages);
   const dir = useDirectory();
   const latest = [...it.updates]
     .sort((a, b) => b.date.getTime() - a.date.getTime())
@@ -64,6 +65,7 @@ export function BoardRow({
             noRecipientHint="owner not in this program's contacts"
             draft={itemDraft({
               projectName,
+              stages,
               stageId: mailStageId,
               kind,
               item: it,
@@ -147,6 +149,7 @@ export function Board({
 }) {
   const content = useAppStore((s) => s.content[stageId]);
   const projectName = useAppStore((s) => s.projectName);
+  const stages = useAppStore((s) => s.stages);
   const today = useAppStore((s) => s.today);
   const dir = useDirectory();
   const list = sortedItems(content, kind);
@@ -162,6 +165,7 @@ export function Board({
             title="Email this activity list to its owners"
             draft={activityListDraft({
               projectName,
+              stages,
               stageId,
               items: list,
               today,

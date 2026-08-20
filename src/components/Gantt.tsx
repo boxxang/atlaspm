@@ -1,9 +1,7 @@
 'use client';
 
 import { useMemo } from 'react';
-import { journeyData } from '@/data/journey';
-import { STAGE_ORDER } from '@/data/scheduleProfiles';
-import type { StageId } from '@/data/types';
+import type { Stage, StageId } from '@/data/types';
 import { hasOpenRisks } from '@/lib/derive';
 import { formatManMonthsShort } from '@/lib/effort';
 import { resolveStageDetail } from '@/lib/stageDetail';
@@ -19,7 +17,10 @@ export function useGanttGeometry(
   tailWeeks = 0,
 ) {
   return useMemo(() => {
-    const minWeek = Math.min(0, ...STAGE_ORDER.map((id) => schedule.stages[id].startOffsetWeeks));
+    const minWeek = Math.min(
+      0,
+      ...Object.values(schedule.stages).map((st) => st.startOffsetWeeks),
+    );
     const total = schedule.totalWeeks - minWeek + 2 + tailWeeks;
     const origin = addWeeks(kickoff, minWeek);
     const end = addWeeks(origin, total);
@@ -65,6 +66,8 @@ export function Gantt({
   const today = useAppStore((s) => s.today);
   const content = useAppStore((s) => s.content);
   const currentStage = useAppStore((s) => s.currentStage);
+  /* the program's own stages, in its profile's order */
+  const stages = useAppStore((s) => s.stages);
   /* While dates are staged, the saved schedule is drawn underneath as a dashed
      outline so both can be read off the same axis. */
   const draftOverrides = useAppStore((s) => s.draftOverrides);
@@ -75,9 +78,9 @@ export function Gantt({
   const effort = useMemo(
     () =>
       Object.fromEntries(
-        journeyData.map((s) => [s.id, resolveStageDetail(s, stageDetails[s.id]).manMonths]),
+        stages.map((s: Stage) => [s.id, resolveStageDetail(s, stageDetails[s.id]).manMonths]),
       ) as Record<StageId, number>,
-    [stageDetails],
+    [stages, stageDetails],
   );
   /* Every milestone sits at a stage's end, so the room to its right is always
      free — the chart is given trailing weeks so a label always has somewhere to
@@ -122,7 +125,7 @@ export function Gantt({
             </>
           )}
         </div>
-        {journeyData.map((s, i) => {
+        {stages.map((s, i) => {
           const st = schedule.stages[s.id];
           const left = ((st.startOffsetWeeks - minWeek) / total) * 100;
           const width = (st.durationWeeks / total) * 100;
@@ -164,7 +167,7 @@ export function Gantt({
                     e.preventDefault();
                     const next = Math.min(
                       Math.max(i + (e.key === 'ArrowDown' ? 1 : -1), 0),
-                      journeyData.length - 1,
+                      stages.length - 1,
                     );
                     document
                       .querySelector<HTMLButtonElement>(

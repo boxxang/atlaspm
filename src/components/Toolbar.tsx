@@ -1,27 +1,22 @@
 'use client';
 
 import Link from 'next/link';
+import type { ProfileSummary, ScheduleProfile } from '@/data/types';
 import { Popover } from './Popover';
 import { ProjectName } from './ProjectName';
 import { SettingsPopover } from './SettingsPopover';
 
 export type ViewMode = 'journey' | 'schedule';
 
-/** Only Typical SoC is modelled; the rest are placeholders in the reference. */
-export const PROFILE_OPTIONS = [
-  { id: 'typicalSoC', label: 'Typical SoC', disabled: false },
-  { id: 'complexSoC', label: 'Complex SoC — soon', disabled: true },
-  { id: 'fastPrototype', label: 'Fast Prototype — soon', disabled: true },
-  { id: 'hpcAiSoC', label: 'HPC / AI SoC — soon', disabled: true },
-] as const;
-
 export function Toolbar({
   projectName,
   onProjectNameChange,
   kickoff,
   onKickoffChange,
-  profileId,
+  profile,
+  profiles,
   onProfileChange,
+  onEditStages,
   tapeout = '—',
   firstSilicon = '—',
   production = '—',
@@ -34,8 +29,11 @@ export function Toolbar({
   /** ISO yyyy-mm-dd, the value the date input round-trips. */
   kickoff: string;
   onKickoffChange: (iso: string) => void;
-  profileId: string;
+  /** The profile this program runs on, and every profile it could run on. */
+  profile: ScheduleProfile;
+  profiles: readonly ProfileSummary[];
   onProfileChange: (id: string) => void;
+  onEditStages: () => void;
   /** Derived in Phase 2 — the toolbar only displays what it is handed. */
   tapeout?: string;
   firstSilicon?: string;
@@ -65,15 +63,19 @@ export function Toolbar({
           <label htmlFor="profile-select">Profile</label>
           <select
             id="profile-select"
-            value={profileId}
+            value={profile.id}
             onChange={(e) => onProfileChange(e.target.value)}
           >
-            {PROFILE_OPTIONS.map((p) => (
-              <option key={p.id} value={p.id} disabled={p.disabled}>
+            {profiles.map((p) => (
+              <option key={p.id} value={p.id}>
                 {p.label}
               </option>
             ))}
           </select>
+          {/* the profile is a list of stages, so editing them lives beside it */}
+          <button id="stages-btn" data-edit-stages onClick={onEditStages} title="Add, reorder or remove stages">
+            Stages
+          </button>
         </div>
         <div className="tb-field">
           <span className="k">Tapeout</span>

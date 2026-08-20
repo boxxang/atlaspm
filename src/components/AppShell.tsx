@@ -1,8 +1,8 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { journeyData } from '@/data/journey';
 import { fmtDate, fromISO, toISO } from '@/lib/schedule';
+import type { ProfileSummary } from '@/data/types';
 import type { ProjectState } from '@/lib/projectState';
 import { useModalStore } from '@/store/modalStore';
 import { useAppStore } from '@/store/useAppStore';
@@ -10,6 +10,7 @@ import { BoardModal } from './BoardModal';
 import { Dashboard } from './Dashboard';
 import { Roadmap } from './Roadmap';
 import { SchedulePreview } from './SchedulePreview';
+import { StageEditor } from './StageEditor';
 import { StagePanel } from './StagePanel';
 import { Toolbar, type ViewMode } from './Toolbar';
 import { Tooltip } from './Tooltip';
@@ -20,7 +21,13 @@ import { Tooltip } from './Tooltip';
  * from the viewer's clock, not the server's — TODAY markers and overdue counts
  * would otherwise be computed in the server's timezone.
  */
-export function AppShell({ initial }: { initial: ProjectState }) {
+export function AppShell({
+  initial,
+  profiles,
+}: {
+  initial: ProjectState;
+  profiles: ProfileSummary[];
+}) {
   const hydrated = useAppStore((s) => s.hydrated);
   const hydrate = useAppStore((s) => s.hydrate);
 
@@ -33,15 +40,16 @@ export function AppShell({ initial }: { initial: ProjectState }) {
     if (switching) useModalStore.getState().close();
   }, [hydrate, initial]);
 
-  return hydrated ? <App /> : null;
+  return hydrated ? <App profiles={profiles} /> : null;
 }
 
-function App() {
+function App({ profiles }: { profiles: ProfileSummary[] }) {
   const projectName = useAppStore((s) => s.projectName);
   const setProjectName = useAppStore((s) => s.setProjectName);
   const kickoff = useAppStore((s) => s.kickoff);
   const setKickoff = useAppStore((s) => s.setKickoff);
-  const profileId = useAppStore((s) => s.profileId);
+  const profile = useAppStore((s) => s.profile);
+  const stages = useAppStore((s) => s.stages);
   const setProfile = useAppStore((s) => s.setProfile);
   const schedule = useAppStore((s) => s.schedule);
   const edited = useAppStore((s) => s.edited);
@@ -49,6 +57,7 @@ function App() {
   const closeAllInline = useAppStore((s) => s.closeAllInline);
   const currentStage = useAppStore((s) => s.currentStage);
   const [mode, setMode] = useState<ViewMode>('journey');
+  const [stagesOpen, setStagesOpen] = useState(false);
 
   /* setMode(): the dashboard is a fixed overlay, so the page behind it locks.
      The cleanup matters on navigation: leaving a program in dashboard mode used
@@ -89,8 +98,10 @@ function App() {
         onProjectNameChange={setProjectName}
         kickoff={toISO(kickoff)}
         onKickoffChange={(iso) => iso && setKickoff(fromISO(iso))}
-        profileId={profileId}
-        onProfileChange={(id) => setProfile(id as typeof profileId)}
+        profile={profile}
+        profiles={profiles}
+        onProfileChange={setProfile}
+        onEditStages={() => setStagesOpen(true)}
         tapeout={fmtDate(schedule.tapeout)}
         firstSilicon={fmtDate(schedule.firstSilicon)}
         production={fmtDate(schedule.production)}
@@ -104,7 +115,7 @@ function App() {
       <Roadmap />
 
       <main id="stage-panels" aria-live="polite">
-        {journeyData.map((s, i) => (
+        {stages.map((s, i) => (
           <StagePanel stage={s} index={i} key={s.id} />
         ))}
         {currentStage === null && (
@@ -115,6 +126,8 @@ function App() {
       </main>
 
       <Dashboard hidden={mode !== 'schedule'} />
+
+      {stagesOpen && <StageEditor profiles={profiles} onClose={() => setStagesOpen(false)} />}
 
       <BoardModal />
       <SchedulePreview />

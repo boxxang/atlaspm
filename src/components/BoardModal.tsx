@@ -1,9 +1,7 @@
 'use client';
 
 import { useEffect } from 'react';
-import { journeyData } from '@/data/journey';
-import { STAGE_ORDER } from '@/data/scheduleProfiles';
-import type { Item, ItemKind, JourneyStage, StageId } from '@/data/types';
+import type { Item, ItemKind, Stage, StageId } from '@/data/types';
 import { isOverdue } from '@/lib/derive';
 import { fmtDT } from '@/lib/schedule';
 import {
@@ -16,21 +14,30 @@ import { flushWrites, sortedItems, useAppStore, type AppState } from '@/store/us
 import { BoardCols, BoardRow } from './Board';
 import { ItemEditor, ItemView } from './ItemView';
 
-const stageOf = (id: StageId) => journeyData.find((s) => s.id === id)!;
+/* Which stages exist belongs to the program's profile, so the aggregate views
+   are handed its stage list rather than reading one out of the code. */
+const finder = (stages: readonly Stage[]) => (id: StageId) =>
+  stages.find((s) => s.id === id) ?? null;
 
 interface Entry {
   it: Item;
-  stage: JourneyStage | null;
+  stage: Stage | null;
 }
 
 /** Rows for the current board view — one stage, or every stage when aggregate. */
-function boardEntries(m: ModalState, content: AppState['content'], today: Date): Entry[] {
+function boardEntries(
+  m: ModalState,
+  content: AppState['content'],
+  stages: readonly Stage[],
+  today: Date,
+): Entry[] {
   if (!m.kind) return [];
   if (!m.agg) {
     return sortedItems(content[m.stageId!], m.kind).map((it) => ({ it, stage: null }));
   }
+  const stageOf = finder(stages);
   const out: Entry[] = [];
-  for (const id of STAGE_ORDER) {
+  for (const id of stages.map((s) => s.id)) {
     for (const it of content[id][m.kind]) {
       if (m.agg.type === 'overdue' && !isOverdue(it, today)) continue;
       out.push({ it, stage: stageOf(id) });
@@ -40,9 +47,10 @@ function boardEntries(m: ModalState, content: AppState['content'], today: Date):
 }
 
 /** Every status update across all stages, newest first. */
-function updateEntries(content: AppState['content']) {
-  const out: { u: Item['updates'][number]; it: Item; kind: ItemKind; stage: JourneyStage }[] = [];
-  for (const id of STAGE_ORDER) {
+function updateEntries(content: AppState['content'], stages: readonly Stage[]) {
+  const out: { u: Item['updates'][number]; it: Item; kind: ItemKind; stage: Stage | null }[] = [];
+  const stageOf = finder(stages);
+  for (const id of stages.map((s) => s.id)) {
     for (const kind of ['keyinfo', 'activities', 'risks'] as const) {
       for (const it of content[id][kind]) {
         for (const u of it.updates) out.push({ u, it, kind, stage: stageOf(id) });
@@ -126,13 +134,14 @@ export function BoardModal() {
   }, [m.open, close]);
 
   const { stageId, kind, view, itemId, agg, origin } = m;
-  const stage = stageId ? stageOf(stageId) : null;
+  const stages = useAppStore((s) => s.stages);
+  const stage = stageId ? stages.find((s) => s.id === stageId) ?? null : null;
   const label = kind ? KIND_LABELS[kind] : '';
   const item =
     itemId && stageId && kind ? content[stageId][kind].find((x) => x.id === itemId) ?? null : null;
 
   const isSu = agg?.type === 'updates';
-  const entries = isSu ? updateEntries(content) : boardEntries(m, content, today);
+  const entries = isSu ? updateEntries(content, stages) : boardEntries(m, content, stages, today);
   const pages = Math.max(Math.ceil(entries.length / PAGE_SIZE), 1);
   const page = Math.min(m.page, pages - 1);
   const visible = entries.slice(page * PAGE_SIZE, page * PAGE_SIZE + PAGE_SIZE);
@@ -183,15 +192,15 @@ export function BoardModal() {
                     <button
                       className="su-brow b-row"
                       key={e.u.id}
-                      data-stage-id={e.stage.id}
+                      data-stage-id={e.stage!.id}
                       data-kind={e.kind}
                       data-item-id={e.it.id}
-                      onClick={() => m.drillInto(e.stage.id, e.kind, e.it.id)}
+                      onClick={() => m.drillInto(e.stage!.id, e.kind, e.it.id)}
                     >
                       <span className="b-date">{fmtDT(e.u.date)}</span>
                       <span className="su2">
                         <span className="t1">
-                          <span className="b-stage">{e.stage.shortTitle}</span>
+                          <span className="b-stage">{e.stage!.shortTitle}</span>
                           {e.it.title}
                         </span>
                         <span className="t2">{e.u.text}</span>

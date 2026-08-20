@@ -4,16 +4,12 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useState, useSyncExternalStore, useTransition } from 'react';
 import { createProject, deleteProject } from '@/app/actions';
-import { journeyData } from '@/data/journey';
-import { scheduleProfiles } from '@/data/scheduleProfiles';
-import type { StageId } from '@/data/types';
+import type { ProfileSummary, StageId } from '@/data/types';
 import { daysTo, dday, inFlightStageIds } from '@/lib/derive';
 import { estimateCost, formatCost, formatManMonths } from '@/lib/effort';
 import type { ProjectSummary } from '@/lib/queries';
 import { computeSchedule, fmtDate, fromISO, startOfDay, toISO } from '@/lib/schedule';
-import { PROFILE_OPTIONS } from './Toolbar';
-
-const titleOf = (id: StageId) => journeyData.find((s) => s.id === id)!;
+import { resolveStages } from '@/lib/stages';
 
 /**
  * Anything that needs "today" waits for mount: the server has no business
@@ -49,8 +45,11 @@ function ProjectCard({ p }: { p: ProjectSummary }) {
   const [confirming, setConfirming] = useState(false);
   const [pending, start] = useTransition();
 
-  const profile = scheduleProfiles[p.profileId] ?? scheduleProfiles.typicalSoC;
-  const schedule = computeSchedule(p.kickoff, profile, p.overrides);
+  /* a card reads the program's own profile — stage names and all */
+  const stages = resolveStages(p.profile);
+  const titleOf = (id: StageId) =>
+    stages.find((st) => st.id === id) ?? { title: id, shortTitle: id };
+  const schedule = computeSchedule(p.kickoff, p.profile, p.overrides);
   const pct = p.deliverablesTotal
     ? Math.round((p.deliverablesDone / p.deliverablesTotal) * 100)
     : 0;
@@ -68,7 +67,7 @@ function ProjectCard({ p }: { p: ProjectSummary }) {
         <span className="pl-name">{p.name}</span>
         {p.edited && <span className="pl-flag" title="Schedule has manual date edits">EDITED</span>}
       </div>
-      <span className="cap pl-profile">{profile.label}</span>
+      <span className="cap pl-profile">{p.profile.label}</span>
 
       <div className="pl-bar">
         <span style={{ width: `${pct}%` }} />
@@ -173,12 +172,12 @@ function ProjectCard({ p }: { p: ProjectSummary }) {
   );
 }
 
-function NewProjectCard() {
+function NewProjectCard({ profiles }: { profiles: readonly ProfileSummary[] }) {
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const [name, setName] = useState('');
   const [kickoff, setKickoff] = useState('');
-  const [profileId, setProfileId] = useState('typicalSoC');
+  const [profileId, setProfileId] = useState(profiles[0]?.id ?? '');
   const [error, setError] = useState('');
   const [pending, start] = useTransition();
 
@@ -186,7 +185,7 @@ function NewProjectCard() {
     setName('');
     /* default to today — read at click time, never during a render */
     setKickoff(toISO(startOfDay(new Date())));
-    setProfileId('typicalSoC');
+    setProfileId(profiles[0]?.id ?? '');
     setError('');
     setOpen(true);
   };
@@ -248,9 +247,10 @@ function NewProjectCard() {
             value={profileId}
             onChange={(e) => setProfileId(e.target.value)}
           >
-            {PROFILE_OPTIONS.map((o) => (
-              <option key={o.id} value={o.id} disabled={o.disabled}>
+            {profiles.map((o) => (
+              <option key={o.id} value={o.id}>
                 {o.label}
+                {o.builtin ? '' : ` — ${o.stageCount} stages`}
               </option>
             ))}
           </select>
@@ -269,7 +269,13 @@ function NewProjectCard() {
   );
 }
 
-export function ProjectList({ projects }: { projects: ProjectSummary[] }) {
+export function ProjectList({
+  projects,
+  profiles,
+}: {
+  projects: ProjectSummary[];
+  profiles: ProfileSummary[];
+}) {
   return (
     <main id="program-list">
       <div className="pl-head">
@@ -286,7 +292,7 @@ export function ProjectList({ projects }: { projects: ProjectSummary[] }) {
         {projects.map((p) => (
           <ProjectCard p={p} key={p.id} />
         ))}
-        <NewProjectCard />
+        <NewProjectCard profiles={profiles} />
       </div>
     </main>
   );

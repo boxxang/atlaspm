@@ -1,6 +1,5 @@
 'use client';
 
-import { journeyData } from '@/data/journey';
 import type { StageId } from '@/data/types';
 import {
   allDeliverables,
@@ -27,10 +26,10 @@ import { useAppStore } from '@/store/useAppStore';
 import { Gantt } from './Gantt';
 import { MailButton } from './MailButton';
 
-const titleOf = (id: StageId) => journeyData.find((s) => s.id === id)!;
 
 export function Dashboard({ hidden }: { hidden: boolean }) {
   const projectName = useAppStore((s) => s.projectName);
+  const stages = useAppStore((s) => s.stages);
   const schedule = useAppStore((s) => s.schedule);
   const today = useAppStore((s) => s.today);
   const content = useAppStore((s) => s.content);
@@ -47,6 +46,9 @@ export function Dashboard({ hidden }: { hidden: boolean }) {
   const dlvDone = allDlv.filter((d) => d.done).length;
   const progress = progressPct(deliverables);
   const openRisks = openRiskCount(content);
+  /* the program's own stages — which exist is a property of its profile */
+  const titleOf = (id: StageId) =>
+    stages.find((st) => st.id === id) ?? { title: id, shortTitle: id };
   const riskStages = riskStageIds(content).map((id) => titleOf(id).title);
   const overdue = overdueCount(content, today);
   const inFlight = inFlightStageIds(schedule, today);
@@ -55,7 +57,7 @@ export function Dashboard({ hidden }: { hidden: boolean }) {
   /* effort is the sum of every stage's engineering table */
   const manMonths =
     Math.round(
-      journeyData.reduce((n, st) => n + resolveStageDetail(st, stageDetails[st.id]).manMonths, 0) *
+      stages.reduce((n, st) => n + resolveStageDetail(st, stageDetails[st.id]).manMonths, 0) *
         10,
     ) / 10;
 
@@ -67,7 +69,14 @@ export function Dashboard({ hidden }: { hidden: boolean }) {
           <MailButton
             title="Email this summary"
             label="Email summary"
-            draft={programSummaryDraft({ projectName, schedule, today, content, deliverables })}
+            draft={programSummaryDraft({
+              projectName,
+              stages,
+              schedule,
+              today,
+              content,
+              deliverables,
+            })}
           />
         </div>
         <p className="note" id="dash-sub">

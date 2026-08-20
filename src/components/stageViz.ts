@@ -2,12 +2,11 @@
  * /components/stageViz.ts — one schematic per stage, ported 1:1.
  * Static SVG markup with no user content; StageViz mounts it as-is.
  */
-import type { StageId } from '@/data/types';
 
 const VB = 'viewBox="0 0 440 260" preserveAspectRatio="xMidYMid meet"';
 const arrow = (x: number, y: number) => `<path class="s" d="M${x} ${y} h22"/><path class="fi" d="M${x + 22} ${y - 4} l8 4 -8 4 z"/>`;
 
-export const stageViz = {
+export const stageViz: Record<string, () => string> = {
   productDefinition: () => `<svg ${VB}>
     ${([["MARKET",46],["PERFORMANCE",92],["POWER",138],["COST",184],["SCHEDULE",230]] as [string, number][]).map(([t,y],i)=>`
       <text x="18" y="${y-8}">${t}</text>
@@ -152,4 +151,4 @@ export const stageViz = {
     <text x="300" y="234">YIELD / RAMP</text>
     <text class="tk" x="300" y="46">MASS PRODUCTION</text>
   </svg>`,
-} satisfies Record<StageId, () => string>;
+};

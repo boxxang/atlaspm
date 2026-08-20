@@ -39,9 +39,18 @@ PORTING_PLAN.md says otherwise.
 
 ## Domain model (from the prototype)
 
+- Profile { id, name, builtin } with ProfileStage { key, order, title,
+  shortTitle, phaseId, baseKey, startOffsetWeeks, durationWeeks } — the stages a
+  program runs on. The built-in profile (`typicalSoC`) is seeded from
+  `/data/scheduleProfiles.ts` and stays immutable; editing a program's stages
+  forks a named copy, so programs already on a profile keep their schedule.
+  `baseKey` points at the built-in stage whose text and drawing the stage shows;
+  a stage someone added points at nothing and starts blank.
 - Project { id, name, kickoff, profileId }
-- StageOverride { stageId, startOffsetWeeks, durationWeeks } — the ONLY schedule
-  mutation surface; baseline profiles are immutable code.
+- StageOverride { stageId, startOffsetWeeks, durationWeeks } — the only
+  PER-PROGRAM schedule mutation surface. Baselines are edited in the profile,
+  which is a different thing: it changes every program on that profile, which is
+  why editing forks.
 - Item { id, stageId, kind: keyinfo|activity|risk, title, body, owner, due?,
   done, updatedAt } with StatusUpdate { id, itemId, text, createdAt } children.
 - Deliverable { id, stageId, title, due?, done, completedAt? }
@@ -50,6 +59,12 @@ PORTING_PLAN.md says otherwise.
 - DisplaySettings { scope: main|dash, json } and board column widths — persist
   per user/browser (a settings table or localStorage is acceptable here; decide
   in Phase 6 and note the tradeoff).
+
+Which stages exist is a property of a program's profile, never of the code:
+`StageId` is a plain string, `/lib/stages.ts` resolves a profile into the
+`Stage[]` the UI reads, and every per-stage map is built by walking that list in
+order. Components read `useAppStore(s => s.stages)`; `journeyData` is content
+that stages inherit, not the list of them.
 
 ## Derived values (never stored)
 

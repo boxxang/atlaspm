@@ -1,9 +1,8 @@
 'use client';
 
 import { useMemo, useRef, useState } from 'react';
-import { journeyData } from '@/data/journey';
-import { lifecyclePhases, phaseOfStage } from '@/data/scheduleProfiles';
 import { fmtDate } from '@/lib/schedule';
+import { stageBands } from '@/lib/stages';
 import { useAppStore } from '@/store/useAppStore';
 import { Gantt, useGanttGeometry } from './Gantt';
 
@@ -22,6 +21,7 @@ export function Roadmap() {
   const kickoff = useAppStore((s) => s.kickoff);
   const today = useAppStore((s) => s.today);
   const currentStage = useAppStore((s) => s.currentStage);
+  const stages = useAppStore((s) => s.stages);
   const selectStage = useAppStore((s) => s.selectStage);
   const { minWeek, total, todayPct, todayVisible } = useGanttGeometry(schedule, kickoff, today);
 
@@ -52,16 +52,20 @@ export function Roadmap() {
    * here, Design & Verify here.
    */
   const bands = useMemo(() => {
-    const starts = lifecyclePhases.map((p) =>
-      Math.min(...p.stages.map((id) => schedule.stages[id].startOffsetWeeks)),
+    const phases = stageBands(stages);
+    const starts = phases.map((p) =>
+      Math.min(...p.stages.map((id) => schedule.stages[id]?.startOffsetWeeks ?? 0)),
     );
-    return lifecyclePhases.map((p, i) => {
+    return phases.map((p, i) => {
       const from = pctOfWeek(starts[i]);
       const to = i + 1 < starts.length ? pctOfWeek(starts[i + 1]) : 100;
-      return { id: p.id, label: p.label, left: from, width: Math.max(to - from, 0) };
+      /* a band can appear twice — a stage added under Implement after
+         Manufacture opens a second Implement band, which is what the chart
+         should show rather than one band spanning both */
+      return { id: p.id, key: `${p.id}-${i}`, label: p.label, left: from, width: Math.max(to - from, 0) };
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [schedule, minWeek, total]);
+  }, [schedule, stages, minWeek, total]);
 
   /* Seven milestones on one axis collide — Design Freeze and Tapeout are a week
      apart — so labels alternate between two rows. */
@@ -71,8 +75,7 @@ export function Roadmap() {
     row: i % 2,
   }));
 
-  const currentPhase =
-    currentStage === null ? null : phaseOfStage[journeyData[currentStage].id].id;
+  const currentPhase = currentStage === null ? null : stages[currentStage]?.phaseId ?? null;
 
   return (
     <section
@@ -91,7 +94,7 @@ export function Roadmap() {
                 className={`rm-region${b.id === currentPhase ? ' current' : ''}`}
                 data-phase={b.id}
                 style={{ left: `${b.left}%`, width: `${b.width}%` }}
-                key={b.id}
+                key={b.key}
               >
                 <span>{b.label}</span>
               </div>

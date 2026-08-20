@@ -4,7 +4,9 @@
  */
 import type { StageId } from './types';
 
-export const TEAM_SEEDS = {
+export const TEAM_SEEDS: Partial<
+  Record<StageId, readonly (readonly [string, string])[]>
+> = {
   productDefinition: [["Nora Feld", "Market & requirements analysis"], ["Ian Brooks", "Cost / die-size modeling"], ["Seojin Ha", "Feasibility studies"]],
   architecture: [["Leo Martins", "System modeling & workloads"], ["Aisha Bello", "Interconnect / NoC architecture"], ["Tim Nguyen", "Memory subsystem"], ["Rhea Kapoor", "IP evaluation"]],
   rtl: [["Jae Song", "Top-level integration"], ["Mira Patel", "Lint / CDC / RDC"], ["Ken Watanabe", "Third-party IP interface"], ["Olga Petrova", "Build & CI infrastructure"]],
@@ -17,4 +19,4 @@ export const TEAM_SEEDS = {
   packaging: [["Aya Nakamura", "Interposer integration"], ["Carlos Vega", "SI / PI analysis"], ["Femi Ade", "Thermal & mechanical"], ["Lucy Zhang", "OSAT program"]],
   bringup: [["Max Richter", "Board & lab infrastructure"], ["Dana Levi", "Functional validation"], ["Vik Sharma", "Characterization"], ["Emma Toth", "Failure analysis"]],
   qualification: [["Owen Price", "Reliability stress testing"], ["Sunita Nair", "Yield analysis"], ["Greg Holt", "Production test"], ["Ines Duarte", "Quality & ramp"]],
-} satisfies Partial<Record<StageId, readonly (readonly [string, string])[]>>;
+};

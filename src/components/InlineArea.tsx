@@ -1,7 +1,6 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { journeyData } from '@/data/journey';
 import type { StageId } from '@/data/types';
 import { formatManMonths } from '@/lib/effort';
 import {
@@ -13,7 +12,9 @@ import {
 import { useAppStore, type InlineState } from '@/store/useAppStore';
 import { Deliverables } from './Deliverables';
 
-const stageOf = (id: StageId) => journeyData.find((s) => s.id === id)!;
+/** The stage as this program's profile defines it, text and all. */
+const useStage = (id: StageId) =>
+  useAppStore((s) => s.stages.find((st) => st.id === id))!;
 
 function InlineHead({
   title,
@@ -251,6 +252,7 @@ function StageDetailEditor({
   engineeringEffort: string | null;
   onDone: () => void;
 }) {
+  const stage = useStage(stageId);
   const save = useAppStore((st) => st.saveStageDetail);
   const [f, setF] = useState({
     description: detail.description,
@@ -287,7 +289,7 @@ function StageDetailEditor({
         <button
           data-sd-save
           onClick={() => {
-            save(stageId, normaliseOverride({ ...f, engineeringEffort }, stageOf(stageId)));
+            save(stageId, normaliseOverride({ ...f, engineeringEffort }, stage));
             onDone();
           }}
         >
@@ -316,7 +318,7 @@ function StageDetailEditor({
 }
 
 function StageDetail({ stageId }: { stageId: StageId }) {
-  const s = stageOf(stageId);
+  const s = useStage(stageId);
   const close = useAppStore((st) => st.closeInline);
   const override = useAppStore((st) => st.stageDetails[stageId]);
   const detail = resolveStageDetail(s, override);
@@ -371,7 +373,7 @@ function StageDetail({ stageId }: { stageId: StageId }) {
 
 /** PM must-check library — anything here can be adopted onto the risk board. */
 function PotentialRisks({ stageId }: { stageId: StageId }) {
-  const s = stageOf(stageId);
+  const s = useStage(stageId);
   const risks = useAppStore((st) => st.content[stageId].risks);
   const adopt = useAppStore((st) => st.adoptPotentialRisk);
   const close = useAppStore((st) => st.closeInline);
@@ -403,6 +405,7 @@ function PotentialRisks({ stageId }: { stageId: StageId }) {
 }
 
 function LeaderEditor({ stageId }: { stageId: StageId }) {
+  const stage = useStage(stageId);
   const l = useAppStore((st) => st.leaders[stageId]);
   const save = useAppStore((st) => st.saveLeader);
   const close = useAppStore((st) => st.closeInline);
@@ -411,7 +414,7 @@ function LeaderEditor({ stageId }: { stageId: StageId }) {
 
   return (
     <>
-      <InlineHead title="Stage Leader" meta={stageOf(stageId).title} onClose={() => close(stageId)} />
+      <InlineHead title="Stage Leader" meta={stage.title} onClose={() => close(stageId)} />
       <div className="item-editor">
         <div className="ie-field">
           <span className="cap">Name</span>

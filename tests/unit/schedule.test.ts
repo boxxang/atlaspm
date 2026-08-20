@@ -25,7 +25,7 @@ const span = (s: ReturnType<typeof baseline>, id: StageId) =>
 describe('stage ordering', () => {
   it('matches journeyData and the profile key order', () => {
     expect([...STAGE_ORDER]).toEqual(journeyData.map((s) => s.id));
-    expect([...STAGE_ORDER]).toEqual(Object.keys(typicalSoC.stages));
+    expect([...STAGE_ORDER]).toEqual(typicalSoC.stages.map((st) => st.key));
   });
 });
 

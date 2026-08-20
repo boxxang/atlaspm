@@ -42,9 +42,8 @@ open risks, overdue count and the stage in flight today. Opening a card goes to
 back.
 
 Creating a program asks for a name, an expected kickoff and a schedule profile.
-Only `typicalSoC` is modelled, so the other three profiles are listed disabled
-exactly as the prototype lists them — adding a real one means adding its stage
-offsets and durations to `src/data/scheduleProfiles.ts`, nothing more.
+The profiles offered are the ones in the database: the built-in `Typical SoC`,
+plus any profile someone has forked by editing a program's stages.
 
 A new program starts with **empty boards** — no key information, activities or
 risks — and no leaders or contacts, because those would be someone else's
@@ -53,15 +52,15 @@ deliverables from `/src/data/journey.ts`, dated to that stage's end. Milestones
 need no rows at all; they fall out of kickoff + profile offsets like every other
 date in the app.
 
-Every stage definition is shared across programs (they live in code). Per
-program the database holds only kickoff, profile, schedule overrides, items,
-deliverables, leaders and contacts.
+Per program the database holds kickoff, profile, schedule overrides, items,
+deliverables, leaders and contacts. The stages themselves belong to the
+profile, which is shared by every program on it.
 
 ## Layout
 
 ```
-src/data/      schedule profiles, journey content, project seed — pure, no DOM
-src/lib/       schedule math, derivations, DB access, DB↔store mapping
+src/data/      the built-in profile, journey content, project seed — pure, no DOM
+src/lib/       schedule math, profile→stages resolution, derivations, DB access
 src/store/     Zustand stores (app state, modal state)
 src/components/ UI, ported 1:1 from the prototype
 src/app/       routes (/ program list, /p/[projectId] program), server actions
@@ -85,6 +84,22 @@ Pure logic never imports UI, and `/src/lib` + `/src/data` never touch the DOM �
   it. The roadmap and both gantts draw the proposal with the saved schedule
   ghosted underneath, and a bar lists every stage and milestone that moves with
   its shift in days. Apply commits, Discard reverts, a reload throws it away.
+- **Stages are editable.** *Stages* in the toolbar opens the profile's stage
+  list: rename, reorder, move a stage into another lifecycle band, change its
+  start and length, add one, remove one. A stage that carries a milestone
+  (Tapeout, First Silicon, Mass Production and the four freezes) cannot be
+  removed, since the milestone is anchored to its end; removing any other stage
+  says first how many board entries, deliverables and contacts go with it.
+- **Editing stages forks a profile.** The built-in profile is code and a shared
+  profile belongs to every program on it, so saving writes a new profile —
+  named in the editor, `Typical SoC (copy)` by default — and moves only this
+  program to it. A profile this program is the sole user of is edited in place,
+  which is also where renaming it happens. Stage keys survive the fork, so a
+  stage's boards, deliverables, leader and contacts travel with it; content on a
+  removed stage is deleted with it, and a manual date edit survives only where
+  the baseline it was made against did not move. New profiles appear in the
+  toolbar select and in the create-program picker, and a program can be moved
+  between profiles from the toolbar.
 - **Stage detail editing.** The pencil in the Stage Details header edits that
   program's copy of the stage text. A field only becomes an override when it
   differs from the shared definition, so emptying it restores the default.
@@ -181,8 +196,8 @@ that is a read/write swap rather than a redesign.
 ## Testing
 
 ```bash
-npm test          # 138 unit tests: schedule engine, derivations, effort, mail, purity
-npm run e2e       # 209 Playwright tests
+npm test          # 153 unit tests: schedule engine, stages/profiles, derivations, effort, mail, purity
+npm run e2e       # 220 Playwright tests
 ```
 
 The e2e suite runs against its own database (`test.db`) on port 3100, so it never

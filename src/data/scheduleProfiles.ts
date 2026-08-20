@@ -1,11 +1,14 @@
 /**
  * /data/scheduleProfiles.ts
- * Baseline profiles are immutable code — StageOverride is the only schedule
- * mutation surface (see CLAUDE.md). Ported 1:1 from the prototype.
+ * The built-in profile, ported 1:1 from the prototype. It is the seed for the
+ * `Profile` / `ProfileStage` rows and stays immutable — editing a program's
+ * stages forks a copy (see /lib/profiles.ts). StageOverride remains the only
+ * per-program schedule mutation surface (CLAUDE.md).
  */
+import { journeyData } from './journey';
 import type { LifecyclePhase, MilestoneDef, ScheduleProfile, StageId } from './types';
 
-/** Chronological stage order — drives the ripple in applyDateEdit(). */
+/** Chronological order of the built-in stages. */
 export const STAGE_ORDER = [
   'productDefinition',
   'architecture',
@@ -21,28 +24,22 @@ export const STAGE_ORDER = [
   'qualification',
 ] as const satisfies readonly StageId[];
 
-export type ProfileId = keyof typeof scheduleProfiles;
+/** Baselines of the built-in stages, in weeks from kickoff. */
+const BASELINES: Record<string, { startOffsetWeeks: number; durationWeeks: number }> = {
+  productDefinition: { startOffsetWeeks: 0,  durationWeeks: 4  },
+  architecture:      { startOffsetWeeks: 3,  durationWeeks: 6  },
+  rtl:               { startOffsetWeeks: 7,  durationWeeks: 12 },
+  verification:      { startOffsetWeeks: 10, durationWeeks: 16 },
+  synthesis:         { startOffsetWeeks: 20, durationWeeks: 4  },
+  physicalDesign:    { startOffsetWeeks: 22, durationWeeks: 12 },
+  signoff:           { startOffsetWeeks: 31, durationWeeks: 6  },
+  tapeout:           { startOffsetWeeks: 37, durationWeeks: 1  },
+  fabrication:       { startOffsetWeeks: 38, durationWeeks: 8  },
+  packaging:         { startOffsetWeeks: 46, durationWeeks: 4  },
+  bringup:           { startOffsetWeeks: 50, durationWeeks: 6  },
+  qualification:     { startOffsetWeeks: 54, durationWeeks: 12 },
+};
 
-export const scheduleProfiles = {
-  typicalSoC: {
-    id: "typicalSoC",
-    label: "Typical SoC",
-    stages: {
-      productDefinition: { startOffsetWeeks: 0,  durationWeeks: 4  },
-      architecture:      { startOffsetWeeks: 3,  durationWeeks: 6  },
-      rtl:               { startOffsetWeeks: 7,  durationWeeks: 12 },
-      verification:      { startOffsetWeeks: 10, durationWeeks: 16 },
-      synthesis:         { startOffsetWeeks: 20, durationWeeks: 4  },
-      physicalDesign:    { startOffsetWeeks: 22, durationWeeks: 12 },
-      signoff:           { startOffsetWeeks: 31, durationWeeks: 6  },
-      tapeout:           { startOffsetWeeks: 37, durationWeeks: 1  },
-      fabrication:       { startOffsetWeeks: 38, durationWeeks: 8  },
-      packaging:         { startOffsetWeeks: 46, durationWeeks: 4  },
-      bringup:           { startOffsetWeeks: 50, durationWeeks: 6  },
-      qualification:     { startOffsetWeeks: 54, durationWeeks: 12 },
-    },
-  },
-} satisfies Record<string, ScheduleProfile>;
 export const milestoneDefs = [
   { id: "archFreeze",     label: "Arch Freeze",     anchor: { stage: "architecture",  at: "end" } },
   { id: "rtlFreeze",      label: "RTL Freeze",      anchor: { stage: "rtl",           at: "end" } },
@@ -52,22 +49,60 @@ export const milestoneDefs = [
   { id: "firstSilicon",   label: "First Silicon",   anchor: { stage: "fabrication",   at: "end" }, major: true },
   { id: "massProduction", label: "Mass Production", anchor: { stage: "qualification", at: "end" }, major: true },
 ] satisfies readonly MilestoneDef[];
+
+/** The roadmap's bands. A stage names the one it sits under. */
 export const lifecyclePhases = [
-  { id: "define",       label: "Define",          stages: ["productDefinition", "architecture"] },
-  { id: "designVerify", label: "Design & Verify", stages: ["rtl", "verification"] },
-  { id: "implement",    label: "Implement",       stages: ["synthesis", "physicalDesign", "signoff"] },
-  { id: "manufacture",  label: "Manufacture",     stages: ["tapeout", "fabrication"] },
-  { id: "integrate",    label: "Integrate",       stages: ["packaging"] },
-  { id: "validateRamp", label: "Validate & Ramp", stages: ["bringup", "qualification"] },
+  { id: "define",       label: "Define" },
+  { id: "designVerify", label: "Design & Verify" },
+  { id: "implement",    label: "Implement" },
+  { id: "manufacture",  label: "Manufacture" },
+  { id: "integrate",    label: "Integrate" },
+  { id: "validateRamp", label: "Validate & Ramp" },
 ] satisfies readonly LifecyclePhase[];
+
+/** Which band each built-in stage sits under. */
+const PHASE_OF: Record<string, string> = {
+  productDefinition: 'define',
+  architecture: 'define',
+  rtl: 'designVerify',
+  verification: 'designVerify',
+  synthesis: 'implement',
+  physicalDesign: 'implement',
+  signoff: 'implement',
+  tapeout: 'manufacture',
+  fabrication: 'manufacture',
+  packaging: 'integrate',
+  bringup: 'validateRamp',
+  qualification: 'validateRamp',
+};
+
+export const phaseById = (id: string): LifecyclePhase =>
+  lifecyclePhases.find((p) => p.id === id) ?? lifecyclePhases[0];
+
 /** Stage → the milestone anchored to its end, if any. */
-export const stageMilestone: Partial<Record<StageId, MilestoneDef>> = {};
+export const stageMilestone: Record<string, MilestoneDef> = {};
 for (const m of milestoneDefs) {
   if (m.anchor.at === 'end') stageMilestone[m.anchor.stage] = m;
 }
 
-/** Stage → its lifecycle phase, plus that phase's index. */
-export const phaseOfStage = {} as Record<StageId, LifecyclePhase & { index: number }>;
-lifecyclePhases.forEach((p, index) => {
-  for (const s of p.stages) phaseOfStage[s] = { ...p, index };
-});
+/** The one profile that ships with the app; every other profile is forked. */
+export const BUILTIN_PROFILE: ScheduleProfile = {
+  id: 'typicalSoC',
+  label: 'Typical SoC',
+  builtin: true,
+  stages: STAGE_ORDER.map((key, i) => {
+    const content = journeyData.find((s) => s.id === key)!;
+    return {
+      key,
+      order: i,
+      title: content.title,
+      shortTitle: content.shortTitle,
+      phaseId: PHASE_OF[key],
+      baseKey: key,
+      ...BASELINES[key],
+    };
+  }),
+};
+
+export const scheduleProfiles = { typicalSoC: BUILTIN_PROFILE };
+export type ProfileId = string;

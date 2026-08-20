@@ -1,9 +1,9 @@
-import { STAGE_ORDER, scheduleProfiles, type ProfileId } from '@/data/scheduleProfiles';
 import type {
   Contact,
   Deliverable,
   ItemKind,
   Leader,
+  ScheduleProfile,
   StageContent,
   StageId,
 } from '@/data/types';
@@ -15,7 +15,9 @@ export interface ProjectState {
   projectId: string;
   projectName: string;
   kickoff: Date;
-  profileId: ProfileId;
+  /** The program's profile, stages and all — which stages exist is a property
+      of the program, not of the code. */
+  profile: ScheduleProfile;
   costPerManMonth: number;
   currency: string;
   overrides: StageOverrides;
@@ -46,15 +48,19 @@ const UI_KIND: Record<string, ItemKind> = {
 
 export const toUiKind = (kind: string): ItemKind | null => UI_KIND[kind] ?? null;
 
-export const emptyContent = (): Record<StageId, StageContent> => {
-  const out = {} as Record<StageId, StageContent>;
-  for (const id of STAGE_ORDER) out[id] = { keyinfo: [], activities: [], risks: [] };
+/* Both builders walk the stage list in order, so every map keyed by stage
+   iterates chronologically without carrying the order alongside it. */
+export const emptyContent = (
+  stageIds: readonly StageId[],
+): Record<StageId, StageContent> => {
+  const out: Record<StageId, StageContent> = {};
+  for (const id of stageIds) out[id] = { keyinfo: [], activities: [], risks: [] };
   return out;
 };
 
-export const emptyLists = <T>(): Record<StageId, T[]> => {
-  const out = {} as Record<StageId, T[]>;
-  for (const id of STAGE_ORDER) out[id] = [];
+export const emptyLists = <T>(stageIds: readonly StageId[]): Record<StageId, T[]> => {
+  const out: Record<StageId, T[]> = {};
+  for (const id of stageIds) out[id] = [];
   return out;
 };
 
@@ -116,7 +122,16 @@ interface StageDetailRow extends StageDetailOverride {
   stageId: string;
 }
 
-const isStage = (id: string): id is StageId => (STAGE_ORDER as readonly string[]).includes(id);
+interface ProfileStageRow {
+  key: string;
+  order: number;
+  title: string;
+  shortTitle: string;
+  phaseId: string;
+  baseKey: string | null;
+  startOffsetWeeks: number;
+  durationWeeks: number;
+}
 
 /** Fold flat DB rows into the per-stage shape the store holds. */
 export function buildProjectState(project: {
@@ -126,6 +141,7 @@ export function buildProjectState(project: {
   profileId: string;
   costPerManMonth: number;
   currency: string;
+  profile: { id: string; name: string; builtin: boolean; stages: ProfileStageRow[] };
   overrides: OverrideRow[];
   items: ItemRow[];
   deliverables: DeliverableRow[];
@@ -133,7 +149,20 @@ export function buildProjectState(project: {
   contacts: ContactRow[];
   stageDetails: StageDetailRow[];
 }): ProjectState {
-  const content = emptyContent();
+  const profile: ScheduleProfile = {
+    id: project.profile.id,
+    label: project.profile.name,
+    builtin: project.profile.builtin,
+    stages: [...project.profile.stages].sort((a, b) => a.order - b.order),
+  };
+  /* Rows for a stage the profile no longer carries are ignored rather than
+     crashing a page — a fork deletes them, but a database edited by hand
+     should still render. */
+  const stageIds = profile.stages.map((st) => st.key);
+  const known = new Set(stageIds);
+  const isStage = (id: string) => known.has(id);
+
+  const content = emptyContent(stageIds);
   for (const row of project.items) {
     const kind = toUiKind(row.kind);
     if (!kind || !isStage(row.stageId)) continue;
@@ -158,7 +187,7 @@ export function buildProjectState(project: {
     });
   }
 
-  const deliverables = emptyLists<Deliverable>();
+  const deliverables = emptyLists<Deliverable>(stageIds);
   for (const d of project.deliverables) {
     if (!isStage(d.stageId)) continue;
     deliverables[d.stageId].push({
@@ -170,17 +199,17 @@ export function buildProjectState(project: {
     });
   }
 
-  const leaders = {} as Record<StageId, Leader>;
+  const leaders: Record<StageId, Leader> = {};
   for (const l of project.leaders) {
     if (!isStage(l.stageId)) continue;
     leaders[l.stageId] = { name: l.name, short: l.short, phone: l.phone, email: l.email };
   }
   /* A new program has no leader rows until someone fills them in. */
-  for (const id of STAGE_ORDER) {
+  for (const id of stageIds) {
     leaders[id] ??= { name: '', short: '', phone: '', email: '' };
   }
 
-  const contacts = emptyLists<Contact>();
+  const contacts = emptyLists<Contact>(stageIds);
   for (const c of project.contacts) {
     if (!isStage(c.stageId)) continue;
     contacts[c.stageId].push({
@@ -218,9 +247,7 @@ export function buildProjectState(project: {
     projectId: project.id,
     projectName: project.name,
     kickoff: project.kickoff,
-    profileId: (project.profileId in scheduleProfiles
-      ? project.profileId
-      : 'typicalSoC') as ProfileId,
+    profile,
     costPerManMonth: project.costPerManMonth,
     currency: project.currency,
     overrides,

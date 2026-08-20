@@ -3,12 +3,19 @@
  * Progress, overdue counts, open risks, in-flight stages, D-days.
  * Pure: no DOM, no state, no UI imports.
  */
-import { STAGE_ORDER } from '@/data/scheduleProfiles';
 import type { Deliverable, Item, StageContent, StageId } from '@/data/types';
 import { DAY, type Schedule } from './schedule';
 
 type ContentMap = Record<StageId, StageContent>;
 type DeliverableMap = Record<StageId, Deliverable[]>;
+
+/**
+ * Which stages exist is a property of the program's profile, so these read the
+ * map they are given rather than a list of stages in code. Every per-stage map
+ * is built by walking the profile in order (see buildProjectState), so its keys
+ * come out chronological.
+ */
+const stagesOf = (map: object): StageId[] => Object.keys(map);
 
 /** Whole days from `today` to `d`, rounded up — matches the reference. */
 export const daysTo = (d: Date, today: Date) =>
@@ -23,7 +30,7 @@ export const dday = (d: Date, today: Date) => {
 /* ---------- deliverables ---------- */
 
 export const allDeliverables = (deliverables: DeliverableMap): Deliverable[] =>
-  STAGE_ORDER.flatMap((id) => deliverables[id] ?? []);
+  stagesOf(deliverables).flatMap((id) => deliverables[id] ?? []);
 
 /** Program progress = done deliverables / total, rounded to a whole percent. */
 export function progressPct(deliverables: DeliverableMap): number {
@@ -44,10 +51,10 @@ export const hasOpenRisks = (content: ContentMap, stageId: StageId) =>
   (content[stageId]?.risks.length ?? 0) > 0;
 
 export const openRiskCount = (content: ContentMap) =>
-  STAGE_ORDER.reduce((n, id) => n + (content[id]?.risks.length ?? 0), 0);
+  stagesOf(content).reduce((n, id) => n + (content[id]?.risks.length ?? 0), 0);
 
 export const riskStageIds = (content: ContentMap) =>
-  STAGE_ORDER.filter((id) => (content[id]?.risks.length ?? 0) > 0);
+  stagesOf(content).filter((id) => (content[id]?.risks.length ?? 0) > 0);
 
 /* ---------- overdue ---------- */
 
@@ -56,13 +63,13 @@ export const isOverdue = (it: Item, today: Date) =>
 
 /** Open activities whose due date has passed, across every stage. */
 export const overdueCount = (content: ContentMap, today: Date) =>
-  STAGE_ORDER.reduce(
+  stagesOf(content).reduce(
     (n, id) => n + (content[id]?.activities.filter((a) => isOverdue(a, today)).length ?? 0),
     0,
   );
 
 export const overdueItems = (content: ContentMap, today: Date) =>
-  STAGE_ORDER.flatMap((id) =>
+  stagesOf(content).flatMap((id) =>
     (content[id]?.activities ?? [])
       .filter((a) => isOverdue(a, today))
       .map((item) => ({ stageId: id, item })),
@@ -72,7 +79,7 @@ export const overdueItems = (content: ContentMap, today: Date) =>
 
 /** Stages whose span contains today — the chips on the dashboard. */
 export const inFlightStageIds = (schedule: Schedule, today: Date) =>
-  STAGE_ORDER.filter((id) => {
+  stagesOf(schedule.stages).filter((id) => {
     const st = schedule.stages[id];
     return st.start <= today && today <= st.end;
   });
@@ -87,7 +94,7 @@ export const upcomingMilestones = (schedule: Schedule, today: Date) =>
 
 /** Every status update across the program, newest first. */
 export const allUpdates = (content: ContentMap) =>
-  STAGE_ORDER.flatMap((stageId) =>
+  stagesOf(content).flatMap((stageId) =>
     (['keyinfo', 'activities', 'risks'] as const).flatMap((kind) =>
       (content[stageId]?.[kind] ?? []).flatMap((item) =>
         item.updates.map((su) => ({ stageId, kind, item, su })),

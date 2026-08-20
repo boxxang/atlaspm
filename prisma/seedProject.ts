@@ -9,7 +9,8 @@ import {
   SEED_EFFORT,
   createProjectSeed,
 } from '../src/data/projectSeed';
-import { STAGE_ORDER, scheduleProfiles } from '../src/data/scheduleProfiles';
+import { BUILTIN_PROFILE, STAGE_ORDER } from '../src/data/scheduleProfiles';
+import { ensureBuiltinProfile } from '../src/lib/builtinProfile';
 import { DB_KIND } from '../src/lib/projectState';
 import { addWeeks, computeSchedule, startOfDay } from '../src/lib/schedule';
 import type { PrismaClient } from '../src/generated/prisma/client';
@@ -29,8 +30,11 @@ export async function seedProject(prisma: PrismaClient, now = new Date()): Promi
   const today = startOfDay(now);
   /* default kickoff = 30 weeks before today, so "today" sits mid-program */
   const kickoff = addWeeks(today, -30);
-  const schedule = computeSchedule(kickoff, scheduleProfiles.typicalSoC, {});
+  const schedule = computeSchedule(kickoff, BUILTIN_PROFILE, {});
   const seed = createProjectSeed({ schedule, now });
+
+  /* Every program needs a profile to point at, and this one is the code's. */
+  await ensureBuiltinProfile(prisma);
 
   /* Scoped to this one project: other programs in the database are left alone.
      Cascades clear its items, updates, deliverables, leaders and contacts. */

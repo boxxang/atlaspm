@@ -104,8 +104,9 @@ test.describe('toolbar controls', () => {
 
     const profile = page.locator('#profile-select');
     await expect(profile).toHaveValue('typicalSoC');
-    // The other three profiles ship disabled, as in the reference.
-    expect(await profile.locator('option:not([disabled])').count()).toBe(1);
+    // Profiles are rows now: a fresh database ships with the built-in one only.
+    await expect(profile.locator('option')).toHaveCount(1);
+    await expect(profile.locator('option')).toHaveText('Typical SoC');
   });
 
   test('mode toggle drives body.schedule-mode and the dashboard overlay', async ({ page }) => {

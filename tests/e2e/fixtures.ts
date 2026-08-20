@@ -33,6 +33,9 @@ export const test = base.extend<{ seeded: void }>({
          never wipes programs someone else created. A test wants the whole
          database back, including anything a previous test created. */
       await prisma().project.deleteMany({});
+      /* profiles forked by a test outlive its programs, and the pickers list
+         them — clear everything the code did not ship */
+      await prisma().profile.deleteMany({ where: { builtin: false } });
       await seedProject(prisma());
       await use();
     },

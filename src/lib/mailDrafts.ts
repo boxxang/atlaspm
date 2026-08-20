@@ -2,8 +2,7 @@
  * /lib/mailDrafts.ts — the two drafts the envelope buttons compose.
  * Pure: hand it state, get back a subject and a plain-text body.
  */
-import { journeyData } from '@/data/journey';
-import type { Deliverable, Item, ItemKind, StageContent, StageId } from '@/data/types';
+import type { Deliverable, Item, ItemKind, Stage, StageContent, StageId } from '@/data/types';
 import {
   allUpdates,
   dday,
@@ -17,7 +16,11 @@ import {
 import { clip, joinSections, row, section, type MailDraft } from './mailto';
 import { fmtDT, fmtDTFull, fmtDate, type Schedule } from './schedule';
 
-const stageOf = (id: StageId) => journeyData.find((s) => s.id === id)!;
+/* Which stages exist comes from the program's profile, so every draft is
+   handed the list rather than reading one out of the code. */
+const finder = (stages: readonly Stage[]) => (id: StageId) =>
+  stages.find((s) => s.id === id) ?? { ...FALLBACK_STAGE, id, title: id };
+const FALLBACK_STAGE = { title: '', shortTitle: '' } as Stage;
 const KIND_LABEL: Record<ItemKind, string> = {
   keyinfo: 'Key Info',
   activities: 'Activity',
@@ -29,12 +32,14 @@ const SIGNATURE = '—\nComposed in AtlasPM. Review before sending.';
 /** Dashboard → a status summary someone can read without opening the tool. */
 export function programSummaryDraft(input: {
   projectName: string;
+  stages: readonly Stage[];
   schedule: Schedule;
   today: Date;
   content: Record<StageId, StageContent>;
   deliverables: Record<StageId, Deliverable[]>;
 }): MailDraft {
   const { projectName, schedule, today, content, deliverables } = input;
+  const stageOf = finder(input.stages);
   const all = Object.values(deliverables).flat();
   const done = all.filter((d) => d.done).length;
   const risks = openRiskCount(content);
@@ -97,6 +102,7 @@ export function programSummaryDraft(input: {
 /** An activity, risk or key-info row → a note to whoever owns it. */
 export function itemDraft(input: {
   projectName: string;
+  stages: readonly Stage[];
   stageId: StageId;
   kind: ItemKind;
   item: Item;
@@ -105,7 +111,7 @@ export function itemDraft(input: {
   ownerEmail: string | null;
 }): MailDraft {
   const { projectName, stageId, kind, item, today, ownerEmail } = input;
-  const stage = stageOf(stageId);
+  const stage = finder(input.stages)(stageId);
   const overdue = !item.done && item.due && item.due < today;
 
   const body = joinSections([
@@ -142,13 +148,14 @@ export function itemDraft(input: {
 /** A whole stage's activity list → one note to everyone who owns a line on it. */
 export function activityListDraft(input: {
   projectName: string;
+  stages: readonly Stage[];
   stageId: StageId;
   items: Item[];
   today: Date;
   recipients: string[];
 }): MailDraft {
   const { projectName, stageId, items, today, recipients } = input;
-  const stage = stageOf(stageId);
+  const stage = finder(input.stages)(stageId);
   const open = items.filter((i) => !i.done);
 
   const body = joinSections([

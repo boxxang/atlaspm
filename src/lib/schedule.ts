@@ -2,7 +2,7 @@
  * /lib/scheduleCalculator.ts — schedule math and the one date formatter set.
  * Pure: no DOM, no state, no UI imports. Ported 1:1 from the prototype.
  */
-import { STAGE_ORDER, milestoneDefs } from '@/data/scheduleProfiles';
+import { milestoneDefs } from '@/data/scheduleProfiles';
 import type {
   MilestoneDef,
   ScheduleProfile,
@@ -83,26 +83,45 @@ export function computeSchedule(
 ): Schedule {
   const stages = {} as Record<StageId, StageSchedule>;
   let totalWeeks = 0;
-  for (const id of STAGE_ORDER) {
-    const p = { ...profile.stages[id], ...(overrides[id] || {}) };
+  /* Insertion order is the profile's stage order — every map keyed by stage is
+     built by walking this list, so Object.keys() reads chronologically. */
+  for (const st of profile.stages) {
+    const p = {
+      startOffsetWeeks: st.startOffsetWeeks,
+      durationWeeks: st.durationWeeks,
+      ...(overrides[st.key] || {}),
+    };
     const start = addWeeks(kickoff, p.startOffsetWeeks);
     const end = addWeeks(start, p.durationWeeks);
-    stages[id] = { ...p, start, end };
+    stages[st.key] = { ...p, start, end };
     totalWeeks = Math.max(totalWeeks, p.startOffsetWeeks + p.durationWeeks);
   }
-  const milestones = milestoneDefs.map((m) => {
-    const s = stages[m.anchor.stage];
-    const week =
-      m.anchor.at === 'end' ? s.startOffsetWeeks + s.durationWeeks : s.startOffsetWeeks;
-    return { ...m, week, date: m.anchor.at === 'end' ? s.end : s.start };
-  });
+  /* A milestone belongs to a stage; a profile that no longer carries that
+     stage no longer carries the milestone either. */
+  const milestones = milestoneDefs
+    .filter((m) => stages[m.anchor.stage])
+    .map((m) => {
+      const s = stages[m.anchor.stage];
+      const week =
+        m.anchor.at === 'end' ? s.startOffsetWeeks + s.durationWeeks : s.startOffsetWeeks;
+      return { ...m, week, date: m.anchor.at === 'end' ? s.end : s.start };
+    });
+
+  /* The toolbar's three dates are milestone dates. Deleting a stage that
+     carries one is blocked in the editor, so the fallback is only reached by a
+     profile built without it — then the program simply ends when it ends. */
+  const lastEnd = profile.stages.length
+    ? new Date(Math.max(...profile.stages.map((st) => stages[st.key].end.getTime())))
+    : new Date(kickoff);
+  const endOf = (key: StageId) => stages[key]?.end ?? lastEnd;
+
   return {
     stages,
     totalWeeks,
     milestones,
-    tapeout: stages.tapeout.end,
-    firstSilicon: stages.fabrication.end,
-    production: stages.qualification.end,
+    tapeout: endOf('tapeout'),
+    firstSilicon: endOf('fabrication'),
+    production: endOf('qualification'),
   };
 }
 
@@ -112,9 +131,13 @@ export function materializeOverrides(
   overrides: StageOverrides = {},
 ): FullOverrides {
   const out = {} as FullOverrides;
-  for (const id of STAGE_ORDER) {
-    const eff = { ...profile.stages[id], ...(overrides[id] || {}) };
-    out[id] = {
+  for (const st of profile.stages) {
+    const eff = {
+      startOffsetWeeks: st.startOffsetWeeks,
+      durationWeeks: st.durationWeeks,
+      ...(overrides[st.key] || {}),
+    };
+    out[st.key] = {
       startOffsetWeeks: eff.startOffsetWeeks,
       durationWeeks: eff.durationWeeks,
     };
@@ -137,20 +160,19 @@ export function applyDateEdit(
   which: 'start' | 'end',
   newDate: Date,
 ): FullOverrides {
-  const idx = STAGE_ORDER.indexOf(stageId);
+  const order = profile.stages.map((st) => st.key);
+  const idx = order.indexOf(stageId);
   const cur = schedule.stages[stageId];
   const next = materializeOverrides(profile, overrides);
   if (which === 'start') {
     const dw = (newDate.getTime() - cur.start.getTime()) / (7 * DAY);
-    for (let i = idx; i < STAGE_ORDER.length; i++)
-      next[STAGE_ORDER[i]].startOffsetWeeks += dw;
+    for (let i = idx; i < order.length; i++) next[order[i]].startOffsetWeeks += dw;
   } else {
     const dw = (newDate.getTime() - cur.end.getTime()) / (7 * DAY);
     const o = next[stageId];
     /* a stage can never shrink below a single day */
     o.durationWeeks = Math.max(1 / 7, o.durationWeeks + dw);
-    for (let i = idx + 1; i < STAGE_ORDER.length; i++)
-      next[STAGE_ORDER[i]].startOffsetWeeks += dw;
+    for (let i = idx + 1; i < order.length; i++) next[order[i]].startOffsetWeeks += dw;
   }
   return next;
 }
@@ -163,12 +185,11 @@ export function hasOverrides(
   profile: ScheduleProfile,
   overrides: StageOverrides,
 ): boolean {
-  return STAGE_ORDER.some((id) => {
-    const o = overrides[id];
+  return profile.stages.some((st) => {
+    const o = overrides[st.key];
     if (!o) return false;
-    const b = profile.stages[id];
     return (
-      o.startOffsetWeeks !== b.startOffsetWeeks || o.durationWeeks !== b.durationWeeks
+      o.startOffsetWeeks !== st.startOffsetWeeks || o.durationWeeks !== st.durationWeeks
     );
   });
 }

@@ -1,7 +1,7 @@
 'use client';
 
-import { phaseOfStage, stageMilestone } from '@/data/scheduleProfiles';
-import type { JourneyStage } from '@/data/types';
+import { lifecyclePhases, phaseById, stageMilestone } from '@/data/scheduleProfiles';
+import type { Stage } from '@/data/types';
 import { fmtW, fromISO, toISO } from '@/lib/schedule';
 import { useModalStore } from '@/store/modalStore';
 import { useAppStore } from '@/store/useAppStore';
@@ -10,7 +10,7 @@ import { Contacts } from './Contacts';
 import { InlineArea } from './InlineArea';
 import { stageViz } from './stageViz';
 
-function LeaderRow({ stage }: { stage: JourneyStage }) {
+function LeaderRow({ stage }: { stage: Stage }) {
   const l = useAppStore((s) => s.leaders[stage.id]);
   const openInline = useAppStore((s) => s.openInline);
   return (
@@ -29,7 +29,7 @@ function LeaderRow({ stage }: { stage: JourneyStage }) {
 }
 
 /** Editing either date ripples the rest of the program — see applyDateEdit. */
-function DatesRow({ stage }: { stage: JourneyStage }) {
+function DatesRow({ stage }: { stage: Stage }) {
   const st = useAppStore((s) => s.schedule.stages[stage.id]);
   const editStageDate = useAppStore((s) => s.editStageDate);
   const ms = stageMilestone[stage.id];
@@ -63,14 +63,15 @@ function DatesRow({ stage }: { stage: JourneyStage }) {
   );
 }
 
-export function StagePanel({ stage, index }: { stage: JourneyStage; index: number }) {
+export function StagePanel({ stage, index }: { stage: Stage; index: number }) {
   const selected = useAppStore((s) => s.currentStage === index);
   const inline = useAppStore((s) => s.inline[stage.id]);
   const openInline = useAppStore((s) => s.openInline);
   const contactEdit = inline?.kind === 'stage' ? inline.editContact : null;
   const openBoard = useModalStore((m) => m.openBoard);
   const num = String(stage.stage).padStart(2, '0');
-  const phase = phaseOfStage[stage.id];
+  const phase = phaseById(stage.phaseId);
+  const phaseNo = lifecyclePhases.findIndex((p) => p.id === phase.id) + 1;
   const detailOpen = !!inline;
 
   return (
@@ -90,7 +91,7 @@ export function StagePanel({ stage, index }: { stage: JourneyStage; index: numbe
     >
       <div className="panel-info">
         <span className="phase-cap">
-          Phase {phase.index + 1} — {phase.label}
+          Phase {phaseNo} — {phase.label}
         </span>
         <div className="stage-meta">
           <span className="stage-num">{num} / 12</span>
@@ -103,11 +104,15 @@ export function StagePanel({ stage, index }: { stage: JourneyStage; index: numbe
       </div>
 
       {/* The visual stretches to the info column beside it, so it ends on the
-          dates row's bottom border rather than running past it. */}
+          dates row's bottom border rather than running past it. A stage someone
+          added has no drawing, and keeps the empty column so the rest of the
+          panel does not reflow around it. */}
       <div
         className="viz"
         aria-hidden="true"
-        dangerouslySetInnerHTML={{ __html: stageViz[stage.id]() }}
+        dangerouslySetInnerHTML={{
+          __html: stage.vizKey ? stageViz[stage.vizKey]() : '',
+        }}
       />
 
       {/* One full-width slot below the dates: the sheet when it is open, the

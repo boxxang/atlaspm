@@ -2,9 +2,9 @@
 
 import { create } from 'zustand';
 import * as api from '@/app/actions';
-import { journeyData } from '@/data/journey';
-import { STAGE_ORDER, scheduleProfiles, type ProfileId } from '@/data/scheduleProfiles';
+import { BUILTIN_PROFILE, STAGE_ORDER } from '@/data/scheduleProfiles';
 import type { ProjectState } from '@/lib/projectState';
+import { resolveStages } from '@/lib/stages';
 import { rejectFile, rejectionMessage } from '@/lib/attachments';
 import { serialiseEffort } from '@/lib/effort';
 import { isEmptyOverride, type StageDetailOverride } from '@/lib/stageDetail';
@@ -15,6 +15,8 @@ import type {
   Item,
   ItemKind,
   Leader,
+  ScheduleProfile,
+  Stage,
   StageContent,
   StageId,
   StatusUpdate,
@@ -43,7 +45,9 @@ export interface AppState {
   today: Date;
   projectName: string;
   kickoff: Date;
-  profileId: ProfileId;
+  /** The profile this program runs on, and the stages it resolves to. */
+  profile: ScheduleProfile;
+  stages: Stage[];
   costPerManMonth: number;
   currency: string;
   overrides: StageOverrides;
@@ -66,7 +70,7 @@ export interface AppState {
   hydrate: (initial: ProjectState, now?: Date) => void;
   setProjectName: (name: string) => void;
   setKickoff: (d: Date) => void;
-  setProfile: (id: ProfileId) => void;
+  setProfile: (id: string) => void;
   /** Picking the selected stage again clears it. */
   selectStage: (i: number | null) => void;
   editStageDate: (stageId: StageId, which: 'start' | 'end', date: Date) => void;
@@ -172,6 +176,17 @@ export const flushWrites = () => Promise.allSettled([...inFlight]).then(() => un
 const emptyMap = <T,>(make: () => T) =>
   Object.fromEntries(STAGE_ORDER.map((id) => [id, make()])) as Record<StageId, T>;
 
+/** Changes only when the profile really changes — id, order, names, baselines. */
+const profileSignature = (p: ScheduleProfile) =>
+  p.id +
+  '|' +
+  p.stages
+    .map(
+      (st) =>
+        `${st.key}@${st.order}:${st.startOffsetWeeks}/${st.durationWeeks}:${st.title}:${st.shortTitle}:${st.phaseId}`,
+    )
+    .join(',');
+
 const BOOT_TODAY = new Date(0);
 const BOOT_KICKOFF = new Date(0);
 
@@ -183,20 +198,19 @@ export const useAppStore = create<AppState>()((set, get) => ({
   today: BOOT_TODAY,
   projectName: 'AtlasEX',
   kickoff: BOOT_KICKOFF,
-  profileId: 'typicalSoC',
+  profile: BUILTIN_PROFILE,
+  stages: resolveStages(BUILTIN_PROFILE),
   costPerManMonth: 0,
   currency: 'USD',
   overrides: {},
-  schedule: computeSchedule(BOOT_KICKOFF, scheduleProfiles.typicalSoC, {}),
-  committedSchedule: computeSchedule(BOOT_KICKOFF, scheduleProfiles.typicalSoC, {}),
+  schedule: computeSchedule(BOOT_KICKOFF, BUILTIN_PROFILE, {}),
+  committedSchedule: computeSchedule(BOOT_KICKOFF, BUILTIN_PROFILE, {}),
   draftOverrides: null,
   edited: false,
   currentStage: null,
   content: emptyMap<StageContent>(() => ({ keyinfo: [], activities: [], risks: [] })),
   deliverables: emptyMap<Deliverable[]>(() => []),
-  leaders: Object.fromEntries(
-    journeyData.map((s) => [s.id, { ...s.leader }]),
-  ) as Record<StageId, Leader>,
+  leaders: emptyMap<Leader>(() => ({ name: '', short: '', phone: '', email: '' })),
   contacts: emptyMap<Contact[]>(() => []),
   stageDetails: {},
   inline: {},
@@ -210,15 +224,28 @@ export const useAppStore = create<AppState>()((set, get) => ({
      first one's name, schedule and boards until a full page load. */
   hydrate: (initial, now = new Date()) => {
     const prev = get();
-    if (prev.hydrated && prev.projectId === initial.projectId) return;
-    const profile = scheduleProfiles[initial.profileId] ?? scheduleProfiles.typicalSoC;
+    /* Also re-hydrate when the program's stage list has changed under it —
+       editing the stages forks a profile, and the keys the boards hang off
+       move with it. */
+    if (
+      prev.hydrated &&
+      prev.projectId === initial.projectId &&
+      profileSignature(prev.profile) === profileSignature(initial.profile)
+    )
+      return;
+    const profile = initial.profile;
+    const stages = resolveStages(profile);
     const today = startOfDay(now);
     const schedule = computeSchedule(initial.kickoff, profile, initial.overrides);
     /* Open on the stage running today. Stages overlap, so several can be — take
        the last, which is the lowest bar on the chart. */
-    const inFlight = STAGE_ORDER.map((id, i) =>
-      schedule.stages[id].start <= today && today <= schedule.stages[id].end ? i : -1,
-    ).filter((i) => i >= 0);
+    const inFlight = stages
+      .map((st, i) =>
+        schedule.stages[st.id].start <= today && today <= schedule.stages[st.id].end
+          ? i
+          : -1,
+      )
+      .filter((i) => i >= 0);
     const openStage = inFlight.length ? inFlight[inFlight.length - 1] : null;
     set({
       hydrated: true,
@@ -226,7 +253,8 @@ export const useAppStore = create<AppState>()((set, get) => ({
       today,
       projectName: initial.projectName,
       kickoff: initial.kickoff,
-      profileId: initial.profileId,
+      profile,
+      stages,
       costPerManMonth: initial.costPerManMonth,
       currency: initial.currency,
       overrides: initial.overrides,
@@ -244,7 +272,7 @@ export const useAppStore = create<AppState>()((set, get) => ({
       inline:
         openStage === null
           ? {}
-          : { [STAGE_ORDER[openStage]]: { kind: 'stage', editContact: null } },
+          : { [stages[openStage].id]: { kind: 'stage', editContact: null } },
     });
   },
 
@@ -255,25 +283,19 @@ export const useAppStore = create<AppState>()((set, get) => ({
 
   setKickoff: (kickoff) => {
     set((s) => {
-      const schedule = computeSchedule(kickoff, scheduleProfiles[s.profileId], s.overrides);
+      const schedule = computeSchedule(kickoff, s.profile, s.overrides);
       /* moving kickoff re-bases everything, so any staged stage edit is stale */
       return { kickoff, schedule, committedSchedule: schedule, draftOverrides: null };
     });
     sync(api.setKickoff(get().projectId, kickoff));
   },
 
+  /**
+   * Moving a program to another profile changes which stages exist, so there is
+   * nothing sensible to draw optimistically — the write goes out and the
+   * re-render brings the new stage list, which hydrate() picks up.
+   */
   setProfile: (profileId) => {
-    set((s) => {
-      const schedule = computeSchedule(s.kickoff, scheduleProfiles[profileId], {});
-      return {
-        profileId,
-        overrides: {},
-        edited: false,
-        schedule,
-        committedSchedule: schedule,
-        draftOverrides: null,
-      };
-    });
     sync(api.setProfile(get().projectId, profileId));
   },
 
@@ -281,7 +303,7 @@ export const useAppStore = create<AppState>()((set, get) => ({
     set((s) => {
       /* picking the same bar again closes the panel */
       if (i === null || i === s.currentStage) return { currentStage: null };
-      const stageId = STAGE_ORDER[i];
+      const stageId = s.stages[i].id;
       return {
         currentStage: i,
         /* stage details are visible by default on the newly selected stage */
@@ -299,7 +321,7 @@ export const useAppStore = create<AppState>()((set, get) => ({
    */
   editStageDate: (stageId, which, date) => {
     const s = get();
-    const profile = scheduleProfiles[s.profileId];
+    const profile = s.profile;
     const base = s.draftOverrides ?? s.overrides;
     const draftOverrides = applyDateEdit(profile, base, s.schedule, stageId, which, date);
     set({ draftOverrides, schedule: computeSchedule(s.kickoff, profile, draftOverrides) });
@@ -308,7 +330,7 @@ export const useAppStore = create<AppState>()((set, get) => ({
   applyScheduleDraft: () => {
     const s = get();
     if (!s.draftOverrides) return;
-    const profile = scheduleProfiles[s.profileId];
+    const profile = s.profile;
     const overrides = s.draftOverrides;
     const schedule = computeSchedule(s.kickoff, profile, overrides);
     set({
@@ -325,12 +347,12 @@ export const useAppStore = create<AppState>()((set, get) => ({
   discardScheduleDraft: () =>
     set((s) => ({
       draftOverrides: null,
-      schedule: computeSchedule(s.kickoff, scheduleProfiles[s.profileId], s.overrides),
+      schedule: computeSchedule(s.kickoff, s.profile, s.overrides),
     })),
 
   resetSchedule: () => {
     set((s) => {
-      const schedule = computeSchedule(s.kickoff, scheduleProfiles[s.profileId], {});
+      const schedule = computeSchedule(s.kickoff, s.profile, {});
       return {
         overrides: {},
         draftOverrides: null,
@@ -509,7 +531,7 @@ export const useAppStore = create<AppState>()((set, get) => ({
   },
 
   setEngineeringLines: (stageId, lines) => {
-    const stage = journeyData.find((x) => x.id === stageId)!;
+    const stage = get().stages.find((x) => x.id === stageId)!;
     const labels = lines.map((l) => l.label.trim()).filter(Boolean);
     const effort = lines.filter((l) => l.label.trim()).map((l) => l.manMonths);
     /* A list identical to the shared default is not an override, so the stage

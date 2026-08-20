@@ -19,6 +19,47 @@ generator client {
   output   = "../src/generated/prisma"
 }
 
+/// A schedule profile: the ordered list of stages a program runs on, shared by
+/// every program using it. The built-in profile is seeded from
+/// /data/scheduleProfiles.ts and stays immutable — editing a program's stages
+/// forks a copy, so other programs on the profile are never rescheduled by
+/// someone else's edit.
+model Profile {
+  id        String   @id
+  name      String
+  builtin   Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  stages   ProfileStage[]
+  projects Project[]
+}
+
+/// One stage of a profile. `key` is what every per-program row (items,
+/// deliverables, leaders, contacts, overrides, stage details) points at, and it
+/// survives a fork, so a forked program keeps its content.
+model ProfileStage {
+  id        String @id
+  profileId String
+  key       String
+  /// Position on the chart's y-axis, and the order the date ripple walks.
+  order     Int
+  title     String
+  shortTitle String
+  /// Lifecycle band: define | designVerify | implement | manufacture | integrate | validateRamp
+  phaseId   String
+  /// The built-in stage whose text and drawing this stage shows; null for a
+  /// stage someone added, which starts blank.
+  baseKey   String?
+
+  startOffsetWeeks Float
+  durationWeeks    Float
+
+  profile Profile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+
+  @@unique([profileId, key])
+  @@index([profileId])
+}
+
 model Project {
   id        String   @id
   name      String
@@ -30,6 +71,8 @@ model Project {
   /// which shows the effort without pretending to know what it costs.
   costPerManMonth Float  @default(0)
   currency        String @default("USD")
+
+  profile      Profile @relation(fields: [profileId], references: [id])
 
   overrides    StageOverride[]
   items        Item[]
