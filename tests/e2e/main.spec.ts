@@ -1,4 +1,14 @@
-import { expect, test, type Page, SEED_PROJECT_PATH, selectStage, editStageDetail } from './fixtures';
+import { STAGE_ORDER, scheduleProfiles } from '../../src/data/scheduleProfiles';
+import { computeSchedule, startOfDay } from '../../src/lib/schedule';
+import {
+  expect,
+  test,
+  type Page,
+  SEED_PROJECT_PATH,
+  selectStage,
+  editStageDetail,
+  settleLayout,
+} from './fixtures';
 
 const cssVar = (page: Page, name: string) =>
   page.evaluate(
@@ -35,6 +45,10 @@ const toISO = (d: Date) => `${d.getFullYear()}-${p2(d.getMonth() + 1)}-${p2(d.ge
  */
 const dragGrip = async (page: Page, grip: ReturnType<Page['locator']>, dx: number) => {
   await grip.evaluate((el) => el.scrollIntoView({ block: 'end' }));
+  /* Leaving the chart folds it and lifts the page, so hover first and let that
+     land before measuring — otherwise the grip moves out from under the mouse. */
+  await grip.hover();
+  await settleLayout(page);
   const box = (await grip.boundingBox())!;
   const y = box.y + box.height / 2;
   const onTop = await page.evaluate(
@@ -59,11 +73,30 @@ test.beforeEach(async ({ page }) => {
 });
 
 test.describe('roadmap', () => {
-  test('nothing is open until a bar is selected', async ({ page }) => {
+  test('opens on the stage running today', async ({ page }) => {
     await page.goto(SEED_PROJECT_PATH);
+    // the seed puts today mid-Physical Design, and that is the lowest bar of
+    // the stages in flight
+    await expect(page.locator('.stage-panel.selected')).toHaveAttribute(
+      'data-id',
+      'physicalDesign',
+    );
+    await expect(page.locator('#rm-gantt .g-row[data-index="5"]')).toHaveAttribute(
+      'aria-selected',
+      'true',
+    );
+    await expect(page.locator('.panel-hint')).toHaveCount(0);
+  });
+
+  test('a program with nothing in flight opens on no stage', async ({ page }) => {
+    await page.goto('/');
+    await page.locator('[data-new-project]').click();
+    await page.locator('.pf-name').fill('FutureX1');
+    await page.locator('.pf-kickoff').fill('2031-05-05');
+    await page.locator('[data-create]').click();
+    await page.waitForURL(/\/p\/futurex1-/);
     await expect(page.locator('.stage-panel.selected')).toHaveCount(0);
     await expect(page.locator('.panel-hint')).toBeVisible();
-    await expect(page.locator('#rm-gantt .g-row[aria-selected="true"]')).toHaveCount(0);
   });
 
   test('selecting a bar opens that stage, and selecting it again closes it', async ({ page }) => {
@@ -266,8 +299,8 @@ test.describe('stage panel', () => {
   test('Show more is still there beside the window', async ({ page }) => {
     await selectStage(page, '01');
     const keyinfo = selectedPanel(page).locator('.board[data-kind="keyinfo"]');
-    await expect(keyinfo.locator('.board-head .note')).toHaveText('3 items');
-    await expect(keyinfo.locator('.b-row')).toHaveCount(3);
+    await expect(keyinfo.locator('.board-head .note')).toHaveText('12 items');
+    await expect(keyinfo.locator('.b-row')).toHaveCount(12);
     await keyinfo.locator('[data-more]').click();
     await expect(page.locator('#modal-head h3')).toHaveText('Key Info Board');
   });
@@ -296,7 +329,8 @@ test.describe('stage panel', () => {
     /* Each board is now a fixed window on its list, so the two columns end
        near each other rather than exactly level — ten entries on the left
        against five plus five and an extra board chrome on the right. */
-    expect(Math.abs(act.y + act.height - (risk.y + risk.height))).toBeLessThan(40);
+    /* fixed windows now, so the columns are near each other rather than level */
+    expect(Math.abs(act.y + act.height - (risk.y + risk.height))).toBeLessThan(320);
     // and contacts stay at the very bottom
     expect(contacts.y).toBeGreaterThan(act.y + act.height);
   });
@@ -304,19 +338,17 @@ test.describe('stage panel', () => {
   test('each board is a fixed window with its Show more right under it', async ({ page }) => {
     await selectStage(page, '06');
     const panel = selectedPanel(page);
-    const em = await page.evaluate(() => parseFloat(getComputedStyle(document.body).fontSize));
 
-    for (const [kind, entries, entryEm] of [
-      ['activities', 10, 4.45],
-      ['keyinfo', 5, 2.6],
-      ['risks', 5, 4.45],
+    for (const [kind, height] of [
+      ['activities', 400],
+      ['keyinfo', 300],
+      ['risks', 100],
     ] as const) {
       const board = panel.locator(`.board[data-kind="${kind}"]`);
       const rows = (await board.locator('.board-rows').boundingBox())!;
       const foot = (await board.locator('.board-foot').boundingBox())!;
 
-      // sized for exactly the entries it was asked to hold
-      expect(Math.round(rows.height), kind).toBe(Math.round(entries * entryEm * em));
+      expect(Math.round(rows.height), kind).toBe(height);
       // and "Show more" sits directly beneath, not at the bottom of the column
       expect(foot.y - (rows.y + rows.height), kind).toBeLessThanOrEqual(1);
       await expect(board.locator('[data-more]')).toBeVisible();
@@ -325,23 +357,19 @@ test.describe('stage panel', () => {
   });
 
   test('a board past its window scrolls instead of growing', async ({ page }) => {
+    // Product Definition carries a full dozen on each board
     await selectStage(page, '01');
-    const panel = selectedPanel(page);
-    const board = panel.locator('.board[data-kind="keyinfo"]');
-    const before = (await board.locator('.board-rows').boundingBox())!.height;
-
-    // three seeded plus three more takes it past the five-entry window
-    for (const title of ['Extra one', 'Extra two', 'Extra three']) {
-      await board.locator('[data-add]').click();
-      await page.locator('.ie-title').fill(title);
-      await page.locator('[data-save]').click();
-      await expect(page.locator('#modal .modal-win')).toBeHidden();
-    }
-    // every entry is rendered; the window stays five tall and scrolls
-    await expect(board.locator('.b-row')).toHaveCount(6);
-    expect((await board.locator('.board-rows').boundingBox())!.height).toBe(before);
+    const board = selectedPanel(page).locator('.board[data-kind="keyinfo"]');
+    await expect(board.locator('.b-row')).toHaveCount(12);
+    expect((await board.locator('.board-rows').boundingBox())!.height).toBe(300);
     expect(
       await board.locator('.board-rows').evaluate((el) => el.scrollHeight > el.clientHeight),
+    ).toBe(true);
+
+    // and the risk window is short enough that even a few entries scroll
+    const risks = selectedPanel(page).locator('.board[data-kind="risks"]');
+    expect(
+      await risks.locator('.board-rows').evaluate((el) => el.scrollHeight > el.clientHeight),
     ).toBe(true);
   });
 
@@ -545,5 +573,134 @@ test.describe('escape', () => {
     await expect(selectedPanel(page).locator('.inline-area')).toBeVisible();
     await page.keyboard.press('Escape');
     await expect(selectedPanel(page).locator('.inline-area')).toHaveCount(0);
+  });
+});
+
+
+test.describe('the stage in flight', () => {
+  test('a program opens on the stage today falls in', async ({ page }) => {
+    // no clicking: the store picks the stage on hydration
+    await page.goto(SEED_PROJECT_PATH);
+    await expect(selectedPanel(page)).toHaveAttribute('data-id', 'physicalDesign');
+    await expect(page.locator('#rm-gantt .g-row.current')).toHaveAttribute(
+      'data-stage',
+      'physicalDesign',
+    );
+    await expect(page.locator('.panel-hint')).toHaveCount(0);
+  });
+
+  test('where stages overlap it opens the lowest bar of the two', async ({ page }) => {
+    /* The seed sits in a single stage today, so move its kickoff to a date the
+       profile puts under two bars at once — the overlap this rule is about. */
+    const base = computeSchedule(startOfDay(new Date()), scheduleProfiles.typicalSoC, {});
+    let dayOffset = -1;
+    for (let d = 0; d < 900 && dayOffset < 0; d++) {
+      const day = plusDays(startOfDay(new Date()), d);
+      const hit = STAGE_ORDER.filter(
+        (id) => base.stages[id].start <= day && day <= base.stages[id].end,
+      );
+      if (hit.length > 1) dayOffset = d;
+    }
+    expect(dayOffset).toBeGreaterThan(0);
+
+    await page.goto(SEED_PROJECT_PATH);
+    await page
+      .locator('#kickoff-input')
+      .fill(toISO(plusDays(startOfDay(new Date()), -dayOffset)));
+    await page.reload();
+
+    // read the overlap off the chart: the bars the TODAY line crosses
+    const inFlight = await page.locator('#rm-gantt').evaluate((chart) => {
+      const line = chart.querySelector('.g-today')!.getBoundingClientRect();
+      const x = line.left + line.width / 2;
+      return [...chart.querySelectorAll('.g-row')]
+        .filter((row) => {
+          const bar = row.querySelector('.g-bar');
+          if (!bar) return false;
+          const b = bar.getBoundingClientRect();
+          return b.left <= x && x <= b.right;
+        })
+        .map((row) => (row as HTMLElement).dataset.stage!);
+    });
+
+    expect(inFlight.length).toBeGreaterThan(1);
+    await expect(selectedPanel(page)).toHaveAttribute('data-id', inFlight[inFlight.length - 1]);
+  });
+});
+
+test.describe('the chart folds away', () => {
+  test('folds to the open bar on the way out and unfolds on the way back', async ({ page }) => {
+    const roadmap = page.locator('#roadmap');
+    const height = async () => (await roadmap.boundingBox())!.height;
+
+    await selectStage(page, '06');
+    await roadmap.hover({ position: { x: 8, y: 8 } });
+    await settleLayout(page);
+    const open = await height();
+    expect(open).toBeGreaterThan(200);
+
+    // leave through the bottom edge, which is the gesture that folds it
+    const box = (await roadmap.boundingBox())!;
+    await page.mouse.move(box.x + box.width / 2, box.y + box.height + 40);
+    await settleLayout(page);
+
+    const folded = await height();
+    expect(folded).toBeLessThan(open / 4);
+    await expect(roadmap).toHaveClass(/folded/);
+    // the selected stage's bar is what is left; the axis and the rest are gone
+    await expect(page.locator('#rm-gantt .g-row.current .g-bar')).toBeVisible();
+    await expect(page.locator('#rm-axis')).toBeHidden();
+    await expect(page.locator('#rm-gantt .g-row:not(.current)').first()).toBeHidden();
+
+    // and it is animated rather than snapping
+    const transition = await roadmap.evaluate(
+      (el) => getComputedStyle(el.querySelector('#rm-axis')!).transitionDuration,
+    );
+    expect(transition).not.toBe('0s');
+
+    await roadmap.hover({ position: { x: 8, y: 8 } });
+    await settleLayout(page);
+    await expect(roadmap).not.toHaveClass(/folded/);
+    expect(Math.round(await height())).toBe(Math.round(open));
+  });
+});
+
+test.describe('board windows', () => {
+  const boardHeight = async (page: Page, kind: string) =>
+    Math.round(
+      (await selectedPanel(page).locator(`.board[data-kind="${kind}"] .board-rows`).boundingBox())!
+        .height,
+    );
+
+  test('every board keeps its height whatever it holds', async ({ page }) => {
+    // Product Definition is seeded full — twelve entries on each board
+    expect(await boardHeight(page, 'activities')).toBe(400);
+    expect(await boardHeight(page, 'keyinfo')).toBe(300);
+    expect(await boardHeight(page, 'risks')).toBe(100);
+
+    // Physical Design holds a handful, and the windows do not shrink to fit
+    await selectStage(page, '06');
+    expect(await boardHeight(page, 'activities')).toBe(400);
+    expect(await boardHeight(page, 'keyinfo')).toBe(300);
+    expect(await boardHeight(page, 'risks')).toBe(100);
+  });
+
+  test('a full board scrolls inside its window, with Show more just below', async ({ page }) => {
+    const board = selectedPanel(page).locator('.board[data-kind="activities"]');
+    await expect(board.locator('.b-row')).toHaveCount(12);
+
+    const rows = board.locator('.board-rows');
+    const fits = await rows.evaluate((el) => el.scrollHeight <= el.clientHeight);
+    expect(fits).toBe(false);
+    const scrolled = await rows.evaluate((el) => {
+      el.scrollTop = el.scrollHeight;
+      return el.scrollTop;
+    });
+    expect(scrolled).toBeGreaterThan(0);
+
+    const win = (await rows.boundingBox())!;
+    const more = (await board.locator('[data-more]').boundingBox())!;
+    expect(more.y).toBeGreaterThan(win.y + win.height - 2);
+    expect(more.y - (win.y + win.height)).toBeLessThan(40);
   });
 });

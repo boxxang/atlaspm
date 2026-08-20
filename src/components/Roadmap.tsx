@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo } from 'react';
+import { useMemo, useRef, useState } from 'react';
 import { journeyData } from '@/data/journey';
 import { lifecyclePhases, phaseOfStage } from '@/data/scheduleProfiles';
 import { fmtDate } from '@/lib/schedule';
@@ -24,6 +24,23 @@ export function Roadmap() {
   const currentStage = useAppStore((s) => s.currentStage);
   const selectStage = useAppStore((s) => s.selectStage);
   const { minWeek, total, todayPct, todayVisible } = useGanttGeometry(schedule, kickoff, today);
+
+  /**
+   * Once a stage is open, the chart is reference rather than navigation, so it
+   * folds down to that one bar when the pointer moves past it into the page and
+   * unfolds when the pointer comes back. Only downward exits collapse it —
+   * leaving upward means going to the toolbar, not to the stage.
+   */
+  const [folded, setFolded] = useState(false);
+  const ref = useRef<HTMLElement>(null);
+  /* derived rather than synced: with nothing open there is nothing to fold to */
+  const isFolded = folded && currentStage !== null;
+
+  const onLeave = (e: React.PointerEvent) => {
+    if (currentStage === null) return;
+    const rect = ref.current?.getBoundingClientRect();
+    if (rect && e.clientY >= rect.bottom - 1) setFolded(true);
+  };
 
   const pctOfWeek = (week: number) => ((week - minWeek) / total) * 100;
 
@@ -58,7 +75,14 @@ export function Roadmap() {
     currentStage === null ? null : phaseOfStage[journeyData[currentStage].id].id;
 
   return (
-    <section id="roadmap" aria-label="Development roadmap">
+    <section
+      id="roadmap"
+      aria-label="Development roadmap"
+      ref={ref}
+      className={isFolded ? 'folded' : undefined}
+      onPointerEnter={() => setFolded(false)}
+      onPointerLeave={onLeave}
+    >
       <div className="rm-scroll">
         <div id="rm-axis">
           <div id="rm-regions">

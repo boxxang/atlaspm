@@ -36,7 +36,7 @@ test.describe('program list', () => {
     const facts = c.locator('.pl-fact');
     await expect(facts.nth(0)).toContainText('Kickoff');
     await expect(facts.nth(1).locator('.v')).toContainText(/^\d{2}\/\d{2}\/\d{4} · D−\d+$/);
-    await expect(facts.nth(2).locator('.v')).toHaveText('7');
+    await expect(facts.nth(2).locator('.v')).toHaveText('19');
     await expect(facts.nth(2).locator('.v')).toHaveClass(/alert/);
     await expect(facts.nth(3).locator('.v')).toHaveText('1');
     // no manual date edits yet
@@ -318,9 +318,13 @@ test.describe('switching programs without a page load', () => {
     ).toHaveCount(1);
     await page.goto('/p/atlasax1');
     await selectStage(page, '01');
+    // AtlasAX1's own risks, none of them the row just written to ZetaX6
     await expect(page.locator('.stage-panel.selected .board[data-kind="risks"] .b-row')).toHaveCount(
-      0,
+      12,
     );
+    await expect(
+      page.locator('.stage-panel.selected .board[data-kind="risks"]'),
+    ).not.toContainText('Written to the new program');
   });
 });
 

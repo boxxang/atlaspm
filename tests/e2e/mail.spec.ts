@@ -34,7 +34,7 @@ test.describe('dashboard summary export', () => {
 
     // the numbers the dashboard shows are the numbers in the mail
     expect(m.body).toContain('51%  (23 of 45 deliverables)');
-    expect(m.body).toMatch(/Open risks {5}7 {2}\(Physical Design, Signoff, Tapeout, Advanced Packaging\)/);
+    expect(m.body).toMatch(/Open risks {5}19 {2}\(Product Definition, Physical Design/);
     expect(m.body).toMatch(/Overdue {8}1/);
     expect(m.body).toContain('PD · Physical Design');
     expect(m.body).toMatch(/Tapeout {8}\d{2}\/\d{2}\/\d{4} {2}D−\d+/);

@@ -154,16 +154,51 @@ test.describe('display settings', () => {
     await expect(page.locator('#set-font-val')).toHaveText('18px');
   });
 
-  test('scopes hold independent rows — icon is Main-only, row height Dashboard-only', async ({
+  test('Programs leads the bar, the program fields sit centred between the controls', async ({
     page,
   }) => {
     await page.goto(SEED_PROJECT_PATH);
-    await page.locator('#settings-btn').click();
-    await expect(page.locator('.set-row[data-key="icon"]')).toBeVisible();
-    await expect(page.locator('.set-row[data-key="drow"]')).toBeHidden();
+    const programs = (await page.locator('#to-programs').boundingBox())!;
+    const centre = (await page.locator('.tb-centre').boundingBox())!;
+    const settings = (await page.locator('#settings-btn').boundingBox())!;
+    const modes = (await page.locator('#mode-toggle').boundingBox())!;
 
-    await page.locator('#set-scope button[data-scope="dash"]').click();
-    await expect(page.locator('.set-row[data-key="icon"]')).toBeHidden();
+    // the link comes first, the view controls last, the rest between them
+    expect(programs.x + programs.width).toBeLessThanOrEqual(centre.x + 1);
+    expect(centre.x + centre.width).toBeLessThanOrEqual(settings.x + 1);
+    expect(settings.x).toBeLessThan(modes.x);
+
+    // and that middle group is centred in the space they leave it
+    const content = (await page.locator('#project-name').boundingBox())!;
+    const last = (await page.locator('#info-note').boundingBox())!;
+    const mid = (content.x + last.x + last.width) / 2;
+    expect(Math.abs(mid - (centre.x + centre.width / 2))).toBeLessThan(2);
+
+    // it reads as a button rather than a caption
+    const style = await page.locator('#to-programs').evaluate((el) => {
+      const c = getComputedStyle(el);
+      return { border: c.borderTopWidth, transform: c.textTransform, weight: c.fontWeight };
+    });
+    expect(style).toEqual({ border: '1px', transform: 'uppercase', weight: '700' });
+
+    await page.locator('#to-programs').click();
+    await expect(page.locator('.pl-card').first()).toBeVisible();
+  });
+
+  test('the panel offers the settings of the view it was opened from', async ({ page }) => {
+    await page.goto(SEED_PROJECT_PATH);
+    await page.locator('#settings-btn').click();
+    // Main: icon size applies, the dashboard's row height does not
+    await expect(page.locator('.set-scope-note')).toHaveAttribute('data-scope', 'main');
+    await expect(page.locator('.set-row[data-key="icon"]')).toBeVisible();
+    await expect(page.locator('.set-row[data-key="drow"]')).toHaveCount(0);
+    await expect(page.locator('.set-scope')).toHaveCount(0); // no scope switch any more
+
+    await page.keyboard.press('Escape');
+    await page.locator('#mode-toggle button[data-mode="schedule"]').click();
+    await page.locator('#settings-btn').click();
+    await expect(page.locator('.set-scope-note')).toHaveAttribute('data-scope', 'dash');
+    await expect(page.locator('.set-row[data-key="icon"]')).toHaveCount(0);
     await expect(page.locator('.set-row[data-key="drow"]')).toBeVisible();
 
     // Dashboard text size writes onto #schedule-view, leaving Main at 18px.

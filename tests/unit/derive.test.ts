@@ -145,9 +145,10 @@ describe('(e) overdue derivation', () => {
 });
 
 describe('open risks', () => {
-  it('counts 7 across 4 stages in the seed', () => {
-    expect(openRiskCount(seed.content)).toBe(7);
+  it('counts 19 across 5 stages in the seed', () => {
+    expect(openRiskCount(seed.content)).toBe(19);
     expect(riskStageIds(seed.content)).toEqual([
+      'productDefinition',
       'physicalDesign',
       'signoff',
       'tapeout',

@@ -20,8 +20,19 @@ const GEAR_PATH =
  * the root vars; Dashboard overrides the same vars scoped on #schedule-view
  * (custom properties inherit downward). Phase 5 hangs the dashboard off it.
  */
-export function SettingsPopover({ onResetSchedule }: { onResetSchedule?: () => void }) {
-  const [scope, setScope] = useState<DisplayScope>('main');
+/**
+ * Display settings act on the view you are in: open it from the main page and
+ * you are adjusting the main page, open it from the dashboard and you are
+ * adjusting the dashboard. There is no scope switch — the view you can see is
+ * the scope.
+ */
+export function SettingsPopover({
+  scope,
+  onResetSchedule,
+}: {
+  scope: DisplayScope;
+  onResetSchedule?: () => void;
+}) {
   /* Restored from localStorage, not the DB; see lib/displaySettings.ts. */
   const [disp, setDisp] = useState<Record<DisplayScope, DisplayValues>>(() =>
     typeof window === 'undefined'
@@ -44,9 +55,9 @@ export function SettingsPopover({ onResetSchedule }: { onResetSchedule?: () => v
     const root = document.documentElement.style;
     const sv = document.getElementById('schedule-view')?.style;
     for (const d of DISP_DEFS) {
-      if (d.scopes.includes('main') && disp.main[d.key] !== undefined)
+      if (d.ranges.main && disp.main[d.key] !== undefined)
         root.setProperty(d.varName, `${disp.main[d.key]}${d.unit}`);
-      if (sv && d.scopes.includes('dash') && disp.dash[d.key] !== undefined)
+      if (sv && d.ranges.dash && disp.dash[d.key] !== undefined)
         sv.setProperty(d.varName, `${disp.dash[d.key]}${d.unit}`);
     }
   }, [disp]);
@@ -72,6 +83,8 @@ export function SettingsPopover({ onResetSchedule }: { onResetSchedule?: () => v
     );
   };
 
+  const rows = DISP_DEFS.filter((d) => d.ranges[scope]);
+
   return (
     <Popover
       id="settings-note"
@@ -96,30 +109,21 @@ export function SettingsPopover({ onResetSchedule }: { onResetSchedule?: () => v
       }
     >
       <span className="cap">Display Settings</span>
-      <div className="set-scope" id="set-scope" role="group" aria-label="Settings scope">
-        {(['main', 'dash'] as const).map((s) => (
-          <button
-            key={s}
-            data-scope={s}
-            aria-pressed={scope === s}
-            onClick={() => setScope(s)}
-          >
-            {s === 'main' ? 'Main' : 'Dashboard'}
-          </button>
-        ))}
-      </div>
-      {DISP_DEFS.map((d) => {
-        const inScope = d.scopes.includes(scope);
-        const value = disp[scope][d.key] ?? d.min;
+      <p className="set-scope-note" data-scope={scope}>
+        Applies to {scope === 'main' ? 'the main page' : 'the dashboard'}.
+      </p>
+      {rows.map((d) => {
+        const range = d.ranges[scope]!;
+        const value = disp[scope][d.key] ?? range.default;
         return (
-          <div className="set-row" data-key={d.key} key={d.key} hidden={!inScope}>
+          <div className="set-row" data-key={d.key} key={d.key}>
             <span className="k">{d.label}</span>
             <input
               type="range"
               id={d.input}
-              min={d.min}
-              max={d.max}
-              step={d.step}
+              min={range.min}
+              max={range.max}
+              step={range.step}
               value={value}
               aria-label={d.label}
               onChange={(e) => {

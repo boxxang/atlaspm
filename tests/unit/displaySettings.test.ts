@@ -33,14 +33,30 @@ describe('display settings defs', () => {
     }
   });
 
-  it('keeps defaults inside each slider range', () => {
+  it('centres every slider on its own default', () => {
     for (const def of DISP_DEFS) {
       for (const scope of def.scopes) {
-        const v = DISP_DEFAULTS[scope][def.key]!;
-        expect(v).toBeGreaterThanOrEqual(def.min);
-        expect(v).toBeLessThanOrEqual(def.max);
+        const range = def.ranges[scope]!;
+        expect(range, `${def.key}/${scope}`).toBeDefined();
+        expect(DISP_DEFAULTS[scope][def.key]).toBe(range.default);
+        // the default sits exactly mid-track, so the slider starts centred
+        expect((range.min + range.max) / 2).toBeCloseTo(range.default, 10);
+        expect(range.min).toBeLessThan(range.max);
       }
     }
+  });
+
+  it('carries the dashboard defaults the program asked for', () => {
+    expect(DISP_DEFAULTS.dash).toEqual({ font: 16, bar: 16, cp: 13, drow: 32 });
+    expect(DISP_DEFAULTS.main).toEqual({ font: 18, icon: 2, bar: 16, cp: 11 });
+  });
+
+  it('offers a setting only in the scopes it applies to', () => {
+    const byKey = Object.fromEntries(DISP_DEFS.map((d) => [d.key, d]));
+    expect(byKey.icon.ranges.dash).toBeUndefined();
+    expect(byKey.drow.ranges.main).toBeUndefined();
+    expect(byKey.font.ranges.main).toBeDefined();
+    expect(byKey.font.ranges.dash).toBeDefined();
   });
 
   it('clones defaults without sharing references', () => {

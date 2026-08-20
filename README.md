@@ -19,7 +19,10 @@ npm run dev         # http://localhost:3000
 reseeding restores AtlasAX1 exactly.
 
 The seed's kickoff is 30 weeks before the day you seed, so "today" always lands
-mid-program (in Physical Design), the way the prototype boots.
+mid-program (in Physical Design), the way the prototype boots. Product
+Definition is seeded full — twelve key information entries, twelve activities
+and twelve open risks — so the scrolling board windows have something to show;
+the other stages carry the prototype's own content.
 
 ## Scripts
 
@@ -88,13 +91,21 @@ Pure logic never imports UI, and `/src/lib` + `/src/data` never touch the DOM �
 - **Stage panel layout.** Title, leader and dates sit beside the stage's
   drawing, which stretches to end on the dates row rather than running past it.
   The stage-details sheet is directly below them; then the boards — Activity
-  down the left at the height of ten entries, key information over risk down the
-  right splitting that same height — and engineering contacts last.
+  down the left, key information over risk down the right — and engineering
+  contacts last. Each board is a fixed window (400px / 300px / 100px) that
+  scrolls rather than growing, so a stage's panel is the same height whether it
+  holds three entries or thirty, and *Show more* sits under the window it
+  belongs to.
 - **One date axis, read twice.** The roadmap carries the lifecycle bands and the
   milestone diamonds across the top, positioned by date; the twelve stages are
   the concurrency chart's y-axis. Both share the same geometry and gutter, so a
-  diamond sits exactly over the bar end it marks. Nothing is open until you pick
-  a bar; picking it again closes it.
+  diamond sits exactly over the bar end it marks. Opening a program opens the
+  stage today falls in — the lowest of them where stages overlap — and picking
+  its bar again closes it.
+- **The chart folds out of the way.** Move the pointer down out of the
+  concurrency chart and it collapses to the open stage's bar alone, animated;
+  move back into it and it unfolds. The stage panel below therefore keeps the
+  screen while you work in it, without losing where the program stands.
 - **Owner picker.** An item's owner is chosen from the stage's leader and its
   engineering contacts rather than typed. It stores the short form
   (`M. Bianchi`), which keeps the Owner column consistent and lets the envelope
@@ -108,6 +119,12 @@ Pure logic never imports UI, and `/src/lib` + `/src/data` never touch the DOM �
   dashboard, and defaults to 0 so no cost is invented. AtlasAX1 is seeded with
   illustrative figures — 709 MM at $15,000, about $10.6M — which are example
   content like the rest of that program, not a benchmark.
+- **Dates and times.** A board row carries the day it was last updated; the
+  clock time appears in *Show more*, where a thread is read in order and the
+  minute matters.
+- **Checkpoint labels.** On the dashboard each milestone label sits past the end
+  of its bar, beside its diamond, with an arrow pointing back at it — so a label
+  never lies over the schedule it annotates, at any row height.
 - **Attachments.** Files and images attach while an item is being written, to
   an item that already exists, or to a status update.
   Bytes live in the database (`Attachment.data`), because the documented deploy
@@ -139,6 +156,16 @@ reconciles on the next load.
 "Today" is applied on the client, not the server: TODAY markers and overdue
 counts belong to the viewer's timezone, so the store hydrates on mount.
 
+### Display settings follow the view
+
+The settings panel adjusts the view it was opened from: from the program page
+it offers text size, icon scale, bar thickness and milestone text; from the
+dashboard it offers text size, bar thickness, milestone text and row height.
+There is no Main/Dashboard switch inside the panel — the view you are in is the
+scope. Each scope keeps its own values, centred on their defaults (Main
+18/2×/16/11, Dashboard 16/16/13/32), so every slider starts mid-track and moves
+the same distance either way.
+
 ### Where display settings live
 
 **localStorage, not the database** (`atlaspm.display.v1`).
@@ -154,14 +181,18 @@ that is a read/write swap rather than a redesign.
 ## Testing
 
 ```bash
-npm test          # 136 unit tests: schedule engine, derivations, effort, mail, purity
-npm run e2e       # 201 Playwright tests
+npm test          # 138 unit tests: schedule engine, derivations, effort, mail, purity
+npm run e2e       # 209 Playwright tests
 ```
 
 The e2e suite runs against its own database (`test.db`) on port 3100, so it never
 touches `dev.db` or a running dev server. Every test reseeds in-process before it
 runs, which is why the suite is single-worker: parallel workers would reseed out
 from under each other.
+
+Writes are optimistic and fire-and-forget, so `tests/e2e/fixtures.ts` counts the
+POSTs in flight and drains them before any navigation — a reload would otherwise
+cancel the action it was meant to verify.
 
 `tests/e2e/regression.spec.ts` holds the prototype's own check list — the
 measurements that rot silently: board/deliverable/contact grid alignment, the

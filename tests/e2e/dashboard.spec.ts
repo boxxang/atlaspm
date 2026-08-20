@@ -43,11 +43,11 @@ test.describe('stat tiles', () => {
     await expect(tapeout.locator('.v')).toHaveText(`D−${days}`);
 
     const risks = stat(page, 'Open Risks');
-    await expect(risks.locator('.v')).toHaveText('7');
+    await expect(risks.locator('.v')).toHaveText('19');
     await expect(risks).toHaveClass(/alert/);
     await expect(risks.locator('.v')).toHaveCSS('color', 'rgb(208, 59, 59)');
     await expect(risks.locator('.sub')).toHaveText(
-      'Physical Design, Signoff, Tapeout, Advanced Packaging',
+      'Product Definition, Physical Design, Signoff, Tapeout, Advanced Packaging',
     );
 
     const overdue = stat(page, 'Overdue Activities');
@@ -73,7 +73,7 @@ test.describe('stat tiles', () => {
     await panel.locator('[data-potential]').click();
     await panel.locator('.pr-add').first().click();
     await openDash(page);
-    await expect(stat(page, 'Open Risks').locator('.v')).toHaveText('8');
+    await expect(stat(page, 'Open Risks').locator('.v')).toHaveText('20');
     await expect(stat(page, 'Open Risks').locator('.sub')).toContainText('Architecture');
   });
 });
@@ -137,11 +137,11 @@ test.describe('milestones, in-flight and updates', () => {
 });
 
 test.describe('program schedule gantt', () => {
-  test('rows are 36px and the TODAY line is drawn', async ({ page }) => {
+  test('rows are 32px and the TODAY line is drawn', async ({ page }) => {
     await openDash(page);
     const rows = page.locator('#gantt-b .g-row');
     await expect(rows).toHaveCount(12);
-    await expect(rows.first()).toHaveCSS('height', '36px');
+    await expect(rows.first()).toHaveCSS('height', '32px');
     await expect(page.locator('#gantt-b .g-today')).toBeVisible();
     await expect(page.locator('#gantt-b .g-today-label')).toHaveText('Today');
     // full labels here, short codes on the roadmap's mini chart
@@ -171,19 +171,44 @@ test.describe('program schedule gantt', () => {
     }
   });
 
-  test('the label chip flips left near the right edge', async ({ page }) => {
+  test('every checkpoint label sits clear of the bars, beside its diamond', async ({
+    page,
+  }) => {
     await openDash(page);
-    // Mass Production is the last milestone — its chip hangs to the left
-    const chip = page.locator('#gantt-b .g-row[data-index="11"] .g-cp');
-    await expect(chip).toHaveClass(/flip/);
-    const dot = (await page
-      .locator('#gantt-b .g-row[data-index="11"] .g-msdot')
-      .boundingBox())!;
-    const box = (await chip.boundingBox())!;
-    expect(box.x + box.width).toBeLessThan(dot.x + dot.width / 2);
-    // Arch Freeze sits mid-chart, so its chip hangs to the right
-    const early = page.locator('#gantt-b .g-row[data-index="1"] .g-cp');
-    await expect(early).not.toHaveClass(/flip/);
+    const rows = await page.locator('#gantt-b .g-row').evaluateAll((els) =>
+      els
+        .map((row) => {
+          const bar = row.querySelector('.g-bar');
+          const chip = row.querySelector('.g-cp');
+          const dot = row.querySelector('.g-msdot');
+          if (!bar || !chip || !dot) return null;
+          const b = bar.getBoundingClientRect();
+          const c = chip.getBoundingClientRect();
+          const d = dot.getBoundingClientRect();
+          return {
+            stage: (row as HTMLElement).dataset.stage,
+            /* the label never overlaps a bar… */
+            overlapsBar:
+              Math.min(b.right, c.right) > Math.max(b.left, c.left) &&
+              Math.min(b.bottom, c.bottom) > Math.max(b.top, c.top),
+            /* …and always sits to the right of the diamond it points at */
+            rightOfDiamond: c.left > d.left,
+          };
+        })
+        .filter(Boolean),
+    );
+    expect(rows).toHaveLength(7);
+    for (const r of rows) {
+      expect(r!.overlapsBar, r!.stage).toBe(false);
+      expect(r!.rightOfDiamond, r!.stage).toBe(true);
+    }
+    // the arrow that ties label to diamond is on every one of them
+    for (const i of [1, 11]) {
+      const arrow = await page
+        .locator(`#gantt-b .g-row[data-index="${i}"] .g-cp`)
+        .evaluate((el) => getComputedStyle(el, '::before').borderRightWidth);
+      expect(arrow).toBe('5px');
+    }
   });
 
   test('a date edit moves the bar and its diamond together', async ({ page }) => {
@@ -214,7 +239,8 @@ test.describe('scoped display settings', () => {
   test('a Dashboard font change leaves Main at 18px', async ({ page }) => {
     await openDash(page);
     await page.locator('#settings-btn').click();
-    await page.locator('#set-scope button[data-scope="dash"]').click();
+    // opened from the dashboard, so it is the dashboard being adjusted
+    await expect(page.locator('.set-scope-note')).toHaveAttribute('data-scope', 'dash');
     await page.locator('#set-font').fill('13');
 
     await expect(page.locator('#schedule-view')).toHaveCSS('font-size', '13px');
@@ -227,22 +253,25 @@ test.describe('scoped display settings', () => {
     await expect(page.locator('body')).toHaveCSS('font-size', '18px');
   });
 
-  test('a Main font change leaves the Dashboard at 18px', async ({ page }) => {
+  test('a Main font change leaves the Dashboard on its own default', async ({ page }) => {
     await page.locator('#settings-btn').click();
+    // opened from the main page, so only main settings are offered
+    await expect(page.locator('.set-scope-note')).toHaveAttribute('data-scope', 'main');
+    await expect(page.locator('.set-row[data-key="drow"]')).toHaveCount(0);
     await page.locator('#set-font').fill('22');
     expect(await cssVar(page, '--fs-base')).toBe('22px');
     await expect(page.locator('body')).toHaveCSS('font-size', '22px');
-    await expect(page.locator('#schedule-view')).toHaveCSS('font-size', '18px');
+    // the dashboard keeps its own 16px
+    await expect(page.locator('#schedule-view')).toHaveCSS('font-size', '16px');
   });
 
   test('Row height is Dashboard-only and resizes the schedule rows', async ({ page }) => {
     await openDash(page);
-    await expect(page.locator('#gantt-b .g-row').first()).toHaveCSS('height', '36px');
+    await expect(page.locator('#gantt-b .g-row').first()).toHaveCSS('height', '32px');
     await page.locator('#settings-btn').click();
-    await page.locator('#set-scope button[data-scope="dash"]').click();
-    await page.locator('#set-drow').fill('64');
-    await expect(page.locator('#gantt-b .g-row').first()).toHaveCSS('height', '64px');
+    await page.locator('#set-drow').fill('48');
+    await expect(page.locator('#gantt-b .g-row').first()).toHaveCSS('height', '48px');
     // the roadmap's mini gantt is driven by --gbar-h, not the dashboard row var
-    await expect(page.locator('#rm-gantt .g-row').first()).not.toHaveCSS('height', '64px');
+    await expect(page.locator('#rm-gantt .g-row').first()).not.toHaveCSS('height', '48px');
   });
 });

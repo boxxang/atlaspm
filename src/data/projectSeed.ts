@@ -147,25 +147,61 @@ export function createProjectSeed({
     }));
   };
 
-    /* ---- 01 Product Definition — CLOSED ---- */
-    seed("productDefinition", {
-      ki: [
-        I("productDefinition", "AtlasAX1: 4nm-class AI inference accelerator — 2.5D package, 2× HBM3, PCIe Gen5 x16 host"),
-        I("productDefinition", "Program targets: 250 TOPS (INT8) at 75 W board power; ES samples committed to two anchor customers"),
-        I("productDefinition", "Business case approved at exec review; BOM cost ceiling locked against Q3 forecast"),
-      ],
-      acts: [
-        I("productDefinition", "Market & customer requirements analysis", { o: "N. Feld", due: W("productDefinition", 3), dn: true,
-          ups: [U(203, "PRD v1.0 signed off by all stakeholders — requirements baseline frozen.")] }),
-        I("productDefinition", "PPA & cost target definition", { o: "I. Brooks", due: E("productDefinition"), dn: true }),
-        I("productDefinition", "Technology node & package feasibility", { o: "Seojin Ha", due: E("productDefinition"), dn: true }),
-        I("productDefinition", "Program schedule baseline (Typical SoC profile)", { due: E("productDefinition"), dn: true }),
-      ],
-      risks: [],
-      dlv: [["PRD v1.0 (signed off)", true], ["Target specification — PPA & cost", true], ["Feasibility & die-size report", true], ["Program charter & budget", true]],
-    });
+    /* ---- 01 Product Definition — CLOSED ----
+     Carries a full dozen on each board; the other stages keep the shorter
+     lists, so one stage shows what a busy board looks like and the rest do not
+     have to. */
+  seed("productDefinition", {
+    ki: [
+      I("productDefinition", "AtlasAX1: 4nm-class AI inference accelerator — 2.5D package, 2× HBM3, PCIe Gen5 x16 host"),
+      I("productDefinition", "Program targets: 250 TOPS (INT8) at 75 W board power; ES samples committed to two anchor customers"),
+      I("productDefinition", "Business case approved at exec review; BOM cost ceiling locked against Q3 forecast"),
+      I("productDefinition", "Process node fixed at N4P; a node change resets the cost model and the schedule baseline"),
+      I("productDefinition", "Package technology decision deferred to Architecture — 2.5D interposer is the working assumption"),
+      I("productDefinition", "Two anchor customers signed early-access agreements; ES quantities are contractual"),
+      I("productDefinition", "Competitor launch expected two quarters after our mass production date"),
+      I("productDefinition", "Initial die size estimate 19–21 mm per side, carrying ±15% until floorplan"),
+      I("productDefinition", "IP licensing budget approved; PCIe Gen5 PHY and HBM3 controller are buy, not build"),
+      I("productDefinition", "Program staffing plan approved at 80% of request — verification is the shortfall"),
+      I("productDefinition", "Schedule baseline uses the Typical SoC profile; 66 weeks kickoff to mass production"),
+      I("productDefinition", "Board power envelope 75 W is a customer requirement, not an engineering target"),
+    ],
+    acts: [
+      I("productDefinition", "Market & customer requirements analysis", { o: "N. Feld", due: W("productDefinition", 3), dn: true,
+        ups: [U(203, "PRD v1.0 signed off by all stakeholders — requirements baseline frozen.")] }),
+      I("productDefinition", "PPA & cost target definition", { o: "I. Brooks", due: E("productDefinition"), dn: true }),
+      I("productDefinition", "Technology node & package feasibility", { o: "Seojin Ha", due: E("productDefinition"), dn: true }),
+      I("productDefinition", "Program schedule baseline (Typical SoC profile)", { due: E("productDefinition"), dn: true }),
+      I("productDefinition", "Competitive benchmarking — inference TOPS/W", { o: "N. Feld", due: W("productDefinition", 2), dn: true,
+        ups: [U(210, "Benchmarked four competing parts; our TOPS/W target sits mid-pack at launch.")] }),
+      I("productDefinition", "Memory bandwidth requirement study", { o: "I. Brooks", due: W("productDefinition", 2), dn: true }),
+      I("productDefinition", "Die size & wafer cost model v2", { o: "I. Brooks", due: W("productDefinition", 3), dn: true,
+        ups: [U(198, "Cost model rebuilt on N4P wafer pricing; BOM lands 6% under ceiling.")] }),
+      I("productDefinition", "Third-party IP make/buy shortlist", { o: "Seojin Ha", due: W("productDefinition", 3), dn: true }),
+      I("productDefinition", "Feasibility gate review pack", { o: "Seojin Ha", due: W("productDefinition", 3), dn: true }),
+      I("productDefinition", "Business case & exec approval", { due: E("productDefinition"), dn: true,
+        ups: [U(196, "Approved at exec staff review; budget released against the 66-week baseline.")] }),
+      I("productDefinition", "Program charter & staffing plan", { due: E("productDefinition"), dn: true }),
+      I("productDefinition", "Anchor customer requirement interviews", { o: "N. Feld", due: W("productDefinition", 2), dn: true }),
+    ],
+    risks: [
+      I("productDefinition", "Requirements not signed off by all stakeholders", { o: "N. Feld" }),
+      I("productDefinition", "Business case sensitive to wafer cost assumptions", { o: "I. Brooks" }),
+      I("productDefinition", "N4P PDK maturity uncertain at program start", { o: "Seojin Ha" }),
+      I("productDefinition", "Competitive window shifts during definition", { o: "N. Feld" }),
+      I("productDefinition", "Staffing plan approved below request", {}),
+      I("productDefinition", "Third-party IP licensing terms open at gate", { o: "Seojin Ha" }),
+      I("productDefinition", "Board power envelope leaves no thermal margin", { o: "I. Brooks" }),
+      I("productDefinition", "Die size estimate carries ±15% into architecture", { o: "I. Brooks" }),
+      I("productDefinition", "Package decision deferred out of this stage", { o: "Seojin Ha" }),
+      I("productDefinition", "HBM3 supply commitments not secured at definition", {}),
+      I("productDefinition", "ES sample dates are contractual, not best-effort", { o: "N. Feld" }),
+      I("productDefinition", "Schedule baseline assumes no respin", {}),
+    ],
+    dlv: [["PRD v1.0 (signed off)", true], ["Target specification — PPA & cost", true], ["Feasibility & die-size report", true], ["Program charter & budget", true]],
+  });
 
-    /* ---- 02 Architecture — CLOSED ---- */
+  /* ---- 02 Architecture — CLOSED ---- */
     seed("architecture", {
       ki: [
         I("architecture", "16-cluster NPU (≈16 TOPS/cluster) + dual-core management CPU + LPDDR5X sideband"),

@@ -11,10 +11,16 @@ import { DAY, addWeeks, fmtDate, fmtDateShort, fmtW, type Schedule } from '@/lib
 import { useAppStore } from '@/store/useAppStore';
 
 /** Geometry shared by the mini roadmap gantt and the dashboard gantt. */
-export function useGanttGeometry(schedule: Schedule, kickoff: Date, today: Date) {
+export function useGanttGeometry(
+  schedule: Schedule,
+  kickoff: Date,
+  today: Date,
+  /** Extra weeks past the end, to park checkpoint labels in. */
+  tailWeeks = 0,
+) {
   return useMemo(() => {
     const minWeek = Math.min(0, ...STAGE_ORDER.map((id) => schedule.stages[id].startOffsetWeeks));
-    const total = schedule.totalWeeks - minWeek + 2;
+    const total = schedule.totalWeeks - minWeek + 2 + tailWeeks;
     const origin = addWeeks(kickoff, minWeek);
     const end = addWeeks(origin, total);
     const months: { pct: number; label: string; index: number }[] = [];
@@ -40,7 +46,7 @@ export function useGanttGeometry(schedule: Schedule, kickoff: Date, today: Date)
       todayPct: (todayWk / total) * 100,
       todayVisible: todayWk >= 0 && todayWk <= total,
     };
-  }, [schedule, kickoff, today]);
+  }, [schedule, kickoff, today, tailWeeks]);
 }
 
 export function Gantt({
@@ -73,10 +79,14 @@ export function Gantt({
       ) as Record<StageId, number>,
     [stageDetails],
   );
+  /* Every milestone sits at a stage's end, so the room to its right is always
+     free — the chart is given trailing weeks so a label always has somewhere to
+     go without being flipped back over the bar it belongs to. */
   const { minWeek, total, months, todayPct, todayVisible } = useGanttGeometry(
     schedule,
     kickoff,
     today,
+    short ? 0 : 14,
   );
 
   /* checkpoints live on their own stage's row (full gantt only) */
@@ -134,6 +144,7 @@ export function Gantt({
             <div
               className={`g-row${i === currentStage ? ' current' : ''}`}
               data-index={i}
+              data-stage={s.id}
               key={s.id}
               role={onSelectStage ? 'tab' : undefined}
               aria-selected={onSelectStage ? i === currentStage : undefined}
@@ -209,8 +220,6 @@ export function Gantt({
                   const pct = ((m.week - minWeek) / total) * 100;
                   const wasMs = ghost?.milestones.find((x) => x.id === m.id);
                   const msMoved = wasMs && wasMs.week !== m.week;
-                  /* near the right edge the label hangs to the left */
-                  const flip = pct > 78;
                   const tip = `${m.label}|${fmtDate(m.date)}`;
                   return (
                     <span key={m.id}>
@@ -228,7 +237,7 @@ export function Gantt({
                         data-tip={tip}
                       />
                       <span
-                        className={`g-cp${m.major ? ' major' : ''}${flip ? ' flip' : ''}`}
+                        className={`g-cp${m.major ? ' major' : ''}`}
                         style={{ left: `${pct}%` }}
                         data-tip={tip}
                       >

@@ -215,6 +215,7 @@ export function BoardModal() {
                       it={e.it}
                       kind={kind}
                       updates={3}
+                      withTime
                       stageTag={e.stage?.shortTitle}
                       stageId={e.stage?.id}
                       mailStageId={e.stage?.id ?? stageId ?? undefined}

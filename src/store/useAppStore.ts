@@ -212,10 +212,18 @@ export const useAppStore = create<AppState>()((set, get) => ({
     const prev = get();
     if (prev.hydrated && prev.projectId === initial.projectId) return;
     const profile = scheduleProfiles[initial.profileId] ?? scheduleProfiles.typicalSoC;
+    const today = startOfDay(now);
+    const schedule = computeSchedule(initial.kickoff, profile, initial.overrides);
+    /* Open on the stage running today. Stages overlap, so several can be — take
+       the last, which is the lowest bar on the chart. */
+    const inFlight = STAGE_ORDER.map((id, i) =>
+      schedule.stages[id].start <= today && today <= schedule.stages[id].end ? i : -1,
+    ).filter((i) => i >= 0);
+    const openStage = inFlight.length ? inFlight[inFlight.length - 1] : null;
     set({
       hydrated: true,
       projectId: initial.projectId,
-      today: startOfDay(now),
+      today,
       projectName: initial.projectName,
       kickoff: initial.kickoff,
       profileId: initial.profileId,
@@ -223,8 +231,8 @@ export const useAppStore = create<AppState>()((set, get) => ({
       currency: initial.currency,
       overrides: initial.overrides,
       edited: hasOverrides(profile, initial.overrides),
-      schedule: computeSchedule(initial.kickoff, profile, initial.overrides),
-      committedSchedule: computeSchedule(initial.kickoff, profile, initial.overrides),
+      schedule,
+      committedSchedule: schedule,
       draftOverrides: null,
       content: initial.content,
       deliverables: initial.deliverables,
@@ -232,8 +240,11 @@ export const useAppStore = create<AppState>()((set, get) => ({
       contacts: initial.contacts,
       stageDetails: initial.stageDetails,
       /* view state belongs to the program you were looking at, not the next one */
-      currentStage: null,
-      inline: {},
+      currentStage: openStage,
+      inline:
+        openStage === null
+          ? {}
+          : { [STAGE_ORDER[openStage]]: { kind: 'stage', editContact: null } },
     });
   },
 

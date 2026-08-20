@@ -1,4 +1,11 @@
-import { expect, test, type Page, SEED_PROJECT_PATH, selectStage } from './fixtures';
+import {
+  expect,
+  test,
+  type Page,
+  SEED_PROJECT_PATH,
+  selectStage,
+  settleLayout,
+} from './fixtures';
 
 /**
  * The prototype's own check list, ported. These are the measurements that
@@ -152,6 +159,10 @@ test.describe('marker registration', () => {
 /** Drag a grip by dx, with the grip scrolled clear of the sticky roadmap. */
 async function dragGrip(page: Page, grip: ReturnType<Page['locator']>, dx: number) {
   await grip.evaluate((el) => el.scrollIntoView({ block: 'end' }));
+  /* Moving down out of the chart folds it away and lifts the page; hover
+     first and let that finish, or the grip slides out from under the cursor. */
+  await grip.hover();
+  await settleLayout(page);
   const box = (await grip.boundingBox())!;
   const y = box.y + box.height / 2;
   const onTop = await page.evaluate(
@@ -220,17 +231,22 @@ test.describe('pagination', () => {
     await page.locator('[data-dash-open="updates"]').click();
 
     const rows = page.locator('#modal-body .su-brow');
-    await expect(page.locator('.board-foot .note')).toHaveText('19 entries');
+    await expect(page.locator('.board-foot .note')).toHaveText('22 entries');
     await expect(rows).toHaveCount(10);
     await expect(page.locator('.pager button[aria-current="true"]')).toHaveText('1');
     await expect(page.locator('.pager button').first()).toBeDisabled();
     await expect(page.locator('.pager button').last()).toBeEnabled();
 
     await page.locator('.pager button').last().click(); // ›
-    await expect(rows).toHaveCount(9);
+    await expect(rows).toHaveCount(10);
     await expect(page.locator('.pager button[aria-current="true"]')).toHaveText('2');
-    await expect(page.locator('.pager button').last()).toBeDisabled();
     await expect(page.locator('.pager button').first()).toBeEnabled();
+    await expect(page.locator('.pager button').last()).toBeEnabled();
+
+    await page.locator('.pager button').last().click(); // ›
+    await expect(rows).toHaveCount(2); // the tail of 22
+    await expect(page.locator('.pager button[aria-current="true"]')).toHaveText('3');
+    await expect(page.locator('.pager button').last()).toBeDisabled();
 
     await page.locator('.pager button').first().click(); // ‹
     await expect(rows).toHaveCount(10);
@@ -245,8 +261,10 @@ test.describe('pagination', () => {
   });
 
   test('a single-page board shows no pager', async ({ page }) => {
+    // Physical Design's key information is four entries — well under a page
+    await selectStage(page, '06');
     await selectedPanel(page).locator('.board[data-kind="keyinfo"] [data-more]').click();
-    await expect(page.locator('#modal-body .b-row')).toHaveCount(3);
+    await expect(page.locator('#modal-body .b-row')).toHaveCount(4);
     await expect(page.locator('.pager')).toHaveCount(0);
     await expect(page.locator('.board-foot .note')).toHaveCount(0);
   });

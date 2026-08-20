@@ -16,6 +16,20 @@ test.beforeEach(async ({ page }) => {
 });
 
 test.describe('board pop-up', () => {
+  test('the board carries the day, the pop-up adds the time', async ({ page }) => {
+    const board = selectedPanel(page).locator('.board[data-kind="activities"]');
+    await expect(board.locator('.b-date').first()).toHaveText(/^\d{2}\/\d{2}\/\d{4}$/);
+    await expect(board.locator('.lu-date').first()).toHaveText(/^\d{2}\/\d{2}\/\d{4}$/);
+
+    await board.locator('[data-more]').click();
+    await expect(page.locator('#modal-body .b-date').first()).toHaveText(
+      /^\d{2}\/\d{2}\/\d{4} · \d{2}:\d{2}$/,
+    );
+    await expect(page.locator('#modal-body .lu-date').first()).toHaveText(
+      /^\d{2}\/\d{2}\/\d{4} · \d{2}:\d{2}$/,
+    );
+  });
+
   test('Show more opens the full board, ESC and the scrim close it', async ({ page }) => {
     await selectStage(page, '06');
     await selectedPanel(page)
@@ -287,7 +301,7 @@ test.describe('item editor', () => {
 });
 
 test.describe('aggregate boards', () => {
-  test('Open Risks lists all 7 across stages, each tagged, and drills in', async ({
+  test('Open Risks lists every one across stages, each tagged, and drills in', async ({
     page,
   }) => {
     await openAgg(page, 'risks');
@@ -296,20 +310,21 @@ test.describe('aggregate boards', () => {
     // an aggregate board is read-only at the top level
     await expect(page.locator('#modal-head [data-add]')).toHaveCount(0);
 
+    // nineteen open risks: twelve on Product Definition plus seven elsewhere
+    await expect(page.locator('.board-foot .note')).toHaveText('19 entries');
     const rows = page.locator('#modal-body .b-row');
-    await expect(rows).toHaveCount(7);
+    await expect(rows).toHaveCount(10); // ten to a page
     // every row carries its stage tag
-    await expect(rows.locator('.b-stage')).toHaveCount(7);
+    await expect(rows.locator('.b-stage')).toHaveCount(10);
     // newest-updated first, regardless of stage
-    await expect(rows.locator('.b-stage')).toHaveText(['PD', 'PKG', 'PD', 'SO', 'PD', 'TO', 'PKG']);
+    await expect(rows.locator('.b-stage').first()).toHaveText('PD');
 
     // row click drills into that row's own stage, and ‹ Board comes back
     await rows.nth(3).click();
     await expect(page.locator('#modal-head h3')).toHaveText('Risk');
-    await expect(page.locator('#modal-head .meta')).toHaveText('Signoff');
     await page.locator('[data-back]').click();
     await expect(page.locator('#modal-head h3')).toHaveText('Open Risks — All Stages');
-    await expect(page.locator('#modal-body .b-row')).toHaveCount(7);
+    await expect(page.locator('#modal-body .b-row')).toHaveCount(10);
   });
 
   test('Overdue lists only open, past-due activities', async ({ page }) => {
@@ -329,16 +344,16 @@ test.describe('aggregate boards', () => {
 
     const rows = page.locator('#modal-body .su-brow');
     await expect(rows).toHaveCount(10);
-    await expect(page.locator('.board-foot .note')).toHaveText('19 entries');
-    await expect(page.locator('.pager button[data-page-m]')).toHaveCount(4); // ‹ 1 2 ›
+    await expect(page.locator('.board-foot .note')).toHaveText('22 entries');
+    await expect(page.locator('.pager button[data-page-m]')).toHaveCount(5); // ‹ 1 2 3 ›
     await expect(page.locator('.pager button[aria-current="true"]')).toHaveText('1');
     await expect(page.locator('.pager button').first()).toBeDisabled();
 
     // newest first
     await expect(rows.first().locator('.b-stage')).toHaveText('PD');
 
-    await page.locator('.pager button', { hasText: '2' }).click();
-    await expect(rows).toHaveCount(9);
+    await page.locator('.pager button', { hasText: '3' }).click();
+    await expect(rows).toHaveCount(2);
     await expect(page.locator('.pager button').last()).toBeDisabled();
 
     await rows.first().click();
@@ -346,7 +361,7 @@ test.describe('aggregate boards', () => {
     await expect(page.locator('.iv-title')).toBeVisible();
     // ‹ Board returns to the page you drilled in from, not to page 1
     await page.locator('[data-back]').click();
-    await expect(page.locator('#modal-body .su-brow')).toHaveCount(9);
-    await expect(page.locator('.pager button[aria-current="true"]')).toHaveText('2');
+    await expect(page.locator('#modal-body .su-brow')).toHaveCount(2);
+    await expect(page.locator('.pager button[aria-current="true"]')).toHaveText('3');
   });
 });

@@ -9,6 +9,14 @@
 export type DisplayScope = 'main' | 'dash';
 export type DisplayKey = 'font' | 'icon' | 'bar' | 'cp' | 'drow';
 
+/** Each scope carries its own default and a range centred on it. */
+export interface DisplayRange {
+  min: number;
+  max: number;
+  step: number;
+  default: number;
+}
+
 export interface DisplayDef {
   key: DisplayKey;
   /** DOM id of the range input — kept identical to the reference. */
@@ -18,10 +26,9 @@ export interface DisplayDef {
   label: string;
   varName: string;
   unit: string;
-  min: number;
-  max: number;
-  step: number;
   scopes: DisplayScope[];
+  /** Absent for a scope the setting does not apply to. */
+  ranges: Partial<Record<DisplayScope, DisplayRange>>;
   fmt: (v: number | string) => string;
 }
 
@@ -34,29 +41,45 @@ export const fmtIcon = (v: number | string) =>
     .replace(/0+$/, '')
     .replace(/\.$/, '')}×`;
 
+/**
+ * Every range is centred on its scope's default, so the slider sits mid-track
+ * when nothing has been changed and moves the same distance either way.
+ */
+const centred = (value: number, span: number, step: number): DisplayRange => ({
+  min: value - span,
+  max: value + span,
+  step,
+  default: value,
+});
+
 export const DISP_DEFS: readonly DisplayDef[] = [
   { key: 'font', input: 'set-font', valEl: 'set-font-val', label: 'Text size',
-    varName: '--fs-base', unit: 'px', min: 13, max: 23, step: 1,
-    scopes: ['main', 'dash'], fmt: px },
+    varName: '--fs-base', unit: 'px', scopes: ['main', 'dash'], fmt: px,
+    ranges: { main: centred(18, 5, 1), dash: centred(16, 5, 1) } },
   { key: 'icon', input: 'set-icon', valEl: 'set-icon-val', label: 'Icon size',
-    varName: '--icon-scale', unit: '', min: 0.75, max: 3.25, step: 0.25,
-    scopes: ['main'], fmt: fmtIcon },
+    varName: '--icon-scale', unit: '', scopes: ['main'], fmt: fmtIcon,
+    ranges: { main: centred(2, 1.25, 0.25) } },
   { key: 'bar', input: 'set-bar', valEl: 'set-bar-val', label: 'Bar thickness',
-    varName: '--gbar-h', unit: 'px', min: 11, max: 21, step: 1,
-    scopes: ['main', 'dash'], fmt: px },
+    varName: '--gbar-h', unit: 'px', scopes: ['main', 'dash'], fmt: px,
+    ranges: { main: centred(16, 5, 1), dash: centred(16, 5, 1) } },
   { key: 'cp', input: 'set-cp', valEl: 'set-cp-val', label: 'Milestone text',
-    varName: '--cp-fs', unit: 'px', min: 6, max: 16, step: 1,
-    scopes: ['main', 'dash'], fmt: px },
+    varName: '--cp-fs', unit: 'px', scopes: ['main', 'dash'], fmt: px,
+    ranges: { main: centred(11, 5, 1), dash: centred(13, 5, 1) } },
   { key: 'drow', input: 'set-drow', valEl: 'set-drow-val', label: 'Row height',
-    varName: '--dash-row-h', unit: 'px', min: 24, max: 96, step: 4,
-    scopes: ['dash'], fmt: px },
+    varName: '--dash-row-h', unit: 'px', scopes: ['dash'], fmt: px,
+    ranges: { dash: centred(32, 16, 4) } },
 ] as const;
 
 export type DisplayValues = Partial<Record<DisplayKey, number>>;
 
+const defaultsFor = (scope: DisplayScope): DisplayValues =>
+  Object.fromEntries(
+    DISP_DEFS.filter((d) => d.ranges[scope]).map((d) => [d.key, d.ranges[scope]!.default]),
+  );
+
 export const DISP_DEFAULTS: Record<DisplayScope, DisplayValues> = {
-  main: { font: 18, icon: 2, bar: 16, cp: 11 },
-  dash: { font: 18, bar: 16, cp: 11, drow: 36 },
+  main: defaultsFor('main'),
+  dash: defaultsFor('dash'),
 };
 
 export const cloneDefaults = (): Record<DisplayScope, DisplayValues> => ({

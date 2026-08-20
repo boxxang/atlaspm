@@ -1,4 +1,11 @@
-import { expect, test, type Page, SEED_PROJECT_PATH, selectStage, editStageDetail } from './fixtures';
+import {
+  expect,
+  test,
+  type Page,
+  SEED_PROJECT_PATH,
+  selectStage,
+  editStageDetail,
+} from './fixtures';
 
 /**
  * Man-months are recorded per engineering line, summed into a stage figure that
@@ -25,7 +32,7 @@ test.describe('the engineering table', () => {
     );
     await expect(panel(page).locator('.mm-input:not(.read)')).toHaveCount(0);
     await expect(panel(page).locator('.mm-add')).toHaveCount(0);
-    expect(await page.locator('[data-mm-text]').allTextContents()).toEqual([
+    expect(await panel(page).locator('[data-mm-text]').allTextContents()).toEqual([
       '2', '2', '1.5', '1.5', '1',
     ]);
     await expect(panel(page).locator('[data-stage-mm]')).toHaveText('8 MM');
@@ -69,7 +76,7 @@ test.describe('the engineering table', () => {
     await panel(page).locator('[data-sd-save]').click();
     await expect(panel(page).locator('.sheet-what')).toHaveText('Reworded, same effort.');
     await expect(panel(page).locator('[data-stage-mm]')).toHaveText('8 MM');
-    expect(await page.locator('[data-mm-text]').allTextContents()).toEqual([
+    expect(await panel(page).locator('[data-mm-text]').allTextContents()).toEqual([
       '2', '2', '1.5', '1.5', '1',
     ]);
   });

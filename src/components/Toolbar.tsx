@@ -46,69 +46,72 @@ export function Toolbar({
 }) {
   return (
     <header id="toolbar">
-      <Link className="mb-back" id="to-programs" href="/" title="All programs">
-        ‹ Programs
+      <Link id="to-programs" href="/" title="All programs">
+        <span aria-hidden="true">‹</span> Programs
       </Link>
-      <ProjectName value={projectName} onChange={onProjectNameChange} />
-      <div className="tb-field">
-        <label htmlFor="kickoff-input">Kickoff</label>
-        <input
-          type="date"
-          id="kickoff-input"
-          value={kickoff}
-          onChange={(e) => onKickoffChange(e.target.value)}
-        />
-      </div>
-      <div className="tb-field">
-        <label htmlFor="profile-select">Profile</label>
-        <select
-          id="profile-select"
-          value={profileId}
-          onChange={(e) => onProfileChange(e.target.value)}
+
+      <div className="tb-centre">
+        <ProjectName value={projectName} onChange={onProjectNameChange} />
+        <div className="tb-field">
+          <label htmlFor="kickoff-input">Kickoff</label>
+          <input
+            type="date"
+            id="kickoff-input"
+            value={kickoff}
+            onChange={(e) => onKickoffChange(e.target.value)}
+          />
+        </div>
+        <div className="tb-field">
+          <label htmlFor="profile-select">Profile</label>
+          <select
+            id="profile-select"
+            value={profileId}
+            onChange={(e) => onProfileChange(e.target.value)}
+          >
+            {PROFILE_OPTIONS.map((p) => (
+              <option key={p.id} value={p.id} disabled={p.disabled}>
+                {p.label}
+              </option>
+            ))}
+          </select>
+        </div>
+        <div className="tb-field">
+          <span className="k">Tapeout</span>
+          <span className="v" data-computed="tapeout">
+            {tapeout}
+          </span>
+        </div>
+        <div className="tb-field tb-opt1">
+          <span className="k">First Silicon</span>
+          <span className="v" data-computed="firstSilicon">
+            {firstSilicon}
+          </span>
+        </div>
+        <div className="tb-field tb-opt2">
+          <span className="k">Production</span>
+          <span className="v" data-computed="production">
+            {production}
+          </span>
+        </div>
+        <span className="edited-flag" data-tip="Schedule has manual date edits — reset in Settings|">
+          EDITED
+        </span>
+        <Popover
+          id="info-note"
+          btnId="info-btn"
+          title="Baseline Planning Assumptions"
+          panelRole="tooltip"
+          trigger="i"
         >
-          {PROFILE_OPTIONS.map((p) => (
-            <option key={p.id} value={p.id} disabled={p.disabled}>
-              {p.label}
-            </option>
-          ))}
-        </select>
+          <strong>Baseline Planning Assumptions.</strong> These durations represent simplified
+          planning assumptions for visualization purposes. Actual semiconductor development
+          schedules vary significantly depending on product complexity, process node, IP reuse,
+          verification requirements, design resources, foundry capacity, packaging technology, and
+          qualification requirements.
+        </Popover>
       </div>
-      <div className="tb-field">
-        <span className="k">Tapeout</span>
-        <span className="v" data-computed="tapeout">
-          {tapeout}
-        </span>
-      </div>
-      <div className="tb-field tb-opt1">
-        <span className="k">First Silicon</span>
-        <span className="v" data-computed="firstSilicon">
-          {firstSilicon}
-        </span>
-      </div>
-      <div className="tb-field tb-opt2">
-        <span className="k">Production</span>
-        <span className="v" data-computed="production">
-          {production}
-        </span>
-      </div>
-      <span className="edited-flag" data-tip="Schedule has manual date edits — reset in Settings|">
-        EDITED
-      </span>
-      <Popover
-        id="info-note"
-        btnId="info-btn"
-        title="Baseline Planning Assumptions"
-        panelRole="tooltip"
-        trigger="i"
-      >
-        <strong>Baseline Planning Assumptions.</strong> These durations represent simplified
-        planning assumptions for visualization purposes. Actual semiconductor development
-        schedules vary significantly depending on product complexity, process node, IP reuse,
-        verification requirements, design resources, foundry capacity, packaging technology, and
-        qualification requirements.
-      </Popover>
-      <div className="tb-spacer" />
-      <SettingsPopover onResetSchedule={onResetSchedule} />
+
+      <SettingsPopover scope={mode === 'schedule' ? 'dash' : 'main'} onResetSchedule={onResetSchedule} />
       <div id="mode-toggle" role="group" aria-label="View mode">
         <button data-mode="journey" aria-pressed={mode === 'journey'} onClick={() => onModeChange('journey')}>
           Main

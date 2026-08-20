@@ -23,6 +23,7 @@ export function BoardRow({
   stageId,
   stageTag,
   updates = 1,
+  withTime = false,
   onOpen,
   mailStageId,
 }: {
@@ -31,6 +32,8 @@ export function BoardRow({
   stageId?: StageId;
   stageTag?: string;
   updates?: number;
+  /** The pop-up shows the clock; a board row only needs the day. */
+  withTime?: boolean;
   onOpen?: () => void;
   /** Set to show the row's envelope; needs to know which stage it belongs to. */
   mailStageId?: StageId;
@@ -50,7 +53,7 @@ export function BoardRow({
       data-stage-id={stageId}
       onClick={onOpen}
     >
-      <span className="b-date">{fmtDT(it.updated)}</span>
+      <span className="b-date">{withTime ? fmtDT(it.updated) : fmtDate(it.updated)}</span>
       <span className="b-title">
         {stageTag && <span className="b-stage">{stageTag}</span>}
         <span className="t">{it.title}</span>
@@ -82,7 +85,7 @@ export function BoardRow({
         ))}
       {latest.map((u) => (
         <span className="b-latest" key={u.id}>
-          <span className="lu-date">{fmtDT(u.date)}</span> — {u.text}
+          <span className="lu-date">{withTime ? fmtDT(u.date) : fmtDate(u.date)}</span> — {u.text}
         </span>
       ))}
     </button>
