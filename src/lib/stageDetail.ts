@@ -8,11 +8,14 @@
  * Pure: no DOM.
  */
 import type { JourneyStage } from '@/data/types';
+import { parseEffort, sumEffort } from './effort';
 
 /** Newline-separated in the database, a list in the UI. */
 export interface StageDetailOverride {
   description?: string | null;
   engineeringView?: string | null;
+  /** Man-months per engineering line — kept even when the list is the default. */
+  engineeringEffort?: string | null;
   programView?: string | null;
   tools?: string | null;
   collaboration?: string | null;
@@ -21,10 +24,13 @@ export interface StageDetailOverride {
 export interface ResolvedStageDetail {
   description: string;
   engineeringView: string[];
+  /** Aligned to engineeringView, zero where nothing has been recorded. */
+  engineeringEffort: number[];
+  manMonths: number;
   programView: string[];
   tools: string[];
   collaboration: string[];
-  /** Which fields this program has edited — drives the "edited" marker. */
+  /** Which *text* fields this program has edited — drives the "edited" marker. */
   overridden: Set<keyof StageDetailOverride>;
 }
 
@@ -60,9 +66,16 @@ export function resolveStageDetail(
     return toLines(v);
   };
 
+  const engineeringView = list('engineeringView', stage.engineeringView);
+  /* Effort is data this program recorded, not a divergence from the shared
+     stage text, so it deliberately does not count towards `overridden`. */
+  const engineeringEffort = parseEffort(override?.engineeringEffort, engineeringView.length);
+
   return {
     description: text('description', stage.description),
-    engineeringView: list('engineeringView', stage.engineeringView),
+    engineeringView,
+    engineeringEffort,
+    manMonths: sumEffort(engineeringEffort),
     programView: list('programView', stage.programView),
     tools: list('tools', stage.tools),
     collaboration: list('collaboration', stage.collaboration),
@@ -86,6 +99,8 @@ export function normaliseOverride(
     programView: string;
     tools: string;
     collaboration: string;
+    /** Passed through: effort is edited in the table, not in this form. */
+    engineeringEffort?: string | null;
   },
   stage: JourneyStage,
 ): StageDetailOverride {
@@ -93,6 +108,7 @@ export function normaliseOverride(
     value !== null && value !== fallback ? value : null;
 
   return {
+    engineeringEffort: input.engineeringEffort ?? null,
     description: differs(pick(input.description), stage.description),
     engineeringView: differs(
       pick(fromLines(toLines(input.engineeringView))),
@@ -112,4 +128,9 @@ export function normaliseOverride(
 
 /** True when nothing is overridden any more, so the row can be dropped. */
 export const isEmptyOverride = (o: StageDetailOverride) =>
-  !o.description && !o.engineeringView && !o.programView && !o.tools && !o.collaboration;
+  !o.description &&
+  !o.engineeringView &&
+  !o.engineeringEffort &&
+  !o.programView &&
+  !o.tools &&
+  !o.collaboration;

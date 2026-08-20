@@ -85,6 +85,16 @@ Pure logic never imports UI, and `/src/lib` + `/src/data` never touch the DOM �
 - **Stage detail editing.** The pencil in the Stage Details header edits that
   program's copy of the stage text. A field only becomes an override when it
   differs from the shared definition, so emptying it restores the default.
+- **Owner picker.** An item's owner is chosen from the stage's leader and its
+  engineering contacts rather than typed. It stores the short form
+  (`M. Bianchi`), which keeps the Owner column consistent and lets the envelope
+  button resolve an address.
+- **Effort and cost.** Each engineering line of a stage carries man-months; the
+  stage's total rides on its gantt bar, and the program's total drives an
+  estimate on the program card. The rate is a program setting, edited on the
+  dashboard, and defaults to 0 so no cost is invented. AtlasAX1 is seeded with
+  illustrative figures — 709 MM at $15,000, about $10.6M — which are example
+  content like the rest of that program, not a benchmark.
 - **Attachments.** Files and images attach to an item or to a status update.
   Bytes live in the database (`Attachment.data`), because the documented deploy
   target has a read-only filesystem and `Bytes` maps to BLOB on SQLite and
@@ -130,8 +140,8 @@ that is a read/write swap rather than a redesign.
 ## Testing
 
 ```bash
-npm test          # 119 unit tests: schedule engine, derivations, mail, purity guard
-npm run e2e       # 154 Playwright tests
+npm test          # 133 unit tests: schedule engine, derivations, effort, mail, purity
+npm run e2e       # 177 Playwright tests
 ```
 
 The e2e suite runs against its own database (`test.db`) on port 3100, so it never

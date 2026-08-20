@@ -908,6 +908,44 @@ body.sched-preview-open #schedule-view .inner{padding-bottom:calc(60px + var(--s
 .su-item .su-body .att-add{margin-top:6px}
 
 /* ============================================================
+   MAN-MONTHS — per engineering line, summed onto the bars
+   ============================================================ */
+.mm-cols{
+  display:grid;grid-template-columns:minmax(0,1fr) 5.5rem;gap:10px;
+  font-size:.58em;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-3);
+  padding:6px 0;border-top:1px solid var(--line-strong);border-bottom:1px solid var(--line);
+}
+.mm-cols>span:last-child{text-align:right}
+.mm-list li{
+  display:grid;grid-template-columns:minmax(0,1fr) 5.5rem;gap:10px;align-items:center;
+  padding:5px 0;border-bottom:1px solid var(--line);
+}
+.mm-t{font-size:.95em;color:var(--ink-2);overflow:hidden;text-overflow:ellipsis}
+.mm-input{
+  border:none;border-bottom:1px dashed var(--line-strong);background:none;
+  font-family:var(--mono);font-size:.78em;padding:1px 0;width:100%;text-align:right;color:var(--ink);
+}
+.mm-input:focus-visible{outline:none;border-bottom:1px solid var(--accent)}
+.mm-input::placeholder{color:var(--line-strong)}
+.mm-total{
+  display:flex;align-items:baseline;justify-content:space-between;gap:10px;
+  padding:9px 0 0;margin-bottom:4px;
+}
+.mm-total .k{font-size:.6em;font-weight:600;letter-spacing:.13em;text-transform:uppercase;color:var(--ink-3)}
+.mm-total .v{font-family:var(--mono);font-size:.9em;font-weight:600;color:var(--ink)}
+/* on the bar in the full gantt, beside it in the mini one */
+.g-bar-mm{
+  position:absolute;left:6px;top:50%;transform:translateY(-50%);
+  font-family:var(--mono);font-size:calc(var(--cp-fs) * 0.82);color:#fff;
+  letter-spacing:.04em;white-space:nowrap;pointer-events:none;opacity:.95;
+}
+.g-mm-tag{
+  position:absolute;top:50%;transform:translate(6px,-50%);
+  font-family:var(--mono);font-size:calc(var(--cp-fs) * 0.72);color:var(--ink-3);
+  letter-spacing:.03em;white-space:nowrap;pointer-events:none;
+}
+
+/* ============================================================
    TOOLTIP — cursor-following, shared by every [data-tip] element
    ============================================================ */
 .g-tip{
@@ -936,7 +974,7 @@ body.schedule-mode #schedule-view{opacity:1;visibility:visible;transform:none}
 #schedule-view .g-months{height:26px}
 /* ===== dashboard ===== */
 #dash{margin:6px 0 44px}
-.stat-row{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:30px}
+.stat-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(205px,1fr));gap:16px;margin-bottom:30px}
 .stat{border:1px solid var(--line);border-radius:6px;background:var(--surface);padding:16px 18px}
 .stat .k{display:block;margin-bottom:6px}
 .stat .v{font-size:1.8em;font-weight:650;letter-spacing:-.01em;font-variant-numeric:tabular-nums}
@@ -947,6 +985,16 @@ body.schedule-mode #schedule-view{opacity:1;visibility:visible;transform:none}
   transition:border-color .15s;
 }
 .stat .v-link:hover,.stat .v-link:focus-visible{border-bottom-color:currentColor}
+.stat .cost-rate{display:flex;align-items:baseline;gap:2px;white-space:nowrap}
+.cost-input{
+  border:none;border-bottom:1px dashed var(--line-strong);background:none;
+  font-family:var(--mono);font-size:1em;width:4.4em;padding:0;color:var(--ink-2);text-align:right;
+}
+.cost-input:focus-visible{outline:none;border-bottom:1px solid var(--accent)}
+.cost-currency{
+  border:none;background:none;font-family:var(--mono);font-size:1em;color:var(--ink-2);padding:0;
+}
+.cost-currency:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
 .dash-grid{display:grid;grid-template-columns:1fr 1fr;gap:36px}
 .dash-col .cap{display:block;padding-bottom:8px;border-bottom:1px solid var(--line-strong)}
 .dash-item{display:flex;gap:14px;align-items:baseline;padding:9px 0;border-bottom:1px solid var(--line);font-size:.9em;color:var(--ink-2)}

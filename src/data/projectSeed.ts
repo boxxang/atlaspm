@@ -22,6 +22,30 @@ import type {
   StatusUpdate,
 } from './types';
 
+/**
+ * Illustrative man-months per engineering line, aligned to each stage's
+ * engineeringView in /data/journey.ts. Like the rest of the seed these are
+ * example figures for a large 4nm-class accelerator — roughly 700 man-months,
+ * or 58 person-years — not a benchmark. A new program starts empty.
+ */
+export const SEED_EFFORT: Record<StageId, number[]> = {
+  productDefinition: [2, 2, 1.5, 1.5, 1],
+  architecture: [8, 6, 4, 4, 2],
+  rtl: [40, 32, 18, 20, 10],
+  verification: [60, 36, 30, 30, 24],
+  synthesis: [10, 8, 6, 4, 2],
+  physicalDesign: [28, 24, 30, 34, 24],
+  signoff: [16, 12, 10, 6, 4],
+  tapeout: [4, 3, 2, 1],
+  fabrication: [2, 2, 1.5, 1.5, 1],
+  packaging: [10, 8, 8, 6, 4],
+  bringup: [12, 10, 10, 8, 5],
+  qualification: [18, 14, 12, 8, 8],
+};
+
+/** Example fully-loaded rate for the seeded program; change it in the app. */
+export const SEED_COST_PER_MAN_MONTH = 15000;
+
 export interface ProjectSeed {
   projectName: string;
   content: Record<StageId, StageContent>;

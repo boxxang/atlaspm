@@ -8,6 +8,7 @@ import { journeyData } from '@/data/journey';
 import { scheduleProfiles } from '@/data/scheduleProfiles';
 import type { StageId } from '@/data/types';
 import { daysTo, dday, inFlightStageIds } from '@/lib/derive';
+import { estimateCost, formatCost, formatManMonths } from '@/lib/effort';
 import type { ProjectSummary } from '@/lib/queries';
 import { computeSchedule, fmtDate, fromISO, startOfDay, toISO } from '@/lib/schedule';
 import { PROFILE_OPTIONS } from './Toolbar';
@@ -113,6 +114,28 @@ function ProjectCard({ p }: { p: ProjectSummary }) {
         <div className="pl-fact">
           <span className="k">Overdue</span>
           <span className={`v${overdue ? ' alert' : ' muted'}`}>{mounted ? overdue : '—'}</span>
+        </div>
+        <div className="pl-fact">
+          <span className="k">Effort</span>
+          <span className={`v${p.manMonths ? '' : ' muted'}`} data-card-mm>
+            {p.manMonths ? formatManMonths(p.manMonths) : '—'}
+          </span>
+        </div>
+        <div className="pl-fact">
+          <span className="k">Est. Cost</span>
+          <span
+            className={`v${p.manMonths && p.costPerManMonth ? '' : ' muted'}`}
+            data-card-cost
+            title={
+              p.costPerManMonth
+                ? `${formatManMonths(p.manMonths)} × ${formatCost(p.costPerManMonth, p.currency)} per man-month`
+                : 'Set a cost per man-month on the program dashboard'
+            }
+          >
+            {p.manMonths && p.costPerManMonth
+              ? formatCost(estimateCost(p.manMonths, p.costPerManMonth), p.currency)
+              : '—'}
+          </span>
         </div>
       </div>
 

@@ -16,6 +16,8 @@ export interface ProjectState {
   projectName: string;
   kickoff: Date;
   profileId: ProfileId;
+  costPerManMonth: number;
+  currency: string;
   overrides: StageOverrides;
   content: Record<StageId, StageContent>;
   deliverables: Record<StageId, Deliverable[]>;
@@ -122,6 +124,8 @@ export function buildProjectState(project: {
   name: string;
   kickoff: Date;
   profileId: string;
+  costPerManMonth: number;
+  currency: string;
   overrides: OverrideRow[];
   items: ItemRow[];
   deliverables: DeliverableRow[];
@@ -203,6 +207,7 @@ export function buildProjectState(project: {
     stageDetails[d.stageId] = {
       description: d.description,
       engineeringView: d.engineeringView,
+      engineeringEffort: d.engineeringEffort,
       programView: d.programView,
       tools: d.tools,
       collaboration: d.collaboration,
@@ -216,6 +221,8 @@ export function buildProjectState(project: {
     profileId: (project.profileId in scheduleProfiles
       ? project.profileId
       : 'typicalSoC') as ProfileId,
+    costPerManMonth: project.costPerManMonth,
+    currency: project.currency,
     overrides,
     content,
     deliverables,

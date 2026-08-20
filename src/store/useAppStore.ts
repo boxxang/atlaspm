@@ -6,6 +6,7 @@ import { journeyData } from '@/data/journey';
 import { STAGE_ORDER, scheduleProfiles, type ProfileId } from '@/data/scheduleProfiles';
 import type { ProjectState } from '@/lib/projectState';
 import { rejectFile, rejectionMessage } from '@/lib/attachments';
+import { serialiseEffort } from '@/lib/effort';
 import { isEmptyOverride, type StageDetailOverride } from '@/lib/stageDetail';
 import type {
   AttachmentRef,
@@ -43,6 +44,8 @@ export interface AppState {
   projectName: string;
   kickoff: Date;
   profileId: ProfileId;
+  costPerManMonth: number;
+  currency: string;
   overrides: StageOverrides;
   /** What the UI draws — the proposal while a draft is open. */
   schedule: Schedule;
@@ -84,6 +87,9 @@ export interface AppState {
   deleteContact: (stageId: StageId, id: string) => void;
   saveLeader: (stageId: StageId, l: Omit<Leader, 'short'>) => void;
   saveStageDetail: (stageId: StageId, detail: StageDetailOverride) => void;
+  /** One man-month figure per engineering line of the stage. */
+  setStageEffort: (stageId: StageId, effort: number[]) => void;
+  setCostRate: (rate: number, currency: string) => void;
   attachFiles: (
     stageId: StageId,
     kind: ItemKind,
@@ -157,6 +163,8 @@ export const useAppStore = create<AppState>()((set, get) => ({
   projectName: 'AtlasEX',
   kickoff: BOOT_KICKOFF,
   profileId: 'typicalSoC',
+  costPerManMonth: 0,
+  currency: 'USD',
   overrides: {},
   schedule: computeSchedule(BOOT_KICKOFF, scheduleProfiles.typicalSoC, {}),
   committedSchedule: computeSchedule(BOOT_KICKOFF, scheduleProfiles.typicalSoC, {}),
@@ -190,6 +198,8 @@ export const useAppStore = create<AppState>()((set, get) => ({
       projectName: initial.projectName,
       kickoff: initial.kickoff,
       profileId: initial.profileId,
+      costPerManMonth: initial.costPerManMonth,
+      currency: initial.currency,
       overrides: initial.overrides,
       edited: hasOverrides(profile, initial.overrides),
       schedule: computeSchedule(initial.kickoff, profile, initial.overrides),
@@ -455,6 +465,22 @@ export const useAppStore = create<AppState>()((set, get) => ({
     sync(api.deleteAttachment(get().projectId, attachmentId));
   },
 
+  setStageEffort: (stageId, effort) => {
+    const serialised = serialiseEffort(effort);
+    set((s) => ({
+      stageDetails: {
+        ...s.stageDetails,
+        [stageId]: { ...s.stageDetails[stageId], engineeringEffort: serialised },
+      },
+    }));
+    sync(api.setStageEffort(get().projectId, stageId, serialised));
+  },
+
+  setCostRate: (costPerManMonth, currency) => {
+    set({ costPerManMonth, currency });
+    sync(api.setCostRate(get().projectId, costPerManMonth, currency));
+  },
+
   saveStageDetail: (stageId, detail) => {
     set((s) => ({
       stageDetails: {
@@ -468,6 +494,7 @@ export const useAppStore = create<AppState>()((set, get) => ({
       api.saveStageDetail(get().projectId, stageId, {
         description: detail.description ?? null,
         engineeringView: detail.engineeringView ?? null,
+        engineeringEffort: detail.engineeringEffort ?? null,
         programView: detail.programView ?? null,
         tools: detail.tools ?? null,
         collaboration: detail.collaboration ?? null,

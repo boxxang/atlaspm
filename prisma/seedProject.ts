@@ -4,7 +4,11 @@
  * "what a fresh install gets" the same program.
  */
 import { journeyData } from '../src/data/journey';
-import { createProjectSeed } from '../src/data/projectSeed';
+import {
+  SEED_COST_PER_MAN_MONTH,
+  SEED_EFFORT,
+  createProjectSeed,
+} from '../src/data/projectSeed';
 import { STAGE_ORDER, scheduleProfiles } from '../src/data/scheduleProfiles';
 import { DB_KIND } from '../src/lib/projectState';
 import { addWeeks, computeSchedule, startOfDay } from '../src/lib/schedule';
@@ -38,6 +42,15 @@ export async function seedProject(prisma: PrismaClient, now = new Date()): Promi
       name: seed.projectName,
       kickoff,
       profileId: 'typicalSoC',
+      costPerManMonth: SEED_COST_PER_MAN_MONTH,
+      currency: 'USD',
+      stageDetails: {
+        create: STAGE_ORDER.map((stageId) => ({
+          id: `${PROJECT_ID}:detail:${stageId}`,
+          stageId,
+          engineeringEffort: SEED_EFFORT[stageId].join('\n'),
+        })),
+      },
       leaders: {
         create: STAGE_ORDER.map((stageId) => ({
           id: `${PROJECT_ID}:leader:${stageId}`,

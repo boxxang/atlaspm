@@ -14,7 +14,14 @@ import {
   upcomingMilestones,
 } from '@/lib/derive';
 import { fmtDT, fmtDate } from '@/lib/schedule';
+import {
+  CURRENCIES,
+  estimateCost,
+  formatCost,
+  formatManMonths,
+} from '@/lib/effort';
 import { programSummaryDraft } from '@/lib/mailDrafts';
+import { resolveStageDetail } from '@/lib/stageDetail';
 import { useModalStore } from '@/store/modalStore';
 import { useAppStore } from '@/store/useAppStore';
 import { Gantt } from './Gantt';
@@ -28,6 +35,10 @@ export function Dashboard({ hidden }: { hidden: boolean }) {
   const today = useAppStore((s) => s.today);
   const content = useAppStore((s) => s.content);
   const deliverables = useAppStore((s) => s.deliverables);
+  const stageDetails = useAppStore((s) => s.stageDetails);
+  const costPerManMonth = useAppStore((s) => s.costPerManMonth);
+  const currency = useAppStore((s) => s.currency);
+  const setCostRate = useAppStore((s) => s.setCostRate);
   const openAgg = useModalStore((m) => m.openAgg);
   const openBoard = useModalStore((m) => m.openBoard);
 
@@ -41,6 +52,12 @@ export function Dashboard({ hidden }: { hidden: boolean }) {
   const inFlight = inFlightStageIds(schedule, today);
   const upcoming = upcomingMilestones(schedule, today).slice(0, 4);
   const recent = allUpdates(content);
+  /* effort is the sum of every stage's engineering table */
+  const manMonths =
+    Math.round(
+      journeyData.reduce((n, st) => n + resolveStageDetail(st, stageDetails[st.id]).manMonths, 0) *
+        10,
+    ) / 10;
 
   return (
     <section id="schedule-view" aria-label="Dashboard" aria-hidden={hidden}>
@@ -96,6 +113,44 @@ export function Dashboard({ hidden }: { hidden: boolean }) {
                 {overdue}
               </button>
               <span className="sub">past target due date</span>
+            </div>
+            <div className="stat">
+              <span className="k cap">Estimated Cost</span>
+              <span className="v" data-cost>
+                {manMonths > 0 && costPerManMonth > 0
+                  ? formatCost(estimateCost(manMonths, costPerManMonth), currency)
+                  : '—'}
+              </span>
+              <span className="sub cost-rate">
+                <span data-total-mm>{formatManMonths(manMonths)}</span>
+                {' × '}
+                <input
+                  type="number"
+                  className="cost-input"
+                  data-cost-rate
+                  min="0"
+                  step="500"
+                  inputMode="numeric"
+                  aria-label="Cost per man-month"
+                  placeholder="rate"
+                  value={costPerManMonth || ''}
+                  onChange={(e) => setCostRate(Number(e.target.value) || 0, currency)}
+                />
+                <select
+                  className="cost-currency"
+                  data-cost-currency
+                  aria-label="Currency"
+                  value={currency}
+                  onChange={(e) => setCostRate(costPerManMonth, e.target.value)}
+                >
+                  {CURRENCIES.map((c) => (
+                    <option key={c} value={c}>
+                      {c}
+                    </option>
+                  ))}
+                </select>
+                {'/MM'}
+              </span>
             </div>
           </div>
 

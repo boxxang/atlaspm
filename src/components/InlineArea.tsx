@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { journeyData } from '@/data/journey';
 import type { StageId } from '@/data/types';
+import { formatManMonths } from '@/lib/effort';
 import {
   fromLines,
   normaliseOverride,
@@ -52,8 +53,63 @@ function PencilIcon() {
   );
 }
 
+/**
+ * The engineering side is a table rather than a list: each line carries the
+ * man-months it takes, and their sum is what the stage costs in effort. That
+ * total is what the gantt bars and the program's cost estimate are built on.
+ */
+function EngineeringTable({
+  stageId,
+  detail,
+}: {
+  stageId: StageId;
+  detail: ResolvedStageDetail;
+}) {
+  const setStageEffort = useAppStore((st) => st.setStageEffort);
+  const update = (index: number, raw: string) => {
+    const n = Number.parseFloat(raw);
+    const next = [...detail.engineeringEffort];
+    next[index] = Number.isFinite(n) && n >= 0 ? n : 0;
+    setStageEffort(stageId, next);
+  };
+
+  return (
+    <>
+      <div className="mm-cols">
+        <span>Engineering activity</span>
+        <span>M/M</span>
+      </div>
+      <ul className="mm-list">
+        {detail.engineeringView.map((label, i) => (
+          <li key={label}>
+            <span className="mm-t">{label}</span>
+            <input
+              type="number"
+              className="mm-input"
+              data-mm={i}
+              min="0"
+              step="0.5"
+              inputMode="decimal"
+              aria-label={`Man-months for ${label}`}
+              value={detail.engineeringEffort[i] || ''}
+              placeholder="0"
+              onChange={(e) => update(i, e.target.value)}
+            />
+          </li>
+        ))}
+      </ul>
+      <div className="mm-total">
+        <span className="k">Stage effort</span>
+        <span className="v" data-stage-mm>
+          {formatManMonths(detail.manMonths)}
+        </span>
+      </div>
+    </>
+  );
+}
+
 /** Engineering | Program — the two readings of the same stage. */
-function ViewToggle({ detail }: { detail: ResolvedStageDetail }) {
+function ViewToggle({ stageId, detail }: { stageId: StageId; detail: ResolvedStageDetail }) {
   const [view, setView] = useState<'eng' | 'prog'>('eng');
   return (
     <div>
@@ -66,11 +122,7 @@ function ViewToggle({ detail }: { detail: ResolvedStageDetail }) {
         </button>
       </div>
       <div className="view-pane enter" data-pane="eng" hidden={view !== 'eng'} key={`eng-${view}`}>
-        <ul className="view-list">
-          {detail.engineeringView.map((x) => (
-            <li key={x}>{x}</li>
-          ))}
-        </ul>
+        <EngineeringTable stageId={stageId} detail={detail} />
         <div className="view-foot">
           <span className="cap">Tools</span>
           <span className="mono">{detail.tools.join(' · ')}</span>
@@ -99,10 +151,13 @@ function ViewToggle({ detail }: { detail: ResolvedStageDetail }) {
 function StageDetailEditor({
   stageId,
   detail,
+  engineeringEffort,
   onDone,
 }: {
   stageId: StageId;
   detail: ResolvedStageDetail;
+  /** Carried through untouched: effort is edited in the table, not here. */
+  engineeringEffort: string | null;
   onDone: () => void;
 }) {
   const save = useAppStore((st) => st.saveStageDetail);
@@ -144,7 +199,7 @@ function StageDetailEditor({
         <button
           data-sd-save
           onClick={() => {
-            save(stageId, normaliseOverride(f, stageOf(stageId)));
+            save(stageId, normaliseOverride({ ...f, engineeringEffort }, stageOf(stageId)));
             onDone();
           }}
         >
@@ -206,13 +261,18 @@ function StageDetail({ stageId, editContact }: { stageId: StageId; editContact: 
       </div>
 
       {editing ? (
-        <StageDetailEditor stageId={stageId} detail={detail} onDone={() => setEditing(false)} />
+        <StageDetailEditor
+          stageId={stageId}
+          detail={detail}
+          engineeringEffort={override?.engineeringEffort ?? null}
+          onDone={() => setEditing(false)}
+        />
       ) : (
         <p className="sheet-what">{detail.description}</p>
       )}
 
       <div className="sheet-grid">
-        <ViewToggle detail={detail} />
+        <ViewToggle stageId={stageId} detail={detail} />
         <div className="sheet-side">
           <Deliverables stageId={stageId} />
         </div>

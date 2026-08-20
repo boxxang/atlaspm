@@ -1,5 +1,6 @@
 import 'server-only';
 import { prisma } from './db';
+import { sumEffortText } from './effort';
 import { buildProjectState, type ProjectState } from './projectState';
 
 const ATTACHMENT_META = { id: true, filename: true, mimeType: true, size: true } as const;
@@ -42,6 +43,10 @@ export interface ProjectSummary {
   kickoff: Date;
   profileId: ProfileId;
   createdAt: Date;
+  costPerManMonth: number;
+  currency: string;
+  /** Summed across every stage's engineering lines. */
+  manMonths: number;
   overrides: Partial<Record<StageId, StageBaseline>>;
   edited: boolean;
   deliverablesDone: number;
@@ -54,7 +59,10 @@ export interface ProjectSummary {
 
 export async function getProjectSummaries(): Promise<ProjectSummary[]> {
   const [projects, dlv, risks, items, dues] = await Promise.all([
-    prisma.project.findMany({ orderBy: { createdAt: 'asc' }, include: { overrides: true } }),
+    prisma.project.findMany({
+      orderBy: { createdAt: 'asc' },
+      include: { overrides: true, stageDetails: { select: { engineeringEffort: true } } },
+    }),
     prisma.deliverable.groupBy({ by: ['projectId', 'done'], _count: true }),
     prisma.item.groupBy({ by: ['projectId'], where: { kind: 'risk' }, _count: true }),
     prisma.item.groupBy({ by: ['projectId'], _count: true }),
@@ -82,6 +90,12 @@ export async function getProjectSummaries(): Promise<ProjectSummary[]> {
       kickoff: p.kickoff,
       profileId: p.profileId as ProfileId,
       createdAt: p.createdAt,
+      costPerManMonth: p.costPerManMonth,
+      currency: p.currency,
+      manMonths:
+        Math.round(
+          p.stageDetails.reduce((n, d) => n + sumEffortText(d.engineeringEffort), 0) * 10,
+        ) / 10,
       overrides,
       edited: p.overrides.length > 0,
       deliverablesDone: mine.filter((d) => d.done).reduce((n, d) => n + d._count, 0),

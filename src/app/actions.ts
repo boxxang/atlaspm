@@ -321,6 +321,7 @@ export async function saveStageDetail(
   detail: {
     description: string | null;
     engineeringView: string | null;
+    engineeringEffort: string | null;
     programView: string | null;
     tools: string | null;
     collaboration: string | null;
@@ -387,5 +388,45 @@ export async function uploadAttachments(form: FormData): Promise<AttachmentMeta[
 
 export async function deleteAttachment(projectId: string, id: string) {
   await prisma.attachment.delete({ where: { id } });
+  touch(projectId);
+}
+
+/* ---------- effort and cost ---------- */
+
+/** Man-months per engineering line of a stage, aligned to that stage's list. */
+export async function setStageEffort(
+  projectId: string,
+  stageId: StageId,
+  effort: string | null,
+) {
+  const pid = await assertProject(projectId);
+  const existing = await prisma.stageDetail.findUnique({
+    where: { projectId_stageId: { projectId: pid, stageId } },
+  });
+
+  if (!effort && existing && !existing.description && !existing.engineeringView &&
+      !existing.programView && !existing.tools && !existing.collaboration) {
+    /* nothing left on the row once the effort goes */
+    await prisma.stageDetail.delete({ where: { id: existing.id } });
+  } else {
+    await prisma.stageDetail.upsert({
+      where: { projectId_stageId: { projectId: pid, stageId } },
+      create: {
+        id: `${pid}:detail:${stageId}`,
+        projectId: pid,
+        stageId,
+        engineeringEffort: effort,
+      },
+      update: { engineeringEffort: effort },
+    });
+  }
+  touch(projectId);
+}
+
+export async function setCostRate(projectId: string, rate: number, currency: string) {
+  await prisma.project.update({
+    where: { id: await assertProject(projectId) },
+    data: { costPerManMonth: Number.isFinite(rate) && rate >= 0 ? rate : 0, currency },
+  });
   touch(projectId);
 }

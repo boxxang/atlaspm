@@ -26,6 +26,10 @@ model Project {
   profileId String
   /// Orders the program list; ids are caller-supplied, so they sort by nothing.
   createdAt DateTime @default(now())
+  /// Fully-loaded cost of one man-month, for the effort estimate. 0 = not set,
+  /// which shows the effort without pretending to know what it costs.
+  costPerManMonth Float  @default(0)
+  currency        String @default("USD")
 
   overrides    StageOverride[]
   items        Item[]
@@ -135,6 +139,9 @@ model StageDetail {
 
   description     String?
   engineeringView String?
+  /// Man-months per engineering line, newline-separated and index-aligned to
+  /// engineeringView — including when that list is the shared default.
+  engineeringEffort String?
   programView     String?
   tools           String?
   collaboration   String?

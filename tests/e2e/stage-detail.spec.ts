@@ -44,7 +44,8 @@ test.describe('editing stage detail', () => {
 
     await expect(panel(page).locator('.sd-edit')).toHaveCount(0);
     await expect(panel(page).locator('.sheet-what')).toHaveText('Our own framing of definition.');
-    await expect(panel(page).locator('[data-pane="eng"] .view-list li')).toHaveText([
+    // the engineering side is a man-month table, not a plain list
+    await expect(panel(page).locator('[data-pane="eng"] .mm-list .mm-t')).toHaveText([
       'Workload-driven PPA modelling',
       'HBM3 budget',
     ]);
@@ -113,7 +114,7 @@ test.describe('editing stage detail', () => {
     await panel(page).locator('[data-sd-edit]').click();
     await panel(page).locator('[data-sd-restore]').click();
     await expect(panel(page).locator('.sheet-what')).toHaveText(SHARED_DESCRIPTION);
-    await expect(panel(page).locator('[data-pane="eng"] .view-list li')).toHaveCount(5);
+    await expect(panel(page).locator('[data-pane="eng"] .mm-list li')).toHaveCount(5);
     await expect(panel(page).locator('.sd-flag')).toHaveCount(0);
 
     await page.reload();

@@ -5,6 +5,8 @@ import { journeyData } from '@/data/journey';
 import { STAGE_ORDER } from '@/data/scheduleProfiles';
 import type { StageId } from '@/data/types';
 import { hasOpenRisks } from '@/lib/derive';
+import { formatManMonthsShort } from '@/lib/effort';
+import { resolveStageDetail } from '@/lib/stageDetail';
 import { DAY, addWeeks, fmtDate, fmtDateShort, fmtW, type Schedule } from '@/lib/schedule';
 import { useAppStore } from '@/store/useAppStore';
 
@@ -61,6 +63,15 @@ export function Gantt({
   const draftOverrides = useAppStore((s) => s.draftOverrides);
   const committed = useAppStore((s) => s.committedSchedule);
   const ghost = draftOverrides ? committed : null;
+  const stageDetails = useAppStore((s) => s.stageDetails);
+  /* what each stage takes in man-months, read off its engineering table */
+  const effort = useMemo(
+    () =>
+      Object.fromEntries(
+        journeyData.map((s) => [s.id, resolveStageDetail(s, stageDetails[s.id]).manMonths]),
+      ) as Record<StageId, number>,
+    [stageDetails],
+  );
   const { minWeek, total, months, todayPct, todayVisible } = useGanttGeometry(
     schedule,
     kickoff,
@@ -149,7 +160,20 @@ export function Gantt({
                   {showPast && (
                     <span className="past-seg" style={{ width: `${(pastFrac * 100).toFixed(1)}%` }} />
                   )}
+                  {/* wide bars carry the figure; narrow ones let it sit outside */}
+                  {!short && effort[s.id] > 0 && (
+                    <span className="g-bar-mm">{formatManMonthsShort(effort[s.id])}</span>
+                  )}
                 </span>
+                {short && effort[s.id] > 0 && (
+                  <span
+                    className="g-mm-tag"
+                    data-stage-mm={s.id}
+                    style={{ left: `${left + width}%` }}
+                  >
+                    {formatManMonthsShort(effort[s.id])}
+                  </span>
+                )}
                 {(msByStage[s.id] ?? []).map((m) => {
                   const pct = ((m.week - minWeek) / total) * 100;
                   const wasMs = ghost?.milestones.find((x) => x.id === m.id);
