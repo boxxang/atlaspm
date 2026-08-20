@@ -30,6 +30,8 @@ export const fmtW = (w: number) => {
   const r = Math.round(w * 10) / 10;
   return (Number.isInteger(r) ? r : r.toFixed(1)) + 'W';
 };
+/** Compact date for a marker that has to fit inside a diamond: "8/16". */
+export const fmtMD = (d: Date) => `${d.getMonth() + 1}/${d.getDate()}`;
 export const fmtTime = (d: Date) => `${p2(d.getHours())}:${p2(d.getMinutes())}`;
 export const fmtDT = (d: Date) => `${fmtDateShort(d)} · ${fmtTime(d)}`;
 export const fmtDTFull = (d: Date) => `${fmtDate(d)} · ${fmtTime(d)}`;

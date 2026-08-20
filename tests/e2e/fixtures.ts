@@ -108,8 +108,8 @@ export const STAGE_BY_NUMBER: Record<string, string> = {
  * the panel below.
  */
 /**
- * The engineering table and the deliverables table are read-outs until the
- * stage sheet is in edit mode; the pencil opens it.
+ * The stage sheet holds three things that are edited separately: the text
+ * (the pencil), the engineering list and the deliverables (a switch each).
  */
 export async function editStageDetail(page: Page) {
   const panel = page.locator('.stage-panel.selected');
@@ -119,12 +119,26 @@ export async function editStageDetail(page: Page) {
   await expect(panel.locator('.sd-edit')).toBeVisible();
 }
 
+const toggleTable = async (page: Page, selector: string, on: boolean) => {
+  const btn = page.locator('.stage-panel.selected').locator(selector);
+  if ((await btn.getAttribute('aria-pressed')) !== String(on)) await btn.click();
+  await expect(btn).toHaveAttribute('aria-pressed', String(on));
+};
+
+/** Turn the engineering table into a form (or back into a read-out). */
+export const editEngineering = (page: Page, on = true) =>
+  toggleTable(page, '[data-mm-edit]', on);
+
+/** Turn the deliverables table into a form (or back into a read-out). */
+export const editDeliverables = (page: Page, on = true) =>
+  toggleTable(page, '[data-dlv-edit]', on);
+
 export async function selectStage(page: Page, num: string) {
   const id = STAGE_BY_NUMBER[num];
   /* The store hydrates on mount and opens the stage today falls in, so wait
      for the chart before reading the selection — asking too early sees nothing
      open and clicks the bar shut again. */
-  await expect(page.locator('#rm-gantt .g-row').first()).toBeVisible();
+  await expect(page.locator('#rm-gantt')).toBeVisible();
   /* Idempotent: picking the selected bar again closes it, so only click when
      the stage is not already open. */
   if (!(await page.locator(`.stage-panel.selected[data-id="${id}"]`).count())) {
@@ -132,7 +146,9 @@ export async function selectStage(page: Page, num: string) {
        move back into it first — unfolding is what a user does before picking
        another bar. */
     await page.locator('#roadmap').hover({ position: { x: 6, y: 6 } });
-    await page.locator(`#rm-gantt [data-select-stage="${id}"]`).click();
+    const bar = page.locator(`#rm-gantt [data-select-stage="${id}"]`);
+    await expect(bar).toBeVisible(); // the fold has to finish opening first
+    await bar.click();
   }
   await expect(page.locator('.stage-panel.selected')).toHaveAttribute('data-id', id);
 }

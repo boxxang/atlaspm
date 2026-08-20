@@ -90,6 +90,7 @@ export const BUILTIN_PROFILE: ScheduleProfile = {
   id: 'typicalSoC',
   label: 'Typical SoC',
   builtin: true,
+  template: true,
   stages: STAGE_ORDER.map((key, i) => {
     const content = journeyData.find((s) => s.id === key)!;
     return {

@@ -103,6 +103,7 @@ export async function getProjectSummaries(): Promise<ProjectSummary[]> {
         id: p.profile.id,
         label: p.profile.name,
         builtin: p.profile.builtin,
+        template: p.profile.template,
         stages: p.profile.stages,
       },
       createdAt: p.createdAt,
@@ -129,6 +130,9 @@ export async function listProfiles(): Promise<ProfileSummary[]> {
      create a program on. */
   await ensureBuiltinProfile(prisma);
   const rows = await prisma.profile.findMany({
+    /* Templates only: a profile a program made for itself is that program's
+       stage list, not something to start another program from. */
+    where: { template: true },
     orderBy: [{ builtin: 'desc' }, { createdAt: 'asc' }],
     include: { _count: { select: { stages: true, projects: true } } },
   });

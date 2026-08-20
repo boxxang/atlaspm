@@ -41,9 +41,10 @@ describe('resolving stage detail', () => {
 });
 
 describe('normalising what the form submits', () => {
+  /* The form carries the stage text only: the engineering list and its
+     man-months are edited in their own table and pass through untouched. */
   const blank = {
     description: '',
-    engineeringView: '',
     programView: '',
     tools: '',
     collaboration: '',
@@ -66,7 +67,6 @@ describe('normalising what the form submits', () => {
     // holding the shared text — it must not be frozen as an override
     const seeded = {
       description: pd.description,
-      engineeringView: fromLines(pd.engineeringView),
       programView: fromLines(pd.programView),
       tools: fromLines(pd.tools),
       collaboration: fromLines(pd.collaboration),
@@ -78,6 +78,25 @@ describe('normalising what the form submits', () => {
     expect(edited.engineeringView).toBeNull();
     expect(edited.tools).toBeNull();
     expect(resolveStageDetail(pd, edited).overridden.size).toBe(1);
+  });
+
+  it('carries the engineering list through untouched', () => {
+    /* The regression this pass fixed: saving the text form used to write back
+       the list as it was when the form opened, wiping anything added to the
+       table in between. */
+    const live = 'Live one\nLive two';
+    const o = normaliseOverride(
+      { ...blank, description: 'Ours', engineeringView: live, engineeringEffort: '2\n3' },
+      pd,
+    );
+    expect(o.engineeringView).toBe(live);
+    expect(o.engineeringEffort).toBe('2\n3');
+    expect(resolveStageDetail(pd, o).engineeringView).toEqual(['Live one', 'Live two']);
+
+    // and an untouched list stays untouched — null, not a frozen copy
+    const none = normaliseOverride({ ...blank, description: 'Ours' }, pd);
+    expect(none.engineeringView).toBeNull();
+    expect(resolveStageDetail(pd, none).engineeringView).toEqual([...pd.engineeringView]);
   });
 
   it('round-trips through resolve', () => {

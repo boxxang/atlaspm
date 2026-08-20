@@ -37,8 +37,10 @@ export interface ProfileStageDef extends StageBaseline {
 export interface ScheduleProfile {
   id: string;
   label: string;
-  /** Built-in profiles are immutable — editing one forks a copy. */
+  /** Built-in profiles are immutable — editing one copies it first. */
   builtin: boolean;
+  /** Listed in the pickers as something to start from; private copies are not. */
+  template: boolean;
   /** Ordered by `order`. */
   stages: readonly ProfileStageDef[];
 }

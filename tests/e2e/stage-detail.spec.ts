@@ -1,4 +1,12 @@
-import { expect, test, type Page, SEED_PROJECT_PATH, selectStage } from './fixtures';
+import {
+  expect,
+  test,
+  type Page,
+  SEED_PROJECT_PATH,
+  selectStage,
+  editEngineering,
+  editDeliverables,
+} from './fixtures';
 
 /**
  * Stage definitions live in code and are shared by every program. A program
@@ -35,30 +43,68 @@ test.describe('read mode versus edit mode', () => {
     await expect(panel(page).locator('.dlv-list input[type="checkbox"]').first()).toBeEnabled();
   });
 
-  test('the pencil turns both tables into forms, and Save turns them back', async ({ page }) => {
-    await panel(page).locator('[data-sd-edit]').click();
+  test('each table has its own switch — the text, the list and the deliverables', async ({
+    page,
+  }) => {
+    // the engineering list opens on its own, and the deliverables stay read-only
+    await editEngineering(page);
     await expect(panel(page).locator('.mm-input:not(.read)')).toHaveCount(5);
     await expect(panel(page).locator('.mm-add')).toHaveCount(1);
     await expect(panel(page).locator('[data-mm-del]')).toHaveCount(5);
+    await expect(panel(page).locator('input.dlv-due')).toHaveCount(0);
+    await expect(panel(page).locator('.sd-edit')).toHaveCount(0);
+
+    // …and the deliverables open on theirs, without closing the list
+    await editDeliverables(page);
     await expect(panel(page).locator('input.dlv-due')).toHaveCount(5); // 4 rows + the add row
     await expect(panel(page).locator('.dlv-add')).toHaveCount(1);
+    await expect(panel(page).locator('.mm-input:not(.read)')).toHaveCount(5);
 
+    // …and the pencil is the stage text, which leaves both of them alone
+    await panel(page).locator('[data-sd-edit]').click();
+    await expect(panel(page).locator('.sd-edit')).toBeVisible();
+    await expect(panel(page).locator('.mm-input:not(.read)')).toHaveCount(5);
     await panel(page).locator('[data-sd-save]').click();
+
+    await editEngineering(page, false);
+    await editDeliverables(page, false);
     await expect(panel(page).locator('.mm-input:not(.read)')).toHaveCount(0);
     await expect(panel(page).locator('input.dlv-due')).toHaveCount(0);
     await expect(panel(page).locator('[data-mm-text]')).toHaveCount(5);
+  });
+
+  test('saving the stage text keeps an activity added while it was open', async ({ page }) => {
+    /* The regression: the text form used to carry the engineering list as it
+       was when the form opened, so anything added meanwhile was overwritten. */
+    await panel(page).locator('[data-sd-edit]').click();
+    await editEngineering(page);
+    await panel(page).locator('.mm-new').fill('Added while editing the text');
+    await panel(page).locator('.mm-new-mm').fill('3');
+    await panel(page).locator('[data-mm-add]').click();
+    await expect(panel(page).locator('.mm-list li')).toHaveCount(6);
+
+    await panel(page).locator('.sd-description').fill('Reworded, same list.');
+    await panel(page).locator('[data-sd-save]').click();
+    await expect(panel(page).locator('.sheet-what')).toHaveText('Reworded, same list.');
+    await expect(panel(page).locator('.mm-list li')).toHaveCount(6);
+
+    await page.reload();
+    await selectStage(page, '01');
+    await expect(panel(page).locator('.mm-list li')).toHaveCount(6);
+    await expect(panel(page).locator('.mm-t').last()).toHaveText('Added while editing the text');
+    await expect(panel(page).locator('[data-stage-mm]')).toHaveText('11 MM');
   });
 
   test('the read-out shows the same numbers the form holds', async ({ page }) => {
     await expect(panel(page).locator('[data-mm-text="0"]')).toHaveText('2');
     await expect(panel(page).locator('[data-stage-mm]')).toHaveText('8 MM');
 
-    await panel(page).locator('[data-sd-edit]').click();
+    await editEngineering(page);
     await panel(page).locator('[data-mm="0"]').fill('7');
     await expect(panel(page).locator('[data-stage-mm]')).toHaveText('13 MM');
-    await panel(page).locator('[data-sd-cancel]').click();
+    await editEngineering(page, false);
 
-    // the table saves as it is typed, so Cancel on the text form does not undo it
+    // the table saves as it is typed, so closing it changes nothing
     await expect(panel(page).locator('[data-mm-text="0"]')).toHaveText('7');
     await expect(panel(page).locator('[data-stage-mm]')).toHaveText('13 MM');
   });
@@ -67,10 +113,56 @@ test.describe('read mode versus edit mode', () => {
     const first = panel(page).locator('.dlv-list li').first();
     await expect(first.locator('[data-dlv-due-text]')).toHaveText(/^\d{2}\/\d{2}\/\d{4}$/);
 
-    await panel(page).locator('[data-sd-edit]').click();
+    await editDeliverables(page);
     await first.locator('input.dlv-due').fill('2027-01-15');
-    await panel(page).locator('[data-sd-save]').click();
+    await editDeliverables(page, false);
     await expect(first.locator('[data-dlv-due-text]')).toHaveText('01/15/2027');
+  });
+
+  test('a deliverable with no date is asked about, then reads TBD', async ({ page }) => {
+    await editDeliverables(page);
+    await panel(page).locator('.dlv-input').fill('Vendor quote');
+    await panel(page).locator('[data-dlv-add]').click();
+
+    // nothing is written until the question is answered
+    const ask = panel(page).locator('.dlv-tbd');
+    await expect(ask).toContainText('No due date for “Vendor quote”');
+    await expect(panel(page).locator('.dlv-list li')).toHaveCount(4);
+
+    await ask.locator('[data-dlv-tbd-cancel]').click();
+    await expect(ask).toHaveCount(0);
+    await expect(panel(page).locator('.dlv-input')).toHaveValue('Vendor quote');
+
+    // a date makes the question moot
+    await panel(page).locator('.dlv-input-due').fill('2026-11-02');
+    await panel(page).locator('[data-dlv-add]').click();
+    await expect(panel(page).locator('.dlv-list li')).toHaveCount(5);
+    await expect(panel(page).locator('.dlv-list li').last().locator('input.dlv-due')).toHaveValue(
+      '2026-11-02',
+    );
+
+    // and TBD is a real answer: it saves, reads back as TBD, and can be dated later
+    await panel(page).locator('.dlv-input').fill('Second sourcing plan');
+    await panel(page).locator('[data-dlv-add]').click();
+    await panel(page).locator('[data-dlv-tbd-ok]').click();
+    const last = panel(page).locator('.dlv-list li').last();
+    await expect(last).toContainText('Second sourcing plan');
+    await expect(last.locator('input.dlv-due')).toHaveValue('');
+
+    await editDeliverables(page, false);
+    await expect(last.locator('[data-dlv-due-text]')).toHaveText('TBD');
+
+    await page.reload();
+    await selectStage(page, '01');
+    await expect(panel(page).locator('.dlv-list li').last().locator('[data-dlv-due-text]')).toHaveText(
+      'TBD',
+    );
+    await editDeliverables(page);
+    await panel(page).locator('.dlv-list li').last().locator('input.dlv-due').fill('2027-03-04');
+    await editDeliverables(page, false);
+    await expect(
+      panel(page).locator('.dlv-list li').last().locator('[data-dlv-due-text]'),
+    ).toHaveText('03/04/2027');
   });
 });
 

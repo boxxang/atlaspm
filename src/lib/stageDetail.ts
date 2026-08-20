@@ -105,11 +105,16 @@ export function resolveStageDetail(
 export function normaliseOverride(
   input: {
     description: string;
-    engineeringView: string;
     programView: string;
     tools: string;
     collaboration: string;
-    /** Passed through: effort is edited in the table, not in this form. */
+    /**
+     * Passed through, not edited here: the engineering list and its
+     * man-months are managed in their own table, which can be open while this
+     * form is. Carrying a copy of them through this form is how an edit made
+     * in the table gets overwritten by a stale snapshot of it.
+     */
+    engineeringView?: string | null;
     engineeringEffort?: string | null;
   },
   stage: JourneyStage,
@@ -119,11 +124,8 @@ export function normaliseOverride(
 
   return {
     engineeringEffort: input.engineeringEffort ?? null,
+    engineeringView: input.engineeringView ?? null,
     description: differs(pick(input.description), stage.description),
-    engineeringView: differs(
-      pick(fromLines(toLines(input.engineeringView))),
-      fromLines(stage.engineeringView),
-    ),
     programView: differs(
       pick(fromLines(toLines(input.programView))),
       fromLines(stage.programView),

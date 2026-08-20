@@ -259,7 +259,13 @@ async function loadProfile(profileId: string): Promise<ScheduleProfile> {
     include: { stages: { orderBy: { order: 'asc' } } },
   });
   if (!row) throw new Error(`Unknown profile: ${profileId}`);
-  return { id: row.id, label: row.name, builtin: row.builtin, stages: row.stages };
+  return {
+    id: row.id,
+    label: row.name,
+    builtin: row.builtin,
+    template: row.template,
+    stages: row.stages,
+  };
 }
 
 export interface StageInput {
@@ -272,36 +278,40 @@ export interface StageInput {
   durationWeeks: number;
 }
 
+interface SaveStagesInput {
+  projectId: string;
+  /** Id to mint a profile under, when this edit needs one of its own. */
+  newProfileId: string;
+  stages: StageInput[];
+  /** Publish these stages as a template others can start from. */
+  template?: { name: string };
+}
+
 /**
  * Rewrite the stages a program runs on.
  *
- * Built-in profiles are immutable and a shared profile belongs to every program
- * on it, so the edit forks: a new profile is written, named by the caller, and
- * only this program moves to it. A profile this program is the sole user of —
- * one it forked earlier — is edited in place instead, so routine tweaking does
- * not breed "(copy) (copy)".
+ * Editing stages is about this program, not about authoring a template: the
+ * change lands on the program you are looking at and on nothing else. A
+ * program already on a profile of its own is edited in place; one sharing a
+ * profile — the built-in one, or a template two programs picked — gets a
+ * private copy first, so nobody else is rescheduled by the edit.
  *
- * Stage keys survive the fork, which is what lets the boards, deliverables,
- * contacts and leaders come along. Content on a stage that was removed is
+ * Passing `template` publishes the same stages under a name, which is what puts
+ * them in the profile pickers for other programs to start from.
+ *
+ * Stage keys survive the copy, which is what lets the boards, deliverables,
+ * contacts and leader come along. Content on a stage that was removed is
  * deleted with it; overrides survive only where the baseline did not move,
  * since an override is a manual edit of that baseline.
  */
-export async function saveProjectStages(input: {
-  projectId: string;
-  /** Id to mint the forked profile under; ignored when editing in place. */
-  newProfileId: string;
-  profileName: string;
-  stages: StageInput[];
-}) {
+export async function saveProjectStages(input: SaveStagesInput) {
   const project = await prisma.project.findUnique({
     where: { id: input.projectId },
-    select: { id: true, profileId: true },
+    select: { id: true, name: true, profileId: true },
   });
   if (!project) throw new Error(`No such program: ${input.projectId}`);
 
   const current = await loadProfile(project.profileId);
-  const name = input.profileName.trim();
-  if (!name) throw new Error('A profile needs a name.');
   if (!input.stages.length) throw new Error('A program needs at least one stage.');
 
   const keys = new Set<string>();
@@ -321,16 +331,32 @@ export async function saveProjectStages(input: {
     }
   }
 
+  const templateName = input.template?.name.trim();
+  if (input.template && !templateName) throw new Error('A template needs a name.');
+  if (templateName) await assertProfileNameFree(templateName);
+
   const others = await prisma.project.count({
     where: { profileId: current.id, id: { not: project.id } },
   });
-  const fork = current.builtin || others > 0;
-  const profileId = fork ? input.newProfileId : current.id;
+  /* "Private" means this program is the only thing the profile describes. */
+  const isPrivate = !current.builtin && !current.template && others === 0;
+  const needsOwn = !isPrivate || !!templateName;
+  const profileId = needsOwn ? input.newProfileId : current.id;
 
-  if (fork) {
-    await prisma.profile.create({ data: { id: profileId, name, builtin: false } });
+  if (needsOwn) {
+    await prisma.profile.create({
+      data: {
+        id: profileId,
+        name: templateName ?? `${project.name} stages`,
+        builtin: false,
+        template: !!templateName,
+      },
+    });
   } else {
-    await prisma.profile.update({ where: { id: profileId }, data: { name } });
+    await prisma.profile.update({
+      where: { id: profileId },
+      data: { name: `${project.name} stages` },
+    });
     await prisma.profileStage.deleteMany({
       where: { profileId, key: { notIn: [...keys] } },
     });
@@ -391,19 +417,33 @@ export async function saveProjectStages(input: {
     prisma.project.update({ where: { id: project.id }, data: { profileId } }),
   ]);
 
+  /* A profile nobody is on any more is nobody's history — drop it, unless it
+     is a template or the built-in one, which exist to be started from. */
+  if (profileId !== current.id && !current.builtin && !current.template) {
+    const left = await prisma.project.count({ where: { profileId: current.id } });
+    if (left === 0) await prisma.profile.delete({ where: { id: current.id } });
+  }
+
   touch(project.id);
-  return { profileId, forked: fork };
+  return { profileId, template: !!templateName };
 }
 
-/** Rename a forked profile. The built-in one is code and keeps its name. */
-export async function renameProfile(profileId: string, name: string) {
-  const profile = await prisma.profile.findUnique({ where: { id: profileId } });
-  if (!profile) throw new Error(`Unknown profile: ${profileId}`);
-  if (profile.builtin) throw new Error('The built-in profile cannot be renamed.');
-  const label = name.trim();
-  if (!label) throw new Error('A profile needs a name.');
-  await prisma.profile.update({ where: { id: profileId }, data: { name: label } });
-  revalidatePath('/');
+/**
+ * Names are how templates are told apart, so two may not share one. Only
+ * templates are compared: a program's private profile is named after the
+ * program and never appears in a picker, so it cannot be confused with one.
+ */
+async function assertProfileNameFree(name: string) {
+  /* SQLite has no case-insensitive filter that also travels to Postgres, so the
+     comparison is done here rather than in the query. */
+  const taken = await prisma.profile.findMany({
+    where: { template: true },
+    select: { name: true },
+  });
+  const wanted = name.trim().toLocaleLowerCase();
+  if (taken.some((p) => p.name.trim().toLocaleLowerCase() === wanted)) {
+    throw new Error(`A profile called "${name}" already exists.`);
+  }
 }
 
 /* ---------- programs ---------- */

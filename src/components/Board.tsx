@@ -132,7 +132,6 @@ export function Board({
   onAdd,
   onShowMore,
   mailWholeList = false,
-  limit = 3,
 }: {
   stageId: StageId;
   kind: ItemKind;
@@ -143,9 +142,6 @@ export function Board({
   onShowMore?: () => void;
   /** Adds an envelope in the header addressed to everyone on the list. */
   mailWholeList?: boolean;
-  /** How many entries the board's window is tall enough to show at once.
-   *  The rest are still rendered — they scroll. */
-  limit?: number;
 }) {
   const content = useAppStore((s) => s.content[stageId]);
   const projectName = useAppStore((s) => s.projectName);
@@ -155,7 +151,7 @@ export function Board({
   const list = sortedItems(content, kind);
 
   return (
-    <div className="board" data-kind={kind} style={{ '--board-rows': limit } as React.CSSProperties}>
+    <div className="board" data-kind={kind}>
       <div className="board-head">
         <span className="cap">{title}</span>
         <span className="note">{boardNote(content, kind)}</span>

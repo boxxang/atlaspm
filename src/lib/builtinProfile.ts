@@ -25,8 +25,13 @@ export async function ensureBuiltinProfile(prisma: PrismaClient): Promise<void> 
   try {
     await prisma.profile.upsert({
       where: { id: BUILTIN_PROFILE.id },
-      create: { id: BUILTIN_PROFILE.id, name: BUILTIN_PROFILE.label, builtin: true },
-      update: { name: BUILTIN_PROFILE.label, builtin: true },
+      create: {
+        id: BUILTIN_PROFILE.id,
+        name: BUILTIN_PROFILE.label,
+        builtin: true,
+        template: true,
+      },
+      update: { name: BUILTIN_PROFILE.label, builtin: true, template: true },
     });
     /* Code is the source of truth for this one profile, so its rows are
        written to match rather than merged — nothing else edits them. */
@@ -74,8 +79,13 @@ interface StoredStage {
   durationWeeks: number;
 }
 
-function matches(stored: { name: string; builtin: boolean; stages: StoredStage[] }): boolean {
-  if (stored.name !== BUILTIN_PROFILE.label || !stored.builtin) return false;
+function matches(stored: {
+  name: string;
+  builtin: boolean;
+  template: boolean;
+  stages: StoredStage[];
+}): boolean {
+  if (stored.name !== BUILTIN_PROFILE.label || !stored.builtin || !stored.template) return false;
   if (stored.stages.length !== BUILTIN_PROFILE.stages.length) return false;
   return BUILTIN_PROFILE.stages.every((st) => {
     const row = stored.stages.find((r) => r.key === st.key);

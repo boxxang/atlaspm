@@ -66,6 +66,12 @@ export function Toolbar({
             value={profile.id}
             onChange={(e) => onProfileChange(e.target.value)}
           >
+            {/* The list is the templates a program can start from; a program
+                that has edited its own stages is on a profile of its own,
+                which belongs in the list only while it is the one selected. */}
+            {!profiles.some((p) => p.id === profile.id) && (
+              <option value={profile.id}>{profile.label}</option>
+            )}
             {profiles.map((p) => (
               <option key={p.id} value={p.id}>
                 {p.label}

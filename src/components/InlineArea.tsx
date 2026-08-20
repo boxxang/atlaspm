@@ -66,14 +66,14 @@ function PencilIcon() {
 function EngineeringTable({
   stageId,
   detail,
-  editing,
 }: {
   stageId: StageId;
   detail: ResolvedStageDetail;
-  /** Outside edit mode the table is a read-out, not a form. */
-  editing: boolean;
 }) {
   const setLines = useAppStore((st) => st.setEngineeringLines);
+  /* Its own edit mode: this list and the stage text are edited independently,
+     and the deliverables table has its own too. */
+  const [editing, setEditing] = useState(false);
   const [draft, setDraft] = useState('');
   const [draftMm, setDraftMm] = useState('');
 
@@ -94,8 +94,20 @@ function EngineeringTable({
 
   return (
     <>
+      <div className="mm-head">
+        <span className="cap">Engineering Activity</span>
+        <button
+          className="tbl-edit"
+          data-mm-edit
+          aria-pressed={editing}
+          title={editing ? 'Done editing the engineering list' : 'Edit the engineering list'}
+          onClick={() => setEditing((v) => !v)}
+        >
+          {editing ? 'Done' : 'Edit'}
+        </button>
+      </div>
       <div className={`mm-cols${editing ? '' : ' read'}`}>
-        <span>Engineering activity</span>
+        <span>Activity</span>
         <span>M/M</span>
         {editing && <span />}
       </div>
@@ -191,15 +203,7 @@ function EngineeringTable({
 }
 
 /** Engineering | Program — the two readings of the same stage. */
-function ViewToggle({
-  stageId,
-  detail,
-  editing,
-}: {
-  stageId: StageId;
-  detail: ResolvedStageDetail;
-  editing: boolean;
-}) {
+function ViewToggle({ stageId, detail }: { stageId: StageId; detail: ResolvedStageDetail }) {
   const [view, setView] = useState<'eng' | 'prog'>('eng');
   return (
     <div>
@@ -214,7 +218,7 @@ function ViewToggle({
       </div>
       </div>
       <div className="view-pane enter" data-pane="eng" hidden={view !== 'eng'} key={`eng-${view}`}>
-        <EngineeringTable stageId={stageId} detail={detail} editing={editing} />
+        <EngineeringTable stageId={stageId} detail={detail} />
         <div className="view-foot">
           <span className="cap">Tools</span>
           <span className="mono">{detail.tools.join(' · ')}</span>
@@ -243,21 +247,16 @@ function ViewToggle({
 function StageDetailEditor({
   stageId,
   detail,
-  engineeringEffort,
   onDone,
 }: {
   stageId: StageId;
   detail: ResolvedStageDetail;
-  /** Carried through untouched: effort is edited in the table, not here. */
-  engineeringEffort: string | null;
   onDone: () => void;
 }) {
   const stage = useStage(stageId);
   const save = useAppStore((st) => st.saveStageDetail);
   const [f, setF] = useState({
     description: detail.description,
-    /* the engineering list is managed in its own table, not here */
-    engineeringView: fromLines(detail.engineeringView),
     programView: fromLines(detail.programView),
     tools: fromLines(detail.tools),
     collaboration: fromLines(detail.collaboration),
@@ -289,7 +288,21 @@ function StageDetailEditor({
         <button
           data-sd-save
           onClick={() => {
-            save(stageId, normaliseOverride({ ...f, engineeringEffort }, stage));
+            /* the engineering list and its man-months belong to their own
+               table — read them live rather than from a snapshot taken when
+               this form opened, which is how an edit there used to vanish */
+            const live = useAppStore.getState().stageDetails[stageId];
+            save(
+              stageId,
+              normaliseOverride(
+                {
+                  ...f,
+                  engineeringView: live?.engineeringView ?? null,
+                  engineeringEffort: live?.engineeringEffort ?? null,
+                },
+                stage,
+              ),
+            );
             onDone();
           }}
         >
@@ -338,7 +351,7 @@ function StageDetail({ stageId }: { stageId: StageId }) {
           <button
             className="sd-pencil"
             data-sd-edit
-            title="Edit this stage — text, engineering activities and deliverables"
+            title="Edit this stage's description"
             aria-label="Edit this stage"
             onClick={() => setEditing(true)}
           >
@@ -351,20 +364,15 @@ function StageDetail({ stageId }: { stageId: StageId }) {
       </div>
 
       {editing ? (
-        <StageDetailEditor
-          stageId={stageId}
-          detail={detail}
-          engineeringEffort={override?.engineeringEffort ?? null}
-          onDone={() => setEditing(false)}
-        />
+        <StageDetailEditor stageId={stageId} detail={detail} onDone={() => setEditing(false)} />
       ) : (
         <p className="sheet-what">{detail.description}</p>
       )}
 
       <div className="sheet-grid">
-        <ViewToggle stageId={stageId} detail={detail} editing={editing} />
+        <ViewToggle stageId={stageId} detail={detail} />
         <div className="sheet-side">
-          <Deliverables stageId={stageId} editing={editing} />
+          <Deliverables stageId={stageId} />
         </div>
       </div>
     </>

@@ -1,4 +1,11 @@
-import { expect, test, type Page, SEED_PROJECT_PATH, selectStage, editStageDetail } from './fixtures';
+import {
+  expect,
+  test,
+  type Page,
+  SEED_PROJECT_PATH,
+  selectStage,
+  editDeliverables,
+} from './fixtures';
 
 /**
  * Phase 6 acceptance: every mutation survives a hard refresh.
@@ -201,16 +208,18 @@ test('kickoff, leader, contact and deliverable edits persist', async ({ page }) 
   await expect(rows.last()).toContainText('Rae Lindqvist');
 
   // deliverable add
-  await editStageDetail(page);
+  await editDeliverables(page);
   await selectedPanel(page).locator('.dlv-input').fill('Cost model refresh');
+  await selectedPanel(page).locator('.dlv-input-due').fill('2026-09-30');
   await selectedPanel(page).locator('[data-dlv-add]').click();
   await hardRefresh(page);
   const dlv = selectedPanel(page).locator('.dlv-list li');
   await expect(dlv).toHaveCount(5);
   await expect(dlv.last()).toContainText('Cost model refresh');
+  await expect(dlv.last().locator('.dlv-due.read')).toHaveText('09/30/2026');
 
   // undo all of it
-  await editStageDetail(page);
+  await editDeliverables(page);
   await dlv.last().locator('[data-dlv-del]').click();
   await rows.last().locator('[data-c-del]').click();
   await selectedPanel(page).locator('[data-leader-edit]').click();

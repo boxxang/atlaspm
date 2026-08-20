@@ -199,13 +199,22 @@ body.has-overrides .edited-flag{display:inline}
   border:4px solid transparent;border-left:6px solid var(--line-strong);
   transform:translateY(-50%);
 }
+/* The diamond carries its own date: the axis is read at a glance rather than
+   hovered. The square is rotated, the date inside is rotated back. */
 .rm-ms{
   position:absolute;top:58.5px;
-  width:calc(7px * var(--icon-scale));height:calc(7px * var(--icon-scale));
+  width:calc(13px * var(--icon-scale));height:calc(13px * var(--icon-scale));
   transform:translate(-50%,-50%) rotate(45deg);
   background:var(--surface);border:1.5px solid var(--ink);z-index:2;
+  display:flex;align-items:center;justify-content:center;
 }
-.rm-ms.major{width:calc(9px * var(--icon-scale));height:calc(9px * var(--icon-scale));background:var(--ink)}
+.rm-ms.major{z-index:3}
+.rm-ms-date{
+  transform:rotate(-45deg);font-family:var(--mono);
+  font-size:calc(var(--cp-fs) * 0.82);line-height:1;color:var(--ink-2);white-space:nowrap;
+}
+.rm-ms.major{background:var(--ink);border-color:var(--ink)}
+.rm-ms.major .rm-ms-date{color:var(--page);font-weight:700}
 .rm-ms-label{
   position:absolute;transform:translateX(-50%);
   font-family:var(--mono);font-size:var(--cp-fs);letter-spacing:.06em;color:var(--ink-2);
@@ -226,23 +235,60 @@ body.has-overrides .edited-flag{display:inline}
 }
 #rm-today .ty-lbl{font-family:var(--mono);font-size:calc(var(--cp-fs) * 0.85);letter-spacing:.14em;color:var(--accent);font-weight:700;line-height:1}
 #rm-today .ty-tick{width:0;height:0;border:4.5px solid transparent;border-top:6.5px solid var(--accent)}
-/* Folded: everything but the open stage's bar collapses away, and unfolds on
-   the way back in. Heights and opacities animate; nothing reflows abruptly. */
+/* Folded: the date axis stays — bands, milestones, months and the Concurrency
+   caption — and only the bar chart collapses, down to the open stage and the
+   stage either side of it. The open row grows to carry its deliverables.
+   Heights and opacities animate; nothing reflows abruptly. */
 #roadmap{transition:padding var(--dur) ease}
-#rm-axis,#rm-gantt-cap,#rm-gantt .g-months{
-  transition:opacity var(--dur) ease,max-height var(--dur) ease,margin var(--dur) ease;
-  overflow:hidden;max-height:200px;
+#rm-gantt .g-row{
+  transition:max-height var(--dur) ease,height var(--dur) ease,opacity var(--dur) ease;
 }
-#rm-gantt .g-row{transition:max-height var(--dur) ease,opacity var(--dur) ease}
-#roadmap.folded{padding-top:8px;padding-bottom:6px}
-#roadmap.folded #rm-axis,
-#roadmap.folded #rm-gantt-cap,
-#roadmap.folded #rm-gantt .g-months{opacity:0;max-height:0;margin:0}
-#roadmap.folded #rm-gantt .g-row:not(.current){max-height:0;opacity:0;pointer-events:none}
-#roadmap.folded #rm-gantt .g-gridlines{opacity:.5}
+#roadmap.folded{padding-bottom:6px}
+#roadmap.folded #rm-gantt .g-row:not(.current):not(.near){max-height:0;opacity:0;pointer-events:none}
+#roadmap.folded #rm-gantt .g-row.near{opacity:.55}
+#roadmap.folded #rm-gantt .g-row.current{height:96px;max-height:96px}
+#roadmap.folded #rm-gantt .g-row.current .g-bar{height:calc(var(--gbar-h) * 1.6)}
+/* the effort tag would land in the middle of the deliverable markers, and the
+   stage panel right below states the same number */
+#roadmap.folded #rm-gantt .g-row.current .g-mm-tag{opacity:0}
 @media (prefers-reduced-motion:reduce){
-  #roadmap,#rm-axis,#rm-gantt-cap,#rm-gantt .g-months,#rm-gantt .g-row{transition:none}
+  #roadmap,#rm-gantt .g-row{transition:none}
 }
+
+/* A deliverable on the open stage's bar: name above, due date inside the
+   diamond. Positions come from the due dates, so editing one moves it. */
+.g-dlv{
+  position:absolute;top:50%;z-index:5;transform:translate(-50%,-50%);
+  display:flex;align-items:center;justify-content:center;pointer-events:auto;
+}
+.g-dlv-name{
+  position:absolute;left:50%;transform:translateX(-50%);
+  max-width:16ch;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+  font-family:var(--mono);font-size:calc(var(--cp-fs) * 0.8);letter-spacing:.02em;
+  color:var(--ink-2);background:var(--surface);padding:0 3px;border-radius:2px;
+  border:1px solid var(--line);
+}
+/* Deliverables cluster around a stage's end, so consecutive markers sit either
+   side of the bar line: the horizontal position stays the true date, the
+   vertical offset is only what keeps two of them apart. */
+.g-dlv[data-row="0"]{top:calc(50% - 15px)}
+.g-dlv[data-row="1"]{top:calc(50% + 15px)}
+.g-dlv[data-row="0"] .g-dlv-name{bottom:calc(100% + 2px)}
+.g-dlv[data-row="1"] .g-dlv-name{top:calc(100% + 2px)}
+.g-dlv:hover{z-index:9}
+.g-dlv:hover .g-dlv-name{max-width:none;border-color:var(--accent)}
+.g-dlv-dot{
+  width:26px;height:26px;transform:rotate(45deg);
+  background:var(--surface);border:1.4px solid var(--accent);
+  display:flex;align-items:center;justify-content:center;
+}
+.g-dlv-date{
+  transform:rotate(-45deg);font-family:var(--mono);line-height:1;
+  font-size:calc(var(--cp-fs) * 0.8);color:var(--accent);white-space:nowrap;
+}
+.g-dlv.done .g-dlv-dot{background:var(--accent);border-color:var(--accent)}
+.g-dlv.done .g-dlv-date{color:var(--page)}
+.g-dlv.done .g-dlv-name{color:var(--ink-3);text-decoration:line-through}
 
 #rm-gantt-cap{display:flex;gap:12px;align-items:baseline;margin:8px 0 4px}
 #rm-gantt-cap .cap{font-size:.56em}
@@ -385,11 +431,10 @@ body.has-overrides .edited-flag{display:inline}
 .facts .board[data-kind="keyinfo"]{grid-column:2;grid-row:1}
 .facts .board[data-kind="risks"]{grid-column:2;grid-row:2}
 .facts .board{display:flex;flex-direction:column;min-height:0}
-/* Each board is a fixed window on its list — ten entries for Activity, five
-   each for key information and risk. Past that it scrolls, and "Show more"
-   sits directly under the window rather than at the bottom of the column, so
-   the full board is always one reach away. --b-entry is a row carrying its
-   status-update line; key information rows have none. */
+/* Each board is a window that grows with its list up to a ceiling — 400px for
+   Activity, 300px for key information, 100px for risk — and scrolls past it.
+   Growing rather than reserving keeps "Show more" directly under the last
+   entry instead of stranded at the bottom of an empty window. */
 .facts .board-rows{
   flex:none;overflow-y:auto;overscroll-behavior:contain;
   scrollbar-width:thin;scrollbar-gutter:stable;
@@ -402,9 +447,9 @@ body.has-overrides .edited-flag{display:inline}
   border:2px solid var(--surface);background-clip:padding-box;
 }
 .facts .board-rows::-webkit-scrollbar-thumb:hover{background:var(--ink-3);background-clip:padding-box}
-.facts .board[data-kind="activities"] .board-rows{height:400px}
-.facts .board[data-kind="keyinfo"] .board-rows{height:300px}
-.facts .board[data-kind="risks"] .board-rows{height:100px}
+.facts .board[data-kind="activities"] .board-rows{max-height:400px}
+.facts .board[data-kind="keyinfo"] .board-rows{max-height:300px}
+.facts .board[data-kind="risks"] .board-rows{max-height:100px}
 .board{margin-top:0}
 .board-head{display:flex;align-items:baseline;gap:12px;padding-bottom:8px}
 .board-head .note{font-size:.66em;color:var(--ink-3)}
@@ -1252,13 +1297,17 @@ body.schedule-mode #schedule-view{opacity:1;visibility:visible;transform:none}
 #se-close:hover{color:var(--ink);border-color:var(--ink-3)}
 .se-body{padding:16px 26px 22px;overflow-y:auto}
 
-.se-name{display:flex;align-items:center;gap:12px;margin-bottom:8px}
-.se-name .k{font-family:var(--mono);font-size:.66em;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-3)}
 .se-name-input{
-  flex:1;max-width:340px;border:1px solid var(--line);border-radius:4px;padding:5px 9px;
+  flex:1;max-width:300px;border:1px solid var(--line);border-radius:4px;padding:5px 9px;
   font:inherit;font-size:.86em;background:var(--page);color:var(--ink);
 }
+.se-name-input:focus{outline:none;border-color:var(--accent)}
 .se-note{font-size:.78em;color:var(--ink-3);margin:0 0 14px}
+
+/* The legend is what the chart's y-axis shows, number and all. */
+.se-legend{display:flex;align-items:center;gap:3px;min-width:0}
+.se-legend-no{font-family:var(--mono);font-size:.74em;color:var(--ink-3);flex:none}
+.se-legend .se-short{min-width:0;width:100%}
 
 .se-cols,.se-row{
   display:grid;
@@ -1315,3 +1364,32 @@ body.schedule-mode #schedule-view{opacity:1;visibility:visible;transform:none}
   .se-row{grid-template-columns:56px minmax(0,1fr) 32px;row-gap:6px}
   .se-row .se-short,.se-row .se-band,.se-row .se-start,.se-row .se-dur{grid-column:2/3}
 }
+
+/* ============================================================
+   V7 — per-table edit modes in the stage sheet
+   ============================================================ */
+/* The stage text, the engineering list and the deliverables are three
+   different things to edit, so each carries its own switch. */
+.tbl-edit{
+  margin-left:auto;font-family:var(--mono);font-size:.62em;letter-spacing:.12em;text-transform:uppercase;
+  color:var(--ink-3);border:1px solid var(--line);border-radius:3px;padding:3px 9px;
+  transition:color .15s,border-color .15s,background .15s;
+}
+.tbl-edit:hover,.tbl-edit:focus-visible{color:var(--ink);border-color:var(--ink-3)}
+.tbl-edit[aria-pressed="true"]{background:var(--ink);color:var(--page);border-color:var(--ink)}
+.mm-head{min-height:33px;display:flex;align-items:center;gap:12px;margin-bottom:14px}
+.mm-head .cap{font-family:var(--mono);font-size:.66em;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-3)}
+
+/* A deliverable with no date is allowed, but asked about first. */
+.dlv-tbd{
+  display:flex;align-items:center;gap:10px;flex-wrap:wrap;
+  font-size:.8em;color:var(--ink-2);background:var(--page);
+  border:1px solid var(--line-strong);border-radius:4px;padding:8px 11px;margin:-12px 0 22px;
+}
+.dlv-tbd button{
+  font-family:var(--mono);font-size:.72em;letter-spacing:.08em;text-transform:uppercase;
+  border:1px solid var(--line);border-radius:3px;padding:3px 9px;color:var(--ink-2);
+}
+.dlv-tbd button[data-dlv-tbd-ok]{background:var(--ink);color:var(--page);border-color:var(--ink)}
+.dlv-tbd button[data-dlv-tbd-cancel]:hover{color:var(--ink);border-color:var(--ink-3)}
+.dlv-due.read:not(.overdue){color:var(--ink-2)}

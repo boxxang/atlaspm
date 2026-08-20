@@ -19,15 +19,19 @@ generator client {
   output   = "../src/generated/prisma"
 }
 
-/// A schedule profile: the ordered list of stages a program runs on, shared by
-/// every program using it. The built-in profile is seeded from
-/// /data/scheduleProfiles.ts and stays immutable — editing a program's stages
-/// forks a copy, so other programs on the profile are never rescheduled by
-/// someone else's edit.
+/// A schedule profile: the ordered list of stages a program runs on. The
+/// built-in profile is seeded from /data/scheduleProfiles.ts and stays
+/// immutable. Editing a program's stages applies to that program: if it shares
+/// its profile with anyone, it gets a private copy first, so no other program is
+/// ever rescheduled by someone else's edit.
 model Profile {
   id        String   @id
   name      String
   builtin   Boolean  @default(false)
+  /// Listed as a template others can start from. A program that edits its own
+  /// stages gets a private profile (template = false) so the edit lands on that
+  /// program alone; "Save as template" is what publishes one.
+  template  Boolean  @default(false)
   createdAt DateTime @default(now())
 
   stages   ProfileStage[]

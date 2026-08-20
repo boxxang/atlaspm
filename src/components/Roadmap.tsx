@@ -1,7 +1,7 @@
 'use client';
 
 import { useMemo, useRef, useState } from 'react';
-import { fmtDate } from '@/lib/schedule';
+import { fmtDate, fmtMD } from '@/lib/schedule';
 import { stageBands } from '@/lib/stages';
 import { useAppStore } from '@/store/useAppStore';
 import { Gantt, useGanttGeometry } from './Gantt';
@@ -27,9 +27,11 @@ export function Roadmap() {
 
   /**
    * Once a stage is open, the chart is reference rather than navigation, so it
-   * folds down to that one bar when the pointer moves past it into the page and
-   * unfolds when the pointer comes back. Only downward exits collapse it —
-   * leaving upward means going to the toolbar, not to the stage.
+   * folds when the pointer moves past it into the page and unfolds when the
+   * pointer comes back. What survives the fold is the date axis — bands,
+   * milestones, months — and the open stage with the stage either side of it,
+   * grown tall enough to carry its deliverables. Only downward exits collapse
+   * it: leaving upward means going to the toolbar, not to the stage.
    */
   const [folded, setFolded] = useState(false);
   const ref = useRef<HTMLElement>(null);
@@ -112,12 +114,16 @@ export function Roadmap() {
                 >
                   {m.label}
                 </span>
+                {/* the date rides inside the diamond rather than waiting for
+                    a hover — the axis is read at a glance */}
                 <span
                   className={`rm-ms${m.major ? ' major' : ''}`}
                   style={{ left: `${m.pct}%` }}
                   data-tip={`${m.label}|${fmtDate(m.date)}`}
                   data-msid={m.id}
-                />
+                >
+                  <span className="rm-ms-date">{fmtMD(m.date)}</span>
+                </span>
               </span>
             ))}
             <div id="rm-line" />
@@ -134,7 +140,7 @@ export function Roadmap() {
           <span className="cap">Concurrency</span>
           <span className="note">stages overlap by design — select a bar to open it</span>
         </div>
-        <Gantt id="rm-gantt" short onSelectStage={selectStage} />
+        <Gantt id="rm-gantt" short folded={isFolded} onSelectStage={selectStage} />
       </div>
     </section>
   );

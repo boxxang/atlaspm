@@ -141,7 +141,13 @@ export function buildProjectState(project: {
   profileId: string;
   costPerManMonth: number;
   currency: string;
-  profile: { id: string; name: string; builtin: boolean; stages: ProfileStageRow[] };
+  profile: {
+    id: string;
+    name: string;
+    builtin: boolean;
+    template: boolean;
+    stages: ProfileStageRow[];
+  };
   overrides: OverrideRow[];
   items: ItemRow[];
   deliverables: DeliverableRow[];
@@ -153,6 +159,7 @@ export function buildProjectState(project: {
     id: project.profile.id,
     label: project.profile.name,
     builtin: project.profile.builtin,
+    template: project.profile.template,
     stages: [...project.profile.stages].sort((a, b) => a.order - b.order),
   };
   /* Rows for a stage the profile no longer carries are ignored rather than

@@ -6,7 +6,7 @@ import {
   type Page,
   SEED_PROJECT_PATH,
   selectStage,
-  editStageDetail,
+  editDeliverables,
   settleLayout,
 } from './fixtures';
 
@@ -335,11 +335,11 @@ test.describe('stage panel', () => {
     expect(contacts.y).toBeGreaterThan(act.y + act.height);
   });
 
-  test('each board is a fixed window with its Show more right under it', async ({ page }) => {
+  test('a board fits its list, with Show more right under the last entry', async ({ page }) => {
     await selectStage(page, '06');
     const panel = selectedPanel(page);
 
-    for (const [kind, height] of [
+    for (const [kind, ceiling] of [
       ['activities', 400],
       ['keyinfo', 300],
       ['risks', 100],
@@ -347,13 +347,29 @@ test.describe('stage panel', () => {
       const board = panel.locator(`.board[data-kind="${kind}"]`);
       const rows = (await board.locator('.board-rows').boundingBox())!;
       const foot = (await board.locator('.board-foot').boundingBox())!;
+      const content = await board
+        .locator('.board-rows')
+        .evaluate((el) => ({ scroll: el.scrollHeight, client: el.clientHeight }));
 
-      expect(Math.round(rows.height), kind).toBe(height);
+      // the window is the list's own height until the ceiling stops it
+      expect(Math.round(rows.height), kind).toBeLessThanOrEqual(ceiling);
+      expect(Math.round(rows.height), kind).toBe(Math.min(content.scroll, ceiling));
       // and "Show more" sits directly beneath, not at the bottom of the column
       expect(foot.y - (rows.y + rows.height), kind).toBeLessThanOrEqual(1);
       await expect(board.locator('[data-more]')).toBeVisible();
       await expect(board.locator('.board-rows')).toHaveCSS('overflow-y', 'auto');
     }
+  });
+
+  test('an empty board keeps Show more beside its own message', async ({ page }) => {
+    // Architecture has nothing on its risk board
+    await selectStage(page, '02');
+    const board = selectedPanel(page).locator('.board[data-kind="risks"]');
+    await expect(board.locator('.b-row')).toHaveCount(0);
+    const rows = (await board.locator('.board-rows').boundingBox())!;
+    const foot = (await board.locator('.board-foot').boundingBox())!;
+    expect(Math.round(rows.height)).toBeLessThan(100); // no reserved emptiness
+    expect(foot.y - (rows.y + rows.height)).toBeLessThanOrEqual(1);
   });
 
   test('a board past its window scrolls instead of growing', async ({ page }) => {
@@ -486,11 +502,12 @@ test.describe('stage details', () => {
     const panel = selectedPanel(page);
     const rows = panel.locator('.dlv-list li');
     await expect(rows).toHaveCount(4);
-    // the table is a read-out until the sheet is opened for editing
+    // the table is a read-out until it is switched into edit mode
     await expect(panel.locator('.dlv-add')).toHaveCount(0);
     await expect(panel.locator('input.dlv-due')).toHaveCount(0);
-    await editStageDetail(page);
+    await editDeliverables(page);
     await panel.locator('.dlv-input').fill('Cost model refresh');
+    await panel.locator('.dlv-input-due').fill('2026-12-11');
     await panel.locator('[data-dlv-add]').click();
     await expect(rows).toHaveCount(5);
     await expect(rows.last()).toContainText('Cost model refresh');
@@ -645,23 +662,106 @@ test.describe('the chart folds away', () => {
     await settleLayout(page);
 
     const folded = await height();
-    expect(folded).toBeLessThan(open / 4);
+    // the bar chart collapses; the axis above it does not, so the saving is
+    // the nine rows that went, not the whole chart
+    expect(folded).toBeLessThan(open - 100);
     await expect(roadmap).toHaveClass(/folded/);
-    // the selected stage's bar is what is left; the axis and the rest are gone
+
+    // the date axis survives — bands, milestones and every month of it
+    await expect(page.locator('#rm-axis')).toBeVisible();
+    await expect(page.locator('#rm-gantt-cap')).toBeVisible();
+    await expect(page.locator('#rm-gantt .g-months .g-month').first()).toBeVisible();
+    await expect(page.locator('.rm-ms').first()).toBeVisible();
+
+    // what collapses is the bar chart, down to the open stage and its neighbours
     await expect(page.locator('#rm-gantt .g-row.current .g-bar')).toBeVisible();
-    await expect(page.locator('#rm-axis')).toBeHidden();
-    await expect(page.locator('#rm-gantt .g-row:not(.current)').first()).toBeHidden();
+    await expect(page.locator('#rm-gantt .g-row[data-index="5"]')).toBeVisible();
+    await expect(page.locator('#rm-gantt .g-row[data-index="4"]')).toBeVisible(); // above
+    await expect(page.locator('#rm-gantt .g-row[data-index="6"]')).toBeVisible(); // below
+    await expect(page.locator('#rm-gantt .g-row[data-index="3"]')).toBeHidden();
+    await expect(page.locator('#rm-gantt .g-row[data-index="0"]')).toBeHidden();
+
+    // the open row grows, so its deliverables have somewhere to sit
+    const rowH = (await page.locator('#rm-gantt .g-row.current').boundingBox())!.height;
+    expect(rowH).toBeGreaterThan(60);
 
     // and it is animated rather than snapping
-    const transition = await roadmap.evaluate(
-      (el) => getComputedStyle(el.querySelector('#rm-axis')!).transitionDuration,
-    );
+    const transition = await page
+      .locator('#rm-gantt .g-row')
+      .first()
+      .evaluate((el) => getComputedStyle(el).transitionDuration);
     expect(transition).not.toBe('0s');
 
     await roadmap.hover({ position: { x: 8, y: 8 } });
     await settleLayout(page);
     await expect(roadmap).not.toHaveClass(/folded/);
     expect(Math.round(await height())).toBe(Math.round(open));
+  });
+});
+
+test.describe('the folded chart carries its dates', () => {
+  const fold = async (page: Page) => {
+    const box = (await page.locator('#roadmap').boundingBox())!;
+    await page.mouse.move(box.x + box.width / 2, box.y + box.height + 40);
+    await settleLayout(page);
+    await expect(page.locator('#roadmap')).toHaveClass(/folded/);
+  };
+
+  test('every milestone diamond shows its own date, hover or not', async ({ page }) => {
+    await selectStage(page, '06');
+    const dots = page.locator('.rm-ms');
+    await expect(dots).toHaveCount(7);
+    for (const text of await dots.locator('.rm-ms-date').allTextContents()) {
+      expect(text).toMatch(/^\d{1,2}\/\d{1,2}$/);
+    }
+    // Tapeout's diamond says what the toolbar says
+    const tapeout = await page.locator('.rm-ms[data-msid="tapeout"] .rm-ms-date').textContent();
+    const toolbar = (await page.locator('[data-computed="tapeout"]').textContent())!;
+    const [m, d] = toolbar.split('/');
+    expect(tapeout).toBe(`${Number(m)}/${Number(d)}`);
+
+    await fold(page);
+    await expect(page.locator('.rm-ms[data-msid="tapeout"] .rm-ms-date')).toBeVisible();
+  });
+
+  test('the month scale keeps every month', async ({ page }) => {
+    await selectStage(page, '06');
+    const before = await page.locator('#rm-gantt .g-month').allTextContents();
+    // consecutive months, no gaps: Feb, Mar, Apr…
+    expect(before.length).toBeGreaterThan(12);
+    expect(before.slice(0, 4)).toEqual(['Feb', 'Mar', 'Apr', 'May']);
+
+    await fold(page);
+    expect(await page.locator('#rm-gantt .g-month').allTextContents()).toEqual(before);
+  });
+
+  test('the open stage wears its deliverables, and a new date moves one', async ({ page }) => {
+    await selectStage(page, '06');
+    await expect(page.locator('.g-dlv')).toHaveCount(0); // only once it folds
+    await fold(page);
+
+    const marks = page.locator('#rm-gantt .g-row.current .g-dlv');
+    await expect(marks).toHaveCount(5); // Physical Design's five deliverables
+    await expect(marks.first().locator('.g-dlv-name')).toHaveText('Floorplan rev C');
+    await expect(marks.first().locator('.g-dlv-date')).toHaveText('7/23');
+
+    // markers are placed by date: later date, further right
+    const xs = await marks.evaluateAll((els) =>
+      els.map((e) => e.getBoundingClientRect().left),
+    );
+    expect([...xs].sort((a, b) => a - b)).toEqual(xs);
+
+    // move a due date in the sheet below and the marker follows
+    const before = xs[0];
+    await editDeliverables(page);
+    await selectedPanel(page).locator('.dlv-list li').first().locator('input.dlv-due').fill('2026-10-05');
+    await page.locator('#roadmap').hover({ position: { x: 8, y: 8 } });
+    await fold(page);
+    const moved = page.locator('#rm-gantt .g-row.current .g-dlv[data-dlv]').filter({
+      hasText: 'Floorplan rev C',
+    });
+    await expect(moved.locator('.g-dlv-date')).toHaveText('10/5');
+    expect((await moved.boundingBox())!.x).toBeGreaterThan(before);
   });
 });
 
@@ -672,17 +772,30 @@ test.describe('board windows', () => {
         .height,
     );
 
-  test('every board keeps its height whatever it holds', async ({ page }) => {
-    // Product Definition is seeded full — twelve entries on each board
-    expect(await boardHeight(page, 'activities')).toBe(400);
-    expect(await boardHeight(page, 'keyinfo')).toBe(300);
-    expect(await boardHeight(page, 'risks')).toBe(100);
+  test('a board is the size of its list until the ceiling stops it', async ({ page }) => {
+    const CEILING = { activities: 400, keyinfo: 300, risks: 100 } as const;
+    const measure = async (kind: keyof typeof CEILING) =>
+      selectedPanel(page)
+        .locator(`.board[data-kind="${kind}"] .board-rows`)
+        .evaluate((el) => ({
+          height: Math.round(el.getBoundingClientRect().height),
+          content: el.scrollHeight,
+        }));
 
-    // Physical Design holds a handful, and the windows do not shrink to fit
+    // Product Definition is seeded full — twelve entries on each board
+    for (const kind of ['activities', 'keyinfo', 'risks'] as const) {
+      const m = await measure(kind);
+      expect(m.height, kind).toBe(CEILING[kind]);
+      expect(m.content, kind).toBeGreaterThan(CEILING[kind]);
+    }
+
+    // Physical Design holds a handful, and its windows shrink to fit them
     await selectStage(page, '06');
-    expect(await boardHeight(page, 'activities')).toBe(400);
-    expect(await boardHeight(page, 'keyinfo')).toBe(300);
-    expect(await boardHeight(page, 'risks')).toBe(100);
+    for (const kind of ['activities', 'keyinfo', 'risks'] as const) {
+      const m = await measure(kind);
+      expect(m.height, kind).toBe(Math.min(m.content, CEILING[kind]));
+    }
+    expect(await boardHeight(page, 'keyinfo')).toBeLessThan(300);
   });
 
   test('a full board scrolls inside its window, with Show more just below', async ({ page }) => {

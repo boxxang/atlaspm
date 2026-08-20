@@ -138,7 +138,6 @@ export function StagePanel({ stage, index }: { stage: Stage; index: number }) {
           kind="activities"
           title="Activity"
           mailWholeList
-          limit={10}
           onOpenItem={(id) => openBoard(stage.id, 'activities', 'item', id, 'board')}
           onAdd={() => openBoard(stage.id, 'activities', 'edit', null, 'add')}
           onShowMore={() => openBoard(stage.id, 'activities', 'board')}
@@ -147,7 +146,6 @@ export function StagePanel({ stage, index }: { stage: Stage; index: number }) {
           stageId={stage.id}
           kind="keyinfo"
           title="Key Information"
-          limit={5}
           onOpenItem={(id) => openBoard(stage.id, 'keyinfo', 'item', id, 'board')}
           onAdd={() => openBoard(stage.id, 'keyinfo', 'edit', null, 'add')}
           onShowMore={() => openBoard(stage.id, 'keyinfo', 'board')}
@@ -156,7 +154,6 @@ export function StagePanel({ stage, index }: { stage: Stage; index: number }) {
           stageId={stage.id}
           kind="risks"
           title="Risk"
-          limit={5}
           onOpenItem={(id) => openBoard(stage.id, 'risks', 'item', id, 'board')}
           onAdd={() => openBoard(stage.id, 'risks', 'edit', null, 'add')}
           onShowMore={() => openBoard(stage.id, 'risks', 'board')}

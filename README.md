@@ -90,27 +90,36 @@ Pure logic never imports UI, and `/src/lib` + `/src/data` never touch the DOM �
   (Tapeout, First Silicon, Mass Production and the four freezes) cannot be
   removed, since the milestone is anchored to its end; removing any other stage
   says first how many board entries, deliverables and contacts go with it.
-- **Editing stages forks a profile.** The built-in profile is code and a shared
-  profile belongs to every program on it, so saving writes a new profile —
-  named in the editor, `Typical SoC (copy)` by default — and moves only this
-  program to it. A profile this program is the sole user of is edited in place,
-  which is also where renaming it happens. Stage keys survive the fork, so a
-  stage's boards, deliverables, leader and contacts travel with it; content on a
-  removed stage is deleted with it, and a manual date edit survives only where
-  the baseline it was made against did not move. New profiles appear in the
-  toolbar select and in the create-program picker, and a program can be moved
-  between profiles from the toolbar.
-- **Stage detail editing.** The pencil in the Stage Details header edits that
-  program's copy of the stage text. A field only becomes an override when it
-  differs from the shared definition, so emptying it restores the default.
+- **Editing stages is about one program.** Save applies the list to the program
+  you are looking at and to nothing else: a program sharing its profile — the
+  built-in one, or a template another program picked — quietly moves onto a
+  private copy first, so nobody else is rescheduled by the edit. Editing again
+  lands in that copy rather than breeding another. *Save as template…* is the
+  other thing you might want: it publishes the same list under a name, which is
+  what puts it in the toolbar select and the create-program picker for other
+  programs to start from. Two profiles may not share a name, case included.
+  Stage keys survive the copy, so a stage's boards, deliverables, leader and
+  contacts travel with it; content on a removed stage is deleted with it, and a
+  manual date edit survives only where the baseline it was made against did not
+  move.
+- **Stage detail editing.** Three things are edited separately, because they are
+  three different things: the pencil in the Stage Details header opens that
+  program's copy of the stage *text*, and the engineering list and the
+  deliverables each carry their own Edit switch. A text field only becomes an
+  override when it differs from the shared definition, so emptying it restores
+  the default; the engineering list and its man-months are the program's own and
+  pass through the text form untouched.
+- **A deliverable without a date.** Adding one with the due date left blank asks
+  first, and saves it as **TBD** if that is what was meant. It reads TBD on the
+  board and takes a date whenever one is known.
 - **Stage panel layout.** Title, leader and dates sit beside the stage's
   drawing, which stretches to end on the dates row rather than running past it.
   The stage-details sheet is directly below them; then the boards — Activity
   down the left, key information over risk down the right — and engineering
-  contacts last. Each board is a fixed window (400px / 300px / 100px) that
-  scrolls rather than growing, so a stage's panel is the same height whether it
-  holds three entries or thirty, and *Show more* sits under the window it
-  belongs to.
+  contacts last. Each board is a window that grows with its list up to a
+  ceiling — 400px, 300px, 100px — and scrolls past it, so *Show more* sits
+  directly under the last entry instead of stranded at the bottom of an empty
+  window.
 - **One date axis, read twice.** The roadmap carries the lifecycle bands and the
   milestone diamonds across the top, positioned by date; the twelve stages are
   the concurrency chart's y-axis. Both share the same geometry and gutter, so a
@@ -118,16 +127,23 @@ Pure logic never imports UI, and `/src/lib` + `/src/data` never touch the DOM �
   stage today falls in — the lowest of them where stages overlap — and picking
   its bar again closes it.
 - **The chart folds out of the way.** Move the pointer down out of the
-  concurrency chart and it collapses to the open stage's bar alone, animated;
-  move back into it and it unfolds. The stage panel below therefore keeps the
-  screen while you work in it, without losing where the program stands.
+  concurrency chart and the bar chart collapses to the open stage and the stage
+  either side of it, animated; move back into it and it unfolds. What never
+  folds is the date axis — lifecycle bands, milestone diamonds and every month
+  of the calendar — so the stage panel below keeps the screen without losing
+  where the program stands. The open stage's row grows as it folds, and that
+  stage's deliverables appear on its bar as dated markers: the name above, the
+  due date inside the diamond, the position taken from the date itself, so
+  editing a date in the sheet below moves the marker.
+- **Dates on the diamonds.** Every milestone on the axis carries its own date
+  (`10/15`) inside the diamond rather than waiting for a hover.
 - **Owner picker.** An item's owner is chosen from the stage's leader and its
   engineering contacts rather than typed. It stores the short form
   (`M. Bianchi`), which keeps the Owner column consistent and lets the envelope
   button resolve an address.
 - **Effort and cost.** A stage's engineering activities are a board — add,
-  rename, delete, each line carrying man-months — behind the sheet's edit mode,
-  as are deliverable due dates. Ticking a deliverable off stays always
+  rename, delete, each line carrying man-months — behind that table's own edit
+  mode, as are deliverable due dates. Ticking a deliverable off stays always
   available, since that is day-to-day work rather than editing the stage. The
   stage's total rides on its gantt bar, and the program's total drives an
   estimate on the program card. The rate is a program setting, edited on the
@@ -196,8 +212,8 @@ that is a read/write swap rather than a redesign.
 ## Testing
 
 ```bash
-npm test          # 153 unit tests: schedule engine, stages/profiles, derivations, effort, mail, purity
-npm run e2e       # 220 Playwright tests
+npm test          # 154 unit tests: schedule engine, stages/profiles, derivations, effort, mail, purity
+npm run e2e       # 229 Playwright tests
 ```
 
 The e2e suite runs against its own database (`test.db`) on port 3100, so it never

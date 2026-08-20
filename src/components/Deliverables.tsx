@@ -9,15 +9,11 @@ import { ColGrip } from './ColGrip';
 /**
  * Ticking a deliverable off is day-to-day work, so the checkbox is always live.
  * Changing a due date, adding a line or removing one changes what the stage
- * owes, so those wait for edit mode.
+ * owes, so those wait for this table's own edit mode — independent of the
+ * stage text and of the engineering list, which each have their own.
  */
-export function Deliverables({
-  stageId,
-  editing = false,
-}: {
-  stageId: StageId;
-  editing?: boolean;
-}) {
+export function Deliverables({ stageId }: { stageId: StageId }) {
+  const [editing, setEditing] = useState(false);
   const list = useAppStore((s) => s.deliverables[stageId]);
   const today = useAppStore((s) => s.today);
   const toggle = useAppStore((s) => s.toggleDeliverable);
@@ -26,14 +22,25 @@ export function Deliverables({
   const del = useAppStore((s) => s.deleteDeliverable);
   const [title, setTitle] = useState('');
   const [due, setDueDraft] = useState('');
+  /* A deliverable with no date is a real answer, but rarely the intended one —
+     so it is asked about once rather than saved silently. */
+  const [askTbd, setAskTbd] = useState(false);
   const done = list.filter((d) => d.done).length;
 
-  const submit = () => {
-    const t = title.trim();
-    if (!t) return;
-    add(stageId, t, due ? fromISO(due) : null);
+  const write = (dueDate: Date | null) => {
+    add(stageId, title.trim(), dueDate);
     setTitle('');
     setDueDraft('');
+    setAskTbd(false);
+  };
+
+  const submit = () => {
+    if (!title.trim()) return;
+    if (!due) {
+      setAskTbd(true);
+      return;
+    }
+    write(fromISO(due));
   };
 
   return (
@@ -45,6 +52,18 @@ export function Deliverables({
             {done} / {list.length} complete
           </span>
         </span>
+        <button
+          className="tbl-edit"
+          data-dlv-edit
+          aria-pressed={editing}
+          title={editing ? 'Done editing the deliverables' : 'Edit the deliverables'}
+          onClick={() => {
+            setEditing((v) => !v);
+            setAskTbd(false);
+          }}
+        >
+          {editing ? 'Done' : 'Edit'}
+        </button>
       </div>
       <div className="dlv-cols">
         <span>
@@ -86,7 +105,7 @@ export function Deliverables({
                 className={`dlv-due read${!d.done && d.due && d.due < today ? ' overdue' : ''}`}
                 data-dlv-due-text={d.id}
               >
-                {d.due ? fmtDate(d.due) : '—'}
+                {d.due ? fmtDate(d.due) : 'TBD'}
               </span>
             )}
             {/* completion timestamp is automatic */}
@@ -128,6 +147,20 @@ export function Deliverables({
           + Add
         </button>
       </div>
+      )}
+      {editing && askTbd && (
+        <div className="dlv-tbd" role="alert">
+          <span>
+            No due date for &ldquo;{title.trim()}&rdquo;. Add it as <strong>TBD</strong>? The date
+            can be filled in here later.
+          </span>
+          <button data-dlv-tbd-ok onClick={() => write(null)}>
+            Add as TBD
+          </button>
+          <button data-dlv-tbd-cancel onClick={() => setAskTbd(false)}>
+            Pick a date
+          </button>
+        </div>
       )}
     </>
   );

@@ -5,7 +5,7 @@ import type { Stage, StageId } from '@/data/types';
 import { hasOpenRisks } from '@/lib/derive';
 import { formatManMonthsShort } from '@/lib/effort';
 import { resolveStageDetail } from '@/lib/stageDetail';
-import { DAY, addWeeks, fmtDate, fmtDateShort, fmtW, type Schedule } from '@/lib/schedule';
+import { DAY, addWeeks, fmtDate, fmtDateShort, fmtMD, fmtW, type Schedule } from '@/lib/schedule';
 import { useAppStore } from '@/store/useAppStore';
 
 /** Geometry shared by the mini roadmap gantt and the dashboard gantt. */
@@ -53,11 +53,17 @@ export function useGanttGeometry(
 export function Gantt({
   id,
   short = false,
+  folded = false,
   onSelectStage,
 }: {
   id?: string;
-  /** Mini variant: short row labels, every other month, no checkpoints. */
+  /** Mini variant: short row labels, no checkpoints. */
   short?: boolean;
+  /**
+   * Folded down to the open stage and its neighbours. The open stage's row
+   * grows, and its deliverables are drawn on the bar as dated markers.
+   */
+  folded?: boolean;
   /** Makes each row a target that opens its stage below. */
   onSelectStage?: (index: number | null) => void;
 }) {
@@ -74,6 +80,7 @@ export function Gantt({
   const committed = useAppStore((s) => s.committedSchedule);
   const ghost = draftOverrides ? committed : null;
   const stageDetails = useAppStore((s) => s.stageDetails);
+  const deliverables = useAppStore((s) => s.deliverables);
   /* what each stage takes in man-months, read off its engineering table */
   const effort = useMemo(
     () =>
@@ -102,14 +109,14 @@ export function Gantt({
 
   return (
     <div className={`gantt${short ? ' mini' : ''}`} id={id}>
+      {/* every month, so the axis still reads as a calendar once the chart
+          folds down to a single stage */}
       <div className="g-months">
-        {months
-          .filter((m) => !short || m.index % 2 === 0)
-          .map((m) => (
-            <span className="g-month" key={m.index} style={{ left: `${m.pct}%` }}>
-              {m.label}
-            </span>
-          ))}
+        {months.map((m) => (
+          <span className="g-month" key={m.index} style={{ left: `${m.pct}%` }}>
+            {m.label}
+          </span>
+        ))}
       </div>
       <div className="g-body">
         <div className="g-gridlines">
@@ -145,7 +152,9 @@ export function Gantt({
           const showPast = pastFrac > 0 && !risky;
           return (
             <div
-              className={`g-row${i === currentStage ? ' current' : ''}`}
+              className={`g-row${i === currentStage ? ' current' : ''}${
+                currentStage !== null && Math.abs(i - currentStage) === 1 ? ' near' : ''
+              }`}
               data-index={i}
               data-stage={s.id}
               key={s.id}
@@ -219,6 +228,35 @@ export function Gantt({
                     {formatManMonthsShort(effort[s.id])}
                   </span>
                 )}
+                {/* Folded down to one stage, the row has the height to carry
+                    that stage's deliverables: one marker each, placed on its
+                    due date, so moving a date moves the marker. */}
+                {folded &&
+                  i === currentStage &&
+                  (deliverables[s.id] ?? [])
+                    .filter((d) => d.due)
+                    .map((d, di) => {
+                      const wk = (d.due!.getTime() - kickoff.getTime()) / (7 * DAY);
+                      const pct = Math.min(Math.max(((wk - minWeek) / total) * 100, 0), 100);
+                      return (
+                        <span
+                          key={d.id}
+                          className={`g-dlv${d.done ? ' done' : ''}`}
+                          data-dlv={d.id}
+                          /* names alternate above and below the bar: stage
+                             deliverables cluster, and stacked labels are
+                             unreadable */
+                          data-row={di % 2}
+                          style={{ left: `${pct}%` }}
+                          data-tip={`${d.title}|${fmtDate(d.due!)}${d.done ? ' · complete' : ''}`}
+                        >
+                          <span className="g-dlv-name">{d.title}</span>
+                          <span className="g-dlv-dot">
+                            <span className="g-dlv-date">{fmtMD(d.due!)}</span>
+                          </span>
+                        </span>
+                      );
+                    })}
                 {(msByStage[s.id] ?? []).map((m) => {
                   const pct = ((m.week - minWeek) / total) * 100;
                   const wasMs = ghost?.milestones.find((x) => x.id === m.id);

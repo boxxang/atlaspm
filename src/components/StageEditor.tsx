@@ -5,7 +5,7 @@ import { useEffect, useState, useTransition } from 'react';
 import { saveProjectStages } from '@/app/actions';
 import { lifecyclePhases, stageMilestone } from '@/data/scheduleProfiles';
 import type { ProfileSummary } from '@/data/types';
-import { defaultShortTitle, forkName } from '@/lib/stages';
+import { defaultShortTitle } from '@/lib/stages';
 import { useAppStore } from '@/store/useAppStore';
 
 interface Row {
@@ -28,14 +28,18 @@ const newKey = () =>
 /**
  * The stages a program runs on.
  *
- * A profile is a list of stages, so this edits the profile — and because a
- * built-in or shared profile belongs to more than this program, saving forks a
- * named copy and moves only this program to it. A profile this program is the
- * only user of is edited in place, which is also where renaming happens.
+ * Editing them is about this program: Save applies the list here and nowhere
+ * else. A program that shares its profile — the built-in one, or a template
+ * another program also picked — quietly gets a copy of its own first, so an
+ * edit never reschedules somebody else's program.
+ *
+ * Save as template is the other thing you might want: publish the same list
+ * under a name, so other programs can start from it. Names have to be unique,
+ * since that is all there is to tell two templates apart.
  *
  * Stage keys never change, so the boards, deliverables, contacts and leader of
- * a stage travel with it through a fork. Deleting a stage takes its content
- * with it, and the counts are on the confirm.
+ * a stage travel with it. Deleting a stage takes its content with it, and the
+ * counts are on the confirm.
  */
 export function StageEditor({
   profiles,
@@ -46,15 +50,18 @@ export function StageEditor({
 }) {
   const router = useRouter();
   const projectId = useAppStore((s) => s.projectId);
+  const projectName = useAppStore((s) => s.projectName);
   const profile = useAppStore((s) => s.profile);
   const stages = useAppStore((s) => s.stages);
   const content = useAppStore((s) => s.content);
   const deliverables = useAppStore((s) => s.deliverables);
   const contacts = useAppStore((s) => s.contacts);
 
+  /* Shared means somebody else's program would move too, so this one takes a
+     copy of the profile before the edit lands. */
   const mine = profiles.find((p) => p.id === profile.id);
-  /* Editing in place is only safe when nothing else runs on this profile. */
-  const forks = profile.builtin || (mine ? mine.projectCount > 1 : true);
+  const shared = profile.builtin || profile.template || !!mine;
+
 
   const [rows, setRows] = useState<Row[]>(() =>
     stages.map((s) => ({
@@ -67,9 +74,8 @@ export function StageEditor({
       duration: String(s.baseline.durationWeeks),
     })),
   );
-  const [name, setName] = useState(() =>
-    forks ? forkName(profile.label, profiles.map((p) => p.label)) : profile.label,
-  );
+  /* null until Save as template is asked for; then it holds the name being typed. */
+  const [templateName, setTemplateName] = useState<string | null>(null);
   const [confirming, setConfirming] = useState<string | null>(null);
   const [error, setError] = useState('');
   const [pending, start] = useTransition();
@@ -119,7 +125,7 @@ export function StageEditor({
     };
   };
 
-  const save = () => {
+  const save = (asTemplate: { name: string } | undefined) => {
     const parsed = rows.map((r) => ({
       key: r.key,
       title: r.title.trim(),
@@ -145,9 +151,17 @@ export function StageEditor({
       );
       return;
     }
-    if (!name.trim()) {
-      setError('Give the profile a name.');
-      return;
+    if (asTemplate) {
+      const wanted = asTemplate.name.trim();
+      if (!wanted) {
+        setError('Give the template a name.');
+        return;
+      }
+      /* caught here as well as on the server, so the field answers at once */
+      if (profiles.some((p) => p.label.trim().toLocaleLowerCase() === wanted.toLocaleLowerCase())) {
+        setError(`A profile called "${wanted}" already exists.`);
+        return;
+      }
     }
     setError('');
     start(async () => {
@@ -155,8 +169,8 @@ export function StageEditor({
         await saveProjectStages({
           projectId,
           newProfileId: 'prof_' + newKey().slice(4),
-          profileName: name,
           stages: parsed,
+          template: asTemplate ? { name: asTemplate.name.trim() } : undefined,
         });
         router.refresh();
         onClose();
@@ -180,19 +194,10 @@ export function StageEditor({
         </div>
 
         <div className="se-body">
-          <label className="se-name">
-            <span className="k">Profile name</span>
-            <input
-              className="se-name-input"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              placeholder="Typical SoC (copy)"
-            />
-          </label>
-          <p className="se-note" data-forks={forks ? 'yes' : 'no'}>
-            {forks
-              ? `Saving writes a new profile and moves ${'this program'} to it. Programs on ${profile.label} keep the schedule they have.`
-              : 'This profile is used by this program alone, so saving edits it in place.'}
+          <p className="se-note" data-shared={shared ? 'yes' : 'no'}>
+            {shared
+              ? `Saving applies to this program only: it moves onto a copy of ${profile.label}, so programs still on ${profile.label} keep the schedule they have.`
+              : 'Saving applies these stages to this program.'}
           </p>
 
           <div className="se-cols">
@@ -236,12 +241,18 @@ export function StageEditor({
                     placeholder="Stage name"
                     onChange={(e) => patch(r.key, 'title', e.target.value)}
                   />
-                  <input
-                    className="se-short"
-                    value={r.shortTitle}
-                    placeholder={defaultShortTitle(r.title)}
-                    onChange={(e) => patch(r.key, 'shortTitle', e.target.value)}
-                  />
+                  {/* the chart's y-axis reads "01.DEF", so the number the stage
+                      will carry is shown here rather than left to guess */}
+                  <span className="se-legend">
+                    <span className="se-legend-no">{String(i + 1).padStart(2, '0')}.</span>
+                    <input
+                      className="se-short"
+                      value={r.shortTitle}
+                      placeholder={defaultShortTitle(r.title)}
+                      aria-label={`Legend for ${r.title}`}
+                      onChange={(e) => patch(r.key, 'shortTitle', e.target.value)}
+                    />
+                  </span>
                   <select
                     className="se-band"
                     value={r.phaseId}
@@ -322,14 +333,54 @@ export function StageEditor({
         </div>
 
         <div className="se-foot">
-          {error && <p className="err" data-se-error>{error}</p>}
+          {error && (
+            <p className="err" data-se-error>
+              {error}
+            </p>
+          )}
           <span className="spacer" />
-          <button data-save-stages disabled={pending} onClick={save}>
-            {pending ? 'Saving…' : forks ? 'Save as new profile' : 'Save'}
-          </button>
-          <button data-cancel-stages onClick={onClose}>
-            Cancel
-          </button>
+          {templateName === null ? (
+            <>
+              <button
+                data-save-as-template
+                disabled={pending}
+                onClick={() => {
+                  setError('');
+                  setTemplateName(`${projectName} flow`);
+                }}
+              >
+                Save as template…
+              </button>
+              <button data-save-stages disabled={pending} onClick={() => save(undefined)}>
+                {pending ? 'Saving…' : 'Save'}
+              </button>
+              <button data-cancel-stages onClick={onClose}>
+                Cancel
+              </button>
+            </>
+          ) : (
+            <>
+              <input
+                className="se-name-input"
+                data-template-name
+                autoFocus
+                value={templateName}
+                placeholder="Template name"
+                onChange={(e) => setTemplateName(e.target.value)}
+                onKeyDown={(e) => e.key === 'Enter' && save({ name: templateName })}
+              />
+              <button
+                data-create-template
+                disabled={pending}
+                onClick={() => save({ name: templateName })}
+              >
+                {pending ? 'Saving…' : 'Save & publish'}
+              </button>
+              <button data-cancel-template onClick={() => setTemplateName(null)}>
+                Cancel
+              </button>
+            </>
+          )}
         </div>
       </div>
     </div>

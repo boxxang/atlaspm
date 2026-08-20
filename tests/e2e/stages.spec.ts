@@ -1,8 +1,10 @@
 import { expect, test, type Page, SEED_PROJECT_PATH, selectStage } from './fixtures';
 
 /**
- * Stages are rows, not code: a profile is a list of them, and editing that list
- * forks a named profile so the programs already on it keep their schedule.
+ * Stages are rows, not code. Editing them is about the program in front of you:
+ * Save applies the list to that program alone, taking a private copy of a
+ * shared profile if it needs one. Save as template publishes the same list
+ * under a name for other programs to start from.
  */
 const editor = (page: Page) => page.locator('#stage-editor');
 const rows = (page: Page) => editor(page).locator('.se-row');
@@ -31,6 +33,13 @@ const save = async (page: Page) => {
   await expect(editor(page)).toHaveCount(0);
 };
 
+/** Save, and publish the same stages as a named template. */
+const saveAsTemplate = async (page: Page, name: string) => {
+  await editor(page).locator('[data-save-as-template]').click();
+  await editor(page).locator('[data-template-name]').fill(name);
+  await editor(page).locator('[data-create-template]').click();
+};
+
 test.beforeEach(async ({ page }) => {
   await page.goto(SEED_PROJECT_PATH);
 });
@@ -46,10 +55,25 @@ test.describe('the stage list', () => {
       'Qualification & Production',
     );
 
-    // the built-in profile belongs to the code, so saving would fork it
-    await expect(editor(page).locator('.se-note')).toHaveAttribute('data-forks', 'yes');
-    await expect(editor(page).locator('.se-name-input')).toHaveValue('Typical SoC (copy)');
-    await expect(editor(page).locator('[data-save-stages]')).toHaveText('Save as new profile');
+    // the legend reads exactly as the chart's y-axis does
+    await expect(rows(page).first().locator('.se-legend-no')).toHaveText('01.');
+    await expect(rows(page).first().locator('.se-short')).toHaveValue('DEF');
+    await expect(rows(page).nth(5).locator('.se-legend-no')).toHaveText('06.');
+    await expect(page.locator('#rm-gantt .g-row-label').nth(5)).toHaveText('06.PD');
+
+    // saving is about this program; the built-in profile is left alone
+    await expect(editor(page).locator('.se-note')).toHaveAttribute('data-shared', 'yes');
+    await expect(editor(page).locator('.se-note')).toContainText('this program only');
+    await expect(editor(page).locator('[data-save-stages]')).toHaveText('Save');
+    await expect(editor(page).locator('[data-save-as-template]')).toBeVisible();
+  });
+
+  test('the legend number follows a reorder before it is even saved', async ({ page }) => {
+    await openEditor(page);
+    await editor(page).locator('.se-row[data-stage="synthesis"] [data-up]').click();
+    const moved = editor(page).locator('.se-row[data-stage="synthesis"]');
+    await expect(moved.locator('.se-legend-no')).toHaveText('04.');
+    await expect(moved.locator('.se-short')).toHaveValue('SYN');
   });
 
   test('a stage carrying a milestone cannot be removed', async ({ page }) => {
@@ -78,14 +102,15 @@ test.describe('the stage list', () => {
 });
 
 test.describe('adding a stage', () => {
-  test('forks a profile, and the new stage is on the chart and empty', async ({ page }) => {
+  test('applies to this program, and the new stage is on the chart and empty', async ({ page }) => {
     await openEditor(page);
     await addStage(page, 'Package Bring-up', { start: 50, length: 4, band: 'integrate' });
     await save(page);
 
-    // the program moved to the fork; the built-in profile still exists
+    // the program is on its own stage list now, and Typical SoC is untouched
     await expect(page.locator('#profile-select')).toHaveValue(/^prof_/);
     await expect(page.locator('#profile-select option')).toHaveCount(2);
+    await expect(page.locator('#profile-select option:checked')).toHaveText('AtlasAX1 stages');
     await expect(page.locator('#rm-gantt .g-row')).toHaveCount(13);
 
     const row = page.locator('#rm-gantt .g-row[data-index="12"]');
@@ -105,7 +130,9 @@ test.describe('adding a stage', () => {
     await expect(panel.locator('.viz svg')).toHaveCount(0);
   });
 
-  test('the seeded program is untouched by another program forking', async ({ page }) => {
+  test('the seeded program is untouched by another program editing its stages', async ({
+    page,
+  }) => {
     await page.goto('/');
     await page.locator('[data-new-project]').click();
     await page.locator('.pf-name').fill('ForkTest');
@@ -123,11 +150,11 @@ test.describe('adding a stage', () => {
     await expect(page.locator('#profile-select')).toHaveValue('typicalSoC');
   });
 
-  test('a program can be created on a forked profile', async ({ page }) => {
+  test('a program can be created on a published template', async ({ page }) => {
     await openEditor(page);
-    await editor(page).locator('.se-name-input').fill('Two-die SoC');
     await addStage(page, 'Second Die', { start: 20, length: 6 });
-    await save(page);
+    await saveAsTemplate(page, 'Two-die SoC');
+    await expect(editor(page)).toHaveCount(0);
 
     await page.goto('/');
     await page.locator('[data-new-project]').click();
@@ -143,24 +170,42 @@ test.describe('adding a stage', () => {
 });
 
 test.describe('editing the list', () => {
-  test('a profile this program alone uses is edited in place, and renames', async ({ page }) => {
+  test('a second edit does not breed a second profile', async ({ page }) => {
     await openEditor(page);
-    await editor(page).locator('.se-name-input').fill('AtlasAX1 flow');
+    await addStage(page, 'Extra Study', { start: 2, length: 3 });
     await save(page);
     await expect(page.locator('#profile-select option')).toHaveCount(2);
+    await expect(page.locator('#rm-gantt .g-row')).toHaveCount(13);
 
-    // second time round there is nobody else on it, so it is edited, not copied
+    // this program is the only one on it now, so the next edit lands in place
     await openEditor(page);
-    await expect(editor(page).locator('.se-note')).toHaveAttribute('data-forks', 'no');
-    await expect(editor(page).locator('.se-name-input')).toHaveValue('AtlasAX1 flow');
-    await expect(editor(page).locator('[data-save-stages]')).toHaveText('Save');
-    await editor(page).locator('.se-name-input').fill('AtlasAX1 flow v2');
+    await expect(editor(page).locator('.se-note')).toHaveAttribute('data-shared', 'no');
+    await expect(editor(page).locator('.se-note')).toContainText('applies these stages');
+    await addStage(page, 'One More', { start: 4, length: 2 });
     await save(page);
 
     await expect(page.locator('#profile-select option')).toHaveCount(2);
-    await expect(
-      page.locator('#profile-select option:checked'),
-    ).toHaveText('AtlasAX1 flow v2');
+    await expect(page.locator('#rm-gantt .g-row')).toHaveCount(14);
+  });
+
+  test('a template name has to be one nobody has taken', async ({ page }) => {
+    await openEditor(page);
+    await editor(page).locator('[data-save-as-template]').click();
+    await editor(page).locator('[data-template-name]').fill('Typical SoC');
+    await editor(page).locator('[data-create-template]').click();
+    await expect(editor(page).locator('[data-se-error]')).toContainText('already exists');
+    await expect(editor(page)).toBeVisible(); // nothing saved
+
+    // case does not make a name different either
+    await editor(page).locator('[data-template-name]').fill('typical soc');
+    await editor(page).locator('[data-create-template]').click();
+    await expect(editor(page).locator('[data-se-error]')).toContainText('already exists');
+
+    await editor(page).locator('[data-template-name]').fill('Typical SoC v2');
+    await editor(page).locator('[data-create-template]').click();
+    await expect(editor(page)).toHaveCount(0);
+    await expect(page.locator('#profile-select option')).toHaveCount(2);
+    await expect(page.locator('#profile-select option:checked')).toHaveText('Typical SoC v2');
   });
 
   test('reordering moves the bar and renumbers the legend', async ({ page }) => {
@@ -190,12 +235,11 @@ test.describe('editing the list', () => {
 
 test.describe('moving a program between profiles', () => {
   test('the toolbar select swaps the stage list', async ({ page }) => {
-    // fork a profile off one program…
+    // publish a shorter list as a template…
     await openEditor(page);
-    await editor(page).locator('.se-name-input').fill('Short flow');
     await editor(page).locator('.se-row[data-stage="synthesis"] [data-del-stage]').click();
     await editor(page).locator('[data-confirm-del]').click();
-    await save(page);
+    await saveAsTemplate(page, 'Short flow');
     await expect(page.locator('#rm-gantt .g-row')).toHaveCount(11);
 
     // …then move the program back onto the built-in one
@@ -203,8 +247,9 @@ test.describe('moving a program between profiles', () => {
     await expect(page.locator('#rm-gantt .g-row')).toHaveCount(12);
     await expect(page.locator('#profile-select')).toHaveValue('typicalSoC');
 
-    // the fork is still on offer, with its own stage count
+    // the template stays on offer for anyone else
     await expect(page.locator('#profile-select option')).toHaveCount(2);
+    await expect(page.locator('#profile-select option').last()).toHaveText(/Short flow/);
   });
 });
 

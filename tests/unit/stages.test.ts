@@ -25,8 +25,9 @@ const custom = (over: Partial<ProfileStageDef> & { key: string; order: number })
 
 const profileOf = (stages: ProfileStageDef[]): ScheduleProfile => ({
   id: 'p1',
-  label: 'Forked',
+  label: 'This program',
   builtin: false,
+  template: false,
   stages,
 });
 

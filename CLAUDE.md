@@ -39,13 +39,16 @@ PORTING_PLAN.md says otherwise.
 
 ## Domain model (from the prototype)
 
-- Profile { id, name, builtin } with ProfileStage { key, order, title,
+- Profile { id, name, builtin, template } with ProfileStage { key, order, title,
   shortTitle, phaseId, baseKey, startOffsetWeeks, durationWeeks } — the stages a
   program runs on. The built-in profile (`typicalSoC`) is seeded from
-  `/data/scheduleProfiles.ts` and stays immutable; editing a program's stages
-  forks a named copy, so programs already on a profile keep their schedule.
-  `baseKey` points at the built-in stage whose text and drawing the stage shows;
-  a stage someone added points at nothing and starts blank.
+  `/data/scheduleProfiles.ts` and stays immutable. Editing a program's stages
+  applies to THAT program: if it shares its profile, it moves onto a private
+  copy (`template: false`, not offered in the pickers) so nobody else is
+  rescheduled. `template: true` is a profile published to start programs from,
+  and profile names are unique. `baseKey` points at the built-in stage whose
+  text and drawing the stage shows; a stage someone added points at nothing and
+  starts blank.
 - Project { id, name, kickoff, profileId }
 - StageOverride { stageId, startOffsetWeeks, durationWeeks } — the only
   PER-PROGRAM schedule mutation surface. Baselines are edited in the profile,
