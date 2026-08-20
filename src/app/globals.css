@@ -290,7 +290,19 @@ body.has-overrides .edited-flag{display:inline}
   border:1px dashed var(--line-strong);border-radius:6px;
 }
 .stage-panel{display:none}
+/* Row 1  info | visual      Row 2  stage details (full width)
+   Row 3  activity | key info over risk      Row 4  contacts */
 .stage-panel.selected{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:24px 60px;align-items:start}
+.stage-panel.selected>.panel-info{grid-column:1}
+/* the dates row carries a 4px bottom margin; match it so the drawing and
+   that row's bottom border land on the same line */
+.stage-panel.selected>.viz{grid-column:2;margin-bottom:4px}
+.stage-panel.selected>.inline-area,
+.stage-panel.selected>.detail-slot,
+.stage-panel.selected>.facts,
+.stage-panel.selected>.contacts-sec{grid-column:1 / -1}
+.detail-slot{padding-top:4px}
+.detail-slot .details-btn{margin-top:0}
 .stage-panel.selected .panel-info,
 .stage-panel.selected .viz{animation:panelIn var(--dur) ease}
 @keyframes panelIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
@@ -333,7 +345,28 @@ body.has-overrides .edited-flag{display:inline}
 .dates-row .mslbl{margin-left:auto;font-size:.66em;letter-spacing:.12em;color:var(--ink);font-weight:600;text-transform:uppercase;white-space:nowrap}
 .dates-row .mslbl::before{content:"◆ "}
 /* ===== boards (Activity / Risk) ===== */
-.board{margin-top:18px}
+/* Activity down the left at the height of ten entries; key information over
+   risk down the right, the two grid rows splitting that same height between
+   them so five and five come out level with the ten. */
+.facts{
+  display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);
+  /* key information takes what it needs; risk takes the rest, so the right
+     column ends level with Activity without padding either out */
+  grid-template-rows:auto 1fr;gap:24px 60px;align-items:stretch;
+}
+.facts .board[data-kind="activities"]{grid-column:1;grid-row:1 / 3}
+.facts .board[data-kind="keyinfo"]{grid-column:2;grid-row:1}
+.facts .board[data-kind="risks"]{grid-column:2;grid-row:2}
+.facts .board{display:flex;flex-direction:column;min-height:0}
+.facts .board-rows{flex:1;min-height:0;overflow-y:auto}
+/* Each board reserves the entries it was asked to hold. --b-entry is a row
+   carrying its status-update line; key information rows have none, so they use
+   the plain height. Anything past the reserved room scrolls. */
+.facts .board[data-kind="activities"] .board-rows{min-height:calc(10 * var(--b-entry))}
+.facts .board[data-kind="keyinfo"] .board-rows{min-height:calc(5 * var(--b-entry-plain))}
+.facts .board[data-kind="risks"] .board-rows{min-height:calc(5 * var(--b-entry))}
+:root{--b-entry:4.45em;--b-entry-plain:2.6em}
+.board{margin-top:0}
 .board-head{display:flex;align-items:baseline;gap:12px;padding-bottom:8px}
 .board-head .note{font-size:.66em;color:var(--ink-3)}
 .board-head .spacer{flex:1}
@@ -414,8 +447,10 @@ body.col-resizing{user-select:none;cursor:col-resize}
 .details-btn::after{content:"+";font-size:1.2em;font-weight:400}
 .stage-panel.detail-open .details-btn::after{content:"−"}
 /* viz */
-.viz{height:var(--viz-h)}
-.viz svg{width:100%;height:100%;display:block}
+/* Stretched to the info column beside it and absolutely filled, so the drawing
+   ends on the dates row's bottom border instead of running past it. */
+.viz{position:relative;align-self:stretch;min-height:0;height:auto}
+.viz svg{position:absolute;inset:0;width:100%;height:100%;display:block}
 .viz svg .s{stroke:var(--ink-2);stroke-width:var(--line-w);fill:none}
 .viz svg .g{stroke:var(--line-strong);stroke-width:1;fill:none}
 .viz svg .gl{stroke:var(--line);stroke-width:1;fill:none}
@@ -443,7 +478,10 @@ body.col-resizing{user-select:none;cursor:col-resize}
 .inline-close:hover{color:var(--ink);border-color:var(--ink-3)}
 .sheet-what{color:var(--ink-2);max-width:64ch;margin:8px 0 22px;font-size:.98em}
 .sheet-grid{display:grid;grid-template-columns:1.2fr 1fr;gap:44px}
-.view-toggle{display:inline-flex;border:1px solid var(--line);border-radius:5px;overflow:hidden;margin-bottom:14px}
+/* Both columns of the sheet open with a header block of the same height, so the
+   deliverables table's column heads line up with the engineering table's. */
+.sheet-head{min-height:33px;display:flex;align-items:center;margin-bottom:14px}
+.view-toggle{display:inline-flex;border:1px solid var(--line);border-radius:5px;overflow:hidden}
 .view-toggle button{padding:6px 16px;font-size:.68em;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-3)}
 .view-toggle button[aria-pressed="true"]{background:var(--ink);color:var(--page)}
 .view-list li{display:flex;gap:10px;align-items:baseline;font-size:.95em;color:var(--ink-2);padding:4px 0}
@@ -451,7 +489,7 @@ body.col-resizing{user-select:none;cursor:col-resize}
 .view-foot{margin-top:14px;padding-top:10px;border-top:1px solid var(--line);font-size:.8em;color:var(--ink-2)}
 .view-foot .cap{margin-right:8px}
 .view-foot .mono{font-size:.95em}
-.sheet-side .cap{display:block;margin-bottom:8px}
+.sheet-side .cap{display:block}
 .sheet-side ul li{font-size:.92em;color:var(--ink-2);padding:3px 0}
 .sheet-side ul{margin-bottom:22px}
 /* deliverables checklist */
@@ -1072,7 +1110,14 @@ body.schedule-mode #schedule-view{opacity:1;visibility:visible;transform:none}
    ============================================================ */
 @media (max-width:1280px){
   .stage-panel.selected{grid-template-columns:1fr;gap:10px}
-  .stage-panel.selected .viz{order:-1;max-width:560px;height:clamp(180px,28vh,280px)}
+  /* one column, so the explicit placements have to go or they would conjure a
+     second one back into existence */
+  .stage-panel.selected>.panel-info,
+  .stage-panel.selected>.viz{grid-column:1}
+  .stage-panel.selected .viz{
+    order:-1;max-width:560px;align-self:auto;margin-bottom:0;
+    height:clamp(180px,28vh,280px);
+  }
   .inline-area{grid-column:auto}
 }
 @media (max-width:1100px){
@@ -1105,6 +1150,10 @@ body.schedule-mode #schedule-view{opacity:1;visibility:visible;transform:none}
   .stage-panel.selected .panel-info,.stage-panel.selected .viz{animation:none}
   .dates-row{flex-wrap:wrap}
   .sheet-grid{grid-template-columns:1fr;gap:26px}
+  .facts{grid-template-columns:1fr;grid-template-rows:auto auto auto;gap:26px}
+  .facts .board[data-kind="activities"]{grid-column:1;grid-row:1}
+  .facts .board[data-kind="keyinfo"]{grid-column:1;grid-row:2}
+  .facts .board[data-kind="risks"]{grid-column:1;grid-row:3}
   .board-cols,.b-row{grid-template-columns:4.6em 1fr 6.5em}
 }
 @media (prefers-reduced-motion:reduce){

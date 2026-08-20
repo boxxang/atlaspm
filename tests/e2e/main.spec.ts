@@ -88,8 +88,10 @@ test.describe('roadmap', () => {
     // twelve rows down the side, labelled and legible
     const labels = page.locator('#rm-gantt .g-row-label');
     await expect(labels).toHaveCount(12);
+    // numbered, so the order is readable at a glance
     await expect(labels).toHaveText([
-      'DEF', 'ARCH', 'RTL', 'DV', 'SYN', 'PD', 'SO', 'TO', 'FAB', 'PKG', 'BU', 'MP',
+      '01.DEF', '02.ARCH', '03.RTL', '04.DV', '05.SYN', '06.PD',
+      '07.SO', '08.TO', '09.FAB', '10.PKG', '11.BU', '12.MP',
     ]);
     const size = await labels.first().evaluate((el) => parseFloat(getComputedStyle(el).fontSize));
     expect(size).toBeGreaterThanOrEqual(12);
@@ -245,17 +247,67 @@ test.describe('stage panel', () => {
     }
   });
 
-  test('boards show the latest 3 with an update preview', async ({ page }) => {
+  test('activity shows up to ten, key information and risk up to five', async ({ page }) => {
     await selectStage(page, '06');
     const panel = selectedPanel(page);
+
     const acts = panel.locator('.board[data-kind="activities"]');
-    await expect(acts.locator('.b-row')).toHaveCount(3);
+    await expect(acts.locator('.b-row')).toHaveCount(6); // all six fit under the cap of ten
     await expect(acts.locator('.board-head .note')).toHaveText('6 items · 6 updates');
-    // newest first
     await expect(acts.locator('.b-row .b-latest').first()).toBeVisible();
+
     const risks = panel.locator('.board[data-kind="risks"]');
     await expect(risks.locator('.board-head .note')).toHaveText('3 open · 3 updates');
     await expect(risks.locator('.b-row').first()).toHaveClass(/risk/);
+
+    // key information is capped at five of its four… so all four show
+    await expect(panel.locator('.board[data-kind="keyinfo"] .b-row')).toHaveCount(4);
+  });
+
+  test('a board past its cap shows the cap and offers the rest', async ({ page }) => {
+    await selectStage(page, '01');
+    const keyinfo = selectedPanel(page).locator('.board[data-kind="keyinfo"]');
+    await expect(keyinfo.locator('.board-head .note')).toHaveText('3 items');
+    await expect(keyinfo.locator('.b-row')).toHaveCount(3);
+    await expect(keyinfo.locator('[data-more]')).toBeVisible();
+  });
+
+  test('activity sits left, key information over risk on the right, contacts last', async ({
+    page,
+  }) => {
+    await selectStage(page, '06');
+    const panel = selectedPanel(page);
+    const box = async (sel: string) => (await panel.locator(sel).boundingBox())!;
+
+    const sheet = await box('.inline-area');
+    const dates = await box('.dates-row');
+    const act = await box('.board[data-kind="activities"]');
+    const keyinfo = await box('.board[data-kind="keyinfo"]');
+    const risk = await box('.board[data-kind="risks"]');
+    const contacts = await box('.contacts-sec');
+
+    // the sheet sits under the dates row, the boards under the sheet
+    expect(sheet.y).toBeGreaterThan(dates.y + dates.height);
+    expect(act.y).toBeGreaterThan(sheet.y);
+    // activity on the left, the other two stacked on the right
+    expect(act.x).toBeLessThan(keyinfo.x);
+    expect(keyinfo.x).toBe(risk.x);
+    expect(risk.y).toBeGreaterThan(keyinfo.y);
+    // the two columns end level
+    expect(Math.abs(act.y + act.height - (risk.y + risk.height))).toBeLessThanOrEqual(1);
+    // and contacts stay at the very bottom
+    expect(contacts.y).toBeGreaterThan(act.y + act.height);
+  });
+
+  test('the visual stops at the dates row rather than running past it', async ({ page }) => {
+    /* only in the two-column layout — below 1280 the panel stacks and the
+       visual takes an explicit height above the text */
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await selectStage(page, '06');
+    const panel = selectedPanel(page);
+    const viz = (await panel.locator('.viz').boundingBox())!;
+    const dates = (await panel.locator('.dates-row').boundingBox())!;
+    expect(Math.abs(viz.y + viz.height - (dates.y + dates.height))).toBeLessThanOrEqual(1);
   });
 
   test('overdue activity dues render red', async ({ page }) => {
@@ -310,13 +362,19 @@ test.describe('stage details', () => {
     await expect(selectedPanel(page).locator('.inline-area[data-kind="stage"]')).toBeVisible();
   });
 
-  test('the Stage Details button toggles the sheet', async ({ page }) => {
+  test('the sheet closes to a button, and the button opens it again', async ({ page }) => {
     const panel = selectedPanel(page);
-    await panel.locator('[data-toggle-detail]').click();
+    await expect(panel.locator('[data-toggle-detail]')).toHaveCount(0);
+
+    await panel.locator('.inline-close').click();
     await expect(panel.locator('.inline-area')).toHaveCount(0);
     await expect(panel).not.toHaveClass(/detail-open/);
+    await expect(panel.locator('[data-toggle-detail]')).toBeVisible();
+
     await panel.locator('[data-toggle-detail]').click();
     await expect(panel.locator('.inline-area[data-kind="stage"]')).toBeVisible();
+    // contacts stay put whether the sheet is open or not
+    await expect(panel.locator('.contacts-sec')).toBeVisible();
   });
 
   test('Engineering | Program swaps the pane', async ({ page }) => {

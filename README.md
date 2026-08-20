@@ -85,6 +85,11 @@ Pure logic never imports UI, and `/src/lib` + `/src/data` never touch the DOM �
 - **Stage detail editing.** The pencil in the Stage Details header edits that
   program's copy of the stage text. A field only becomes an override when it
   differs from the shared definition, so emptying it restores the default.
+- **Stage panel layout.** Title, leader and dates sit beside the stage's
+  drawing, which stretches to end on the dates row rather than running past it.
+  The stage-details sheet is directly below them; then the boards — Activity
+  down the left at the height of ten entries, key information over risk down the
+  right splitting that same height — and engineering contacts last.
 - **One date axis, read twice.** The roadmap carries the lifecycle bands and the
   milestone diamonds across the top, positioned by date; the twelve stages are
   the concurrency chart's y-axis. Both share the same geometry and gutter, so a
@@ -149,7 +154,7 @@ that is a read/write swap rather than a redesign.
 
 ```bash
 npm test          # 136 unit tests: schedule engine, derivations, effort, mail, purity
-npm run e2e       # 188 Playwright tests
+npm run e2e       # 191 Playwright tests
 ```
 
 The e2e suite runs against its own database (`test.db`) on port 3100, so it never

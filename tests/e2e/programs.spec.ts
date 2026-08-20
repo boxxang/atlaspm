@@ -1,4 +1,4 @@
-import { expect, test, type Page, selectStage, editStageDetail } from './fixtures';
+import { expect, test, type Page, selectStage } from './fixtures';
 
 /**
  * The landing page: one card per program, create and delete, and the contract

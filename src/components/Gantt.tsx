@@ -164,7 +164,7 @@ export function Gantt({
                 />
               )}
               <span className="g-row-label" title={s.title}>
-                {short ? s.shortTitle : s.title}
+                {short ? `${String(s.stage).padStart(2, '0')}.${s.shortTitle}` : s.title}
               </span>
               <span className="g-row-track">
                 {moved && was && (

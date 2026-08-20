@@ -38,12 +38,14 @@ export function Deliverables({
 
   return (
     <>
-      <span className="cap">
-        Key Deliverables
-        <span className="dlv-note">
-          {done} / {list.length} complete
+      <div className="sheet-head">
+        <span className="cap">
+          Key Deliverables
+          <span className="dlv-note">
+            {done} / {list.length} complete
+          </span>
         </span>
-      </span>
+      </div>
       <div className="dlv-cols">
         <span>
           Deliverable

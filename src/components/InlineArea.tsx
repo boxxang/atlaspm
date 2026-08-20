@@ -11,7 +11,6 @@ import {
   type ResolvedStageDetail,
 } from '@/lib/stageDetail';
 import { useAppStore, type InlineState } from '@/store/useAppStore';
-import { Contacts } from './Contacts';
 import { Deliverables } from './Deliverables';
 
 const stageOf = (id: StageId) => journeyData.find((s) => s.id === id)!;
@@ -203,6 +202,7 @@ function ViewToggle({
   const [view, setView] = useState<'eng' | 'prog'>('eng');
   return (
     <div>
+      <div className="sheet-head">
       <div className="view-toggle" role="group">
         <button aria-pressed={view === 'eng'} data-view="eng" onClick={() => setView('eng')}>
           Engineering
@@ -210,6 +210,7 @@ function ViewToggle({
         <button aria-pressed={view === 'prog'} data-view="prog" onClick={() => setView('prog')}>
           Program
         </button>
+      </div>
       </div>
       <div className="view-pane enter" data-pane="eng" hidden={view !== 'eng'} key={`eng-${view}`}>
         <EngineeringTable stageId={stageId} detail={detail} editing={editing} />
@@ -314,7 +315,7 @@ function StageDetailEditor({
   );
 }
 
-function StageDetail({ stageId, editContact }: { stageId: StageId; editContact: string | null }) {
+function StageDetail({ stageId }: { stageId: StageId }) {
   const s = stageOf(stageId);
   const close = useAppStore((st) => st.closeInline);
   const override = useAppStore((st) => st.stageDetails[stageId]);
@@ -364,7 +365,6 @@ function StageDetail({ stageId, editContact }: { stageId: StageId; editContact: 
           <Deliverables stageId={stageId} editing={editing} />
         </div>
       </div>
-      <Contacts stageId={stageId} editId={editContact} />
     </>
   );
 }
@@ -480,7 +480,7 @@ export function InlineArea({
 
   return (
     <div className="inline-area" data-kind={state.kind} ref={ref}>
-      {state.kind === 'stage' && <StageDetail stageId={stageId} editContact={state.editContact} />}
+      {state.kind === 'stage' && <StageDetail stageId={stageId} />}
       {state.kind === 'potential' && <PotentialRisks stageId={stageId} />}
       {state.kind === 'leader' && <LeaderEditor stageId={stageId} />}
     </div>

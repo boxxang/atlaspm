@@ -6,12 +6,6 @@ import { expect, test, type Page, SEED_PROJECT_PATH, selectStage, editStageDetai
  */
 const panel = (page: Page) => page.locator('.stage-panel.selected');
 
-/** toHaveValue takes one value; the table has an input per line. */
-const effortValues = (page: Page) =>
-  page.locator('.stage-panel.selected .mm-input').evaluateAll((els) =>
-    els.map((e) => (e as HTMLInputElement).value),
-  );
-
 test.beforeEach(async ({ page }) => {
   await page.goto(SEED_PROJECT_PATH);
   await selectStage(page, '01');

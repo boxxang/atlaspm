@@ -6,6 +6,7 @@ import { fmtW, fromISO, toISO } from '@/lib/schedule';
 import { useModalStore } from '@/store/modalStore';
 import { useAppStore } from '@/store/useAppStore';
 import { Board } from './Board';
+import { Contacts } from './Contacts';
 import { InlineArea } from './InlineArea';
 import { stageViz } from './stageViz';
 
@@ -66,7 +67,7 @@ export function StagePanel({ stage, index }: { stage: JourneyStage; index: numbe
   const selected = useAppStore((s) => s.currentStage === index);
   const inline = useAppStore((s) => s.inline[stage.id]);
   const openInline = useAppStore((s) => s.openInline);
-  const closeInline = useAppStore((s) => s.closeInline);
+  const contactEdit = inline?.kind === 'stage' ? inline.editContact : null;
   const openBoard = useModalStore((m) => m.openBoard);
   const num = String(stage.stage).padStart(2, '0');
   const phase = phaseOfStage[stage.id];
@@ -99,58 +100,74 @@ export function StagePanel({ stage, index }: { stage: JourneyStage; index: numbe
         <p className="tagline">{stage.tagline}</p>
         <LeaderRow stage={stage} />
         <DatesRow stage={stage} />
-        <div className="facts">
-          <Board
-            stageId={stage.id}
-            kind="keyinfo"
-            title="Key Information"
-            onOpenItem={(id) => openBoard(stage.id, 'keyinfo', 'item', id, 'board')}
-            onAdd={() => openBoard(stage.id, 'keyinfo', 'edit', null, 'add')}
-            onShowMore={() => openBoard(stage.id, 'keyinfo', 'board')}
-          />
-          <Board
-            stageId={stage.id}
-            kind="activities"
-            title="Activity"
-            mailWholeList
-            onOpenItem={(id) => openBoard(stage.id, 'activities', 'item', id, 'board')}
-            onAdd={() => openBoard(stage.id, 'activities', 'edit', null, 'add')}
-            onShowMore={() => openBoard(stage.id, 'activities', 'board')}
-          />
-          <Board
-            stageId={stage.id}
-            kind="risks"
-            title="Risk"
-            onOpenItem={(id) => openBoard(stage.id, 'risks', 'item', id, 'board')}
-            onAdd={() => openBoard(stage.id, 'risks', 'edit', null, 'add')}
-            onShowMore={() => openBoard(stage.id, 'risks', 'board')}
-            extraBtns={
-              <button
-                className="board-btn"
-                data-potential
-                onClick={() => openInline(stage.id, 'potential')}
-              >
-                Potential Risks
-              </button>
-            }
-          />
-        </div>
-        <button
-          className="details-btn"
-          data-toggle-detail
-          onClick={() =>
-            inline?.kind === 'stage' ? closeInline(stage.id) : openInline(stage.id, 'stage')
-          }
-        >
-          Stage Details
-        </button>
       </div>
+
+      {/* The visual stretches to the info column beside it, so it ends on the
+          dates row's bottom border rather than running past it. */}
       <div
         className="viz"
         aria-hidden="true"
         dangerouslySetInnerHTML={{ __html: stageViz[stage.id]() }}
       />
-      {inline && <InlineArea stageId={stage.id} state={inline} scroll={false} />}
+
+      {/* One full-width slot below the dates: the sheet when it is open, the
+          button that opens it when it is not. */}
+      {inline ? (
+        <InlineArea stageId={stage.id} state={inline} scroll={false} />
+      ) : (
+        <div className="detail-slot">
+          <button
+            className="details-btn"
+            data-toggle-detail
+            onClick={() => openInline(stage.id, 'stage')}
+          >
+            Stage Details
+          </button>
+        </div>
+      )}
+
+      {/* Activity down the left; key information over risk on the right. */}
+      <div className="facts">
+        <Board
+          stageId={stage.id}
+          kind="activities"
+          title="Activity"
+          mailWholeList
+          limit={10}
+          onOpenItem={(id) => openBoard(stage.id, 'activities', 'item', id, 'board')}
+          onAdd={() => openBoard(stage.id, 'activities', 'edit', null, 'add')}
+          onShowMore={() => openBoard(stage.id, 'activities', 'board')}
+        />
+        <Board
+          stageId={stage.id}
+          kind="keyinfo"
+          title="Key Information"
+          limit={5}
+          onOpenItem={(id) => openBoard(stage.id, 'keyinfo', 'item', id, 'board')}
+          onAdd={() => openBoard(stage.id, 'keyinfo', 'edit', null, 'add')}
+          onShowMore={() => openBoard(stage.id, 'keyinfo', 'board')}
+        />
+        <Board
+          stageId={stage.id}
+          kind="risks"
+          title="Risk"
+          limit={5}
+          onOpenItem={(id) => openBoard(stage.id, 'risks', 'item', id, 'board')}
+          onAdd={() => openBoard(stage.id, 'risks', 'edit', null, 'add')}
+          onShowMore={() => openBoard(stage.id, 'risks', 'board')}
+          extraBtns={
+            <button
+              className="board-btn"
+              data-potential
+              onClick={() => openInline(stage.id, 'potential')}
+            >
+              Potential Risks
+            </button>
+          }
+        />
+      </div>
+
+      <Contacts stageId={stage.id} editId={contactEdit} />
     </div>
   );
 }

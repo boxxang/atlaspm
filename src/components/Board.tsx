@@ -127,6 +127,7 @@ export function Board({
   onAdd,
   onShowMore,
   mailWholeList = false,
+  limit = 3,
 }: {
   stageId: StageId;
   kind: ItemKind;
@@ -137,6 +138,8 @@ export function Board({
   onShowMore?: () => void;
   /** Adds an envelope in the header addressed to everyone on the list. */
   mailWholeList?: boolean;
+  /** Rows shown before "Show more" takes over. */
+  limit?: number;
 }) {
   const content = useAppStore((s) => s.content[stageId]);
   const projectName = useAppStore((s) => s.projectName);
@@ -145,7 +148,7 @@ export function Board({
   const list = sortedItems(content, kind);
 
   return (
-    <div className="board" data-kind={kind}>
+    <div className="board" data-kind={kind} style={{ '--board-rows': limit } as React.CSSProperties}>
       <div className="board-head">
         <span className="cap">{title}</span>
         <span className="note">{boardNote(content, kind)}</span>
@@ -172,21 +175,23 @@ export function Board({
         </button>
       </div>
       <BoardCols kind={kind} />
-      {list.length ? (
-        list
-          .slice(0, 3)
-          .map((it) => (
-            <BoardRow
-              it={it}
-              kind={kind}
-              key={it.id}
-              mailStageId={stageId}
-              onOpen={onOpenItem ? () => onOpenItem(it.id) : undefined}
-            />
-          ))
-      ) : (
-        <div className="b-empty">Nothing here yet.</div>
-      )}
+      <div className="board-rows">
+        {list.length ? (
+          list
+            .slice(0, limit)
+            .map((it) => (
+              <BoardRow
+                it={it}
+                kind={kind}
+                key={it.id}
+                mailStageId={stageId}
+                onOpen={onOpenItem ? () => onOpenItem(it.id) : undefined}
+              />
+            ))
+        ) : (
+          <div className="b-empty">Nothing here yet.</div>
+        )}
+      </div>
       <div className="board-foot">
         <button className="board-btn" data-more={kind} onClick={onShowMore}>
           Show more
