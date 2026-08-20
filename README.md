@@ -108,7 +108,8 @@ Pure logic never imports UI, and `/src/lib` + `/src/data` never touch the DOM �
   dashboard, and defaults to 0 so no cost is invented. AtlasAX1 is seeded with
   illustrative figures — 709 MM at $15,000, about $10.6M — which are example
   content like the rest of that program, not a benchmark.
-- **Attachments.** Files and images attach to an item or to a status update.
+- **Attachments.** Files and images attach while an item is being written, to
+  an item that already exists, or to a status update.
   Bytes live in the database (`Attachment.data`), because the documented deploy
   target has a read-only filesystem and `Bytes` maps to BLOB on SQLite and
   bytea on Postgres. That caps a file at 5 MB — moving to object storage means
@@ -154,7 +155,7 @@ that is a read/write swap rather than a redesign.
 
 ```bash
 npm test          # 136 unit tests: schedule engine, derivations, effort, mail, purity
-npm run e2e       # 191 Playwright tests
+npm run e2e       # 201 Playwright tests
 ```
 
 The e2e suite runs against its own database (`test.db`) on port 3100, so it never

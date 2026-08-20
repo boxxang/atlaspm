@@ -102,6 +102,72 @@ test.describe('attaching to an item', () => {
   });
 });
 
+test.describe('attaching while writing the item', () => {
+  test('files picked in the editor land on the item once it is saved', async ({ page }) => {
+    const board = page.locator('.stage-panel.selected .board[data-kind="activities"]');
+    await board.locator('[data-add]').click();
+    await page.locator('.ie-title').fill('Ball map review');
+    await page.locator('.ie-attach .att-input').setInputFiles([PNG, TXT]);
+
+    // they wait, named, until the item exists to hang them off
+    await expect(page.locator('.ie-attach .att-list.pending .att')).toHaveCount(2);
+    await expect(page.locator('.ie-attach .att-name')).toHaveText([
+      'atlaspm-shot.png',
+      'atlaspm-spec.txt',
+    ]);
+    await expect(page.locator('.att-pending')).toContainText('attached when you save');
+
+    await page.locator('[data-save]').click();
+    await expect(page.locator('#modal .modal-win')).toBeHidden();
+
+    await board.locator('[data-more]').click();
+    await page.locator('#modal-body .b-row').filter({ hasText: 'Ball map review' }).click();
+    await expect(page.locator('.iv-attach .att')).toHaveCount(2);
+
+    await page.reload();
+    /* the board this test writes to belongs to the stage beforeEach opened */
+    await selectStage(page, '01');
+    await board.locator('[data-more]').click();
+    await page.locator('#modal-body .b-row').filter({ hasText: 'Ball map review' }).click();
+    await expect(page.locator('.iv-attach .att')).toHaveCount(2);
+  });
+
+  test('a pending file can be dropped before saving', async ({ page }) => {
+    const board = page.locator('.stage-panel.selected .board[data-kind="activities"]');
+    await board.locator('[data-add]').click();
+    await page.locator('.ie-title').fill('Only one file');
+    await page.locator('.ie-attach .att-input').setInputFiles([PNG, TXT]);
+    await expect(page.locator('.ie-attach .att')).toHaveCount(2);
+
+    await page.locator('[data-pending-del="0"]').click();
+    await expect(page.locator('.ie-attach .att')).toHaveCount(1);
+    await page.locator('[data-save]').click();
+
+    await board.locator('[data-more]').click();
+    await page.locator('#modal-body .b-row').filter({ hasText: 'Only one file' }).click();
+    await expect(page.locator('.iv-attach .att-name')).toHaveText(['atlaspm-spec.txt']);
+  });
+
+  test('an oversized file is refused while composing', async ({ page }) => {
+    const board = page.locator('.stage-panel.selected .board[data-kind="activities"]');
+    await board.locator('[data-add]').click();
+    await page.locator('.ie-attach .att-input').setInputFiles([BIG]);
+    await expect(page.locator('[data-form-error]')).toContainText('over 5 MB');
+    await expect(page.locator('.ie-attach .att')).toHaveCount(0);
+  });
+
+  test('an existing item shows its attachments in the editor', async ({ page }) => {
+    await openItem(page, 'ECO drop 1 planning');
+    await page.locator('.iv-attach .att-input').setInputFiles(TXT);
+    await expect(page.locator('.iv-attach .att')).toHaveCount(1);
+
+    await page.locator('[data-edit]').click();
+    await expect(page.locator('.ie-attach .att-name')).toHaveText(['atlaspm-spec.txt']);
+    await page.locator('.ie-attach [data-att-del]').click();
+    await expect(page.locator('.ie-attach .att')).toHaveCount(0);
+  });
+});
+
 test.describe('attaching to a status update', () => {
   test('files picked before posting land on the update', async ({ page }) => {
     await openItem(page, 'ECO drop 1 planning');

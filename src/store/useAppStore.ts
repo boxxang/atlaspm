@@ -151,9 +151,23 @@ export const uid = () =>
  * runs. A rejected write leaves the two out of step until the next load — there
  * is no rollback in this pass, so failures are surfaced loudly instead.
  */
+const inFlight = new Set<Promise<unknown>>();
+
 const sync = (p: Promise<unknown>) => {
-  void p.catch((e) => console.error('[atlaspm] server action failed', e));
+  inFlight.add(p);
+  void p
+    .catch((e) => console.error('[atlaspm] server action failed', e))
+    .finally(() => inFlight.delete(p));
 };
+
+/**
+ * Waits for the writes already sent. Callers need this when the next write
+ * depends on an earlier one having landed — attaching a file to an item that
+ * was created a moment ago, say. SQLite does not enforce foreign keys by
+ * default, so without it the attachment can be written before its item and
+ * nothing complains.
+ */
+export const flushWrites = () => Promise.allSettled([...inFlight]).then(() => undefined);
 
 const emptyMap = <T,>(make: () => T) =>
   Object.fromEntries(STAGE_ORDER.map((id) => [id, make()])) as Record<StageId, T>;

@@ -12,7 +12,7 @@ import {
   useModalStore,
   type ModalState,
 } from '@/store/modalStore';
-import { sortedItems, useAppStore, type AppState } from '@/store/useAppStore';
+import { flushWrites, sortedItems, useAppStore, type AppState } from '@/store/useAppStore';
 import { BoardCols, BoardRow } from './Board';
 import { ItemEditor, ItemView } from './ItemView';
 
@@ -258,16 +258,25 @@ export function BoardModal() {
 
             {view === 'edit' && kind && stageId && (
               <ItemEditor
-                key={item?.id ?? 'new'}
+                /* keyed by session so each open starts on a clean form */
+                key={`${item?.id ?? 'new'}-${m.session}`}
                 item={item}
                 kind={kind}
                 stageId={stageId}
-                onSave={(f) => {
+                onSave={async (f, files) => {
                   const saved = saveItem(stageId, kind, itemId, f);
+                  /* the item has to be stored before files can hang off it */
+                  if (files.length) {
+                    await flushWrites();
+                    await attachFiles(stageId, kind, saved.id, {}, files);
+                  }
                   /* +Add from main: the save lands on the main page */
                   if (origin === 'add') return m.close();
                   m.setView('item', saved.id);
                 }}
+                onDetach={(attachmentId) =>
+                  removeAttachment(stageId, kind, item!.id, attachmentId)
+                }
                 onDelete={() => {
                   deleteItem(stageId, kind, itemId!);
                   if (origin === 'add') return m.close();

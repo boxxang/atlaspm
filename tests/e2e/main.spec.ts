@@ -252,7 +252,7 @@ test.describe('stage panel', () => {
     const panel = selectedPanel(page);
 
     const acts = panel.locator('.board[data-kind="activities"]');
-    await expect(acts.locator('.b-row')).toHaveCount(6); // all six fit under the cap of ten
+    await expect(acts.locator('.b-row')).toHaveCount(6); // all six fit inside the ten-entry window
     await expect(acts.locator('.board-head .note')).toHaveText('6 items · 6 updates');
     await expect(acts.locator('.b-row .b-latest').first()).toBeVisible();
 
@@ -260,16 +260,16 @@ test.describe('stage panel', () => {
     await expect(risks.locator('.board-head .note')).toHaveText('3 open · 3 updates');
     await expect(risks.locator('.b-row').first()).toHaveClass(/risk/);
 
-    // key information is capped at five of its four… so all four show
     await expect(panel.locator('.board[data-kind="keyinfo"] .b-row')).toHaveCount(4);
   });
 
-  test('a board past its cap shows the cap and offers the rest', async ({ page }) => {
+  test('Show more is still there beside the window', async ({ page }) => {
     await selectStage(page, '01');
     const keyinfo = selectedPanel(page).locator('.board[data-kind="keyinfo"]');
     await expect(keyinfo.locator('.board-head .note')).toHaveText('3 items');
     await expect(keyinfo.locator('.b-row')).toHaveCount(3);
-    await expect(keyinfo.locator('[data-more]')).toBeVisible();
+    await keyinfo.locator('[data-more]').click();
+    await expect(page.locator('#modal-head h3')).toHaveText('Key Info Board');
   });
 
   test('activity sits left, key information over risk on the right, contacts last', async ({
@@ -293,10 +293,56 @@ test.describe('stage panel', () => {
     expect(act.x).toBeLessThan(keyinfo.x);
     expect(keyinfo.x).toBe(risk.x);
     expect(risk.y).toBeGreaterThan(keyinfo.y);
-    // the two columns end level
-    expect(Math.abs(act.y + act.height - (risk.y + risk.height))).toBeLessThanOrEqual(1);
+    /* Each board is now a fixed window on its list, so the two columns end
+       near each other rather than exactly level — ten entries on the left
+       against five plus five and an extra board chrome on the right. */
+    expect(Math.abs(act.y + act.height - (risk.y + risk.height))).toBeLessThan(40);
     // and contacts stay at the very bottom
     expect(contacts.y).toBeGreaterThan(act.y + act.height);
+  });
+
+  test('each board is a fixed window with its Show more right under it', async ({ page }) => {
+    await selectStage(page, '06');
+    const panel = selectedPanel(page);
+    const em = await page.evaluate(() => parseFloat(getComputedStyle(document.body).fontSize));
+
+    for (const [kind, entries, entryEm] of [
+      ['activities', 10, 4.45],
+      ['keyinfo', 5, 2.6],
+      ['risks', 5, 4.45],
+    ] as const) {
+      const board = panel.locator(`.board[data-kind="${kind}"]`);
+      const rows = (await board.locator('.board-rows').boundingBox())!;
+      const foot = (await board.locator('.board-foot').boundingBox())!;
+
+      // sized for exactly the entries it was asked to hold
+      expect(Math.round(rows.height), kind).toBe(Math.round(entries * entryEm * em));
+      // and "Show more" sits directly beneath, not at the bottom of the column
+      expect(foot.y - (rows.y + rows.height), kind).toBeLessThanOrEqual(1);
+      await expect(board.locator('[data-more]')).toBeVisible();
+      await expect(board.locator('.board-rows')).toHaveCSS('overflow-y', 'auto');
+    }
+  });
+
+  test('a board past its window scrolls instead of growing', async ({ page }) => {
+    await selectStage(page, '01');
+    const panel = selectedPanel(page);
+    const board = panel.locator('.board[data-kind="keyinfo"]');
+    const before = (await board.locator('.board-rows').boundingBox())!.height;
+
+    // three seeded plus three more takes it past the five-entry window
+    for (const title of ['Extra one', 'Extra two', 'Extra three']) {
+      await board.locator('[data-add]').click();
+      await page.locator('.ie-title').fill(title);
+      await page.locator('[data-save]').click();
+      await expect(page.locator('#modal .modal-win')).toBeHidden();
+    }
+    // every entry is rendered; the window stays five tall and scrolls
+    await expect(board.locator('.b-row')).toHaveCount(6);
+    expect((await board.locator('.board-rows').boundingBox())!.height).toBe(before);
+    expect(
+      await board.locator('.board-rows').evaluate((el) => el.scrollHeight > el.clientHeight),
+    ).toBe(true);
   });
 
   test('the visual stops at the dates row rather than running past it', async ({ page }) => {

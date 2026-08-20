@@ -138,7 +138,8 @@ export function Board({
   onShowMore?: () => void;
   /** Adds an envelope in the header addressed to everyone on the list. */
   mailWholeList?: boolean;
-  /** Rows shown before "Show more" takes over. */
+  /** How many entries the board's window is tall enough to show at once.
+   *  The rest are still rendered — they scroll. */
   limit?: number;
 }) {
   const content = useAppStore((s) => s.content[stageId]);
@@ -178,7 +179,6 @@ export function Board({
       <div className="board-rows">
         {list.length ? (
           list
-            .slice(0, limit)
             .map((it) => (
               <BoardRow
                 it={it}

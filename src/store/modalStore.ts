@@ -33,6 +33,12 @@ export interface ModalState {
   origin: ModalOrigin;
   editingSuId: string | null;
   agg: { type: AggType; title: string } | null;
+  /**
+   * Bumped every time the pop-up is opened or switched to the editor. The
+   * pop-up stays mounted while it is hidden, so without this the editor kept
+   * its state and a second "+ Add" opened on the last one's text.
+   */
+  session: number;
 
   openBoard: (
     stageId: StageId,
@@ -50,7 +56,7 @@ export interface ModalState {
   back: () => void;
 }
 
-export const useModalStore = create<ModalState>()((set) => ({
+export const useModalStore = create<ModalState>()((set, get) => ({
   open: false,
   stageId: null,
   kind: null,
@@ -60,6 +66,7 @@ export const useModalStore = create<ModalState>()((set) => ({
   origin: 'board',
   editingSuId: null,
   agg: null,
+  session: 0,
 
   openBoard: (stageId, kind, view = 'board', itemId = null, origin = 'board') =>
     set((s) => ({
@@ -72,6 +79,7 @@ export const useModalStore = create<ModalState>()((set) => ({
       editingSuId: null,
       agg: null,
       page: view === 'board' ? 0 : s.page,
+      session: s.session + 1,
     })),
 
   openAgg: (type) =>
@@ -85,15 +93,28 @@ export const useModalStore = create<ModalState>()((set) => ({
       origin: 'agg',
       editingSuId: null,
       agg: { type, title: AGG_TITLES[type] },
+      session: get().session + 1,
     }),
 
   close: () => set({ open: false }),
   setView: (view, itemId) =>
-    set((s) => ({ view, itemId: itemId === undefined ? s.itemId : itemId, editingSuId: null })),
+    set((s) => ({
+      view,
+      itemId: itemId === undefined ? s.itemId : itemId,
+      editingSuId: null,
+      session: s.session + 1,
+    })),
   setPage: (page) => set({ page }),
   /* aggregate rows carry their own stage and kind */
   drillInto: (stageId, kind, itemId) =>
-    set({ stageId, kind, view: 'item', itemId, editingSuId: null }),
+    set((s) => ({
+      stageId,
+      kind,
+      view: 'item',
+      itemId,
+      editingSuId: null,
+      session: s.session + 1,
+    })),
   setEditingSu: (editingSuId) => set({ editingSuId }),
   back: () => set({ view: 'board', editingSuId: null }),
 }));

@@ -1,13 +1,15 @@
 'use client';
 
-import { useState } from 'react';
+import { useRef, useState } from 'react';
+import { rejectFile, rejectionMessage, formatBytes } from '@/lib/attachments';
 import { AttachmentList, AttachmentPicker, AttachmentProblems } from './Attachments';
+import { missingMessage, reportMissing } from './validation';
 import type { Item, ItemKind, StageId } from '@/data/types';
 import { itemDraft } from '@/lib/mailDrafts';
 import { resolveEmail } from '@/lib/people';
 import { fmtDT, fmtDTFull, fmtDate, toISO } from '@/lib/schedule';
 import { KIND_LABELS } from '@/store/modalStore';
-import { useAppStore, type ItemFields } from '@/store/useAppStore';
+import { flushWrites, useAppStore, type ItemFields } from '@/store/useAppStore';
 import { useDirectory } from './Board';
 import { OwnerSelect } from './OwnerSelect';
 import { MailButton } from './MailButton';
@@ -117,6 +119,7 @@ function StatusUpdates({
             const suId = onPost(t);
             setDraft('');
             if (pending.length) {
+              await flushWrites();
               setProblems(await onAttach(pending, suId));
               setPending([]);
             }
@@ -244,12 +247,16 @@ export function ItemEditor({
   stageId,
   onSave,
   onDelete,
+  onDetach,
 }: {
   item: Item | null;
   kind: ItemKind;
   stageId: StageId;
-  onSave: (f: ItemFields) => void;
+  /** Files are handed over with the fields: they can only be stored once the
+   *  item they hang off exists. */
+  onSave: (f: ItemFields, files: File[]) => void | Promise<void>;
   onDelete?: () => void;
+  onDetach?: (attachmentId: string) => void;
 }) {
   const label = KIND_LABELS[kind];
   const [f, setF] = useState({
@@ -258,14 +265,45 @@ export function ItemEditor({
     due: item?.due ? toISO(item.due) : '',
     body: item?.body ?? '',
   });
+  const [pending, setPending] = useState<File[]>([]);
+  const [error, setError] = useState('');
+  const [saving, setSaving] = useState(false);
+  const titleRef = useRef<HTMLInputElement>(null);
+
+  const titleMissing = !f.title.trim();
+
+  const save = async () => {
+    if (titleMissing) {
+      setError(missingMessage([`${label} title`]));
+      reportMissing([titleRef.current]);
+      return;
+    }
+    setError('');
+    setSaving(true);
+    try {
+      await onSave(
+        {
+          title: f.title.trim(),
+          owner: f.owner.trim(),
+          body: f.body.trim(),
+          due: f.due ? fromISOLocal(f.due) : null,
+        },
+        pending,
+      );
+      setPending([]);
+    } finally {
+      setSaving(false);
+    }
+  };
 
   return (
     <div className="item-editor">
       <input
-        className="ie-title"
+        className={`ie-title${error && titleMissing ? ' invalid' : ''}`}
         placeholder={`${label} title`}
         value={f.title}
         autoFocus
+        ref={titleRef}
         onChange={(e) => setF({ ...f, title: e.target.value })}
       />
       <div className="ie-field">
@@ -291,24 +329,62 @@ export function ItemEditor({
         value={f.body}
         onChange={(e) => setF({ ...f, body: e.target.value })}
       />
-      <div className="ie-actions">
-        <button
-          data-save
-          onClick={() => {
-            const title = f.title.trim();
-            if (!title) {
-              document.querySelector<HTMLInputElement>('.ie-title')?.focus();
-              return;
+
+      <div className="ie-attach">
+        {item && item.attachments.length > 0 && (
+          <AttachmentList files={item.attachments} onRemove={onDetach} />
+        )}
+        {pending.length > 0 && (
+          <ul className="att-list pending">
+            {pending.map((file, i) => (
+              <li className="att" key={`${file.name}-${i}`}>
+                <span className="att-link">
+                  <span className="att-doc" aria-hidden="true">
+                    +
+                  </span>
+                  <span className="att-name">{file.name}</span>
+                  <span className="att-size">{formatBytes(file.size)}</span>
+                </span>
+                <button
+                  className="att-del"
+                  data-pending-del={i}
+                  aria-label={`Remove ${file.name}`}
+                  onClick={() => setPending((prev) => prev.filter((_, j) => j !== i))}
+                >
+                  ✕
+                </button>
+              </li>
+            ))}
+          </ul>
+        )}
+        <AttachmentPicker
+          label={pending.length ? `${pending.length} file(s) ready` : 'Attach files'}
+          onPick={(files) => {
+            const problems: string[] = [];
+            const ok: File[] = [];
+            for (const file of files) {
+              const reason = rejectFile(file, (item?.attachments.length ?? 0) + pending.length + ok.length);
+              if (reason) problems.push(rejectionMessage(reason, file.name));
+              else ok.push(file);
             }
-            onSave({
-              title,
-              owner: f.owner.trim(),
-              body: f.body.trim(),
-              due: f.due ? fromISOLocal(f.due) : null,
-            });
+            setPending((prev) => [...prev, ...ok]);
+            setError(problems.join(' '));
           }}
-        >
-          Save
+        />
+        {pending.length > 0 && (
+          <span className="att-pending">attached when you save</span>
+        )}
+      </div>
+
+      {error && (
+        <p className="form-error" role="alert" data-form-error>
+          {error}
+        </p>
+      )}
+
+      <div className="ie-actions">
+        <button data-save disabled={saving} onClick={save}>
+          {saving ? 'Saving…' : 'Save'}
         </button>
         {item && (
           <button data-del onClick={onDelete}>

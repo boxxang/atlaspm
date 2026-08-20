@@ -182,12 +182,80 @@ test.describe('item editor', () => {
     await expect(board.locator('.board-head .note')).toHaveText('7 items · 6 updates');
   });
 
-  test('a titleless item will not save', async ({ page }) => {
+  test('a titleless item says what is missing and marks the field', async ({ page }) => {
     await selectedPanel(page).locator('.board[data-kind="risks"] [data-add]').click();
     await page.locator('.ie-body').fill('No title given');
+    await expect(page.locator('[data-form-error]')).toHaveCount(0);
+
     await page.locator('[data-save]').click();
     await expect(page.locator('#modal .modal-win')).toBeVisible();
+    await expect(page.locator('[data-form-error]')).toHaveText('Risk title is required.');
+    await expect(page.locator('.ie-title')).toHaveClass(/invalid/);
     await expect(page.locator('.ie-title')).toBeFocused();
+    // the empty field blinks so it is obvious which one it is
+    expect(await page.locator('.ie-title').evaluate((el) => el.getAnimations().length)).toBe(1);
+
+    // filling it in lets the save through — opened with +Add, so it closes
+    await page.locator('.ie-title').fill('Now it has one');
+    await page.locator('[data-save]').click();
+    await expect(page.locator('#modal .modal-win')).toBeHidden();
+    await expect(
+      selectedPanel(page).locator('.board[data-kind="risks"] .b-row').first().locator('.t'),
+    ).toHaveText('Now it has one');
+  });
+
+  test('the message names the board it came from', async ({ page }) => {
+    await selectedPanel(page).locator('.board[data-kind="keyinfo"] [data-add]').click();
+    await page.locator('[data-save]').click();
+    await expect(page.locator('[data-form-error]')).toHaveText('Key Info title is required.');
+    await page.locator('#modal-close').click();
+
+    await selectedPanel(page).locator('.board[data-kind="activities"] [data-add]').click();
+    await page.locator('[data-save]').click();
+    await expect(page.locator('[data-form-error]')).toHaveText('Activity title is required.');
+  });
+
+  test('a second Add opens on an empty form', async ({ page }) => {
+    const board = selectedPanel(page).locator('.board[data-kind="activities"]');
+
+    await board.locator('[data-add]').click();
+    await page.locator('.ie-title').fill('First one');
+    await page.locator('.ie-owner').selectOption('N. Feld');
+    await page.locator('.ie-body').fill('Some detail.');
+    await page.locator('.ie-due').fill('2030-02-01');
+    await page.locator('[data-save]').click();
+    await expect(page.locator('#modal .modal-win')).toBeHidden();
+
+    await board.locator('[data-add]').click();
+    await expect(page.locator('#modal-head h3')).toHaveText('New Activity');
+    await expect(page.locator('.ie-title')).toHaveValue('');
+    await expect(page.locator('.ie-owner')).toHaveValue('');
+    await expect(page.locator('.ie-body')).toHaveValue('');
+    await expect(page.locator('.ie-due')).toHaveValue('');
+    await expect(page.locator('[data-form-error]')).toHaveCount(0);
+  });
+
+  test('a warning from one attempt does not linger into the next Add', async ({ page }) => {
+    const board = selectedPanel(page).locator('.board[data-kind="activities"]');
+    await board.locator('[data-add]').click();
+    await page.locator('[data-save]').click();
+    await expect(page.locator('[data-form-error]')).toBeVisible();
+    await page.locator('#modal-close').click();
+
+    await board.locator('[data-add]').click();
+    await expect(page.locator('[data-form-error]')).toHaveCount(0);
+    await expect(page.locator('.ie-title')).not.toHaveClass(/invalid/);
+  });
+
+  test('editing an existing item still opens on its own values', async ({ page }) => {
+    const board = selectedPanel(page).locator('.board[data-kind="activities"]');
+    await board.locator('[data-add]').click();
+    await page.locator('.ie-title').fill('Has values');
+    await page.locator('[data-save]').click();
+
+    await board.locator('.b-row').filter({ hasText: 'Has values' }).click();
+    await page.locator('[data-edit]').click();
+    await expect(page.locator('.ie-title')).toHaveValue('Has values');
   });
 
   test('editing from the item view returns to the item, and Delete returns to the board', async ({
