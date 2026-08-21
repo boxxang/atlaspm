@@ -89,6 +89,8 @@ export async function seedProject(prisma: PrismaClient, now = new Date()): Promi
         due: it.due,
         done: it.done,
         updatedAt: it.updated,
+        /* what the activity is work towards; keyinfo and risks carry none */
+        deliverableId: it.deliverableId ?? null,
       })),
     ),
   );

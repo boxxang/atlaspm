@@ -1138,3 +1138,87 @@ test.describe('the deliverables table opens its records', () => {
     await expect(row.locator('[data-dlv-record]')).toHaveCount(0);
   });
 });
+
+test.describe('the opened board says what each entry is towards', () => {
+  test('the deliverable column leads the opened Activity board, and filters there too', async ({
+    page,
+  }) => {
+    await selectStage(page, 'physicalDesign');
+    const panel = selectedPanel(page);
+    const board = panel.locator('.board[data-kind="activities"]');
+
+    // not on the page — the column it would take is the title's
+    await expect(board.locator('[data-b-deliverable]')).toHaveCount(0);
+    await expect(board.locator('.board-cols > span').first()).toHaveText('Updated');
+
+    await board.locator('[data-more]').click();
+    const list = page.locator('#modal-list');
+    await expect(list.locator('.board-cols > span').first()).toHaveText('Deliverable');
+    await expect(list.locator('.b-row').first().locator('[data-b-deliverable]')).toBeVisible();
+
+    // and the same question can be asked of it
+    const total = await list.locator('.b-row').count();
+    const tag = (await list.locator('[data-b-deliverable]').first().textContent())!;
+    await page.locator('#modal-head [data-filter-deliverable]').selectOption({ label: tag });
+    const shown = await list.locator('.b-row').count();
+    expect(shown).toBeGreaterThan(0);
+    expect(shown).toBeLessThanOrEqual(total);
+    for (const t of await list.locator('[data-b-deliverable]').allTextContents()) {
+      expect(t).toBe(tag);
+    }
+  });
+
+  test('a board across stages has no column to give it', async ({ page }) => {
+    // references belong to a stage; across stages the same one means two things
+    await page.locator('#mode-toggle button[data-mode="schedule"]').click();
+    await page.locator('[data-dash-open="overdue"]').click();
+    await expect(page.locator('#modal-list .board-cols > span').first()).toHaveText('Updated');
+    await expect(page.locator('#modal-head [data-filter-deliverable]')).toHaveCount(0);
+  });
+});
+
+test.describe('the TODAY line stands on today', () => {
+  test('its date is where the calendar puts it, to the day', async ({ page }) => {
+    /* Read off the axis itself rather than trusted: the first two month
+       gridlines give the scale, and the line is measured against them. */
+    const read = await page.evaluate(() => {
+      const g = document.querySelector('#rm-gantt')!;
+      const pct = (e: Element) => parseFloat((e as HTMLElement).style.left);
+      const gl = [...g.querySelectorAll('.g-gridline')];
+      const perDay = (pct(gl[1]) - pct(gl[0])) / 30; // Jun 1 → Jul 1, thirty days
+      return {
+        days: (pct(g.querySelector('.g-today')!) - pct(gl[0])) / perDay,
+        tick: pct(g.querySelector('.g-today-tick')!),
+        cap: pct(g.querySelector('.g-today-cap')!),
+        line: pct(g.querySelector('.g-today')!),
+      };
+    });
+    // the seed's chart opens on the June before kickoff; today is 66 weeks on
+    const jun1 = new Date(new Date().getFullYear() - 1, 5, 1);
+    const today = new Date();
+    const expected = Math.round((today.getTime() - jun1.getTime()) / 86_400_000);
+    expect(Math.abs(read.days - expected)).toBeLessThanOrEqual(1);
+
+    // the caption and the tick on the calendar stand on the same date as the line
+    expect(read.tick).toBeCloseTo(read.line, 6);
+    expect(read.cap).toBeCloseTo(read.line, 6);
+  });
+});
+
+test.describe('a row opens wherever it is clicked', () => {
+  test('the envelope keeps to the end of the title column', async ({ page }) => {
+    /* The envelope is a link inside a row that is itself a button, so wherever
+       it sits is a spot where clicking does not open the row. Trailing the
+       words put it in the middle — which is where a row gets clicked. */
+    await selectStage(page, 'physicalDesign');
+    const board = selectedPanel(page).locator('.board[data-kind="activities"]');
+    const row = board.locator('.b-row').filter({ hasText: 'ECO drop 1 planning' });
+    const box = (await row.boundingBox())!;
+    const mail = (await row.locator('.mail-btn').boundingBox())!;
+    expect(mail.x).toBeGreaterThan(box.x + box.width / 2);
+
+    // so the middle of a row opens the row
+    await row.click();
+    await expect(page.locator('.iv-title')).toContainText('ECO drop 1 planning');
+  });
+});

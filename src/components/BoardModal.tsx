@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import type { Item, ItemKind, Stage, StageId } from '@/data/types';
 import { isOverdue } from '@/lib/derive';
 import { fmtDT } from '@/lib/schedule';
@@ -12,7 +12,7 @@ import {
 } from '@/store/modalStore';
 import { flushWrites, sortedItems, useAppStore, type AppState } from '@/store/useAppStore';
 import { useWrapped } from '@/store/wrapStore';
-import { BoardCols, BoardRow } from './Board';
+import { BoardCols, BoardRow, useDeliverableTags } from './Board';
 import { WrapToggle } from './WrapToggle';
 import { ItemEditor, ItemView } from './ItemView';
 
@@ -150,7 +150,23 @@ export function BoardModal() {
       : null;
 
   const isSu = agg?.type === 'updates';
-  const entries = isSu ? updateEntries(content, stages) : boardEntries(m, content, stages, today);
+  /**
+   * The opened board has the width the one on the page does not, so it shows
+   * what each activity is work towards — and can be read one deliverable at a
+   * time, the same as the board it was opened from. Only a single stage's
+   * activity board: across stages the references belong to different stages
+   * and mean different things.
+   */
+  const { list: deliverables, tagOf } = useDeliverableTags(stageId);
+  const withDeliverable = !agg && kind === 'activities' && deliverables.length > 0;
+  const [filter, setFilter] = useState('');
+  useEffect(() => setFilter(''), [stageId, kind, agg?.type]);
+
+  const all = isSu ? updateEntries(content, stages) : boardEntries(m, content, stages, today);
+  const entries =
+    withDeliverable && filter
+      ? (all as Entry[]).filter((e) => e.it.deliverableId === filter)
+      : all;
   const pages = Math.max(Math.ceil(entries.length / PAGE_SIZE), 1);
   const page = Math.min(m.page, pages - 1);
   const visible = entries.slice(page * PAGE_SIZE, page * PAGE_SIZE + PAGE_SIZE);
@@ -172,6 +188,27 @@ export function BoardModal() {
             <h3>{boardTitle}</h3>
             <span className="meta">{agg ? projectName : stage ? stage.title : ''}</span>
             <span className="spacer" />
+            {withDeliverable && (
+              <select
+                className="board-filter"
+                data-filter-deliverable
+                data-on={filter || undefined}
+                aria-label="Show only the activities towards one deliverable"
+                title="Show only the activities towards one deliverable"
+                value={filter}
+                onChange={(e) => {
+                  setFilter(e.target.value);
+                  m.setPage(0);
+                }}
+              >
+                <option value="">All deliverables</option>
+                {deliverables.map((d) => (
+                  <option value={d.id} key={d.id}>
+                    {tagOf(d.id)}
+                  </option>
+                ))}
+              </select>
+            )}
             <WrapToggle boardKey={wrapKey} />
             {!agg && kind && (
               <button
@@ -230,8 +267,13 @@ export function BoardModal() {
             )}
 
             {!isSu && kind && (
-              <div className={`board${wrapped ? ' wrapped' : ''}`} data-kind={kind}>
-                <BoardCols kind={kind} />
+              <div
+                className={`board${wrapped ? ' wrapped' : ''}${
+                  withDeliverable ? ' with-dlv' : ''
+                }`}
+                data-kind={kind}
+              >
+                <BoardCols kind={kind} withDeliverable={withDeliverable} />
                 {visible.length ? (
                   (visible as Entry[]).map((e) => (
                     <BoardRow
@@ -242,6 +284,7 @@ export function BoardModal() {
                       withTime
                       stageTag={e.stage?.shortTitle}
                       stageId={e.stage?.id}
+                      deliverableTag={withDeliverable ? tagOf(e.it.deliverableId) : undefined}
                       mailStageId={e.stage?.id ?? stageId ?? undefined}
                       selected={e.it.id === itemId}
                       onOpen={() =>

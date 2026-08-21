@@ -13,6 +13,29 @@ import { ColGrip } from './ColGrip';
 import { MailButton } from './MailButton';
 import { WrapToggle } from './WrapToggle';
 
+/**
+ * The reference an activity's deliverable goes by — PD-D3 — for every
+ * deliverable of a stage. One place, so the picker, the filter and the board
+ * column all print the same thing.
+ */
+export function useDeliverableTags(stageId: StageId | null | undefined) {
+  const deliverables = useAppStore((s) => (stageId ? s.deliverables[stageId] : undefined));
+  const shortTitle = useAppStore((s) =>
+    stageId ? (s.stages.find((st) => st.id === stageId)?.shortTitle ?? '') : '',
+  );
+  return useMemo(() => {
+    const list = deliverables ?? [];
+    return {
+      list,
+      tagOf: (id: string | null | undefined) => {
+        if (!id) return null;
+        const i = list.findIndex((d) => d.id === id);
+        return i < 0 ? null : deliverableRowId(shortTitle, i);
+      },
+    };
+  }, [deliverables, shortTitle]);
+}
+
 /** The program's own address book, used to route an item to its owner. */
 export function useDirectory() {
   const leaders = useAppStore((s) => s.leaders);
@@ -31,6 +54,7 @@ export function BoardRow({
   onOpen,
   mailStageId,
   selected = false,
+  deliverableTag,
 }: {
   it: Item;
   kind: ItemKind;
@@ -44,6 +68,8 @@ export function BoardRow({
   mailStageId?: StageId;
   /** The row the pop-up's pane is showing, marked in the list. */
   selected?: boolean;
+  /** Reference of the deliverable this is work towards, e.g. PD-D3. */
+  deliverableTag?: string | null;
 }) {
   const today = useAppStore((s) => s.today);
   const projectName = useAppStore((s) => s.projectName);
@@ -62,6 +88,11 @@ export function BoardRow({
       aria-current={selected || undefined}
       onClick={onOpen}
     >
+      {deliverableTag !== undefined && (
+        <span className={`b-dlv${deliverableTag ? '' : ' none'}`} data-b-deliverable>
+          {deliverableTag ?? '—'}
+        </span>
+      )}
       <span className="b-date">{withTime ? fmtDT(it.updated) : fmtDate(it.updated)}</span>
       <span className="b-title">
         {stageTag && <span className="b-stage">{stageTag}</span>}
@@ -108,9 +139,17 @@ export function BoardRow({
   );
 }
 
-export function BoardCols({ kind }: { kind: ItemKind }) {
+export function BoardCols({
+  kind,
+  withDeliverable = false,
+}: {
+  kind: ItemKind;
+  /** The opened board has the width for it; the one on the page does not. */
+  withDeliverable?: boolean;
+}) {
   return (
     <div className="board-cols">
+      {withDeliverable && <span>Deliverable</span>}
       <span>
         Updated
         <ColGrip col="date" dir={1} cell={0} kind={kind} />
@@ -174,10 +213,7 @@ export function Board({
    * work towards; this asks the board the question back — what is being done
    * about PD-D3 — which is the question a review actually opens with.
    */
-  const deliverables = useAppStore((s) => s.deliverables[stageId] ?? []);
-  const shortTitle = useAppStore(
-    (s) => s.stages.find((st) => st.id === stageId)?.shortTitle ?? '',
-  );
+  const { list: deliverables, tagOf } = useDeliverableTags(stageId);
   const [filter, setFilter] = useState('');
   const list = filter ? all.filter((i) => i.deliverableId === filter) : all;
 
@@ -200,9 +236,9 @@ export function Board({
             onChange={(e) => setFilter(e.target.value)}
           >
             <option value="">All deliverables</option>
-            {deliverables.map((d, i) => (
+            {deliverables.map((d) => (
               <option value={d.id} key={d.id}>
-                {deliverableRowId(shortTitle, i)}
+                {tagOf(d.id)}
               </option>
             ))}
           </select>

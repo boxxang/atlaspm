@@ -163,6 +163,19 @@ export function createProjectSeed({
          is filed from here on; see saveDeliverableRecord. */
       return { id: uid(), title, done, due, completedAt, note: '', attachments: [] };
     });
+
+    /* Every activity is work towards something, and in a schedule that
+       something is the next artefact its own date feeds: the first deliverable
+       due on or after the activity is due. Real programs are messier than that
+       — an activity can serve two — but a seed has to pick, and picking by the
+       schedule is at least a rule anyone can check against the dates in front
+       of them. Work due past the last deliverable is towards none of them. */
+    const dated = deliverables[stage].filter((d) => d.due);
+    for (const a of acts) {
+      if (!a.due) continue;
+      const towards = dated.find((d) => d.due! >= a.due!);
+      if (towards) a.deliverableId = towards.id;
+    }
   };
 
     /* ---- 01 Product Definition — CLOSED ----

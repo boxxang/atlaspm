@@ -36,6 +36,7 @@
   --bck-keyinfo-date:5.4rem;    --bck-keyinfo-owner:5.2rem;
   --bck-activities-date:5.4rem; --bck-activities-owner:5.2rem; --bck-activities-due:5.4rem;
   --bck-risks-date:5.4rem;      --bck-risks-owner:5.2rem;      --bck-risks-due:0rem;
+  --bc-dlv:5.4rem;           /* the deliverable an entry is work towards */
   --dash-row-h:36px;         /* dashboard schedule row height */
   --ms-dot:26px;             /* checkpoint diamonds on the concurrency chart */
   --row-id-w:3.8rem;         /* the DEF-01 / DEF-D1 column on both tables */
@@ -344,6 +345,15 @@ body.has-overrides .edited-flag{display:inline}
 .g-today{position:absolute;top:0;bottom:0;width:1.5px;transform:translateX(-50%);background:var(--accent);opacity:.7;pointer-events:none}
 /* above the month letters rather than among them — the caption row beside the
    Concurrency note is empty out here, and the months stay legible */
+/* The line runs the height of the rows, which start below the calendar — so
+   on the calendar itself it is a tick, at the same percentage, carrying the
+   caption down onto the month it falls in. Without it the caption floats
+   above an axis it never visibly touches, and the eye has nothing to read the
+   line's date against. */
+.g-today-tick{
+  position:absolute;left:0;bottom:0;width:1.5px;height:9px;
+  transform:translateX(-50%);background:var(--accent);opacity:.7;pointer-events:none;
+}
 .g-today-cap{
   position:absolute;top:-15px;transform:translateX(-50%);z-index:4;white-space:nowrap;
   font-size:calc(var(--cp-fs) * 0.85);letter-spacing:.1em;color:var(--accent);
@@ -549,12 +559,26 @@ body.has-overrides .edited-flag{display:inline}
 .board[data-kind="keyinfo"]{--bc-date:var(--bck-keyinfo-date);--bc-owner:var(--bck-keyinfo-owner)}
 .board[data-kind="activities"]{--bc-date:var(--bck-activities-date);--bc-owner:var(--bck-activities-owner);--bc-due:var(--bck-activities-due)}
 .board[data-kind="risks"]{--bc-date:var(--bck-risks-date);--bc-owner:var(--bck-risks-owner);--bc-due:var(--bck-risks-due)}
+/* Opened, the Activity board has the width to say what each entry is work
+   towards. The board on the page does not, and the column it would take is
+   the title's. */
+.board.with-dlv .board-cols,
+.board.with-dlv .b-row{
+  grid-template-columns:var(--bc-dlv) var(--bc-date) minmax(0,1fr) var(--bc-owner) var(--bc-due);
+}
+.b-dlv{
+  font-family:var(--mono);font-size:.7em;letter-spacing:.04em;color:var(--accent);
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+.b-dlv.none{color:var(--line-strong)}
+.board.with-dlv .b-row .b-latest{grid-column:3 / -1}
+
 /* Only activities carry a due date, so only they spend a column on one. */
 .board[data-kind="keyinfo"] .board-cols,
 .board[data-kind="keyinfo"] .b-row,
 .board[data-kind="risks"] .board-cols,
 .board[data-kind="risks"] .b-row{grid-template-columns:var(--bc-date) minmax(0,1fr) var(--bc-owner)}
-.board-cols>span{position:relative}
+.board-cols>span{position:relative;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .col-grip{position:absolute;top:-7px;bottom:-7px;right:-9px;width:16px;cursor:col-resize;z-index:5}
 .col-grip::after{
   content:"";position:absolute;left:7px;top:2px;bottom:2px;width:2px;
@@ -1093,6 +1117,11 @@ body.modal-open .modal-win{transform:none}
 /* bare icon, for a board row */
 .mail-btn.icon{border:none;padding:2px 4px;border-radius:3px}
 .mail-btn.icon svg{width:15px;height:15px}
+/* Pinned to the end of the title column rather than trailing the words. It
+   is a link inside a row that is itself a button, so wherever it sits is a
+   spot where clicking does not open the row — and trailing the words put it
+   in the middle of the row, which is exactly where a row gets clicked. */
+.b-row .b-title .mail-btn.icon{margin-left:auto}
 .b-row .mail-btn.icon,.dlv-list .mail-btn.icon{opacity:0;transition:opacity .15s}
 .b-row:hover .mail-btn.icon,.b-row:focus-within .mail-btn.icon{opacity:1}
 .mail-note{

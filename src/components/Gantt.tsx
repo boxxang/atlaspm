@@ -186,9 +186,12 @@ export function Gantt({
             so what says which date it is rides up here on the calendar, where
             it stays in view however far down the rows you are. */}
         {todayVisible && (
-          <span className="g-today-cap" style={{ left: `${todayPct}%` }}>
-            Today {fmtMD(today)}
-          </span>
+          <>
+            <span className="g-today-tick" style={{ left: `${todayPct}%` }} />
+            <span className="g-today-cap" style={{ left: `${todayPct}%` }}>
+              Today {fmtMD(today)}
+            </span>
+          </>
         )}
       </div>
       <div className="g-body" ref={bodyRef}>

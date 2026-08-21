@@ -179,7 +179,11 @@ Pure logic never imports UI, and `/src/lib` + `/src/data` never touch the DOM â€
 - **An activity is work towards something.** Writing one names the key
   deliverable it is for, and the Activity board can then be read one
   deliverable at a time â€” which is the question a review opens with, not "show
-  me every task". A deliverable is deleted without taking that record of the
+  me every task". Opened, the board leads with that reference as its first
+  column and filters on it there too; on the page there is no room for a
+  column that would be the title's. Across stages there is no column at all:
+  a reference belongs to a stage, and the same one means two different things
+  in two of them. A deliverable is deleted without taking that record of the
   work with it (`SetNull`, not `Cascade`).
 - **Potential risks** open over the page rather than inside it: the checklist
   is a reference you consult against the risk board, and the inline panel
@@ -262,7 +266,7 @@ that is a read/write swap rather than a redesign.
 
 ```bash
 npm test          # 171 unit tests: schedule engine, stages/profiles, derivations, effort, mail, purity
-npm run e2e       # 244 Playwright tests
+npm run e2e       # 248 Playwright tests
 ```
 
 The e2e suite runs against its own database (`test.db`) on port 3100, so it never
