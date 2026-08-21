@@ -155,16 +155,20 @@ export function Deliverables({ stageId }: { stageId: StageId }) {
                     <ClipBadge count={d.attachments.length} />
                   </button>
                 ))}
-              {/* Files the record: the history, and the thing itself. */}
-              <button
-                className="dlv-attach"
-                data-dlv-record={d.id}
-                title="File the delivery record — history and artefact"
-                aria-label={`File the delivery record for ${d.title}`}
-                onClick={() => setRecord(d.id)}
-              >
-                <ClipIcon />
-              </button>
+              {/* Files the record: the history, and the thing itself. Once
+                  one is filed the row already carries a clip that opens the
+                  artefact — a second clip beside it would say nothing new. */}
+              {!d.attachments.length && (
+                <button
+                  className="dlv-attach"
+                  data-dlv-record={d.id}
+                  title="File the delivery record — history and artefact"
+                  aria-label={`File the delivery record for ${d.title}`}
+                  onClick={() => setRecord(d.id)}
+                >
+                  <ClipIcon />
+                </button>
+              )}
             </span>
             {editing ? (
               <input
@@ -258,6 +262,9 @@ export function Deliverables({ stageId }: { stageId: StageId }) {
           key={open.id}
           stageId={stageId}
           deliverable={open}
+          /* The table's Edit button is what says "I am here to change things",
+             so a record opened while it is on opens ready to be changed. */
+          startEditing={editing}
           onClose={() => setRecord(null)}
         />
       )}

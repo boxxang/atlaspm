@@ -37,7 +37,8 @@ test.describe('column alignment', () => {
     for (const kind of ['keyinfo', 'activities', 'risks'] as const) {
       const board = `.stage-panel.selected .board[data-kind="${kind}"]`;
       const head = await lefts(page, `${board} .board-cols > span`);
-      expect(head.length).toBe(kind === 'keyinfo' ? 3 : 4);
+      // only activities carry a due date, so only they spend a column on one
+      expect(head.length).toBe(kind === 'activities' ? 4 : 3);
 
       const rows = page.locator(`${board} .b-row`);
       const n = await rows.count();
@@ -372,9 +373,9 @@ test.describe('responsive stops', () => {
         name,
       );
     };
-    expect(await varAt(1200, '--bck-activities-date')).toBe('6.6rem');
-    expect(await varAt(1100, '--bck-activities-date')).toBe('6.2rem');
-    expect(await varAt(1100, '--bck-risks-due')).toBe('6rem');
+    expect(await varAt(1200, '--bck-activities-date')).toBe('5.4rem');
+    expect(await varAt(1100, '--bck-activities-date')).toBe('5.2rem');
+    expect(await varAt(1100, '--bck-activities-due')).toBe('5.2rem');
     // contacts drop from five wide columns to the narrow set
     await page.setViewportSize({ width: 1100, height: 900 });
     const cols = await selectedPanel(page)

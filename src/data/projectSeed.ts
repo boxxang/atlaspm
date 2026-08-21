@@ -122,17 +122,34 @@ export function createProjectSeed({
   ) => {
     content[stage] = { keyinfo: ki, activities: acts, risks };
     /* The stage's key deliverables are the template's — every program starts
-       with the same list — and they are dated across the stage rather than on
-       its last day: deliverable i of n lands at i/n of the span, so the last
-       one falls on the stage end date. Anything due more than three weeks ago
-       reads as done; the recent ones stay open, which is what leaves the
-       program with a handful of genuinely overdue lines. */
+       with the same list — and they are dated the way a stage actually runs
+       rather than at even intervals across it.
+       
+       A stage opens with a plan or a spec, which lands early and alone. What
+       follows spreads out, and then the last few bunch against the gate,
+       because the gate is what they are for: the review reads the closing
+       artefacts together. So the fractions are eased toward the end rather
+       than divided evenly, and each carries a couple of days of drift so the
+       dates read as dates rather than as arithmetic.
+       
+       Anything due more than three weeks ago reads as done; the recent ones
+       stay open, which is what leaves the program with a handful of genuinely
+       overdue lines. Slips are the common case, so the completion drift runs
+       late more often than early. */
     const titles = journeyData.find((s) => s.id === stage)?.deliverables ?? [];
     const span = sc[stage].durationWeeks;
     const settled = ago(21);
-    const drift = [-4, 2, -1, 3, -2, 1, -3, 0];
+    const drift = [2, -1, 5, 0, 3, -2, 8, 1, -3, 4];
+    const jitter = [0, 3, -2, 1, -3, 2, 0, -1, 4, -2, 1, 3];
+    /** The first artefact lands a fifth of the way in; the last on the gate. */
+    const OPENS_AT = 0.2;
+    /** Below 1, so the gaps close as the stage runs down to its review. */
+    const EASE = 0.75;
     deliverables[stage] = titles.map((title, i) => {
-      const due = W(stage, (span * (i + 1)) / titles.length);
+      const t = titles.length > 1 ? (i / (titles.length - 1)) ** EASE : 1;
+      const due = W(stage, span * (OPENS_AT + (1 - OPENS_AT) * t));
+      /* a couple of days either way, never enough to reorder the list */
+      due.setDate(due.getDate() + jitter[i % jitter.length]);
       const done = due < settled;
       let completedAt: Date | null = null;
       if (done) {

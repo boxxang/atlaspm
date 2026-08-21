@@ -117,25 +117,26 @@ test('a filed deliverable persists with its record and its stamp', async ({ page
   await expect(row.locator('.dlv-comp')).toHaveText('—');
   await fileDeliverable(page, 'Interim physical DRC', ARTEFACT, 'Clean on the N2 drop.');
   const stamped = await row.locator('.dlv-comp').textContent();
-  await expect(panel.locator('.dlv-note')).toHaveText('6 / 9 complete');
+  await expect(panel.locator('.dlv-note')).toHaveText('4 / 9 complete');
 
   await hardRefresh(page);
   await selectStage(page, 'physicalDesign');
   const after = selectedPanel(page).locator('.dlv-list li').nth(5);
   await expect(after.locator('input[type="checkbox"]')).toBeChecked();
   await expect(after.locator('.dlv-comp')).toHaveText(stamped!);
-  await expect(selectedPanel(page).locator('.dlv-note')).toHaveText('6 / 9 complete');
+  await expect(selectedPanel(page).locator('.dlv-note')).toHaveText('4 / 9 complete');
   // and the dashboard counts it
   await page.locator('#mode-toggle button[data-mode="schedule"]').click();
-  await expect(page.locator('.stat').first().locator('.v')).toHaveText('58%');
+  await expect(page.locator('.stat').first().locator('.v')).toHaveText('54%');
   await page.locator('#mode-toggle button[data-mode="journey"]').click();
 
   // the record came back with it, history and artefact both
   await openDeliveryRecord(page, 'Interim physical DRC');
-  await expect(page.locator('[data-dr-note]')).toHaveValue('Clean on the N2 drop.');
+  await expect(page.locator('[data-dr-note-text]')).toHaveText('Clean on the N2 drop.');
   await expect(page.locator('.dr-files .att-name')).toHaveText('atlaspm-artefact.txt');
 
   // and taking the artefact off takes the completion with it
+  await page.locator('[data-dr-edit]').click();
   await page.locator('.dr-files [data-att-del]').click();
   await page.locator('[data-dr-save]').click();
   await hardRefresh(page);

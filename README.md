@@ -176,6 +176,14 @@ Pure logic never imports UI, and `/src/lib` + `/src/data` never touch the DOM �
 - **Checkpoint labels.** On the dashboard each milestone label sits past the end
   of its bar, beside its diamond, with an arrow pointing back at it — so a label
   never lies over the schedule it annotates, at any row height.
+- **An activity is work towards something.** Writing one names the key
+  deliverable it is for, and the Activity board can then be read one
+  deliverable at a time — which is the question a review opens with, not "show
+  me every task". A deliverable is deleted without taking that record of the
+  work with it (`SetNull`, not `Cascade`).
+- **Potential risks** open over the page rather than inside it: the checklist
+  is a reference you consult against the risk board, and the inline panel
+  covered the board while you read it.
 - **The delivery record.** A key deliverable is not completed by ticking a box:
   ticking says a thing was done, and the artefact *is* the thing. Its record —
   the development history, and the file that came out of it — is filed from the
@@ -185,7 +193,9 @@ Pure logic never imports UI, and `/src/lib` + `/src/data` never touch the DOM �
   tick; the rule governs what is filed from here on. A completed row carries a
   clip that opens its artefact straight from the page, and its title reads the
   record back — months later the question is never "was it ticked" but "what
-  was delivered, and what happened on the way".
+  was delivered, and what happened on the way". A filed record opens as a
+  record: read, and reopened for changes with the pencil. The table's own Edit
+  button opens one ready to be changed, title included.
 - **Attachments.** Files and images attach while an item is being written, to
   an item that already exists (behind its Edit button, with every other change
   to the entry), or to a status update. An entry that carries files says so on
@@ -252,7 +262,7 @@ that is a read/write swap rather than a redesign.
 
 ```bash
 npm test          # 171 unit tests: schedule engine, stages/profiles, derivations, effort, mail, purity
-npm run e2e       # 240 Playwright tests
+npm run e2e       # 244 Playwright tests
 ```
 
 The e2e suite runs against its own database (`test.db`) on port 3100, so it never

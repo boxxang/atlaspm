@@ -1,12 +1,13 @@
 'use client';
 
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import type { Item, ItemKind, StageContent, StageId } from '@/data/types';
 import { activityListDraft, itemDraft } from '@/lib/mailDrafts';
 import { buildDirectory, resolveEmail } from '@/lib/people';
 import { fmtDT, fmtDate } from '@/lib/schedule';
 import { sortedItems, useAppStore } from '@/store/useAppStore';
 import { useWrapped } from '@/store/wrapStore';
+import { deliverableRowId } from '@/lib/rowIds';
 import { ClipBadge } from './Attachments';
 import { ColGrip } from './ColGrip';
 import { MailButton } from './MailButton';
@@ -89,8 +90,8 @@ export function BoardRow({
         )}
       </span>
       <span className="b-owner">{it.owner || '—'}</span>
-      {/* key information has no DUE column */}
-      {kind !== 'keyinfo' &&
+      {/* only activities have a DUE column — see BoardCols */}
+      {kind === 'activities' &&
         (!it.due ? (
           <span className="b-due">—</span>
         ) : (
@@ -120,9 +121,12 @@ export function BoardCols({ kind }: { kind: ItemKind }) {
       </span>
       <span>
         Owner
-        {kind !== 'keyinfo' && <ColGrip col="due" dir={-1} cell={3} kind={kind} />}
+        {kind === 'activities' && <ColGrip col="due" dir={-1} cell={3} kind={kind} />}
       </span>
-      {kind !== 'keyinfo' && <span>Due</span>}
+      {/* Only activities carry a due date. A risk is open until it is closed —
+          it has no deadline of its own, and the column it was given was empty
+          on every row, at the cost of the titles beside it. */}
+      {kind === 'activities' && <span>Due</span>}
     </div>
   );
 }
@@ -161,16 +165,48 @@ export function Board({
   const stages = useAppStore((s) => s.stages);
   const today = useAppStore((s) => s.today);
   const dir = useDirectory();
-  const list = sortedItems(content, kind);
+  const all = sortedItems(content, kind);
   /* keyed by kind, so the pop-up over this board reads the same way it does */
   const wrapped = useWrapped(kind);
+
+  /**
+   * Reading the board one deliverable at a time. An activity says what it is
+   * work towards; this asks the board the question back — what is being done
+   * about PD-D3 — which is the question a review actually opens with.
+   */
+  const deliverables = useAppStore((s) => s.deliverables[stageId] ?? []);
+  const shortTitle = useAppStore(
+    (s) => s.stages.find((st) => st.id === stageId)?.shortTitle ?? '',
+  );
+  const [filter, setFilter] = useState('');
+  const list = filter ? all.filter((i) => i.deliverableId === filter) : all;
 
   return (
     <div className={`board${wrapped ? ' wrapped' : ''}`} data-kind={kind}>
       <div className="board-head">
         <span className="cap">{title}</span>
-        <span className="note">{boardNote(content, kind)}</span>
+        <span className="note">
+          {filter ? `${list.length} of ${all.length}` : boardNote(content, kind)}
+        </span>
         <span className="spacer" />
+        {kind === 'activities' && deliverables.length > 0 && (
+          <select
+            className="board-filter"
+            data-filter-deliverable
+            data-on={filter || undefined}
+            aria-label="Show only the activities towards one deliverable"
+            title="Show only the activities towards one deliverable"
+            value={filter}
+            onChange={(e) => setFilter(e.target.value)}
+          >
+            <option value="">All deliverables</option>
+            {deliverables.map((d, i) => (
+              <option value={d.id} key={d.id}>
+                {deliverableRowId(shortTitle, i)}
+              </option>
+            ))}
+          </select>
+        )}
         {mailWholeList && list.length > 0 && (
           <MailButton
             title="Email this activity list to its owners"
@@ -208,7 +244,9 @@ export function Board({
               />
             ))
         ) : (
-          <div className="b-empty">Nothing here yet.</div>
+          <div className="b-empty">
+            {filter ? 'Nothing towards this deliverable yet.' : 'Nothing here yet.'}
+          </div>
         )}
       </div>
       <div className="board-foot">

@@ -291,21 +291,23 @@ test.describe('stage panel', () => {
     await expect(panel.locator('[data-role="start-edit"]')).toHaveValue(isoPlusDays(start, 7));
   });
 
-  test('the key information board has no DUE column', async ({ page }) => {
+  test('only the Activity board carries a DUE column', async ({ page }) => {
     const panel = selectedPanel(page);
-    const keyinfo = panel.locator('.board[data-kind="keyinfo"]');
-    await expect(keyinfo.locator('.board-cols > span')).toHaveText([
-      'Updated',
-      'Title',
-      'Owner',
-    ]);
-    await expect(keyinfo.locator('.b-due')).toHaveCount(0);
-    // the other two boards do carry it
-    for (const kind of ['activities', 'risks']) {
-      await expect(
-        panel.locator(`.board[data-kind="${kind}"] .board-cols > span`),
-      ).toHaveText(['Updated', 'Title', 'Owner', 'Due']);
+    /* A due date belongs to work that is owed by a date. Key information is
+       not owed, and a risk is open until it is closed — the column they were
+       each given was empty on every row, at the cost of the titles beside it. */
+    for (const kind of ['keyinfo', 'risks']) {
+      const board = panel.locator(`.board[data-kind="${kind}"]`);
+      await expect(board.locator('.board-cols > span')).toHaveText([
+        'Updated',
+        'Title',
+        'Owner',
+      ]);
+      await expect(board.locator('.b-due')).toHaveCount(0);
     }
+    await expect(
+      panel.locator('.board[data-kind="activities"] .board-cols > span'),
+    ).toHaveText(['Updated', 'Title', 'Owner', 'Due']);
   });
 
   test('activity shows up to ten, key information and risk up to five', async ({ page }) => {
@@ -520,7 +522,7 @@ test.describe('stage details', () => {
   }) => {
     await selectStage(page, 'physicalDesign');
     const panel = selectedPanel(page);
-    await expect(panel.locator('.dlv-note')).toHaveText('5 / 9 complete');
+    await expect(panel.locator('.dlv-note')).toHaveText('3 / 9 complete');
 
     const row = panel.locator('.dlv-list li').filter({ hasText: 'Interim physical DRC' });
     await expect(row.locator('.dlv-comp')).toHaveText('—');
@@ -538,21 +540,27 @@ test.describe('stage details', () => {
     await expect(row.locator('input[type="checkbox"]')).toBeChecked();
     await expect(row.locator('.dlv-comp')).toHaveText(/^\d{2}\/\d{2}\/\d{4}$/);
     await expect(row.locator('.dlv-t')).toHaveClass(/done/);
-    await expect(panel.locator('.dlv-note')).toHaveText('6 / 9 complete');
+    await expect(panel.locator('.dlv-note')).toHaveText('4 / 9 complete');
     // and the row says it carries a file, without opening anything
     await expect(row.locator('.clip-badge')).toBeVisible();
 
-    // the record reads back — which is the other half of filing one
+    /* The record reads back — which is the other half of filing one. A filed
+       deliverable opens as what it is: a record, read rather than edited, and
+       reopened for changes with the pencil. */
     await openDeliveryRecord(page, 'Interim physical DRC');
-    await expect(page.locator('[data-dr-note]')).toHaveValue('DRC clean on the N2 drop.');
+    await expect(page.locator('[data-dr-note-text]')).toHaveText('DRC clean on the N2 drop.');
     await expect(page.locator('.dr-files .att-name')).toHaveText('atlaspm-deliverable.txt');
+    await expect(page.locator('.dr-files [data-att-del]')).toHaveCount(0);
+    await expect(page.locator('[data-dr-save]')).toHaveCount(0);
 
     // taking the artefact away takes the tick with it
+    await page.locator('[data-dr-edit]').click();
+    await expect(page.locator('[data-dr-note]')).toHaveValue('DRC clean on the N2 drop.');
     await page.locator('.dr-files [data-att-del]').click();
     await page.locator('[data-dr-save]').click();
     await expect(row.locator('input[type="checkbox"]')).not.toBeChecked();
     await expect(row.locator('.dlv-comp')).toHaveText('—');
-    await expect(panel.locator('.dlv-note')).toHaveText('5 / 9 complete');
+    await expect(panel.locator('.dlv-note')).toHaveText('3 / 9 complete');
   });
 
   test('deliverables can be added and deleted', async ({ page }) => {
@@ -618,7 +626,7 @@ test.describe('risk library and leader', () => {
 
     await expect(first.locator('.pr-add')).toHaveText('Added');
     await expect(first.locator('.pr-add')).toBeDisabled();
-    await panel.locator('.inline-close').click();
+    await page.locator('[data-pr-close]').click();
     await expect(panel.locator('.board[data-kind="risks"] .b-row')).toHaveCount(1);
     await expect(panel.locator('.board[data-kind="risks"] .b-row .t')).toHaveText(title!);
     await expect(panel.locator('.board[data-kind="risks"] .board-head .note')).toHaveText(
@@ -821,11 +829,11 @@ test.describe('the folded chart carries its dates', () => {
     const marks = page.locator('#rm-gantt .g-row.current .g-dlv');
     await expect(marks).toHaveCount(9); // Physical Design's nine deliverables
     // a finished deliverable is marked on the day it was finished
-    const first = marks.filter({ hasText: 'Floorplan and PDN' });
+    const first = marks.filter({ hasText: 'Flow setup release' });
     await expect(first.locator('.g-dlv-date')).toHaveText(/^\d{1,2}\/\d{1,2}$/);
     await expect(first).toHaveClass(/done/);
     // an open one still shows what it is due
-    await expect(marks.filter({ hasText: 'Bump map' }).locator('.g-dlv-date')).toHaveText('9/13');
+    await expect(marks.filter({ hasText: 'Bump map' }).locator('.g-dlv-date')).toHaveText('9/27');
 
     // markers are placed by date: later date, further right
     const xs = await marks.evaluateAll((els) =>
@@ -841,13 +849,13 @@ test.describe('the folded chart carries its dates', () => {
       .locator('.dlv-list li')
       .filter({ hasText: 'Bump map' })
       .locator('input.dlv-due')
-      .fill('2026-09-24');
+      .fill('2026-10-24');
     await page.locator('#roadmap').hover({ position: { x: 8, y: 8 } });
     await fold(page);
     const moved = page.locator('#rm-gantt .g-row.current .g-dlv').filter({
       hasText: 'Bump map',
     });
-    await expect(moved.locator('.g-dlv-date')).toHaveText('9/24');
+    await expect(moved.locator('.g-dlv-date')).toHaveText('10/24');
     expect((await moved.boundingBox())!.x).toBeGreaterThan(before);
   });
 });
@@ -1025,5 +1033,108 @@ test.describe('board windows', () => {
     const more = (await board.locator('[data-more]').boundingBox())!;
     expect(more.y).toBeGreaterThan(win.y + win.height - 2);
     expect(more.y - (win.y + win.height)).toBeLessThan(40);
+  });
+});
+
+test.describe('an activity is work towards a deliverable', () => {
+  test('the editor names one, and the board can be read one at a time', async ({ page }) => {
+    await selectStage(page, 'physicalDesign');
+    const panel = selectedPanel(page);
+    const board = panel.locator('.board[data-kind="activities"]');
+    await expect(board.locator('.b-row')).toHaveCount(6);
+
+    // the deliverables of this stage, by the reference the sheet prints
+    await board.locator('[data-add]').click();
+    const picker = page.locator('[data-ie-deliverable]');
+    await expect(picker.locator('option')).toHaveCount(10); // none, plus nine
+    await expect(picker.locator('option').nth(1)).toContainText('PD-D1');
+
+    await page.locator('.ie-title').fill('Bump map cross-check with the package team');
+    await picker.selectOption({ index: 7 }); // PD-D7 — none, then D1…D9
+    await page.locator('[data-save]').click();
+    await expect(page.locator('#modal-list .b-row')).toHaveCount(7);
+    await page.keyboard.press('Escape');
+    await expect(page.locator('#modal .modal-win')).toBeHidden();
+    await expect(board.locator('.b-row')).toHaveCount(7);
+
+    // and the board answers the question back: what is being done about PD-D7
+    const filter = board.locator('[data-filter-deliverable]');
+    await filter.selectOption({ label: 'PD-D7' });
+    await expect(board.locator('.b-row')).toHaveCount(1);
+    await expect(board.locator('.b-row .t')).toHaveText(
+      'Bump map cross-check with the package team',
+    );
+    await expect(board.locator('.board-head .note')).toHaveText('1 of 7');
+
+    // a deliverable nothing has been done about says so
+    await filter.selectOption({ label: 'PD-D9' });
+    await expect(board.locator('.b-row')).toHaveCount(0);
+    await expect(board.locator('.b-empty')).toHaveText('Nothing towards this deliverable yet.');
+
+    await filter.selectOption({ label: 'All deliverables' });
+    await expect(board.locator('.b-row')).toHaveCount(7);
+
+    // the link survives a reload, and reads back in the editor
+    await page.reload();
+    await selectStage(page, 'physicalDesign');
+    await selectedPanel(page)
+      .locator('.board[data-kind="activities"] [data-filter-deliverable]')
+      .selectOption({ label: 'PD-D7' });
+    await expect(
+      selectedPanel(page).locator('.board[data-kind="activities"] .b-row'),
+    ).toHaveCount(1);
+  });
+
+  test('only activities are work towards something', async ({ page }) => {
+    const panel = selectedPanel(page);
+    for (const kind of ['keyinfo', 'risks'] as const) {
+      await panel.locator(`.board[data-kind="${kind}"] [data-add]`).click();
+      await expect(page.locator('[data-ie-deliverable]')).toHaveCount(0);
+      await page.keyboard.press('Escape');
+      await expect(page.locator('#modal .modal-win')).toBeHidden();
+    }
+    await expect(panel.locator('[data-filter-deliverable]')).toHaveCount(1);
+  });
+});
+
+test.describe('the deliverables table opens its records', () => {
+  test('Edit opens a record ready to be changed, title included', async ({ page }) => {
+    await selectStage(page, 'physicalDesign');
+    const panel = selectedPanel(page);
+    const row = panel.locator('.dlv-list li').filter({ hasText: 'Signoff-ready database' });
+
+    // a filed one opens as a record; this one is open, so it opens ready
+    await row.locator('[data-dlv-open]').click();
+    await expect(page.locator('[data-dr-note]')).toBeVisible();
+    await expect(page.locator('[data-dr-title]')).toHaveValue('Signoff-ready database handoff');
+    await page.locator('[data-dr-cancel]').click();
+
+    // renaming happens in the record, and only in edit mode
+    await editDeliverables(page);
+    await row.locator('[data-dlv-open]').click();
+    await page.locator('[data-dr-title]').fill('Signoff-ready database handoff v2');
+    await page.locator('[data-dr-save]').click();
+    await expect(panel.locator('.dlv-list li').filter({ hasText: 'handoff v2' })).toHaveCount(1);
+
+    await page.reload();
+    await selectStage(page, 'physicalDesign');
+    await expect(
+      selectedPanel(page).locator('.dlv-list li').filter({ hasText: 'handoff v2' }),
+    ).toHaveCount(1);
+  });
+
+  test('a filed row drops the paperclip it no longer needs', async ({ page }) => {
+    await selectStage(page, 'physicalDesign');
+    const panel = selectedPanel(page);
+    const row = panel.locator('.dlv-list li').filter({ hasText: 'Bump map' });
+    // unfiled: the clip that files a record, and no clip badge
+    await expect(row.locator('[data-dlv-record]')).toHaveCount(1);
+    await expect(row.locator('.clip-badge')).toHaveCount(0);
+
+    await fileDeliverable(page, 'Bump map', TXT);
+    /* filed: the badge opens the artefact, and the paperclip that filed it
+       would say nothing the badge does not */
+    await expect(row.locator('[data-dlv-files]')).toHaveCount(1);
+    await expect(row.locator('[data-dlv-record]')).toHaveCount(0);
   });
 });

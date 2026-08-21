@@ -27,7 +27,7 @@ test.describe('design tokens', () => {
     expect(await cssVar(page, '--fs-base')).toBe('15px');
     expect(await cssVar(page, '--toolbar-h')).toBe('58px');
     expect(await cssVar(page, '--dash-row-h')).toBe('36px');
-    expect(await cssVar(page, '--bck-risks-due')).toBe('6.6rem');
+    expect(await cssVar(page, '--bck-activities-due')).toBe('5.4rem');
   });
 
   test('body uses the page background and base font size', async ({ page }) => {

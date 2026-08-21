@@ -1,0 +1,1432 @@
+{
+  "version": "v1",
+  "note": "Activity detail content. Titles, TAT, M/M and stage windows are NOT duplicated here — join on the id against docs/stage-template-v2.json.",
+  "authored": 9,
+  "totalActivities": 257,
+  "activities": {
+    "DEF-01": {
+      "stage": "productDefinition",
+      "window": [
+        0,
+        4
+      ],
+      "criticalPath": true,
+      "purpose": [
+        "Turn what customers and the market are asking for into <b>one ranked, signed requirement set</b> that the whole program is measured against.",
+        "Everything downstream is an answer to this list — the PPA targets, the cost model, the feasibility call, the architecture itself. Until it is baselined and signed, every one of those answers is provisional. A requirement that arrives in week 30 costs roughly a hundred times what it costs here, and the difference is paid in silicon."
+      ],
+      "steps": [
+        {
+          "n": 1,
+          "text": "Stakeholder map and interview plan",
+          "tat": 0.5,
+          "lane": "main"
+        },
+        {
+          "n": 2,
+          "text": "Anchor-customer interviews — two accounts, six sessions",
+          "tat": 1.5,
+          "lane": "main"
+        },
+        {
+          "n": 3,
+          "text": "Market and analyst input, segment sizing",
+          "tat": 1,
+          "lane": "par"
+        },
+        {
+          "n": 4,
+          "text": "Requirement extraction, de-duplication, register build",
+          "tat": 1,
+          "lane": "main"
+        },
+        {
+          "n": 5,
+          "text": "Conflict resolution and MoSCoW prioritisation workshop",
+          "tat": 0.5,
+          "lane": "main"
+        },
+        {
+          "n": 6,
+          "text": "Traceability tagging to candidate KPIs and PPA targets",
+          "tat": 0.5,
+          "lane": "par"
+        },
+        {
+          "n": 7,
+          "text": "Stakeholder review and baseline sign-off",
+          "tat": 0.5,
+          "lane": "main"
+        }
+      ],
+      "flowNote": "Seven steps add up to 5.5 weeks of work inside a 4-week window — steps 3 and 6 run alongside the main sequence. That is why the activity TAT and the sum of its steps do not match, and why pulling either parallel step onto the critical path costs a further 1.5 weeks.",
+      "consumes": [
+        "Customer RFI / RFQ responses",
+        "Field feedback and errata from the previous generation",
+        "Analyst forecasts and segment sizing",
+        "Competitor datasheets and public benchmarks",
+        "Sales pipeline and committed-volume view"
+      ],
+      "produces": [
+        "Interview notes, per account",
+        "Requirement register — ID, owner, priority, acceptance measure",
+        "Conflict and deferral log",
+        "MoSCoW prioritisation record",
+        "Baseline sign-off sheet"
+      ],
+      "rel": [
+        {
+          "id": "DEF-D1",
+          "rel": "produces",
+          "text": "<b>Product requirements document (PRD).</b> The register is the PRD's body — this activity is where the deliverable's content comes from, not merely a contributor to it."
+        },
+        {
+          "id": "DEF-D2",
+          "rel": "feeds",
+          "text": "<b>Target specification — PPA and KPI table.</b> Each ranked requirement becomes a KPI line that <code>DEF-03</code> turns into a number. An untraced target is a target nobody asked for."
+        },
+        {
+          "id": "DEF-D3",
+          "rel": "informs",
+          "text": "<b>Product cost and margin model.</b> Supplies the volume, segment and ASP assumptions the model is built on."
+        },
+        {
+          "id": "DEF-D4",
+          "rel": "feeds",
+          "text": "<b>Feasibility report.</b> <code>DEF-07</code> tests <em>this</em> list against the candidate nodes — a feasibility study run against a different list proves nothing."
+        },
+        {
+          "id": "DEF-D6",
+          "rel": "gates",
+          "text": "<b>Kickoff Go / No-Go decision record.</b> The gate reads the sign-off sheet. An unsigned register is a No-Go condition, not a footnote."
+        }
+      ],
+      "risks": [
+        "<b>Requirements not signed off by all stakeholders.</b> Sales agreeing verbally is not a signature, and the Go / No-Go gate reads signatures.",
+        "<b>Late customer additions after baseline.</b> With no change-control channel agreed at sign-off, the register keeps moving and nothing downstream can freeze.",
+        "<b>Requirements written as solutions.</b> \"Use HBM3E\" is an answer; \"819 GB/s sustained\" is a requirement. Solutions here remove the architect's options in <code>ARCH-02</code>.",
+        "<b>No acceptance measure.</b> A requirement that cannot be tested resurfaces at qualification, when the only remaining fix is a respin or a waiver.",
+        "<b>One anchor account dominating the list.</b> Requirements that fit a single customer and no segment turn a product into a bespoke part carrying a product's cost structure."
+      ],
+      "roles": [
+        {
+          "r": "Requirements lead",
+          "d": "Owns the register and the baseline"
+        },
+        {
+          "r": "Customer engagement",
+          "d": "One per anchor account, through the interview window"
+        },
+        {
+          "r": "Product cost analyst",
+          "d": "Volume, segment and ASP assumptions"
+        },
+        {
+          "r": "Feasibility liaison",
+          "d": "Flags requirements the node cannot carry"
+        },
+        {
+          "r": "Stage lead",
+          "d": "Approves the baseline"
+        }
+      ],
+      "effort": [
+        [
+          "Interviews and market input",
+          1.5
+        ],
+        [
+          "Register build and traceability",
+          1.5
+        ],
+        [
+          "Workshops and review",
+          0.5
+        ],
+        [
+          "Documentation and sign-off",
+          0.5
+        ]
+      ],
+      "entry": [
+        "Program charter drafted and funded to study",
+        "Anchor customers identified, NDAs executed",
+        "Previous-generation field feedback available"
+      ],
+      "exit": [
+        "Every requirement has an owner, a priority and an acceptance measure",
+        "Conflicts resolved, or deferred with a named decision owner",
+        "Register baselined and signed by product, engineering and sales"
+      ],
+      "dependsOn": [],
+      "dependsNote": "Nothing upstream — this is the program's first activity. Its preconditions are the entry criteria above.",
+      "feedsInto": [
+        "DEF-02",
+        "DEF-05",
+        "DEF-06",
+        "DEF-07",
+        "ARCH-01",
+        "IPR-01"
+      ],
+      "measuredBy": [
+        "Requirements baselined against the expected count",
+        "Share carrying an acceptance measure",
+        "Change requests raised after baseline"
+      ]
+    },
+    "DEF-02": {
+      "stage": "productDefinition",
+      "window": [
+        1,
+        6
+      ],
+      "criticalPath": true,
+      "purpose": [
+        "The requirement register says what customers want. This says <b>what the silicon has to do</b> — the workloads it will actually run, and the KPI numbers derived from them.",
+        "A KPI with no workload behind it is a marketing number. <code>ARCH-01</code> spends fourteen weeks simulating against whatever this activity hands over; if the traces are not representative of the deployed mix, the architecture is optimised for a workload nobody runs, and nothing in verification will catch it."
+      ],
+      "steps": [
+        {
+          "n": 1,
+          "text": "Use-case shortlist drawn from the requirement register",
+          "tat": 0.5,
+          "lane": "main"
+        },
+        {
+          "n": 2,
+          "text": "Workload trace capture — LLM inference, vision, recommendation",
+          "tat": 1.5,
+          "lane": "main"
+        },
+        {
+          "n": 3,
+          "text": "Reference runs on the previous generation for a baseline",
+          "tat": 1,
+          "lane": "par"
+        },
+        {
+          "n": 4,
+          "text": "KPI derivation — TOPS, TOPS/W, tokens/s, time-to-first-token, batch scaling",
+          "tat": 1.5,
+          "lane": "main"
+        },
+        {
+          "n": 5,
+          "text": "Precision and quantisation policy — INT8, FP8, mixed",
+          "tat": 1,
+          "lane": "par"
+        },
+        {
+          "n": 6,
+          "text": "Sensitivity study — which KPI moves with which architectural knob",
+          "tat": 1,
+          "lane": "main"
+        },
+        {
+          "n": 7,
+          "text": "Workload suite packaging and handoff to architecture",
+          "tat": 0.5,
+          "lane": "main"
+        }
+      ],
+      "flowNote": "The main sequence fills the 5-week window exactly. Steps 3 and 5 ride alongside it — the reference runs need lab time rather than analyst time, and the precision policy can be settled while traces are still being captured.",
+      "consumes": [
+        "Requirement register from DEF-01",
+        "Customer-supplied models and traces, where the NDA allows",
+        "Previous-generation silicon and its lab platform",
+        "Public model zoo and framework benchmarks",
+        "Deployment mix estimates from the segment sizing"
+      ],
+      "produces": [
+        "Workload suite — traces, models, and the harness to run them",
+        "KPI derivation worksheet, one row per requirement",
+        "Precision and quantisation policy note",
+        "Sensitivity table — KPI against architectural knob",
+        "Baseline measurements on the previous generation"
+      ],
+      "rel": [
+        {
+          "id": "DEF-D2",
+          "rel": "produces",
+          "text": "<b>Target specification — PPA and KPI table.</b> The KPI half of the deliverable is derived here; <code>DEF-03</code> supplies the PPA half."
+        },
+        {
+          "id": "DEF-D1",
+          "rel": "feeds",
+          "text": "<b>Product requirements document.</b> The use-case list and the deployment mix are written back into the PRD as the context the requirements sit in."
+        },
+        {
+          "id": "DEF-D4",
+          "rel": "feeds",
+          "text": "<b>Feasibility report.</b> Feasibility is tested against these KPI numbers, not against the requirement prose."
+        }
+      ],
+      "risks": [
+        "<b>Traces that flatter the design.</b> A workload suite assembled from what runs well on the previous generation will not find the case that breaks the new one.",
+        "<b>Customer models unavailable under NDA.</b> Substituting a public proxy is legitimate; not recording that a proxy was used is not.",
+        "<b>Deployment mix guessed rather than sized.</b> The architecture is tuned to the mix; a wrong mix misallocates silicon area that cannot be recovered later.",
+        "<b>Precision policy left open.</b> INT8 versus FP8 changes the datapath, the memory footprint and the KPI at once, and the decision gets more expensive every week it waits.",
+        "<b>KPIs quoted without conditions.</b> TOPS with no batch size, no sequence length and no precision is not a number anyone can design against."
+      ],
+      "roles": [
+        {
+          "r": "Workload architect",
+          "d": "Owns the suite and the KPI derivation"
+        },
+        {
+          "r": "ML performance engineer",
+          "d": "Trace capture, reference runs, precision study"
+        },
+        {
+          "r": "Systems analyst",
+          "d": "Deployment mix and sensitivity analysis"
+        },
+        {
+          "r": "Customer engagement",
+          "d": "Obtains models and confirms representativeness"
+        },
+        {
+          "r": "Architecture liaison",
+          "d": "Takes the handoff and confirms it is modellable"
+        }
+      ],
+      "effort": [
+        [
+          "Trace capture and reference runs",
+          2
+        ],
+        [
+          "KPI derivation",
+          1.5
+        ],
+        [
+          "Sensitivity study",
+          1
+        ],
+        [
+          "Precision and quantisation policy",
+          1
+        ],
+        [
+          "Suite packaging and handoff",
+          0.5
+        ]
+      ],
+      "entry": [
+        "Requirement register at v0.9 or better",
+        "Lab access to the previous-generation platform",
+        "NDA coverage for any customer-supplied model"
+      ],
+      "exit": [
+        "Every KPI traces to a named workload and stated conditions",
+        "Workload suite runs end to end on the reference platform",
+        "Architecture has accepted the handoff as modellable"
+      ],
+      "dependsOn": [
+        "DEF-01"
+      ],
+      "dependsNote": null,
+      "feedsInto": [
+        "DEF-03",
+        "DEF-05",
+        "DEF-07",
+        "ARCH-01",
+        "DV-09"
+      ],
+      "measuredBy": [
+        "KPIs traceable to a workload",
+        "Workload suite runtime on the reference platform",
+        "Spread between the sensitivity study and the eventual ARCH-01 model"
+      ]
+    },
+    "DEF-03": {
+      "stage": "productDefinition",
+      "window": [
+        3,
+        7
+      ],
+      "criticalPath": true,
+      "purpose": [
+        "Convert the KPI set into the three numbers the design is actually held to — <b>frequency, power envelope, die area</b> — and allocate them so every block owner inherits a share rather than a slogan.",
+        "An unallocated target is not a target. \"75 W board power\" binds nobody until it is decomposed into a die budget, a per-domain budget and a per-block budget with an owner against each. That decomposition is what makes an overrun visible in week 20 instead of week 60."
+      ],
+      "steps": [
+        {
+          "n": 1,
+          "text": "Frequency target from the KPI set and expected IPC",
+          "tat": 0.75,
+          "lane": "main"
+        },
+        {
+          "n": 2,
+          "text": "Power envelope decomposition — board, package, die, per-domain",
+          "tat": 1,
+          "lane": "main"
+        },
+        {
+          "n": 3,
+          "text": "Die area budget from the block list and the reuse inventory",
+          "tat": 1,
+          "lane": "main"
+        },
+        {
+          "n": 4,
+          "text": "Multi-Vt and operating voltage strategy, first pass",
+          "tat": 0.5,
+          "lane": "par"
+        },
+        {
+          "n": 5,
+          "text": "PPA sensitivity against the candidate nodes",
+          "tat": 0.75,
+          "lane": "par"
+        },
+        {
+          "n": 6,
+          "text": "Per-block allocation with a named owner against each budget",
+          "tat": 0.75,
+          "lane": "main"
+        },
+        {
+          "n": 7,
+          "text": "Target review with architecture and physical design",
+          "tat": 0.5,
+          "lane": "main"
+        }
+      ],
+      "flowNote": "Allocation is the step that matters and it sits late, because it cannot start until the block list is stable. Steps 4 and 5 run in parallel with the budget work — both are inputs to the review rather than to the budgets themselves.",
+      "consumes": [
+        "KPI table from DEF-02",
+        "Block list and reuse inventory from the architecture sketch",
+        "Node PPA data from TECH-03",
+        "Previous-generation power and area actuals",
+        "Thermal and board constraints from the requirement register"
+      ],
+      "produces": [
+        "Frequency target with the IPC assumption behind it",
+        "Power budget tree — board to per-domain",
+        "Die area budget by block",
+        "Voltage and multi-Vt strategy note",
+        "Per-block allocation sheet with owners"
+      ],
+      "rel": [
+        {
+          "id": "DEF-D2",
+          "rel": "produces",
+          "text": "<b>Target specification — PPA and KPI table.</b> The PPA half of the deliverable. <code>DEF-02</code> supplies the KPI half; the two are published as one table."
+        },
+        {
+          "id": "DEF-D4",
+          "rel": "feeds",
+          "text": "<b>Feasibility report.</b> These are the numbers <code>DEF-07</code> asks each candidate node to carry."
+        },
+        {
+          "id": "DEF-D3",
+          "rel": "informs",
+          "text": "<b>Product cost and margin model.</b> The die area budget is the model's largest single input."
+        }
+      ],
+      "risks": [
+        "<b>Targets set from ambition rather than from the node.</b> A frequency target the library cannot reach turns into an eighteen-month argument that ends in a respin or a reduced bin.",
+        "<b>Power budget with no margin.</b> A budget allocated to 100% at definition has nothing left for the ECO storm at physical design, when power always grows.",
+        "<b>Area budget without the reuse inventory.</b> Budgets set before knowing which blocks are reused assign area to work that will not happen and starve work that will.",
+        "<b>Allocation without owners.</b> An unowned budget is a budget nobody defends, and it is spent by whoever moves first.",
+        "<b>Targets frozen before DEF-07 reports.</b> Feasibility can only return a verdict against targets; setting them beyond reach makes the verdict meaningless."
+      ],
+      "roles": [
+        {
+          "r": "PPA lead",
+          "d": "Owns the budget tree and the allocation"
+        },
+        {
+          "r": "Architect",
+          "d": "Frequency and IPC assumptions, block list"
+        },
+        {
+          "r": "Power analyst",
+          "d": "Envelope decomposition and voltage strategy"
+        },
+        {
+          "r": "Physical design liaison",
+          "d": "Reality-checks the frequency and area against the node"
+        },
+        {
+          "r": "Stage lead",
+          "d": "Arbitrates when blocks contest the same budget"
+        }
+      ],
+      "effort": [
+        [
+          "Frequency and power budgets",
+          1
+        ],
+        [
+          "Die area budget",
+          0.75
+        ],
+        [
+          "Node sensitivity",
+          0.5
+        ],
+        [
+          "Per-block allocation",
+          0.5
+        ],
+        [
+          "Review and arbitration",
+          0.25
+        ]
+      ],
+      "entry": [
+        "KPI table available from DEF-02",
+        "Block list stable enough to allocate against",
+        "At least two candidate nodes characterised by TECH-03"
+      ],
+      "exit": [
+        "Frequency, power and area targets each carry a stated assumption",
+        "Every block has an allocated budget and a named owner",
+        "Architecture and physical design have signed the review"
+      ],
+      "dependsOn": [
+        "DEF-02",
+        "DEF-05",
+        "TECH-03"
+      ],
+      "dependsNote": null,
+      "feedsInto": [
+        "DEF-04",
+        "DEF-07",
+        "ARCH-06",
+        "SYN-01",
+        "PD-09"
+      ],
+      "measuredBy": [
+        "Share of the die budget allocated to a named owner",
+        "Margin held back against each budget",
+        "Delta between these targets and the ARCH-06 allocation"
+      ]
+    },
+    "DEF-04": {
+      "stage": "productDefinition",
+      "window": [
+        3,
+        7
+      ],
+      "criticalPath": false,
+      "purpose": [
+        "Price the product <b>before anyone commits to building it</b>. Wafer, mask, package, test and yield fold into one model that says what the part costs at volume and whether the margin survives.",
+        "The cost model is also the veto. A design that meets every KPI and misses the cost ceiling is not a product, and the only cheap moment to discover that is here — while the die size is still an estimate rather than a floorplan."
+      ],
+      "steps": [
+        {
+          "n": 1,
+          "text": "Die area estimate from the block list and the reuse inventory",
+          "tat": 0.75,
+          "lane": "main"
+        },
+        {
+          "n": 2,
+          "text": "Wafer cost and gross die per wafer, per node candidate",
+          "tat": 0.5,
+          "lane": "main"
+        },
+        {
+          "n": 3,
+          "text": "Defect density and yield model per node candidate",
+          "tat": 1,
+          "lane": "main"
+        },
+        {
+          "n": 4,
+          "text": "Package and substrate cost — interposer, substrate layers, HBM stacks",
+          "tat": 0.75,
+          "lane": "par"
+        },
+        {
+          "n": 5,
+          "text": "Test cost model — sort and final, with a test-time assumption",
+          "tat": 0.5,
+          "lane": "par"
+        },
+        {
+          "n": 6,
+          "text": "Volume, ASP and margin roll-up",
+          "tat": 1,
+          "lane": "main"
+        },
+        {
+          "n": 7,
+          "text": "Sensitivity — the three assumptions the model is most exposed to",
+          "tat": 0.75,
+          "lane": "main"
+        }
+      ],
+      "flowNote": "The sensitivity step is not optional decoration. A 2.5D part's cost is dominated by yield, interposer supply and HBM price, and each of those is an assumption rather than a quote at this point in the program.",
+      "consumes": [
+        "Die area budget from DEF-03",
+        "Wafer, mask and NRE quotations from TECH-04",
+        "Package architecture assumption from the requirement register",
+        "HBM and substrate price indications",
+        "Volume forecast and ASP from the segment sizing"
+      ],
+      "produces": [
+        "Cost model workbook — wafer, package, test, yield",
+        "Gross die and yield curves per node candidate",
+        "Margin roll-up at the forecast volume",
+        "Sensitivity analysis on the three dominant assumptions",
+        "Cost ceiling statement for the design"
+      ],
+      "rel": [
+        {
+          "id": "DEF-D3",
+          "rel": "produces",
+          "text": "<b>Product cost and margin model.</b> This activity is the deliverable — the workbook and its assumptions are handed over intact, not summarised."
+        },
+        {
+          "id": "DEF-D4",
+          "rel": "feeds",
+          "text": "<b>Feasibility report.</b> A node that meets the PPA targets and breaks the cost ceiling is recorded as infeasible, and this model is what says so."
+        },
+        {
+          "id": "DEF-D6",
+          "rel": "gates",
+          "text": "<b>Kickoff Go / No-Go decision record.</b> The funding decision is a margin decision. A model that does not close is a No-Go condition."
+        }
+      ],
+      "risks": [
+        "<b>Yield assumed from a mature node.</b> Defect density at a node in early ramp is not the number in the foundry's marketing chart, and the gap lands entirely in margin.",
+        "<b>Package cost treated as a rounding error.</b> On a 2.5D part with two HBM stacks the package can approach the die cost; modelling it as an adder hides the largest controllable line.",
+        "<b>Test cost with no test time.</b> Test cost is test time multiplied by tester rate; without a time assumption from DFT the line is decorative.",
+        "<b>Single-point ASP.</b> An ASP with no downside scenario turns the margin into a number nobody can be held to.",
+        "<b>Die size estimate carried without a tolerance.</b> An area estimate that later grows 15% moves gross die per wafer non-linearly, and the model reports it as a small change."
+      ],
+      "roles": [
+        {
+          "r": "Product cost analyst",
+          "d": "Owns the model and its assumptions"
+        },
+        {
+          "r": "Yield engineer",
+          "d": "Defect density and yield curves per node"
+        },
+        {
+          "r": "Package cost liaison",
+          "d": "Interposer, substrate and HBM pricing"
+        },
+        {
+          "r": "Test engineering liaison",
+          "d": "Test time and tester rate assumptions"
+        },
+        {
+          "r": "Finance partner",
+          "d": "Volume, ASP and margin treatment"
+        }
+      ],
+      "effort": [
+        [
+          "Yield model per node",
+          1
+        ],
+        [
+          "Cost roll-up and margin",
+          0.75
+        ],
+        [
+          "Package and test cost lines",
+          0.75
+        ],
+        [
+          "Sensitivity analysis",
+          0.5
+        ]
+      ],
+      "entry": [
+        "Die area budget available from DEF-03",
+        "Wafer and mask quotations received from TECH-04",
+        "Volume forecast agreed with sales"
+      ],
+      "exit": [
+        "Cost model closes at the forecast volume with stated margin",
+        "Every assumption is named, sourced and dated",
+        "Sensitivity identifies the three exposures and their range"
+      ],
+      "dependsOn": [
+        "DEF-01",
+        "DEF-03",
+        "TECH-04"
+      ],
+      "dependsNote": null,
+      "feedsInto": [
+        "DEF-07",
+        "DEF-09",
+        "TECH-04",
+        "MP-05"
+      ],
+      "measuredBy": [
+        "Margin at forecast volume against the target",
+        "Share of model inputs backed by a quotation rather than an estimate",
+        "Cost delta carried by the sensitivity range"
+      ]
+    },
+    "DEF-05": {
+      "stage": "productDefinition",
+      "window": [
+        2,
+        5
+      ],
+      "criticalPath": false,
+      "purpose": [
+        "Fix the bandwidth the workloads need at each level of the hierarchy, and turn that into <b>the interface count the package and the floorplan will have to carry</b>.",
+        "Bandwidth is where a specification becomes physical. Two HBM stacks rather than one is not a line in a document; it is a larger interposer, a different substrate, a bigger power envelope and a different cost model. Deciding it here is cheap and deciding it at architecture is not."
+      ],
+      "steps": [
+        {
+          "n": 1,
+          "text": "Bandwidth demand per workload, from the DEF-02 traces",
+          "tat": 0.75,
+          "lane": "main"
+        },
+        {
+          "n": 2,
+          "text": "Memory hierarchy sizing — on-die SRAM, HBM capacity and channels",
+          "tat": 1,
+          "lane": "main"
+        },
+        {
+          "n": 3,
+          "text": "Host interface sizing — PCIe / CXL generation and lane count",
+          "tat": 0.5,
+          "lane": "par"
+        },
+        {
+          "n": 4,
+          "text": "Die-to-die interface requirement, if a chiplet split is a candidate",
+          "tat": 0.5,
+          "lane": "par"
+        },
+        {
+          "n": 5,
+          "text": "Translation into a pin and bump budget",
+          "tat": 0.75,
+          "lane": "main"
+        },
+        {
+          "n": 6,
+          "text": "Requirement review with architecture and package",
+          "tat": 0.5,
+          "lane": "main"
+        }
+      ],
+      "flowNote": "Step 5 is the one that binds. Bandwidth stated in GB/s commits nobody; the same number stated as a bump count commits the floorplan, the package and the cost model at once.",
+      "consumes": [
+        "Workload traces and KPI table from DEF-02",
+        "Requirement register — capacity and latency requirements",
+        "HBM generation availability and roadmap",
+        "Interface standard revisions in flight (PCIe, CXL, UCIe)",
+        "Previous-generation bandwidth utilisation data"
+      ],
+      "produces": [
+        "Bandwidth demand table, per workload and per hierarchy level",
+        "Memory configuration recommendation — capacity, stacks, channels",
+        "Host and die-to-die interface requirement",
+        "Pin and bump budget estimate",
+        "Review record with architecture and package"
+      ],
+      "rel": [
+        {
+          "id": "DEF-D1",
+          "rel": "feeds",
+          "text": "<b>Product requirements document.</b> Bandwidth and capacity enter the PRD as requirements with numbers rather than as adjectives."
+        },
+        {
+          "id": "DEF-D2",
+          "rel": "feeds",
+          "text": "<b>Target specification.</b> The bandwidth figures become KPI lines, and the bump budget becomes an area constraint on the PPA half."
+        }
+      ],
+      "risks": [
+        "<b>Bandwidth sized on peak rather than sustained.</b> Peak numbers size an interface nobody reaches and a cost nobody wanted.",
+        "<b>Capacity and bandwidth conflated.</b> HBM stack count is often set by capacity while the argument is conducted in GB/s; the two constraints do not move together.",
+        "<b>Interface standard still in revision.</b> Committing to a generation whose specification is not final transfers a standards-body schedule into the program's schedule.",
+        "<b>Bump budget never derived.</b> A bandwidth requirement that is not translated into bumps is discovered as a floorplan problem at <code>PD-04</code>, when the package is already ordered.",
+        "<b>Chiplet option left open too long.</b> A die-to-die interface is a large architectural commitment; deferring it past architecture freeze forces the conservative choice by default."
+      ],
+      "roles": [
+        {
+          "r": "Memory systems architect",
+          "d": "Owns the hierarchy sizing and the bandwidth table"
+        },
+        {
+          "r": "Interface architect",
+          "d": "Host and die-to-die interface selection"
+        },
+        {
+          "r": "Workload analyst",
+          "d": "Sustained demand extraction from the traces"
+        },
+        {
+          "r": "Package liaison",
+          "d": "Confirms the bump budget is buildable"
+        },
+        {
+          "r": "Architecture liaison",
+          "d": "Takes the requirement into ARCH-03"
+        }
+      ],
+      "effort": [
+        [
+          "Hierarchy sizing and bandwidth analysis",
+          1
+        ],
+        [
+          "Interface sizing",
+          0.5
+        ],
+        [
+          "Bump budget translation and review",
+          0.5
+        ]
+      ],
+      "entry": [
+        "Workload traces available from DEF-02",
+        "Requirement register carries capacity and latency requirements",
+        "HBM and interface roadmaps available under NDA"
+      ],
+      "exit": [
+        "Bandwidth stated as sustained, per workload, with conditions",
+        "Memory configuration and interface count recommended with a reason",
+        "Bump budget accepted as buildable by package"
+      ],
+      "dependsOn": [
+        "DEF-01",
+        "DEF-02"
+      ],
+      "dependsNote": null,
+      "feedsInto": [
+        "DEF-03",
+        "ARCH-03",
+        "ARCH-04",
+        "PKGD-02"
+      ],
+      "measuredBy": [
+        "Bandwidth headroom against sustained demand",
+        "Bump budget against the package's stated capability",
+        "Interface revisions still open at architecture freeze"
+      ]
+    },
+    "DEF-06": {
+      "stage": "productDefinition",
+      "window": [
+        0,
+        4
+      ],
+      "criticalPath": false,
+      "purpose": [
+        "Establish where the part lands <b>against what will be shipping when it ships</b> — not against what ships today.",
+        "A benchmark against the current generation is a comfortable exercise and a useless one. The program's silicon arrives thirty months out; the comparison that matters is against the parts that will be launching in that window, projected from public roadmaps and node cadence."
+      ],
+      "steps": [
+        {
+          "n": 1,
+          "text": "Competitor set definition and launch-window mapping",
+          "tat": 0.5,
+          "lane": "main"
+        },
+        {
+          "n": 2,
+          "text": "Public benchmark, datasheet and disclosure collection",
+          "tat": 1,
+          "lane": "main"
+        },
+        {
+          "n": 3,
+          "text": "Normalisation to comparable metrics and conditions",
+          "tat": 1,
+          "lane": "par"
+        },
+        {
+          "n": 4,
+          "text": "Projection to our own launch window",
+          "tat": 1,
+          "lane": "main"
+        },
+        {
+          "n": 5,
+          "text": "Positioning statement and capability gap list",
+          "tat": 1,
+          "lane": "main"
+        },
+        {
+          "n": 6,
+          "text": "Review with product and sales",
+          "tat": 0.5,
+          "lane": "main"
+        }
+      ],
+      "flowNote": "Normalisation runs in parallel because it is slow, thankless and independent of collection — vendors quote TOPS at different precisions, batch sizes and power points, and none of the published numbers compare until they are restated.",
+      "consumes": [
+        "Competitor datasheets, disclosures and conference material",
+        "Public benchmark submissions (MLPerf and equivalents)",
+        "Foundry node cadence and process roadmaps",
+        "Analyst launch forecasts",
+        "Field intelligence from sales"
+      ],
+      "produces": [
+        "Competitor set with launch-window estimates",
+        "Normalised comparison table with stated conditions",
+        "Projection of the competitive field at our launch",
+        "Positioning statement",
+        "Capability gap list, ranked"
+      ],
+      "rel": [
+        {
+          "id": "DEF-D1",
+          "rel": "feeds",
+          "text": "<b>Product requirements document.</b> The gap list becomes requirements — a gap nobody writes down is a gap nobody closes."
+        },
+        {
+          "id": "DEF-D3",
+          "rel": "informs",
+          "text": "<b>Product cost and margin model.</b> Competitive positioning is what an ASP assumption is defended with."
+        }
+      ],
+      "risks": [
+        "<b>Benchmarking against today's field.</b> The comparison that decides the product is against parts launching thirty months out, and those numbers have to be projected rather than read.",
+        "<b>Vendor numbers taken at face value.</b> TOPS quoted at a precision, batch size and power point chosen to flatter is not a comparable number until it is restated.",
+        "<b>Gap list with no owner.</b> A capability gap that does not become a requirement is an observation, and observations do not change silicon.",
+        "<b>Positioning built on a single axis.</b> A part positioned only on TOPS/W loses to one positioned on total cost of ownership, and the argument is not had until launch.",
+        "<b>Competitor launch dates treated as fixed.</b> A slip in the competitive field is as consequential as a slip in ours, and neither is knowable to a quarter."
+      ],
+      "roles": [
+        {
+          "r": "Product marketing lead",
+          "d": "Owns the competitor set and the positioning"
+        },
+        {
+          "r": "Performance analyst",
+          "d": "Normalisation and projection"
+        },
+        {
+          "r": "Technology analyst",
+          "d": "Node cadence and roadmap reading"
+        },
+        {
+          "r": "Sales liaison",
+          "d": "Field intelligence and account-level reality"
+        },
+        {
+          "r": "Stage lead",
+          "d": "Turns the gap list into requirements"
+        }
+      ],
+      "effort": [
+        [
+          "Collection and competitor set",
+          0.75
+        ],
+        [
+          "Normalisation and projection",
+          0.75
+        ],
+        [
+          "Positioning and gap list",
+          0.5
+        ]
+      ],
+      "entry": [
+        "Product concept defined well enough to name a competitor set",
+        "Access to analyst material and benchmark submissions",
+        "Launch-window assumption from the program schedule"
+      ],
+      "exit": [
+        "Every comparison is normalised to stated conditions",
+        "Field projected to our launch window, not read from today",
+        "Gap list handed to DEF-01 as candidate requirements"
+      ],
+      "dependsOn": [
+        "DEF-01"
+      ],
+      "dependsNote": null,
+      "feedsInto": [
+        "DEF-01",
+        "DEF-04",
+        "DEF-09"
+      ],
+      "measuredBy": [
+        "Competitors covered against the expected launch field",
+        "Share of comparisons normalised rather than quoted",
+        "Gaps converted into tracked requirements"
+      ]
+    },
+    "DEF-07": {
+      "stage": "productDefinition",
+      "window": [
+        4,
+        8
+      ],
+      "criticalPath": true,
+      "purpose": [
+        "Test the requirement set, the PPA targets and the cost model against real nodes and return a verdict: <b>buildable as specified, buildable with named concessions, or not buildable</b>.",
+        "Feasibility is the only activity in the stage whose output can be \"no\". Its value is entirely in being allowed to say so — a feasibility study run after the node is chosen and the budget is committed is a formality, and formalities do not stop programs that should be stopped."
+      ],
+      "steps": [
+        {
+          "n": 1,
+          "text": "Candidate node shortlist agreed with TECH",
+          "tat": 0.5,
+          "lane": "main"
+        },
+        {
+          "n": 2,
+          "text": "PPA achievability per node — density, frequency, leakage",
+          "tat": 1.25,
+          "lane": "main"
+        },
+        {
+          "n": 3,
+          "text": "IP availability check per node, ahead of IPR",
+          "tat": 0.75,
+          "lane": "par"
+        },
+        {
+          "n": 4,
+          "text": "Cost model re-run per node",
+          "tat": 0.5,
+          "lane": "par"
+        },
+        {
+          "n": 5,
+          "text": "Package and thermal feasibility at the target power",
+          "tat": 0.75,
+          "lane": "main"
+        },
+        {
+          "n": 6,
+          "text": "Concession list — what must be given up, per node",
+          "tat": 0.75,
+          "lane": "main"
+        },
+        {
+          "n": 7,
+          "text": "Verdict and recommendation",
+          "tat": 0.75,
+          "lane": "main"
+        }
+      ],
+      "flowNote": "The concession list is the deliverable that gets used. A binary verdict tells the decision room nothing it can act on; a list saying \"this node, at 200 MHz less, with the PHY bought rather than built\" is a decision it can take.",
+      "consumes": [
+        "Requirement register from DEF-01",
+        "PPA targets from DEF-03",
+        "Cost model from DEF-04",
+        "Node characterisation and DTCO study from TECH-03",
+        "IP availability indications from vendors and internal inventory"
+      ],
+      "produces": [
+        "Node-by-node achievability matrix",
+        "IP availability finding per node",
+        "Thermal and package feasibility note",
+        "Concession list per node",
+        "Feasibility verdict with a named recommendation"
+      ],
+      "rel": [
+        {
+          "id": "DEF-D4",
+          "rel": "produces",
+          "text": "<b>Feasibility report.</b> This activity is the deliverable. The verdict, the matrix and the concession list are published together — the verdict alone is not usable."
+        },
+        {
+          "id": "DEF-D6",
+          "rel": "gates",
+          "text": "<b>Kickoff Go / No-Go decision record.</b> A No-Go recommendation here is the only mechanism in the stage that stops the program, and it must reach the room unedited."
+        }
+      ],
+      "risks": [
+        "<b>Feasibility run after the node is already chosen.</b> The study then documents a decision rather than informing one, and its independence is gone.",
+        "<b>Optimism at the boundary.</b> A target reachable \"with aggressive closure\" is a target reachable in a slide and not in a timing report.",
+        "<b>IP availability taken from the vendor's roadmap.</b> A block promised on the node and not yet ported is a schedule risk being recorded as an asset.",
+        "<b>Thermal checked at typical rather than at the envelope.</b> Feasibility at average power says nothing about the part at its rated envelope, which is the condition it is sold at.",
+        "<b>No concession list.</b> A bare yes or no gives the decision room no third option, and the third option is usually the right one."
+      ],
+      "roles": [
+        {
+          "r": "Feasibility lead",
+          "d": "Owns the verdict and the concession list"
+        },
+        {
+          "r": "PPA analyst",
+          "d": "Achievability per node against the DEF-03 targets"
+        },
+        {
+          "r": "IP strategist",
+          "d": "Availability and porting status per node"
+        },
+        {
+          "r": "Thermal and package liaison",
+          "d": "Feasibility at the rated power envelope"
+        },
+        {
+          "r": "Stage lead",
+          "d": "Carries the recommendation into the gate"
+        }
+      ],
+      "effort": [
+        [
+          "PPA achievability per node",
+          1
+        ],
+        [
+          "IP and cost checks",
+          0.75
+        ],
+        [
+          "Package and thermal feasibility",
+          0.5
+        ],
+        [
+          "Concession list and verdict",
+          0.75
+        ]
+      ],
+      "entry": [
+        "PPA targets published by DEF-03",
+        "Cost model closing in DEF-04",
+        "At least two nodes characterised by TECH-03"
+      ],
+      "exit": [
+        "Every target has an achievability finding per candidate node",
+        "Concessions named and costed, not described",
+        "Verdict recorded with a recommendation and a dissent record"
+      ],
+      "dependsOn": [
+        "DEF-01",
+        "DEF-03",
+        "DEF-04",
+        "TECH-03"
+      ],
+      "dependsNote": null,
+      "feedsInto": [
+        "DEF-09",
+        "TECH-01",
+        "ARCH-01",
+        "IPR-03"
+      ],
+      "measuredBy": [
+        "Targets assessed against every candidate node",
+        "Concessions accepted at the gate against those raised",
+        "Findings later contradicted by ARCH-01 modelling"
+      ]
+    },
+    "DEF-08": {
+      "stage": "productDefinition",
+      "window": [
+        4,
+        8
+      ],
+      "criticalPath": false,
+      "purpose": [
+        "Turn the milestone profile into a dated plan for <b>this</b> program, and say what it takes in people — then set that against the people who actually exist.",
+        "A schedule that assumes a headcount curve the organisation cannot staff is not a plan; it is a forecast of a slip. The value of this activity is the comparison, not the Gantt chart: effort rolled up by stage and discipline, against the capacity on hand."
+      ],
+      "steps": [
+        {
+          "n": 1,
+          "text": "Profile selection and kickoff date",
+          "tat": 0.5,
+          "lane": "main"
+        },
+        {
+          "n": 2,
+          "text": "Stage baseline adjustment for this program's scope",
+          "tat": 0.75,
+          "lane": "main"
+        },
+        {
+          "n": 3,
+          "text": "Effort roll-up by stage and by discipline",
+          "tat": 1,
+          "lane": "main"
+        },
+        {
+          "n": 4,
+          "text": "Headcount curve set against the organisation's real capacity",
+          "tat": 1,
+          "lane": "main"
+        },
+        {
+          "n": 5,
+          "text": "External lead-time overlay — substrate, probe card, IP, shuttle",
+          "tat": 0.75,
+          "lane": "par"
+        },
+        {
+          "n": 6,
+          "text": "Risk buffer placement and critical path identification",
+          "tat": 0.75,
+          "lane": "main"
+        },
+        {
+          "n": 7,
+          "text": "Schedule review and commitment",
+          "tat": 0.5,
+          "lane": "par"
+        }
+      ],
+      "flowNote": "The lead-time overlay runs in parallel and changes more dates than the internal plan does. A twenty-week probe card and a twenty-week substrate are ordered against dates this activity sets, and both sit outside the organisation's control once placed.",
+      "consumes": [
+        "Milestone profile and stage baselines",
+        "Effort figures per activity from the template",
+        "Organisation capacity and current program commitments",
+        "Supplier lead times — substrate, interposer, probe card, IP, shuttle",
+        "Feasibility concessions from DEF-07"
+      ],
+      "produces": [
+        "Program schedule with dated stage boundaries and milestones",
+        "Effort roll-up by stage and discipline",
+        "Headcount curve against available capacity",
+        "Lead-time overlay and order-by dates",
+        "Critical path and buffer placement record"
+      ],
+      "rel": [
+        {
+          "id": "DEF-D5",
+          "rel": "produces",
+          "text": "<b>Program charter, staffing and budget plan.</b> The schedule, the headcount curve and the effort roll-up are the charter's operative content."
+        },
+        {
+          "id": "DEF-D6",
+          "rel": "gates",
+          "text": "<b>Kickoff Go / No-Go decision record.</b> The gate approves a schedule and a headcount. An unresourced plan is a No-Go condition."
+        }
+      ],
+      "risks": [
+        "<b>Headcount curve nobody can staff.</b> A peak of 200 engineers in a 120-engineer organisation is a slip already committed to, recorded as a plan.",
+        "<b>Template baselines used unadjusted.</b> The profile describes a typical program; a derivative or a first-of-node program is not typical, and the deltas belong in the plan.",
+        "<b>Lead times discovered rather than planned.</b> Probe card and substrate lead times run to twenty weeks; found late they move wafer-out, not the purchasing date.",
+        "<b>Buffer at the end.</b> A buffer placed after the last stage protects nothing; buffers belong in front of the gates that cannot move.",
+        "<b>Critical path asserted rather than derived.</b> On a 23-stage profile with parallel enablement workstreams the critical path is rarely the design spine, and assuming it is misdirects the attention that matters."
+      ],
+      "roles": [
+        {
+          "r": "Program manager",
+          "d": "Owns the schedule, the buffers and the critical path"
+        },
+        {
+          "r": "Resource manager",
+          "d": "Capacity, headcount curve and hiring plan"
+        },
+        {
+          "r": "Discipline leads",
+          "d": "Confirm the effort roll-up for their stages"
+        },
+        {
+          "r": "Procurement liaison",
+          "d": "Supplier lead times and order-by dates"
+        },
+        {
+          "r": "Finance partner",
+          "d": "Converts effort into budget"
+        }
+      ],
+      "effort": [
+        [
+          "Effort roll-up by stage and discipline",
+          1
+        ],
+        [
+          "Headcount curve against capacity",
+          0.75
+        ],
+        [
+          "Lead-time overlay",
+          0.5
+        ],
+        [
+          "Buffer and critical path",
+          0.5
+        ],
+        [
+          "Review and commitment",
+          0.25
+        ]
+      ],
+      "entry": [
+        "Milestone profile selected",
+        "Scope stable enough to adjust baselines against",
+        "Organisation capacity data available"
+      ],
+      "exit": [
+        "Schedule dated from a committed kickoff",
+        "Headcount curve reconciled against real capacity, gaps named",
+        "Critical path derived and buffers placed against the fixed gates"
+      ],
+      "dependsOn": [
+        "DEF-01",
+        "DEF-07"
+      ],
+      "dependsNote": null,
+      "feedsInto": [
+        "DEF-09",
+        "TECH-05",
+        "IPR-09",
+        "TEST-02",
+        "PKGD-09"
+      ],
+      "measuredBy": [
+        "Peak headcount against available capacity",
+        "Buffer weeks held in front of fixed gates",
+        "Long-lead items with an order-by date on the plan"
+      ]
+    },
+    "DEF-09": {
+      "stage": "productDefinition",
+      "window": [
+        5,
+        8
+      ],
+      "criticalPath": true,
+      "purpose": [
+        "Assemble what the stage produced into <b>the case the funding decision is made on</b>, and put a named recommendation in front of the people who can say no.",
+        "This activity writes nothing new. Its work is selection and honesty: the feasibility verdict, the cost model and the resourced schedule carried into the room intact, with the downside scenario shown rather than described. A business case that only closes in the base case has not been reviewed."
+      ],
+      "steps": [
+        {
+          "n": 1,
+          "text": "Financial model assembly — NRE, opex, revenue, breakeven",
+          "tat": 1,
+          "lane": "main"
+        },
+        {
+          "n": 2,
+          "text": "Scenario set — base, downside, upside",
+          "tat": 0.75,
+          "lane": "par"
+        },
+        {
+          "n": 3,
+          "text": "Risk register summary written for the decision room",
+          "tat": 0.5,
+          "lane": "main"
+        },
+        {
+          "n": 4,
+          "text": "Recommendation and the ask, stated as a number",
+          "tat": 0.5,
+          "lane": "main"
+        },
+        {
+          "n": 5,
+          "text": "Executive review pack",
+          "tat": 0.75,
+          "lane": "main"
+        },
+        {
+          "n": 6,
+          "text": "Decision meeting and record",
+          "tat": 0.25,
+          "lane": "main"
+        }
+      ],
+      "flowNote": "The decision meeting is a quarter of a week and the preparation is three weeks, which is the correct ratio. A gate that is argued in the room rather than before it is a gate whose outcome depends on who attends.",
+      "consumes": [
+        "Cost and margin model from DEF-04",
+        "Feasibility verdict and concession list from DEF-07",
+        "Resourced schedule and headcount curve from DEF-08",
+        "Positioning and gap list from DEF-06",
+        "Program risk register"
+      ],
+      "produces": [
+        "Financial model — NRE, opex, revenue, breakeven",
+        "Scenario set with the downside made explicit",
+        "Risk summary for the decision room",
+        "Recommendation with a stated ask",
+        "Decision record with owners, conditions and dissent"
+      ],
+      "rel": [
+        {
+          "id": "DEF-D6",
+          "rel": "produces",
+          "text": "<b>Kickoff Go / No-Go decision record.</b> This activity is the deliverable — the record, its conditions and its dissent, not the slides that preceded it."
+        },
+        {
+          "id": "DEF-D5",
+          "rel": "feeds",
+          "text": "<b>Program charter, staffing and budget plan.</b> The charter is only funded once this decision lands; the approved figure is written back into it."
+        }
+      ],
+      "risks": [
+        "<b>Base case only.</b> A case that closes at forecast volume and is never shown at downside volume transfers the risk to whoever inherits the program.",
+        "<b>Conditions accepted verbally.</b> A Go granted \"subject to\" something nobody wrote down is a Go, and the condition is never revisited.",
+        "<b>Dissent unrecorded.</b> The objection nobody minuted is the objection that resurfaces at first silicon with nothing to point at.",
+        "<b>Feasibility concessions edited on the way to the room.</b> A concession list softened in the pack is the one failure mode that makes the whole stage worthless.",
+        "<b>Decision owners unclear.</b> A gate where nobody is identified as able to say no is a gate that cannot say no."
+      ],
+      "roles": [
+        {
+          "r": "Program manager",
+          "d": "Owns the pack, the ask and the record"
+        },
+        {
+          "r": "Finance partner",
+          "d": "Financial model and scenario set"
+        },
+        {
+          "r": "Product lead",
+          "d": "Revenue, positioning and the market case"
+        },
+        {
+          "r": "Stage lead",
+          "d": "Carries the feasibility verdict unedited"
+        },
+        {
+          "r": "Executive sponsor",
+          "d": "Chairs the decision and owns the outcome"
+        }
+      ],
+      "effort": [
+        [
+          "Financial model assembly",
+          0.75
+        ],
+        [
+          "Scenario set",
+          0.5
+        ],
+        [
+          "Review pack",
+          0.5
+        ],
+        [
+          "Decision meeting and record",
+          0.25
+        ]
+      ],
+      "entry": [
+        "Cost model closed by DEF-04",
+        "Feasibility verdict issued by DEF-07",
+        "Resourced schedule available from DEF-08"
+      ],
+      "exit": [
+        "Case shown at base and downside, not base alone",
+        "Decision recorded with named owners, conditions and dissent",
+        "Approved budget written back into the program charter"
+      ],
+      "dependsOn": [
+        "DEF-04",
+        "DEF-06",
+        "DEF-07",
+        "DEF-08"
+      ],
+      "dependsNote": null,
+      "feedsInto": [
+        "ARCH-01",
+        "TECH-06",
+        "IPR-07"
+      ],
+      "measuredBy": [
+        "Scenarios presented against those prepared",
+        "Conditions attached to the decision and their owners",
+        "Days from pack circulation to decision"
+      ]
+    }
+  }
+}

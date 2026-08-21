@@ -32,7 +32,7 @@ import {
 } from '@/lib/schedule';
 
 /** Which inline sheet a panel is showing, if any. */
-export type InlineKind = 'stage' | 'potential' | 'leader';
+export type InlineKind = 'stage' | 'leader';
 export interface InlineState {
   kind: InlineKind;
   /** Contact id being edited, "new" for the add row, or null. */
@@ -86,6 +86,8 @@ export interface AppState {
 
   toggleDeliverable: (stageId: StageId, id: string, done: boolean) => void;
   setDeliverableDue: (stageId: StageId, id: string, due: Date | null) => void;
+  /** Renames a deliverable — from its record, in edit mode. */
+  renameDeliverable: (stageId: StageId, id: string, title: string) => void;
   /** Files the record; the tick follows whether an artefact is attached. */
   saveDeliverableRecord: (stageId: StageId, id: string, note: string) => void;
   /** Uploads artefacts; resolves with what the server refused, if anything. */
@@ -145,6 +147,8 @@ export interface ItemFields {
   owner: string;
   body: string;
   due: Date | null;
+  /** Which key deliverable this is work towards. Activities only. */
+  deliverableId?: string | null;
 }
 
 /**
@@ -438,6 +442,16 @@ export const useAppStore = create<AppState>()((set, get) => ({
    * complete by filing rather than by clicking. Filing a record with nothing
    * attached clears the tick again — that is the same rule, read backwards.
    */
+  renameDeliverable: (stageId, id, title) => {
+    set((s) => ({
+      deliverables: {
+        ...s.deliverables,
+        [stageId]: s.deliverables[stageId].map((d) => (d.id === id ? { ...d, title } : d)),
+      },
+    }));
+    sync(api.renameDeliverable(get().projectId, id, title));
+  },
+
   saveDeliverableRecord: (stageId, id, note) => {
     const d = get().deliverables[stageId]?.find((x) => x.id === id);
     if (!d) return;

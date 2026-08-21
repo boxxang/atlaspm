@@ -114,12 +114,18 @@ model Item {
   due       DateTime?
   done      Boolean   @default(false)
   updatedAt DateTime
+  /// The key deliverable this activity is work towards, if it is towards one.
+  /// SetNull rather than Cascade: deleting a deliverable must not delete the
+  /// record of the work that went into it.
+  deliverableId String?
 
   project     Project        @relation(fields: [projectId], references: [id], onDelete: Cascade)
   updates     StatusUpdate[]
   attachments Attachment[]
+  deliverable Deliverable?   @relation(fields: [deliverableId], references: [id], onDelete: SetNull)
 
   @@index([projectId, stageId, kind])
+  @@index([deliverableId])
 }
 
 model StatusUpdate {
@@ -178,6 +184,7 @@ model Deliverable {
 
   project     Project      @relation(fields: [projectId], references: [id], onDelete: Cascade)
   attachments Attachment[]
+  items       Item[]
 
   @@index([projectId, stageId])
 }

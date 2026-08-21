@@ -463,39 +463,6 @@ function StageDetail({ stageId }: { stageId: StageId }) {
   );
 }
 
-/** PM must-check library — anything here can be adopted onto the risk board. */
-function PotentialRisks({ stageId }: { stageId: StageId }) {
-  const s = useStage(stageId);
-  const risks = useAppStore((st) => st.content[stageId].risks);
-  const adopt = useAppStore((st) => st.adoptPotentialRisk);
-  const close = useAppStore((st) => st.closeInline);
-  const existing = new Set(risks.map((r) => r.title));
-  return (
-    <>
-      <InlineHead
-        title="Potential Risks"
-        meta={`${s.title} — PM checklist · add any to the risk board`}
-        onClose={() => close(stageId)}
-      />
-      <div className="pr-list">
-        {s.potentialRisks.map((t, i) => (
-          <div className="pr-row" key={t}>
-            <span className="t">{t}</span>
-            <button
-              className="pr-add"
-              data-pr-index={i}
-              disabled={existing.has(t)}
-              onClick={() => adopt(stageId, t)}
-            >
-              {existing.has(t) ? 'Added' : '+ Track'}
-            </button>
-          </div>
-        ))}
-      </div>
-    </>
-  );
-}
-
 function LeaderEditor({ stageId }: { stageId: StageId }) {
   const stage = useStage(stageId);
   const l = useAppStore((st) => st.leaders[stageId]);
@@ -576,7 +543,6 @@ export function InlineArea({
   return (
     <div className="inline-area" data-kind={state.kind} ref={ref}>
       {state.kind === 'stage' && <StageDetail stageId={stageId} />}
-      {state.kind === 'potential' && <PotentialRisks stageId={stageId} />}
       {state.kind === 'leader' && <LeaderEditor stageId={stageId} />}
     </div>
   );

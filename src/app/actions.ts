@@ -96,6 +96,8 @@ export interface ItemInput {
   due: Date | null;
   done: boolean;
   updatedAt: Date;
+  /** The key deliverable this activity is work towards, if any. */
+  deliverableId?: string | null;
 }
 
 export async function saveItem(input: ItemInput) {
@@ -109,6 +111,7 @@ export async function saveItem(input: ItemInput) {
     due: input.due,
     done: input.done,
     updatedAt: input.updatedAt,
+    deliverableId: input.deliverableId ?? null,
   };
   await prisma.item.upsert({
     where: { id: input.id },
@@ -608,6 +611,13 @@ export async function uploadAttachments(form: FormData): Promise<AttachmentMeta[
   }
   touch(projectId);
   return saved;
+}
+
+/** A deliverable's title, corrected from its record. */
+export async function renameDeliverable(projectId: string, id: string, title: string) {
+  await assertProject(projectId);
+  await prisma.deliverable.update({ where: { id }, data: { title } });
+  touch(projectId);
 }
 
 /**

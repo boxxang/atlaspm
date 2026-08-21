@@ -28,8 +28,8 @@ test.describe('program list', () => {
 
     const c = card(page, 'AtlasAX1');
     await expect(c.locator('.pl-profile')).toHaveText('Typical SoC');
-    await expect(c.locator('.pl-pct .n')).toHaveText('57%');
-    await expect(c.locator('.pl-pct')).toContainText('96 / 167 deliverables');
+    await expect(c.locator('.pl-pct .n')).toHaveText('54%');
+    await expect(c.locator('.pl-pct')).toContainText('90 / 167 deliverables');
     // the stage the card names is the one the program opens on
     await expect(c.locator('.pl-stage')).toHaveText('TEST · Test Development');
     await expect(c.locator('.pl-stage')).toHaveClass(/risky/);
@@ -188,7 +188,7 @@ test.describe('creating a program', () => {
     await page.goto('/');
     await expect(page.locator('.pl-card:not(.new)')).toHaveCount(2);
     await expect(card(page, 'AtlasBX5').locator('.pl-pct .n')).toHaveText('0%');
-    await expect(card(page, 'AtlasAX1').locator('.pl-pct .n')).toHaveText('57%');
+    await expect(card(page, 'AtlasAX1').locator('.pl-pct .n')).toHaveText('54%');
   });
 
   test('Cancel closes the form without creating anything', async ({ page }) => {
@@ -252,7 +252,7 @@ test.describe('switching programs without a page load', () => {
   test('the dashboard follows the switch too', async ({ page }) => {
     await card(page, 'AtlasAX1').locator('.pl-open').click();
     await page.locator('#mode-toggle button[data-mode="schedule"]').click();
-    await expect(page.locator('.stat').first().locator('.v')).toHaveText('57%');
+    await expect(page.locator('.stat').first().locator('.v')).toHaveText('54%');
     await page.locator('#mode-toggle button[data-mode="journey"]').click();
 
     await page.locator('#to-programs').click();

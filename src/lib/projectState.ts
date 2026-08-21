@@ -76,6 +76,7 @@ interface ItemRow {
   due: Date | null;
   done: boolean;
   updatedAt: Date;
+  deliverableId?: string | null;
   updates: {
     id: string;
     text: string;
@@ -182,6 +183,7 @@ export function buildProjectState(project: {
       owner: row.owner,
       due: row.due,
       done: row.done,
+      deliverableId: row.deliverableId ?? null,
       /* DB column is updatedAt (CLAUDE.md); the UI type calls it updated */
       updated: row.updatedAt,
       attachments: row.attachments ?? [],

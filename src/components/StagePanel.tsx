@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from 'react';
 import { lifecyclePhases, phaseById, stageMilestone } from '@/data/scheduleProfiles';
 import type { Stage } from '@/data/types';
 import { addWeeks, fromISO, toISO } from '@/lib/schedule';
@@ -11,6 +12,7 @@ import { useAppStore } from '@/store/useAppStore';
 import { Board } from './Board';
 import { Contacts } from './Contacts';
 import { InlineArea } from './InlineArea';
+import { PotentialRisksWindow } from './PotentialRisks';
 import { stageViz } from './stageViz';
 
 function LeaderRow({ stage }: { stage: Stage }) {
@@ -93,6 +95,8 @@ export function StagePanel({ stage, index }: { stage: Stage; index: number }) {
   /* out of however many stages this program's profile has, not out of the
      twelve the built-in profile happened to start with */
   const stageCount = useAppStore((st) => st.stages.length);
+  /* the PM checklist opens over the page, not inside it — see the window */
+  const [potential, setPotential] = useState(false);
   const phase = phaseById(stage.phaseId);
   const phaseNo = lifecyclePhases.findIndex((p) => p.id === phase.id) + 1;
   const detailOpen = !!inline;
@@ -186,11 +190,7 @@ export function StagePanel({ stage, index }: { stage: Stage; index: number }) {
           onAdd={() => openBoard(stage.id, 'risks', 'edit', null, 'add')}
           onShowMore={() => openBoard(stage.id, 'risks', 'board')}
           extraBtns={
-            <button
-              className="board-btn"
-              data-potential
-              onClick={() => openInline(stage.id, 'potential')}
-            >
+            <button className="board-btn" data-potential onClick={() => setPotential(true)}>
               Potential Risks
             </button>
           }
@@ -198,6 +198,9 @@ export function StagePanel({ stage, index }: { stage: Stage; index: number }) {
       </div>
 
       <Contacts stageId={stage.id} editId={contactEdit} />
+      {potential && (
+        <PotentialRisksWindow stageId={stage.id} onClose={() => setPotential(false)} />
+      )}
     </div>
   );
 }

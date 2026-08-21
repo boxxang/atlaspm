@@ -10,6 +10,7 @@ import { resolveEmail } from '@/lib/people';
 import { fmtDT, fmtDTFull, fmtDate, toISO } from '@/lib/schedule';
 import { KIND_LABELS } from '@/store/modalStore';
 import { flushWrites, useAppStore, type ItemFields } from '@/store/useAppStore';
+import { deliverableRowId } from '@/lib/rowIds';
 import { useDirectory } from './Board';
 import { OwnerSelect } from './OwnerSelect';
 import { MailButton } from './MailButton';
@@ -268,7 +269,16 @@ export function ItemEditor({
     owner: item?.owner ?? '',
     due: item?.due ? toISO(item.due) : '',
     body: item?.body ?? '',
+    deliverableId: item?.deliverableId ?? '',
   });
+  /* An activity is work towards something. Naming which key deliverable turns
+     a board of tasks into a board that can be read per deliverable — see the
+     filter on the Activity board. */
+  const deliverables = useAppStore((s) => s.deliverables[stageId] ?? []);
+  /* the same reference the deliverables sheet prints — PD-D3, not a guess */
+  const shortTitle = useAppStore(
+    (s) => s.stages.find((st) => st.id === stageId)?.shortTitle ?? '',
+  );
   const [pending, setPending] = useState<File[]>([]);
   const [error, setError] = useState('');
   const [saving, setSaving] = useState(false);
@@ -291,6 +301,7 @@ export function ItemEditor({
           owner: f.owner.trim(),
           body: f.body.trim(),
           due: f.due ? fromISOLocal(f.due) : null,
+          deliverableId: f.deliverableId || null,
         },
         pending,
       );
@@ -318,6 +329,25 @@ export function ItemEditor({
           onChange={(owner) => setF({ ...f, owner })}
         />
       </div>
+      {kind === 'activities' && (
+        <div className="ie-field">
+          <span className="cap">Deliverable</span>
+          <select
+            className="ie-dlv"
+            data-ie-deliverable
+            aria-label="Key deliverable this activity is work towards"
+            value={f.deliverableId}
+            onChange={(e) => setF({ ...f, deliverableId: e.target.value })}
+          >
+            <option value="">— none —</option>
+            {deliverables.map((d, i) => (
+              <option value={d.id} key={d.id}>
+                {deliverableRowId(shortTitle, i)} · {d.title}
+              </option>
+            ))}
+          </select>
+        </div>
+      )}
       <div className="ie-field">
         <span className="cap">Target Due</span>
         <input

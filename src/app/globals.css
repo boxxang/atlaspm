@@ -30,9 +30,12 @@
   --bc-date:9.5rem;          /* generic fallback (status-update board) */
   --bc-owner:7.5rem;
   --bc-due:7.5rem;
-  --bck-keyinfo-date:6.6rem;    --bck-keyinfo-owner:6rem;
-  --bck-activities-date:6.6rem; --bck-activities-owner:6rem; --bck-activities-due:6.6rem;
-  --bck-risks-date:6.6rem;      --bck-risks-owner:6rem;      --bck-risks-due:6.6rem;
+  /* The title is the column being read; the rest are there to place it. A
+     date needs one line of MM/DD/YYYY and a name needs a name, and neither
+     needs the room they were holding. */
+  --bck-keyinfo-date:5.4rem;    --bck-keyinfo-owner:5.2rem;
+  --bck-activities-date:5.4rem; --bck-activities-owner:5.2rem; --bck-activities-due:5.4rem;
+  --bck-risks-date:5.4rem;      --bck-risks-owner:5.2rem;      --bck-risks-due:0rem;
   --dash-row-h:36px;         /* dashboard schedule row height */
   --ms-dot:26px;             /* checkpoint diamonds on the concurrency chart */
   --row-id-w:3.8rem;         /* the DEF-01 / DEF-D1 column on both tables */
@@ -457,7 +460,7 @@ body.has-overrides .edited-flag{display:inline}
    that height down the right, 60/40, so the three boards end level whatever
    they hold. */
 .facts{
-  display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);
+  display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);
   /* minmax(0,…) so the rows split the Activity board's height rather than
      growing to their own content */
   /* The frame is on the grid, so the two rows on the right divide a height
@@ -520,6 +523,23 @@ body.has-overrides .edited-flag{display:inline}
   border:1px dashed var(--line-strong);border-radius:3px;padding:3px 9px;text-transform:uppercase;
 }
 .board-btn:hover,.board-btn:focus-visible{color:var(--accent);border-color:var(--accent)}
+/* Reading the board one deliverable at a time — it sits with the buttons it
+   belongs beside, and wears the same dashed outline they do. */
+.board-filter{
+  font-family:var(--mono);font-size:.62em;letter-spacing:.08em;color:var(--ink-3);
+  border:1px dashed var(--line-strong);border-radius:3px;padding:3px 5px;
+  background:none;text-transform:uppercase;max-width:9rem;
+}
+.board-filter:hover,.board-filter:focus-visible{color:var(--accent);border-color:var(--accent)}
+/* React sets value as a property, so the state is flagged rather than read
+   off an attribute that is never written */
+.board-filter[data-on]{color:var(--accent);border-color:var(--accent);border-style:solid}
+/* the deliverable an activity is work towards, chosen while writing it */
+.ie-dlv{
+  flex:1;min-width:0;border:1px solid var(--line);border-radius:4px;background:var(--page);
+  font-size:.85em;color:var(--ink-2);padding:5px 8px;
+}
+.ie-dlv:focus-visible{outline:none;border-color:var(--accent)}
 /* shared grid: header and rows use the same resizable column vars */
 .board-cols,.b-row{
   display:grid;grid-template-columns:var(--bc-date) minmax(0,1fr) var(--bc-owner) var(--bc-due);
@@ -529,9 +549,11 @@ body.has-overrides .edited-flag{display:inline}
 .board[data-kind="keyinfo"]{--bc-date:var(--bck-keyinfo-date);--bc-owner:var(--bck-keyinfo-owner)}
 .board[data-kind="activities"]{--bc-date:var(--bck-activities-date);--bc-owner:var(--bck-activities-owner);--bc-due:var(--bck-activities-due)}
 .board[data-kind="risks"]{--bc-date:var(--bck-risks-date);--bc-owner:var(--bck-risks-owner);--bc-due:var(--bck-risks-due)}
-/* key information has no DUE column */
+/* Only activities carry a due date, so only they spend a column on one. */
 .board[data-kind="keyinfo"] .board-cols,
-.board[data-kind="keyinfo"] .b-row{grid-template-columns:var(--bc-date) minmax(0,1fr) var(--bc-owner)}
+.board[data-kind="keyinfo"] .b-row,
+.board[data-kind="risks"] .board-cols,
+.board[data-kind="risks"] .b-row{grid-template-columns:var(--bc-date) minmax(0,1fr) var(--bc-owner)}
 .board-cols>span{position:relative}
 .col-grip{position:absolute;top:-7px;bottom:-7px;right:-9px;width:16px;cursor:col-resize;z-index:5}
 .col-grip::after{
@@ -1413,9 +1435,9 @@ body.schedule-mode #schedule-view{opacity:1;visibility:visible;transform:none}
 @media (max-width:1100px){
   :root{
     --bc-date:8rem;--bc-owner:6rem;--bc-due:6.5rem;
-    --bck-keyinfo-date:6.2rem;--bck-keyinfo-owner:5.2rem;
-    --bck-activities-date:6.2rem;--bck-activities-owner:5.2rem;--bck-activities-due:6rem;
-    --bck-risks-date:6.2rem;--bck-risks-owner:5.2rem;--bck-risks-due:6rem;
+    --bck-keyinfo-date:5.2rem;--bck-keyinfo-owner:4.8rem;
+    --bck-activities-date:5.2rem;--bck-activities-owner:4.8rem;--bck-activities-due:5.2rem;
+    --bck-risks-date:5.2rem;--bck-risks-owner:4.8rem;
   }
   .board-cols,.b-row{gap:10px}
   .c-cols,.c-row,.c-row.editing{grid-template-columns:9rem minmax(0,1fr) 12rem 9rem 6rem;gap:10px}
@@ -1591,6 +1613,22 @@ body.schedule-mode #schedule-view{opacity:1;visibility:visible;transform:none}
 }
 .dr-close:hover,.dr-close:focus-visible{color:var(--ink);border-color:var(--ink-3)}
 .dr-title{font-size:1.15em;font-weight:700;color:var(--ink);margin:0}
+/* the title is a field only while the record is open for changes */
+.dr-title-input{
+  font-size:1.15em;font-weight:700;color:var(--ink);width:100%;
+  border:none;border-bottom:1px dashed var(--line-strong);background:none;padding:2px 0;
+}
+.dr-title-input:focus-visible{outline:none;border-bottom:1px solid var(--accent)}
+.dr-edit{
+  width:22px;height:22px;display:inline-flex;align-items:center;justify-content:center;
+  color:var(--ink-3);border:1px solid var(--line);border-radius:3px;
+}
+.dr-edit:hover,.dr-edit:focus-visible{color:var(--accent);border-color:var(--accent);outline:none}
+.dr-note.read{
+  border:none;background:none;padding:0;margin:0;white-space:pre-wrap;
+  font-size:.92em;color:var(--ink-2);line-height:1.55;
+}
+.dr-note.read.empty{color:var(--ink-3);font-style:italic}
 .dr-meta{display:flex;gap:14px;font-family:var(--mono);font-size:.72em;color:var(--ink-3)}
 .dr-meta .dr-done{color:var(--accent);font-weight:700}
 .dr-label{

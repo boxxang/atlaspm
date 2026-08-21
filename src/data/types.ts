@@ -139,6 +139,8 @@ export interface StatusUpdate {
 export interface Item {
   id: string;
   title: string;
+  /** The key deliverable this is work towards — activities only. */
+  deliverableId?: string | null;
   body: string;
   owner: string;
   due: Date | null;

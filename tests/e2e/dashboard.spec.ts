@@ -37,13 +37,13 @@ test.beforeEach(async ({ page }) => {
 });
 
 test.describe('stat tiles', () => {
-  test('the seed program reads 57% / D−xx / 23 / 7', async ({ page }) => {
+  test('the seed program reads 54% / D−xx / 23 / 7', async ({ page }) => {
     await openDash(page);
     await expect(page.locator('#dash-title')).toHaveText('AtlasAX1 — Dashboard');
 
     const progress = stat(page, 'Program Progress');
-    await expect(progress.locator('.v')).toHaveText('57%');
-    await expect(progress.locator('.sub')).toHaveText('96 of 167 deliverables complete');
+    await expect(progress.locator('.v')).toHaveText('54%');
+    await expect(progress.locator('.sub')).toHaveText('90 of 167 deliverables complete');
 
     const tapeout = stat(page, 'Tapeout');
     await expect(tapeout.locator('.v')).toHaveText(/^D−\d+$/);
@@ -72,17 +72,16 @@ test.describe('stat tiles', () => {
   });
 
   test('the counters follow the data', async ({ page }) => {
-    /* Tick one more deliverable off and the tile counts it: 96 of 167 → 97,
-       which is still 58% of the way through. */
+    /* File one more deliverable and the tile counts it: 90 of 167 → 91. */
     await selectStage(page, 'physicalDesign');
     await settleLayout(page); // the sheet animates in
     /* Completing one means filing its record — the artefact is the tick. */
     await fileDeliverable(page, 'Interim physical DRC', ARTEFACT);
     await openDash(page);
     await expect(stat(page, 'Program Progress').locator('.sub')).toHaveText(
-      '97 of 167 deliverables complete',
+      '91 of 167 deliverables complete',
     );
-    await expect(stat(page, 'Program Progress').locator('.v')).toHaveText('58%');
+    await expect(stat(page, 'Program Progress').locator('.v')).toHaveText('54%');
   });
 
   test('a stage with no open risks drops out of the risk list', async ({ page }) => {
@@ -91,6 +90,8 @@ test.describe('stat tiles', () => {
     await settleLayout(page);
     await panel.locator('[data-potential]').click();
     await panel.locator('.pr-add').first().click();
+    // the checklist opens over the page now, so it is closed before moving on
+    await page.locator('[data-pr-close]').click();
     await openDash(page);
     await expect(stat(page, 'Open Risks').locator('.v')).toHaveText('24');
     await expect(stat(page, 'Open Risks').locator('.sub')).toContainText('Architecture');
