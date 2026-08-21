@@ -23,6 +23,7 @@
   --gbar-h:16px;
   /* the shared height of the engineering and deliverables tables */
   --sheet-list-h:300px;
+  --g-rows-shown:11;         /* stages on screen before the chart scrolls */
   --cp-fs:11px;            /* milestone / checkpoint text */
   /* board column widths — per-board, drag the header grips to change */
   --bc-date:9.5rem;          /* generic fallback (status-update board) */
@@ -34,8 +35,13 @@
   --dash-row-h:36px;         /* dashboard schedule row height */
   --ms-dot:26px;             /* checkpoint diamonds on the concurrency chart */
   --row-id-w:3.8rem;         /* the DEF-01 / DEF-D1 column on both tables */
-  --dlv-due:8.5rem;          /* deliverables table columns */
-  --dlv-comp:10.5rem;
+  /* Deliverables: the title takes what the two date columns do not need, and
+     they need one line of MM/DD/YYYY and no more — the clock was dropped from
+     both, since what a review asks is which day, not which minute. */
+  --dlv-due:5.6rem;          /* deliverables table columns */
+  --dlv-comp:5.6rem;
+  --mm-tat:3.1rem;           /* engineering table's two number columns */
+  --mm-mm:3.1rem;
   /* layout */
   --toolbar-h:58px;
   --viz-h:clamp(220px,38vh,380px);
@@ -220,9 +226,14 @@ body.has-overrides .edited-flag{display:inline}
    swallowing the pointer that had just left it. Fold, enter, unfold, leave: the
    flicker. A max-height only ever bounds; the folded chart sits below it. */
 #rm-gantt .g-body{
-  flex:1;min-height:0;max-height:min(40vh,336px);overflow-y:auto;overscroll-behavior:contain;
+  flex:1;min-height:0;overflow-y:auto;overscroll-behavior:contain;
+  /* eleven rows: the stage in flight with five either side — see
+     WINDOW_EITHER_SIDE in Gantt.tsx, which scrolls the window onto them */
+  max-height:calc(var(--g-mini-row) * var(--g-rows-shown));
   scrollbar-width:thin;scrollbar-color:var(--line-strong) transparent;
 }
+/* the gridlines are inside this, so it is what they are measured against */
+.g-plot{position:relative}
 #roadmap.folded #rm-gantt .g-body{overflow:visible}
 
 #roadmap{transition:padding var(--dur) ease}
@@ -232,6 +243,10 @@ body.has-overrides .edited-flag{display:inline}
 #roadmap.folded{padding-bottom:6px}
 #roadmap.folded #rm-gantt .g-row:not(.current){max-height:0;opacity:0;pointer-events:none}
 #roadmap.folded #rm-gantt .g-row.current{height:96px;max-height:96px}
+/* Folded, the chart is one stage — so the wash that told it apart from the
+   other rows has nothing left to tell it apart from, and only made a blue
+   band. The months show through instead, as they do on the open chart. */
+#roadmap.folded #rm-gantt .g-row.current::before{background:none}
 /* the effort tag would land in the middle of the deliverable markers, and the
    stage panel right below states the same number */
 #roadmap.folded #rm-gantt .g-row.current .g-bar-mm{opacity:0}
@@ -323,6 +338,13 @@ body.has-overrides .edited-flag{display:inline}
 /* centred on the date rather than starting at it, so the roadmap's TODAY
    marker registers with it exactly instead of half a line-width out */
 .g-today{position:absolute;top:0;bottom:0;width:1.5px;transform:translateX(-50%);background:var(--accent);opacity:.7;pointer-events:none}
+/* above the month letters rather than among them — the caption row beside the
+   Concurrency note is empty out here, and the months stay legible */
+.g-today-cap{
+  position:absolute;top:-15px;transform:translateX(-50%);z-index:4;white-space:nowrap;
+  font-size:calc(var(--cp-fs) * 0.85);letter-spacing:.1em;color:var(--accent);
+  font-weight:700;text-transform:uppercase;pointer-events:none;
+}
 .g-today-label{
   position:absolute;top:-15px;transform:translateX(-50%);
   font-size:calc(var(--cp-fs) * 0.85);letter-spacing:.12em;color:var(--accent);font-weight:700;text-transform:uppercase;white-space:nowrap;
@@ -332,7 +354,8 @@ body.has-overrides .edited-flag{display:inline}
 .gantt.mini .g-months{height:16px;margin-left:var(--rm-label-w)}
 .gantt.mini .g-month{font-size:calc(var(--cp-fs) * 0.8)}
 .gantt.mini .g-gridlines{left:var(--rm-label-w)}
-.gantt.mini .g-row{height:calc(var(--gbar-h) * 0.66 + 13px);max-height:60px}
+:root{--g-mini-row:calc(var(--gbar-h) * 0.66 + 13px)}
+.gantt.mini .g-row{height:var(--g-mini-row);max-height:60px}
 .gantt.mini .g-row-label{
   width:var(--rm-label-w);font-size:calc(var(--cp-fs) * 1.15);padding-right:12px;
   letter-spacing:.06em;color:var(--ink-2);
@@ -442,10 +465,10 @@ body.has-overrides .edited-flag{display:inline}
 .facts .board[data-kind="keyinfo"]{grid-column:2;grid-row:1}
 .facts .board[data-kind="risks"]{grid-column:2;grid-row:2}
 .facts .board{display:flex;flex-direction:column;min-height:0}
-/* Each board is a window that grows with its list up to a ceiling — 600px for
-   Activity, 300px each for key information and risk — and scrolls past it.
-   Growing rather than reserving keeps "Show more" directly under the last
-   entry instead of stranded at the bottom of an empty window. */
+/* Activity's window is a fixed height, not a ceiling it grows into. It is
+   what the pair beside it divide, so a stage with four activities used to
+   squeeze key information and risk into a couple of rows each — the boards
+   that matter most on a stage that is only just starting. */
 .facts .board-rows{
   flex:none;overflow-y:auto;overscroll-behavior:contain;
   scrollbar-width:thin;scrollbar-gutter:stable;
@@ -458,7 +481,7 @@ body.has-overrides .edited-flag{display:inline}
   border:2px solid var(--surface);background-clip:padding-box;
 }
 .facts .board-rows::-webkit-scrollbar-thumb:hover{background:var(--ink-3);background-clip:padding-box}
-.facts .board[data-kind="activities"] .board-rows{max-height:600px}
+.facts .board[data-kind="activities"] .board-rows{height:600px}
 /* The right-hand pair take whatever their grid row gives them — basis 0, so
    their own content never decides how tall the column is. */
 .facts .board[data-kind="keyinfo"] .board-rows,
@@ -584,13 +607,16 @@ body.col-resizing{user-select:none;cursor:col-resize}
 .sheet-grid>*{display:flex;flex-direction:column;min-height:0}
 .view-pane{flex:1;display:flex;flex-direction:column;min-height:0}
 .view-pane[hidden]{display:none}
-/* Both tables get the same window, so they start and end on the same lines
-   whatever sits under them — the engineering total and tools on one side, the
-   add row on the other. */
+/* The engineering side sets the height: its list, its total, its tools line.
+   The deliverables list then takes whatever the column has left, so the two
+   columns finish on the same line rather than the right one stopping short at
+   the height of the list alone. */
 .mm-list,.dlv-list{
-  flex:0 0 auto;height:var(--sheet-list-h);overflow-y:auto;overscroll-behavior:contain;
+  overflow-y:auto;overscroll-behavior:contain;
   scrollbar-width:thin;scrollbar-color:var(--line-strong) transparent;
 }
+.mm-list{flex:0 0 auto;height:var(--sheet-list-h)}
+.dlv-list{flex:1 1 0;min-height:var(--sheet-list-h);border-bottom:1px solid var(--line)}
 /* Both columns of the sheet open with a header block of the same height, so the
    deliverables table's column heads line up with the engineering table's. */
 .sheet-head{min-height:33px;display:flex;align-items:center;margin-bottom:14px}
@@ -623,12 +649,15 @@ body.col-resizing{user-select:none;cursor:col-resize}
 .dlv-list .dlv-due.read{border:none;font-family:var(--mono);font-size:.72em;color:var(--ink-2);display:block}
 .dlv-list .dlv-due.overdue{color:var(--risk);font-weight:600}
 .dlv-list .dlv-comp{font-family:var(--mono);font-size:.72em;color:var(--ink-3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.dlv-list .dlv-due.read,.dlv-list .dlv-comp{white-space:nowrap}
 .dlv-list .dlv-comp-edit{
   border:none;border-bottom:1px dashed var(--line-strong);background:none;
   font-family:var(--mono);font-size:.72em;color:var(--ink-2);padding:2px 0;width:100%;min-width:0;
 }
 .dlv-list .dlv-comp-edit:focus-visible{outline:none;border-bottom:1px solid var(--accent)}
 .dlv-list input[type="checkbox"]{width:16px;height:16px;accent-color:var(--accent);flex:none;cursor:pointer}
+/* ticked and out of edit mode: the record stands until it is edited */
+.dlv-list input[type="checkbox"]:disabled{cursor:default;opacity:.75}
 .dlv-list .dlv-t{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .dlv-list .dlv-t.done{text-decoration:line-through;color:var(--ink-3)}
 .dlv-list [data-dlv-del]{
@@ -791,22 +820,27 @@ body.col-resizing{user-select:none;cursor:col-resize}
   position:absolute;top:0;bottom:0;width:1px;
   background:repeating-linear-gradient(var(--line-strong) 0 4px,transparent 4px 8px);
 }
-/* Kick-off rides on the month strip, sized to it rather than to the checkpoint
-   diamonds: it is where the program starts, not one of the gates it passes. It
-   was drawn down among the rows first, and there it covered the start of the
-   very bar it dates — week zero is where that bar begins. The date is written
-   to its left, over the gutter the row labels sit under, because to its right
-   is the first month of the calendar. */
-.g-kickoff-mark{position:absolute;top:50%;transform:translateY(-50%);width:0;height:14px}
+/* Kick-off is week zero, which is where the first stage starts — so it is
+   drawn on that stage's bar, filled ink to tell it from the hollow checkpoints
+   ahead. Its left edge is flush with week zero rather than centred on it: a
+   diamond centred there puts half of itself over the row's own label. */
 .g-kickoff-dot{
-  position:absolute;left:0;top:0;width:14px;height:14px;z-index:8;
-  transform:translateX(-50%) rotate(45deg);
+  /* on the first row's line, and above the row hit targets it shares the
+     chart with — the gridline layer takes no pointer events, so it opts in */
+  position:absolute;top:calc(var(--g-mini-row) / 2);pointer-events:auto;
+  width:var(--ms-dot);height:var(--ms-dot);z-index:9;
+  transform:translate(2%,-50%) rotate(45deg);
   background:var(--ink);border:1.4px solid var(--ink);cursor:pointer;padding:0;
+  display:flex;align-items:center;justify-content:center;
 }
 .g-kickoff-date{
-  position:absolute;right:11px;top:50%;transform:translateY(-50%);
-  font-family:var(--mono);font-size:var(--cp-fs);color:var(--ink-2);white-space:nowrap;
+  transform:rotate(-45deg);font-family:var(--mono);line-height:1;
+  font-size:calc(var(--ms-dot) * 0.3);color:var(--page);white-space:nowrap;
 }
+/* The kick-off diamond takes the left end of the first bar, so that bar's
+   effort figure reads from the right end instead — free, because no checkpoint
+   is anchored to the end of the first stage. */
+.g-bar-mm.after-kickoff{left:auto;right:6px}
 .g-kickoff-dot:hover,.g-kickoff-dot:focus-visible{background:var(--accent);border-color:var(--accent);outline:none}
 /* Every checkpoint reads the same way: the label sits to the right of its
    diamond — where the bar has already ended, so nothing is covered — with an
@@ -1148,18 +1182,19 @@ body.sched-preview-open #schedule-view .inner{padding-bottom:calc(60px + var(--s
    MAN-MONTHS — per engineering line, summed onto the bars
    ============================================================ */
 .mm-cols{
-  display:grid;grid-template-columns:var(--row-id-w) minmax(0,1fr) 3.1rem 3.1rem 2.2rem;gap:8px;
+  display:grid;grid-template-columns:var(--row-id-w) minmax(0,1fr) var(--mm-tat) var(--mm-mm) 2.2rem;gap:8px;
   font-size:.58em;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-3);
   padding:6px 0;border-top:1px solid var(--line-strong);border-bottom:1px solid var(--line);
 }
 .mm-cols>span:nth-child(3),.mm-cols>span:nth-child(4){text-align:right}
-.mm-cols.read,.mm-list.read li{grid-template-columns:var(--row-id-w) minmax(0,1fr) 3.1rem 3.1rem}
+.mm-cols>span{position:relative}
+.mm-cols.read,.mm-list.read li{grid-template-columns:var(--row-id-w) minmax(0,1fr) var(--mm-tat) var(--mm-mm)}
 .mm-t.read{font-size:.95em;color:var(--ink-2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .mm-input.read{
   font-family:var(--mono);font-size:.78em;color:var(--ink);text-align:right;
 }
 .mm-list li{
-  display:grid;grid-template-columns:var(--row-id-w) minmax(0,1fr) 3.1rem 3.1rem 2.2rem;gap:8px;align-items:center;
+  display:grid;grid-template-columns:var(--row-id-w) minmax(0,1fr) var(--mm-tat) var(--mm-mm) 2.2rem;gap:8px;align-items:center;
   padding:5px 0;border-bottom:1px solid var(--line);
 }
 /* The reference ID beside every activity and deliverable row: quiet enough to
@@ -1478,6 +1513,10 @@ body.schedule-mode #schedule-view{opacity:1;visibility:visible;transform:none}
    ============================================================ */
 /* The stage text, the engineering list and the deliverables are three
    different things to edit, so each carries its own switch. */
+/* The two switches on a table read as a pair, at the right where the eye
+   leaves the row: wrap first, then Edit. */
+.sheet-head .wrap-btn{margin-left:auto}
+.sheet-head .wrap-btn+.tbl-edit{margin-left:8px}
 .tbl-edit{
   margin-left:auto;font-family:var(--mono);font-size:.62em;letter-spacing:.12em;text-transform:uppercase;
   color:var(--ink-3);border:1px solid var(--line);border-radius:3px;padding:3px 9px;

@@ -43,9 +43,15 @@ test.describe('read mode versus edit mode', () => {
     await expect(panel(page).locator('[data-dlv-del]')).toHaveCount(0);
     await expect(panel(page).locator('.dlv-add')).toHaveCount(0);
 
-    // …but ticking one off is day-to-day work, not editing
+    /* …but ticking one off is day-to-day work, not editing. Only ticking:
+       once a deliverable is closed the box locks, because undoing it is a
+       correction to a record rather than a day's work. */
     await expect(panel(page).locator('.dlv-list input[type="checkbox"]')).toHaveCount(6);
-    await expect(panel(page).locator('.dlv-list input[type="checkbox"]').first()).toBeEnabled();
+    await expect(panel(page).locator('.dlv-list input[type="checkbox"]').first()).toBeDisabled();
+    await selectStage(page, 'physicalDesign');
+    const boxes = panel(page).locator('.dlv-list input[type="checkbox"]');
+    await expect(boxes.first()).toBeDisabled(); // closed
+    await expect(boxes.last()).toBeEnabled(); // still open
   });
 
   test('each table has its own switch — the text, the list and the deliverables', async ({
@@ -129,22 +135,23 @@ test.describe('read mode versus edit mode', () => {
     /* the pane animates in — measure once it has landed */
     await settleLayout(page);
     /* Engineering activity on the left, key deliverables on the right: read
-       side by side, so they start and end on the same lines whatever sits
-       under them. */
+       side by side, so they start on the same line and their columns end on
+       the same line — the engineering side sets the height, its total and its
+       tools line included, and the deliverables list takes what is left. */
     const heads = await panel(page)
       .locator('.mm-cols, .dlv-cols')
       .evaluateAll((els) => els.map((e) => Math.round(e.getBoundingClientRect().top)));
     expect(heads[0]).toBe(heads[1]);
 
+    const cols = await panel(page)
+      .locator('.sheet-grid > *')
+      .evaluateAll((els) => els.map((e) => Math.round(e.getBoundingClientRect().height)));
+    expect(cols[0]).toBe(cols[1]);
+
     const lists = await panel(page)
       .locator('.mm-list, .dlv-list')
-      .evaluateAll((els) =>
-        els.map((e) => ({
-          top: Math.round(e.getBoundingClientRect().top),
-          bottom: Math.round(e.getBoundingClientRect().bottom),
-        })),
-      );
-    expect(lists[0]).toEqual(lists[1]);
+      .evaluateAll((els) => els.map((e) => Math.round(e.getBoundingClientRect().top)));
+    expect(lists[0]).toBe(lists[1]);
   });
 
   test('the completion date is the checkbox stamp, and edit mode corrects it', async ({

@@ -2,18 +2,19 @@
 
 import { useWrapStore, useWrapped, type WrapKey } from '@/store/wrapStore';
 
-/** The pilcrow-ish return arrow every text editor uses for a line break. */
+/**
+ * The wrap-text mark editors use: lines of text, the middle one running out to
+ * a hook that turns back and points at the line below.
+ */
 function WrapIcon() {
   return (
-    <svg viewBox="0 0 16 16" width="13" height="13" aria-hidden="true">
-      <path
-        d="M14 3v5.5a2.5 2.5 0 0 1-2.5 2.5H4.2"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="1.6"
-        strokeLinecap="round"
-      />
-      <path d="M6.6 8.3 3.3 11l3.3 2.7z" fill="currentColor" />
+    <svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true">
+      <g stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" fill="none">
+        <path d="M2 3.2h12" />
+        <path d="M2 8h9a2.4 2.4 0 0 1 0 4.8H8.4" />
+        <path d="M2 12.8h2.6" />
+      </g>
+      <path d="M9.4 10.4 6.4 12.8l3 2.4z" fill="currentColor" />
     </svg>
   );
 }

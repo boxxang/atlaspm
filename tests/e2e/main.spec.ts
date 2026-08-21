@@ -214,12 +214,14 @@ test.describe('roadmap', () => {
     await expect(row.locator('.g-bar-mm')).toHaveCSS('font-weight', '700');
   });
 
-  test('the TODAY line and its label stand on the same date', async ({ page }) => {
-    // there is one today line now — the strip that carried a second one is
-    // gone — and its label sits over it
+  test('the TODAY line says which day it is, over the line itself', async ({ page }) => {
     await expect(page.locator('#rm-gantt .g-today')).toBeVisible();
+    // a bare line says nothing, so it is captioned with the date it stands on
+    await expect(page.locator('#rm-gantt .g-today-cap')).toHaveText(
+      /^Today \d{1,2}\/\d{1,2}$/,
+    );
     const line = await centerX(page, '#rm-gantt .g-today');
-    const label = await centerX(page, '#rm-gantt .g-today-label');
+    const label = await centerX(page, '#rm-gantt .g-today-cap');
     expect(label).not.toBeNull();
     expect(Math.abs(label! - line!)).toBeLessThanOrEqual(1);
   });
@@ -378,14 +380,16 @@ test.describe('stage panel', () => {
     }
   });
 
-  test('an empty board keeps Show more beside its own message', async ({ page }) => {
+  test('an empty board keeps Show more directly under its own message', async ({ page }) => {
     // Architecture has nothing on its risk board
     await selectStage(page, 'architecture');
     const board = selectedPanel(page).locator('.board[data-kind="risks"]');
     await expect(board.locator('.b-row')).toHaveCount(0);
     const rows = (await board.locator('.board-rows').boundingBox())!;
+    const empty = (await board.locator('.b-empty').boundingBox())!;
     const foot = (await board.locator('.board-foot').boundingBox())!;
-    expect(Math.round(rows.height)).toBeLessThan(100); // no reserved emptiness
+    // the message is at the top of the window, not floating in the middle
+    expect(Math.round(empty.y - rows.y)).toBeLessThanOrEqual(2);
     expect(foot.y - (rows.y + rows.height)).toBeLessThanOrEqual(1);
   });
 
@@ -510,12 +514,16 @@ test.describe('stage details', () => {
     await expect(row.locator('.dlv-comp')).toHaveText('—');
     await row.locator('input[type="checkbox"]').check();
 
-    await expect(row.locator('.dlv-comp')).toHaveText(/^\d{2}\/\d{2}\/\d{4} · \d{2}:\d{2}$/);
+    await expect(row.locator('.dlv-comp')).toHaveText(/^\d{2}\/\d{2}\/\d{4}$/);
     await expect(row.locator('.dlv-t')).toHaveClass(/done/);
     await expect(panel.locator('.dlv-note')).toHaveText('6 / 9 complete');
 
-    // unchecking clears the stamp again
+    /* Ticked, the box locks: undoing a completion is a correction to the
+       record, and corrections are made in edit mode. */
+    await expect(row.locator('input[type="checkbox"]')).toBeDisabled();
+    await editDeliverables(page);
     await row.locator('input[type="checkbox"]').uncheck();
+    await editDeliverables(page, false);
     await expect(row.locator('.dlv-comp')).toHaveText('—');
     await expect(panel.locator('.dlv-note')).toHaveText('5 / 9 complete');
   });
@@ -958,13 +966,14 @@ test.describe('board windows', () => {
     expect(ki.content).toBeGreaterThan(ki.height);
     expect(risks.content).toBeGreaterThan(risks.height);
 
-    // Physical Design holds a handful; Activity shrinks to its list and the
-    // right-hand pair shrink with it rather than reserving 600px of nothing
+    /* Activity's window is the same height on a stage with six entries as on
+       one with twelve. It is what the pair beside it divide, so letting it
+       shrink to its list squeezed key information and risk into two rows each
+       on exactly the stages where they matter most. */
     await selectStage(page, 'physicalDesign');
     const short = await measure('activities');
-    expect(short.height).toBe(Math.min(short.content, 600));
-    expect(short.height).toBeLessThan(acts.height);
-    expect(await boardHeight(page, 'keyinfo')).toBeLessThan(300);
+    expect(short.height).toBe(acts.height);
+    expect(await boardHeight(page, 'keyinfo')).toBeGreaterThan(200);
   });
 
   test('a full board scrolls inside its window, with Show more just below', async ({ page }) => {

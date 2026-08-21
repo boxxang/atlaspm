@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import type { StageId } from '@/data/types';
-import { fmtDT, fmtDate, fromISO, toISO } from '@/lib/schedule';
+import { fmtDate, fromISO, toISO } from '@/lib/schedule';
 import { deliverableRowId } from '@/lib/rowIds';
 import { useAppStore } from '@/store/useAppStore';
 import { ColGrip } from './ColGrip';
@@ -93,10 +93,19 @@ export function Deliverables({ stageId }: { stageId: StageId }) {
               {deliverableRowId(shortTitle, i)}
             </span>
             <label>
+              {/* Ticking something off is day-to-day work, so it is done from
+                  the page. Un-ticking it is a correction to a record — that
+                  belongs in edit mode, with the completion date beside it. */}
               <input
                 type="checkbox"
                 data-dlv-check={d.id}
                 checked={d.done}
+                disabled={d.done && !editing}
+                title={
+                  d.done && !editing
+                    ? 'Completed — open Edit to change it'
+                    : 'Mark complete, stamping today'
+                }
                 onChange={(e) => toggle(stageId, d.id, e.target.checked)}
               />
               <span className={`dlv-t${d.done ? ' done' : ''}`}>{d.title}</span>
@@ -135,7 +144,7 @@ export function Deliverables({ stageId }: { stageId: StageId }) {
               />
             ) : (
               <span className="dlv-comp" data-comp={d.id}>
-                {d.completedAt ? fmtDT(d.completedAt) : '—'}
+                {d.completedAt ? fmtDate(d.completedAt) : '—'}
               </span>
             )}
             {editing ? (

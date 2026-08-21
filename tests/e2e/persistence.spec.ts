@@ -121,7 +121,11 @@ test('checking a deliverable persists with its completion stamp', async ({ page 
   await expect(page.locator('.stat').first().locator('.v')).toHaveText('58%');
   await page.locator('#mode-toggle button[data-mode="journey"]').click();
 
+  // ticked, the box locks — undoing it is an edit-mode correction
+  await expect(after.locator('input[type="checkbox"]')).toBeDisabled();
+  await editDeliverables(page);
   await after.locator('input[type="checkbox"]').uncheck();
+  await editDeliverables(page, false);
   await hardRefresh(page);
   await selectStage(page, 'physicalDesign');
   await expect(

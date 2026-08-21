@@ -13,6 +13,7 @@ export function ColGrip({
   dir,
   cell,
   kind = 'activities',
+  min = 56,
 }: {
   col: string;
   /** +1 when the column grows with the cursor, -1 when it shrinks. */
@@ -20,6 +21,9 @@ export function ColGrip({
   /** Index of the header cell whose width this grip controls. */
   cell: number;
   kind?: string;
+  /** Narrowest the column may get. A number column needs far less than a
+      title one, and 56px is wider than "12w" ever needs to be. */
+  min?: number;
 }) {
   const ref = useRef<HTMLSpanElement>(null);
 
@@ -31,13 +35,13 @@ export function ColGrip({
     const varName = col.startsWith('--') ? col : `--bck-${kind}-${col}`;
     const startX = e.clientX;
     /* measure the column this grip controls (not necessarily its own cell) */
-    const cells = grip.closest('.board-cols, .dlv-cols')?.children;
+    const cells = grip.closest('.board-cols, .dlv-cols, .mm-cols')?.children;
     if (!cells) return;
     const startW = cells[cell].getBoundingClientRect().width;
     document.body.classList.add('col-resizing');
     grip.classList.add('active');
     const move = (ev: PointerEvent) => {
-      const w = Math.min(Math.max(startW + dir * (ev.clientX - startX), 56), 420);
+      const w = Math.min(Math.max(startW + dir * (ev.clientX - startX), min), 420);
       document.documentElement.style.setProperty(varName, w + 'px');
     };
     const up = () => {

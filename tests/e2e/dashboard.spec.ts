@@ -159,7 +159,9 @@ test.describe('program schedule gantt', () => {
     await expect(rows).toHaveCount(23);
     await expect(rows.first()).toHaveCSS('height', '32px');
     await expect(page.locator('#gantt-b .g-today')).toBeVisible();
-    await expect(page.locator('#gantt-b .g-today-label')).toHaveText('Today');
+    /* the caption rides the calendar above the rows, so it stays in view
+       however far down a 23-stage chart is scrolled */
+    await expect(page.locator('#gantt-b .g-today-cap')).toHaveText(/^Today \d{1,2}\/\d{1,2}$/);
     // full labels here, short codes on the roadmap's mini chart
     await expect(rows.first().locator('.g-row-label')).toHaveText('Product Definition');
   });

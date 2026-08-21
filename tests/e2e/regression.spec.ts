@@ -131,9 +131,9 @@ test.describe('form control metrics', () => {
 test.describe('marker registration', () => {
   /* There is one TODAY line now. The strip that carried a second one is gone,
      so what is checked is that its label stands over the line it labels. */
-  test('the roadmap TODAY label is 0px off the today line', async ({ page }) => {
+  test('the roadmap TODAY caption is 0px off the today line', async ({ page }) => {
     const delta =
-      (await centerX(page, '#rm-gantt .g-today-label')) -
+      (await centerX(page, '#rm-gantt .g-today-cap')) -
       (await centerX(page, '#rm-gantt .g-today'));
     expect(delta).toBe(0);
   });
@@ -142,7 +142,7 @@ test.describe('marker registration', () => {
     await page.setViewportSize({ width: 1500, height: 900 });
     await expect(page.locator('#rm-gantt .g-today')).toBeVisible();
     expect(
-      (await centerX(page, '#rm-gantt .g-today-label')) -
+      (await centerX(page, '#rm-gantt .g-today-cap')) -
         (await centerX(page, '#rm-gantt .g-today')),
     ).toBe(0);
 
@@ -163,7 +163,7 @@ test.describe('marker registration', () => {
     await page.locator('#roadmap').hover({ position: { x: 8, y: 8 } });
     await settleLayout(page);
     expect(
-      (await centerX(page, '#rm-gantt .g-today-label')) -
+      (await centerX(page, '#rm-gantt .g-today-cap')) -
         (await centerX(page, '#rm-gantt .g-today')),
     ).toBe(0);
   });

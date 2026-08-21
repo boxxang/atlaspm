@@ -8,6 +8,13 @@ import { resolveStageDetail } from '@/lib/stageDetail';
 import { DAY, addWeeks, fmtDate, fmtDateShort, fmtMD, fmtW, type Schedule } from '@/lib/schedule';
 import { useAppStore } from '@/store/useAppStore';
 
+/**
+ * How many stages sit either side of the one in flight in the roadmap's
+ * window — eleven rows in all. The CSS sizes the window to match; see
+ * --g-rows-shown in globals.css.
+ */
+const WINDOW_EITHER_SIDE = 5;
+
 /** Geometry shared by the mini roadmap gantt and the dashboard gantt. */
 /** A window onto the schedule, in weeks from kickoff — used to zoom in. */
 export interface GanttZoom {
@@ -127,6 +134,33 @@ export function Gantt({
   }, []);
   const monthStep = total > 0 ? (4.345 / total) * monthsWidth : 60;
 
+  /**
+   * Stages are concurrent, so a dozen of twenty-three can be running at once
+   * and the whole list does not belong on screen. The window holds eleven
+   * rows and opens centred on the work in hand: the topmost stage today falls
+   * inside, with five either side of it. The rest is a scroll away.
+   *
+   * Set once per program rather than on every render — after that the scroll
+   * position is the reader's.
+   */
+  const bodyRef = useRef<HTMLDivElement>(null);
+  const openedOn = useRef('');
+  const firstInFlight = stages.findIndex((s: Stage) => {
+    const st = schedule.stages[s.id];
+    return st && st.start <= today && today <= st.end;
+  });
+  useEffect(() => {
+    const el = bodyRef.current;
+    if (!el || !short || folded) return;
+    const key = `${stages.map((s: Stage) => s.id).join()}|${firstInFlight}`;
+    if (openedOn.current === key) return;
+    openedOn.current = key;
+    if (firstInFlight < 0) return;
+    const row = el.querySelector<HTMLElement>('.g-row');
+    if (!row) return;
+    el.scrollTop = Math.max(firstInFlight - WINDOW_EITHER_SIDE, 0) * row.offsetHeight;
+  }, [stages, firstInFlight, short, folded]);
+
   /* Checkpoints live on the bar of the stage they belong to — the roadmap's
      own milestone strip was folded into this chart, so both read the same. */
   const msByStage: Partial<Record<StageId, Schedule['milestones']>> = {};
@@ -148,42 +182,48 @@ export function Gantt({
               {monthStep >= 52 ? m.label : m.short}
             </span>
           ))}
-        {/* Kick-off is week zero, which is where the first bar starts — so the
-            marker goes on the calendar above the rows rather than on top of
-            that bar, and is edited where it is drawn. */}
-        {kickoffMark && (
-          <span className="g-kickoff-mark" style={{ left: `${((0 - minWeek) / total) * 100}%` }}>
-            {/* the date reads to the left of the diamond, into the gutter the
-                row labels sit under — to its right is the first month */}
-            <span className="g-kickoff-date">{fmtMD(kickoffMark.date)}</span>
-            <button
-              className="g-kickoff-dot"
-              data-msid="kickoff"
-              data-tip={`Kick-off|${fmtDate(kickoffMark.date)} · click to change`}
-              aria-label={`Kick-off ${fmtDate(kickoffMark.date)} — change`}
-              onClick={kickoffMark.onEdit}
-            />
+        {/* The today line runs the height of the chart, which is scrollable —
+            so what says which date it is rides up here on the calendar, where
+            it stays in view however far down the rows you are. */}
+        {todayVisible && (
+          <span className="g-today-cap" style={{ left: `${todayPct}%` }}>
+            Today {fmtMD(today)}
           </span>
         )}
       </div>
-      <div className="g-body">
-        <div className="g-gridlines">
-          {months.map((m) => (
-            <span className="g-gridline" key={m.index} style={{ left: `${m.pct}%` }} />
-          ))}
-          {todayVisible && (
-            <>
-              <span className="g-today" style={{ left: `${todayPct}%` }} />
-              <span className="g-today-label" style={{ left: `${todayPct}%` }}>
-                Today
-              </span>
-            </>
-          )}
-          {kickoffMark && (
-            <span className="g-kickoff" style={{ left: `${((0 - minWeek) / total) * 100}%` }} />
-          )}
-        </div>
-        {stages.map((s, i) => {
+      <div className="g-body" ref={bodyRef}>
+        {/* The gridlines are a sibling of the rows inside the scrolling block
+            rather than of the block itself: anchored to the scroll port they
+            stopped at whatever was on screen, so scrolling down left the lower
+            stages with no calendar behind them. */}
+        <div className="g-plot">
+          <div className="g-gridlines">
+            {months.map((m) => (
+              <span className="g-gridline" key={m.index} style={{ left: `${m.pct}%` }} />
+            ))}
+            {todayVisible && <span className="g-today" style={{ left: `${todayPct}%` }} />}
+            {/* Kick-off is week zero, which is where the first stage starts,
+                so it is drawn on that stage's bar. It rides the gridline layer
+                rather than the row's own track: the track is a stacking
+                context beneath the row's hit target, and a button inside it
+                cannot be clicked at all. */}
+            {kickoffMark && (
+              <>
+                <span className="g-kickoff" style={{ left: `${((0 - minWeek) / total) * 100}%` }} />
+                <button
+                  className="g-kickoff-dot"
+                  style={{ left: `${((0 - minWeek) / total) * 100}%` }}
+                  data-msid="kickoff"
+                  data-tip={`Kick-off|${fmtDate(kickoffMark.date)} · click to change`}
+                  aria-label={`Kick-off ${fmtDate(kickoffMark.date)} — change`}
+                  onClick={kickoffMark.onEdit}
+                >
+                  <span className="g-kickoff-date">{fmtMD(kickoffMark.date)}</span>
+                </button>
+              </>
+            )}
+          </div>
+          {stages.map((s, i) => {
           const st = schedule.stages[s.id];
           const left = ((st.startOffsetWeeks - minWeek) / total) * 100;
           const width = (st.durationWeeks / total) * 100;
@@ -269,7 +309,10 @@ export function Gantt({
                       bar too narrow to hold the figure clips it rather than
                       spilling it over its neighbours. */}
                   {effort[s.id] > 0 && (
-                    <span className="g-bar-mm" data-stage-mm={s.id}>
+                    <span
+                      className={`g-bar-mm${kickoffMark && i === 0 ? ' after-kickoff' : ''}`}
+                      data-stage-mm={s.id}
+                    >
                       {formatManMonthsShort(effort[s.id])}
                     </span>
                   )}
@@ -354,7 +397,8 @@ export function Gantt({
               </span>
             </div>
           );
-        })}
+          })}
+        </div>
       </div>
     </div>
   );

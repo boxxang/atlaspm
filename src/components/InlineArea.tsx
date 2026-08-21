@@ -14,6 +14,7 @@ import { useAppStore, type InlineState } from '@/store/useAppStore';
 import { Deliverables } from './Deliverables';
 import { useWrapped } from '@/store/wrapStore';
 import { WrapToggle } from './WrapToggle';
+import { ColGrip } from './ColGrip';
 
 /** The stage as this program's profile defines it, text and all. */
 const useStage = (id: StageId) =>
@@ -116,8 +117,14 @@ function EngineeringTable({
     <>
       <div className={`mm-cols${editing ? '' : ' read'}`}>
         <span>ID</span>
-        <span>Activity</span>
-        <span>TAT</span>
+        <span>
+          Activity
+          <ColGrip col="--mm-tat" dir={-1} cell={2} min={34} />
+        </span>
+        <span>
+          TAT
+          <ColGrip col="--mm-mm" dir={-1} cell={3} min={34} />
+        </span>
         <span>M/M</span>
         {editing && <span />}
       </div>
