@@ -3,8 +3,11 @@
 import { useState } from 'react';
 import type { StageId } from '@/data/types';
 import { fmtDT, fmtDate, fromISO, toISO } from '@/lib/schedule';
+import { deliverableRowId } from '@/lib/rowIds';
 import { useAppStore } from '@/store/useAppStore';
 import { ColGrip } from './ColGrip';
+import { useWrapped } from '@/store/wrapStore';
+import { WrapToggle } from './WrapToggle';
 
 /**
  * Ticking a deliverable off is day-to-day work, so the checkbox is always live.
@@ -14,7 +17,10 @@ import { ColGrip } from './ColGrip';
  */
 export function Deliverables({ stageId }: { stageId: StageId }) {
   const [editing, setEditing] = useState(false);
+  const wrapped = useWrapped('deliverables');
   const list = useAppStore((s) => s.deliverables[stageId]);
+  /* The row IDs are the template's — DEF-D1 — so a review can name a line. */
+  const shortTitle = useAppStore((s) => s.stages.find((st) => st.id === stageId)?.shortTitle ?? '');
   const today = useAppStore((s) => s.today);
   const toggle = useAppStore((s) => s.toggleDeliverable);
   const setDue = useAppStore((s) => s.setDeliverableDue);
@@ -53,6 +59,7 @@ export function Deliverables({ stageId }: { stageId: StageId }) {
             {done} / {list.length} complete
           </span>
         </span>
+        <WrapToggle boardKey="deliverables" />
         <button
           className="tbl-edit"
           data-dlv-edit
@@ -67,20 +74,24 @@ export function Deliverables({ stageId }: { stageId: StageId }) {
         </button>
       </div>
       <div className="dlv-cols">
+        <span>ID</span>
         <span>
           Deliverable
-          <ColGrip col="--dlv-due" dir={-1} cell={1} />
+          <ColGrip col="--dlv-due" dir={-1} cell={2} />
         </span>
         <span>
           Due
-          <ColGrip col="--dlv-comp" dir={-1} cell={2} />
+          <ColGrip col="--dlv-comp" dir={-1} cell={3} />
         </span>
         <span>Completed</span>
         <span />
       </div>
-      <ul className="dlv-list">
-        {list.map((d) => (
+      <ul className={`dlv-list${wrapped ? ' wrapped' : ''}`}>
+        {list.map((d, i) => (
           <li key={d.id}>
+            <span className="row-id" data-dlv-id={d.id}>
+              {deliverableRowId(shortTitle, i)}
+            </span>
             <label>
               <input
                 type="checkbox"

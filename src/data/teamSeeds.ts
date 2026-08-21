@@ -7,6 +7,17 @@ import type { StageId } from './types';
 export const TEAM_SEEDS: Partial<
   Record<StageId, readonly (readonly [string, string])[]>
 > = {
+  technology: [["Ines Moreau", "Foundry engagement"], ["Bo Lindqvist", "Wafer & NRE costing"]],
+  pdk: [["Ravi Shankar", "PDK & rule decks"], ["Elin Dahl", "Library qualification"], ["Peter Voss", "EDA tool qualification"]],
+  ipReadiness: [["Amara Nwosu", "IP evaluation"], ["Tomasz Lis", "Vendor management"]],
+  amsIp: [["Sylvie Roche", "PLL & clocking"], ["Hyunwoo Baek", "SerDes / PHY"], ["Marta Ferreira", "Custom memory design"], ["Gil Amrani", "Analog layout"]],
+  testChip: [["Ola Bergstrom", "Test chip integration"], ["Ravi Nair", "Silicon characterization"]],
+  dft: [["Yusuf Demir", "Scan & compression"], ["Anja Keller", "MBIST & repair"], ["Tarek Haddad", "ATPG"]],
+  packageDesign: [["Aya Nakamura", "Interposer integration"], ["Carlos Vega", "Substrate design"], ["Femi Ade", "Thermal & mechanical"]],
+  packageTestVehicle: [["Sunita Rege", "Vehicle build & DOE"], ["Piotr Zieba", "Reliability testing"]],
+  chipPackageCoVerification: [["Hannah Storm", "PDN co-analysis"], ["Rui Alves", "Channel simulation"]],
+  validationHardware: [["Max Richter", "Board design"], ["Ana Sousa", "PCB layout & SI"], ["Jonas Ek", "Lab infrastructure"]],
+  testDevelopment: [["Grace Holt", "Test program development"], ["Ken Abe", "Probe card & load board"], ["Nadia Petrov", "Test data & yield"]],
   productDefinition: [["Nora Feld", "Market & requirements analysis"], ["Ian Brooks", "Cost / die-size modeling"], ["Seojin Ha", "Feasibility studies"]],
   architecture: [["Leo Martins", "System modeling & workloads"], ["Aisha Bello", "Interconnect / NoC architecture"], ["Tim Nguyen", "Memory subsystem"], ["Rhea Kapoor", "IP evaluation"]],
   rtl: [["Jae Song", "Top-level integration"], ["Mira Patel", "Lint / CDC / RDC"], ["Ken Watanabe", "Third-party IP interface"], ["Olga Petrova", "Build & CI infrastructure"]],

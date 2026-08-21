@@ -76,7 +76,9 @@ export function programSummaryDraft(input: {
       'UPCOMING MILESTONES',
       upcomingMilestones(schedule, today)
         .slice(0, 4)
-        .map((m) => `  ${fmtDate(m.date)}  ${m.label.padEnd(16)}${dday(m.date, today)}`),
+        /* padEnd alone runs a long checkpoint name straight into its D−day;
+           the two are always separated by at least one space */
+        .map((m) => `  ${fmtDate(m.date)}  ${m.label.padEnd(16)} ${dday(m.date, today)}`),
     ),
 
     section(

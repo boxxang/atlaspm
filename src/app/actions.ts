@@ -539,6 +539,7 @@ export async function saveStageDetail(
     description: string | null;
     engineeringView: string | null;
     engineeringEffort: string | null;
+    engineeringTat: string | null;
     programView: string | null;
     tools: string | null;
     collaboration: string | null;
@@ -613,20 +614,24 @@ export async function deleteAttachment(projectId: string, id: string) {
 
 /* ---------- effort and cost ---------- */
 
-/** Man-months per engineering line of a stage, aligned to that stage's list. */
+/**
+ * Man-months and elapsed weeks per engineering line of a stage, both aligned to
+ * that stage's list. They travel together because the table edits them together.
+ */
 export async function setStageEffort(
   projectId: string,
   stageId: StageId,
   effort: string | null,
+  tat: string | null = null,
 ) {
   const pid = await assertProject(projectId);
   const existing = await prisma.stageDetail.findUnique({
     where: { projectId_stageId: { projectId: pid, stageId } },
   });
 
-  if (!effort && existing && !existing.description && existing.engineeringView === null &&
+  if (!effort && !tat && existing && !existing.description && existing.engineeringView === null &&
       !existing.programView && !existing.tools && !existing.collaboration) {
-    /* nothing left on the row once the effort goes */
+    /* nothing left on the row once the numbers go */
     await prisma.stageDetail.delete({ where: { id: existing.id } });
   } else {
     await prisma.stageDetail.upsert({
@@ -636,8 +641,9 @@ export async function setStageEffort(
         projectId: pid,
         stageId,
         engineeringEffort: effort,
+        engineeringTat: tat,
       },
-      update: { engineeringEffort: effort },
+      update: { engineeringEffort: effort, engineeringTat: tat },
     });
   }
   touch(projectId);

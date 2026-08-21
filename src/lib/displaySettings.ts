@@ -7,7 +7,7 @@
  */
 
 export type DisplayScope = 'main' | 'dash';
-export type DisplayKey = 'font' | 'icon' | 'bar' | 'cp' | 'drow';
+export type DisplayKey = 'font' | 'icon' | 'bar' | 'cp' | 'drow' | 'ms';
 
 /** Each scope carries its own default and a range centred on it. */
 export interface DisplayRange {
@@ -55,13 +55,16 @@ const centred = (value: number, span: number, step: number): DisplayRange => ({
 export const DISP_DEFS: readonly DisplayDef[] = [
   { key: 'font', input: 'set-font', valEl: 'set-font-val', label: 'Text size',
     varName: '--fs-base', unit: 'px', scopes: ['main', 'dash'], fmt: px,
-    ranges: { main: centred(16, 5, 1), dash: centred(16, 5, 1) } },
+    ranges: { main: centred(15, 5, 1), dash: centred(16, 5, 1) } },
   { key: 'icon', input: 'set-icon', valEl: 'set-icon-val', label: 'Icon size',
     varName: '--icon-scale', unit: '', scopes: ['main'], fmt: fmtIcon,
     ranges: { main: centred(2, 1.25, 0.25) } },
   { key: 'bar', input: 'set-bar', valEl: 'set-bar-val', label: 'Bar thickness',
     varName: '--gbar-h', unit: 'px', scopes: ['main', 'dash'], fmt: px,
     ranges: { main: centred(16, 5, 1), dash: centred(16, 5, 1) } },
+  { key: 'ms', input: 'set-ms', valEl: 'set-ms-val', label: 'Checkpoint size',
+    varName: '--ms-dot', unit: 'px', scopes: ['main'], fmt: px,
+    ranges: { main: centred(26, 12, 2) } },
   { key: 'cp', input: 'set-cp', valEl: 'set-cp-val', label: 'Milestone text',
     varName: '--cp-fs', unit: 'px', scopes: ['main', 'dash'], fmt: px,
     ranges: { main: centred(11, 5, 1), dash: centred(13, 5, 1) } },

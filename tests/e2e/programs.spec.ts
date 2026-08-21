@@ -28,17 +28,18 @@ test.describe('program list', () => {
 
     const c = card(page, 'AtlasAX1');
     await expect(c.locator('.pl-profile')).toHaveText('Typical SoC');
-    await expect(c.locator('.pl-pct .n')).toHaveText('51%');
-    await expect(c.locator('.pl-pct')).toContainText('23 / 45 deliverables');
-    await expect(c.locator('.pl-stage')).toHaveText('PD · Physical Design');
+    await expect(c.locator('.pl-pct .n')).toHaveText('57%');
+    await expect(c.locator('.pl-pct')).toContainText('96 / 167 deliverables');
+    // the stage the card names is the one the program opens on
+    await expect(c.locator('.pl-stage')).toHaveText('TEST · Test Development');
     await expect(c.locator('.pl-stage')).toHaveClass(/risky/);
 
     const facts = c.locator('.pl-fact');
     await expect(facts.nth(0)).toContainText('Kickoff');
     await expect(facts.nth(1).locator('.v')).toContainText(/^\d{2}\/\d{2}\/\d{4} · D−\d+$/);
-    await expect(facts.nth(2).locator('.v')).toHaveText('19');
+    await expect(facts.nth(2).locator('.v')).toHaveText('23');
     await expect(facts.nth(2).locator('.v')).toHaveClass(/alert/);
-    await expect(facts.nth(3).locator('.v')).toHaveText('1');
+    await expect(facts.nth(3).locator('.v')).toHaveText('7');
     // no manual date edits yet
     await expect(c.locator('.pl-flag')).toHaveCount(0);
   });
@@ -47,7 +48,7 @@ test.describe('program list', () => {
     await card(page, 'AtlasAX1').locator('.pl-open').click();
     await expect(page).toHaveURL(/\/p\/atlasax1$/);
     await expect(page.locator('#project-name')).toHaveText('AtlasAX1');
-    await selectStage(page, '01');
+    await selectStage(page, 'productDefinition');
 
     await page.locator('#to-programs').click();
     await expect(page).toHaveURL(/\/$/);
@@ -57,7 +58,7 @@ test.describe('program list', () => {
   test('the EDITED flag surfaces a manually edited schedule', async ({ page }) => {
     await page.goto('/p/atlasax1');
     const panel = page.locator('.stage-panel.selected');
-    await selectStage(page, '04');
+    await selectStage(page, 'verification');
     const end = await panel.locator('[data-role="end-edit"]').inputValue();
     const [y, m, d] = end.split('-').map(Number);
     const moved = new Date(y, m - 1, d);
@@ -99,12 +100,12 @@ test.describe('creating a program', () => {
   test('milestones fall out of the kickoff and the profile TATs', async ({ page }) => {
     await createProgram(page, 'AtlasBX3', '2027-03-01');
     // kickoff is a mark on the axis now, not a field in the toolbar
-    await expect(page.locator('.rm-ms[data-msid="kickoff"] .rm-ms-date')).toHaveText('3/1');
-    // Tapeout ends 38 weeks after kickoff, First Silicon 46, Production 66
-    expect(await milestoneDate(page, 'tapeout')).toBe('11/22/2027');
-    expect(await milestoneDate(page, 'firstSilicon')).toBe('01/17/2028');
-    expect(await milestoneDate(page, 'massProduction')).toBe('06/05/2028');
-    await expect(page.locator('.rm-ms-label')).toContainText([
+    await expect(page.locator('#rm-gantt .g-kickoff-date')).toHaveText('3/1');
+    // Tapeout ends 86 weeks after kickoff, First Silicon 98, Production 132
+    expect(await milestoneDate(page, 'tapeout')).toBe('10/23/2028');
+    expect(await milestoneDate(page, 'firstSilicon')).toBe('01/15/2029');
+    expect(await milestoneDate(page, 'massProduction')).toBe('09/10/2029');
+    await expect(page.locator('#rm-gantt .g-cp')).toContainText([
       'Arch Freeze',
       'RTL Freeze',
       'DV Closure',
@@ -114,16 +115,16 @@ test.describe('creating a program', () => {
       'Mass Production',
     ]);
     // and the stage rows agree
-    await selectStage(page, '01');
+    await selectStage(page, 'productDefinition');
     await expect(page.locator('.stage-panel.selected [data-role="start-edit"]')).toHaveValue(
       '2027-03-01',
     );
-    await expect(page.locator('.stage-panel.selected [data-role="tat-edit"]')).toHaveValue('4');
+    await expect(page.locator('.stage-panel.selected [data-role="tat-edit"]')).toHaveValue('8');
   });
 
   test('starts with empty boards but keeps the stage deliverables', async ({ page }) => {
     await createProgram(page, 'AtlasBX4', '2027-03-01');
-    await selectStage(page, '01');
+    await selectStage(page, 'productDefinition');
     const panel = page.locator('.stage-panel.selected');
 
     for (const kind of ['keyinfo', 'activities', 'risks'] as const) {
@@ -136,19 +137,25 @@ test.describe('creating a program', () => {
     }
 
     // key deliverables survive: they are what the stage owes, not program content
-    await expect(panel.locator('.dlv-list li')).toHaveCount(3);
+    await expect(panel.locator('.dlv-list li')).toHaveCount(6);
     await expect(panel.locator('.dlv-t')).toHaveText([
-      'Product requirements document',
-      'Target specification',
+      'Product requirements document (PRD)',
+      'Target specification — PPA and KPI table',
+      'Product cost and margin model',
       'Feasibility report',
+      'Program charter, staffing and budget plan',
+      'Kickoff Go / No-Go decision record',
     ]);
-    await expect(panel.locator('.dlv-note')).toHaveText('0 / 3 complete');
-    /* dated across the stage under this program's own schedule: three of them
-       at a third, two thirds and the end of a four-week stage from 03/01 */
+    await expect(panel.locator('.dlv-note')).toHaveText('0 / 6 complete');
+    /* dated across the stage under this program's own schedule: six of them
+       spread over the eight weeks that run from 03/01 */
     await expect(panel.locator('[data-dlv-due-text]')).toHaveText([
       '03/10/2027',
       '03/20/2027',
       '03/29/2027',
+      '04/07/2027',
+      '04/17/2027',
+      '04/26/2027',
     ]);
 
     // leaders and contacts are the program's to fill in
@@ -163,7 +170,7 @@ test.describe('creating a program', () => {
 
   test('a new program is editable and independent of the seeded one', async ({ page }) => {
     await createProgram(page, 'AtlasBX5', '2027-03-01');
-    await selectStage(page, '01');
+    await selectStage(page, 'productDefinition');
     const panel = page.locator('.stage-panel.selected');
     await panel.locator('.board[data-kind="activities"] [data-add]').click();
     await page.locator('.ie-title').fill('Kick off the definition review');
@@ -172,7 +179,7 @@ test.describe('creating a program', () => {
 
     // the seeded program is untouched
     await page.goto('/p/atlasax1');
-    await selectStage(page, '06');
+    await selectStage(page, 'physicalDesign');
     await expect(
       page.locator('.stage-panel.selected .board[data-kind="activities"] .board-head .note'),
     ).toHaveText('6 items · 6 updates');
@@ -181,7 +188,7 @@ test.describe('creating a program', () => {
     await page.goto('/');
     await expect(page.locator('.pl-card:not(.new)')).toHaveCount(2);
     await expect(card(page, 'AtlasBX5').locator('.pl-pct .n')).toHaveText('0%');
-    await expect(card(page, 'AtlasAX1').locator('.pl-pct .n')).toHaveText('51%');
+    await expect(card(page, 'AtlasAX1').locator('.pl-pct .n')).toHaveText('57%');
   });
 
   test('Cancel closes the form without creating anything', async ({ page }) => {
@@ -207,21 +214,21 @@ test.describe('switching programs without a page load', () => {
     await page.locator('#to-programs').click();
 
     await createProgram(page, 'ZetaX1', '2029-06-04');
-    await selectStage(page, '01');
+    await selectStage(page, 'productDefinition');
     const panel = page.locator('.stage-panel.selected');
 
     await expect(page.locator('#project-name')).toHaveText('ZetaX1');
-    await expect(page.locator('.rm-ms[data-msid="kickoff"] .rm-ms-date')).toHaveText('6/4');
+    await expect(page.locator('#rm-gantt .g-kickoff-date')).toHaveText('6/4');
     // milestones follow the kickoff that was just typed in
-    expect(await milestoneDate(page, 'tapeout')).toBe('02/25/2030');
-    expect(await milestoneDate(page, 'firstSilicon')).toBe('04/22/2030');
+    expect(await milestoneDate(page, 'tapeout')).toBe('01/27/2031');
+    expect(await milestoneDate(page, 'firstSilicon')).toBe('04/21/2031');
     await expect(panel.locator('[data-role="start-edit"]')).toHaveValue('2029-06-04');
     // and none of AtlasAX1's content came along
     await expect(panel.locator('.board[data-kind="keyinfo"] .b-row')).toHaveCount(0);
     await expect(panel.locator('.board[data-kind="activities"] .b-row')).toHaveCount(0);
     await expect(panel.locator('.l-name')).toHaveText('Unassigned');
     await expect(panel.locator('.contacts-sec .c-row')).toHaveCount(0);
-    await expect(panel.locator('.dlv-note')).toHaveText('0 / 3 complete');
+    await expect(panel.locator('.dlv-note')).toHaveText('0 / 6 complete');
     await expect(page.locator('.edited-flag')).toBeHidden();
   });
 
@@ -230,13 +237,13 @@ test.describe('switching programs without a page load', () => {
     await page.locator('#to-programs').click();
     await card(page, 'AtlasAX1').locator('.pl-open').click();
     await expect(page.locator('#project-name')).toHaveText('AtlasAX1');
-    await expect(page.locator('.rm-ms[data-msid="kickoff"] .rm-ms-date')).not.toHaveText('6/4');
+    await expect(page.locator('#rm-gantt .g-kickoff-date')).not.toHaveText('6/4');
 
     await page.locator('#to-programs').click();
     await card(page, 'ZetaX2').locator('.pl-open').click();
     await expect(page.locator('#project-name')).toHaveText('ZetaX2');
-    await expect(page.locator('.rm-ms[data-msid="kickoff"] .rm-ms-date')).toHaveText('6/4');
-    expect(await milestoneDate(page, 'tapeout')).toBe('02/25/2030');
+    await expect(page.locator('#rm-gantt .g-kickoff-date')).toHaveText('6/4');
+    expect(await milestoneDate(page, 'tapeout')).toBe('01/27/2031');
     await expect(
       page.locator('.stage-panel.selected .board[data-kind="activities"] .b-row'),
     ).toHaveCount(0);
@@ -245,7 +252,7 @@ test.describe('switching programs without a page load', () => {
   test('the dashboard follows the switch too', async ({ page }) => {
     await card(page, 'AtlasAX1').locator('.pl-open').click();
     await page.locator('#mode-toggle button[data-mode="schedule"]').click();
-    await expect(page.locator('.stat').first().locator('.v')).toHaveText('51%');
+    await expect(page.locator('.stat').first().locator('.v')).toHaveText('57%');
     await page.locator('#mode-toggle button[data-mode="journey"]').click();
 
     await page.locator('#to-programs').click();
@@ -258,7 +265,7 @@ test.describe('switching programs without a page load', () => {
 
   test('the view resets: selected stage and open sheets do not carry over', async ({ page }) => {
     await card(page, 'AtlasAX1').locator('.pl-open').click();
-    await selectStage(page, '09');
+    await selectStage(page, 'fabrication');
     await expect(page.locator('.stage-panel.selected')).toHaveAttribute('data-id', 'fabrication');
 
     await page.locator('#to-programs').click();
@@ -266,7 +273,7 @@ test.describe('switching programs without a page load', () => {
     // nothing carries over: the new program opens with nothing selected
     await expect(page.locator('.stage-panel.selected')).toHaveCount(0);
     await expect(page.locator('.panel-hint')).toBeVisible();
-    await selectStage(page, '01');
+    await selectStage(page, 'productDefinition');
     await expect(
       page.locator('.stage-panel.selected .inline-area[data-kind="stage"]'),
     ).toBeVisible();
@@ -274,7 +281,7 @@ test.describe('switching programs without a page load', () => {
 
   test('leaving with a pop-up open does not strand the page lock', async ({ page }) => {
     await card(page, 'AtlasAX1').locator('.pl-open').click();
-    await selectStage(page, '01');
+    await selectStage(page, 'productDefinition');
     await page.locator('.stage-panel.selected .board[data-kind="keyinfo"] [data-more]').click();
     await expect(page.locator('#modal .modal-win')).toBeVisible();
     await expect(page.locator('body')).toHaveClass(/modal-open/);
@@ -306,7 +313,7 @@ test.describe('switching programs without a page load', () => {
     await card(page, 'AtlasAX1').locator('.pl-open').click();
     await page.locator('#to-programs').click();
     await createProgram(page, 'ZetaX6', '2029-06-04');
-    await selectStage(page, '01');
+    await selectStage(page, 'productDefinition');
 
     await page.locator('.stage-panel.selected .board[data-kind="risks"] [data-add]').click();
     await page.locator('.ie-title').fill('Written to the new program');
@@ -318,12 +325,12 @@ test.describe('switching programs without a page load', () => {
     // the write landed on ZetaX6, not on the program the store was holding
     await page.reload();
     await expect(page.locator('#project-name')).toHaveText('ZetaX6');
-    await selectStage(page, '01');
+    await selectStage(page, 'productDefinition');
     await expect(
       page.locator('.stage-panel.selected .board[data-kind="risks"] .b-row'),
     ).toHaveCount(1);
     await page.goto('/p/atlasax1');
-    await selectStage(page, '01');
+    await selectStage(page, 'productDefinition');
     // AtlasAX1's own risks, none of them the row just written to ZetaX6
     await expect(page.locator('.stage-panel.selected .board[data-kind="risks"] .b-row')).toHaveCount(
       12,

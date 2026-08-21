@@ -1,11 +1,13 @@
 import 'server-only';
 import { ensureBuiltinProfile } from './builtinProfile';
 import { prisma } from './db';
-import { sumEffortText } from './effort';
 import { buildProjectState, type ProjectState } from './projectState';
+import { resolveStageDetail } from './stageDetail';
+import { resolveStages } from './stages';
 
 const ATTACHMENT_META = { id: true, filename: true, mimeType: true, size: true } as const;
 import type {
+  ProfileStageDef,
   ProfileSummary,
   ScheduleProfile,
   StageBaseline,
@@ -71,7 +73,9 @@ export async function getProjectSummaries(): Promise<ProjectSummary[]> {
       include: {
         profile: { include: { stages: { orderBy: { order: 'asc' } } } },
         overrides: true,
-        stageDetails: { select: { engineeringEffort: true } },
+        stageDetails: {
+          select: { stageId: true, engineeringView: true, engineeringEffort: true },
+        },
       },
     }),
     prisma.deliverable.groupBy({ by: ['projectId', 'done'], _count: true }),
@@ -109,10 +113,10 @@ export async function getProjectSummaries(): Promise<ProjectSummary[]> {
       createdAt: p.createdAt,
       costPerManMonth: p.costPerManMonth,
       currency: p.currency,
-      manMonths:
-        Math.round(
-          p.stageDetails.reduce((n, d) => n + sumEffortText(d.engineeringEffort), 0) * 10,
-        ) / 10,
+      /* The same arithmetic the stage sheet does: a line the program has not
+         costed still carries the template's own figure, so the card and the
+         dashboard agree on what the program takes. */
+      manMonths: programManMonths(p.profile, p.stageDetails),
       overrides,
       edited: p.overrides.length > 0,
       deliverablesDone: mine.filter((d) => d.done).reduce((n, d) => n + d._count, 0),
@@ -122,6 +126,25 @@ export async function getProjectSummaries(): Promise<ProjectSummary[]> {
       openActivityDues: dues.filter((d) => d.projectId === p.id).map((d) => d.due!),
     };
   });
+}
+
+/** What a program takes in man-months, template figures included. */
+function programManMonths(
+  profile: { stages: readonly ProfileStageDef[] },
+  details: { stageId: string; engineeringView: string | null; engineeringEffort: string | null }[],
+): number {
+  const stages = resolveStages({
+    id: '',
+    label: '',
+    builtin: false,
+    template: false,
+    stages: profile.stages,
+  });
+  const total = stages.reduce((n, stage) => {
+    const detail = details.find((d) => d.stageId === stage.id);
+    return n + resolveStageDetail(stage, detail ?? null).manMonths;
+  }, 0);
+  return Math.round(total * 10) / 10;
 }
 
 /** Every profile a program can run on, oldest first, built-in leading. */

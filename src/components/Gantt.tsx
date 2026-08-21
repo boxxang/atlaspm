@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import type { Stage, StageId } from '@/data/types';
 import { hasOpenRisks } from '@/lib/derive';
 import { formatManMonthsShort } from '@/lib/effort';
@@ -31,16 +31,17 @@ export function useGanttGeometry(
     const total = zoom ? zoom.total : schedule.totalWeeks - minWeek + 2 + tailWeeks;
     const origin = addWeeks(kickoff, minWeek);
     const end = addWeeks(origin, total);
-    const months: { pct: number; label: string; index: number }[] = [];
+    const months: { pct: number; label: string; short: string; index: number }[] = [];
     const cursor = new Date(origin.getFullYear(), origin.getMonth() + 1, 1);
     let mIdx = 0;
     while (cursor < end) {
       const wk = (cursor.getTime() - origin.getTime()) / (7 * DAY);
+      const short = cursor.toLocaleDateString('en-US', { month: 'short' });
       months.push({
         pct: (wk / total) * 100,
-        label:
-          cursor.toLocaleDateString('en-US', { month: 'short' }) +
-          (cursor.getMonth() === 0 ? ' ’' + String(cursor.getFullYear()).slice(2) : ''),
+        /* January carries the year — until the axis is too tight for it. */
+        label: short + (cursor.getMonth() === 0 ? ' ’' + String(cursor.getFullYear()).slice(2) : ''),
+        short,
         index: mIdx,
       });
       cursor.setMonth(cursor.getMonth() + 1);
@@ -62,6 +63,7 @@ export function Gantt({
   short = false,
   folded = false,
   zoom,
+  kickoff: kickoffMark,
   onSelectStage,
 }: {
   id?: string;
@@ -74,6 +76,8 @@ export function Gantt({
   folded?: boolean;
   /** Zoomed window, so one stage can be read at the scale of one stage. */
   zoom?: GanttZoom;
+  /** Kickoff, drawn at week zero and editable where the chart offers it. */
+  kickoff?: { date: Date; onEdit: () => void };
   /** Makes each row a target that opens its stage below. */
   onSelectStage?: (index: number | null) => void;
 }) {
@@ -110,24 +114,57 @@ export function Gantt({
     zoom,
   );
 
-  /* checkpoints live on their own stage's row (full gantt only) */
+  /* How much room a month gets on screen, so the axis can thin its labels
+     rather than overprint them. */
+  const monthsRef = useRef<HTMLDivElement>(null);
+  const [monthsWidth, setMonthsWidth] = useState(900);
+  useEffect(() => {
+    const el = monthsRef.current;
+    if (!el) return;
+    const ro = new ResizeObserver(([entry]) => setMonthsWidth(entry.contentRect.width));
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
+  const monthStep = total > 0 ? (4.345 / total) * monthsWidth : 60;
+
+  /* Checkpoints live on the bar of the stage they belong to — the roadmap's
+     own milestone strip was folded into this chart, so both read the same. */
   const msByStage: Partial<Record<StageId, Schedule['milestones']>> = {};
-  if (!short) {
-    for (const m of schedule.milestones) {
-      (msByStage[m.anchor.stage] ??= []).push(m);
-    }
+  for (const m of schedule.milestones) {
+    (msByStage[m.anchor.stage] ??= []).push(m);
   }
 
   return (
     <div className={`gantt${short ? ' mini' : ''}`} id={id}>
-      {/* every month, so the axis still reads as a calendar once the chart
-          folds down to a single stage */}
-      <div className="g-months">
-        {months.map((m) => (
-          <span className="g-month" key={m.index} style={{ left: `${m.pct}%` }}>
-            {m.label}
+      {/* Every month, so the axis reads as a calendar — but only as many as
+          fit: a 132-week program puts thirty of them on one line, and at that
+          spacing "Jan ’27" runs into February. The year goes first, then every
+          other month. */}
+      <div className="g-months" ref={monthsRef}>
+        {months
+          .filter((m) => monthStep >= 24 || m.index % 2 === 0)
+          .map((m) => (
+            <span className="g-month" key={m.index} style={{ left: `${m.pct}%` }}>
+              {monthStep >= 52 ? m.label : m.short}
+            </span>
+          ))}
+        {/* Kick-off is week zero, which is where the first bar starts — so the
+            marker goes on the calendar above the rows rather than on top of
+            that bar, and is edited where it is drawn. */}
+        {kickoffMark && (
+          <span className="g-kickoff-mark" style={{ left: `${((0 - minWeek) / total) * 100}%` }}>
+            {/* the date reads to the left of the diamond, into the gutter the
+                row labels sit under — to its right is the first month */}
+            <span className="g-kickoff-date">{fmtMD(kickoffMark.date)}</span>
+            <button
+              className="g-kickoff-dot"
+              data-msid="kickoff"
+              data-tip={`Kick-off|${fmtDate(kickoffMark.date)} · click to change`}
+              aria-label={`Kick-off ${fmtDate(kickoffMark.date)} — change`}
+              onClick={kickoffMark.onEdit}
+            />
           </span>
-        ))}
+        )}
       </div>
       <div className="g-body">
         <div className="g-gridlines">
@@ -141,6 +178,9 @@ export function Gantt({
                 Today
               </span>
             </>
+          )}
+          {kickoffMark && (
+            <span className="g-kickoff" style={{ left: `${((0 - minWeek) / total) * 100}%` }} />
           )}
         </div>
         {stages.map((s, i) => {
@@ -223,20 +263,17 @@ export function Gantt({
                   {showPast && (
                     <span className="past-seg" style={{ width: `${(pastFrac * 100).toFixed(1)}%` }} />
                   )}
-                  {/* wide bars carry the figure; narrow ones let it sit outside */}
-                  {!short && effort[s.id] > 0 && (
-                    <span className="g-bar-mm">{formatManMonthsShort(effort[s.id])}</span>
+                  {/* The figure rides inside the bar. Outside it, past the
+                      bar's end, is where the checkpoint diamond and its label
+                      go — the two used to be drawn on the same few pixels. A
+                      bar too narrow to hold the figure clips it rather than
+                      spilling it over its neighbours. */}
+                  {effort[s.id] > 0 && (
+                    <span className="g-bar-mm" data-stage-mm={s.id}>
+                      {formatManMonthsShort(effort[s.id])}
+                    </span>
                   )}
                 </span>
-                {short && effort[s.id] > 0 && (
-                  <span
-                    className="g-mm-tag"
-                    data-stage-mm={s.id}
-                    style={{ left: `${left + width}%` }}
-                  >
-                    {formatManMonthsShort(effort[s.id])}
-                  </span>
-                )}
                 {/* Folded down to one stage, the row has the height to carry
                     that stage's deliverables: one marker each, placed on its
                     due date, so moving a date moves the marker. */}
@@ -291,17 +328,25 @@ export function Gantt({
                           style={{ left: `${((wasMs.week - minWeek) / total) * 100}%` }}
                         />
                       )}
+                      {/* the diamond carries its own date on the roadmap, the
+                          way the milestone strip it replaced did */}
                       <span
-                        className={`g-msdot${m.major ? ' major' : ''}`}
+                        className={`g-msdot${m.major ? ' major' : ''}${
+                          m.date <= today ? ' past' : ''
+                        }`}
                         style={{ left: `${pct}%` }}
+                        data-msid={m.id}
                         data-tip={tip}
-                      />
+                      >
+                        {short && <span className="g-msdot-date">{fmtMD(m.date)}</span>}
+                      </span>
                       <span
                         className={`g-cp${m.major ? ' major' : ''}`}
                         style={{ left: `${pct}%` }}
+                        data-ms-label={m.id}
                         data-tip={tip}
                       >
-                        {m.label} · {fmtDateShort(m.date)}
+                        {short ? m.label : `${m.label} · ${fmtDateShort(m.date)}`}
                       </span>
                     </span>
                   );

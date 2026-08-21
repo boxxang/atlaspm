@@ -2,7 +2,8 @@
 
 import { useEffect, useRef, useState } from 'react';
 import type { StageId } from '@/data/types';
-import { formatManMonths } from '@/lib/effort';
+import { formatManMonths, formatTat } from '@/lib/effort';
+import { activityRowId } from '@/lib/rowIds';
 import {
   fromLines,
   normaliseOverride,
@@ -11,6 +12,8 @@ import {
 } from '@/lib/stageDetail';
 import { useAppStore, type InlineState } from '@/store/useAppStore';
 import { Deliverables } from './Deliverables';
+import { useWrapped } from '@/store/wrapStore';
+import { WrapToggle } from './WrapToggle';
 
 /** The stage as this program's profile defines it, text and all. */
 const useStage = (id: StageId) =>
@@ -65,44 +68,65 @@ function PencilIcon() {
  */
 function EngineeringTable({
   stageId,
+  shortTitle,
   detail,
   editing,
 }: {
   stageId: StageId;
+  /** Prefix of the row IDs — DEF-01, PKGD-11. */
+  shortTitle: string;
   detail: ResolvedStageDetail;
   /** Owned by the pane header, so the switch sits on the same row as the
       deliverables' one and the two tables line up. */
   editing: boolean;
 }) {
   const setLines = useAppStore((st) => st.setEngineeringLines);
+  const wrapped = useWrapped('engineering');
   const [draft, setDraft] = useState('');
   const [draftMm, setDraftMm] = useState('');
+  const [draftTat, setDraftTat] = useState('');
 
   const lines = detail.engineeringView.map((label, i) => ({
     label,
     manMonths: detail.engineeringEffort[i] ?? 0,
+    tatWeeks: detail.engineeringTat[i] ?? 0,
   }));
-  const write = (next: { label: string; manMonths: number }[]) => setLines(stageId, next);
+  const write = (next: { label: string; manMonths: number; tatWeeks: number }[]) =>
+    setLines(stageId, next);
 
   const add = () => {
     const label = draft.trim();
     if (!label) return;
-    const n = Number.parseFloat(draftMm);
-    write([...lines, { label, manMonths: Number.isFinite(n) && n >= 0 ? n : 0 }]);
+    const mm = Number.parseFloat(draftMm);
+    const tat = Number.parseFloat(draftTat);
+    write([
+      ...lines,
+      {
+        label,
+        manMonths: Number.isFinite(mm) && mm >= 0 ? mm : 0,
+        tatWeeks: Number.isFinite(tat) ? tat : 0,
+      },
+    ]);
     setDraft('');
     setDraftMm('');
+    setDraftTat('');
   };
 
   return (
     <>
       <div className={`mm-cols${editing ? '' : ' read'}`}>
+        <span>ID</span>
         <span>Activity</span>
+        <span>TAT</span>
         <span>M/M</span>
         {editing && <span />}
       </div>
-      <ul className={`mm-list${editing ? '' : ' read'}`}>
+      <ul className={`mm-list${editing ? '' : ' read'}${wrapped ? ' wrapped' : ''}`}>
         {lines.map((line, i) => (
           <li key={`${i}-${line.label}`}>
+            <span className="row-id" data-act-id={i}>
+              {activityRowId(shortTitle, i)}
+            </span>
             {editing ? (
               <input
                 className="mm-t"
@@ -116,6 +140,31 @@ function EngineeringTable({
             ) : (
               <span className="mm-t read" data-mm-label-text={i}>
                 {line.label}
+              </span>
+            )}
+            {editing ? (
+              <input
+                type="number"
+                className="mm-input tat"
+                data-tat={i}
+                step="0.5"
+                inputMode="decimal"
+                aria-label={`Turn-around weeks for ${line.label}`}
+                title="Elapsed weeks; a negative value marks an activity that runs continuously"
+                value={line.tatWeeks || ''}
+                placeholder="0"
+                onChange={(e) => {
+                  const n = Number.parseFloat(e.target.value);
+                  write(
+                    lines.map((l, j) =>
+                      j === i ? { ...l, tatWeeks: Number.isFinite(n) ? n : 0 } : l,
+                    ),
+                  );
+                }}
+              />
+            ) : (
+              <span className="mm-input tat read" data-tat-text={i}>
+                {formatTat(line.tatWeeks)}
               </span>
             )}
             {editing ? (
@@ -167,6 +216,16 @@ function EngineeringTable({
         />
         <input
           type="number"
+          className="mm-new-tat"
+          step="0.5"
+          placeholder="TAT"
+          aria-label="Turn-around weeks for the new activity"
+          value={draftTat}
+          onChange={(e) => setDraftTat(e.target.value)}
+          onKeyDown={(e) => e.key === 'Enter' && add()}
+        />
+        <input
+          type="number"
           className="mm-new-mm"
           min="0"
           step="0.5"
@@ -192,7 +251,15 @@ function EngineeringTable({
 }
 
 /** Engineering | Program — the two readings of the same stage. */
-function ViewToggle({ stageId, detail }: { stageId: StageId; detail: ResolvedStageDetail }) {
+function ViewToggle({
+  stageId,
+  shortTitle,
+  detail,
+}: {
+  stageId: StageId;
+  shortTitle: string;
+  detail: ResolvedStageDetail;
+}) {
   const [view, setView] = useState<'eng' | 'prog'>('eng');
   /* The engineering list has its own edit mode, independent of the stage text
      and of the deliverables; its switch lives up here so both tables carry
@@ -209,6 +276,7 @@ function ViewToggle({ stageId, detail }: { stageId: StageId; detail: ResolvedSta
             Program
           </button>
         </div>
+        {view === 'eng' && <WrapToggle boardKey="engineering" />}
         {view === 'eng' && (
           <button
             className="tbl-edit"
@@ -222,7 +290,12 @@ function ViewToggle({ stageId, detail }: { stageId: StageId; detail: ResolvedSta
         )}
       </div>
       <div className="view-pane enter" data-pane="eng" hidden={view !== 'eng'} key={`eng-${view}`}>
-        <EngineeringTable stageId={stageId} detail={detail} editing={editing} />
+        <EngineeringTable
+            stageId={stageId}
+            shortTitle={shortTitle}
+            detail={detail}
+            editing={editing}
+          />
         <div className="view-foot">
           <span className="cap">Tools</span>
           <span className="mono">{detail.tools.join(' · ')}</span>
@@ -374,7 +447,7 @@ function StageDetail({ stageId }: { stageId: StageId }) {
       )}
 
       <div className="sheet-grid">
-        <ViewToggle stageId={stageId} detail={detail} />
+        <ViewToggle stageId={stageId} shortTitle={s.shortTitle} detail={detail} />
         <div className="sheet-side">
           <Deliverables stageId={stageId} />
         </div>

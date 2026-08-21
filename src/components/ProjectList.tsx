@@ -56,7 +56,11 @@ function ProjectCard({ p }: { p: ProjectSummary }) {
 
   const today = mounted ? startOfDay(new Date()) : null;
   const overdue = today ? p.openActivityDues.filter((d) => d < today).length : 0;
+  /* Stages are concurrent, so a dozen can be in flight at once. The card names
+     the one the program opens on — the lowest bar of them, same rule as the
+     store's — rather than the first, which named a stage you never landed on. */
   const inFlight = today ? inFlightStageIds(schedule, today) : [];
+  const openStage = inFlight.length ? inFlight[inFlight.length - 1] : null;
   const done = today ? daysTo(schedule.production, today) < 0 : false;
 
   return (
@@ -88,7 +92,7 @@ function ProjectCard({ p }: { p: ProjectSummary }) {
         {!mounted
           ? ' '
           : inFlight.length
-            ? `${titleOf(inFlight[0]).shortTitle} · ${titleOf(inFlight[0]).title}`
+            ? `${titleOf(openStage!).shortTitle} · ${titleOf(openStage!).title}`
             : done
               ? 'Complete'
               : 'Not started'}

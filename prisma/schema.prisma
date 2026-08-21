@@ -189,6 +189,9 @@ model StageDetail {
   /// Man-months per engineering line, newline-separated and index-aligned to
   /// engineeringView — including when that list is the shared default.
   engineeringEffort String?
+  /// Elapsed weeks per engineering line, stored the same way. Negative marks an
+  /// activity that runs continuously across the stage rather than closing once.
+  engineeringTat    String?
   programView     String?
   tools           String?
   collaboration   String?

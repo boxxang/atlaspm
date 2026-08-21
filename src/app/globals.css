@@ -18,7 +18,7 @@
   --accent-soft:#e7effa;
   --risk:#d03b3b;
   /* adjustable via settings (each default ±5 steps) */
-  --fs-base:16px;
+  --fs-base:15px;
   --icon-scale:2;
   --gbar-h:16px;
   /* the shared height of the engineering and deliverables tables */
@@ -32,6 +32,8 @@
   --bck-activities-date:6.6rem; --bck-activities-owner:6rem; --bck-activities-due:6.6rem;
   --bck-risks-date:6.6rem;      --bck-risks-owner:6rem;      --bck-risks-due:6.6rem;
   --dash-row-h:36px;         /* dashboard schedule row height */
+  --ms-dot:26px;             /* checkpoint diamonds on the concurrency chart */
+  --row-id-w:3.8rem;         /* the DEF-01 / DEF-D1 column on both tables */
   --dlv-due:8.5rem;          /* deliverables table columns */
   --dlv-comp:10.5rem;
   /* layout */
@@ -176,7 +178,15 @@ body.has-overrides .edited-flag{display:inline}
   padding:18px 56px 10px;
   border-bottom:1px solid var(--line);
   background:var(--surface);
+  /* A sticky header may not eat the page it sits above: a 23-stage profile
+     would otherwise put 600px of chart over the panel being read. The bar
+     chart scrolls inside whatever is left. */
+  max-height:62vh;display:flex;flex-direction:column;overflow:hidden;
 }
+#roadmap .rm-scroll{min-height:0;display:flex;flex-direction:column}
+#rm-gantt{min-height:0;display:flex;flex-direction:column}
+/* the month strip keeps its height; only the rows below it give way */
+#rm-gantt .g-months,#rm-gantt-cap{flex:none}
 /* Stages live on the y-axis of the concurrency chart; the x-axis carries only
    the milestone diamonds. Both are inset by the same gutter and share the
    gantt's geometry, so a diamond lands exactly over the bar end it marks. */
@@ -192,69 +202,29 @@ body.has-overrides .edited-flag{display:inline}
 .rm-region+.rm-region{border-left:1px solid var(--line)}
 .rm-region.current{color:var(--ink);font-weight:600}
 .rm-region>span{overflow:hidden;text-overflow:ellipsis;padding:0 6px}
-/* tall enough for the major diamonds to sit inside it rather than
-   spilling into the concurrency caption below */
-#rm-line-wrap{position:relative;height:78px}
-#rm-line{position:absolute;left:0;right:0;top:58px;height:var(--line-w);background:var(--line-strong)}
-#rm-line::after{
-  content:"";position:absolute;right:-2px;top:50%;
-  border:4px solid transparent;border-left:6px solid var(--line-strong);
-  transform:translateY(-50%);
-}
-/* The diamond carries its own date: the axis is read at a glance rather than
-   hovered. The square is rotated, the date inside is rotated back. */
-.rm-ms{
-  position:absolute;top:58.5px;
-  width:calc(13px * var(--icon-scale));height:calc(13px * var(--icon-scale));
-  transform:translate(-50%,-50%) rotate(45deg);
-  background:var(--surface);border:1.5px solid var(--ink);z-index:2;
-  display:flex;align-items:center;justify-content:center;
-}
-.rm-ms.major{z-index:3}
-.rm-ms-date{
-  transform:rotate(-45deg);font-family:var(--mono);
-  font-size:calc(var(--cp-fs) * 0.82);line-height:1;color:var(--ink-2);white-space:nowrap;
-}
-/* One rule for every marker on the axis: a date already behind us is filled,
-   one still ahead is hollow. Major milestones say so with weight, not colour. */
-.rm-ms.past{background:var(--ink);border-color:var(--ink)}
-.rm-ms.past .rm-ms-date{color:var(--page)}
-.rm-ms{border-width:1.5px}
-.rm-ms.kickoff{border-style:dashed;cursor:pointer}
-.rm-ms.kickoff:hover,.rm-ms.kickoff:focus-visible{border-color:var(--accent);outline:none}
-.rm-ms.kickoff:hover .rm-ms-date{color:var(--accent)}
-.rm-ms.kickoff.past:hover .rm-ms-date{color:var(--page)}
-.rm-ms-label.kickoff{color:var(--ink-2)}
-.rm-kickoff-edit{position:absolute;top:86px;transform:translateX(-50%);z-index:6}
-.rm-kickoff-edit input{
-  font-family:var(--mono);font-size:.72em;border:1px solid var(--line-strong);border-radius:4px;
-  padding:3px 6px;background:var(--surface);color:var(--ink);
-}
-.rm-kickoff-edit input:focus{outline:none;border-color:var(--accent)}
-.rm-ms-label{
-  position:absolute;transform:translateX(-50%);
-  font-family:var(--mono);font-size:var(--cp-fs);letter-spacing:.06em;color:var(--ink-2);
-  text-transform:uppercase;white-space:nowrap;
-}
-.rm-ms-label.major{color:var(--ink)}
-.rm-ms-label::after{
-  content:"";position:absolute;left:50%;top:calc(100% + 1px);width:1px;background:var(--line);
-}
-.rm-ms-label[data-row="0"]{top:0}
-.rm-ms-label[data-row="1"]{top:21px}
-.rm-ms-label[data-row="0"]::after{height:43px}
-.rm-ms-label[data-row="1"]::after{height:22px}
-/* today marker on the milestone axis */
-#rm-today{
-  position:absolute;top:34px;transform:translateX(-50%);z-index:3;
-  display:flex;flex-direction:column;align-items:center;gap:2px;pointer-events:none;
-}
-#rm-today .ty-lbl{font-family:var(--mono);font-size:calc(var(--cp-fs) * 0.85);letter-spacing:.14em;color:var(--accent);font-weight:700;line-height:1}
-#rm-today .ty-tick{width:0;height:0;border:4.5px solid transparent;border-top:6.5px solid var(--accent)}
 /* Folded: the date axis stays — bands, milestones, months and the Concurrency
    caption — and only the bar chart collapses, down to the open stage and the
    stage either side of it. The open row grows to carry its deliverables.
    Heights and opacities animate; nothing reflows abruptly. */
+/* One row per stage, so a 23-stage profile is close to 600px of chart. The
+   roadmap is sticky: at that height it would cover the panel it is supposed to
+   sit above, and its transparent row hit-targets would swallow clicks meant for
+   the boards below. The rows scroll inside a bounded window instead; the months
+   axis above them stays put, and folding lifts the bound because the chart is
+   one row tall by then, well inside the bound.
+
+   The bound stays on while folded. Lifting it there — the chart is short now,
+   why cap it — grew the chart instead of shrinking it: the cap goes away in one
+   frame while the rows collapse over the whole transition, so for those frames
+   23 full-height rows were unbounded and the chart jumped to its 62vh ceiling,
+   swallowing the pointer that had just left it. Fold, enter, unfold, leave: the
+   flicker. A max-height only ever bounds; the folded chart sits below it. */
+#rm-gantt .g-body{
+  flex:1;min-height:0;max-height:min(40vh,336px);overflow-y:auto;overscroll-behavior:contain;
+  scrollbar-width:thin;scrollbar-color:var(--line-strong) transparent;
+}
+#roadmap.folded #rm-gantt .g-body{overflow:visible}
+
 #roadmap{transition:padding var(--dur) ease}
 #rm-gantt .g-row{
   transition:max-height var(--dur) ease,height var(--dur) ease,opacity var(--dur) ease;
@@ -264,7 +234,7 @@ body.has-overrides .edited-flag{display:inline}
 #roadmap.folded #rm-gantt .g-row.current{height:96px;max-height:96px}
 /* the effort tag would land in the middle of the deliverable markers, and the
    stage panel right below states the same number */
-#roadmap.folded #rm-gantt .g-row.current .g-mm-tag{opacity:0}
+#roadmap.folded #rm-gantt .g-row.current .g-bar-mm{opacity:0}
 @media (prefers-reduced-motion:reduce){
   #roadmap,#rm-gantt .g-row{transition:none}
 }
@@ -302,7 +272,7 @@ body.has-overrides .edited-flag{display:inline}
 }
 .g-dlv.done .g-dlv-dot{background:var(--accent);border-color:var(--accent)}
 .g-dlv.done .g-dlv-date{color:var(--page)}
-.g-dlv.done .g-dlv-name{color:var(--ink-3);text-decoration:line-through}
+.g-dlv.done .g-dlv-name{color:var(--ink-3)}
 
 #rm-gantt-cap{display:flex;gap:12px;align-items:baseline;margin:8px 0 4px}
 #rm-gantt-cap .cap{font-size:.56em}
@@ -314,6 +284,8 @@ body.has-overrides .edited-flag{display:inline}
    ============================================================ */
 .gantt{position:relative;font-family:var(--mono)}
 .g-months{position:relative;height:20px;margin-left:180px}
+/* the kick-off marker rides on this strip, and its date reaches past its right */
+#rm-gantt .g-months{overflow:visible}
 .g-month{position:absolute;top:0;font-size:var(--cp-fs);color:var(--ink-3);letter-spacing:.08em;text-transform:uppercase;transform:translateX(2px);white-space:nowrap}
 .g-body{position:relative}
 .g-gridlines{position:absolute;top:0;bottom:0;left:180px;right:0;pointer-events:none}
@@ -338,7 +310,7 @@ body.has-overrides .edited-flag{display:inline}
 .g-row-label,.g-row-track{position:relative;z-index:1}
 /* and the selected row's own text gets heavier rather than lighter */
 .g-row[aria-selected="true"] .g-row-label{color:var(--ink);font-weight:700}
-.g-row[aria-selected="true"] .g-mm-tag{color:var(--ink);font-weight:700}
+.g-row[aria-selected="true"] .g-bar-mm{color:var(--ink);font-weight:700}
 .gantt.mini .g-row[aria-selected="true"] .g-bar{opacity:1;box-shadow:0 0 0 1.5px var(--accent)}
 .g-bar{
   position:absolute;top:50%;transform:translateY(-50%);height:var(--gbar-h);border-radius:2px;
@@ -374,6 +346,12 @@ body.has-overrides .edited-flag{display:inline}
    STAGE PANELS
    ============================================================ */
 #stage-panels{max-width:1280px;margin:0 auto;padding:32px 40px 60px}
+/* scrollIntoView lands below the toolbar and the roadmap rather than under
+   them — --rm-h is the roadmap's measured height (see Roadmap.tsx). */
+.stage-panel,.stage-panel .facts,.stage-panel .sheet-grid,.stage-panel .board,
+.stage-panel .dlv-list li,.stage-panel .mm-list li,.stage-panel .contacts-sec{
+  scroll-margin-top:calc(var(--toolbar-h) + var(--rm-h,0px) + 16px);
+}
 .panel-hint{
   font-size:.86em;color:var(--ink-3);text-align:center;padding:44px 0;
   border:1px dashed var(--line-strong);border-radius:6px;
@@ -630,12 +608,12 @@ body.col-resizing{user-select:none;cursor:col-resize}
 /* deliverables checklist */
 .dlv-note{font-size:.66em;color:var(--ink-3);font-weight:400;letter-spacing:.04em;margin-left:8px}
 .dlv-cols{
-  display:grid;grid-template-columns:minmax(0,1fr) var(--dlv-due) var(--dlv-comp) 2.2rem;gap:10px;
+  display:grid;grid-template-columns:var(--row-id-w) minmax(0,1fr) var(--dlv-due) var(--dlv-comp) 2.2rem;gap:10px;
   font-size:.58em;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-3);
   padding:6px 0;border-top:1px solid var(--line-strong);border-bottom:1px solid var(--line);
 }
 .dlv-cols>span{position:relative}
-.dlv-list li{display:grid;grid-template-columns:minmax(0,1fr) var(--dlv-due) var(--dlv-comp) 2.2rem;gap:10px;align-items:center;padding:5px 0!important;border-bottom:1px solid var(--line)}
+.dlv-list li{display:grid;grid-template-columns:var(--row-id-w) minmax(0,1fr) var(--dlv-due) var(--dlv-comp) 2.2rem;gap:10px;align-items:center;padding:5px 0!important;border-bottom:1px solid var(--line)}
 .dlv-list label{display:flex;gap:10px;align-items:center;cursor:pointer;min-width:0}
 .dlv-list .dlv-due{
   border:none;border-bottom:1px dashed var(--line-strong);background:none;
@@ -787,12 +765,49 @@ body.col-resizing{user-select:none;cursor:col-resize}
 .c-row input:focus-visible{outline:none;border-bottom:1px solid var(--accent)}
 /* checkpoint markers in dashboard rows: the diamond sits EXACTLY on its date;
    the label chip hangs beside it */
+/* A checkpoint sits on the bar of the stage it belongs to. --ms-dot is its
+   size and nothing else's, so the diamonds can be made bigger without moving
+   the bars or the text around them. */
 .g-msdot{
-  position:absolute;top:50%;width:8px;height:8px;z-index:3;
+  position:absolute;top:50%;width:var(--ms-dot);height:var(--ms-dot);z-index:3;
   transform:translate(-50%,-50%) rotate(45deg);
   background:var(--surface);border:1.4px solid var(--ink);cursor:default;
+  display:flex;align-items:center;justify-content:center;
 }
-.g-msdot.major{width:10px;height:10px;background:var(--ink)}
+/* a date already behind us is filled, one still ahead hollow */
+.g-msdot.past{background:var(--ink);border-color:var(--ink)}
+.g-msdot-date{
+  transform:rotate(-45deg);font-family:var(--mono);line-height:1;
+  font-size:calc(var(--ms-dot) * 0.3);color:var(--ink-2);white-space:nowrap;
+}
+.g-msdot.past .g-msdot-date{color:var(--page)}
+.gantt.mini .g-msdot{width:var(--ms-dot);height:var(--ms-dot)}
+/* the dashboard chart keeps the small plain diamonds it always had */
+.gantt:not(.mini) .g-msdot{width:8px;height:8px}
+.gantt:not(.mini) .g-msdot.major{width:10px;height:10px;background:var(--ink)}
+
+/* Kick-off: week zero, on the same chart, editable where it is drawn. */
+.g-kickoff{
+  position:absolute;top:0;bottom:0;width:1px;
+  background:repeating-linear-gradient(var(--line-strong) 0 4px,transparent 4px 8px);
+}
+/* Kick-off rides on the month strip, sized to it rather than to the checkpoint
+   diamonds: it is where the program starts, not one of the gates it passes. It
+   was drawn down among the rows first, and there it covered the start of the
+   very bar it dates — week zero is where that bar begins. The date is written
+   to its left, over the gutter the row labels sit under, because to its right
+   is the first month of the calendar. */
+.g-kickoff-mark{position:absolute;top:50%;transform:translateY(-50%);width:0;height:14px}
+.g-kickoff-dot{
+  position:absolute;left:0;top:0;width:14px;height:14px;z-index:8;
+  transform:translateX(-50%) rotate(45deg);
+  background:var(--ink);border:1.4px solid var(--ink);cursor:pointer;padding:0;
+}
+.g-kickoff-date{
+  position:absolute;right:11px;top:50%;transform:translateY(-50%);
+  font-family:var(--mono);font-size:var(--cp-fs);color:var(--ink-2);white-space:nowrap;
+}
+.g-kickoff-dot:hover,.g-kickoff-dot:focus-visible{background:var(--accent);border-color:var(--accent);outline:none}
 /* Every checkpoint reads the same way: the label sits to the right of its
    diamond — where the bar has already ended, so nothing is covered — with an
    arrow pointing back at it. The chart carries trailing weeks so even the last
@@ -1133,20 +1148,28 @@ body.sched-preview-open #schedule-view .inner{padding-bottom:calc(60px + var(--s
    MAN-MONTHS — per engineering line, summed onto the bars
    ============================================================ */
 .mm-cols{
-  display:grid;grid-template-columns:minmax(0,1fr) 5.5rem 2.2rem;gap:10px;
+  display:grid;grid-template-columns:var(--row-id-w) minmax(0,1fr) 3.1rem 3.1rem 2.2rem;gap:8px;
   font-size:.58em;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-3);
   padding:6px 0;border-top:1px solid var(--line-strong);border-bottom:1px solid var(--line);
 }
-.mm-cols>span:nth-child(2){text-align:right}
-.mm-cols.read,.mm-list.read li{grid-template-columns:minmax(0,1fr) 5.5rem}
+.mm-cols>span:nth-child(3),.mm-cols>span:nth-child(4){text-align:right}
+.mm-cols.read,.mm-list.read li{grid-template-columns:var(--row-id-w) minmax(0,1fr) 3.1rem 3.1rem}
 .mm-t.read{font-size:.95em;color:var(--ink-2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .mm-input.read{
   font-family:var(--mono);font-size:.78em;color:var(--ink);text-align:right;
 }
 .mm-list li{
-  display:grid;grid-template-columns:minmax(0,1fr) 5.5rem 2.2rem;gap:10px;align-items:center;
+  display:grid;grid-template-columns:var(--row-id-w) minmax(0,1fr) 3.1rem 3.1rem 2.2rem;gap:8px;align-items:center;
   padding:5px 0;border-bottom:1px solid var(--line);
 }
+/* The reference ID beside every activity and deliverable row: quiet enough to
+   ignore while reading, precise enough to quote in a review. */
+.row-id{
+  font-family:var(--mono);font-size:.66em;color:var(--ink-3);letter-spacing:.03em;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+.mm-input.tat{color:var(--ink-2)}
+.mm-input.tat.read{font-size:.74em}
 .mm-list li.mm-empty{display:block;font-size:.8em;color:var(--ink-3);font-style:italic;padding:10px 0}
 input.mm-t{
   border:none;border-bottom:1px dashed transparent;background:none;
@@ -1165,7 +1188,7 @@ input.mm-t:focus-visible{outline:none;border-bottom:1px solid var(--accent);colo
   flex:1;min-width:0;border:none;border-bottom:1px dashed var(--line-strong);background:none;
   font-size:.88em;padding:3px 0;
 }
-.mm-add .mm-new-mm{
+.mm-add .mm-new-tat,.mm-add .mm-new-mm,.mm-add .mm-new-tat{
   width:4.4rem;border:none;border-bottom:1px dashed var(--line-strong);background:none;
   font-family:var(--mono);font-size:.78em;padding:3px 0;text-align:right;
 }
@@ -1193,11 +1216,10 @@ input.mm-t:focus-visible{outline:none;border-bottom:1px solid var(--accent);colo
   font-family:var(--mono);font-size:var(--cp-fs);color:#fff;
   letter-spacing:.04em;white-space:nowrap;pointer-events:none;opacity:.95;
 }
-.g-mm-tag{
-  position:absolute;top:50%;transform:translate(6px,-50%);
-  font-family:var(--mono);font-size:var(--cp-fs);color:var(--ink-2);
-  letter-spacing:.03em;white-space:nowrap;pointer-events:none;
-}
+/* the mini chart's bars are a pale wash rather than solid accent */
+.gantt.mini .g-bar-mm{color:var(--ink-2)}
+.gantt.mini .g-bar.risky .g-bar-mm{color:#fff}
+
 
 /* ============================================================
    FORM VALIDATION — what still needs filling in
@@ -1487,3 +1509,43 @@ body.schedule-mode #schedule-view{opacity:1;visibility:visible;transform:none}
 }
 #rm-pin:hover,#rm-pin:focus-visible{color:var(--ink);border-color:var(--ink-3);outline:none}
 #rm-pin[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--page)}
+
+/* ============================================================
+   WRAPPED BOARDS
+   ============================================================
+   A board row is a grid, and a grid reads down its columns — which is why
+   every text cell in one is a single clipped line by default. Long titles
+   then end in an ellipsis exactly where the sentence got interesting. The
+   wrap toggle in each board header lifts the clip for that board: the cells
+   keep their columns and take as many lines as their text needs, and the row
+   grows with them. Everything here is the same three declarations undone. */
+.wrap-btn{display:inline-flex;align-items:center;padding:2px 7px;line-height:0}
+.wrap-btn[aria-pressed="true"]{color:var(--accent);border-color:var(--accent)}
+
+/* rows stop being vertically centred once they are more than one line tall */
+.board.wrapped .b-row,
+.mb-list.wrapped .su-brow{align-items:start}
+
+.board.wrapped .b-row .b-title,
+.mb-list.wrapped .b-row .b-title{align-items:start}
+.board.wrapped .b-row .b-title .t,
+.board.wrapped .b-row .b-latest,
+.board.wrapped .b-row .b-owner,
+.mb-list.wrapped .b-row .b-title .t,
+.mb-list.wrapped .b-row .b-latest,
+.mb-list.wrapped .b-row .b-owner{
+  overflow:visible;text-overflow:clip;white-space:normal;overflow-wrap:anywhere;
+}
+.mb-list.wrapped .su-brow .t1,
+.mb-list.wrapped .su-brow .t2{white-space:normal;overflow-wrap:anywhere}
+
+.dlv-list.wrapped .dlv-t,
+.dlv-list.wrapped .dlv-comp{overflow:visible;text-overflow:clip;white-space:normal;overflow-wrap:anywhere}
+.dlv-list.wrapped li{align-items:start}
+
+.mm-list.wrapped .mm-t.read,
+.mm-list.wrapped .row-id{overflow:visible;text-overflow:clip;white-space:normal;overflow-wrap:anywhere}
+.mm-list.wrapped li{align-items:start}
+
+.dash-su.wrapped .t1,
+.dash-su.wrapped .t2{overflow:visible;text-overflow:clip;white-space:normal;overflow-wrap:anywhere}

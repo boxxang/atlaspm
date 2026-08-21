@@ -25,6 +25,8 @@ import { useModalStore } from '@/store/modalStore';
 import { useAppStore } from '@/store/useAppStore';
 import { Gantt } from './Gantt';
 import { MailButton } from './MailButton';
+import { useWrapped } from '@/store/wrapStore';
+import { WrapToggle } from './WrapToggle';
 
 
 export function Dashboard({ hidden }: { hidden: boolean }) {
@@ -40,6 +42,7 @@ export function Dashboard({ hidden }: { hidden: boolean }) {
   const setCostRate = useAppStore((s) => s.setCostRate);
   const openAgg = useModalStore((m) => m.openAgg);
   const openBoard = useModalStore((m) => m.openBoard);
+  const wrapUpdates = useWrapped('dash-updates');
 
   /* progress = completed deliverables across the whole flow */
   const allDlv = allDeliverables(deliverables);
@@ -201,6 +204,7 @@ export function Dashboard({ hidden }: { hidden: boolean }) {
               <div className="dash-head-row">
                 <span className="cap">Recent Status Updates</span>
                 <span className="spacer" />
+                <WrapToggle boardKey="dash-updates" />
                 <button
                   className="board-btn"
                   style={{ color: 'var(--accent)' }}
@@ -213,7 +217,7 @@ export function Dashboard({ hidden }: { hidden: boolean }) {
               {recent.length ? (
                 recent.slice(0, 6).map((r) => (
                   <button
-                    className="dash-su"
+                    className={`dash-su${wrapUpdates ? ' wrapped' : ''}`}
                     key={r.su.id}
                     data-su-stage={r.stageId}
                     data-su-kind={r.kind}

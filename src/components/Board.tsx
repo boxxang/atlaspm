@@ -6,8 +6,10 @@ import { activityListDraft, itemDraft } from '@/lib/mailDrafts';
 import { buildDirectory, resolveEmail } from '@/lib/people';
 import { fmtDT, fmtDate } from '@/lib/schedule';
 import { sortedItems, useAppStore } from '@/store/useAppStore';
+import { useWrapped } from '@/store/wrapStore';
 import { ColGrip } from './ColGrip';
 import { MailButton } from './MailButton';
+import { WrapToggle } from './WrapToggle';
 
 /** The program's own address book, used to route an item to its owner. */
 export function useDirectory() {
@@ -153,9 +155,11 @@ export function Board({
   const today = useAppStore((s) => s.today);
   const dir = useDirectory();
   const list = sortedItems(content, kind);
+  /* keyed by kind, so the pop-up over this board reads the same way it does */
+  const wrapped = useWrapped(kind);
 
   return (
-    <div className="board" data-kind={kind}>
+    <div className={`board${wrapped ? ' wrapped' : ''}`} data-kind={kind}>
       <div className="board-head">
         <span className="cap">{title}</span>
         <span className="note">{boardNote(content, kind)}</span>
@@ -178,6 +182,7 @@ export function Board({
           />
         )}
         {extraBtns}
+        <WrapToggle boardKey={kind} />
         <button className="board-btn" data-add={kind} onClick={onAdd}>
           + Add
         </button>

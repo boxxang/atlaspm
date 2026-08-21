@@ -7,8 +7,11 @@ import {
   formatCost,
   formatManMonths,
   formatManMonthsShort,
+  formatTat,
   parseEffort,
+  parseTat,
   serialiseEffort,
+  serialiseTat,
   sumEffort,
   sumEffortText,
 } from '@/lib/effort';
@@ -78,8 +81,8 @@ describe('the seeded program', () => {
 
   it('adds up to the program total the card shows', () => {
     const total = sumEffort(STAGE_ORDER.flatMap((id) => SEED_EFFORT[id]));
-    expect(total).toBe(709);
-    expect(estimateCost(total, SEED_COST_PER_MAN_MONTH)).toBe(10_635_000);
+    expect(total).toBe(3653);
+    expect(estimateCost(total, SEED_COST_PER_MAN_MONTH)).toBe(54_795_000);
   });
 
   it('resolves through the stage detail merge', () => {
@@ -88,7 +91,7 @@ describe('the seeded program', () => {
       engineeringEffort: serialiseEffort(SEED_EFFORT.productDefinition),
     });
     expect(r.engineeringEffort).toEqual(SEED_EFFORT.productDefinition);
-    expect(r.manMonths).toBe(8);
+    expect(r.manMonths).toBe(28);
     // effort does not disturb the text, which still comes from the shared stage
     expect(r.description).toBe(pd.description);
     expect(r.engineeringView).toEqual([...pd.engineeringView]);
@@ -96,10 +99,67 @@ describe('the seeded program', () => {
     expect(r.overridden.size).toBe(0);
   });
 
-  it('reads as unrecorded when a program has entered nothing', () => {
+  it('inherits the template figures when a program has entered nothing', () => {
     const pd = journeyData.find((s) => s.id === 'productDefinition')!;
     const r = resolveStageDetail(pd, null);
-    expect(r.manMonths).toBe(0);
-    expect(r.engineeringEffort).toEqual([0, 0, 0, 0, 0]);
+    expect(r.engineeringEffort).toEqual([...pd.engineeringEffort]);
+    expect(r.engineeringTat).toEqual([...pd.engineeringTat]);
+    expect(r.manMonths).toBe(28);
+    /* inheriting is not editing — the stage is still tracking the template */
+    expect(r.overridden.size).toBe(0);
+  });
+
+  it('lets one recorded figure override without losing the rest', () => {
+    const pd = journeyData.find((s) => s.id === 'productDefinition')!;
+    const mine = [...pd.engineeringEffort];
+    mine[0] = 99;
+    const r = resolveStageDetail(pd, { engineeringEffort: serialiseEffort(mine) });
+    expect(r.engineeringEffort[0]).toBe(99);
+    expect(r.engineeringEffort.slice(1)).toEqual([...pd.engineeringEffort].slice(1));
+  });
+
+  it('stops inheriting once the program owns the activity list', () => {
+    const pd = journeyData.find((s) => s.id === 'productDefinition')!;
+    /* the indices no longer point at the same activities, so the template's
+       numbers would be attached to the wrong rows */
+    const r = resolveStageDetail(pd, { engineeringView: 'Only this one' });
+    expect(r.engineeringView).toEqual(['Only this one']);
+    expect(r.engineeringEffort).toEqual([0]);
+    expect(r.engineeringTat).toEqual([0]);
+  });
+});
+
+describe('turn-around time', () => {
+  it('round-trips whole and fractional weeks', () => {
+    expect(parseTat(serialiseTat([4, 0.5, 12]), 3)).toEqual([4, 0.5, 12]);
+  });
+
+  it('keeps the negative that marks a continuous activity', () => {
+    expect(serialiseTat([-30, 4])).toBe('-30\n4');
+    expect(parseTat('-30\n4', 2)).toEqual([-30, 4]);
+  });
+
+  it('stores nothing when every line is blank', () => {
+    expect(serialiseTat([0, 0])).toBeNull();
+    expect(parseTat(null, 2)).toEqual([0, 0]);
+  });
+
+  it('pads and truncates to the length of the activity list', () => {
+    expect(parseTat('4\n5\n6', 2)).toEqual([4, 5]);
+    expect(parseTat('4', 3)).toEqual([4, 0, 0]);
+  });
+
+  it('reads a span, and marks the continuous ones', () => {
+    expect(formatTat(12)).toBe('12w');
+    expect(formatTat(0.5)).toBe('0.5w');
+    expect(formatTat(-30)).toBe('30w cont.');
+    expect(formatTat(0)).toBe('—');
+  });
+
+  it('gives every engineering line of the template a span', () => {
+    for (const stage of journeyData) {
+      expect(stage.engineeringTat, stage.id).toHaveLength(stage.engineeringView.length);
+      expect(stage.engineeringTat.every((v) => v !== 0), stage.id).toBe(true);
+    }
   });
 });

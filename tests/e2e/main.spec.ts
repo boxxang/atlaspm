@@ -9,7 +9,6 @@ import {
   editDeliverables,
   settleLayout,
   tapeoutDate,
-  setKickoffDate,
 } from './fixtures';
 
 const cssVar = (page: Page, name: string) =>
@@ -71,19 +70,19 @@ const centerX = async (page: Page, sel: string) => {
 
 test.beforeEach(async ({ page }) => {
   await page.goto(SEED_PROJECT_PATH);
-  await selectStage(page, '01');
+  await selectStage(page, 'productDefinition');
 });
 
 test.describe('roadmap', () => {
   test('opens on the stage running today', async ({ page }) => {
     await page.goto(SEED_PROJECT_PATH);
-    // the seed puts today mid-Physical Design, and that is the lowest bar of
-    // the stages in flight
+    // the seed kicks off 66 weeks ago, so today falls inside eleven of the
+    // twenty-three bars; Test Development is the lowest of them
     await expect(page.locator('.stage-panel.selected')).toHaveAttribute(
       'data-id',
-      'physicalDesign',
+      'testDevelopment',
     );
-    await expect(page.locator('#rm-gantt .g-row[data-index="5"]')).toHaveAttribute(
+    await expect(page.locator('#rm-gantt .g-row[data-index="20"]')).toHaveAttribute(
       'aria-selected',
       'true',
     );
@@ -102,10 +101,10 @@ test.describe('roadmap', () => {
   });
 
   test('selecting a bar opens that stage, and selecting it again closes it', async ({ page }) => {
-    await selectStage(page, '06');
+    await selectStage(page, 'physicalDesign');
     await expect(selectedPanel(page)).toHaveAttribute('data-id', 'physicalDesign');
     await expect(selectedPanel(page).locator('h2')).toHaveText('Physical Design');
-    await expect(page.locator('#rm-gantt .g-row[data-index="5"]')).toHaveAttribute(
+    await expect(page.locator('#rm-gantt .g-row[data-index="11"]')).toHaveAttribute(
       'aria-selected',
       'true',
     );
@@ -120,32 +119,43 @@ test.describe('roadmap', () => {
   test('the stages are the y-axis, and nothing but milestones is on the x-axis', async ({
     page,
   }) => {
-    // twelve rows down the side, labelled and legible
+    // one row per stage of the profile, labelled and legible
     const labels = page.locator('#rm-gantt .g-row-label');
-    await expect(labels).toHaveCount(12);
+    await expect(labels).toHaveCount(23);
     // numbered, so the order is readable at a glance
     await expect(labels).toHaveText([
-      '01.DEF', '02.ARCH', '03.RTL', '04.DV', '05.SYN', '06.PD',
-      '07.SO', '08.TO', '09.FAB', '10.PKG', '11.BU', '12.MP',
+      '01.DEF', '02.ARCH', '03.TECH', '04.PDK', '05.IPR', '06.AMS',
+      '07.TC', '08.RTL', '09.DV', '10.DFT', '11.SYN', '12.PD',
+      '13.SO', '14.TO', '15.FAB', '16.PKGD', '17.PTV', '18.SIPI',
+      '19.ASSY', '20.EVB', '21.TEST', '22.BU', '23.MP',
     ]);
     const size = await labels.first().evaluate((el) => parseFloat(getComputedStyle(el).fontSize));
     expect(size).toBeGreaterThanOrEqual(12);
 
-    // the old station row is gone; the axis carries the seven milestones
+    // the old station row is gone, and so is the separate milestone strip:
+    // every checkpoint is a diamond on the bar of the stage that carries it
     await expect(page.locator('.rm-station')).toHaveCount(0);
     await expect(page.locator('#rm-progress')).toHaveCount(0);
-    // kickoff plus the seven milestones
-    await expect(page.locator('.rm-ms')).toHaveCount(8);
-    await expect(page.locator('.rm-ms[data-msid="kickoff"]')).toHaveCount(1);
-    await expect(page.locator('.rm-ms.major')).toHaveCount(3);
-    await expect(page.locator('.rm-ms-label')).toHaveText([
-      'Kick-off',
+    await expect(page.locator('#rm-line-wrap')).toHaveCount(0);
+    // the fifteen a TPM is held to, three of them major, plus kickoff
+    await expect(page.locator('#rm-gantt .g-msdot')).toHaveCount(15);
+    await expect(page.locator('#rm-gantt .g-kickoff-dot')).toHaveCount(1);
+    await expect(page.locator('#rm-gantt .g-msdot.major')).toHaveCount(3);
+    await expect(page.locator('#rm-gantt .g-cp')).toHaveText([
       'Arch Freeze',
+      'PDK 1.0 Release',
+      'IP Plan Freeze',
+      'AMS Macro Handoff',
+      'Test Chip Silicon',
       'RTL Freeze',
       'DV Closure',
+      'FFN Release',
       'Design Freeze',
-      'Tapeout',
+      'Tapeout (BEOL MTO)',
       'First Silicon',
+      'Package Design Freeze',
+      'EVB Ready',
+      'Probe Card Ready',
       'Mass Production',
     ]);
   });
@@ -161,22 +171,23 @@ test.describe('roadmap', () => {
     };
     for (const [milestone, index] of [
       ['archFreeze', '1'],
-      ['rtlFreeze', '2'],
-      ['dvClosure', '3'],
-      ['designFreeze', '6'],
-      ['tapeout', '7'],
-      ['firstSilicon', '8'],
-      ['massProduction', '11'],
+      ['pdk10Release', '3'],
+      ['rtlFreeze', '7'],
+      ['dvClosure', '8'],
+      ['designFreeze', '12'],
+      ['tapeoutBeolMto', '13'],
+      ['firstSilicon', '14'],
+      ['massProduction', '22'],
     ] as const) {
       expect(
-        Math.abs((await centre(`[data-msid="${milestone}"]`)) - (await barEnd(index))),
+        Math.abs((await centre(`#rm-gantt [data-msid="${milestone}"]`)) - (await barEnd(index))),
         milestone,
       ).toBeLessThanOrEqual(1);
     }
   });
 
   test('arrow keys walk the y-axis', async ({ page }) => {
-    await selectStage(page, '03');
+    await selectStage(page, 'rtl');
     await page.locator('#rm-gantt [data-select-stage="rtl"]').focus();
     await page.keyboard.press('ArrowDown');
     await page.keyboard.press('Enter');
@@ -188,8 +199,8 @@ test.describe('roadmap', () => {
   });
 
   test('a selected row stays legible — the highlight sits behind its text', async ({ page }) => {
-    await selectStage(page, '06');
-    const row = page.locator('#rm-gantt .g-row[data-index="5"]');
+    await selectStage(page, 'physicalDesign');
+    const row = page.locator('#rm-gantt .g-row[data-index="11"]');
     await expect(row).toHaveAttribute('aria-selected', 'true');
 
     // the hit target on top is transparent; the wash is behind the content
@@ -200,24 +211,26 @@ test.describe('roadmap', () => {
     // and a selected row reads heavier, not lighter
     await expect(row.locator('.g-row-label')).toHaveCSS('font-weight', '700');
     await expect(row.locator('.g-row-label')).toHaveCSS('color', 'rgb(11, 11, 11)');
-    await expect(row.locator('.g-mm-tag')).toHaveCSS('font-weight', '700');
+    await expect(row.locator('.g-bar-mm')).toHaveCSS('font-weight', '700');
   });
 
-  test('TODAY marker aligns pixel-exact with the gantt today line', async ({ page }) => {
-    await expect(page.locator('#rm-today')).toBeVisible();
-    const marker = await centerX(page, '#rm-today');
+  test('the TODAY line and its label stand on the same date', async ({ page }) => {
+    // there is one today line now — the strip that carried a second one is
+    // gone — and its label sits over it
+    await expect(page.locator('#rm-gantt .g-today')).toBeVisible();
     const line = await centerX(page, '#rm-gantt .g-today');
-    expect(marker).not.toBeNull();
-    expect(Math.abs(marker! - line!)).toBeLessThanOrEqual(1);
+    const label = await centerX(page, '#rm-gantt .g-today-label');
+    expect(label).not.toBeNull();
+    expect(Math.abs(label! - line!)).toBeLessThanOrEqual(1);
   });
 
   test('past bars render gray and risky bars render red', async ({ page }) => {
-    // RTL closed long ago; its bar is fully past and carries no open risk
+    // Technology closed long ago; its bar is fully past and carries no open risk
     const past = page.locator('#rm-gantt .g-row[data-index="2"] .g-bar');
     await expect(past).not.toHaveClass(/risky/);
     await expect(past.locator('.past-seg')).toHaveCSS('width', /.+/);
-    // Physical Design holds 3 open risks — risk color wins over past-gray
-    const risky = page.locator('#rm-gantt .g-row[data-index="5"] .g-bar');
+    // Physical Design holds open risks — risk color wins over past-gray
+    const risky = page.locator('#rm-gantt .g-row[data-index="11"] .g-bar');
     await expect(risky).toHaveClass(/risky/);
     await expect(risky).toHaveCSS('background-color', 'rgb(208, 59, 59)');
     await expect(risky.locator('.past-seg')).toHaveCount(0);
@@ -228,10 +241,10 @@ test.describe('stage panel', () => {
   test('DV end-date edit ripples to the Tapeout milestone', async ({ page }) => {
     const before = await tapeoutDate(page);
 
-    await selectStage(page, '04');
+    await selectStage(page, 'verification');
     const panel = selectedPanel(page);
     await expect(panel).toHaveAttribute('data-id', 'verification');
-    await expect(panel.locator('[data-role="tat-edit"]')).toHaveValue('16');
+    await expect(panel.locator('[data-role="tat-edit"]')).toHaveValue('40');
 
     const end = await panel.locator('[data-role="end-edit"]').inputValue();
     const iso = isoPlusDays(end, 28);
@@ -239,7 +252,7 @@ test.describe('stage panel', () => {
 
     // the edit is staged: review it, then apply
     await expect(page.locator('#sched-preview')).toBeVisible();
-    await expect(panel.locator('[data-role="tat-edit"]')).toHaveValue('20');
+    await expect(panel.locator('[data-role="tat-edit"]')).toHaveValue('44');
     await page.locator('[data-apply-schedule]').click();
     await expect(page.locator('#sched-preview')).toHaveCount(0);
     await expect(panel.locator('[data-role="end-edit"]')).toHaveValue(iso);
@@ -257,7 +270,7 @@ test.describe('stage panel', () => {
   });
 
   test('a start-date edit shifts the stage without changing its TAT', async ({ page }) => {
-    await selectStage(page, '07');
+    await selectStage(page, 'signoff');
     const panel = selectedPanel(page);
     const tat = await panel.locator('[data-role="tat-edit"]').inputValue();
     const start = await panel.locator('[data-role="start-edit"]').inputValue();
@@ -285,7 +298,7 @@ test.describe('stage panel', () => {
   });
 
   test('activity shows up to ten, key information and risk up to five', async ({ page }) => {
-    await selectStage(page, '06');
+    await selectStage(page, 'physicalDesign');
     const panel = selectedPanel(page);
 
     const acts = panel.locator('.board[data-kind="activities"]');
@@ -301,7 +314,7 @@ test.describe('stage panel', () => {
   });
 
   test('Show more is still there beside the window', async ({ page }) => {
-    await selectStage(page, '01');
+    await selectStage(page, 'productDefinition');
     const keyinfo = selectedPanel(page).locator('.board[data-kind="keyinfo"]');
     await expect(keyinfo.locator('.board-head .note')).toHaveText('12 items');
     await expect(keyinfo.locator('.b-row')).toHaveCount(12);
@@ -312,7 +325,7 @@ test.describe('stage panel', () => {
   test('activity sits left, key information over risk on the right, contacts last', async ({
     page,
   }) => {
-    await selectStage(page, '06');
+    await selectStage(page, 'physicalDesign');
     const panel = selectedPanel(page);
     const box = async (sel: string) => (await panel.locator(sel).boundingBox())!;
 
@@ -342,7 +355,7 @@ test.describe('stage panel', () => {
   test('the three boards end level, the right pair splitting the left 60/40', async ({
     page,
   }) => {
-    await selectStage(page, '06');
+    await selectStage(page, 'physicalDesign');
     const panel = selectedPanel(page);
     const box = async (kind: string) =>
       (await panel.locator(`.board[data-kind="${kind}"]`).boundingBox())!;
@@ -367,7 +380,7 @@ test.describe('stage panel', () => {
 
   test('an empty board keeps Show more beside its own message', async ({ page }) => {
     // Architecture has nothing on its risk board
-    await selectStage(page, '02');
+    await selectStage(page, 'architecture');
     const board = selectedPanel(page).locator('.board[data-kind="risks"]');
     await expect(board.locator('.b-row')).toHaveCount(0);
     const rows = (await board.locator('.board-rows').boundingBox())!;
@@ -378,14 +391,18 @@ test.describe('stage panel', () => {
 
   test('a board past its window scrolls instead of growing', async ({ page }) => {
     // Product Definition carries a full dozen on each board
-    await selectStage(page, '01');
+    await selectStage(page, 'productDefinition');
     const panel = selectedPanel(page);
     const act = panel.locator('.board[data-kind="activities"]');
     await expect(act.locator('.b-row')).toHaveCount(12);
-    // the Activity window stops at its ceiling and scrolls from there
-    expect(Math.round((await act.locator('.board-rows').boundingBox())!.height)).toBe(600);
+    // Activity grows with its content, but never past its ceiling
+    const actH = Math.round((await act.locator('.board-rows').boundingBox())!.height);
+    expect(actH).toBeGreaterThan(400);
+    expect(actH).toBeLessThanOrEqual(600);
 
-    for (const kind of ['activities', 'keyinfo', 'risks'] as const) {
+    // the pair beside it split that height rather than adding to it, so they
+    // scroll inside their share instead of stretching the panel
+    for (const kind of ['keyinfo', 'risks'] as const) {
       const rows = panel.locator(`.board[data-kind="${kind}"] .board-rows`);
       expect(
         await rows.evaluate((el) => el.scrollHeight > el.clientHeight),
@@ -398,7 +415,7 @@ test.describe('stage panel', () => {
     /* only in the two-column layout — below 1280 the panel stacks and the
        visual takes an explicit height above the text */
     await page.setViewportSize({ width: 1440, height: 900 });
-    await selectStage(page, '06');
+    await selectStage(page, 'physicalDesign');
     const panel = selectedPanel(page);
     const viz = (await panel.locator('.viz').boundingBox())!;
     const dates = (await panel.locator('.dates-row').boundingBox())!;
@@ -406,10 +423,10 @@ test.describe('stage panel', () => {
   });
 
   test('overdue activity dues render red', async ({ page }) => {
-    await selectStage(page, '06');
-    await expect(
-      selectedPanel(page).locator('.board[data-kind="activities"] .b-due.overdue'),
-    ).toHaveCSS('color', 'rgb(208, 59, 59)');
+    await selectStage(page, 'physicalDesign');
+    const overdue = selectedPanel(page).locator('.board[data-kind="activities"] .b-due.overdue');
+    await expect(overdue.first()).toHaveCSS('color', 'rgb(208, 59, 59)');
+    await expect(overdue.last()).toHaveCSS('color', 'rgb(208, 59, 59)');
   });
 });
 
@@ -453,7 +470,7 @@ test.describe('stage details', () => {
     page,
   }) => {
     await expect(selectedPanel(page).locator('.inline-area[data-kind="stage"]')).toBeVisible();
-    await selectStage(page, '09');
+    await selectStage(page, 'fabrication');
     await expect(selectedPanel(page).locator('.inline-area[data-kind="stage"]')).toBeVisible();
   });
 
@@ -485,28 +502,28 @@ test.describe('stage details', () => {
   test('checking a deliverable stamps completedAt and updates the counter', async ({
     page,
   }) => {
-    await selectStage(page, '06');
+    await selectStage(page, 'physicalDesign');
     const panel = selectedPanel(page);
-    await expect(panel.locator('.dlv-note')).toHaveText('2 / 5 complete');
+    await expect(panel.locator('.dlv-note')).toHaveText('5 / 9 complete');
 
-    const row = panel.locator('.dlv-list li').nth(2); // Routed database — open
+    const row = panel.locator('.dlv-list li').nth(5); // Interim DRC / LVS — open
     await expect(row.locator('.dlv-comp')).toHaveText('—');
     await row.locator('input[type="checkbox"]').check();
 
     await expect(row.locator('.dlv-comp')).toHaveText(/^\d{2}\/\d{2}\/\d{4} · \d{2}:\d{2}$/);
     await expect(row.locator('.dlv-t')).toHaveClass(/done/);
-    await expect(panel.locator('.dlv-note')).toHaveText('3 / 5 complete');
+    await expect(panel.locator('.dlv-note')).toHaveText('6 / 9 complete');
 
     // unchecking clears the stamp again
     await row.locator('input[type="checkbox"]').uncheck();
     await expect(row.locator('.dlv-comp')).toHaveText('—');
-    await expect(panel.locator('.dlv-note')).toHaveText('2 / 5 complete');
+    await expect(panel.locator('.dlv-note')).toHaveText('5 / 9 complete');
   });
 
   test('deliverables can be added and deleted', async ({ page }) => {
     const panel = selectedPanel(page);
     const rows = panel.locator('.dlv-list li');
-    await expect(rows).toHaveCount(4);
+    await expect(rows).toHaveCount(6);
     // the table is a read-out until it is switched into edit mode
     await expect(panel.locator('.dlv-add')).toHaveCount(0);
     await expect(panel.locator('input.dlv-due')).toHaveCount(0);
@@ -514,11 +531,11 @@ test.describe('stage details', () => {
     await panel.locator('.dlv-input').fill('Cost model refresh');
     await panel.locator('.dlv-input-due').fill('2026-12-11');
     await panel.locator('[data-dlv-add]').click();
-    await expect(rows).toHaveCount(5);
+    await expect(rows).toHaveCount(7);
     await expect(rows.last()).toContainText('Cost model refresh');
-    await expect(panel.locator('.dlv-note')).toHaveText('4 / 5 complete');
+    await expect(panel.locator('.dlv-note')).toHaveText('6 / 7 complete');
     await rows.last().locator('[data-dlv-del]').click();
-    await expect(rows).toHaveCount(4);
+    await expect(rows).toHaveCount(6);
   });
 
   test('contacts can be added, edited and deleted', async ({ page }) => {
@@ -554,7 +571,7 @@ test.describe('stage details', () => {
 
 test.describe('risk library and leader', () => {
   test('a potential risk can be tracked onto the risk board', async ({ page }) => {
-    await selectStage(page, '02');
+    await selectStage(page, 'architecture');
     const panel = selectedPanel(page);
     await expect(panel.locator('.board[data-kind="risks"] .b-row')).toHaveCount(0);
     await expect(panel.locator('.b-empty')).toBeVisible();
@@ -603,31 +620,25 @@ test.describe('the stage in flight', () => {
   test('a program opens on the stage today falls in', async ({ page }) => {
     // no clicking: the store picks the stage on hydration
     await page.goto(SEED_PROJECT_PATH);
-    await expect(selectedPanel(page)).toHaveAttribute('data-id', 'physicalDesign');
+    await expect(selectedPanel(page)).toHaveAttribute('data-id', 'testDevelopment');
     await expect(page.locator('#rm-gantt .g-row.current')).toHaveAttribute(
       'data-stage',
-      'physicalDesign',
+      'testDevelopment',
     );
     await expect(page.locator('.panel-hint')).toHaveCount(0);
   });
 
-  test('where stages overlap it opens the lowest bar of the two', async ({ page }) => {
-    /* The seed sits in a single stage today, so move its kickoff to a date the
-       profile puts under two bars at once — the overlap this rule is about. */
+  test('where stages overlap it opens the lowest bar of them all', async ({ page }) => {
+    /* Stages are concurrent by design: the profile has today under a dozen
+       bars at once, which is exactly the case this rule is about. */
     const base = computeSchedule(startOfDay(new Date()), scheduleProfiles.typicalSoC, {});
-    let dayOffset = -1;
-    for (let d = 0; d < 900 && dayOffset < 0; d++) {
-      const day = plusDays(startOfDay(new Date()), d);
-      const hit = STAGE_ORDER.filter(
-        (id) => base.stages[id].start <= day && day <= base.stages[id].end,
-      );
-      if (hit.length > 1) dayOffset = d;
-    }
-    expect(dayOffset).toBeGreaterThan(0);
+    const today = startOfDay(new Date());
+    expect(
+      STAGE_ORDER.filter((id) => base.stages[id].start <= today && today <= base.stages[id].end)
+        .length,
+    ).toBeGreaterThan(0);
 
     await page.goto(SEED_PROJECT_PATH);
-    await setKickoffDate(page, toISO(plusDays(startOfDay(new Date()), -dayOffset)));
-    await page.reload();
 
     // read the overlap off the chart: the bars the TODAY line crosses
     const inFlight = await page.locator('#rm-gantt').evaluate((chart) => {
@@ -653,7 +664,7 @@ test.describe('the chart folds away', () => {
     const roadmap = page.locator('#roadmap');
     const height = async () => (await roadmap.boundingBox())!.height;
 
-    await selectStage(page, '06');
+    await selectStage(page, 'physicalDesign');
     await roadmap.hover({ position: { x: 8, y: 8 } });
     await settleLayout(page);
     const open = await height();
@@ -670,17 +681,16 @@ test.describe('the chart folds away', () => {
     expect(folded).toBeLessThan(open - 100);
     await expect(roadmap).toHaveClass(/folded/);
 
-    // the date axis survives — bands, milestones and every month of it
+    // the date axis survives — bands and every month of it
     await expect(page.locator('#rm-axis')).toBeVisible();
     await expect(page.locator('#rm-gantt-cap')).toBeVisible();
     await expect(page.locator('#rm-gantt .g-months .g-month').first()).toBeVisible();
-    await expect(page.locator('.rm-ms').first()).toBeVisible();
 
     // what collapses is the bar chart, down to the open stage alone
     await expect(page.locator('#rm-gantt .g-row.current .g-bar')).toBeVisible();
-    await expect(page.locator('#rm-gantt .g-row[data-index="5"]')).toBeVisible();
-    await expect(page.locator('#rm-gantt .g-row[data-index="4"]')).toBeHidden();
-    await expect(page.locator('#rm-gantt .g-row[data-index="6"]')).toBeHidden();
+    await expect(page.locator('#rm-gantt .g-row[data-index="11"]')).toBeVisible();
+    await expect(page.locator('#rm-gantt .g-row[data-index="10"]')).toBeHidden();
+    await expect(page.locator('#rm-gantt .g-row[data-index="12"]')).toBeHidden();
     await expect(page.locator('#rm-gantt .g-row[data-index="0"]')).toBeHidden();
 
     // and it is drawn at the scale of that stage: the bar takes ~70%, centred
@@ -719,28 +729,45 @@ test.describe('the folded chart carries its dates', () => {
   };
 
   test('every milestone diamond shows its own date, hover or not', async ({ page }) => {
-    await selectStage(page, '06');
-    const dots = page.locator('.rm-ms');
-    await expect(dots).toHaveCount(8); // kickoff and the seven milestones
-    for (const text of await dots.locator('.rm-ms-date').allTextContents()) {
+    await selectStage(page, 'physicalDesign');
+    const dots = page.locator('#rm-gantt .g-msdot');
+    await expect(dots).toHaveCount(15); // the checkpoints a TPM is held to
+    for (const text of await dots.locator('.g-msdot-date').allTextContents()) {
       expect(text).toMatch(/^\d{1,2}\/\d{1,2}$/);
     }
     // Tapeout's diamond says what the toolbar says
-    const tapeout = await page.locator('.rm-ms[data-msid="tapeout"] .rm-ms-date').textContent();
+    const tapeout = await page
+      .locator('#rm-gantt .g-msdot[data-msid^="tapeout"] .g-msdot-date')
+      .first()
+      .textContent();
     const toolbar = (await tapeoutDate(page))!;
     const [m, d] = toolbar.split('/');
     expect(tapeout).toBe(`${Number(m)}/${Number(d)}`);
 
+    /* Folded, the chart is one stage, so what survives is that stage's own
+       checkpoint — the diamond sits on its bar now, not on a strip above. */
+    await selectStage(page, 'tapeout');
     await fold(page);
-    await expect(page.locator('.rm-ms[data-msid="tapeout"] .rm-ms-date')).toBeVisible();
+    await expect(
+      page.locator('#rm-gantt .g-row.current .g-msdot[data-msid^="tapeout"] .g-msdot-date'),
+    ).toBeVisible();
   });
 
   test('the month scale keeps every month, and follows the zoom', async ({ page }) => {
-    await selectStage(page, '06');
+    await selectStage(page, 'physicalDesign');
     const before = await page.locator('#rm-gantt .g-month').allTextContents();
-    // consecutive months, no gaps: Feb, Mar, Apr…
+    /* Consecutive months, no gaps. Which month the chart opens on depends on
+       when the seed was planted — its kickoff is 66 weeks before today — so
+       the run of months is what is asserted, not the month it starts at. */
+    const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+                    'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    // a January carries its year — "Jan '26" — so the label is read loosely
+    const monthNo = (label: string) => MONTHS.findIndex((m) => label.startsWith(m));
     expect(before.length).toBeGreaterThan(12);
-    expect(before.slice(0, 4)).toEqual(['Feb', 'Mar', 'Apr', 'May']);
+    for (const [i, label] of before.entries()) {
+      expect(monthNo(label), label).toBeGreaterThanOrEqual(0);
+      if (i > 0) expect((monthNo(before[i - 1]) + 1) % 12, label).toBe(monthNo(label));
+    }
 
     /* Folded, the chart is one stage wide, so the calendar comes with it:
        fewer months, still every one of them, still in order. */
@@ -752,21 +779,18 @@ test.describe('the folded chart carries its dates', () => {
   });
 
   test('the open stage wears its deliverables, and a new date moves one', async ({ page }) => {
-    await selectStage(page, '06');
+    await selectStage(page, 'physicalDesign');
     await expect(page.locator('.g-dlv')).toHaveCount(0); // only once it folds
     await fold(page);
 
     const marks = page.locator('#rm-gantt .g-row.current .g-dlv');
-    await expect(marks).toHaveCount(5); // Physical Design's five deliverables
-    /* A finished deliverable is marked on the day it was finished — this one
-       was due 7/23 and closed a week later. */
-    const first = marks.filter({ hasText: 'Floorplan rev C' });
-    await expect(first.locator('.g-dlv-date')).toHaveText('7/30');
+    await expect(marks).toHaveCount(9); // Physical Design's nine deliverables
+    // a finished deliverable is marked on the day it was finished
+    const first = marks.filter({ hasText: 'Floorplan and PDN' });
+    await expect(first.locator('.g-dlv-date')).toHaveText(/^\d{1,2}\/\d{1,2}$/);
     await expect(first).toHaveClass(/done/);
     // an open one still shows what it is due
-    await expect(
-      marks.filter({ hasText: 'Routed database' }).locator('.g-dlv-date'),
-    ).toHaveText('9/3');
+    await expect(marks.filter({ hasText: 'Bump map' }).locator('.g-dlv-date')).toHaveText('9/13');
 
     // markers are placed by date: later date, further right
     const xs = await marks.evaluateAll((els) =>
@@ -775,18 +799,18 @@ test.describe('the folded chart carries its dates', () => {
     expect([...xs].sort((a, b) => a - b)).toEqual(xs);
 
     // move a due date in the sheet below and the marker follows
-    const open = marks.filter({ hasText: 'Routed database' });
+    const open = marks.filter({ hasText: 'Bump map' });
     const before = (await open.boundingBox())!.x;
     await editDeliverables(page);
     await selectedPanel(page)
       .locator('.dlv-list li')
-      .filter({ hasText: 'Routed database' })
+      .filter({ hasText: 'Bump map' })
       .locator('input.dlv-due')
       .fill('2026-09-24');
     await page.locator('#roadmap').hover({ position: { x: 8, y: 8 } });
     await fold(page);
     const moved = page.locator('#rm-gantt .g-row.current .g-dlv').filter({
-      hasText: 'Routed database',
+      hasText: 'Bump map',
     });
     await expect(moved.locator('.g-dlv-date')).toHaveText('9/24');
     expect((await moved.boundingBox())!.x).toBeGreaterThan(before);
@@ -795,7 +819,7 @@ test.describe('the folded chart carries its dates', () => {
 
 test.describe('the pin holds the chart open', () => {
   test('pinned it never folds; unpinned it folds again', async ({ page }) => {
-    await selectStage(page, '06');
+    await selectStage(page, 'physicalDesign');
     const roadmap = page.locator('#roadmap');
     const leave = async () => {
       await settleLayout(page);
@@ -808,7 +832,7 @@ test.describe('the pin holds the chart open', () => {
     await expect(page.locator('[data-pin]')).toHaveAttribute('aria-pressed', 'true');
     await leave();
     await expect(roadmap).not.toHaveClass(/folded/);
-    await expect(page.locator('#rm-gantt .g-row')).toHaveCount(12);
+    await expect(page.locator('#rm-gantt .g-row')).toHaveCount(23);
 
     // it is a preference, so it survives a reload
     await page.reload();
@@ -823,7 +847,7 @@ test.describe('the pin holds the chart open', () => {
   });
 
   test('the folded bar is drawn no thicker than the others', async ({ page }) => {
-    await selectStage(page, '06');
+    await selectStage(page, 'physicalDesign');
     const bar = page.locator('#rm-gantt .g-row.current .g-bar');
     const before = (await bar.boundingBox())!.height;
     const box = (await page.locator('#roadmap').boundingBox())!;
@@ -835,7 +859,7 @@ test.describe('the pin holds the chart open', () => {
 
 test.describe('marks tell past from future', () => {
   test('a date behind us is filled, one ahead is hollow', async ({ page }) => {
-    const marks = await page.locator('.rm-ms').evaluateAll((els) =>
+    const marks = await page.locator('#rm-gantt .g-msdot').evaluateAll((els) =>
       els.map((el) => ({
         id: (el as HTMLElement).dataset.msid,
         past: el.classList.contains('past'),
@@ -847,7 +871,7 @@ test.describe('marks tell past from future', () => {
     expect(ink).not.toBe(paper);
 
     // one shape for all of them: same border, same weight
-    const shape = await page.locator('.rm-ms').evaluateAll((els) =>
+    const shape = await page.locator('#rm-gantt .g-msdot').evaluateAll((els) =>
       els.map((el) => {
         const c = getComputedStyle(el);
         return `${c.borderTopWidth}|${getComputedStyle(el.firstElementChild!).fontWeight}`;
@@ -857,18 +881,18 @@ test.describe('marks tell past from future', () => {
     // and it is the date that decides, not whether the milestone is a major one
     for (const m of marks) expect(m.filled, m.id).toBe(m.past ? ink : paper);
 
-    // kickoff is 30 weeks back in the seed, tapeout still ahead
-    expect(marks.find((m) => m.id === 'kickoff')!.past).toBe(true);
-    expect(marks.find((m) => m.id === 'tapeout')!.past).toBe(false);
+    // Arch Freeze is long behind the seed's today, tapeout still ahead
+    expect(marks.find((m) => m.id === 'archFreeze')!.past).toBe(true);
+    expect(marks.find((m) => m.id === 'tapeoutBeolMto')!.past).toBe(false);
   });
 
   test('ticking a deliverable moves its marker onto the day it was finished', async ({
     page,
   }) => {
-    await selectStage(page, '06');
+    await selectStage(page, 'physicalDesign');
     const row = selectedPanel(page)
       .locator('.dlv-list li')
-      .filter({ hasText: 'Routed database' });
+      .filter({ hasText: 'Bump map' });
     await row.locator('input[type="checkbox"]').check();
     await expect(row.locator('.dlv-comp')).not.toHaveText('—');
 
@@ -877,7 +901,7 @@ test.describe('marks tell past from future', () => {
     await settleLayout(page);
 
     const mark = page.locator('#rm-gantt .g-row.current .g-dlv').filter({
-      hasText: 'Routed database',
+      hasText: 'Bump map',
     });
     await expect(mark).toHaveClass(/done/);
     const today = new Date();
@@ -889,19 +913,19 @@ test.describe('marks tell past from future', () => {
 
 test.describe('the stage duration is a field', () => {
   test('typing weeks moves the completion date and ripples on', async ({ page }) => {
-    await selectStage(page, '04');
+    await selectStage(page, 'verification');
     const panel = selectedPanel(page);
     const start = await panel.locator('[data-role="start-edit"]').inputValue();
-    await expect(panel.locator('[data-role="tat-edit"]')).toHaveValue('16');
+    await expect(panel.locator('[data-role="tat-edit"]')).toHaveValue('40');
 
-    await panel.locator('[data-role="tat-edit"]').fill('20');
+    await panel.locator('[data-role="tat-edit"]').fill('44');
     // the start stays put and the end lands four weeks later
     await expect(panel.locator('[data-role="start-edit"]')).toHaveValue(start);
-    await expect(panel.locator('[data-role="end-edit"]')).toHaveValue(isoPlusDays(start, 140));
+    await expect(panel.locator('[data-role="end-edit"]')).toHaveValue(isoPlusDays(start, 308));
     // and it is staged like any other date edit, not saved behind your back
     await expect(page.locator('#sched-preview')).toBeVisible();
     await page.locator('[data-discard-schedule]').click();
-    await expect(panel.locator('[data-role="tat-edit"]')).toHaveValue('16');
+    await expect(panel.locator('[data-role="tat-edit"]')).toHaveValue('40');
   });
 });
 
@@ -923,19 +947,29 @@ test.describe('board windows', () => {
 
     // Product Definition is seeded full — twelve entries on each board
     const acts = await measure('activities');
-    expect(acts.height).toBe(600);
-    expect(acts.content).toBeGreaterThan(600);
+    expect(acts.height).toBe(Math.min(acts.content, 600));
+    expect(acts.height).toBeGreaterThan(400);
+
+    // the pair beside Activity divide its height rather than adding to it, so
+    // the panel stays one screen and they scroll inside their share
+    const ki = await measure('keyinfo');
+    const risks = await measure('risks');
+    expect(ki.height + risks.height).toBeLessThanOrEqual(acts.height);
+    expect(ki.content).toBeGreaterThan(ki.height);
+    expect(risks.content).toBeGreaterThan(risks.height);
 
     // Physical Design holds a handful; Activity shrinks to its list and the
     // right-hand pair shrink with it rather than reserving 600px of nothing
-    await selectStage(page, '06');
+    await selectStage(page, 'physicalDesign');
     const short = await measure('activities');
     expect(short.height).toBe(Math.min(short.content, 600));
+    expect(short.height).toBeLessThan(acts.height);
     expect(await boardHeight(page, 'keyinfo')).toBeLessThan(300);
   });
 
   test('a full board scrolls inside its window, with Show more just below', async ({ page }) => {
-    const board = selectedPanel(page).locator('.board[data-kind="activities"]');
+    // Key Info gets 60% of Activity's height, which its twelve rows overflow
+    const board = selectedPanel(page).locator('.board[data-kind="keyinfo"]');
     await expect(board.locator('.b-row')).toHaveCount(12);
 
     const rows = board.locator('.board-rows');

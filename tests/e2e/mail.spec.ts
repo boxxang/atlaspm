@@ -19,7 +19,7 @@ const draft = async (page: Page, selector: string) => {
 
 test.beforeEach(async ({ page }) => {
   await page.goto(SEED_PROJECT_PATH);
-  await selectStage(page, '01');
+  await selectStage(page, 'productDefinition');
 });
 
 test.describe('dashboard summary export', () => {
@@ -33,13 +33,15 @@ test.describe('dashboard summary export', () => {
     expect(m.subject).toMatch(/^AtlasAX1 — program summary \d{2}\/\d{2}\/\d{4}$/);
 
     // the numbers the dashboard shows are the numbers in the mail
-    expect(m.body).toContain('51%  (23 of 45 deliverables)');
-    expect(m.body).toMatch(/Open risks {5}19 {2}\(Product Definition, Physical Design/);
-    expect(m.body).toMatch(/Overdue {8}1/);
+    expect(m.body).toContain('57%  (96 of 167 deliverables)');
+    expect(m.body).toMatch(/Open risks {5}23 {2}\(Product Definition, Physical Design/);
+    expect(m.body).toMatch(/Overdue {8}7/);
     expect(m.body).toContain('PD · Physical Design');
     expect(m.body).toMatch(/Tapeout {8}\d{2}\/\d{2}\/\d{4} {2}D−\d+/);
     expect(m.body).toContain('UPCOMING MILESTONES');
-    expect(m.body).toContain('Multi-corner timing closure');
+    /* A program this size fills the mailto ceiling, so the tail is trimmed —
+       but the sign-off is kept, because a trimmed draft still has to read as a
+       finished one. */
     expect(m.body).toContain('Review before sending.');
   });
 
@@ -47,25 +49,29 @@ test.describe('dashboard summary export', () => {
     await page.locator('#mode-toggle button[data-mode="schedule"]').click();
     const link = page.locator('.dash-title-row [data-mail]');
     expect((await link.getAttribute('href'))!.length).toBeLessThanOrEqual(1900);
-    await expect(link).not.toHaveAttribute('data-truncated', 'true');
+    /* A 23-stage program fills the ceiling, so the tail is trimmed — and the
+       mail says so rather than ending mid-sentence. */
+    const m = await draft(page, '.dash-title-row [data-mail]');
+    expect(m.body).toContain('open the item in AtlasPM for the full record');
+    await expect(link).toHaveAttribute('title', /trimmed to fit/);
   });
 
   test('it tracks the data — checking a deliverable moves the summary', async ({ page }) => {
-    await selectStage(page, '06');
+    await selectStage(page, 'physicalDesign');
     await page
       .locator('.stage-panel.selected .dlv-list li')
-      .nth(2)
+      .nth(5) // the first one still open
       .locator('input[type="checkbox"]')
       .check();
     await page.locator('#mode-toggle button[data-mode="schedule"]').click();
     const m = await draft(page, '.dash-title-row [data-mail]');
-    expect(m.body).toContain('53%  (24 of 45 deliverables)');
+    expect(m.body).toContain('58%  (97 of 167 deliverables)');
   });
 });
 
 test.describe('activity export', () => {
   test('a row addresses its own owner and carries the activity', async ({ page }) => {
-    await selectStage(page, '06');
+    await selectStage(page, 'physicalDesign');
     const row = page
       .locator('.stage-panel.selected .board[data-kind="activities"] .b-row')
       .filter({ hasText: 'Top-level detailed routing' });
@@ -88,7 +94,7 @@ test.describe('activity export', () => {
   });
 
   test('an overdue activity says so in the draft', async ({ page }) => {
-    await selectStage(page, '06');
+    await selectStage(page, 'physicalDesign');
     const m = await draft(
       page,
       '.b-row:has-text("PDN IR-drop analysis rev 2") [data-mail]',
@@ -98,7 +104,7 @@ test.describe('activity export', () => {
   });
 
   test('the board header emails the whole list to everyone on it', async ({ page }) => {
-    await selectStage(page, '06');
+    await selectStage(page, 'physicalDesign');
     const m = await draft(
       page,
       '.stage-panel.selected .board[data-kind="activities"] .board-head [data-mail]',
@@ -123,7 +129,7 @@ test.describe('activity export', () => {
   });
 
   test('the item view offers the same draft', async ({ page }) => {
-    await selectStage(page, '06');
+    await selectStage(page, 'physicalDesign');
     await page
       .locator('.stage-panel.selected .board[data-kind="activities"] .b-row')
       .filter({ hasText: 'Top-level detailed routing' })
@@ -135,7 +141,7 @@ test.describe('activity export', () => {
   });
 
   test('risks and key info get an envelope too', async ({ page }) => {
-    await selectStage(page, '06');
+    await selectStage(page, 'physicalDesign');
     const risk = await draft(
       page,
       '.stage-panel.selected .board[data-kind="risks"] .b-row [data-mail]',
@@ -177,7 +183,7 @@ test.describe('activity export', () => {
   });
 
   test('clicking an envelope does not open the row behind it', async ({ page }) => {
-    await selectStage(page, '06');
+    await selectStage(page, 'physicalDesign');
     const row = page
       .locator('.stage-panel.selected .board[data-kind="activities"] .b-row')
       .first();

@@ -13,6 +13,7 @@ describe('display settings defs', () => {
       '--fs-base',
       '--icon-scale',
       '--gbar-h',
+      '--ms-dot',
       '--cp-fs',
       '--dash-row-h',
     ]);
@@ -48,7 +49,7 @@ describe('display settings defs', () => {
 
   it('carries the dashboard defaults the program asked for', () => {
     expect(DISP_DEFAULTS.dash).toEqual({ font: 16, bar: 16, cp: 13, drow: 32 });
-    expect(DISP_DEFAULTS.main).toEqual({ font: 16, icon: 2, bar: 16, cp: 11 });
+    expect(DISP_DEFAULTS.main).toEqual({ font: 15, icon: 2, bar: 16, ms: 26, cp: 11 });
   });
 
   it('offers a setting only in the scopes it applies to', () => {
@@ -62,8 +63,8 @@ describe('display settings defs', () => {
   it('clones defaults without sharing references', () => {
     const a = cloneDefaults();
     a.main.font = 23;
-    expect(DISP_DEFAULTS.main.font).toBe(16);
-    expect(cloneDefaults().main.font).toBe(16);
+    expect(DISP_DEFAULTS.main.font).toBe(15);
+    expect(cloneDefaults().main.font).toBe(15);
   });
 });
 

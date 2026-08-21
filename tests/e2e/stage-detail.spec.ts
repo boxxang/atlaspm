@@ -1,3 +1,4 @@
+import { journeyData } from '../../src/data/journey';
 import {
   expect,
   test,
@@ -16,31 +17,34 @@ import {
  */
 const panel = (page: Page) => page.locator('.stage-panel.selected');
 
-const SHARED_DESCRIPTION =
-  'Define what the product needs to achieve and establish the technical, business, cost, and schedule boundaries of the program before any design work begins.';
+/* Read from the data rather than copied out of it: the shared text is what a
+   stage falls back to, and a test that hardcodes it only proves it was pasted
+   correctly on the day it was written. */
+const stageText = (id: string) => journeyData.find((j) => j.id === id)!.description;
+const SHARED_DESCRIPTION = stageText('productDefinition');
 
 test.beforeEach(async ({ page }) => {
   await page.goto(SEED_PROJECT_PATH);
-  await selectStage(page, '01');
+  await selectStage(page, 'productDefinition');
 });
 
 test.describe('read mode versus edit mode', () => {
   test('the tables are read-outs until the pencil is pressed', async ({ page }) => {
     // engineering: values shown, nothing to type into
-    await expect(panel(page).locator('[data-mm-text]')).toHaveCount(5);
+    await expect(panel(page).locator('[data-mm-text]')).toHaveCount(9);
     await expect(panel(page).locator('.mm-input:not(.read)')).toHaveCount(0);
-    await expect(panel(page).locator('.mm-t.read')).toHaveCount(5);
+    await expect(panel(page).locator('.mm-t.read')).toHaveCount(9);
     await expect(panel(page).locator('[data-mm-del]')).toHaveCount(0);
     await expect(panel(page).locator('.mm-add')).toHaveCount(0);
 
     // deliverables: due dates read as text, no add row, no delete
-    await expect(panel(page).locator('[data-dlv-due-text]')).toHaveCount(4);
+    await expect(panel(page).locator('[data-dlv-due-text]')).toHaveCount(6);
     await expect(panel(page).locator('input.dlv-due')).toHaveCount(0);
     await expect(panel(page).locator('[data-dlv-del]')).toHaveCount(0);
     await expect(panel(page).locator('.dlv-add')).toHaveCount(0);
 
     // …but ticking one off is day-to-day work, not editing
-    await expect(panel(page).locator('.dlv-list input[type="checkbox"]')).toHaveCount(4);
+    await expect(panel(page).locator('.dlv-list input[type="checkbox"]')).toHaveCount(6);
     await expect(panel(page).locator('.dlv-list input[type="checkbox"]').first()).toBeEnabled();
   });
 
@@ -49,29 +53,30 @@ test.describe('read mode versus edit mode', () => {
   }) => {
     // the engineering list opens on its own, and the deliverables stay read-only
     await editEngineering(page);
-    await expect(panel(page).locator('.mm-input:not(.read)')).toHaveCount(5);
+    // one row is two fields — man-months and TAT — so nine rows are eighteen
+    await expect(panel(page).locator('.mm-input:not(.read)')).toHaveCount(18);
     await expect(panel(page).locator('.mm-add')).toHaveCount(1);
-    await expect(panel(page).locator('[data-mm-del]')).toHaveCount(5);
+    await expect(panel(page).locator('[data-mm-del]')).toHaveCount(9);
     await expect(panel(page).locator('input.dlv-due')).toHaveCount(0);
     await expect(panel(page).locator('.sd-edit')).toHaveCount(0);
 
     // …and the deliverables open on theirs, without closing the list
     await editDeliverables(page);
-    await expect(panel(page).locator('input.dlv-due')).toHaveCount(5); // 4 rows + the add row
+    await expect(panel(page).locator('input.dlv-due')).toHaveCount(7); // 6 rows + the add row
     await expect(panel(page).locator('.dlv-add')).toHaveCount(1);
-    await expect(panel(page).locator('.mm-input:not(.read)')).toHaveCount(5);
+    await expect(panel(page).locator('.mm-input:not(.read)')).toHaveCount(18);
 
     // …and the pencil is the stage text, which leaves both of them alone
     await panel(page).locator('[data-sd-edit]').click();
     await expect(panel(page).locator('.sd-edit')).toBeVisible();
-    await expect(panel(page).locator('.mm-input:not(.read)')).toHaveCount(5);
+    await expect(panel(page).locator('.mm-input:not(.read)')).toHaveCount(18);
     await panel(page).locator('[data-sd-save]').click();
 
     await editEngineering(page, false);
     await editDeliverables(page, false);
     await expect(panel(page).locator('.mm-input:not(.read)')).toHaveCount(0);
     await expect(panel(page).locator('input.dlv-due')).toHaveCount(0);
-    await expect(panel(page).locator('[data-mm-text]')).toHaveCount(5);
+    await expect(panel(page).locator('[data-mm-text]')).toHaveCount(9);
   });
 
   test('saving the stage text keeps an activity added while it was open', async ({ page }) => {
@@ -82,32 +87,32 @@ test.describe('read mode versus edit mode', () => {
     await panel(page).locator('.mm-new').fill('Added while editing the text');
     await panel(page).locator('.mm-new-mm').fill('3');
     await panel(page).locator('[data-mm-add]').click();
-    await expect(panel(page).locator('.mm-list li')).toHaveCount(6);
+    await expect(panel(page).locator('.mm-list li')).toHaveCount(10);
 
     await panel(page).locator('.sd-description').fill('Reworded, same list.');
     await panel(page).locator('[data-sd-save]').click();
     await expect(panel(page).locator('.sheet-what')).toHaveText('Reworded, same list.');
-    await expect(panel(page).locator('.mm-list li')).toHaveCount(6);
+    await expect(panel(page).locator('.mm-list li')).toHaveCount(10);
 
     await page.reload();
-    await selectStage(page, '01');
-    await expect(panel(page).locator('.mm-list li')).toHaveCount(6);
+    await selectStage(page, 'productDefinition');
+    await expect(panel(page).locator('.mm-list li')).toHaveCount(10);
     await expect(panel(page).locator('.mm-t').last()).toHaveText('Added while editing the text');
-    await expect(panel(page).locator('[data-stage-mm]')).toHaveText('11 MM');
+    await expect(panel(page).locator('[data-stage-mm]')).toHaveText('31 MM');
   });
 
   test('the read-out shows the same numbers the form holds', async ({ page }) => {
-    await expect(panel(page).locator('[data-mm-text="0"]')).toHaveText('2');
-    await expect(panel(page).locator('[data-stage-mm]')).toHaveText('8 MM');
+    await expect(panel(page).locator('[data-mm-text="0"]')).toHaveText('4');
+    await expect(panel(page).locator('[data-stage-mm]')).toHaveText('28 MM');
 
     await editEngineering(page);
     await panel(page).locator('[data-mm="0"]').fill('7');
-    await expect(panel(page).locator('[data-stage-mm]')).toHaveText('13 MM');
+    await expect(panel(page).locator('[data-stage-mm]')).toHaveText('31 MM');
     await editEngineering(page, false);
 
     // the table saves as it is typed, so closing it changes nothing
     await expect(panel(page).locator('[data-mm-text="0"]')).toHaveText('7');
-    await expect(panel(page).locator('[data-stage-mm]')).toHaveText('13 MM');
+    await expect(panel(page).locator('[data-stage-mm]')).toHaveText('31 MM');
   });
 
   test('a deliverable due date is only editable in edit mode', async ({ page }) => {
@@ -145,10 +150,10 @@ test.describe('read mode versus edit mode', () => {
   test('the completion date is the checkbox stamp, and edit mode corrects it', async ({
     page,
   }) => {
-    /* Product Definition's four are all closed in the seed, so tick one off
-       from a stage that is still running. */
-    await selectStage(page, '06');
-    const row = panel(page).locator('.dlv-list li').filter({ hasText: 'Routed database' });
+    /* Product Definition's are all closed in the seed, so tick one off from a
+       stage that is still running. */
+    await selectStage(page, 'physicalDesign');
+    const row = panel(page).locator('.dlv-list li').filter({ hasText: 'Bump map' });
     await expect(row.locator('.dlv-comp')).toHaveText('—');
 
     // ticking it stamps today
@@ -168,11 +173,11 @@ test.describe('read mode versus edit mode', () => {
     await expect(row.locator('.dlv-comp')).toContainText('05/04/2026');
 
     await page.reload();
-    await selectStage(page, '06');
+    await selectStage(page, 'physicalDesign');
     await expect(
       panel(page)
         .locator('.dlv-list li')
-        .filter({ hasText: 'Routed database' })
+        .filter({ hasText: 'Bump map' })
         .locator('.dlv-comp'),
     ).toContainText('05/04/2026');
   });
@@ -185,7 +190,7 @@ test.describe('read mode versus edit mode', () => {
     // nothing is written until the question is answered
     const ask = panel(page).locator('.dlv-tbd');
     await expect(ask).toContainText('No due date for “Vendor quote”');
-    await expect(panel(page).locator('.dlv-list li')).toHaveCount(4);
+    await expect(panel(page).locator('.dlv-list li')).toHaveCount(6);
 
     await ask.locator('[data-dlv-tbd-cancel]').click();
     await expect(ask).toHaveCount(0);
@@ -194,7 +199,7 @@ test.describe('read mode versus edit mode', () => {
     // a date makes the question moot
     await panel(page).locator('.dlv-input-due').fill('2026-11-02');
     await panel(page).locator('[data-dlv-add]').click();
-    await expect(panel(page).locator('.dlv-list li')).toHaveCount(5);
+    await expect(panel(page).locator('.dlv-list li')).toHaveCount(7);
     await expect(panel(page).locator('.dlv-list li').last().locator('input.dlv-due')).toHaveValue(
       '2026-11-02',
     );
@@ -211,7 +216,7 @@ test.describe('read mode versus edit mode', () => {
     await expect(last.locator('[data-dlv-due-text]')).toHaveText('TBD');
 
     await page.reload();
-    await selectStage(page, '01');
+    await selectStage(page, 'productDefinition');
     await expect(panel(page).locator('.dlv-list li').last().locator('[data-dlv-due-text]')).toHaveText(
       'TBD',
     );
@@ -287,7 +292,7 @@ test.describe('editing stage detail', () => {
     await expect(panel(page).locator('.sheet-what')).toHaveText('Persisted framing.');
 
     await page.reload();
-    await selectStage(page, '01');
+    await selectStage(page, 'productDefinition');
     await expect(panel(page).locator('.sheet-what')).toHaveText('Persisted framing.');
     await expect(panel(page).locator('.sd-flag')).toHaveText('EDITED');
   });
@@ -318,7 +323,7 @@ test.describe('editing stage detail', () => {
     await expect(panel(page).locator('.sd-flag')).toHaveCount(0);
 
     await page.reload();
-    await selectStage(page, '01');
+    await selectStage(page, 'productDefinition');
     await expect(panel(page).locator('.sheet-what')).toHaveText(SHARED_DESCRIPTION);
   });
 
@@ -328,10 +333,8 @@ test.describe('editing stage detail', () => {
     await panel(page).locator('[data-sd-save]').click();
 
     // another stage of the same program keeps the shared text
-    await selectStage(page, '06');
-    await expect(panel(page).locator('.sheet-what')).toContainText(
-      'Transform the synthesized design into a physically realizable implementation',
-    );
+    await selectStage(page, 'physicalDesign');
+    await expect(panel(page).locator('.sheet-what')).toHaveText(stageText('physicalDesign'));
     await expect(panel(page).locator('.sd-flag')).toHaveCount(0);
 
     // and so does another program
@@ -341,7 +344,7 @@ test.describe('editing stage detail', () => {
     await page.locator('.pf-kickoff').fill('2029-01-08');
     await page.locator('[data-create]').click();
     await page.waitForURL(/\/p\/detailx1-/);
-    await selectStage(page, '01');
+    await selectStage(page, 'productDefinition');
     await expect(panel(page).locator('.sheet-what')).toHaveText(SHARED_DESCRIPTION);
     await expect(panel(page).locator('.sd-flag')).toHaveCount(0);
   });

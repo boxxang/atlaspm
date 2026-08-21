@@ -6,7 +6,7 @@ import { BUILTIN_PROFILE, STAGE_ORDER } from '@/data/scheduleProfiles';
 import type { ProjectState } from '@/lib/projectState';
 import { resolveStages } from '@/lib/stages';
 import { rejectFile, rejectionMessage } from '@/lib/attachments';
-import { serialiseEffort } from '@/lib/effort';
+import { serialiseEffort, serialiseTat } from '@/lib/effort';
 import { isEmptyOverride, type StageDetailOverride } from '@/lib/stageDetail';
 import type {
   AttachmentRef,
@@ -100,7 +100,7 @@ export interface AppState {
   /** Rewrites the stage's engineering list — titles and their man-months. */
   setEngineeringLines: (
     stageId: StageId,
-    lines: { label: string; manMonths: number }[],
+    lines: { label: string; manMonths: number; tatWeeks: number }[],
   ) => void;
   setCostRate: (rate: number, currency: string) => void;
   attachFiles: (
@@ -546,19 +546,25 @@ export const useAppStore = create<AppState>()((set, get) => ({
 
   setEngineeringLines: (stageId, lines) => {
     const stage = get().stages.find((x) => x.id === stageId)!;
-    const labels = lines.map((l) => l.label.trim()).filter(Boolean);
-    const effort = lines.filter((l) => l.label.trim()).map((l) => l.manMonths);
+    const kept = lines.filter((l) => l.label.trim());
+    const labels = kept.map((l) => l.label.trim());
     /* A list identical to the shared default is not an override, so the stage
        keeps tracking /data/journey.ts. An emptied list stores '' rather than
        null, which is what tells resolveStageDetail the program meant it. */
     const view = labels.join('\n');
     const engineeringView = view === stage.engineeringView.join('\n') ? null : view;
-    const engineeringEffort = serialiseEffort(effort);
+    const engineeringEffort = serialiseEffort(kept.map((l) => l.manMonths));
+    const engineeringTat = serialiseTat(kept.map((l) => l.tatWeeks));
 
     set((s) => ({
       stageDetails: {
         ...s.stageDetails,
-        [stageId]: { ...s.stageDetails[stageId], engineeringView, engineeringEffort },
+        [stageId]: {
+          ...s.stageDetails[stageId],
+          engineeringView,
+          engineeringEffort,
+          engineeringTat,
+        },
       },
     }));
     const detail = get().stageDetails[stageId] ?? {};
@@ -567,6 +573,7 @@ export const useAppStore = create<AppState>()((set, get) => ({
         description: detail.description ?? null,
         engineeringView,
         engineeringEffort,
+        engineeringTat,
         programView: detail.programView ?? null,
         tools: detail.tools ?? null,
         collaboration: detail.collaboration ?? null,
@@ -593,6 +600,7 @@ export const useAppStore = create<AppState>()((set, get) => ({
         description: detail.description ?? null,
         engineeringView: detail.engineeringView ?? null,
         engineeringEffort: detail.engineeringEffort ?? null,
+        engineeringTat: detail.engineeringTat ?? null,
         programView: detail.programView ?? null,
         tools: detail.tools ?? null,
         collaboration: detail.collaboration ?? null,

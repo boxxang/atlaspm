@@ -23,27 +23,19 @@ import type {
 } from './types';
 
 /**
- * Illustrative man-months per engineering line, aligned to each stage's
- * engineeringView in /data/journey.ts. Like the rest of the seed these are
- * example figures for a large 4nm-class accelerator — roughly 700 man-months,
- * or 58 person-years — not a benchmark. A new program starts empty.
+ * Man-months and elapsed weeks per engineering activity. Both are the
+ * template's own figures (/data/journey.ts), lifted here so the seeder can
+ * write them without reaching into content it does not own — and so they can
+ * never drift out of alignment with the activity list they index.
  */
-export const SEED_EFFORT: Record<StageId, number[]> = {
-  productDefinition: [2, 2, 1.5, 1.5, 1],
-  architecture: [8, 6, 4, 4, 2],
-  rtl: [40, 32, 18, 20, 10],
-  verification: [60, 36, 30, 30, 24],
-  synthesis: [10, 8, 6, 4, 2],
-  physicalDesign: [28, 24, 30, 34, 24],
-  signoff: [16, 12, 10, 6, 4],
-  tapeout: [4, 3, 2, 1],
-  fabrication: [2, 2, 1.5, 1.5, 1],
-  packaging: [10, 8, 8, 6, 4],
-  bringup: [12, 10, 10, 8, 5],
-  qualification: [18, 14, 12, 8, 8],
-};
+export const SEED_EFFORT: Record<StageId, number[]> = Object.fromEntries(
+  journeyData.map((s) => [s.id, [...s.engineeringEffort]]),
+);
 
-/** Example fully-loaded rate for the seeded program; change it in the app. */
+export const SEED_TAT: Record<StageId, number[]> = Object.fromEntries(
+  journeyData.map((s) => [s.id, [...s.engineeringTat]]),
+);
+
 export const SEED_COST_PER_MAN_MONTH = 15000;
 
 export interface ProjectSeed {
@@ -55,8 +47,6 @@ export interface ProjectSeed {
 }
 
 /** dlv entry: [title, done, due?, completedAt?] */
-type DlvSeed = [title: string, done: boolean, due?: Date, completedAt?: Date];
-
 interface ItemOpts {
   o?: string;
   due?: Date | null;
@@ -128,35 +118,30 @@ export function createProjectSeed({
 
   const seed = (
     stage: StageId,
-    {
-      ki = [],
-      acts = [],
-      risks = [],
-      dlv = [],
-    }: { ki?: Item[]; acts?: Item[]; risks?: Item[]; dlv?: DlvSeed[] },
+    { ki = [], acts = [], risks = [] }: { ki?: Item[]; acts?: Item[]; risks?: Item[] } = {},
   ) => {
     content[stage] = { keyinfo: ki, activities: acts, risks };
-    /* dlv entry: [title, done, due?, completedAt?].
-       Left to itself, a deliverable is dated across the stage rather than on
-       its last day: four of them land at a quarter, half, three quarters and
-       the end of the span, which is what a stage that actually ran looks like.
-       A completed one is stamped a few days either side of its due date —
-       deterministic, so the seed is the same program every time. */
+    /* The stage's key deliverables are the template's — every program starts
+       with the same list — and they are dated across the stage rather than on
+       its last day: deliverable i of n lands at i/n of the span, so the last
+       one falls on the stage end date. Anything due more than three weeks ago
+       reads as done; the recent ones stay open, which is what leaves the
+       program with a handful of genuinely overdue lines. */
+    const titles = journeyData.find((s) => s.id === stage)?.deliverables ?? [];
     const span = sc[stage].durationWeeks;
+    const settled = ago(21);
     const drift = [-4, 2, -1, 3, -2, 1, -3, 0];
-    deliverables[stage] = dlv.map(([title, done, due, comp], i) => {
-      const dueDate = due !== undefined ? due : W(stage, (span * (i + 1)) / dlv.length);
+    deliverables[stage] = titles.map((title, i) => {
+      const due = W(stage, (span * (i + 1)) / titles.length);
+      const done = due < settled;
       let completedAt: Date | null = null;
       if (done) {
-        if (comp !== undefined) completedAt = comp;
-        else {
-          const c = new Date(dueDate);
-          c.setDate(c.getDate() + drift[i % drift.length]);
-          c.setHours(16, 30, 0, 0);
-          completedAt = c;
-        }
+        const c = new Date(due);
+        c.setDate(c.getDate() + drift[i % drift.length]);
+        c.setHours(16, 30, 0, 0);
+        completedAt = c;
       }
-      return { id: uid(), title, done, due: dueDate, completedAt };
+      return { id: uid(), title, done, due, completedAt };
     });
   };
 
@@ -176,7 +161,7 @@ export function createProjectSeed({
       I("productDefinition", "Initial die size estimate 19–21 mm per side, carrying ±15% until floorplan"),
       I("productDefinition", "IP licensing budget approved; PCIe Gen5 PHY and HBM3 controller are buy, not build"),
       I("productDefinition", "Program staffing plan approved at 80% of request — verification is the shortfall"),
-      I("productDefinition", "Schedule baseline uses the Typical SoC profile; 66 weeks kickoff to mass production"),
+      I("productDefinition", "Schedule baseline uses the Typical SoC profile; 132 weeks kickoff to mass production"),
       I("productDefinition", "Board power envelope 75 W is a customer requirement, not an engineering target"),
     ],
     acts: [
@@ -193,7 +178,7 @@ export function createProjectSeed({
       I("productDefinition", "Third-party IP make/buy shortlist", { o: "Seojin Ha", due: W("productDefinition", 3), dn: true }),
       I("productDefinition", "Feasibility gate review pack", { o: "Seojin Ha", due: W("productDefinition", 3), dn: true }),
       I("productDefinition", "Business case & exec approval", { due: E("productDefinition"), dn: true,
-        ups: [U(196, "Approved at exec staff review; budget released against the 66-week baseline.")] }),
+        ups: [U(196, "Approved at exec staff review; budget released against the 132-week baseline.")] }),
       I("productDefinition", "Program charter & staffing plan", { due: E("productDefinition"), dn: true }),
       I("productDefinition", "Anchor customer requirement interviews", { o: "N. Feld", due: W("productDefinition", 2), dn: true }),
     ],
@@ -211,7 +196,6 @@ export function createProjectSeed({
       I("productDefinition", "ES sample dates are contractual, not best-effort", { o: "N. Feld" }),
       I("productDefinition", "Schedule baseline assumes no respin", {}),
     ],
-    dlv: [["PRD v1.0 (signed off)", true], ["Target specification — PPA & cost", true], ["Feasibility & die-size report", true], ["Program charter & budget", true]],
   });
 
   /* ---- 02 Architecture — CLOSED ---- */
@@ -229,7 +213,6 @@ export function createProjectSeed({
         I("architecture", "Architecture specification v2.0", { due: E("architecture"), dn: true }),
       ],
       risks: [],
-      dlv: [["Architecture spec v2.0", true], ["IP make/buy decision record", true], ["Interface & bandwidth budgets", true], ["Per-block PPA budgets", true]],
     });
 
     /* ---- 03 IP & RTL — CLOSED ---- */
@@ -247,7 +230,6 @@ export function createProjectSeed({
         I("rtl", "UPF power intent v1.2", { due: E("rtl"), dn: true }),
       ],
       risks: [],
-      dlv: [["Block & top RTL (frozen)", true], ["Integration testbench", true], ["CDC / RDC closure reports", true], ["UPF v1.2", true]],
     });
 
     /* ---- 04 Verification — CLOSED ---- */
@@ -265,7 +247,6 @@ export function createProjectSeed({
           ups: [U(14, "DV signoff review complete; scoreboard archived. Two functional-coverage waivers approved by architecture.")] }),
       ],
       risks: [],
-      dlv: [["Verification plan & closure report", true], ["Final coverage dashboard", true], ["GLS report (SS corner)", true], ["DV signoff memo", true]],
     });
 
     /* ---- 05 Synthesis — CLOSED ---- */
@@ -281,7 +262,6 @@ export function createProjectSeed({
           ups: [U(42, "LEC clean on all partitions; handoff package delivered to PD.")] }),
       ],
       risks: [],
-      dlv: [["Gate-level netlist r2", true], ["SDC v3", true], ["DFT insertion report", true], ["LEC report", true]],
     });
 
     /* ---- 06 Physical Design — IN PROGRESS (today) ---- */
@@ -318,13 +298,6 @@ export function createProjectSeed({
           body: "Worst dynamic IR 4.8% vs 5% budget — margin too thin for signoff.",
           ups: [U(3, "Interim mesh straps added: 4.8% → 4.1% in sims. Final answer needs the updated ball map.")] }),
       ],
-      dlv: [
-        ["Floorplan rev C", true, W("physicalDesign", 4), ago(21)],
-        ["CTS implementation report", true, W("physicalDesign", 7), ago(9)],
-        ["Routed database (DRC clean)", false, W("physicalDesign", 10)],
-        ["Multi-corner timing closure report", false, W("physicalDesign", 11)],
-        ["Pre-signoff IR/EM report", false, E("physicalDesign")],
-      ],
     });
 
     /* ---- 07 Signoff — RAMPING ---- */
@@ -344,12 +317,6 @@ export function createProjectSeed({
           body: "Six-week signoff window assumes DRC-clean route at ECO-1. One week slip consumes the schedule buffer.",
           ups: [U(2, "Tracking PD route daily; go/no-go checkpoint with PD lead set for Monday.")] }),
       ],
-      dlv: [
-        ["Signoff STA env validation memo", true, W("signoff", 1), ago(4)],
-        ["Full-chip DRC/LVS clean report", false, W("signoff", 4)],
-        ["EM/IR signoff report", false, W("signoff", 5)],
-        ["Timing signoff report", false, E("signoff")],
-      ],
     });
 
     /* ---- 08 Tapeout — PLANNED ---- */
@@ -367,7 +334,6 @@ export function createProjectSeed({
         I("tapeout", "Mask slot vs closure schedule alignment", { o: "H. Yoon",
           body: "Reserved mask slot assumes Go decision on plan. Slip >1 week likely means requeueing." }),
       ],
-      dlv: [["Tapeout checklist (all items closed)", false], ["GDSII release", false], ["Mask order confirmation", false]],
     });
 
     /* ---- 09 Fabrication — PLANNED ---- */
@@ -381,7 +347,6 @@ export function createProjectSeed({
         I("fabrication", "Weekly bring-up readiness sync (with BU team)", { o: "K. Weiss" }),
       ],
       risks: [],
-      dlv: [["First-silicon wafers out", false], ["WAT / PCM data report", false], ["Wafer acceptance memo", false]],
     });
 
     /* ---- 10 Advanced Packaging — LOGISTICS IN FLIGHT ---- */
@@ -401,7 +366,6 @@ export function createProjectSeed({
           ups: [U(1, "Supplier call: allocation letter expected next week; qual quantities committed verbally.")] }),
         I("packaging", "Substrate arrival buffer only 1 week vs wafer-out", { o: "Y. Tanaka" }),
       ],
-      dlv: [["Assembled ES units", false], ["KGD test program (98% gate)", false], ["Assembly yield report", false], ["Thermal validation report", false]],
     });
 
     /* ---- 11 Bring-up — PREP ---- */
@@ -415,7 +379,6 @@ export function createProjectSeed({
         I("bringup", "Debug access validation — JTAG & on-die trace", { o: "M. Richter", due: W("bringup", -2) }),
       ],
       risks: [],
-      dlv: [["Bring-up report", false], ["Characterization data pack", false], ["Errata list r0", false]],
     });
 
     /* ---- 12 Qualification & Production — PLANNED ---- */
@@ -429,7 +392,172 @@ export function createProjectSeed({
         I("qualification", "Production test time budget", { o: "G. Holt", due: W("qualification", 2) }),
       ],
       risks: [],
-      dlv: [["Qualification report", false], ["Production test release", false], ["Ramp readiness review", false]],
     });
+
+    /* ---- 03 Technology & Foundry Selection — CLOSED ---- */
+    seed("technology", {
+      ki: [
+        I("technology", "N4P selected over N5P on density and leakage; HPC flavour with the multi-Vt menu"),
+        I("technology", "Design agreement and NDA executed; tapeout slot reserved with hot-lot priority"),
+      ],
+      acts: [
+        I("technology", "DTCO benchmarking against PPA targets", { o: "R. Lange", due: W("technology", 7), dn: true }),
+        I("technology", "Wafer, mask and NRE quotation", { o: "R. Lange", due: E("technology"), dn: true }),
+      ],
+      risks: [],
+    });
+
+    /* ---- 04 PDK & Design Enablement — CLOSED ---- */
+    seed("pdk", {
+      ki: [
+        I("pdk", "Production PDK adopted at week 26; the 0.5 → 1.0 delta reopened two timing corners"),
+        I("pdk", "Memory compiler instances missed the L2 density budget — custom array path opened"),
+      ],
+      acts: [
+        I("pdk", "EDA tool version qualification for N4P", { o: "A. Mehta", due: W("pdk", 18), dn: true }),
+        I("pdk", "Signoff corner and derate definition with foundry", { o: "A. Mehta", due: W("pdk", 24), dn: true,
+          ups: [U(120, "Corner list rev A agreed: 9 corners × 3 modes, POCV derates from the foundry deck.")] }),
+      ],
+      risks: [],
+    });
+
+    /* ---- 05 IP Strategy & Readiness — CLOSED ---- */
+    seed("ipReadiness", {
+      ki: [
+        I("ipReadiness", "IP-BOM: 31 blocks — 18 reuse, 9 buy, 4 build. PCIe Gen5 PHY and HBM3 controller are buy"),
+        I("ipReadiness", "Two bought blocks were not silicon-proven on N4P; both carry a hardening schedule"),
+      ],
+      acts: [
+        I("ipReadiness", "Silicon-proven status check per IP on N4P", { o: "S. Ha", due: W("ipReadiness", 12), dn: true }),
+        I("ipReadiness", "Licence negotiation and PO issue", { o: "S. Ha", due: E("ipReadiness"), dn: true,
+          ups: [U(150, "All IP POs issued; vendor delivery dates folded into the RTL integration plan.")] }),
+      ],
+      risks: [],
+    });
+
+    /* ---- 06 Custom, AMS & Memory IP — CLOSED ---- */
+    seed("amsIp", {
+      ki: [
+        I("amsIp", "Custom L2 SRAM instance built after the compiler missed density by 14%"),
+        I("amsIp", "PLL and HBM PHY macros handed to PD ahead of floorplan; abstracts landed week 51"),
+      ],
+      acts: [
+        I("amsIp", "Custom array layout and pushed-rule DRC closure", { o: "L. Bisset", due: W("amsIp", 32), dn: true,
+          ups: [U(96, "Pushed rules approved by the foundry; array meets the density budget with 3% margin.")] }),
+        I("amsIp", "Sigma-Vmin and Monte Carlo margin analysis", { o: "L. Bisset", due: W("amsIp", 36), dn: true }),
+      ],
+      risks: [],
+    });
+
+    /* ---- 07 Test Chip / MPW Shuttle — CLOSED ---- */
+    seed("testChip", {
+      ki: [
+        I("testChip", "Shuttle carried the HBM PHY, the custom array and PCM structures"),
+        I("testChip", "Silicon correlated within 6% of post-layout simulation; no production design change"),
+      ],
+      acts: [
+        I("testChip", "Silicon characterisation and model correlation", { o: "I. Sollberg", due: W("testChip", 34), dn: true }),
+        I("testChip", "Margin decisions fed into the production design", { o: "I. Sollberg", due: E("testChip"), dn: true }),
+      ],
+      risks: [],
+    });
+
+    /* ---- 10 DFT Architecture — CLOSED ---- */
+    seed("dft", {
+      ki: [
+        I("dft", "Hierarchical DFT with 120× compression; stuck-at coverage 99.1%, transition 92.4%"),
+        I("dft", "On-chip clock controllers per cluster for at-speed test; IJTAG network for debug"),
+      ],
+      acts: [
+        I("dft", "ATPG pattern generation and coverage closure", { o: "O. Bradley", due: W("dft", 32), dn: true }),
+        I("dft", "Pattern validation by gate-level simulation", { o: "O. Bradley", due: E("dft"), dn: true,
+          ups: [U(60, "Patterns validated on the final netlist; STIL handed to test development.")] }),
+      ],
+      risks: [],
+    });
+
+    /* ---- 16 Package & Substrate Design — IN FLIGHT ---- */
+    seed("packageDesign", {
+      ki: [
+        I("packageDesign", "2.5D on a silicon interposer; 6-2-6 organic substrate, 55×55 mm body"),
+        I("packageDesign", "Substrate PO placed against a 20-week lead time — arrival aligned to wafer-out"),
+      ],
+      acts: [
+        I("packageDesign", "Bump map and power-ground planning with PD", { o: "Y. Tanaka", due: W("packageDesign", 16), dn: true }),
+        I("packageDesign", "Package design freeze, DRC and tooling release", { o: "Y. Tanaka", due: E("packageDesign"),
+          ups: [U(3, "Freeze holds pending the last bump map delta from the PD final turn.")] }),
+      ],
+      risks: [
+        I("packageDesign", "Substrate arrival buffer only two weeks against wafer-out", { o: "Y. Tanaka" }),
+      ],
+    });
+
+    /* ---- 17 Package Test Vehicle — IN FLIGHT ---- */
+    seed("packageTestVehicle", {
+      ki: [
+        I("packageTestVehicle", "MTV, TTV and daisy-chain vehicles built on the production substrate stack"),
+        I("packageTestVehicle", "Package validation must close before wafer-out — ten weeks of margin in the plan"),
+      ],
+      acts: [
+        I("packageTestVehicle", "Warpage measurement across the reflow profile", { o: "N. Farouk", due: W("packageTestVehicle", 34), dn: true,
+          ups: [U(14, "Warpage peaks at 118 µm at 245 °C — inside the 150 µm limit across all four corners.")] }),
+        I("packageTestVehicle", "CPI stress evaluation — ULK crack and bump integrity", { o: "N. Farouk", due: W("packageTestVehicle", 44) }),
+      ],
+      risks: [
+        I("packageTestVehicle", "Board-level reliability finishes four weeks before the wafer-out gate", { o: "N. Farouk" }),
+      ],
+    });
+
+    /* ---- 18 Chip-Package-System Co-Verification — IN FLIGHT ---- */
+    seed("chipPackageCoVerification", {
+      ki: [
+        I("chipPackageCoVerification", "Co-verification signs off before signoff closes — the precondition for releasing mask data"),
+        I("chipPackageCoVerification", "Chip power model released per domain from the PD turn-2 database"),
+      ],
+      acts: [
+        I("chipPackageCoVerification", "Die-package-board PDN co-simulation", { o: "V. Halvorsen", due: W("chipPackageCoVerification", 16),
+          ups: [U(2, "Package inductance adds 0.9% to worst dynamic IR; decap budget under review with PD.")] }),
+        I("chipPackageCoVerification", "HBM and PCIe channel compliance with extracted models", { o: "V. Halvorsen", due: W("chipPackageCoVerification", 22) }),
+      ],
+      risks: [
+        I("chipPackageCoVerification", "Dynamic IR margin thins once package inductance is included", { o: "V. Halvorsen",
+          body: "Die-only analysis showed 4.1%; with the package model it reads 5.0% against a 5% budget." }),
+      ],
+    });
+
+    /* ---- 20 Validation Hardware / EVB — IN FLIGHT ---- */
+    seed("validationHardware", {
+      ki: [
+        I("validationHardware", "EVB rev A at the CM; rev B planned against bring-up findings"),
+        I("validationHardware", "Board must be shaken out before first packaged parts arrive"),
+      ],
+      acts: [
+        I("validationHardware", "PCB layout with high-speed channel SI/PI simulation", { o: "C. Whitfield", due: W("validationHardware", 22) }),
+        I("validationHardware", "Debug infrastructure — JTAG and trace pods", { o: "C. Whitfield", due: W("validationHardware", 28) }),
+      ],
+      risks: [],
+    });
+
+    /* ---- 21 Test Development — IN FLIGHT ---- */
+    seed("testDevelopment", {
+      ki: [
+        I("testDevelopment", "Probe card carries a twenty-week lead time — ordered against the wafer-out date"),
+        I("testDevelopment", "Sort and final programs built on the DFT pattern release"),
+      ],
+      acts: [
+        I("testDevelopment", "Probe card design, fabrication and qualification", { o: "D. Jo", due: W("testDevelopment", 20),
+          ups: [U(5, "Probe card design frozen and released to the vendor; qualification slot booked.")] }),
+        I("testDevelopment", "Wafer sort test program development", { o: "D. Jo", due: W("testDevelopment", 30) }),
+      ],
+      risks: [
+        I("testDevelopment", "Probe card qualification lands two weeks before wafer sort", { o: "D. Jo" }),
+      ],
+    });
+
+  /* A stage with no hand-written boards still owes its deliverables, so the
+     backfill runs the same seeder with empty boards rather than leaving holes
+     the UI would have to guard against. */
+  for (const st of journeyData) if (!content[st.id]) seed(st.id);
+
   return { projectName: 'AtlasAX1', content, deliverables, leaders, contacts };
 }

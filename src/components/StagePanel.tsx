@@ -90,6 +90,9 @@ export function StagePanel({ stage, index }: { stage: Stage; index: number }) {
   const contactEdit = inline?.kind === 'stage' ? inline.editContact : null;
   const openBoard = useModalStore((m) => m.openBoard);
   const num = String(stage.stage).padStart(2, '0');
+  /* out of however many stages this program's profile has, not out of the
+     twelve the built-in profile happened to start with */
+  const stageCount = useAppStore((st) => st.stages.length);
   const phase = phaseById(stage.phaseId);
   const phaseNo = lifecyclePhases.findIndex((p) => p.id === phase.id) + 1;
   const detailOpen = !!inline;
@@ -114,7 +117,9 @@ export function StagePanel({ stage, index }: { stage: Stage; index: number }) {
           Phase {phaseNo} — {phase.label}
         </span>
         <div className="stage-meta">
-          <span className="stage-num">{num} / 12</span>
+          <span className="stage-num">
+            {num} / {stageCount}
+          </span>
           <span className="stage-short">{stage.shortTitle}</span>
         </div>
         <h2>{stage.title}</h2>
@@ -131,7 +136,10 @@ export function StagePanel({ stage, index }: { stage: Stage; index: number }) {
         className="viz"
         aria-hidden="true"
         dangerouslySetInnerHTML={{
-          __html: stage.vizKey ? stageViz[stage.vizKey]() : '',
+          /* A stage the drawings do not cover — one added to a profile, or a
+             built-in one with no illustration — renders the frame empty rather
+             than nothing at all, so the panel keeps its shape. */
+          __html: (stage.vizKey && stageViz[stage.vizKey]?.()) || '',
         }}
       />
 

@@ -34,26 +34,37 @@ describe('(a) baseline schedule for kickoff 05/12/2027', () => {
 
   it('places every stage on the spec dates', () => {
     expect(Object.fromEntries(STAGE_ORDER.map((id) => [id, span(s, id)]))).toEqual({
-      productDefinition: ['05/12/2027', '06/09/2027'],
-      architecture: ['06/02/2027', '07/14/2027'],
-      rtl: ['06/30/2027', '09/22/2027'],
-      verification: ['07/21/2027', '11/10/2027'],
-      synthesis: ['09/29/2027', '10/27/2027'],
-      physicalDesign: ['10/13/2027', '01/05/2028'],
-      signoff: ['12/15/2027', '01/26/2028'],
-      tapeout: ['01/26/2028', '02/02/2028'],
-      fabrication: ['02/02/2028', '03/29/2028'],
-      packaging: ['03/29/2028', '04/26/2028'],
-      bringup: ['04/26/2028', '06/07/2028'],
-      qualification: ['05/24/2028', '08/16/2028'],
+      productDefinition: ['05/12/2027', '07/07/2027'],
+      architecture: ['06/23/2027', '10/27/2027'],
+      technology: ['05/12/2027', '08/18/2027'],
+      pdk: ['07/07/2027', '03/15/2028'],
+      ipReadiness: ['06/09/2027', '11/10/2027'],
+      amsIp: ['09/15/2027', '07/05/2028'],
+      testChip: ['10/13/2027', '07/19/2028'],
+      rtl: ['09/29/2027', '05/10/2028'],
+      verification: ['11/10/2027', '08/16/2028'],
+      dft: ['09/15/2027', '06/21/2028'],
+      synthesis: ['03/01/2028', '08/16/2028'],
+      physicalDesign: ['03/29/2028', '10/25/2028'],
+      signoff: ['07/19/2028', '11/08/2028'],
+      tapeout: ['11/08/2028', '01/03/2029'],
+      fabrication: ['11/15/2028', '03/28/2029'],
+      packageDesign: ['10/27/2027', '10/25/2028'],
+      packageTestVehicle: ['01/19/2028', '01/17/2029'],
+      chipPackageCoVerification: ['04/26/2028', '10/25/2028'],
+      packaging: ['03/28/2029', '05/23/2029'],
+      validationHardware: ['05/10/2028', '01/31/2029'],
+      testDevelopment: ['05/24/2028', '03/14/2029'],
+      bringup: ['04/25/2029', '08/29/2029'],
+      qualification: ['05/23/2029', '11/21/2029'],
     });
   });
 
   it('exposes the three toolbar dates and the program length', () => {
-    expect(fmtDate(s.tapeout)).toBe('02/02/2028');
-    expect(fmtDate(s.firstSilicon)).toBe('03/29/2028');
-    expect(fmtDate(s.production)).toBe('08/16/2028');
-    expect(s.totalWeeks).toBe(66);
+    expect(fmtDate(s.tapeout)).toBe('01/03/2029');
+    expect(fmtDate(s.firstSilicon)).toBe('03/28/2029');
+    expect(fmtDate(s.production)).toBe('11/21/2029');
+    expect(s.totalWeeks).toBe(132);
   });
 
   it('keeps stages overlapping — the program is concurrent by design', () => {
@@ -80,7 +91,7 @@ describe('(d) milestones anchor to stage ends', () => {
   it('names the three major milestones', () => {
     const major = baseline().milestones.filter((m) => m.major);
     expect(major.map((m) => m.label)).toEqual([
-      'Tapeout',
+      'Tapeout (BEOL MTO)',
       'First Silicon',
       'Mass Production',
     ]);
@@ -99,7 +110,7 @@ describe('(d) milestones anchor to stage ends', () => {
     const s = computeSchedule(KICKOFF, typicalSoC, ov);
     const dv = s.milestones.find((m) => m.id === 'dvClosure')!;
     expect(dv.date).toEqual(s.stages.verification.end);
-    expect(fmtDate(dv.date)).toBe('12/08/2027');
+    expect(fmtDate(dv.date)).toBe('09/13/2028');
   });
 });
 
@@ -110,10 +121,10 @@ describe('(b) DV end edit ripples downstream', () => {
   const ov = applyDateEdit(typicalSoC, {}, base, 'verification', 'end', newEnd);
   const s = computeSchedule(KICKOFF, typicalSoC, ov);
 
-  it('moves DV TAT from 16W to 20W', () => {
-    expect(fmtW(base.stages.verification.durationWeeks)).toBe('16W');
-    expect(fmtW(s.stages.verification.durationWeeks)).toBe('20W');
-    expect(fmtDate(s.stages.verification.end)).toBe('12/08/2027');
+  it('moves DV TAT from 40W to 44W', () => {
+    expect(fmtW(base.stages.verification.durationWeeks)).toBe('40W');
+    expect(fmtW(s.stages.verification.durationWeeks)).toBe('44W');
+    expect(fmtDate(s.stages.verification.end)).toBe('09/13/2028');
   });
 
   it('leaves the DV start put', () => {
@@ -124,7 +135,7 @@ describe('(b) DV end edit ripples downstream', () => {
     const delta =
       (s.stages.tapeout.end.getTime() - base.stages.tapeout.end.getTime()) / 864e5;
     expect(Math.round(delta)).toBe(28);
-    expect(fmtDate(s.tapeout)).toBe('03/01/2028');
+    expect(fmtDate(s.tapeout)).toBe('01/31/2029');
   });
 
   it('shifts every later stage by the same 28 days, and no earlier one', () => {
@@ -178,7 +189,7 @@ describe('fractional weeks preserve days', () => {
     const ov = applyDateEdit(typicalSoC, {}, base, 'rtl', 'end', newEnd);
     const s = computeSchedule(KICKOFF, typicalSoC, ov);
     expect(s.stages.rtl.end).toEqual(newEnd);
-    expect(fmtW(s.stages.rtl.durationWeeks)).toBe('12.4W');
+    expect(fmtW(s.stages.rtl.durationWeeks)).toBe('32.4W');
     const shift =
       (s.stages.tapeout.end.getTime() - base.stages.tapeout.end.getTime()) / 864e5;
     expect(Math.round(shift)).toBe(3);
@@ -208,8 +219,8 @@ describe('fractional weeks preserve days', () => {
       addWeeks(s1.stages.verification.end, 2),
     );
     const s2 = computeSchedule(KICKOFF, typicalSoC, e2);
-    expect(fmtW(s2.stages.verification.durationWeeks)).toBe('20W');
-    expect(fmtDate(s2.stages.tapeout.end)).toBe('03/01/2028');
+    expect(fmtW(s2.stages.verification.durationWeeks)).toBe('44W');
+    expect(fmtDate(s2.stages.tapeout.end)).toBe('01/31/2029');
   });
 });
 

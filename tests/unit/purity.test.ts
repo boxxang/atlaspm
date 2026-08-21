@@ -42,7 +42,9 @@ describe('pure modules', () => {
   it.each(files.map((f) => [f.slice(ROOT.length + 1), f]))('%s is DOM-free', (_rel, file) => {
     const src = readFileSync(file, 'utf8');
     for (const g of DOM_GLOBALS) {
-      expect(src).not.toMatch(new RegExp(`(^|[^.\\w'"\`])${g}\\s*[.\\[(]`, 'm'));
+      /* No space before the accessor: real DOM code is `document.body`, never
+         `document (PRD)` — which is prose a deliverable title may well contain. */
+      expect(src).not.toMatch(new RegExp(`(^|[^.\\w'"\`])${g}[.\\[(]`, 'm'));
     }
   });
 

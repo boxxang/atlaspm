@@ -49,10 +49,10 @@ test.beforeEach(async ({ page }) => {
 test.describe('the stage list', () => {
   test('mirrors the profile the program runs on', async ({ page }) => {
     await openEditor(page);
-    await expect(rows(page)).toHaveCount(12);
+    await expect(rows(page)).toHaveCount(23);
     await expect(rows(page).first().locator('.se-title-input')).toHaveValue('Product Definition');
     await expect(rows(page).first().locator('.se-start')).toHaveValue('0');
-    await expect(rows(page).first().locator('.se-dur')).toHaveValue('4');
+    await expect(rows(page).first().locator('.se-dur')).toHaveValue('8');
     await expect(rows(page).last().locator('.se-title-input')).toHaveValue(
       'Qualification & Production',
     );
@@ -61,7 +61,7 @@ test.describe('the stage list', () => {
     await expect(rows(page).first().locator('.se-legend-no')).toHaveText('01.');
     await expect(rows(page).first().locator('.se-short')).toHaveValue('DEF');
     await expect(rows(page).nth(5).locator('.se-legend-no')).toHaveText('06.');
-    await expect(page.locator('#rm-gantt .g-row-label').nth(5)).toHaveText('06.PD');
+    await expect(page.locator('#rm-gantt .g-row-label').nth(5)).toHaveText('06.AMS');
 
     // saving is about this program; the built-in profile is left alone
     await expect(editor(page).locator('.se-note')).toHaveAttribute('data-shared', 'yes');
@@ -74,7 +74,7 @@ test.describe('the stage list', () => {
     await openEditor(page);
     await editor(page).locator('.se-row[data-stage="synthesis"] [data-up]').click();
     const moved = editor(page).locator('.se-row[data-stage="synthesis"]');
-    await expect(moved.locator('.se-legend-no')).toHaveText('04.');
+    await expect(moved.locator('.se-legend-no')).toHaveText('10.');
     await expect(moved.locator('.se-short')).toHaveValue('SYN');
   });
 
@@ -84,11 +84,11 @@ test.describe('the stage list', () => {
     await expect(tapeout.locator('[data-del-stage]')).toBeDisabled();
     await expect(tapeout.locator('[data-del-stage]')).toHaveAttribute(
       'title',
-      /carries the Tapeout milestone/,
+      /carries the Tapeout \(BEOL MTO\) milestone/,
     );
     // a stage without one is removable
     await expect(
-      editor(page).locator('.se-row[data-stage="synthesis"] [data-del-stage]'),
+      editor(page).locator('.se-row[data-stage="dft"] [data-del-stage]'),
     ).toBeEnabled();
   });
 
@@ -97,8 +97,8 @@ test.describe('the stage list', () => {
     await editor(page).locator('.se-row').first().locator('.se-title-input').fill('Renamed');
     await page.keyboard.press('Escape');
     await expect(editor(page)).toHaveCount(0);
-    await expect(page.locator('#rm-gantt .g-row')).toHaveCount(12);
-    await selectStage(page, '01');
+    await expect(page.locator('#rm-gantt .g-row')).toHaveCount(23);
+    await selectStage(page, 'productDefinition');
     await expect(page.locator('.stage-panel.selected h2')).toHaveText('Product Definition');
   });
 });
@@ -113,11 +113,11 @@ test.describe('adding a stage', () => {
     await expect(page.locator('#profile-select')).toHaveValue(/^prof_/);
     await expect(page.locator('#profile-select option')).toHaveCount(2);
     await expect(page.locator('#profile-select option:checked')).toHaveText('AtlasAX1 stages');
-    await expect(page.locator('#rm-gantt .g-row')).toHaveCount(13);
+    await expect(page.locator('#rm-gantt .g-row')).toHaveCount(24);
 
-    const row = page.locator('#rm-gantt .g-row[data-index="12"]');
+    const row = page.locator('#rm-gantt .g-row[data-index="23"]');
     // the mini chart's legend is the number and the short title
-    await expect(row.locator('.g-row-label')).toHaveText('13.PBU');
+    await expect(row.locator('.g-row-label')).toHaveText('24.PBU');
     await expect(row.locator('.g-row-label')).toHaveAttribute('title', 'Package Bring-up');
 
     /* the chart folds once the pointer has left it, so come back in first */
@@ -145,10 +145,10 @@ test.describe('adding a stage', () => {
     await openEditor(page);
     await addStage(page, 'Extra Study', { start: 2, length: 3 });
     await save(page);
-    await expect(page.locator('#rm-gantt .g-row')).toHaveCount(13);
+    await expect(page.locator('#rm-gantt .g-row')).toHaveCount(24);
 
     await page.goto(SEED_PROJECT_PATH);
-    await expect(page.locator('#rm-gantt .g-row')).toHaveCount(12);
+    await expect(page.locator('#rm-gantt .g-row')).toHaveCount(23);
     await expect(page.locator('#profile-select')).toHaveValue('typicalSoC');
   });
 
@@ -162,11 +162,11 @@ test.describe('adding a stage', () => {
     await page.locator('[data-new-project]').click();
     await page.locator('.pf-name').fill('BX9');
     await page.locator('.pf-kickoff').fill('2027-06-01');
-    await page.locator('.pf-profile').selectOption({ label: 'Two-die SoC — 13 stages' });
+    await page.locator('.pf-profile').selectOption({ label: 'Two-die SoC — 24 stages' });
     await page.locator('[data-create]').click();
 
     await expect(page.locator('#project-name')).toHaveText('BX9');
-    await expect(page.locator('#rm-gantt .g-row')).toHaveCount(13);
+    await expect(page.locator('#rm-gantt .g-row')).toHaveCount(24);
     await expect(page.locator('#profile-select')).toHaveValue(/^prof_/);
   });
 });
@@ -177,7 +177,7 @@ test.describe('editing the list', () => {
     await addStage(page, 'Extra Study', { start: 2, length: 3 });
     await save(page);
     await expect(page.locator('#profile-select option')).toHaveCount(2);
-    await expect(page.locator('#rm-gantt .g-row')).toHaveCount(13);
+    await expect(page.locator('#rm-gantt .g-row')).toHaveCount(24);
 
     // this program is the only one on it now, so the next edit lands in place
     await openEditor(page);
@@ -187,7 +187,7 @@ test.describe('editing the list', () => {
     await save(page);
 
     await expect(page.locator('#profile-select option')).toHaveCount(2);
-    await expect(page.locator('#rm-gantt .g-row')).toHaveCount(14);
+    await expect(page.locator('#rm-gantt .g-row')).toHaveCount(25);
   });
 
   test('a template name has to be one nobody has taken', async ({ page }) => {
@@ -212,24 +212,24 @@ test.describe('editing the list', () => {
 
   test('reordering moves the bar and renumbers the legend', async ({ page }) => {
     await openEditor(page);
-    // Synthesis (5th) above Verification (4th)
+    // Synthesis (11th) above DFT (10th)
     await editor(page).locator('.se-row[data-stage="synthesis"] [data-up]').click();
     await save(page);
 
     const labels = page.locator('#rm-gantt .g-row-label');
-    await expect(labels.nth(3)).toHaveText('04.SYN');
-    await expect(labels.nth(4)).toHaveText('05.DV');
+    await expect(labels.nth(9)).toHaveText('10.SYN');
+    await expect(labels.nth(10)).toHaveText('11.DFT');
   });
 
   test('a longer stage moves everything downstream', async ({ page }) => {
     const before = await tapeoutDate(page);
     await openEditor(page);
-    await editor(page).locator('.se-row[data-stage="rtl"] .se-dur').fill('16');
+    await editor(page).locator('.se-row[data-stage="rtl"] .se-dur').fill('36');
     await save(page);
     // RTL runs four weeks longer; the stages after it keep their own offsets,
     // so Tapeout is where the profile puts it — the editor is the baseline now
     await expect(page.locator('.se-win')).toHaveCount(0);
-    const rtl = page.locator('#rm-gantt .g-row[data-index="2"] .g-bar');
+    const rtl = page.locator('#rm-gantt .g-row[data-index="7"] .g-bar');
     await expect(rtl).toBeVisible();
     expect(await tapeoutDate(page)).toBe(before);
   });
@@ -239,14 +239,14 @@ test.describe('moving a program between profiles', () => {
   test('the toolbar select swaps the stage list', async ({ page }) => {
     // publish a shorter list as a template…
     await openEditor(page);
-    await editor(page).locator('.se-row[data-stage="synthesis"] [data-del-stage]').click();
+    await editor(page).locator('.se-row[data-stage="dft"] [data-del-stage]').click();
     await editor(page).locator('[data-confirm-del]').click();
     await saveAsTemplate(page, 'Short flow');
-    await expect(page.locator('#rm-gantt .g-row')).toHaveCount(11);
+    await expect(page.locator('#rm-gantt .g-row')).toHaveCount(22);
 
     // …then move the program back onto the built-in one
     await page.locator('#profile-select').selectOption('typicalSoC');
-    await expect(page.locator('#rm-gantt .g-row')).toHaveCount(12);
+    await expect(page.locator('#rm-gantt .g-row')).toHaveCount(23);
     await expect(page.locator('#profile-select')).toHaveValue('typicalSoC');
 
     // the template stays on offer for anyone else
@@ -264,23 +264,23 @@ test.describe('deleting a stage', () => {
     const confirm = editor(page).locator('.se-confirm');
     await expect(confirm).toContainText('Remove Product Definition?');
     await expect(confirm).toContainText('36 board entries');
-    await expect(confirm).toContainText('4 deliverables');
+    await expect(confirm).toContainText('6 deliverables');
     await expect(confirm).toContainText('3 contacts');
 
     await confirm.locator('[data-cancel-del]').click();
-    await expect(rows(page)).toHaveCount(12);
+    await expect(rows(page)).toHaveCount(23);
 
     await row.locator('[data-del-stage]').click();
     await editor(page).locator('[data-confirm-del]').click();
-    await expect(rows(page)).toHaveCount(11);
+    await expect(rows(page)).toHaveCount(22);
     await save(page);
 
-    await expect(page.locator('#rm-gantt .g-row')).toHaveCount(11);
+    await expect(page.locator('#rm-gantt .g-row')).toHaveCount(22);
     await expect(page.locator('#rm-gantt .g-row-label').first()).toContainText('01.ARCH');
 
     // and it stays gone, with its boards
     await page.reload();
-    await expect(page.locator('#rm-gantt .g-row')).toHaveCount(11);
+    await expect(page.locator('#rm-gantt .g-row')).toHaveCount(22);
     await expect(page.locator('.stage-panel[data-id="productDefinition"]')).toHaveCount(0);
   });
 });

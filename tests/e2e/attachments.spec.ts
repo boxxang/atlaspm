@@ -19,7 +19,7 @@ writeFileSync(TXT, 'PDN rev 2 notes\nball map pending');
 writeFileSync(BIG, Buffer.alloc(6 * 1024 * 1024, 1)); // over the 5MB ceiling
 
 const openItem = async (page: Page, title: string) => {
-  await selectStage(page, '06');
+  await selectStage(page, 'physicalDesign');
   await page
     .locator('.stage-panel.selected .board[data-kind="activities"] [data-more]')
     .click();
@@ -29,7 +29,7 @@ const openItem = async (page: Page, title: string) => {
 
 test.beforeEach(async ({ page }) => {
   await page.goto(SEED_PROJECT_PATH);
-  await selectStage(page, '01');
+  await selectStage(page, 'productDefinition');
 });
 
 test.describe('attaching to an item', () => {
@@ -126,7 +126,7 @@ test.describe('attaching while writing the item', () => {
 
     await page.reload();
     /* the board this test writes to belongs to the stage beforeEach opened */
-    await selectStage(page, '01');
+    await selectStage(page, 'productDefinition');
     await board.locator('[data-more]').click();
     await page.locator('#modal-body .b-row').filter({ hasText: 'Ball map review' }).click();
     await expect(page.locator('.iv-attach .att')).toHaveCount(2);

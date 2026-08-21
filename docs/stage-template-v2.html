@@ -1,0 +1,1195 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Silicon Program Stage Template</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Serif:ital,wght@0,400;1,400&display=swap">
+
+<style>
+:root{
+  --page:#f9f9f7;
+  --surface:#fcfcfb;
+  --raise:#ffffff;
+  --ink:#0b0b0b;
+  --ink-2:#52514e;
+  --ink-3:#898781;
+  --line:#e1e0d9;
+  --line-strong:#c3c2b7;
+  --accent:#256abf;
+  --accent-soft:#e7effa;
+  --new:#a2621c;
+  --new-soft:#f6eddf;
+  --grid:#ecebe4;
+  --gate:#c9bfae;
+
+  --sans:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --serif:"IBM Plex Serif",Georgia,"Times New Roman",serif;
+  --mono:"IBM Plex Mono",ui-monospace,"SF Mono",Menlo,monospace;
+
+  --maxw:1260px;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --page:#131311;
+    --surface:#1a1a18;
+    --raise:#201f1d;
+    --ink:#eceae4;
+    --ink-2:#b0aea6;
+    --ink-3:#83817a;
+    --line:#302f2b;
+    --line-strong:#454339;
+    --accent:#66a3ec;
+    --accent-soft:#16263c;
+    --new:#d99a4e;
+    --new-soft:#2e2418;
+    --grid:#242320;
+    --gate:#4a463d;
+  }
+}
+:root[data-theme="dark"]{
+  --page:#131311;
+  --surface:#1a1a18;
+  --raise:#201f1d;
+  --ink:#eceae4;
+  --ink-2:#b0aea6;
+  --ink-3:#83817a;
+  --line:#302f2b;
+  --line-strong:#454339;
+  --accent:#66a3ec;
+  --accent-soft:#16263c;
+  --new:#d99a4e;
+  --new-soft:#2e2418;
+  --grid:#242320;
+  --gate:#4a463d;
+}
+
+*{box-sizing:border-box}
+body{
+  margin:0;
+  background:var(--page);
+  color:var(--ink);
+  font-family:var(--sans);
+  font-size:15px;
+  line-height:1.5;
+  -webkit-font-smoothing:antialiased;
+}
+.wrap{max-width:var(--maxw);margin:0 auto;padding:0 24px}
+
+/* ---------- masthead ---------- */
+header.masthead{
+  border-bottom:1.25px solid var(--line-strong);
+  background:var(--surface);
+}
+.masthead .wrap{
+  display:flex;flex-direction:column;gap:18px;
+  padding-top:34px;padding-bottom:22px;
+}
+.eyebrow{
+  font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--ink-3);
+}
+h1{
+  margin:0;font-size:clamp(28px,4.2vw,42px);line-height:1.1;font-weight:600;
+  letter-spacing:-.015em;text-wrap:balance;
+}
+.standfirst{
+  margin:0;max-width:64ch;font-family:var(--serif);font-size:16px;line-height:1.62;
+  color:var(--ink-2);
+}
+.stats{
+  display:flex;flex-wrap:wrap;gap:0;border-top:1px solid var(--line);
+  padding-top:14px;
+}
+.stat{padding-right:30px;margin-right:30px;border-right:1px solid var(--line)}
+.stat:last-child{border-right:0;margin-right:0;padding-right:0}
+.stat b{display:block;font-family:var(--mono);font-size:23px;font-weight:500;font-variant-numeric:tabular-nums}
+.stat span{font-family:var(--mono);font-size:10.5px;letter-spacing:.11em;text-transform:uppercase;color:var(--ink-3)}
+
+/* ---------- toolbar ---------- */
+.toolbar{
+  position:sticky;top:0;z-index:20;
+  background:color-mix(in srgb,var(--page) 92%,transparent);
+  backdrop-filter:blur(8px);
+  border-bottom:1px solid var(--line);
+}
+.toolbar .wrap{
+  display:flex;align-items:center;gap:10px;flex-wrap:wrap;
+  padding-top:9px;padding-bottom:9px;
+}
+.jump{display:flex;gap:5px;flex-wrap:wrap;flex:1 1 420px}
+.jump a{
+  font-family:var(--mono);font-size:10.5px;font-weight:500;letter-spacing:.04em;
+  text-decoration:none;color:var(--ink-2);
+  border:1px solid var(--line);border-radius:2px;
+  padding:3px 6px;background:var(--surface);
+  transition:border-color .15s,color .15s,background .15s;
+}
+.jump a:hover,.jump a:focus-visible{border-color:var(--accent);color:var(--accent);background:var(--accent-soft)}
+.jump a.is-new{color:var(--new);border-color:color-mix(in srgb,var(--new) 40%,var(--line))}
+.jump a.is-new:hover,.jump a.is-new:focus-visible{background:var(--new-soft);border-color:var(--new)}
+.filters{display:flex;gap:6px}
+.filters button{
+  font-family:var(--mono);font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;
+  padding:5px 10px;border:1px solid var(--line-strong);background:var(--surface);color:var(--ink-2);
+  border-radius:2px;cursor:pointer;transition:all .15s;
+}
+.filters button[aria-pressed="true"]{background:var(--ink);color:var(--page);border-color:var(--ink)}
+.filters button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
+/* ---------- gantt ---------- */
+section.chart{padding:30px 0 6px}
+.chart-head{display:flex;justify-content:space-between;align-items:baseline;gap:16px;flex-wrap:wrap;margin-bottom:16px}
+h2.sec{
+  margin:0;font-size:13px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;
+  font-family:var(--mono);
+}
+.legend{display:flex;gap:16px;font-family:var(--mono);font-size:10.5px;color:var(--ink-3);letter-spacing:.04em}
+.legend i{display:inline-block;width:16px;height:8px;margin-right:6px;vertical-align:baseline;border-radius:1px}
+.gantt-scroll{overflow-x:auto;padding-bottom:6px}
+.gantt{min-width:820px}
+.grow{display:grid;grid-template-columns:212px 1fr;align-items:center;column-gap:12px}
+.axis{position:relative;height:22px;border-bottom:1px solid var(--line-strong)}
+.axis .q{position:absolute;top:0;bottom:0;border-left:1px solid var(--line);}
+.axis .q em{
+  position:absolute;left:5px;top:3px;font-style:normal;
+  font-family:var(--mono);font-size:10px;color:var(--ink-3);letter-spacing:.06em;white-space:nowrap;
+}
+.axis .g{position:absolute;top:0;bottom:0;width:0;border-left:1px solid var(--line-strong)}
+.axis .g em{
+  position:absolute;right:6px;top:3px;font-style:normal;
+  font-family:var(--mono);font-size:10px;color:var(--ink-2);letter-spacing:.04em;white-space:nowrap;
+}
+/* gate rules: week 78 (signoff closed + co-verification signed off — mask data may go out)
+   and week 98 (package validation must close before wafers leave the fab).
+   78/132 = 59.09%, 98/132 = 74.24%; grid every 13 weeks = 9.85% */
+.track{position:relative;height:19px;background:
+  linear-gradient(to right,transparent 59.09%,var(--gate) 59.09%,var(--gate) calc(59.09% + 1px),transparent calc(59.09% + 1px)),
+  linear-gradient(to right,transparent 74.24%,var(--gate) 74.24%,var(--gate) calc(74.24% + 1px),transparent calc(74.24% + 1px)),
+  repeating-linear-gradient(to right,transparent 0,transparent calc(9.85% - 1px),var(--grid) calc(9.85% - 1px),var(--grid) 9.85%);
+}
+.bar{
+  position:absolute;top:3px;height:13px;border-radius:2px;
+  background:var(--accent);
+}
+.bar.new{background:var(--new)}
+/* release points inside a bar — FEOL and BEOL mask tape-out */
+.mk{
+  position:absolute;top:3px;height:13px;display:flex;align-items:center;
+  transform:translateX(-50%);font-size:8px;line-height:1;color:var(--page);
+}
+.rowlabel{
+  display:flex;align-items:baseline;gap:7px;justify-self:end;text-align:right;
+  font-size:12px;overflow:hidden;white-space:nowrap;
+}
+.rowlabel .code{font-family:var(--mono);font-size:10px;color:var(--ink-3);letter-spacing:.05em}
+.rowlabel a{color:var(--ink-2);text-decoration:none;border-bottom:1px solid transparent}
+.rowlabel a:hover,.rowlabel a:focus-visible{color:var(--accent);border-bottom-color:var(--accent)}
+.grow.newrow .rowlabel a{color:var(--new)}
+.bandrow{
+  margin-top:12px;padding-bottom:3px;
+  font-family:var(--mono);font-size:10px;letter-spacing:.13em;text-transform:uppercase;color:var(--ink-3);
+  border-bottom:1px solid var(--line);grid-column:1 / -1;
+}
+.grow + .bandrow{margin-top:16px}
+
+/* ---------- anchors table ---------- */
+section.anchors{padding:34px 0 4px}
+.anchors .intro{
+  margin:0 0 16px;max-width:72ch;font-family:var(--serif);font-size:14.5px;line-height:1.62;color:var(--ink-2);
+}
+.atable-scroll{overflow-x:auto}
+table.anchor{width:100%;min-width:660px;border-collapse:collapse;font-size:13.5px}
+table.anchor th{
+  text-align:left;font-family:var(--mono);font-size:10px;font-weight:600;
+  letter-spacing:.12em;text-transform:uppercase;color:var(--ink-3);
+  padding:0 12px 7px 0;border-bottom:1px solid var(--line-strong);
+}
+table.anchor th.num,table.anchor td.num{text-align:right;font-variant-numeric:tabular-nums}
+table.anchor td{padding:7px 12px 7px 0;border-bottom:1px solid var(--line);vertical-align:baseline}
+table.anchor td.num{font-family:var(--mono);font-size:12.5px;white-space:nowrap}
+table.anchor td.was{font-family:var(--mono);font-size:12px;color:var(--ink-3);white-space:nowrap;text-align:right}
+table.anchor td.note{color:var(--ink-2);font-size:12.5px;line-height:1.45}
+table.anchor tr:last-child td{border-bottom:0}
+
+/* ---------- stage cards ---------- */
+main{padding-bottom:70px}
+.bandhead{
+  margin:44px 0 18px;padding-bottom:8px;border-bottom:1.25px solid var(--line-strong);
+  display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;
+}
+.bandhead h2{margin:0;font-size:19px;font-weight:600;letter-spacing:-.01em}
+.bandhead .meta{font-family:var(--mono);font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3)}
+
+.stage{
+  border:1px solid var(--line);border-left:3px solid var(--accent);
+  background:var(--surface);border-radius:2px;
+  margin-bottom:16px;scroll-margin-top:64px;
+}
+.stage.new{border-left-color:var(--new)}
+.stage[hidden]{display:none}
+.st-head{
+  display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;
+  padding:14px 18px 12px;border-bottom:1px solid var(--line);
+}
+.st-no{font-family:var(--mono);font-size:11px;color:var(--ink-3);font-variant-numeric:tabular-nums}
+.st-code{
+  font-family:var(--mono);font-size:11px;font-weight:600;letter-spacing:.08em;
+  color:var(--accent);background:var(--accent-soft);
+  padding:2px 7px;border-radius:2px;
+}
+.stage.new .st-code{color:var(--new);background:var(--new-soft)}
+.st-name{margin:0;font-size:17px;font-weight:600;letter-spacing:-.01em}
+.badge{
+  font-family:var(--mono);font-size:9.5px;font-weight:600;letter-spacing:.11em;text-transform:uppercase;
+  padding:2px 6px;border-radius:2px;border:1px solid currentColor;
+}
+.badge.new{color:var(--new)}
+.badge.rev{color:var(--accent)}
+.st-when{
+  margin-left:auto;font-family:var(--mono);font-size:11px;color:var(--ink-2);
+  font-variant-numeric:tabular-nums;white-space:nowrap;
+}
+.st-desc{
+  padding:12px 18px;margin:0;font-family:var(--serif);font-size:14.5px;line-height:1.6;
+  color:var(--ink-2);max-width:92ch;border-bottom:1px solid var(--line);
+}
+.st-note{
+  padding:9px 18px;margin:0;font-size:12.5px;line-height:1.55;color:var(--ink-2);
+  background:var(--accent-soft);border-bottom:1px solid var(--line);
+}
+.stage.new .st-note{background:var(--new-soft)}
+.st-note b{font-weight:600;color:var(--ink)}
+.st-body{display:grid;grid-template-columns:1.7fr 1fr;gap:0}
+.col{padding:14px 18px 16px;min-width:0}
+.col + .col{border-left:1px solid var(--line)}
+.col h3{
+  margin:0 0 10px;font-family:var(--mono);font-size:10px;font-weight:600;
+  letter-spacing:.13em;text-transform:uppercase;color:var(--ink-3);
+}
+table.acts{width:100%;border-collapse:collapse}
+table.acts thead th{
+  font-family:var(--mono);font-size:9px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--ink-3);padding:0 0 5px;border-bottom:1px solid var(--line);text-align:right;
+}
+table.acts thead th.l{text-align:left}
+table.acts td{padding:4px 0;vertical-align:baseline;border-bottom:1px solid color-mix(in srgb,var(--line) 55%,transparent)}
+table.acts tr:last-child td{border-bottom:0}
+td.id{font-family:var(--mono);font-size:10.5px;color:var(--ink-3);white-space:nowrap;padding-right:10px;width:1%}
+td.act{font-size:13.5px;line-height:1.45}
+td.tat,td.mm{
+  font-family:var(--mono);font-size:11.5px;font-variant-numeric:tabular-nums;
+  text-align:right;white-space:nowrap;padding-left:14px;width:1%;
+}
+td.tat{color:var(--ink-2)}
+td.mm{color:var(--ink)}
+td.tat .cont{color:var(--ink-3);font-size:10px}
+ul.dlv{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:5px}
+ul.dlv li{display:flex;gap:10px;font-size:13.5px;line-height:1.42}
+ul.dlv .id{font-family:var(--mono);font-size:10.5px;color:var(--ink-3);white-space:nowrap;padding-top:1px}
+.ms{
+  padding:9px 18px;border-top:1px solid var(--line);
+  font-family:var(--mono);font-size:11px;letter-spacing:.04em;color:var(--ink-2);
+  display:flex;gap:8px;align-items:baseline;flex-wrap:wrap;
+}
+.ms .lbl{font-size:9.5px;letter-spacing:.13em;text-transform:uppercase;color:var(--ink-3)}
+.ms .dia{color:var(--accent)}
+
+footer{
+  border-top:1.25px solid var(--line-strong);background:var(--surface);
+  padding:26px 0 40px;
+}
+footer .wrap{display:flex;flex-direction:column;gap:11px}
+footer p{margin:0;max-width:74ch;font-size:13px;color:var(--ink-2);line-height:1.6}
+footer code{font-family:var(--mono);font-size:12px;background:var(--accent-soft);padding:1px 5px;border-radius:2px;color:var(--ink)}
+
+@media (max-width:900px){
+  .st-body{grid-template-columns:1fr}
+  .col + .col{border-left:0;border-top:1px solid var(--line)}
+}
+@media (max-width:640px){
+  .wrap{padding:0 16px}
+  .stat{padding-right:20px;margin-right:20px}
+  .st-when{margin-left:0;width:100%}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+
+<style>
+/* standalone-only: the artifact host supplies these; a local file does not */
+html{-webkit-text-size-adjust:100%}
+img,svg{max-width:100%;height:auto}
+@media print{
+  .toolbar{position:static;background:transparent;backdrop-filter:none;border-bottom:1px solid #ccc}
+  .filters{display:none}
+  .gantt-scroll,.atable-scroll{overflow:visible}
+  .stage{break-inside:avoid;page-break-inside:avoid}
+  .bandhead{break-after:avoid;page-break-after:avoid}
+  a{color:inherit;text-decoration:none}
+  @page{margin:14mm}
+}
+</style>
+</head>
+<body>
+<header class="masthead">
+  <div class="wrap">
+    <p class="eyebrow">AtlasPM · milestone template revision · draft for review</p>
+    <h1>Silicon Program Stage Template</h1>
+    <p class="standfirst">The current template carries twelve stages — the path the design database travels. What actually breaks schedules sits beside that path: IP that is not silicon-proven on the chosen node, a PDK still at 0.5, a compiler SRAM that misses its density budget, a probe card with a twenty-week lead time, a package nobody stressed until the real dies arrived. Eleven of those workstreams are proposed here as stages of their own, and the implementation stages are rebuilt around how work actually flows — netlists arrive as a sequence of drops, mask data leaves in two releases a month apart. Every activity carries an elapsed TAT and an effort estimate in man-months.</p>
+    <div class="stats" id="stats"></div>
+  </div>
+</header>
+
+<nav class="toolbar">
+  <div class="wrap">
+    <div class="jump" id="jump"></div>
+    <div class="filters">
+      <button id="f-all" aria-pressed="true">All</button>
+      <button id="f-new" aria-pressed="false">New only</button>
+    </div>
+  </div>
+</nav>
+
+<section class="chart">
+  <div class="wrap">
+    <div class="chart-head">
+      <h2 class="sec">Program map · week 0 – 132</h2>
+      <div class="legend">
+        <span><i style="background:var(--accent)"></i>existing stage</span>
+        <span><i style="background:var(--new)"></i>proposed stage</span>
+        <span><i style="background:var(--gate);width:2px;height:12px"></i>gate</span>
+        <span style="color:var(--ink-2)">◆ mask release</span>
+      </div>
+    </div>
+    <div class="gantt-scroll">
+      <div class="gantt" id="gantt"></div>
+    </div>
+  </div>
+</section>
+
+<section class="anchors">
+  <div class="wrap">
+    <div class="chart-head"><h2 class="sec">Schedule anchors · why 132 weeks</h2></div>
+    <p class="intro">An earlier draft of this template ran 92 weeks. Checked against what leading-edge programs actually report, the back half held up and the front half did not — RTL development at fifteen weeks and verification closure at eighteen were not schedules, they were wishes. The anchors below are the check. Ranges are for a <em>new architecture</em> on a leading node with 2.5D packaging and HBM, not a derivative; a derivative of an existing design runs roughly 40&nbsp;% shorter and is a separate profile, not this one.</p>
+    <div class="atable-scroll">
+      <table class="anchor" id="anchors"></table>
+    </div>
+  </div>
+</section>
+
+<main class="wrap" id="main"></main>
+
+<footer>
+  <div class="wrap">
+    <p><b>How to give feedback.</b> Every activity and deliverable has a stable ID — <code>IPR-03</code>, <code>PKGD-D6</code>. Point at the ID and say cut, move, rename, or change the TAT or the M/M. Stage-level calls: keep, drop, merge with another, or split.</p>
+    <p><b>TAT</b> is elapsed calendar time — how long the activity occupies the schedule, not how much work it contains. <span style="color:var(--ink-3)">cont.</span> marks an activity that runs continuously across the stage rather than closing once. <b>M/M</b> is effort in man-months. The two are independent: a four-week foundry contract negotiation costs two man-months, while a four-week timing closure sprint costs forty. Dividing M/M by TAT in months gives the headcount that activity needs while it is live — useful for spotting where the plan quietly assumes twenty engineers who do not exist.</p>
+    <p><b>The two vertical rules on the map are hard gates.</b> Week 78 — signoff closed and chip-package co-verification (SIPI) signed off, the precondition for releasing any mask data. Week 98 — package validation on test vehicles (PTV) complete before product wafers leave the fab, so the first real assembly runs into a frozen process window rather than an open question.</p>
+    <p><b>Mask release is two events, not one.</b> The diamonds inside the Tapeout bar mark FEOL MTO at week 80 and BEOL MTO at week 84. The four weeks between them are the BEOL fix window — metal-layer ECOs land there while the front-end mask set is already being cut, and wafer start waits only on the FEOL masks.</p>
+    <p><b>Synthesis hands over four times, not once.</b> N0 is the flow-flush netlist that lets physical design build its flow; N1 and N2 are quality turns; the FFN is the only netlist the final turn sees. SYN and PD therefore overlap by twenty weeks rather than meeting at a single handoff date.</p>
+    <p>Weeks are offsets from program kickoff; the template stays relative so every program's dates fall out of its own kickoff date. Effort figures are for a large 4&nbsp;nm-class accelerator with 2.5D packaging and two HBM stacks, excluding software, firmware and SDK — those sit outside this template's scope.</p>
+  </div>
+</footer>
+
+<script>
+const BANDS = [
+  {id:'define',     label:'Define',                     note:'What the product must be, and what it will cost'},
+  {id:'enable',     label:'Technology & IP Enablement',  note:'Everything that must exist before design can start — the layer the current template is missing'},
+  {id:'design',     label:'Design & Verify',            note:'Logic, confidence, and testability'},
+  {id:'implement',  label:'Implement',                  note:'Gates to a manufacturable layout, across a sequence of netlist drops'},
+  {id:'manufacture',label:'Manufacture',                note:'Two mask releases, then silicon'},
+  {id:'integrate',  label:'Integrate',                  note:'Package design, co-verification, vehicle validation and build'},
+  {id:'validate',   label:'Validate & Ramp',            note:'Proving it, and making it a product'},
+];
+
+/* Schedule anchors: [label, week, months, industry range, note] */
+const ANCHORS = [
+  ['Architecture freeze', 24, 'mo 4 – 7',
+   'Workload modelling and partitioning for a new accelerator architecture. Was month 2.5 — that is a derivative’s schedule, not a new one’s.'],
+  ['RTL freeze', 52, 'mo 10 – 15',
+   'Large accelerator RTL runs 8 – 10 months of block work plus integration. Was 15 weeks.'],
+  ['DV closure', 66, 'mo 13 – 18',
+   'Verification is the longest pre-silicon activity and closes 2 – 3 months before tapeout. Was 18 weeks.'],
+  ['Design freeze / signoff complete', 78, 'mo 16 – 22',
+   'Three PD turns plus a final FFN turn, then multi-corner signoff with a rehearsed dry run.'],
+  ['FEOL mask tape-out', 80, '—',
+   'Front-end data out first; the BEOL fix window opens here.'],
+  ['First silicon — wafer out', 98, 'mo 20 – 26',
+   'FEOL MTO to wafer out is 18 weeks: 7 weeks for an EUV mask set plus an 11-week hot-lot fab cycle at 4 nm.'],
+  ['Assembled units available', 104, 'mo 23 – 28',
+   'Sort, known-good-die selection and 2.5D assembly. Interposer supply, not the die, sets this date.'],
+  ['Bring-up complete', 120, 'mo 25 – 31',
+   'Power-on to characterised silicon with an errata list and a respin decision on the record.'],
+  ['Mass production release', 132, 'mo 28 – 36',
+   'Reliability qualification alone is 1000 hours of HTOL plus package qual; yield learning runs alongside.'],
+];
+
+/* act: [text, TAT weeks, man-months, cont?]  ·  dlv: [text] */
+const STAGES = [
+/* ---------------- DEFINE ---------------- */
+{code:'DEF', name:'Product Definition', band:'define', s:0, e:8,
+ desc:'Fix what the product must achieve and the technical, cost and schedule boundaries the program will be held to. Nothing downstream is negotiable if this is vague.',
+ rev:'IP strategy and technology node selection move out to IPR and TECH — this stage keeps requirements, PPA and the business case. Window 0–4 → 0–8: two months is the floor for a new product, not four weeks.',
+ acts:[
+  ['Market and customer requirements consolidation',4,4],
+  ['Workload / use-case profiling and target KPI derivation (TOPS, TOPS/W, tokens/s)',5,6],
+  ['PPA target definition — frequency, power envelope, die area budget',4,3],
+  ['Die size, yield and product cost model (wafer, mask, package, test, ASP)',4,3],
+  ['Memory and interface bandwidth requirements (HBM stacks, PCIe/CXL lanes, D2D)',3,2],
+  ['Competitive benchmarking and product positioning',4,2],
+  ['Feasibility assessment against candidate technology nodes',4,3],
+  ['Program schedule, resource and staffing plan drafting',4,3],
+  ['Business case preparation and funding approval package',3,2],
+ ],
+ dlvs:[
+  'Product requirements document (PRD)',
+  'Target specification — PPA and KPI table',
+  'Product cost and margin model',
+  'Feasibility report',
+  'Program charter, staffing and budget plan',
+  'Kickoff Go / No-Go decision record',
+ ]},
+
+{code:'ARCH', name:'Architecture', band:'define', s:6, e:24,
+ desc:'Turn requirements into a system architecture and make the decisions — partitioning, memory hierarchy, interfaces, power — that every downstream team inherits.',
+ rev:'Window 3–11 → 6–24. Architecture freeze at month 5.5 rather than month 2.5: workload modelling for a new accelerator architecture is a four-to-five month activity on its own. IP make/buy leaves for IPR; safety/security architecture and DVFS strategy added.',
+ acts:[
+  ['System-level performance modelling and workload simulation',14,28],
+  ['Compute / memory / interconnect partitioning; monolithic vs chiplet decision',8,14],
+  ['Dataflow and memory hierarchy definition (on-die SRAM capacity, HBM channels)',8,12],
+  ['Interface and protocol selection (PCIe gen, CXL, UCIe, HBM3/3E)',6,6],
+  ['Power domain, clock domain and DVFS architecture; UPF intent draft',7,9],
+  ['PPA budget allocation per block',4,4],
+  ['Security and safety architecture — secure boot, root of trust, fusing',6,7],
+  ['Chip-level floorplan intent, pin and bump budget',5,5],
+  ['Architecture specification authoring and review',9,14],
+  ['Block microarchitecture specification kickoff',6,12],
+ ],
+ dlvs:[
+  'Architecture specification',
+  'Performance model and workload analysis report',
+  'Block partitioning and PPA budget table',
+  'Interface and protocol definition document',
+  'Power / clock / reset architecture and UPF intent',
+  'Chip-level block diagram with pin and bump budget',
+  'Architecture Freeze review package',
+ ],
+ ms:'Arch Freeze'},
+
+/* ---------------- ENABLEMENT ---------------- */
+{code:'TECH', name:'Technology & Foundry Selection', band:'enable', s:0, e:14, isNew:true,
+ desc:'Choose the foundry, the node and the process flavour, and convert that choice into signed commercial and capacity commitments. Everything in IP, PDK and library land is downstream of this decision.',
+ note:'<b>New.</b> Today this exists as one activity line inside Product Definition — "technology node selection" — with no schedule, no deliverable and no capacity commitment behind it. Low effort, long TAT: most of the elapsed time is the foundry’s, not yours.',
+ acts:[
+  ['Foundry and node long-list to short-list evaluation',5,4],
+  ['Process option and flavour selection (HPC/HD, multi-Vt menu, backside PDN, RF/HV adders)',5,4],
+  ['Density / performance / leakage benchmarking against product targets (DTCO study)',7,6],
+  ['Wafer price, mask and NRE quotation; MPW and volume pricing',6,3],
+  ['Fab capacity and tapeout slot reservation; hot-lot policy agreement',5,2],
+  ['Foundry legal engagement — NDA, design agreement, IP licensing frame',8,2],
+  ['Foundry roadmap and risk-production timing alignment',4,1.5],
+  ['Second-source and node-migration strategy assessment',4,1.5],
+  ['OSAT and backend supply chain preliminary alignment',5,2],
+ ],
+ dlvs:[
+  'Technology selection report and decision record',
+  'Process option / flavour sheet agreed with foundry',
+  'Wafer, mask and NRE cost sheet',
+  'Executed foundry design agreement (DA) and NDA',
+  'Capacity and tapeout slot commitment',
+  'Node risk assessment — maturity, defect density, yield learning curve',
+ ]},
+
+{code:'PDK', name:'PDK & Design Enablement', band:'enable', s:8, e:44, isNew:true,
+ desc:'Get the design kit, the libraries, the tools and the signoff conditions to a state the program can actually build on — and keep tracking them as the foundry releases new versions underneath you.',
+ note:'<b>New.</b> Today this appears only as a risk line in Logic Synthesis: "library / PDK version mismatches across teams". A 0.5-to-1.0 PDK delta that reopens timing is a schedule event, not a warning. This stage also owns the <b>memory instance decision gate</b> — if compiler instances miss the block PPA budget, the custom-array path opens here and executes in AMS.',
+ acts:[
+  ['PDK version roadmap tracking (0.1 → 0.5 → 1.0 → production) and delta impact analysis',34,14,true],
+  ['Design rule manual review; restricted and recommended rule disposition',6,5],
+  ['Standard cell library selection and qualification (track height, multi-Vt, multi-bit flops)',8,9],
+  ['Memory compiler evaluation and instance generation (SRAM, register file)',9,10],
+  ['Compiler instance PPA characterisation against block budgets — density, Vmin, access time, leakage',6,7],
+  ['Custom / pushed-rule memory instance decision, scope and schedule impact assessment',4,3],
+  ['IO, ESD and latch-up library qualification',6,5],
+  ['EDA tool version qualification for the node — synthesis, P&R, STA, PV, EM/IR',10,12],
+  ['Foundry reference flow bring-up and internal methodology deck',10,12],
+  ['Rule deck, QRC tech file and DRC/LVS deck version control',6,4,true],
+  ['Signoff corner and derate definition agreed with foundry (PVT, OCV/AOCV/POCV)',6,5],
+  ['Compute farm, EDA license and storage capacity planning',6,3],
+  ['Golden design environment release and flow regression',8,8],
+ ],
+ dlvs:[
+  'PDK readiness dashboard — version, release date, open gap list',
+  'Qualified library list with .lib / LEF / GDS views',
+  'Memory PPA gap analysis and custom-instance decision record',
+  'EDA tool and version matrix (qualified and frozen)',
+  'Internal reference flow and methodology guide',
+  'Signoff corner definition agreed with foundry',
+  'Compute and license capacity plan',
+  'Golden environment release notes',
+ ],
+ ms:'PDK 1.0 Release'},
+
+{code:'IPR', name:'IP Strategy & Readiness', band:'enable', s:4, e:26, isNew:true,
+ desc:'Decompose the product into the IP it needs, decide make / buy / reuse for each, and prove that every bought or reused block is actually available and silicon-proven on the selected process option — before anyone schedules integration around it.',
+ note:'<b>New.</b> Today this is a risk line in RTL Development: "third-party IP delivery dates unconfirmed". IP acquisition is a workstream with lead times, not a risk to watch. Licence negotiation dominates the TAT and almost none of the effort.',
+ acts:[
+  ['Product requirement → IP requirement decomposition (IP bill of materials)',5,5],
+  ['Reuse inventory audit — internal IP already available on the target node',4,3],
+  ['Make / buy / reuse decision per IP block',5,4],
+  ['Vendor RFI / RFQ and technical evaluation',9,10],
+  ['Silicon-proven status check per IP on the selected node and process option',7,6],
+  ['IP deliverable checklist review (GDS, LEF, multi-corner .lib, CDL, UPF, DV collateral, errata)',7,6],
+  ['Licence negotiation, PO issue and delivery-date commitment',12,5],
+  ['Porting / hardening scope and schedule for IP not proven on the node',5,4],
+  ['IP delivery schedule alignment to RTL and PD integration windows',4,2],
+  ['IP maturity risk rating and second-source contingency',4,2],
+ ],
+ dlvs:[
+  'IP bill of materials with make / buy / reuse decision per block',
+  'Vendor evaluation matrix and selection record',
+  'IP readiness report — silicon-proven status and maturity level per IP',
+  'IP deliverable acceptance checklist',
+  'Executed licences and POs with committed delivery dates',
+  'IP delivery schedule folded into the program plan',
+  'IP risk register and contingency plan',
+ ],
+ ms:'IP Plan Freeze'},
+
+{code:'AMS', name:'Custom, AMS & Memory IP Development', band:'enable', s:18, e:60, isNew:true,
+ desc:'Build the analog, custom and memory blocks that no vendor and no compiler is delivering — PLLs, SerDes and PHYs, regulators, custom SRAM arrays — through schematic, layout, post-layout characterisation and hardening into usable macros.',
+ note:'<b>New.</b> Analog appears today only as a collaborator name. When an IP has to be developed rather than bought, it is a multi-quarter mini-program on the tapeout critical path. The <b>custom SRAM path</b> opens only when PDK-06 shows compiler instances missing the block PPA budget — its abstract views must land before PD floorplan at week 53, even if final characterisation trails to week 60.',
+ acts:[
+  ['AMS IP specification and budget allocation (jitter, BER, PSRR, area)',6,8],
+  ['PLL / clock generator design and closure',26,32],
+  ['SerDes and PHY design or vendor hardening (PCIe/CXL, UCIe, HBM PHY)',34,60],
+  ['LDO, bandgap and power-management cell design',20,22],
+  ['Custom SRAM instance architecture — bitcell selection, array organisation, sense amp and replica timing',10,14],
+  ['Read / write assist circuit design for Vmin — WL boost, negative bitline, VDD collapse',10,12],
+  ['Custom array layout and pushed-rule DRC closure with foundry approval',16,22],
+  ['Statistical margin and yield analysis — importance sampling, sigma-Vmin, bitcell variation',10,12],
+  ['Redundancy and repair scheme integration with the BISR architecture',6,6],
+  ['Custom memory view generation and compiler-equivalent characterisation across corners',10,12],
+  ['Schematic design and pre-layout simulation',16,20],
+  ['Custom layout with DRC / LVS / antenna and fill closure',18,26],
+  ['Post-layout extracted simulation across PVT and Monte Carlo',16,20],
+  ['Reliability checks — EM/IR, aging, ESD, latch-up',10,10],
+  ['Hard macro abstraction and view generation (LEF, .lib, CDL, GDS, behavioural model)',8,8],
+  ['AMS–digital co-simulation and integration support',16,12,true],
+ ],
+ dlvs:[
+  'AMS IP specifications and design review packages',
+  'Characterisation reports across PVT and Monte Carlo',
+  'Custom SRAM instance specification with Vmin and sigma-yield report',
+  'Custom memory views characterised to compiler equivalence',
+  'Hard macro GDS with abstract views (LEF, .lib, CDL, UPF, wreal/Verilog model)',
+  'Per-macro DRC / LVS clean signoff, pushed rules approved by foundry',
+  'Reliability report — EM/IR, ESD, latch-up, aging',
+  'Integration guide with known limitations and errata',
+ ],
+ ms:'AMS Macro Handoff'},
+
+{code:'TC', name:'Test Chip / MPW Shuttle', band:'enable', s:22, e:62, isNew:true,
+ desc:'De-risk the parts of the design that cannot be trusted to simulation — new IP, new process, marginal circuits — on a small shuttle vehicle whose silicon comes back in time to change the production design.',
+ note:'<b>New, optional.</b> Programs on a mature node with proven IP can drop this stage. Programs with new SerDes or a new node generally cannot. The shuttle fab window is sixteen weeks of waiting and almost no effort.',
+ acts:[
+  ['Test chip objective definition and risk-item selection',5,4],
+  ['Test chip design and integration (IP under test, ring oscillators, PCM structures)',12,18],
+  ['MPW shuttle slot booking and data submission scheduling',4,1],
+  ['Test chip physical implementation and signoff',12,20],
+  ['Shuttle tapeout and fabrication',16,4],
+  ['Test chip board and lab setup preparation',9,8],
+  ['Silicon characterisation and correlation to simulation',12,20],
+  ['Feedback into the production design — model correction and margin decisions',6,8],
+ ],
+ dlvs:[
+  'Test chip specification and risk coverage matrix',
+  'Test chip GDS and shuttle submission record',
+  'Test chip silicon and characterisation report',
+  'Silicon-to-model correlation report',
+  'Design guidance and margin decisions for the production chip',
+ ],
+ ms:'Test Chip Silicon'},
+
+/* ---------------- DESIGN & VERIFY ---------------- */
+{code:'RTL', name:'RTL Design & Integration', band:'design', s:20, e:52,
+ desc:'Implement the architecture in synthesisable logic, integrate the IP that IPR and AMS deliver, and hold the design under change control until freeze.',
+ rev:'Window 9–24 → 20–52. Fifteen weeks of RTL for a large accelerator was not a schedule; block work alone is 8 – 10 months. Renamed from "IP & RTL Development" — IP acquisition moves to IPR. Register map generation and spec change control made explicit.',
+ acts:[
+  ['Block microarchitecture specification',10,40],
+  ['Block-level RTL implementation',24,180],
+  ['Third-party and internal IP integration — wrappers, glue, configuration',16,45],
+  ['Chip-level integration and top assembly',12,35],
+  ['Clock, reset and power intent (UPF) implementation',10,18],
+  ['Lint, CDC and RDC closure',16,30],
+  ['Register map / RDL definition and header generation',8,10],
+  ['Trial synthesis feedback loop on RTL PPA',12,20],
+  ['CI build, nightly regression and release management',30,20,true],
+  ['Specification change control and ECO board',30,12,true],
+ ],
+ dlvs:[
+  'Block and top-level RTL release, tagged',
+  'Register map / RDL and generated headers',
+  'Integration testbench and build system',
+  'Lint / CDC / RDC clean reports with waiver list',
+  'UPF power intent file',
+  'IP integration report and version manifest',
+  'RTL Freeze package',
+ ],
+ ms:'RTL Freeze'},
+
+{code:'DV', name:'Verification', band:'design', s:26, e:66,
+ desc:'Build the evidence that the design does what the specification says, across block, chip and system level — the longest and most schedule-critical pre-silicon activity, and the largest single line of effort in the program.',
+ rev:'Window 12–30 → 26–66. Verification closing eighteen weeks after it started was the least credible number in the previous draft; it closes 2 – 3 months before tapeout, not before RTL is written. Emulation and FPGA prototyping made an explicit activity; low-power and performance validation added.',
+ acts:[
+  ['Verification plan and coverage model definition',8,25],
+  ['UVM environment and VIP bring-up',14,60],
+  ['Block-level constrained-random and directed testing',30,200],
+  ['Chip-level and system-level scenario testing',22,110],
+  ['Formal property verification — control logic, connectivity, security',16,40],
+  ['Low-power (UPF) verification',10,20],
+  ['AMS / mixed-signal co-simulation',12,20],
+  ['Emulation and FPGA prototype bring-up — capacity, partitioning, speed',20,55],
+  ['Performance and bandwidth validation against the architecture model',12,30],
+  ['Coverage closure and regression stability management',26,45,true],
+  ['Gate-level simulation, functional and timing-annotated',10,20],
+  ['Bug triage and disposition board',34,25,true],
+ ],
+ dlvs:[
+  'Verification plan (vPlan) and coverage model',
+  'UVM testbenches and integrated VIP',
+  'Regression and coverage dashboards',
+  'Formal proof reports with assumption list',
+  'Low-power verification report',
+  'Emulation platform and system test suite',
+  'Gate-level simulation report',
+  'DV closure signoff package',
+ ],
+ ms:'DV Closure'},
+
+{code:'DFT', name:'DFT Architecture', band:'design', s:18, e:58, isNew:true,
+ desc:'Decide how the chip will be tested before it can be built to be testable — scan and compression, memory BIST and repair, JTAG and debug access — then produce and validate the patterns the tester will run.',
+ note:'<b>New.</b> Today DFT is one activity line inside Logic Synthesis ("DFT insertion"). The architecture is decided at ARCH time and the pattern work runs past synthesis; missing coverage targets is found far too late when it lives inside SYN.',
+ acts:[
+  ['DFT architecture definition — scan style, compression ratio, hierarchical DFT',8,12],
+  ['Test coverage and test-time target negotiation with product and test engineering',5,4],
+  ['MBIST / BIRA / BISR architecture for embedded memories',10,14],
+  ['Boundary scan and IJTAG (1149.1 / 1687), TAP and debug access architecture',8,10],
+  ['On-chip clock controller design for at-speed testing',7,8],
+  ['Scan insertion and DFT DRC during synthesis',10,14],
+  ['ATPG pattern generation — stuck-at, transition, cell-aware — and coverage closure',16,28],
+  ['Pattern validation by gate-level simulation and ATE format conversion (STIL/WGL)',10,14],
+  ['Scan compression and chain routing feasibility with physical design',10,10],
+  ['eFuse, chip ID and memory repair infrastructure',6,6],
+  ['Silicon debug hooks — trace, observability, design-for-debug',8,10],
+ ],
+ dlvs:[
+  'DFT architecture specification and coverage plan',
+  'MBIST / BISR insertion and test collateral',
+  'JTAG / IJTAG description files (BSDL, ICL, PDL)',
+  'ATPG pattern sets with coverage report',
+  'DFT DRC clean report',
+  'Pattern validation (GLS) report and ATE-ready pattern files',
+  'DFT signoff entry for the tapeout checklist',
+ ],
+ ms:'DFT Architecture Freeze'},
+
+/* ---------------- IMPLEMENT ---------------- */
+{code:'SYN', name:'Logic Synthesis & Netlist Drops', band:'implement', s:42, e:66,
+ desc:'Map verified RTL onto the qualified library under real constraints — and issue it as a sequence of netlists rather than one handover. The first drop exists so physical design can build its flow; the last one, the FFN, is the only netlist the final turn is allowed to see.',
+ rev:'Restructured around how netlists actually arrive, and moved 22–28 → 42–66. Synthesis does not hand over once: N0 is a flow-flush netlist released for PD flow setup, N1 and N2 are quality turns against PD feedback, and the FFN is the final release. DFT insertion moved to the DFT stage.',
+ acts:[
+  ['SDC constraint development and validation',8,18],
+  ['Technology mapping and optimisation — multi-Vt, multi-bit, useful skew',8,16],
+  ['N0 flow-flush netlist release — functionally incomplete, structurally representative, issued so PD can build the flow',4,6],
+  ['Physical-aware synthesis with congestion feedback from the PD flow setup',7,14],
+  ['N1 netlist drop — first quality turn against PD placement and congestion feedback',5,12],
+  ['Power optimisation — clock gating, operand isolation, Vt mix',7,12],
+  ['Low-power synthesis — isolation and level-shifter insertion against UPF',5,8],
+  ['N2 netlist drop — timing and congestion converged, late RTL changes absorbed',5,12],
+  ['FFN (final full netlist) release — RTL frozen, ECOs closed, no functional change beyond this point',4,10],
+  ['Formal equivalence checking per drop, RTL versus netlist',20,12,true],
+  ['Timing, area and power reporting against budget, per drop',22,10,true],
+  ['Netlist handoff and QoR delta review with physical design, per drop',22,6,true],
+ ],
+ dlvs:[
+  'N0 flow-flush netlist for PD flow setup',
+  'N1 and N2 netlist drops with QoR delta reports',
+  'FFN — final full netlist, release-tagged',
+  'Validated SDC constraint set per mode and corner',
+  'Synthesis QoR report per drop against PPA targets',
+  'Formal equivalence clean report per drop',
+  'Power intent implementation report',
+  'Physical design handoff package per drop',
+ ],
+ ms:'FFN Release'},
+
+{code:'PD', name:'Physical Design', band:'implement', s:46, e:76,
+ desc:'Make the netlist physically real — floorplan, power grid, placement, clock trees, routing — across a sequence of turns whose quality climbs with each netlist drop, then close the design on the final turn against the FFN.',
+ rev:'Restructured around the netlist drop cadence and moved 26–40 → 46–76: flow setup on the N0 flow-flush netlist, two quality turns on N1 and N2, then the final turn on the FFN. Bump / RDL planning and chip power model extraction added as explicit handoffs.',
+ acts:[
+  ['Flow setup and MMMC environment build on the N0 flow-flush netlist — scripts, decks, runtimes, capacity',7,22],
+  ['Floorplan, macro placement and partition definition',9,32],
+  ['Power delivery network design and early IR analysis',8,20],
+  ['Bump and RDL planning with chip-package co-design feedback',8,14],
+  ['Turn 1 on the N1 drop — placement, CTS and first full route; QoR baseline established',8,45],
+  ['Turn 2 on the N2 drop — congestion, timing and power convergence; closure risk quantified',8,45],
+  ['Clock tree synthesis with skew and jitter budgeting, refined across turns',12,26,true],
+  ['Detailed routing and DRC convergence',16,40,true],
+  ['Multi-corner multi-mode timing closure',22,60,true],
+  ['Signal and power integrity iteration — crosstalk, EM',10,18],
+  ['Chip power model (CPM/CPS) extraction and handoff to package co-verification',5,6],
+  ['Scan chain reordering and DFT-aware routing',6,8],
+  ['Final turn on the FFN — full closure, no functional change admitted',11,55],
+  ['Functional and timing ECO implementation',18,22,true],
+  ['Chip finishing — seal ring, dummy and metal fill, alignment marks',5,6],
+  ['Hierarchical block closure and top-level assembly',14,30],
+ ],
+ dlvs:[
+  'Flow setup release — MMMC environment, scripts and runtime baseline',
+  'Turn 1 and Turn 2 databases with QoR delta reports',
+  'Final-turn routed database on the FFN, per block and top',
+  'Floorplan and PDN specification',
+  'MCMM timing closure reports with violation burn-down across turns',
+  'Interim physical DRC / LVS clean',
+  'Bump map, RDL and package interface files',
+  'ECO log and change control record',
+  'Signoff-ready database handoff',
+ ]},
+
+{code:'SO', name:'Signoff', band:'implement', s:62, e:78,
+ desc:'Prove the final implementation holds across every electrical, timing, reliability and manufacturing check the foundry and the product demand, and dispose of every waiver on the record. The decks are rehearsed on an intermediate turn so the final turn is not the first time the flow runs at full chip.',
+ rev:'Window 37–44 → 62–78. Signoff dry runs on the Turn 2 database added — decks, runtimes and violation triage are rehearsed before the FFN turn arrives. DFM / lithography and reliability (ESD, latch-up, FIT) added; the chip-package co-verification result (SIPI) now enters signoff as its own review.',
+ acts:[
+  ['Signoff flow dry run on the Turn 2 database — decks, runtimes, capacity and violation triage rehearsed',6,14],
+  ['Multi-corner multi-mode static timing analysis and closure on the final turn',10,34],
+  ['Full-chip DRC, LVS, antenna and density verification',9,26],
+  ['EM and IR-drop signoff, static and dynamic',8,20],
+  ['Power and signal integrity signoff — crosstalk, noise',6,12],
+  ['Chip-package-system co-analysis signoff review against SIPI results',4,5],
+  ['Reliability verification — ESD, latch-up, soft error / FIT',6,10],
+  ['DFM and lithography checks, CMP and hotspot analysis',6,10],
+  ['Final formal equivalence and LVS netlist consistency',5,8],
+  ['Waiver review board and foundry waiver alignment',6,6],
+  ['Gate-level simulation with final SDF',5,8],
+  ['Signoff corner correlation against foundry decks',5,6],
+ ],
+ dlvs:[
+  'STA signoff reports across all corners and modes, with waiver list',
+  'Clean DRC / LVS / antenna / density reports',
+  'EM/IR and SI/PI signoff reports',
+  'Reliability reports — ESD, latch-up, FIT',
+  'DFM and lithography hotspot report',
+  'Final formal equivalence report',
+  'Signoff summary and Design Freeze package',
+ ],
+ ms:'Design Freeze'},
+
+/* ---------------- MANUFACTURE ---------------- */
+{code:'TO', name:'Tapeout & Mask Release (MTO)', band:'manufacture', s:78, e:86,
+ marks:[[80,'FEOL MTO'],[84,'BEOL MTO']],
+ desc:'Release the design to mask in two steps. Front-end layers go out first and the mask shop starts cutting them; back-end layers follow about a month later. That gap is not slack — it is the last window in which a metal-layer fix can still be made without touching the front-end mask set.',
+ rev:'Split into FEOL and BEOL mask tape-out. Previously a single one-week moment; now an eight-week release sequence with a deliberate four-week BEOL design fix window between the two MTOs.',
+ acts:[
+  ['Final GDSII / OASIS assembly on the FFN closure database, with layer map verification',2,6],
+  ['Final full-chip verification re-run on the released database',2,8],
+  ['Tapeout checklist completion and owner sign-off',3,5],
+  ['Open-issue risk assessment and waiver acceptance',2,3],
+  ['Go / No-Go decision meeting',0.5,1],
+  ['FEOL layer data preparation and MTO release to the mask shop',1.5,3],
+  ['FEOL mask order confirmation and mask shop scheduling',1,1],
+  ['BEOL design fix window — metal-layer ECOs and late fixes while FEOL masks are being cut',4,10],
+  ['BEOL layer re-verification — DRC, LVS, antenna and density on the fixed metal stack',2.5,6],
+  ['BEOL layer data preparation and MTO release',1.5,3],
+  ['BEOL mask order confirmation and full mask set completion tracking',1,1],
+ ],
+ dlvs:[
+  'Released GDSII / OASIS database with checksum record',
+  'Tapeout checklist with sign-off matrix',
+  'Open issue and risk acceptance record',
+  'Go / No-Go decision minutes',
+  'FEOL MTO release package and mask order confirmation',
+  'BEOL ECO log covering the fix window',
+  'BEOL MTO release package and mask order confirmation',
+  'Full mask set completion record',
+ ],
+ ms:'Tapeout (BEOL MTO)'},
+
+{code:'FAB', name:'Fabrication', band:'manufacture', s:79, e:98,
+ desc:'Masks are cut and wafers are processed. The program has almost no levers here — only hot-lot priority, WIP visibility and an honest wafer-out forecast. Eighteen weeks from FEOL MTO to wafer out: seven for an EUV mask set, eleven for a hot-lot cycle.',
+ rev:'Split to follow the two mask releases: wafer start is gated on FEOL mask availability, and the BEOL masks are cut while front-end processing is already running. Wafer-out is gated on PTV closing package validation — wafers must not arrive at an unqualified assembly process.',
+ acts:[
+  ['FEOL mask set fabrication, inspection and qualification',7,4],
+  ['Wafer start on FEOL mask availability',1,1],
+  ['BEOL mask set fabrication, inspection and qualification, in parallel with front-end processing',6,4],
+  ['Front-end wafer processing',8,3],
+  ['Back-end-of-line processing',5,2],
+  ['Inline metrology and defect inspection monitoring',14,5,true],
+  ['E-test / PCM data review',3,3],
+  ['Wafer acceptance test and lot disposition',3,3],
+  ['Hot-lot management and WIP tracking',18,4,true],
+  ['Wafer shipment and logistics to sort and assembly',2,1],
+ ],
+ dlvs:[
+  'FEOL and BEOL mask sets with qualification reports',
+  'Processed engineering-lot wafers',
+  'Inline, PCM and WAT data package',
+  'Wafer acceptance disposition record',
+  'Wafer-out forecast versus actual log',
+  'First Silicon availability notice',
+ ],
+ ms:'First Silicon'},
+
+/* ---------------- INTEGRATE ---------------- */
+{code:'PKGD', name:'Package & Substrate Design', band:'integrate', s:24, e:76, isNew:true,
+ desc:'Design the package the die will live in — interposer, substrate, bump map, thermal and mechanical solution — on a schedule driven by substrate lead time rather than by the die.',
+ note:'<b>New, split out of Advanced Packaging.</b> Package design runs in parallel with physical design and feeds the bump map into it. Leaving it beside assembly is what makes substrate lead time a surprise. Electrical closure is owned by SIPI and physical validation by PTV — this stage designs, those two verify.',
+ acts:[
+  ['Package architecture selection — 2.5D interposer type, organic substrate, layer count',8,10],
+  ['Bump map, pitch and power-ground planning with physical design',10,12],
+  ['Interposer / RDL routing design',14,18],
+  ['Substrate stack-up, escape routing and package DRC',14,18],
+  ['Package routing for signal integrity — length matching, reference plane and via design',10,12],
+  ['Package PDN and decap footprint design (electrical closure owned by SIPI)',9,10],
+  ['Thermal and mechanical simulation — warpage, co-planarity, TIM, lid',12,12],
+  ['Test vehicle requirement definition and handoff to PTV',4,3],
+  ['Substrate and interposer supplier selection and lead-time booking',10,4],
+  ['OSAT selection and assembly process definition',9,5],
+  ['Package design freeze, DRC and tooling release',6,6],
+ ],
+ dlvs:[
+  'Package architecture specification',
+  'Bump map and interposer / RDL database',
+  'Substrate design files (Gerber / ODB++) and stack-up',
+  'Package electrical design intent and model handoff to co-verification',
+  'Thermal and mechanical (warpage) simulation reports',
+  'Test vehicle requirement specification for PTV',
+  'Substrate and interposer PO with committed lead time',
+  'OSAT assembly process flow and agreement',
+  'Package Design Freeze package',
+ ],
+ ms:'Package Design Freeze'},
+
+{code:'PTV', name:'Package Test Vehicle (CPI / TTV)', band:'integrate', s:36, e:88, isNew:true,
+ desc:'Prove the package before the product die exists. Mechanical, thermal and daisy-chain vehicles carry the chip-package interaction, warpage and thermal risk, so the first real assembly is not the first experiment.',
+ note:'<b>New.</b> Package validation must close <b>before product wafer-out</b> — the vehicles have to be designed, built and stressed while the die is still in the fab. This stage closes at week 88, ten weeks ahead of wafer-out at week 98. Today none of this exists in the template.',
+ acts:[
+  ['Test vehicle strategy and risk item definition — CPI, warpage, thermal, ULK/BEOL stress',6,5],
+  ['Mechanical test vehicle (MTV) design — bump array, dummy die stack, substrate coupon',9,8],
+  ['Thermal test vehicle (TTV) design — embedded heater array and RTD sensor placement',9,8],
+  ['Daisy-chain electrical vehicle design — interconnect continuity and bump yield structures',8,6],
+  ['TV die fabrication and interposer / substrate vehicle build',16,6],
+  ['OSAT assembly of vehicles with process window DOE',11,12],
+  ['Warpage and co-planarity measurement across the reflow profile (shadow moiré)',7,8],
+  ['Chip-package interaction stress evaluation — low-k / ULK crack, bump and BEOL integrity',11,14],
+  ['Thermal characterisation — Rjc / Rja, TIM performance, hotspot mapping against the thermal model',9,10],
+  ['Board-level reliability on vehicles — temperature cycle, drop, bend',14,8],
+  ['Daisy-chain continuity test and assembly yield learning',9,6],
+  ['Feedback into package design and assembly process window freeze',7,5],
+ ],
+ dlvs:[
+  'Test vehicle plan and risk coverage matrix',
+  'MTV, TTV and daisy-chain vehicle designs',
+  'Built vehicle lots with assembly travelers',
+  'Warpage and co-planarity data across the reflow profile',
+  'CPI stress assessment report — ULK, bump and BEOL integrity',
+  'Thermal characterisation report with model correlation (Rjc, TIM, hotspot map)',
+  'Board-level reliability data on vehicles',
+  'Frozen assembly process window definition',
+  'Package validation complete record — gate for product wafer-out',
+ ],
+ ms:'Package Validation Complete'},
+
+{code:'SIPI', name:'Chip-Package-System Co-Verification', band:'integrate', s:50, e:76, isNew:true,
+ desc:'Verify the die, the package and the board as one electrical system — one power delivery network, one channel — and close it as a signoff with named exit criteria, not as three separate simulations that never met.',
+ note:'<b>New.</b> Today SI/PI appears three times as isolated activities inside physical design, signoff and package design, each assuming a model of the other two. The co-analysis that catches package-induced voltage droop and channel loss has no owner, no procedure and no exit criteria. This stage closes at week 76 — before signoff completes at week 78 and the FEOL mask release goes out at week 80.',
+ acts:[
+  ['Chip power model (CPM/CPS) extraction per power domain and operating mode',7,8],
+  ['Package and board model extraction — 3D EM, S-parameter and RLC network',8,10],
+  ['Die-package-board PDN co-simulation — DC and AC impedance versus target',9,12],
+  ['Dynamic voltage-drop analysis with package inductance and real switching profiles',8,10],
+  ['Decoupling capacitor budget and placement optimisation across die, package and board',7,7],
+  ['SSN / SSO and simultaneous-switching noise analysis at the IO ring',5,5],
+  ['High-speed channel simulation with extracted package models — insertion loss, crosstalk, return path',9,11],
+  ['Eye diagram, jitter and BER budget closure per interface (PCIe/CXL, HBM, die-to-die)',8,9],
+  ['Power-aware timing correlation — voltage drop back-annotated into STA',5,5],
+  ['Electro-thermal co-analysis coupled with the package thermal model',5,5],
+  ['Co-verification signoff review and criteria disposition with design and package teams',4,3],
+ ],
+ dlvs:[
+  'Chip power model (CPM/CPS) release per domain and mode',
+  'Extracted package and board electrical models',
+  'PDN impedance and dynamic IR co-simulation report',
+  'Decap budget and placement specification across die, package and board',
+  'Channel compliance report per interface, with margins',
+  'Eye, jitter and BER budget closure record',
+  'Power-aware STA correlation report',
+  'Chip-package-system co-verification signoff — tapeout gate',
+ ],
+ ms:'Co-Verification Signoff'},
+
+{code:'ASSY', name:'Assembly & Package Build', band:'integrate', s:98, e:106,
+ desc:'Stack, bond and build the units — known-good die, HBM stacks, underfill, lid — and learn the assembly yield on the parts bring-up and qualification will consume.',
+ rev:'Renamed from "Advanced Packaging" and reduced to the build. Design content moves to PKGD, electrical verification to SIPI, and the process window this stage runs to is the one PTV froze.',
+ acts:[
+  ['Known-good-die sort and selection',3,5],
+  ['HBM stack procurement and incoming inspection',3,2],
+  ['Die attach, micro-bump and thermo-compression bonding',3,6],
+  ['Interposer and substrate assembly, underfill, molding',3,5],
+  ['Lid / TIM attach and ball attach',2,3],
+  ['Assembly inline inspection — X-ray, CSAM, warpage metrology',2,3],
+  ['Assembly yield analysis and process tuning',5,6],
+  ['Package-level open / short and continuity test',2,3],
+  ['Unit build for bring-up, qualification and customer samples',3,3],
+ ],
+ dlvs:[
+  'Assembled units — bring-up, qualification and sample lots',
+  'Assembly travelers and process data',
+  'Assembly yield report and failure pareto',
+  'Package-level inspection and test data',
+  'Unit allocation record across bring-up, qual and customers',
+ ]},
+
+/* ---------------- VALIDATE & RAMP ---------------- */
+{code:'EVB', name:'Validation Hardware / EVB', band:'validate', s:52, e:90, isNew:true,
+ desc:'Design, build and debug the boards and lab infrastructure that first silicon will be plugged into — finished and shaken out before the parts arrive, not after.',
+ note:'<b>New, optional.</b> Today this is a risk line in Silicon Bring-up: "evaluation boards not ready when silicon arrives". Programs that reuse an existing platform can fold it into BU.',
+ acts:[
+  ['Validation platform requirements and topology definition',5,5],
+  ['EVB schematic design — power tree, clocking, host interface, connectors',10,14],
+  ['PCB layout with high-speed channel SI/PI simulation',12,18],
+  ['PCB fabrication and assembly',8,4],
+  ['Power delivery, VRM and telemetry design and bring-up',7,8],
+  ['Debug infrastructure — JTAG and trace pods, interposers, instrumentation headers',7,8],
+  ['Board bring-up with socketed or dummy parts',7,10],
+  ['Thermal solution and cooling for the lab platform',7,7],
+  ['Lab instrumentation reservation and test rack build',7,8],
+  ['Minimum host-side enablement for power-on (BSP handoff boundary)',7,10],
+ ],
+ dlvs:[
+  'Validation platform specification',
+  'EVB schematics, BOM and layout database',
+  'Fabricated and assembled boards, rev A/B with quantity plan',
+  'Board bring-up report and known issues',
+  'Debug and trace access documentation',
+  'Lab setup and instrument reservation plan',
+ ],
+ ms:'EVB Ready'},
+
+{code:'TEST', name:'Test Development', band:'validate', s:54, e:96, isNew:true,
+ desc:'Build the ability to test the product — tester platform, probe card and load board, sort and final programs — on a critical path set by probe card lead time, not by wafer-out.',
+ note:'<b>New.</b> Today test work appears only inside Qualification & Production, after wafer-out. A probe card ordered then arrives twenty weeks after the wafers.',
+ acts:[
+  ['Test plan and coverage strategy — wafer sort, final test, system-level test',8,12],
+  ['ATE platform selection and tester time booking',6,4],
+  ['Probe card design, fabrication and qualification',20,16],
+  ['Load board / DUT board design, fabrication and bring-up',17,16],
+  ['Wafer sort test program development',16,30],
+  ['Final / package test program development',16,28],
+  ['Characterisation test content — shmoo, Vmin/Fmax, PVT sweeps',12,20],
+  ['DFT pattern porting to ATE format and pattern debug',10,16],
+  ['Test time and cost optimisation — parallelism, site count',9,12],
+  ['Correlation between ATE, bench and system results',8,10],
+  ['Test data infrastructure — STDF collection and yield database',8,10],
+ ],
+ dlvs:[
+  'Test plan and test coverage matrix',
+  'Qualified probe card and load board',
+  'Wafer sort and final test programs, release-tagged',
+  'Characterisation test suite',
+  'ATE-ready pattern set with debug log',
+  'Test time and test cost model',
+  'Test data infrastructure and yield database',
+ ],
+ ms:'Probe Card Ready'},
+
+{code:'BU', name:'Silicon Bring-up', band:'validate', s:102, e:120,
+ desc:'Find out what the silicon actually does. Power on, train the interfaces, characterise the margins, debug what does not match, and decide whether the program respins.',
+ rev:'Window 56–64 → 102–120. Interface training, memory subsystem validation and the respin decision analysis broken out as their own activities; ten weeks was too short for a first-silicon accelerator with HBM and high-speed links.',
+ acts:[
+  ['Sample receipt, incoming inspection and board mounting',1.5,2],
+  ['Power-on, power sequencing and basic health check',3,8],
+  ['Reset, clocking and PLL lock validation',3,8],
+  ['Boot, firmware load and functional smoke test',4,12],
+  ['Interface bring-up — PCIe/CXL link training, HBM training, die-to-die',8,26],
+  ['Memory subsystem and bandwidth validation',6,16],
+  ['Shmoo across voltage, frequency and temperature',7,16],
+  ['Performance validation against the architecture model',6,16],
+  ['Silicon debug of anomalies and failure analysis requests',10,28],
+  ['Errata capture, workaround definition and documentation',7,10],
+  ['Respin versus metal-fix decision analysis — ECO scope, cost, schedule',4,5],
+  ['Customer sample readiness and release package',5,6],
+ ],
+ dlvs:[
+  'Bring-up report with per-milestone health status',
+  'Characterisation data set — V/F/T shmoo and power measurements',
+  'Interface compliance results with training margins',
+  'Errata list with workarounds',
+  'Failure analysis reports',
+  'Respin versus metal-fix decision record',
+  'Customer sample release package',
+ ]},
+
+{code:'MP', name:'Qualification & Production', band:'validate', s:106, e:132,
+ desc:'Prove reliability to standard, drive yield to the cost model, release the production test program, and commit to a ramp the supply chain can actually hold.',
+ rev:'Window 62–78 → 106–132. Sixteen weeks did not cover 1000 hours of HTOL plus package qualification plus yield learning. Compliance and certification, documentation release and supply chain ramp commitment added; test program work now inherits from TEST rather than starting here.',
+ acts:[
+  ['Qualification plan definition against JEDEC / AEC standards',6,8],
+  ['Reliability stress — HTOL, HTS, temperature cycle, uHAST, THB',18,30],
+  ['ESD (HBM, CDM) and latch-up qualification',6,8],
+  ['Package qualification — MSL, drop, bend, board-level reliability',12,18],
+  ['Yield learning, failure pareto and defect analysis',20,40,true],
+  ['Production test program release and guard-band validation',9,20],
+  ['Test time reduction and multi-site conversion',9,16],
+  ['Process corner and split-lot validation',9,14],
+  ['Production readiness review and change control (PCN) setup',6,8],
+  ['Capacity, supply chain and ramp commitment — wafer starts, substrate, HBM',12,12],
+  ['Compliance and certification — PCIe/CXL compliance, RoHS/REACH, safety',12,18],
+  ['Documentation release — datasheet, user guide, errata, application notes',10,16],
+ ],
+ dlvs:[
+  'Qualification plan and JEDEC-compliant qualification report',
+  'Reliability and package qualification data packages',
+  'Production test program release',
+  'Yield model versus cost target report',
+  'Production readiness review sign-off',
+  'Ramp plan and supply commitment',
+  'Compliance certificates',
+  'Datasheet and product documentation set',
+  'Mass Production release record',
+ ],
+ ms:'Mass Production'},
+];
+
+/* ---------------- render ---------------- */
+const SPAN = 132;
+STAGES.forEach((s, i) => { s.n = i + 1; });   /* array order is band order — numbering follows it */
+const pct = w => (w / SPAN * 100);
+const esc = s => String(s).replace(/[&<>]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
+const mmOf = s => s.acts.reduce((a, x) => a + x[2], 0);
+const wk = n => (n === 0.5 ? '½w' : `${n}w`);
+
+/* stats */
+const nNew  = STAGES.filter(s => s.isNew).length;
+const nActs = STAGES.reduce((a, s) => a + s.acts.length, 0);
+const nDlvs = STAGES.reduce((a, s) => a + s.dlvs.length, 0);
+const totMM = STAGES.reduce((a, s) => a + mmOf(s), 0);
+document.getElementById('stats').innerHTML = [
+  [STAGES.length, 'stages'], [nNew, 'proposed new'], [nActs, 'activities'], [nDlvs, 'deliverables'],
+  [SPAN, 'week span'], [Math.round(totMM).toLocaleString(), 'man-months'],
+  [Math.round(totMM * 4.345 / SPAN), 'avg headcount'],
+].map(([v, l]) => `<div class="stat"><b>${v}</b><span>${l}</span></div>`).join('');
+
+/* jump bar */
+document.getElementById('jump').innerHTML = STAGES.map(s =>
+  `<a href="#s-${s.code}" class="${s.isNew ? 'is-new' : ''}" title="${esc(s.name)}">${s.code}</a>`).join('');
+
+/* gantt */
+let g = '';
+for (const b of BANDS) {
+  g += `<div class="grow"><div class="bandrow">${esc(b.label)}</div></div>`;
+  for (const s of STAGES.filter(x => x.band === b.id)) {
+    g += `<div class="grow ${s.isNew ? 'newrow' : ''}">
+      <div class="rowlabel"><span class="code">${s.code}</span><a href="#s-${s.code}">${esc(s.name)}</a></div>
+      <div class="track"><div class="bar ${s.isNew ? 'new' : ''}"
+        style="left:${pct(s.s).toFixed(2)}%;width:${Math.max(pct(s.e - s.s), 0.6).toFixed(2)}%"
+        title="week ${s.s} – ${s.e}"></div>${
+        (s.marks || []).map(([w, l]) =>
+          `<span class="mk" style="left:${pct(w).toFixed(2)}%" title="${esc(l)} · week ${w}">◆</span>`).join('')
+      }</div>
+    </div>`;
+  }
+}
+const GATES = [[78, 'w78 · MTO gate'], [98, 'w98 · wafer-out gate']];
+g += `<div class="grow"><div></div><div class="axis">` +
+  [0, 13, 26, 39, 52, 65, 91, 104, 117, 130].map(w =>
+    `<div class="q" style="left:${pct(w).toFixed(2)}%"><em>w${w}</em></div>`).join('') +
+  GATES.map(([w, l]) =>
+    `<div class="g" style="left:${pct(w).toFixed(2)}%"><em>${l}</em></div>`).join('') +
+  `</div></div>`;
+document.getElementById('gantt').innerHTML = g;
+
+/* schedule anchors */
+document.getElementById('anchors').innerHTML =
+  `<thead><tr>
+     <th class="l">Anchor</th><th class="num">Week</th><th class="num">Month</th>
+     <th class="num">Reported range</th><th class="l" style="padding-left:18px">Basis</th>
+   </tr></thead><tbody>` +
+  ANCHORS.map(([label, w, range, note]) => `<tr>
+     <td>${esc(label)}</td>
+     <td class="num">w${w}</td>
+     <td class="num">${(w / 4.345).toFixed(1)}</td>
+     <td class="was">${esc(range)}</td>
+     <td class="note" style="padding-left:18px">${esc(note)}</td>
+   </tr>`).join('') + `</tbody>`;
+
+/* stage cards */
+let m = '';
+for (const b of BANDS) {
+  const list = STAGES.filter(x => x.band === b.id);
+  const bandMM = list.reduce((a, s) => a + mmOf(s), 0);
+  m += `<div class="bandhead"><h2>${esc(b.label)}</h2>
+        <span class="meta">${list.length} stages · ${Math.round(bandMM).toLocaleString()} M/M · ${esc(b.note)}</span></div>`;
+  for (const s of list) {
+    const acts = s.acts.map((a, i) => {
+      const id = `${s.code}-${String(i + 1).padStart(2, '0')}`;
+      return `<tr><td class="id">${id}</td><td class="act">${esc(a[0])}</td>
+        <td class="tat">${wk(a[1])}${a[3] ? ' <span class="cont">cont.</span>' : ''}</td>
+        <td class="mm">${a[2]}</td></tr>`;
+    }).join('');
+    const dlvs = s.dlvs.map((d, i) =>
+      `<li><span class="id">${s.code}-D${i + 1}</span><span>${esc(d)}</span></li>`).join('');
+    const badge = s.isNew
+      ? '<span class="badge new">new</span>'
+      : (s.rev ? '<span class="badge rev">revised</span>' : '');
+    const note = s.note ? `<p class="st-note">${s.note}</p>`
+               : (s.rev ? `<p class="st-note"><b>Revised.</b> ${esc(s.rev)}</p>` : '');
+    const mm = mmOf(s);
+    m += `<article class="stage ${s.isNew ? 'new' : ''}" id="s-${s.code}" data-new="${!!s.isNew}">
+      <div class="st-head">
+        <span class="st-no">${String(s.n).padStart(2, '0')}</span>
+        <span class="st-code">${s.code}</span>
+        <h3 class="st-name">${esc(s.name)}</h3>
+        ${badge}
+        <span class="st-when">week ${s.s} – ${s.e} · ${s.e - s.s}w · ${Math.round(mm)} M/M · ~${(mm * 4.345 / (s.e - s.s)).toFixed(0)} FTE</span>
+      </div>
+      <p class="st-desc">${esc(s.desc)}</p>
+      ${note}
+      <div class="st-body">
+        <div class="col">
+          <h3>Engineering activities · ${s.acts.length}</h3>
+          <table class="acts">
+            <thead><tr><th class="l" colspan="2">Activity</th><th>TAT</th><th>M/M</th></tr></thead>
+            <tbody>${acts}</tbody>
+          </table>
+        </div>
+        <div class="col"><h3>Key deliverables · ${s.dlvs.length}</h3><ul class="dlv">${dlvs}</ul></div>
+      </div>
+      ${s.ms ? `<div class="ms"><span class="lbl">milestone</span><span class="dia">◆</span><span>${esc(s.ms)}</span></div>` : ''}
+    </article>`;
+  }
+}
+document.getElementById('main').innerHTML = m;
+
+/* filter */
+const bAll = document.getElementById('f-all'), bNew = document.getElementById('f-new');
+bAll.textContent = `All ${STAGES.length}`;
+bNew.textContent = `New only · ${nNew}`;
+function setFilter(onlyNew) {
+  bAll.setAttribute('aria-pressed', String(!onlyNew));
+  bNew.setAttribute('aria-pressed', String(onlyNew));
+  document.querySelectorAll('.stage').forEach(el => {
+    el.hidden = onlyNew && el.dataset.new !== 'true';
+  });
+  document.querySelectorAll('.bandhead').forEach(h => {
+    let n = h.nextElementSibling, any = false;
+    while (n && n.classList.contains('stage')) { if (!n.hidden) any = true; n = n.nextElementSibling; }
+    h.hidden = !any;
+  });
+}
+bAll.addEventListener('click', () => setFilter(false));
+bNew.addEventListener('click', () => setFilter(true));
+</script>
+</body>
+</html>

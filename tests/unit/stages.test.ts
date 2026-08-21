@@ -34,15 +34,17 @@ const profileOf = (stages: ProfileStageDef[]): ScheduleProfile => ({
 describe('resolving a profile into stages', () => {
   it('gives the built-in profile the prototype content, in order', () => {
     const stages = resolveStages(BUILTIN_PROFILE);
-    expect(stages).toHaveLength(12);
+    expect(stages).toHaveLength(23);
     expect(stages.map((s) => s.id)).toEqual(BUILTIN_PROFILE.stages.map((s) => s.key));
-    expect(stages.map((s) => s.stage)).toEqual([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]);
+    expect(stages.map((s) => s.stage)).toEqual(
+      Array.from({ length: 23 }, (_, i) => i + 1),
+    );
 
     const def = stages[0];
     expect(def.title).toBe('Product Definition');
     expect(def.vizKey).toBe('productDefinition');
     expect(def.phaseId).toBe('define');
-    expect(def.baseline).toEqual({ startOffsetWeeks: 0, durationWeeks: 4 });
+    expect(def.baseline).toEqual({ startOffsetWeeks: 0, durationWeeks: 8 });
     expect(def.activities.length).toBeGreaterThan(0);
     expect(def.leader.name).toBe('Daniel Kim');
   });
@@ -91,6 +93,7 @@ describe('lifecycle bands', () => {
     const bands = stageBands(resolveStages(BUILTIN_PROFILE));
     expect(bands.map((b) => b.id)).toEqual([
       'define',
+      'enable',
       'designVerify',
       'implement',
       'manufacture',
@@ -98,7 +101,7 @@ describe('lifecycle bands', () => {
       'validateRamp',
     ]);
     expect(bands[0].stages).toEqual(['productDefinition', 'architecture']);
-    expect(bands[2].label).toBe('Implement');
+    expect(bands[3].label).toBe('Implement');
   });
 
   it('opens a second band when a phase comes back later', () => {
@@ -161,7 +164,7 @@ describe('scheduling a profile that is not the built-in one', () => {
       stages: BUILTIN_PROFILE.stages.filter((st) => keep.includes(st.key)),
     };
     const s = computeSchedule(KICKOFF, profile, {});
-    expect(s.milestones.map((m) => m.id)).toEqual(['archFreeze', 'tapeout']);
+    expect(s.milestones.map((m) => m.id)).toEqual(['archFreeze', 'tapeoutBeolMto']);
     expect(milestoneDefs.length).toBeGreaterThan(s.milestones.length);
     expect(fmtDate(s.tapeout)).toBe(fmtDate(s.stages.tapeout.end));
   });

@@ -90,16 +90,27 @@ export { expect, type Page } from '@playwright/test';
 export const STAGE_BY_NUMBER: Record<string, string> = {
   '01': 'productDefinition',
   '02': 'architecture',
-  '03': 'rtl',
-  '04': 'verification',
-  '05': 'synthesis',
-  '06': 'physicalDesign',
-  '07': 'signoff',
-  '08': 'tapeout',
-  '09': 'fabrication',
-  '10': 'packaging',
-  '11': 'bringup',
-  '12': 'qualification',
+  '03': 'technology',
+  '04': 'pdk',
+  '05': 'ipReadiness',
+  '06': 'amsIp',
+  '07': 'testChip',
+  '08': 'rtl',
+  '09': 'verification',
+  '10': 'dft',
+  '11': 'synthesis',
+  '12': 'physicalDesign',
+  '13': 'signoff',
+  '14': 'tapeout',
+  '15': 'fabrication',
+  '16': 'packageDesign',
+  '17': 'packageTestVehicle',
+  '18': 'chipPackageCoVerification',
+  '19': 'packaging',
+  '20': 'validationHardware',
+  '21': 'testDevelopment',
+  '22': 'bringup',
+  '23': 'qualification',
 };
 
 /**
@@ -138,15 +149,17 @@ export const editDeliverables = (page: Page, on = true) =>
  * marker states its own in the tooltip it already had.
  */
 export async function milestoneDate(page: Page, id: string): Promise<string> {
-  const tip = await page.locator(`.rm-ms[data-msid="${id}"]`).getAttribute('data-tip');
+  const tip = await page.locator(`#rm-gantt .g-msdot[data-msid^="${id}"]`).first().getAttribute('data-tip');
   return (tip ?? '').split('|')[1]?.split(' ')[0] ?? '';
 }
 
+/* The milestone's id carries what the template calls it — 'tapeoutBeolMto' in
+   the current one — so it is matched by prefix rather than pinned. */
 export const tapeoutDate = (page: Page) => milestoneDate(page, 'tapeout');
 
 /** Kickoff is edited where it is drawn: click the diamond, type the date. */
 export async function setKickoffDate(page: Page, iso: string) {
-  await page.locator('.rm-ms[data-msid="kickoff"]').click();
+  await page.locator('#rm-gantt .g-kickoff-dot').click();
   const input = page.locator('#kickoff-input');
   await expect(input).toBeVisible();
   await input.fill(iso);
@@ -154,8 +167,14 @@ export async function setKickoffDate(page: Page, iso: string) {
   await expect(input).toHaveCount(0);
 }
 
-export async function selectStage(page: Page, num: string) {
-  const id = STAGE_BY_NUMBER[num];
+/**
+ * `ref` is a stage key ('physicalDesign') or, where a test is about the chart's
+ * numbering itself, a two-digit station number. Keys are what the rest of the
+ * suite uses: a stage's position moves whenever the profile changes, its key
+ * does not.
+ */
+export async function selectStage(page: Page, ref: string) {
+  const id = STAGE_BY_NUMBER[ref] ?? ref;
   /* The store hydrates on mount and opens the stage today falls in, so wait
      for the chart before reading the selection — asking too early sees nothing
      open and clicks the bar shut again. */

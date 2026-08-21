@@ -13,7 +13,7 @@ const openEditor = async (page: Page, kind: string) => {
 
 test.beforeEach(async ({ page }) => {
   await page.goto(SEED_PROJECT_PATH);
-  await selectStage(page, '01');
+  await selectStage(page, 'productDefinition');
 });
 
 test.describe('picking an owner', () => {
@@ -62,7 +62,7 @@ test.describe('picking an owner', () => {
   });
 
   test('the list follows the stage you are on', async ({ page }) => {
-    await selectStage(page, '06');
+    await selectStage(page, 'physicalDesign');
     await openEditor(page, 'risks');
     await expect(page.locator('.ie-owner optgroup[label="Stage leader"] option')).toHaveText([
       'Grace Park (G. Park)',
@@ -92,7 +92,7 @@ test.describe('picking an owner', () => {
   test('an existing owner stays selected even when they left the contact list', async ({
     page,
   }) => {
-    await selectStage(page, '06');
+    await selectStage(page, 'physicalDesign');
     // "M. Bianchi" owns a seeded activity; remove the contact behind them
     const rows = panel(page).locator('.contacts-sec .c-row:not(.editing)');
     await rows.filter({ hasText: 'Marco Bianchi' }).locator('[data-c-del]').click();
@@ -128,7 +128,7 @@ test.describe('picking an owner', () => {
     await page.locator('.pf-kickoff').fill('2029-02-05');
     await page.locator('[data-create]').click();
     await page.waitForURL(/\/p\/ownerx1-/);
-    await selectStage(page, '01');
+    await selectStage(page, 'productDefinition');
 
     await openEditor(page, 'activities');
     await expect(page.locator('.ie-owner option')).toHaveText([

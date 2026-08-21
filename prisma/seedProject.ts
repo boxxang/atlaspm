@@ -4,11 +4,7 @@
  * "what a fresh install gets" the same program.
  */
 import { journeyData } from '../src/data/journey';
-import {
-  SEED_COST_PER_MAN_MONTH,
-  SEED_EFFORT,
-  createProjectSeed,
-} from '../src/data/projectSeed';
+import { SEED_COST_PER_MAN_MONTH, createProjectSeed } from '../src/data/projectSeed';
 import { BUILTIN_PROFILE, STAGE_ORDER } from '../src/data/scheduleProfiles';
 import { ensureBuiltinProfile } from '../src/lib/builtinProfile';
 import { DB_KIND } from '../src/lib/projectState';
@@ -28,8 +24,10 @@ export interface SeedCounts {
 
 export async function seedProject(prisma: PrismaClient, now = new Date()): Promise<SeedCounts> {
   const today = startOfDay(now);
-  /* default kickoff = 30 weeks before today, so "today" sits mid-program */
-  const kickoff = addWeeks(today, -30);
+  /* Default kickoff = 66 weeks before today, half way through the 132-week
+     baseline: physical design is mid-flight, signoff is ramping, and the
+     package and test workstreams are in the thick of it. */
+  const kickoff = addWeeks(today, -66);
   const schedule = computeSchedule(kickoff, BUILTIN_PROFILE, {});
   const seed = createProjectSeed({ schedule, now });
 
@@ -48,13 +46,9 @@ export async function seedProject(prisma: PrismaClient, now = new Date()): Promi
       profileId: 'typicalSoC',
       costPerManMonth: SEED_COST_PER_MAN_MONTH,
       currency: 'USD',
-      stageDetails: {
-        create: STAGE_ORDER.map((stageId) => ({
-          id: `${PROJECT_ID}:detail:${stageId}`,
-          stageId,
-          engineeringEffort: SEED_EFFORT[stageId].join('\n'),
-        })),
-      },
+      /* No stage detail rows: effort and TAT are the template's own figures
+         and the program inherits them. A row is written the moment someone
+         edits a number, which is what makes "edited" mean something. */
       leaders: {
         create: STAGE_ORDER.map((stageId) => ({
           id: `${PROJECT_ID}:leader:${stageId}`,

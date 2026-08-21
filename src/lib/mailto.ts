@@ -29,6 +29,8 @@ export interface BuiltMail {
 }
 
 const TRUNCATION_NOTE = '\n\n[… truncated — open the item in AtlasPM for the full record]';
+/** Start of the sign-off block every draft ends with — see SIGNATURE. */
+const SIGN_OFF = '\n—\n';
 
 /** RFC 6068: everything after `mailto:` is percent-encoded, spaces included. */
 export function buildMailto({ to = [], cc = [], subject, body }: MailDraft): BuiltMail {
@@ -43,16 +45,24 @@ export function buildMailto({ to = [], cc = [], subject, body }: MailDraft): Bui
   let truncated = false;
   if (encodeURIComponent(text).length > room) {
     truncated = true;
+    /* What gets cut is the middle, never the end. A draft is signed off at the
+       bottom — "Review before sending." — and a program long enough to overrun
+       the limit is exactly the one where that line matters; trimming from the
+       tail dropped it and left the mail ending mid-sentence. */
+    const cut = body.lastIndexOf(SIGN_OFF);
+    const tail = cut >= 0 ? body.slice(cut) : '';
+    const trunk = cut >= 0 ? body.slice(0, cut) : body;
     /* Encoding is variable width, so walk the plain text down until it fits. */
-    const note = encodeURIComponent(TRUNCATION_NOTE).length;
-    let hi = text.length;
+    const fixed =
+      encodeURIComponent(TRUNCATION_NOTE).length + encodeURIComponent(tail).length;
+    let hi = trunk.length;
     let lo = 0;
     while (lo < hi) {
       const mid = Math.ceil((lo + hi) / 2);
-      if (encodeURIComponent(text.slice(0, mid)).length + note <= room) lo = mid;
+      if (encodeURIComponent(trunk.slice(0, mid)).length + fixed <= room) lo = mid;
       else hi = mid - 1;
     }
-    text = text.slice(0, lo).replace(/\s+$/, '') + TRUNCATION_NOTE;
+    text = trunk.slice(0, lo).replace(/\s+$/, '') + TRUNCATION_NOTE + tail;
   }
   return { href: head + encodeURIComponent(text), truncated };
 }

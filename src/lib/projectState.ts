@@ -244,6 +244,7 @@ export function buildProjectState(project: {
       description: d.description,
       engineeringView: d.engineeringView,
       engineeringEffort: d.engineeringEffort,
+      engineeringTat: d.engineeringTat,
       programView: d.programView,
       tools: d.tools,
       collaboration: d.collaboration,

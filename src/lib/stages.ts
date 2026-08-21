@@ -30,6 +30,8 @@ const BLANK: JourneyStage = {
   collaboration: [],
   tools: [],
   engineeringView: [],
+  engineeringTat: [],
+  engineeringEffort: [],
   programView: [],
   perspective: '',
 };

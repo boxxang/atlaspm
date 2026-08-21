@@ -93,6 +93,14 @@ export interface JourneyStage {
   collaboration: readonly string[];
   tools: readonly string[];
   engineeringView: readonly string[];
+  /**
+   * Elapsed weeks per engineering activity, index-aligned to engineeringView.
+   * Negative marks an activity that runs continuously across the stage rather
+   * than closing once — the magnitude is still its span.
+   */
+  engineeringTat: readonly number[];
+  /** Man-months per engineering activity, index-aligned to engineeringView. */
+  engineeringEffort: readonly number[];
   programView: readonly string[];
   perspective: string;
 }

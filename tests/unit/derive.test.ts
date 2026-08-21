@@ -20,11 +20,12 @@ import {
 } from '@/lib/derive';
 import { DAY, addWeeks, computeSchedule, startOfDay } from '@/lib/schedule';
 
-/* The prototype boots with kickoff = 30 weeks before today, so "today" lands
-   mid-program (Physical Design). Fixed clock keeps the assertions stable. */
+/* The seeder boots with kickoff = 66 weeks before today, half way through the
+   132-week baseline, so "today" lands mid-implementation with physical design
+   in flight. Fixed clock keeps the assertions stable. */
 const NOW = new Date(2026, 7, 19, 9, 30);
 const TODAY = startOfDay(NOW);
-const KICKOFF = addWeeks(TODAY, -30);
+const KICKOFF = addWeeks(TODAY, -66);
 const schedule = computeSchedule(KICKOFF, scheduleProfiles.typicalSoC, {});
 const seed = createProjectSeed({ schedule, now: NOW });
 
@@ -80,14 +81,14 @@ describe('project seed', () => {
   it('dates deliverables across their stage, not all on its last day', () => {
     const pd = seed.deliverables.productDefinition;
     const stage = schedule.stages.productDefinition;
-    expect(pd).toHaveLength(4);
+    expect(pd).toHaveLength(6);
 
-    // four of them land at a quarter, half, three quarters and the end
+    // they land at even fractions of the span, the last one on the end date
     const dues = pd.map((d) => d.due!.getTime());
     expect([...dues].sort((a, b) => a - b)).toEqual(dues); // in order
-    expect(new Set(dues).size).toBe(4); // and no two share a date
+    expect(new Set(dues).size).toBe(6); // and no two share a date
     expect(dues[0]).toBeGreaterThan(stage.start.getTime());
-    expect(pd[3].due).toEqual(stage.end);
+    expect(pd[5].due).toEqual(stage.end);
 
     // a finished one is stamped near its due date, not on the stage end
     expect(pd[0].done).toBe(true);
@@ -112,14 +113,14 @@ describe('project seed', () => {
 describe('(e) progress derivation', () => {
   it('is done deliverables over total, program-wide', () => {
     const all = Object.values(seed.deliverables).flat();
-    expect(all).toHaveLength(45);
-    expect(all.filter((d) => d.done)).toHaveLength(23);
-    expect(progressPct(seed.deliverables)).toBe(51);
+    expect(all).toHaveLength(167);
+    expect(all.filter((d) => d.done)).toHaveLength(96);
+    expect(progressPct(seed.deliverables)).toBe(57);
   });
 
   it('reports per-stage counters', () => {
-    expect(stageProgress(seed.deliverables.physicalDesign)).toEqual({ done: 2, total: 5 });
-    expect(stageProgress(seed.deliverables.tapeout)).toEqual({ done: 0, total: 3 });
+    expect(stageProgress(seed.deliverables.physicalDesign)).toEqual({ done: 5, total: 9 });
+    expect(stageProgress(seed.deliverables.tapeout)).toEqual({ done: 0, total: 8 });
     expect(stageProgress([])).toEqual({ done: 0, total: 0 });
   });
 
@@ -136,10 +137,11 @@ describe('(e) progress derivation', () => {
 
 describe('(e) overdue derivation', () => {
   it('counts open activities past their due date', () => {
-    expect(overdueCount(seed.content, TODAY)).toBe(1);
-    const [only] = overdueItems(seed.content, TODAY);
-    expect(only.stageId).toBe('physicalDesign');
-    expect(only.item.title).toBe('PDN IR-drop analysis rev 2');
+    expect(overdueCount(seed.content, TODAY)).toBe(7);
+    const over = overdueItems(seed.content, TODAY);
+    /* the two stages carrying live work today */
+    expect([...new Set(over.map((o) => o.stageId))]).toEqual(['physicalDesign', 'signoff']);
+    expect(over.map((o) => o.item.title)).toContain('PDN IR-drop analysis rev 2');
   });
 
   it('ignores done items, undated items, and future dues', () => {
@@ -157,14 +159,18 @@ describe('(e) overdue derivation', () => {
 });
 
 describe('open risks', () => {
-  it('counts 19 across 5 stages in the seed', () => {
-    expect(openRiskCount(seed.content)).toBe(19);
+  it('counts 23 across 9 stages in the seed', () => {
+    expect(openRiskCount(seed.content)).toBe(23);
     expect(riskStageIds(seed.content)).toEqual([
       'productDefinition',
       'physicalDesign',
       'signoff',
       'tapeout',
       'packaging',
+      'packageDesign',
+      'packageTestVehicle',
+      'chipPackageCoVerification',
+      'testDevelopment',
     ]);
   });
 
@@ -175,24 +181,43 @@ describe('open risks', () => {
 });
 
 describe('schedule position', () => {
-  it('puts the program in Physical Design today', () => {
-    expect(inFlightStageIds(schedule, TODAY)).toEqual(['physicalDesign']);
+  it('has nine stages in flight today, physical design among them', () => {
+    const live = inFlightStageIds(schedule, TODAY);
+    expect(live).toContain('physicalDesign');
+    /* stages overlap by design, and the enablement and package workstreams run
+       alongside implementation — a single "current stage" is not a thing */
+    expect(live).toEqual([
+      'verification',
+      'synthesis',
+      'physicalDesign',
+      'signoff',
+      'packageDesign',
+      'packageTestVehicle',
+      'chipPackageCoVerification',
+      'validationHardware',
+      'testDevelopment',
+    ]);
   });
 
   it('counts down to Tapeout', () => {
-    expect(daysTo(schedule.tapeout, TODAY)).toBe(56);
-    expect(dday(schedule.tapeout, TODAY)).toBe('D−56');
+    expect(daysTo(schedule.tapeout, TODAY)).toBe(141);
+    expect(dday(schedule.tapeout, TODAY)).toBe('D−141');
   });
 
   it('prints D+ for dates already past', () => {
-    expect(dday(schedule.stages.rtl.end, TODAY)).toBe('D+77');
+    expect(dday(schedule.stages.rtl.end, TODAY)).toBe('D+98');
   });
 
   it('lists only milestones still ahead, soonest first', () => {
     const up = upcomingMilestones(schedule, TODAY);
     expect(up.map((m) => m.id)).toEqual([
+      'dvClosure',
+      'ffnRelease',
+      'packageDesignFreeze',
       'designFreeze',
-      'tapeout',
+      'tapeoutBeolMto',
+      'evbReady',
+      'probeCardReady',
       'firstSilicon',
       'massProduction',
     ]);

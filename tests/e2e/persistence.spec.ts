@@ -24,16 +24,16 @@ const selectedPanel = (page: Page) => page.locator('.stage-panel.selected');
 const hardRefresh = async (page: Page) => {
   await page.reload({ waitUntil: 'load' });
   /* a reload clears the stage selection, so reopen the first stage */
-  await selectStage(page, '01');
+  await selectStage(page, 'productDefinition');
 };
 
 test.beforeEach(async ({ page }) => {
   await page.goto(SEED_PROJECT_PATH);
-  await selectStage(page, '01');
+  await selectStage(page, 'productDefinition');
 });
 
 test('creating an activity persists', async ({ page }) => {
-  await selectStage(page, '06');
+  await selectStage(page, 'physicalDesign');
   const board = selectedPanel(page).locator('.board[data-kind="activities"]');
   await board.locator('[data-add]').click();
   await page.locator('.ie-title').fill('Persisted ECO review');
@@ -44,7 +44,7 @@ test('creating an activity persists', async ({ page }) => {
   await expect(page.locator('#modal .modal-win')).toBeHidden();
 
   await hardRefresh(page);
-  await selectStage(page, '06');
+  await selectStage(page, 'physicalDesign');
   const top = selectedPanel(page).locator('.board[data-kind="activities"] .b-row').first();
   await expect(top.locator('.t')).toHaveText('Persisted ECO review');
   await expect(top.locator('.b-owner')).toHaveText('I. Berg');
@@ -59,14 +59,14 @@ test('creating an activity persists', async ({ page }) => {
   await page.locator('[data-del]').click();
   await page.locator('#modal-close').click();
   await hardRefresh(page);
-  await selectStage(page, '06');
+  await selectStage(page, 'physicalDesign');
   await expect(
     selectedPanel(page).locator('.board[data-kind="activities"] .b-row').first().locator('.t'),
   ).not.toHaveText('Persisted ECO review');
 });
 
 test('posting a status update persists, and editing keeps its timestamp', async ({ page }) => {
-  await selectStage(page, '06');
+  await selectStage(page, 'physicalDesign');
   await selectedPanel(page).locator('.board[data-kind="activities"] [data-more]').click();
   await page.locator('#modal-body .b-row', { hasText: 'ECO drop 1 planning' }).click();
   await page.locator('.su-input').fill('Persisted through a reload.');
@@ -74,7 +74,7 @@ test('posting a status update persists, and editing keeps its timestamp', async 
   const stamp = await page.locator('.su-item .su-date').textContent();
 
   await hardRefresh(page);
-  await selectStage(page, '06');
+  await selectStage(page, 'physicalDesign');
   await selectedPanel(page).locator('.board[data-kind="activities"] [data-more]').click();
   await page.locator('#modal-body .b-row', { hasText: 'ECO drop 1 planning' }).click();
   await expect(page.locator('.su-item')).toHaveCount(1);
@@ -86,7 +86,7 @@ test('posting a status update persists, and editing keeps its timestamp', async 
   await page.locator('.su-edit-input').fill('Edited, then reloaded.');
   await page.locator('[data-su-save]').click();
   await hardRefresh(page);
-  await selectStage(page, '06');
+  await selectStage(page, 'physicalDesign');
   await selectedPanel(page).locator('.board[data-kind="activities"] [data-more]').click();
   await page.locator('#modal-body .b-row', { hasText: 'ECO drop 1 planning' }).click();
   await expect(page.locator('.su-item .su-text')).toHaveText('Edited, then reloaded.');
@@ -95,44 +95,44 @@ test('posting a status update persists, and editing keeps its timestamp', async 
   await page.locator('[data-su-del]').click();
   await expect(page.locator('.su-empty')).toBeVisible();
   await hardRefresh(page);
-  await selectStage(page, '06');
+  await selectStage(page, 'physicalDesign');
   await selectedPanel(page).locator('.board[data-kind="activities"] [data-more]').click();
   await page.locator('#modal-body .b-row', { hasText: 'ECO drop 1 planning' }).click();
   await expect(page.locator('.su-empty')).toBeVisible();
 });
 
 test('checking a deliverable persists with its completion stamp', async ({ page }) => {
-  await selectStage(page, '06');
+  await selectStage(page, 'physicalDesign');
   const panel = selectedPanel(page);
-  const row = panel.locator('.dlv-list li').nth(2);
+  const row = panel.locator('.dlv-list li').nth(5); // the first still open
   await expect(row.locator('.dlv-comp')).toHaveText('—');
   await row.locator('input[type="checkbox"]').check();
   const stamped = await row.locator('.dlv-comp').textContent();
-  await expect(panel.locator('.dlv-note')).toHaveText('3 / 5 complete');
+  await expect(panel.locator('.dlv-note')).toHaveText('6 / 9 complete');
 
   await hardRefresh(page);
-  await selectStage(page, '06');
-  const after = selectedPanel(page).locator('.dlv-list li').nth(2);
+  await selectStage(page, 'physicalDesign');
+  const after = selectedPanel(page).locator('.dlv-list li').nth(5);
   await expect(after.locator('input[type="checkbox"]')).toBeChecked();
   await expect(after.locator('.dlv-comp')).toHaveText(stamped!);
-  await expect(selectedPanel(page).locator('.dlv-note')).toHaveText('3 / 5 complete');
+  await expect(selectedPanel(page).locator('.dlv-note')).toHaveText('6 / 9 complete');
   // and the dashboard counts it
   await page.locator('#mode-toggle button[data-mode="schedule"]').click();
-  await expect(page.locator('.stat').first().locator('.v')).toHaveText('53%');
+  await expect(page.locator('.stat').first().locator('.v')).toHaveText('58%');
   await page.locator('#mode-toggle button[data-mode="journey"]').click();
 
   await after.locator('input[type="checkbox"]').uncheck();
   await hardRefresh(page);
-  await selectStage(page, '06');
+  await selectStage(page, 'physicalDesign');
   await expect(
-    selectedPanel(page).locator('.dlv-list li').nth(2).locator('.dlv-comp'),
+    selectedPanel(page).locator('.dlv-list li').nth(5).locator('.dlv-comp'),
   ).toHaveText('—');
 });
 
 test('a DV end-date edit persists as effective overrides', async ({ page }) => {
   const before = await tapeoutDate(page);
 
-  await selectStage(page, '04');
+  await selectStage(page, 'verification');
   const panel = selectedPanel(page);
   const end = await panel.locator('[data-role="end-edit"]').inputValue();
   const [y, m, d] = end.split('-').map(Number);
@@ -141,7 +141,7 @@ test('a DV end-date edit persists as effective overrides', async ({ page }) => {
   const p2 = (n: number) => String(n).padStart(2, '0');
   const iso = `${moved.getFullYear()}-${p2(moved.getMonth() + 1)}-${p2(moved.getDate())}`;
   await panel.locator('[data-role="end-edit"]').fill(iso);
-  await expect(panel.locator('[data-role="tat-edit"]')).toHaveValue('20');
+  await expect(panel.locator('[data-role="tat-edit"]')).toHaveValue('44');
   await page.locator('[data-apply-schedule]').click();
   await expect(page.locator('#sched-preview')).toHaveCount(0);
   const shifted = await tapeoutDate(page);
@@ -150,8 +150,8 @@ test('a DV end-date edit persists as effective overrides', async ({ page }) => {
   await hardRefresh(page);
   await expect.poll(() => tapeoutDate(page)).toBe(shifted);
   await expect(page.locator('.edited-flag')).toBeVisible();
-  await selectStage(page, '04');
-  await expect(selectedPanel(page).locator('[data-role="tat-edit"]')).toHaveValue('20');
+  await selectStage(page, 'verification');
+  await expect(selectedPanel(page).locator('[data-role="tat-edit"]')).toHaveValue('44');
   await expect(selectedPanel(page).locator('[data-role="end-edit"]')).toHaveValue(iso);
 
   // reset clears the stored overrides too
@@ -185,10 +185,10 @@ test('renaming the project persists', async ({ page }) => {
 test('kickoff, leader, contact and deliverable edits persist', async ({ page }) => {
   // kickoff moves the whole program
   await setKickoffDate(page, '2028-01-03');
-  await expect.poll(() => tapeoutDate(page)).toBe('09/25/2028');
+  await expect.poll(() => tapeoutDate(page)).toBe('08/27/2029');
   await hardRefresh(page);
-  await expect(page.locator('.rm-ms[data-msid="kickoff"] .rm-ms-date')).toHaveText('1/3');
-  await expect.poll(() => tapeoutDate(page)).toBe('09/25/2028');
+  await expect(page.locator('#rm-gantt .g-kickoff-date')).toHaveText('1/3');
+  await expect.poll(() => tapeoutDate(page)).toBe('08/27/2029');
 
   // leader
   const panel = selectedPanel(page);
@@ -215,7 +215,7 @@ test('kickoff, leader, contact and deliverable edits persist', async ({ page }) 
   await selectedPanel(page).locator('[data-dlv-add]').click();
   await hardRefresh(page);
   const dlv = selectedPanel(page).locator('.dlv-list li');
-  await expect(dlv).toHaveCount(5);
+  await expect(dlv).toHaveCount(7);
   await expect(dlv.last()).toContainText('Cost model refresh');
   await expect(dlv.last().locator('.dlv-due.read')).toHaveText('09/30/2026');
 
@@ -231,31 +231,31 @@ test('kickoff, leader, contact and deliverable edits persist', async ({ page }) 
     await page.evaluate(() => {
       const d = new Date();
       d.setHours(0, 0, 0, 0);
-      d.setDate(d.getDate() - 210);
+      d.setDate(d.getDate() - 66 * 7);
       const p = (n: number) => String(n).padStart(2, '0');
       return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}`;
     }),
   );
   await hardRefresh(page);
   await expect(selectedPanel(page).locator('.l-name')).toHaveText('Daniel Kim');
-  await expect(selectedPanel(page).locator('.dlv-list li')).toHaveCount(4);
+  await expect(selectedPanel(page).locator('.dlv-list li')).toHaveCount(6);
   await expect(selectedPanel(page).locator('.contacts-sec .c-row')).toHaveCount(3);
 });
 
 test('display settings persist in localStorage, not the database', async ({ page }) => {
   await page.locator('#settings-btn').click();
-  await page.locator('#set-font').fill('21');
-  await expect(page.locator('body')).toHaveCSS('font-size', '21px');
+  await page.locator('#set-font').fill('20');
+  await expect(page.locator('body')).toHaveCSS('font-size', '20px');
 
   const stored = await page.evaluate(() => localStorage.getItem('atlaspm.display.v1'));
-  expect(stored).toContain('21');
+  expect(stored).toContain('20');
 
   await hardRefresh(page);
-  await expect(page.locator('body')).toHaveCSS('font-size', '21px');
+  await expect(page.locator('body')).toHaveCSS('font-size', '20px');
 
   await page.locator('#settings-btn').click();
   await page.locator('#set-reset').click();
-  await expect(page.locator('body')).toHaveCSS('font-size', '16px');
+  await expect(page.locator('body')).toHaveCSS('font-size', '15px');
   await hardRefresh(page);
-  await expect(page.locator('body')).toHaveCSS('font-size', '16px');
+  await expect(page.locator('body')).toHaveCSS('font-size', '15px');
 });

@@ -24,7 +24,7 @@ test.describe('design tokens', () => {
     expect(await cssVar(page, '--accent')).toBe('#256abf');
     expect(await cssVar(page, '--risk')).toBe('#d03b3b');
     expect(await cssVar(page, '--line')).toBe('#e1e0d9');
-    expect(await cssVar(page, '--fs-base')).toBe('16px');
+    expect(await cssVar(page, '--fs-base')).toBe('15px');
     expect(await cssVar(page, '--toolbar-h')).toBe('58px');
     expect(await cssVar(page, '--dash-row-h')).toBe('36px');
     expect(await cssVar(page, '--bck-risks-due')).toBe('6.6rem');
@@ -33,7 +33,7 @@ test.describe('design tokens', () => {
   test('body uses the page background and base font size', async ({ page }) => {
     const body = page.locator('body');
     await expect(body).toHaveCSS('background-color', 'rgb(249, 249, 247)');
-    await expect(body).toHaveCSS('font-size', '16px');
+    await expect(body).toHaveCSS('font-size', '15px');
   });
 });
 
@@ -94,18 +94,18 @@ test.describe('toolbar controls', () => {
 
   test('kickoff is edited on the axis, and the template select round-trips', async ({ page }) => {
     await page.goto(SEED_PROJECT_PATH);
-    // The store seeds kickoff 30 weeks before today, so "today" sits mid-program.
+    // The seed kicks off 66 weeks before today, so "today" sits mid-program.
     const expected = new Date();
     expected.setHours(0, 0, 0, 0);
-    expected.setDate(expected.getDate() - 210);
-    await expect(page.locator('.rm-ms[data-msid="kickoff"] .rm-ms-date')).toHaveText(
+    expected.setDate(expected.getDate() - 66 * 7);
+    await expect(page.locator('#rm-gantt .g-kickoff-date')).toHaveText(
       `${expected.getMonth() + 1}/${expected.getDate()}`,
     );
 
     await setKickoffDate(page, '2028-01-03');
-    await expect(page.locator('.rm-ms[data-msid="kickoff"] .rm-ms-date')).toHaveText('1/3');
+    await expect(page.locator('#rm-gantt .g-kickoff-date')).toHaveText('1/3');
     // changing kickoff moves the whole program
-    await expect.poll(() => tapeoutDate(page)).toBe('09/25/2028');
+    await expect.poll(() => tapeoutDate(page)).toBe('08/27/2029');
 
     const profile = page.locator('#profile-select');
     await expect(page.locator('label[for="profile-select"]')).toHaveText('Milestone template');
@@ -152,15 +152,15 @@ test.describe('display settings', () => {
     await page.locator('#settings-btn').click();
     await expect(page.locator('#settings-panel')).toBeVisible();
 
-    /* the slider is centred on 16, so 20 is inside its range */
+    /* the slider is centred on 15, so 20 is inside its range */
     await page.locator('#set-font').fill('20');
     expect(await cssVar(page, '--fs-base')).toBe('20px');
     await expect(page.locator('#set-font-val')).toHaveText('20px');
     await expect(page.locator('body')).toHaveCSS('font-size', '20px');
 
     await page.locator('#set-reset').click();
-    expect(await cssVar(page, '--fs-base')).toBe('16px');
-    await expect(page.locator('#set-font-val')).toHaveText('16px');
+    expect(await cssVar(page, '--fs-base')).toBe('15px');
+    await expect(page.locator('#set-font-val')).toHaveText('15px');
   });
 
   test('Programs leads the bar, the program fields sit centred between the controls', async ({
@@ -212,7 +212,7 @@ test.describe('display settings', () => {
 
     // Dashboard text size writes onto #schedule-view, leaving Main at 16px.
     await page.locator('#set-font').fill('15');
-    expect(await cssVar(page, '--fs-base')).toBe('16px');
+    expect(await cssVar(page, '--fs-base')).toBe('15px');
     await expect(page.locator('#schedule-view')).toHaveCSS('font-size', '15px');
   });
 

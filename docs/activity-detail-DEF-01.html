@@ -1,0 +1,730 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Activity Detail — DEF-01</title>
+
+<style>
+/* ============================================================
+   Tokens lifted from the app's :root, so this mock-up is what the
+   pop-up will look like inside AtlasPM rather than an approximation
+   of it. Light theme only — the app commits to one.
+
+   Health is proposed rather than lifted. A schedule has three states,
+   not two — on track, at risk, late — and the app currently has a
+   colour for only the last of them. Green / orange / red, each with a
+   soft ground so a chip can be filled without shouting. The hues are
+   pulled toward the warm paper rather than taken at full saturation,
+   so they sit beside the blue accent instead of fighting it.
+   ============================================================ */
+:root{
+  --page:#f9f9f7;
+  --surface:#fcfcfb;
+  --ink:#0b0b0b;
+  --ink-2:#52514e;
+  --ink-3:#898781;
+  --line:#e1e0d9;
+  --line-strong:#c3c2b7;
+  --accent:#256abf;
+  --accent-soft:#e7effa;
+  /* health: on track / at risk / late */
+  --ok:#2f7a4d;
+  --ok-soft:#e9f2ec;
+  --warn:#c2670c;
+  --warn-soft:#fbeedc;
+  --risk:#d03b3b;
+  --risk-soft:#fbeceb;
+  --fs-base:18px;
+  --mono:ui-monospace,"SF Mono","Cascadia Mono",Menlo,monospace;
+  --sans:system-ui,-apple-system,"Segoe UI",sans-serif;
+  --serif:Georgia,"Times New Roman",serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-text-size-adjust:100%}
+body{
+  font-family:var(--sans);font-size:var(--fs-base);line-height:1.5;color:var(--ink);
+  background:var(--page);-webkit-font-smoothing:antialiased;
+}
+button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
+code{font-family:var(--mono);font-size:.86em}
+
+/* ---------- the app's modal shell, verbatim ---------- */
+#modal-scrim{position:fixed;inset:0;z-index:130;background:rgba(11,11,11,.28)}
+#modal{
+  position:fixed;inset:0;z-index:135;display:flex;align-items:center;justify-content:center;
+  pointer-events:none;padding:4vh 3vw;
+}
+.modal-win{
+  pointer-events:auto;background:var(--surface);border:1px solid var(--line);border-radius:8px;
+  box-shadow:0 24px 80px rgba(11,11,11,.20);
+  width:min(1180px,96vw);height:88vh;display:flex;flex-direction:column;
+}
+.modal-head{
+  display:flex;align-items:baseline;gap:14px;padding:18px 26px 14px;
+  border-bottom:1px solid var(--line);flex-wrap:wrap;
+}
+.modal-head h3{font-size:1.15em;font-weight:650;letter-spacing:-.01em}
+.modal-head .spacer{flex:1}
+#modal-close{
+  font-family:var(--mono);font-size:.72em;color:var(--ink-3);
+  border:1px solid var(--line);border-radius:4px;padding:3px 9px;
+}
+#modal-close:hover{color:var(--ink);border-color:var(--ink-3)}
+.modal-body{padding:0 26px 30px;overflow-y:auto;min-height:0}
+
+/* ---------- identity ---------- */
+.ad-id{
+  font-family:var(--mono);font-size:.72em;font-weight:600;letter-spacing:.08em;
+  color:var(--accent);background:var(--accent-soft);padding:3px 9px;border-radius:3px;
+}
+.ad-crumb{font-family:var(--mono);font-size:.7em;color:var(--ink-3);letter-spacing:.04em}
+.pill{
+  font-family:var(--mono);font-size:.58em;font-weight:700;letter-spacing:.11em;
+  text-transform:uppercase;padding:3px 8px;border-radius:3px;border:1px solid currentColor;
+}
+.pill.live{color:var(--accent);background:var(--accent-soft)}
+.pill.ok{color:var(--ok);background:var(--ok-soft)}
+.pill.warn{color:var(--warn);background:var(--warn-soft)}
+.pill.late{color:var(--risk);background:var(--risk-soft)}
+
+/* An inline health mark, for the places where a row has a health of its own */
+.health{
+  font-family:var(--mono);font-size:.92em;font-weight:700;letter-spacing:.07em;
+  text-transform:uppercase;padding:1px 5px;border-radius:2px;margin-right:6px;
+}
+.health.ok{color:var(--ok);background:var(--ok-soft)}
+.health.warn{color:var(--warn);background:var(--warn-soft)}
+.health.late{color:var(--risk);background:var(--risk-soft)}
+
+/* the key, so the three states are legible without hunting for an example */
+.ad-key{
+  display:flex;gap:14px;flex-wrap:wrap;align-items:baseline;margin-top:10px;
+  font-family:var(--mono);font-size:.56em;letter-spacing:.06em;color:var(--ink-3);
+}
+.ad-key i{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:5px;vertical-align:-1px}
+
+/* ---------- status band: sticky, because it is what the pop-up is opened for ---------- */
+.ad-status{
+  position:sticky;top:0;z-index:2;background:var(--surface);
+  padding:16px 0 14px;border-bottom:1px solid var(--line);margin-bottom:22px;
+}
+.ad-status-top{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;margin-bottom:11px}
+.ad-status-top .why{font-size:.82em;color:var(--ink-2)}
+.ad-status-top .why b{color:var(--ink);font-weight:600}
+.ad-bar{
+  position:relative;height:9px;border-radius:5px;background:var(--line);overflow:hidden;margin-bottom:6px;
+}
+.ad-bar i{position:absolute;inset:0 auto 0 0;background:var(--ok);border-radius:5px}
+.ad-bar.warn i{background:var(--warn)}
+.ad-bar.late i{background:var(--risk)}
+.ad-bar u{
+  position:absolute;top:-3px;bottom:-3px;width:2px;background:var(--ink);border-radius:1px;
+}
+.ad-bar-legend{
+  display:flex;justify-content:space-between;font-family:var(--mono);font-size:.58em;
+  color:var(--ink-3);letter-spacing:.05em;
+}
+
+/* the numbers strip — plan against actual, which is the only useful form */
+.ad-facts{
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(126px,1fr));
+  border:1px solid var(--line);border-radius:5px;background:var(--page);
+  margin-top:14px;overflow:hidden;
+}
+.ad-fact{padding:10px 14px;border-right:1px solid var(--line)}
+.ad-fact:last-child{border-right:0}
+.ad-fact .k{
+  display:block;font-family:var(--mono);font-size:.56em;font-weight:600;
+  letter-spacing:.12em;text-transform:uppercase;color:var(--ink-3);margin-bottom:3px;
+}
+.ad-fact .v{font-family:var(--mono);font-size:.95em;font-variant-numeric:tabular-nums}
+.ad-fact .v small{font-size:.64em;color:var(--ink-3);letter-spacing:.02em}
+.ad-fact .d{font-family:var(--mono);font-size:.6em;letter-spacing:.03em;display:block;margin-top:2px}
+.ad-fact .d.over{color:var(--warn)}
+.ad-fact .d.flat{color:var(--ink-3)}
+
+.ad-grid{display:grid;grid-template-columns:minmax(0,1.62fr) minmax(0,1fr);gap:34px;align-items:start}
+section.ad-sec{margin-bottom:28px}
+section.ad-sec:last-child{margin-bottom:0}
+.cap{
+  font-family:var(--mono);font-size:.6em;font-weight:700;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--ink-3);display:flex;align-items:baseline;gap:10px;
+  padding-bottom:6px;border-bottom:1px solid var(--line-strong);margin-bottom:12px;
+}
+.cap .n{color:var(--ink-3);font-weight:400;letter-spacing:.04em}
+.ad-lede{font-family:var(--serif);font-size:.95em;line-height:1.62;color:var(--ink-2);max-width:64ch}
+.ad-lede + .ad-lede{margin-top:10px}
+.ad-lede b{color:var(--ink);font-weight:600}
+.ad-note{font-size:.82em;line-height:1.5;color:var(--ink-2);margin-top:12px}
+
+/* ---------- work flow: two lanes, and each step carries its state ---------- */
+.ad-flow{border:1px solid var(--line);border-radius:5px;background:var(--page);padding:14px 16px 10px}
+.ad-axis{position:relative;height:15px;margin-bottom:8px;border-bottom:1px solid var(--line-strong)}
+.ad-axis span{
+  position:absolute;top:0;font-family:var(--mono);font-size:.56em;color:var(--ink-3);
+  transform:translateX(-50%);white-space:nowrap;
+}
+.ad-axis .now{color:var(--ink);font-weight:700}
+.ad-lane{position:relative;height:26px;margin-bottom:5px}
+.ad-lane::before{content:"";position:absolute;left:0;right:0;top:50%;height:1px;background:var(--line)}
+.ad-nowline{
+  position:absolute;top:-4px;bottom:-4px;width:1.5px;background:var(--ink);z-index:3;pointer-events:none;
+}
+.ad-step{
+  position:absolute;top:2px;height:22px;border-radius:3px;z-index:2;
+  display:flex;align-items:center;gap:6px;padding:0 7px;overflow:hidden;
+  font-family:var(--mono);font-size:.58em;letter-spacing:.03em;white-space:nowrap;
+}
+.ad-step b{font-weight:700}
+.ad-step.done{background:var(--accent);color:#fff}
+.ad-step.live{
+  background:repeating-linear-gradient(115deg,var(--accent-soft) 0 6px,#fff 6px 12px);
+  color:var(--accent);border:1.25px solid var(--accent);
+}
+.ad-step.todo{background:var(--page);border:1px dashed var(--line-strong);color:var(--ink-3)}
+.ad-step.par.done{background:var(--ink-3)}
+.ad-lane-tag{
+  font-family:var(--mono);font-size:.55em;letter-spacing:.12em;text-transform:uppercase;
+  color:var(--ink-3);margin:6px 0 2px;
+}
+.ad-flow-key{
+  display:flex;gap:16px;flex-wrap:wrap;margin-top:9px;padding-top:8px;border-top:1px solid var(--line);
+  font-family:var(--mono);font-size:.56em;letter-spacing:.05em;color:var(--ink-3);
+}
+.ad-flow-key i{display:inline-block;width:14px;height:8px;border-radius:2px;margin-right:5px;vertical-align:baseline}
+
+.ad-steps{list-style:none;margin-top:14px}
+.ad-steps li{
+  display:grid;grid-template-columns:.9rem 1.6rem minmax(0,1fr) 4.4rem 3.4rem;gap:10px;align-items:baseline;
+  padding:6px 0;border-bottom:1px solid var(--line);font-size:.85em;
+}
+.ad-steps li:last-child{border-bottom:0}
+.ad-steps .dot{font-size:.62em;line-height:1}
+.ad-steps .dot.done{color:var(--accent)}
+.ad-steps .dot.live{color:var(--warn)}
+.ad-steps .dot.todo{color:var(--line-strong)}
+.ad-steps .n{font-family:var(--mono);font-size:.76em;color:var(--ink-3)}
+.ad-steps .w,.ad-steps .a{
+  font-family:var(--mono);font-size:.74em;text-align:right;font-variant-numeric:tabular-nums;
+}
+.ad-steps .w{color:var(--ink-3)}
+.ad-steps .a{color:var(--ink-2)}
+.ad-steps .a.over{color:var(--warn);font-weight:600}
+.ad-steps .par-note{font-family:var(--mono);font-size:.72em;color:var(--ink-3);letter-spacing:.04em}
+.ad-steps-head{
+  display:grid;grid-template-columns:.9rem 1.6rem minmax(0,1fr) 4.4rem 3.4rem;gap:10px;
+  font-family:var(--mono);font-size:.54em;font-weight:700;letter-spacing:.11em;text-transform:uppercase;
+  color:var(--ink-3);padding-bottom:5px;border-bottom:1px solid var(--line-strong);margin-top:14px;
+}
+.ad-steps-head span:nth-child(4),.ad-steps-head span:nth-child(5){text-align:right}
+
+/* ---------- generic lists ---------- */
+.ad-io{display:grid;grid-template-columns:1fr 1fr;gap:26px}
+.ad-io h4{
+  font-family:var(--mono);font-size:.58em;font-weight:700;letter-spacing:.12em;
+  text-transform:uppercase;color:var(--ink-2);margin-bottom:8px;
+}
+ul.ad-list{list-style:none;display:flex;flex-direction:column;gap:5px}
+ul.ad-list li{display:flex;gap:9px;font-size:.85em;line-height:1.45;color:var(--ink-2)}
+ul.ad-list li::before{content:"—";color:var(--line-strong);font-family:var(--mono);flex:none}
+
+/* ---------- deliverable relationships ---------- */
+.ad-rel li{
+  display:grid;grid-template-columns:4.4rem 5.4rem minmax(0,1fr);gap:11px;align-items:baseline;
+  padding:9px 0;border-bottom:1px solid var(--line);list-style:none;
+}
+.ad-rel li:last-child{border-bottom:0}
+.ad-rel .did{font-family:var(--mono);font-size:.7em;color:var(--accent);font-weight:600}
+.rel{
+  font-family:var(--mono);font-size:.55em;font-weight:700;letter-spacing:.1em;text-transform:uppercase;
+  border:1px solid currentColor;border-radius:3px;padding:2px 0;text-align:center;
+}
+.rel.produces{color:var(--accent);background:var(--accent-soft)}
+.rel.feeds{color:var(--ink-2)}
+.rel.gates{color:var(--risk);background:var(--risk-soft)}
+.ad-rel .txt{font-size:.85em;line-height:1.45;color:var(--ink-2)}
+.ad-rel .txt b{color:var(--ink);font-weight:600}
+.ad-rel .txt .state{
+  font-family:var(--mono);font-size:.72em;letter-spacing:.04em;color:var(--ink-3);display:block;margin-top:3px;
+}
+
+/* ---------- status updates ---------- */
+.ad-upd{list-style:none;display:flex;flex-direction:column}
+.ad-upd li{padding:10px 0;border-bottom:1px solid var(--line)}
+.ad-upd li:last-child{border-bottom:0}
+.ad-upd .meta{
+  display:flex;gap:10px;align-items:baseline;font-family:var(--mono);font-size:.64em;
+  color:var(--ink-3);letter-spacing:.04em;margin-bottom:4px;
+}
+.ad-upd .meta .who{color:var(--ink-2);font-weight:600}
+.ad-upd p{font-size:.86em;line-height:1.5;color:var(--ink-2)}
+
+/* ---------- risks ---------- */
+ul.ad-risks{list-style:none}
+ul.ad-risks li{
+  display:grid;grid-template-columns:1.1rem minmax(0,1fr) 4.6rem;gap:9px;
+  font-size:.85em;line-height:1.45;color:var(--ink-2);
+  padding:8px 0;border-bottom:1px solid var(--line);align-items:baseline;
+}
+ul.ad-risks li:last-child{border-bottom:0}
+ul.ad-risks .mark{color:var(--risk);font-size:.7em}
+ul.ad-risks .mark.watch{color:var(--line-strong)}
+ul.ad-risks b{color:var(--ink);font-weight:600}
+ul.ad-risks .st{
+  font-family:var(--mono);font-size:.6em;letter-spacing:.06em;text-transform:uppercase;text-align:right;
+}
+ul.ad-risks .st.open{color:var(--risk)}
+ul.ad-risks .st.lib{color:var(--ink-3)}
+
+/* ---------- side column ---------- */
+.ad-side{
+  border:1px solid var(--line);border-radius:5px;background:var(--page);
+  padding:16px 18px 18px;
+}
+.ad-side section{margin-bottom:22px}
+.ad-side section:last-child{margin-bottom:0}
+.ad-kv{display:flex;flex-direction:column}
+.ad-kv div{
+  display:flex;justify-content:space-between;gap:12px;align-items:baseline;
+  padding:6px 0;border-bottom:1px solid var(--line);font-size:.82em;
+}
+.ad-kv div:last-child{border-bottom:0}
+.ad-kv .k{color:var(--ink-3)}
+.ad-kv .v{font-family:var(--mono);font-size:.92em;font-variant-numeric:tabular-nums;text-align:right}
+.ad-kv .v.ok{color:var(--ok);font-weight:600}
+.ad-kv .v.over{color:var(--warn);font-weight:600}
+.ad-kv .v.late{color:var(--risk);font-weight:600}
+
+.ad-people{display:flex;flex-direction:column}
+.ad-people div{
+  display:grid;grid-template-columns:minmax(0,1fr) 2.9rem;gap:10px;align-items:baseline;
+  padding:6px 0;border-bottom:1px solid var(--line);font-size:.8em;
+}
+.ad-people div:last-child{border-bottom:0;font-weight:600;color:var(--ink)}
+.ad-people .r{display:block;color:var(--ink-3);font-size:.86em;margin-top:1px}
+.ad-people .al{font-family:var(--mono);font-size:.9em;text-align:right;color:var(--ink-2);font-variant-numeric:tabular-nums}
+
+.ad-crit li{font-size:.82em}
+.ad-crit li::before{content:"·";color:var(--ink-3);font-family:var(--mono)}
+.ad-crit.met li::before{content:"✓";color:var(--accent)}
+.ad-crit.met li.pending::before{content:"○";color:var(--line-strong)}
+.ad-crit.met li.pending{color:var(--ink-3)}
+
+.ad-chain{display:flex;flex-wrap:wrap;gap:5px}
+.ad-chain a{
+  font-family:var(--mono);font-size:.66em;letter-spacing:.04em;text-decoration:none;
+  color:var(--ink-2);border:1px solid var(--line);border-radius:3px;padding:3px 7px;background:var(--surface);
+}
+.ad-chain a:hover,.ad-chain a:focus-visible{color:var(--accent);border-color:var(--accent);background:var(--accent-soft)}
+.ad-chain .none{font-size:.78em;color:var(--ink-3);line-height:1.45}
+
+.ad-split{display:flex;flex-direction:column}
+.ad-split div{
+  display:grid;grid-template-columns:minmax(0,1fr) 2.5rem 2.5rem;gap:8px;align-items:baseline;
+  padding:5px 0;border-bottom:1px solid var(--line);font-size:.79em;color:var(--ink-2);
+}
+.ad-split div:last-child{border-bottom:0;color:var(--ink);font-weight:600}
+.ad-split .mm{font-family:var(--mono);font-size:.92em;text-align:right;font-variant-numeric:tabular-nums}
+.ad-split .mm.sp{color:var(--ink)}
+.ad-split-head{
+  display:grid;grid-template-columns:minmax(0,1fr) 2.5rem 2.5rem;gap:8px;
+  font-family:var(--mono);font-size:.54em;font-weight:700;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--ink-3);padding-bottom:4px;border-bottom:1px solid var(--line-strong);
+}
+.ad-split-head span:not(:first-child){text-align:right}
+
+.ad-sign{display:flex;flex-direction:column}
+.ad-sign div{
+  display:grid;grid-template-columns:minmax(0,1fr) 4.4rem;gap:10px;align-items:baseline;
+  padding:6px 0;border-bottom:1px solid var(--line);font-size:.8em;
+}
+.ad-sign div:last-child{border-bottom:0}
+.ad-sign .s{font-family:var(--mono);font-size:.72em;letter-spacing:.05em;text-align:right}
+.ad-sign .s.signed{color:var(--ok);font-weight:600}
+.ad-sign .s.pending{color:var(--warn)}
+
+.ad-files{display:flex;flex-direction:column}
+.ad-files a{
+  display:grid;grid-template-columns:minmax(0,1fr) 3.6rem;gap:10px;align-items:baseline;
+  padding:6px 0;border-bottom:1px solid var(--line);font-size:.79em;
+  text-decoration:none;color:var(--ink-2);
+}
+.ad-files a:last-child{border-bottom:0}
+.ad-files a:hover,.ad-files a:focus-visible{color:var(--accent)}
+.ad-files .sz{font-family:var(--mono);font-size:.86em;color:var(--ink-3);text-align:right}
+
+.ad-metric{display:flex;flex-direction:column}
+.ad-metric div{
+  display:flex;justify-content:space-between;gap:10px;align-items:baseline;
+  padding:6px 0;border-bottom:1px solid var(--line);font-size:.8em;color:var(--ink-2);
+}
+.ad-metric div:last-child{border-bottom:0}
+.ad-metric .v{font-family:var(--mono);font-size:.9em;color:var(--ink);font-variant-numeric:tabular-nums}
+.ad-metric .v.na{color:var(--ink-3)}
+
+@media (max-width:940px){
+  .ad-grid{grid-template-columns:minmax(0,1fr)}
+  .ad-io{grid-template-columns:1fr}
+  .modal-win{height:94vh}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+
+<div id="modal-scrim"></div>
+<div id="modal" role="dialog" aria-modal="true" aria-labelledby="ad-title">
+  <div class="modal-win">
+
+    <div class="modal-head">
+      <span class="ad-id">DEF-01</span>
+      <h3 id="ad-title">Market and customer requirements consolidation</h3>
+      <span class="pill live">In progress</span>
+      <span class="spacer"></span>
+      <span class="ad-crumb">01 DEF · Product Definition · week 0 – 4</span>
+      <button id="modal-close" aria-label="Close">✕ CLOSE</button>
+    </div>
+
+    <div class="modal-body">
+
+      <!-- ---------- status band ---------- -->
+      <div class="ad-status">
+        <div class="ad-status-top">
+          <span class="pill warn">At risk</span>
+          <span class="why"><b>Forecast finish w5, one week past plan.</b> The second anchor account moved its final session twice; the register build started late and step 4 is carrying the slip.</span>
+        </div>
+        <div class="ad-bar warn" role="img" aria-label="62 percent complete; today sits at week 3.5 of a 4 week plan">
+          <i style="width:62%"></i>
+          <u style="left:87.5%"></u>
+        </div>
+        <div class="ad-bar-legend">
+          <span>62% complete · 3.1 of 4.0 M/M spent</span>
+          <span>today = w3.5 of w0 – w4</span>
+        </div>
+        <div class="ad-key">
+          <span><i style="background:var(--ok)"></i>on track</span>
+          <span><i style="background:var(--warn)"></i>at risk</span>
+          <span><i style="background:var(--risk)"></i>late</span>
+          <span style="color:var(--line-strong)">|</span>
+          <span>health is the forecast against the plan, not the work done so far</span>
+        </div>
+
+        <div class="ad-facts">
+          <div class="ad-fact">
+            <span class="k">TAT plan</span><span class="v">4w</span>
+            <span class="d flat">w0 – w4</span>
+          </div>
+          <div class="ad-fact">
+            <span class="k">TAT forecast</span><span class="v">5w</span>
+            <span class="d over">+1w against plan</span>
+          </div>
+          <div class="ad-fact">
+            <span class="k">Effort plan</span><span class="v">4.0 <small>M/M</small></span>
+            <span class="d flat">~4.3 FTE while live</span>
+          </div>
+          <div class="ad-fact">
+            <span class="k">Effort forecast</span><span class="v">4.8 <small>M/M</small></span>
+            <span class="d over">+0.8 against plan</span>
+          </div>
+          <div class="ad-fact">
+            <span class="k">Owner</span><span class="v" style="font-size:.8em">N. Feld</span>
+            <span class="d flat">Requirements lead</span>
+          </div>
+          <div class="ad-fact">
+            <span class="k">Approver</span><span class="v" style="font-size:.8em">D. Kim</span>
+            <span class="d flat">Stage lead</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="ad-grid">
+        <div>
+
+          <section class="ad-sec">
+            <span class="cap">Purpose</span>
+            <p class="ad-lede">Turn what customers and the market are asking for into <b>one ranked, signed requirement set</b> that the whole program is measured against.</p>
+            <p class="ad-lede">Everything downstream is an answer to this list — the PPA targets, the cost model, the feasibility call, the architecture itself. Until it is baselined and signed, every one of those answers is provisional. A requirement that arrives in week 30 costs roughly a hundred times what it costs here, and the difference is paid in silicon.</p>
+          </section>
+
+          <section class="ad-sec">
+            <span class="cap">Work flow <span class="n">7 steps · 2 lanes</span></span>
+            <div class="ad-flow">
+              <div class="ad-axis">
+                <span style="left:0%">w0</span>
+                <span style="left:20%">w1</span>
+                <span style="left:40%">w2</span>
+                <span style="left:60%">w3</span>
+                <span style="left:70%" class="now">today</span>
+                <span style="left:80%">w4</span>
+                <span style="left:100%">w5</span>
+              </div>
+
+              <p class="ad-lane-tag">Main sequence</p>
+              <div class="ad-lane">
+                <span class="ad-nowline" style="left:70%"></span>
+                <span class="ad-step done" style="left:0%;width:10%"><b>1</b></span>
+                <span class="ad-step done" style="left:10%;width:40%"><b>2</b> Interviews</span>
+                <span class="ad-step live" style="left:50%;width:30%"><b>4</b> Register</span>
+                <span class="ad-step todo" style="left:80%;width:10%"><b>5</b></span>
+                <span class="ad-step todo" style="left:90%;width:10%"><b>7</b></span>
+              </div>
+
+              <p class="ad-lane-tag">In parallel</p>
+              <div class="ad-lane">
+                <span class="ad-nowline" style="left:70%"></span>
+                <span class="ad-step par done" style="left:10%;width:20%"><b>3</b> Market input</span>
+                <span class="ad-step live" style="left:55%;width:20%"><b>6</b> Traceability</span>
+              </div>
+
+              <div class="ad-flow-key">
+                <span><i style="background:var(--accent)"></i>done</span>
+                <span><i style="background:repeating-linear-gradient(115deg,var(--accent-soft) 0 4px,#fff 4px 8px);border:1px solid var(--accent)"></i>in flight</span>
+                <span><i style="border:1px dashed var(--line-strong)"></i>not started</span>
+                <span><i style="width:2px;background:var(--ink)"></i>today</span>
+              </div>
+            </div>
+
+            <div class="ad-steps-head">
+              <span></span><span>#</span><span>Step</span><span>Plan</span><span>Actual</span>
+            </div>
+            <ul class="ad-steps">
+              <li><span class="dot done">●</span><span class="n">1</span><span>Stakeholder map and interview plan</span><span class="w">0.5w</span><span class="a">0.5w</span></li>
+              <li><span class="dot done">●</span><span class="n">2</span><span>Anchor-customer interviews — two accounts, six sessions</span><span class="w">1.5w</span><span class="a over">2.0w</span></li>
+              <li><span class="dot done">●</span><span class="n">3</span><span>Market and analyst input, segment sizing <span class="par-note">· parallel</span></span><span class="w">1.0w</span><span class="a">1.0w</span></li>
+              <li><span class="dot live">◐</span><span class="n">4</span><span>Requirement extraction, de-duplication, register build</span><span class="w">1.0w</span><span class="a over">1.5w est</span></li>
+              <li><span class="dot todo">○</span><span class="n">5</span><span>Conflict resolution and MoSCoW prioritisation workshop</span><span class="w">0.5w</span><span class="a">—</span></li>
+              <li><span class="dot live">◐</span><span class="n">6</span><span>Traceability tagging to candidate KPIs and PPA targets <span class="par-note">· parallel</span></span><span class="w">0.5w</span><span class="a">0.3w</span></li>
+              <li><span class="dot todo">○</span><span class="n">7</span><span>Stakeholder review and baseline sign-off</span><span class="w">0.5w</span><span class="a">—</span></li>
+            </ul>
+            <p class="ad-note">Seven steps add up to 5.5 weeks of work inside a 4-week window — steps 3 and 6 run alongside the main sequence. That is why the activity TAT and the sum of its steps do not match, and why pulling either parallel step onto the critical path costs a further 1.5 weeks.</p>
+          </section>
+
+          <section class="ad-sec">
+            <span class="cap">Inputs and working artifacts</span>
+            <div class="ad-io">
+              <div>
+                <h4>Consumes</h4>
+                <ul class="ad-list">
+                  <li>Customer RFI / RFQ responses</li>
+                  <li>Field feedback and errata from the previous generation</li>
+                  <li>Analyst forecasts and segment sizing</li>
+                  <li>Competitor datasheets and public benchmarks</li>
+                  <li>Sales pipeline and committed-volume view</li>
+                </ul>
+              </div>
+              <div>
+                <h4>Produces</h4>
+                <ul class="ad-list">
+                  <li>Interview notes, per account</li>
+                  <li>Requirement register — ID, owner, priority, acceptance measure</li>
+                  <li>Conflict and deferral log</li>
+                  <li>MoSCoW prioritisation record</li>
+                  <li>Baseline sign-off sheet</li>
+                </ul>
+              </div>
+            </div>
+          </section>
+
+          <section class="ad-sec">
+            <span class="cap">Relationship to the stage's key deliverables</span>
+            <ul class="ad-rel">
+              <li>
+                <span class="did">DEF-D1</span>
+                <span class="rel produces">produces</span>
+                <span class="txt"><b>Product requirements document (PRD).</b> The register is the PRD's body — this activity is where the deliverable's content comes from, not merely a contributor to it.
+                  <span class="state"><b class="health late">late</b>due w1.3 · open · 2.2w past due, blocked by this activity</span></span>
+              </li>
+              <li>
+                <span class="did">DEF-D2</span>
+                <span class="rel feeds">feeds</span>
+                <span class="txt"><b>Target specification — PPA and KPI table.</b> Each ranked requirement becomes a KPI line that <code>DEF-03</code> turns into a number. An untraced target is a target nobody asked for.
+                  <span class="state"><b class="health late">late</b>due w2.7 · open · 0.8w past due</span></span>
+              </li>
+              <li>
+                <span class="did">DEF-D3</span>
+                <span class="rel feeds">informs</span>
+                <span class="txt"><b>Product cost and margin model.</b> Supplies the volume, segment and ASP assumptions the model is built on.
+                  <span class="state"><b class="health warn">at risk</b>due w4.0 · open · needs the volume assumptions this activity owes</span></span>
+              </li>
+              <li>
+                <span class="did">DEF-D4</span>
+                <span class="rel feeds">feeds</span>
+                <span class="txt"><b>Feasibility report.</b> <code>DEF-07</code> tests <em>this</em> list against the candidate nodes — a feasibility study run against a different list proves nothing.
+                  <span class="state"><b class="health warn">at risk</b>due w5.3 · open · starts only when the register baselines, now forecast w5</span></span>
+              </li>
+              <li>
+                <span class="did">DEF-D6</span>
+                <span class="rel gates">gates</span>
+                <span class="txt"><b>Kickoff Go / No-Go decision record.</b> The gate reads the sign-off sheet. An unsigned register is a No-Go condition, not a footnote.
+                  <span class="state"><b class="health ok">on track</b>due w8.0 · open · 4.5w of float, but the gate reads the sign-off sheet</span></span>
+              </li>
+            </ul>
+          </section>
+
+          <section class="ad-sec">
+            <span class="cap">Status updates <span class="n">3</span></span>
+            <ul class="ad-upd">
+              <li>
+                <div class="meta"><span class="who">N. Feld</span><span>w3.4 · 2 days ago</span></div>
+                <p>Account B moved its final session to next week — third reschedule. Register build continues on account A's set so the work is not idle, but the baseline cannot be called until B's requirements land. Forecast finish slips to w5.</p>
+              </li>
+              <li>
+                <div class="meta"><span class="who">N. Feld</span><span>w2.5 · 9 days ago</span></div>
+                <p>Six of six sessions held with account A. 74 raw requirements extracted, 41 after de-duplication. Eleven are written as solutions rather than needs and have gone back for restatement.</p>
+              </li>
+              <li>
+                <div class="meta"><span class="who">D. Kim</span><span>w1.0 · 17 days ago</span></div>
+                <p>Interview plan signed off. Segment sizing pulled forward to run alongside the interviews rather than after them, which is what buys the week the schedule assumes.</p>
+              </li>
+            </ul>
+          </section>
+
+          <section class="ad-sec">
+            <span class="cap">Risks <span class="n">1 open · 4 watched</span></span>
+            <ul class="ad-risks">
+              <li>
+                <span class="mark">▲</span>
+                <span><b>Account B's requirements land after the register is baselined.</b> Raised w2.5 by N. Feld. Mitigation: baseline account A's set as v0.9 and hold a delta review rather than delaying the whole register.</span>
+                <span class="st open">open</span>
+              </li>
+              <li>
+                <span class="mark watch">▲</span>
+                <span><b>Requirements not signed off by all stakeholders.</b> Sales agreeing verbally is not a signature.</span>
+                <span class="st lib">watch</span>
+              </li>
+              <li>
+                <span class="mark watch">▲</span>
+                <span><b>Late customer additions after baseline.</b> With no change-control channel agreed at sign-off, the register keeps moving and nothing downstream can freeze.</span>
+                <span class="st lib">watch</span>
+              </li>
+              <li>
+                <span class="mark watch">▲</span>
+                <span><b>Requirements written as solutions.</b> "Use HBM3E" is an answer; "819 GB/s sustained" is a requirement. Solutions here remove the architect's options in <code>ARCH-02</code>.</span>
+                <span class="st lib">watch</span>
+              </li>
+              <li>
+                <span class="mark watch">▲</span>
+                <span><b>No acceptance measure.</b> A requirement that cannot be tested resurfaces at qualification, when the only remaining fix is a respin or a waiver.</span>
+                <span class="st lib">watch</span>
+              </li>
+            </ul>
+          </section>
+
+        </div>
+
+        <aside class="ad-side">
+
+          <section>
+            <span class="cap">At a glance</span>
+            <div class="ad-kv">
+              <div><span class="k">Activity</span><span class="v">DEF-01</span></div>
+              <div><span class="k">Stage</span><span class="v">01 · DEF</span></div>
+              <div><span class="k">State</span><span class="v">In progress</span></div>
+              <div><span class="k">Health</span><span class="v over">At risk</span></div>
+              <div><span class="k">Plan</span><span class="v">w0 – w4</span></div>
+              <div><span class="k">Forecast</span><span class="v over">w0 – w5</span></div>
+              <div><span class="k">Deliverables</span><span class="v late">2 late · 2 at risk</span></div>
+              <div><span class="k">Continuous</span><span class="v">no</span></div>
+              <div><span class="k">On critical path</span><span class="v">yes</span></div>
+            </div>
+          </section>
+
+          <section>
+            <span class="cap">People <span class="n">4.3 FTE</span></span>
+            <div class="ad-people">
+              <div><span>Nora Feld<span class="r">Requirements lead · owner</span></span><span class="al">100%</span></div>
+              <div><span>Marco Silva<span class="r">Customer engagement — account A</span></span><span class="al">100%</span></div>
+              <div><span>Ai Kimura<span class="r">Customer engagement — account B</span></span><span class="al">80%</span></div>
+              <div><span>Ian Brooks<span class="r">Cost and volume input</span></span><span class="al">60%</span></div>
+              <div><span>Seojin Ha<span class="r">Feasibility liaison</span></span><span class="al">60%</span></div>
+              <div><span>Daniel Kim<span class="r">Stage lead · approver</span></span><span class="al">30%</span></div>
+              <div><span>Allocated</span><span class="al">430%</span></div>
+            </div>
+          </section>
+
+          <section>
+            <span class="cap">Effort <span class="n">M/M</span></span>
+            <div class="ad-split-head"><span>Line</span><span>Plan</span><span>Spent</span></div>
+            <div class="ad-split">
+              <div><span>Interviews and market input</span><span class="mm">1.5</span><span class="mm sp">1.8</span></div>
+              <div><span>Register build and traceability</span><span class="mm">1.5</span><span class="mm sp">1.0</span></div>
+              <div><span>Workshops and review</span><span class="mm">0.5</span><span class="mm sp">0.1</span></div>
+              <div><span>Documentation and sign-off</span><span class="mm">0.5</span><span class="mm sp">0.2</span></div>
+              <div><span>Total</span><span class="mm">4.0</span><span class="mm sp">3.1</span></div>
+            </div>
+          </section>
+
+          <section>
+            <span class="cap">Entry criteria <span class="n">met</span></span>
+            <ul class="ad-list ad-crit met">
+              <li>Program charter drafted and funded to study</li>
+              <li>Anchor customers identified, NDAs executed</li>
+              <li>Previous-generation field feedback available</li>
+            </ul>
+          </section>
+
+          <section>
+            <span class="cap">Exit criteria <span class="n">1 of 3</span></span>
+            <ul class="ad-list ad-crit met">
+              <li>Every requirement has an owner, a priority and an acceptance measure</li>
+              <li class="pending">Conflicts resolved, or deferred with a named decision owner</li>
+              <li class="pending">Register baselined and signed by product, engineering and sales</li>
+            </ul>
+          </section>
+
+          <section>
+            <span class="cap">Sign-off</span>
+            <div class="ad-sign">
+              <div><span>Product</span><span class="s signed">signed w3.1</span></div>
+              <div><span>Engineering</span><span class="s pending">pending</span></div>
+              <div><span>Sales</span><span class="s pending">pending</span></div>
+            </div>
+          </section>
+
+          <section>
+            <span class="cap">Depends on</span>
+            <p class="none" style="font-size:.78em;color:var(--ink-3);line-height:1.45">
+              Nothing upstream — this is the program's first activity. Its preconditions are the entry criteria above.
+            </p>
+          </section>
+
+          <section>
+            <span class="cap">Feeds into</span>
+            <div class="ad-chain">
+              <a href="#" title="Workload / use-case profiling — needs the use-case list">DEF-02</a>
+              <a href="#" title="Competitive benchmarking — scoped against the same requirements">DEF-06</a>
+              <a href="#" title="Feasibility assessment against candidate nodes">DEF-07</a>
+              <a href="#" title="System-level performance modelling — inherits the workloads">ARCH-01</a>
+              <a href="#" title="Product requirement → IP requirement decomposition">IPR-01</a>
+            </div>
+          </section>
+
+          <section>
+            <span class="cap">Attachments <span class="n">3</span></span>
+            <div class="ad-files">
+              <a href="#"><span>requirement-register-v0.9.xlsx</span><span class="sz">412 KB</span></a>
+              <a href="#"><span>account-A-session-notes.pdf</span><span class="sz">1.8 MB</span></a>
+              <a href="#"><span>moscow-workshop-agenda.md</span><span class="sz">22 KB</span></a>
+            </div>
+          </section>
+
+          <section>
+            <span class="cap">Measured by</span>
+            <div class="ad-metric">
+              <div><span>Requirements baselined</span><span class="v">41 / ~55</span></div>
+              <div><span>With an acceptance measure</span><span class="v">78%</span></div>
+              <div><span>Restated from solution to need</span><span class="v">11</span></div>
+              <div><span>Change requests after baseline</span><span class="v na">n/a</span></div>
+            </div>
+          </section>
+
+        </aside>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

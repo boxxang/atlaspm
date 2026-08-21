@@ -1,7 +1,7 @@
 'use client';
 
-import { useMemo, useRef, useState } from 'react';
-import { fmtDate, fmtMD, fromISO, toISO } from '@/lib/schedule';
+import { useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { fromISO, toISO } from '@/lib/schedule';
 import { stageBands } from '@/lib/stages';
 import { useAppStore } from '@/store/useAppStore';
 import { Gantt, useGanttGeometry } from './Gantt';
@@ -41,7 +41,8 @@ export function Roadmap() {
      drawn rather than from a field in the toolbar. */
   const [editingKickoff, setEditingKickoff] = useState(false);
   const selectStage = useAppStore((s) => s.selectStage);
-  const { minWeek, total, todayPct, todayVisible } = useGanttGeometry(schedule, kickoff, today);
+  /* the bands share the chart's geometry, so a band edge lands on a bar edge */
+  const { minWeek, total } = useGanttGeometry(schedule, kickoff, today);
 
   /**
    * Once a stage is open, the chart is reference rather than navigation, so it
@@ -69,6 +70,14 @@ export function Roadmap() {
   const ref = useRef<HTMLElement>(null);
   /* derived rather than synced: with nothing open there is nothing to fold to */
   const isFolded = folded && currentStage !== null && !pinned;
+
+  /* Unfolding is bound to movement, not to pointerenter: a browser fires the
+     boundary events again whenever layout puts a different element under a
+     pointer that never moved, so a chart that changes height under the pointer
+     re-enters itself. Coming back to the chart is a movement; growing is not. */
+  const onMove = () => {
+    if (folded) setFolded(false);
+  };
 
   const onLeave = (e: React.PointerEvent) => {
     if (currentStage === null || pinned) return;
@@ -99,13 +108,19 @@ export function Roadmap() {
    * here, Design & Verify here.
    */
   const bands = useMemo(() => {
-    const phases = stageBands(stages);
-    const starts = phases.map((p) =>
-      Math.min(...p.stages.map((id) => schedule.stages[id]?.startOffsetWeeks ?? 0)),
-    );
+    /* Stage order is not date order once a profile interleaves packaging with
+       design, so the bands are laid out by when they start. Without that a
+       band can run backwards over its neighbour and the two labels overprint. */
+    const phases = stageBands(stages)
+      .map((p) => ({
+        ...p,
+        start: Math.min(...p.stages.map((id) => schedule.stages[id]?.startOffsetWeeks ?? 0)),
+      }))
+      .sort((a, b) => a.start - b.start);
+    const starts = phases.map((p) => p.start);
     return phases.map((p, i) => {
       const from = pctOfWeek(starts[i]);
-      const to = i + 1 < starts.length ? pctOfWeek(starts[i + 1]) : 100;
+      const to = i + 1 < starts.length ? pctOfWeek(Math.max(starts[i + 1], starts[i])) : 100;
       /* a band can appear twice — a stage added under Implement after
          Manufacture opens a second Implement band, which is what the chart
          should show rather than one band spanning both */
@@ -114,15 +129,22 @@ export function Roadmap() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [schedule, stages, minWeek, total]);
 
-  /* Seven milestones on one axis collide — Design Freeze and Tapeout are a week
-     apart — so labels alternate between two rows. A date already behind us is
-     drawn filled, one still ahead hollow: the axis reads as a progress bar. */
-  const marks = schedule.milestones.map((m, i) => ({
-    ...m,
-    pct: pctOfWeek(m.week),
-    row: i % 2,
-    past: m.date <= today,
-  }));
+  /**
+   * --rm-h is what the page below has to clear when something is scrolled to,
+   * since this header is sticky.
+   *
+   * It deliberately does NOT correct the scroll position to match the fold.
+   * Doing that pulled the page down under a pointer that had just left the
+   * chart, which put the pointer back inside it: unfold, correct, leave, fold —
+   * the flicker. Folding moves the page up and away from the pointer instead.
+   */
+  const heightRef = useRef(0);
+  useLayoutEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    heightRef.current = el.offsetHeight;
+    document.documentElement.style.setProperty('--rm-h', `${heightRef.current}px`);
+  }, [isFolded]);
 
   const currentPhase = currentStage === null ? null : stages[currentStage]?.phaseId ?? null;
 
@@ -132,7 +154,7 @@ export function Roadmap() {
       aria-label="Development roadmap"
       ref={ref}
       className={isFolded ? 'folded' : undefined}
-      onPointerEnter={() => setFolded(false)}
+      onPointerMove={onMove}
       onPointerLeave={onLeave}
     >
       <div className="rm-scroll">
@@ -150,73 +172,6 @@ export function Roadmap() {
             ))}
           </div>
 
-          <div id="rm-line-wrap">
-            {/* Kickoff is the first mark on the axis — the program starts
-                somewhere, and that date has to be visible and editable. */}
-            <span key="kickoff">
-              <span
-                className={`rm-ms-label kickoff${kickoff <= today ? ' past' : ''}`}
-                style={{ left: `${pctOfWeek(0)}%` }}
-                data-row={1}
-                data-ms-label="kickoff"
-              >
-                Kick-off
-              </span>
-              <button
-                className={`rm-ms kickoff${kickoff <= today ? ' past' : ''}`}
-                style={{ left: `${pctOfWeek(0)}%` }}
-                data-tip={`Kick-off|${fmtDate(kickoff)} · click to change`}
-                data-msid="kickoff"
-                aria-label={`Kick-off ${fmtDate(kickoff)} — change`}
-                onClick={() => setEditingKickoff((v) => !v)}
-              >
-                <span className="rm-ms-date">{fmtMD(kickoff)}</span>
-              </button>
-              {editingKickoff && (
-                <span className="rm-kickoff-edit" style={{ left: `${pctOfWeek(0)}%` }}>
-                  <input
-                    type="date"
-                    id="kickoff-input"
-                    autoFocus
-                    value={toISO(kickoff)}
-                    aria-label="Kickoff date"
-                    onChange={(e) => e.target.value && setKickoff(fromISO(e.target.value))}
-                    onBlur={() => setEditingKickoff(false)}
-                    onKeyDown={(e) => e.key === 'Enter' && setEditingKickoff(false)}
-                  />
-                </span>
-              )}
-            </span>
-            {marks.map((m) => (
-              <span key={m.id}>
-                <span
-                  className={`rm-ms-label${m.major ? ' major' : ''}${m.past ? ' past' : ''}`}
-                  style={{ left: `${m.pct}%` }}
-                  data-row={m.row}
-                  data-ms-label={m.id}
-                >
-                  {m.label}
-                </span>
-                {/* the date rides inside the diamond rather than waiting for
-                    a hover — the axis is read at a glance */}
-                <span
-                  className={`rm-ms${m.major ? ' major' : ''}${m.past ? ' past' : ''}`}
-                  style={{ left: `${m.pct}%` }}
-                  data-tip={`${m.label}|${fmtDate(m.date)}`}
-                  data-msid={m.id}
-                >
-                  <span className="rm-ms-date">{fmtMD(m.date)}</span>
-                </span>
-              </span>
-            ))}
-            <div id="rm-line" />
-            {todayVisible && (
-              <div id="rm-today" style={{ left: `${todayPct}%` }}>
-                <span className="ty-lbl">TODAY</span>
-                <span className="ty-tick" />
-              </div>
-            )}
-          </div>
         </div>
 
         <div id="rm-gantt-cap">
@@ -240,7 +195,28 @@ export function Roadmap() {
             <PinIcon />
           </button>
         </div>
-        <Gantt id="rm-gantt" short folded={isFolded} zoom={zoom} onSelectStage={selectStage} />
+        <Gantt
+          id="rm-gantt"
+          short
+          folded={isFolded}
+          zoom={zoom}
+          kickoff={{ date: kickoff, onEdit: () => setEditingKickoff((v) => !v) }}
+          onSelectStage={selectStage}
+        />
+        {editingKickoff && (
+          <span className="rm-kickoff-edit">
+            <input
+              type="date"
+              id="kickoff-input"
+              autoFocus
+              value={toISO(kickoff)}
+              aria-label="Kickoff date"
+              onChange={(e) => e.target.value && setKickoff(fromISO(e.target.value))}
+              onBlur={() => setEditingKickoff(false)}
+              onKeyDown={(e) => e.key === 'Enter' && setEditingKickoff(false)}
+            />
+          </span>
+        )}
       </div>
     </section>
   );

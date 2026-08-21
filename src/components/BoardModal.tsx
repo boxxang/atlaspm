@@ -11,7 +11,9 @@ import {
   type ModalState,
 } from '@/store/modalStore';
 import { flushWrites, sortedItems, useAppStore, type AppState } from '@/store/useAppStore';
+import { useWrapped } from '@/store/wrapStore';
 import { BoardCols, BoardRow } from './Board';
+import { WrapToggle } from './WrapToggle';
 import { ItemEditor, ItemView } from './ItemView';
 
 /* Which stages exist belongs to the program's profile, so the aggregate views
@@ -154,6 +156,10 @@ export function BoardModal() {
   const visible = entries.slice(page * PAGE_SIZE, page * PAGE_SIZE + PAGE_SIZE);
 
   const boardTitle = agg ? agg.title : label + ' Board';
+  /* The pop-up over a stage board is that board, so it shares its wrap key; the
+     aggregate views are their own boards and keep their own. */
+  const wrapKey = agg ? `agg:${agg.type}` : kind ?? 'board';
+  const wrapped = useWrapped(wrapKey);
   const paneLabel = paneKind ? KIND_LABELS[paneKind] : label;
   const paneOpen = view !== 'board';
 
@@ -166,6 +172,7 @@ export function BoardModal() {
             <h3>{boardTitle}</h3>
             <span className="meta">{agg ? projectName : stage ? stage.title : ''}</span>
             <span className="spacer" />
+            <WrapToggle boardKey={wrapKey} />
             {!agg && kind && (
               <button
                 className="board-btn"
@@ -187,7 +194,7 @@ export function BoardModal() {
             id="modal-body"
             data-pane={view}
           >
-            <div className="mb-list" id="modal-list">
+            <div className={`mb-list${wrapped ? ' wrapped' : ''}`} id="modal-list">
             {isSu && (
               <>
                 <div className="board-cols su-cols">
@@ -223,7 +230,7 @@ export function BoardModal() {
             )}
 
             {!isSu && kind && (
-              <div className="board" data-kind={kind}>
+              <div className={`board${wrapped ? ' wrapped' : ''}`} data-kind={kind}>
                 <BoardCols kind={kind} />
                 {visible.length ? (
                   (visible as Entry[]).map((e) => (

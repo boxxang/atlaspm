@@ -43,6 +43,37 @@ export const formatManMonths = (mm: number): string =>
 export const estimateCost = (manMonths: number, ratePerManMonth: number): number =>
   Math.round(manMonths * ratePerManMonth);
 
+/* ---------- turn-around time ---------- */
+
+/**
+ * TAT is stored the same way as effort — one number per engineering line — but
+ * it admits negatives: a negative value marks an activity that runs
+ * continuously across the stage rather than closing once, and its magnitude is
+ * still the span in weeks.
+ */
+export function parseTat(stored: string | null | undefined, length: number): number[] {
+  const parsed = (stored ?? '').split('\n').map(toSignedNumber);
+  return Array.from({ length }, (_, i) => parsed[i] ?? 0);
+}
+
+/** null when nothing has been recorded, so the column stays empty. */
+export function serialiseTat(values: readonly number[]): string | null {
+  return values.some((v) => v !== 0) ? values.map((v) => String(v)).join('\n') : null;
+}
+
+const toSignedNumber = (line: string) => {
+  const n = Number.parseFloat(line.trim());
+  return Number.isFinite(n) ? n : 0;
+};
+
+/** "12w", "0.5w", and "30w cont." for the continuous ones. */
+export function formatTat(weeks: number): string {
+  if (!weeks) return '—';
+  const w = Math.abs(weeks);
+  const span = `${Number.isInteger(w) ? w : w.toFixed(1)}w`;
+  return weeks < 0 ? `${span} cont.` : span;
+}
+
 export const CURRENCIES = ['USD', 'KRW', 'EUR', 'JPY'] as const;
 export type Currency = (typeof CURRENCIES)[number];
 

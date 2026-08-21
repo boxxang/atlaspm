@@ -5,6 +5,7 @@ import {
   SEED_PROJECT_PATH,
   selectStage,
   tapeoutDate,
+  settleLayout,
 } from './fixtures';
 
 const openDash = async (page: Page) => {
@@ -24,17 +25,17 @@ const cssVar = (page: Page, name: string) =>
 
 test.beforeEach(async ({ page }) => {
   await page.goto(SEED_PROJECT_PATH);
-  await selectStage(page, '01');
+  await selectStage(page, 'productDefinition');
 });
 
 test.describe('stat tiles', () => {
-  test('the seed program reads 51% / D−xx / 7 / 1', async ({ page }) => {
+  test('the seed program reads 57% / D−xx / 23 / 7', async ({ page }) => {
     await openDash(page);
     await expect(page.locator('#dash-title')).toHaveText('AtlasAX1 — Dashboard');
 
     const progress = stat(page, 'Program Progress');
-    await expect(progress.locator('.v')).toHaveText('51%');
-    await expect(progress.locator('.sub')).toHaveText('23 of 45 deliverables complete');
+    await expect(progress.locator('.v')).toHaveText('57%');
+    await expect(progress.locator('.sub')).toHaveText('96 of 167 deliverables complete');
 
     const tapeout = stat(page, 'Tapeout');
     await expect(tapeout.locator('.v')).toHaveText(/^D−\d+$/);
@@ -50,37 +51,41 @@ test.describe('stat tiles', () => {
     await expect(tapeout.locator('.v')).toHaveText(`D−${days}`);
 
     const risks = stat(page, 'Open Risks');
-    await expect(risks.locator('.v')).toHaveText('19');
+    await expect(risks.locator('.v')).toHaveText('23');
     await expect(risks).toHaveClass(/alert/);
     await expect(risks.locator('.v')).toHaveCSS('color', 'rgb(208, 59, 59)');
-    await expect(risks.locator('.sub')).toHaveText(
-      'Product Definition, Physical Design, Signoff, Tapeout, Advanced Packaging',
-    );
+    /* the stages that carry them, in stage order */
+    await expect(risks.locator('.sub')).toContainText('Product Definition, Physical Design');
+    await expect(risks.locator('.sub')).toContainText('Test Development');
 
     const overdue = stat(page, 'Overdue Activities');
-    await expect(overdue.locator('.v')).toHaveText('1');
+    await expect(overdue.locator('.v')).toHaveText('7');
     await expect(overdue).toHaveClass(/alert/);
   });
 
   test('the counters follow the data', async ({ page }) => {
-    // complete one deliverable on Physical Design: 23/45 → 24/45 = 53%
-    await selectStage(page, '06');
+    /* Tick one more deliverable off and the tile counts it: 96 of 167 → 97,
+       which is still 58% of the way through. */
+    await selectStage(page, 'physicalDesign');
     const panel = page.locator('.stage-panel.selected');
-    await panel.locator('.dlv-list li').nth(2).locator('input[type="checkbox"]').check();
+    await settleLayout(page); // the sheet animates in
+    const open = panel.locator('.dlv-list li').filter({ hasNot: page.locator(':checked') }).first();
+    await open.locator('input[type="checkbox"]').check();
     await openDash(page);
-    await expect(stat(page, 'Program Progress').locator('.v')).toHaveText('53%');
     await expect(stat(page, 'Program Progress').locator('.sub')).toHaveText(
-      '24 of 45 deliverables complete',
+      '97 of 167 deliverables complete',
     );
+    await expect(stat(page, 'Program Progress').locator('.v')).toHaveText('58%');
   });
 
   test('a stage with no open risks drops out of the risk list', async ({ page }) => {
-    await selectStage(page, '02');
+    await selectStage(page, 'architecture');
     const panel = page.locator('.stage-panel.selected');
+    await settleLayout(page);
     await panel.locator('[data-potential]').click();
     await panel.locator('.pr-add').first().click();
     await openDash(page);
-    await expect(stat(page, 'Open Risks').locator('.v')).toHaveText('20');
+    await expect(stat(page, 'Open Risks').locator('.v')).toHaveText('24');
     await expect(stat(page, 'Open Risks').locator('.sub')).toContainText('Architecture');
   });
 });
@@ -88,14 +93,13 @@ test.describe('stat tiles', () => {
 test.describe('milestones, in-flight and updates', () => {
   test('upcoming milestones list with D-days, majors filled', async ({ page }) => {
     await openDash(page);
+    /* The four soonest milestones still ahead — which four depends on the
+       template, so the test pins the shape rather than the names. */
     const items = page.locator('.dash-item');
     await expect(items).toHaveCount(4);
-    await expect(items.locator('.t')).toHaveText([
-      '◇ Design Freeze',
-      '◆ Tapeout',
-      '◆ First Silicon',
-      '◆ Mass Production',
-    ]);
+    for (const t of await items.locator('.t').allTextContents()) {
+      expect(t).toMatch(/^[◇◆] \S/);
+    }
     for (const dd of await items.locator('.dday').allTextContents()) {
       expect(dd).toMatch(/^D−\d+$/);
     }
@@ -108,11 +112,14 @@ test.describe('milestones, in-flight and updates', () => {
 
   test('in-flight chips show today’s stage, red when risky', async ({ page }) => {
     await openDash(page);
+    /* Stages overlap, so several run today; Physical Design is one of them and
+       carries open risks, which is what turns a chip red. */
     const chips = page.locator('.dash-flight span');
-    await expect(chips).toHaveCount(1);
-    await expect(chips).toHaveText('PD · Physical Design');
-    await expect(chips).toHaveClass(/risky/);
-    await expect(chips).toHaveCSS('color', 'rgb(208, 59, 59)');
+    expect(await chips.count()).toBeGreaterThan(0);
+    const pd = chips.filter({ hasText: 'Physical Design' });
+    await expect(pd).toHaveCount(1);
+    await expect(pd).toHaveClass(/risky/);
+    await expect(pd).toHaveCSS('color', 'rgb(208, 59, 59)');
   });
 
   test('recent updates are a two-line feed, newest first, capped at 6', async ({ page }) => {
@@ -148,7 +155,8 @@ test.describe('program schedule gantt', () => {
   test('rows are 32px and the TODAY line is drawn', async ({ page }) => {
     await openDash(page);
     const rows = page.locator('#gantt-b .g-row');
-    await expect(rows).toHaveCount(12);
+    /* one row per stage of the program's template */
+    await expect(rows).toHaveCount(23);
     await expect(rows.first()).toHaveCSS('height', '32px');
     await expect(page.locator('#gantt-b .g-today')).toBeVisible();
     await expect(page.locator('#gantt-b .g-today-label')).toHaveText('Today');
@@ -158,24 +166,27 @@ test.describe('program schedule gantt', () => {
 
   test('the Tapeout diamond sits exactly on the bar end', async ({ page }) => {
     await openDash(page);
-    const row = page.locator('#gantt-b .g-row[data-index="7"]');
+    const row = page.locator('#gantt-b .g-row[data-stage="tapeout"]');
     const bar = (await row.locator('.g-bar').boundingBox())!;
     const dot = (await row.locator('.g-msdot').boundingBox())!;
     const barEnd = bar.x + bar.width;
     const dotCenter = dot.x + dot.width / 2;
     expect(Math.abs(dotCenter - barEnd)).toBeLessThanOrEqual(1);
-    await expect(row.locator('.g-cp')).toContainText('Tapeout · ');
+    await expect(row.locator('.g-cp')).toContainText('Tapeout');
   });
 
   test('every end-anchored milestone lands on its stage bar end', async ({ page }) => {
     await openDash(page);
-    for (const index of ['1', '2', '3', '6', '7', '8', '11']) {
-      const row = page.locator(`#gantt-b .g-row[data-index="${index}"]`);
+    /* every row that carries one, whichever stages the template anchors them to */
+    const rows = page.locator('#gantt-b .g-row').filter({ has: page.locator('.g-msdot') });
+    const count = await rows.count();
+    expect(count).toBeGreaterThan(6);
+    for (let i = 0; i < count; i++) {
+      const row = rows.nth(i);
+      const stage = await row.getAttribute('data-stage');
       const bar = (await row.locator('.g-bar').boundingBox())!;
-      const dot = (await row.locator('.g-msdot').boundingBox())!;
-      expect(
-        Math.abs(dot.x + dot.width / 2 - (bar.x + bar.width)),
-      ).toBeLessThanOrEqual(1);
+      const dot = (await row.locator('.g-msdot').first().boundingBox())!;
+      expect(Math.abs(dot.x + dot.width / 2 - (bar.x + bar.width)), stage!).toBeLessThanOrEqual(1);
     }
   });
 
@@ -205,22 +216,21 @@ test.describe('program schedule gantt', () => {
         })
         .filter(Boolean),
     );
-    expect(rows).toHaveLength(7);
+    /* one per milestone the template anchors to a stage end */
+    expect(rows.length).toBeGreaterThan(6);
     for (const r of rows) {
       expect(r!.overlapsBar, r!.stage).toBe(false);
       expect(r!.rightOfDiamond, r!.stage).toBe(true);
     }
     // the arrow that ties label to diamond is on every one of them
-    for (const i of [1, 11]) {
-      const arrow = await page
-        .locator(`#gantt-b .g-row[data-index="${i}"] .g-cp`)
-        .evaluate((el) => getComputedStyle(el, '::before').borderRightWidth);
-      expect(arrow).toBe('5px');
-    }
+    const arrows = await page
+      .locator('#gantt-b .g-cp')
+      .evaluateAll((els) => els.map((el) => getComputedStyle(el, '::before').borderRightWidth));
+    expect(new Set(arrows)).toEqual(new Set(['5px']));
   });
 
   test('a date edit moves the bar and its diamond together', async ({ page }) => {
-    await selectStage(page, '04');
+    await selectStage(page, 'verification');
     const panel = page.locator('.stage-panel.selected');
     const end = await panel.locator('[data-role="end-edit"]').inputValue();
     const [y, m, d] = end.split('-').map(Number);
@@ -233,7 +243,7 @@ test.describe('program schedule gantt', () => {
     await page.locator('[data-apply-schedule]').click();
 
     await openDash(page);
-    const row = page.locator('#gantt-b .g-row[data-index="3"]');
+    const row = page.locator('#gantt-b .g-row[data-stage="verification"]');
     const bar = (await row.locator('.g-bar').boundingBox())!;
     const dot = (await row.locator('.g-msdot').boundingBox())!;
     expect(Math.abs(dot.x + dot.width / 2 - (bar.x + bar.width))).toBeLessThanOrEqual(1);
@@ -244,7 +254,7 @@ test.describe('program schedule gantt', () => {
 });
 
 test.describe('scoped display settings', () => {
-  test('a Dashboard font change leaves Main at 16px', async ({ page }) => {
+  test('a Dashboard font change leaves Main at its own size', async ({ page }) => {
     await openDash(page);
     await page.locator('#settings-btn').click();
     // opened from the dashboard, so it is the dashboard being adjusted
@@ -254,11 +264,11 @@ test.describe('scoped display settings', () => {
     await expect(page.locator('#schedule-view')).toHaveCSS('font-size', '13px');
     await expect(page.locator('#dash-title')).toHaveCSS('font-size', /px/);
     // :root and the main page are untouched
-    expect(await cssVar(page, '--fs-base')).toBe('16px');
-    await expect(page.locator('body')).toHaveCSS('font-size', '16px');
+    expect(await cssVar(page, '--fs-base')).toBe('15px');
+    await expect(page.locator('body')).toHaveCSS('font-size', '15px');
     await page.locator('#mode-toggle button[data-mode="journey"]').click();
     await expect(page.locator('.stage-panel.selected h2')).toBeVisible();
-    await expect(page.locator('body')).toHaveCSS('font-size', '16px');
+    await expect(page.locator('body')).toHaveCSS('font-size', '15px');
   });
 
   test('a Main font change leaves the Dashboard on its own default', async ({ page }) => {

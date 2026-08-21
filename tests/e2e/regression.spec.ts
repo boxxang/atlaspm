@@ -27,13 +27,13 @@ const centerX = async (page: Page, sel: string) => {
 
 test.beforeEach(async ({ page }) => {
   await page.goto(SEED_PROJECT_PATH);
-  await selectStage(page, '01');
+  await selectStage(page, 'productDefinition');
 });
 
 test.describe('column alignment', () => {
   test('every board header cell sits exactly over its row cells', async ({ page }) => {
     // Physical Design carries rows on all three boards
-    await selectStage(page, '06');
+    await selectStage(page, 'physicalDesign');
     for (const kind of ['keyinfo', 'activities', 'risks'] as const) {
       const board = `.stage-panel.selected .board[data-kind="${kind}"]`;
       const head = await lefts(page, `${board} .board-cols > span`);
@@ -78,7 +78,7 @@ test.describe('column alignment', () => {
   });
 
   test('alignment survives a column resize', async ({ page }) => {
-    await selectStage(page, '06');
+    await selectStage(page, 'physicalDesign');
     const board = '.stage-panel.selected .board[data-kind="activities"]';
     await dragGrip(page, page.locator(`${board} .col-grip[data-col="date"]`), 40);
     const head = await lefts(page, `${board} .board-cols > span`);
@@ -129,19 +129,24 @@ test.describe('form control metrics', () => {
 });
 
 test.describe('marker registration', () => {
-  test('the roadmap TODAY marker is 0px off the gantt today line', async ({ page }) => {
-    const delta = (await centerX(page, '#rm-today')) - (await centerX(page, '#rm-gantt .g-today'));
+  /* There is one TODAY line now. The strip that carried a second one is gone,
+     so what is checked is that its label stands over the line it labels. */
+  test('the roadmap TODAY label is 0px off the today line', async ({ page }) => {
+    const delta =
+      (await centerX(page, '#rm-gantt .g-today-label')) -
+      (await centerX(page, '#rm-gantt .g-today'));
     expect(delta).toBe(0);
   });
 
   test('it stays at 0px after a resize and after a date edit', async ({ page }) => {
     await page.setViewportSize({ width: 1500, height: 900 });
-    await expect(page.locator('#rm-today')).toBeVisible();
+    await expect(page.locator('#rm-gantt .g-today')).toBeVisible();
     expect(
-      (await centerX(page, '#rm-today')) - (await centerX(page, '#rm-gantt .g-today')),
+      (await centerX(page, '#rm-gantt .g-today-label')) -
+        (await centerX(page, '#rm-gantt .g-today')),
     ).toBe(0);
 
-    await selectStage(page, '04');
+    await selectStage(page, 'verification');
     const panel = selectedPanel(page);
     const end = await panel.locator('[data-role="end-edit"]').inputValue();
     const [y, m, d] = end.split('-').map(Number);
@@ -158,12 +163,13 @@ test.describe('marker registration', () => {
     await page.locator('#roadmap').hover({ position: { x: 8, y: 8 } });
     await settleLayout(page);
     expect(
-      (await centerX(page, '#rm-today')) - (await centerX(page, '#rm-gantt .g-today')),
+      (await centerX(page, '#rm-gantt .g-today-label')) -
+        (await centerX(page, '#rm-gantt .g-today')),
     ).toBe(0);
   });
 
   test('folded, the chart is a stage-sized window rather than the program', async ({ page }) => {
-    await selectStage(page, '03');
+    await selectStage(page, 'rtl');
     const wide = (await page.locator('#rm-gantt .g-row.current .g-bar').boundingBox())!.width;
 
     const box = (await page.locator('#roadmap').boundingBox())!;
@@ -174,8 +180,10 @@ test.describe('marker registration', () => {
     const track = (await page.locator('#rm-gantt .g-row.current .g-row-track').boundingBox())!;
     expect(zoomed.width).toBeGreaterThan(wide * 2);
     expect(zoomed.width / track.width).toBeCloseTo(0.7, 1);
-    // the milestone axis above is untouched — it still reads the whole program
-    await expect(page.locator('.rm-ms')).toHaveCount(8);
+    // RTL's own checkpoint comes with it; the rest fold away with their rows
+    await expect(
+      page.locator('#rm-gantt .g-row.current .g-msdot[data-msid="rtlFreeze"]'),
+    ).toBeVisible();
   });
 
 });
@@ -202,7 +210,7 @@ async function dragGrip(page: Page, grip: ReturnType<Page['locator']>, dx: numbe
 
 test.describe('boundary drags', () => {
   test('the boundary follows the cursor, pixel for pixel', async ({ page }) => {
-    await selectStage(page, '06');
+    await selectStage(page, 'physicalDesign');
     const board = '.stage-panel.selected .board[data-kind="activities"]';
     const ownerLeft = async () => (await lefts(page, `${board} .board-cols > span`))[2];
 
@@ -242,7 +250,8 @@ test.describe('boundary drags', () => {
   });
 
   test('the deliverables boundary follows the cursor as well', async ({ page }) => {
-    const dueLeft = async () => (await lefts(page, '.stage-panel.selected .dlv-cols > span'))[1];
+    /* ID, Deliverable, Due, Completed — the grip moves the Due boundary */
+    const dueLeft = async () => (await lefts(page, '.stage-panel.selected .dlv-cols > span'))[2];
     const before = await dueLeft();
     await dragGrip(page, page.locator('.stage-panel.selected .col-grip[data-col="--dlv-due"]'), -50);
     expect(Math.round((await dueLeft()) - before)).toBe(-50);
@@ -255,7 +264,7 @@ test.describe('pagination', () => {
     await page.locator('[data-dash-open="updates"]').click();
 
     const rows = page.locator('#modal-body .su-brow');
-    await expect(page.locator('.board-foot .note')).toHaveText('22 entries');
+    await expect(page.locator('.board-foot .note')).toHaveText('30 entries');
     await expect(rows).toHaveCount(10);
     await expect(page.locator('.pager button[aria-current="true"]')).toHaveText('1');
     await expect(page.locator('.pager button').first()).toBeDisabled();
@@ -268,7 +277,7 @@ test.describe('pagination', () => {
     await expect(page.locator('.pager button').last()).toBeEnabled();
 
     await page.locator('.pager button').last().click(); // ›
-    await expect(rows).toHaveCount(2); // the tail of 22
+    await expect(rows).toHaveCount(10);
     await expect(page.locator('.pager button[aria-current="true"]')).toHaveText('3');
     await expect(page.locator('.pager button').last()).toBeDisabled();
 
@@ -278,7 +287,7 @@ test.describe('pagination', () => {
     // deleting entries until page 2 empties clamps the pager back to page 1
     await page.locator('#modal-close').click();
     await page.locator('#mode-toggle button[data-mode="journey"]').click();
-    await selectStage(page, '06');
+    await selectStage(page, 'physicalDesign');
     await selectedPanel(page).locator('.board[data-kind="activities"] [data-more]').click();
     await expect(page.locator('#modal-body .b-row')).toHaveCount(6);
     await expect(page.locator('.pager')).toHaveCount(0); // 6 entries, one page
@@ -286,7 +295,7 @@ test.describe('pagination', () => {
 
   test('a single-page board shows no pager', async ({ page }) => {
     // Physical Design's key information is four entries — well under a page
-    await selectStage(page, '06');
+    await selectStage(page, 'physicalDesign');
     await selectedPanel(page).locator('.board[data-kind="keyinfo"] [data-more]').click();
     await expect(page.locator('#modal-body .b-row')).toHaveCount(4);
     await expect(page.locator('.pager')).toHaveCount(0);
@@ -401,7 +410,7 @@ test.describe('reduced motion', () => {
     await page.emulateMedia({ reducedMotion: 'reduce' });
     await page.reload();
     /* a reload clears the selection, so open a stage again */
-    await selectStage(page, '01');
+    await selectStage(page, 'productDefinition');
     expect(
       await page.evaluate(() => matchMedia('(prefers-reduced-motion: reduce)').matches),
     ).toBe(true);
@@ -434,12 +443,12 @@ test.describe('reduced motion', () => {
     // without the preference these are the real durations
     await page.emulateMedia({ reducedMotion: 'no-preference' });
     await page.reload();
-    await selectStage(page, '01');
+    await selectStage(page, 'productDefinition');
     expect((await durations('#modal-scrim', 'transitionDuration'))[0]).toBeCloseTo(0.2, 2);
   });
 
   test('the app still works with motion off', async ({ page }) => {
-    await selectStage(page, '06');
+    await selectStage(page, 'physicalDesign');
     await expect(selectedPanel(page)).toHaveAttribute('data-id', 'physicalDesign');
     await selectedPanel(page).locator('.board[data-kind="risks"] [data-more]').click();
     await expect(page.locator('#modal .modal-win')).toBeVisible();
