@@ -357,7 +357,10 @@ test.describe('stage panel', () => {
   test('the three boards end level, the right pair splitting the left 60/40', async ({
     page,
   }) => {
-    await selectStage(page, 'physicalDesign');
+    /* Product Definition fills all three, which is when the split is a real
+       one — 60/40 is a ceiling on the pair, not a reservation, so on a stage
+       that fills neither of them each takes only what it holds. */
+    await selectStage(page, 'productDefinition');
     const panel = selectedPanel(page);
     const box = async (kind: string) =>
       (await panel.locator(`.board[data-kind="${kind}"]`).boundingBox())!;
@@ -955,8 +958,11 @@ test.describe('board windows', () => {
 
     // Product Definition is seeded full — twelve entries on each board
     const acts = await measure('activities');
-    expect(acts.height).toBe(Math.min(acts.content, 600));
+    /* The list stops short of the frame by the head and the foot, so "Show
+       more" is inside the board rather than hanging off the bottom of it. */
+    expect(acts.height).toBeLessThan(600);
     expect(acts.height).toBeGreaterThan(400);
+    expect(acts.content).toBeGreaterThan(acts.height); // and it scrolls
 
     // the pair beside Activity divide its height rather than adding to it, so
     // the panel stays one screen and they scroll inside their share
@@ -966,14 +972,15 @@ test.describe('board windows', () => {
     expect(ki.content).toBeGreaterThan(ki.height);
     expect(risks.content).toBeGreaterThan(risks.height);
 
-    /* Activity's window is the same height on a stage with six entries as on
-       one with twelve. It is what the pair beside it divide, so letting it
-       shrink to its list squeezed key information and risk into two rows each
-       on exactly the stages where they matter most. */
+    /* The 60/40 share is a ceiling, not a reservation. A stage with a handful
+       of activities takes a handful of activities' worth: nobody is squeezed
+       into two rows, and nobody holds half a screen of nothing open under a
+       stranded "Show more". */
     await selectStage(page, 'physicalDesign');
     const short = await measure('activities');
-    expect(short.height).toBe(acts.height);
-    expect(await boardHeight(page, 'keyinfo')).toBeGreaterThan(200);
+    expect(short.height).toBeLessThanOrEqual(acts.height);
+    expect(short.height).toBe(short.content); // its whole list, no scrolling
+    expect(await boardHeight(page, 'keyinfo')).toBeGreaterThan(120);
   });
 
   test('a full board scrolls inside its window, with Show more just below', async ({ page }) => {
