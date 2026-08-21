@@ -2,10 +2,13 @@
 
 import { useState } from 'react';
 import type { StageId } from '@/data/types';
+import { attachmentUrl } from '@/lib/attachments';
 import { fmtDate, fromISO, toISO } from '@/lib/schedule';
 import { deliverableRowId } from '@/lib/rowIds';
 import { useAppStore } from '@/store/useAppStore';
+import { ClipBadge, ClipIcon } from './Attachments';
 import { ColGrip } from './ColGrip';
+import { DeliveryRecord } from './DeliveryRecord';
 import { useWrapped } from '@/store/wrapStore';
 import { WrapToggle } from './WrapToggle';
 
@@ -17,12 +20,13 @@ import { WrapToggle } from './WrapToggle';
  */
 export function Deliverables({ stageId }: { stageId: StageId }) {
   const [editing, setEditing] = useState(false);
+  /** Which deliverable's record is open, if any. */
+  const [record, setRecord] = useState<string | null>(null);
   const wrapped = useWrapped('deliverables');
   const list = useAppStore((s) => s.deliverables[stageId]);
   /* The row IDs are the template's — DEF-D1 — so a review can name a line. */
   const shortTitle = useAppStore((s) => s.stages.find((st) => st.id === stageId)?.shortTitle ?? '');
   const today = useAppStore((s) => s.today);
-  const toggle = useAppStore((s) => s.toggleDeliverable);
   const setDue = useAppStore((s) => s.setDeliverableDue);
   const setCompleted = useAppStore((s) => s.setDeliverableCompleted);
   const add = useAppStore((s) => s.addDeliverable);
@@ -49,6 +53,9 @@ export function Deliverables({ stageId }: { stageId: StageId }) {
     }
     write(fromISO(due));
   };
+
+  /* read live, so the window shows the artefact the moment it uploads */
+  const open = record ? (list.find((d) => d.id === record) ?? null) : null;
 
   return (
     <>
@@ -92,24 +99,73 @@ export function Deliverables({ stageId }: { stageId: StageId }) {
             <span className="row-id" data-dlv-id={d.id}>
               {deliverableRowId(shortTitle, i)}
             </span>
-            <label>
-              {/* Ticking something off is day-to-day work, so it is done from
-                  the page. Un-ticking it is a correction to a record — that
-                  belongs in edit mode, with the completion date beside it. */}
+            <span className="dlv-cell">
+              {/* The tick is not a control. A box says a thing was done; the
+                  artefact is the thing. So it reads the record's state and
+                  opens the record when pressed — where the artefact goes. */}
               <input
                 type="checkbox"
                 data-dlv-check={d.id}
                 checked={d.done}
-                disabled={d.done && !editing}
+                readOnly
                 title={
-                  d.done && !editing
-                    ? 'Completed — open Edit to change it'
-                    : 'Mark complete, stamping today'
+                  d.done
+                    ? 'Delivered — open the record to see what was filed'
+                    : 'Marked complete by filing its artefact, not by ticking'
                 }
-                onChange={(e) => toggle(stageId, d.id, e.target.checked)}
+                onClick={() => setRecord(d.id)}
+                onChange={() => {}}
               />
-              <span className={`dlv-t${d.done ? ' done' : ''}`}>{d.title}</span>
-            </label>
+              <button
+                className={`dlv-t${d.done ? ' done' : ''}`}
+                data-dlv-open={d.id}
+                title="Open the delivery record"
+                onClick={() => setRecord(d.id)}
+              >
+                {d.title}
+              </button>
+              {/* Straight to the artefact, without opening the record for it.
+                  A panel would have been clipped by this scrolling list, and
+                  the point of the clip is that it is immediate: one file opens,
+                  several send you to the record that lists them. */}
+              {d.attachments.length > 0 &&
+                (d.attachments.length === 1 ? (
+                  <a
+                    className="dlv-clip"
+                    href={attachmentUrl(d.attachments[0].id)}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    data-dlv-files={d.id}
+                    data-tip={`${d.attachments[0].filename}|open the artefact`}
+                    aria-label={`Open ${d.attachments[0].filename}`}
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    <ClipBadge count={1} />
+                  </a>
+                ) : (
+                  <button
+                    className="dlv-clip"
+                    data-dlv-files={d.id}
+                    data-tip={`${d.attachments.length} artefacts|${d.attachments
+                      .map((a) => a.filename)
+                      .join(' · ')}`}
+                    aria-label={`${d.attachments.length} artefacts on ${d.title}`}
+                    onClick={() => setRecord(d.id)}
+                  >
+                    <ClipBadge count={d.attachments.length} />
+                  </button>
+                ))}
+              {/* Files the record: the history, and the thing itself. */}
+              <button
+                className="dlv-attach"
+                data-dlv-record={d.id}
+                title="File the delivery record — history and artefact"
+                aria-label={`File the delivery record for ${d.title}`}
+                onClick={() => setRecord(d.id)}
+              >
+                <ClipIcon />
+              </button>
+            </span>
             {editing ? (
               <input
                 type="date"
@@ -196,6 +252,14 @@ export function Deliverables({ stageId }: { stageId: StageId }) {
             Pick a date
           </button>
         </div>
+      )}
+      {open && (
+        <DeliveryRecord
+          key={open.id}
+          stageId={stageId}
+          deliverable={open}
+          onClose={() => setRecord(null)}
+        />
       )}
     </>
   );

@@ -157,6 +157,35 @@ export async function milestoneDate(page: Page, id: string): Promise<string> {
    the current one — so it is matched by prefix rather than pinned. */
 export const tapeoutDate = (page: Page) => milestoneDate(page, 'tapeout');
 
+/**
+ * A deliverable is completed by filing its record, not by ticking a box: the
+ * artefact is what the tick means. Opens the record, writes the history,
+ * attaches the artefact and files it.
+ */
+export async function fileDeliverable(
+  page: Page,
+  title: string,
+  file: string,
+  note = 'Filed by the regression suite.',
+) {
+  await openDeliveryRecord(page, title);
+  if (note) await page.locator('[data-dr-note]').fill(note);
+  await page.locator('.dr-files .att-input').setInputFiles(file);
+  await expect(page.locator('.dr-files .att')).toHaveCount(1);
+  await page.locator('[data-dr-save]').click();
+  await expect(page.locator('.dr-win')).toHaveCount(0);
+}
+
+/** Opens a deliverable's record from the sheet — the title is the way in. */
+export async function openDeliveryRecord(page: Page, title: string) {
+  await page
+    .locator('.stage-panel.selected .dlv-list li')
+    .filter({ hasText: title })
+    .locator('[data-dlv-open]')
+    .click();
+  await expect(page.locator('.dr-win')).toBeVisible();
+}
+
 /** Kickoff is edited where it is drawn: click the diamond, type the date. */
 export async function setKickoffDate(page: Page, iso: string) {
   await page.locator('#rm-gantt .g-kickoff-dot').click();

@@ -27,6 +27,16 @@ const openItem = async (page: Page, title: string) => {
   await expect(page.locator('.iv-title')).toContainText(title);
 };
 
+/**
+ * Reading an entry is not editing it: the files are there to open, and adding
+ * one happens behind Edit with every other change. So attaching to an entry
+ * that already exists goes through the editor.
+ */
+const attachToItem = async (page: Page, files: string | string[]) => {
+  await page.locator('[data-edit]').click();
+  await page.locator('.ie-attach .att-input').setInputFiles(files);
+};
+
 test.beforeEach(async ({ page }) => {
   await page.goto(SEED_PROJECT_PATH);
   await selectStage(page, 'productDefinition');
@@ -37,7 +47,10 @@ test.describe('attaching to an item', () => {
     await openItem(page, 'ECO drop 1 planning');
     await expect(page.locator('.iv-attach .att')).toHaveCount(0);
 
-    await page.locator('.iv-attach .att-input').setInputFiles([PNG, TXT]);
+    await attachToItem(page, [PNG, TXT]);
+    await expect(page.locator('.ie-attach .att')).toHaveCount(2);
+    await page.locator('[data-save]').click();
+
     await expect(page.locator('.iv-attach .att')).toHaveCount(2);
     await expect(page.locator('.iv-attach .att-name')).toHaveText([
       'atlaspm-shot.png',
@@ -55,7 +68,8 @@ test.describe('attaching to an item', () => {
 
   test('an image is served inline and a document is served as a download', async ({ page }) => {
     await openItem(page, 'ECO drop 1 planning');
-    await page.locator('.iv-attach .att-input').setInputFiles([PNG, TXT]);
+    await attachToItem(page, [PNG, TXT]);
+    await page.locator('[data-save]').click();
     await expect(page.locator('.iv-attach .att')).toHaveCount(2);
 
     const imgSrc = (await page.locator('.iv-attach .att-link.img').getAttribute('href'))!;
@@ -82,11 +96,13 @@ test.describe('attaching to an item', () => {
 
   test('removing one takes it off the item for good', async ({ page }) => {
     await openItem(page, 'ECO drop 1 planning');
-    await page.locator('.iv-attach .att-input').setInputFiles([PNG, TXT]);
-    await expect(page.locator('.iv-attach .att')).toHaveCount(2);
+    await attachToItem(page, [PNG, TXT]);
+    await expect(page.locator('.ie-attach .att')).toHaveCount(2);
 
-    await page.locator('.iv-attach .att').first().locator('[data-att-del]').click();
-    await expect(page.locator('.iv-attach .att')).toHaveCount(1);
+    // picked but not yet saved, so it is a pending chip
+    await page.locator('[data-pending-del="0"]').click();
+    await expect(page.locator('.ie-attach .att')).toHaveCount(1);
+    await page.locator('[data-save]').click();
     await expect(page.locator('.iv-attach .att-name')).toHaveText(['atlaspm-spec.txt']);
 
     await page.reload();
@@ -96,9 +112,9 @@ test.describe('attaching to an item', () => {
 
   test('a file over the ceiling is refused, with a reason', async ({ page }) => {
     await openItem(page, 'ECO drop 1 planning');
-    await page.locator('.iv-attach .att-input').setInputFiles([BIG]);
-    await expect(page.locator('.att-problems li')).toContainText('over 5 MB');
-    await expect(page.locator('.iv-attach .att')).toHaveCount(0);
+    await attachToItem(page, [BIG]);
+    await expect(page.locator('[data-form-error]')).toContainText('over 5 MB');
+    await expect(page.locator('.ie-attach .att')).toHaveCount(0);
   });
 });
 
@@ -158,7 +174,8 @@ test.describe('attaching while writing the item', () => {
 
   test('an existing item shows its attachments in the editor', async ({ page }) => {
     await openItem(page, 'ECO drop 1 planning');
-    await page.locator('.iv-attach .att-input').setInputFiles(TXT);
+    await attachToItem(page, TXT);
+    await page.locator('[data-save]').click();
     await expect(page.locator('.iv-attach .att')).toHaveCount(1);
 
     await page.locator('[data-edit]').click();
@@ -195,8 +212,14 @@ test.describe('attaching to a status update', () => {
     const first = page.locator('.su-item').first();
     await expect(first.locator('.att')).toHaveCount(0);
 
-    await first.locator('.att-input').setInputFiles(TXT);
-    await expect(first.locator('.att')).toHaveCount(1);
+    // an update's files change under its own Edit, for the same reason
+    const id = (await first.locator('[data-su-edit]').getAttribute('data-su-edit'))!;
+    await first.locator('[data-su-edit]').click();
+    const editing = page.locator('.su-edit-form').first();
+    await editing.locator('.att-input').setInputFiles(TXT);
+    await expect(editing.locator('.att')).toHaveCount(1);
+    await page.locator(`[data-su-save="${id}"]`).click();
+    await expect(page.locator('.su-item').first().locator('.att')).toHaveCount(1);
 
     await page.reload();
     await openItem(page, 'Top-level detailed routing');

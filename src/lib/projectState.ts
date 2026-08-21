@@ -97,6 +97,8 @@ interface DeliverableRow {
   due: Date | null;
   done: boolean;
   completedAt: Date | null;
+  note: string;
+  attachments?: AttachmentRow[];
 }
 interface LeaderRow {
   stageId: string;
@@ -203,6 +205,8 @@ export function buildProjectState(project: {
       due: d.due,
       done: d.done,
       completedAt: d.completedAt,
+      note: d.note ?? '',
+      attachments: d.attachments ?? [],
     });
   }
 

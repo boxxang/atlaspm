@@ -1,4 +1,18 @@
-import { expect, test, type Page, SEED_PROJECT_PATH, selectStage } from './fixtures';
+import { writeFileSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
+import {
+  expect,
+  test,
+  type Page,
+  SEED_PROJECT_PATH,
+  selectStage,
+  fileDeliverable,
+} from './fixtures';
+
+/** An artefact to file against a deliverable — any real file will do. */
+const ARTEFACT = join(tmpdir(), 'atlaspm-artefact.txt');
+writeFileSync(ARTEFACT, 'Signed off; report attached.');
 
 /**
  * The envelope buttons are real mailto links, so the assertions read the href
@@ -58,11 +72,7 @@ test.describe('dashboard summary export', () => {
 
   test('it tracks the data — checking a deliverable moves the summary', async ({ page }) => {
     await selectStage(page, 'physicalDesign');
-    await page
-      .locator('.stage-panel.selected .dlv-list li')
-      .nth(5) // the first one still open
-      .locator('input[type="checkbox"]')
-      .check();
+    await fileDeliverable(page, 'Interim physical DRC', ARTEFACT);
     await page.locator('#mode-toggle button[data-mode="schedule"]').click();
     const m = await draft(page, '.dash-title-row [data-mail]');
     expect(m.body).toContain('58%  (97 of 167 deliverables)');

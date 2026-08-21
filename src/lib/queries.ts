@@ -28,7 +28,10 @@ export async function getProjectState(projectId: string): Promise<ProjectState |
           attachments: { select: ATTACHMENT_META },
         },
       },
-      deliverables: { orderBy: { position: 'asc' } },
+      deliverables: {
+        orderBy: { position: 'asc' },
+        include: { attachments: { select: ATTACHMENT_META } },
+      },
       contacts: { orderBy: { position: 'asc' } },
       stageDetails: true,
     },

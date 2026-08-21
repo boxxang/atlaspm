@@ -58,6 +58,12 @@ function StatusUpdates({
                   autoFocus
                   onChange={(e) => setEdit(e.target.value)}
                 />
+                {/* attaching belongs to editing — see the note on .iv-attach */}
+                <AttachmentList files={u.attachments} onRemove={(id) => onDetach(id, u.id)} />
+                <AttachmentPicker
+                  label="Attach"
+                  onPick={async (files) => setProblems(await onAttach(files, u.id))}
+                />
               </span>
               <span className="su-acts" style={{ opacity: 1 }}>
                 <button data-su-save={u.id} onClick={() => onSave(u.id, edit.trim())}>
@@ -75,11 +81,7 @@ function StatusUpdates({
                   beside it rather than inside it */}
               <span className="su-body">
                 <span className="su-text">{u.text}</span>
-                <AttachmentList files={u.attachments} onRemove={(id) => onDetach(id, u.id)} />
-                <AttachmentPicker
-                  label="Attach"
-                  onPick={async (files) => setProblems(await onAttach(files, u.id))}
-                />
+                <AttachmentList files={u.attachments} />
               </span>
               <span className="su-acts">
                 <button
@@ -178,7 +180,6 @@ export function ItemView({
   const projectName = useAppStore((s) => s.projectName);
   const stages = useAppStore((s) => s.stages);
   const dir = useDirectory();
-  const [attachProblems, setAttachProblems] = useState<string[]>([]);
   const label = KIND_LABELS[kind];
   const dueOver = !!item.due && item.due < today;
 
@@ -204,10 +205,11 @@ export function ItemView({
       <p className={`iv-body${item.body ? '' : ' empty'}`}>
         {item.body || 'No details recorded yet.'}
       </p>
+      {/* Reading an entry is not editing it: the files are here to open, and
+          adding or removing one happens behind the Edit button below, with
+          every other change to the entry. */}
       <div className="iv-attach">
-        <AttachmentList files={item.attachments} onRemove={(id) => onDetach(id)} />
-        <AttachmentPicker onPick={async (files) => setAttachProblems(await onAttach(files))} />
-        <AttachmentProblems problems={attachProblems} />
+        <AttachmentList files={item.attachments} />
       </div>
       <div className="iv-actions">
         <button data-edit onClick={onEdit}>

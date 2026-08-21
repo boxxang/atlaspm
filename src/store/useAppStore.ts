@@ -86,6 +86,11 @@ export interface AppState {
 
   toggleDeliverable: (stageId: StageId, id: string, done: boolean) => void;
   setDeliverableDue: (stageId: StageId, id: string, due: Date | null) => void;
+  /** Files the record; the tick follows whether an artefact is attached. */
+  saveDeliverableRecord: (stageId: StageId, id: string, note: string) => void;
+  /** Uploads artefacts; resolves with what the server refused, if anything. */
+  attachToDeliverable: (stageId: StageId, id: string, files: FileList | File[]) => Promise<string[]>;
+  detachFromDeliverable: (stageId: StageId, id: string, attachmentId: string) => void;
   /** Corrects the stamp the checkbox wrote — see setDeliverableCompleted. */
   setDeliverableCompleted: (stageId: StageId, id: string, completedAt: Date | null) => void;
   addDeliverable: (stageId: StageId, title: string, due: Date | null) => void;
@@ -417,11 +422,91 @@ export const useAppStore = create<AppState>()((set, get) => ({
         ...s.deliverables,
         [stageId]: [
           ...s.deliverables[stageId],
-          { id, title, done: false, due, completedAt: null },
+          { id, title, done: false, due, completedAt: null, note: '', attachments: [] },
         ],
       },
     }));
     sync(api.addDeliverable({ projectId: get().projectId, id, stageId, title, due }));
+  },
+
+  /**
+   * Files a deliverable's record: the development history, and the artefact
+   * that came out of it.
+   *
+   * The tick follows the artefact. Ticking a box says a thing was done; an
+   * attached file is the thing, which is why a deliverable is now marked
+   * complete by filing rather than by clicking. Filing a record with nothing
+   * attached clears the tick again — that is the same rule, read backwards.
+   */
+  saveDeliverableRecord: (stageId, id, note) => {
+    const d = get().deliverables[stageId]?.find((x) => x.id === id);
+    if (!d) return;
+    const done = d.attachments.length > 0;
+    const completedAt = done ? (d.completedAt ?? new Date()) : null;
+    set((s) => ({
+      deliverables: {
+        ...s.deliverables,
+        [stageId]: s.deliverables[stageId].map((x) =>
+          x.id === id ? { ...x, note, done, completedAt } : x,
+        ),
+      },
+    }));
+    sync(api.saveDeliverableRecord(get().projectId, id, note, done, completedAt));
+  },
+
+  /**
+   * The artefact itself. Like the board's attachments this waits for the
+   * bytes to land before the chip means anything, and returns whatever the
+   * server refused.
+   */
+  attachToDeliverable: async (stageId, id, files) => {
+    const d = get().deliverables[stageId]?.find((x) => x.id === id);
+    if (!d) return ['That deliverable is no longer here.'];
+    const accepted: File[] = [];
+    const problems: string[] = [];
+    for (const file of files) {
+      const reason = rejectFile(file, d.attachments.length + accepted.length);
+      if (reason) problems.push(rejectionMessage(reason, file.name));
+      else accepted.push(file);
+    }
+    if (!accepted.length) return problems;
+
+    const form = new FormData();
+    form.set('projectId', get().projectId);
+    form.set('deliverableId', id);
+    for (const file of accepted) {
+      form.append('files', file);
+      form.append('ids', uid());
+    }
+    try {
+      const saved = await api.uploadAttachments(form);
+      set((s) => ({
+        deliverables: {
+          ...s.deliverables,
+          [stageId]: s.deliverables[stageId].map((x) =>
+            x.id === id ? { ...x, attachments: [...x.attachments, ...saved] } : x,
+          ),
+        },
+      }));
+    } catch (e) {
+      console.error('[atlaspm] deliverable attachment upload failed', e);
+      problems.push('Upload failed — the files were not attached.');
+    }
+    return problems;
+  },
+
+  detachFromDeliverable: (stageId, id, attachmentId) => {
+    set((s) => ({
+      deliverables: {
+        ...s.deliverables,
+        [stageId]: s.deliverables[stageId].map((x) =>
+          x.id === id
+            ? { ...x, attachments: x.attachments.filter((a) => a.id !== attachmentId) }
+            : x,
+        ),
+      },
+    }));
+    sync(api.deleteAttachment(get().projectId, attachmentId));
   },
 
   deleteDeliverable: (stageId, id) => {

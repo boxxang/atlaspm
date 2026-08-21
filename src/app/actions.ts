@@ -575,7 +575,9 @@ export async function uploadAttachments(form: FormData): Promise<AttachmentMeta[
   const projectId = String(form.get('projectId') ?? '');
   const itemId = String(form.get('itemId') ?? '') || null;
   const statusUpdateId = String(form.get('statusUpdateId') ?? '') || null;
-  if (!itemId && !statusUpdateId) throw new Error('An attachment needs an item or an update.');
+  const deliverableId = String(form.get('deliverableId') ?? '') || null;
+  if (!itemId && !statusUpdateId && !deliverableId)
+    throw new Error('An attachment needs an item, an update or a deliverable.');
   await assertProject(projectId);
 
   const ids = form.getAll('ids').map(String);
@@ -597,6 +599,7 @@ export async function uploadAttachments(form: FormData): Promise<AttachmentMeta[
         ...meta,
         itemId,
         statusUpdateId,
+        deliverableId,
         data: Buffer.from(await file.arrayBuffer()),
         createdAt: new Date(),
       },
@@ -605,6 +608,22 @@ export async function uploadAttachments(form: FormData): Promise<AttachmentMeta[
   }
   touch(projectId);
   return saved;
+}
+
+/**
+ * A deliverable's record: its development history, and the tick that follows
+ * from whether an artefact is attached to it.
+ */
+export async function saveDeliverableRecord(
+  projectId: string,
+  id: string,
+  note: string,
+  done: boolean,
+  completedAt: Date | null,
+) {
+  await assertProject(projectId);
+  await prisma.deliverable.update({ where: { id }, data: { note, done, completedAt } });
+  touch(projectId);
 }
 
 export async function deleteAttachment(projectId: string, id: string) {

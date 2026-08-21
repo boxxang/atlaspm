@@ -7,6 +7,7 @@ import { buildDirectory, resolveEmail } from '@/lib/people';
 import { fmtDT, fmtDate } from '@/lib/schedule';
 import { sortedItems, useAppStore } from '@/store/useAppStore';
 import { useWrapped } from '@/store/wrapStore';
+import { ClipBadge } from './Attachments';
 import { ColGrip } from './ColGrip';
 import { MailButton } from './MailButton';
 import { WrapToggle } from './WrapToggle';
@@ -64,6 +65,12 @@ export function BoardRow({
       <span className="b-title">
         {stageTag && <span className="b-stage">{stageTag}</span>}
         <span className="t">{it.title}</span>
+        {/* An entry with files says so on the board, so nobody has to open
+            each one to find where the evidence was filed. Updates count: a
+            report attached to an update belongs to the entry it is under. */}
+        <ClipBadge
+          count={it.attachments.length + it.updates.reduce((n, u) => n + u.attachments.length, 0)}
+        />
         {mailStageId && (
           <MailButton
             className="mail-btn icon"

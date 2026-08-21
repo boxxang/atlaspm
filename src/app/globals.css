@@ -39,8 +39,8 @@
   /* Deliverables: the title takes what the two date columns do not need, and
      they need one line of MM/DD/YYYY and no more — the clock was dropped from
      both, since what a review asks is which day, not which minute. */
-  --dlv-due:5.6rem;          /* deliverables table columns */
-  --dlv-comp:5.6rem;
+  --dlv-due:5rem;            /* deliverables table columns */
+  --dlv-comp:5rem;
   --mm-tat:3.1rem;           /* engineering table's two number columns */
   --mm-mm:3.1rem;
   /* layout */
@@ -625,7 +625,7 @@ body.col-resizing{user-select:none;cursor:col-resize}
 /* The two tables are read side by side, so they end on the same line: each
    column is a flex stack and the list inside it takes up the slack, scrolling
    when its own content runs past the taller column. */
-.sheet-grid{display:grid;grid-template-columns:1.2fr 1fr;gap:44px;align-items:stretch}
+.sheet-grid{display:grid;grid-template-columns:1fr 1fr;gap:44px;align-items:stretch}
 .sheet-grid>*{display:flex;flex-direction:column;min-height:0}
 .view-pane{flex:1;display:flex;flex-direction:column;min-height:0}
 .view-pane[hidden]{display:none}
@@ -662,7 +662,22 @@ body.col-resizing{user-select:none;cursor:col-resize}
 }
 .dlv-cols>span{position:relative}
 .dlv-list li{display:grid;grid-template-columns:var(--row-id-w) minmax(0,1fr) var(--dlv-due) var(--dlv-comp) 2.2rem;gap:10px;align-items:center;padding:5px 0!important;border-bottom:1px solid var(--line)}
-.dlv-list label{display:flex;gap:10px;align-items:center;cursor:pointer;min-width:0}
+.dlv-cell{display:flex;gap:8px;align-items:center;min-width:0}
+/* the title opens the record — it is the way into what was delivered */
+.dlv-list .dlv-t{
+  text-align:left;min-width:0;color:inherit;
+  border-bottom:1px solid transparent;transition:border-color .15s,color .15s;
+}
+.dlv-list .dlv-t:hover,.dlv-list .dlv-t:focus-visible{color:var(--accent);border-bottom-color:var(--accent);outline:none}
+/* the paperclip that files the record: quiet until the row is under the eye */
+.dlv-attach{
+  flex:none;width:19px;height:19px;display:inline-flex;align-items:center;justify-content:center;
+  color:var(--ink-3);border:1px solid transparent;border-radius:3px;
+  opacity:0;transition:opacity .15s,color .15s,border-color .15s;
+}
+.dlv-attach svg{width:12px;height:12px}
+.dlv-list li:hover .dlv-attach,.dlv-list li:focus-within .dlv-attach{opacity:1}
+.dlv-attach:hover,.dlv-attach:focus-visible{color:var(--accent);border-color:var(--accent);outline:none}
 .dlv-list .dlv-due{
   border:none;border-bottom:1px dashed var(--line-strong);background:none;
   font-family:var(--mono);font-size:.72em;padding:1px 0;width:100%;color:var(--ink-2);
@@ -1546,6 +1561,55 @@ body.schedule-mode #schedule-view{opacity:1;visibility:visible;transform:none}
 }
 .tbl-edit:hover,.tbl-edit:focus-visible{color:var(--ink);border-color:var(--ink-3)}
 .tbl-edit[aria-pressed="true"]{background:var(--ink);color:var(--page);border-color:var(--ink)}
+
+/* A clip beside a title: this one carries files. It stays visible — unlike
+   the paperclip that files a record, it is information rather than a control. */
+.clip-badge{
+  display:inline-flex;align-items:center;gap:1px;flex:none;
+  color:var(--accent);font-family:var(--mono);font-size:.62em;
+}
+.clip-badge svg{width:11px;height:11px}
+.dlv-clip{flex:none;display:inline-flex;padding:1px 2px;border-radius:3px}
+.dlv-clip:hover,.dlv-clip:focus-visible{background:var(--accent-soft);outline:none}
+
+/* ============================================================
+   DELIVERY RECORD — how a deliverable came to be, and the thing itself
+   ============================================================ */
+.dr-scrim{position:fixed;inset:0;z-index:200;background:rgba(20,20,18,.28)}
+.dr-win{
+  position:fixed;z-index:201;top:50%;left:50%;transform:translate(-50%,-50%);
+  width:min(620px,calc(100vw - 48px));max-height:min(84vh,760px);overflow-y:auto;
+  display:flex;flex-direction:column;gap:10px;
+  background:var(--surface);border:1px solid var(--line-strong);border-radius:6px;
+  padding:20px 24px 18px;box-shadow:0 18px 60px rgba(20,20,18,.22);
+}
+.dr-head{display:flex;align-items:center;gap:12px}
+.dr-head .spacer{flex:1}
+.dr-close{
+  font-family:var(--mono);font-size:.62em;letter-spacing:.12em;color:var(--ink-3);
+  border:1px solid var(--line);border-radius:3px;padding:3px 9px;
+}
+.dr-close:hover,.dr-close:focus-visible{color:var(--ink);border-color:var(--ink-3)}
+.dr-title{font-size:1.15em;font-weight:700;color:var(--ink);margin:0}
+.dr-meta{display:flex;gap:14px;font-family:var(--mono);font-size:.72em;color:var(--ink-3)}
+.dr-meta .dr-done{color:var(--accent);font-weight:700}
+.dr-label{
+  font-size:.58em;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-3);
+  margin-top:6px;
+}
+.dr-note{
+  border:1px solid var(--line);border-radius:4px;background:var(--page);
+  padding:9px 11px;font-size:.92em;color:var(--ink-2);line-height:1.55;resize:vertical;
+}
+.dr-note:focus-visible{outline:none;border-color:var(--accent)}
+.dr-files{display:flex;flex-direction:column;gap:8px;align-items:flex-start;margin-top:6px}
+.dr-files .cap{font-size:.58em;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-3)}
+.dr-files .att-list{width:100%}
+.dr-hint{font-size:.76em;color:var(--ink-3);margin:0}
+.dr-foot{display:flex;align-items:center;gap:10px;margin-top:10px;padding-top:12px;border-top:1px solid var(--line)}
+.dr-foot .dr-hint{flex:1}
+.board-btn.primary{border-style:solid;color:var(--accent);border-color:var(--accent)}
+.board-btn.primary:hover,.board-btn.primary:focus-visible{background:var(--accent);color:var(--page)}
 
 /* A deliverable with no date is allowed, but asked about first. */
 .dlv-tbd{

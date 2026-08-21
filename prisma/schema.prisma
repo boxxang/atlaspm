@@ -145,17 +145,21 @@ model Attachment {
   id             String   @id
   itemId         String?
   statusUpdateId String?
+  /// A deliverable's artefact — what makes it a delivered deliverable.
+  deliverableId  String?
   filename       String
   mimeType       String
   size           Int
   data           Bytes
   createdAt      DateTime
 
-  item   Item?         @relation(fields: [itemId], references: [id], onDelete: Cascade)
-  update StatusUpdate? @relation(fields: [statusUpdateId], references: [id], onDelete: Cascade)
+  item        Item?         @relation(fields: [itemId], references: [id], onDelete: Cascade)
+  update      StatusUpdate? @relation(fields: [statusUpdateId], references: [id], onDelete: Cascade)
+  deliverable Deliverable?  @relation(fields: [deliverableId], references: [id], onDelete: Cascade)
 
   @@index([itemId])
   @@index([statusUpdateId])
+  @@index([deliverableId])
 }
 
 model Deliverable {
@@ -166,10 +170,14 @@ model Deliverable {
   due         DateTime?
   done        Boolean   @default(false)
   completedAt DateTime?
+  /// How the thing came to be: the development history written when it was
+  /// filed. Kept beside the artefact, because neither is much use alone.
+  note        String    @default("")
   /// Preserves seed / insertion order within a stage.
   position    Int
 
-  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  project     Project      @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  attachments Attachment[]
 
   @@index([projectId, stageId])
 }

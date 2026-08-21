@@ -176,8 +176,20 @@ Pure logic never imports UI, and `/src/lib` + `/src/data` never touch the DOM �
 - **Checkpoint labels.** On the dashboard each milestone label sits past the end
   of its bar, beside its diamond, with an arrow pointing back at it — so a label
   never lies over the schedule it annotates, at any row height.
+- **The delivery record.** A key deliverable is not completed by ticking a box:
+  ticking says a thing was done, and the artefact *is* the thing. Its record —
+  the development history, and the file that came out of it — is filed from the
+  paperclip beside its title, and the tick follows whether an artefact is
+  attached. Filing one with nothing attached leaves it open; removing the last
+  artefact re-opens it. Seeded completions predate the record and keep their
+  tick; the rule governs what is filed from here on. A completed row carries a
+  clip that opens its artefact straight from the page, and its title reads the
+  record back — months later the question is never "was it ticked" but "what
+  was delivered, and what happened on the way".
 - **Attachments.** Files and images attach while an item is being written, to
-  an item that already exists, or to a status update.
+  an item that already exists (behind its Edit button, with every other change
+  to the entry), or to a status update. An entry that carries files says so on
+  the board with a clip beside its title.
   Bytes live in the database (`Attachment.data`), because the documented deploy
   target has a read-only filesystem and `Bytes` maps to BLOB on SQLite and
   bytea on Postgres. That caps a file at 5 MB — moving to object storage means

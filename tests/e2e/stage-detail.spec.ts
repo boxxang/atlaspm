@@ -1,3 +1,6 @@
+import { writeFileSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
 import { journeyData } from '../../src/data/journey';
 import {
   expect,
@@ -8,7 +11,12 @@ import {
   editEngineering,
   editDeliverables,
   settleLayout,
+  fileDeliverable,
 } from './fixtures';
+
+/** An artefact to file against a deliverable — any real file will do. */
+const ARTEFACT = join(tmpdir(), 'atlaspm-artefact.txt');
+writeFileSync(ARTEFACT, 'Signed off; report attached.');
 
 /**
  * Stage definitions live in code and are shared by every program. A program
@@ -43,15 +51,17 @@ test.describe('read mode versus edit mode', () => {
     await expect(panel(page).locator('[data-dlv-del]')).toHaveCount(0);
     await expect(panel(page).locator('.dlv-add')).toHaveCount(0);
 
-    /* …but ticking one off is day-to-day work, not editing. Only ticking:
-       once a deliverable is closed the box locks, because undoing it is a
-       correction to a record rather than a day's work. */
+    /* The tick is not a control at all now: it reads the record's state, and
+       pressing it opens the record — where the artefact that makes it true
+       is filed. So there is nothing on this table to toggle. */
     await expect(panel(page).locator('.dlv-list input[type="checkbox"]')).toHaveCount(6);
-    await expect(panel(page).locator('.dlv-list input[type="checkbox"]').first()).toBeDisabled();
-    await selectStage(page, 'physicalDesign');
-    const boxes = panel(page).locator('.dlv-list input[type="checkbox"]');
-    await expect(boxes.first()).toBeDisabled(); // closed
-    await expect(boxes.last()).toBeEnabled(); // still open
+    await expect(panel(page).locator('.dlv-list input[type="checkbox"]').first()).toHaveJSProperty(
+      'readOnly',
+      true,
+    );
+    // and every row offers the way in, closed or open
+    await expect(panel(page).locator('[data-dlv-record]')).toHaveCount(6);
+    await expect(panel(page).locator('[data-dlv-open]')).toHaveCount(6);
   });
 
   test('each table has its own switch — the text, the list and the deliverables', async ({
@@ -154,17 +164,17 @@ test.describe('read mode versus edit mode', () => {
     expect(lists[0]).toBe(lists[1]);
   });
 
-  test('the completion date is the checkbox stamp, and edit mode corrects it', async ({
+  test('the completion date is the filing stamp, and edit mode corrects it', async ({
     page,
   }) => {
-    /* Product Definition's are all closed in the seed, so tick one off from a
+    /* Product Definition's are all closed in the seed, so file one from a
        stage that is still running. */
     await selectStage(page, 'physicalDesign');
     const row = panel(page).locator('.dlv-list li').filter({ hasText: 'Bump map' });
     await expect(row.locator('.dlv-comp')).toHaveText('—');
 
-    // ticking it stamps today
-    await row.locator('input[type="checkbox"]').check();
+    // filing its record stamps today
+    await fileDeliverable(page, 'Bump map', ARTEFACT);
     const today = new Date();
     const p2 = (n: number) => String(n).padStart(2, '0');
     const iso = `${today.getFullYear()}-${p2(today.getMonth() + 1)}-${p2(today.getDate())}`;

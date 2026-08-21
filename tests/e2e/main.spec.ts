@@ -1,3 +1,6 @@
+import { writeFileSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
 import { STAGE_ORDER, scheduleProfiles } from '../../src/data/scheduleProfiles';
 import { computeSchedule, startOfDay } from '../../src/lib/schedule';
 import {
@@ -9,6 +12,8 @@ import {
   editDeliverables,
   settleLayout,
   tapeoutDate,
+  fileDeliverable,
+  openDeliveryRecord,
 } from './fixtures';
 
 const cssVar = (page: Page, name: string) =>
@@ -18,6 +23,10 @@ const cssVar = (page: Page, name: string) =>
   );
 
 const selectedPanel = (page: Page) => page.locator('.stage-panel.selected');
+
+/** An artefact to file against a deliverable — any real file will do. */
+const TXT = join(tmpdir(), 'atlaspm-deliverable.txt');
+writeFileSync(TXT, 'Signed off; report attached.');
 
 
 /** MM/DD/YYYY → Date at local midnight, so day arithmetic survives DST. */
@@ -506,27 +515,42 @@ test.describe('stage details', () => {
     await expect(panel.locator('[data-pane="prog"] .view-foot .mono')).toContainText('Product');
   });
 
-  test('checking a deliverable stamps completedAt and updates the counter', async ({
+  test('filing a record completes the deliverable, and the artefact is the tick', async ({
     page,
   }) => {
     await selectStage(page, 'physicalDesign');
     const panel = selectedPanel(page);
     await expect(panel.locator('.dlv-note')).toHaveText('5 / 9 complete');
 
-    const row = panel.locator('.dlv-list li').nth(5); // Interim DRC / LVS — open
+    const row = panel.locator('.dlv-list li').filter({ hasText: 'Interim physical DRC' });
     await expect(row.locator('.dlv-comp')).toHaveText('—');
-    await row.locator('input[type="checkbox"]').check();
+    // the box is a read-out, not a control: pressing it opens the record
+    await expect(row.locator('input[type="checkbox"]')).not.toBeChecked();
+    await row.locator('input[type="checkbox"]').click();
+    await expect(page.locator('.dr-win')).toBeVisible();
+    // and says so, rather than quietly doing nothing
+    await expect(page.locator('[data-dr-empty]')).toContainText('marked complete by its artefact');
+    await page.locator('[data-dr-cancel]').click();
+    await expect(row.locator('input[type="checkbox"]')).not.toBeChecked();
 
+    await fileDeliverable(page, 'Interim physical DRC', TXT, 'DRC clean on the N2 drop.');
+
+    await expect(row.locator('input[type="checkbox"]')).toBeChecked();
     await expect(row.locator('.dlv-comp')).toHaveText(/^\d{2}\/\d{2}\/\d{4}$/);
     await expect(row.locator('.dlv-t')).toHaveClass(/done/);
     await expect(panel.locator('.dlv-note')).toHaveText('6 / 9 complete');
+    // and the row says it carries a file, without opening anything
+    await expect(row.locator('.clip-badge')).toBeVisible();
 
-    /* Ticked, the box locks: undoing a completion is a correction to the
-       record, and corrections are made in edit mode. */
-    await expect(row.locator('input[type="checkbox"]')).toBeDisabled();
-    await editDeliverables(page);
-    await row.locator('input[type="checkbox"]').uncheck();
-    await editDeliverables(page, false);
+    // the record reads back — which is the other half of filing one
+    await openDeliveryRecord(page, 'Interim physical DRC');
+    await expect(page.locator('[data-dr-note]')).toHaveValue('DRC clean on the N2 drop.');
+    await expect(page.locator('.dr-files .att-name')).toHaveText('atlaspm-deliverable.txt');
+
+    // taking the artefact away takes the tick with it
+    await page.locator('.dr-files [data-att-del]').click();
+    await page.locator('[data-dr-save]').click();
+    await expect(row.locator('input[type="checkbox"]')).not.toBeChecked();
     await expect(row.locator('.dlv-comp')).toHaveText('—');
     await expect(panel.locator('.dlv-note')).toHaveText('5 / 9 complete');
   });
@@ -901,10 +925,10 @@ test.describe('marks tell past from future', () => {
     page,
   }) => {
     await selectStage(page, 'physicalDesign');
+    await fileDeliverable(page, 'Bump map', TXT);
     const row = selectedPanel(page)
       .locator('.dlv-list li')
       .filter({ hasText: 'Bump map' });
-    await row.locator('input[type="checkbox"]').check();
     await expect(row.locator('.dlv-comp')).not.toHaveText('—');
 
     const box = (await page.locator('#roadmap').boundingBox())!;

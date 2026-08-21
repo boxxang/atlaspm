@@ -155,9 +155,17 @@ export type StageContent = Record<ItemKind, Item[]>;
 export interface Deliverable {
   id: string;
   title: string;
+  /**
+   * Complete because the artefact is here, not because someone said so: this
+   * follows `attachments` once a delivery record has been filed against it.
+   */
   done: boolean;
   due: Date | null;
   completedAt: Date | null;
+  /** The delivery record's development history. Empty until one is filed. */
+  note: string;
+  /** The artefact itself — what makes the deliverable delivered. */
+  attachments: AttachmentRef[];
 }
 
 export interface Contact {

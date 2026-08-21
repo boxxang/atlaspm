@@ -62,8 +62,14 @@ export async function seedProject(prisma: PrismaClient, now = new Date()): Promi
         ),
       },
       deliverables: {
+        /* attachments are rows of their own, and a seeded deliverable has
+           none — its record has not been filed */
         create: STAGE_ORDER.flatMap((stageId) =>
-          seed.deliverables[stageId].map((d, position) => ({ ...d, stageId, position })),
+          seed.deliverables[stageId].map(({ attachments: _a, ...d }, position) => ({
+            ...d,
+            stageId,
+            position,
+          })),
         ),
       },
     },

@@ -141,7 +141,10 @@ export function createProjectSeed({
         c.setHours(16, 30, 0, 0);
         completedAt = c;
       }
-      return { id: uid(), title, done, due, completedAt };
+      /* Seeded completions predate the delivery record — they are history,
+         not filings. The rule that a tick needs an artefact applies to what
+         is filed from here on; see saveDeliverableRecord. */
+      return { id: uid(), title, done, due, completedAt, note: '', attachments: [] };
     });
   };
 

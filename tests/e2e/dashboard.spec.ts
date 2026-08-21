@@ -1,3 +1,6 @@
+import { writeFileSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
 import {
   expect,
   test,
@@ -6,7 +9,12 @@ import {
   selectStage,
   tapeoutDate,
   settleLayout,
+  fileDeliverable,
 } from './fixtures';
+
+/** An artefact to file against a deliverable — any real file will do. */
+const ARTEFACT = join(tmpdir(), 'atlaspm-artefact.txt');
+writeFileSync(ARTEFACT, 'Signed off; report attached.');
 
 const openDash = async (page: Page) => {
   await page.locator('#mode-toggle button[data-mode="schedule"]').click();
@@ -67,10 +75,9 @@ test.describe('stat tiles', () => {
     /* Tick one more deliverable off and the tile counts it: 96 of 167 → 97,
        which is still 58% of the way through. */
     await selectStage(page, 'physicalDesign');
-    const panel = page.locator('.stage-panel.selected');
     await settleLayout(page); // the sheet animates in
-    const open = panel.locator('.dlv-list li').filter({ hasNot: page.locator(':checked') }).first();
-    await open.locator('input[type="checkbox"]').check();
+    /* Completing one means filing its record — the artefact is the tick. */
+    await fileDeliverable(page, 'Interim physical DRC', ARTEFACT);
     await openDash(page);
     await expect(stat(page, 'Program Progress').locator('.sub')).toHaveText(
       '97 of 167 deliverables complete',

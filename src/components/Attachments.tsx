@@ -109,7 +109,21 @@ export function AttachmentProblems({ problems }: { problems: string[] }) {
   );
 }
 
-function ClipIcon() {
+/**
+ * A clip beside a title: this carries files. It says how many, so a record
+ * with three attachments is not read as a record with one.
+ */
+export function ClipBadge({ count, ...rest }: { count: number } & React.ComponentProps<'span'>) {
+  if (!count) return null;
+  return (
+    <span className="clip-badge" data-clip={count} aria-hidden="true" {...rest}>
+      <ClipIcon />
+      {count > 1 && <span className="n">{count}</span>}
+    </span>
+  );
+}
+
+export function ClipIcon() {
   return (
     <svg
       viewBox="0 0 24 24"
