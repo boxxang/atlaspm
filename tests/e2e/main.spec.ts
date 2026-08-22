@@ -832,8 +832,18 @@ test.describe('the folded chart carries its dates', () => {
     const first = marks.filter({ hasText: 'Flow setup release' });
     await expect(first.locator('.g-dlv-date')).toHaveText(/^\d{1,2}\/\d{1,2}$/);
     await expect(first).toHaveClass(/done/);
-    // an open one still shows what it is due
-    await expect(marks.filter({ hasText: 'ECO log' }).locator('.g-dlv-date')).toHaveText('10/16');
+    /* An open one still shows what it is due — read off the sheet below
+       rather than written down here: the seed is dated from today, so a date
+       hardcoded in a test is a date that is right until tomorrow. */
+    const dueOnSheet = (await selectedPanel(page)
+      .locator('.dlv-list li')
+      .filter({ hasText: 'ECO log' })
+      .locator('[data-dlv-due-text]')
+      .textContent())!;
+    const [mm, dd] = dueOnSheet.split('/');
+    await expect(marks.filter({ hasText: 'ECO log' }).locator('.g-dlv-date')).toHaveText(
+      `${Number(mm)}/${Number(dd)}`,
+    );
 
     // markers are placed by date: later date, further right
     const xs = await marks.evaluateAll((els) =>

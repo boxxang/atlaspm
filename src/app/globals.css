@@ -685,11 +685,16 @@ body.col-resizing{user-select:none;cursor:col-resize}
    column is a flex stack and the list inside it takes up the slack, scrolling
    when its own content runs past the taller column. */
 .sheet-grid{display:grid;grid-template-columns:1fr 1fr;gap:0 44px;align-items:stretch}
-/* Three rows, not two columns of stacks: the headers line up on the first,
-   the timeline spans the second when it is open, and the two tables share the
-   third — which is what keeps them the same height whatever sits above. */
-.sh-head{grid-row:1}
-.sh-chart{grid-row:2;grid-column:1 / -1}
+/* Three rows, not two columns of stacks: the timeline spans the first when it
+   is open, the headers line up on the second, and the two tables share the
+   third — which is what keeps them the same height whatever sits above.
+
+   The headers sit under the chart rather than over it because they title the
+   tables, not the timeline: a column heading belongs against the column it
+   heads. With the chart closed the first row has nothing in it and collapses,
+   so the sheet reads exactly as it did before. */
+.sh-chart{grid-row:1;grid-column:1 / -1}
+.sh-head{grid-row:2}
 .sh-body{grid-row:3;display:flex;flex-direction:column;min-height:0}
 .sh-l{grid-column:1}
 .sh-r{grid-column:2}

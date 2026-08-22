@@ -288,7 +288,7 @@ that is a read/write swap rather than a redesign.
 
 ```bash
 npm test          # 171 unit tests: schedule engine, stages/profiles, derivations, effort, mail, purity
-npm run e2e       # 258 Playwright tests
+npm run e2e       # 257 Playwright tests
 ```
 
 The e2e suite runs against its own database (`test.db`) on port 3100, so it never

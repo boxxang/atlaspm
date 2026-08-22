@@ -14,7 +14,7 @@ test.beforeEach(async ({ page }) => {
 });
 
 test.describe('the stage timeline', () => {
-  test('opens from its own switch, between the switch and the table', async ({ page }) => {
+  test('opens from its own switch, above the headers and the tables', async ({ page }) => {
     await expect(page.locator('[data-stage-gantt]')).toHaveCount(0);
 
     const btn = page.locator(`${panel} [data-stage-chart]`);
@@ -33,11 +33,14 @@ test.describe('the stage timeline', () => {
     const gantt = page.locator('[data-stage-gantt]');
     await expect(gantt).toBeVisible();
 
-    // between the head it opened from and the table it belongs to
-    const head = (await page.locator(`${panel} .sheet-head`).first().boundingBox())!;
+    /* Above both header rows, which title the tables rather than the
+       timeline: a column heading belongs against the column it heads. */
     const box = (await gantt.boundingBox())!;
+    for (const head of await page.locator(`${panel} .sheet-head`).all()) {
+      const h = (await head.boundingBox())!;
+      expect(box.y + box.height).toBeLessThanOrEqual(h.y + 1);
+    }
     const table = (await page.locator(`${panel} .mm-cols`).boundingBox())!;
-    expect(box.y).toBeGreaterThanOrEqual(head.y + head.height - 1);
     expect(box.y + box.height).toBeLessThanOrEqual(table.y + 1);
 
     await btn.click();
