@@ -114,12 +114,12 @@ describe('(e) progress derivation', () => {
   it('is done deliverables over total, program-wide', () => {
     const all = Object.values(seed.deliverables).flat();
     expect(all).toHaveLength(167);
-    expect(all.filter((d) => d.done)).toHaveLength(96);
-    expect(progressPct(seed.deliverables)).toBe(57);
+    expect(all.filter((d) => d.done)).toHaveLength(90);
+    expect(progressPct(seed.deliverables)).toBe(54);
   });
 
   it('reports per-stage counters', () => {
-    expect(stageProgress(seed.deliverables.physicalDesign)).toEqual({ done: 5, total: 9 });
+    expect(stageProgress(seed.deliverables.physicalDesign)).toEqual({ done: 3, total: 9 });
     expect(stageProgress(seed.deliverables.tapeout)).toEqual({ done: 0, total: 8 });
     expect(stageProgress([])).toEqual({ done: 0, total: 0 });
   });
