@@ -1618,6 +1618,17 @@ body.schedule-mode #schedule-view{opacity:1;visibility:visible;transform:none}
    leaves the row: wrap first, then Edit. */
 .sheet-head .wrap-btn{margin-left:auto}
 .sheet-head .wrap-btn+.tbl-edit{margin-left:8px}
+/* the chart's switch, wearing the same quiet outline as the wrap toggle */
+.tbl-icon{
+  display:inline-flex;align-items:center;padding:2px 7px;line-height:0;
+  font-family:var(--mono);color:var(--ink-3);
+  border:1px dashed var(--line-strong);border-radius:3px;
+}
+.tbl-icon:hover,.tbl-icon:focus-visible{color:var(--accent);border-color:var(--accent);outline:none}
+.tbl-icon[aria-pressed="true"]{color:var(--accent);border-color:var(--accent);border-style:solid}
+.sheet-head .tbl-icon{margin-left:auto}
+.sheet-head .tbl-icon+.wrap-btn{margin-left:8px}
+.sheet-head .tbl-icon~.tbl-edit{margin-left:8px}
 .tbl-edit{
   margin-left:auto;font-family:var(--mono);font-size:.62em;letter-spacing:.12em;text-transform:uppercase;
   color:var(--ink-3);border:1px solid var(--line);border-radius:3px;padding:3px 9px;
@@ -1690,6 +1701,75 @@ body.schedule-mode #schedule-view{opacity:1;visibility:visible;transform:none}
 .dr-foot .dr-hint{flex:1}
 .board-btn.primary{border-style:solid;color:var(--accent);border-color:var(--accent)}
 .board-btn.primary:hover,.board-btn.primary:focus-visible{background:var(--accent);color:var(--page)}
+
+/* ============================================================
+   STAGE TIMELINE — the engineering list and its artefacts, on dates
+   ============================================================
+   The same language as the roadmap: months behind, bars on them, a diamond
+   for each artefact and one line for today. What it does not share is the
+   axis — this one spans the stage, so a thirty-two week stage is read at the
+   scale of thirty-two weeks rather than of a hundred and thirty-two. */
+:root{--sg-id-w:3.8rem;--sg-name-w:14rem}
+.sg{margin:0 0 18px;padding:12px 0 4px;border-top:1px solid var(--line-strong)}
+.sg-cap{display:flex;align-items:baseline;gap:10px;margin-bottom:10px;flex-wrap:wrap}
+.sg-cap .cap{
+  font-size:.58em;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-3);
+}
+.sg-cap .note{font-size:.66em;color:var(--ink-3)}
+.sg-months{
+  position:relative;height:15px;margin-left:calc(var(--sg-id-w) + var(--sg-name-w) + 16px);
+}
+.sg-month{
+  position:absolute;top:0;transform:translateX(2px);white-space:nowrap;
+  font-family:var(--mono);font-size:var(--cp-fs);letter-spacing:.08em;text-transform:uppercase;
+  color:var(--ink-3);
+}
+.sg-today-cap{
+  position:absolute;top:-13px;transform:translateX(-50%);white-space:nowrap;z-index:3;
+  font-size:calc(var(--cp-fs) * 0.85);letter-spacing:.1em;text-transform:uppercase;
+  color:var(--accent);font-weight:700;pointer-events:none;
+}
+.sg-plot{position:relative}
+.sg-grid{
+  position:absolute;top:0;bottom:0;right:0;pointer-events:none;
+  left:calc(var(--sg-id-w) + var(--sg-name-w) + 16px);
+}
+.sg-line{position:absolute;top:0;bottom:0;width:1px;background:var(--line)}
+.sg-today{position:absolute;top:0;bottom:0;width:1.5px;transform:translateX(-50%);background:var(--accent);opacity:.7}
+.sg-row{
+  display:grid;grid-template-columns:var(--sg-id-w) var(--sg-name-w) minmax(0,1fr);
+  gap:8px;align-items:center;height:23px;
+}
+.sg-id{
+  font-family:var(--mono);font-size:.66em;color:var(--ink-3);letter-spacing:.03em;white-space:nowrap;
+}
+.sg-name{
+  font-size:.8em;color:var(--ink-2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+}
+.sg-track{position:relative;height:100%}
+.sg-bar{
+  position:absolute;top:50%;transform:translateY(-50%);height:13px;min-width:3px;border-radius:2px;
+  background:var(--accent);opacity:.5;display:flex;align-items:center;overflow:hidden;
+}
+.sg-bar.cont{
+  opacity:.28;
+  background:repeating-linear-gradient(115deg,var(--accent) 0 6px,transparent 6px 12px);
+}
+.sg-bar-t{
+  position:absolute;top:50%;transform:translate(5px,-50%);white-space:nowrap;pointer-events:none;
+  font-family:var(--mono);font-size:calc(var(--cp-fs) * 0.92);color:var(--ink-3);
+}
+.sg-gate{position:absolute;top:0;bottom:0;width:1px;background:var(--line-strong)}
+/* the artefacts sit under a rule, because they are not the same kind of thing */
+.sg-row.dlv{height:21px}
+.sg-row.dlv:first-of-type{margin-top:6px}
+.sg-plot .sg-row.dlv .sg-name{color:var(--ink-3)}
+.sg-dot{
+  position:absolute;top:50%;left:0;width:11px;height:11px;
+  transform:translate(-50%,-50%) rotate(45deg);
+  background:var(--surface);border:1.4px solid var(--ink);
+}
+.sg-dot.done{background:var(--ink)}
 
 /* A deliverable with no date is allowed, but asked about first. */
 .dlv-tbd{

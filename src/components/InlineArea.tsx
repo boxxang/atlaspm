@@ -15,6 +15,7 @@ import { Deliverables } from './Deliverables';
 import { useWrapped } from '@/store/wrapStore';
 import { WrapToggle } from './WrapToggle';
 import { ColGrip } from './ColGrip';
+import { StageGantt } from './StageGantt';
 
 /** The stage as this program's profile defines it, text and all. */
 const useStage = (id: StageId) =>
@@ -257,6 +258,19 @@ function EngineeringTable({
   );
 }
 
+/** Bars on a timeline — the mark for reading a table as a schedule. */
+function ChartIcon() {
+  return (
+    <svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true">
+      <g fill="currentColor">
+        <rect x="2" y="3" width="9" height="2.4" rx="1.2" />
+        <rect x="5" y="6.8" width="9" height="2.4" rx="1.2" />
+        <rect x="3.5" y="10.6" width="7" height="2.4" rx="1.2" />
+      </g>
+    </svg>
+  );
+}
+
 /** Engineering | Program — the two readings of the same stage. */
 function ViewToggle({
   stageId,
@@ -272,6 +286,11 @@ function ViewToggle({
      and of the deliverables; its switch lives up here so both tables carry
      exactly one header row and their columns line up. */
   const [editing, setEditing] = useState(false);
+  /* A first look at reading a stage as a timeline rather than as two tables.
+     One stage for now — it is a question about whether the derived starts are
+     worth having, and one stage answers that as well as twenty-three would. */
+  const [chart, setChart] = useState(false);
+  const timeline = stageId === 'rtl';
   return (
     <div>
       <div className="sheet-head">
@@ -283,6 +302,18 @@ function ViewToggle({
             Program
           </button>
         </div>
+        {view === 'eng' && timeline && (
+          <button
+            className="tbl-icon"
+            data-stage-chart
+            aria-pressed={chart}
+            title={chart ? 'Hide the stage timeline' : 'Show the stage timeline'}
+            aria-label={chart ? 'Hide the stage timeline' : 'Show the stage timeline'}
+            onClick={() => setChart((v) => !v)}
+          >
+            <ChartIcon />
+          </button>
+        )}
         {view === 'eng' && <WrapToggle boardKey="engineering" />}
         {view === 'eng' && (
           <button
@@ -297,6 +328,7 @@ function ViewToggle({
         )}
       </div>
       <div className="view-pane enter" data-pane="eng" hidden={view !== 'eng'} key={`eng-${view}`}>
+        {timeline && chart && <StageGantt stageId={stageId} />}
         <EngineeringTable
             stageId={stageId}
             shortTitle={shortTitle}

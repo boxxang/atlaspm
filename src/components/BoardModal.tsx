@@ -159,8 +159,14 @@ export function BoardModal() {
    */
   const { list: deliverables, tagOf } = useDeliverableTags(stageId);
   const withDeliverable = !agg && kind === 'activities' && deliverables.length > 0;
-  const [filter, setFilter] = useState('');
-  useEffect(() => setFilter(''), [stageId, kind, agg?.type]);
+  /* The filter belongs to the board it was set on, so it is stored with that
+     board's identity rather than cleared from an effect when the identity
+     changes — a render deriving what it already knows, not a second render
+     correcting the first. */
+  const boardId = `${stageId ?? ''}|${kind ?? ''}|${agg?.type ?? ''}`;
+  const [filterFor, setFilterFor] = useState({ id: boardId, value: '' });
+  const filter = filterFor.id === boardId ? filterFor.value : '';
+  const setFilter = (value: string) => setFilterFor({ id: boardId, value });
 
   const all = isSu ? updateEntries(content, stages) : boardEntries(m, content, stages, today);
   const entries =
