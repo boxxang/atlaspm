@@ -113,7 +113,9 @@ test('posting a status update persists, and editing keeps its timestamp', async 
 test('a filed deliverable persists with its record and its stamp', async ({ page }) => {
   await selectStage(page, 'physicalDesign');
   const panel = selectedPanel(page);
-  const row = panel.locator('.dlv-list li').nth(5); // the first still open
+  /* by name rather than by index: which row is open depends on the stage's
+     plan and the clock, and the point of the test is neither */
+  const row = panel.locator('.dlv-list li').filter({ hasText: 'Interim physical DRC' });
   await expect(row.locator('.dlv-comp')).toHaveText('—');
   await fileDeliverable(page, 'Interim physical DRC', ARTEFACT, 'Clean on the N2 drop.');
   const stamped = await row.locator('.dlv-comp').textContent();
@@ -121,13 +123,15 @@ test('a filed deliverable persists with its record and its stamp', async ({ page
 
   await hardRefresh(page);
   await selectStage(page, 'physicalDesign');
-  const after = selectedPanel(page).locator('.dlv-list li').nth(5);
+  const after = selectedPanel(page)
+    .locator('.dlv-list li')
+    .filter({ hasText: 'Interim physical DRC' });
   await expect(after.locator('input[type="checkbox"]')).toBeChecked();
   await expect(after.locator('.dlv-comp')).toHaveText(stamped!);
   await expect(selectedPanel(page).locator('.dlv-note')).toHaveText('4 / 9 complete');
   // and the dashboard counts it
   await page.locator('#mode-toggle button[data-mode="schedule"]').click();
-  await expect(page.locator('.stat').first().locator('.v')).toHaveText('54%');
+  await expect(page.locator('.stat').first().locator('.v')).toHaveText('53%');
   await page.locator('#mode-toggle button[data-mode="journey"]').click();
 
   // the record came back with it, history and artefact both
@@ -142,7 +146,10 @@ test('a filed deliverable persists with its record and its stamp', async ({ page
   await hardRefresh(page);
   await selectStage(page, 'physicalDesign');
   await expect(
-    selectedPanel(page).locator('.dlv-list li').nth(5).locator('.dlv-comp'),
+    selectedPanel(page)
+      .locator('.dlv-list li')
+      .filter({ hasText: 'Interim physical DRC' })
+      .locator('.dlv-comp'),
   ).toHaveText('—');
 });
 

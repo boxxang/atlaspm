@@ -83,10 +83,13 @@ describe('project seed', () => {
     const stage = schedule.stages.productDefinition;
     expect(pd).toHaveLength(6);
 
-    // they land at even fractions of the span, the last one on the end date
+    /* They are the stage's own plan now, so they land where the work that
+       makes them finishes: in order, none on the day the stage opens, and the
+       last on the day it closes. Two can share a day — the charter and the
+       go/no-go both land on the gate — which an even spread could not do. */
     const dues = pd.map((d) => d.due!.getTime());
     expect([...dues].sort((a, b) => a - b)).toEqual(dues); // in order
-    expect(new Set(dues).size).toBe(6); // and no two share a date
+    expect(new Set(dues).size).toBeGreaterThan(1);
     expect(dues[0]).toBeGreaterThan(stage.start.getTime());
     expect(pd[5].due).toEqual(stage.end);
 
@@ -114,8 +117,8 @@ describe('(e) progress derivation', () => {
   it('is done deliverables over total, program-wide', () => {
     const all = Object.values(seed.deliverables).flat();
     expect(all).toHaveLength(167);
-    expect(all.filter((d) => d.done)).toHaveLength(90);
-    expect(progressPct(seed.deliverables)).toBe(54);
+    expect(all.filter((d) => d.done)).toHaveLength(87);
+    expect(progressPct(seed.deliverables)).toBe(52);
   });
 
   it('reports per-stage counters', () => {

@@ -19,11 +19,12 @@ export const journeyData = [
     tagline: "Setting the boundaries of the program.",
     description: "Fix what the product must achieve and the technical, cost and schedule boundaries the program will be held to. Nothing downstream is negotiable if this is vague.",
     activities: ["Market requirements analysis", "PPA target definition", "Cost target modeling", "Feasibility study"],
+    /* Listed in the order this stage's plan produces them. */
     deliverables: [
       "Product requirements document (PRD)",
       "Target specification — PPA and KPI table",
-      "Product cost and margin model",
       "Feasibility report",
+      "Product cost and margin model",
       "Program charter, staffing and budget plan",
       "Kickoff Go / No-Go decision record"
     ],
@@ -41,6 +42,11 @@ export const journeyData = [
     /** Elapsed weeks per engineering activity; negative marks one that runs continuously. */
     engineeringTat: [4, 5, 4, 4, 3, 4, 4, 4, 3],
     engineeringEffort: [4, 6, 3, 3, 2, 2, 3, 3, 2],
+    /* The plan this stage runs to, in weeks from its start. Requirements first, with benchmarking beside them; the targets they imply, then the models those targets are costed against, and the charter and go/no-go the whole thing exists to produce. */
+    engineeringStart: [0, 1, 2, 3, 3, 0, 3, 4, 5],
+    /* Which activity produces each deliverable, and the week it is due. */
+    deliverableFrom: [0, 2, 6, 3, 7, 8],
+    deliverableWeek: [4, 6, 7, 7, 8, 8],
     risks: ["Specification instability", "Unrealistic PPA targets", "Technology availability"],
     potentialRisks: [
       "Requirements not signed off by all stakeholders",
@@ -67,13 +73,14 @@ export const journeyData = [
     tagline: "The decisions that shape everything downstream.",
     description: "Turn requirements into a system architecture and make the decisions — partitioning, memory hierarchy, interfaces, power — that every downstream team inherits.",
     activities: ["System architecture", "Partitioning", "Interface selection", "PPA tradeoffs"],
+    /* Listed in the order this stage's plan produces them. */
     deliverables: [
-      "Architecture specification",
-      "Performance model and workload analysis report",
-      "Block partitioning and PPA budget table",
       "Interface and protocol definition document",
       "Power / clock / reset architecture and UPF intent",
+      "Performance model and workload analysis report",
+      "Block partitioning and PPA budget table",
       "Chip-level block diagram with pin and bump budget",
+      "Architecture specification",
       "Architecture Freeze review package"
     ],
     engineeringView: [
@@ -91,6 +98,11 @@ export const journeyData = [
     /** Elapsed weeks per engineering activity; negative marks one that runs continuously. */
     engineeringTat: [14, 8, 8, 6, 7, 4, 6, 5, 9, 6],
     engineeringEffort: [28, 14, 12, 6, 9, 4, 7, 5, 14, 12],
+    /* The plan this stage runs to, in weeks from its start. Modelling runs almost the whole stage because everything else is argued against it; interfaces settle early, partitioning and budgets fall out of the model, and the specification is written across the back half. */
+    engineeringStart: [0, 2, 3, 0, 6, 10, 4, 10, 9, 12],
+    /* Which activity produces each deliverable, and the week it is due. */
+    deliverableFrom: [3, 4, 0, 5, 7, 8, 9],
+    deliverableWeek: [6, 13, 14, 14, 15, 18, 18],
     risks: ["Late architecture changes", "Workload model gaps", "Underestimated complexity"],
     potentialRisks: [
       "Architecture not validated against key workloads",
@@ -117,13 +129,14 @@ export const journeyData = [
     tagline: "The choice everything else is downstream of.",
     description: "Choose the foundry, the node and the process flavour, and convert that choice into signed commercial and capacity commitments. Everything in IP, PDK and library land is downstream of this decision.",
     activities: ["Foundry evaluation", "Process option selection", "Capacity booking", "Commercial agreement"],
+    /* Listed in the order this stage's plan produces them. */
     deliverables: [
       "Technology selection report and decision record",
       "Process option / flavour sheet agreed with foundry",
       "Wafer, mask and NRE cost sheet",
+      "Node risk assessment — maturity, defect density, yield learning curve",
       "Executed foundry design agreement (DA) and NDA",
-      "Capacity and tapeout slot commitment",
-      "Node risk assessment — maturity, defect density, yield learning curve"
+      "Capacity and tapeout slot commitment"
     ],
     engineeringView: [
       "Foundry and node long-list to short-list evaluation",
@@ -139,6 +152,11 @@ export const journeyData = [
     /** Elapsed weeks per engineering activity; negative marks one that runs continuously. */
     engineeringTat: [5, 5, 7, 6, 5, 8, 4, 4, 5],
     engineeringEffort: [4, 4, 6, 3, 2, 2, 1.5, 1.5, 2],
+    /* The plan this stage runs to, in weeks from its start. The benchmarking decides the node, the commercial work runs alongside it, and the capacity commitment closes the stage because it is what cannot be signed until everything else is. */
+    engineeringStart: [0, 4, 2, 4, 9, 4, 6, 8, 9],
+    /* Which activity produces each deliverable, and the week it is due. */
+    deliverableFrom: [2, 1, 3, 6, 5, 4],
+    deliverableWeek: [9, 9, 10, 10, 12, 14],
     risks: ["Node maturity", "Capacity commitment", "Wafer cost volatility"],
     potentialRisks: [
       "Selection made before workload targets are firm",
@@ -165,14 +183,15 @@ export const journeyData = [
     tagline: "What the flow is allowed to assume.",
     description: "Get the design kit, the libraries, the tools and the signoff conditions to a state the program can actually build on — and keep tracking them as the foundry releases new versions underneath you.",
     activities: ["PDK version tracking", "Library qualification", "EDA tool qualification", "Signoff corner definition"],
+    /* Listed in the order this stage's plan produces them. */
     deliverables: [
       "PDK readiness dashboard — version, release date, open gap list",
       "Qualified library list with .lib / LEF / GDS views",
-      "Memory PPA gap analysis and custom-instance decision record",
+      "Compute and license capacity plan",
       "EDA tool and version matrix (qualified and frozen)",
       "Internal reference flow and methodology guide",
       "Signoff corner definition agreed with foundry",
-      "Compute and license capacity plan",
+      "Memory PPA gap analysis and custom-instance decision record",
       "Golden environment release notes"
     ],
     engineeringView: [
@@ -193,6 +212,11 @@ export const journeyData = [
     /** Elapsed weeks per engineering activity; negative marks one that runs continuously. */
     engineeringTat: [-34, 6, 8, 9, 6, 4, 6, 10, 10, -6, 6, 6, 8],
     engineeringEffort: [14, 5, 9, 10, 7, 3, 5, 12, 12, 4, 5, 3, 8],
+    /* The plan this stage runs to, in weeks from its start. Libraries and tools qualify first because the flow is built on them; the flow follows, corners are agreed against it, and the golden environment is released once there is something to freeze. */
+    engineeringStart: [0, 0, 2, 4, 13, 19, 8, 4, 10, 0, 16, 6, 28],
+    /* Which activity produces each deliverable, and the week it is due. */
+    deliverableFrom: [0, 2, 11, 7, 8, 10, 5, 12],
+    deliverableWeek: [8, 10, 12, 14, 20, 22, 23, 36],
     risks: ["PDK version churn", "Library gaps", "Tool qualification lag"],
     potentialRisks: [
       "Design started on a PDK the foundry still calls preliminary",
@@ -219,14 +243,15 @@ export const journeyData = [
     tagline: "Knowing what you need before you need it.",
     description: "Decompose the product into the IP it needs, decide make / buy / reuse for each, and prove that every bought or reused block is actually available and silicon-proven on the selected process option — before anyone schedules integration around it.",
     activities: ["IP bill of materials", "Make / buy / reuse", "Silicon-proven check", "Licensing & PO"],
+    /* Listed in the order this stage's plan produces them. */
     deliverables: [
       "IP bill of materials with make / buy / reuse decision per block",
       "Vendor evaluation matrix and selection record",
       "IP readiness report — silicon-proven status and maturity level per IP",
       "IP deliverable acceptance checklist",
       "Executed licences and POs with committed delivery dates",
-      "IP delivery schedule folded into the program plan",
-      "IP risk register and contingency plan"
+      "IP risk register and contingency plan",
+      "IP delivery schedule folded into the program plan"
     ],
     engineeringView: [
       "Product requirement → IP requirement decomposition (IP bill of materials)",
@@ -243,6 +268,11 @@ export const journeyData = [
     /** Elapsed weeks per engineering activity; negative marks one that runs continuously. */
     engineeringTat: [5, 4, 5, 9, 7, 7, 12, 5, 4, 4],
     engineeringEffort: [5, 3, 4, 10, 6, 6, 5, 4, 2, 2],
+    /* The plan this stage runs to, in weeks from its start. Decomposition and the reuse audit come first, evaluation and licensing overlap because the negotiation is long, and the delivery dates fold into the program plan last. */
+    engineeringStart: [0, 2, 5, 6, 8, 10, 8, 15, 18, 17],
+    /* Which activity produces each deliverable, and the week it is due. */
+    deliverableFrom: [2, 3, 4, 5, 6, 9, 8],
+    deliverableWeek: [10, 15, 15, 17, 20, 21, 22],
     risks: ["IP not proven on node", "Licensing lead time", "Vendor delivery slip"],
     potentialRisks: [
       "IP list derived from the last program rather than this product",
@@ -269,14 +299,15 @@ export const journeyData = [
     tagline: "The blocks nobody will sell you.",
     description: "Build the analog, custom and memory blocks that no vendor and no compiler is delivering — PLLs, SerDes and PHYs, regulators, custom SRAM arrays — through schematic, layout, post-layout characterisation and hardening into usable macros.",
     activities: ["PLL & SerDes design", "Custom SRAM instance", "Post-layout characterization", "Macro hardening"],
+    /* Listed in the order this stage's plan produces them. */
     deliverables: [
       "AMS IP specifications and design review packages",
-      "Characterisation reports across PVT and Monte Carlo",
       "Custom SRAM instance specification with Vmin and sigma-yield report",
-      "Custom memory views characterised to compiler equivalence",
-      "Hard macro GDS with abstract views (LEF, .lib, CDL, UPF, wreal/Verilog model)",
       "Per-macro DRC / LVS clean signoff, pushed rules approved by foundry",
       "Reliability report — EM/IR, ESD, latch-up, aging",
+      "Characterisation reports across PVT and Monte Carlo",
+      "Custom memory views characterised to compiler equivalence",
+      "Hard macro GDS with abstract views (LEF, .lib, CDL, UPF, wreal/Verilog model)",
       "Integration guide with known limitations and errata"
     ],
     engineeringView: [
@@ -300,6 +331,11 @@ export const journeyData = [
     /** Elapsed weeks per engineering activity; negative marks one that runs continuously. */
     engineeringTat: [6, 26, 34, 20, 10, 10, 16, 10, 6, 10, 16, 18, 16, 10, 8, -16],
     engineeringEffort: [8, 32, 60, 22, 14, 12, 22, 12, 6, 12, 20, 26, 20, 10, 8, 12],
+    /* The plan this stage runs to, in weeks from its start. The long analogue blocks — SerDes, PLL, LDO — run most of the stage; layout and post-layout simulation trail them, and the macro views that the digital side integrates come out at the end. */
+    engineeringStart: [0, 6, 4, 6, 4, 12, 18, 24, 22, 30, 8, 20, 24, 28, 34, 0],
+    /* Which activity produces each deliverable, and the week it is due. */
+    deliverableFrom: [0, 4, 11, 13, 12, 9, 14, 15],
+    deliverableWeek: [6, 14, 38, 38, 40, 40, 42, 42],
     risks: ["Analog schedule slip", "Vmin margin shortfall", "Macro late to floorplan"],
     potentialRisks: [
       "Abstract views arriving after floorplan needs them",
@@ -326,6 +362,7 @@ export const journeyData = [
     tagline: "Buying certainty with a small piece of silicon.",
     description: "De-risk the parts of the design that cannot be trusted to simulation — new IP, new process, marginal circuits — on a small shuttle vehicle whose silicon comes back in time to change the production design.",
     activities: ["Risk item selection", "Test chip design", "Shuttle tapeout", "Silicon correlation"],
+    /* Listed in the order this stage's plan produces them. */
     deliverables: [
       "Test chip specification and risk coverage matrix",
       "Test chip GDS and shuttle submission record",
@@ -346,6 +383,11 @@ export const journeyData = [
     /** Elapsed weeks per engineering activity; negative marks one that runs continuously. */
     engineeringTat: [5, 12, 4, 12, 16, 9, 12, 6],
     engineeringEffort: [4, 18, 1, 20, 4, 8, 20, 8],
+    /* The plan this stage runs to, in weeks from its start. Design, implement, submit, wait for the shuttle — and then characterise against the clock, which is why the correlation and the guidance are cut at the gate. */
+    engineeringStart: [0, 4, 3, 14, 20, 26, 34, 36],
+    /* Which activity produces each deliverable, and the week it is due. */
+    deliverableFrom: [0, 3, 4, 6, 7],
+    deliverableWeek: [5, 26, 36, 40, 40],
     risks: ["Shuttle slot availability", "Correlation gap", "Feedback arrives too late"],
     potentialRisks: [
       "Test chip scope grows until it misses the shuttle",
@@ -438,13 +480,14 @@ export const journeyData = [
     tagline: "Building confidence before silicon.",
     description: "Build the evidence that the design does what the specification says, across block, chip and system level — the longest and most schedule-critical pre-silicon activity, and the largest single line of effort in the program.",
     activities: ["UVM testbench", "Regression & coverage", "Formal", "Emulation"],
+    /* Listed in the order this stage's plan produces them. */
     deliverables: [
       "Verification plan (vPlan) and coverage model",
       "UVM testbenches and integrated VIP",
-      "Regression and coverage dashboards",
+      "Emulation platform and system test suite",
       "Formal proof reports with assumption list",
       "Low-power verification report",
-      "Emulation platform and system test suite",
+      "Regression and coverage dashboards",
       "Gate-level simulation report",
       "DV closure signoff package"
     ],
@@ -465,6 +508,11 @@ export const journeyData = [
     /** Elapsed weeks per engineering activity; negative marks one that runs continuously. */
     engineeringTat: [8, 14, 30, 22, 16, 10, 12, 20, 12, -26, 10, -34],
     engineeringEffort: [25, 60, 200, 110, 40, 20, 20, 55, 30, 45, 20, 25],
+    /* The plan this stage runs to, in weeks from its start. The plan, then the environment, then thirty weeks of block-level testing under it; emulation starts early because its bring-up is long, and gate-level simulation closes the stage. */
+    engineeringStart: [0, 4, 8, 16, 12, 22, 18, 6, 24, 0, 30, 0],
+    /* Which activity produces each deliverable, and the week it is due. */
+    deliverableFrom: [0, 1, 7, 4, 5, 9, 10, 11],
+    deliverableWeek: [8, 18, 26, 28, 32, 34, 40, 40],
     risks: ["Coverage closure", "Late bug discovery", "Spec changes"],
     potentialRisks: [
       "Verification plan has coverage holes vs spec",
@@ -491,12 +539,13 @@ export const journeyData = [
     tagline: "Deciding now how it will be tested later.",
     description: "Decide how the chip will be tested before it can be built to be testable — scan and compression, memory BIST and repair, JTAG and debug access — then produce and validate the patterns the tester will run.",
     activities: ["Scan architecture", "MBIST & repair", "ATPG closure", "Debug access"],
+    /* Listed in the order this stage's plan produces them. */
     deliverables: [
       "DFT architecture specification and coverage plan",
       "MBIST / BISR insertion and test collateral",
       "JTAG / IJTAG description files (BSDL, ICL, PDL)",
-      "ATPG pattern sets with coverage report",
       "DFT DRC clean report",
+      "ATPG pattern sets with coverage report",
       "Pattern validation (GLS) report and ATE-ready pattern files",
       "DFT signoff entry for the tapeout checklist"
     ],
@@ -516,6 +565,11 @@ export const journeyData = [
     /** Elapsed weeks per engineering activity; negative marks one that runs continuously. */
     engineeringTat: [8, 5, 10, 8, 7, 10, 16, 10, 10, 6, 8],
     engineeringEffort: [12, 4, 14, 10, 8, 14, 28, 14, 10, 6, 10],
+    /* The plan this stage runs to, in weeks from its start. Architecture first, then the on-chip infrastructure it calls for; scan insertion waits on synthesis, and ATPG and its validation run against the gate. */
+    engineeringStart: [0, 2, 6, 8, 10, 18, 24, 30, 16, 12, 14],
+    /* Which activity produces each deliverable, and the week it is due. */
+    deliverableFrom: [0, 2, 3, 5, 6, 7, 7],
+    deliverableWeek: [8, 16, 16, 28, 40, 40, 40],
     risks: ["Coverage target miss", "Pattern volume", "Debug access gaps"],
     potentialRisks: [
       "Coverage and test-time targets never agreed with product engineering",
@@ -541,15 +595,16 @@ export const journeyData = [
     tagline: "Four netlists, not one handover.",
     description: "Map verified RTL onto the qualified library under real constraints — and issue it as a sequence of netlists rather than one handover. The first drop exists so physical design can build its flow; the last one, the FFN, is the only netlist the final turn is allowed to see.",
     activities: ["Constraints (SDC)", "Technology mapping", "Netlist drops", "FFN release"],
+    /* Listed in the order this stage's plan produces them. */
     deliverables: [
       "N0 flow-flush netlist for PD flow setup",
-      "N1 and N2 netlist drops with QoR delta reports",
-      "FFN — final full netlist, release-tagged",
       "Validated SDC constraint set per mode and corner",
+      "Power intent implementation report",
+      "N1 and N2 netlist drops with QoR delta reports",
       "Synthesis QoR report per drop against PPA targets",
       "Formal equivalence clean report per drop",
-      "Power intent implementation report",
-      "Physical design handoff package per drop"
+      "Physical design handoff package per drop",
+      "FFN — final full netlist, release-tagged"
     ],
     engineeringView: [
       "SDC constraint development and validation",
@@ -568,6 +623,11 @@ export const journeyData = [
     /** Elapsed weeks per engineering activity; negative marks one that runs continuously. */
     engineeringTat: [8, 8, 4, 7, 5, 7, 5, 5, 4, -20, -22, -22],
     engineeringEffort: [18, 16, 6, 14, 12, 12, 8, 12, 10, 12, 10, 6],
+    /* The plan this stage runs to, in weeks from its start. N0 goes out in week four so physical design has something to build a flow on; the drops step through the stage and the FFN closes it. */
+    engineeringStart: [0, 4, 0, 8, 10, 12, 13, 15, 20, 0, 0, 0],
+    /* Which activity produces each deliverable, and the week it is due. */
+    deliverableFrom: [2, 0, 6, 7, 10, 9, 11, 8],
+    deliverableWeek: [4, 8, 18, 20, 20, 22, 22, 24],
     risks: ["Timing infeasibility", "Constraint quality", "Late RTL churn"],
     potentialRisks: [
       "SDC constraints incomplete or unvalidated",
@@ -593,15 +653,16 @@ export const journeyData = [
     tagline: "Turn by turn, until it closes.",
     description: "Make the netlist physically real — floorplan, power grid, placement, clock trees, routing — across a sequence of turns whose quality climbs with each netlist drop, then close the design on the final turn against the FFN.",
     activities: ["Flow setup", "Floorplan & PDN", "Quality turns", "Final FFN turn"],
+    /* Listed in the order this stage's plan produces them. */
     deliverables: [
       "Flow setup release — MMMC environment, scripts and runtime baseline",
-      "Turn 1 and Turn 2 databases with QoR delta reports",
-      "Final-turn routed database on the FFN, per block and top",
       "Floorplan and PDN specification",
-      "MCMM timing closure reports with violation burn-down across turns",
-      "Interim physical DRC / LVS clean",
       "Bump map, RDL and package interface files",
+      "Turn 1 and Turn 2 databases with QoR delta reports",
+      "Interim physical DRC / LVS clean",
+      "MCMM timing closure reports with violation burn-down across turns",
       "ECO log and change control record",
+      "Final-turn routed database on the FFN, per block and top",
       "Signoff-ready database handoff"
     ],
     engineeringView: [
@@ -625,6 +686,11 @@ export const journeyData = [
     /** Elapsed weeks per engineering activity; negative marks one that runs continuously. */
     engineeringTat: [7, 9, 8, 8, 8, 8, -12, -16, -22, 10, 5, 6, 11, -18, 5, 14],
     engineeringEffort: [22, 32, 20, 14, 45, 45, 26, 40, 60, 18, 6, 8, 55, 22, 6, 30],
+    /* The plan this stage runs to, in weeks from its start. The flow is built on N0, the floorplan and PDN under it, and then the turns: each on its netlist drop, with clock trees, routing and timing closure running continuously across all of them. */
+    engineeringStart: [0, 3, 6, 8, 10, 16, 0, 0, 0, 16, 18, 14, 19, 0, 25, 12],
+    /* Which activity produces each deliverable, and the week it is due. */
+    deliverableFrom: [0, 2, 3, 5, 7, 8, 13, 12, 14],
+    deliverableWeek: [7, 14, 16, 24, 24, 26, 28, 30, 30],
     risks: ["Timing convergence", "Congestion", "Power grid weaknesses"],
     potentialRisks: [
       "Flow setup starting without an N0 netlist",
@@ -651,12 +717,13 @@ export const journeyData = [
     tagline: "Proving the design is manufacturable.",
     description: "Prove the final implementation holds across every electrical, timing, reliability and manufacturing check the foundry and the product demand, and dispose of every waiver on the record. The decks are rehearsed on an intermediate turn so the final turn is not the first time the flow runs at full chip.",
     activities: ["Dry run on turn 2", "MCMM STA", "DRC / LVS", "Waiver disposition"],
+    /* Listed in the order this stage's plan produces them. */
     deliverables: [
-      "STA signoff reports across all corners and modes, with waiver list",
-      "Clean DRC / LVS / antenna / density reports",
       "EM/IR and SI/PI signoff reports",
       "Reliability reports — ESD, latch-up, FIT",
       "DFM and lithography hotspot report",
+      "STA signoff reports across all corners and modes, with waiver list",
+      "Clean DRC / LVS / antenna / density reports",
       "Final formal equivalence report",
       "Signoff summary and Design Freeze package"
     ],
@@ -677,6 +744,11 @@ export const journeyData = [
     /** Elapsed weeks per engineering activity; negative marks one that runs continuously. */
     engineeringTat: [6, 10, 9, 8, 6, 4, 6, 6, 5, 6, 5, 5],
     engineeringEffort: [14, 34, 26, 20, 12, 5, 10, 10, 8, 6, 8, 6],
+    /* The plan this stage runs to, in weeks from its start. A dry run on the Turn 2 database rehearses the decks and the triage, then everything runs at once on the final turn and the waiver board closes it. */
+    engineeringStart: [0, 5, 6, 6, 8, 11, 8, 8, 10, 10, 9, 0],
+    /* Which activity produces each deliverable, and the week it is due. */
+    deliverableFrom: [4, 6, 7, 1, 2, 8, 9],
+    deliverableWeek: [14, 14, 14, 15, 15, 15, 16],
     risks: ["Late violations", "IR drop hotspots", "Signoff iteration loops"],
     potentialRisks: [
       "Signoff corner list not agreed with foundry",
@@ -702,6 +774,7 @@ export const journeyData = [
     tagline: "Two releases, four weeks apart.",
     description: "Release the design to mask in two steps. Front-end layers go out first and the mask shop starts cutting them; back-end layers follow about a month later. That gap is not slack — it is the last window in which a metal-layer fix can still be made without touching the front-end mask set.",
     activities: ["Final GDS assembly", "Go / No-Go", "FEOL MTO", "BEOL MTO"],
+    /* Listed in the order this stage's plan produces them. */
     deliverables: [
       "Released GDSII / OASIS database with checksum record",
       "Tapeout checklist with sign-off matrix",
@@ -728,6 +801,11 @@ export const journeyData = [
     /** Elapsed weeks per engineering activity; negative marks one that runs continuously. */
     engineeringTat: [2, 2, 3, 2, 0.5, 1.5, 1, 4, 2.5, 1.5, 1],
     engineeringEffort: [6, 8, 5, 3, 1, 3, 1, 10, 6, 3, 1],
+    /* The plan this stage runs to, in weeks from its start. Eight weeks with the split in the middle: FEOL goes out on the go/no-go, and the BEOL fix window runs while the front-end masks are being cut. */
+    engineeringStart: [0, 1, 0, 2, 3.5, 4, 5, 2, 5, 6.5, 7],
+    /* Which activity produces each deliverable, and the week it is due. */
+    deliverableFrom: [0, 2, 3, 4, 6, 7, 9, 10],
+    deliverableWeek: [2, 3, 4, 4, 6, 6, 8, 8],
     risks: ["Escaped bugs", "Checklist gaps", "Mask schedule slips"],
     potentialRisks: [
       "Checklist items waived without formal risk review",
@@ -753,12 +831,13 @@ export const journeyData = [
     tagline: "Hundreds of steps, weeks of patience.",
     description: "Masks are cut and wafers are processed. The program has almost no levers here — only hot-lot priority, WIP visibility and an honest wafer-out forecast. Eighteen weeks from FEOL MTO to wafer out: seven for an EUV mask set, eleven for a hot-lot cycle.",
     activities: ["Mask fabrication", "Wafer processing", "Process monitoring", "Wafer acceptance"],
+    /* Listed in the order this stage's plan produces them. */
     deliverables: [
       "FEOL and BEOL mask sets with qualification reports",
+      "Wafer-out forecast versus actual log",
       "Processed engineering-lot wafers",
       "Inline, PCM and WAT data package",
       "Wafer acceptance disposition record",
-      "Wafer-out forecast versus actual log",
       "First Silicon availability notice"
     ],
     engineeringView: [
@@ -776,6 +855,11 @@ export const journeyData = [
     /** Elapsed weeks per engineering activity; negative marks one that runs continuously. */
     engineeringTat: [7, 1, 6, 8, 5, -14, 3, 3, -18, 2],
     engineeringEffort: [4, 1, 4, 3, 2, 5, 3, 3, 4, 1],
+    /* The plan this stage runs to, in weeks from its start. Masks, then wafer start on FEOL availability; back-end processing overlaps the front-end tail lot by lot, and inline monitoring runs the whole way. */
+    engineeringStart: [0, 7, 3, 8, 13, 0, 15, 16, 0, 17],
+    /* Which activity produces each deliverable, and the week it is due. */
+    deliverableFrom: [2, 8, 4, 6, 7, 9],
+    deliverableWeek: [9, 14, 18, 18, 19, 19],
     risks: ["Fab cycle time variation", "Process excursions", "Hot lot priority"],
     potentialRisks: [
       "Fab slot / hot-lot priority not confirmed in writing",
@@ -801,15 +885,16 @@ export const journeyData = [
     tagline: "Substrate lead time sets this date, not the die.",
     description: "Design the package the die will live in — interposer, substrate, bump map, thermal and mechanical solution — on a schedule driven by substrate lead time rather than by the die.",
     activities: ["Package architecture", "Bump map & RDL", "Substrate design", "Supplier booking"],
+    /* Listed in the order this stage's plan produces them. */
     deliverables: [
       "Package architecture specification",
+      "Test vehicle requirement specification for PTV",
       "Bump map and interposer / RDL database",
+      "Substrate and interposer PO with committed lead time",
       "Substrate design files (Gerber / ODB++) and stack-up",
       "Package electrical design intent and model handoff to co-verification",
-      "Thermal and mechanical (warpage) simulation reports",
-      "Test vehicle requirement specification for PTV",
-      "Substrate and interposer PO with committed lead time",
       "OSAT assembly process flow and agreement",
+      "Thermal and mechanical (warpage) simulation reports",
       "Package Design Freeze package"
     ],
     engineeringView: [
@@ -828,6 +913,11 @@ export const journeyData = [
     /** Elapsed weeks per engineering activity; negative marks one that runs continuously. */
     engineeringTat: [8, 10, 14, 14, 10, 9, 12, 4, 10, 9, 6],
     engineeringEffort: [10, 12, 18, 18, 12, 10, 12, 3, 4, 5, 6],
+    /* The plan this stage runs to, in weeks from its start. The architecture and the test vehicle requirements go out early because PTV is waiting on them; routing and analysis fill the middle, and the freeze closes a stage that ran a year. */
+    engineeringStart: [0, 8, 18, 16, 24, 28, 30, 6, 10, 32, 46],
+    /* Which activity produces each deliverable, and the week it is due. */
+    deliverableFrom: [0, 7, 1, 8, 3, 5, 9, 6, 10],
+    deliverableWeek: [8, 10, 18, 20, 30, 37, 41, 42, 52],
     risks: ["Substrate lead time", "Interposer supply", "Design freeze slip"],
     potentialRisks: [
       "Substrate lead times longer than the fab cycle",
@@ -854,6 +944,7 @@ export const journeyData = [
     tagline: "Stress the package before the die exists.",
     description: "Prove the package before the product die exists. Mechanical, thermal and daisy-chain vehicles carry the chip-package interaction, warpage and thermal risk, so the first real assembly is not the first experiment.",
     activities: ["Vehicle design", "Assembly DOE", "CPI & warpage", "Process window freeze"],
+    /* Listed in the order this stage's plan produces them. */
     deliverables: [
       "Test vehicle plan and risk coverage matrix",
       "MTV, TTV and daisy-chain vehicle designs",
@@ -882,6 +973,11 @@ export const journeyData = [
     /** Elapsed weeks per engineering activity; negative marks one that runs continuously. */
     engineeringTat: [6, 9, 9, 8, 16, 11, 7, 11, 9, 14, 9, 7],
     engineeringEffort: [5, 8, 8, 6, 6, 12, 8, 14, 10, 8, 6, 5],
+    /* The plan this stage runs to, in weeks from its start. Three vehicles designed together, built together, and then measured for the rest of the stage — the stress and reliability work is what the vehicles exist for. */
+    engineeringStart: [0, 6, 6, 8, 16, 30, 38, 38, 40, 36, 40, 45],
+    /* Which activity produces each deliverable, and the week it is due. */
+    deliverableFrom: [0, 3, 5, 6, 7, 8, 9, 11, 11],
+    deliverableWeek: [6, 16, 41, 45, 49, 49, 50, 52, 52],
     risks: ["Vehicle build slip", "CPI failure late", "Process window unproven"],
     potentialRisks: [
       "Vehicle results arriving after product wafer-out",
@@ -907,14 +1003,15 @@ export const journeyData = [
     tagline: "One power network, one channel, one signoff.",
     description: "Verify the die, the package and the board as one electrical system — one power delivery network, one channel — and close it as a signoff with named exit criteria, not as three separate simulations that never met.",
     activities: ["CPM extraction", "PDN co-simulation", "Channel compliance", "Co-verification signoff"],
+    /* Listed in the order this stage's plan produces them. */
     deliverables: [
       "Chip power model (CPM/CPS) release per domain and mode",
       "Extracted package and board electrical models",
+      "Channel compliance report per interface, with margins",
       "PDN impedance and dynamic IR co-simulation report",
       "Decap budget and placement specification across die, package and board",
-      "Channel compliance report per interface, with margins",
-      "Eye, jitter and BER budget closure record",
       "Power-aware STA correlation report",
+      "Eye, jitter and BER budget closure record",
       "Chip-package-system co-verification signoff — tapeout gate"
     ],
     engineeringView: [
@@ -933,6 +1030,11 @@ export const journeyData = [
     /** Elapsed weeks per engineering activity; negative marks one that runs continuously. */
     engineeringTat: [7, 8, 9, 8, 7, 5, 9, 8, 5, 5, 4],
     engineeringEffort: [8, 10, 12, 10, 7, 5, 11, 9, 5, 5, 3],
+    /* The plan this stage runs to, in weeks from its start. Nothing can be simulated until the models exist, so the extractions come first; the power and channel work then runs in parallel and meets at the signoff review. */
+    engineeringStart: [0, 2, 8, 12, 14, 16, 8, 16, 18, 18, 22],
+    /* Which activity produces each deliverable, and the week it is due. */
+    deliverableFrom: [0, 1, 6, 3, 4, 8, 7, 10],
+    deliverableWeek: [7, 10, 17, 20, 21, 23, 24, 26],
     risks: ["Package-induced droop", "Channel margin", "Model availability"],
     potentialRisks: [
       "Each team simulating with its own model of the other two",
@@ -958,11 +1060,12 @@ export const journeyData = [
     tagline: "The journey leaves the die.",
     description: "Stack, bond and build the units — known-good die, HBM stacks, underfill, lid — and learn the assembly yield on the parts bring-up and qualification will consume.",
     activities: ["Known-good-die sort", "Bonding & underfill", "Inline inspection", "Unit allocation"],
+    /* Listed in the order this stage's plan produces them. */
     deliverables: [
-      "Assembled units — bring-up, qualification and sample lots",
       "Assembly travelers and process data",
-      "Assembly yield report and failure pareto",
+      "Assembled units — bring-up, qualification and sample lots",
       "Package-level inspection and test data",
+      "Assembly yield report and failure pareto",
       "Unit allocation record across bring-up, qual and customers"
     ],
     engineeringView: [
@@ -979,6 +1082,11 @@ export const journeyData = [
     /** Elapsed weeks per engineering activity; negative marks one that runs continuously. */
     engineeringTat: [3, 3, 3, 3, 2, 2, 5, 2, 3],
     engineeringEffort: [5, 2, 6, 5, 3, 3, 6, 3, 3],
+    /* The plan this stage runs to, in weeks from its start. Eight weeks of line work: known-good die and HBM in at the start, bonding and assembly through the middle, and the units out at the end. */
+    engineeringStart: [0, 0, 2, 3, 5, 3, 3, 6, 5],
+    /* Which activity produces each deliverable, and the week it is due. */
+    deliverableFrom: [3, 4, 7, 6, 8],
+    deliverableWeek: [6, 7, 8, 8, 8],
     risks: ["Assembly yield", "Material availability", "Inspection escapes"],
     potentialRisks: [
       "Known-good-die test coverage insufficient",
@@ -1004,13 +1112,14 @@ export const journeyData = [
     tagline: "Ready before the silicon arrives.",
     description: "Design, build and debug the boards and lab infrastructure that first silicon will be plugged into — finished and shaken out before the parts arrive, not after.",
     activities: ["Schematic & layout", "Board fabrication", "Debug infrastructure", "Lab setup"],
+    /* Listed in the order this stage's plan produces them. */
     deliverables: [
       "Validation platform specification",
+      "Debug and trace access documentation",
+      "Lab setup and instrument reservation plan",
       "EVB schematics, BOM and layout database",
       "Fabricated and assembled boards, rev A/B with quantity plan",
-      "Board bring-up report and known issues",
-      "Debug and trace access documentation",
-      "Lab setup and instrument reservation plan"
+      "Board bring-up report and known issues"
     ],
     engineeringView: [
       "Validation platform requirements and topology definition",
@@ -1027,6 +1136,11 @@ export const journeyData = [
     /** Elapsed weeks per engineering activity; negative marks one that runs continuously. */
     engineeringTat: [5, 10, 12, 8, 7, 7, 7, 7, 7, 7],
     engineeringEffort: [5, 14, 18, 4, 8, 8, 10, 7, 8, 10],
+    /* The plan this stage runs to, in weeks from its start. Schematic, layout, fabrication and bring-up in sequence because each waits on the last; the lab and thermal work is fitted around them. */
+    engineeringStart: [0, 5, 15, 27, 8, 10, 31, 18, 20, 28],
+    /* Which activity produces each deliverable, and the week it is due. */
+    deliverableFrom: [0, 5, 8, 2, 3, 6],
+    deliverableWeek: [5, 17, 27, 27, 35, 38],
     risks: ["Board respin", "Lab capacity", "Debug access gaps"],
     potentialRisks: [
       "Boards not ready when silicon arrives",
@@ -1052,14 +1166,15 @@ export const journeyData = [
     tagline: "Probe card lead time is the critical path.",
     description: "Build the ability to test the product — tester platform, probe card and load board, sort and final programs — on a critical path set by probe card lead time, not by wafer-out.",
     activities: ["Test plan", "Probe card & load board", "Sort & final programs", "Test time optimisation"],
+    /* Listed in the order this stage's plan produces them. */
     deliverables: [
       "Test plan and test coverage matrix",
-      "Qualified probe card and load board",
-      "Wafer sort and final test programs, release-tagged",
-      "Characterisation test suite",
       "ATE-ready pattern set with debug log",
+      "Test data infrastructure and yield database",
+      "Qualified probe card and load board",
+      "Characterisation test suite",
       "Test time and test cost model",
-      "Test data infrastructure and yield database"
+      "Wafer sort and final test programs, release-tagged"
     ],
     engineeringView: [
       "Test plan and coverage strategy — wafer sort, final test, system-level test",
@@ -1077,6 +1192,11 @@ export const journeyData = [
     /** Elapsed weeks per engineering activity; negative marks one that runs continuously. */
     engineeringTat: [8, 6, 20, 17, 16, 16, 12, 10, 9, 8, 8],
     engineeringEffort: [12, 4, 16, 16, 30, 28, 20, 16, 12, 10, 10],
+    /* The plan this stage runs to, in weeks from its start. The hardware has the longest lead time, so the probe card is started as soon as the plan allows; programs are written against it and released at the gate. */
+    engineeringStart: [0, 4, 10, 12, 18, 26, 24, 14, 30, 34, 20],
+    /* Which activity produces each deliverable, and the week it is due. */
+    deliverableFrom: [0, 7, 10, 2, 6, 8, 5],
+    deliverableWeek: [8, 24, 28, 30, 36, 39, 42],
     risks: ["Probe card lead time", "Program maturity", "Tester availability"],
     potentialRisks: [
       "Probe card ordered after wafer-out is committed",
@@ -1102,12 +1222,13 @@ export const journeyData = [
     tagline: "The moment of truth.",
     description: "Find out what the silicon actually does. Power on, train the interfaces, characterise the margins, debug what does not match, and decide whether the program respins.",
     activities: ["Lab bring-up", "Interface training", "Characterization", "Respin decision"],
+    /* Listed in the order this stage's plan produces them. */
     deliverables: [
       "Bring-up report with per-milestone health status",
-      "Characterisation data set — V/F/T shmoo and power measurements",
+      "Failure analysis reports",
       "Interface compliance results with training margins",
       "Errata list with workarounds",
-      "Failure analysis reports",
+      "Characterisation data set — V/F/T shmoo and power measurements",
       "Respin versus metal-fix decision record",
       "Customer sample release package"
     ],
@@ -1128,6 +1249,11 @@ export const journeyData = [
     /** Elapsed weeks per engineering activity; negative marks one that runs continuously. */
     engineeringTat: [1.5, 3, 3, 4, 8, 6, 7, 6, 10, 7, 4, 5],
     engineeringEffort: [2, 8, 8, 12, 26, 16, 16, 16, 28, 10, 5, 6],
+    /* The plan this stage runs to, in weeks from its start. Power-on, clocks, boot, interfaces — in that order because each depends on the last — with debug running under all of it and the respin call made near the end. */
+    engineeringStart: [0, 1.5, 3, 5, 7, 9, 10, 11, 4, 8, 13, 13],
+    /* Which activity produces each deliverable, and the week it is due. */
+    deliverableFrom: [3, 8, 4, 9, 6, 10, 11],
+    deliverableWeek: [9, 14, 15, 15, 17, 17, 18],
     risks: ["Silicon bugs", "Debug cycle time", "Respin decision"],
     potentialRisks: [
       "Evaluation boards not ready when silicon arrives",
@@ -1153,15 +1279,16 @@ export const journeyData = [
     tagline: "Engineering becomes a product.",
     description: "Prove reliability to standard, drive yield to the cost model, release the production test program, and commit to a ramp the supply chain can actually hold.",
     activities: ["Reliability qual", "Yield learning", "Production test release", "Volume ramp"],
+    /* Listed in the order this stage's plan produces them. */
     deliverables: [
       "Qualification plan and JEDEC-compliant qualification report",
-      "Reliability and package qualification data packages",
-      "Production test program release",
       "Yield model versus cost target report",
-      "Production readiness review sign-off",
-      "Ramp plan and supply commitment",
+      "Production test program release",
       "Compliance certificates",
+      "Reliability and package qualification data packages",
+      "Ramp plan and supply commitment",
       "Datasheet and product documentation set",
+      "Production readiness review sign-off",
       "Mass Production release record"
     ],
     engineeringView: [
@@ -1181,6 +1308,11 @@ export const journeyData = [
     /** Elapsed weeks per engineering activity; negative marks one that runs continuously. */
     engineeringTat: [6, 18, 6, 12, -20, 9, 9, 9, 6, 12, 12, 10],
     engineeringEffort: [8, 30, 8, 18, 40, 20, 16, 14, 8, 12, 18, 16],
+    /* The plan this stage runs to, in weeks from its start. Reliability stress sets the length of the stage — eighteen weeks of it — and everything else is arranged to finish before the production readiness review that releases the product. */
+    engineeringStart: [0, 4, 6, 8, 0, 10, 14, 8, 20, 10, 8, 12],
+    /* Which activity produces each deliverable, and the week it is due. */
+    deliverableFrom: [0, 4, 5, 10, 1, 9, 11, 8, 8],
+    deliverableWeek: [6, 16, 19, 20, 22, 22, 22, 26, 26],
     risks: ["Qualification failures", "Yield shortfall", "Supply constraints"],
     potentialRisks: [
       "Qualification vehicles not ready on time",

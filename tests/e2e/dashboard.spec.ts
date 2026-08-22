@@ -37,13 +37,13 @@ test.beforeEach(async ({ page }) => {
 });
 
 test.describe('stat tiles', () => {
-  test('the seed program reads 54% / D−xx / 23 / 7', async ({ page }) => {
+  test('the seed program reads 52% / D−xx / 23 / 7', async ({ page }) => {
     await openDash(page);
     await expect(page.locator('#dash-title')).toHaveText('AtlasAX1 — Dashboard');
 
     const progress = stat(page, 'Program Progress');
-    await expect(progress.locator('.v')).toHaveText('54%');
-    await expect(progress.locator('.sub')).toHaveText('90 of 167 deliverables complete');
+    await expect(progress.locator('.v')).toHaveText('52%');
+    await expect(progress.locator('.sub')).toHaveText('87 of 167 deliverables complete');
 
     const tapeout = stat(page, 'Tapeout');
     await expect(tapeout.locator('.v')).toHaveText(/^D−\d+$/);
@@ -72,16 +72,16 @@ test.describe('stat tiles', () => {
   });
 
   test('the counters follow the data', async ({ page }) => {
-    /* File one more deliverable and the tile counts it: 90 of 167 → 91. */
+    /* File one more deliverable and the tile counts it: 87 of 167 → 88. */
     await selectStage(page, 'physicalDesign');
     await settleLayout(page); // the sheet animates in
     /* Completing one means filing its record — the artefact is the tick. */
     await fileDeliverable(page, 'Interim physical DRC', ARTEFACT);
     await openDash(page);
     await expect(stat(page, 'Program Progress').locator('.sub')).toHaveText(
-      '91 of 167 deliverables complete',
+      '88 of 167 deliverables complete',
     );
-    await expect(stat(page, 'Program Progress').locator('.v')).toHaveText('54%');
+    await expect(stat(page, 'Program Progress').locator('.v')).toHaveText('53%');
   });
 
   test('a stage with no open risks drops out of the risk list', async ({ page }) => {

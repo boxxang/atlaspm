@@ -176,16 +176,18 @@ Pure logic never imports UI, and `/src/lib` + `/src/data` never touch the DOM �
 - **Checkpoint labels.** On the dashboard each milestone label sits past the end
   of its bar, beside its diamond, with an arrow pointing back at it — so a label
   never lies over the schedule it annotates, at any row height.
-- **The stage timeline** (RTL only, on trial). A stage read as a schedule
-  rather than as two tables, spanning both of them, with the tables under it.
-  The engineering list is bars and each deliverable is a diamond on the bar of
-  the activity that produces it — because what a stage timeline is asked to
-  show is not that an artefact is due, but what has to finish for it to exist.
-  A stage states its plan (`engineeringStart`, `deliverableFrom`,
-  `deliverableWeek` in /data/journey), so both ends of every bar are recorded
-  rather than guessed; a stage with no plan falls back to the order of its
-  list, which is a guess and says so above the chart. The switch is
-  `stageId === 'rtl'` in ViewToggle.
+- **The stage timeline.** A stage read as a schedule rather than as two
+  tables, spanning both of them, with the tables under it. The engineering
+  list is bars and each deliverable is a diamond on the bar of the activity
+  that produces it — because what a stage timeline is asked to show is not
+  that an artefact is due, but what has to finish for it to exist.
+  Every stage states its plan in /data/journey: `engineeringStart` (weeks
+  from the stage start to each activity's own start), `deliverableFrom`
+  (which activity produces each artefact) and `deliverableWeek` (the week it
+  is due, which is the week that activity finishes). So both ends of every bar
+  are recorded rather than guessed, and the seed and every new program date
+  their deliverables from it. A stage given no plan still charts, from the
+  order of its list — a guess, and the note above the chart says so.
 - **The toolbar's three dates.** Kick-off, MTO and MP read beside the program
   name. The milestone axis below carries every checkpoint positioned in time,
   which is where to read the shape of a schedule and the wrong place to answer
@@ -286,7 +288,7 @@ that is a read/write swap rather than a redesign.
 
 ```bash
 npm test          # 171 unit tests: schedule engine, stages/profiles, derivations, effort, mail, purity
-npm run e2e       # 256 Playwright tests
+npm run e2e       # 258 Playwright tests
 ```
 
 The e2e suite runs against its own database (`test.db`) on port 3100, so it never

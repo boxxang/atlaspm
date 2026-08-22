@@ -1,9 +1,9 @@
 import { expect, test, SEED_PROJECT_PATH, selectStage, settleLayout } from './fixtures';
 
 /**
- * A first look at reading a stage as a timeline rather than as two tables.
- * One stage carries it for now — RTL — because the question it answers is
- * whether derived starts are worth having, and one stage answers that.
+ * A stage read as a timeline rather than as two tables. RTL carries most of
+ * the assertions because its plan is the one worked through first, but every
+ * stage draws one from a plan of its own.
  */
 const panel = '.stage-panel.selected';
 
@@ -75,11 +75,36 @@ test.describe('the stage timeline', () => {
     expect(Math.abs(last.x + last.width / 2 - gate.x)).toBeLessThanOrEqual(2);
   });
 
-  test('it is one stage’s trial, not every stage’s', async ({ page }) => {
-    await selectStage(page, 'physicalDesign');
+  test('every stage draws one, from its own plan', async ({ page }) => {
+    for (const stage of ['productDefinition', 'physicalDesign', 'tapeout', 'qualification']) {
+      await selectStage(page, stage);
+      await settleLayout(page);
+      await page.locator(`${panel} [data-stage-chart]`).click();
+      const gantt = page.locator('[data-stage-gantt]');
+      await expect(gantt, stage).toBeVisible();
+      // drawn from what the stage states, not from the order of its list
+      await expect(gantt.locator('.sg-cap .note'), stage).toContainText('the stage’s own plan');
+      // one bar per engineering line, every artefact on the work that makes it
+      expect(await gantt.locator('[data-sg-act]').count(), stage).toBe(
+        await page.locator(`${panel} .mm-list li`).count(),
+      );
+      await expect(gantt.locator('.sg-row.dlv'), stage).toHaveCount(0);
+      expect(await gantt.locator('[data-sg-dlv]').count(), stage).toBe(
+        await page.locator(`${panel} .dlv-list li`).count(),
+      );
+      await page.locator(`${panel} [data-stage-chart]`).click();
+    }
+  });
+
+  test('January says which January it is', async ({ page }) => {
+    /* A stage that crosses a new year should say so on its axis rather than
+       only in the caption above it — the roadmap's axis does the same. */
+    await selectStage(page, 'tapeout'); // runs from November into January
     await settleLayout(page);
-    await expect(page.locator(`${panel} [data-stage-chart]`)).toHaveCount(0);
-    await expect(page.locator(`${panel} .sheet-head [data-wrap="engineering"]`)).toHaveCount(1);
+    await page.locator(`${panel} [data-stage-chart]`).click();
+    const months = await page.locator('[data-stage-gantt] .sg-month').allTextContents();
+    expect(months.some((m) => /^Jan ’\d{2}$/.test(m))).toBe(true);
+    for (const m of months) expect(m).toMatch(/^[A-Z][a-z]{2}( ’\d{2})?$/);
   });
 });
 

@@ -497,18 +497,21 @@ export async function createProject(input: {
       kickoff: input.kickoff,
       profileId: input.profileId,
       deliverables: {
-        /* Dated across the stage rather than all on its last day: a stage's
-           deliverables are steps through it, so they land at even fractions of
-           its span with the last one on the end date. */
+        /* Dated by the stage's own plan, which says the week each artefact is
+           due — the week the work that makes it finishes. A stage with no plan
+           falls back to even fractions of its span, last one on the end date,
+           which is a spread rather than a schedule but is at least ordered. */
         create: stages.flatMap((stage) => {
           const st = schedule.stages[stage.id];
+          const planned = stage.deliverableWeek;
           return stage.deliverables.map((title, position) => ({
             id: `${input.id}:dlv:${stage.id}:${position}`,
             stageId: stage.id,
             title,
             due: addWeeks(
               st.start,
-              (st.durationWeeks * (position + 1)) / stage.deliverables.length,
+              planned?.[position] ??
+                (st.durationWeeks * (position + 1)) / stage.deliverables.length,
             ),
             done: false,
             completedAt: null,

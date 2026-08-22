@@ -28,8 +28,8 @@ test.describe('program list', () => {
 
     const c = card(page, 'AtlasAX1');
     await expect(c.locator('.pl-profile')).toHaveText('Typical SoC');
-    await expect(c.locator('.pl-pct .n')).toHaveText('54%');
-    await expect(c.locator('.pl-pct')).toContainText('90 / 167 deliverables');
+    await expect(c.locator('.pl-pct .n')).toHaveText('52%');
+    await expect(c.locator('.pl-pct')).toContainText('87 / 167 deliverables');
     // the stage the card names is the one the program opens on
     await expect(c.locator('.pl-stage')).toHaveText('TEST · Test Development');
     await expect(c.locator('.pl-stage')).toHaveClass(/risky/);
@@ -141,20 +141,21 @@ test.describe('creating a program', () => {
     await expect(panel.locator('.dlv-t')).toHaveText([
       'Product requirements document (PRD)',
       'Target specification — PPA and KPI table',
-      'Product cost and margin model',
       'Feasibility report',
+      'Product cost and margin model',
       'Program charter, staffing and budget plan',
       'Kickoff Go / No-Go decision record',
     ]);
     await expect(panel.locator('.dlv-note')).toHaveText('0 / 6 complete');
-    /* dated across the stage under this program's own schedule: six of them
-       spread over the eight weeks that run from 03/01 */
+    /* dated by the stage's own plan under this program's schedule: each on
+       the day the work that makes it finishes, the last on the gate — which
+       is why two can share a day */
     await expect(panel.locator('[data-dlv-due-text]')).toHaveText([
-      '03/10/2027',
-      '03/20/2027',
       '03/29/2027',
-      '04/07/2027',
-      '04/17/2027',
+      '04/12/2027',
+      '04/19/2027',
+      '04/19/2027',
+      '04/26/2027',
       '04/26/2027',
     ]);
 
@@ -188,7 +189,7 @@ test.describe('creating a program', () => {
     await page.goto('/');
     await expect(page.locator('.pl-card:not(.new)')).toHaveCount(2);
     await expect(card(page, 'AtlasBX5').locator('.pl-pct .n')).toHaveText('0%');
-    await expect(card(page, 'AtlasAX1').locator('.pl-pct .n')).toHaveText('54%');
+    await expect(card(page, 'AtlasAX1').locator('.pl-pct .n')).toHaveText('52%');
   });
 
   test('Cancel closes the form without creating anything', async ({ page }) => {
@@ -252,7 +253,7 @@ test.describe('switching programs without a page load', () => {
   test('the dashboard follows the switch too', async ({ page }) => {
     await card(page, 'AtlasAX1').locator('.pl-open').click();
     await page.locator('#mode-toggle button[data-mode="schedule"]').click();
-    await expect(page.locator('.stat').first().locator('.v')).toHaveText('54%');
+    await expect(page.locator('.stat').first().locator('.v')).toHaveText('52%');
     await page.locator('#mode-toggle button[data-mode="journey"]').click();
 
     await page.locator('#to-programs').click();

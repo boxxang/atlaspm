@@ -47,7 +47,7 @@ test.describe('dashboard summary export', () => {
     expect(m.subject).toMatch(/^AtlasAX1 — program summary \d{2}\/\d{2}\/\d{4}$/);
 
     // the numbers the dashboard shows are the numbers in the mail
-    expect(m.body).toContain('54%  (90 of 167 deliverables)');
+    expect(m.body).toContain('52%  (87 of 167 deliverables)');
     expect(m.body).toMatch(/Open risks {5}23 {2}\(Product Definition, Physical Design/);
     expect(m.body).toMatch(/Overdue {8}7/);
     expect(m.body).toContain('PD · Physical Design');
@@ -75,7 +75,7 @@ test.describe('dashboard summary export', () => {
     await fileDeliverable(page, 'Interim physical DRC', ARTEFACT);
     await page.locator('#mode-toggle button[data-mode="schedule"]').click();
     const m = await draft(page, '.dash-title-row [data-mail]');
-    expect(m.body).toContain('54%  (91 of 167 deliverables)');
+    expect(m.body).toContain('53%  (88 of 167 deliverables)');
   });
 });
 

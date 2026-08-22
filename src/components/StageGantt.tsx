@@ -55,10 +55,12 @@ export function StageGantt({ stageId }: { stageId: StageId }) {
     while (cursor.getTime() < start + axis) {
       months.push({
         pct: pct(cursor.getTime()),
-        /* No year on the labels: a stage is months wide, so eight of them
-           share about three hundred pixels and "Jan ’26" runs into February.
-           Which years these are is stated once, in the caption above. */
-        label: cursor.toLocaleDateString('en-US', { month: 'short' }),
+        /* January carries its year, the way the roadmap's axis does — a
+           stage that crosses a new year should say so on the axis rather than
+           only in the caption. */
+        label:
+          cursor.toLocaleDateString('en-US', { month: 'short' }) +
+          (cursor.getMonth() === 0 ? ` ’${String(cursor.getFullYear()).slice(2)}` : ''),
         key: cursor.getTime(),
       });
       cursor.setMonth(cursor.getMonth() + 1);

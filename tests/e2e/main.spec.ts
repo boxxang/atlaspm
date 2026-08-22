@@ -833,7 +833,7 @@ test.describe('the folded chart carries its dates', () => {
     await expect(first.locator('.g-dlv-date')).toHaveText(/^\d{1,2}\/\d{1,2}$/);
     await expect(first).toHaveClass(/done/);
     // an open one still shows what it is due
-    await expect(marks.filter({ hasText: 'Bump map' }).locator('.g-dlv-date')).toHaveText('9/27');
+    await expect(marks.filter({ hasText: 'ECO log' }).locator('.g-dlv-date')).toHaveText('10/16');
 
     // markers are placed by date: later date, further right
     const xs = await marks.evaluateAll((els) =>
@@ -842,18 +842,18 @@ test.describe('the folded chart carries its dates', () => {
     expect([...xs].sort((a, b) => a - b)).toEqual(xs);
 
     // move a due date in the sheet below and the marker follows
-    const open = marks.filter({ hasText: 'Bump map' });
+    const open = marks.filter({ hasText: 'ECO log' });
     const before = (await open.boundingBox())!.x;
     await editDeliverables(page);
     await selectedPanel(page)
       .locator('.dlv-list li')
-      .filter({ hasText: 'Bump map' })
+      .filter({ hasText: 'ECO log' })
       .locator('input.dlv-due')
       .fill('2026-10-24');
     await page.locator('#roadmap').hover({ position: { x: 8, y: 8 } });
     await fold(page);
     const moved = page.locator('#rm-gantt .g-row.current .g-dlv').filter({
-      hasText: 'Bump map',
+      hasText: 'ECO log',
     });
     await expect(moved.locator('.g-dlv-date')).toHaveText('10/24');
     expect((await moved.boundingBox())!.x).toBeGreaterThan(before);
@@ -933,10 +933,10 @@ test.describe('marks tell past from future', () => {
     page,
   }) => {
     await selectStage(page, 'physicalDesign');
-    await fileDeliverable(page, 'Bump map', TXT);
+    await fileDeliverable(page, 'ECO log', TXT);
     const row = selectedPanel(page)
       .locator('.dlv-list li')
-      .filter({ hasText: 'Bump map' });
+      .filter({ hasText: 'ECO log' });
     await expect(row.locator('.dlv-comp')).not.toHaveText('—');
 
     const box = (await page.locator('#roadmap').boundingBox())!;
@@ -944,7 +944,7 @@ test.describe('marks tell past from future', () => {
     await settleLayout(page);
 
     const mark = page.locator('#rm-gantt .g-row.current .g-dlv').filter({
-      hasText: 'Bump map',
+      hasText: 'ECO log',
     });
     await expect(mark).toHaveClass(/done/);
     const today = new Date();
@@ -1126,12 +1126,12 @@ test.describe('the deliverables table opens its records', () => {
   test('a filed row drops the paperclip it no longer needs', async ({ page }) => {
     await selectStage(page, 'physicalDesign');
     const panel = selectedPanel(page);
-    const row = panel.locator('.dlv-list li').filter({ hasText: 'Bump map' });
+    const row = panel.locator('.dlv-list li').filter({ hasText: 'ECO log' });
     // unfiled: the clip that files a record, and no clip badge
     await expect(row.locator('[data-dlv-record]')).toHaveCount(1);
     await expect(row.locator('.clip-badge')).toHaveCount(0);
 
-    await fileDeliverable(page, 'Bump map', TXT);
+    await fileDeliverable(page, 'ECO log', TXT);
     /* filed: the badge opens the artefact, and the paperclip that filed it
        would say nothing the badge does not */
     await expect(row.locator('[data-dlv-files]')).toHaveCount(1);

@@ -286,11 +286,12 @@ function ViewToggle({
      and of the deliverables; its switch lives up here so both tables carry
      exactly one header row and their columns line up. */
   const [editing, setEditing] = useState(false);
-  /* A first look at reading a stage as a timeline rather than as two tables.
-     One stage for now — it is a question about whether the derived starts are
-     worth having, and one stage answers that as well as twenty-three would. */
+  /* Every stage can be read as a timeline rather than as two tables, so long
+     as it has a plan to draw — see engineeringStart in /data/journey. A stage
+     without one still charts, from the order of its list; what it cannot do
+     is pretend that order is a plan, so the note above the chart says which
+     of the two is being drawn. */
   const [chart, setChart] = useState(false);
-  const timeline = stageId === 'rtl';
   /* Three grid items, not one column: the chart spans both columns between
      the header row and the tables, so it is read at the width of the stage
      rather than at half of it. */
@@ -306,7 +307,7 @@ function ViewToggle({
             Program
           </button>
         </div>
-        {view === 'eng' && timeline && (
+        {view === 'eng' && (
           <button
             className="tbl-icon"
             data-stage-chart
@@ -333,7 +334,7 @@ function ViewToggle({
       </div>
       </div>
 
-      {timeline && chart && (
+      {chart && (
         <div className="sh sh-chart">
           <StageGantt stageId={stageId} />
         </div>

@@ -174,11 +174,11 @@ test.describe('read mode versus edit mode', () => {
     /* Product Definition's are all closed in the seed, so file one from a
        stage that is still running. */
     await selectStage(page, 'physicalDesign');
-    const row = panel(page).locator('.dlv-list li').filter({ hasText: 'Bump map' });
+    const row = panel(page).locator('.dlv-list li').filter({ hasText: 'ECO log' });
     await expect(row.locator('.dlv-comp')).toHaveText('—');
 
     // filing its record stamps today
-    await fileDeliverable(page, 'Bump map', ARTEFACT);
+    await fileDeliverable(page, 'ECO log', ARTEFACT);
     const today = new Date();
     const p2 = (n: number) => String(n).padStart(2, '0');
     const iso = `${today.getFullYear()}-${p2(today.getMonth() + 1)}-${p2(today.getDate())}`;
@@ -198,7 +198,7 @@ test.describe('read mode versus edit mode', () => {
     await expect(
       panel(page)
         .locator('.dlv-list li')
-        .filter({ hasText: 'Bump map' })
+        .filter({ hasText: 'ECO log' })
         .locator('.dlv-comp'),
     ).toContainText('05/04/2026');
   });
