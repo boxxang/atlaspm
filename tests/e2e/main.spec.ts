@@ -1222,3 +1222,18 @@ test.describe('a row opens wherever it is clicked', () => {
     await expect(page.locator('.iv-title')).toContainText('ECO drop 1 planning');
   });
 });
+
+test.describe('a stage ends on the artefact it ends with', () => {
+  test('the last key deliverable is due the day its stage closes', async ({ page }) => {
+    /* The gate reviews the closing artefact, so the stage cannot end before
+       it: a schedule where it does is one nobody can work to. */
+    for (const stage of ['productDefinition', 'physicalDesign', 'tapeout', 'qualification']) {
+      await selectStage(page, stage);
+      const panel = selectedPanel(page);
+      const end = await panel.locator('[data-role="end-edit"]').inputValue();
+      const dues = await panel.locator('[data-dlv-due-text]').allTextContents();
+      const [m, d, y] = dues[dues.length - 1].split('/');
+      expect(`${y}-${m}-${d}`, stage).toBe(end);
+    }
+  });
+});

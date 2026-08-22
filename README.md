@@ -176,6 +176,16 @@ Pure logic never imports UI, and `/src/lib` + `/src/data` never touch the DOM �
 - **Checkpoint labels.** On the dashboard each milestone label sits past the end
   of its bar, beside its diamond, with an arrow pointing back at it — so a label
   never lies over the schedule it annotates, at any row height.
+- **The toolbar's three dates.** Kick-off, MTO and MP read beside the program
+  name. The milestone axis below carries every checkpoint positioned in time,
+  which is where to read the shape of a schedule and the wrong place to answer
+  "when is tapeout" from across a room. They give way in order as the bar
+  tightens — mass production first, kick-off last, being what the rest are
+  counted from.
+- **A stage ends on the artefact it ends with.** The last key deliverable of a
+  stage falls on the day that stage closes, exactly: the gate reviews the
+  closing artefact, so a stage that ends before it is a schedule nobody can
+  work to. The rest of the list carries a few days of drift; that one does not.
 - **An activity is work towards something.** Writing one names the key
   deliverable it is for, and the Activity board can then be read one
   deliverable at a time — which is the question a review opens with, not "show
@@ -266,7 +276,7 @@ that is a read/write swap rather than a redesign.
 
 ```bash
 npm test          # 171 unit tests: schedule engine, stages/profiles, derivations, effort, mail, purity
-npm run e2e       # 248 Playwright tests
+npm run e2e       # 251 Playwright tests
 ```
 
 The e2e suite runs against its own database (`test.db`) on port 3100, so it never

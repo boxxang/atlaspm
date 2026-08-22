@@ -2,11 +2,50 @@
 
 import Link from 'next/link';
 import type { ProfileSummary, ScheduleProfile } from '@/data/types';
+import { dday } from '@/lib/derive';
+import { fmtDate } from '@/lib/schedule';
+import { useAppStore } from '@/store/useAppStore';
 import { Popover } from './Popover';
 import { ProjectName } from './ProjectName';
 import { SettingsPopover } from './SettingsPopover';
 
 export type ViewMode = 'journey' | 'schedule';
+
+/**
+ * The three dates a program is held to, beside the name it is held under:
+ * when it started, when the masks go out, when it ships.
+ *
+ * The milestone axis below carries every checkpoint, positioned in time, and
+ * that is the right place to read the shape of the schedule. It is the wrong
+ * place to answer "when is tapeout" from across a room, which is the question
+ * these three get asked. They are read-outs — kick-off is edited on the axis
+ * where it is drawn, and the other two are where the stages put them.
+ */
+function ProgramDates() {
+  const kickoff = useAppStore((s) => s.kickoff);
+  const schedule = useAppStore((s) => s.schedule);
+  const today = useAppStore((s) => s.today);
+  const dates = [
+    { k: 'Kick-off', v: kickoff, cls: '' },
+    { k: 'MTO', v: schedule.tapeout, cls: ' tb-opt1', tip: 'Tapeout — mask order' },
+    { k: 'MP', v: schedule.production, cls: ' tb-opt2', tip: 'Mass production' },
+  ];
+  return (
+    <div className="tb-dates" data-tb-dates>
+      {dates.map((d) => (
+        <span
+          className={`tb-date${d.cls}`}
+          key={d.k}
+          data-tb-date={d.k}
+          data-tip={d.tip ? `${d.tip}|${fmtDate(d.v)} · ${dday(d.v, today)}` : undefined}
+        >
+          <span className="k">{d.k}</span>
+          <span className="v">{fmtDate(d.v)}</span>
+        </span>
+      ))}
+    </div>
+  );
+}
 
 export function Toolbar({
   projectName,
@@ -36,11 +75,11 @@ export function Toolbar({
         <span aria-hidden="true">‹</span> Programs
       </Link>
 
-      {/* Program, the template it runs on, and the way into editing that
-          template. Dates are not here: the milestone axis below carries them,
-          kickoff included, and it carries them positioned in time. */}
+      {/* Program, the three dates it is held to, the template it runs on, and
+          the way into editing that template. */}
       <div className="tb-centre">
         <ProjectName value={projectName} onChange={onProjectNameChange} />
+        <ProgramDates />
         <div className="tb-field">
           <label htmlFor="profile-select">Milestone template</label>
           <select

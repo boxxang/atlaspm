@@ -225,3 +225,48 @@ test.describe('display settings', () => {
     expect(await cssVar(page, '--icon-scale')).toBe('2.25');
   });
 });
+
+test.describe('the three dates a program is held to', () => {
+  test('kick-off, MTO and MP read beside the name', async ({ page }) => {
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await page.goto(SEED_PROJECT_PATH);
+    const dates = page.locator('.tb-dates .tb-date');
+    await expect(dates).toHaveCount(3);
+    await expect(dates.locator('.k')).toHaveText(['Kick-off', 'MTO', 'MP']);
+    for (const v of await dates.locator('.v').allTextContents()) {
+      expect(v).toMatch(/^\d{2}\/\d{2}\/\d{4}$/);
+    }
+
+    // they are the schedule's, not a second copy of it
+    const [kick, mto, mp] = await dates.locator('.v').allTextContents();
+    expect(kick).toBe(
+      await page.locator('#rm-gantt .g-kickoff-dot').getAttribute('aria-label').then((l) =>
+        l!.replace('Kick-off ', '').replace(' — change', ''),
+      ),
+    );
+    expect(mto).toBe(await tapeoutDate(page));
+    expect(new Date(mp).getTime()).toBeGreaterThan(new Date(mto).getTime());
+
+    // and they follow the program rather than sitting still
+    await setKickoffDate(page, '2028-01-03');
+    await expect(dates.locator('.v').first()).toHaveText('01/03/2028');
+    await expect.poll(() => dates.locator('.v').nth(1).textContent()).toBe(
+      await tapeoutDate(page),
+    );
+  });
+
+  test('they give way in order as the bar tightens', async ({ page }) => {
+    await page.goto(SEED_PROJECT_PATH);
+    /* the dates come from the store, so they arrive with the hydration */
+    await expect(page.locator('.tb-dates .tb-date').first()).toBeVisible();
+    const shown = async (w: number) => {
+      await page.setViewportSize({ width: w, height: 900 });
+      return page.locator('.tb-dates .tb-date:visible').count();
+    };
+    // mass production goes first, tapeout next; kick-off is what the rest
+    // are counted from, so it is the last to go
+    expect(await shown(1440)).toBe(3);
+    expect(await shown(1280)).toBe(2);
+    expect(await shown(1100)).toBe(1);
+  });
+});

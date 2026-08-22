@@ -146,10 +146,14 @@ export function createProjectSeed({
     /** Below 1, so the gaps close as the stage runs down to its review. */
     const EASE = 0.75;
     deliverables[stage] = titles.map((title, i) => {
+      const last = i === titles.length - 1;
       const t = titles.length > 1 ? (i / (titles.length - 1)) ** EASE : 1;
-      const due = W(stage, span * (OPENS_AT + (1 - OPENS_AT) * t));
+      /* The last one is the gate itself, so it falls on the day the stage
+         closes — exactly, with no drift. A stage that ends before the artefact
+         it ends on is not a schedule anyone can work to. */
+      const due = last ? E(stage) : W(stage, span * (OPENS_AT + (1 - OPENS_AT) * t));
       /* a couple of days either way, never enough to reorder the list */
-      due.setDate(due.getDate() + jitter[i % jitter.length]);
+      if (!last) due.setDate(due.getDate() + jitter[i % jitter.length]);
       const done = due < settled;
       let completedAt: Date | null = null;
       if (done) {

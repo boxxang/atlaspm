@@ -95,6 +95,19 @@ input,select,textarea{font:inherit;color:inherit}
   border-bottom:1px solid var(--line);
 }
 @media (max-width:1760px){.tb-field.tb-opt2{display:none}}
+/* The three dates the program is held to, beside its name. They give way in
+   order as the bar tightens: mass production first, then tapeout, and
+   kick-off last — it is the one the rest are counted from. */
+.tb-dates{display:flex;align-items:baseline;gap:14px;flex:none;white-space:nowrap}
+.tb-date{display:inline-flex;align-items:baseline;gap:6px}
+.tb-date .k{
+  font-family:var(--mono);font-size:.58em;font-weight:600;letter-spacing:.12em;
+  text-transform:uppercase;color:var(--ink-3);
+}
+.tb-date .v{font-family:var(--mono);font-size:.72em;color:var(--ink-2)}
+@media (max-width:1300px){.tb-dates .tb-opt2{display:none}}
+@media (max-width:1180px){.tb-dates .tb-opt1{display:none}}
+@media (max-width:1060px){.tb-dates{display:none}}
 @media (max-width:1560px){.tb-field.tb-opt1{display:none}}
 @media (max-width:1460px){#toolbar{gap:14px}.tb-field label,.tb-field .k{letter-spacing:.08em}}
 /* Programs stays pinned left and reads as the way out; everything about the
