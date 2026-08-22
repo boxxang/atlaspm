@@ -177,13 +177,15 @@ Pure logic never imports UI, and `/src/lib` + `/src/data` never touch the DOM �
   of its bar, beside its diamond, with an arrow pointing back at it — so a label
   never lies over the schedule it annotates, at any row height.
 - **The stage timeline** (RTL only, on trial). A stage read as a schedule
-  rather than as two tables: the engineering list as bars, the deliverables as
-  diamonds on their own due dates. The engineering table records how long each
-  activity takes but not when it starts, so the starts are derived by the one
-  rule the list already implies — *the k-th of n activities starts k/n of the
-  way into the stage and runs for its own TAT* — and every duration on the
-  chart is real. It carries one stage while that rule is being judged; the
-  switch is `stageId === 'rtl'` in ViewToggle.
+  rather than as two tables, spanning both of them, with the tables under it.
+  The engineering list is bars and each deliverable is a diamond on the bar of
+  the activity that produces it — because what a stage timeline is asked to
+  show is not that an artefact is due, but what has to finish for it to exist.
+  A stage states its plan (`engineeringStart`, `deliverableFrom`,
+  `deliverableWeek` in /data/journey), so both ends of every bar are recorded
+  rather than guessed; a stage with no plan falls back to the order of its
+  list, which is a guess and says so above the chart. The switch is
+  `stageId === 'rtl'` in ViewToggle.
 - **The toolbar's three dates.** Kick-off, MTO and MP read beside the program
   name. The milestone axis below carries every checkpoint positioned in time,
   which is where to read the shape of a schedule and the wrong place to answer
@@ -284,7 +286,7 @@ that is a read/write swap rather than a redesign.
 
 ```bash
 npm test          # 171 unit tests: schedule engine, stages/profiles, derivations, effort, mail, purity
-npm run e2e       # 254 Playwright tests
+npm run e2e       # 256 Playwright tests
 ```
 
 The e2e suite runs against its own database (`test.db`) on port 3100, so it never

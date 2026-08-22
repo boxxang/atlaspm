@@ -291,8 +291,12 @@ function ViewToggle({
      worth having, and one stage answers that as well as twenty-three would. */
   const [chart, setChart] = useState(false);
   const timeline = stageId === 'rtl';
+  /* Three grid items, not one column: the chart spans both columns between
+     the header row and the tables, so it is read at the width of the stage
+     rather than at half of it. */
   return (
-    <div>
+    <>
+      <div className="sh sh-head sh-l">
       <div className="sheet-head">
         <div className="view-toggle" role="group">
           <button aria-pressed={view === 'eng'} data-view="eng" onClick={() => setView('eng')}>
@@ -327,8 +331,16 @@ function ViewToggle({
           </button>
         )}
       </div>
+      </div>
+
+      {timeline && chart && (
+        <div className="sh sh-chart">
+          <StageGantt stageId={stageId} />
+        </div>
+      )}
+
+      <div className="sh sh-body sh-l">
       <div className="view-pane enter" data-pane="eng" hidden={view !== 'eng'} key={`eng-${view}`}>
-        {timeline && chart && <StageGantt stageId={stageId} />}
         <EngineeringTable
             stageId={stageId}
             shortTitle={shortTitle}
@@ -351,7 +363,8 @@ function ViewToggle({
           <span className="mono">{detail.collaboration.join(' · ')}</span>
         </div>
       </div>
-    </div>
+      </div>
+    </>
   );
 }
 
@@ -487,9 +500,7 @@ function StageDetail({ stageId }: { stageId: StageId }) {
 
       <div className="sheet-grid">
         <ViewToggle stageId={stageId} shortTitle={s.shortTitle} detail={detail} />
-        <div className="sheet-side">
-          <Deliverables stageId={stageId} />
-        </div>
+        <Deliverables stageId={stageId} />
       </div>
     </>
   );

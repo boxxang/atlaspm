@@ -136,7 +136,11 @@ export function createProjectSeed({
        stay open, which is what leaves the program with a handful of genuinely
        overdue lines. Slips are the common case, so the completion drift runs
        late more often than early. */
-    const titles = journeyData.find((s) => s.id === stage)?.deliverables ?? [];
+    const j = journeyData.find((s) => s.id === stage);
+    const titles = j?.deliverables ?? [];
+    /* A stage that states its plan states its dates too; the spread below is
+       for the stages that do not. */
+    const planned = j?.deliverableWeek;
     const span = sc[stage].durationWeeks;
     const settled = ago(21);
     const drift = [2, -1, 5, 0, 3, -2, 8, 1, -3, 4];
@@ -151,9 +155,13 @@ export function createProjectSeed({
       /* The last one is the gate itself, so it falls on the day the stage
          closes — exactly, with no drift. A stage that ends before the artefact
          it ends on is not a schedule anyone can work to. */
-      const due = last ? E(stage) : W(stage, span * (OPENS_AT + (1 - OPENS_AT) * t));
+      const due = planned
+        ? W(stage, planned[i] ?? span)
+        : last
+          ? E(stage)
+          : W(stage, span * (OPENS_AT + (1 - OPENS_AT) * t));
       /* a couple of days either way, never enough to reorder the list */
-      if (!last) due.setDate(due.getDate() + jitter[i % jitter.length]);
+      if (!planned && !last) due.setDate(due.getDate() + jitter[i % jitter.length]);
       const done = due < settled;
       let completedAt: Date | null = null;
       if (done) {

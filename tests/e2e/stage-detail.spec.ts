@@ -153,9 +153,13 @@ test.describe('read mode versus edit mode', () => {
       .evaluateAll((els) => els.map((e) => Math.round(e.getBoundingClientRect().top)));
     expect(heads[0]).toBe(heads[1]);
 
+    /* The two tables share a grid row, which is what makes them the same
+       height whatever sits above them — the header row, and the stage
+       timeline when it is open. */
     const cols = await panel(page)
-      .locator('.sheet-grid > *')
+      .locator('.sheet-grid .sh-body')
       .evaluateAll((els) => els.map((e) => Math.round(e.getBoundingClientRect().height)));
+    expect(cols).toHaveLength(2);
     expect(cols[0]).toBe(cols[1]);
 
     const lists = await panel(page)

@@ -101,6 +101,26 @@ export interface JourneyStage {
   engineeringTat: readonly number[];
   /** Man-months per engineering activity, index-aligned to engineeringView. */
   engineeringEffort: readonly number[];
+  /**
+   * Weeks from the stage start to each engineering activity's own start,
+   * index-aligned to engineeringView — the plan the stage runs to.
+   *
+   * Optional, and carried by the stage the timeline is being trialled on. A
+   * stage without it has no start dates to draw, only durations; see
+   * StageGantt, which derives them from the order of the list instead.
+   */
+  engineeringStart?: readonly number[];
+  /**
+   * Which engineering activity produces each deliverable — an index into
+   * engineeringView, aligned to `deliverables`. Optional for the same reason.
+   */
+  deliverableFrom?: readonly number[];
+  /**
+   * Weeks from the stage start to each deliverable's due date, aligned to
+   * `deliverables`. A stage that states its plan states these too, rather than
+   * taking the spread the seed derives for stages that do not.
+   */
+  deliverableWeek?: readonly number[];
   programView: readonly string[];
   perspective: string;
 }

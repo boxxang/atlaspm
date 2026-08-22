@@ -684,8 +684,15 @@ body.col-resizing{user-select:none;cursor:col-resize}
 /* The two tables are read side by side, so they end on the same line: each
    column is a flex stack and the list inside it takes up the slack, scrolling
    when its own content runs past the taller column. */
-.sheet-grid{display:grid;grid-template-columns:1fr 1fr;gap:44px;align-items:stretch}
-.sheet-grid>*{display:flex;flex-direction:column;min-height:0}
+.sheet-grid{display:grid;grid-template-columns:1fr 1fr;gap:0 44px;align-items:stretch}
+/* Three rows, not two columns of stacks: the headers line up on the first,
+   the timeline spans the second when it is open, and the two tables share the
+   third — which is what keeps them the same height whatever sits above. */
+.sh-head{grid-row:1}
+.sh-chart{grid-row:2;grid-column:1 / -1}
+.sh-body{grid-row:3;display:flex;flex-direction:column;min-height:0}
+.sh-l{grid-column:1}
+.sh-r{grid-column:2}
 .view-pane{flex:1;display:flex;flex-direction:column;min-height:0}
 .view-pane[hidden]{display:none}
 /* The engineering side sets the height: its list, its total, its tools line.
@@ -709,9 +716,9 @@ body.col-resizing{user-select:none;cursor:col-resize}
 .view-foot{margin-top:14px;padding-top:10px;border-top:1px solid var(--line);font-size:.8em;color:var(--ink-2)}
 .view-foot .cap{margin-right:8px}
 .view-foot .mono{font-size:.95em}
-.sheet-side .cap{display:block}
-.sheet-side ul li{font-size:.92em;color:var(--ink-2);padding:3px 0}
-.sheet-side ul{margin-bottom:22px}
+.sh-r .cap{display:block}
+.sh-r ul li{font-size:.92em;color:var(--ink-2);padding:3px 0}
+.sh-body.sh-r .dlv-list{margin-bottom:22px}
 /* deliverables checklist */
 .dlv-note{font-size:.66em;color:var(--ink-3);font-weight:400;letter-spacing:.04em;margin-left:8px}
 .dlv-cols{
@@ -1760,6 +1767,9 @@ body.schedule-mode #schedule-view{opacity:1;visibility:visible;transform:none}
   font-family:var(--mono);font-size:calc(var(--cp-fs) * 0.92);color:var(--ink-3);
 }
 .sg-gate{position:absolute;top:0;bottom:0;width:1px;background:var(--line-strong)}
+/* a row whose artefact lands on its bar's end needs the duration out of the
+   diamond's way */
+.sg-row.has-mark .sg-bar-t{transform:translate(14px,-50%)}
 /* the artefacts sit under a rule, because they are not the same kind of thing */
 .sg-row.dlv{height:21px}
 .sg-row.dlv:first-of-type{margin-top:6px}
@@ -1770,6 +1780,9 @@ body.schedule-mode #schedule-view{opacity:1;visibility:visible;transform:none}
   background:var(--surface);border:1.4px solid var(--ink);
 }
 .sg-dot.done{background:var(--ink)}
+/* Sitting on the bar that produces it, a diamond needs a gap around it or it
+   reads as part of the bar rather than as a mark on it. */
+.sg-dot.on-bar{z-index:2;box-shadow:0 0 0 2px var(--surface)}
 
 /* A deliverable with no date is allowed, but asked about first. */
 .dlv-tbd{

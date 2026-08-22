@@ -371,13 +371,15 @@ export const journeyData = [
     tagline: "Implementing the architecture in logic.",
     description: "Implement the architecture in synthesisable logic, integrate the IP that IPR and AMS deliver, and hold the design under change control until freeze.",
     activities: ["RTL development", "IP integration", "Lint & CDC", "Change control"],
+    /* Listed in the order they are produced, which is the order the plan below
+       produces them in — see deliverableWeek. */
     deliverables: [
-      "Block and top-level RTL release, tagged",
-      "Register map / RDL and generated headers",
       "Integration testbench and build system",
-      "Lint / CDC / RDC clean reports with waiver list",
+      "Register map / RDL and generated headers",
       "UPF power intent file",
       "IP integration report and version manifest",
+      "Block and top-level RTL release, tagged",
+      "Lint / CDC / RDC clean reports with waiver list",
       "RTL Freeze package"
     ],
     engineeringView: [
@@ -395,6 +397,21 @@ export const journeyData = [
     /** Elapsed weeks per engineering activity; negative marks one that runs continuously. */
     engineeringTat: [10, 24, 16, 12, 10, 16, 8, 12, -30, -30],
     engineeringEffort: [40, 180, 45, 35, 18, 30, 10, 20, 20, 12],
+    /* The plan this stage runs to, in weeks from its start. It reads as an RTL
+       stage reads: the spec goes first and the RTL implementation starts under
+       its tail rather than after it; the register map comes early because the
+       headers it generates are what the RTL includes; IP integration begins
+       once the first blocks exist; top assembly waits for blocks; UPF and
+       lint/CDC run across the back half; trial synthesis closes the stage
+       against freeze. CI and change control run the whole way. */
+    engineeringStart: [0, 4, 8, 16, 12, 14, 2, 20, 0, 0],
+    /* Which activity produces each deliverable, so the artefact is drawn on
+       the work that makes it rather than on a row of its own. */
+    deliverableFrom: [8, 6, 4, 2, 3, 5, 7],
+    /* And when each is due: the week its producing activity finishes, except
+       the build system, which lands early and is then maintained. The last
+       falls on the gate, as every stage's last does. */
+    deliverableWeek: [6, 10, 22, 24, 28, 30, 32],
     risks: ["Late IP readiness", "Integration issues", "Spec churn"],
     potentialRisks: [
       "Third-party IP delivery dates unconfirmed",

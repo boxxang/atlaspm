@@ -48,9 +48,13 @@ test.describe('the stage timeline', () => {
     await page.locator(`${panel} [data-stage-chart]`).click();
     const gantt = page.locator('[data-stage-gantt]');
 
-    // one row per engineering activity, one per deliverable
+    // one row per engineering activity; the artefacts ride the work
     await expect(gantt.locator('[data-sg-act]')).toHaveCount(10);
+    await expect(gantt.locator('.sg-row.dlv')).toHaveCount(0);
     await expect(gantt.locator('[data-sg-dlv]')).toHaveCount(7);
+    // each on the bar of the activity that produces it
+    await expect(gantt.locator('[data-sg-on="RTL-07"]')).toHaveCount(1); // the register map
+    await expect(gantt.locator('[data-sg-on="RTL-08"]')).toHaveCount(1); // the freeze package
 
     /* Durations are the table's TATs, not a second set of numbers: RTL-02 is
        recorded as 24 weeks and reads as 24 weeks. */
@@ -67,7 +71,7 @@ test.describe('the stage timeline', () => {
 
     // and the last artefact is due on the gate, which is drawn
     const gate = (await gantt.locator('[data-sg-gate]').boundingBox())!;
-    const last = (await gantt.locator('[data-sg-dlv]').last().locator('.sg-dot').boundingBox())!;
+    const last = (await gantt.locator('[data-sg-on="RTL-08"]').boundingBox())!;
     expect(Math.abs(last.x + last.width / 2 - gate.x)).toBeLessThanOrEqual(2);
   });
 
@@ -76,5 +80,47 @@ test.describe('the stage timeline', () => {
     await settleLayout(page);
     await expect(page.locator(`${panel} [data-stage-chart]`)).toHaveCount(0);
     await expect(page.locator(`${panel} .sheet-head [data-wrap="engineering"]`)).toHaveCount(1);
+  });
+});
+
+test.describe('the chart is read at the width of the stage', () => {
+  test('it spans both tables, which sit under it', async ({ page }) => {
+    await page.setViewportSize({ width: 1440, height: 1300 });
+    await page.locator(`${panel} [data-stage-chart]`).click();
+    const gantt = (await page.locator('[data-stage-gantt]').boundingBox())!;
+    const bodies = await page.locator(`${panel} .sheet-grid .sh-body`).all();
+    const [left, right] = await Promise.all(bodies.map((b) => b.boundingBox()));
+
+    // as wide as the two tables together, and above both of them
+    expect(gantt.x).toBeLessThanOrEqual(left!.x + 1);
+    expect(gantt.x + gantt.width).toBeGreaterThanOrEqual(right!.x + right!.width - 1);
+    expect(gantt.y + gantt.height).toBeLessThanOrEqual(left!.y + 1);
+    expect(gantt.y + gantt.height).toBeLessThanOrEqual(right!.y + 1);
+
+    // and the tables still finish level with it open
+    expect(Math.round(left!.height)).toBe(Math.round(right!.height));
+  });
+
+  test('the bars are the stage’s plan, not a guess at one', async ({ page }) => {
+    await page.locator(`${panel} [data-stage-chart]`).click();
+    const gantt = page.locator('[data-stage-gantt]');
+    await expect(gantt.locator('.sg-cap .note')).toContainText('the stage’s own plan');
+
+    /* The plan opens with the specification and starts the RTL under its tail
+       rather than after it — which is the whole point of stating one. */
+    const x = async (id: string) =>
+      (await gantt.locator(`[data-sg-act="${id}"] .sg-bar`).boundingBox())!;
+    const spec = await x('RTL-01');
+    const rtl = await x('RTL-02');
+    const regmap = await x('RTL-07');
+    expect(Math.round(spec.x)).toBe(Math.round(regmap.x) - Math.round(regmap.x - spec.x));
+    expect(rtl.x).toBeGreaterThan(spec.x); // starts later
+    expect(rtl.x).toBeLessThan(spec.x + spec.width); // but before the spec ends
+    // and the two continuous lines run the whole stage
+    for (const id of ['RTL-09', 'RTL-10']) {
+      const b = await x(id);
+      expect(Math.round(b.x)).toBe(Math.round(spec.x));
+      expect(b.width).toBeGreaterThan(spec.width * 2);
+    }
   });
 });

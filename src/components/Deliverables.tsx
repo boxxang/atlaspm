@@ -57,8 +57,11 @@ export function Deliverables({ stageId }: { stageId: StageId }) {
   /* read live, so the window shows the artefact the moment it uploads */
   const open = record ? (list.find((d) => d.id === record) ?? null) : null;
 
+  /* Two grid items: the header row sits beside the engineering one, the table
+     below whatever the chart between them takes. */
   return (
     <>
+      <div className="sh sh-head sh-r">
       <div className="sheet-head">
         <span className="cap">
           Key Deliverables
@@ -80,6 +83,9 @@ export function Deliverables({ stageId }: { stageId: StageId }) {
           {editing ? 'Done' : 'Edit'}
         </button>
       </div>
+      </div>
+
+      <div className="sh sh-body sh-r">
       <div className="dlv-cols">
         <span>ID</span>
         <span>
@@ -257,6 +263,7 @@ export function Deliverables({ stageId }: { stageId: StageId }) {
           </button>
         </div>
       )}
+      </div>
       {open && (
         <DeliveryRecord
           key={open.id}
