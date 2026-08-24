@@ -8,15 +8,20 @@ see `CLAUDE.md` and `PORTING_PLAN.md`.
 
 ## Getting started
 
+Postgres, the same engine the deployed app runs on:
+
 ```bash
+brew install postgresql@17 && brew services start postgresql@17
+createdb atlaspm_dev && createdb atlaspm_test
+cp .env.example .env          # point DATABASE_URL at atlaspm_dev
+
 npm install
-npm run db:push     # create dev.db from prisma/schema.prisma
+npm run db:push     # create the schema from prisma/schema.prisma
 npm run db:seed     # load the AtlasAX1 program
 npm run dev         # http://localhost:3000
 ```
 
-`npm run db:reset` does all three from scratch — deleting `dev.db` and
-reseeding restores AtlasAX1 exactly.
+`npm run db:reset` pushes and reseeds — AtlasAX1 comes back exactly as it was.
 
 The seed's kickoff is 30 weeks before the day you seed, so "today" always lands
 mid-program (in Physical Design), the way the prototype boots. Deliverables are
@@ -226,10 +231,10 @@ Pure logic never imports UI, and `/src/lib` + `/src/data` never touch the DOM �
   an item that already exists (behind its Edit button, with every other change
   to the entry), or to a status update. An entry that carries files says so on
   the board with a clip beside its title.
-  Bytes live in the database (`Attachment.data`), because the documented deploy
-  target has a read-only filesystem and `Bytes` maps to BLOB on SQLite and
-  bytea on Postgres. That caps a file at 5 MB — moving to object storage means
-  replacing that column with a URL and nothing else. Only PNG, JPEG, GIF and
+  Bytes live in the database (`Attachment.data`, a `bytea`), because the deploy
+  target has a read-only filesystem and instances that do not outlive a
+  request. That caps a file at 5 MB — moving to object storage means replacing
+  that column with a URL and nothing else. Only PNG, JPEG, GIF and
   WebP render inline; everything else, SVG included, is served as a download
   with `nosniff`, because inline user content from our own origin is an XSS
   vector.
@@ -243,11 +248,19 @@ Pure logic never imports UI, and `/src/lib` + `/src/data` never touch the DOM �
 
 ## Persistence
 
-Prisma + SQLite locally (`DATABASE_URL=file:./dev.db`). The schema stays
-Postgres-compatible: no SQLite-only types, `kind`/`profileId` are `String`
-rather than enums, and ids are supplied by the caller. Switching to Postgres
-means changing the `provider` in `prisma/schema.prisma` and the adapter in
-`src/lib/db.ts` — no model changes.
+Prisma + Postgres, in development, in the e2e suite and deployed.
+
+It was SQLite locally and Postgres in production until the app was deployed,
+which does not work: Prisma fixes `provider` at generate time and will not read
+it from the environment, so the two cannot share a schema — and a suite that
+runs on a different engine from the one it ships on is not testing the thing it
+ships. One engine everywhere costs a `brew install` and settles both.
+
+The models never needed changing for the move: no engine-specific types,
+`kind`/`profileId` are `String` rather than enums, ids are supplied by the
+caller, and attachment bytes were already a `Bytes` column rather than a file
+on disk. The whole change was the `provider`, the driver adapter in
+`src/lib/db.ts`, and the connection strings.
 
 Prisma 7 keeps the connection URL out of the schema: Migrate reads it from
 `prisma.config.ts`, and `PrismaClient` gets a driver adapter.
@@ -291,10 +304,11 @@ npm test          # 171 unit tests: schedule engine, stages/profiles, derivation
 npm run e2e       # 257 Playwright tests
 ```
 
-The e2e suite runs against its own database (`test.db`) on port 3100, so it never
-touches `dev.db` or a running dev server. Every test reseeds in-process before it
-runs, which is why the suite is single-worker: parallel workers would reseed out
-from under each other.
+The e2e suite runs against its own database (`atlaspm_test`) on port 3100, so it
+never touches the development one or a running dev server. `TEST_DATABASE_URL`
+overrides it for CI. Every test reseeds in-process before it runs, which is why
+the suite is single-worker: parallel workers would reseed out from under each
+other.
 
 Writes are optimistic and fire-and-forget, so `tests/e2e/fixtures.ts` counts the
 POSTs in flight and drains them before any navigation — a reload would otherwise

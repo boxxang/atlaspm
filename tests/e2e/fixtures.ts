@@ -1,15 +1,19 @@
-import { PrismaBetterSqlite3 } from '@prisma/adapter-better-sqlite3';
+import { PrismaPg } from '@prisma/adapter-pg';
 import { expect, test as base, type Page } from '@playwright/test';
 import { PrismaClient } from '../../src/generated/prisma/client';
 import { seedProject } from '../../prisma/seedProject';
 
 /**
  * Phase 6 made the app stateful, so tests now share a database. Each test gets
- * a freshly seeded one: the suite runs against test.db (never the developer's
- * dev.db) and reseeds in-process before every test, which is why e2e runs on a
- * single worker — parallel workers would reseed out from under each other.
+ * a freshly seeded one: the suite runs against its own database (never the
+ * developer's) and reseeds in-process before every test, which is why e2e runs
+ * on a single worker — parallel workers would reseed out from under each other.
+ *
+ * Postgres, the same engine the deployed app runs on. TEST_DATABASE_URL can be
+ * overridden for CI; locally it is the database `createdb atlaspm_test` makes.
  */
-export const TEST_DATABASE_URL = 'file:./test.db';
+export const TEST_DATABASE_URL =
+  process.env.TEST_DATABASE_URL ?? `postgresql://${process.env.USER ?? 'postgres'}@localhost:5432/atlaspm_test`;
 
 /** The seeded program, and the route its detail view lives at. */
 export const SEED_PROJECT_ID = 'atlasax1';
@@ -18,7 +22,7 @@ export const SEED_PROJECT_PATH = `/p/${SEED_PROJECT_ID}`;
 let client: PrismaClient | null = null;
 const prisma = () =>
   (client ??= new PrismaClient({
-    adapter: new PrismaBetterSqlite3({ url: TEST_DATABASE_URL }),
+    adapter: new PrismaPg({ connectionString: TEST_DATABASE_URL }),
   }));
 
 /* Writes are optimistic and fire-and-forget, so a reload can outrun one. The

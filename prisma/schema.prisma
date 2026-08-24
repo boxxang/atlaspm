@@ -11,7 +11,7 @@
 // Prisma 7 keeps the connection URL out of the schema: Migrate reads it from
 // prisma.config.ts, and PrismaClient gets a driver adapter (see src/lib/db.ts).
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
 }
 
 generator client {
@@ -142,9 +142,9 @@ model StatusUpdate {
 
 /// Files attached to an item or to one of its status updates.
 ///
-/// Bytes live in the database rather than on disk: the documented deploy target
-/// is Vercel, whose filesystem is read-only, and `Bytes` maps to BLOB on SQLite
-/// and bytea on Postgres, so the column travels with the rest of the schema.
+/// Bytes live in the database rather than on disk: the deploy target is
+/// Vercel, whose filesystem is read-only and whose instances do not outlive a
+/// request, so `Bytes` (bytea) keeps the file with the rest of the row.
 /// That caps the sensible file size (see MAX_ATTACHMENT_BYTES); moving to object
 /// storage later means replacing `data` with a URL and nothing else.
 model Attachment {

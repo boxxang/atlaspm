@@ -71,7 +71,7 @@ the source of truth for behavior.
   project rename, kickoff/profile. Store hydrates from DB on load; optimistic
   updates with revalidation. Decide + document where display settings live.
 - **Accept:** create an activity, post an update, check a deliverable, edit DV
-  end date, rename project → hard-refresh → all persist. `rm dev.db && seed`
+  end date, rename project → hard-refresh → all persist. `npm run db:reset`
   restores AtlasAX1 exactly.
 
 ## Phase 7 — E2E regression sweep & polish

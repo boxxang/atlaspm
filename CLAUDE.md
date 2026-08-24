@@ -30,9 +30,9 @@ PORTING_PLAN.md says otherwise.
 - Next.js (App Router) + TypeScript + Tailwind (tokens mapped from the reference
   `:root` variables into CSS custom properties, not Tailwind theme colors only).
 - State: Zustand store mirroring the prototype's `state` + `userContent` shapes.
-- Persistence: Prisma + SQLite for local dev (`DATABASE_URL=file:./dev.db`);
-  schema must stay Postgres-compatible so production can switch providers
-  without model changes. Mutations via server actions; reads via server
+- Persistence: Prisma + Postgres everywhere — development, the e2e suite and
+  the deployed app. Prisma fixes `provider` at generate time and will not read
+  it from the environment, so there is no second engine to keep in step. Mutations via server actions; reads via server
   components where natural. Optimistic UI on board/deliverable mutations.
 - Tests: Vitest for /lib, Playwright for e2e (port the checks listed in
   PORTING_PLAN Phase 7).

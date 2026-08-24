@@ -13,15 +13,16 @@
     "typecheck": "next typegen && tsc --noEmit",
     "db:push": "prisma db push",
     "db:seed": "prisma db seed",
-    "db:reset": "rm -f dev.db && prisma db push && prisma db seed",
+    "db:reset": "prisma db push && prisma db seed",
     "db:studio": "prisma studio",
-    "e2e:db": "rm -f test.db test.db-journal && prisma db push"
+    "e2e:db": "prisma db push"
   },
   "dependencies": {
-    "@prisma/adapter-better-sqlite3": "^7.9.1",
+    "@prisma/adapter-pg": "^7.9.1",
     "@prisma/client": "^7.9.1",
     "dotenv": "^17.4.2",
     "next": "16.3.1",
+    "pg": "^8.23.0",
     "prisma": "^7.9.1",
     "react": "19.2.8",
     "react-dom": "19.2.8",
@@ -33,6 +34,7 @@
     "@playwright/test": "^1.62.1",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
+    "@types/pg": "^8.23.1",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "eslint": "^9",
