@@ -1,13 +1,16 @@
 import { expect, test, SEED_PROJECT_PATH, selectStage, settleLayout } from './fixtures';
-import { activityDetails } from '../../src/data/activityDetails';
+import { writtenActivities } from '../../src/data/activityIndex';
+import { journeyData } from '../../src/data/journey';
 
 /**
  * An engineering activity that has been written up opens a page of its own —
  * a long read with an address, reached by leaving the programme rather than by
  * covering it, and returned from by the bar at the top.
  *
- * Product Definition is written up; the other stages are not, and their rows
- * stay plain text rather than pretending to lead somewhere.
+ * Every activity of the 23 stages is written up now, so every row of every
+ * stage opens. The code still knows how to refuse — an ID that names nothing
+ * is not a page, and a connection to an unwritten activity is an inert chip —
+ * and that refusal is checked where it can be reached, on the units.
  */
 const panel = '.stage-panel.selected';
 
@@ -37,10 +40,13 @@ test.describe('opening an activity', () => {
     await expect(page.locator('#roadmap')).toBeVisible();
   });
 
-  test('every written activity of the stage opens', async ({ page }) => {
-    const ids = Object.keys(activityDetails).sort();
-    expect(ids).toHaveLength(9);
-    for (const id of ids) {
+  test('the first activity of every stage opens', async ({ page }) => {
+    expect(writtenActivities).toHaveLength(257);
+    /* one page per stage: a stage whose data is malformed fails here rather
+       than the day somebody opens it */
+    const first = journeyData.map((s) => `${s.shortTitle}-01`);
+    expect(first).toHaveLength(23);
+    for (const id of first) {
       await page.goto(`/p/atlasax1/activity/${id}`);
       await expect(page.locator(`[data-activity="${id}"]`), id).toBeVisible();
       // the four figures, the steps, and at least one thing to watch
@@ -50,15 +56,16 @@ test.describe('opening an activity', () => {
     }
   });
 
-  test('a stage with nothing written keeps its rows as text', async ({ page }) => {
+  test('a later stage links every row it lists', async ({ page }) => {
     await selectStage(page, 'physicalDesign');
     await settleLayout(page);
-    await expect(page.locator(`${panel} [data-activity-link]`)).toHaveCount(0);
-    await expect(page.locator(`${panel} .mm-t.read`).first()).toBeVisible();
+    const rows = journeyData.find((s) => s.id === 'physicalDesign')!.engineeringView.length;
+    await expect(page.locator(`${panel} [data-activity-link]`)).toHaveCount(rows);
+    await expect(page.locator(`${panel} [data-activity-link="PD-01"]`)).toBeVisible();
   });
 
-  test('an activity nobody has written is not a page', async ({ page }) => {
-    const res = await page.goto('/p/atlasax1/activity/PD-01');
+  test('an ID that names no activity is not a page', async ({ page }) => {
+    const res = await page.goto('/p/atlasax1/activity/DEF-99');
     expect(res?.status()).toBe(404);
   });
 });
@@ -89,14 +96,16 @@ test.describe('what the page says', () => {
     expect(await par.evaluate((e) => parseFloat((e as HTMLElement).style.left))).toBeGreaterThan(0);
   });
 
-  test('a connection that is written up is a link; one that is not, is not', async ({ page }) => {
-    const on = page.locator('.ad-chip.on');
-    await expect(on.first()).toBeVisible();
-    await expect(on.first()).toHaveAttribute('href', /\/activity\/DEF-\d+$/);
-    // ARCH-01 exists in the programme but has no write-up, so it is inert
-    const off = page.locator('.ad-chip:not(.on)').first();
-    await expect(off).toBeVisible();
-    expect(await off.evaluate((e) => e.tagName)).not.toBe('A');
+  test('every connection is a link, across stages as well as within one', async ({ page }) => {
+    const chips = page.locator('.ad-chip');
+    const total = await chips.count();
+    expect(total).toBeGreaterThan(0);
+    /* nothing is inert any more: every activity a write-up names is written */
+    await expect(page.locator('.ad-chip:not(.on)')).toHaveCount(0);
+    await expect(chips.first()).toHaveAttribute('href', /\/activity\/[A-Z]+-\d{2}$/);
+    // DEF-01 feeds activities of other stages, and those lead away too
+    const hrefs = await chips.evaluateAll((els) => els.map((e) => e.getAttribute('href') ?? ''));
+    expect(hrefs.some((h) => !h.includes('/DEF-'))).toBe(true);
   });
 
   test('following a connection lands on that activity', async ({ page }) => {

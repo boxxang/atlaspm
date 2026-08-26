@@ -1,5 +1,13 @@
 import { describe, expect, it } from 'vitest';
 import { parseRich } from '@/lib/activityRefs';
+import {
+  detailActivityTitles,
+  hasActivityDetail,
+  writtenActivities,
+} from '@/data/activityIndex';
+import { activityDetails } from '@/data/activityDetails';
+import { journeyData } from '@/data/journey';
+import { activityRowId } from '@/lib/rowIds';
 
 /**
  * A write-up names other activities in its prose — "PPA targets from DEF-03".
@@ -76,5 +84,54 @@ describe('activity references in a write-up', () => {
 
   it('returns nothing for an empty string', () => {
     expect(parseRich('')).toEqual([]);
+  });
+});
+
+describe('which activities open a page', () => {
+  it('knows the written ones and refuses everything else', () => {
+    expect(writtenActivities).toHaveLength(257);
+    expect(hasActivityDetail('DEF-01')).toBe(true);
+    expect(hasActivityDetail('MP-12')).toBe(true);
+    /* the shape of a row ID, but no row has it */
+    expect(hasActivityDetail('DEF-99')).toBe(false);
+    expect(hasActivityDetail('ZZZ-01')).toBe(false);
+    /* a deliverable is not an activity */
+    expect(hasActivityDetail('DEF-D1')).toBe(false);
+  });
+
+  it('lists them in the order the programme runs them', () => {
+    expect(writtenActivities[0]).toBe('DEF-01');
+    expect(writtenActivities[writtenActivities.length - 1]).toBe('MP-12');
+  });
+});
+
+/**
+ * The engineering table prints a row's title from the profile; the page that
+ * row opens prints the same title, because it reads that same table. The index
+ * used for tooltips and chips is a third copy. If they drift, a chip promises
+ * one activity and the page delivers another.
+ */
+describe('the table, the index and the write-ups name the same activities', () => {
+  it('gives every row of every stage a write-up', () => {
+    const rows = journeyData.flatMap((s) =>
+      s.engineeringView.map((_, i) => activityRowId(s.shortTitle, i)),
+    );
+    expect(rows).toHaveLength(257);
+    expect(rows.filter((id) => !hasActivityDetail(id))).toEqual([]);
+  });
+
+  it('titles the index exactly as the profile titles the row', () => {
+    const drift = journeyData.flatMap((s) =>
+      s.engineeringView
+        .map((title, i) => ({ id: activityRowId(s.shortTitle, i), title }))
+        .filter(({ id, title }) => detailActivityTitles[id] !== title),
+    );
+    expect(drift).toEqual([]);
+  });
+
+  it('files every write-up under a stage the profile has', () => {
+    const stages = new Set(journeyData.map((s) => s.id));
+    const orphans = writtenActivities.filter((id) => !stages.has(activityDetails[id].stage));
+    expect(orphans).toEqual([]);
   });
 });

@@ -17,7 +17,7 @@ import { WrapToggle } from './WrapToggle';
 import { ColGrip } from './ColGrip';
 import { StageGantt } from './StageGantt';
 import Link from 'next/link';
-import { activityDetail as detailFor } from '@/data/activityDetails';
+import { hasActivityDetail } from '@/data/activityIndex';
 
 /** The stage as this program's profile defines it, text and all. */
 const useStage = (id: StageId) =>
@@ -149,7 +149,7 @@ function EngineeringTable({
                   write(lines.map((l, j) => (j === i ? { ...l, label: e.target.value } : l)))
                 }
               />
-            ) : detailFor(activityRowId(shortTitle, i)) ? (
+            ) : hasActivityDetail(activityRowId(shortTitle, i)) ? (
               /* An activity that has been written up opens its own page — a
                  long read with an address, not a panel over this table. */
               <Link

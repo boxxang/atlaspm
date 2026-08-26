@@ -84,16 +84,16 @@ export const journeyData = [
       "Architecture Freeze review package"
     ],
     engineeringView: [
-      "System-level performance modelling and workload simulation",
-      "Compute / memory / interconnect partitioning; monolithic vs chiplet decision",
-      "Dataflow and memory hierarchy definition (on-die SRAM capacity, HBM channels)",
-      "Interface and protocol selection (PCIe gen, CXL, UCIe, HBM3/3E)",
-      "Power domain, clock domain and DVFS architecture; UPF intent draft",
-      "PPA budget allocation per block",
-      "Security and safety architecture — secure boot, root of trust, fusing",
-      "Chip-level floorplan intent, pin and bump budget",
-      "Architecture specification authoring and review",
-      "Block microarchitecture specification kickoff"
+      "System-level performance modeling and workload simulation",
+      "System Architecture Partitioning",
+      "Dataflow and Memory Hierarchy Definition",
+      "Interface and protocol selection",
+      "Power, Clock, and DVFS Architecture",
+      "Block-Level PPA Budget Allocation",
+      "Security and Safety Architecture",
+      "Chip-Level Floorplan and Bump Planning",
+      "Architecture Specification and Freeze",
+      "Block Microarchitecture Definition"
     ],
     /** Elapsed weeks per engineering activity; negative marks one that runs continuously. */
     engineeringTat: [14, 8, 8, 6, 7, 4, 6, 5, 9, 6],
@@ -140,8 +140,8 @@ export const journeyData = [
     ],
     engineeringView: [
       "Foundry and node long-list to short-list evaluation",
-      "Process option and flavour selection (HPC/HD, multi-Vt menu, backside PDN, RF/HV adders)",
-      "Density / performance / leakage benchmarking against product targets (DTCO study)",
+      "Process option and flavor selection",
+      "Density / performance / leakage benchmarking against product targets",
       "Wafer price, mask and NRE quotation; MPW and volume pricing",
       "Fab capacity and tapeout slot reservation; hot-lot policy agreement",
       "Foundry legal engagement — NDA, design agreement, IP licensing frame",
@@ -197,15 +197,15 @@ export const journeyData = [
     engineeringView: [
       "PDK version roadmap tracking (0.1 → 0.5 → 1.0 → production) and delta impact analysis",
       "Design rule manual review; restricted and recommended rule disposition",
-      "Standard cell library selection and qualification (track height, multi-Vt, multi-bit flops)",
-      "Memory compiler evaluation and instance generation (SRAM, register file)",
-      "Compiler instance PPA characterisation against block budgets — density, Vmin, access time, leakage",
+      "Standard cell library selection and qualification",
+      "Memory compiler evaluation and instance generation",
+      "Compiler instance PPA characterization against block budgets — density, Vmin, access time, leakage",
       "Custom / pushed-rule memory instance decision, scope and schedule impact assessment",
       "IO, ESD and latch-up library qualification",
       "EDA tool version qualification for the node — synthesis, P&R, STA, PV, EM/IR",
       "Foundry reference flow bring-up and internal methodology deck",
       "Rule deck, QRC tech file and DRC/LVS deck version control",
-      "Signoff corner and derate definition agreed with foundry (PVT, OCV/AOCV/POCV)",
+      "Signoff corner and derate definition agreed with foundry",
       "Compute farm, EDA license and storage capacity planning",
       "Golden design environment release and flow regression"
     ],
@@ -254,12 +254,12 @@ export const journeyData = [
       "IP delivery schedule folded into the program plan"
     ],
     engineeringView: [
-      "Product requirement → IP requirement decomposition (IP bill of materials)",
+      "Product requirement → IP requirement decomposition",
       "Reuse inventory audit — internal IP already available on the target node",
       "Make / buy / reuse decision per IP block",
       "Vendor RFI / RFQ and technical evaluation",
       "Silicon-proven status check per IP on the selected node and process option",
-      "IP deliverable checklist review (GDS, LEF, multi-corner .lib, CDL, UPF, DV collateral, errata)",
+      "IP deliverable checklist review",
       "Licence negotiation, PO issue and delivery-date commitment",
       "Porting / hardening scope and schedule for IP not proven on the node",
       "IP delivery schedule alignment to RTL and PD integration windows",
@@ -311,21 +311,21 @@ export const journeyData = [
       "Integration guide with known limitations and errata"
     ],
     engineeringView: [
-      "AMS IP specification and budget allocation (jitter, BER, PSRR, area)",
+      "AMS IP specification and budget allocation",
       "PLL / clock generator design and closure",
-      "SerDes and PHY design or vendor hardening (PCIe/CXL, UCIe, HBM PHY)",
+      "SerDes and PHY design or vendor hardening",
       "LDO, bandgap and power-management cell design",
-      "Custom SRAM instance architecture — bitcell selection, array organisation, sense amp and replica timing",
+      "Custom SRAM instance architecture — bitcell selection, array organization, sense amp and replica timing",
       "Read / write assist circuit design for Vmin — WL boost, negative bitline, VDD collapse",
       "Custom array layout and pushed-rule DRC closure with foundry approval",
       "Statistical margin and yield analysis — importance sampling, sigma-Vmin, bitcell variation",
       "Redundancy and repair scheme integration with the BISR architecture",
-      "Custom memory view generation and compiler-equivalent characterisation across corners",
+      "Custom memory view generation and compiler-equivalent characterization across corners",
       "Schematic design and pre-layout simulation",
       "Custom layout with DRC / LVS / antenna and fill closure",
       "Post-layout extracted simulation across PVT and Monte Carlo",
       "Reliability checks — EM/IR, aging, ESD, latch-up",
-      "Hard macro abstraction and view generation (LEF, .lib, CDL, GDS, behavioural model)",
+      "Hard macro abstraction and view generation",
       "AMS–digital co-simulation and integration support"
     ],
     /** Elapsed weeks per engineering activity; negative marks one that runs continuously. */
@@ -372,12 +372,12 @@ export const journeyData = [
     ],
     engineeringView: [
       "Test chip objective definition and risk-item selection",
-      "Test chip design and integration (IP under test, ring oscillators, PCM structures)",
+      "Test chip design and integration",
       "MPW shuttle slot booking and data submission scheduling",
       "Test chip physical implementation and signoff",
       "Shuttle tapeout and fabrication",
       "Test chip board and lab setup preparation",
-      "Silicon characterisation and correlation to simulation",
+      "Silicon characterization and correlation to simulation",
       "Feedback into the production design — model correction and margin decisions"
     ],
     /** Elapsed weeks per engineering activity; negative marks one that runs continuously. */
@@ -557,7 +557,7 @@ export const journeyData = [
       "On-chip clock controller design for at-speed testing",
       "Scan insertion and DFT DRC during synthesis",
       "ATPG pattern generation — stuck-at, transition, cell-aware — and coverage closure",
-      "Pattern validation by gate-level simulation and ATE format conversion (STIL/WGL)",
+      "Pattern validation by gate-level simulation and ATE format conversion",
       "Scan compression and chain routing feasibility with physical design",
       "eFuse, chip ID and memory repair infrastructure",
       "Silicon debug hooks — trace, observability, design-for-debug"
@@ -608,11 +608,11 @@ export const journeyData = [
     ],
     engineeringView: [
       "SDC constraint development and validation",
-      "Technology mapping and optimisation — multi-Vt, multi-bit, useful skew",
+      "Technology mapping and optimization — multi-Vt, multi-bit, useful skew",
       "N0 flow-flush netlist release — functionally incomplete, structurally representative, issued so PD can build the flow",
       "Physical-aware synthesis with congestion feedback from the PD flow setup",
       "N1 netlist drop — first quality turn against PD placement and congestion feedback",
-      "Power optimisation — clock gating, operand isolation, Vt mix",
+      "Power optimization — clock gating, operand isolation, Vt mix",
       "Low-power synthesis — isolation and level-shifter insertion against UPF",
       "N2 netlist drop — timing and congestion converged, late RTL changes absorbed",
       "FFN (final full netlist) release — RTL frozen, ECOs closed, no functional change beyond this point",
@@ -788,7 +788,7 @@ export const journeyData = [
     engineeringView: [
       "Final GDSII / OASIS assembly on the FFN closure database, with layer map verification",
       "Final full-chip verification re-run on the released database",
-      "Tapeout checklist completion and owner sign-off",
+      "Tapeout checklist completion and owner signoff",
       "Open-issue risk assessment and waiver acceptance",
       "Go / No-Go decision meeting",
       "FEOL layer data preparation and MTO release to the mask shop",
@@ -903,7 +903,7 @@ export const journeyData = [
       "Interposer / RDL routing design",
       "Substrate stack-up, escape routing and package DRC",
       "Package routing for signal integrity — length matching, reference plane and via design",
-      "Package PDN and decap footprint design (electrical closure owned by SIPI)",
+      "Package PDN and decap footprint design",
       "Thermal and mechanical simulation — warpage, co-planarity, TIM, lid",
       "Test vehicle requirement definition and handoff to PTV",
       "Substrate and interposer supplier selection and lead-time booking",
@@ -963,9 +963,9 @@ export const journeyData = [
       "Daisy-chain electrical vehicle design — interconnect continuity and bump yield structures",
       "TV die fabrication and interposer / substrate vehicle build",
       "OSAT assembly of vehicles with process window DOE",
-      "Warpage and co-planarity measurement across the reflow profile (shadow moiré)",
+      "Warpage and co-planarity measurement across the reflow profile",
       "Chip-package interaction stress evaluation — low-k / ULK crack, bump and BEOL integrity",
-      "Thermal characterisation — Rjc / Rja, TIM performance, hotspot mapping against the thermal model",
+      "Thermal characterization — Rjc / Rja, TIM performance, hotspot mapping against the thermal model",
       "Board-level reliability on vehicles — temperature cycle, drop, bend",
       "Daisy-chain continuity test and assembly yield learning",
       "Feedback into package design and assembly process window freeze"
@@ -1019,10 +1019,10 @@ export const journeyData = [
       "Package and board model extraction — 3D EM, S-parameter and RLC network",
       "Die-package-board PDN co-simulation — DC and AC impedance versus target",
       "Dynamic voltage-drop analysis with package inductance and real switching profiles",
-      "Decoupling capacitor budget and placement optimisation across die, package and board",
+      "Decoupling capacitor budget and placement optimization across die, package and board",
       "SSN / SSO and simultaneous-switching noise analysis at the IO ring",
       "High-speed channel simulation with extracted package models — insertion loss, crosstalk, return path",
-      "Eye diagram, jitter and BER budget closure per interface (PCIe/CXL, HBM, die-to-die)",
+      "Eye diagram, jitter and BER budget closure per interface",
       "Power-aware timing correlation — voltage drop back-annotated into STA",
       "Electro-thermal co-analysis coupled with the package thermal model",
       "Co-verification signoff review and criteria disposition with design and package teams"
@@ -1131,7 +1131,7 @@ export const journeyData = [
       "Board bring-up with socketed or dummy parts",
       "Thermal solution and cooling for the lab platform",
       "Lab instrumentation reservation and test rack build",
-      "Minimum host-side enablement for power-on (BSP handoff boundary)"
+      "Minimum host-side enablement for power-on"
     ],
     /** Elapsed weeks per engineering activity; negative marks one that runs continuously. */
     engineeringTat: [5, 10, 12, 8, 7, 7, 7, 7, 7, 7],
@@ -1183,9 +1183,9 @@ export const journeyData = [
       "Load board / DUT board design, fabrication and bring-up",
       "Wafer sort test program development",
       "Final / package test program development",
-      "Characterisation test content — shmoo, Vmin/Fmax, PVT sweeps",
+      "Characterization test content — shmoo, Vmin/Fmax, PVT sweeps",
       "DFT pattern porting to ATE format and pattern debug",
-      "Test time and cost optimisation — parallelism, site count",
+      "Test time and cost optimization — parallelism, site count",
       "Correlation between ATE, bench and system results",
       "Test data infrastructure — STDF collection and yield database"
     ],

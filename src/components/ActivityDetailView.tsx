@@ -3,14 +3,13 @@
 import Link from 'next/link';
 import { useMemo, useState } from 'react';
 import {
-  activityDetail,
-  activityDetails,
   activityGlossary,
   detailActivityTitles,
   detailDeliverables,
-  type ActivityDetail,
-  type DetailStep,
-} from '@/data/activityDetails';
+  hasActivityDetail,
+  writtenActivities,
+} from '@/data/activityIndex';
+import type { ActivityDetail, DetailStep } from '@/data/activityDetailTypes';
 import type { ProjectState } from '@/lib/projectState';
 import { addWeeks, computeSchedule, fmtDate, fmtW } from '@/lib/schedule';
 import { resolveStages } from '@/lib/stages';
@@ -80,7 +79,7 @@ function Rich({ nodes, projectId }: { nodes: RichNode[]; projectId: string }) {
         }
         const title = detailActivityTitles[n.id];
         if (!title) return <span key={i}>{n.id}</span>;
-        return activityDetail(n.id) ? (
+        return hasActivityDetail(n.id) ? (
           <Link
             className="ad-ref"
             key={i}
@@ -165,7 +164,7 @@ export function ActivityDetailView({
 
   /* The arrows walk the activities that have been written up, in ID order, and
      wrap — the same set the stage's rows link into. */
-  const written = useMemo(() => Object.keys(activityDetails).sort(), []);
+  const written = writtenActivities;
   const at = written.indexOf(activityId);
   const prev = written[(at - 1 + written.length) % written.length];
   const next = written[(at + 1) % written.length];
@@ -456,7 +455,7 @@ export function ActivityDetailView({
                       <p className="conn-k">{label}</p>
                       <div className="ad-chain">
                         {v.map((x) =>
-                          activityDetail(x) ? (
+                          hasActivityDetail(x) ? (
                             <Link
                               className="ad-chip on"
                               key={x}
