@@ -29,15 +29,15 @@ export const journeyData = [
       "Kickoff Go / No-Go decision record"
     ],
     engineeringView: [
-      "Market and customer requirements consolidation",
-      "Workload / use-case profiling and target KPI derivation (TOPS, TOPS/W, tokens/s)",
-      "PPA target definition — frequency, power envelope, die area budget",
-      "Die size, yield and product cost model (wafer, mask, package, test, ASP)",
-      "Memory and interface bandwidth requirements (HBM stacks, PCIe/CXL lanes, D2D)",
-      "Competitive benchmarking and product positioning",
-      "Feasibility assessment against candidate technology nodes",
-      "Program schedule, resource and staffing plan drafting",
-      "Business case preparation and funding approval package"
+      "Customer and Market Requirements Definition",
+      "Workload Definition and KPI Targets",
+      "PPA target definition",
+      "Product Cost and Margin Model",
+      "Memory and Interface Requirements",
+      "Competitive benchmarking and gap analysis",
+      "Technology Node Feasibility Assessment",
+      "Program Planning and Resourcing",
+      "Business Case and Funding Approval"
     ],
     /** Elapsed weeks per engineering activity; negative marks one that runs continuously. */
     engineeringTat: [4, 5, 4, 4, 3, 4, 4, 4, 3],

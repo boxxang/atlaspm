@@ -28,7 +28,7 @@ test.describe('opening an activity', () => {
     await expect(page.locator('#roadmap')).toHaveCount(0);
     await expect(page.locator('[data-activity="DEF-01"]')).toBeVisible();
     await expect(page.locator('.ad-title')).toHaveText(
-      'Market and customer requirements consolidation',
+      'Customer and Market Requirements Definition',
     );
 
     // and back to the programme it is dated against
@@ -103,7 +103,7 @@ test.describe('what the page says', () => {
     await page.locator('.ad-chip.on').first().click();
     await page.waitForURL(/\/activity\/DEF-\d+$/);
     await expect(page.locator('.ad-title')).not.toHaveText(
-      'Market and customer requirements consolidation',
+      'Customer and Market Requirements Definition',
     );
   });
 

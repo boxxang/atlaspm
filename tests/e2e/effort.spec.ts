@@ -35,7 +35,7 @@ test.describe('the engineering table', () => {
     await expect(rows).toHaveCount(9);
     // read-only until this table is switched into edit mode
     await expect(rows.first().locator('.mm-t')).toHaveText(
-      'Market and customer requirements consolidation',
+      'Customer and Market Requirements Definition',
     );
     await expect(rows.first().locator('.row-id')).toHaveText('DEF-01');
     await expect(panel(page).locator('.mm-input:not(.read)')).toHaveCount(0);
