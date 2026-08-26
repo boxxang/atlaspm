@@ -181,6 +181,14 @@ Pure logic never imports UI, and `/src/lib` + `/src/data` never touch the DOM �
 - **Checkpoint labels.** On the dashboard each milestone label sits past the end
   of its bar, beside its diamond, with an arrow pointing back at it — so a label
   never lies over the schedule it annotates, at any row height.
+- **Activity detail.** An engineering activity that has been written up opens a
+  page of its own at `/p/<id>/activity/<ref>` — why it exists, the steps it runs
+  in two lanes, what it needs and produces, who is on it, what to watch, and the
+  activities either side of it. Product Definition (DEF-01…09) is written; the
+  rest are not, and their rows stay plain text rather than pretending to lead
+  somewhere. The write-up is authored elsewhere and exported into
+  `/data/activityDetails.ts`; the numbers on the page come from the programme's
+  own engineering table, and the weeks are resolved against its kickoff.
 - **The stage timeline.** A stage read as a schedule rather than as two
   tables, spanning both of them, with the tables under it. The engineering
   list is bars and each deliverable is a diamond on the bar of the activity
@@ -300,8 +308,8 @@ that is a read/write swap rather than a redesign.
 ## Testing
 
 ```bash
-npm test          # 171 unit tests: schedule engine, stages/profiles, derivations, effort, mail, purity
-npm run e2e       # 257 Playwright tests
+npm test          # 173 unit tests: schedule engine, stages/profiles, derivations, effort, mail, purity
+npm run e2e       # 266 Playwright tests
 ```
 
 The e2e suite runs against its own database (`atlaspm_test`) on port 3100, so it

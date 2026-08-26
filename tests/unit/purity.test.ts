@@ -7,9 +7,13 @@ import { describe, expect, it } from 'vitest';
  * (CLAUDE.md: "UI renders data; data never imports UI").
  *
  * /src/lib holds server-side modules too (db, queries) — those are DOM-free by
- * the same rule, which is what this guards. displaySettings.ts names DOM ids as
- * strings: data about the UI, not a DOM call, so only real global access is
- * rejected.
+ * the same rule, which is what this guards.
+ *
+ * The check reads code, not prose: comments and quoted strings are stripped
+ * first, so `displaySettings.ts` naming a DOM id and a deliverable called
+ * "Product requirements document." are both what they are — data about the UI,
+ * not a call into it. Template literals are left in, so `${document.title}` is
+ * still caught.
  */
 const ROOT = resolve(import.meta.dirname, '../..');
 const PURE_DIRS = ['src/lib', 'src/data'];
@@ -21,6 +25,18 @@ const walk = (dir: string): string[] =>
   });
 
 const files = PURE_DIRS.flatMap((d) => walk(join(ROOT, d)));
+
+/**
+ * Comments and quoted strings out, so the DOM check reads code. One pass, so
+ * a `//` inside a string and a quote inside a comment both behave. A regex
+ * literal containing a quote could confuse it — that would fail the test
+ * loudly rather than pass something through, which is the safe direction.
+ */
+const stripLiterals = (src: string): string =>
+  src.replace(
+    /\/\*[\s\S]*?\*\/|\/\/[^\n]*|"(?:[^"\\\n]|\\.)*"|'(?:[^'\\\n]|\\.)*'/g,
+    (m) => (m.startsWith('/') ? ' ' : '""'),
+  );
 
 const DOM_GLOBALS = [
   'document',
@@ -40,10 +56,8 @@ describe('pure modules', () => {
   });
 
   it.each(files.map((f) => [f.slice(ROOT.length + 1), f]))('%s is DOM-free', (_rel, file) => {
-    const src = readFileSync(file, 'utf8');
+    const src = stripLiterals(readFileSync(file, 'utf8'));
     for (const g of DOM_GLOBALS) {
-      /* No space before the accessor: real DOM code is `document.body`, never
-         `document (PRD)` — which is prose a deliverable title may well contain. */
       expect(src).not.toMatch(new RegExp(`(^|[^.\\w'"\`])${g}[.\\[(]`, 'm'));
     }
   });

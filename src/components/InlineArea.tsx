@@ -16,6 +16,8 @@ import { useWrapped } from '@/store/wrapStore';
 import { WrapToggle } from './WrapToggle';
 import { ColGrip } from './ColGrip';
 import { StageGantt } from './StageGantt';
+import Link from 'next/link';
+import { activityDetail as detailFor } from '@/data/activityDetails';
 
 /** The stage as this program's profile defines it, text and all. */
 const useStage = (id: StageId) =>
@@ -83,6 +85,8 @@ function EngineeringTable({
   editing: boolean;
 }) {
   const setLines = useAppStore((st) => st.setEngineeringLines);
+  /* Which rows can be opened: only the activities that have been written up. */
+  const projectId = useAppStore((st) => st.projectId);
   const wrapped = useWrapped('engineering');
   const [draft, setDraft] = useState('');
   const [draftMm, setDraftMm] = useState('');
@@ -145,6 +149,18 @@ function EngineeringTable({
                   write(lines.map((l, j) => (j === i ? { ...l, label: e.target.value } : l)))
                 }
               />
+            ) : detailFor(activityRowId(shortTitle, i)) ? (
+              /* An activity that has been written up opens its own page — a
+                 long read with an address, not a panel over this table. */
+              <Link
+                className="mm-t read linked"
+                data-mm-label-text={i}
+                data-activity-link={activityRowId(shortTitle, i)}
+                href={`/p/${projectId}/activity/${activityRowId(shortTitle, i)}`}
+                title="Open the written-up detail for this activity"
+              >
+                {line.label}
+              </Link>
             ) : (
               <span className="mm-t read" data-mm-label-text={i}>
                 {line.label}
