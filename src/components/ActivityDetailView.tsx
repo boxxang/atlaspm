@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { useMemo, useState } from 'react';
 import {
   activityDetail,
+  activityDetails,
   activityGlossary,
   detailActivityTitles,
   detailDeliverables,
@@ -15,6 +16,7 @@ import { addWeeks, computeSchedule, fmtDate, fmtW } from '@/lib/schedule';
 import { resolveStages } from '@/lib/stages';
 import { resolveStageDetail } from '@/lib/stageDetail';
 import { activityRowId } from '@/lib/rowIds';
+import { parseRich, type RichNode } from '@/lib/activityRefs';
 
 /** Steps carry weeks; the reader wants dates. One conversion, done here. */
 const useWindow = (project: ProjectState, stageId: string) =>
@@ -57,6 +59,45 @@ const splitRisk = (raw: string) => {
   const strip = (s: string) => s.replace(/<[^>]+>/g, '').trim();
   return m ? { head: strip(m[1]), rest: strip(m[2]) } : { head: strip(raw), rest: '' };
 };
+
+/**
+ * A write-up string as the page shows it: its markup kept, and every activity
+ * it names turned into the same thing the Connections rail offers — a link
+ * where the activity is written up, an inert mark where it is only known.
+ */
+function Rich({ nodes, projectId }: { nodes: RichNode[]; projectId: string }) {
+  return (
+    <>
+      {nodes.map((n, i) => {
+        if (n.kind === 'text') return <span key={i}>{n.text}</span>;
+        if (n.kind === 'tag') {
+          const Tag = n.tag;
+          return (
+            <Tag key={i}>
+              <Rich nodes={n.children} projectId={projectId} />
+            </Tag>
+          );
+        }
+        const title = detailActivityTitles[n.id];
+        if (!title) return <span key={i}>{n.id}</span>;
+        return activityDetail(n.id) ? (
+          <Link
+            className="ad-ref"
+            key={i}
+            href={`/p/${projectId}/activity/${n.id}`}
+            data-tip={`${n.id}|${title}`}
+          >
+            {n.id}
+          </Link>
+        ) : (
+          <span className="ad-ref off" key={i} data-tip={`${n.id}|${title} — not written up yet`}>
+            {n.id}
+          </span>
+        );
+      })}
+    </>
+  );
+}
 
 function BackIcon() {
   return (
@@ -112,6 +153,23 @@ export function ActivityDetailView({
   const span = Math.max(detail.window[1] - detail.window[0], 0.5);
   const pos = (w: number) => ((w - detail.window[0]) / span) * 100;
 
+  /* A tick a week while the window is short, five across it once it is long. */
+  const ticks = useMemo(() => {
+    const [from, to] = detail.window;
+    const step = to - from <= 4 ? 1 : Math.ceil((to - from) / 5);
+    const out: number[] = [];
+    for (let w = from; w <= to + 0.001; w += step) out.push(w);
+    if (out[out.length - 1] !== to) out.push(to);
+    return out;
+  }, [detail.window]);
+
+  /* The arrows walk the activities that have been written up, in ID order, and
+     wrap — the same set the stage's rows link into. */
+  const written = useMemo(() => Object.keys(activityDetails).sort(), []);
+  const at = written.indexOf(activityId);
+  const prev = written[(at - 1 + written.length) % written.length];
+  const next = written[(at + 1) % written.length];
+
   /* Which step yields which output, so the step table can show what it adds. */
   const gives = useMemo(() => {
     const by: Record<number, string[]> = {};
@@ -130,6 +188,10 @@ export function ActivityDetailView({
 
   const dateOf = (w: number) => (win ? fmtDate(addWeeks(win.start, w)) : null);
 
+  /* Every string the page prints comes through here, so an ID in prose leads
+     where the same ID in the Connections rail leads. */
+  const rich = (text: string) => <Rich nodes={parseRich(text)} projectId={projectId} />;
+
   const conn: [string, string[]][] = [
     ['Depends on', detail.links.dependsOn],
     ['Runs with', detail.links.runsWith],
@@ -146,19 +208,29 @@ export function ActivityDetailView({
           <BackIcon />
           <span>{project.projectName}</span>
         </Link>
-        <span className="ad-crumb">
-          {stage ? `${String(stage.stage).padStart(2, '0')} · ${stage.title}` : detail.stage}
-        </span>
         <span className="spacer" />
         {detail.criticalPath && <span className="ad-cp">Critical path</span>}
       </header>
 
       <div className="ad-page">
-        <p className="ad-eyebrow">
+        <div className="ad-head">
           <span className="ad-id">{activityId}</span>
-          Engineering activity
-        </p>
-        <h1 className="ad-title">{line?.text ?? activityId}</h1>
+          <h1 className="ad-title">{line?.text ?? activityId}</h1>
+          <span className="spacer" />
+          <span className="ad-crumb">
+            {stage
+              ? `${String(stage.stage).padStart(2, '0')} ${stage.shortTitle} · ${stage.title} · stage w${stage.baseline.startOffsetWeeks}–${stage.baseline.startOffsetWeeks + stage.baseline.durationWeeks}`
+              : detail.stage}
+          </span>
+          <span className="ad-nav">
+            <Link href={`/p/${projectId}/activity/${prev}`} aria-label="Previous activity">
+              ←
+            </Link>
+            <Link href={`/p/${projectId}/activity/${next}`} aria-label="Next activity">
+              →
+            </Link>
+          </span>
+        </div>
 
         <div className="ad-facts">
           <div className="ad-fact">
@@ -192,11 +264,9 @@ export function ActivityDetailView({
             <section className="ad-sec">
               <span className="cap">Why it exists</span>
               {detail.purpose.map((p, i) => (
-                <p
-                  className="ad-lede"
-                  key={i}
-                  dangerouslySetInnerHTML={{ __html: p }}
-                />
+                <p className="ad-lede" key={i}>
+                  {rich(p)}
+                </p>
               ))}
             </section>
 
@@ -204,17 +274,14 @@ export function ActivityDetailView({
               <span className="cap">What it delivers</span>
               {owns.length ? (
                 owns.map((r) => (
-                  <div className="ad-deliv" key={r.id}>
-                    <p className="ad-deliv-h">
+                  <div className="deliv" key={r.id}>
+                    <p className="deliv-h">
                       <span className="did">{r.id}</span>
                       {detailDeliverables[r.id] ?? r.id}
                     </p>
-                    <p
-                      className="ad-deliv-w"
-                      dangerouslySetInnerHTML={{
-                        __html: r.text.replace(/^<b>[^<]*<\/b>\s*/, ''),
-                      }}
-                    />
+                    <p className="deliv-w">
+                      {rich(r.text.replace(/^<b>[^<]*<\/b>\s*/, ''))}
+                    </p>
                   </div>
                 ))
               ) : (
@@ -223,12 +290,12 @@ export function ActivityDetailView({
                 </p>
               )}
               {contributes.length > 0 && (
-                <div className="ad-contrib">
+                <div className="ad-from">
                   {contributes.map((r) => (
                     <p key={r.id}>
                       <span className="did">{r.id}</span>
                       <span className="rel">{r.rel}</span>
-                      {detailDeliverables[r.id] ?? r.id}
+                      {rich(detailDeliverables[r.id] ?? r.id)}
                     </p>
                   ))}
                 </div>
@@ -239,16 +306,16 @@ export function ActivityDetailView({
               <span className="cap">Needs first</span>
               <ul className="ad-list">
                 {detail.consumes.map((x, i) => (
-                  <li key={i}>{x}</li>
+                  <li key={i}>{rich(x)}</li>
                 ))}
               </ul>
             </section>
 
             <section className="ad-sec">
               <span className="cap">Done when</span>
-              <ul className="ad-list ad-crit-list">
+              <ul className="ad-list ad-crit">
                 {detail.exit.map((x, i) => (
-                  <li key={i}>{x}</li>
+                  <li key={i}>{rich(x)}</li>
                 ))}
               </ul>
             </section>
@@ -263,6 +330,13 @@ export function ActivityDetailView({
               </span>
 
               <div className="ad-flow">
+                <div className="ad-axis">
+                  {ticks.map((w) => (
+                    <span key={w} style={{ left: `${pos(w).toFixed(1)}%` }}>
+                      w{w}
+                    </span>
+                  ))}
+                </div>
                 {(['main', 'par'] as const)
                   .filter((l) => detail.steps.some((x) => x.lane === l))
                   .map((l) => (
@@ -283,7 +357,7 @@ export function ActivityDetailView({
                               }}
                               data-tip={`${p.st.n}. ${p.st.text}|${fmtW(p.st.tat)}`}
                             >
-                              {p.st.n}
+                              <b>{p.st.n}</b>
                             </span>
                           ))}
                       </div>
@@ -302,14 +376,14 @@ export function ActivityDetailView({
                   <li className={st.lane === 'par' ? 'par' : undefined} key={st.n}>
                     <span className="n">{st.n}</span>
                     <span>
-                      {st.text}
+                      {rich(st.text)}
                       {st.lane === 'par' && <em className="ln">runs in parallel</em>}
                     </span>
                     <span className="gives">
                       {gives[st.n] ? (
                         gives[st.n].map((g) => (
                           <span className="give" key={g}>
-                            {g}
+                            {rich(g)}
                           </span>
                         ))
                       ) : (
@@ -320,34 +394,25 @@ export function ActivityDetailView({
                   </li>
                 ))}
               </ul>
-              {detail.flowNote && <p className="ad-note">{detail.flowNote}</p>}
+              {detail.flowNote && <p className="ad-note">{rich(detail.flowNote)}</p>}
             </section>
 
             <section className="ad-sec">
               <span className="cap">
                 Watch out for<span className="n">{detail.risks.length}</span>
               </span>
-              <ul className="ad-risks">
+              <ul className="ad-risks simple">
                 {detail.risks.map((raw, i) => {
                   const { head, rest } = splitRisk(raw);
                   return (
                     <li key={i}>
-                      <b>{head}</b>
-                      {rest && <span>{rest}</span>}
+                      <span title={rest ? `${head} ${rest}` : head}>{rich(head)}</span>
                     </li>
                   );
                 })}
               </ul>
             </section>
 
-            <section className="ad-sec">
-              <span className="cap">Measured by</span>
-              <ul className="ad-list">
-                {detail.measuredBy.map((x, i) => (
-                  <li key={i}>{x}</li>
-                ))}
-              </ul>
-            </section>
           </main>
 
           <aside className="ad-side">
@@ -380,14 +445,6 @@ export function ActivityDetailView({
               </div>
             </section>
 
-            <section>
-              <span className="cap">Starts when</span>
-              <ul className="ad-list sm">
-                {detail.entry.map((x, i) => (
-                  <li key={i}>{x}</li>
-                ))}
-              </ul>
-            </section>
 
             <section>
               <span className="cap">Connections</span>
@@ -395,8 +452,8 @@ export function ActivityDetailView({
                 conn
                   .filter(([, v]) => v.length)
                   .map(([label, v]) => (
-                    <div className="ad-conn" key={label}>
-                      <p className="ad-conn-k">{label}</p>
+                    <div className="conn" key={label}>
+                      <p className="conn-k">{label}</p>
                       <div className="ad-chain">
                         {v.map((x) =>
                           activityDetail(x) ? (
