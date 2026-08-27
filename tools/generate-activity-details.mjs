@@ -20,6 +20,7 @@ const h = fs.readFileSync(`${ROOT}/${SRC}`, 'utf8');
 const D = JSON.parse(h.match(/<script id="ad-data" type="application\/json">([\s\S]*?)<\/script>/)[1]);
 
 const j1 = o => JSON.stringify(o, null, 1);
+const trim = s => String(s).replace(/\s+/g, ' ').trim();
 const ordered = (obj, keys) => { const o = {}; for (const k of keys) o[k] = obj[k]; return o; };
 
 /*
@@ -36,6 +37,9 @@ const DETAIL_FIELDS = ['stage', 'window', 'criticalPath', 'purpose', 'steps', 'f
 const STEP_FIELDS = ['n', 'text', 'tat', 'lane'];
 
 const dropped = new Set();
+const realigned = [];
+const blanks = [];
+const FIXES = JSON.parse(fs.readFileSync(`${ROOT}/tools/activity-output-fixes.json`, 'utf8'));
 const pick = (o, fields) => {
   const out = {};
   for (const k of fields) if (k in o) out[k] = o[k];
@@ -51,6 +55,43 @@ for (const id of allIds) {
   if (!d) continue;
   details[id] = pick(d, DETAIL_FIELDS);
   details[id].steps = d.steps.map(st => ({ ...pick(st, STEP_FIELDS), tat: Number(st.tat) || 0 }));
+
+  /*
+   * Where the document gives every step its own `adds`, that is the steps
+   * table's column and it replaces the produces/producedBy pair. The pair is
+   * an older draft: it lists the activity's outputs and then assigns them to
+   * steps, and the assignment slipped — PDK-03 credits "inventory the
+   * libraries" with the selection record and "select and release" with
+   * re-characterisation results. `adds` was written against the step it sits
+   * on, so the column says what the step actually adds.
+   */
+  if (d.steps.length && d.steps.every(st => st.adds)) {
+    details[id].produces = d.steps.map(st => st.adds);
+    details[id].producedBy = d.steps.map(st => st.n);
+    realigned.push({ id, steps: d.steps.length, dropped: d.produces.length });
+  }
+
+  /* An output with no text is a row of nothing in the steps table. */
+  const keep = details[id].produces.map((p, i) => ({ p: trim(p), n: details[id].producedBy[i] }))
+    .filter(x => { if (x.p) return true; blanks.push(id); return false; });
+  details[id].produces = keep.map(x => x.p);
+  details[id].producedBy = keep.map(x => x.n);
+  details[id].steps.forEach(st => { st.text = trim(st.text); });
+}
+
+/* ---------- outputs the document pins to the wrong step ---------- */
+const applied = [];
+for (const [id, fix] of Object.entries(FIXES)) {
+  if (id.startsWith('_')) continue;
+  const d = details[id];
+  if (!d) throw new Error(`fix names ${id}, which the document does not have`);
+  const ns = new Set(d.steps.map(s => s.n));
+  for (const [out, n] of Object.entries(fix.producedBy)) {
+    const i = d.produces.indexOf(out);
+    if (i < 0) throw new Error(`fix for ${id} names an output it does not have: ${out}`);
+    if (!ns.has(n)) throw new Error(`fix for ${id} names step ${n}, which does not exist`);
+    if (d.producedBy[i] !== n) { applied.push(`${id}: "${out}" ${d.producedBy[i]} -> ${n}`); d.producedBy[i] = n; }
+  }
 }
 
 /* a step whose duration was blanked in the editor; the document lays it out at
@@ -179,6 +220,16 @@ fs.writeFileSync(`${ROOT}/src/data/journey.ts`, jr);
 console.log(`details ${Object.keys(details).length} | titles ${Object.keys(titles).length} | deliverables ${Object.keys(deliverables).length} | glossary ${Object.keys(glossary).length}`);
 console.log(`engineeringView blocks rewritten: ${n}, titles changed: ${changed}`);
 if (dropped.size) console.log(`fields the document carries but never renders, dropped: ${[...dropped].join(', ')}`);
+if (realigned.length) {
+  const steps = realigned.reduce((t, r) => t + r.steps, 0);
+  const was = realigned.reduce((t, r) => t + r.dropped, 0);
+  console.log(`${realigned.length} activities take their outputs from the step that adds them: ${steps} outputs, one per step, replacing ${was} assigned by the older draft`);
+}
+if (blanks.length) console.log(`${blanks.length} outputs had no text and were dropped: ${[...new Set(blanks)].join(', ')}`);
+if (applied.length) {
+  console.log(`${applied.length} outputs moved to the step named in tools/activity-output-fixes.json:`);
+  for (const a of applied) console.log(`   ${a}`);
+}
 if (blankTat.length) {
   console.log(`WARNING: ${blankTat.length} steps have no duration and are laid out at zero weeks:`);
   for (const b of blankTat) console.log(`         ${b.id} step ${b.n}: ${b.text}`);

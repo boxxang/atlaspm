@@ -1,0 +1,19 @@
+{
+  "_note": [
+    "Outputs the authoring document pins to the wrong step, corrected here so the",
+    "port stays reproducible: the document is read as it is, and these are applied",
+    "on top. Each entry maps an output's exact text to the step number that adds",
+    "it. Every output named must exist in the activity, and every step named must",
+    "exist, or the generator stops.",
+    "Run `node tools/check-step-outputs.mjs` to see what else might belong here."
+  ],
+  "EVB-07": {
+    "why": "The outputs of steps 3 to 6 sat one step late, with step 3's landing on step 6: telemetry validation was credited to the interface loopback step, and the thermal fit check to the step that validates clocking. Each moves onto the step whose name it repeats.",
+    "producedBy": {
+      "Telemetry and protection validation": 3,
+      "Clocking and reference validation": 4,
+      "Thermal fit check": 5,
+      "Interface loopback and signal validation results": 6
+    }
+  }
+}

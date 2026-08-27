@@ -162,3 +162,36 @@ describe('every output names a step that exists', () => {
     expect(ragged.map((d) => d.id)).toEqual([]);
   });
 });
+
+/**
+ * What a step adds is printed beside it. A blank one draws an empty line where
+ * an output should be, and untrimmed text pushes the column off its baseline —
+ * both were in the authoring document and both are cleaned at the port.
+ */
+describe('what a step adds is printed, so it has to be printable', () => {
+  it('gives every output some text', () => {
+    const blank = writtenActivities.flatMap((id) =>
+      activityDetails[id].produces.filter((p) => !p.trim()).map(() => id),
+    );
+    expect(blank).toEqual([]);
+  });
+
+  it('leaves no step or output padded with whitespace', () => {
+    const padded = writtenActivities.flatMap((id) => {
+      const d = activityDetails[id];
+      return [...d.steps.map((s) => s.text), ...d.produces]
+        .filter((t) => t !== t.trim() || /\s{2,}|\n/.test(t))
+        .map((t) => `${id}: ${JSON.stringify(t)}`);
+    });
+    expect(padded).toEqual([]);
+  });
+
+  it('gives every step something to show in the column', () => {
+    const silent = writtenActivities.flatMap((id) => {
+      const d = activityDetails[id];
+      const has = new Set(d.producedBy);
+      return d.steps.filter((s) => !has.has(s.n)).map((s) => `${id} step ${s.n}`);
+    });
+    expect(silent).toEqual([]);
+  });
+});

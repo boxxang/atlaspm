@@ -75,7 +75,7 @@ export const activityDetails: Record<string, ActivityDetail> = {
    },
    {
     "n": 7,
-    "text": "Review and baseline product requirements ",
+    "text": "Review and baseline product requirements",
     "tat": 0.5,
     "lane": "main"
    }
@@ -1121,7 +1121,6 @@ export const activityDetails: Record<string, ActivityDetail> = {
    "Comparable benchmark data with clearly defined conditions",
    "Expected competitor performance and capabilities at launch",
    "Prioritized performance and capability gaps",
-   "",
    "Competitive gaps to feed into DEF-01 product requirements"
   ],
   "producedBy": [
@@ -1129,7 +1128,6 @@ export const activityDetails: Record<string, ActivityDetail> = {
    2,
    3,
    4,
-   5,
    5,
    6
   ],
@@ -1640,7 +1638,7 @@ export const activityDetails: Record<string, ActivityDetail> = {
   "steps": [
    {
     "n": 1,
-    "text": "Build the financial model - NRE, operating cost, revenue, and breakeven\n",
+    "text": "Build the financial model - NRE, operating cost, revenue, and breakeven",
     "tat": 1,
     "lane": "main"
    },
@@ -1900,8 +1898,7 @@ export const activityDetails: Record<string, ActivityDetail> = {
    "Power and TOPS/W projections",
    "Bottleneck and roofline analysis",
    "Sensitivity results and model confidence range",
-   "Performance model, source, and regression environment",
-   ""
+   "Performance model, source, and regression environment"
   ],
   "producedBy": [
    1,
@@ -1913,7 +1910,6 @@ export const activityDetails: Record<string, ActivityDetail> = {
    7,
    8,
    9,
-   10,
    10
   ],
   "rel": [
@@ -2579,7 +2575,6 @@ export const activityDetails: Record<string, ActivityDetail> = {
    "Host interface selection and protocol versions",
    "HBM selection and controller requirements",
    "Die-to-die interface selection and requirements",
-   "",
    "Compliance and interoperability requirements",
    "Controller and PHY requirements",
    "ARCH-D4 Interface and Protocol Definition Document"
@@ -2589,7 +2584,6 @@ export const activityDetails: Record<string, ActivityDetail> = {
    2,
    3,
    4,
-   5,
    5,
    6,
    7,
@@ -4098,13 +4092,13 @@ export const activityDetails: Record<string, ActivityDetail> = {
    "Export control and supply-continuity guidance"
   ],
   "produces": [
-   "Foundry and node long-list with availability windows",
-   "Weighted screening criteria",
-   "Foundry information request responses",
-   "Previous-program experience review",
-   "Screening record — what was dropped and why",
-   "Short-list of two or three candidates",
-   "Selection recommendation and decision record"
+   "Foundry and node evaluation criteria",
+   "Candidate foundry and node list",
+   "Qualified candidate shortlist",
+   "Comparable foundry and node assessment",
+   "Risk and dependency assessment by option",
+   "Technology selection and decision rationale",
+   "Approved foundry and process node selection"
   ],
   "producedBy": [
    1,
@@ -4293,13 +4287,12 @@ export const activityDetails: Record<string, ActivityDetail> = {
    "Analog and PHY requirements from ARCH-04"
   ],
   "produces": [
-   "Flavor option comparison against the PPA targets",
-   "Multi-Vt menu selection with leakage projection",
-   "Backside power delivery evaluation",
-   "Analog, RF and high-voltage adder list",
-   "Metal stack selection and routing resource definition",
-   "Priced option adders",
-   "Process option / flavor sheet agreed with the foundry"
+   "Process option and device-flavor inventory",
+   "Requirement-to-process-option mapping",
+   "Process option tradeoff assessment",
+   "Optional-feature feasibility and impact",
+   "Design-enablement readiness by option",
+   "Selected process option and flavor set"
   ],
   "producedBy": [
    1,
@@ -4307,7 +4300,6 @@ export const activityDetails: Record<string, ActivityDetail> = {
    3,
    4,
    5,
-   6,
    6
   ],
   "rel": [
@@ -4502,14 +4494,13 @@ export const activityDetails: Record<string, ActivityDetail> = {
    "Memory compiler capability indications"
   ],
   "produces": [
-   "Benchmark circuit set and its rationale",
-   "Density and area scaling results per node",
-   "Ring oscillator and critical-path frequency study",
-   "Frequency and leakage characterization per Vt",
-   "SRAM density and Vmin findings",
-   "Routing congestion proxy results",
-   "Node comparison against the PPA targets",
-   "DTCO findings and node recommendation"
+   "Benchmark scope and common assumptions",
+   "Qualified benchmark inputs",
+   "Baseline PPA results by configuration",
+   "PPA gap assessment",
+   "DTCO improvement opportunities",
+   "PPA sensitivity assessment",
+   "Process PPA and DTCO assessment"
   ],
   "producedBy": [
    1,
@@ -4518,7 +4509,6 @@ export const activityDetails: Record<string, ActivityDetail> = {
    4,
    5,
    6,
-   7,
    7
   ],
   "rel": [
@@ -4705,13 +4695,12 @@ export const activityDetails: Record<string, ActivityDetail> = {
    "MPW shuttle calendar from the foundry"
   ],
   "produces": [
-   "Volume and wafer-start forecast",
-   "Wafer price quotations per foundry",
-   "Mask set and NRE quotation per candidate",
-   "MPW shuttle pricing and slot cost",
-   "Option adder pricing",
-   "Wafer price quotation with tier structure",
-   "Cost sheet published into the DEF-04 model"
+   "Foundry pricing request scope",
+   "Foundry cost inputs",
+   "Comparable cost basis",
+   "Cost-driver breakdown",
+   "Validated cost assumptions",
+   "Approved wafer, mask, and NRE cost sheet"
   ],
   "producedBy": [
    1,
@@ -4719,7 +4708,6 @@ export const activityDetails: Record<string, ActivityDetail> = {
    3,
    4,
    5,
-   6,
    6
   ],
   "rel": [
@@ -4892,12 +4880,12 @@ export const activityDetails: Record<string, ActivityDetail> = {
    "Engineering and risk-lot requirements from the test plan"
   ],
   "produces": [
-   "Wafer-start profile against the program schedule",
-   "Capacity allocation agreement",
-   "Tapeout slot reservation",
-   "Hot-lot policy and priority terms",
-   "Engineering and risk-lot allocation",
-   "Capacity commitment letter with an escalation path"
+   "Required foundry schedule",
+   "Foundry availability assessment",
+   "Capacity and schedule gap list",
+   "Schedule mitigation options",
+   "Foundry commitment record",
+   "Updated program schedule and dependencies"
   ],
   "producedBy": [
    1,
@@ -5075,14 +5063,12 @@ export const activityDetails: Record<string, ActivityDetail> = {
    "IP requirements from ARCH-04 and IPR-01"
   ],
   "produces": [
+   "Agreement and access checklist",
    "Executed NDA",
-   "Design agreement, scoped and executed",
-   "PDK and library license terms",
-   "Foundry IP licensing frame",
-   "Agreed liability, indemnity and yield-responsibility terms",
-   "Compliance and export-control record",
-   "Redline history with resolved positions",
-   "Distribution record — who is covered to access what"
+   "Design agreement issues and required changes",
+   "IP licensing framework",
+   "Closed legal and commercial issue list",
+   "Executed design agreement and legal package"
   ],
   "producedBy": [
    1,
@@ -5090,8 +5076,6 @@ export const activityDetails: Record<string, ActivityDetail> = {
    3,
    4,
    5,
-   6,
-   6,
    6
   ],
   "rel": [
@@ -5265,12 +5249,12 @@ export const activityDetails: Record<string, ActivityDetail> = {
    "DTCO findings as they emerge from TECH-03"
   ],
   "produces": [
-   "Node maturity and risk-production timing assessment",
-   "Defect density trend and yield learning curve",
-   "Roadmap alignment note against the program schedule",
-   "Capacity ramp profile",
-   "Node maturity assessment per candidate",
-   "Node risk assessment with mitigation options"
+   "Program-to-foundry milestone map",
+   "Technology maturity assessment",
+   "Production-readiness risk assessment",
+   "Foundry-dependent schedule items",
+   "Technology-readiness mitigation plan",
+   "Updated roadmap and schedule alignment"
   ],
   "producedBy": [
    1,
@@ -5278,7 +5262,7 @@ export const activityDetails: Record<string, ActivityDetail> = {
    3,
    4,
    5,
-   5
+   6
   ],
   "rel": [
    {
@@ -5446,18 +5430,20 @@ export const activityDetails: Record<string, ActivityDetail> = {
    "Supply-continuity findings from TECH-01"
   ],
   "produces": [
-   "Second-source viability assessment result",
-   "Migration cost and schedule estimate",
-   "IP portability assessment",
-   "Design rule and library delta analysis",
-   "Sourcing strategy recommendation and decision record"
+   "Second-source and migration objectives",
+   "Alternative technology options",
+   "Portability gap assessment",
+   "Migration impact estimate",
+   "Second-source feasibility assessment",
+   "Second-source and migration strategy"
   ],
   "producedBy": [
    1,
    2,
    3,
    4,
-   5
+   5,
+   6
   ],
   "rel": [
    {
@@ -5633,13 +5619,13 @@ export const activityDetails: Record<string, ActivityDetail> = {
    "Interposer technology options from the foundry"
   ],
   "produces": [
-   "OSAT long-list with capability assessment",
-   "Advanced packaging capacity indication",
-   "Foundry-to-OSAT logistics model",
-   "Substrate and interposer supplier landscape",
-   "Known-good-die responsibility model",
-   "Preliminary OSAT capacity indication",
-   "Backend supply chain findings for package design"
+   "OSAT and backend requirements",
+   "Candidate supplier list",
+   "Supplier capability assessment",
+   "Backend capacity and lead-time assessment",
+   "OSAT and supply-chain gap list",
+   "Backend schedule and dependency alignment",
+   "OSAT and backend action plan"
   ],
   "producedBy": [
    1,
@@ -5828,14 +5814,13 @@ export const activityDetails: Record<string, ActivityDetail> = {
    "Design status — what has been characterized against which version"
   ],
   "produces": [
-   "Release calendar and version tracking framework",
-   "0.1-to-0.5 delta impact analysis",
-   "Open gap list against the design's requirements",
-   "Delta impact analysis per version transition",
-   "Re-qualification record per library and deck",
-   "Production PDK adoption and freeze decision",
-   "Version freeze decision and exception log",
-   "PDK readiness dashboard, maintained"
+   "PDK release timeline and maturity map",
+   "PDK delta summary by release",
+   "Design and schedule impact assessment",
+   "PDK blocking-gap list",
+   "PDK adoption plan by milestone",
+   "PDK readiness status and action list",
+   "Controlled PDK version history"
   ],
   "producedBy": [
    1,
@@ -5844,7 +5829,6 @@ export const activityDetails: Record<string, ActivityDetail> = {
    4,
    5,
    6,
-   7,
    7
   ],
   "rel": [
@@ -6025,19 +6009,17 @@ export const activityDetails: Record<string, ActivityDetail> = {
    "Foundry exception request process"
   ],
   "produces": [
-   "Rule change log against the previous node",
-   "Restricted rule impact assessment",
-   "Recommended rule disposition record",
-   "Density and spacing rule impact on the floorplan",
-   "Exception requests submitted to the foundry",
-   "DRM review record for the design teams"
+   "Design rule review baseline",
+   "Rule classification",
+   "Product-specific rule impact",
+   "Rule disposition and design guidance",
+   "Approved rule disposition"
   ],
   "producedBy": [
    1,
    2,
    3,
    4,
-   5,
    5
   ],
   "rel": [
@@ -6213,13 +6195,12 @@ export const activityDetails: Record<string, ActivityDetail> = {
    "Foundry library release notes and characterization data"
   ],
   "produces": [
-   "Library family and track height selection record",
-   "Qualified Vt menu with leakage projections",
-   "Multi-bit and special cell evaluation",
-   "Timing model quality report across corners",
-   "Physical view and abstract consistency findings",
-   "Re-characterization results where foundry data was thin",
-   "Library qualification record and freeze"
+   "Library option inventory",
+   "Library PPA comparison",
+   "Low-power and specialty-cell readiness",
+   "Library view completeness",
+   "Library qualification results",
+   "Qualified standard cell library list"
   ],
   "producedBy": [
    1,
@@ -6227,7 +6208,6 @@ export const activityDetails: Record<string, ActivityDetail> = {
    3,
    4,
    5,
-   6,
    6
   ],
   "rel": [
@@ -6427,13 +6407,13 @@ export const activityDetails: Record<string, ActivityDetail> = {
    "Block memory budgets from ARCH-06"
   ],
   "produces": [
-   "Memory requirement list per block",
-   "Compiler license and access setup record",
-   "Compiler capability screen and gap list",
-   "Generated instances across required configurations",
-   "Redundancy and repair option evaluation",
-   "Compiler view completeness findings",
-   "Instance library with complete views"
+   "Memory instance requirement set",
+   "Memory compiler capability matrix",
+   "Requirement-to-compiler mapping",
+   "Representative compiled memory set",
+   "Memory compiler feasibility assessment",
+   "Compiler gap list",
+   "Memory compiler and instance plan"
   ],
   "producedBy": [
    1,
@@ -6631,12 +6611,12 @@ export const activityDetails: Record<string, ActivityDetail> = {
    "DTCO SRAM findings from TECH-03"
   ],
   "produces": [
-   "Per-block memory budget extract",
-   "Density measurement per instance",
-   "Vmin and access time characterization results",
-   "Leakage and dynamic power measurements",
-   "Area efficiency comparison against budget",
-   "Quantified gap analysis per block"
+   "Memory characterization scope",
+   "Memory PPA data set",
+   "Memory PPA gap analysis",
+   "Memory configuration sensitivity",
+   "Custom-memory candidate list",
+   "Memory PPA disposition"
   ],
   "producedBy": [
    1,
@@ -6817,13 +6797,12 @@ export const activityDetails: Record<string, ActivityDetail> = {
    "Cost impact of the die area at stake from DEF-04"
   ],
   "produces": [
-   "Shortfall review against the block budgets",
-   "Defined options — pushed rules, custom array, architecture change",
-   "Schedule impact assessment against the AMS window",
-   "Foundry pushed-rule appetite assessment result",
-   "Option definition with cost, schedule and risk per path",
-   "Decision record with the alternatives rejected",
-   "Scope handoff package to AMS"
+   "Custom-memory candidate list",
+   "Expected custom-memory benefit",
+   "Custom-memory development impact",
+   "Foundry feasibility and approval plan",
+   "Memory implementation decision",
+   "Custom-memory scope and schedule"
   ],
   "producedBy": [
    1,
@@ -6831,7 +6810,6 @@ export const activityDetails: Record<string, ActivityDetail> = {
    3,
    4,
    5,
-   6,
    6
   ],
   "rel": [
@@ -7006,12 +6984,12 @@ export const activityDetails: Record<string, ActivityDetail> = {
    "Package and board ESD requirements"
   ],
   "produces": [
-   "Consolidated IO requirement list",
-   "IO library selection per interface",
-   "ESD strategy and clamp selection record",
-   "Latch-up and guard ring strategy",
-   "IO timing and SI model quality report",
-   "IO qualification record"
+   "I/O requirement-to-library mapping",
+   "Protection-cell capability assessment",
+   "I/O physical integration assessment",
+   "I/O library view completeness",
+   "I/O and protection gap disposition",
+   "Qualified I/O and protection library list"
   ],
   "producedBy": [
    1,
@@ -7194,14 +7172,12 @@ export const activityDetails: Record<string, ActivityDetail> = {
    "Flow step definitions from PDK-09"
   ],
   "produces": [
-   "Tool and version matrix per flow step",
-   "Vendor certification status record",
-   "Synthesis and place-and-route version qualification results",
-   "STA and signoff tool qualification results",
-   "Qualification results per tool",
-   "Interoperability check findings",
-   "Version freeze and upgrade exception policy",
-   "Published tool matrix"
+   "EDA qualification scope",
+   "Candidate tool-version matrix",
+   "Qualified test environment",
+   "Cross-flow qualification results",
+   "Tool issue and patch disposition",
+   "Qualified EDA tool and version baseline"
   ],
   "producedBy": [
    1,
@@ -7209,8 +7185,6 @@ export const activityDetails: Record<string, ActivityDetail> = {
    3,
    4,
    5,
-   6,
-   6,
    6
   ],
   "rel": [
@@ -7403,14 +7377,13 @@ export const activityDetails: Record<string, ActivityDetail> = {
    "Hierarchical partitioning from ARCH-02"
   ],
   "produces": [
-   "Ingested foundry reference flow",
-   "Gap analysis against internal methodology",
-   "Adapted synthesis and place-and-route flow",
-   "Adapted synthesis, P&R and signoff flows",
-   "Low-power flow integration",
-   "Hierarchical and block-level flow definition",
-   "Internal methodology deck",
-   "Pilot results on a representative block"
+   "Working foundry reference flow",
+   "Reference-flow validation results",
+   "Program-specific flow configuration",
+   "Internal flow enhancements",
+   "Reference-flow regression results",
+   "Internal methodology guide",
+   "Released reference-flow baseline"
   ],
   "producedBy": [
    1,
@@ -7419,7 +7392,6 @@ export const activityDetails: Record<string, ActivityDetail> = {
    4,
    5,
    6,
-   7,
    7
   ],
   "rel": [
@@ -7604,12 +7576,12 @@ export const activityDetails: Record<string, ActivityDetail> = {
    "Rule dispositions from PDK-02"
   ],
   "produces": [
-   "Deck inventory with version baseline",
-   "Version control and release process",
-   "Extraction deck validation results",
-   "DRC and LVS validation results",
-   "Change notification process and log",
-   "Deck version tracking log"
+   "Signoff-deck inventory",
+   "Deck compatibility matrix",
+   "Controlled signoff-deck baseline",
+   "Deck-update regression results",
+   "Deck delta impact assessment",
+   "Signoff-deck release history"
   ],
   "producedBy": [
    1,
@@ -7799,12 +7771,12 @@ export const activityDetails: Record<string, ActivityDetail> = {
    "Runtime and license capacity constraints"
   ],
   "produces": [
-   "Corner and mode enumeration",
-   "Proposed PVT corner set",
-   "Derate methodology selection and rationale",
-   "PVT corner set, agreed with the foundry",
-   "Signoff condition document",
-   "Corner count impact on runtime and licences"
+   "Signoff condition requirements",
+   "Candidate corner set",
+   "Variation and derate strategy",
+   "Corner-set tradeoff assessment",
+   "Foundry-aligned signoff assumptions",
+   "Signoff corner and derate baseline"
   ],
   "producedBy": [
    1,
@@ -7992,12 +7964,12 @@ export const activityDetails: Record<string, ActivityDetail> = {
    "Existing farm and license estate"
   ],
   "produces": [
-   "Compute demand model per stage and flow step",
-   "EDA license demand model at peak concurrency",
-   "Storage and retention requirement",
-   "Farm capacity plan with procurement dates",
-   "Licence pooling strategy",
-   "Published capacity plan and review record"
+   "Compute demand forecast",
+   "License demand forecast",
+   "Storage demand forecast",
+   "Infrastructure capacity gap analysis",
+   "Capacity mitigation plan",
+   "Compute, license, and storage capacity plan"
   ],
   "producedBy": [
    1,
@@ -8184,13 +8156,13 @@ export const activityDetails: Record<string, ActivityDetail> = {
    "Frozen PDK version from PDK-01"
   ],
   "produces": [
-   "Environment scope definition",
-   "Golden design environment, versioned",
-   "Flow regression suite",
-   "Reference block regression results",
-   "Regression results against the pilot baseline",
-   "Release notes and known-issue list",
-   "Onboarding material and team access"
+   "Golden environment candidate",
+   "Environment configuration baseline",
+   "Golden environment regression results",
+   "Environment issue disposition",
+   "Golden environment release notes",
+   "Golden design environment release",
+   "Golden environment change-control history"
   ],
   "producedBy": [
    1,
@@ -8388,14 +8360,12 @@ export const activityDetails: Record<string, ActivityDetail> = {
    "Foundry IP catalogue for the selected node"
   ],
   "produces": [
-   "Requirement-to-IP decomposition",
-   "Block-level IP list",
-   "Interface and protocol IP list",
-   "Interface and foundry IP identification",
-   "Per-IP specification stubs",
-   "Requirement-to-IP traceability matrix",
-   "IP bill of materials, block by block",
-   "Traceability gap list"
+   "Complete IP block inventory",
+   "Functional and performance requirement set",
+   "IP integration requirements",
+   "Technology and qualification requirements",
+   "IP deliverable and schedule requirements",
+   "Approved IP requirement baseline"
   ],
   "producedBy": [
    1,
@@ -8403,8 +8373,6 @@ export const activityDetails: Record<string, ActivityDetail> = {
    3,
    4,
    5,
-   6,
-   6,
    6
   ],
   "rel": [
@@ -8572,11 +8540,11 @@ export const activityDetails: Record<string, ActivityDetail> = {
    "Team ownership records"
   ],
   "produces": [
-   "Internal IP inventory mapped to the bill",
-   "Node availability assessment result per block",
-   "Collateral completeness audit",
-   "Ownership and maintenance status",
-   "Reuse classification per block"
+   "Internal reuse candidate list",
+   "Functional reuse assessment",
+   "Technology compatibility assessment",
+   "IP maturity and deliverable assessment",
+   "Internal IP reuse disposition"
   ],
   "producedBy": [
    1,
@@ -8748,13 +8716,12 @@ export const activityDetails: Record<string, ActivityDetail> = {
    "Cost model assumptions from DEF-04"
   ],
   "produces": [
-   "Decision criteria and their weighting",
-   "Differentiation screen result",
-   "Internal capacity commitment for make decisions",
-   "Cost and schedule comparison per line",
-   "Foundry-specific versus portable IP assessment",
-   "Make / buy / reuse decision per line",
-   "Rejected option record with cost and schedule"
+   "IP sourcing decision criteria",
+   "Reuse option assessment",
+   "Make option assessment",
+   "Buy option assessment",
+   "IP sourcing tradeoff matrix",
+   "Make / buy / reuse decision record"
   ],
   "producedBy": [
    1,
@@ -8762,7 +8729,6 @@ export const activityDetails: Record<string, ActivityDetail> = {
    3,
    4,
    5,
-   6,
    6
   ],
   "rel": [
@@ -8942,13 +8908,13 @@ export const activityDetails: Record<string, ActivityDetail> = {
    "Vendor landscape and previous-program experience"
   ],
   "produces": [
-   "Vendor long-list per IP line",
-   "RFI responses per vendor",
-   "Technical evaluation against the stubs",
-   "Reference customer findings",
-   "Support model and escalation path assessment",
-   "RFI and RFQ responses",
-   "Vendor evaluation matrix and selection record"
+   "Vendor RFI / RFQ package",
+   "Vendor candidate list",
+   "Technical compliance matrix",
+   "Vendor readiness assessment",
+   "Commercial and program-impact comparison",
+   "Closed vendor clarification list",
+   "Vendor selection recommendation"
   ],
   "producedBy": [
    1,
@@ -9141,13 +9107,13 @@ export const activityDetails: Record<string, ActivityDetail> = {
    "Errata from previous programs and vendor disclosures"
   ],
   "produces": [
-   "Evidence standard the program accepts",
-   "Collected silicon evidence per block",
-   "Silicon evidence per block, with node and option match",
-   "Speed grade and condition match findings",
-   "Errata and known-issue summary",
-   "Maturity level per block and a gap list",
-   "IP readiness report with its gap list"
+   "Silicon-proven acceptance criteria",
+   "IP silicon evidence package",
+   "Configuration delta assessment",
+   "Silicon quality assessment",
+   "Node-readiness risk rating",
+   "Risk-reduction plan",
+   "IP silicon-proven status matrix"
   ],
   "producedBy": [
    1,
@@ -9342,13 +9308,13 @@ export const activityDetails: Record<string, ActivityDetail> = {
    "Previous-program IP delivery disputes"
   ],
   "produces": [
-   "Deliverable checklist per IP class",
-   "View and model requirement list",
-   "Verification collateral requirements",
-   "Documentation, errata and integration guide requirements",
-   "Acceptance criteria and incoming inspection procedure",
-   "Vendor-agreed checklists",
-   "Published checklist with procurement handoff"
+   "IP deliverable checklist template",
+   "Deliverable-to-integration mapping",
+   "IP deliverable gap assessment",
+   "Deliverable compatibility results",
+   "IP deliverable action list",
+   "Committed IP deliverable plan",
+   "IP integration-readiness status"
   ],
   "producedBy": [
    1,
@@ -9542,15 +9508,14 @@ export const activityDetails: Record<string, ActivityDetail> = {
    "Corporate legal templates and positions"
   ],
   "produces": [
-   "Commercial terms per IP line",
-   "Agreed licence model per block",
-   "Executed licences with delivery commitments",
-   "Deliverable checklist as a contractual schedule",
-   "Support and escalation terms",
-   "Agreed liability, indemnity and warranty terms",
-   "Redline history with resolved positions",
-   "Purchase orders issued",
-   "Distribution record of what has been licensed to whom"
+   "IP licensing requirement set",
+   "Commercial term assessment",
+   "Negotiated IP agreement",
+   "Closed commercial approval items",
+   "Contractual delivery schedule",
+   "Executed procurement commitment",
+   "Active IP license and access",
+   "IP commercial obligation register"
   ],
   "producedBy": [
    1,
@@ -9560,7 +9525,6 @@ export const activityDetails: Record<string, ActivityDetail> = {
    5,
    6,
    7,
-   8,
    8
   ],
   "rel": [
@@ -9739,12 +9703,12 @@ export const activityDetails: Record<string, ActivityDetail> = {
    "Integration window requirements from RTL and PD"
   ],
   "produces": [
-   "Unproven block list",
-   "Unproven block list with porting scope",
-   "Execution decision per block — vendor or internal",
-   "Effort and duration estimates",
-   "Dependency map against integration windows",
-   "Hardening plan with owners and dates"
+   "Porting and hardening candidate list",
+   "Porting delta assessment",
+   "Porting work breakdown",
+   "Porting resource plan",
+   "Porting and hardening schedule",
+   "Approved porting plan"
   ],
   "producedBy": [
    1,
@@ -9923,12 +9887,12 @@ export const activityDetails: Record<string, ActivityDetail> = {
    "Deliverable checklist from IPR-06"
   ],
   "produces": [
-   "Integration window map per consuming stage",
-   "Committed delivery dates per block and deliverable",
-   "Deliverable-level delivery schedule",
-   "Hardening overlay",
-   "Mismatch and escalation list",
-   "IP schedule folded into the program plan"
+   "IP integration need-by schedule",
+   "IP view-to-milestone mapping",
+   "Integrated IP delivery schedule",
+   "IP schedule gap list",
+   "IP schedule recovery plan",
+   "Controlled IP delivery schedule"
   ],
   "producedBy": [
    1,
@@ -10103,11 +10067,11 @@ export const activityDetails: Record<string, ActivityDetail> = {
    "Sourcing strategy from TECH-08"
   ],
   "produces": [
-   "Risk rating per IP line",
-   "Critical dependency list",
-   "Second-source viability findings",
-   "Internal fallback assessment",
-   "Contingency plan with triggers and decision dates"
+   "IP risk-rating framework",
+   "IP maturity risk matrix",
+   "Critical IP watch list",
+   "IP contingency options",
+   "IP contingency plan"
   ],
   "producedBy": [
    1,
@@ -10283,17 +10247,15 @@ export const activityDetails: Record<string, ActivityDetail> = {
    "Block PPA budgets from ARCH-06"
   ],
   "produces": [
-   "Custom block list with owners",
-   "System-level budget decomposition",
-   "Per-block specifications with jitter, BER, PSRR and area budgets",
-   "Per-block AMS specifications",
-   "Area and power allocation per block",
-   "PSRR and supply sensitivity requirements",
-   "Specification review and acceptance record"
+   "AMS IP inventory",
+   "AMS functional and electrical specifications",
+   "AMS PPA and noise budgets",
+   "AMS integration requirements",
+   "AMS verification requirements",
+   "Approved AMS specification and budget baseline"
   ],
   "producedBy": [
    1,
-   2,
    2,
    3,
    4,
@@ -10503,23 +10465,21 @@ export const activityDetails: Record<string, ActivityDetail> = {
    "Supply and rail topology from ARCH-05"
   ],
   "produces": [
-   "PLL architecture selection record",
-   "Loop dynamics and phase noise budget",
-   "VCO design with its tuning range",
-   "PLL architecture selection and loop design",
-   "VCO and loop component designs",
-   "Supply regulation and calibration scheme",
-   "Lock detection, calibration and startup sequencing design",
-   "PLL layout with matching and shielding",
-   "Post-layout jitter results across PVT",
-   "Clock distribution interface definition",
-   "Characterized PLL macro with views"
+   "PLL architecture and loop requirements",
+   "Circuit architecture definition",
+   "Baseline PLL design",
+   "PVT performance results",
+   "Noise and spur sensitivity assessment",
+   "Variation robustness results",
+   "PLL calibration and test requirements",
+   "Post-layout PLL verification",
+   "PLL integration model set",
+   "Qualified PLL / clock-generator design"
   ],
   "producedBy": [
    1,
    2,
    3,
-   4,
    4,
    5,
    6,
@@ -10747,16 +10707,16 @@ export const activityDetails: Record<string, ActivityDetail> = {
    "Jitter budget from AMS-01"
   ],
   "produces": [
-   "PHY strategy per interface",
-   "Vendor deliverable gap assessment",
-   "Equalization and link training architecture",
-   "TX/RX front-end and clock recovery designs",
-   "Clock recovery and per-lane timing design",
-   "HBM PHY integration and training sequence",
-   "SerDes layout with lane pitch closure",
-   "Post-layout BER and eye results across PVT",
-   "Compliance simulation results",
-   "Released PHY macros with integration support"
+   "PHY electrical requirement baseline",
+   "PHY implementation architecture",
+   "PHY circuit implementation",
+   "End-to-end channel model",
+   "PHY performance results",
+   "PHY variation robustness assessment",
+   "PHY physical integration requirements",
+   "PHY test and debug coverage",
+   "Qualified PHY implementation",
+   "PHY integration package"
   ],
   "producedBy": [
    1,
@@ -10990,14 +10950,14 @@ export const activityDetails: Record<string, ActivityDetail> = {
    "Test and trim capability from TEST-01"
   ],
   "produces": [
-   "Supply topology and regulation plan",
-   "Bandgap reference design with trim strategy",
-   "LDO designs with stability and PSRR results",
-   "Bias generation and distribution scheme",
-   "Startup, sequencing and brown-out behavior definition",
-   "Regulator layout with supply isolation",
-   "Post-layout stability and PSRR results across PVT",
-   "Trim and calibration procedure for production test"
+   "Power-management electrical requirements",
+   "Analog power-management architecture",
+   "Baseline power-management design",
+   "Electrical performance results",
+   "Power-state behavior results",
+   "Variation robustness results",
+   "Power-management test and trim requirements",
+   "Analog power-management macro set"
   ],
   "producedBy": [
    1,
@@ -11207,14 +11167,14 @@ export const activityDetails: Record<string, ActivityDetail> = {
    "Foundry bitcell options and pushed-rule policy"
   ],
   "produces": [
-   "Confirmed custom array scope",
-   "Bitcell selection with rule implications",
-   "Array organization and banking scheme",
-   "Sense amplifier topology and offset budget",
-   "Replica timing scheme",
-   "Peripheral circuit architecture",
-   "Density projection against budget",
-   "Architecture freeze record"
+   "Custom SRAM requirement baseline",
+   "Bitcell option assessment",
+   "Array organization",
+   "Memory periphery architecture",
+   "SRAM timing architecture",
+   "SRAM architecture tradeoff results",
+   "Custom SRAM architecture decision",
+   "Custom SRAM design requirements"
   ],
   "producedBy": [
    1,
@@ -11411,13 +11371,13 @@ export const activityDetails: Record<string, ActivityDetail> = {
    "Power budget for the array from ARCH-06"
   ],
   "produces": [
-   "Vmin gap analysis with assist requirement",
-   "Assist technique selection and interaction findings",
-   "Wordline boost circuit design",
-   "Wordline boost, negative bitline and collapse circuits",
-   "VDD collapse and read-assist timing design",
-   "Assist control and calibration scheme",
-   "Vmin verification results with assist enabled"
+   "SRAM Vmin limitation analysis",
+   "Assist option tradeoff",
+   "SRAM assist circuit implementation",
+   "Assist operating-range definition",
+   "Assist Vmin and yield results",
+   "Assist reliability assessment",
+   "Qualified SRAM assist design"
   ],
   "producedBy": [
    1,
@@ -11605,14 +11565,14 @@ export const activityDetails: Record<string, ActivityDetail> = {
    "Density target from the block budget"
   ],
   "produces": [
-   "Pushed-rule set with foundry pre-alignment",
-   "Bitcell array and peripheral layout",
-   "Peripheral and assist circuit layout",
-   "Density and fill compliance record",
-   "Foundry approval record and waivers",
-   "DRC closure record with pushed-rule waivers",
-   "DRC, LVS and antenna clean layout",
-   "Frozen layout with extraction handoff"
+   "Custom SRAM layout plan",
+   "SRAM core-array layout",
+   "SRAM periphery layout",
+   "Complete custom SRAM layout",
+   "Physical verification results",
+   "Foundry rule disposition",
+   "Layout optimization results",
+   "Custom SRAM layout release"
   ],
   "producedBy": [
    1,
@@ -11805,13 +11765,13 @@ export const activityDetails: Record<string, ActivityDetail> = {
    "Redundancy scheme from AMS-09"
   ],
   "produces": [
-   "Statistical methodology and its validation",
-   "Bitcell variation model validation record",
-   "Sigma-Vmin results for read, write and retention",
-   "Sense amplifier offset distribution analysis",
-   "Offset and peripheral variation contributions",
-   "Array yield projection with redundancy",
-   "Statistical margin report"
+   "SRAM statistical acceptance criteria",
+   "Statistical failure-mode model",
+   "Statistical simulation methodology",
+   "Variation characterization results",
+   "Array-level Vmin distribution",
+   "Yield sensitivity results",
+   "SRAM statistical margin and yield report"
   ],
   "producedBy": [
    1,
@@ -11998,20 +11958,18 @@ export const activityDetails: Record<string, ActivityDetail> = {
    "Yield target from the cost model"
   ],
   "produces": [
-   "Redundancy scheme selection record",
-   "Redundancy scheme with spare allocation",
-   "Repair interface definition",
-   "Fuse and repair storage allocation",
-   "Repair interface specification, agreed with DFT",
-   "Repair algorithm agreement",
-   "Redundancy yield contribution analysis"
+   "Memory redundancy requirements",
+   "Redundancy architecture",
+   "Repair encoding specification",
+   "BISR integration interface",
+   "Repair-sequence verification",
+   "Memory repair verification results"
   ],
   "producedBy": [
    1,
    2,
    3,
    4,
-   5,
    5,
    6
   ],
@@ -12193,13 +12151,13 @@ export const activityDetails: Record<string, ActivityDetail> = {
    "Tool view requirements from PDK-08"
   ],
   "produces": [
-   "View requirement definition against the tool matrix",
-   "Timing views across the signoff corners",
-   "Power and leakage views",
-   "Physical abstract and blockage views",
-   "Functional and behavioural models",
-   "Compiler-equivalence check results",
-   "Released view set"
+   "Custom-memory characterization plan",
+   "Memory timing and power data",
+   "Timing and functional views",
+   "Physical and circuit views",
+   "Memory integration collateral",
+   "Custom-memory view qualification results",
+   "Qualified custom-memory release"
   ],
   "producedBy": [
    1,
@@ -12393,13 +12351,13 @@ export const activityDetails: Record<string, ActivityDetail> = {
    "Reliability rules and limits from the DRM"
   ],
   "produces": [
-   "Design environment and testbench framework",
-   "Topology selection per block",
-   "Sized schematics with operating points",
-   "Pre-layout corner simulation results",
-   "Pre-layout corner and Monte Carlo results",
-   "Per-block regression suites",
-   "Layout entry gate records"
+   "AMS circuit architecture",
+   "AMS schematic design",
+   "Baseline pre-layout results",
+   "PVT verification results",
+   "Variation and mismatch results",
+   "Control and robustness results",
+   "Layout-ready AMS schematic"
   ],
   "producedBy": [
    1,
@@ -12600,14 +12558,14 @@ export const activityDetails: Record<string, ActivityDetail> = {
    "Golden environment and decks from PDK-13"
   ],
   "produces": [
-   "Macro floorplans and pin placement",
-   "Matching-critical device layouts",
-   "Shielding and isolation structures",
-   "EM-compliant supply and bias routing",
-   "Fill and density compliance record",
-   "Per-macro DRC closure",
-   "DRC, LVS and antenna clean layouts",
-   "Extraction-ready frozen layouts"
+   "AMS layout plan",
+   "Critical device placement",
+   "AMS custom routing",
+   "Layout protection structures",
+   "Physical verification results",
+   "Fill-compliant layout",
+   "Layout quality review",
+   "Physically verified AMS layout"
   ],
   "producedBy": [
    1,
@@ -12812,13 +12770,13 @@ export const activityDetails: Record<string, ActivityDetail> = {
    "Block specifications and budgets from AMS-01"
   ],
   "produces": [
-   "Extraction flow and parasitic model selection",
-   "Post-layout functional and corner results per block",
-   "Post-layout PVT corner closure results",
-   "Monte Carlo and mismatch results",
-   "Degradation analysis pre- to post-layout",
-   "Layout iteration requests",
-   "Assembled characterization data"
+   "Extracted AMS netlist",
+   "Pre / post-layout correlation",
+   "Extracted PVT results",
+   "Post-layout statistical results",
+   "Parasitic impact assessment",
+   "Post-layout closure actions",
+   "Post-layout AMS signoff results"
   ],
   "producedBy": [
    1,
@@ -13019,13 +12977,13 @@ export const activityDetails: Record<string, ActivityDetail> = {
    "Assist boost levels from AMS-06"
   ],
   "produces": [
-   "Reliability requirements per macro",
-   "EM analysis results on supply and signal routing",
-   "In-macro IR drop results",
-   "Aging and lifetime simulation results",
-   "ESD path verification and latch-up review",
-   "Latch-up and guard structure review findings",
-   "Reliability report with waiver dispositions"
+   "AMS reliability verification plan",
+   "Device stress results",
+   "AMS EM / IR results",
+   "Aging assessment",
+   "ESD verification results",
+   "Latch-up assessment",
+   "AMS reliability closure record"
   ],
   "producedBy": [
    1,
@@ -13228,14 +13186,14 @@ export const activityDetails: Record<string, ActivityDetail> = {
    "View and tool requirements from PDK-08 and PD-01"
   ],
   "produces": [
-   "Confirmed view requirement list",
-   "Finalized GDS per macro",
-   "Physical abstracts with blockages and pins",
-   "Timing and power views",
-   "CDL netlists and UPF power intent",
-   "Behavioural and wreal models",
-   "Trial placement integration verification results",
-   "Released, version-controlled macro set"
+   "AMS macro release requirements",
+   "AMS physical abstract",
+   "AMS timing and power views",
+   "AMS circuit and signoff views",
+   "AMS simulation models",
+   "AMS integration guide",
+   "AMS macro qualification results",
+   "Qualified AMS hard-macro release"
   ],
   "producedBy": [
    1,
@@ -13447,13 +13405,13 @@ export const activityDetails: Record<string, ActivityDetail> = {
    "Startup and sequencing requirements from ARCH-05"
   ],
   "produces": [
-   "AMS co-simulation environment",
-   "Model correlation results",
-   "Boundary and control interface verification results",
-   "Startup and calibration co-simulation results",
-   "Integration support record for RTL and physical design",
-   "Integration guide with known limitations",
-   "Errata list and bring-up debug material"
+   "AMS integration verification plan",
+   "AMS–digital simulation environment",
+   "AMS interface verification results",
+   "AMS control-sequence results",
+   "AMS power-state integration results",
+   "AMS model correlation",
+   "Qualified AMS integration model set"
   ],
   "producedBy": [
    1,
@@ -42432,10 +42390,10 @@ export const activityDetails: Record<string, ActivityDetail> = {
   "producedBy": [
    1,
    2,
-   6,
    3,
    4,
    5,
+   6,
    6
   ],
   "rel": [
