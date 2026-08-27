@@ -1469,6 +1469,66 @@ body.schedule-mode #schedule-view{opacity:1;visibility:visible;transform:none}
 }
 .dash-flight span.risky{border-color:var(--risk);color:var(--risk)}
 #sched-cap{margin-top:44px}
+/* ---------- where the program is stuck ----------
+   A row per bottleneck: the reference, what it is, how late, how much waits,
+   and when the first of that work was due to start. Every figure is checkable,
+   so none of them is a score. */
+.dash-panel{margin:0 0 34px}
+.bn-list{list-style:none;margin:0;padding:0}
+.bn{border-bottom:1px solid var(--line)}
+.bn:last-child{border-bottom:0}
+.bn-row{
+  display:grid;
+  grid-template-columns:5.2rem minmax(0,1.6fr) 7rem 8rem 8.5rem 8.5rem 1.6rem;
+  gap:14px;align-items:baseline;padding:10px 0;
+}
+.bn-row>span{display:flex;flex-direction:column;gap:2px;min-width:0}
+.bn-row em{
+  font-style:normal;font-family:var(--mono);font-size:.62em;letter-spacing:.04em;
+  color:var(--ink-3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+.bn-id{
+  align-self:start;font-family:var(--mono);font-size:.72em;font-weight:700;letter-spacing:.06em;
+  color:var(--accent);background:var(--accent-soft);border-radius:3px;padding:3px 7px;
+  text-decoration:none;text-align:center;
+}
+.bn-id:hover,.bn-id:focus-visible{background:var(--accent);color:var(--page);outline:none}
+.bn-t b{font-weight:600;font-size:.88em;color:var(--ink);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.bn-late{color:var(--risk);font-family:var(--mono);font-size:.84em;font-weight:700}
+.bn-n,.bn-mm{font-family:var(--mono);font-size:.84em;color:var(--ink-2);font-variant-numeric:tabular-nums}
+.bn-mm{color:var(--ink);font-weight:600}
+.bn-when{font-family:var(--mono);font-size:.8em;color:var(--ink-2)}
+.bn-more{
+  align-self:start;font-family:var(--mono);font-size:.9em;line-height:1;color:var(--ink-3);
+  border:1px solid var(--line);border-radius:3px;padding:3px 0;width:100%;
+}
+.bn-more:hover{color:var(--accent);border-color:var(--accent)}
+
+.bn-open{padding:2px 0 14px}
+.bn-why{margin:0 0 10px;font-size:.84em;color:var(--ink-2);line-height:1.5}
+.bn-why span{display:block}
+.bn-why b{color:var(--ink);font-weight:600}
+.bn-stage{display:grid;grid-template-columns:4.2rem minmax(0,1fr);gap:10px;align-items:baseline;padding:4px 0}
+.bn-stage-k{
+  font-family:var(--mono);font-size:.62em;font-weight:700;letter-spacing:.1em;
+  text-transform:uppercase;color:var(--ink-3);
+}
+.bn-chips{display:flex;flex-wrap:wrap;gap:4px}
+.bn-chip{
+  font-family:var(--mono);font-size:.68em;letter-spacing:.03em;text-decoration:none;
+  color:var(--ink-2);border:1px solid var(--line-strong);border-radius:3px;padding:2px 6px;
+  background:var(--surface);
+}
+.bn-chip:hover,.bn-chip:focus-visible{color:var(--accent);border-color:var(--accent);outline:none}
+/* already under way: unblocking this does not release it */
+.bn-chip.started{opacity:.42}
+.bn-chip.crit::after{content:"·";color:var(--risk);font-weight:700;margin-left:4px}
+.bn-key{margin:10px 0 0;font-size:.72em;color:var(--ink-3);line-height:1.5}
+
+@media (max-width:900px){
+  .bn-row{grid-template-columns:5.2rem minmax(0,1fr) 1.6rem;row-gap:6px}
+  .bn-row .bn-late,.bn-row .bn-n,.bn-row .bn-mm,.bn-row .bn-when{grid-column:2}
+}
 @media (max-width:900px){.stat-row{grid-template-columns:1fr 1fr}.dash-grid{grid-template-columns:1fr}}
 
 /* ============================================================

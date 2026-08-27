@@ -27,6 +27,7 @@ import { Gantt } from './Gantt';
 import { MailButton } from './MailButton';
 import { useWrapped } from '@/store/wrapStore';
 import { WrapToggle } from './WrapToggle';
+import { Bottlenecks } from './Bottlenecks';
 
 
 export function Dashboard({ hidden }: { hidden: boolean }) {
@@ -165,6 +166,8 @@ export function Dashboard({ hidden }: { hidden: boolean }) {
               </span>
             </div>
           </div>
+
+          <Bottlenecks />
 
           <div className="dash-grid">
             <div className="dash-col">

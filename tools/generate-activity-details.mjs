@@ -164,6 +164,17 @@ export const activityDetail = (id: string): ActivityDetail | undefined =>
   activityDetails[id];
 `);
 
+/* the dependency graph, kept apart from the prose it is written in */
+const feeds = {};
+for (const [id, d] of Object.entries(details)) {
+  const to = d.links.feedsInto.filter(x => details[x]);
+  if (to.length) feeds[id] = to;
+}
+const edges = Object.values(feeds).reduce((t, l) => t + l.length, 0);
+const cross = Object.entries(feeds)
+  .reduce((t, [id, l]) => t + l.filter(x => details[x].stage !== details[id].stage).length, 0);
+const critical = Object.keys(details).filter(id => details[id].criticalPath);
+
 /* ---------- the light module: what a browser is allowed to hold ---------- */
 fs.writeFileSync(`${ROOT}/src/data/activityIndex.ts`, `/**
  * The small maps about activities — titles, deliverable titles, the glossary,
@@ -196,6 +207,20 @@ export const activityGlossary: Record<string, GlossaryTerm> = ${j1(glossary)};
  * and what the engineering table decides to link on.
  */
 export const writtenActivities: string[] = ${j1(Object.keys(details))};
+
+/**
+ * What each activity feeds, as the write-ups state it — ${edges} edges, ${cross} of
+ * them crossing a stage boundary. This is the programme's dependency graph, and
+ * it is here rather than with the write-ups because it is small and a browser
+ * needs it: it is what says who waits when something is late.
+ *
+ * Not acyclic. An activity can feed one that later feeds back into it, so
+ * anything walking this has to keep track of where it has been.
+ */
+export const activityFeeds: Record<string, string[]> = ${j1(feeds)};
+
+/** The activities a slip moves the programme through. */
+export const criticalPathActivities: string[] = ${j1(critical)};
 
 const WRITTEN = new Set(writtenActivities);
 
