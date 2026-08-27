@@ -4308,7 +4308,7 @@ export const activityDetails: Record<string, ActivityDetail> = {
    4,
    5,
    6,
-   7
+   6
   ],
   "rel": [
    {
@@ -4519,7 +4519,7 @@ export const activityDetails: Record<string, ActivityDetail> = {
    5,
    6,
    7,
-   8
+   7
   ],
   "rel": [
    {
@@ -4720,7 +4720,7 @@ export const activityDetails: Record<string, ActivityDetail> = {
    4,
    5,
    6,
-   7
+   6
   ],
   "rel": [
    {
@@ -5091,8 +5091,8 @@ export const activityDetails: Record<string, ActivityDetail> = {
    4,
    5,
    6,
-   7,
-   8
+   6,
+   6
   ],
   "rel": [
    {
@@ -5845,7 +5845,7 @@ export const activityDetails: Record<string, ActivityDetail> = {
    5,
    6,
    7,
-   8
+   7
   ],
   "rel": [
    {
@@ -6038,7 +6038,7 @@ export const activityDetails: Record<string, ActivityDetail> = {
    3,
    4,
    5,
-   6
+   5
   ],
   "rel": [
    {
@@ -6228,7 +6228,7 @@ export const activityDetails: Record<string, ActivityDetail> = {
    4,
    5,
    6,
-   7
+   6
   ],
   "rel": [
    {
@@ -7210,8 +7210,8 @@ export const activityDetails: Record<string, ActivityDetail> = {
    4,
    5,
    6,
-   7,
-   8
+   6,
+   6
   ],
   "rel": [
    {
@@ -7420,7 +7420,7 @@ export const activityDetails: Record<string, ActivityDetail> = {
    5,
    6,
    7,
-   8
+   7
   ],
   "rel": [
    {

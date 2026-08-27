@@ -60,11 +60,28 @@ const blankTat = Object.entries(details).flatMap(([id, d]) =>
   d.steps.filter((st, i) => !(Number(D.details[id].steps[i].tat) > 0) && st.tat === 0)
     .map(st => ({ id, n: st.n, text: st.text })));
 
-/* an output pinned to a step that does not exist never reaches the page */
-const orphaned = Object.entries(details).flatMap(([id, d]) => {
-  const ns = new Set(d.steps.map(s => s.n));
-  return d.producedBy.map((n, i) => ({ id, n, out: d.produces[i] })).filter(x => !ns.has(x.n));
-});
+/*
+ * An output pinned to a step that does not exist reaches nobody: the steps
+ * table shows outputs by step number, so the row it belongs to is never drawn.
+ * Every one of them sits past the last step rather than in a gap, which reads
+ * as a closing step that was merged away after its outputs were assigned — so
+ * they move to the last step the activity actually has. The alternative is
+ * inventing the step, and its text and its duration with it.
+ *
+ * Repaired here rather than in the page: the page should be able to trust that
+ * a produced thing names a step that exists. Every repair is reported, so a
+ * document that grows more of them says so out loud.
+ */
+const orphaned = [];
+for (const [id, d] of Object.entries(details)) {
+  const ns = d.steps.map(s => s.n);
+  const last = Math.max(...ns);
+  d.producedBy = d.producedBy.map((n, i) => {
+    if (ns.includes(n)) return n;
+    orphaned.push({ id, was: n, now: last, out: d.produces[i] });
+    return last;
+  });
+}
 
 const titles = {};
 for (const s of D.stages) for (const a of s.activities) titles[a.id] = a.text;
@@ -167,7 +184,6 @@ if (blankTat.length) {
   for (const b of blankTat) console.log(`         ${b.id} step ${b.n}: ${b.text}`);
 }
 if (orphaned.length) {
-  console.log(`WARNING: ${orphaned.length} outputs are pinned to a step that does not exist, so the`);
-  console.log('         steps table cannot show them. Fix them in the document:');
-  for (const o of orphaned) console.log(`         ${o.id} step ${o.n}: ${o.out}`);
+  console.log(`${orphaned.length} outputs named a step that does not exist and were moved to the last one:`);
+  for (const o of orphaned) console.log(`   ${o.id} step ${o.was} -> ${o.now}: ${o.out}`);
 }

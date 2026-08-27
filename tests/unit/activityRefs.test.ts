@@ -135,3 +135,30 @@ describe('the table, the index and the write-ups name the same activities', () =
     expect(orphans).toEqual([]);
   });
 });
+
+/**
+ * The steps table prints an activity's outputs against the step that yields
+ * them, by step number. An output naming a number no step has is not a
+ * rendering bug that shows the wrong thing — it shows nothing at all, and the
+ * output disappears from the page in silence. The port repairs these; this is
+ * what says so.
+ */
+describe('every output names a step that exists', () => {
+  it('leaves no output stranded off the end of the steps', () => {
+    const stranded = writtenActivities.flatMap((id) => {
+      const d = activityDetails[id];
+      const ns = new Set(d.steps.map((s) => s.n));
+      return d.producedBy
+        .map((n, i) => ({ id, n, out: d.produces[i] }))
+        .filter((x) => !ns.has(x.n));
+    });
+    expect(stranded).toEqual([]);
+  });
+
+  it('names a producing step for every output, and no more', () => {
+    const ragged = writtenActivities
+      .map((id) => ({ id, ...activityDetails[id] }))
+      .filter((d) => d.produces.length !== d.producedBy.length);
+    expect(ragged.map((d) => d.id)).toEqual([]);
+  });
+});
