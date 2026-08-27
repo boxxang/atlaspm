@@ -1053,7 +1053,8 @@ body.modal-open .modal-win{transform:none}
    ============================================================ */
 #program-list{max-width:1240px;margin:0 auto;padding:56px 32px 80px}
 .pl-head{display:flex;align-items:baseline;gap:16px;flex-wrap:wrap;margin-bottom:6px}
-.pl-head h1{font-size:clamp(1.4rem,2.4vw,2rem);font-weight:650;letter-spacing:-.015em;text-transform:uppercase}
+/* the product's name, so it keeps its own capitals rather than being shouted */
+.pl-head h1{font-size:clamp(1.4rem,2.4vw,2rem);font-weight:650;letter-spacing:-.015em}
 .pl-head .count{font-family:var(--mono);font-size:.74em;color:var(--ink-3)}
 .pl-sub{font-size:.82em;color:var(--ink-3);margin:0 0 30px}
 .pl-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));gap:18px}

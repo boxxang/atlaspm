@@ -283,7 +283,7 @@ export function ProjectList({
   return (
     <main id="program-list">
       <div className="pl-head">
-        <h1>Programs</h1>
+        <h1>AtlasPM</h1>
         <span className="count">
           {projects.length} program{projects.length === 1 ? '' : 's'}
         </span>

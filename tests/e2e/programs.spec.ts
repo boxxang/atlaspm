@@ -23,7 +23,7 @@ test.beforeEach(async ({ page }) => {
 
 test.describe('program list', () => {
   test('shows a card per program with its headline numbers', async ({ page }) => {
-    await expect(page.locator('.pl-head h1')).toHaveText('Programs');
+    await expect(page.locator('.pl-head h1')).toHaveText('AtlasPM');
     await expect(page.locator('.pl-head .count')).toHaveText('1 program');
 
     const c = card(page, 'AtlasAX1');
@@ -52,7 +52,7 @@ test.describe('program list', () => {
 
     await page.locator('#to-programs').click();
     await expect(page).toHaveURL(/\/$/);
-    await expect(page.locator('.pl-head h1')).toHaveText('Programs');
+    await expect(page.locator('.pl-head h1')).toHaveText('AtlasPM');
   });
 
   test('the EDITED flag surfaces a manually edited schedule', async ({ page }) => {
