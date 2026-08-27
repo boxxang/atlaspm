@@ -1,7 +1,11 @@
 /**
  * Regenerates the activity data modules from the authoring document.
  *
- *   node tools/generate-activity-details.mjs
+ *   node tools/generate-activity-details.mjs [path/to/document.html]
+ *
+ * The document is the one named by the default below; pass another to port
+ * from a newer draft. Only what the document renders is taken: a field it
+ * carries but never shows is authoring scaffolding, not content.
  *
  * Writes /data/activityDetails.ts (the write-ups, server-side),
  * /data/activityIndex.ts (the small maps a browser may hold),
@@ -11,16 +15,56 @@
 import fs from 'node:fs';
 import { fileURLToPath } from 'node:url';
 const ROOT = fileURLToPath(new URL('..', import.meta.url));
-const SRC = 'docs/activity-details-ARCH06-onward-reviewed-v3-codefix.html';
+const SRC = process.argv[2] ?? 'docs/activitydetails_v9.html';
 const h = fs.readFileSync(`${ROOT}/${SRC}`, 'utf8');
 const D = JSON.parse(h.match(/<script id="ad-data" type="application\/json">([\s\S]*?)<\/script>/)[1]);
 
 const j1 = o => JSON.stringify(o, null, 1);
 const ordered = (obj, keys) => { const o = {}; for (const k of keys) o[k] = obj[k]; return o; };
 
+/*
+ * The app's shape, named rather than inherited. Authoring drafts carry fields
+ * the document itself never renders — v9 added `why`, `inputs`,
+ * `deliverableNote` and a per-step `adds` that its own renderer ignores — and
+ * a port that copied whatever it found would grow the page's contract by
+ * accident. What the document shows is the content; the rest is scaffolding,
+ * and it is dropped loudly.
+ */
+const DETAIL_FIELDS = ['stage', 'window', 'criticalPath', 'purpose', 'steps', 'flowNote',
+  'consumes', 'produces', 'producedBy', 'rel', 'risks', 'roles', 'effort', 'entry', 'exit',
+  'dependsOn', 'dependsNote', 'feedsInto', 'measuredBy', 'links', 'terms'];
+const STEP_FIELDS = ['n', 'text', 'tat', 'lane'];
+
+const dropped = new Set();
+const pick = (o, fields) => {
+  const out = {};
+  for (const k of fields) if (k in o) out[k] = o[k];
+  for (const k of Object.keys(o)) if (!fields.includes(k)) dropped.add(k);
+  return out;
+};
+
 /* every activity in template order, so the file reads as the programme runs */
 const allIds = D.stages.flatMap(s => s.activities.map(a => a.id));
-const details = ordered(D.details, allIds.filter(id => D.details[id]));
+const details = {};
+for (const id of allIds) {
+  const d = D.details[id];
+  if (!d) continue;
+  details[id] = pick(d, DETAIL_FIELDS);
+  details[id].steps = d.steps.map(st => ({ ...pick(st, STEP_FIELDS), tat: Number(st.tat) || 0 }));
+}
+
+/* a step whose duration was blanked in the editor; the document lays it out at
+   zero too (`Number(st.tat) || 0`), so the port agrees with it rather than
+   inventing a length */
+const blankTat = Object.entries(details).flatMap(([id, d]) =>
+  d.steps.filter((st, i) => !(Number(D.details[id].steps[i].tat) > 0) && st.tat === 0)
+    .map(st => ({ id, n: st.n, text: st.text })));
+
+/* an output pinned to a step that does not exist never reaches the page */
+const orphaned = Object.entries(details).flatMap(([id, d]) => {
+  const ns = new Set(d.steps.map(s => s.n));
+  return d.producedBy.map((n, i) => ({ id, n, out: d.produces[i] })).filter(x => !ns.has(x.n));
+});
 
 const titles = {};
 for (const s of D.stages) for (const a of s.activities) titles[a.id] = a.text;
@@ -117,3 +161,13 @@ fs.writeFileSync(`${ROOT}/src/data/journey.ts`, jr);
 
 console.log(`details ${Object.keys(details).length} | titles ${Object.keys(titles).length} | deliverables ${Object.keys(deliverables).length} | glossary ${Object.keys(glossary).length}`);
 console.log(`engineeringView blocks rewritten: ${n}, titles changed: ${changed}`);
+if (dropped.size) console.log(`fields the document carries but never renders, dropped: ${[...dropped].join(', ')}`);
+if (blankTat.length) {
+  console.log(`WARNING: ${blankTat.length} steps have no duration and are laid out at zero weeks:`);
+  for (const b of blankTat) console.log(`         ${b.id} step ${b.n}: ${b.text}`);
+}
+if (orphaned.length) {
+  console.log(`WARNING: ${orphaned.length} outputs are pinned to a step that does not exist, so the`);
+  console.log('         steps table cannot show them. Fix them in the document:');
+  for (const o of orphaned) console.log(`         ${o.id} step ${o.n}: ${o.out}`);
+}

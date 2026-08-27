@@ -139,15 +139,15 @@ export const journeyData = [
       "Capacity and tapeout slot commitment"
     ],
     engineeringView: [
-      "Foundry and node long-list to short-list evaluation",
-      "Process option and flavor selection",
-      "Density / performance / leakage benchmarking against product targets",
-      "Wafer price, mask and NRE quotation; MPW and volume pricing",
-      "Fab capacity and tapeout slot reservation; hot-lot policy agreement",
-      "Foundry legal engagement — NDA, design agreement, IP licensing frame",
-      "Foundry roadmap and risk-production timing alignment",
-      "Second-source and node-migration strategy assessment",
-      "OSAT and backend supply chain preliminary alignment"
+      "Foundry and Process Node Selection",
+      "Process Option and Flavor Selection",
+      "Process PPA Benchmarking and DTCO Assessment",
+      "Wafer, Mask, and NRE Cost Assessment",
+      "Fab Capacity and Tapeout Slot Planning",
+      "Foundry Commercial and Legal Alignment",
+      "Foundry Roadmap and Production Readiness Alignment",
+      "Second-Source and Node Migration Assessment",
+      "OSAT and Backend Supply Chain Alignment"
     ],
     /** Elapsed weeks per engineering activity; negative marks one that runs continuously. */
     engineeringTat: [5, 5, 7, 6, 5, 8, 4, 4, 5],
@@ -195,19 +195,19 @@ export const journeyData = [
       "Golden environment release notes"
     ],
     engineeringView: [
-      "PDK version roadmap tracking (0.1 → 0.5 → 1.0 → production) and delta impact analysis",
-      "Design rule manual review; restricted and recommended rule disposition",
-      "Standard cell library selection and qualification",
-      "Memory compiler evaluation and instance generation",
-      "Compiler instance PPA characterization against block budgets — density, Vmin, access time, leakage",
-      "Custom / pushed-rule memory instance decision, scope and schedule impact assessment",
-      "IO, ESD and latch-up library qualification",
-      "EDA tool version qualification for the node — synthesis, P&R, STA, PV, EM/IR",
-      "Foundry reference flow bring-up and internal methodology deck",
-      "Rule deck, QRC tech file and DRC/LVS deck version control",
-      "Signoff corner and derate definition agreed with foundry",
-      "Compute farm, EDA license and storage capacity planning",
-      "Golden design environment release and flow regression"
+      "PDK Version Readiness and Change Management",
+      "Design Rule Review and Disposition",
+      "Standard Cell Library Selection and Qualification",
+      "Memory Compiler Evaluation and Instance Planning",
+      "Memory Compiler PPA Characterization",
+      "Custom Memory Decision and Planning",
+      "I/O, ESD, and Latch-Up Library Qualification",
+      "EDA Tool Qualification",
+      "Reference Flow Bring-Up and Methodology Development",
+      "Signoff Deck and QRC Version Control",
+      "Signoff Corner and Derate Definition",
+      "Compute, License, and Storage Capacity Planning",
+      "Golden Design Environment Release and Regression"
     ],
     /** Elapsed weeks per engineering activity; negative marks one that runs continuously. */
     engineeringTat: [-34, 6, 8, 9, 6, 4, 6, 10, 10, -6, 6, 6, 8],
@@ -254,16 +254,16 @@ export const journeyData = [
       "IP delivery schedule folded into the program plan"
     ],
     engineeringView: [
-      "Product requirement → IP requirement decomposition",
-      "Reuse inventory audit — internal IP already available on the target node",
-      "Make / buy / reuse decision per IP block",
-      "Vendor RFI / RFQ and technical evaluation",
-      "Silicon-proven status check per IP on the selected node and process option",
-      "IP deliverable checklist review",
-      "Licence negotiation, PO issue and delivery-date commitment",
-      "Porting / hardening scope and schedule for IP not proven on the node",
-      "IP delivery schedule alignment to RTL and PD integration windows",
-      "IP maturity risk rating and second-source contingency"
+      "IP Requirement Definition",
+      "Internal IP Reuse Assessment",
+      "IP Make / Buy / Reuse Decision",
+      "IP Vendor Evaluation and Selection",
+      "IP Silicon-Proven and Node Readiness Assessment",
+      "IP Deliverable and Integration Readiness Review",
+      "IP Licensing and Procurement",
+      "IP Porting and Hardening Planning",
+      "IP Delivery and Integration Schedule Alignment",
+      "IP Maturity Risk and Contingency Planning"
     ],
     /** Elapsed weeks per engineering activity; negative marks one that runs continuously. */
     engineeringTat: [5, 4, 5, 9, 7, 7, 12, 5, 4, 4],
@@ -311,22 +311,22 @@ export const journeyData = [
       "Integration guide with known limitations and errata"
     ],
     engineeringView: [
-      "AMS IP specification and budget allocation",
-      "PLL / clock generator design and closure",
-      "SerDes and PHY design or vendor hardening",
-      "LDO, bandgap and power-management cell design",
-      "Custom SRAM instance architecture — bitcell selection, array organization, sense amp and replica timing",
-      "Read / write assist circuit design for Vmin — WL boost, negative bitline, VDD collapse",
-      "Custom array layout and pushed-rule DRC closure with foundry approval",
-      "Statistical margin and yield analysis — importance sampling, sigma-Vmin, bitcell variation",
-      "Redundancy and repair scheme integration with the BISR architecture",
-      "Custom memory view generation and compiler-equivalent characterization across corners",
-      "Schematic design and pre-layout simulation",
-      "Custom layout with DRC / LVS / antenna and fill closure",
-      "Post-layout extracted simulation across PVT and Monte Carlo",
-      "Reliability checks — EM/IR, aging, ESD, latch-up",
-      "Hard macro abstraction and view generation",
-      "AMS–digital co-simulation and integration support"
+      "AMS IP Specification and Budget Definition",
+      "PLL and Clock Generator Design",
+      "SerDes and PHY Design / Hardening",
+      "Analog Power Management Design",
+      "Custom SRAM Architecture",
+      "SRAM Read / Write Assist Design",
+      "Custom SRAM Layout and Foundry Rule Closure",
+      "SRAM Statistical Margin and Yield Analysis",
+      "Memory Redundancy and Repair Integration",
+      "Custom Memory Characterization and View Generation",
+      "AMS Schematic Design and Pre-Layout Verification",
+      "AMS Custom Layout and Physical Verification",
+      "Post-Layout Extracted Verification",
+      "AMS Reliability Verification",
+      "Hard Macro Abstraction and View Generation",
+      "AMS–Digital Integration and Co-Simulation"
     ],
     /** Elapsed weeks per engineering activity; negative marks one that runs continuously. */
     engineeringTat: [6, 26, 34, 20, 10, 10, 16, 10, 6, 10, 16, 18, 16, 10, 8, -16],
@@ -371,14 +371,14 @@ export const journeyData = [
       "Design guidance and margin decisions for the production chip"
     ],
     engineeringView: [
-      "Test chip objective definition and risk-item selection",
-      "Test chip design and integration",
-      "MPW shuttle slot booking and data submission scheduling",
-      "Test chip physical implementation and signoff",
-      "Shuttle tapeout and fabrication",
-      "Test chip board and lab setup preparation",
-      "Silicon characterization and correlation to simulation",
-      "Feedback into the production design — model correction and margin decisions"
+      "Test Chip Objectives and Risk Coverage",
+      "Test Chip Design and Integration",
+      "MPW Shuttle Planning and Booking",
+      "Test Chip Physical Implementation and Signoff",
+      "MPW Tapeout and Fabrication",
+      "Test Chip Board and Lab Preparation",
+      "Silicon Characterization and Model Correlation",
+      "Production Design Feedback and Margin Update"
     ],
     /** Elapsed weeks per engineering activity; negative marks one that runs continuously. */
     engineeringTat: [5, 12, 4, 12, 16, 9, 12, 6],
@@ -425,16 +425,16 @@ export const journeyData = [
       "RTL Freeze package"
     ],
     engineeringView: [
-      "Block microarchitecture specification",
-      "Block-level RTL implementation",
-      "Third-party and internal IP integration — wrappers, glue, configuration",
-      "Chip-level integration and top assembly",
-      "Clock, reset and power intent (UPF) implementation",
-      "Lint, CDC and RDC closure",
-      "Register map / RDL definition and header generation",
-      "Trial synthesis feedback loop on RTL PPA",
-      "CI build, nightly regression and release management",
-      "Specification change control and ECO board"
+      "Block Microarchitecture Specification Completion",
+      "Block-Level RTL Implementation",
+      "Third-Party and Internal IP Integration",
+      "Chip-Level Integration and Top-Level Assembly",
+      "Clock, Reset, and Power Intent (UPF) Implementation",
+      "Lint, CDC, and RDC Closure",
+      "Register Map / RDL Definition and Header Generation",
+      "Trial Synthesis and RTL PPA Feedback Loop",
+      "CI Build, Nightly Regression, and Release Management",
+      "Specification Change Control and ECO Board"
     ],
     /** Elapsed weeks per engineering activity; negative marks one that runs continuously. */
     engineeringTat: [10, 24, 16, 12, 10, 16, 8, 12, -30, -30],
@@ -492,18 +492,18 @@ export const journeyData = [
       "DV closure signoff package"
     ],
     engineeringView: [
-      "Verification plan and coverage model definition",
-      "UVM environment and VIP bring-up",
-      "Block-level constrained-random and directed testing",
-      "Chip-level and system-level scenario testing",
-      "Formal property verification — control logic, connectivity, security",
-      "Low-power (UPF) verification",
-      "AMS / mixed-signal co-simulation",
-      "Emulation and FPGA prototype bring-up — capacity, partitioning, speed",
-      "Performance and bandwidth validation against the architecture model",
-      "Coverage closure and regression stability management",
-      "Gate-level simulation, functional and timing-annotated",
-      "Bug triage and disposition board"
+      "Verification Plan and Coverage Model Definition",
+      "UVM Environment and VIP Bring-Up",
+      "Block-Level Constrained-Random and Directed Testing",
+      "Chip-Level and System-Level Scenario Testing",
+      "Formal Verification of Control, Connectivity, and Security Properties",
+      "Low-Power (UPF) Verification",
+      "AMS / Mixed-Signal Co-Simulation",
+      "Emulation and FPGA Prototype Bring-Up",
+      "Performance and Bandwidth Validation Against the Architecture Model",
+      "Coverage Closure and Regression Stability Management",
+      "Functional and Timing-Annotated Gate-Level Simulation",
+      "Bug Triage and Disposition Board"
     ],
     /** Elapsed weeks per engineering activity; negative marks one that runs continuously. */
     engineeringTat: [8, 14, 30, 22, 16, 10, 12, 20, 12, -26, 10, -34],
@@ -550,17 +550,17 @@ export const journeyData = [
       "DFT signoff entry for the tapeout checklist"
     ],
     engineeringView: [
-      "DFT architecture definition — scan style, compression ratio, hierarchical DFT",
-      "Test coverage and test-time target negotiation with product and test engineering",
-      "MBIST / BIRA / BISR architecture for embedded memories",
-      "Boundary scan and IJTAG (1149.1 / 1687), TAP and debug access architecture",
-      "On-chip clock controller design for at-speed testing",
-      "Scan insertion and DFT DRC during synthesis",
-      "ATPG pattern generation — stuck-at, transition, cell-aware — and coverage closure",
-      "Pattern validation by gate-level simulation and ATE format conversion",
-      "Scan compression and chain routing feasibility with physical design",
-      "eFuse, chip ID and memory repair infrastructure",
-      "Silicon debug hooks — trace, observability, design-for-debug"
+      "DFT Architecture and Test Strategy Definition",
+      "Test Coverage and Test-Time Target Negotiation",
+      "MBIST / BIRA / BISR Architecture for Embedded Memories",
+      "TAP, Boundary Scan, and IJTAG Debug Access Architecture",
+      "On-Chip Clock Controller Design for At-Speed Test",
+      "Scan Insertion and DFT DRC Closure",
+      "ATPG Pattern Generation and Coverage Closure",
+      "Gate-Level Pattern Validation and ATE Format Conversion",
+      "Scan Compression and Chain Routing Feasibility with Physical Design",
+      "eFuse, Chip ID, and Memory Repair Infrastructure",
+      "Design-for-Debug and Trace Observability Architecture"
     ],
     /** Elapsed weeks per engineering activity; negative marks one that runs continuously. */
     engineeringTat: [8, 5, 10, 8, 7, 10, 16, 10, 10, 6, 8],
@@ -607,18 +607,18 @@ export const journeyData = [
       "FFN — final full netlist, release-tagged"
     ],
     engineeringView: [
-      "SDC constraint development and validation",
-      "Technology mapping and optimization — multi-Vt, multi-bit, useful skew",
-      "N0 flow-flush netlist release — functionally incomplete, structurally representative, issued so PD can build the flow",
-      "Physical-aware synthesis with congestion feedback from the PD flow setup",
-      "N1 netlist drop — first quality turn against PD placement and congestion feedback",
-      "Power optimization — clock gating, operand isolation, Vt mix",
-      "Low-power synthesis — isolation and level-shifter insertion against UPF",
-      "N2 netlist drop — timing and congestion converged, late RTL changes absorbed",
-      "FFN (final full netlist) release — RTL frozen, ECOs closed, no functional change beyond this point",
-      "Formal equivalence checking per drop, RTL versus netlist",
-      "Timing, area and power reporting against budget, per drop",
-      "Netlist handoff and QoR delta review with physical design, per drop"
+      "SDC Constraint Development and Validation",
+      "Technology Mapping and Optimization",
+      "N0 Flow-Flush Netlist Release",
+      "Physical-Aware Synthesis with Congestion Feedback",
+      "N1 Netlist Drop and QoR Baseline",
+      "Dynamic and Leakage Power Optimization",
+      "Low-Power Synthesis and UPF Consistency Checking",
+      "N2 Netlist Drop and Closure Risk Statement",
+      "FFN (Final Full Netlist) Release and Functional Freeze",
+      "RTL-to-Netlist Formal Equivalence Checking per Drop",
+      "Per-Drop QoR Reporting Against PPA Budgets",
+      "Per-Drop Netlist Handoff and QoR Delta Review"
     ],
     /** Elapsed weeks per engineering activity; negative marks one that runs continuously. */
     engineeringTat: [8, 8, 4, 7, 5, 7, 5, 5, 4, -20, -22, -22],
@@ -666,22 +666,22 @@ export const journeyData = [
       "Signoff-ready database handoff"
     ],
     engineeringView: [
-      "Flow setup and MMMC environment build on the N0 flow-flush netlist — scripts, decks, runtimes, capacity",
-      "Floorplan, macro placement and partition definition",
-      "Power delivery network design and early IR analysis",
-      "Bump and RDL planning with chip-package co-design feedback",
-      "Turn 1 on the N1 drop — placement, CTS and first full route; QoR baseline established",
-      "Turn 2 on the N2 drop — congestion, timing and power convergence; closure risk quantified",
-      "Clock tree synthesis with skew and jitter budgeting, refined across turns",
-      "Detailed routing and DRC convergence",
-      "Multi-corner multi-mode timing closure",
-      "Signal and power integrity iteration — crosstalk, EM",
-      "Chip power model (CPM/CPS) extraction and handoff to package co-verification",
-      "Scan chain reordering and DFT-aware routing",
-      "Final turn on the FFN — full closure, no functional change admitted",
-      "Functional and timing ECO implementation",
-      "Chip finishing — seal ring, dummy and metal fill, alignment marks",
-      "Hierarchical block closure and top-level assembly"
+      "Flow Setup and MMMC Environment Build on N0",
+      "Floorplan, Macro Placement, and Partition Definition",
+      "Power Delivery Network Design and Early IR Analysis",
+      "Bump and RDL Planning with Chip-Package Co-Design",
+      "Turn 1 on the N1 Netlist and QoR Baseline",
+      "Turn 2 on the N2 Netlist and Closure Risk Quantification",
+      "Clock Tree Synthesis with Skew and Jitter Budgeting",
+      "Detailed Routing and DRC Convergence",
+      "Multi-Corner Multi-Mode Timing Closure",
+      "Signal and Power Integrity Iteration",
+      "Chip Power Model (CPM/CPS) Extraction and Handoff",
+      "Scan Chain Reordering and DFT-Aware Routing",
+      "Final Turn on the FFN and Full Closure",
+      "Functional and Timing ECO Implementation",
+      "Chip Finishing and Post-Fill Verification",
+      "Hierarchical Block Closure and Top-Level Assembly"
     ],
     /** Elapsed weeks per engineering activity; negative marks one that runs continuously. */
     engineeringTat: [7, 9, 8, 8, 8, 8, -12, -16, -22, 10, 5, 6, 11, -18, 5, 14],
@@ -728,18 +728,18 @@ export const journeyData = [
       "Signoff summary and Design Freeze package"
     ],
     engineeringView: [
-      "Signoff flow dry run on the Turn 2 database — decks, runtimes, capacity and violation triage rehearsed",
-      "Multi-corner multi-mode static timing analysis and closure on the final turn",
-      "Full-chip DRC, LVS, antenna and density verification",
-      "EM and IR-drop signoff, static and dynamic",
-      "Power and signal integrity signoff — crosstalk, noise",
-      "Chip-package-system co-analysis signoff review against SIPI results",
-      "Reliability verification — ESD, latch-up, soft error / FIT",
-      "DFM and lithography checks, CMP and hotspot analysis",
-      "Final formal equivalence and LVS netlist consistency",
-      "Waiver review board and foundry waiver alignment",
-      "Gate-level simulation with final SDF",
-      "Signoff corner correlation against foundry decks"
+      "Signoff Flow Dry Run on the Turn 2 Database",
+      "Multi-Corner Multi-Mode Signoff STA and Closure",
+      "Full-Chip DRC, LVS, Antenna, and Density Verification",
+      "Static and Dynamic EM / IR-Drop Signoff",
+      "Power and Signal Integrity Signoff",
+      "Chip-Package-System Co-Analysis Signoff Review",
+      "ESD, Latch-Up, and Soft Error / FIT Verification",
+      "DFM, Lithography Hotspot, and CMP Analysis",
+      "Final Formal Equivalence and LVS Netlist Consistency",
+      "Waiver Review Board and Foundry Waiver Alignment",
+      "Gate-Level Simulation with Final SDF",
+      "Signoff Corner Correlation Against Foundry Decks"
     ],
     /** Elapsed weeks per engineering activity; negative marks one that runs continuously. */
     engineeringTat: [6, 10, 9, 8, 6, 4, 6, 6, 5, 6, 5, 5],
@@ -786,17 +786,17 @@ export const journeyData = [
       "Full mask set completion record"
     ],
     engineeringView: [
-      "Final GDSII / OASIS assembly on the FFN closure database, with layer map verification",
-      "Final full-chip verification re-run on the released database",
-      "Tapeout checklist completion and owner signoff",
-      "Open-issue risk assessment and waiver acceptance",
-      "Go / No-Go decision meeting",
-      "FEOL layer data preparation and MTO release to the mask shop",
-      "FEOL mask order confirmation and mask shop scheduling",
-      "BEOL design fix window — metal-layer ECOs and late fixes while FEOL masks are being cut",
-      "BEOL layer re-verification — DRC, LVS, antenna and density on the fixed metal stack",
-      "BEOL layer data preparation and MTO release",
-      "BEOL mask order confirmation and full mask set completion tracking"
+      "Final GDSII / OASIS Assembly and Layer Map Verification",
+      "Final Full-Chip Verification Re-Run on the Released Database",
+      "Tapeout Checklist Completion and Owner Signoff",
+      "Open-Issue Risk Assessment and Waiver Acceptance",
+      "Go / No-Go Decision Meeting",
+      "FEOL Layer Data Preparation and MTO Release",
+      "FEOL Mask Order Confirmation and Mask Shop Scheduling",
+      "BEOL Fix Window for Metal-Layer ECOs",
+      "BEOL DRC, LVS, Antenna, and Density Re-Verification",
+      "BEOL Layer Data Preparation and MTO Release",
+      "BEOL Mask Order Confirmation and Full Mask Set Completion Tracking"
     ],
     /** Elapsed weeks per engineering activity; negative marks one that runs continuously. */
     engineeringTat: [2, 2, 3, 2, 0.5, 1.5, 1, 4, 2.5, 1.5, 1],
@@ -841,16 +841,16 @@ export const journeyData = [
       "First Silicon availability notice"
     ],
     engineeringView: [
-      "FEOL mask set fabrication, inspection and qualification",
-      "Wafer start on FEOL mask availability",
-      "BEOL mask set fabrication, inspection and qualification, in parallel with front-end processing",
-      "Front-end wafer processing",
-      "Back-end-of-line processing",
-      "Inline metrology and defect inspection monitoring",
-      "E-test / PCM data review",
-      "Wafer acceptance test and lot disposition",
-      "Hot-lot management and WIP tracking",
-      "Wafer shipment and logistics to sort and assembly"
+      "FEOL Mask Set Fabrication, Inspection, and Qualification",
+      "Wafer Start on FEOL Mask Availability",
+      "BEOL Mask Set Fabrication, Inspection, and Qualification",
+      "Front-End Wafer Processing",
+      "Back-End-of-Line Wafer Processing",
+      "Inline Metrology and Defect Inspection Monitoring",
+      "E-Test / PCM Data Review",
+      "Wafer Acceptance Test and Lot Disposition",
+      "Hot-Lot Management and WIP Tracking",
+      "Wafer Shipment and Logistics to Sort and Assembly"
     ],
     /** Elapsed weeks per engineering activity; negative marks one that runs continuously. */
     engineeringTat: [7, 1, 6, 8, 5, -14, 3, 3, -18, 2],
@@ -898,17 +898,17 @@ export const journeyData = [
       "Package Design Freeze package"
     ],
     engineeringView: [
-      "Package architecture selection — 2.5D interposer type, organic substrate, layer count",
-      "Bump map, pitch and power-ground planning with physical design",
-      "Interposer / RDL routing design",
-      "Substrate stack-up, escape routing and package DRC",
-      "Package routing for signal integrity — length matching, reference plane and via design",
-      "Package PDN and decap footprint design",
-      "Thermal and mechanical simulation — warpage, co-planarity, TIM, lid",
-      "Test vehicle requirement definition and handoff to PTV",
-      "Substrate and interposer supplier selection and lead-time booking",
-      "OSAT selection and assembly process definition",
-      "Package design freeze, DRC and tooling release"
+      "Package Architecture Selection",
+      "Bump Map, Pitch, and Power-Ground Planning with Physical Design",
+      "Interposer / RDL Routing Design",
+      "Substrate Stack-Up, Escape Routing, and Package DRC",
+      "Package Routing for Signal Integrity",
+      "Package PDN and Decap Footprint Design",
+      "Thermal and Mechanical (Warpage) Simulation",
+      "Test Vehicle Requirement Definition and Handoff to PTV",
+      "Substrate and Interposer Supplier Selection and Lead-Time Booking",
+      "OSAT Selection and Assembly Process Definition",
+      "Package Design Freeze, DRC, and Tooling Release"
     ],
     /** Elapsed weeks per engineering activity; negative marks one that runs continuously. */
     engineeringTat: [8, 10, 14, 14, 10, 9, 12, 4, 10, 9, 6],
@@ -957,18 +957,18 @@ export const journeyData = [
       "Package validation complete record — gate for product wafer-out"
     ],
     engineeringView: [
-      "Test vehicle strategy and risk item definition — CPI, warpage, thermal, ULK/BEOL stress",
-      "Mechanical test vehicle (MTV) design — bump array, dummy die stack, substrate coupon",
-      "Thermal test vehicle (TTV) design — embedded heater array and RTD sensor placement",
-      "Daisy-chain electrical vehicle design — interconnect continuity and bump yield structures",
-      "TV die fabrication and interposer / substrate vehicle build",
-      "OSAT assembly of vehicles with process window DOE",
-      "Warpage and co-planarity measurement across the reflow profile",
-      "Chip-package interaction stress evaluation — low-k / ULK crack, bump and BEOL integrity",
-      "Thermal characterization — Rjc / Rja, TIM performance, hotspot mapping against the thermal model",
-      "Board-level reliability on vehicles — temperature cycle, drop, bend",
-      "Daisy-chain continuity test and assembly yield learning",
-      "Feedback into package design and assembly process window freeze"
+      "Test Vehicle Strategy and Risk Coverage Definition",
+      "Mechanical Test Vehicle (MTV) Design",
+      "Thermal Test Vehicle (TTV) Design",
+      "Daisy-Chain Electrical Vehicle Design",
+      "TV Die Fabrication and Interposer / Substrate Vehicle Build",
+      "OSAT Vehicle Assembly with Process Window DOE",
+      "Warpage and Co-Planarity Measurement Across the Reflow Profile",
+      "Chip-Package Interaction (CPI) Stress Evaluation",
+      "Thermal Characterization and Model Correlation",
+      "Board-Level Reliability Testing on Vehicles",
+      "Daisy-Chain Continuity Test and Assembly Yield Learning",
+      "Package Design Feedback and Assembly Process Window Freeze"
     ],
     /** Elapsed weeks per engineering activity; negative marks one that runs continuously. */
     engineeringTat: [6, 9, 9, 8, 16, 11, 7, 11, 9, 14, 9, 7],
@@ -1015,17 +1015,17 @@ export const journeyData = [
       "Chip-package-system co-verification signoff — tapeout gate"
     ],
     engineeringView: [
-      "Chip power model (CPM/CPS) extraction per power domain and operating mode",
-      "Package and board model extraction — 3D EM, S-parameter and RLC network",
-      "Die-package-board PDN co-simulation — DC and AC impedance versus target",
-      "Dynamic voltage-drop analysis with package inductance and real switching profiles",
-      "Decoupling capacitor budget and placement optimization across die, package and board",
-      "SSN / SSO and simultaneous-switching noise analysis at the IO ring",
-      "High-speed channel simulation with extracted package models — insertion loss, crosstalk, return path",
-      "Eye diagram, jitter and BER budget closure per interface",
-      "Power-aware timing correlation — voltage drop back-annotated into STA",
-      "Electro-thermal co-analysis coupled with the package thermal model",
-      "Co-verification signoff review and criteria disposition with design and package teams"
+      "Chip Power Model (CPM/CPS) Extraction per Power Domain and Operating Mode",
+      "Package and Board Electrical Model Extraction",
+      "Die-Package-Board PDN Impedance Co-Simulation",
+      "Dynamic Voltage-Drop Analysis with Package Inductance",
+      "Decap Budget and Placement Optimization Across Die, Package, and Board",
+      "Simultaneous-Switching Noise (SSN / SSO) Analysis at the IO Ring",
+      "High-Speed Channel Simulation with Extracted Package Models",
+      "Eye, Jitter, and BER Budget Closure per Interface",
+      "Power-Aware STA Correlation with Back-Annotated Voltage Drop",
+      "Electro-Thermal Co-Analysis with the Package Thermal Model",
+      "Co-Verification Signoff Review and Criteria Disposition"
     ],
     /** Elapsed weeks per engineering activity; negative marks one that runs continuously. */
     engineeringTat: [7, 8, 9, 8, 7, 5, 9, 8, 5, 5, 4],
@@ -1069,15 +1069,15 @@ export const journeyData = [
       "Unit allocation record across bring-up, qual and customers"
     ],
     engineeringView: [
-      "Known-good-die sort and selection",
-      "HBM stack procurement and incoming inspection",
-      "Die attach, micro-bump and thermo-compression bonding",
-      "Interposer and substrate assembly, underfill, molding",
-      "Lid / TIM attach and ball attach",
-      "Assembly inline inspection — X-ray, CSAM, warpage metrology",
-      "Assembly yield analysis and process tuning",
-      "Package-level open / short and continuity test",
-      "Unit build for bring-up, qualification and customer samples"
+      "Known-Good-Die Sort and Selection",
+      "HBM Stack Procurement and Incoming Inspection",
+      "Die Attach and Micro-Bump Thermo-Compression Bonding",
+      "Interposer-to-Substrate Attach, Underfill, and Molding",
+      "Lid / TIM Attach and Ball Attach",
+      "X-Ray, CSAM, and Warpage Inline Inspection",
+      "Assembly Yield Analysis and Process Tuning",
+      "Package-Level Open / Short and Continuity Test",
+      "Unit Build and Allocation for Bring-Up, Qualification, and Samples"
     ],
     /** Elapsed weeks per engineering activity; negative marks one that runs continuously. */
     engineeringTat: [3, 3, 3, 3, 2, 2, 5, 2, 3],
@@ -1122,16 +1122,16 @@ export const journeyData = [
       "Board bring-up report and known issues"
     ],
     engineeringView: [
-      "Validation platform requirements and topology definition",
-      "EVB schematic design — power tree, clocking, host interface, connectors",
-      "PCB layout with high-speed channel SI/PI simulation",
-      "PCB fabrication and assembly",
-      "Power delivery, VRM and telemetry design and bring-up",
-      "Debug infrastructure — JTAG and trace pods, interposers, instrumentation headers",
-      "Board bring-up with socketed or dummy parts",
-      "Thermal solution and cooling for the lab platform",
-      "Lab instrumentation reservation and test rack build",
-      "Minimum host-side enablement for power-on"
+      "Validation Platform Requirements and Topology Definition",
+      "EVB Schematic Design and BOM",
+      "PCB Layout with High-Speed Channel SI/PI Simulation",
+      "PCB Fabrication and Assembly",
+      "Power Delivery, VRM, and Telemetry Design and Bring-Up",
+      "Debug and Trace Access Infrastructure",
+      "Board Bring-Up with Socketed or Dummy Parts",
+      "Thermal Solution and Cooling for the Lab Platform",
+      "Lab Instrumentation Reservation and Test Rack Build",
+      "Minimum Host-Side Enablement for Power-On"
     ],
     /** Elapsed weeks per engineering activity; negative marks one that runs continuously. */
     engineeringTat: [5, 10, 12, 8, 7, 7, 7, 7, 7, 7],
@@ -1177,17 +1177,17 @@ export const journeyData = [
       "Wafer sort and final test programs, release-tagged"
     ],
     engineeringView: [
-      "Test plan and coverage strategy — wafer sort, final test, system-level test",
-      "ATE platform selection and tester time booking",
-      "Probe card design, fabrication and qualification",
-      "Load board / DUT board design, fabrication and bring-up",
-      "Wafer sort test program development",
-      "Final / package test program development",
-      "Characterization test content — shmoo, Vmin/Fmax, PVT sweeps",
-      "DFT pattern porting to ATE format and pattern debug",
-      "Test time and cost optimization — parallelism, site count",
-      "Correlation between ATE, bench and system results",
-      "Test data infrastructure — STDF collection and yield database"
+      "Test Plan and Coverage Strategy Definition",
+      "ATE Platform Selection and Tester Time Booking",
+      "Probe Card Design, Fabrication, and Qualification",
+      "Load Board / DUT Board Design, Fabrication, and Bring-Up",
+      "Wafer Sort Test Program Development",
+      "Final / Package Test Program Development",
+      "Characterization Test Suite Development",
+      "DFT Pattern Porting to ATE Format and Pattern Debug",
+      "Test Time and Cost Optimization",
+      "ATE, Bench, and System Correlation",
+      "Test Data Infrastructure and Yield Database"
     ],
     /** Elapsed weeks per engineering activity; negative marks one that runs continuously. */
     engineeringTat: [8, 6, 20, 17, 16, 16, 12, 10, 9, 8, 8],
@@ -1233,18 +1233,18 @@ export const journeyData = [
       "Customer sample release package"
     ],
     engineeringView: [
-      "Sample receipt, incoming inspection and board mounting",
-      "Power-on, power sequencing and basic health check",
-      "Reset, clocking and PLL lock validation",
-      "Boot, firmware load and functional smoke test",
-      "Interface bring-up — PCIe/CXL link training, HBM training, die-to-die",
-      "Memory subsystem and bandwidth validation",
-      "Shmoo across voltage, frequency and temperature",
-      "Performance validation against the architecture model",
-      "Silicon debug of anomalies and failure analysis requests",
-      "Errata capture, workaround definition and documentation",
-      "Respin versus metal-fix decision analysis — ECO scope, cost, schedule",
-      "Customer sample readiness and release package"
+      "Sample Receipt, Incoming Inspection, and Board Mounting",
+      "Power-On, Power Sequencing, and Basic Health Check",
+      "Reset, Clocking, and PLL Lock Validation",
+      "Boot, Firmware Load, and Functional Smoke Test",
+      "PCIe/CXL, HBM, and Die-to-Die Interface Bring-Up",
+      "Memory Subsystem and Bandwidth Validation",
+      "Shmoo Across Voltage, Frequency, and Temperature",
+      "Performance Validation Against the Architecture Model",
+      "Silicon Anomaly Debug and Failure Analysis",
+      "Errata Capture, Workaround Definition, and Documentation",
+      "Respin versus Metal-Fix Decision Analysis",
+      "Customer Sample Readiness and Release Package"
     ],
     /** Elapsed weeks per engineering activity; negative marks one that runs continuously. */
     engineeringTat: [1.5, 3, 3, 4, 8, 6, 7, 6, 10, 7, 4, 5],
@@ -1292,18 +1292,18 @@ export const journeyData = [
       "Mass Production release record"
     ],
     engineeringView: [
-      "Qualification plan definition against JEDEC / AEC standards",
-      "Reliability stress — HTOL, HTS, temperature cycle, uHAST, THB",
-      "ESD (HBM, CDM) and latch-up qualification",
-      "Package qualification — MSL, drop, bend, board-level reliability",
-      "Yield learning, failure pareto and defect analysis",
-      "Production test program release and guard-band validation",
-      "Test time reduction and multi-site conversion",
-      "Process corner and split-lot validation",
-      "Production readiness review and change control (PCN) setup",
-      "Capacity, supply chain and ramp commitment — wafer starts, substrate, HBM",
-      "Compliance and certification — PCIe/CXL compliance, RoHS/REACH, safety",
-      "Documentation release — datasheet, user guide, errata, application notes"
+      "Qualification Plan Definition Against JEDEC / AEC Standards",
+      "Reliability Stress Execution (HTOL, HTS, Temperature Cycle, uHAST, THB)",
+      "ESD (HBM, CDM) and Latch-Up Qualification",
+      "Package Qualification (MSL, Drop, Bend, Board-Level Reliability)",
+      "Yield Learning, Failure Pareto, and Defect Analysis",
+      "Production Test Program Release and Guard-Band Validation",
+      "Test Time Reduction and Multi-Site Conversion",
+      "Process Corner and Split-Lot Validation",
+      "Production Readiness Review and Change Control (PCN) Setup",
+      "Capacity, Supply Chain, and Ramp Commitment",
+      "Compliance and Certification (PCIe/CXL, RoHS/REACH, Safety)",
+      "Product Documentation Release"
     ],
     /** Elapsed weeks per engineering activity; negative marks one that runs continuously. */
     engineeringTat: [6, 18, 6, 12, -20, 9, 9, 9, 6, 12, 12, 10],

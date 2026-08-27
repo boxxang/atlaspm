@@ -6,7 +6,7 @@
  * All 257 activities of the 23 stages are written. Weeks are weeks from the
  * stage start; the programme turns them into dates.
  *
- * The source is a separate authoring document — docs/activity-details-ARCH06-onward-reviewed-v3-codefix.html —
+ * The source is a separate authoring document — docs/activitydetails_v9.html —
  * and this module is its export, so nothing here is edited by hand. It is a
  * megabyte of prose and it is imported by the server only: the page reads the
  * one write-up it needs and hands it down. What a browser needs is the small
@@ -3226,7 +3226,7 @@ export const activityDetails: Record<string, ActivityDetail> = {
    },
    {
     "n": 7,
-    "text": "Review security architecture note and",
+    "text": "Review and approve the security architecture",
     "tat": 2.5,
     "lane": "main"
    }
@@ -4048,43 +4048,43 @@ export const activityDetails: Record<string, ActivityDetail> = {
   "steps": [
    {
     "n": 1,
-    "text": "Build the long list — foundries, nodes and their availability windows",
+    "text": "Define evaluation criteria from product, PPA, cost, and schedule requirements",
     "tat": 0.75,
     "lane": "main"
    },
    {
     "n": 2,
-    "text": "Define and document screening criteria weighted against the product requirements",
+    "text": "Build the initial list of candidate foundries and process nodes",
     "tat": 0.5,
     "lane": "main"
    },
    {
     "n": 3,
-    "text": "Define and document foundry engagement and formal information requests",
+    "text": "Screen candidates for basic technical and schedule feasibility",
     "tat": 1.5,
     "lane": "main"
    },
    {
     "n": 4,
-    "text": "Review previous-program experience and relationship",
+    "text": "Compare PPA, maturity, cost, capacity, and ecosystem readiness",
     "tat": 0.5,
     "lane": "par"
    },
    {
     "n": 5,
-    "text": "Define and document geopolitical, export-control and supply-continuity screen",
+    "text": "Review key risks and dependencies for each shortlisted option",
     "tat": 0.75,
     "lane": "par"
    },
    {
     "n": 6,
-    "text": "Define and document short-list down to two or three candidates",
+    "text": "Select the preferred foundry and process node",
     "tat": 1,
     "lane": "main"
    },
    {
     "n": 7,
-    "text": "Select recommendation and decision record",
+    "text": "Review and approve the technology selection",
     "tat": 1.25,
     "lane": "main"
    }
@@ -4128,11 +4128,11 @@ export const activityDetails: Record<string, ActivityDetail> = {
    }
   ],
   "risks": [
-   "Only one candidate in the shortlist",
-   "Selection driven primarily by prior relationships",
-   "Availability window not checked",
-   "Export control screened late",
-   "Criteria written after the data arrives"
+   "Node selected mainly from roadmap preference rather than product fit",
+   "Foundry comparisons based on inconsistent assumptions or conditions",
+   "Capacity and schedule constraints evaluated too late",
+   "IP and design-enablement readiness assumed rather than verified",
+   "Selection made without a documented alternative and decision rationale"
   ],
   "roles": [
    {
@@ -4184,9 +4184,9 @@ export const activityDetails: Record<string, ActivityDetail> = {
    "Legal cover in place for preliminary discussion"
   ],
   "exit": [
-   "Short-list of at least two candidates, with the dropped options recorded",
-   "Criteria weighted before the responses were read",
-   "Recommendation carries availability windows, not only technical fit"
+   "Candidate foundries and process nodes are compared using consistent criteria",
+   "Key PPA, cost, capacity, schedule, and IP risks are identified for each option",
+   "Preferred foundry and process node are selected with clear decision rationale"
   ],
   "dependsOn": [
    "DEF-01"
@@ -4249,45 +4249,39 @@ export const activityDetails: Record<string, ActivityDetail> = {
   "steps": [
    {
     "n": 1,
-    "text": "Define and document process flavor options against the PPA targets — HPC, HD, or mixed",
+    "text": "Review available process options and device flavors",
     "tat": 1,
     "lane": "main"
    },
    {
     "n": 2,
-    "text": "Select multi-Vt menu and its leakage implication",
+    "text": "Map product PPA and architecture needs to available options",
     "tat": 1,
     "lane": "main"
    },
    {
     "n": 3,
-    "text": "Define and document backside power delivery evaluation, where the node offers it",
+    "text": "Evaluate performance, leakage, density, and cost tradeoffs",
     "tat": 0.75,
     "lane": "par"
    },
    {
     "n": 4,
-    "text": "Define and document rF, high-voltage and analog adder requirements",
+    "text": "Assess optional features such as backside PDN, RF, or HV where applicable",
     "tat": 0.5,
     "lane": "par"
    },
    {
     "n": 5,
-    "text": "Select metal stack and routing resource implication",
+    "text": "Confirm library, IP, rule, and EDA support for the preferred configuration",
     "tat": 1,
     "lane": "main"
    },
    {
     "n": 6,
-    "text": "Define and document option cost adders priced with TECH-04",
+    "text": "Select the process configuration for the program",
     "tat": 0.5,
     "lane": "par"
-   },
-   {
-    "n": 7,
-    "text": "Define and document flavor sheet agreement with the foundry",
-    "tat": 2,
-    "lane": "main"
    }
   ],
   "flowNote": "Two of the five weeks sit in step 7, which is signature time rather than engineering time. The sheet is a contractual artifact: once agreed it governs what the PDK contains and what the wafer costs, and changing it later reopens both.",
@@ -4334,11 +4328,11 @@ export const activityDetails: Record<string, ActivityDetail> = {
    }
   ],
   "risks": [
-   "Flavor chosen for density alone",
-   "Metal stack chosen without a congestion study",
-   "Multi-Vt menu wider than the flow supports",
-   "Backside power taken for the roadmap",
-   "Adders discovered after the sheet is agreed"
+   "Process options selected without quantified PPA benefit",
+   "Optional features added without accounting for cost or schedule impact",
+   "Library or IP support assumed before it is available",
+   "Vt strategy chosen without considering leakage and timing together",
+   "Foundry configuration changed after design enablement has started"
   ],
   "roles": [
    {
@@ -4386,9 +4380,9 @@ export const activityDetails: Record<string, ActivityDetail> = {
    "Early DTCO results available from TECH-03"
   ],
   "exit": [
-   "Flavor sheet agreed and signed, not merely discussed",
-   "Metal stack backed by a congestion study rather than by precedent",
-   "Every analog and adder requirement captured before agreement"
+   "Required process options and device flavors are selected for the product",
+   "PPA and cost impacts of optional features are understood",
+   "Selected options are confirmed to be supported by the foundry and design ecosystem"
   ],
   "dependsOn": [
    "TECH-01",
@@ -4458,50 +4452,44 @@ export const activityDetails: Record<string, ActivityDetail> = {
   "steps": [
    {
     "n": 1,
-    "text": "Define benchmark circuit set , representative of the design",
+    "text": "Define representative blocks and benchmark conditions",
     "tat": 0.75,
     "lane": "main"
    },
    {
     "n": 2,
-    "text": "Define and document standard cell density and area scaling study",
+    "text": "Collect process, library, and interconnect characterization inputs",
     "tat": 1.5,
     "lane": "main"
    },
    {
     "n": 3,
-    "text": "Define and document ring oscillator and critical-path frequency study",
+    "text": "Estimate or implement baseline PPA for each candidate configuration",
     "tat": 1.5,
     "lane": "main"
    },
    {
     "n": 4,
-    "text": "Characterize leakage and dynamic power across the Vt menu",
+    "text": "Compare density, frequency, leakage, and power against product targets",
     "tat": 1.25,
     "lane": "par"
    },
    {
     "n": 5,
-    "text": "Define and document sRAM bitcell density and Vmin study",
+    "text": "Run DTCO studies on the largest PPA gaps",
     "tat": 1.25,
     "lane": "par"
    },
    {
     "n": 6,
-    "text": "Route congestion proxy study on the candidate metal stacks",
+    "text": "Evaluate sensitivity to key design and process assumptions",
     "tat": 1,
     "lane": "par"
    },
    {
     "n": 7,
-    "text": "Compare node against the DEF-03 targets",
+    "text": "Summarize expected PPA capability and remaining risks",
     "tat": 1.5,
-    "lane": "main"
-   },
-   {
-    "n": 8,
-    "text": "Define and document dTCO findings and recommendation",
-    "tat": 1.75,
     "lane": "main"
    }
   ],
@@ -4551,11 +4539,11 @@ export const activityDetails: Record<string, ActivityDetail> = {
    }
   ],
   "risks": [
-   "Benchmark circuits unrepresentative",
-   "Preliminary libraries treated as final",
-   "SRAM left out",
-   "Congestion never modelled",
-   "Results reported without margin"
+   "Benchmark conditions that favor one node or process option",
+   "Foundry marketing metrics used in place of product-relevant implementation data",
+   "Representative blocks that do not reflect actual design complexity",
+   "DTCO gains assumed without verifying library, rule, or flow support",
+   "PPA gaps hidden by optimistic utilization or routing assumptions"
   ],
   "roles": [
    {
@@ -4607,9 +4595,9 @@ export const activityDetails: Record<string, ActivityDetail> = {
    "PPA targets published by DEF-03"
   ],
   "exit": [
-   "Every target has a measured result per candidate node",
-   "Findings state margin, not only pass or fail",
-   "Benchmark set documented well enough to re-run on a later PDK"
+   "PPA results are compared under consistent implementation assumptions",
+   "Key gaps to product targets are quantified for each candidate configuration",
+   "DTCO opportunities and remaining limitations are documented for downstream planning"
   ],
   "dependsOn": [
    "TECH-01",
@@ -4673,44 +4661,38 @@ export const activityDetails: Record<string, ActivityDetail> = {
   "steps": [
    {
     "n": 1,
-    "text": "Define and document volume and wafer-start forecast from the business case",
+    "text": "Define the pricing scope and required quotation items",
     "tat": 0.5,
     "lane": "main"
    },
    {
     "n": 2,
-    "text": "Process wafer price request and negotiation",
+    "text": "Collect wafer, mask, NRE, MPW, and volume pricing",
     "tat": 2,
     "lane": "main"
    },
    {
     "n": 3,
-    "text": "Prepare mask set and NRE quotation per node and flavor",
+    "text": "Normalize quotations to common volume and schedule assumptions",
     "tat": 1.5,
     "lane": "par"
    },
    {
     "n": 4,
-    "text": "Define and document mPW shuttle pricing and slot cost",
+    "text": "Identify one-time and recurring cost drivers",
     "tat": 0.5,
     "lane": "par"
    },
    {
     "n": 5,
-    "text": "Define and document option adder pricing against the TECH-02 sheet",
+    "text": "Review commercial assumptions and sensitivity with product finance",
     "tat": 0.5,
     "lane": "par"
    },
    {
     "n": 6,
-    "text": "Define and document volume tier and price-break structure",
+    "text": "Release cost inputs to the product cost model",
     "tat": 2.5,
-    "lane": "main"
-   },
-   {
-    "n": 7,
-    "text": "Define and document cost sheet publication into the DEF-04 model",
-    "tat": 1,
     "lane": "main"
    }
   ],
@@ -4753,11 +4735,11 @@ export const activityDetails: Record<string, ActivityDetail> = {
    }
   ],
   "risks": [
-   "Price quoted at a volume the product will not reach",
-   "Mask cost estimated from layer count alone",
-   "Adders priced after the sheet is agreed",
-   "Currency and term exposure ignored",
-   "Second-source pricing never requested"
+   "Wafer pricing compared without matching volume assumptions",
+   "Mask and NRE costs omitted from early business-case analysis",
+   "Engineering-lot or MPW costs treated as production pricing",
+   "Quotation validity dates ignored as the program schedule changes",
+   "Commercial assumptions not updated after process-option changes"
   ],
   "roles": [
    {
@@ -4805,9 +4787,9 @@ export const activityDetails: Record<string, ActivityDetail> = {
    "Die size estimate available from DEF-04"
   ],
   "exit": [
-   "Every cost line quoted, with a validity period and currency term",
-   "Tier structure reflects the actual ramp, not a notional volume",
-   "Cost sheet loaded into the DEF-04 model, not summarized into it"
+   "Wafer, mask, and NRE costs are defined for the selected technology",
+   "Pricing assumptions are tied to stated volume and schedule conditions",
+   "Cost inputs are ready for use in DEF-04 and business-case updates"
   ],
   "dependsOn": [
    "TECH-01",
@@ -4866,37 +4848,37 @@ export const activityDetails: Record<string, ActivityDetail> = {
   "steps": [
    {
     "n": 1,
-    "text": "Define and document wafer-start profile derived from the program schedule",
+    "text": "Translate the program schedule into required tapeout and wafer-start windows",
     "tat": 0.5,
     "lane": "main"
    },
    {
     "n": 2,
-    "text": "Allocate capacity request and discussion",
+    "text": "Review foundry slot availability and capacity outlook",
     "tat": 1.5,
     "lane": "main"
    },
    {
     "n": 3,
-    "text": "Define and document tapeout slot reservation against the DEF-08 date",
+    "text": "Identify conflicts between program demand and available capacity",
     "tat": 1,
     "lane": "main"
    },
    {
     "n": 4,
-    "text": "Define and document hot-lot policy and priority terms",
+    "text": "Evaluate priority, hot-lot, or alternate scheduling options where needed",
     "tat": 1,
     "lane": "par"
    },
    {
     "n": 5,
-    "text": "Allocate engineering-lot and risk-wafer",
+    "text": "Secure the required tapeout slot and capacity commitment",
     "tat": 0.75,
     "lane": "par"
    },
    {
     "n": 6,
-    "text": "Define and document capacity commitment letter and escalation path",
+    "text": "Integrate confirmed foundry dates into the program schedule",
     "tat": 2,
     "lane": "main"
    }
@@ -4938,11 +4920,11 @@ export const activityDetails: Record<string, ActivityDetail> = {
    }
   ],
   "risks": [
-   "Slot reserved against a date that has not been committed",
-   "Hot-lot terms left informal",
-   "No escalation path",
-   "Engineering lots forgotten",
-   "Capacity sized to the base case only"
+   "Tapeout slots treated as available until late in the program",
+   "Capacity commitments based only on verbal alignment",
+   "Engineering-lot needs omitted from capacity planning",
+   "Hot-lot assumptions used without confirmed foundry support",
+   "Foundry schedule changes not reflected in the program critical path"
   ],
   "roles": [
    {
@@ -4990,9 +4972,9 @@ export const activityDetails: Record<string, ActivityDetail> = {
    "Design agreement executed or in final redline"
   ],
   "exit": [
-   "Capacity committed in writing, with an escalation contact named",
-   "Hot-lot terms explicit rather than understood",
-   "Engineering and risk lots allocated separately from production"
+   "Required tapeout windows are aligned with the program schedule",
+   "Engineering and production capacity assumptions are confirmed with the foundry",
+   "Capacity or slot risks have owners and mitigation plans"
   ],
   "dependsOn": [
    "TECH-01",
@@ -5049,51 +5031,39 @@ export const activityDetails: Record<string, ActivityDetail> = {
   "steps": [
    {
     "n": 1,
-    "text": "Define and document nDA execution, to open technical discussion",
+    "text": "Identify required legal and commercial agreements",
     "tat": 1,
     "lane": "main"
    },
    {
     "n": 2,
-    "text": "Define design agreement scope",
+    "text": "Execute the NDA required for technical data exchange",
     "tat": 1,
     "lane": "main"
    },
    {
     "n": 3,
-    "text": "Define and document pDK and library licensing terms",
+    "text": "Review foundry design-agreement terms and design-data rights",
     "tat": 1.5,
     "lane": "par"
    },
    {
     "n": 4,
-    "text": "Define and document foundry IP licensing frame — memory compilers, IO, PHY",
+    "text": "Align IP licensing and third-party usage terms",
     "tat": 2.5,
     "lane": "main"
    },
    {
     "n": 5,
-    "text": "Define and document liability, indemnity and yield-responsibility terms",
+    "text": "Resolve commercial and legal exceptions",
     "tat": 1.5,
     "lane": "par"
    },
    {
     "n": 6,
-    "text": "Review export control and compliance",
+    "text": "Execute the required foundry agreements",
     "tat": 1,
     "lane": "par"
-   },
-   {
-    "n": 7,
-    "text": "Define and document legal negotiation and redline cycles",
-    "tat": 2.5,
-    "lane": "main"
-   },
-   {
-    "n": 8,
-    "text": "Define and document execution and distribution to the teams that need it",
-    "tat": 1,
-    "lane": "main"
    }
   ],
   "flowNote": "Step 1 is deliberately first and deliberately short. Nothing technical can be discussed before the NDA executes, so every week it takes is a week subtracted from TECH-03—which is why the NDA is chased separately from the agreement it precedes.",
@@ -5137,11 +5107,11 @@ export const activityDetails: Record<string, ActivityDetail> = {
    }
   ],
   "risks": [
-   "NDA treated as a formality and queued behind the agreement",
-   "Foundry IP frame left out of scope",
-   "Distribution not tracked",
-   "Yield responsibility left ambiguous",
-   "Redline cycles unbudgeted"
+   "Technical data access blocked by an incomplete NDA",
+   "Design work started before usage rights are clear",
+   "IP licensing terms assumed to be covered by the foundry agreement",
+   "Legal review started only after the technology decision is final",
+   "Commercial exceptions left unresolved until procurement or tapeout"
   ],
   "roles": [
    {
@@ -5189,9 +5159,9 @@ export const activityDetails: Record<string, ActivityDetail> = {
    "Compliance guidance for the candidate foundries"
   ],
   "exit": [
-   "NDA and design agreement executed, not merely agreed",
-   "PDK, library and foundry IP access all covered by scope",
-   "Access distributed to the teams that need it, and tracked"
+   "Required legal agreements are executed before protected design data is needed",
+   "Design-data access and usage rights are clearly defined",
+   "IP licensing and commercial responsibilities are aligned with the program plan"
   ],
   "dependsOn": [
    "TECH-01"
@@ -5251,33 +5221,39 @@ export const activityDetails: Record<string, ActivityDetail> = {
   "steps": [
    {
     "n": 1,
-    "text": "Review node maturity and risk-production timing",
+    "text": "Map program milestones to foundry roadmap milestones",
     "tat": 1,
     "lane": "main"
    },
    {
     "n": 2,
-    "text": "Define and document defect density trend and yield learning curve request",
+    "text": "Review process maturity, model readiness, and risk-production timing",
     "tat": 1,
     "lane": "main"
    },
    {
     "n": 3,
-    "text": "Define and document foundry roadmap alignment against the program schedule",
+    "text": "Assess yield-learning and manufacturing-readiness risk",
     "tat": 1,
     "lane": "par"
    },
    {
     "n": 4,
-    "text": "Define and document capacity ramp profile at the node",
+    "text": "Identify schedule dependencies on future foundry releases",
     "tat": 0.75,
     "lane": "par"
    },
    {
     "n": 5,
-    "text": "Assess node risk and mitigation options",
+    "text": "Define mitigation for readiness gaps",
     "tat": 2,
     "lane": "main"
+   },
+   {
+    "n": 6,
+    "text": "Align the program schedule with confirmed foundry milestones",
+    "lane": "main",
+    "tat": 0
    }
   ],
   "flowNote": "Step 2 asks for data the foundry treats as sensitive, and how much of it arrives is itself a signal. A foundry that will not share a defect density trend under NDA is telling the program something about the trend.",
@@ -5317,11 +5293,11 @@ export const activityDetails: Record<string, ActivityDetail> = {
    }
   ],
   "risks": [
-   "Marketing defect density used as a planning number",
-   "Risk production date taken as the availability date",
-   "Roadmap alignment checked once",
-   "No mitigation options developed",
-   "Large-die yield inferred from small-die data"
+   "Program schedule based on foundry roadmap dates without maturity margin",
+   "Risk production treated as equivalent to stable high-volume manufacturing",
+   "PDK and model readiness assumed to track process readiness automatically",
+   "Yield-learning risk excluded from launch planning",
+   "Foundry milestone changes not propagated into the program schedule"
   ],
   "roles": [
    {
@@ -5365,9 +5341,9 @@ export const activityDetails: Record<string, ActivityDetail> = {
    "Program tapeout date estimated by DEF-08"
   ],
   "exit": [
-   "Yield curve stated at the program's own tapeout date, not in general",
-   "Every maturity risk carries at least one mitigation option",
-   "Assessment handed to DEF-04 as the model's yield input"
+   "Program milestones are aligned with foundry technology-readiness milestones",
+   "Key maturity and production-readiness gaps are identified with mitigation plans",
+   "Schedule assumptions are updated to reflect realistic foundry readiness"
   ],
   "dependsOn": [
    "TECH-01"
@@ -5426,33 +5402,39 @@ export const activityDetails: Record<string, ActivityDetail> = {
   "steps": [
    {
     "n": 1,
-    "text": "Define and document second-source viability screen at the selected node class",
+    "text": "Define the business and supply reasons for a second source or migration path",
     "tat": 1,
     "lane": "main"
    },
    {
     "n": 2,
-    "text": "Define and document migration cost and schedule estimate",
+    "text": "Identify technically credible alternative nodes or foundries",
     "tat": 1.25,
     "lane": "main"
    },
    {
     "n": 3,
-    "text": "Assess iP portability across foundries",
+    "text": "Compare IP, library, design-rule, and architecture compatibility",
     "tat": 0.75,
     "lane": "par"
    },
    {
     "n": 4,
-    "text": "Analyze design rule and library delta",
+    "text": "Estimate redesign, validation, qualification, cost, and schedule impact",
     "tat": 0.75,
     "lane": "par"
    },
    {
     "n": 5,
-    "text": "Define and document strategy recommendation — dual-source, migration-ready, or single-source accepted",
+    "text": "Evaluate whether the contingency provides sufficient business value",
     "tat": 1.75,
     "lane": "main"
+   },
+   {
+    "n": 6,
+    "text": "Define the selected contingency strategy and trigger conditions",
+    "lane": "main",
+    "tat": 0
    }
   ],
   "flowNote": "Migration readiness is a design-time choice, not a later option: it constrains which IP can be used and how aggressively design rules can be pushed. Deciding after RTL starts means the decision has already been made by everyone who chose an IP.",
@@ -5490,11 +5472,11 @@ export const activityDetails: Record<string, ActivityDetail> = {
    }
   ],
   "risks": [
-   "Single-source accepted by default",
-   "Migration cost estimated without IP portability",
-   "Migration readiness assumed to be free",
-   "Decision taken after IP selection",
-   "Second source screened on capability alone"
+   "Second source assumed to be a simple database port",
+   "IP portability accepted without checking vendor and node support",
+   "Qualification and package changes excluded from migration planning",
+   "Contingency cost ignored in the business case",
+   "Backup strategy defined without clear trigger conditions"
   ],
   "roles": [
    {
@@ -5542,9 +5524,9 @@ export const activityDetails: Record<string, ActivityDetail> = {
    "Design rule sets accessible for at least one alternative"
   ],
   "exit": [
-   "Migration cost estimated with IP portability included",
-   "Recommendation recorded, including the option of accepting single source",
-   "Accepted exposure entered on the program risk register with an owner"
+   "Second-source or migration need is explicitly decided rather than assumed",
+   "Major technical, cost, and schedule impacts are quantified",
+   "Contingency path and trigger conditions are documented where required"
   ],
   "dependsOn": [
    "TECH-01",
@@ -5601,43 +5583,43 @@ export const activityDetails: Record<string, ActivityDetail> = {
   "steps": [
    {
     "n": 1,
-    "text": "Define and document oSAT long-list against the package architecture assumption",
+    "text": "Define backend manufacturing and package capability requirements",
     "tat": 0.75,
     "lane": "main"
    },
    {
     "n": 2,
-    "text": "Define and document advanced packaging capability and capacity screen",
+    "text": "Identify candidate OSAT and backend suppliers",
     "tat": 1.5,
     "lane": "main"
    },
    {
     "n": 3,
-    "text": "Define and document foundry-to-OSAT logistics and interface model",
+    "text": "Assess assembly, substrate, interposer, and test capability",
     "tat": 1,
     "lane": "par"
    },
    {
     "n": 4,
-    "text": "Define substrate and interposer supplier landscape",
+    "text": "Review capacity, lead times, and supply-chain constraints",
     "tat": 1,
     "lane": "par"
    },
    {
     "n": 5,
-    "text": "Hand off known-good-die responsibility model",
+    "text": "Identify capability and schedule gaps",
     "tat": 0.75,
     "lane": "par"
    },
    {
     "n": 6,
-    "text": "Define and document preliminary capacity indication and engagement",
+    "text": "Align supplier assumptions with package and program schedules",
     "tat": 1.5,
     "lane": "main"
    },
    {
     "n": 7,
-    "text": "Hand off backend supply chain finding and to package design",
+    "text": "Define follow-up actions and supplier engagement plan",
     "tat": 1.25,
     "lane": "main"
    }
@@ -5686,11 +5668,11 @@ export const activityDetails: Record<string, ActivityDetail> = {
    }
   ],
   "risks": [
-   "Advanced packaging capacity assumed available",
-   "OSAT chosen after package design starts",
-   "Known-good-die responsibility left open",
-   "Substrate lead time discovered rather than planned",
-   "Logistics model ignored"
+   "OSAT engagement started after package architecture is fixed",
+   "Substrate or interposer lead times omitted from early schedule planning",
+   "Supplier capability assumed from generic technology claims",
+   "Backend capacity risk evaluated only after wafer capacity is secured",
+   "Package and test dependencies not reflected in the program schedule"
   ],
   "roles": [
    {
@@ -5738,9 +5720,9 @@ export const activityDetails: Record<string, ActivityDetail> = {
    "Volume and ramp profile available"
   ],
   "exit": [
-   "Advanced packaging capacity indicated, not assumed",
-   "Known-good-die responsibility model agreed in principle",
-   "Findings handed to PKGD before package architecture is chosen"
+   "Candidate OSAT and backend suppliers can support the required package technology",
+   "Major capacity, lead-time, and supply risks are identified with owners",
+   "Backend assumptions are aligned with the package-design and program schedules"
   ],
   "dependsOn": [
    "TECH-01",
@@ -5796,51 +5778,45 @@ export const activityDetails: Record<string, ActivityDetail> = {
   "steps": [
    {
     "n": 1,
-    "text": "Release calendar and version tracking framework",
+    "text": "Build the PDK release roadmap for the program",
     "tat": 1,
     "lane": "main"
    },
    {
     "n": 2,
-    "text": "Analyze 0.1 to 0.5 delta impact",
+    "text": "Track changes in design rules, models, extraction, and signoff content",
     "tat": 4,
     "lane": "main"
    },
    {
     "n": 3,
-    "text": "Identify gap list maintained against what the design actually needs",
+    "text": "Assess the impact of each major PDK update on active design work",
     "tat": 3,
     "lane": "par"
    },
    {
     "n": 4,
-    "text": "Analyze 0.5 to 1.0 delta impact",
+    "text": "Identify gaps that block library, IP, implementation, or signoff work",
     "tat": 5,
     "lane": "main"
    },
    {
     "n": 5,
-    "text": "Qualify library and deck re- per version",
+    "text": "Align PDK adoption points with program milestones",
     "tat": 6,
     "lane": "par"
    },
    {
     "n": 6,
-    "text": "Make and document the production PDK adoption and version freeze decision",
+    "text": "Review readiness and open issues with the foundry and design teams",
     "tat": 4,
     "lane": "main"
    },
    {
     "n": 7,
-    "text": "Define and document version freeze policy and exception handling",
+    "text": "Maintain version history and release decisions through tapeout",
     "tat": 3,
     "lane": "par"
-   },
-   {
-    "n": 8,
-    "text": "Define and document readiness dashboard maintenance across the stage",
-    "tat": 20,
-    "lane": "main"
    }
   ],
   "flowNote": "Step 8 runs for twenty of the thirty-four weeks and is the activity most likely to be dropped when the team is busy. It is also the only artifact that tells the program which of its assumptions have quietly expired.",
@@ -5889,11 +5865,11 @@ export const activityDetails: Record<string, ActivityDetail> = {
    }
   ],
   "risks": [
-   "Design starts on a version the foundry calls preliminary and nobody re-checks",
-   "Delta analysis done on the release notes alone",
-   "Teams on different versions",
-   "Freeze declared without an exception path",
-   "Dashboard maintained until the team gets busy"
+   "PDK updates adopted without impact analysis",
+   "Different teams using different PDK versions",
+   "Early PDK limitations treated as production-ready behavior",
+   "Signoff assumptions changed without updating downstream flows",
+   "Open PDK gaps not tied to program milestones"
   ],
   "roles": [
    {
@@ -5945,9 +5921,9 @@ export const activityDetails: Record<string, ActivityDetail> = {
    "Release calendar obtained from the foundry"
   ],
   "exit": [
-   "Every version transition assessed before adoption, not after",
-   "All teams on one recorded version, with exceptions logged",
-   "Production PDK adopted and frozen with an exception path defined"
+   "Current and planned PDK versions are mapped to the program schedule",
+   "Major release changes have documented design and signoff impact",
+   "Open PDK gaps have owners, mitigation plans, and target closure dates"
   ],
   "dependsOn": [
    "TECH-01",
@@ -6011,39 +5987,33 @@ export const activityDetails: Record<string, ActivityDetail> = {
   "steps": [
    {
     "n": 1,
-    "text": "Define and document dRM ingestion and change log against the previous node",
+    "text": "Review the design rule manual and foundry guidance",
     "tat": 1,
     "lane": "main"
    },
    {
     "n": 2,
-    "text": "Assess restricted rule identification and impact",
+    "text": "Identify restricted, recommended, and high-risk rules",
     "tat": 1.5,
     "lane": "main"
    },
    {
     "n": 3,
-    "text": "Define and document recommended rule disposition — adopt, waive or defer",
+    "text": "Assess product impact for routing, density, macros, and reliability",
     "tat": 1.5,
     "lane": "main"
    },
    {
     "n": 4,
-    "text": "Define and document density and spacing rule impact on the floorplan",
+    "text": "Define required design practices and exceptions",
     "tat": 1,
     "lane": "par"
    },
    {
     "n": 5,
-    "text": "Prepare rule exception request for the foundry",
+    "text": "Review critical rules with physical design, IP, and foundry teams",
     "tat": 1,
     "lane": "par"
-   },
-   {
-    "n": 6,
-    "text": "Review dRM record and distribution to the design teams",
-    "tat": 2,
-    "lane": "main"
    }
   ],
   "flowNote": "Exception requests in step 5 run in parallel because the foundry's response time is measured in weeks. Submitting them at the end of the review rather than as each one is identified adds a month to the answer.",
@@ -6083,11 +6053,11 @@ export const activityDetails: Record<string, ActivityDetail> = {
    }
   ],
   "risks": [
-   "Recommended rules adopted wholesale",
-   "Restricted rules discovered at physical verification",
-   "Exception requests batched to the end",
-   "Analog rules read only by the digital team",
-   "Disposition never distributed"
+   "Recommended rules treated as optional without yield assessment",
+   "Restricted rules discovered only during late DRC closure",
+   "Rule interpretation differing across design teams",
+   "Product-specific exceptions not aligned with the foundry",
+   "Rule changes not propagated after PDK updates"
   ],
   "roles": [
    {
@@ -6135,9 +6105,9 @@ export const activityDetails: Record<string, ActivityDetail> = {
    "Exception request process agreed with the foundry"
   ],
   "exit": [
-   "Every recommended rule dispositioned with a reason, not defaulted",
-   "Exception requests submitted, with expected response dates",
-   "Disposition distributed to digital and custom teams alike"
+   "Restricted and recommended rules are identified and categorized",
+   "Product-specific rule exceptions and risks are documented",
+   "Implementation teams have a clear rule disposition for early design work"
   ],
   "dependsOn": [
    "TECH-02",
@@ -6199,45 +6169,39 @@ export const activityDetails: Record<string, ActivityDetail> = {
   "steps": [
    {
     "n": 1,
-    "text": "Track height and library family selection",
+    "text": "Inventory available standard cell libraries and variants",
     "tat": 1,
     "lane": "main"
    },
    {
     "n": 2,
-    "text": "Qualify multi-Vt menu against the flavor sheet",
+    "text": "Compare track height, Vt, density, timing, and leakage tradeoffs",
     "tat": 1.5,
     "lane": "main"
    },
    {
     "n": 3,
-    "text": "Define and document multi-bit flop and special cell evaluation",
+    "text": "Check support for multi-bit, isolation, level-shifter, retention, and power cells",
     "tat": 1.5,
     "lane": "par"
    },
    {
     "n": 4,
-    "text": "Build timing model quality check across corners",
+    "text": "Verify required .lib, LEF, GDS, and related views",
     "tat": 2,
     "lane": "main"
    },
    {
     "n": 5,
-    "text": "Define and document physical view and abstract consistency check",
+    "text": "Run representative implementation checks where needed",
     "tat": 1.5,
     "lane": "par"
    },
    {
     "n": 6,
-    "text": "Characterize library re- where the foundry data is thin",
+    "text": "Select and release the qualified library set",
     "tat": 2,
     "lane": "par"
-   },
-   {
-    "n": 7,
-    "text": "Qualify record and library freeze",
-    "tat": 3.5,
-    "lane": "main"
    }
   ],
   "flowNote": "Step 4 is the step that earns the activity. Foundry timing models are qualified by the foundry against the foundry's test cases; checking them at this design's corners and slew ranges is what catches the model error before it becomes a silicon failure.",
@@ -6284,11 +6248,11 @@ export const activityDetails: Record<string, ActivityDetail> = {
    }
   ],
   "risks": [
-   "Timing models trusted without a quality check",
-   "Track height chosen from the previous program",
-   "Vt menu wider than the flow can maintain",
-   "Multi-bit flops evaluated after synthesis starts",
-   "LEF and GDS inconsistency"
+   "Library selected on timing alone without power and density tradeoffs",
+   "Low-power or specialty cells missing from the qualified set",
+   "Physical and timing views not aligned to the same release",
+   "Library limitations discovered after synthesis or floorplanning begins",
+   "Different blocks using inconsistent library variants"
   ],
   "roles": [
    {
@@ -6340,9 +6304,9 @@ export const activityDetails: Record<string, ActivityDetail> = {
    "PPA and clock power budget available from ARCH-06"
   ],
   "exit": [
-   "Timing models checked at this design's corners, not only the foundry's",
-   "Vt menu frozen with a maintenance owner per corner",
-   "Abstract and layout views confirmed consistent"
+   "Required standard cell variants are selected and qualified",
+   "Timing, power, physical, and low-power views are complete for the intended flow",
+   "Library limitations and usage guidance are documented for synthesis and physical design"
   ],
   "dependsOn": [
    "TECH-02",
@@ -6413,43 +6377,43 @@ export const activityDetails: Record<string, ActivityDetail> = {
   "steps": [
    {
     "n": 1,
-    "text": "Define memory requirement collection from the hierarchy",
+    "text": "Collect memory requirements from architecture and block planning",
     "tat": 0.5,
     "lane": "main"
    },
    {
     "n": 2,
-    "text": "Set up compiler license and access",
+    "text": "Inventory available memory compilers and supported configurations",
     "tat": 1,
     "lane": "main"
    },
    {
     "n": 3,
-    "text": "Define and document compiler capability screen against the requirement list",
+    "text": "Map required depth, width, ports, voltage, and aspect ratio to compiler options",
     "tat": 1.5,
     "lane": "main"
    },
    {
     "n": 4,
-    "text": "Generate instance across the required configurations",
+    "text": "Generate representative memory instances and views",
     "tat": 2.5,
     "lane": "main"
    },
    {
     "n": 5,
-    "text": "Define and document redundancy and repair option evaluation",
+    "text": "Review PPA, physical constraints, and operating limits",
     "tat": 1.5,
     "lane": "par"
    },
    {
     "n": 6,
-    "text": "Define and document compiler view completeness check — .lib, LEF, GDS, CDL, models",
+    "text": "Identify unsupported instances and escalation needs",
     "tat": 1.5,
     "lane": "par"
    },
    {
     "n": 7,
-    "text": "Release instance library assembly and",
+    "text": "Release the planned memory instance set to downstream teams",
     "tat": 3.5,
     "lane": "main"
    }
@@ -6498,11 +6462,11 @@ export const activityDetails: Record<string, ActivityDetail> = {
    }
   ],
   "risks": [
-   "Compiler license assumed to be covered by the PDK agreement",
-   "Capability screened after generation starts",
-   "Views generated but never checked",
-   "Redundancy chosen without DFT",
-   "Instance count explosion"
+   "Architecture assumes memory configurations the compiler cannot generate",
+   "Aspect ratio and floorplan constraints ignored during instance selection",
+   "Compiler views incomplete for synthesis, STA, or physical design",
+   "Operating voltage or Vmin capability assumed without characterization",
+   "Unsupported instances discovered after block design begins"
   ],
   "roles": [
    {
@@ -6554,9 +6518,9 @@ export const activityDetails: Record<string, ActivityDetail> = {
    "PDK version stable enough to generate against"
   ],
   "exit": [
-   "Every required configuration either generated or recorded as a gap",
-   "All views present and checked, not merely produced",
-   "Redundancy scheme aligned with the DFT architecture"
+   "Required SRAM and register-file configurations are mapped to available compilers",
+   "Critical memory instances can be generated with complete implementation views",
+   "Compiler gaps that may require custom memory development are identified"
   ],
   "dependsOn": [
    "ARCH-03",
@@ -6623,37 +6587,37 @@ export const activityDetails: Record<string, ActivityDetail> = {
   "steps": [
    {
     "n": 1,
-    "text": "Extract block memory budget from ARCH-06",
+    "text": "Select representative and critical compiled memory instances",
     "tat": 0.5,
     "lane": "main"
    },
    {
     "n": 2,
-    "text": "Measure density per generated instance",
+    "text": "Collect timing, power, leakage, area, and Vmin data",
     "tat": 1.5,
     "lane": "main"
    },
    {
     "n": 3,
-    "text": "Characterize vmin and access time",
+    "text": "Compare each instance against block-level budgets",
     "tat": 1.5,
     "lane": "main"
    },
    {
     "n": 4,
-    "text": "Measure leakage and dynamic power",
+    "text": "Evaluate sensitivity to size, aspect ratio, Vt, and operating conditions",
     "tat": 1,
     "lane": "par"
    },
    {
     "n": 5,
-    "text": "Define and document area efficiency against the block budget",
+    "text": "Identify instances that cannot meet the required budget",
     "tat": 1,
     "lane": "par"
    },
    {
     "n": 6,
-    "text": "Analyze gap and shortfall quantification",
+    "text": "Review results with architecture, PDK, and AMS teams",
     "tat": 2.5,
     "lane": "main"
    }
@@ -6695,11 +6659,11 @@ export const activityDetails: Record<string, ActivityDetail> = {
    }
   ],
   "risks": [
-   "Density measured on the datasheet rather than the instance",
-   "Vmin characterized at nominal only",
-   "Gap described rather than quantified",
-   "Measurement late enough to remove the option",
-   "Access time measured without the wire load"
+   "Memory PPA assessed only at nominal conditions",
+   "Compiler marketing data used without instance-level characterization",
+   "Vmin gaps ignored until low-power validation",
+   "Area and aspect-ratio impact separated from timing analysis",
+   "Custom-memory need identified too late for the program schedule"
   ],
   "roles": [
    {
@@ -6747,9 +6711,9 @@ export const activityDetails: Record<string, ActivityDetail> = {
    "Characterization environment available"
   ],
   "exit": [
-   "Every instance measured against its block's budget",
-   "Gaps quantified in area, power and Vmin, not described",
-   "Results delivered with enough runway for PDK-06 to act"
+   "Critical memory instances are characterized against block PPA targets",
+   "Timing, density, Vmin, and leakage gaps are quantified",
+   "Instances requiring custom optimization are clearly identified"
   ],
   "dependsOn": [
    "PDK-04",
@@ -6809,37 +6773,37 @@ export const activityDetails: Record<string, ActivityDetail> = {
   "steps": [
    {
     "n": 1,
-    "text": "Review shortfall against the block budgets",
+    "text": "Review memory gaps that cannot be closed with standard compiler options",
     "tat": 0.5,
     "lane": "main"
    },
    {
     "n": 2,
-    "text": "Define option — pushed rules, custom array, or architecture change",
+    "text": "Estimate achievable PPA benefit from custom or pushed-rule development",
     "tat": 1,
     "lane": "main"
    },
    {
     "n": 3,
-    "text": "Assess schedule impact against the AMS window",
+    "text": "Assess design, verification, foundry, and schedule effort",
     "tat": 1,
     "lane": "main"
    },
    {
     "n": 4,
-    "text": "Define and document foundry appetite for pushed rules and the approval path",
+    "text": "Confirm pushed-rule feasibility and approval path with the foundry",
     "tat": 0.75,
     "lane": "par"
    },
    {
     "n": 5,
-    "text": "Compare cost and risk of the options",
+    "text": "Select standard, custom, or pushed-rule disposition for each instance",
     "tat": 0.75,
     "lane": "par"
    },
    {
     "n": 6,
-    "text": "Hand off decision and scope to AMS",
+    "text": "Integrate approved custom-memory work into AMS and program schedules",
     "tat": 1.5,
     "lane": "main"
    }
@@ -6883,11 +6847,11 @@ export const activityDetails: Record<string, ActivityDetail> = {
    }
   ],
   "risks": [
-   "Decision deferred to preserve options",
-   "Pushed rules chosen without foundry commitment",
-   "Architecture change dismissed too quickly",
-   "Scope handed to AMS without a schedule",
-   "Decision taken without the block owner"
+   "Custom memory selected without a quantified product benefit",
+   "Foundry pushed-rule approval assumed rather than confirmed",
+   "Verification and characterization effort omitted from the estimate",
+   "Custom-memory schedule not integrated with RTL and physical design needs",
+   "Standard compiler limitations accepted without exploring lower-risk alternatives"
   ],
   "roles": [
    {
@@ -6935,9 +6899,9 @@ export const activityDetails: Record<string, ActivityDetail> = {
    "Foundry pushed-rule policy understood"
   ],
   "exit": [
-   "Decision taken and recorded with the rejected options priced",
-   "Foundry approval path confirmed if pushed rules are chosen",
-   "Scope handed to AMS with a date, not only a requirement"
+   "Each unsupported or underperforming memory instance has a clear disposition",
+   "Custom-memory benefit and schedule impact are quantified",
+   "Required foundry approvals and development ownership are defined"
   ],
   "dependsOn": [
    "PDK-05",
@@ -6998,37 +6962,37 @@ export const activityDetails: Record<string, ActivityDetail> = {
   "steps": [
    {
     "n": 1,
-    "text": "Define and document iO requirement collection from the interface and bump plans",
+    "text": "Map interface and voltage requirements to available I/O cells",
     "tat": 0.5,
     "lane": "main"
    },
    {
     "n": 2,
-    "text": "Select iO library against the interface list",
+    "text": "Review ESD and latch-up protection options and limits",
     "tat": 1.5,
     "lane": "main"
    },
    {
     "n": 3,
-    "text": "Select eSD strategy and clamp",
+    "text": "Check package, bump, placement, and power-domain compatibility",
     "tat": 1.5,
     "lane": "main"
    },
    {
     "n": 4,
-    "text": "Review latch-up rule and guard ring strategy",
+    "text": "Verify required logical, timing, LEF, GDS, CDL, and reliability views",
     "tat": 1,
     "lane": "par"
    },
    {
     "n": 5,
-    "text": "Define and document iO timing and signal integrity model quality check",
+    "text": "Resolve unsupported interfaces or protection gaps",
     "tat": 1,
     "lane": "par"
    },
    {
     "n": 6,
-    "text": "Qualify record and release",
+    "text": "Release the qualified I/O, ESD, and latch-up library set",
     "tat": 2.5,
     "lane": "main"
    }
@@ -7070,11 +7034,11 @@ export const activityDetails: Record<string, ActivityDetail> = {
    }
   ],
   "risks": [
-   "ESD strategy chosen after the pad ring",
-   "IO models unchecked",
-   "Latch-up rules read as a formality",
-   "Package and board ESD requirements ignored",
-   "Library selected per interface with no consolidation"
+   "I/O voltage support assumed from nominal library descriptions",
+   "ESD requirements checked independently of package and bump architecture",
+   "Latch-up constraints discovered during late physical verification",
+   "Required implementation or reliability views missing at integration",
+   "I/O placement constraints not reflected in early floorplanning"
   ],
   "roles": [
    {
@@ -7122,9 +7086,9 @@ export const activityDetails: Record<string, ActivityDetail> = {
    "Foundry IO library and ESD rules released"
   ],
   "exit": [
-   "ESD strategy fixed before the pad ring is committed",
-   "IO models validated for both timing and channel use",
-   "Latch-up strategy reviewed against the qualification plan"
+   "Required I/O voltage and interface combinations are supported",
+   "ESD and latch-up structures are qualified for the intended product use",
+   "Implementation views and placement constraints are ready for physical design"
   ],
   "dependsOn": [
    "ARCH-04",
@@ -7186,51 +7150,39 @@ export const activityDetails: Record<string, ActivityDetail> = {
   "steps": [
    {
     "n": 1,
-    "text": "Define tool and version matrix per flow step",
+    "text": "Define the required EDA tool chain and use cases",
     "tat": 1,
     "lane": "main"
    },
    {
     "n": 2,
-    "text": "Review vendor node certification status",
+    "text": "Review foundry-supported versions and required patches",
     "tat": 1,
     "lane": "main"
    },
    {
     "n": 3,
-    "text": "Qualify synthesis and place-and-route version",
+    "text": "Install and configure candidate tool versions with the target PDK",
     "tat": 2.5,
     "lane": "main"
    },
    {
     "n": 4,
-    "text": "Qualify sTA and signoff tool",
+    "text": "Run representative synthesis, P&R, STA, PV, extraction, and EM/IR tests",
     "tat": 2,
     "lane": "par"
    },
    {
     "n": 5,
-    "text": "Qualify physical verification and EM/IR tool",
+    "text": "Resolve compatibility, runtime, and result-correlation issues",
     "tat": 2,
     "lane": "par"
    },
    {
     "n": 6,
-    "text": "Define and document interoperability and database version check across tools",
+    "text": "Freeze and release the approved tool-version matrix",
     "tat": 1.5,
     "lane": "par"
-   },
-   {
-    "n": 7,
-    "text": "Define and document version freeze and upgrade exception policy",
-    "tat": 4,
-    "lane": "main"
-   },
-   {
-    "n": 8,
-    "text": "Define and document tool matrix publication to every team",
-    "tat": 1.5,
-    "lane": "main"
    }
   ],
   "flowNote": "Step 6 catches what per-tool qualification cannot. Each tool can be certified on the node and still disagree with the next one about a database format or a parasitic convention, and only a cross-tool check finds it.",
@@ -7279,11 +7231,11 @@ export const activityDetails: Record<string, ActivityDetail> = {
    }
   ],
   "risks": [
-   "Teams on different versions",
-   "Certification status assumed",
-   "Interoperability never checked",
-   "Freeze with no upgrade path",
-   "Matrix published once"
+   "Foundry-supported versions assumed to work in the internal flow without testing",
+   "Different implementation stages using incompatible tool versions",
+   "Required patches or hotfixes not captured in the release baseline",
+   "Cross-tool database and constraint handoffs not validated",
+   "Tool upgrades introduced during closure without regression"
   ],
   "roles": [
    {
@@ -7335,9 +7287,9 @@ export const activityDetails: Record<string, ActivityDetail> = {
    "Foundry reference flow requirements known"
   ],
   "exit": [
-   "Every flow step has a qualified, named tool version",
-   "Cross-tool interoperability checked, not assumed",
-   "Freeze published with an exception route for critical fixes"
+   "Required EDA tools and versions are qualified for the selected PDK",
+   "Critical cross-tool handoffs and signoff interfaces are validated",
+   "Approved tool versions and known limitations are documented for the program"
   ],
   "dependsOn": [
    "TECH-02",
@@ -7401,50 +7353,44 @@ export const activityDetails: Record<string, ActivityDetail> = {
   "steps": [
    {
     "n": 1,
-    "text": "Define and document foundry reference flow ingestion",
+    "text": "Bring up the foundry reference flow in the internal environment",
     "tat": 1,
     "lane": "main"
    },
    {
     "n": 2,
-    "text": "Analyze gap against internal methodology and design needs",
+    "text": "Validate major tool stages, inputs, outputs, and handoffs",
     "tat": 1.5,
     "lane": "main"
    },
    {
     "n": 3,
-    "text": "Define and document synthesis and place-and-route flow adaptation",
+    "text": "Adapt scripts and settings to program-specific methodology",
     "tat": 2.5,
     "lane": "main"
    },
    {
     "n": 4,
-    "text": "Integrate signoff flow adaptation and deck",
+    "text": "Add checks, automation, reporting, and reproducibility requirements",
     "tat": 2,
     "lane": "par"
    },
    {
     "n": 5,
-    "text": "Integrate low-power flow against the UPF intent",
+    "text": "Run end-to-end regression on a representative design",
     "tat": 1.5,
     "lane": "par"
    },
    {
     "n": 6,
-    "text": "Define hierarchical and block-level flow",
+    "text": "Document methodology, known limitations, and usage guidance",
     "tat": 2,
     "lane": "par"
    },
    {
     "n": 7,
-    "text": "Define and document methodology deck authoring",
+    "text": "Release the internal reference flow to design teams",
     "tat": 2,
-    "lane": "main"
-   },
-   {
-    "n": 8,
-    "text": "Define and document flow pilot on a representative block",
-    "tat": 3,
     "lane": "main"
    }
   ],
@@ -7494,11 +7440,11 @@ export const activityDetails: Record<string, ActivityDetail> = {
    }
   ],
   "risks": [
-   "Pilot skipped under schedule pressure",
-   "Reference flow adopted rather than adapted",
-   "Low-power flow bolted on late",
-   "Methodology deck written after the flow changes",
-   "Pilot block unrepresentative"
+   "Foundry reference scripts used without understanding their assumptions",
+   "Flow customized without retaining regression coverage",
+   "Different teams creating separate local versions of the methodology",
+   "Signoff requirements added only after implementation begins",
+   "Known tool or PDK limitations omitted from the methodology guide"
   ],
   "roles": [
    {
@@ -7550,9 +7496,9 @@ export const activityDetails: Record<string, ActivityDetail> = {
    "UPF intent available from ARCH-05"
   ],
   "exit": [
-   "Flow run end to end on a representative block, not a toy one",
-   "Methodology deck matches the scripts as released",
-   "Hierarchical and block flows both defined, not only the top"
+   "The reference design runs through the required implementation and signoff stages",
+   "Program-specific flow changes are documented and regression-tested",
+   "Internal teams have a repeatable methodology and baseline scripts"
   ],
   "dependsOn": [
    "PDK-02",
@@ -7614,37 +7560,37 @@ export const activityDetails: Record<string, ActivityDetail> = {
   "steps": [
    {
     "n": 1,
-    "text": "Define and document deck inventory and version baseline",
+    "text": "Inventory required signoff decks and technology files",
     "tat": 1,
     "lane": "main"
    },
    {
     "n": 2,
-    "text": "Define version control and release process",
+    "text": "Map each deck to its PDK and tool compatibility requirements",
     "tat": 1,
     "lane": "main"
    },
    {
     "n": 3,
-    "text": "Validate qRC tech file and extraction deck",
+    "text": "Baseline the approved DRC, LVS, extraction, and QRC versions",
     "tat": 1.5,
     "lane": "par"
    },
    {
     "n": 4,
-    "text": "Validate dRC and LVS deck on known-good structures",
+    "text": "Regression-test major deck updates on representative designs",
     "tat": 1.5,
     "lane": "main"
    },
    {
     "n": 5,
-    "text": "Define and document deck change notification and impact process",
+    "text": "Assess the impact of rule or extraction changes on active designs",
     "tat": 1,
     "lane": "par"
    },
    {
     "n": 6,
-    "text": "Continuously deck version tracking across the stage",
+    "text": "Release approved updates with version history and usage notes",
     "tat": 2.5,
     "lane": "main"
    }
@@ -7691,11 +7637,11 @@ export const activityDetails: Record<string, ActivityDetail> = {
    }
   ],
   "risks": [
-   "Decks used from a shared directory",
-   "Extraction deck unvalidated",
-   "Deck updates applied silently",
-   "No known-good structures",
-   "Tracking stops when the stage ends"
+   "Different teams using different signoff deck versions",
+   "Deck updates adopted without regression",
+   "QRC or extraction changes not propagated into timing and EM/IR flows",
+   "Foundry release notes not reviewed for design impact",
+   "Signoff results reported without recording the deck version"
   ],
   "roles": [
    {
@@ -7743,9 +7689,9 @@ export const activityDetails: Record<string, ActivityDetail> = {
    "Known-good test structures available"
   ],
   "exit": [
-   "Every deck versioned and pinned, none used from a shared path",
-   "Extraction and verification decks validated against known answers",
-   "Change notification process running, with a log"
+   "All signoff decks are tied to approved versions and PDK releases",
+   "Deck updates are regression-tested before program adoption",
+   "Design and signoff teams use the same controlled deck baseline"
   ],
   "dependsOn": [
    "PDK-01",
@@ -7809,37 +7755,37 @@ export const activityDetails: Record<string, ActivityDetail> = {
   "steps": [
    {
     "n": 1,
-    "text": "Define corner and mode enumeration from the operating conditions",
+    "text": "Collect product operating conditions and foundry signoff guidance",
     "tat": 1,
     "lane": "main"
    },
    {
     "n": 2,
-    "text": "Define and document pVT corner set proposal",
+    "text": "Define candidate PVT and RC corner combinations",
     "tat": 1.5,
     "lane": "main"
    },
    {
     "n": 3,
-    "text": "Select oCV, AOCV or POCV derate methodology",
+    "text": "Select OCV, AOCV, or POCV methodology and required derates",
     "tat": 1.5,
     "lane": "par"
    },
    {
     "n": 4,
-    "text": "Define and document foundry alignment on the corner set and derates",
+    "text": "Evaluate coverage, pessimism, and runtime tradeoffs",
     "tat": 2,
     "lane": "main"
    },
    {
     "n": 5,
-    "text": "Define and document signoff condition documentation",
+    "text": "Align the signoff methodology with the foundry and STA teams",
     "tat": 1.5,
     "lane": "main"
    },
    {
     "n": 6,
-    "text": "Define corner count against runtime and license cost",
+    "text": "Release the approved corner and derate definition",
     "tat": 1,
     "lane": "par"
    }
@@ -7881,11 +7827,11 @@ export const activityDetails: Record<string, ActivityDetail> = {
    }
   ],
   "risks": [
-   "Corner set agreed after closure starts",
-   "Derate methodology chosen for margin",
-   "Corner count unbounded",
-   "Modes forgotten",
-   "Library corners narrower than the signoff set"
+   "Signoff corners defined after timing closure has started",
+   "Too few corners missing product operating conditions",
+   "Too many corners added without considering closure and runtime impact",
+   "Derates inconsistent between synthesis, implementation, and signoff",
+   "Foundry variation guidance interpreted differently across teams"
   ],
   "roles": [
    {
@@ -7933,9 +7879,9 @@ export const activityDetails: Record<string, ActivityDetail> = {
    "Foundry signoff requirements available"
   ],
   "exit": [
-   "Corner set agreed with the foundry in writing",
-   "Every signoff corner covered by library characterization",
-   "Runtime and license impact quantified and accepted"
+   "Required functional and signoff PVT corners are defined",
+   "OCV and derate methodology is agreed with implementation and foundry teams",
+   "The corner set is usable consistently across synthesis, STA, and signoff"
   ],
   "dependsOn": [
    "ARCH-05",
@@ -8002,37 +7948,37 @@ export const activityDetails: Record<string, ActivityDetail> = {
   "steps": [
    {
     "n": 1,
-    "text": "Define and document compute demand model per stage and per flow step",
+    "text": "Estimate compute demand by tool, stage, and program phase",
     "tat": 1.5,
     "lane": "main"
    },
    {
     "n": 2,
-    "text": "Define and document eDA license demand model against peak concurrency",
+    "text": "Estimate EDA license demand during peak concurrent usage",
     "tat": 1.5,
     "lane": "main"
    },
    {
     "n": 3,
-    "text": "Define and document storage and data retention requirement",
+    "text": "Estimate working, checkpoint, regression, and archive storage needs",
     "tat": 0.75,
     "lane": "par"
    },
    {
     "n": 4,
-    "text": "Define and document farm capacity plan against procurement lead time",
+    "text": "Compare demand against available infrastructure",
     "tat": 1.5,
     "lane": "main"
    },
    {
     "n": 5,
-    "text": "Define and document licence negotiation support and pooling strategy",
+    "text": "Define procurement, reservation, or scheduling actions for gaps",
     "tat": 1,
     "lane": "par"
    },
    {
     "n": 6,
-    "text": "Review capacity plan publication and",
+    "text": "Align infrastructure readiness with the program schedule",
     "tat": 1.5,
     "lane": "main"
    }
@@ -8074,11 +8020,11 @@ export const activityDetails: Record<string, ActivityDetail> = {
    }
   ],
   "risks": [
-   "Demand modelled per team rather than per flow step",
-   "Peak sized to the average",
-   "Licences procured without lead time",
-   "Storage forgotten",
-   "Plan never reviewed against actual usage"
+   "Capacity estimated from average rather than peak concurrent usage",
+   "License demand planned independently from compute capacity",
+   "Storage growth underestimated for iterative physical design databases",
+   "Infrastructure procurement started after closure workloads begin",
+   "Shared farm commitments from other programs ignored"
   ],
   "roles": [
    {
@@ -8126,9 +8072,9 @@ export const activityDetails: Record<string, ActivityDetail> = {
    "Program schedule available from DEF-08"
   ],
   "exit": [
-   "Peak demand modelled per flow step, not per team",
-   "Procurement dated against lead time, not against need date",
-   "Plan published with a review cadence against actual usage"
+   "Peak compute, license, and storage demand is estimated by program phase",
+   "Capacity gaps are identified with procurement or allocation actions",
+   "Infrastructure is available before the corresponding design workload begins"
   ],
   "dependsOn": [
    "PDK-08",
@@ -8188,43 +8134,43 @@ export const activityDetails: Record<string, ActivityDetail> = {
   "steps": [
    {
     "n": 1,
-    "text": "Define environment scope — tools, decks, libraries, scripts",
+    "text": "Assemble the approved PDK, libraries, tools, decks, and flow configuration",
     "tat": 1,
     "lane": "main"
    },
    {
     "n": 2,
-    "text": "Define and document golden environment assembly",
+    "text": "Define release manifests, paths, environment variables, and access controls",
     "tat": 2,
     "lane": "main"
    },
    {
     "n": 3,
-    "text": "Define flow regression suite",
+    "text": "Run end-to-end regression on representative designs",
     "tat": 1.5,
     "lane": "par"
    },
    {
     "n": 4,
-    "text": "Define and document regression run on the reference block",
+    "text": "Resolve version, compatibility, and reproducibility issues",
     "tat": 2,
     "lane": "main"
    },
    {
     "n": 5,
-    "text": "Compare result against the pilot baseline",
+    "text": "Document release notes, known limitations, and change history",
     "tat": 1.5,
     "lane": "par"
    },
    {
     "n": 6,
-    "text": "Release notes and known-issue list",
+    "text": "Release the qualified environment to program teams",
     "tat": 1.5,
     "lane": "par"
    },
    {
     "n": 7,
-    "text": "Release environment and team onboarding",
+    "text": "Maintain regression and controlled updates through tapeout",
     "tat": 3,
     "lane": "main"
    }
@@ -8273,11 +8219,11 @@ export const activityDetails: Record<string, ActivityDetail> = {
    }
   ],
   "risks": [
-   "Environment released without a regression",
-   "Results differ from the pilot and the difference is not chased",
-   "Known issues omitted",
-   "No onboarding",
-   "Released and then not maintained"
+   "Tools, libraries, and decks released independently without a common baseline",
+   "Environment updates made without regression",
+   "Local user overrides creating non-reproducible results",
+   "Known limitations not included in release notes",
+   "Golden environment changed during closure without impact review"
   ],
   "roles": [
    {
@@ -8329,9 +8275,9 @@ export const activityDetails: Record<string, ActivityDetail> = {
    "Flow piloted successfully by PDK-09"
   ],
   "exit": [
-   "Regression reproduces the pilot baseline, or the difference is explained",
-   "Known issues published with the release, not after it",
-   "Teams onboarded onto the environment rather than copying it"
+   "PDK, libraries, tools, decks, and methodology are released as one controlled environment",
+   "End-to-end regression passes on representative designs",
+   "Version changes require documented impact assessment and release control"
   ],
   "dependsOn": [
    "PDK-01",
@@ -8398,37 +8344,37 @@ export const activityDetails: Record<string, ActivityDetail> = {
   "steps": [
    {
     "n": 1,
-    "text": "Decompose product requirements into IP requirements against the product requirements",
+    "text": "Identify all IP blocks required by the architecture",
     "tat": 1,
     "lane": "main"
    },
    {
     "n": 2,
-    "text": "Define and document block-level IP identification from the architecture sketch",
+    "text": "Define functional and performance requirements for each IP",
     "tat": 1.5,
     "lane": "main"
    },
    {
     "n": 3,
-    "text": "Define and document interface and protocol IP identification",
+    "text": "Define interface, clock, reset, power, and configuration requirements",
     "tat": 0.75,
     "lane": "par"
    },
    {
     "n": 4,
-    "text": "Define and document foundry IP identification — memory compilers, IO, standard cells",
+    "text": "Define process-node, PVT, reliability, and qualification requirements",
     "tat": 0.75,
     "lane": "par"
    },
    {
     "n": 5,
-    "text": "Define per-IP stub — function, performance, interfaces",
+    "text": "Define required views, models, documentation, and delivery dates",
     "tat": 1.5,
     "lane": "main"
    },
    {
     "n": 6,
-    "text": "Define and document bill of materials assembly and traceability check",
+    "text": "Review and baseline the IP requirement set",
     "tat": 1,
     "lane": "main"
    }
@@ -8474,11 +8420,11 @@ export const activityDetails: Record<string, ActivityDetail> = {
    }
   ],
   "risks": [
-   "Bill inherited from the previous program",
-   "Foundry IP omitted",
-   "Specification stubs too thin to evaluate against",
-   "Traceability skipped",
-   "Bill frozen before architecture settles"
+   "IP requirements written only as block names or protocol names",
+   "Architecture assumptions not translated into measurable IP requirements",
+   "Required implementation or verification views omitted",
+   "Process-node and qualification requirements added after vendor selection",
+   "Delivery dates not tied to RTL and physical-design integration needs"
   ],
   "roles": [
    {
@@ -8526,9 +8472,9 @@ export const activityDetails: Record<string, ActivityDetail> = {
    "Foundry IP catalogue accessible"
   ],
   "exit": [
-   "Every IP traces to a requirement, and every requirement to an IP or a gap",
-   "Foundry IP included alongside third-party and internal blocks",
-   "Specification stubs detailed enough to evaluate a vendor against"
+   "Every required IP block has a defined requirement set",
+   "Requirements include technical, process-node, deliverable, and schedule needs",
+   "IP requirements are ready for internal reuse and vendor evaluation"
   ],
   "dependsOn": [
    "DEF-01",
@@ -8588,31 +8534,31 @@ export const activityDetails: Record<string, ActivityDetail> = {
   "steps": [
    {
     "n": 1,
-    "text": "Define and document internal IP inventory against the bill of materials",
+    "text": "Search the internal inventory against the required IP list",
     "tat": 0.75,
     "lane": "main"
    },
    {
     "n": 2,
-    "text": "Define and document node availability check per internal block",
+    "text": "Confirm functional and interface fit for each candidate",
     "tat": 1.25,
     "lane": "main"
    },
    {
     "n": 3,
-    "text": "Define and document collateral completeness audit — views, testbenches, documentation",
+    "text": "Check node, process-option, library, and tool compatibility",
     "tat": 1,
     "lane": "par"
    },
    {
     "n": 4,
-    "text": "Define and document maintenance and ownership status per block",
+    "text": "Review available views, documentation, silicon history, and known issues",
     "tat": 0.75,
     "lane": "par"
    },
    {
     "n": 5,
-    "text": "Define and document reuse classification — direct, port required, or rebuild",
+    "text": "Classify each candidate as reusable, reusable with work, or not reusable",
     "tat": 2,
     "lane": "main"
    }
@@ -8652,11 +8598,11 @@ export const activityDetails: Record<string, ActivityDetail> = {
    }
   ],
   "risks": [
-   "Reuse claimed on the previous node",
-   "Collateral assumed complete",
-   "Unmaintained blocks counted as reuse",
-   "Audit run on the catalogue rather than the repository",
-   "Silicon history ignored"
+   "IP counted as reusable because its name and function match",
+   "Prior-node IP assumed portable without checking technology dependencies",
+   "Known issues and silicon history excluded from the assessment",
+   "Missing views discovered only during integration",
+   "Internal ownership or support capacity not confirmed"
   ],
   "roles": [
    {
@@ -8704,9 +8650,9 @@ export const activityDetails: Record<string, ActivityDetail> = {
    "Node selected so availability can be assessed"
   ],
   "exit": [
-   "Every internal block classified as direct reuse, port, or rebuild",
-   "Collateral gaps listed per block, not assumed away",
-   "Blocks with no maintainer flagged as such"
+   "Every required IP has been checked against the internal inventory",
+   "Reuse candidates are assessed for node, view, quality, and support readiness",
+   "Reuse gaps are identified before make / buy decisions"
   ],
   "dependsOn": [
    "IPR-01",
@@ -8758,37 +8704,37 @@ export const activityDetails: Record<string, ActivityDetail> = {
   "steps": [
    {
     "n": 1,
-    "text": "Define decision criteria — cost, schedule, differentiation, risk",
+    "text": "Define common make / buy / reuse evaluation criteria",
     "tat": 0.75,
     "lane": "main"
    },
    {
     "n": 2,
-    "text": "Define and document differentiation screen — which blocks are the product's own value",
+    "text": "Assess internal reuse options and required modification effort",
     "tat": 1,
     "lane": "main"
    },
    {
     "n": 3,
-    "text": "Define and document internal capacity check against the make candidates",
+    "text": "Estimate in-house development effort, schedule, and risk",
     "tat": 1,
     "lane": "par"
    },
    {
     "n": 4,
-    "text": "Compare cost and schedule per line",
+    "text": "Assess external sourcing availability, cost, maturity, and schedule",
     "tat": 1.5,
     "lane": "main"
    },
    {
     "n": 5,
-    "text": "Define and document foundry-specific versus portable IP consideration",
+    "text": "Compare options against program priorities and dependencies",
     "tat": 0.75,
     "lane": "par"
    },
    {
     "n": 6,
-    "text": "Make and document the per line and record of rejected options decision",
+    "text": "Select and record the sourcing path for each IP",
     "tat": 1.75,
     "lane": "main"
    }
@@ -8832,11 +8778,11 @@ export const activityDetails: Record<string, ActivityDetail> = {
    }
   ],
   "risks": [
-   "Make decided on capability rather than capacity",
-   "Differentiating IP bought",
-   "Commodity IP built",
-   "Foundry-specific IP chosen without reference to sourcing strategy",
-   "Decisions recorded without the alternatives"
+   "Decision based on license price alone",
+   "Internal development effort treated as zero-cost capacity",
+   "Vendor maturity assumed from roadmap status",
+   "Integration and verification effort omitted from the comparison",
+   "Decision made without a fallback for schedule-critical IP"
   ],
   "roles": [
    {
@@ -8884,9 +8830,9 @@ export const activityDetails: Record<string, ActivityDetail> = {
    "AMS capacity known from the program plan"
   ],
   "exit": [
-   "Every line decided with a criterion attached, not by default",
-   "Make decisions backed by a named capacity commitment",
-   "Rejected options priced and recorded"
+   "Every required IP has a make, buy, or reuse disposition",
+   "Technical, schedule, cost, and maturity tradeoffs are compared consistently",
+   "Decisions and exceptions are recorded with owners"
   ],
   "dependsOn": [
    "IPR-01",
@@ -8946,43 +8892,43 @@ export const activityDetails: Record<string, ActivityDetail> = {
   "steps": [
    {
     "n": 1,
-    "text": "Evaluate vendor long-list per IP line",
+    "text": "Prepare the RFI / RFQ package from the approved IP requirements",
     "tat": 0.75,
     "lane": "main"
    },
    {
     "n": 2,
-    "text": "Define and document rFI issue and response collection",
+    "text": "Identify qualified candidate vendors",
     "tat": 2,
     "lane": "main"
    },
    {
     "n": 3,
-    "text": "Define technical evaluation against the stubs",
+    "text": "Review technical compliance against the requirement set",
     "tat": 2.5,
     "lane": "main"
    },
    {
     "n": 4,
-    "text": "Define and document reference customer checks and tapeout track record",
+    "text": "Evaluate node readiness, deliverables, support, and delivery schedule",
     "tat": 1.5,
     "lane": "par"
    },
    {
     "n": 5,
-    "text": "Assess support model and escalation path",
+    "text": "Compare commercial terms and total integration impact",
     "tat": 1,
     "lane": "par"
    },
    {
     "n": 6,
-    "text": "Compare rFQ issue and commercial",
+    "text": "Resolve critical gaps through vendor clarification or technical review",
     "tat": 1.75,
     "lane": "par"
    },
    {
     "n": 7,
-    "text": "Select evaluation matrix and vendor",
+    "text": "Select the preferred vendor and record the rationale",
     "tat": 3.75,
     "lane": "main"
    }
@@ -9031,11 +8977,11 @@ export const activityDetails: Record<string, ActivityDetail> = {
    }
   ],
   "risks": [
-   "Evaluation from the datasheet",
-   "Reference checks skipped",
-   "Single vendor evaluated",
-   "Support model unexamined",
-   "Node-specific capability assumed from a different node"
+   "Vendors compared using different requirement baselines",
+   "Roadmap claims treated as committed deliverables",
+   "Technical evaluation separated from delivery and support capability",
+   "Missing views or models discovered after purchase",
+   "Selection completed without a credible alternative for critical IP"
   ],
   "roles": [
    {
@@ -9087,9 +9033,9 @@ export const activityDetails: Record<string, ActivityDetail> = {
    "NDAs in place with candidate vendors"
   ],
   "exit": [
-   "At least two candidates evaluated per significant line",
-   "Reference customers contacted for the critical blocks",
-   "Selection recorded against the matrix, with support model assessed"
+   "Candidate vendors are evaluated against the same requirement set",
+   "Technical, delivery, support, and commercial gaps are explicitly identified",
+   "Preferred vendor is selected with documented rationale and backup options where needed"
   ],
   "dependsOn": [
    "IPR-01",
@@ -9145,43 +9091,43 @@ export const activityDetails: Record<string, ActivityDetail> = {
   "steps": [
    {
     "n": 1,
-    "text": "Define proven-status — what the program will accept as evidence",
+    "text": "Define the evidence required to claim silicon-proven status",
     "tat": 0.75,
     "lane": "main"
    },
    {
     "n": 2,
-    "text": "Characterize evidence request per block — test chip, production part, data",
+    "text": "Collect silicon, test-chip, production, and qualification evidence",
     "tat": 1.5,
     "lane": "main"
    },
    {
     "n": 3,
-    "text": "Verify node and process option match",
+    "text": "Compare proven configuration against the program's node and process options",
     "tat": 1.5,
     "lane": "main"
    },
    {
     "n": 4,
-    "text": "Define and document speed grade and operating condition match check",
+    "text": "Review known silicon issues, errata, and field history",
     "tat": 1,
     "lane": "par"
    },
    {
     "n": 5,
-    "text": "Review errata and known-issue per block",
+    "text": "Assess remaining technical and schedule risk",
     "tat": 1,
     "lane": "par"
    },
    {
     "n": 6,
-    "text": "Define and document maturity level assignment per block",
+    "text": "Define validation actions for IP not proven on the exact configuration",
     "tat": 1.25,
     "lane": "main"
    },
    {
     "n": 7,
-    "text": "Define and document readiness report and gap list",
+    "text": "Record the readiness status for each selected IP",
     "tat": 2,
     "lane": "main"
    }
@@ -9230,11 +9176,11 @@ export const activityDetails: Record<string, ActivityDetail> = {
    }
   ],
   "risks": [
-   "Vendor claim accepted at the vendor's definition",
-   "Node matched, process option not",
-   "Errata not requested",
-   "Assessment done after the license is signed",
-   "Speed grade ignored"
+   "Silicon proven accepted without defining what was actually proven",
+   "Evidence from a different node or process option treated as equivalent",
+   "Errata and production history excluded from the assessment",
+   "Unproven IP allowed onto the critical path without mitigation",
+   "Vendor claims accepted without supporting evidence"
   ],
   "roles": [
    {
@@ -9282,9 +9228,9 @@ export const activityDetails: Record<string, ActivityDetail> = {
    "Vendor NDAs allow access to characterization data"
   ],
   "exit": [
-   "Every block carries a maturity level backed by evidence, not by claim",
-   "Node and process option match verified per block",
-   "Findings available before licences are signed in IPR-07"
+   "Silicon-proven status is defined against the exact node and process configuration",
+   "Evidence and remaining gaps are recorded for every critical IP",
+   "Unproven IP has a named validation or contingency plan"
   ],
   "dependsOn": [
    "IPR-02",
@@ -9346,43 +9292,43 @@ export const activityDetails: Record<string, ActivityDetail> = {
   "steps": [
    {
     "n": 1,
-    "text": "Define deliverable checklist per IP class",
+    "text": "Define the required deliverables by IP type and integration flow",
     "tat": 1,
     "lane": "main"
    },
    {
     "n": 2,
-    "text": "Define and document view and model requirements against the tool matrix",
+    "text": "Map each deliverable to its downstream consumer and required date",
     "tat": 1.5,
     "lane": "main"
    },
    {
     "n": 3,
-    "text": "Verify collateral requirements with DV",
+    "text": "Review vendor or internal delivery manifests against the checklist",
     "tat": 1,
     "lane": "par"
    },
    {
     "n": 4,
-    "text": "Integrate documentation, errata and guide requirements",
+    "text": "Validate format, version, and tool compatibility for critical views",
     "tat": 1,
     "lane": "par"
    },
    {
     "n": 5,
-    "text": "Define and document acceptance criteria and incoming inspection procedure",
+    "text": "Identify missing collateral and required corrective actions",
     "tat": 1.5,
     "lane": "main"
    },
    {
     "n": 6,
-    "text": "Define and document checklist agreement with each vendor",
+    "text": "Agree delivery content and dates with the IP owner or vendor",
     "tat": 2,
     "lane": "par"
    },
    {
     "n": 7,
-    "text": "Hand off checklist publication and to procurement",
+    "text": "Track integration readiness through delivery",
     "tat": 3,
     "lane": "main"
    }
@@ -9426,11 +9372,11 @@ export const activityDetails: Record<string, ActivityDetail> = {
    }
   ],
   "risks": [
-   "Checklist agreed after the PO",
-   "Views specified without the tool matrix",
-   "Verification collateral omitted",
-   "No incoming inspection",
-   "One checklist for all IP classes"
+   "RTL or GDS delivery treated as complete IP delivery",
+   "Physical, timing, power, or verification views omitted from the checklist",
+   "Deliverable formats not checked against the program tool versions",
+   "Documentation and integration support treated as optional",
+   "Missing collateral discovered only when the consuming team starts work"
   ],
   "roles": [
    {
@@ -9478,9 +9424,9 @@ export const activityDetails: Record<string, ActivityDetail> = {
    "Signoff corner intent known from PDK-11"
   ],
   "exit": [
-   "Checklist agreed with each vendor before the PO is placed",
-   "Acceptance procedure names who checks what, and when",
-   "Views cover the signoff corners the program will actually run"
+   "Every IP has an agreed deliverable checklist",
+   "Required views and models are mapped to the teams and milestones that consume them",
+   "Missing or late collateral has an owner and recovery date"
   ],
   "dependsOn": [
    "IPR-04",
@@ -9540,49 +9486,49 @@ export const activityDetails: Record<string, ActivityDetail> = {
   "steps": [
    {
     "n": 1,
-    "text": "Define commercial terms per IP line",
+    "text": "Define required license scope, usage rights, and support terms",
     "tat": 1.5,
     "lane": "main"
    },
    {
     "n": 2,
-    "text": "Define and document licence model negotiation — per-use, per-project, royalty",
+    "text": "Review vendor quotation and commercial structure",
     "tat": 2.5,
     "lane": "main"
    },
    {
     "n": 3,
-    "text": "Define and document delivery date commitment and milestone schedule",
+    "text": "Negotiate license, support, liability, and delivery terms",
     "tat": 2,
     "lane": "main"
    },
    {
     "n": 4,
-    "text": "Define and document deliverable checklist attached as a contractual schedule",
+    "text": "Resolve legal, procurement, finance, and security requirements",
     "tat": 1,
     "lane": "par"
    },
    {
     "n": 5,
-    "text": "Define and document support, maintenance and escalation terms",
+    "text": "Confirm final deliverable scope and committed dates",
     "tat": 1.5,
     "lane": "par"
    },
    {
     "n": 6,
-    "text": "Define and document liability, indemnity and IP warranty terms",
+    "text": "Issue the purchase order or equivalent authorization",
     "tat": 1.5,
     "lane": "par"
    },
    {
     "n": 7,
-    "text": "Define and document legal redline cycles",
+    "text": "Complete license execution and access setup",
     "tat": 3.5,
     "lane": "main"
    },
    {
     "n": 8,
-    "text": "Define and document execution, PO issue and distribution",
+    "text": "Record commercial obligations and renewal or support milestones",
     "tat": 2.5,
     "lane": "main"
    }
@@ -9635,11 +9581,11 @@ export const activityDetails: Record<string, ActivityDetail> = {
    }
   ],
   "risks": [
-   "Licence executed without a committed delivery date",
-   "Readiness findings not used in negotiation",
-   "Checklist not attached",
-   "Redline duration underestimated",
-   "Support terms omitted"
+   "Technical selection completed without budget or procurement alignment",
+   "License scope too narrow for intended product or derivative use",
+   "Delivery dates stated as targets rather than contractual commitments",
+   "Support and maintenance terms omitted from negotiation",
+   "PO or access setup started after the integration window opens"
   ],
   "roles": [
    {
@@ -9687,9 +9633,9 @@ export const activityDetails: Record<string, ActivityDetail> = {
    "Deliverable checklists agreed in IPR-06"
   ],
   "exit": [
-   "Every license carries a committed delivery date, not an intention",
-   "Deliverable checklist attached as a contractual schedule",
-   "Access distributed and tracked to the teams that need it"
+   "Required IP usage rights and license scope are executed",
+   "Purchase order or equivalent commercial commitment is in place",
+   "Delivery and support dates are contractually aligned with program needs"
   ],
   "dependsOn": [
    "IPR-04",
@@ -9749,37 +9695,37 @@ export const activityDetails: Record<string, ActivityDetail> = {
   "steps": [
    {
     "n": 1,
-    "text": "Define and document unproven block list from the readiness report",
+    "text": "Identify IP requiring porting, re-characterization, or hardening",
     "tat": 0.5,
     "lane": "main"
    },
    {
     "n": 2,
-    "text": "Characterize porting scope per block — layout, , verification",
+    "text": "Define technology and implementation deltas from the source IP",
     "tat": 1.5,
     "lane": "main"
    },
    {
     "n": 3,
-    "text": "Make and document the vendor versus internal execution per block decision",
+    "text": "Define design, characterization, verification, and signoff work",
     "tat": 1,
     "lane": "par"
    },
    {
     "n": 4,
-    "text": "Define and document effort and duration estimate per block",
+    "text": "Assign ownership and estimate engineering effort",
     "tat": 1.25,
     "lane": "main"
    },
    {
     "n": 5,
-    "text": "Integrate dependency mapping against the windows",
+    "text": "Build the development and validation schedule",
     "tat": 0.75,
     "lane": "par"
    },
    {
     "n": 6,
-    "text": "Define and document hardening plan with owners and dates",
+    "text": "Review readiness against the required integration date",
     "tat": 1.75,
     "lane": "main"
    }
@@ -9821,11 +9767,11 @@ export const activityDetails: Record<string, ActivityDetail> = {
    }
   ],
   "risks": [
-   "Hardening treated as vendor overhead",
-   "Internal execution assumed available",
-   "Re-verification omitted from scope",
-   "Characterization corners not matched to the program's",
-   "Plan without dates"
+   "Porting treated as a simple process-node conversion",
+   "Characterization and signoff effort omitted from the plan",
+   "Source-IP assumptions incompatible with the target design environment",
+   "Foundry or vendor dependencies not included in the schedule",
+   "Ported IP delivered after the block integration window"
   ],
   "roles": [
    {
@@ -9873,9 +9819,9 @@ export const activityDetails: Record<string, ActivityDetail> = {
    "Integration windows known from RTL and PD planning"
   ],
   "exit": [
-   "Every unproven block has a scoped plan with an owner and a date",
-   "Internal execution decisions backed by a capacity commitment",
-   "Re-verification scope included, not assumed"
+   "Porting or hardening scope is defined for every affected IP",
+   "Required design, characterization, verification, and signoff work is scheduled",
+   "Delivery dates are aligned with downstream integration windows"
   ],
   "dependsOn": [
    "IPR-02",
@@ -9933,37 +9879,37 @@ export const activityDetails: Record<string, ActivityDetail> = {
   "steps": [
    {
     "n": 1,
-    "text": "Integrate window extraction — what each stage needs and when",
+    "text": "Collect need-by dates from all downstream integration teams",
     "tat": 0.75,
     "lane": "main"
    },
    {
     "n": 2,
-    "text": "Define and document committed delivery date collection per block and per deliverable",
+    "text": "Map required IP views and maturity levels to each need-by date",
     "tat": 1,
     "lane": "main"
    },
    {
     "n": 3,
-    "text": "Define and document deliverable-level alignment — abstracts before models before collateral",
+    "text": "Overlay vendor, internal, and porting delivery commitments",
     "tat": 1.25,
     "lane": "main"
    },
    {
     "n": 4,
-    "text": "Define and document hardening plan overlay from IPR-08",
+    "text": "Identify gaps between committed delivery and integration need",
     "tat": 0.75,
     "lane": "par"
    },
    {
     "n": 5,
-    "text": "Define and document mismatch identification and escalation list",
+    "text": "Define recovery, early-access, or staged-delivery actions",
     "tat": 1,
     "lane": "main"
    },
    {
     "n": 6,
-    "text": "Integrate schedule into the program plan",
+    "text": "Baseline and track the IP schedule against program milestones",
     "tat": 0.75,
     "lane": "par"
    }
@@ -10005,11 +9951,11 @@ export const activityDetails: Record<string, ActivityDetail> = {
    }
   ],
   "risks": [
-   "Block-level dates instead of deliverable-level",
-   "IP schedule maintained separately",
-   "Mismatches recorded without escalation",
-   "Hardening overlay omitted",
-   "Floorplan needs underestimated"
+   "Only the final IP delivery date tracked",
+   "Early RTL, model, LEF, or timing-view needs omitted",
+   "Vendor schedule not connected to the program critical path",
+   "Staged or preliminary releases used without maturity labels",
+   "Delivery slips not propagated to consuming teams"
   ],
   "roles": [
    {
@@ -10057,9 +10003,9 @@ export const activityDetails: Record<string, ActivityDetail> = {
    "Integration windows known from the program schedule"
   ],
   "exit": [
-   "Alignment done per deliverable, not per block",
-   "Every mismatch has an owner and an escalation path",
-   "IP schedule visible inside the program plan, not beside it"
+   "Every required IP view has a need-by date and committed delivery date",
+   "Delivery dependencies are reflected in downstream team schedules",
+   "Schedule gaps have owners, recovery actions, and escalation dates"
   ],
   "dependsOn": [
    "IPR-06",
@@ -10119,31 +10065,31 @@ export const activityDetails: Record<string, ActivityDetail> = {
   "steps": [
    {
     "n": 1,
-    "text": "Assess risk rating per IP line — maturity, vendor, schedule, supply",
+    "text": "Define common IP maturity and risk-rating criteria",
     "tat": 1,
     "lane": "main"
    },
    {
     "n": 2,
-    "text": "Define and document critical dependency identification — which failures stop the program",
+    "text": "Rate each critical IP for technical, maturity, delivery, and supplier risk",
     "tat": 1,
     "lane": "main"
    },
    {
     "n": 3,
-    "text": "Define and document second-source viability per critical block",
+    "text": "Identify IP whose failure can affect tapeout or launch",
     "tat": 0.75,
     "lane": "par"
    },
    {
     "n": 4,
-    "text": "Assess internal fallback option",
+    "text": "Evaluate second-source, internal, or architecture fallback options",
     "tat": 0.75,
     "lane": "par"
    },
    {
     "n": 5,
-    "text": "Define contingency decision and trigger per critical block",
+    "text": "Define mitigation actions, triggers, owners, and decision dates",
     "tat": 2,
     "lane": "main"
    }
@@ -10183,11 +10129,11 @@ export const activityDetails: Record<string, ActivityDetail> = {
    }
   ],
   "risks": [
-   "Register without triggers",
-   "Every line rated as critical",
-   "Second source assessed on capability alone",
-   "Internal fallback assumed",
-   "Register written and not reviewed"
+   "Risk rating based only on vendor confidence",
+   "Schedule risk separated from technical maturity",
+   "Second source named without verifying node and deliverable readiness",
+   "Fallback decision delayed until the primary IP has already missed the integration window",
+   "High-risk IP not visible in the program-level risk register"
   ],
   "roles": [
    {
@@ -10235,9 +10181,9 @@ export const activityDetails: Record<string, ActivityDetail> = {
    "Sourcing strategy known from TECH-08"
   ],
   "exit": [
-   "Critical dependencies identified and separated from the rest",
-   "Every critical block has a contingency with a trigger date",
-   "Register has a review cadence, not just an author"
+   "Critical IP is rated using consistent maturity and schedule criteria",
+   "High-risk IP has a defined mitigation or contingency path",
+   "Fallback trigger conditions and latest decision dates are recorded"
   ],
   "dependsOn": [
    "IPR-05",
@@ -10293,37 +10239,37 @@ export const activityDetails: Record<string, ActivityDetail> = {
   "steps": [
    {
     "n": 1,
-    "text": "Define and document custom block list confirmation from the make decisions",
+    "text": "Identify all custom analog, mixed-signal, and memory blocks",
     "tat": 0.5,
     "lane": "main"
    },
    {
     "n": 2,
-    "text": "Decompose system-level budget — jitter, noise, BER",
+    "text": "Extract functional and electrical requirements for each block",
     "tat": 1.5,
     "lane": "main"
    },
    {
     "n": 3,
-    "text": "Define per-block authoring",
+    "text": "Allocate power, area, performance, and noise budgets",
     "tat": 2,
     "lane": "main"
    },
    {
     "n": 4,
-    "text": "Allocate area and power per block",
+    "text": "Define interfaces, supplies, clocks, resets, and control requirements",
     "tat": 1,
     "lane": "par"
    },
    {
     "n": 5,
-    "text": "Define and document pSRR and supply sensitivity requirements",
+    "text": "Define PVT, reliability, and verification coverage",
     "tat": 1,
     "lane": "par"
    },
    {
     "n": 6,
-    "text": "Define review and owner acceptance",
+    "text": "Review and baseline the AMS specifications and budgets",
     "tat": 2,
     "lane": "main"
    }
@@ -10367,11 +10313,11 @@ export const activityDetails: Record<string, ActivityDetail> = {
    }
   ],
   "risks": [
-   "Budgets stated as totals rather than allocations",
-   "Specifications written without the PHY vendor",
-   "Area allocated before the architecture is understood",
-   "PSRR requirements omitted",
-   "No owner acceptance"
+   "AMS design started before measurable specifications are agreed",
+   "Power or area budgets allocated independently of system constraints",
+   "Interface and supply assumptions differ between AMS and digital teams",
+   "PVT and reliability requirements added after circuit design",
+   "Budget changes not propagated to architecture and integration teams"
   ],
   "roles": [
    {
@@ -10419,9 +10365,9 @@ export const activityDetails: Record<string, ActivityDetail> = {
    "Interface and clock architecture defined by ARCH-04 and ARCH-05"
   ],
   "exit": [
-   "Every system budget decomposed into per-block allocations",
-   "Each specification accepted by its named owner",
-   "Area and power allocations reconciled against ARCH-06"
+   "Every AMS block has measurable electrical and PPA targets",
+   "Operating conditions, interfaces, and verification requirements are defined",
+   "Budgets are reviewed and accepted by architecture and integration teams"
   ],
   "dependsOn": [
    "IPR-03",
@@ -10489,61 +10435,61 @@ export const activityDetails: Record<string, ActivityDetail> = {
   "steps": [
    {
     "n": 1,
-    "text": "Select architecture — integer, fractional, ring or LC",
+    "text": "Define the PLL / clock-generator architecture from the frequency plan",
     "tat": 2,
     "lane": "main"
    },
    {
     "n": 2,
-    "text": "Define and document loop dynamics and phase noise budget",
+    "text": "Select oscillator, divider, phase detector, charge-pump, and loop-filter implementation",
     "tat": 2,
     "lane": "main"
    },
    {
     "n": 3,
-    "text": "Define vCO design and tuning range",
+    "text": "Design and simulate the core loop at nominal conditions",
     "tat": 4,
     "lane": "main"
    },
    {
     "n": 4,
-    "text": "Define and document charge pump, loop filter and divider design",
+    "text": "Close frequency range, jitter, phase noise, and lock behavior across PVT",
     "tat": 4,
     "lane": "main"
    },
    {
     "n": 5,
-    "text": "Define and document supply regulation and PSRR strategy",
+    "text": "Analyze supply noise, reference noise, and spur sensitivity",
     "tat": 3,
     "lane": "par"
    },
    {
     "n": 6,
-    "text": "Define and document lock detection, calibration and startup sequencing",
+    "text": "Run Monte Carlo and mismatch verification",
     "tat": 3,
     "lane": "par"
    },
    {
     "n": 7,
-    "text": "Define and document layout with matching, shielding and isolation",
+    "text": "Define calibration, trim, test, and debug features",
     "tat": 6,
     "lane": "main"
    },
    {
     "n": 8,
-    "text": "Close post-layout jitter across PVT",
+    "text": "Complete layout-aware and extracted verification",
     "tat": 5,
     "lane": "main"
    },
    {
     "n": 9,
-    "text": "Define clock distribution interface with physical design",
+    "text": "Generate behavioral and integration models",
     "tat": 3,
     "lane": "par"
    },
    {
     "n": 10,
-    "text": "Characterize and macro release",
+    "text": "Release the closed PLL / clock-generator macro",
     "tat": 3,
     "lane": "main"
    }
@@ -10600,11 +10546,11 @@ export const activityDetails: Record<string, ActivityDetail> = {
    }
   ],
   "risks": [
-   "Post-layout jitter worse than budget",
-   "PSRR ignored until integration",
-   "Tuning range too narrow across corners",
-   "Lock time and startup unspecified",
-   "One PLL designed for several very different uses"
+   "PLL architecture selected without a complete frequency and jitter budget",
+   "Jitter verified only at nominal supply conditions",
+   "Supply coupling and reference spurs assessed too late",
+   "Calibration range insufficient for PVT and mismatch",
+   "Behavioral model not correlated to transistor-level behavior"
   ],
   "roles": [
    {
@@ -10660,9 +10606,9 @@ export const activityDetails: Record<string, ActivityDetail> = {
    "Device models available from the tracked PDK"
   ],
   "exit": [
-   "Jitter closed post-layout across PVT, not pre-layout",
-   "Lock time and startup sequence characterized and documented",
-   "Macro released with views and a behavioural model"
+   "Frequency, jitter, lock time, and operating-range targets are met across required corners",
+   "Variation and supply-noise sensitivity are verified",
+   "Required integration models and physical views are released"
   ],
   "dependsOn": [
    "AMS-01",
@@ -10733,61 +10679,61 @@ export const activityDetails: Record<string, ActivityDetail> = {
   "steps": [
    {
     "n": 1,
-    "text": "Define and document pHY strategy per interface — build, buy hardened, or buy soft",
+    "text": "Define the target channel, data rate, BER, jitter, and compliance requirements",
     "tat": 2,
     "lane": "main"
    },
    {
     "n": 2,
-    "text": "Assess vendor deliverable ingestion and gap",
+    "text": "Select the PHY architecture or establish the vendor-hardening baseline",
     "tat": 3,
     "lane": "main"
    },
    {
     "n": 3,
-    "text": "Define and document equalization and link training architecture",
+    "text": "Develop or adapt TX, RX, clocking, equalization, and calibration circuits",
     "tat": 4,
     "lane": "par"
    },
    {
     "n": 4,
-    "text": "Define and document tX and RX front-end design or adaptation",
+    "text": "Integrate package and channel models into link analysis",
     "tat": 7,
     "lane": "main"
    },
    {
     "n": 5,
-    "text": "Define and document clock recovery and per-lane timing",
+    "text": "Verify eye, jitter, BER, and equalization margin across PVT",
     "tat": 5,
     "lane": "par"
    },
    {
     "n": 6,
-    "text": "Integrate hBM PHY and training sequence",
+    "text": "Run variation and calibration-range analysis",
     "tat": 6,
     "lane": "main"
    },
    {
     "n": 7,
-    "text": "Close layout, matching and lane pitch",
+    "text": "Close power, area, bump, and floorplan constraints",
     "tat": 8,
     "lane": "main"
    },
    {
     "n": 8,
-    "text": "Close post-layout BER and eye across PVT",
+    "text": "Verify test, loopback, training, and debug features",
     "tat": 6,
     "lane": "main"
    },
    {
     "n": 9,
-    "text": "Define compliance simulation against the interface",
+    "text": "Complete extracted or vendor-hardening signoff",
     "tat": 4,
     "lane": "par"
    },
    {
     "n": 10,
-    "text": "Integrate macro release and support",
+    "text": "Release integration models, views, and constraints",
     "tat": 2,
     "lane": "main"
    }
@@ -10842,11 +10788,11 @@ export const activityDetails: Record<string, ActivityDetail> = {
    }
   ],
   "risks": [
-   "Bought PHY assumed to need no work",
-   "Lane pitch incompatible with the bump map",
-   "Compliance simulated late",
-   "Channel budget not shared with SI",
-   "Vendor support model untested until integration"
+   "PHY evaluated without the actual package and channel assumptions",
+   "Vendor hardening treated as integration-only work",
+   "Equalization and calibration range verified only at nominal conditions",
+   "Bump and floorplan constraints discovered after macro placement",
+   "Compliance and test features added after circuit closure"
   ],
   "roles": [
    {
@@ -10906,9 +10852,9 @@ export const activityDetails: Record<string, ActivityDetail> = {
    "Bump pitch and PHY placement known from ARCH-08"
   ],
   "exit": [
-   "BER and eye closed post-layout across PVT at the specified channel",
-   "Compliance simulated against the interface specification, not only internally",
-   "Macros released with a stated limitation list"
+   "PHY performance is verified against the target channel and package",
+   "PVT, jitter, equalization, and calibration margins are demonstrated",
+   "Required controller, physical, and verification interfaces are ready for integration"
   ],
   "dependsOn": [
    "AMS-01",
@@ -10988,49 +10934,49 @@ export const activityDetails: Record<string, ActivityDetail> = {
   "steps": [
    {
     "n": 1,
-    "text": "Define and document supply topology and regulation requirement per domain",
+    "text": "Define rail, load, accuracy, noise, transient, and startup requirements",
     "tat": 1.5,
     "lane": "main"
    },
    {
     "n": 2,
-    "text": "Define and document bandgap reference design and trim strategy",
+    "text": "Select LDO, reference, monitor, and regulator architectures",
     "tat": 3.5,
     "lane": "main"
    },
    {
     "n": 3,
-    "text": "Define and document lDO design — load range, stability, PSRR",
+    "text": "Design the core regulation and reference circuits",
     "tat": 5,
     "lane": "main"
    },
    {
     "n": 4,
-    "text": "Generate bias and distribution",
+    "text": "Verify DC accuracy, PSRR, noise, stability, and transient response",
     "tat": 3,
     "lane": "par"
    },
    {
     "n": 5,
-    "text": "Define and document startup, sequencing and brown-out behavior",
+    "text": "Verify startup, shutdown, sequencing, and fault behavior",
     "tat": 2.5,
     "lane": "par"
    },
    {
     "n": 6,
-    "text": "Define and document layout with matching and supply isolation",
+    "text": "Run PVT and Monte Carlo verification",
     "tat": 4,
     "lane": "main"
    },
    {
     "n": 7,
-    "text": "Verify post-layout stability and PSRR across PVT",
+    "text": "Define trim, test, monitor, and debug features",
     "tat": 4,
     "lane": "main"
    },
    {
     "n": 8,
-    "text": "Define trim and calibration procedure for test",
+    "text": "Release qualified macros and integration views",
     "tat": 2,
     "lane": "main"
    }
@@ -11081,11 +11027,11 @@ export const activityDetails: Record<string, ActivityDetail> = {
    }
   ],
   "risks": [
-   "PSRR specified at DC",
-   "Stability verified only at nominal load",
-   "Bandgap trim undefined",
-   "Brown-out and startup behavior unspecified",
-   "Reviewed by nobody"
+   "LDO stability checked without realistic load and package parasitics",
+   "Reference accuracy verified without mismatch and temperature spread",
+   "Startup and sequencing behavior left to top-level integration",
+   "Noise coupling to sensitive blocks not budgeted",
+   "Trim range defined without production-test capability"
   ],
   "roles": [
    {
@@ -11141,9 +11087,9 @@ export const activityDetails: Record<string, ActivityDetail> = {
    "Node precision element characterization available"
   ],
   "exit": [
-   "PSRR verified at the digital switching frequency, not only at DC",
-   "Stability held across the full load range post-layout",
-   "Trim procedure agreed with test engineering"
+   "Regulation, reference accuracy, stability, startup, and transient targets are met across PVT",
+   "Load and package interactions are included in verification",
+   "Control, trim, test, and integration requirements are released"
   ],
   "dependsOn": [
    "AMS-01",
@@ -11205,49 +11151,49 @@ export const activityDetails: Record<string, ActivityDetail> = {
   "steps": [
    {
     "n": 1,
-    "text": "Make and document the scope confirmation against the PDK-06 and gap decision",
+    "text": "Define capacity, width, ports, bandwidth, Vmin, and PPA targets",
     "tat": 0.75,
     "lane": "main"
    },
    {
     "n": 2,
-    "text": "Select bitcell — foundry cell, pushed rules, or custom",
+    "text": "Evaluate available bitcell and pushed-rule options",
     "tat": 1.75,
     "lane": "main"
    },
    {
     "n": 3,
-    "text": "Define and document array organization — banking, segmentation, aspect ratio",
+    "text": "Define row, column, banking, and mux organization",
     "tat": 2,
     "lane": "main"
    },
    {
     "n": 4,
-    "text": "Define and document sense amplifier topology and offset budget",
+    "text": "Define wordline, bitline, precharge, sensing, and write architecture",
     "tat": 2,
     "lane": "main"
    },
    {
     "n": 5,
-    "text": "Define and document replica timing and self-timed path design",
+    "text": "Define replica, tracking, and internal timing strategy",
     "tat": 1.75,
     "lane": "par"
    },
    {
     "n": 6,
-    "text": "Define and document peripheral circuit architecture — decoders, drivers, IO",
+    "text": "Estimate area, delay, power, and margin for candidate organizations",
     "tat": 1.5,
     "lane": "par"
    },
    {
     "n": 7,
-    "text": "Define and document density projection against the block budget",
+    "text": "Select the preferred custom SRAM architecture",
     "tat": 3.5,
     "lane": "main"
    },
    {
     "n": 8,
-    "text": "Review architecture and freeze",
+    "text": "Hand off architecture constraints to circuit and layout design",
     "tat": 1.5,
     "lane": "par"
    }
@@ -11293,11 +11239,11 @@ export const activityDetails: Record<string, ActivityDetail> = {
    }
   ],
   "risks": [
-   "Architecture that does not recover the gap",
-   "Bitcell pushed beyond foundry appetite",
-   "Sense amplifier offset budget optimistic",
-   "Replica timing not proven across corners",
-   "Architecture frozen without the density projection"
+   "Bitcell selected before array-level PPA is evaluated",
+   "Array organization optimized for area without bandwidth and timing impact",
+   "Replica timing copied from a prior node without revalidation",
+   "Pushed-rule benefit assumed before foundry approval",
+   "Floorplan aspect ratio considered after architecture freeze"
   ],
   "roles": [
    {
@@ -11349,9 +11295,9 @@ export const activityDetails: Record<string, ActivityDetail> = {
    "Foundry pushed-rule appetite known"
   ],
   "exit": [
-   "Projected density closes the gap the decision was taken on",
-   "Bitcell choice within the foundry's stated approval appetite",
-   "Architecture frozen with an offset and Vmin budget attached"
+   "Bitcell and array organization are selected against measurable PPA and Vmin targets",
+   "Banking, ports, sensing, and timing architecture are defined",
+   "Architecture is ready for circuit, assist, layout, and statistical-margin development"
   ],
   "dependsOn": [
    "PDK-05",
@@ -11415,43 +11361,43 @@ export const activityDetails: Record<string, ActivityDetail> = {
   "steps": [
    {
     "n": 1,
-    "text": "Analyze vmin gap against the AMS-05 architecture",
+    "text": "Identify the dominant read and write Vmin limitations",
     "tat": 1,
     "lane": "main"
    },
    {
     "n": 2,
-    "text": "Select assist technique and interaction study",
+    "text": "Evaluate candidate assist techniques for the selected bitcell and array",
     "tat": 2,
     "lane": "main"
    },
    {
     "n": 3,
-    "text": "Define and document wordline boost circuit design",
+    "text": "Design wordline, bitline, supply, or timing assist circuits as required",
     "tat": 2,
     "lane": "par"
    },
    {
     "n": 4,
-    "text": "Define and document negative bitline circuit design",
+    "text": "Optimize assist strength and timing across PVT",
     "tat": 2,
     "lane": "par"
    },
    {
     "n": 5,
-    "text": "Define and document vDD collapse and read-assist timing",
+    "text": "Run statistical read, write, and hold margin analysis",
     "tat": 2,
     "lane": "main"
    },
    {
     "n": 6,
-    "text": "Define and document assist control, timing and calibration",
+    "text": "Verify reliability, disturb, and recovery behavior",
     "tat": 2,
     "lane": "main"
    },
    {
     "n": 7,
-    "text": "Verify vmin with assist enabled, across corners",
+    "text": "Release the selected assist scheme and control requirements",
     "tat": 3,
     "lane": "main"
    }
@@ -11495,11 +11441,11 @@ export const activityDetails: Record<string, ActivityDetail> = {
    }
   ],
   "risks": [
-   "Assist techniques combined without an interaction study",
-   "Assist verified at nominal",
-   "Boost levels beyond reliability limits",
-   "Assist timing not calibrated",
-   "Area cost of assist unbudgeted"
+   "Assist strength optimized at nominal conditions only",
+   "Read improvement traded for unrecognized hold or disturb risk",
+   "Boosted or negative voltages exceed device reliability limits",
+   "Assist supply-generation cost excluded from the PPA tradeoff",
+   "Statistical benefit claimed without array-level yield analysis"
   ],
   "roles": [
    {
@@ -11547,9 +11493,9 @@ export const activityDetails: Record<string, ActivityDetail> = {
    "Bitcell characterization data available"
   ],
   "exit": [
-   "Vmin target met statistically, not at nominal",
-   "Assist interactions studied rather than assumed",
-   "Boost levels within the reliability limits AMS-14 will check"
+   "Assist benefit is quantified for read and write Vmin",
+   "Assist range is robust across PVT and statistical variation",
+   "Reliability, disturb, timing, and recovery constraints are satisfied"
   ],
   "dependsOn": [
    "AMS-05",
@@ -11603,49 +11549,49 @@ export const activityDetails: Record<string, ActivityDetail> = {
   "steps": [
    {
     "n": 1,
-    "text": "Define and document pushed-rule set proposal and foundry pre-alignment",
+    "text": "Define array floorplan, tiling, power, and pin architecture",
     "tat": 2,
     "lane": "main"
    },
    {
     "n": 2,
-    "text": "Define and document bitcell array layout at pushed rules",
+    "text": "Implement bitcell tiling and array routing",
     "tat": 4,
     "lane": "main"
    },
    {
     "n": 3,
-    "text": "Define and document peripheral and assist circuit layout",
+    "text": "Implement periphery with matching and critical-parasitic constraints",
     "tat": 3.5,
     "lane": "main"
    },
    {
     "n": 4,
-    "text": "Define and document dummy, fill and density compliance",
+    "text": "Integrate assist, replica, and timing circuits",
     "tat": 2,
     "lane": "par"
    },
    {
     "n": 5,
-    "text": "Define and document foundry approval submission and iteration",
+    "text": "Run DRC, LVS, antenna, density, and manufacturability checks",
     "tat": 5,
     "lane": "par"
    },
    {
     "n": 6,
-    "text": "Close dRC including pushed-rule waivers",
+    "text": "Review pushed-rule violations and exceptions with the foundry",
     "tat": 3,
     "lane": "main"
    },
    {
     "n": 7,
-    "text": "Close lVS and antenna",
+    "text": "Close parasitic-driven layout issues against circuit targets",
     "tat": 2,
     "lane": "main"
    },
    {
     "n": 8,
-    "text": "Extract layout freeze and handoff",
+    "text": "Release the physically verified macro layout",
     "tat": 1.5,
     "lane": "main"
    }
@@ -11691,11 +11637,11 @@ export const activityDetails: Record<string, ActivityDetail> = {
    }
   ],
   "risks": [
-   "Foundry refuses a pushed rule after layout is built on it",
-   "Density target missed despite the pushed rules",
-   "Approval iterations underestimated",
-   "Fill and density compliance left to the end",
-   "Layout frozen before extraction is proven"
+   "Pushed-rule usage assumed acceptable without written foundry approval",
+   "Array compaction creates unmodeled parasitic or matching loss",
+   "Periphery layout optimized separately from replica timing",
+   "Density and fill impact evaluated after electrical closure",
+   "Foundry rule changes not propagated into the custom layout"
   ],
   "roles": [
    {
@@ -11747,9 +11693,9 @@ export const activityDetails: Record<string, ActivityDetail> = {
    "Foundry pushed-rule approval path agreed in PDK-06"
   ],
   "exit": [
-   "Every pushed rule approved by the foundry in writing",
-   "Achieved density meets the target the decision was taken on",
-   "Layout DRC, LVS and antenna clean, and extractable"
+   "Array and periphery layout meet area and electrical constraints",
+   "DRC, LVS, antenna, density, and required reliability checks are clean",
+   "All pushed-rule usage has documented foundry approval"
   ],
   "dependsOn": [
    "AMS-05",
@@ -11809,43 +11755,43 @@ export const activityDetails: Record<string, ActivityDetail> = {
   "steps": [
    {
     "n": 1,
-    "text": "Select statistical methodology — importance sampling, scaled sigma",
+    "text": "Define target failure probability and array-level yield requirement",
     "tat": 1.5,
     "lane": "main"
    },
    {
     "n": 2,
-    "text": "Validate bitcell variation model against silicon data",
+    "text": "Identify dominant read, write, and hold failure mechanisms",
     "tat": 2,
     "lane": "main"
    },
    {
     "n": 3,
-    "text": "Analyze sigma-Vmin for read, write and retention",
+    "text": "Build the required Monte Carlo or importance-sampling methodology",
     "tat": 3,
     "lane": "main"
    },
    {
     "n": 4,
-    "text": "Analyze sense amplifier offset distribution",
+    "text": "Characterize bitcell and critical periphery variation",
     "tat": 2,
     "lane": "par"
    },
    {
     "n": 5,
-    "text": "Define and document peripheral and timing variation contribution",
+    "text": "Project read, write, and hold Vmin distributions to target array size",
     "tat": 1.5,
     "lane": "par"
    },
    {
     "n": 6,
-    "text": "Define and document array-level yield projection with redundancy applied",
+    "text": "Evaluate assist and design sensitivity on yield",
     "tat": 2,
     "lane": "main"
    },
    {
     "n": 7,
-    "text": "Define and document statistical margin report and signoff",
+    "text": "Set the signoff margin and report confidence",
     "tat": 1.5,
     "lane": "main"
    }
@@ -11889,11 +11835,11 @@ export const activityDetails: Record<string, ActivityDetail> = {
    }
   ],
   "risks": [
-   "Brute-force Monte Carlo used at the tail",
-   "Variation model unvalidated",
-   "Redundancy assumed to cover the tail",
-   "Retention overlooked",
-   "Result reported without the methodology"
+   "Typical Monte Carlo used to estimate rare array failures",
+   "Cell-level sigma quoted without scaling to array size",
+   "Peripheral variation excluded from Vmin analysis",
+   "Importance-sampling model not validated against direct simulation",
+   "Yield margin reported without a confidence statement"
   ],
   "roles": [
    {
@@ -11945,9 +11891,9 @@ export const activityDetails: Record<string, ActivityDetail> = {
    "Foundry variation models and silicon data accessible"
   ],
   "exit": [
-   "Sigma targets met for read, write and retention",
-   "Variation model validated against silicon, not assumed",
-   "Yield projection handed to the cost model with its methodology"
+   "Read, write, and hold failure distributions are quantified",
+   "Array-size impact is included in the yield projection",
+   "Vmin and margin targets are supported by statistically credible analysis"
   ],
   "dependsOn": [
    "AMS-05",
@@ -12008,37 +11954,37 @@ export const activityDetails: Record<string, ActivityDetail> = {
   "steps": [
    {
     "n": 1,
-    "text": "Select redundancy scheme — row, column, or both",
+    "text": "Define repair coverage and spare-resource targets",
     "tat": 1,
     "lane": "main"
    },
    {
     "n": 2,
-    "text": "Allocate spare against the projected defect distribution",
+    "text": "Select row, column, or hybrid redundancy architecture",
     "tat": 1.5,
     "lane": "main"
    },
    {
     "n": 3,
-    "text": "Define repair interface with the BISR architecture",
+    "text": "Define repair address encoding and storage format",
     "tat": 1.25,
     "lane": "main"
    },
    {
     "n": 4,
-    "text": "Allocate fuse and repair storage",
+    "text": "Integrate memory repair controls with MBIST / BISR",
     "tat": 1,
     "lane": "par"
    },
    {
     "n": 5,
-    "text": "Define and document repair algorithm agreement with DFT",
+    "text": "Verify repair loading, application, and boot sequencing",
     "tat": 1,
     "lane": "par"
    },
    {
     "n": 6,
-    "text": "Verify redundancy and yield contribution analysis",
+    "text": "Run fault-injection scenarios through detection and repair",
     "tat": 2.25,
     "lane": "main"
    }
@@ -12082,11 +12028,11 @@ export const activityDetails: Record<string, ActivityDetail> = {
    }
   ],
   "risks": [
-   "Repair interface specified independently by both sides",
-   "Spare allocation not matched to the defect distribution",
-   "Fuse capacity insufficient",
-   "Redundancy credited twice",
-   "Repair algorithm not validated against agreed"
+   "Spare resources selected without a yield model",
+   "Memory repair encoding differs from BISR assumptions",
+   "Fuse capacity checked after redundancy architecture is fixed",
+   "Repair sequence not verified across reset and power states",
+   "Fault injection proves detection but not restored operation"
   ],
   "roles": [
    {
@@ -12134,9 +12080,9 @@ export const activityDetails: Record<string, ActivityDetail> = {
    "Defect density projection from TECH-07"
   ],
   "exit": [
-   "Repair interface written jointly with DFT, not in parallel",
-   "Spare allocation matched to the projected defect modes",
-   "Fuse capacity sized against the worst-case repair set"
+   "Spare row and column resources are defined from yield assumptions",
+   "Repair encoding and BISR interfaces are fully specified",
+   "Fault injection demonstrates detection, repair, and restored memory operation"
   ],
   "dependsOn": [
    "AMS-05",
@@ -12197,43 +12143,43 @@ export const activityDetails: Record<string, ActivityDetail> = {
   "steps": [
    {
     "n": 1,
-    "text": "Define view requirement against the tool matrix",
+    "text": "Define the required characterization corners, arcs, and view set",
     "tat": 1,
     "lane": "main"
    },
    {
     "n": 2,
-    "text": "Characterize timing across the signoff corners",
+    "text": "Run extracted timing and power characterization",
     "tat": 3,
     "lane": "main"
    },
    {
     "n": 3,
-    "text": "Characterize power and leakage",
+    "text": "Generate Liberty and functional simulation models",
     "tat": 2,
     "lane": "par"
    },
    {
     "n": 4,
-    "text": "Generate physical abstract, blockage and pin view",
+    "text": "Generate LEF, GDS, CDL / SPICE, and required physical views",
     "tat": 1.5,
     "lane": "par"
    },
    {
     "n": 5,
-    "text": "Generate functional and behavioural model",
+    "text": "Generate test, DFT, and integration collateral",
     "tat": 1.5,
     "lane": "par"
    },
    {
     "n": 6,
-    "text": "Define and document compiler-equivalence check against a reference instance",
+    "text": "Run cross-view consistency and downstream tool checks",
     "tat": 2,
     "lane": "main"
    },
    {
     "n": 7,
-    "text": "Verify view release and integration",
+    "text": "Release the compiler-equivalent memory package",
     "tat": 4,
     "lane": "main"
    }
@@ -12277,11 +12223,11 @@ export const activityDetails: Record<string, ActivityDetail> = {
    }
   ],
   "risks": [
-   "Characterized at fewer corners than signoff runs",
-   "Equivalence assumed from the file list",
-   "Behavioural model diverging from the circuit",
-   "Abstract blockages wrong",
-   "Views released before the layout freezes"
+   "Only nominal memory views generated",
+   "Timing, physical, and circuit views produced from different macro revisions",
+   "Characterization corners do not match program signoff corners",
+   "Internal timing arcs omitted from the Liberty model",
+   "Views released without downstream integration checks"
   ],
   "roles": [
    {
@@ -12333,9 +12279,9 @@ export const activityDetails: Record<string, ActivityDetail> = {
    "Tool view requirements known from PDK-08"
   ],
   "exit": [
-   "Characterized at every corner signoff will run",
-   "Equivalence proven by substitution, not by inspection",
-   "Views released only after the layout freeze"
+   "Required timing and power arcs are characterized across approved corners",
+   "All implementation views are generated from the same qualified macro release",
+   "Views pass consistency and integration checks in downstream tools"
   ],
   "dependsOn": [
    "AMS-06",
@@ -12397,43 +12343,43 @@ export const activityDetails: Record<string, ActivityDetail> = {
   "steps": [
    {
     "n": 1,
-    "text": "Set up design environment and testbench framework",
+    "text": "Select the circuit topology and device operating points",
     "tat": 1.5,
     "lane": "main"
    },
    {
     "n": 2,
-    "text": "Define and document topology exploration per block",
+    "text": "Implement the transistor-level schematic",
     "tat": 3,
     "lane": "main"
    },
    {
     "n": 3,
-    "text": "Define device sizing and operating point",
+    "text": "Verify nominal DC, AC, transient, noise, and functional behavior",
     "tat": 3.5,
     "lane": "main"
    },
    {
     "n": 4,
-    "text": "Simulate pre-layout corner",
+    "text": "Run required PVT corner simulations",
     "tat": 3,
     "lane": "main"
    },
    {
     "n": 5,
-    "text": "Analyze pre-layout Monte Carlo and mismatch",
+    "text": "Run Monte Carlo and mismatch analysis on critical metrics",
     "tat": 2.5,
     "lane": "par"
    },
    {
     "n": 6,
-    "text": "Define and document testbench and regression suite per block",
+    "text": "Verify startup, calibration, trim, and fault behavior where applicable",
     "tat": 2.5,
     "lane": "par"
    },
    {
     "n": 7,
-    "text": "Review pre-layout design and layout entry gate",
+    "text": "Release layout constraints and the pre-layout design baseline",
     "tat": 5,
     "lane": "main"
    }
@@ -12477,11 +12423,11 @@ export const activityDetails: Record<string, ActivityDetail> = {
    }
   ],
   "risks": [
-   "Blocks entering layout without passing the gate",
-   "Corner simulation run at typical mismatch",
-   "Testbenches written per block by different people",
-   "Device models used from an unfrozen PDK",
-   "No regression suite"
+   "Schematic optimized only at typical conditions",
+   "Monte Carlo deferred until after layout",
+   "Device operating points violate reliability limits at corners",
+   "Layout-critical matching and parasitic constraints not documented",
+   "Trim or calibration used to hide insufficient intrinsic margin"
   ],
   "roles": [
    {
@@ -12537,9 +12483,9 @@ export const activityDetails: Record<string, ActivityDetail> = {
    "Simulator versions qualified by PDK-08"
   ],
   "exit": [
-   "Every block passes a pre-layout gate before entering layout",
-   "Corner simulation includes mismatch, not only process corners",
-   "Regression suite exists per block and runs automatically"
+   "Schematic meets required functional and electrical specifications across PVT",
+   "Critical variation and mismatch sensitivities are understood",
+   "Design is stable enough to proceed to layout with documented constraints"
   ],
   "dependsOn": [
    "AMS-01",
@@ -12598,49 +12544,49 @@ export const activityDetails: Record<string, ActivityDetail> = {
   "steps": [
    {
     "n": 1,
-    "text": "Place floorplan and pin per macro",
+    "text": "Define device placement, matching, shielding, and routing constraints",
     "tat": 2,
     "lane": "main"
    },
    {
     "n": 2,
-    "text": "Define and document matching-critical device layout",
+    "text": "Place matched and sensitive devices",
     "tat": 4,
     "lane": "main"
    },
    {
     "n": 3,
-    "text": "Define and document shielding, guarding and isolation structures",
+    "text": "Route signal, bias, clock, and supply networks",
     "tat": 3,
     "lane": "main"
    },
    {
     "n": 4,
-    "text": "Route supply and bias with EM compliance",
+    "text": "Complete guard rings, shielding, taps, and reliability structures",
     "tat": 3,
     "lane": "par"
    },
    {
     "n": 5,
-    "text": "Define and document fill and density compliance without disturbing matching",
+    "text": "Run DRC, LVS, and antenna checks",
     "tat": 2.5,
     "lane": "par"
    },
    {
     "n": 6,
-    "text": "Close dRC per macro",
+    "text": "Insert required density fill and recheck sensitive parasitics",
     "tat": 4,
     "lane": "main"
    },
    {
     "n": 7,
-    "text": "Close lVS and antenna",
+    "text": "Review layout against electrical and integration constraints",
     "tat": 3,
     "lane": "main"
    },
    {
     "n": 8,
-    "text": "Extract setup and layout freeze",
+    "text": "Release the extracted-verification layout baseline",
     "tat": 2,
     "lane": "main"
    }
@@ -12686,11 +12632,11 @@ export const activityDetails: Record<string, ActivityDetail> = {
    }
   ],
   "risks": [
-   "Fill applied late and without care",
-   "Matching implemented by intent rather than by construction",
-   "EM checked only at signoff",
-   "Pin placement not agreed with physical design",
-   "Layout frozen without an extraction check"
+   "Matching-critical devices placed without common-centroid or gradient consideration where required",
+   "Sensitive nodes routed without coupling and shielding analysis",
+   "Fill inserted after electrical signoff without re-extraction",
+   "DRC-clean layout assumed to preserve schematic performance",
+   "Pin and supply geometry finalized without top-level integration review"
   ],
   "roles": [
    {
@@ -12746,9 +12692,9 @@ export const activityDetails: Record<string, ActivityDetail> = {
    "Macro placement intent known from ARCH-08"
   ],
   "exit": [
-   "Every macro DRC, LVS and antenna clean",
-   "Fill applied without disturbing matching structures",
-   "Pin placement agreed with physical design before freeze"
+   "Layout matches the approved schematic and electrical constraints",
+   "DRC, LVS, antenna, density, and fill checks are clean",
+   "Critical layout assumptions are ready for extracted verification"
   ],
   "dependsOn": [
    "AMS-02",
@@ -12816,43 +12762,43 @@ export const activityDetails: Record<string, ActivityDetail> = {
   "steps": [
    {
     "n": 1,
-    "text": "Select extraction flow setup and parasitic model",
+    "text": "Extract the layout with the qualified parasitic setup",
     "tat": 1.5,
     "lane": "main"
    },
    {
     "n": 2,
-    "text": "Simulate post-layout functional per block",
+    "text": "Correlate extracted nominal results against the pre-layout baseline",
     "tat": 3,
     "lane": "main"
    },
    {
     "n": 3,
-    "text": "Close pVT corner post-layout",
+    "text": "Run required PVT simulations on the extracted design",
     "tat": 4,
     "lane": "main"
    },
    {
     "n": 4,
-    "text": "Analyze monte Carlo and mismatch post-layout",
+    "text": "Run Monte Carlo or mismatch analysis on critical metrics",
     "tat": 3,
     "lane": "par"
    },
    {
     "n": 5,
-    "text": "Analyze pre- to post-layout degradation",
+    "text": "Analyze coupling, RC, and layout-dependent performance loss",
     "tat": 2,
     "lane": "par"
    },
    {
     "n": 6,
-    "text": "Simulate layout iteration requests and re",
+    "text": "Iterate circuit or layout where margins are insufficient",
     "tat": 4.5,
     "lane": "main"
    },
    {
     "n": 7,
-    "text": "Characterize data assembly",
+    "text": "Release the final extracted verification report",
     "tat": 3,
     "lane": "main"
    }
@@ -12896,11 +12842,11 @@ export const activityDetails: Record<string, ActivityDetail> = {
    }
   ],
   "risks": [
-   "No layout iteration in the plan",
-   "Corner closure on a subset of blocks",
-   "Parasitic model too coarse",
-   "Degradation not analyzed",
-   "Monte Carlo run at reduced sample count"
+   "Post-layout verification limited to nominal conditions",
+   "Extraction setup differs from the qualified signoff environment",
+   "Large pre-to-post-layout delta accepted without root cause",
+   "Monte Carlo run on schematic instead of the extracted critical paths",
+   "Layout changes made after extracted signoff without rerun"
   ],
   "roles": [
    {
@@ -12956,9 +12902,9 @@ export const activityDetails: Record<string, ActivityDetail> = {
    "Extraction decks validated by PDK-10"
   ],
   "exit": [
-   "Every block closed post-layout at every signoff corner",
-   "Degradation from pre-layout quantified per block",
-   "Characterization data complete enough to release the macros"
+   "Extracted simulations meet the required electrical specification across PVT",
+   "Monte Carlo or statistical checks cover critical post-layout metrics",
+   "Any pre-to-post-layout degradation is understood and dispositioned"
   ],
   "dependsOn": [
    "AMS-11",
@@ -13023,43 +12969,43 @@ export const activityDetails: Record<string, ActivityDetail> = {
   "steps": [
    {
     "n": 1,
-    "text": "Define reliability requirement per macro",
+    "text": "Define the applicable reliability checks and mission profile",
     "tat": 1,
     "lane": "main"
    },
    {
     "n": 2,
-    "text": "Analyze electromigration on supply and signal routing",
+    "text": "Check device voltage, current, and operating-area limits",
     "tat": 2.5,
     "lane": "main"
    },
    {
     "n": 3,
-    "text": "Analyze iR drop within macros",
+    "text": "Run EM / IR analysis on critical supply and high-current paths",
     "tat": 1.5,
     "lane": "par"
    },
    {
     "n": 4,
-    "text": "Simulate aging and lifetime at the rated conditions",
+    "text": "Evaluate aging and lifetime degradation on sensitive circuits",
     "tat": 2.5,
     "lane": "main"
    },
    {
     "n": 5,
-    "text": "Verify eSD path through the macro",
+    "text": "Verify ESD protection paths and clamp assumptions",
     "tat": 2,
     "lane": "par"
    },
    {
     "n": 6,
-    "text": "Review latch-up and guard structure",
+    "text": "Review latch-up spacing, taps, guard rings, and injection risks",
     "tat": 1.5,
     "lane": "par"
    },
    {
     "n": 7,
-    "text": "Define and document reliability report and waiver disposition",
+    "text": "Close reliability violations and release the assessment",
     "tat": 4,
     "lane": "main"
    }
@@ -13103,11 +13049,11 @@ export const activityDetails: Record<string, ActivityDetail> = {
    }
   ],
   "risks": [
-   "Aging simulated at nominal conditions",
-   "EM checked on supplies only",
-   "ESD path assumed from the strategy",
-   "Assist boost stress not fed back",
-   "Waivers granted without a lifetime calculation"
+   "Reliability checked using typical rather than lifetime worst-case activity",
+   "EM evaluated without extracted current distribution",
+   "Aging analysis omitted for timing- or bias-sensitive circuits",
+   "ESD reviewed independently of package and I/O current paths",
+   "Reliability rerun omitted after late layout changes"
   ],
   "roles": [
    {
@@ -13159,9 +13105,9 @@ export const activityDetails: Record<string, ActivityDetail> = {
    "ESD strategy fixed by PDK-07"
   ],
   "exit": [
-   "Aging simulated against the product's real mission profile",
-   "EM checked on signal routing as well as supplies",
-   "Every waiver carries a quantified lifetime impact"
+   "Applicable device, interconnect, aging, ESD, and latch-up checks pass",
+   "Worst-case operating and lifetime conditions are represented",
+   "Reliability violations are closed or formally dispositioned before release"
   ],
   "dependsOn": [
    "AMS-06",
@@ -13226,49 +13172,49 @@ export const activityDetails: Record<string, ActivityDetail> = {
   "steps": [
    {
     "n": 1,
-    "text": "Verify view requirement confirmation with physical design and",
+    "text": "Define the required hard-macro view set and release manifest",
     "tat": 1,
     "lane": "main"
    },
    {
     "n": 2,
-    "text": "Define gDS finalization and macro boundary",
+    "text": "Generate LEF and physical abstracts",
     "tat": 1.5,
     "lane": "main"
    },
    {
     "n": 3,
-    "text": "Generate abstract — blockages, pins, routing layers",
+    "text": "Generate timing and power models",
     "tat": 1.5,
     "lane": "main"
    },
    {
     "n": 4,
-    "text": "Characterize timing view generation from data",
+    "text": "Generate GDS, CDL / SPICE, and LVS collateral",
     "tat": 2,
     "lane": "par"
    },
    {
     "n": 5,
-    "text": "Generate cDL netlist and UPF power intent",
+    "text": "Generate behavioral or functional models where required",
     "tat": 1.5,
     "lane": "par"
    },
    {
     "n": 6,
-    "text": "Release behavioural and wreal model",
+    "text": "Document placement, supply, clock, pin, and usage constraints",
     "tat": 1.5,
     "lane": "par"
    },
    {
     "n": 7,
-    "text": "Verify integration on a trial placement",
+    "text": "Run cross-view and downstream tool consistency checks",
     "tat": 2,
     "lane": "main"
    },
    {
     "n": 8,
-    "text": "Release macro and version control",
+    "text": "Release the version-controlled hard-macro package",
     "tat": 2,
     "lane": "main"
    }
@@ -13319,11 +13265,11 @@ export const activityDetails: Record<string, ActivityDetail> = {
    }
   ],
   "risks": [
-   "Abstracts delivered with the models",
-   "Trial placement skipped",
-   "Views inconsistent with the characterization",
-   "Macro released without version control",
-   "Power intent omitted"
+   "Views generated from different schematic or layout revisions",
+   "Timing model omits important mode or constraint behavior",
+   "Physical abstract does not match actual macro boundaries or pins",
+   "Integration constraints exist only in designer knowledge",
+   "Macro released without testing in downstream tools"
   ],
   "roles": [
    {
@@ -13379,9 +13325,9 @@ export const activityDetails: Record<string, ActivityDetail> = {
    "View requirements confirmed with PD and DV"
   ],
   "exit": [
-   "Abstracts released ahead of models, on the schedule PD needs",
-   "Trial placement run and clean before general release",
-   "Every macro version-controlled and its views mutually consistent"
+   "Required hard-macro views are generated from the same qualified design revision",
+   "Views are mutually consistent and load successfully in downstream tools",
+   "Macro constraints and known limitations are documented for integration"
   ],
   "dependsOn": [
    "AMS-10",
@@ -13451,43 +13397,43 @@ export const activityDetails: Record<string, ActivityDetail> = {
   "steps": [
    {
     "n": 1,
-    "text": "Simulate aMS co- environment setup",
+    "text": "Define AMS–digital integration scenarios and abstraction levels",
     "tat": 2,
     "lane": "main"
    },
    {
     "n": 2,
-    "text": "Correlate behavioural model against circuit simulation",
+    "text": "Integrate behavioral or real-number AMS models with the RTL environment",
     "tat": 2.5,
     "lane": "main"
    },
    {
     "n": 3,
-    "text": "Verify boundary and control interface co",
+    "text": "Verify clocks, resets, controls, status, and data interfaces",
     "tat": 3,
     "lane": "main"
    },
    {
     "n": 4,
-    "text": "Simulate startup, calibration and sequencing co",
+    "text": "Verify startup, calibration, trim, and mode transitions",
     "tat": 2.5,
     "lane": "par"
    },
    {
     "n": 5,
-    "text": "Integrate support to RTL and physical design",
+    "text": "Verify relevant power-state and supply sequencing behavior",
     "tat": 5,
     "lane": "par"
    },
    {
     "n": 6,
-    "text": "Integrate errata capture and guide authoring",
+    "text": "Correlate behavioral models against transistor-level or extracted results",
     "tat": 3,
     "lane": "main"
    },
    {
     "n": 7,
-    "text": "Debug bring-up support material and hooks",
+    "text": "Close integration issues and release models for regression",
     "tat": 5.5,
     "lane": "main"
    }
@@ -13531,11 +13477,11 @@ export const activityDetails: Record<string, ActivityDetail> = {
    }
   ],
   "risks": [
-   "Behavioural models never correlated",
-   "Boundary conditions unverified",
-   "Support engineer unassigned",
-   "Errata captured in email",
-   "Calibration sequence not co-simulated"
+   "AMS verification limited to standalone macro simulations",
+   "Behavioral model not correlated with the final circuit implementation",
+   "Reset and calibration sequences verified separately from system control",
+   "Power-state behavior omitted from mixed-signal integration",
+   "Late macro changes not propagated to SoC verification models"
   ],
   "roles": [
    {
@@ -13591,9 +13537,9 @@ export const activityDetails: Record<string, ActivityDetail> = {
    "Co-simulation tools qualified by PDK-08"
   ],
   "exit": [
-   "Every behavioural model correlated against circuit simulation",
-   "Boundary and sequencing verified, not assumed",
-   "Integration guide published and maintained, not held in email"
+   "AMS–digital interfaces are verified in normal, reset, calibration, and power-state scenarios",
+   "Behavioral models are correlated to the qualified AMS implementation",
+   "Integration issues are closed and models are released for SoC regression"
   ],
   "dependsOn": [
    "AMS-11",
@@ -13647,48 +13593,48 @@ export const activityDetails: Record<string, ActivityDetail> = {
   ],
   "criticalPath": true,
   "purpose": [
-   "Decide what the test chip is for—which specific risks it retires—and select the structures that will answer those questions rather than the ones that are easy to include.",
-   "A test chip with no objective becomes a collection of everything anyone wanted to try, and it answers nothing in time to matter. The discipline is subtractive: name the two or three uncertainties that would change a production decision, and carry only what measures them."
+   "Define <b>which product risks the test chip must retire</b>, what must be measured, and which production decision each result will support.",
+   "The test chip should carry only experiments that can change or confirm a production decision while there is still time to act. Risk selection, measurement scope, schedule, die area, and cost therefore need to be resolved together before the vehicle is defined."
   ],
   "steps": [
    {
     "n": 1,
-    "text": "Define objective — which production decisions this chip informs",
+    "text": "Define the production decisions the test chip must support",
     "tat": 1,
     "lane": "main"
    },
    {
     "n": 2,
-    "text": "Select risk item and prioritization",
+    "text": "Select and prioritize the risks that require silicon evidence",
     "tat": 1.5,
     "lane": "main"
    },
    {
     "n": 3,
-    "text": "Make and document the schedule feasibility — does the answer arrive before the decision",
+    "text": "Confirm that silicon results will arrive before the corresponding decisions",
     "tat": 1,
     "lane": "par"
    },
    {
     "n": 4,
-    "text": "Select structure per risk item",
+    "text": "Select the test structures and measurements for each risk",
     "tat": 1,
     "lane": "main"
    },
    {
     "n": 5,
-    "text": "Define and document cost and area budget for the shuttle die",
+    "text": "Close the shuttle die-area and cost budget",
     "tat": 0.75,
     "lane": "par"
    },
    {
     "n": 6,
-    "text": "Define and risk coverage matrix",
+    "text": "Baseline the test-chip specification and risk coverage matrix",
     "tat": 1.5,
     "lane": "main"
    }
   ],
-  "flowNote": "Step 3 can cancel the activity, and should be allowed to. A test chip whose results land after the production design has committed is an expense with no decision attached, and finding that out in week three is far better than in week forty.",
+  "flowNote": "Schedule feasibility is a real decision gate. If the selected shuttle returns silicon after the production design must commit, the test chip cannot retire that risk in time and the scope should be reconsidered before design begins.",
   "consumes": [
    "Node risk assessment from TECH-07",
    "IP readiness gaps from IPR-05",
@@ -13697,11 +13643,11 @@ export const activityDetails: Record<string, ActivityDetail> = {
    "Production design schedule from DEF-08"
   ],
   "produces": [
-   "Test chip objective statement",
-   "Prioritized risk item list",
-   "Schedule feasibility assessment result",
-   "Structure selection per risk",
-   "Shuttle die cost and area budget",
+   "Production decision and test-chip objective statement",
+   "Prioritized silicon-risk list",
+   "Schedule feasibility assessment",
+   "Risk-to-structure and measurement mapping",
+   "Shuttle die-area and cost budget",
    "Test chip specification and risk coverage matrix"
   ],
   "producedBy": [
@@ -13716,20 +13662,20 @@ export const activityDetails: Record<string, ActivityDetail> = {
    {
     "id": "TC-D1",
     "rel": "produces",
-    "text": "Test chip specification and risk coverage matrix. The deliverable the matrix is what every later result is reported against."
+    "text": "<b>Test chip specification and risk coverage matrix.</b> This activity defines the objective, selected risks, measurements, and decision criteria that later test-chip work is executed and reported against."
    },
    {
     "id": "TC-D5",
     "rel": "feeds",
-    "text": "Design guidance and margin decisions. The guidance can only address risks this activity chose to carry—everything else stays unmeasured."
+    "text": "<b>Design guidance and margin decisions.</b> TC-01 determines which production risks can ultimately be informed by test-chip silicon."
    }
   ],
   "risks": [
-   "Scope grows until the shuttle is missed",
-   "Results arrive after the decision",
-   "Structures chosen for measurability rather than for risk",
-   "No decision rule attached to a result",
-   "Area budget set after structure selection"
+   "Test-chip scope grows beyond the shuttle area or schedule",
+   "Silicon results arrive after the production decision they were intended to support",
+   "Structures are selected because they are easy to measure rather than because they address the highest product risk",
+   "Measurements are defined without a clear decision criterion",
+   "Area and cost are budgeted only after structures have been selected"
   ],
   "roles": [
    {
@@ -13772,14 +13718,14 @@ export const activityDetails: Record<string, ActivityDetail> = {
    ]
   ],
   "entry": [
-   "Node risk assessment available from TECH-07",
-   "IP and memory gaps known from IPR-05 and PDK-06",
-   "Production design schedule dated by DEF-08"
+   "Node and technology risks from TECH-07",
+   "IP and memory readiness gaps from IPR-05 and PDK-06",
+   "Production schedule and decision dates from DEF-08"
   ],
   "exit": [
-   "Every carried structure traces to a named risk and a decision rule",
-   "Schedule feasibility confirmed against the decision dates",
-   "Area and cost budget fixed before structures are finalized"
+   "Every selected structure traces to a named risk and production decision",
+   "Required measurements and decision criteria are defined before design starts",
+   "Schedule, area, and cost feasibility are confirmed before the specification is frozen"
   ],
   "dependsOn": [
    "TECH-07",
@@ -13832,76 +13778,76 @@ export const activityDetails: Record<string, ActivityDetail> = {
   ],
   "criticalPath": true,
   "purpose": [
-   "Design and integrate the vehicle itself—the IP under test, its access wrappers, the process monitors and the measurement structures—as a small chip that has to work first time.",
-   "A test chip gets one shuttle. There is no bring-up iteration and no respin, so the access paths, the monitors and the pad ring have to be right on submission."
+   "Define and integrate <b>the IP, circuits, process monitors, and measurement structures that will be placed on the test chip</b>, together with the access, control, pad, and measurement infrastructure required to characterize them.",
+   "TC-01 identifies the risks that need silicon evidence. This activity turns those risks into concrete test-chip content: what will be fabricated, in which configuration, how each structure will be controlled and observed, and how the complete vehicle will be integrated before physical implementation."
   ],
   "steps": [
    {
     "n": 1,
-    "text": "Integrate iP-under-test plan",
+    "text": "Define the IP / circuits to be included and their target configurations",
     "tat": 1,
     "lane": "main"
    },
    {
     "n": 2,
-    "text": "Define and document device-under-test wrapper and access path design",
+    "text": "Design DUT wrappers, controls, and access paths",
     "tat": 3,
     "lane": "main"
    },
    {
     "n": 3,
-    "text": "Define and document ring oscillator and process monitor array",
+    "text": "Define ring-oscillator and process-monitor arrays",
     "tat": 2,
     "lane": "par"
    },
    {
     "n": 4,
-    "text": "Measure and PCM structure design",
+    "text": "Design measurement and PCM structures",
     "tat": 3,
     "lane": "main"
    },
    {
     "n": 5,
-    "text": "Test structure library assembly",
+    "text": "Assemble the reusable test-structure library",
     "tat": 2,
     "lane": "par"
    },
    {
     "n": 6,
-    "text": "Integrate top-level and pad assignment",
+    "text": "Integrate the top level and close pad assignment",
     "tat": 2.5,
     "lane": "main"
    },
    {
     "n": 7,
-    "text": "Define and document pad ring and ESD for the shuttle die",
+    "text": "Define the pad ring, ESD, and external measurement interfaces",
     "tat": 1.5,
     "lane": "par"
    },
    {
     "n": 8,
-    "text": "Verify of access paths and measurement modes",
+    "text": "Verify all access paths and measurement modes",
     "tat": 2.5,
     "lane": "main"
    }
   ],
-  "flowNote": "Step 8 gets two and a half weeks for a chip that is mostly structures, because an access path that does not work makes the structure behind it unmeasurable. Every mode has to be exercised in simulation, since there is no second chance in silicon.",
+  "flowNote": "Content definition comes before integration. First decide exactly which IP, circuits, memory structures, and monitors will be fabricated and in what configuration; then build the wrappers, access paths, measurement structures, top-level integration, and external interfaces around that selected content.",
   "consumes": [
    "Test chip specification and coverage matrix from TC-01",
-   "IP-under-test deliverables from AMS and IPR",
+   "selected IP / circuit deliverables from AMS and IPR",
    "Process monitor structure definitions from the foundry",
    "Shuttle die area and pad count limits from TC-03",
    "PDK and libraries from PDK-13"
   ],
   "produces": [
-   "IP-under-test integration plan",
-   "IP-under-test integration with access wrappers",
-   "Ring oscillator and process monitor arrays",
-   "Measurement and PCM structures",
-   "Assembled test structure library",
-   "Top-level netlist with pad assignment",
-   "Pad ring and ESD design for the shuttle",
-   "Access path and measurement mode verification results"
+   "Test-chip content and target-configuration definition",
+   "DUT wrapper and access architecture",
+   "Ring-oscillator and process-monitor array definition",
+   "Measurement and PCM structure set",
+   "Assembled test-structure library",
+   "Integrated top-level netlist and pad assignment",
+   "Pad-ring / ESD and measurement-interface definition",
+   "Access-path and measurement-mode verification results"
   ],
   "producedBy": [
    1,
@@ -13917,20 +13863,20 @@ export const activityDetails: Record<string, ActivityDetail> = {
    {
     "id": "TC-D2",
     "rel": "feeds",
-    "text": "Test chip GDS and shuttle submission record. The design half—<code>TC-04</code> turns it into a submittable database."
+    "text": "<b>Test chip GDS and shuttle submission record.</b> TC-02 defines the selected test-chip content and target configurations, then provides the integrated design and measurement infrastructure that TC-04 converts into a physically signed-off shuttle database."
    },
    {
     "id": "TC-D1",
     "rel": "feeds",
-    "text": "Test chip specification and risk coverage matrix. Where a structure cannot be built as specified, the matrix is what gets updated."
+    "text": "<b>Test chip specification and risk coverage matrix.</b> The selected IP, circuits, monitors, and measurement structures are checked against the risks and measurements committed in TC-01."
    }
   ],
   "risks": [
-   "Access paths unverified",
-   "Pad count exceeded",
-   "IP under test modified for the vehicle",
-   "Monitors placed without regard to position",
-   "No redundancy in critical structures"
+   "Test-chip content is selected without tracing each structure back to a TC-01 risk",
+   "Target configuration differs from the configuration intended for the production design",
+   "Access paths or measurement modes are not fully verified before submission",
+   "Pad count or measurement resources force late changes to the selected structures",
+   "Critical experiments rely on a single structure with no redundancy"
   ],
   "roles": [
    {
@@ -13939,7 +13885,7 @@ export const activityDetails: Record<string, ActivityDetail> = {
    },
    {
     "r": "Analog designers",
-    "d": "IP-under-test wrappers and measurement paths"
+    "d": "selected IP / circuit wrappers and measurement paths"
    },
    {
     "r": "Device engineer",
@@ -13981,14 +13927,14 @@ export const activityDetails: Record<string, ActivityDetail> = {
    ]
   ],
   "entry": [
-   "Specification and coverage matrix from TC-01",
-   "IP-under-test available in a form that can be instantiated",
-   "Shuttle die area and pad limits known"
+   "Test chip specification and risk coverage matrix from TC-01",
+   "Candidate IP, circuits, memory structures, and process monitors available for silicon evaluation",
+   "Shuttle die-area, pad-count, and process-option limits"
   ],
   "exit": [
-   "Every structure reachable through a verified access path",
-   "Monitors distributed to see across-die variation",
-   "Pad budget met without unverified multiplexing"
+   "Every selected risk is mapped to a defined test-chip structure and target configuration",
+   "Every test structure is reachable through a verified access and measurement path",
+   "Pad, ESD, control, and measurement-mode requirements close within shuttle limits"
   ],
   "dependsOn": [
    "TC-01",
@@ -14040,42 +13986,42 @@ export const activityDetails: Record<string, ActivityDetail> = {
   ],
   "criticalPath": false,
   "purpose": [
-   "Book the shuttle slot and work backwards from its submission date—because the shuttle calendar is fixed, and missing a slot costs a quarter rather than a week.",
-   "One M/M across four weeks: almost all of this is scheduling and paperwork. Its importance is out of proportion to its effort, because the submission date it fixes is what every other test chip activity is planned against."
+   "Secure an MPW shuttle slot and <b>translate its fixed submission date into the internal schedule the test-chip team must meet</b>.",
+   "MPW dates are externally fixed. Missing a cutoff can delay silicon by an entire shuttle cycle, so format requirements, approvals, physical-verification closure, and data submission must be planned backward from the confirmed slot."
   ],
   "steps": [
    {
     "n": 1,
-    "text": "Review shuttle calendar and slot options",
+    "text": "Review MPW calendars and identify viable shuttle windows",
     "tat": 1,
     "lane": "main"
    },
    {
     "n": 2,
-    "text": "Define and document foundry or broker engagement and pricing",
+    "text": "Confirm foundry or broker pricing and process-option eligibility",
     "tat": 0.75,
     "lane": "par"
    },
    {
     "n": 3,
-    "text": "Book slot against the production decision dates",
+    "text": "Book the shuttle against the production decision timeline",
     "tat": 1,
     "lane": "main"
    },
    {
     "n": 4,
-    "text": "Analyze data format and submission requirement collection",
+    "text": "Collect data-format, layer, and submission requirements",
     "tat": 0.75,
     "lane": "par"
    },
    {
     "n": 5,
-    "text": "Define and document submission schedule and checklist working backwards from the slot",
+    "text": "Build the backward-planned submission schedule and checklist",
     "tat": 2,
     "lane": "main"
    }
   ],
-  "flowNote": "Step 5 is the useful output. A shuttle slot is a date on which a compliant database must exist; scheduling backwards from it is what tells TC-04 when physical verification actually has to finish.",
+  "flowNote": "The key output is the backward-planned schedule. The shuttle submission date is fixed, so TC-04 needs an internal physical-verification deadline with margin rather than simply inheriting the foundry cutoff.",
   "consumes": [
    "Test chip objective and schedule feasibility from TC-01",
    "Shuttle calendars from the foundry or broker",
@@ -14084,34 +14030,32 @@ export const activityDetails: Record<string, ActivityDetail> = {
    "Submission format requirements"
   ],
   "produces": [
-   "Shuttle slot options and pricing",
-   "Foundry or broker engagement with pricing",
-   "Booked slot with confirmation",
-   "Data format and submission requirements",
-   "Backward-planned submission schedule",
-   "Submission checklist"
+   "Viable MPW shuttle options",
+   "Foundry / broker pricing and eligibility record",
+   "Confirmed MPW slot",
+   "Submission requirement record",
+   "Backward-planned submission schedule and checklist"
   ],
   "producedBy": [
    1,
    2,
    3,
    4,
-   5,
    5
   ],
   "rel": [
    {
     "id": "TC-D2",
     "rel": "feeds",
-    "text": "Test chip GDS and shuttle submission record. The booking and its requirements are half the submission record; the database is the other half."
+    "text": "<b>Test chip GDS and shuttle submission record.</b> This activity provides the confirmed shuttle slot, submission requirements, and backward schedule used to control the physical implementation and submission."
    }
   ],
   "risks": [
-   "Slot booked without checking the production decision date",
-   "Submission requirements collected late",
-   "Backward schedule not enforced",
-   "No contingency slot identified",
-   "Cost approved after booking"
+   "A shuttle slot is booked without checking when the production decision needs the result",
+   "Submission requirements are collected too late",
+   "The backward schedule does not include enough physical-verification margin",
+   "No contingency shuttle is identified",
+   "Shuttle cost is committed before budget approval"
   ],
   "roles": [
    {
@@ -14150,14 +14094,14 @@ export const activityDetails: Record<string, ActivityDetail> = {
    ]
   ],
   "entry": [
-   "Objective and schedule feasibility confirmed by TC-01",
-   "Shuttle calendars available",
-   "Budget authority for the shuttle cost"
+   "Test-chip objective and schedule feasibility from TC-01",
+   "Foundry or broker MPW calendars and pricing",
+   "Budget authority for the required shuttle slot"
   ],
   "exit": [
-   "Slot confirmed in writing with a submission date",
-   "Submission requirements collected and understood",
-   "Backward schedule agreed with physical design"
+   "The MPW slot and submission date are confirmed in writing",
+   "Submission formats, layer rules, and administrative requirements are understood",
+   "A backward-planned schedule with physical-verification margin is agreed with TC-04"
   ],
   "dependsOn": [
    "TC-01",
@@ -14203,25 +14147,25 @@ export const activityDetails: Record<string, ActivityDetail> = {
   ],
   "criticalPath": true,
   "purpose": [
-   "Implement the test chip physically and sign it off to shuttle submission standard—the same DRC, LVS and antenna closure a production die needs, on a fraction of the schedule.",
-   "The vehicle is small and the standard is not reduced. A shuttle rejects a non-compliant database, and the rejection costs the slot."
+   "Implement the test chip physically and <b>close the database to shuttle submission requirements</b> while preserving the electrical conditions needed for accurate measurement.",
+   "The test chip may be small, but physical-verification standards are not reduced. DRC, LVS, antenna, density, frame compliance, timing, and measurement-quality power delivery must all close before the booked submission date."
   ],
   "steps": [
    {
     "n": 1,
-    "text": "Place floorplan and structure",
+    "text": "Define the floorplan and place the measurement structures",
     "tat": 1.5,
     "lane": "main"
    },
    {
     "n": 2,
-    "text": "Place and route",
+    "text": "Place and route the integrated test-chip design",
     "tat": 2.5,
     "lane": "main"
    },
    {
     "n": 3,
-    "text": "Measure power delivery network for accuracy",
+    "text": "Implement the measurement-grade power delivery network",
     "tat": 2,
     "lane": "par"
    },
@@ -14233,30 +14177,30 @@ export const activityDetails: Record<string, ActivityDetail> = {
    },
    {
     "n": 5,
-    "text": "Define and document fill, seal ring and shuttle frame compliance",
+    "text": "Complete fill, seal-ring, and shuttle-frame requirements",
     "tat": 1.5,
     "lane": "par"
    },
    {
     "n": 6,
-    "text": "Verify physical — DRC, antenna, density",
+    "text": "Close DRC, antenna, density, and required physical checks",
     "tat": 3,
     "lane": "main"
    },
    {
     "n": 7,
-    "text": "Close lVS",
+    "text": "Close LVS and final netlist consistency",
     "tat": 1.5,
     "lane": "par"
    },
    {
     "n": 8,
-    "text": "Define and document gDS assembly and shuttle submission",
+    "text": "Assemble the final GDS / OASIS and submit to the shuttle",
     "tat": 2.5,
     "lane": "main"
    }
   ],
-  "flowNote": "Step 3 exists because a test chip measures small signals. A power delivery network adequate for function but noisy in the measurement bands turns a characterization result into an argument about the vehicle rather than the device.",
+  "flowNote": "Measurement quality is part of physical closure. Power delivery, sensitive routing, monitor placement, and shuttle-frame compliance must be resolved together with DRC / LVS rather than deferred to the lab.",
   "consumes": [
    "Test chip netlist and structures from TC-02",
    "Submission requirements and date from TC-03",
@@ -14265,15 +14209,14 @@ export const activityDetails: Record<string, ActivityDetail> = {
    "Measurement accuracy requirements from TC-01"
   ],
   "produces": [
-   "Floorplan and routed database",
-   "Placed and routed shuttle database",
-   "Measurement-grade power delivery network",
-   "Timing closure results on access and control paths",
-   "Fill, seal ring and frame compliance record",
-   "Physical verification clean reports",
+   "Test-chip floorplan and structure placement",
+   "Placed-and-routed shuttle database",
+   "Measurement-grade PDN",
+   "Timing closure on access and control paths",
+   "Fill / seal-ring / frame compliance record",
+   "Physical-verification closure reports",
    "LVS closure record",
-   "Shuttle frame compliant GDS",
-   "Submission package and record"
+   "Submitted shuttle GDS / OASIS package"
   ],
   "producedBy": [
    1,
@@ -14283,27 +14226,26 @@ export const activityDetails: Record<string, ActivityDetail> = {
    5,
    6,
    7,
-   8,
    8
   ],
   "rel": [
    {
     "id": "TC-D2",
     "rel": "produces",
-    "text": "Test chip GDS and shuttle submission record. The deliverable the submission record is what proves the slot was met."
+    "text": "<b>Test chip GDS and shuttle submission record.</b> This activity produces the physically verified shuttle database and final submission package."
    },
    {
     "id": "TC-D3",
     "rel": "feeds",
-    "text": "Test chip silicon and characterization report. Measurement quality is determined here—a noisy vehicle produces uncertain results."
+    "text": "<b>Test chip silicon and characterization report.</b> Measurement quality is determined here—a noisy vehicle produces uncertain results."
    }
   ],
   "risks": [
-   "Submission rejected on frame or format compliance",
-   "PDN adequate for function and inadequate for measurement",
-   "Physical verification compressed because the chip is small",
-   "Structures placed without regard to the measurement plan",
-   "No margin against the submission date"
+   "Submission is rejected because of frame, format, or physical-verification non-compliance",
+   "The PDN supports function but corrupts sensitive measurements",
+   "Physical verification is compressed because the die is small",
+   "Structure placement does not support the intended measurement or variation analysis",
+   "No schedule margin remains before the MPW cutoff"
   ],
   "roles": [
    {
@@ -14354,14 +14296,14 @@ export const activityDetails: Record<string, ActivityDetail> = {
    ]
   ],
   "entry": [
-   "Netlist and structures complete from TC-02",
-   "Submission date and format requirements from TC-03",
-   "Golden environment available from PDK-13"
+   "Integrated test-chip design from TC-02",
+   "Confirmed shuttle date and submission requirements from TC-03",
+   "Golden design environment from PDK-13"
   ],
   "exit": [
-   "Database clean against production physical verification standards",
-   "Shuttle frame and format compliance confirmed before submission",
-   "Submission made on the booked date"
+   "The test-chip database is clean to the required physical-verification standard",
+   "Measurement-sensitive placement, routing, and power constraints are preserved",
+   "Shuttle frame, format, and final submission requirements are closed on schedule"
   ],
   "dependsOn": [
    "TC-02",
@@ -14409,48 +14351,48 @@ export const activityDetails: Record<string, ActivityDetail> = {
   ],
   "criticalPath": true,
   "purpose": [
-   "Wait, visibly—mask, fabricate, dice and deliver—while keeping the program informed about a schedule it has almost no ability to influence.",
-   "Sixteen weeks and four M/M. The work here is tracking and logistics rather than engineering, and the value is that the rest of the program knows what date to plan against."
+   "Move the accepted shuttle design through <b>mask fabrication, wafer processing, e-test / PCM review, dicing, packaging, and delivery</b> while keeping the program aligned to the actual fabrication status.",
+   "Most elapsed time is controlled by the shuttle and foundry. The program value comes from visibility: WIP changes, early PCM data, packaging readiness, sample quantity, and delivery status must be communicated as soon as they are known."
   ],
   "steps": [
    {
     "n": 1,
-    "text": "Analyze data submission and acceptance confirmation",
+    "text": "Confirm shuttle data acceptance and fabrication start",
     "tat": 1,
     "lane": "main"
    },
    {
     "n": 2,
-    "text": "Define and document shuttle mask fabrication",
+    "text": "Track shuttle mask fabrication",
     "tat": 4,
     "lane": "main"
    },
    {
     "n": 3,
-    "text": "Track wIP and schedule communication",
+    "text": "Track WIP and communicate schedule changes",
     "tat": 2,
     "lane": "par"
    },
    {
     "n": 4,
-    "text": "Process wafer processing",
+    "text": "Track wafer processing through completion",
     "tat": 8,
     "lane": "main"
    },
    {
     "n": 5,
-    "text": "Review e-test and PCM data as it becomes available",
+    "text": "Review e-test and PCM data as soon as released",
     "tat": 1.5,
     "lane": "par"
    },
    {
     "n": 6,
-    "text": "Define and document dicing, packaging and delivery",
+    "text": "Coordinate dicing, packaging, sample quantity, and delivery",
     "tat": 3,
     "lane": "main"
    }
   ],
-  "flowNote": "Step 5 matters more than its 1.5 weeks suggest. PCM and e-test data arrives before packaged parts do, and it answers some of the process questions the chip was built for weeks earlier than the lab can.",
+  "flowNote": "E-test and PCM data can answer some process questions before packaged parts arrive. Reviewing those results immediately enables early correlation and issue triage while assembly and delivery continue.",
   "consumes": [
    "Submitted GDS from TC-04",
    "Shuttle slot confirmation from TC-03",
@@ -14459,13 +14401,12 @@ export const activityDetails: Record<string, ActivityDetail> = {
    "Delivery logistics arrangements"
   ],
   "produces": [
-   "Submission acceptance confirmation",
-   "Fabricated shuttle mask set",
-   "WIP status reporting against the program schedule",
-   "Processed wafers",
-   "E-test and PCM data",
-   "Packaged test chip parts",
-   "Delivery record"
+   "Accepted shuttle submission and wafer-start confirmation",
+   "Mask fabrication status",
+   "WIP and schedule status record",
+   "Processed test-chip wafers",
+   "E-test / PCM review findings",
+   "Packaged parts and delivery record"
   ],
   "producedBy": [
    1,
@@ -14473,22 +14414,21 @@ export const activityDetails: Record<string, ActivityDetail> = {
    3,
    4,
    5,
-   6,
    6
   ],
   "rel": [
    {
     "id": "TC-D3",
     "rel": "feeds",
-    "text": "Test chip silicon and characterization report. The silicon itself, plus the PCM data that arrives with it."
+    "text": "<b>Test chip silicon and characterization report.</b> TC-05 supplies the fabricated silicon, e-test / PCM data, and delivery record required for characterization."
    }
   ],
   "risks": [
-   "Shuttle lot slips and the program hears late",
-   "Packaging not arranged in advance",
-   "PCM data ignored until parts arrive",
-   "Insufficient parts requested",
-   "Logistics and customs not planned"
+   "Fabrication slips are communicated too late to downstream teams",
+   "Packaging or socket preparation is not aligned with wafer delivery",
+   "Available PCM data is not reviewed until packaged parts arrive",
+   "Delivered sample quantity is insufficient for the characterization matrix",
+   "Shipping, customs, or engineering-sample logistics delay silicon access"
   ],
   "roles": [
    {
@@ -14531,14 +14471,14 @@ export const activityDetails: Record<string, ActivityDetail> = {
    ]
   ],
   "entry": [
-   "GDS submitted and accepted by the shuttle",
-   "Packaging and socket requirements defined by TC-06",
-   "Delivery logistics arranged"
+   "Shuttle database submitted and accepted from TC-04",
+   "Packaging and socket requirements defined with TC-06",
+   "Delivery logistics and required sample quantity defined"
   ],
   "exit": [
-   "Parts delivered in the quantity the characterization plan needs",
-   "PCM and e-test data reviewed before parts arrive",
-   "Schedule communicated at every status change, not only at delivery"
+   "Required test-chip parts are delivered for the characterization plan",
+   "E-test and PCM data are reviewed as soon as they become available",
+   "Fabrication and delivery changes are communicated to downstream owners"
   ],
   "dependsOn": [
    "TC-03",
@@ -14579,48 +14519,48 @@ export const activityDetails: Record<string, ActivityDetail> = {
   ],
   "criticalPath": false,
   "purpose": [
-   "Have the board, sockets, instruments and automation ready before the parts arrive, so that characterization starts on the day of delivery rather than six weeks later.",
-   "This is the small-scale version of the same mistake the production program makes with EVB. Parts arriving into a lab with no board is a delay that consumes the schedule advantage the test chip was supposed to buy, and it is entirely avoidable by starting during fabrication."
+   "Prepare the <b>board, socket or probe solution, instruments, and measurement automation before silicon arrives</b> so characterization can begin immediately.",
+   "Board or socket work started after wafer-out gives back the schedule advantage the test chip was intended to create. The measurement platform must also meet the noise, bandwidth, accuracy, and automation needs of the TC-01 coverage plan."
   ],
   "steps": [
    {
     "n": 1,
-    "text": "Define measurement requirement from the coverage matrix",
+    "text": "Translate the coverage matrix into measurement and lab requirements",
     "tat": 1,
     "lane": "main"
    },
    {
     "n": 2,
-    "text": "Measure board design — supplies, bias, paths",
+    "text": "Design the board for supplies, bias, clocks, and measurement paths",
     "tat": 2.5,
     "lane": "main"
    },
    {
     "n": 3,
-    "text": "Select socket or probe card and lead time",
+    "text": "Select and order the socket or probe solution",
     "tat": 1.5,
     "lane": "par"
    },
    {
     "n": 4,
-    "text": "Prepare board fabrication and assembly",
+    "text": "Fabricate and assemble the test boards",
     "tat": 2.5,
     "lane": "main"
    },
    {
     "n": 5,
-    "text": "Measure automation and data capture scripting",
+    "text": "Develop measurement automation and data-capture scripts",
     "tat": 1.5,
     "lane": "par"
    },
    {
     "n": 6,
-    "text": "Bring up board and instrument setup",
+    "text": "Bring up the board and qualify the instrument setup",
     "tat": 3,
     "lane": "main"
    }
   ],
-  "flowNote": "Step 3 has a lead time that can exceed the whole activity. Sockets for an unusual package are made to order, and a socket ordered when the parts ship arrives after they do.",
+  "flowNote": "Socket or probe-card lead time can exceed board-development time, so it runs in parallel. Board hardware, instruments, and automation should all be treated as first-silicon prerequisites.",
   "consumes": [
    "Coverage matrix and measurement plan from TC-01",
    "Pad assignment and access modes from TC-02",
@@ -14629,12 +14569,12 @@ export const activityDetails: Record<string, ActivityDetail> = {
    "Measurement accuracy requirements"
   ],
   "produces": [
-   "Measurement requirement specification",
-   "Test chip board design and assembled boards",
-   "Socket or probe card",
-   "Fabricated and assembled test boards",
+   "Measurement and lab requirement specification",
+   "Test-chip board design",
+   "Socket / probe solution and lead-time commitment",
+   "Fabricated and assembled boards",
    "Measurement automation and capture scripts",
-   "Bring-up record and instrument setup"
+   "Board bring-up and qualified instrument setup"
   ],
   "producedBy": [
    1,
@@ -14648,15 +14588,15 @@ export const activityDetails: Record<string, ActivityDetail> = {
    {
     "id": "TC-D3",
     "rel": "feeds",
-    "text": "Test chip silicon and characterization report. The measurement quality the report can claim is bounded by the board and the automation built here."
+    "text": "<b>Test chip silicon and characterization report.</b> This activity provides the measurement platform and lab readiness needed to generate the characterization data."
    }
   ],
   "risks": [
-   "Board started when parts ship",
-   "Socket lead time discovered late",
-   "Measurement automation deferred",
-   "Board noise floor above the signal of interest",
-   "Instruments not reserved"
+   "Board development starts only after parts ship",
+   "Socket or probe-card lead time is discovered too late",
+   "Measurement automation is deferred until silicon arrives",
+   "Board noise floor, bandwidth, or accuracy is insufficient for the target measurements",
+   "Required lab instruments are not available during the characterization window"
   ],
   "roles": [
    {
@@ -14703,14 +14643,14 @@ export const activityDetails: Record<string, ActivityDetail> = {
    ]
   ],
   "entry": [
-   "Coverage matrix and measurement plan available from TC-01",
-   "Pad assignment fixed by TC-02",
-   "Package format known from TC-05"
+   "Measurement requirements from TC-01",
+   "Pad assignment and external interfaces from TC-02",
+   "Expected package or probe format from the shuttle plan"
   ],
   "exit": [
-   "Board bring-up complete before parts are delivered",
-   "Sockets in hand, not on order",
-   "Automation able to run the matrix without manual steps"
+   "Board and measurement setup are ready before silicon characterization begins",
+   "Socket or probe hardware and required instruments are available",
+   "Automation can execute and capture the planned characterization matrix repeatably"
   ],
   "dependsOn": [
    "TC-01",
@@ -14752,60 +14692,60 @@ export const activityDetails: Record<string, ActivityDetail> = {
   ],
   "criticalPath": true,
   "purpose": [
-   "Measure the silicon and correlate it against the models the production design is being built on—which is the only reason the chip exists.",
-   "Characterization without correlation produces a data set. Correlation produces a statement of the form \"the model is optimistic by 8% on this parameter at this corner\", and that statement is what <code>TC-08</code> converts into margin decisions the production design can act on."
+   "Measure the test-chip silicon and <b>correlate the results against the pre-silicon models and predictions</b> used by the production design.",
+   "The useful output is not a set of measurements alone, but the quantified difference between prediction and silicon, including measurement uncertainty and observed variation. That correlation is what enables production margin and model decisions."
   ],
   "steps": [
    {
     "n": 1,
-    "text": "Define and document incoming inspection and basic functionality check",
+    "text": "Perform incoming inspection and basic functionality checks",
     "tat": 1.5,
     "lane": "main"
    },
    {
     "n": 2,
-    "text": "Characterize iP-under-test across the matrix",
+    "text": "Characterize the selected IP and circuits across the planned matrix",
     "tat": 3,
     "lane": "main"
    },
    {
     "n": 3,
-    "text": "Measure ring oscillator frequency and leakage",
+    "text": "Measure ring-oscillator frequency, leakage, and monitor structures",
     "tat": 2.5,
     "lane": "par"
    },
    {
     "n": 4,
-    "text": "Extract pCM and device parameter",
+    "text": "Extract PCM and device parameters",
     "tat": 3,
     "lane": "main"
    },
    {
     "n": 5,
-    "text": "Correlate corner setup against simulation",
+    "text": "Set up corner-by-corner correlation against simulation",
     "tat": 2,
     "lane": "par"
    },
    {
     "n": 6,
-    "text": "Analyze across-wafer and lot-to-lot variability",
+    "text": "Analyze across-wafer and lot-to-lot variation",
     "tat": 2,
     "lane": "main"
    },
    {
     "n": 7,
-    "text": "Analyze failure on outliers",
+    "text": "Investigate outliers and unexpected behavior",
     "tat": 1.5,
     "lane": "par"
    },
    {
     "n": 8,
-    "text": "Correlate results assembly",
+    "text": "Compile the silicon-to-model correlation results with uncertainty",
     "tat": 2.5,
     "lane": "main"
    }
   ],
-  "flowNote": "This window overlaps the tail of fabrication because the stage as templated does not allow a clean sequence—PCM and e-test data are worked first, and device characterization follows once packaged parts arrive. It is worth noting that the stage's forty weeks are tight for its own chain.",
+  "flowNote": "Correlation starts with the earliest available silicon evidence and expands to full device characterization. The final result must state the model-to-silicon delta under matched conditions, not only report measured values.",
   "consumes": [
    "Packaged parts and PCM data from TC-05",
    "Measurement setup from TC-06",
@@ -14815,13 +14755,13 @@ export const activityDetails: Record<string, ActivityDetail> = {
   ],
   "produces": [
    "Incoming inspection and functionality results",
-   "Functional and characterization results per structure",
-   "Ring oscillator and leakage measurements",
-   "Extracted device parameters",
-   "Corner correlation setup",
-   "Variability analysis across wafer and lot",
-   "Failure analysis findings",
-   "Silicon-to-model correlation results"
+   "Selected IP / circuit characterization data",
+   "Ring-oscillator / leakage / monitor measurements",
+   "Extracted PCM and device parameters",
+   "Simulation-correlation setup",
+   "Variation analysis",
+   "Outlier and failure-analysis findings",
+   "Silicon-to-model correlation report"
   ],
   "producedBy": [
    1,
@@ -14837,20 +14777,20 @@ export const activityDetails: Record<string, ActivityDetail> = {
    {
     "id": "TC-D3",
     "rel": "produces",
-    "text": "Test chip silicon and characterization report. The measurement half of the deliverable."
+    "text": "<b>Test chip silicon and characterization report.</b> This activity produces the measured silicon characterization results."
    },
    {
     "id": "TC-D4",
     "rel": "produces",
-    "text": "Silicon-to-model correlation report. The half that makes the measurements actionable—a delta against what was predicted, per parameter and corner."
+    "text": "<b>Silicon-to-model correlation report.</b> It also quantifies the difference between measured silicon and pre-silicon prediction under matched conditions."
    }
   ],
   "risks": [
-   "Characterization without correlation",
-   "Sample size too small for variability",
-   "Measurement uncertainty larger than the effect",
-   "Outliers discarded",
-   "Results delivered too late for TC-08"
+   "Characterization results are reported without correlation to pre-silicon predictions",
+   "Sample size is too small to support variation claims",
+   "Measurement uncertainty is comparable to or larger than the observed model delta",
+   "Outliers are removed without root-cause analysis",
+   "Correlation results arrive too late for production changes"
   ],
   "roles": [
    {
@@ -14863,7 +14803,7 @@ export const activityDetails: Record<string, ActivityDetail> = {
    },
    {
     "r": "Analog designers",
-    "d": "IP-under-test interpretation against simulation"
+    "d": "selected IP / circuit interpretation against simulation"
    },
    {
     "r": "Modeling engineer",
@@ -14876,7 +14816,7 @@ export const activityDetails: Record<string, ActivityDetail> = {
   ],
   "effort": [
    [
-    "IP-under-test characterization",
+    "selected IP / circuit characterization",
     6
    ],
    [
@@ -14901,14 +14841,14 @@ export const activityDetails: Record<string, ActivityDetail> = {
    ]
   ],
   "entry": [
-   "Parts delivered from TC-05",
-   "Measurement setup ready from TC-06",
-   "Simulation predictions available for comparison"
+   "Silicon and available e-test / PCM data from TC-05",
+   "Qualified measurement setup from TC-06",
+   "Pre-silicon predictions and models for comparison"
   ],
   "exit": [
-   "Every measured parameter compared against its prediction",
-   "Measurement uncertainty stated alongside each correlation claim",
-   "Results delivered with time for TC-08 to act"
+   "Required silicon parameters are compared with corresponding pre-silicon predictions",
+   "Correlation results include measurement uncertainty and observed variation",
+   "Significant model-to-silicon gaps have a root-cause assessment or follow-up plan"
   ],
   "dependsOn": [
    "TC-01",
@@ -14961,48 +14901,48 @@ export const activityDetails: Record<string, ActivityDetail> = {
   ],
   "criticalPath": true,
   "purpose": [
-   "Convert correlation findings into changes the production design makes—corrected models, revised margins, methodology updates—and track that they were adopted.",
-   "This is where a test chip earns or wastes its cost. A correlation report that circulates and changes nothing has bought an expensive confirmation of what everyone assumed."
+   "Convert test-chip correlation results into <b>specific updates to production models, margins, rules, methodology, and design assumptions</b>, and track those changes to adoption.",
+   "A test chip retires risk only when its results change or confirm a production decision. Each meaningful finding therefore needs a quantified disposition, an owner, and a completion date."
   ],
   "steps": [
    {
     "n": 1,
-    "text": "Analyze correlation gap — where model and silicon disagree",
+    "text": "Quantify where silicon and pre-silicon models disagree",
     "tat": 1,
     "lane": "main"
    },
    {
     "n": 2,
-    "text": "Characterize model correction and re- requests",
+    "text": "Define model-correction and re-characterization actions",
     "tat": 1.5,
     "lane": "main"
    },
    {
     "n": 3,
-    "text": "Define and document design rule and methodology update proposals",
+    "text": "Propose design-rule and methodology updates",
     "tat": 1,
     "lane": "par"
    },
    {
     "n": 4,
-    "text": "Define and document margin decisions for the production design",
+    "text": "Make quantified production margin decisions",
     "tat": 1.5,
     "lane": "main"
    },
    {
     "n": 5,
-    "text": "Define and document production design change requests",
+    "text": "Raise required production design changes through change control",
     "tat": 1,
     "lane": "par"
    },
    {
     "n": 6,
-    "text": "Track guidance publication and adoption",
+    "text": "Publish the guidance and track adoption to closure",
     "tat": 2,
     "lane": "main"
    }
   ],
-  "flowNote": "Step 6 is the one that distinguishes a useful test chip from an expensive one. Publishing guidance is easy; tracking that physical design actually changed its margin and that the model was actually re-characterized is what turns the finding into a change.",
+  "flowNote": "Publication is not completion. The activity closes only when the corrected model, revised margin, methodology update, or production design change has been adopted or explicitly dispositioned.",
   "consumes": [
    "Correlation results from TC-07",
    "Production design status and open margins",
@@ -15012,11 +14952,11 @@ export const activityDetails: Record<string, ActivityDetail> = {
   ],
   "produces": [
    "Correlation gap analysis",
-   "Model correction requests and re-characterization scope",
-   "Methodology and rule update proposals",
-   "Margin decisions for the production design",
+   "Model-correction and re-characterization actions",
+   "Methodology / rule update proposals",
+   "Production margin decisions",
    "Production design change requests",
-   "Adoption tracking record"
+   "Guidance publication and adoption-closure record"
   ],
   "producedBy": [
    1,
@@ -15030,20 +14970,20 @@ export const activityDetails: Record<string, ActivityDetail> = {
    {
     "id": "TC-D5",
     "rel": "produces",
-    "text": "Design guidance and margin decisions for the production chip. The deliverable adoption tracking is what makes it more than a report."
+    "text": "<b>Design guidance and margin decisions for the production chip.</b> This activity converts silicon findings into model updates, margin decisions, methodology changes, and tracked production actions."
    },
    {
     "id": "TC-D4",
     "rel": "feeds",
-    "text": "Silicon-to-model correlation report. The gap analysis is published with the correlation, so the finding and its consequence stay together."
+    "text": "<b>Silicon-to-model correlation report.</b> The gap analysis is published with the correlation, so the finding and its consequence stay together."
    }
   ],
   "risks": [
-   "Guidance published and not adopted",
-   "Findings arrive after the design has committed",
-   "Model corrections requested but not scheduled",
-   "Only bad news acted on",
-   "Guidance stated as observation"
+   "Guidance is published but not adopted by production teams",
+   "Findings arrive after the relevant production design has committed",
+   "Model corrections are requested without an owner or schedule",
+   "Only negative silicon findings change margins while validated margin opportunity is ignored",
+   "Findings are stated as observations rather than quantified production actions"
   ],
   "roles": [
    {
@@ -15090,14 +15030,14 @@ export const activityDetails: Record<string, ActivityDetail> = {
    ]
   ],
   "entry": [
-   "Correlation results available from TC-07",
-   "Production design status known well enough to act on",
-   "Change control process available from RTL-10"
+   "Silicon-to-model correlation results from TC-07",
+   "Current production design status, margins, and open risks",
+   "Change-control process for production updates"
   ],
   "exit": [
-   "Every finding converted into a specific, owned action",
-   "Margin released where silicon beat the model, not only tightened where it did not",
-   "Adoption tracked to completion, not just published"
+   "Every material finding has a production action or explicit no-change disposition",
+   "Model and margin updates are quantified and communicated to affected teams",
+   "Adoption is tracked to closure before the relevant production design gate"
   ],
   "dependsOn": [
    "TC-07"
@@ -15145,49 +15085,49 @@ export const activityDetails: Record<string, ActivityDetail> = {
   ],
   "criticalPath": true,
   "purpose": [
-   "Complete the microarchitecture specification for every block—pipeline, interfaces, control, register map—to the level of detail an implementer can write code against without inventing anything.",
+   "Complete the <b>microarchitecture specification for every block</b>—pipeline, interfaces, control, register map—to the level of detail an implementer can write code against without inventing anything.",
    "<code>ARCH-10</code> started these inside architecture; this finishes them. The distinction matters: a block whose specification is still being written while its RTL is being written produces code that documents itself, and the specification then follows the code instead of leading it."
   ],
   "steps": [
    {
     "n": 1,
-    "text": "Define completion plan and block-owner assignment",
+    "text": "Plan specification completion and assign block owners",
     "tat": 1,
     "lane": "main"
    },
    {
     "n": 2,
-    "text": "Define and document pipeline and datapath detail per block",
+    "text": "Write the pipeline and datapath detail for each block",
     "tat": 3,
     "lane": "main"
    },
    {
     "n": 3,
-    "text": "Define control and state machine",
+    "text": "Specify control logic and state machines",
     "tat": 2.5,
     "lane": "par"
    },
    {
     "n": 4,
-    "text": "Define and document block interface and protocol detail against the NoC",
+    "text": "Detail block interfaces and protocols against the NoC",
     "tat": 2.5,
     "lane": "main"
    },
    {
     "n": 5,
-    "text": "Define and document exception, error and corner-case behavior",
+    "text": "Define exception, error and corner-case behavior",
     "tat": 2,
     "lane": "par"
    },
    {
     "n": 6,
-    "text": "Verify hook and observability requirements with DV",
+    "text": "Define verification hooks and observability requirements with DV",
     "tat": 1.5,
     "lane": "par"
    },
    {
     "n": 7,
-    "text": "Define review and implementation entry gate",
+    "text": "Review each specification and run the implementation entry gate",
     "tat": 3.5,
     "lane": "main"
    }
@@ -15201,13 +15141,13 @@ export const activityDetails: Record<string, ActivityDetail> = {
    "Interface definitions from ARCH-04"
   ],
   "produces": [
-   "Block microarchitecture specifications, complete",
+   "Specification completion plan and block-owner assignments",
    "Per-block pipeline and datapath detail",
    "Control and state machine definitions",
    "Interface and protocol detail per block",
    "Exception and corner-case behavior definitions",
    "Verification hook and observability requirements",
-   "Implementation entry gate records"
+   "Reviewed specifications with implementation entry gate records"
   ],
   "producedBy": [
    1,
@@ -15222,20 +15162,20 @@ export const activityDetails: Record<string, ActivityDetail> = {
    {
     "id": "RTL-D1",
     "rel": "feeds",
-    "text": "Block and top-level RTL release. The specification is what the release is checked against; without it, review has nothing to compare code to."
+    "text": "<b>Block and top-level RTL release.</b> The specification is what the release is checked against; without it, review has nothing to compare code to."
    },
    {
     "id": "RTL-D7",
     "rel": "gates",
-    "text": "RTL Freeze package. A block whose specification was never completed cannot be declared frozen against anything."
+    "text": "<b>RTL Freeze package.</b> A block whose specification was never completed cannot be declared frozen against anything."
    }
   ],
   "risks": [
-   "Specification written alongside the code",
-   "Corner cases left undefined",
-   "Interfaces specified from one side",
-   "Entry gate skipped for schedule",
-   "Observability requirements added later"
+   "<b>Specification written alongside the code.</b> The document then records what was built rather than defining it, and verification loses its independent reference.",
+   "<b>Corner cases left undefined.</b> The implementer decides, verification cannot check, and the disagreement surfaces at chip-level integration.",
+   "<b>Interfaces specified from one side.</b> Two blocks each documenting their own view of a shared protocol produces two consistent documents that disagree.",
+   "<b>Entry gate skipped for schedule.</b> Coding against an incomplete specification is faster for two weeks and slower for two months.",
+   "<b>Observability requirements added later.</b> Debug and coverage hooks designed in cost little; retrofitted they cost timing and an RTL change under control."
   ],
   "roles": [
    {
@@ -15344,55 +15284,55 @@ export const activityDetails: Record<string, ActivityDetail> = {
   ],
   "criticalPath": true,
   "purpose": [
-   "Write the synthesisable logic for every block, to a coding standard that survives lint, CDC, synthesis and gate-level simulation without rework.",
-   "At 180 M/M this is the largest single activity in the entire template—nearly 5% of the program's effort in one line. It is also the one most exposed to specification churn: every change upstream lands here, multiplied by the number of blocks that inherit it."
+   "Write the <b>synthesisable logic for every block</b>, to a coding standard that survives lint, CDC, synthesis and gate-level simulation without rework.",
+   "At 180 man-months this is the largest single activity in the entire template—nearly 5% of the program's effort in one line. It is also the one most exposed to specification churn: every change upstream lands here, multiplied by the number of blocks that inherit it."
   ],
   "steps": [
    {
     "n": 1,
-    "text": "Define and document coding standard, directory structure and naming conventions",
+    "text": "Set the coding standard, directory structure and naming conventions",
     "tat": 1.5,
     "lane": "main"
    },
    {
     "n": 2,
-    "text": "Implement block RTL , first pass",
+    "text": "Implement first-pass RTL for each block",
     "tat": 9,
     "lane": "main"
    },
    {
     "n": 3,
-    "text": "Define and document insert block-level self-checking and assertion",
+    "text": "Insert block-level self-checking and assertions",
     "tat": 4,
     "lane": "par"
    },
    {
     "n": 4,
-    "text": "Define block RTL review against",
+    "text": "Review block RTL against its specification",
     "tat": 3.5,
     "lane": "main"
    },
    {
     "n": 5,
-    "text": "Implement parameterization and configurability",
+    "text": "Implement parameterization and configuration options",
     "tat": 3,
     "lane": "par"
    },
    {
     "n": 6,
-    "text": "Verify bug fix and refinement against block",
+    "text": "Fix and refine blocks against block-level verification results",
     "tat": 7,
     "lane": "main"
    },
    {
     "n": 7,
-    "text": "Define and document block-level PPA refinement against trial synthesis",
+    "text": "Refine block PPA against trial synthesis feedback",
     "tat": 4,
     "lane": "par"
    },
    {
     "n": 8,
-    "text": "Release block freeze and tagging",
+    "text": "Freeze blocks and tag the release",
     "tat": 3,
     "lane": "main"
    }
@@ -15410,12 +15350,12 @@ export const activityDetails: Record<string, ActivityDetail> = {
    "First-pass block RTL",
    "Embedded assertions and self-checking",
    "Block RTL review findings",
-   "Parameterization and configurability implementation",
+   "Parameterized and configurable block RTL",
    "Fixed and refined block RTL",
    "Block-level PPA refinement record",
    "Block RTL source, tagged",
-   "Parameterized and configurable blocks",
-   "Block review records",
+   "Frozen block configuration set",
+   "Compiled block review records",
    "Block release tags with known issues"
   ],
   "producedBy": [
@@ -15435,20 +15375,20 @@ export const activityDetails: Record<string, ActivityDetail> = {
    {
     "id": "RTL-D1",
     "rel": "produces",
-    "text": "Block and top-level RTL release, tagged. The block half of the deliverable; <code>RTL-04</code> assembles the top."
+    "text": "<b>Block and top-level RTL release, tagged.</b> The block half of the deliverable; <code>RTL-04</code> assembles the top."
    },
    {
     "id": "RTL-D4",
     "rel": "feeds",
-    "text": "Lint / CDC / RDC clean reports. Clean reports are a property of the code, and the coding standard set here largely determines them."
+    "text": "<b>Lint / CDC / RDC clean reports.</b> Clean reports are a property of the code, and the coding standard set here largely determines them."
    }
   ],
   "risks": [
-   "Specification churn arriving mid-implementation",
-   "Coding standard imposed after code exists",
-   "Assertions treated as verification's job",
-   "Blocks declared complete without verification feedback",
-   "Configurability added everywhere"
+   "<b>Specification churn arriving mid-implementation.</b> Every upstream change lands here multiplied by the blocks affected, which is why <code>RTL-10</code> exists.",
+   "<b>Coding standard imposed after code exists.</b> Retrofitting a standard across 180 man-months of code is a project nobody schedules and everyone half-does.",
+   "<b>Assertions treated as verification's job.</b> Assertions written by the implementer capture intent; written by someone else they capture observed behavior.",
+   "<b>Blocks declared complete without verification feedback.</b> First-pass code is not correct code, and a block frozen before its verification loop closes freezes its bugs.",
+   "<b>Configurability added everywhere.</b> Parameterization nobody uses multiplies the verification space at no benefit, and the cost lands on <code>DV-03</code>."
   ],
   "roles": [
    {
@@ -15563,31 +15503,31 @@ export const activityDetails: Record<string, ActivityDetail> = {
   ],
   "criticalPath": true,
   "purpose": [
-   "Bring every third-party, foundry and internal IP into the design—wrappers, glue, configuration and version control—and prove each one behaves as its documentation claims.",
+   "Bring every third-party, foundry and internal IP into the design—<b>wrappers, glue, configuration and version control</b>—and prove each one behaves as its documentation claims.",
    "IP integration fails at the boundary rather than in the block. A PHY that meets its specification and a controller that meets its specification can still disagree about reset ordering, and the disagreement is found here or it is found in the lab."
   ],
   "steps": [
    {
     "n": 1,
-    "text": "Define and document iP receipt, incoming inspection against the acceptance checklist",
+    "text": "Receive each IP delivery and inspect it against the acceptance checklist",
     "tat": 1.5,
     "lane": "main"
    },
    {
     "n": 2,
-    "text": "Integrate environment and wrapper framework",
+    "text": "Build the integration environment and wrapper framework",
     "tat": 2,
     "lane": "main"
    },
    {
     "n": 3,
-    "text": "Implement per-IP wrapper and glue",
+    "text": "Implement wrappers and glue logic per IP",
     "tat": 5,
     "lane": "main"
    },
    {
     "n": 4,
-    "text": "Define and document configuration, tie-off and parameter setting per IP",
+    "text": "Configure, tie off and set parameters for each IP",
     "tat": 3,
     "lane": "par"
    },
@@ -15599,19 +15539,19 @@ export const activityDetails: Record<string, ActivityDetail> = {
    },
    {
     "n": 6,
-    "text": "Integrate aMS macro with behavioural models",
+    "text": "Integrate AMS macros with their behavioural models",
     "tat": 3.5,
     "lane": "par"
    },
    {
     "n": 7,
-    "text": "Define and document iP version manifest and update handling",
+    "text": "Build the IP version manifest and handle vendor updates",
     "tat": 2.5,
     "lane": "par"
    },
    {
     "n": 8,
-    "text": "Integrate report and issue escalation to vendors",
+    "text": "Compile the integration report and escalate issues to vendors",
     "tat": 3.5,
     "lane": "main"
    }
@@ -15628,9 +15568,9 @@ export const activityDetails: Record<string, ActivityDetail> = {
    "Incoming inspection records per delivery",
    "Integration environment and wrapper framework",
    "IP wrappers and glue logic",
-   "Per-IP configuration and tie-off",
+   "Per-IP configuration and tie-off records",
    "Boundary and reset sequencing verification results",
-   "AMS macro integration with behavioural models",
+   "Integrated AMS macros with behavioural models",
    "IP version manifest",
    "Integration report and vendor issue log"
   ],
@@ -15648,20 +15588,20 @@ export const activityDetails: Record<string, ActivityDetail> = {
    {
     "id": "RTL-D6",
     "rel": "produces",
-    "text": "IP integration report and version manifest. The deliverable the manifest is what makes an IP-related bug traceable to a version."
+    "text": "<b>IP integration report and version manifest.</b> The integration report and the version manifest are assembled here, and the manifest is what makes an IP-related bug traceable to a version."
    },
    {
     "id": "RTL-D1",
     "rel": "feeds",
-    "text": "Block and top-level RTL release. Integrated IP is part of the release, and its versions are part of the tag."
+    "text": "<b>Block and top-level RTL release.</b> Integrated IP is part of the release, and its versions are part of the tag."
    }
   ],
   "risks": [
-   "Deliveries accepted without inspection",
-   "Boundary behavior assumed from documentation",
-   "Version manifest not maintained",
-   "IP updates absorbed silently",
-   "Late IP compressing integration"
+   "<b>Deliveries accepted without inspection.</b> Missing views and collateral then become the integration team's problem rather than the vendor's.",
+   "<b>Boundary behavior assumed from documentation.</b> Reset ordering, enable timing and calibration sequences are where IP integration actually fails.",
+   "<b>Version manifest not maintained.</b> An IP bug that cannot be traced to a version cannot be reported usefully or fixed reproducibly.",
+   "<b>IP updates absorbed silently.</b> A vendor drop applied without impact assessment can change behavior verification has already signed off.",
+   "<b>Late IP compressing integration.</b> The integration window is fixed at its far end by <code>RTL-04</code>; a late delivery does not move it, it shortens it."
   ],
   "roles": [
    {
@@ -15779,19 +15719,19 @@ export const activityDetails: Record<string, ActivityDetail> = {
   ],
   "criticalPath": true,
   "purpose": [
-   "Assemble the blocks and the IP into one top-level design that elaborates, connects and boots—the first point at which the chip exists as a single object.",
+   "Assemble the blocks and the IP into <b>one top-level design that elaborates, connects and boots</b>—the first point at which the chip exists as a single object.",
    "Chip-level integration is where every optimistic assumption made in isolation meets every other one. Connectivity, clock and reset distribution, address maps and configuration all become concrete here, and the defects found are the ones no block-level test could have seen."
   ],
   "steps": [
    {
     "n": 1,
-    "text": "Define top-level hierarchy and connectivity",
+    "text": "Define the top-level hierarchy and connectivity",
     "tat": 1.5,
     "lane": "main"
    },
    {
     "n": 2,
-    "text": "Integrate noC and interconnect",
+    "text": "Integrate the NoC and interconnect",
     "tat": 3,
     "lane": "main"
    },
@@ -15803,31 +15743,31 @@ export const activityDetails: Record<string, ActivityDetail> = {
    },
    {
     "n": 4,
-    "text": "Define and document address map and configuration space assembly",
+    "text": "Assemble the address map and configuration space",
     "tat": 2,
     "lane": "par"
    },
    {
     "n": 5,
-    "text": "Define and document top-level elaboration and connectivity checking",
+    "text": "Elaborate the top level and run automated connectivity checks",
     "tat": 2.5,
     "lane": "main"
    },
    {
     "n": 6,
-    "text": "Integrate boot and bring-up path",
+    "text": "Integrate the boot and bring-up path",
     "tat": 2.5,
     "lane": "par"
    },
    {
     "n": 7,
-    "text": "Define and document chip-level smoke tests and first boot",
+    "text": "Run chip-level smoke tests and the first boot in simulation",
     "tat": 2.5,
     "lane": "main"
    },
    {
     "n": 8,
-    "text": "Integrate issue closure and top release",
+    "text": "Close integration issues and release the top level",
     "tat": 2.5,
     "lane": "main"
    }
@@ -15841,9 +15781,9 @@ export const activityDetails: Record<string, ActivityDetail> = {
    "Top-level architecture from ARCH-09"
   ],
   "produces": [
-   "Top-level hierarchy and connectivity",
+   "Top-level hierarchy and connectivity definition",
    "Integrated NoC and interconnect",
-   "Clock and reset distribution",
+   "Implemented clock and reset distribution",
    "Assembled address map and configuration space",
    "Elaborated top level with connectivity check results",
    "Integrated boot and bring-up path",
@@ -15864,20 +15804,20 @@ export const activityDetails: Record<string, ActivityDetail> = {
    {
     "id": "RTL-D1",
     "rel": "produces",
-    "text": "Block and top-level RTL release, tagged. The top half of the deliverable—the object every downstream stage actually consumes."
+    "text": "<b>Block and top-level RTL release, tagged.</b> The top half of the deliverable—the object every downstream stage actually consumes."
    },
    {
     "id": "RTL-D7",
     "rel": "feeds",
-    "text": "RTL Freeze package. Freeze is declared on the top-level release, so its state is what the package describes."
+    "text": "<b>RTL Freeze package.</b> Freeze is declared on the top-level release, so its state is what the package describes."
    }
   ],
   "risks": [
-   "Connectivity checked by inspection",
-   "Integration started before blocks are stable",
-   "Address map assembled from block documentation",
-   "First boot deferred",
-   "Clock and reset distribution treated as a wiring task"
+   "<b>Connectivity checked by inspection.</b> A chip this size has too many connections to review; automated connectivity checking is the only reliable method.",
+   "<b>Integration started before blocks are stable.</b> Integrating moving blocks produces defects that are re-found every time a block updates.",
+   "<b>Address map assembled from block documentation.</b> Generated maps agree with the code; hand-assembled maps agree with the documentation, which is a different thing.",
+   "<b>First boot deferred.</b> The boot path exercises reset, clocking, configuration and the fabric together, and delaying it delays every defect that only appears in combination.",
+   "<b>Clock and reset distribution treated as a wiring task.</b> It carries the crossing inventory from <code>ARCH-05</code> and the CDC obligations that follow from it."
   ],
   "roles": [
    {
@@ -15995,25 +15935,25 @@ export const activityDetails: Record<string, ActivityDetail> = {
   ],
   "criticalPath": false,
   "purpose": [
-   "Implement the clock, reset and power intent the architecture defined—domain boundaries, isolation, retention, crossing synchronisers—and produce a UPF file the tools accept.",
-   "Power intent is where architecture becomes an obligation on every downstream tool. Synthesis inserts isolation cells from it, verification checks against it, and physical design implements it."
+   "Implement the <b>clock, reset and power intent</b> the architecture defined—domain boundaries, isolation, retention, crossing synchronisers—and produce a UPF file the tools accept.",
+   "Power intent is where architecture becomes an obligation on every downstream tool. Synthesis inserts isolation cells from it, verification checks against it, and physical design implements it. An intent file that is wrong or incomplete propagates the same error into all three."
   ],
   "steps": [
    {
     "n": 1,
-    "text": "Define domain boundary implementation against the ARCH-05",
+    "text": "Implement power domain boundaries against the ARCH-05 definition",
     "tat": 2,
     "lane": "main"
    },
    {
     "n": 2,
-    "text": "Implement isolation, level shifter and retention strategy",
+    "text": "Implement the isolation, level-shifter and retention strategy",
     "tat": 2.5,
     "lane": "main"
    },
    {
     "n": 3,
-    "text": "Implement clock domain crossing synchroniser",
+    "text": "Implement CDC synchronisers against the crossing inventory",
     "tat": 2,
     "lane": "par"
    },
@@ -16025,19 +15965,19 @@ export const activityDetails: Record<string, ActivityDetail> = {
    },
    {
     "n": 5,
-    "text": "Define and document uPF authoring and tool acceptance check",
+    "text": "Author the UPF and check tool acceptance in synthesis",
     "tat": 2.5,
     "lane": "main"
    },
    {
     "n": 6,
-    "text": "Define and document power management controller RTL",
+    "text": "Implement the power management controller RTL",
     "tat": 2,
     "lane": "par"
    },
    {
     "n": 7,
-    "text": "Verify intent review with synthesis, and physical design",
+    "text": "Review the intent with synthesis, verification and physical design",
     "tat": 3,
     "lane": "main"
    }
@@ -16052,9 +15992,9 @@ export const activityDetails: Record<string, ActivityDetail> = {
   ],
   "produces": [
    "Implemented power domain boundaries",
-   "Isolation, level shifter and retention implementation",
-   "Implemented domain boundaries",
-   "CDC synchroniser implementation",
+   "Implemented isolation, level shifters and retention",
+   "Synchroniser coverage against the crossing inventory",
+   "Implemented CDC synchronisers",
    "Reset sequencing logic",
    "UPF power intent file, tool-accepted",
    "Power management controller RTL",
@@ -16074,20 +16014,20 @@ export const activityDetails: Record<string, ActivityDetail> = {
    {
     "id": "RTL-D5",
     "rel": "produces",
-    "text": "UPF power intent file. The deliverable \"tool-accepted\" is the standard rather than \"reviewed\"."
+    "text": "<b>UPF power intent file.</b> The UPF file is authored and tool-checked here, and \"tool-accepted\" is the standard rather than \"reviewed\"."
    },
    {
     "id": "RTL-D4",
     "rel": "feeds",
-    "text": "Lint / CDC / RDC clean reports. The synchroniser implementation is what CDC closure in <code>RTL-06</code> is checking."
+    "text": "<b>Lint / CDC / RDC clean reports.</b> The synchroniser implementation is what CDC closure in <code>RTL-06</code> is checking."
    }
   ],
   "risks": [
-   "UPF written as a document",
-   "Crossings implemented without reference to the inventory",
-   "Retention strategy decided late",
-   "Reset sequencing implemented from the block view",
-   "Intent reviewed only by its author"
+   "<b>UPF written as a document.</b> Intent that has never been elaborated in synthesis is intent whose errors are found by the first person who runs the flow.",
+   "<b>Crossings implemented without reference to the inventory.</b> A synchroniser strategy chosen per crossing by each designer produces inconsistency CDC will flag hundreds of times.",
+   "<b>Retention strategy decided late.</b> Retention cells cost area and change the physical implementation; adding them after floorplan is expensive.",
+   "<b>Reset sequencing implemented from the block view.</b> Reset order is a chip-level property, and blocks each releasing in their own order produces a boot that works in simulation and not in silicon.",
+   "<b>Intent reviewed only by its author.</b> Synthesis, verification and physical design each consume it differently, and each has to confirm it works for them."
   ],
   "roles": [
    {
@@ -16200,49 +16140,49 @@ export const activityDetails: Record<string, ActivityDetail> = {
   ],
   "criticalPath": true,
   "purpose": [
-   "Drive lint, clock domain crossing and reset domain crossing to closure—every violation either fixed or waived with a reason someone signed.",
+   "Drive <b>lint, clock domain crossing and reset domain crossing to closure</b>—every violation either fixed or waived with a reason someone signed.",
    "These checks find the class of defect that simulation cannot: a crossing without a synchroniser works in every simulation and fails intermittently in silicon. The discipline is in the waivers—an unexamined waiver list is where the surviving bugs live."
   ],
   "steps": [
    {
     "n": 1,
-    "text": "Define lint, CDC and RDC methodology and rule set",
+    "text": "Define the lint, CDC and RDC methodology and rule sets",
     "tat": 1.5,
     "lane": "main"
    },
    {
     "n": 2,
-    "text": "Close block-level lint",
+    "text": "Close lint at block level",
     "tat": 3.5,
     "lane": "main"
    },
    {
     "n": 3,
-    "text": "Close block-level CDC",
+    "text": "Close CDC at block level",
     "tat": 3.5,
     "lane": "par"
    },
    {
     "n": 4,
-    "text": "Close chip-level CDC against the crossing inventory",
+    "text": "Close CDC at chip level against the crossing inventory",
     "tat": 4,
     "lane": "main"
    },
    {
     "n": 5,
-    "text": "Analyze rDC closure and reset domain",
+    "text": "Close RDC and analyze reset domains",
     "tat": 3,
     "lane": "par"
    },
    {
     "n": 6,
-    "text": "Review waiver and disposition",
+    "text": "Review and disposition every waiver",
     "tat": 3,
     "lane": "main"
    },
    {
     "n": 7,
-    "text": "Close reporting and regression setup",
+    "text": "Report closure and set up the closure regression",
     "tat": 4,
     "lane": "main"
    }
@@ -16259,9 +16199,9 @@ export const activityDetails: Record<string, ActivityDetail> = {
    "Lint, CDC and RDC rule sets",
    "Block-level lint closure record",
    "Block-level CDC closure record",
-   "Block and chip-level closure results",
+   "Chip-level CDC closure results",
    "Crossing inventory reconciliation",
-   "RDC closure and reset domain analysis",
+   "RDC closure record and reset domain analysis",
    "Waiver list with dispositions and signatures",
    "Closure regression in the CI flow"
   ],
@@ -16279,20 +16219,20 @@ export const activityDetails: Record<string, ActivityDetail> = {
    {
     "id": "RTL-D4",
     "rel": "produces",
-    "text": "Lint / CDC / RDC clean reports with waiver list. The deliverable the waiver list is the part that needs review rather than filing."
+    "text": "<b>Lint / CDC / RDC clean reports with waiver list.</b> The clean reports and the waiver list are produced here, and the waiver list is the part that needs review rather than filing."
    },
    {
     "id": "RTL-D7",
     "rel": "gates",
-    "text": "RTL Freeze package. Freeze with open CDC violations is freezing a class of defect that will not appear until silicon."
+    "text": "<b>RTL Freeze package.</b> Freeze with open CDC violations is freezing a class of defect that will not appear until silicon."
    }
   ],
   "risks": [
-   "Waivers accumulated rather than reviewed",
-   "CDC run only at block level",
-   "Closure not regressed",
-   "Rule set weakened to reduce noise",
-   "Crossing inventory not reconciled"
+   "<b>Waivers accumulated rather than reviewed.</b> A waiver list nobody re-reads is where the surviving crossings hide, and they are the hardest silicon bugs to diagnose.",
+   "<b>CDC run only at block level.</b> The crossings that matter are usually between blocks, and neither owner runs the check that would find them.",
+   "<b>Closure not regressed.</b> Clean at one release and dirty at the next, with nobody noticing until the freeze package is assembled.",
+   "<b>Rule set weakened to reduce noise.</b> Turning off the rule that produces the most violations is the fastest way to a clean report and the slowest way to a working chip.",
+   "<b>Crossing inventory not reconciled.</b> Crossings found by the tool but absent from <code>ARCH-05</code>'s inventory mean the architecture and the implementation disagree."
   ],
   "roles": [
    {
@@ -16406,49 +16346,49 @@ export const activityDetails: Record<string, ActivityDetail> = {
   ],
   "criticalPath": false,
   "purpose": [
-   "Define the register map—the software contract—and generate the RTL, headers and documentation from one source so they cannot disagree.",
+   "Define the <b>register map—the software contract</b>—and generate the RTL, headers and documentation from one source so they cannot disagree.",
    "The register map is where hardware and firmware meet, and it is the interface most often maintained in three places. Generating the RTL, the C headers and the documentation from a single description is what makes them consistent; hand-maintaining them is what produces a driver that writes to the wrong offset."
   ],
   "steps": [
    {
     "n": 1,
-    "text": "Select register description language and tooling",
+    "text": "Select the register description language and generation tooling",
     "tat": 1,
     "lane": "main"
    },
    {
     "n": 2,
-    "text": "Allocate address map across blocks",
+    "text": "Allocate the address map across blocks",
     "tat": 1.5,
     "lane": "main"
    },
    {
     "n": 3,
-    "text": "Define per-block register",
+    "text": "Define registers per block",
     "tat": 2.5,
     "lane": "main"
    },
    {
     "n": 4,
-    "text": "Define access policy, reset value and side-effect",
+    "text": "Specify access policies, reset values and side effects",
     "tat": 1.5,
     "lane": "par"
    },
    {
     "n": 5,
-    "text": "Generate flow — RTL, headers, documentation, UVM model",
+    "text": "Build the generation flow for RTL, headers, documentation and the UVM model",
     "tat": 2,
     "lane": "par"
    },
    {
     "n": 6,
-    "text": "Review software of the map",
+    "text": "Run the software review of the map",
     "tat": 1.5,
     "lane": "par"
    },
    {
     "n": 7,
-    "text": "Map release and change control",
+    "text": "Release the map under change control",
     "tat": 3,
     "lane": "main"
    }
@@ -16483,20 +16423,20 @@ export const activityDetails: Record<string, ActivityDetail> = {
    {
     "id": "RTL-D2",
     "rel": "produces",
-    "text": "Register map / RDL and generated headers. This activity is the deliverable, generated from one source rather than maintained in several."
+    "text": "<b>Register map / RDL and generated headers.</b> The register map source and its generated views are produced here, generated from one source rather than maintained in several."
    },
    {
     "id": "RTL-D1",
     "rel": "feeds",
-    "text": "Block and top-level RTL release. Generated register RTL is part of every block, so the map's release cadence is tied to the RTL's."
+    "text": "<b>Block and top-level RTL release.</b> Generated register RTL is part of every block, so the map's release cadence is tied to the RTL's."
    }
   ],
   "risks": [
-   "Map maintained in more than one place",
-   "Software reviews the map after freeze",
-   "Side effects undocumented",
-   "Security access rules omitted",
-   "Reset values unspecified"
+   "<b>Map maintained in more than one place.</b> RTL, headers and documentation drift apart, and the driver eventually writes to an offset that moved.",
+   "<b>Software reviews the map after freeze.</b> An awkward interface then gets worked around in the driver, and the workaround becomes the contract nobody documented.",
+   "<b>Side effects undocumented.</b> A read that clears a status bit is a behavior firmware has to know about, and discovering it in the lab costs days per instance.",
+   "<b>Security access rules omitted.</b> Registers that should be locked in production lifecycle states are locked late or not at all.",
+   "<b>Reset values unspecified.</b> Registers whose reset value is whatever the implementer chose produce a boot sequence that depends on undocumented behavior."
   ],
   "roles": [
    {
@@ -16602,49 +16542,49 @@ export const activityDetails: Record<string, ActivityDetail> = {
   ],
   "criticalPath": false,
   "purpose": [
-   "Run trial synthesis continuously against the evolving RTL and feed timing, area and power back to block owners while the code can still change cheaply.",
+   "Run <b>trial synthesis continuously against the evolving RTL</b> and feed timing, area and power back to block owners while the code can still change cheaply.",
    "RTL that has never been synthesized is RTL whose PPA is unknown. A block that misses its area budget by 30% is a redesign if found at <code>SYN-02</code> and an afternoon if found here, and the difference is only whether anyone was running synthesis during implementation."
   ],
   "steps": [
    {
     "n": 1,
-    "text": "Define and document trial synthesis flow and constraint bootstrap",
+    "text": "Set up the trial synthesis flow and bootstrap constraints",
     "tat": 1.5,
     "lane": "main"
    },
    {
     "n": 2,
-    "text": "Define and document per-block trial synthesis and QoR baseline",
+    "text": "Run per-block trial synthesis and establish QoR baselines",
     "tat": 3,
     "lane": "main"
    },
    {
     "n": 3,
-    "text": "Define and document timing feedback to block owners",
+    "text": "Deliver timing feedback to block owners",
     "tat": 2.5,
     "lane": "par"
    },
    {
     "n": 4,
-    "text": "Track area and budget against ARCH-06",
+    "text": "Track area against the ARCH-06 budgets",
     "tat": 2,
     "lane": "main"
    },
    {
     "n": 5,
-    "text": "Define and document power and clock gating effectiveness feedback",
+    "text": "Feed back power and clock-gating effectiveness to block owners",
     "tat": 2,
     "lane": "par"
    },
    {
     "n": 6,
-    "text": "Define and document congestion and routability early indication",
+    "text": "Flag congestion and routability early indications",
     "tat": 2,
     "lane": "par"
    },
    {
     "n": 7,
-    "text": "Define and document recurring trial synthesis cadence and reporting",
+    "text": "Operate the recurring trial synthesis cadence and reporting",
     "tat": 5.5,
     "lane": "main"
    }
@@ -16660,9 +16600,9 @@ export const activityDetails: Record<string, ActivityDetail> = {
   "produces": [
    "Trial synthesis flow and constraints",
    "Per-block QoR baselines",
-   "Timing feedback to block owners",
-   "Budget tracking against ARCH-06",
-   "Timing, area and power feedback reports",
+   "Timing feedback reports to block owners",
+   "Area tracking against the ARCH-06 budgets",
+   "Power and clock-gating effectiveness reports",
    "Congestion and routability indications",
    "Trial synthesis cadence and reporting record"
   ],
@@ -16679,20 +16619,20 @@ export const activityDetails: Record<string, ActivityDetail> = {
    {
     "id": "RTL-D1",
     "rel": "feeds",
-    "text": "Block and top-level RTL release. A block released without a trial synthesis result has an unknown PPA, and the release quality reflects that."
+    "text": "<b>Block and top-level RTL release.</b> A block released without a trial synthesis result has an unknown PPA, and the release quality reflects that."
    },
    {
     "id": "RTL-D7",
     "rel": "feeds",
-    "text": "RTL Freeze package. The package states where each block sits against its budget, and this activity is where that number comes from."
+    "text": "<b>RTL Freeze package.</b> The package states where each block sits against its budget, and this activity is where that number comes from."
    }
   ],
   "risks": [
-   "Trial synthesis run once",
-   "Feedback delivered without constraints",
-   "Area overrun tolerated because it is early",
-   "Congestion ignored",
-   "Results not tied to the budget"
+   "<b>Trial synthesis run once.</b> A snapshot tells a block owner where they were; only a cadence tells them whether they are improving.",
+   "<b>Feedback delivered without constraints.</b> Timing results against bootstrap constraints that do not resemble the real ones send block owners chasing paths that do not matter.",
+   "<b>Area overrun tolerated because it is early.</b> Blocks rarely shrink after implementation, and an overrun accepted at trial synthesis is an overrun accepted permanently.",
+   "<b>Congestion ignored.</b> Routability problems are cheaper to fix in RTL structure than in placement, and the early indication is the only chance to do so.",
+   "<b>Results not tied to the budget.</b> QoR reported in absolute terms rather than against <code>ARCH-06</code> tells nobody whether the block is acceptable."
   ],
   "roles": [
    {
@@ -16802,49 +16742,49 @@ export const activityDetails: Record<string, ActivityDetail> = {
   ],
   "criticalPath": false,
   "purpose": [
-   "Run the build, regression and release machinery the whole stage depends on—continuous integration, nightly regressions, tagged releases and a reproducible environment.",
+   "Run the <b>build, regression and release machinery</b> the whole stage depends on—continuous integration, nightly regressions, tagged releases and a reproducible environment.",
    "This is infrastructure, and its value shows only in its absence. Without a nightly build, a break introduced on Tuesday is found on Friday by whoever needed the design; without release tagging, a bug cannot be reproduced against the version that had it."
   ],
   "steps": [
    {
     "n": 1,
-    "text": "Build system and dependency management setup",
+    "text": "Set up the build system and dependency management",
     "tat": 2.5,
     "lane": "main"
    },
    {
     "n": 2,
-    "text": "Continuously integration and per-commit checking",
+    "text": "Stand up continuous integration with per-commit checks",
     "tat": 3,
     "lane": "main"
    },
    {
     "n": 3,
-    "text": "Define nightly regression and scheduling",
+    "text": "Define and schedule the nightly regression",
     "tat": 2.5,
     "lane": "par"
    },
    {
     "n": 4,
-    "text": "Release tagging and version manifest process",
+    "text": "Establish release tagging and the version manifest process",
     "tat": 2,
     "lane": "main"
    },
    {
     "n": 5,
-    "text": "Define and document compute and license capacity management for regressions",
+    "text": "Manage compute and license capacity for regressions",
     "tat": 2,
     "lane": "par"
    },
    {
     "n": 6,
-    "text": "Triage failure and notification workflow",
+    "text": "Build the failure triage and notification workflow",
     "tat": 2.5,
     "lane": "par"
    },
    {
     "n": 7,
-    "text": "Continuously operation and maintenance across the stage",
+    "text": "Operate and maintain the machinery across the stage",
     "tat": 22.5,
     "lane": "main"
    }
@@ -16879,20 +16819,20 @@ export const activityDetails: Record<string, ActivityDetail> = {
    {
     "id": "RTL-D3",
     "rel": "produces",
-    "text": "Integration testbench and build system. The deliverable its measure is that every release is reproducible from a tag."
+    "text": "<b>Integration testbench and build system.</b> The build, regression and release machinery is built and operated here, and its measure is that every release is reproducible from a tag."
    },
    {
     "id": "RTL-D1",
     "rel": "feeds",
-    "text": "Block and top-level RTL release. Releases are produced and tagged by this machinery; without it a release is a directory copy."
+    "text": "<b>Block and top-level RTL release.</b> Releases are produced and tagged by this machinery; without it a release is a directory copy."
    }
   ],
   "risks": [
-   "Red builds tolerated",
-   "Regression runtime exceeding the night",
-   "Releases produced by hand",
-   "Capacity not managed",
-   "Triage unowned"
+   "<b>Red builds tolerated.</b> Once a broken build is normal, the signal is gone and every subsequent break is invisible.",
+   "<b>Regression runtime exceeding the night.</b> A nightly that takes thirty hours is not nightly, and the feedback loop silently doubles.",
+   "<b>Releases produced by hand.</b> An untagged release cannot be reproduced, and an IP bug found against it cannot be reported precisely.",
+   "<b>Capacity not managed.</b> Regressions competing with verification for the same licences slow both, usually at the point in the schedule where both matter most.",
+   "<b>Triage unowned.</b> Failures nobody is assigned to investigate accumulate until the regression result is meaningless."
   ],
   "roles": [
    {
@@ -16999,49 +16939,49 @@ export const activityDetails: Record<string, ActivityDetail> = {
   ],
   "criticalPath": true,
   "purpose": [
-   "Control what changes and when—specification change requests, ECO board decisions and the freeze itself—so the design converges rather than oscillates.",
-   "Every stage downstream assumes RTL stops moving at some point. Change control is how that point is created: not by refusing changes, but by making each one visible, costed and decided by people who can see what it affects."
+   "Control what changes and when—<b>specification change requests, ECO board decisions and the freeze itself</b>—so the design converges rather than oscillates.",
+   "Every stage downstream assumes RTL stops moving at some point. Change control is how that point is created: not by refusing changes, but by making each one visible, costed and decided by people who can see what it affects. The freeze is this activity's output, and its credibility is the whole program's."
   ],
   "steps": [
    {
     "n": 1,
-    "text": "Define change control process and ECO board",
+    "text": "Define the change control process and ECO board charter",
     "tat": 1.5,
     "lane": "main"
    },
    {
     "n": 2,
-    "text": "Assess change request intake and impact workflow",
+    "text": "Build the change request intake and impact assessment workflow",
     "tat": 2,
     "lane": "main"
    },
    {
     "n": 3,
-    "text": "Make and document the eCO board operation and records decision",
+    "text": "Operate the ECO board and record decisions",
     "tat": 20,
     "lane": "main"
    },
    {
     "n": 4,
-    "text": "Verify change tracking against blocks, and synthesis",
+    "text": "Track approved changes across blocks, verification and synthesis",
     "tat": 3,
     "lane": "par"
    },
    {
     "n": 5,
-    "text": "Define freeze criteria and readiness tracking",
+    "text": "Define freeze criteria and track readiness against them",
     "tat": 2.5,
     "lane": "par"
    },
    {
     "n": 6,
-    "text": "Define and document rTL Freeze package assembly",
+    "text": "Assemble the RTL Freeze package",
     "tat": 3,
     "lane": "main"
    },
    {
     "n": 7,
-    "text": "Define and document freeze declaration and post-freeze exception policy",
+    "text": "Declare freeze and publish the post-freeze exception policy",
     "tat": 3.5,
     "lane": "main"
    }
@@ -17076,20 +17016,20 @@ export const activityDetails: Record<string, ActivityDetail> = {
    {
     "id": "RTL-D7",
     "rel": "produces",
-    "text": "RTL Freeze package. This activity is the deliverable—the freeze, its criteria, its exceptions and the change history behind it."
+    "text": "<b>RTL Freeze package.</b> The freeze package is assembled and declared here—the freeze, its criteria, its exceptions and the change history behind it."
    },
    {
     "id": "RTL-D1",
     "rel": "gates",
-    "text": "Block and top-level RTL release. After freeze, a release is only produced through an approved exception."
+    "text": "<b>Block and top-level RTL release.</b> After freeze, a release is only produced through an approved exception."
    }
   ],
   "risks": [
-   "Freeze declared by date rather than by criteria",
-   "Impact assessment skipped for small changes",
-   "Post-freeze exceptions ungoverned",
-   "Board without downstream representation",
-   "Change log not reconciled with the release"
+   "<b>Freeze declared by date rather than by criteria.</b> A gate that passes because it was scheduled teaches everyone that gates mean nothing.",
+   "<b>Impact assessment skipped for small changes.</b> The cost of a change is rarely in the block that changes; it is in the verification that has to be re-run.",
+   "<b>Post-freeze exceptions ungoverned.</b> Changes will be needed after freeze; without a policy they happen informally and nobody knows what the design contains.",
+   "<b>Board without downstream representation.</b> Verification and synthesis are the ones who pay for most changes, and a board without them approves costs it cannot see.",
+   "<b>Change log not reconciled with the release.</b> A freeze package that does not match what was actually built is a package nobody can rely on."
   ],
   "roles": [
    {
@@ -17199,43 +17139,43 @@ export const activityDetails: Record<string, ActivityDetail> = {
   ],
   "criticalPath": true,
   "purpose": [
-   "Write the plan that says what will be verified, how, and how anyone will know it is done—feature by feature, with a coverage model behind each claim.",
-   "Completing this work early provides a clear basis for downstream design decisions and reduces late rework, schedule risk, and integration issues."
+   "Write the plan that says <b>what will be verified, how, and how anyone will know it is done</b>—feature by feature, with a coverage model behind each claim.",
+   "Verification is the largest line of effort in the program, and without a plan it is 650 man-months of activity with no definition of completion. The coverage model is what turns \"we tested it\" into a measurable statement, and the features nobody writes into the plan are the features nobody verifies."
   ],
   "steps": [
    {
     "n": 1,
-    "text": "Extract feature from the architecture and block specifications",
+    "text": "Extract the feature list from the architecture and block specifications",
     "tat": 1.5,
     "lane": "main"
    },
    {
     "n": 2,
-    "text": "Verify strategy per feature — simulation, formal, emulation",
+    "text": "Assign a verification strategy per feature — simulation, formal or emulation",
     "tat": 1.5,
     "lane": "main"
    },
    {
     "n": 3,
-    "text": "Define coverage model — functional, code, assertion",
+    "text": "Define the coverage model — functional, code and assertion",
     "tat": 2,
     "lane": "main"
    },
    {
     "n": 4,
-    "text": "Define closure criteria and signoff per block",
+    "text": "Define closure criteria and signoff per block and at chip level",
     "tat": 1,
     "lane": "par"
    },
    {
     "n": 5,
-    "text": "Define and document resource, compute and schedule modeling",
+    "text": "Model the resource, compute and schedule demand",
     "tat": 1,
     "lane": "par"
    },
    {
     "n": 6,
-    "text": "Verify plan review with design and architecture",
+    "text": "Review the verification plan with design and architecture",
     "tat": 3,
     "lane": "main"
    }
@@ -17268,20 +17208,20 @@ export const activityDetails: Record<string, ActivityDetail> = {
    {
     "id": "DV-D1",
     "rel": "produces",
-    "text": "Verification plan (vPlan) and coverage model. The deliverable the coverage model is what every later closure claim is measured against."
+    "text": "<b>Verification plan (vPlan) and coverage model.</b> The plan and its coverage model are written here, and the coverage model is what every later closure claim is measured against."
    },
    {
     "id": "DV-D8",
     "rel": "gates",
-    "text": "DV closure signoff package. Closure is defined here; a signoff against criteria written later is a signoff against a moving target."
+    "text": "<b>DV closure signoff package.</b> Closure is defined here; a signoff against criteria written later is a signoff against a moving target."
    }
   ],
   "risks": [
-   "Plan written from the RTL rather than the specification",
-   "Coverage model that measures activity rather than intent",
-   "Closure criteria left vague",
-   "Architecture not in the review",
-   "Resource model omitted"
+   "<b>Plan written from the RTL rather than the specification.</b> It then verifies what was built rather than what was specified, and the two differ exactly where the bugs are.",
+   "<b>Coverage model that measures activity rather than intent.</b> Code coverage says lines were executed; functional coverage says features were exercised, and only the second answers the question.",
+   "<b>Closure criteria left vague.</b> \"High coverage\" is not a criterion anyone can sign, and it becomes whatever the schedule allows.",
+   "<b>Architecture not in the review.</b> The features the plan missed are exactly the ones only the specification's author would notice.",
+   "<b>Resource model omitted.</b> A plan that needs more compute or more engineers than exist is a plan whose closure date is fiction."
   ],
   "roles": [
    {
@@ -17394,55 +17334,55 @@ export const activityDetails: Record<string, ActivityDetail> = {
   ],
   "criticalPath": true,
   "purpose": [
-   "Build the verification environment—UVM agents, scoreboards, sequences, VIP integration—that every test in the program will run inside.",
-   "The environment is infrastructure with a long lead time and no visible output until it works. Sixty M/M buys agents for every interface, scoreboards that check, and reusable sequences."
+   "Build the <b>verification environment</b>—UVM agents, scoreboards, sequences, VIP integration—that every test in the program will run inside.",
+   "The environment is infrastructure with a long lead time and no visible output until it works. Sixty man-months buys agents for every interface, scoreboards that actually check, and reusable sequences. Testbench bring-up running late is the single most common reason verification starts late, and it starts late invisibly."
   ],
   "steps": [
    {
     "n": 1,
-    "text": "Set up environment architecture and reuse strategy",
+    "text": "Define the environment architecture and reuse strategy",
     "tat": 1.5,
     "lane": "main"
    },
    {
     "n": 2,
-    "text": "Define and document agent development per interface",
+    "text": "Develop UVM agents for each interface",
     "tat": 4,
     "lane": "main"
    },
    {
     "n": 3,
-    "text": "Integrate third-party VIP and configuration",
+    "text": "Integrate and configure third-party VIP",
     "tat": 3,
     "lane": "par"
    },
    {
     "n": 4,
-    "text": "Define and document scoreboard and reference model development",
+    "text": "Develop scoreboards and reference models",
     "tat": 4,
     "lane": "main"
    },
    {
     "n": 5,
-    "text": "Define and document sequence library and stimulus infrastructure",
+    "text": "Build the sequence library and stimulus infrastructure",
     "tat": 3,
     "lane": "par"
    },
    {
     "n": 6,
-    "text": "Integrate register model from the RDL source",
+    "text": "Integrate the register model generated from the RDL source",
     "tat": 2,
     "lane": "par"
    },
    {
     "n": 7,
-    "text": "Bring up environment on the first block",
+    "text": "Bring the environment up on the first real block",
     "tat": 2.5,
     "lane": "main"
    },
    {
     "n": 8,
-    "text": "Release environment and documentation",
+    "text": "Release the environment with its documentation",
     "tat": 2,
     "lane": "main"
    }
@@ -17461,7 +17401,7 @@ export const activityDetails: Record<string, ActivityDetail> = {
    "Integrated third-party VIP",
    "Scoreboards and reference models",
    "Sequence library",
-   "Register model integration",
+   "Integrated register model from the RDL source",
    "Environment bring-up results on the first block",
    "Released environment with documentation"
   ],
@@ -17479,20 +17419,20 @@ export const activityDetails: Record<string, ActivityDetail> = {
    {
     "id": "DV-D2",
     "rel": "produces",
-    "text": "UVM testbenches and integrated VIP. This activity is the deliverable—the environment every subsequent verification activity runs inside."
+    "text": "<b>UVM testbenches and integrated VIP.</b> The environment and its integrated VIP are built here—the infrastructure every subsequent verification activity runs inside."
    },
    {
     "id": "DV-D1",
     "rel": "feeds",
-    "text": "Verification plan and coverage model. Coverage is collected by the environment, so what it can measure bounds what the plan can claim."
+    "text": "<b>Verification plan and coverage model.</b> Coverage is collected by the environment, so what it can measure bounds what the plan can claim."
    }
   ],
   "risks": [
-   "Bring-up slower than planned and invisible",
-   "Scoreboards that check protocol rather than function",
-   "No reuse strategy",
-   "Register model hand-written",
-   "VIP licences short"
+   "<b>Bring-up slower than planned and invisible.</b> Environment work has no test-pass metric, so slippage is not visible until testing should have started.",
+   "<b>Scoreboards that check protocol rather than function.</b> A legal transaction carrying wrong data passes, and the bug survives to chip level.",
+   "<b>No reuse strategy.</b> Every block building its own environment multiplies effort and makes results incomparable across blocks.",
+   "<b>Register model hand-written.</b> A model that diverges from the RDL source produces tests that pass against the wrong offsets.",
+   "<b>VIP licences short.</b> Verification concurrency is capped by VIP seats, and the cap is discovered when regressions start queuing."
   ],
   "roles": [
    {
@@ -17606,55 +17546,55 @@ export const activityDetails: Record<string, ActivityDetail> = {
   ],
   "criticalPath": true,
   "purpose": [
-   "Verify every block against its specification with constrained-random and directed testing, and drive each one to its coverage closure criteria.",
-   "Two hundred M/M—the largest activity in the template—spread across thirty weeks and every block in the design. This is where most bugs are found and most verification time is spent, and its efficiency is set almost entirely by decisions taken in <code>DV-01</code> and <code>DV-02</code>."
+   "Verify every block against its specification with <b>constrained-random and directed testing</b>, and drive each one to its coverage closure criteria.",
+   "Two hundred man-months—the largest activity in the template—spread across thirty weeks and every block in the design. This is where most bugs are found and most verification time is spent, and its efficiency is set almost entirely by decisions taken in <code>DV-01</code> and <code>DV-02</code>."
   ],
   "steps": [
    {
     "n": 1,
-    "text": "Define and document per-block testbench instantiation from the shared environment",
+    "text": "Instantiate per-block testbenches from the shared environment",
     "tat": 2.5,
     "lane": "main"
    },
    {
     "n": 2,
-    "text": "Define and document directed test development for specified behavior",
+    "text": "Develop directed tests for specified behavior",
     "tat": 5,
     "lane": "main"
    },
    {
     "n": 3,
-    "text": "Define and document constrained-random stimulus and constraint development",
+    "text": "Develop constrained-random stimulus and tune the constraints",
     "tat": 6,
     "lane": "main"
    },
    {
     "n": 4,
-    "text": "Define and document assertion development and binding",
+    "text": "Write and bind assertions",
     "tat": 4,
     "lane": "par"
    },
    {
     "n": 5,
-    "text": "Test corner-case and error-injection",
+    "text": "Run corner-case and error-injection testing",
     "tat": 5,
     "lane": "main"
    },
    {
     "n": 6,
-    "text": "Analyze coverage and hole closure per block",
+    "text": "Analyze coverage and close holes per block",
     "tat": 6,
     "lane": "main"
    },
    {
     "n": 7,
-    "text": "Debug and bug reporting loop with block owners",
+    "text": "Run the debug and bug reporting loop with block owners",
     "tat": 8,
     "lane": "par"
    },
    {
     "n": 8,
-    "text": "Close block-level and signoff",
+    "text": "Close each block against the DV-01 criteria and sign off",
     "tat": 5.5,
     "lane": "main"
    }
@@ -17670,13 +17610,13 @@ export const activityDetails: Record<string, ActivityDetail> = {
   "produces": [
    "Per-block testbenches and test suites",
    "Directed test suite for specified behavior",
-   "Directed and constrained-random tests",
+   "Constrained-random test suite with tuned constraints",
    "Bound assertion set",
    "Corner-case and error-injection results",
    "Coverage analysis and hole closure records",
    "Bug reports and debug log with block owners",
    "Assertions bound to block interfaces",
-   "Block-level signoff records"
+   "Per-block closure evidence package"
   ],
   "producedBy": [
    1,
@@ -17693,25 +17633,25 @@ export const activityDetails: Record<string, ActivityDetail> = {
    {
     "id": "DV-D2",
     "rel": "feeds",
-    "text": "UVM testbenches and integrated VIP. Per-block testbenches extend the shared environment and are delivered with it."
+    "text": "<b>UVM testbenches and integrated VIP.</b> Per-block testbenches extend the shared environment and are delivered with it."
    },
    {
     "id": "DV-D3",
     "rel": "feeds",
-    "text": "Regression and coverage dashboards. Block coverage is the largest contributor to the dashboards <code>DV-10</code> maintains."
+    "text": "<b>Regression and coverage dashboards.</b> Block coverage is the largest contributor to the dashboards <code>DV-10</code> maintains."
    },
    {
     "id": "DV-D8",
     "rel": "feeds",
-    "text": "DV closure signoff package. Block signoff is the substance of chip-level closure; the package aggregates it."
+    "text": "<b>DV closure signoff package.</b> Block signoff is the substance of chip-level closure; the package aggregates it."
    }
   ],
   "risks": [
-   "Coverage closed by adding coverage points rather than tests",
-   "Constrained-random left unconstrained",
-   "Corner cases skipped because the specification is silent",
-   "Debug loop bottlenecked on block owners",
-   "Blocks signed off against different standards"
+   "<b>Coverage closed by adding coverage points rather than tests.</b> Redefining the model to match what was tested produces a closure number that measures nothing.",
+   "<b>Constrained-random left unconstrained.</b> Random stimulus without well-designed constraints spends compute exploring illegal or uninteresting space.",
+   "<b>Corner cases skipped because the specification is silent.</b> The gap belongs back in <code>RTL-01</code>, not quietly into the untested set.",
+   "<b>Debug loop bottlenecked on block owners.</b> Verification finds faster than design fixes, and the queue is where the schedule quietly goes.",
+   "<b>Blocks signed off against different standards.</b> Without enforced criteria from <code>DV-01</code>, each block closes to whatever its owner considered enough."
   ],
   "roles": [
    {
@@ -17822,55 +17762,55 @@ export const activityDetails: Record<string, ActivityDetail> = {
   ],
   "criticalPath": true,
   "purpose": [
-   "Verify the chip as one system running realistic scenarios—boot, configuration, traffic, power transitions, error recovery—rather than as a collection of verified blocks.",
-   "Blocks that each pass in isolation routinely fail together. Chip-level verification is where arbitration, ordering, deadlock, reset sequencing and end-to-end data integrity are tested, and none of those are visible from inside a block."
+   "Verify the chip as <b>one system running realistic scenarios</b>—boot, configuration, traffic, power transitions, error recovery—rather than as a collection of verified blocks.",
+   "Blocks that each pass in isolation routinely fail together. Chip-level verification is where arbitration, ordering, deadlock, reset sequencing and end-to-end data integrity are actually tested, and none of those are visible from inside a block."
   ],
   "steps": [
    {
     "n": 1,
-    "text": "Define and document chip-level environment assembly",
+    "text": "Assemble the chip-level verification environment",
     "tat": 2.5,
     "lane": "main"
    },
    {
     "n": 2,
-    "text": "Define and document boot and configuration scenario development",
+    "text": "Develop boot and configuration scenarios",
     "tat": 3,
     "lane": "main"
    },
    {
     "n": 3,
-    "text": "Test end-to-end data path and integrity",
+    "text": "Test end-to-end data paths and data integrity",
     "tat": 4,
     "lane": "main"
    },
    {
     "n": 4,
-    "text": "Test interconnect stress, arbitration and deadlock",
+    "text": "Stress the interconnect for arbitration and deadlock under contention",
     "tat": 3.5,
     "lane": "par"
    },
    {
     "n": 5,
-    "text": "Test power state transition and DVFS scenario",
+    "text": "Test power state transitions and DVFS scenarios",
     "tat": 3,
     "lane": "par"
    },
    {
     "n": 6,
-    "text": "Define and document error injection and recovery at system level",
+    "text": "Inject errors and verify recovery at system level",
     "tat": 3.5,
     "lane": "main"
    },
    {
     "n": 7,
-    "text": "Define and document realistic workload scenarios from the DEF-02 suite",
+    "text": "Run realistic workload scenarios from the DEF-02 suite",
     "tat": 3.5,
     "lane": "par"
    },
    {
     "n": 8,
-    "text": "Close chip-level coverage and signoff",
+    "text": "Close chip-level coverage and sign off",
     "tat": 9,
     "lane": "main"
    }
@@ -17891,7 +17831,7 @@ export const activityDetails: Record<string, ActivityDetail> = {
    "Power transition scenario results",
    "System-level error injection and recovery results",
    "Realistic workload scenarios in the testbench",
-   "Chip-level coverage closure and signoff"
+   "Chip-level coverage closure and signoff record"
   ],
   "producedBy": [
    1,
@@ -17907,20 +17847,20 @@ export const activityDetails: Record<string, ActivityDetail> = {
    {
     "id": "DV-D8",
     "rel": "feeds",
-    "text": "DV closure signoff package. Chip-level closure is the part of the package that speaks to whether the system works, rather than the parts."
+    "text": "<b>DV closure signoff package.</b> Chip-level closure is the part of the package that speaks to whether the system works, rather than the parts."
    },
    {
     "id": "DV-D3",
     "rel": "feeds",
-    "text": "Regression and coverage dashboards. Chip-level scenarios are the slowest and most informative regressions on the dashboard."
+    "text": "<b>Regression and coverage dashboards.</b> Chip-level scenarios are the slowest and most informative regressions on the dashboard."
    }
   ],
   "risks": [
-   "Started too late because blocks are not ready",
-   "Scenarios written by verification alone",
-   "Deadlock and arbitration untested",
-   "Power transitions verified functionally only",
-   "Simulation too slow to run meaningful scenarios"
+   "<b>Started too late because blocks are not ready.</b> Chip-level defects take longest to find and fix, and compressing the window pushes them into silicon.",
+   "<b>Scenarios written by verification alone.</b> Realistic use comes from the workload suite and from software; invented scenarios test what verification imagined.",
+   "<b>Deadlock and arbitration untested.</b> These fail only under contention, which random block-level stimulus does not create.",
+   "<b>Power transitions verified functionally only.</b> Retention, isolation and sequencing across a real power state change are where low-power designs actually fail.",
+   "<b>Simulation too slow to run meaningful scenarios.</b> If a boot takes a day, the scenario set shrinks to what fits, and emulation in <code>DV-08</code> is the answer."
   ],
   "roles": [
    {
@@ -18035,49 +17975,49 @@ export const activityDetails: Record<string, ActivityDetail> = {
   ],
   "criticalPath": false,
   "purpose": [
-   "Use formal proof where simulation is weak—connectivity, control logic, arbiters, security properties, register access—and prove exhaustively what testing can only sample.",
-   "Formal answers a different question. Simulation shows that the cases tried worked; a proof shows that no case exists that does not."
+   "Use <b>formal proof where simulation is weak</b>—connectivity, control logic, arbiters, security properties, register access—and prove exhaustively what testing can only sample.",
+   "Formal answers a different question. Simulation shows that the cases tried worked; a proof shows that no case exists that does not. For arbiters, protocol state machines and security isolation, the space is too large to sample and the failure modes are exactly the ones random stimulus misses."
   ],
   "steps": [
    {
     "n": 1,
-    "text": "Select target — where formal beats simulation",
+    "text": "Select formal targets where proof beats simulation",
     "tat": 1.5,
     "lane": "main"
    },
    {
     "n": 2,
-    "text": "Define property per target",
+    "text": "Write property specifications per target",
     "tat": 3,
     "lane": "main"
    },
    {
     "n": 3,
-    "text": "Define and document connectivity and structural proof at chip level",
+    "text": "Prove connectivity and structural properties at chip level",
     "tat": 2.5,
     "lane": "par"
    },
    {
     "n": 4,
-    "text": "Define and document control logic and arbiter proofs",
+    "text": "Prove control logic and arbiter properties",
     "tat": 3.5,
     "lane": "main"
    },
    {
     "n": 5,
-    "text": "Define and document security and isolation property proofs",
+    "text": "Prove security and isolation properties",
     "tat": 2.5,
     "lane": "par"
    },
    {
     "n": 6,
-    "text": "Review assumption and over-constraint checking",
+    "text": "Review assumptions and check for over-constraint",
     "tat": 2.5,
     "lane": "main"
    },
    {
     "n": 7,
-    "text": "Close proof , bounded results and reporting",
+    "text": "Close proofs, state bounded results and report",
     "tat": 5.5,
     "lane": "main"
    }
@@ -18112,20 +18052,20 @@ export const activityDetails: Record<string, ActivityDetail> = {
    {
     "id": "DV-D4",
     "rel": "produces",
-    "text": "Formal proof reports with assumption list. The deliverable the assumption list is what makes the proofs auditable."
+    "text": "<b>Formal proof reports with assumption list.</b> The proof reports and their assumption lists are produced here, and the assumption list is what makes the proofs auditable."
    },
    {
     "id": "DV-D8",
     "rel": "feeds",
-    "text": "DV closure signoff package. Formally proved properties are a different kind of evidence from coverage, and the package should distinguish them."
+    "text": "<b>DV closure signoff package.</b> Formally proved properties are a different kind of evidence from coverage, and the package should distinguish them."
    }
   ],
   "risks": [
-   "Over-constrained proofs",
-   "Formal applied where simulation is better",
-   "Bounded results reported as proofs",
-   "Properties written from the RTL",
-   "Security properties omitted"
+   "<b>Over-constrained proofs.</b> Assumptions that exclude the failing case produce a green result and no information, and only assumption review catches it.",
+   "<b>Formal applied where simulation is better.</b> Datapath and workload behavior are poor formal targets; applying it there consumes specialist time for little return.",
+   "<b>Bounded results reported as proofs.</b> A property proved to depth twenty is not proved; the bound has to be stated with the result.",
+   "<b>Properties written from the RTL.</b> A property derived from the implementation proves the implementation matches itself.",
+   "<b>Security properties omitted.</b> Isolation and access control are exactly the properties simulation samples poorly and formal proves well."
   ],
   "roles": [
    {
@@ -18231,49 +18171,49 @@ export const activityDetails: Record<string, ActivityDetail> = {
   ],
   "criticalPath": false,
   "purpose": [
-   "Verify the design against its power intent—isolation, retention, level shifting, power sequencing—because none of it is visible in a normal functional simulation.",
-   "Completing this work early provides a clear basis for downstream design decisions and reduces late rework, schedule risk, and integration issues."
+   "Verify the design <b>against its power intent</b>—isolation, retention, level shifting, power sequencing—because none of it is visible in a normal functional simulation.",
+   "A design that passes every functional test can still corrupt state on a power-down, drive an isolated domain, or fail to retain what it needed. Low-power verification simulates the domains actually powering down, and it is the only place these failures appear before silicon."
   ],
   "steps": [
    {
     "n": 1,
-    "text": "Simulate uPF-aware environment setup",
+    "text": "Set up the UPF-aware simulation environment",
     "tat": 1.5,
     "lane": "main"
    },
    {
     "n": 2,
-    "text": "Define and document static UPF structural checking",
+    "text": "Run static UPF structural checks",
     "tat": 1.5,
     "lane": "main"
    },
    {
     "n": 3,
-    "text": "Verify isolation and level shifter",
+    "text": "Verify isolation and level shifters",
     "tat": 2,
     "lane": "main"
    },
    {
     "n": 4,
-    "text": "Verify retention and state restoration",
+    "text": "Verify retention and state restoration through real power-down cycles",
     "tat": 2,
     "lane": "par"
    },
    {
     "n": 5,
-    "text": "Verify power sequencing and controller",
+    "text": "Verify power sequencing and the power management controller",
     "tat": 2,
     "lane": "par"
    },
    {
     "n": 6,
-    "text": "Integrate power-aware regression",
+    "text": "Integrate power-aware tests into the standing regression",
     "tat": 1.5,
     "lane": "par"
    },
    {
     "n": 7,
-    "text": "Close low-power coverage and reporting",
+    "text": "Close low-power coverage and report",
     "tat": 5,
     "lane": "main"
    }
@@ -18292,7 +18232,7 @@ export const activityDetails: Record<string, ActivityDetail> = {
    "Isolation and level shifter verification results",
    "Retention verification results",
    "Power sequencing verification results",
-   "Power-aware regression integration",
+   "Power-aware tests in the standing regression",
    "Low-power coverage report"
   ],
   "producedBy": [
@@ -18308,20 +18248,20 @@ export const activityDetails: Record<string, ActivityDetail> = {
    {
     "id": "DV-D5",
     "rel": "produces",
-    "text": "Low-power verification report. The deliverable it is the only evidence that the power architecture works as intended."
+    "text": "<b>Low-power verification report.</b> The report is produced entirely here, and it is the only evidence that the power architecture works as intended."
    },
    {
     "id": "DV-D3",
     "rel": "feeds",
-    "text": "Regression and coverage dashboards. Power-aware regressions belong in the same dashboard as functional ones, not in a side report."
+    "text": "<b>Regression and coverage dashboards.</b> Power-aware regressions belong in the same dashboard as functional ones, not in a side report."
    }
   ],
   "risks": [
-   "Only static checking performed",
-   "Retention verified for the intended state only",
-   "Power sequences tested in isolation",
-   "Power-aware simulation excluded from regression",
-   "UPF used for verification differing from synthesis"
+   "<b>Only static checking performed.</b> Structural UPF checks find missing cells; only simulation finds a design that corrupts state when the domain actually goes down.",
+   "<b>Retention verified for the intended state only.</b> What is not retained matters as much as what is, and a design that retains too little fails on resume.",
+   "<b>Power sequences tested in isolation.</b> The failure is usually a power transition during traffic, not a clean idle transition.",
+   "<b>Power-aware simulation excluded from regression.</b> It is slow, so it gets run once; a later RTL change then breaks it silently.",
+   "<b>UPF used for verification differing from synthesis.</b> Two versions of the intent means verifying one design and building another."
   ],
   "roles": [
    {
@@ -18428,49 +18368,49 @@ export const activityDetails: Record<string, ActivityDetail> = {
   ],
   "criticalPath": false,
   "purpose": [
-   "Verify the boundary between the analog macros and the digital design—control interfaces, calibration sequences, startup ordering—with the analog represented by models correlated to its circuits.",
-   "Analog blocks fail where they meet digital. A PLL that locks perfectly and a controller that sequences perfectly can still disagree about when lock is valid."
+   "Verify the <b>boundary between the analog macros and the digital design</b>—control interfaces, calibration sequences, startup ordering—with the analog represented by models correlated to its circuits.",
+   "Analog blocks fail where they meet digital. A PLL that locks perfectly and a controller that sequences perfectly can still disagree about when lock is valid. Co-simulation is where those disagreements appear, and the alternative is finding them at bring-up with an oscilloscope."
   ],
   "steps": [
    {
     "n": 1,
-    "text": "Integrate co-simulation environment and model",
+    "text": "Build the co-simulation environment and integrate the models",
     "tat": 2,
     "lane": "main"
    },
    {
     "n": 2,
-    "text": "Characterize model fidelity review against AMS",
+    "text": "Review model fidelity against the AMS characterization results",
     "tat": 2,
     "lane": "main"
    },
    {
     "n": 3,
-    "text": "Verify control and configuration interface",
+    "text": "Verify the control and configuration interfaces",
     "tat": 2.5,
     "lane": "main"
    },
    {
     "n": 4,
-    "text": "Verify calibration and training sequence",
+    "text": "Verify calibration and training sequences from the digital side",
     "tat": 2.5,
     "lane": "par"
    },
    {
     "n": 5,
-    "text": "Verify startup, lock and ready-signaling",
+    "text": "Verify startup, lock and ready signaling",
     "tat": 2,
     "lane": "par"
    },
    {
     "n": 6,
-    "text": "Define and document analog fault and degraded-mode behavior",
+    "text": "Verify analog fault and degraded-mode behavior",
     "tat": 1.5,
     "lane": "par"
    },
    {
     "n": 7,
-    "text": "Close co-simulation and findings report",
+    "text": "Close co-simulation and report the findings",
     "tat": 5.5,
     "lane": "main"
    }
@@ -18505,20 +18445,20 @@ export const activityDetails: Record<string, ActivityDetail> = {
    {
     "id": "DV-D2",
     "rel": "feeds",
-    "text": "UVM testbenches and integrated VIP. The co-simulation environment extends the shared testbench rather than standing beside it."
+    "text": "<b>UVM testbenches and integrated VIP.</b> The co-simulation environment extends the shared testbench rather than standing beside it."
    },
    {
     "id": "DV-D8",
     "rel": "feeds",
-    "text": "DV closure signoff package. Mixed-signal boundary closure is a distinct claim in the package, because it rests on models rather than on RTL alone."
+    "text": "<b>DV closure signoff package.</b> Mixed-signal boundary closure is a distinct claim in the package, because it rests on models rather than on RTL alone."
    }
   ],
   "risks": [
-   "Models never correlated",
-   "Calibration sequences untested from the digital side",
-   "Ready and lock signaling assumed",
-   "Degraded modes unverified",
-   "Co-simulation too slow to regress"
+   "<b>Models never correlated.</b> Digital passes against a fiction, and the mismatch reaches silicon as a bring-up failure nobody predicted.",
+   "<b>Calibration sequences untested from the digital side.</b> A calibration that works when the analog engineer drives it manually is first exercised by firmware at bring-up.",
+   "<b>Ready and lock signaling assumed.</b> When a lock signal becomes valid is a contract; each side assuming a different answer produces intermittent boot failures.",
+   "<b>Degraded modes unverified.</b> What the digital side does when a PLL fails to lock is behavior that only matters in the field, where it matters a great deal.",
+   "<b>Co-simulation too slow to regress.</b> Run once and never again, it cannot catch a later change on either side."
   ],
   "roles": [
    {
@@ -18630,55 +18570,55 @@ export const activityDetails: Record<string, ActivityDetail> = {
   ],
   "criticalPath": false,
   "purpose": [
-   "Stand up emulation and FPGA prototyping—partitioning, capacity, speed, debug—so that scenarios too long for simulation can be run.",
+   "Stand up <b>emulation and FPGA prototyping</b>—partitioning, capacity, speed, debug—so that scenarios too long for simulation can actually be run.",
    "A boot that takes a day in simulation takes minutes in emulation, and workload scenarios that are impossible in one are routine in the other. Emulation is also the platform firmware development runs on, which makes its availability date a dependency for a team outside this stage entirely."
   ],
   "steps": [
    {
     "n": 1,
-    "text": "Select platform and capacity sizing",
+    "text": "Select the platform and size the capacity",
     "tat": 2,
     "lane": "main"
    },
    {
     "n": 2,
-    "text": "Define and document design partitioning across the platform",
+    "text": "Partition the design across the platform",
     "tat": 3.5,
     "lane": "main"
    },
    {
     "n": 3,
-    "text": "Define and document memory and interface modeling on the platform",
+    "text": "Model memories and interfaces on the platform",
     "tat": 3,
     "lane": "par"
    },
    {
     "n": 4,
-    "text": "Bring up and first boot on emulation",
+    "text": "Bring the platform up to first boot",
     "tat": 4,
     "lane": "main"
    },
    {
     "n": 5,
-    "text": "Debug and visibility infrastructure",
+    "text": "Build the debug and visibility infrastructure",
     "tat": 3,
     "lane": "par"
    },
    {
     "n": 6,
-    "text": "Define and document performance and throughput tuning",
+    "text": "Tune performance and throughput",
     "tat": 2.5,
     "lane": "par"
    },
    {
     "n": 7,
-    "text": "Define and document long-scenario and workload execution",
+    "text": "Execute long scenarios and workloads",
     "tat": 8,
     "lane": "main"
    },
    {
     "n": 8,
-    "text": "Validate platform handover to firmware and",
+    "text": "Hand the platform over to firmware and validation",
     "tat": 2.5,
     "lane": "main"
    }
@@ -18715,20 +18655,20 @@ export const activityDetails: Record<string, ActivityDetail> = {
    {
     "id": "DV-D6",
     "rel": "produces",
-    "text": "Emulation platform and system test suite. The deliverable it serves firmware and validation as much as verification."
+    "text": "<b>Emulation platform and system test suite.</b> The platform and its test suite are stood up here, and they serve firmware and validation as much as verification."
    },
    {
     "id": "DV-D3",
     "rel": "feeds",
-    "text": "Regression and coverage dashboards. Emulation regressions cover scenarios simulation cannot reach, and belong in the same view."
+    "text": "<b>Regression and coverage dashboards.</b> Emulation regressions cover scenarios simulation cannot reach, and belong in the same view."
    }
   ],
   "risks": [
-   "Partitioning consuming more time than expected",
-   "Capacity contended with another program",
-   "Debug visibility inadequate",
-   "Handover date not in the program schedule",
-   "Models diverging from the design"
+   "<b>Partitioning consuming more time than expected.</b> Splitting a large design across emulator capacity is difficult and iterative, and it is routinely underestimated.",
+   "<b>Capacity contended with another program.</b> Emulator capacity is expensive and shared; a program without a booked allocation runs when the other one is not.",
+   "<b>Debug visibility inadequate.</b> A platform that runs fast and cannot be probed produces failures that cannot be diagnosed.",
+   "<b>Handover date not in the program schedule.</b> Firmware plans against it, and treating it as an internal verification milestone means nobody outside knows when it slips.",
+   "<b>Models diverging from the design.</b> Memory and interface models built for the platform can drift from the RTL, and results then reflect the model."
   ],
   "roles": [
    {
@@ -18836,49 +18776,49 @@ export const activityDetails: Record<string, ActivityDetail> = {
   ],
   "criticalPath": false,
   "purpose": [
-   "Check that the design delivers the performance the architecture promised—bandwidth, latency, utilization—against the same workloads <code>ARCH-01</code> modelled.",
+   "Check that the design <b>actually delivers the performance the architecture promised</b>—bandwidth, latency, utilization—against the same workloads <code>ARCH-01</code> modelled.",
    "Functional correctness and performance are separate questions, and passing every test says nothing about the second. A design that computes correctly at 60% of modelled throughput is a product that misses its headline KPI, and finding that in silicon leaves no options."
   ],
   "steps": [
    {
     "n": 1,
-    "text": "Measure performance infrastructure in the testbench",
+    "text": "Build performance measurement infrastructure into the testbench",
     "tat": 1.5,
     "lane": "main"
    },
    {
     "n": 2,
-    "text": "Simulate workload execution on emulation and",
+    "text": "Execute the workloads on emulation and simulation",
     "tat": 3,
     "lane": "main"
    },
    {
     "n": 3,
-    "text": "Measure bandwidth and utilization against the model",
+    "text": "Measure bandwidth and utilization against the model predictions",
     "tat": 2.5,
     "lane": "main"
    },
    {
     "n": 4,
-    "text": "Analyze latency and queueing",
+    "text": "Analyze latency and queueing behavior",
     "tat": 2,
     "lane": "par"
    },
    {
     "n": 5,
-    "text": "Define and document bottleneck identification and root cause",
+    "text": "Identify bottlenecks and establish root causes",
     "tat": 2.5,
     "lane": "par"
    },
    {
     "n": 6,
-    "text": "Correlate against the ARCH-01 performance model",
+    "text": "Correlate results against the ARCH-01 performance model",
     "tat": 2.5,
     "lane": "main"
    },
    {
     "n": 7,
-    "text": "Reconcile findings, recommendations and model",
+    "text": "Report findings, recommendations and model reconciliation",
     "tat": 2.5,
     "lane": "main"
    }
@@ -18895,7 +18835,7 @@ export const activityDetails: Record<string, ActivityDetail> = {
    "Performance measurement infrastructure",
    "Workload execution results",
    "Bandwidth, utilization and latency measurements",
-   "Latency and queueing analysis",
+   "Latency and queueing analysis results",
    "Bottleneck analysis with root causes",
    "Model correlation results",
    "Findings and recommendations"
@@ -18913,20 +18853,20 @@ export const activityDetails: Record<string, ActivityDetail> = {
    {
     "id": "DV-D8",
     "rel": "feeds",
-    "text": "DV closure signoff package. Performance evidence is part of tapeout readiness—functional closure alone does not say the product meets its KPIs."
+    "text": "<b>DV closure signoff package.</b> Performance evidence is part of tapeout readiness—functional closure alone does not say the product meets its KPIs."
    },
    {
     "id": "DV-D6",
     "rel": "feeds",
-    "text": "Emulation platform and system test suite. The performance workloads become part of the standing suite the platform runs."
+    "text": "<b>Emulation platform and system test suite.</b> The performance workloads become part of the standing suite the platform runs."
    }
   ],
   "risks": [
-   "Performance treated as a bring-up activity",
-   "Measured only on synthetic traffic",
-   "Model and RTL disagreement left unresolved",
-   "Bottlenecks found without root cause",
-   "No time left to act"
+   "<b>Performance treated as a bring-up activity.</b> Discovered in silicon, a throughput shortfall has no remaining fix except software and marketing.",
+   "<b>Measured only on synthetic traffic.</b> Synthetic patterns exercise the interconnect; real workloads exercise the design, and only the second predicts the product.",
+   "<b>Model and RTL disagreement left unresolved.</b> Whichever is wrong, not knowing which means every downstream projection is unreliable.",
+   "<b>Bottlenecks found without root cause.</b> Knowing throughput is low is not actionable; knowing which queue saturates is.",
+   "<b>No time left to act.</b> Findings that arrive after RTL freeze can only be documented, not fixed."
   ],
   "roles": [
    {
@@ -19034,55 +18974,55 @@ export const activityDetails: Record<string, ActivityDetail> = {
   ],
   "criticalPath": true,
   "purpose": [
-   "Keep the regressions running and the coverage moving toward closure—triage failures, manage capacity, publish where every block stands, and close the holes that remain.",
+   "Keep the regressions running and the <b>coverage moving toward closure</b>—triage failures, manage capacity, publish where every block stands, and close the holes that remain.",
    "Coverage closure is not a phase at the end; it is a curve that either bends or does not. This activity owns the curve: which holes are real, which tests would close them, and whether the regression is stable enough for the numbers to mean anything."
   ],
   "steps": [
    {
     "n": 1,
-    "text": "Define regression suite and tiering",
+    "text": "Define and tier the regression suites",
     "tat": 2,
     "lane": "main"
    },
    {
     "n": 2,
-    "text": "Define and document regression infrastructure and capacity management",
+    "text": "Build the regression infrastructure and manage capacity",
     "tat": 2.5,
     "lane": "main"
    },
    {
     "n": 3,
-    "text": "Triage failure process and ownership",
+    "text": "Establish the failure triage process with ownership",
     "tat": 2.5,
     "lane": "par"
    },
    {
     "n": 4,
-    "text": "Define and document coverage collection, merging and reporting",
+    "text": "Collect, merge and report coverage",
     "tat": 3,
     "lane": "main"
    },
    {
     "n": 5,
-    "text": "Analyze coverage hole and test targeting",
+    "text": "Analyze coverage holes and target tests at them",
     "tat": 5,
     "lane": "main"
    },
    {
     "n": 6,
-    "text": "Define and document regression stability and flake elimination",
+    "text": "Stabilize the regression and eliminate flaky tests",
     "tat": 4,
     "lane": "par"
    },
    {
     "n": 7,
-    "text": "Track dashboard publication and closure",
+    "text": "Publish the dashboard and track closure",
     "tat": 4,
     "lane": "par"
    },
    {
     "n": 8,
-    "text": "Close coverage and signoff assembly",
+    "text": "Drive coverage to closure and assemble the signoff",
     "tat": 13.5,
     "lane": "main"
    }
@@ -19103,7 +19043,7 @@ export const activityDetails: Record<string, ActivityDetail> = {
    "Hole analysis and targeted test list",
    "Regression stability and flake elimination record",
    "Published coverage dashboard",
-   "Coverage dashboards and closure signoff"
+   "Assembled DV closure signoff package"
   ],
   "producedBy": [
    1,
@@ -19119,20 +19059,20 @@ export const activityDetails: Record<string, ActivityDetail> = {
    {
     "id": "DV-D3",
     "rel": "produces",
-    "text": "Regression and coverage dashboards. The deliverable its value is that the numbers are current and trusted."
+    "text": "<b>Regression and coverage dashboards.</b> The dashboards are built and maintained here, and their value is that the numbers are current and trusted."
    },
    {
     "id": "DV-D8",
     "rel": "produces",
-    "text": "DV closure signoff package. Closure is assembled here from the evidence every other DV activity produced."
+    "text": "<b>DV closure signoff package.</b> Closure is assembled here from the evidence every other DV activity produced."
    }
   ],
   "risks": [
-   "Flaky regressions tolerated",
-   "Coverage merged without stability",
-   "Holes closed by waiving rather than testing",
-   "Capacity insufficient at peak",
-   "Closure signed with the curve still climbing"
+   "<b>Flaky regressions tolerated.</b> Once red results are routinely ignored, the regression has stopped providing information and nobody notices when it matters.",
+   "<b>Coverage merged without stability.</b> Numbers from an unstable regression are noise presented as a trend.",
+   "<b>Holes closed by waiving rather than testing.</b> A hole waived without analysis is untested behavior recorded as covered.",
+   "<b>Capacity insufficient at peak.</b> Regression queues at the point of closure directly extend the closure date.",
+   "<b>Closure signed with the curve still climbing.</b> Coverage still rising at signoff means the plan's completion criteria were not what stopped the work."
   ],
   "roles": [
    {
@@ -19248,49 +19188,49 @@ export const activityDetails: Record<string, ActivityDetail> = {
   ],
   "criticalPath": true,
   "purpose": [
-   "Simulate the gate-level netlist, first functionally and then with real timing, to catch what RTL simulation structurally cannot—X-propagation, reset behavior, timing-dependent failures and synthesis or DFT-induced differences.",
+   "Simulate the <b>gate-level netlist</b>, first functionally and then with real timing, to catch what RTL simulation structurally cannot—X-propagation, reset behavior, timing-dependent failures and synthesis or DFT-induced differences.",
    "RTL simulation is optimistic about X and blind to timing. Gate-level simulation is slow, painful and the last check before the design becomes masks—it is also where scan insertion, clock gating and synthesis transformations are proved not to have changed behavior."
   ],
   "steps": [
    {
     "n": 1,
-    "text": "Bring up gate-level environment and netlist",
+    "text": "Build the gate-level environment and bring the netlist up",
     "tat": 1.5,
     "lane": "main"
    },
    {
     "n": 2,
-    "text": "Simulate zero-delay functional gate-level",
+    "text": "Run zero-delay functional gate-level simulation",
     "tat": 2,
     "lane": "main"
    },
    {
     "n": 3,
-    "text": "Analyze x-propagation and reset initialization",
+    "text": "Analyze X-propagation and reset initialization",
     "tat": 2,
     "lane": "main"
    },
    {
     "n": 4,
-    "text": "Simulate sDF back-annotated timing",
+    "text": "Run SDF back-annotated timing simulation",
     "tat": 2.5,
     "lane": "par"
    },
    {
     "n": 5,
-    "text": "Simulate dFT and scan mode",
+    "text": "Simulate DFT and scan modes",
     "tat": 2,
     "lane": "par"
    },
    {
     "n": 6,
-    "text": "Simulate power-aware gate-level",
+    "text": "Run power-aware gate-level simulation",
     "tat": 1.5,
     "lane": "par"
    },
    {
     "n": 7,
-    "text": "Close failure debug and",
+    "text": "Debug failures and close the findings",
     "tat": 4.5,
     "lane": "main"
    }
@@ -19309,7 +19249,7 @@ export const activityDetails: Record<string, ActivityDetail> = {
    "X-propagation and reset initialization findings",
    "SDF timing-annotated simulation results",
    "Scan and DFT mode simulation results",
-   "Gate-level simulation environment",
+   "Power-aware gate-level simulation results",
    "Gate-level simulation report",
    "Failure debug and closure record"
   ],
@@ -19320,27 +19260,27 @@ export const activityDetails: Record<string, ActivityDetail> = {
    4,
    5,
    6,
-   6,
+   7,
    7
   ],
   "rel": [
    {
     "id": "DV-D7",
     "rel": "produces",
-    "text": "Gate-level simulation report. The deliverable it is a tapeout checklist item rather than an optional confirmation."
+    "text": "<b>Gate-level simulation report.</b> The gate-level results—functional, timing-annotated, scan and power-aware—are produced here, and the report is a tapeout checklist item rather than an optional confirmation."
    },
    {
     "id": "DV-D8",
     "rel": "feeds",
-    "text": "DV closure signoff package. Gate-level results close the gap between what was verified and what will be manufactured."
+    "text": "<b>DV closure signoff package.</b> Gate-level results close the gap between what was verified and what will be manufactured."
    }
   ],
   "risks": [
-   "Skipped because it is slow",
-   "Run only in functional mode",
-   "Started after netlist churn has settled",
-   "X failures suppressed rather than fixed",
-   "Timing simulation on a subset of corners"
+   "<b>Skipped because it is slow.</b> The failures it finds—X propagation, reset, timing-dependent behavior—have no other pre-silicon detector.",
+   "<b>Run only in functional mode.</b> Scan and test modes are how the part is tested at ATE, and a scan mode that does not work makes the part untestable.",
+   "<b>Started after netlist churn has settled.</b> Waiting for a stable netlist means starting too late; running early on an imperfect netlist finds environment problems while there is time.",
+   "<b>X failures suppressed rather than fixed.</b> Forcing initial values to make the simulation run hides exactly the uninitialized state the check exists to find.",
+   "<b>Timing simulation on a subset of corners.</b> Timing-dependent failures appear at specific corners, and the corner skipped is the one that fails."
   ],
   "roles": [
    {
@@ -19456,55 +19396,55 @@ export const activityDetails: Record<string, ActivityDetail> = {
   ],
   "criticalPath": true,
   "purpose": [
-   "Run the bug disposition board—triage every defect, decide what gets fixed, and make the risk of what does not explicit and owned.",
-   "Every program reaches tapeout with open bugs. The question is whether they were assessed and accepted or simply ran out of time, and the difference is entirely this activity."
+   "Run the <b>bug disposition board</b>—triage every defect, decide what gets fixed, and make the risk of what does not explicit and owned.",
+   "Every program reaches tapeout with open bugs. The question is whether they were assessed and accepted or simply ran out of time, and the difference is entirely this activity. Its output at the end is the errata list bring-up will work against and the risk statement the Go / No-Go decision reads."
   ],
   "steps": [
    {
     "n": 1,
-    "text": "Define bug tracking, severity and triage process",
+    "text": "Define bug tracking, severity and the triage process",
     "tat": 1.5,
     "lane": "main"
    },
    {
     "n": 2,
-    "text": "Define and document disposition board charter and membership",
+    "text": "Charter the disposition board and set its membership",
     "tat": 1,
     "lane": "main"
    },
    {
     "n": 3,
-    "text": "Continuously triage and disposition",
+    "text": "Run continuous triage and disposition",
     "tat": 22,
     "lane": "main"
    },
    {
     "n": 4,
-    "text": "Analyze bug rate and closure trend",
+    "text": "Analyze bug rate and closure trends",
     "tat": 4,
     "lane": "par"
    },
    {
     "n": 5,
-    "text": "Assess deferred bug risk",
+    "text": "Assess the risk of every deferred bug",
     "tat": 4,
     "lane": "par"
    },
    {
     "n": 6,
-    "text": "Analyze escape on late-found defects",
+    "text": "Run escape analysis on late-found defects",
     "tat": 3,
     "lane": "par"
    },
    {
     "n": 7,
-    "text": "Define and document open bug list and risk statement for tapeout",
+    "text": "Compile the open bug list and risk statement for tapeout",
     "tat": 5,
     "lane": "main"
    },
    {
     "n": 8,
-    "text": "Close dV recommendation",
+    "text": "Issue the DV closure recommendation",
     "tat": 4.5,
     "lane": "main"
    }
@@ -19519,7 +19459,7 @@ export const activityDetails: Record<string, ActivityDetail> = {
   ],
   "produces": [
    "Bug tracking and triage process",
-   "Disposition board decisions",
+   "Disposition board charter and membership",
    "Triage and disposition log",
    "Bug rate and closure trend analysis",
    "Deferred bug risk assessments",
@@ -19541,20 +19481,20 @@ export const activityDetails: Record<string, ActivityDetail> = {
    {
     "id": "DV-D8",
     "rel": "feeds",
-    "text": "DV closure signoff package. The open bug list and its risk statement are the part of the package the Go / No-Go decision actually reads."
+    "text": "<b>DV closure signoff package.</b> The open bug list and its risk statement are the part of the package the Go / No-Go decision actually reads."
    },
    {
     "id": "DV-D3",
     "rel": "feeds",
-    "text": "Regression and coverage dashboards. Bug find and closure rates sit alongside coverage as the two curves that say whether verification is converging."
+    "text": "<b>Regression and coverage dashboards.</b> Bug find and closure rates sit alongside coverage as the two curves that say whether verification is converging."
    }
   ],
   "risks": [
-   "Bugs deferred without risk assessment",
-   "Severity assigned by the finder",
-   "Bug rate still rising at closure",
-   "No escape analysis",
-   "Errata list assembled after tapeout"
+   "<b>Bugs deferred without risk assessment.</b> An unassessed open bug at tapeout is a risk nobody quantified being accepted by nobody in particular.",
+   "<b>Severity assigned by the finder.</b> Consistent severity requires a board; without one, the same defect is critical in one block and minor in another.",
+   "<b>Bug rate still rising at closure.</b> A find rate that has not turned over means the design has more defects than have been found, whatever the coverage says.",
+   "<b>No escape analysis.</b> The process that let a bug survive to week 34 will let the next one survive too.",
+   "<b>Errata list assembled after tapeout.</b> Bring-up needs the known-issue list on day one, and assembling it later means debugging problems that were already known."
   ],
   "roles": [
    {
@@ -19667,43 +19607,43 @@ export const activityDetails: Record<string, ActivityDetail> = {
   ],
   "criticalPath": true,
   "purpose": [
-   "Decide how the chip will be tested before it is built to be testable—scan style, compression ratio, hierarchical partitioning, and the test modes the design will support.",
+   "Decide <b>how the chip will be tested</b> before it is built to be testable—scan style, compression ratio, hierarchical partitioning, and the test modes the design will support.",
    "Every one of these choices constrains the design rather than following it. Compression ratio decides pattern volume and therefore test cost; hierarchical DFT decides whether a block can be tested independently; and both have to be settled before <code>SYN-01</code> writes constraints against them."
   ],
   "steps": [
    {
     "n": 1,
-    "text": "Test strategy definition — what is tested where and how",
+    "text": "Define the test strategy — what is tested where and how",
     "tat": 1.5,
     "lane": "main"
    },
    {
     "n": 2,
-    "text": "Define and document scan architecture and chain organization",
+    "text": "Define the scan architecture and chain organization",
     "tat": 2,
     "lane": "main"
    },
    {
     "n": 3,
-    "text": "Select compression architecture and ratio",
+    "text": "Select the compression architecture and ratio against the cost model",
     "tat": 1.5,
     "lane": "main"
    },
    {
     "n": 4,
-    "text": "Define and document hierarchical DFT partitioning against the design hierarchy",
+    "text": "Partition hierarchical DFT against the design hierarchy",
     "tat": 1.5,
     "lane": "par"
    },
    {
     "n": 5,
-    "text": "Test mode definition and mode control",
+    "text": "Define the test modes and mode control",
     "tat": 1.5,
     "lane": "par"
    },
    {
     "n": 6,
-    "text": "Define architecture and review",
+    "text": "Write the architecture specification and run its review",
     "tat": 3,
     "lane": "main"
    }
@@ -19736,20 +19676,20 @@ export const activityDetails: Record<string, ActivityDetail> = {
    {
     "id": "DFT-D1",
     "rel": "produces",
-    "text": "DFT architecture specification and coverage plan. The deliverable everything else in the stage is executed against it."
+    "text": "<b>DFT architecture specification and coverage plan.</b> The architecture specification and coverage plan are written here, and everything else in the stage is executed against them."
    },
    {
     "id": "DFT-D7",
     "rel": "gates",
-    "text": "DFT signoff entry for the tapeout checklist. An architecture that was never fixed cannot be signed off against."
+    "text": "<b>DFT signoff entry for the tapeout checklist.</b> An architecture that was never fixed cannot be signed off against."
    }
   ],
   "risks": [
-   "Architecture decided after synthesis starts",
-   "Compression ratio chosen without the test cost model",
-   "Hierarchical DFT ignored on a large die",
-   "Test modes defined without the security architecture",
-   "Architecture written and not reviewed by test engineering"
+   "<b>Architecture decided after synthesis starts.</b> Scan insertion and constraints depend on it; deciding late means re-running both.",
+   "<b>Compression ratio chosen without the test cost model.</b> Ratio trades pattern volume against silicon area, and only <code>TEST-09</code>'s cost model says which side to favor.",
+   "<b>Hierarchical DFT ignored on a large die.</b> Flat scan on a design this size produces pattern volumes and runtimes that become their own schedule problem.",
+   "<b>Test modes defined without the security architecture.</b> Every test mode is an access path, and <code>ARCH-07</code> has to lock the ones that should not exist in production.",
+   "<b>Architecture written and not reviewed by test engineering.</b> A scheme that is elegant in design and unrunnable on the chosen ATE is discovered at <code>TEST-08</code>."
   ],
   "roles": [
    {
@@ -19859,37 +19799,37 @@ export const activityDetails: Record<string, ActivityDetail> = {
   ],
   "criticalPath": false,
   "purpose": [
-   "Agree the coverage and test-time targets with the people who pay for them—product engineering, who own quality, and test engineering, who own the tester seconds.",
-   "Coverage and test time pull against each other, and neither belongs to DFT alone. A defect-per-million target sets required coverage; a cost-per-unit target sets allowable test time; and the architecture in <code>DFT-01</code> is chosen to sit between them."
+   "Agree the <b>coverage and test-time targets</b> with the people who pay for them—product engineering, who own quality, and test engineering, who own the tester seconds.",
+   "Coverage and test time pull against each other, and neither belongs to DFT alone. A defect-per-million target sets required coverage; a cost-per-unit target sets allowable test time; and the architecture in <code>DFT-01</code> is chosen to sit between them. Negotiating this first is what makes the architecture decidable."
   ],
   "steps": [
    {
     "n": 1,
-    "text": "Define and document quality target translation — DPPM to required coverage",
+    "text": "Translate the DPPM quality target into required coverage",
     "tat": 1,
     "lane": "main"
    },
    {
     "n": 2,
-    "text": "Test time budget from the product cost model",
+    "text": "Derive the test time budget from the product cost model",
     "tat": 1,
     "lane": "main"
    },
    {
     "n": 3,
-    "text": "Select fault model — stuck-at, transition, cell-aware",
+    "text": "Select the fault models — stuck-at, transition, cell-aware",
     "tat": 1,
     "lane": "par"
    },
    {
     "n": 4,
-    "text": "Define and document coverage target per fault model and per block class",
+    "text": "Set coverage targets per fault model and per block class",
     "tat": 1,
     "lane": "par"
    },
    {
     "n": 5,
-    "text": "Define and document target agreement and record",
+    "text": "Negotiate the targets and record the agreement",
     "tat": 3,
     "lane": "main"
    }
@@ -19920,20 +19860,20 @@ export const activityDetails: Record<string, ActivityDetail> = {
    {
     "id": "DFT-D1",
     "rel": "feeds",
-    "text": "DFT architecture specification and coverage plan. The coverage plan half—the numbers <code>DFT-01</code>'s architecture is chosen to reach."
+    "text": "<b>DFT architecture specification and coverage plan.</b> The coverage plan half—the numbers <code>DFT-01</code>'s architecture is chosen to reach."
    },
    {
     "id": "DFT-D4",
     "rel": "feeds",
-    "text": "ATPG pattern sets with coverage report. The report is measured against the targets set here, not against what the tool happened to reach."
+    "text": "<b>ATPG pattern sets with coverage report.</b> The report is measured against the targets set here, not against what the tool happened to reach."
    }
   ],
   "risks": [
-   "Coverage target set by convention",
-   "Test time budget not derived from cost",
-   "Fault model chosen at pattern generation",
-   "Targets agreed without product engineering",
-   "No per-block differentiation"
+   "<b>Coverage target set by convention.</b> \"99% stuck-at\" carried from the last program may be far from what this product's DPPM requirement needs.",
+   "<b>Test time budget not derived from cost.</b> A test time nobody costed becomes whatever the patterns need, and the per-unit cost is discovered at production.",
+   "<b>Fault model chosen at pattern generation.</b> Adding cell-aware late multiplies pattern volume against a tester memory budget already fixed.",
+   "<b>Targets agreed without product engineering.</b> The organization that owns field quality has to own the coverage number, or it will be renegotiated when patterns run long.",
+   "<b>No per-block differentiation.</b> Memory-dominated blocks and control logic need different approaches, and a single flat target over-tests one and under-tests the other."
   ],
   "roles": [
    {
@@ -20030,55 +19970,55 @@ export const activityDetails: Record<string, ActivityDetail> = {
   ],
   "criticalPath": true,
   "purpose": [
-   "Architect memory test and repair—MBIST engines, BIRA analysis, BISR repair and the fuse path—for a design where memory is most of the die.",
+   "Architect <b>memory test and repair</b>—MBIST engines, BIRA analysis, BISR repair and the fuse path—for a design where memory is most of the die.",
    "On an accelerator the arrays dominate both area and defect exposure, and they cannot be tested by scan. MBIST is how they are tested and repair is how the yield is recovered; both have to be designed jointly with <code>AMS-09</code>, because the array provides the spares and this activity provides the engine that uses them."
   ],
   "steps": [
    {
     "n": 1,
-    "text": "Define and document memory inventory and test requirement per instance",
+    "text": "Inventory the memories and set a test requirement per instance",
     "tat": 1.5,
     "lane": "main"
    },
    {
     "n": 2,
-    "text": "Allocate mBIST architecture and engine",
+    "text": "Architect MBIST and allocate the engines",
     "tat": 2.5,
     "lane": "main"
    },
    {
     "n": 3,
-    "text": "Select algorithm per memory type",
+    "text": "Select test algorithms per memory type",
     "tat": 1.5,
     "lane": "par"
    },
    {
     "n": 4,
-    "text": "Analyze bIRA and repair architecture",
+    "text": "Architect the BIRA and repair analysis",
     "tat": 2,
     "lane": "main"
    },
    {
     "n": 5,
-    "text": "Integrate bISR and fuse path with ARCH-07",
+    "text": "Integrate BISR and the fuse path with ARCH-07",
     "tat": 2,
     "lane": "par"
    },
    {
     "n": 6,
-    "text": "Define and document repair interface agreement with the memory designers",
+    "text": "Agree the repair interface jointly with the memory designers",
     "tat": 1.5,
     "lane": "par"
    },
    {
     "n": 7,
-    "text": "Integrate mBIST insertion and",
+    "text": "Insert and integrate the MBIST logic",
     "tat": 2.5,
     "lane": "main"
    },
    {
     "n": 8,
-    "text": "Verify architecture and specification",
+    "text": "Verify the architecture and release its specification",
     "tat": 1.5,
     "lane": "main"
    }
@@ -20115,20 +20055,20 @@ export const activityDetails: Record<string, ActivityDetail> = {
    {
     "id": "DFT-D2",
     "rel": "produces",
-    "text": "MBIST / BISR insertion and test collateral. This activity is the deliverable, including the repair collateral test engineering will run."
+    "text": "<b>MBIST / BISR insertion and test collateral.</b> The MBIST / BISR architecture, its insertion and its collateral come from here, including the repair collateral test engineering will run."
    },
    {
     "id": "DFT-D1",
     "rel": "feeds",
-    "text": "DFT architecture specification. Memory test is a large part of the overall architecture, not a separate subject."
+    "text": "<b>DFT architecture specification.</b> Memory test is a large part of the overall architecture, not a separate subject."
    }
   ],
   "risks": [
-   "Repair interface specified separately from the array",
-   "Algorithms chosen without the failure modes",
-   "Fuse capacity insufficient",
-   "MBIST runtime unbudgeted",
-   "Repair not verified end to end"
+   "<b>Repair interface specified separately from the array.</b> Two consistent specifications that disagree, found at pattern generation when both are frozen.",
+   "<b>Algorithms chosen without the failure modes.</b> March algorithms differ in what they catch; a default choice misses the defect modes this array actually exhibits.",
+   "<b>Fuse capacity insufficient.</b> Repair data has to be stored, and an allocation made without counting the worst-case repair set produces unrepairable parts.",
+   "<b>MBIST runtime unbudgeted.</b> Memory test on an array-dominated die can dominate test time, and it is often costed after the architecture is fixed.",
+   "<b>Repair not verified end to end.</b> A repair path proven in pieces and never exercised from failure through analysis to fuse blow fails at production test."
   ],
   "roles": [
    {
@@ -20240,13 +20180,13 @@ export const activityDetails: Record<string, ActivityDetail> = {
   ],
   "criticalPath": false,
   "purpose": [
-   "Design the access network—boundary scan, IJTAG, TAP controller and the debug paths—that every test, every repair and every silicon debug session runs through.",
-   "The TAP is the door into the chip. It is used at wafer sort, at package test, during bring-up and in the field, and it is also the door <code>ARCH-07</code> needs to lock in production."
+   "Design the <b>access network</b>—boundary scan, IJTAG, TAP controller and the debug paths—that every test, every repair and every silicon debug session runs through.",
+   "The TAP is the door into the chip. It is used at wafer sort, at package test, during bring-up and in the field, and it is also the door <code>ARCH-07</code> needs to lock in production. Designing it is a negotiation between access and security rather than a purely technical exercise."
   ],
   "steps": [
    {
     "n": 1,
-    "text": "Define and document access architecture — TAP, IJTAG network topology",
+    "text": "Define the access architecture — TAP and IJTAG network topology",
     "tat": 1.5,
     "lane": "main"
    },
@@ -20258,13 +20198,13 @@ export const activityDetails: Record<string, ActivityDetail> = {
    },
    {
     "n": 3,
-    "text": "Define and document iJTAG instrument network and description files",
+    "text": "Build the IJTAG instrument network and its description files",
     "tat": 2,
     "lane": "par"
    },
    {
     "n": 4,
-    "text": "Debug and trace access path definition",
+    "text": "Define the debug and trace access paths",
     "tat": 1.5,
     "lane": "par"
    },
@@ -20276,7 +20216,7 @@ export const activityDetails: Record<string, ActivityDetail> = {
    },
    {
     "n": 6,
-    "text": "Verify access network and description file generation",
+    "text": "Verify the access network and generate the description files",
     "tat": 3.5,
     "lane": "main"
    }
@@ -20293,7 +20233,7 @@ export const activityDetails: Record<string, ActivityDetail> = {
    "TAP and IJTAG network architecture",
    "Boundary scan implementation",
    "Instrument network with ICL and PDL descriptions",
-   "BSDL and description files",
+   "BSDL description files",
    "Debug and trace access paths",
    "Lifecycle-state lockdown integration",
    "Access network verification results and description files"
@@ -20302,7 +20242,7 @@ export const activityDetails: Record<string, ActivityDetail> = {
    1,
    2,
    3,
-   3,
+   2,
    4,
    5,
    6
@@ -20311,20 +20251,20 @@ export const activityDetails: Record<string, ActivityDetail> = {
    {
     "id": "DFT-D3",
     "rel": "produces",
-    "text": "JTAG / IJTAG description files (BSDL, ICL, PDL). The deliverable these files are what board test and ATE consume."
+    "text": "<b>JTAG / IJTAG description files (BSDL, ICL, PDL).</b> The BSDL, ICL and PDL description files are generated and validated here, and they are what board test and ATE consume."
    },
    {
     "id": "DFT-D1",
     "rel": "feeds",
-    "text": "DFT architecture specification. The access network is how every other DFT feature is reached."
+    "text": "<b>DFT architecture specification.</b> The access network is how every other DFT feature is reached."
    }
   ],
   "risks": [
-   "Debug access designed out for security",
-   "Lockdown untested",
-   "Description files generated late",
-   "Access network verified only in functional mode",
-   "Pin budget for debug not reserved"
+   "<b>Debug access designed out for security.</b> A part that cannot be debugged in the field is a part whose first field failure has no diagnostic path.",
+   "<b>Lockdown untested.</b> The lifecycle transition that locks the TAP is the one nobody exercises, because exercising it makes the part undebuggable.",
+   "<b>Description files generated late.</b> BSDL and ICL are consumed by board test and ATE; generating them near tapeout leaves no time to validate them.",
+   "<b>Access network verified only in functional mode.</b> The network exists to work when the design does not, and that is the mode that needs proving.",
+   "<b>Pin budget for debug not reserved.</b> Trace ports need pins, and a bump map fixed without them means debug through a narrow channel."
   ],
   "roles": [
    {
@@ -20434,43 +20374,43 @@ export const activityDetails: Record<string, ActivityDetail> = {
   ],
   "criticalPath": false,
   "purpose": [
-   "Design the on-chip clock controllers that generate at-speed test clocks—because transition-fault testing needs clock pulses the tester cannot supply at frequency.",
-   "Stuck-at testing runs slowly and catches static defects. The defects that matter for a high-frequency part are timing-related, and catching them needs launch-capture pulses at functional speed."
+   "Design the <b>on-chip clock controllers</b> that generate at-speed test clocks—because transition-fault testing needs clock pulses the tester cannot supply at frequency.",
+   "Stuck-at testing runs slowly and catches static defects. The defects that matter for a high-frequency part are timing-related, and catching them needs launch-capture pulses at functional speed. The tester cannot produce them, so the chip has to produce them for itself."
   ],
   "steps": [
    {
     "n": 1,
-    "text": "Define and document at-speed test requirement per clock domain",
+    "text": "Establish the at-speed test requirement per clock domain",
     "tat": 1,
     "lane": "main"
    },
    {
     "n": 2,
-    "text": "Define and document oCC architecture and PLL interface",
+    "text": "Architect the OCC and its PLL interface",
     "tat": 1.5,
     "lane": "main"
    },
    {
     "n": 3,
-    "text": "Define and document launch-capture sequencing and pulse control",
+    "text": "Design launch-capture sequencing and pulse control",
     "tat": 1.5,
     "lane": "main"
    },
    {
     "n": 4,
-    "text": "Define and document multi-domain and cross-domain at-speed strategy",
+    "text": "Define the multi-domain and cross-domain at-speed strategy",
     "tat": 1.5,
     "lane": "par"
    },
    {
     "n": 5,
-    "text": "Integrate oCC insertion and",
+    "text": "Insert and integrate the OCC logic",
     "tat": 1.5,
     "lane": "par"
    },
    {
     "n": 6,
-    "text": "Verify at-speed clocking",
+    "text": "Verify at-speed clocking across the domains",
     "tat": 3,
     "lane": "main"
    }
@@ -20503,20 +20443,20 @@ export const activityDetails: Record<string, ActivityDetail> = {
    {
     "id": "DFT-D1",
     "rel": "feeds",
-    "text": "DFT architecture specification. At-speed clocking is what makes transition-fault coverage achievable, so it belongs in the architecture."
+    "text": "<b>DFT architecture specification.</b> At-speed clocking is what makes transition-fault coverage achievable, so it belongs in the architecture."
    },
    {
     "id": "DFT-D4",
     "rel": "feeds",
-    "text": "ATPG pattern sets with coverage report. Transition patterns cannot be generated for domains the OCC cannot clock at speed."
+    "text": "<b>ATPG pattern sets with coverage report.</b> Transition patterns cannot be generated for domains the OCC cannot clock at speed."
    }
   ],
   "risks": [
-   "At-speed test not supported on every domain",
-   "Cross-domain paths untested at speed",
-   "OCC interaction with the PLL unverified",
-   "Power during at-speed test ignored",
-   "OCC inserted late"
+   "<b>At-speed test not supported on every domain.</b> Coverage then has a hole exactly where the fastest logic is, which is where transition defects concentrate.",
+   "<b>Cross-domain paths untested at speed.</b> These are among the most timing-marginal paths in the design and the hardest to cover.",
+   "<b>OCC interaction with the PLL unverified.</b> A controller that cannot get a clean clock from the PLL in test mode produces patterns that fail on good silicon.",
+   "<b>Power during at-speed test ignored.</b> Scan shift followed by at-speed capture creates switching activity far above functional, and the IR drop can cause failures on good parts.",
+   "<b>OCC inserted late.</b> It sits in the clock path, so adding it after clock tree synthesis means redoing the tree."
   ],
   "roles": [
    {
@@ -20623,49 +20563,49 @@ export const activityDetails: Record<string, ActivityDetail> = {
   ],
   "criticalPath": true,
   "purpose": [
-   "Insert the scan chains, compression and test logic into the design during synthesis, and drive DFT design-rule checking to clean.",
+   "Insert the <b>scan chains, compression and test logic</b> into the design during synthesis, and drive DFT design-rule checking to clean.",
    "This is where the architecture becomes logic. DFT DRC violations—uncontrollable clocks, unresettable flops, blocked scan paths—reduce coverage silently, and each one is a set of faults ATPG will never be able to target."
   ],
   "steps": [
    {
     "n": 1,
-    "text": "Set up insert scan and configuration",
+    "text": "Set up and configure scan insertion",
     "tat": 1.5,
     "lane": "main"
    },
    {
     "n": 2,
-    "text": "Define and document insert scan chain and stitching",
+    "text": "Insert and stitch the scan chains",
     "tat": 2,
     "lane": "main"
    },
    {
     "n": 3,
-    "text": "Define and document insert compression logic",
+    "text": "Insert the compression logic",
     "tat": 1.5,
     "lane": "par"
    },
    {
     "n": 4,
-    "text": "Test point insertion for coverage improvement",
+    "text": "Insert test points for coverage improvement",
     "tat": 1.5,
     "lane": "par"
    },
    {
     "n": 5,
-    "text": "Analyze dFT DRC and violation closure",
+    "text": "Analyze DFT DRC and close the violations",
     "tat": 3,
     "lane": "main"
    },
    {
     "n": 6,
-    "text": "Verify scan chain integrity",
+    "text": "Verify scan chain integrity in simulation",
     "tat": 1.5,
     "lane": "par"
    },
    {
     "n": 7,
-    "text": "Hand off insert signoff and netlist",
+    "text": "Sign off insertion and hand off the netlist",
     "tat": 3.5,
     "lane": "main"
    }
@@ -20700,20 +20640,20 @@ export const activityDetails: Record<string, ActivityDetail> = {
    {
     "id": "DFT-D5",
     "rel": "produces",
-    "text": "DFT DRC clean report. The deliverable clean means every violation fixed or explicitly accepted with its coverage cost."
+    "text": "<b>DFT DRC clean report.</b> The clean report is produced here, and clean means every violation fixed or explicitly accepted with its coverage cost."
    },
    {
     "id": "DFT-D4",
     "rel": "feeds",
-    "text": "ATPG pattern sets with coverage report. Coverage achievable at <code>DFT-07</code> is bounded by how clean this activity got."
+    "text": "<b>ATPG pattern sets with coverage report.</b> Coverage achievable at <code>DFT-07</code> is bounded by how clean this activity got."
    }
   ],
   "risks": [
-   "DRC violations accepted without measuring their coverage cost",
-   "Test points inserted without area budget",
-   "Chain balance ignored",
-   "Insertion done once and not re-run",
-   "Chain integrity unverified"
+   "<b>DRC violations accepted without measuring their coverage cost.</b> Each one silently removes faults from the targetable set, and the total is invisible until ATPG reports a low number.",
+   "<b>Test points inserted without area budget.</b> They improve coverage and cost area and timing, and adding them late competes with closure.",
+   "<b>Chain balance ignored.</b> Unbalanced chains set shift time by the longest one, and shift time is most of the test time.",
+   "<b>Insertion done once and not re-run.</b> Netlist changes after insertion leave chains stale, and the mismatch appears at pattern validation.",
+   "<b>Chain integrity unverified.</b> A broken chain makes everything behind it untestable, and finding that at ATE rather than in simulation costs a silicon turn."
   ],
   "roles": [
    {
@@ -20834,43 +20774,43 @@ export const activityDetails: Record<string, ActivityDetail> = {
   ],
   "criticalPath": true,
   "purpose": [
-   "Generate the ATPG patterns—stuck-at, transition and cell-aware—and drive coverage to the targets <code>DFT-02</code> agreed, inside the pattern volume the tester can hold.",
+   "Generate the <b>ATPG patterns</b>—stuck-at, transition and cell-aware—and drive coverage to the targets <code>DFT-02</code> agreed, inside the pattern volume the tester can hold.",
    "Two constraints pull against each other here: coverage has to reach the quality target and pattern volume has to fit tester memory and test time. Every technique that raises one raises the other, and closing both is the work."
   ],
   "steps": [
    {
     "n": 1,
-    "text": "Set up aTPG , constraints and test mode configuration",
+    "text": "Set up ATPG, constraints and test mode configuration",
     "tat": 2,
     "lane": "main"
    },
    {
     "n": 2,
-    "text": "Analyze stuck-at pattern generation and coverage",
+    "text": "Generate stuck-at patterns and analyze coverage",
     "tat": 3,
     "lane": "main"
    },
    {
     "n": 3,
-    "text": "Generate transition and at-speed pattern",
+    "text": "Generate transition and at-speed patterns",
     "tat": 3.5,
     "lane": "main"
    },
    {
     "n": 4,
-    "text": "Generate cell-aware pattern",
+    "text": "Generate cell-aware patterns",
     "tat": 2.5,
     "lane": "par"
    },
    {
     "n": 5,
-    "text": "Analyze untestable fault and coverage justification",
+    "text": "Analyze untestable faults and justify the coverage",
     "tat": 2.5,
     "lane": "par"
    },
    {
     "n": 6,
-    "text": "Generate pattern volume reduction and compaction",
+    "text": "Reduce and compact the pattern volume",
     "tat": 3,
     "lane": "main"
    },
@@ -20882,7 +20822,7 @@ export const activityDetails: Record<string, ActivityDetail> = {
    },
    {
     "n": 8,
-    "text": "Release pattern set assembly and",
+    "text": "Assemble and release the pattern sets",
     "tat": 4.5,
     "lane": "main"
    }
@@ -20899,7 +20839,7 @@ export const activityDetails: Record<string, ActivityDetail> = {
    "ATPG setup and constraints",
    "Stuck-at pattern set with coverage analysis",
    "Transition and at-speed pattern set",
-   "Stuck-at, transition and cell-aware pattern sets",
+   "Cell-aware pattern set",
    "Untestable fault analysis",
    "Compacted pattern volumes",
    "Coverage report against targets",
@@ -20919,20 +20859,20 @@ export const activityDetails: Record<string, ActivityDetail> = {
    {
     "id": "DFT-D4",
     "rel": "produces",
-    "text": "ATPG pattern sets with coverage report. The deliverable the coverage report is what the quality target is measured against."
+    "text": "<b>ATPG pattern sets with coverage report.</b> The pattern sets and their coverage report are generated here, and the coverage report is what the quality target is measured against."
    },
    {
     "id": "DFT-D7",
     "rel": "feeds",
-    "text": "DFT signoff entry for the tapeout checklist. Coverage against target is one of the checklist's quantitative entries."
+    "text": "<b>DFT signoff entry for the tapeout checklist.</b> Coverage against target is one of the checklist's quantitative entries."
    }
   ],
   "risks": [
-   "Coverage target missed and accepted late",
-   "Pattern volume exceeding tester memory",
-   "Untestable faults accepted without analysis",
-   "Cell-aware added late",
-   "Patterns generated on a netlist that then changes"
+   "<b>Coverage target missed and accepted late.</b> The remedies—test points, DRC fixes, architecture changes—all need an RTL or netlist change, and none are available near tapeout.",
+   "<b>Pattern volume exceeding tester memory.</b> Patterns that do not fit have to be split across loads, which multiplies test time and cost.",
+   "<b>Untestable faults accepted without analysis.</b> A fixable DRC violation reported as an untestable fault is coverage given away.",
+   "<b>Cell-aware added late.</b> It multiplies pattern count against a budget already set, forcing a choice between coverage and test time with no room to negotiate.",
+   "<b>Patterns generated on a netlist that then changes.</b> Any netlist change after generation invalidates the set, and regeneration takes weeks."
   ],
   "roles": [
    {
@@ -21043,49 +20983,49 @@ export const activityDetails: Record<string, ActivityDetail> = {
   ],
   "criticalPath": true,
   "purpose": [
-   "Prove the patterns run—simulate them against the netlist with timing, convert them to tester format, and hand ATE a set that works.",
+   "Prove the patterns <b>actually run</b>—simulate them against the netlist with timing, convert them to tester format, and hand ATE a set that works.",
    "A pattern set that passes in ATPG and fails in gate-level simulation is a pattern set that would have failed on silicon. This activity is the last place a pattern problem is cheap, and it is also where the format conversion for the tester is proved rather than assumed."
   ],
   "steps": [
    {
     "n": 1,
-    "text": "Simulate pattern environment setup",
+    "text": "Set up the pattern simulation environment",
     "tat": 1.5,
     "lane": "main"
    },
    {
     "n": 2,
-    "text": "Validate zero-delay pattern by gate-level simulation",
+    "text": "Validate patterns in zero-delay gate-level simulation",
     "tat": 2,
     "lane": "main"
    },
    {
     "n": 3,
-    "text": "Simulate timing-annotated pattern",
+    "text": "Simulate patterns with SDF timing annotation",
     "tat": 2,
     "lane": "par"
    },
    {
     "n": 4,
-    "text": "Debug pattern failure and regeneration",
+    "text": "Debug pattern failures and regenerate the affected sets",
     "tat": 2.5,
     "lane": "main"
    },
    {
     "n": 5,
-    "text": "Define and document sTIL and WGL format conversion",
+    "text": "Convert patterns to STIL and WGL formats",
     "tat": 1.5,
     "lane": "par"
    },
    {
     "n": 6,
-    "text": "Validate tester format and timing set",
+    "text": "Validate tester format and timing sets against the ATE",
     "tat": 1.5,
     "lane": "par"
    },
    {
     "n": 7,
-    "text": "Release pattern and DFT tapeout signoff",
+    "text": "Release the patterns and sign the DFT tapeout entry",
     "tat": 4,
     "lane": "main"
    }
@@ -21100,7 +21040,7 @@ export const activityDetails: Record<string, ActivityDetail> = {
   ],
   "produces": [
    "Pattern simulation environment",
-   "Zero-delay and timing-annotated validation results",
+   "Zero-delay validation results",
    "Timing-annotated pattern simulation results",
    "Regenerated patterns for failures",
    "STIL and WGL format files",
@@ -21120,20 +21060,20 @@ export const activityDetails: Record<string, ActivityDetail> = {
    {
     "id": "DFT-D6",
     "rel": "produces",
-    "text": "Pattern validation (GLS) report and ATE-ready pattern files. This activity is the deliverable—patterns proved to run rather than assumed to."
+    "text": "<b>Pattern validation (GLS) report and ATE-ready pattern files.</b> The validated, ATE-ready pattern files are produced here—patterns proved to run rather than assumed to."
    },
    {
     "id": "DFT-D7",
     "rel": "produces",
-    "text": "DFT signoff entry for the tapeout checklist. DFT signs the checklist on validated patterns, not on generated ones."
+    "text": "<b>DFT signoff entry for the tapeout checklist.</b> DFT signs the checklist on validated patterns, not on generated ones."
    }
   ],
   "risks": [
-   "Validation skipped for schedule",
-   "Only zero-delay simulation run",
-   "Format conversion assumed",
-   "Regeneration cost underestimated",
-   "Timing sets not validated against the actual tester"
+   "<b>Validation skipped for schedule.</b> A pattern failure then appears at ATE bring-up, where the diagnosis competes with everything else happening at first silicon.",
+   "<b>Only zero-delay simulation run.</b> Timing-related pattern failures are exactly what at-speed patterns are meant to detect, and they are invisible without SDF.",
+   "<b>Format conversion assumed.</b> STIL and WGL translation has tool-specific quirks, and a set that converts cleanly can still time incorrectly on the tester.",
+   "<b>Regeneration cost underestimated.</b> A pattern failure requiring regeneration puts the whole set back through <code>DFT-07</code>, which takes weeks not days.",
+   "<b>Timing sets not validated against the actual tester.</b> A pattern that assumes an edge placement the ATE cannot produce fails on hardware for a reason no simulation shows."
   ],
   "roles": [
    {
@@ -21245,43 +21185,43 @@ export const activityDetails: Record<string, ActivityDetail> = {
   ],
   "criticalPath": false,
   "purpose": [
-   "Work with physical design on whether the scan chains and compression network can be routed—and fix the plan before routing rather than after.",
+   "Work with physical design on whether the <b>scan chains and compression network can actually be routed</b>—and fix the plan before routing rather than after.",
    "Compression networks connect every chain to a shared decompressor and compactor, which produces long routes across the die competing with functional signals for the same resource. A compression ratio that is optimal on paper and unroutable in practice is discovered at <code>PD-06</code>, when the remedies are expensive."
   ],
   "steps": [
    {
     "n": 1,
-    "text": "Analyze chain routing feasibility with the floorplan",
+    "text": "Analyze chain routing feasibility against the floorplan",
     "tat": 1.5,
     "lane": "main"
    },
    {
     "n": 2,
-    "text": "Define and document compression network topology against physical partitioning",
+    "text": "Align the compression network topology to the physical partitions",
     "tat": 2,
     "lane": "main"
    },
    {
     "n": 3,
-    "text": "Define and document chain ordering and reordering strategy",
+    "text": "Define the chain ordering and reordering strategy",
     "tat": 1.5,
     "lane": "par"
    },
    {
     "n": 4,
-    "text": "Assess congestion impact",
+    "text": "Assess the congestion impact of the test network",
     "tat": 1.5,
     "lane": "par"
    },
    {
     "n": 5,
-    "text": "Test clock distribution feasibility",
+    "text": "Confirm test clock distribution feasibility",
     "tat": 1.5,
     "lane": "par"
    },
    {
     "n": 6,
-    "text": "Define and document physical DFT plan agreement with physical design",
+    "text": "Agree the physical DFT plan with physical design",
     "tat": 6.5,
     "lane": "main"
    }
@@ -21314,20 +21254,20 @@ export const activityDetails: Record<string, ActivityDetail> = {
    {
     "id": "DFT-D1",
     "rel": "feeds",
-    "text": "DFT architecture specification. An architecture that cannot be routed is not an architecture, and this is where that is established."
+    "text": "<b>DFT architecture specification.</b> An architecture that cannot be routed is not an architecture, and this is where that is established."
    },
    {
     "id": "DFT-D5",
     "rel": "feeds",
-    "text": "DFT DRC clean report. Physical feasibility findings often send work back into insertion, so the two are closed together."
+    "text": "<b>DFT DRC clean report.</b> Physical feasibility findings often send work back into insertion, so the two are closed together."
    }
   ],
   "risks": [
-   "Compression ratio unroutable",
-   "Chain reordering breaking diagnosis",
-   "Test clock distribution treated as functional",
-   "Feasibility assessed after routing starts",
-   "Hierarchical partition boundaries ignored"
+   "<b>Compression ratio unroutable.</b> A ratio chosen for pattern volume alone produces a network that consumes routing resource the functional design needs.",
+   "<b>Chain reordering breaking diagnosis.</b> Physical reordering improves routing and can destroy the chain-to-block mapping diagnosis depends on.",
+   "<b>Test clock distribution treated as functional.</b> Scan shift clocks reach every flop and have their own skew and power requirements.",
+   "<b>Feasibility assessed after routing starts.</b> The findings then arrive when the only remaining remedy is to reduce coverage.",
+   "<b>Hierarchical partition boundaries ignored.</b> Chains crossing physical partitions carry a routing and timing cost that a logical view does not show."
   ],
   "roles": [
    {
@@ -21429,49 +21369,49 @@ export const activityDetails: Record<string, ActivityDetail> = {
   ],
   "criticalPath": false,
   "purpose": [
-   "Build the fuse and identity infrastructure—eFuse arrays, chip ID, repair storage, lifecycle state—that repair, traceability and security all depend on.",
-   "Fuses are written once and read forever. They store memory repair, trim values, chip identity and lifecycle state, and every one of those consumers has its own requirements."
+   "Build the <b>fuse and identity infrastructure</b>—eFuse arrays, chip ID, repair storage, lifecycle state—that repair, traceability and security all depend on.",
+   "Fuses are written once and read forever. They store memory repair, trim values, chip identity and lifecycle state, and every one of those consumers has its own requirements. Getting the capacity or the read path wrong produces parts that cannot be repaired, identified or secured."
   ],
   "steps": [
    {
     "n": 1,
-    "text": "Define fuse consumer inventory — repair, trim, ID, lifecycle, security",
+    "text": "Inventory the fuse consumers — repair, trim, ID, lifecycle, security",
     "tat": 1,
     "lane": "main"
    },
    {
     "n": 2,
-    "text": "Allocate capacity against worst-case need",
+    "text": "Allocate capacity against the worst-case need",
     "tat": 1,
     "lane": "main"
    },
    {
     "n": 3,
-    "text": "Integrate eFuse array and programming path",
+    "text": "Integrate the eFuse array and its programming path",
     "tat": 1.5,
     "lane": "par"
    },
    {
     "n": 4,
-    "text": "Define fuse read, shadow register and distribution design",
+    "text": "Design the fuse read, shadow register and distribution logic",
     "tat": 1.5,
     "lane": "main"
    },
    {
     "n": 5,
-    "text": "Define and document chip identity and traceability scheme",
+    "text": "Define the chip identity and traceability scheme",
     "tat": 1,
     "lane": "par"
    },
    {
     "n": 6,
-    "text": "Define and document lifecycle state encoding with ARCH-07",
+    "text": "Agree the lifecycle state encoding with ARCH-07",
     "tat": 1,
     "lane": "par"
    },
    {
     "n": 7,
-    "text": "Verify fuse infrastructure",
+    "text": "Verify the fuse infrastructure end to end",
     "tat": 2.5,
     "lane": "main"
    }
@@ -21506,20 +21446,20 @@ export const activityDetails: Record<string, ActivityDetail> = {
    {
     "id": "DFT-D2",
     "rel": "feeds",
-    "text": "MBIST / BISR insertion and test collateral. Repair is only useful if the repair data can be stored and read back, which this activity provides."
+    "text": "<b>MBIST / BISR insertion and test collateral.</b> Repair is only useful if the repair data can be stored and read back, which this activity provides."
    },
    {
     "id": "DFT-D3",
     "rel": "feeds",
-    "text": "JTAG / IJTAG description files. Fuse programming and readback run through the access network, and the instrument descriptions cover them."
+    "text": "<b>JTAG / IJTAG description files.</b> Fuse programming and readback run through the access network, and the instrument descriptions cover them."
    }
   ],
   "risks": [
-   "Capacity sized to the average repair need",
-   "Programming path untested",
-   "Fuse read timing in the boot path unconsidered",
-   "Traceability scheme designed late",
-   "Lifecycle encoding without a test path"
+   "<b>Capacity sized to the average repair need.</b> Repair need is a distribution, and the parts needing most repair are exactly the ones the allocation fails.",
+   "<b>Programming path untested.</b> Fuses are one-time; a programming path that does not work correctly produces parts that are permanently wrong.",
+   "<b>Fuse read timing in the boot path unconsidered.</b> Repair and trim values have to be distributed before the logic that uses them is released from reset.",
+   "<b>Traceability scheme designed late.</b> Chip identity is needed for yield analysis and field returns, and retrofitting it means parts that cannot be traced.",
+   "<b>Lifecycle encoding without a test path.</b> A lifecycle transition that cannot be exercised in test is a transition whose correctness is unknown until the field."
   ],
   "roles": [
    {
@@ -21628,43 +21568,43 @@ export const activityDetails: Record<string, ActivityDetail> = {
   ],
   "criticalPath": false,
   "purpose": [
-   "Design the observability the lab will need—trace, triggers, internal visibility, design-for-debug—because at bring-up the only view into the chip is the one designed in months earlier.",
+   "Design the <b>observability the lab will need</b>—trace, triggers, internal visibility, design-for-debug—because at bring-up the only view into the chip is the one designed in months earlier.",
    "Silicon debug is constrained entirely by what was built. A failure that cannot be observed cannot be diagnosed, and the difference between a two-day debug and a two-month one is usually whether someone put a trigger and a trace port where it was needed."
   ],
   "steps": [
    {
     "n": 1,
-    "text": "Debug requirement collection from validation and design",
+    "text": "Collect debug requirements from validation and design",
     "tat": 1,
     "lane": "main"
    },
    {
     "n": 2,
-    "text": "Define and document observability architecture — trace, triggers, snapshot",
+    "text": "Architect the observability — trace, triggers, snapshot",
     "tat": 2,
     "lane": "main"
    },
    {
     "n": 3,
-    "text": "Define and document trace port and bandwidth budget",
+    "text": "Budget the trace ports and bandwidth",
     "tat": 1,
     "lane": "par"
    },
    {
     "n": 4,
-    "text": "Define and document trigger and cross-trigger network",
+    "text": "Design the trigger and cross-trigger network",
     "tat": 1.5,
     "lane": "par"
    },
    {
     "n": 5,
-    "text": "Define and document internal state snapshot and scan dump capability",
+    "text": "Implement internal state snapshot and scan dump capability",
     "tat": 1.5,
     "lane": "main"
    },
    {
     "n": 6,
-    "text": "Debug infrastructure verification and documentation",
+    "text": "Verify the debug infrastructure and document it for the lab",
     "tat": 3.5,
     "lane": "main"
    }
@@ -21697,20 +21637,20 @@ export const activityDetails: Record<string, ActivityDetail> = {
    {
     "id": "DFT-D3",
     "rel": "feeds",
-    "text": "JTAG / IJTAG description files. Debug instruments are part of the access network and are described alongside it."
+    "text": "<b>JTAG / IJTAG description files.</b> Debug instruments are part of the access network and are described alongside it."
    },
    {
     "id": "DFT-D1",
     "rel": "feeds",
-    "text": "DFT architecture specification. Design-for-debug is part of the DFT architecture rather than a separate concern."
+    "text": "<b>DFT architecture specification.</b> Design-for-debug is part of the DFT architecture rather than a separate concern."
    }
   ],
   "risks": [
-   "Debug traded away for area",
-   "Requirements collected from design rather than validation",
-   "Trace bandwidth inadequate",
-   "Debug infrastructure unverified",
-   "No documentation"
+   "<b>Debug traded away for area.</b> The saving is small and the cost is paid at bring-up, in weeks, by a different team.",
+   "<b>Requirements collected from design rather than validation.</b> The people who will debug the silicon know what they need to see; the people who built it usually assume it works.",
+   "<b>Trace bandwidth inadequate.</b> A trace port too narrow to capture the event of interest produces a debug capability that cannot answer the question.",
+   "<b>Debug infrastructure unverified.</b> It is used first when the chip is misbehaving, which is the worst moment to discover the debug path is broken.",
+   "<b>No documentation.</b> A capability the lab does not know exists is a capability that was not built."
   ],
   "roles": [
    {
@@ -21815,43 +21755,43 @@ export const activityDetails: Record<string, ActivityDetail> = {
   ],
   "criticalPath": true,
   "purpose": [
-   "Write the constraints the whole implementation is optimized and signed off against—clocks, generated clocks, IO timing, exceptions, test modes—and validate them rather than assume them.",
-   "Completing this work early provides a clear basis for downstream design decisions and reduces late rework, schedule risk, and integration issues."
+   "Write the <b>constraints the whole implementation is optimized and signed off against</b>—clocks, generated clocks, IO timing, exceptions, test modes—and validate them rather than assume them.",
+   "Constraints are the specification synthesis and physical design actually read. A missing clock definition produces a design optimized for a path nobody cares about; a wrong false path produces one that closes in the tool and fails in silicon. Every hour spent validating them here saves days at <code>PD-09</code>."
   ],
   "steps": [
    {
     "n": 1,
-    "text": "Define and document mode and corner enumeration against the operating conditions",
+    "text": "Enumerate the modes and corners against the operating conditions",
     "tat": 1.5,
     "lane": "main"
    },
    {
     "n": 2,
-    "text": "Define clock and generated clock across the design",
+    "text": "Define clocks and generated clocks across the design",
     "tat": 2,
     "lane": "main"
    },
    {
     "n": 3,
-    "text": "Define exception, false path and multicycle",
+    "text": "Specify exceptions, false paths and multicycle paths",
     "tat": 1.5,
     "lane": "par"
    },
    {
     "n": 4,
-    "text": "Define and document iO and interface timing constraints",
+    "text": "Write the IO and interface timing constraints",
     "tat": 2,
     "lane": "main"
    },
    {
     "n": 5,
-    "text": "Test mode and scan constraints",
+    "text": "Write the test mode and scan constraints",
     "tat": 1.5,
     "lane": "par"
    },
    {
     "n": 6,
-    "text": "Validate constraint and quality checking",
+    "text": "Validate the constraints with quality checking tools",
     "tat": 2.5,
     "lane": "main"
    }
@@ -21884,20 +21824,20 @@ export const activityDetails: Record<string, ActivityDetail> = {
    {
     "id": "SYN-D4",
     "rel": "produces",
-    "text": "Validated SDC constraint set per mode and corner. The deliverable \"validated\" is what distinguishes it from a file of assertions."
+    "text": "<b>Validated SDC constraint set per mode and corner.</b> The constraint set is developed and validated here, and \"validated\" is what distinguishes it from a file of assertions."
    },
    {
     "id": "SYN-D5",
     "rel": "feeds",
-    "text": "Synthesis QoR report per drop. QoR is only meaningful against constraints; an unconstrained path reports as passing."
+    "text": "<b>Synthesis QoR report per drop.</b> QoR is only meaningful against constraints; an unconstrained path reports as passing."
    }
   ],
   "risks": [
-   "Unconstrained paths reported as clean",
-   "Exceptions written to close timing",
-   "Constraints diverging between synthesis and signoff",
-   "Test mode constraints written late",
-   "IO constraints assumed from the interface specification"
+   "<b>Unconstrained paths reported as clean.</b> A path with no constraint is a path the tool ignores, and it appears in the report as no violation at all.",
+   "<b>Exceptions written to close timing.</b> A false path added because the path would not close is a silicon failure being converted into a green report.",
+   "<b>Constraints diverging between synthesis and signoff.</b> Two constraint sets means optimizing against one and being judged against the other.",
+   "<b>Test mode constraints written late.</b> Scan shift and at-speed modes have their own timing, and a design closed only in functional mode fails at ATE.",
+   "<b>IO constraints assumed from the interface specification.</b> Actual budgets come from the package and channel analysis in <code>SIPI-07</code>, not from the protocol document."
   ],
   "roles": [
    {
@@ -22021,43 +21961,43 @@ export const activityDetails: Record<string, ActivityDetail> = {
   ],
   "criticalPath": true,
   "purpose": [
-   "Map the RTL onto the qualified library and optimize it for the PPA budget—Vt mix, multi-bit banking, useful skew, datapath structure.",
+   "Map the RTL onto the qualified library and <b>optimize it for the PPA budget</b>—Vt mix, multi-bit banking, useful skew, datapath structure.",
    "Technology mapping is where architecture becomes gates and where most of the achievable PPA is decided. The same RTL mapped two ways can differ by 20% in area and a hundred millivolts in achievable frequency, and the difference is entirely in how this activity is configured."
   ],
   "steps": [
    {
     "n": 1,
-    "text": "Select library and mapping strategy",
+    "text": "Select the library and mapping strategy",
     "tat": 1.5,
     "lane": "main"
    },
    {
     "n": 2,
-    "text": "Map baseline and optimization",
+    "text": "Run baseline mapping and optimization",
     "tat": 2.5,
     "lane": "main"
    },
    {
     "n": 3,
-    "text": "Define and document datapath and arithmetic optimization",
+    "text": "Optimize datapath and arithmetic structures",
     "tat": 1.5,
     "lane": "par"
    },
    {
     "n": 4,
-    "text": "Define and document multi-bit banking and useful skew configuration",
+    "text": "Configure multi-bit banking and useful skew",
     "tat": 2,
     "lane": "main"
    },
    {
     "n": 5,
-    "text": "Define and document area recovery on non-critical paths",
+    "text": "Recover area on non-critical paths",
     "tat": 1.5,
     "lane": "par"
    },
    {
     "n": 6,
-    "text": "Analyze qoR and optimization iteration",
+    "text": "Analyze QoR and iterate the optimization",
     "tat": 2,
     "lane": "main"
    }
@@ -22090,20 +22030,20 @@ export const activityDetails: Record<string, ActivityDetail> = {
    {
     "id": "SYN-D5",
     "rel": "feeds",
-    "text": "Synthesis QoR report per drop. This activity produces the QoR the report describes, drop after drop."
+    "text": "<b>Synthesis QoR report per drop.</b> The QoR the report describes is produced here, drop after drop."
    },
    {
     "id": "SYN-D2",
     "rel": "feeds",
-    "text": "N1 and N2 netlist drops. Each drop is this activity's output at a point in time, with whatever optimization was enabled."
+    "text": "<b>N1 and N2 netlist drops.</b> Each drop is this activity's output at a point in time, with whatever optimization was enabled."
    }
   ],
   "risks": [
-   "Everything optimized for speed",
-   "Multi-bit banking configured late",
-   "Useful skew used to hide a timing problem",
-   "Library subset used without knowing it",
-   "QoR compared drop to drop without normalizing"
+   "<b>Everything optimized for speed.</b> Area and leakage on non-critical paths are given away for performance nobody asked for, and the die grows.",
+   "<b>Multi-bit banking configured late.</b> Clock power depends heavily on it, and adding it after closure means re-timing the design.",
+   "<b>Useful skew used to hide a timing problem.</b> It buys real margin and also makes the clock tree harder to build; using it to rescue a path that should be restructured moves the problem to <code>PD-07</code>.",
+   "<b>Library subset used without knowing it.</b> Synthesis using only part of the Vt menu produces avoidable leakage, and nobody notices because the design closes.",
+   "<b>QoR compared drop to drop without normalizing.</b> A netlist with more RTL in it is not directly comparable to the last one, and the trend becomes noise."
   ],
   "roles": [
    {
@@ -22219,37 +22159,37 @@ export const activityDetails: Record<string, ActivityDetail> = {
   ],
   "criticalPath": true,
   "purpose": [
-   "Release the N0 flow-flush netlist—functionally incomplete, structurally representative—so physical design can build and debug its flow against a real database months before the design is ready.",
-   "N0 exists to be wrong in the right way. It has the right hierarchy, the right macros and roughly the right size, and it does not need to work."
+   "Release the <b>N0 flow-flush netlist</b>—functionally incomplete, structurally representative—so physical design can build and debug its flow against a real database months before the design is ready.",
+   "N0 exists to be wrong in the right way. It has the right hierarchy, the right macros and roughly the right size, and it does not need to work. Its entire purpose is to let <code>PD-01</code> find its flow problems on a throwaway netlist rather than on the one the schedule depends on."
   ],
   "steps": [
    {
     "n": 1,
-    "text": "Define n0 scope — what must be representative, what may be stubbed",
+    "text": "Define the N0 scope — what must be representative, what may be stubbed",
     "tat": 1,
     "lane": "main"
    },
    {
     "n": 2,
-    "text": "Define and document black-box and stub strategy for incomplete blocks",
+    "text": "Black-box and stub the incomplete blocks",
     "tat": 1,
     "lane": "main"
    },
    {
     "n": 3,
-    "text": "Define and document constraint bootstrap for N0",
+    "text": "Bootstrap the constraints for N0",
     "tat": 1,
     "lane": "par"
    },
    {
     "n": 4,
-    "text": "Define and document elaboration and structural sanity checking",
+    "text": "Elaborate the netlist and run structural sanity checks",
     "tat": 1,
     "lane": "main"
    },
    {
     "n": 5,
-    "text": "Release and physical design handover",
+    "text": "Release N0 and hand it over to physical design",
     "tat": 1,
     "lane": "main"
    }
@@ -22264,7 +22204,7 @@ export const activityDetails: Record<string, ActivityDetail> = {
   ],
   "produces": [
    "N0 scope definition — representative versus stubbed",
-   "N0 scope definition and stub strategy",
+   "Stub and black-box strategy record",
    "Black-boxed and stubbed netlist",
    "Bootstrap constraint set",
    "Structural sanity check results",
@@ -22282,20 +22222,20 @@ export const activityDetails: Record<string, ActivityDetail> = {
    {
     "id": "SYN-D1",
     "rel": "produces",
-    "text": "N0 flow-flush netlist for PD flow setup. The deliverable its value is entirely in arriving early rather than in being correct."
+    "text": "<b>N0 flow-flush netlist for PD flow setup.</b> The N0 netlist is assembled and released here, and its value is entirely in arriving early rather than in being correct."
    },
    {
     "id": "SYN-D8",
     "rel": "feeds",
-    "text": "Physical design handoff package per drop. N0 is the first handoff, and it sets the format every later one follows."
+    "text": "<b>Physical design handoff package per drop.</b> N0 is the first handoff, and it sets the format every later one follows."
    }
   ],
   "risks": [
-   "N0 delayed until it is good",
-   "Not representative in the dimensions that matter",
-   "Limitations not stated",
-   "Stub strategy that changes the hierarchy",
-   "Treated as a milestone rather than a tool"
+   "<b>N0 delayed until it is good.</b> The point is to be early; a correct N0 delivered late has become N1 and left PD's flow undebugged.",
+   "<b>Not representative in the dimensions that matter.</b> A netlist with a tenth of the instances exercises none of the runtime and capacity problems PD needs to find.",
+   "<b>Limitations not stated.</b> Physical design chasing timing on a stubbed netlist wastes a week before someone explains it was never going to close.",
+   "<b>Stub strategy that changes the hierarchy.</b> A hierarchy that differs from the real one means the flow is set up for a structure that will not arrive.",
+   "<b>Treated as a milestone rather than a tool.</b> N0 is scaffolding; celebrating it as progress distracts from the fact that no real design has been synthesized."
   ],
   "roles": [
    {
@@ -22393,43 +22333,43 @@ export const activityDetails: Record<string, ActivityDetail> = {
   ],
   "criticalPath": false,
   "purpose": [
-   "Synthesize with the floorplan in the loop—physical-aware mapping, congestion feedback, placement-driven restructuring—so the netlist that reaches physical design is already routable.",
+   "Synthesize <b>with the floorplan in the loop</b>—physical-aware mapping, congestion feedback, placement-driven restructuring—so the netlist that reaches physical design is already routable.",
    "Logic synthesis without physical information optimizes for a wire model that does not exist. On a large die the difference between estimated and actual wire delay is large enough to invalidate the optimization, and the correction happens either here or as weeks of congestion work at <code>PD-06</code>."
   ],
   "steps": [
    {
     "n": 1,
-    "text": "Set up physical-aware flow with the floorplan",
+    "text": "Set up the physical-aware flow with the floorplan",
     "tat": 1.5,
     "lane": "main"
    },
    {
     "n": 2,
-    "text": "Map floorplan-aware and optimization",
+    "text": "Run floorplan-aware mapping and optimization",
     "tat": 2,
     "lane": "main"
    },
    {
     "n": 3,
-    "text": "Place macro and blockage awareness in",
+    "text": "Model macros and blockages in placement",
     "tat": 1.5,
     "lane": "par"
    },
    {
     "n": 4,
-    "text": "Define and document congestion feedback loop with physical design",
+    "text": "Run the congestion feedback loop with physical design",
     "tat": 2,
     "lane": "main"
    },
    {
     "n": 5,
-    "text": "Place driven logic restructuring",
+    "text": "Restructure logic in the congested regions",
     "tat": 1.5,
     "lane": "par"
    },
    {
     "n": 6,
-    "text": "Compare qoR against non-physical synthesis",
+    "text": "Compare QoR against the non-physical synthesis result",
     "tat": 1.5,
     "lane": "main"
    }
@@ -22462,20 +22402,20 @@ export const activityDetails: Record<string, ActivityDetail> = {
    {
     "id": "SYN-D5",
     "rel": "feeds",
-    "text": "Synthesis QoR report per drop. Physical-aware results are the ones that predict what physical design will actually achieve."
+    "text": "<b>Synthesis QoR report per drop.</b> Physical-aware results are the ones that predict what physical design will actually achieve."
    },
    {
     "id": "SYN-D8",
     "rel": "feeds",
-    "text": "Physical design handoff package per drop. A netlist synthesized against the floorplan is a materially better handoff than one synthesized against a wire model."
+    "text": "<b>Physical design handoff package per drop.</b> A netlist synthesized against the floorplan is a materially better handoff than one synthesized against a wire model."
    }
   ],
   "risks": [
-   "Floorplan too immature to synthesize against",
-   "Congestion feedback one-directional",
-   "Runtime cost not justified",
-   "Restructuring breaking hierarchy",
-   "Blockages not modelled"
+   "<b>Floorplan too immature to synthesize against.</b> Physical-aware synthesis against a floorplan that then changes produces optimization for a layout that never exists.",
+   "<b>Congestion feedback one-directional.</b> Synthesis restructures and physical design re-places; without both, each optimizes against the other's stale result.",
+   "<b>Runtime cost not justified.</b> Physical-aware flows are slow, and without the QoR comparison nobody knows whether the extra hours bought anything.",
+   "<b>Restructuring breaking hierarchy.</b> Aggressive cross-boundary optimization improves QoR and makes the netlist harder to close hierarchically and harder to equivalence-check.",
+   "<b>Blockages not modelled.</b> Macros and their keep-out regions dominate placement on this die, and synthesis blind to them produces logic that cannot be placed where it assumed."
   ],
   "roles": [
    {
@@ -22575,43 +22515,43 @@ export const activityDetails: Record<string, ActivityDetail> = {
   ],
   "criticalPath": true,
   "purpose": [
-   "Release the N1 drop—the first netlist meant to be closed—against PD's feedback from its flow setup, and establish the QoR baseline every later drop is measured against.",
-   "N0 proved the flow ran. N1 is where the design's actual QoR first becomes visible: real timing, real area, real congestion."
+   "Release the <b>N1 drop—the first netlist meant to be closed</b>—against PD's feedback from its flow setup, and establish the QoR baseline every later drop is measured against.",
+   "N0 proved the flow ran. N1 is where the design's actual QoR first becomes visible: real timing, real area, real congestion. The number it establishes is the one <code>PD-05</code> will work from and the one everyone will argue about for the next three months."
   ],
   "steps": [
    {
     "n": 1,
-    "text": "Review rTL drop intake and delta against N0",
+    "text": "Take in the RTL drop and review the delta against N0",
     "tat": 1,
     "lane": "main"
    },
    {
     "n": 2,
-    "text": "Close synthesis run and block-level",
+    "text": "Run synthesis and close at block level",
     "tat": 1.5,
     "lane": "main"
    },
    {
     "n": 3,
-    "text": "Define and document physical design feedback incorporation",
+    "text": "Incorporate the physical design feedback",
     "tat": 1,
     "lane": "par"
    },
    {
     "n": 4,
-    "text": "Analyze qoR delta against the N0 baseline",
+    "text": "Analyze the QoR delta against the N0 baseline",
     "tat": 1.5,
     "lane": "main"
    },
    {
     "n": 5,
-    "text": "Define and document issue list for the next drop",
+    "text": "Compile the issue list for the next drop",
     "tat": 1,
     "lane": "par"
    },
    {
     "n": 6,
-    "text": "Release and handoff to physical design",
+    "text": "Release N1 and hand it off to physical design",
     "tat": 1,
     "lane": "main"
    }
@@ -22646,20 +22586,20 @@ export const activityDetails: Record<string, ActivityDetail> = {
    {
     "id": "SYN-D2",
     "rel": "produces",
-    "text": "N1 and N2 netlist drops with QoR delta reports. The first of the two quality drops, with the baseline it establishes."
+    "text": "<b>N1 and N2 netlist drops with QoR delta reports.</b> The first of the two quality drops, with the baseline it establishes."
    },
    {
     "id": "SYN-D5",
     "rel": "feeds",
-    "text": "Synthesis QoR report per drop. N1 sets the baseline the QoR trend is measured from."
+    "text": "<b>Synthesis QoR report per drop.</b> N1 sets the baseline the QoR trend is measured from; every later drop's delta is read against this number."
    }
   ],
   "risks": [
-   "N1 released before RTL is worth synthesizing",
-   "QoR delta not analyzed",
-   "Issue list not carried forward",
-   "PD feedback arriving after the drop",
-   "Baseline set on a partial design"
+   "<b>N1 released before RTL is worth synthesizing.</b> A drop taken from unstable RTL produces a baseline that means nothing and a PD turn that chases moving targets.",
+   "<b>QoR delta not analyzed.</b> Knowing the numbers without knowing what changed them leaves the next drop guessing about what to fix.",
+   "<b>Issue list not carried forward.</b> N2 then rediscovers the same problems, and the drop cadence loses its cumulative benefit.",
+   "<b>PD feedback arriving after the drop.</b> Feedback from flow setup has to reach synthesis before N1 is run, not after it is released.",
+   "<b>Baseline set on a partial design.</b> A QoR baseline missing significant blocks flatters the trend and hides the growth that follows."
   ],
   "roles": [
    {
@@ -22766,43 +22706,43 @@ export const activityDetails: Record<string, ActivityDetail> = {
   ],
   "criticalPath": false,
   "purpose": [
-   "Reduce power where it is spent—clock gating, operand isolation, Vt mix—driven by real switching activity rather than by defaults.",
-   "Power optimization without activity data is guesswork. Clock gating inserted everywhere costs area and saves little; inserted where the data says the logic is idle it saves a meaningful fraction of dynamic power."
+   "Reduce power where it is actually spent—<b>clock gating, operand isolation, Vt mix</b>—driven by real switching activity rather than by defaults.",
+   "Power optimization without activity data is guesswork. Clock gating inserted everywhere costs area and saves little; inserted where the data says the logic is idle it saves a meaningful fraction of dynamic power. The activity data comes from verification, which makes this a cross-stage dependency more than a synthesis setting."
   ],
   "steps": [
    {
     "n": 1,
-    "text": "Analyze power baseline and hot-spot identification",
+    "text": "Establish the power analysis baseline and identify hot spots",
     "tat": 1.5,
     "lane": "main"
    },
    {
     "n": 2,
-    "text": "Analyze clock gating insertion and efficiency",
+    "text": "Insert clock gating and analyze its efficiency",
     "tat": 2,
     "lane": "main"
    },
    {
     "n": 3,
-    "text": "Define and document vt mix optimization for leakage",
+    "text": "Optimize the Vt mix for leakage",
     "tat": 1.5,
     "lane": "par"
    },
    {
     "n": 4,
-    "text": "Define and document operand isolation and datapath gating",
+    "text": "Implement operand isolation and datapath gating",
     "tat": 2,
     "lane": "main"
    },
    {
     "n": 5,
-    "text": "Define and document activity-driven optimization with real switching data",
+    "text": "Re-optimize with real switching activity data",
     "tat": 1.5,
     "lane": "par"
    },
    {
     "n": 6,
-    "text": "Compare power QoR and against the budget",
+    "text": "Report power QoR against the budget",
     "tat": 1.5,
     "lane": "main"
    }
@@ -22835,20 +22775,20 @@ export const activityDetails: Record<string, ActivityDetail> = {
    {
     "id": "SYN-D5",
     "rel": "feeds",
-    "text": "Synthesis QoR report per drop. Power is one of the three QoR axes, and the only one that needs external activity data to measure honestly."
+    "text": "<b>Synthesis QoR report per drop.</b> Power is one of the three QoR axes, and the only one that needs external activity data to measure honestly."
    },
    {
     "id": "SYN-D7",
     "rel": "feeds",
-    "text": "Power intent implementation report. Dynamic power optimization sits alongside the UPF implementation from <code>SYN-07</code> in the same report."
+    "text": "<b>Power intent implementation report.</b> Dynamic power optimization sits alongside the UPF implementation from <code>SYN-07</code> in the same report."
    }
   ],
   "risks": [
-   "Optimization driven by default activity",
-   "Clock gating efficiency unmeasured",
-   "Vt mix skewed to low-Vt for timing",
-   "Power measured at the wrong operating point",
-   "Optimization deferred to the final turn"
+   "<b>Optimization driven by default activity.</b> Uniform switching assumptions produce gating where it saves nothing and none where it would.",
+   "<b>Clock gating efficiency unmeasured.</b> Gates inserted without measuring how often they actually gate cost area and leakage for no benefit.",
+   "<b>Vt mix skewed to low-Vt for timing.</b> Leakage grows non-linearly, and a design closed on low-Vt everywhere blows its static power budget.",
+   "<b>Power measured at the wrong operating point.</b> The number that matters is at the DVFS point the product runs at, not at nominal.",
+   "<b>Optimization deferred to the final turn.</b> Power changes timing; a design closed on timing and then power-optimized has to be re-closed."
   ],
   "roles": [
    {
@@ -22957,43 +22897,43 @@ export const activityDetails: Record<string, ActivityDetail> = {
   ],
   "criticalPath": false,
   "purpose": [
-   "Implement the power intent in the netlist—isolation cells, level shifters, retention flops, always-on paths—from the UPF, and prove the netlist and the intent still agree.",
-   "UPF describes what should happen; synthesis is where it becomes cells. An isolation cell missing at a domain boundary is a design that corrupts data on power-down, and it is invisible in any functional check that does not model power."
+   "Implement the <b>power intent in the netlist</b>—isolation cells, level shifters, retention flops, always-on paths—from the UPF, and prove the netlist and the intent still agree.",
+   "UPF describes what should happen; synthesis is where it becomes cells. An isolation cell missing at a domain boundary is a design that corrupts data on power-down, and it is invisible in any functional check that does not model power. The consistency check between netlist and intent is the only reliable detector."
   ],
   "steps": [
    {
     "n": 1,
-    "text": "Define and document uPF ingestion and elaboration in the synthesis flow",
+    "text": "Ingest and elaborate the UPF in the synthesis flow",
     "tat": 1,
     "lane": "main"
    },
    {
     "n": 2,
-    "text": "Define and document insert isolation and level shifter inference and",
+    "text": "Infer and insert isolation cells and level shifters",
     "tat": 1.5,
     "lane": "main"
    },
    {
     "n": 3,
-    "text": "Define and document always-on and feed-through path handling",
+    "text": "Handle always-on and feed-through paths",
     "tat": 1,
     "lane": "par"
    },
    {
     "n": 4,
-    "text": "Define and document insert retention cell and control",
+    "text": "Insert retention cells and their control",
     "tat": 1.5,
     "lane": "main"
    },
    {
     "n": 5,
-    "text": "Define and document uPF and netlist consistency checking",
+    "text": "Check UPF-to-netlist consistency",
     "tat": 1,
     "lane": "par"
    },
    {
     "n": 6,
-    "text": "Implement power intent report",
+    "text": "Write the power intent implementation report",
     "tat": 1,
     "lane": "main"
    }
@@ -23026,20 +22966,20 @@ export const activityDetails: Record<string, ActivityDetail> = {
    {
     "id": "SYN-D7",
     "rel": "produces",
-    "text": "Power intent implementation report. This activity is the deliverable—what was inferred, what was inserted, and where intent and netlist agree."
+    "text": "<b>Power intent implementation report.</b> The implementation report is produced here—what was inferred, what was inserted, and where intent and netlist agree."
    },
    {
     "id": "SYN-D6",
     "rel": "feeds",
-    "text": "Formal equivalence clean report per drop. Low-power cells complicate equivalence checking, and the two activities have to agree on how they are handled."
+    "text": "<b>Formal equivalence clean report per drop.</b> Low-power cells complicate equivalence checking, and the two activities have to agree on how they are handled."
    }
   ],
   "risks": [
-   "Isolation inferred but not verified",
-   "Retention cells inserted without physical planning",
-   "Always-on paths not identified",
-   "UPF and netlist diverging",
-   "Level shifters omitted between voltage domains"
+   "<b>Isolation inferred but not verified.</b> A missing cell at one boundary corrupts state on power-down and appears in no functional test.",
+   "<b>Retention cells inserted without physical planning.</b> They have a different footprint and power connectivity, and adding them late disturbs the floorplan.",
+   "<b>Always-on paths not identified.</b> Logic that must survive a domain shutting down and is not marked always-on is powered down with it.",
+   "<b>UPF and netlist diverging.</b> Two descriptions of the same intent, and downstream tools reading different ones.",
+   "<b>Level shifters omitted between voltage domains.</b> The design functions in simulation and fails at the voltage extremes in silicon."
   ],
   "roles": [
    {
@@ -23145,43 +23085,43 @@ export const activityDetails: Record<string, ActivityDetail> = {
   ],
   "criticalPath": true,
   "purpose": [
-   "Release the N2 drop with everything enabled—full optimization, power, low-power intent, physical awareness—and state honestly how much closure risk remains.",
+   "Release the <b>N2 drop with everything enabled</b>—full optimization, power, low-power intent, physical awareness—and state honestly how much closure risk remains.",
    "N2 is the last drop before the FFN and the last chance to change anything structurally. Its QoR is the best prediction available of what the final turn will achieve, and the closure risk statement it carries is what tells the program whether the tapeout date is credible."
   ],
   "steps": [
    {
     "n": 1,
-    "text": "Define and document rTL and ECO intake since N1",
+    "text": "Take in the RTL and ECO changes since N1",
     "tat": 1,
     "lane": "main"
    },
    {
     "n": 2,
-    "text": "Define and document full synthesis with all optimizations enabled",
+    "text": "Run full synthesis with all optimizations enabled",
     "tat": 1.5,
     "lane": "main"
    },
    {
     "n": 3,
-    "text": "Assess late RTL change impact",
+    "text": "Assess the impact of late RTL changes",
     "tat": 1,
     "lane": "par"
    },
    {
     "n": 4,
-    "text": "Define and document congestion and timing convergence check",
+    "text": "Check congestion and timing convergence",
     "tat": 1.5,
     "lane": "main"
    },
    {
     "n": 5,
-    "text": "Define and document physical design turn-1 feedback incorporation",
+    "text": "Incorporate the turn-1 feedback from physical design",
     "tat": 1,
     "lane": "par"
    },
    {
     "n": 6,
-    "text": "Release with a closure risk statement",
+    "text": "Release N2 with a closure risk statement",
     "tat": 1,
     "lane": "main"
    }
@@ -23214,20 +23154,20 @@ export const activityDetails: Record<string, ActivityDetail> = {
    {
     "id": "SYN-D2",
     "rel": "produces",
-    "text": "N1 and N2 netlist drops with QoR delta reports. The second quality drop, and the last structurally changeable one."
+    "text": "<b>N1 and N2 netlist drops with QoR delta reports.</b> The second quality drop, and the last structurally changeable one."
    },
    {
     "id": "SYN-D5",
     "rel": "feeds",
-    "text": "Synthesis QoR report per drop. The N2 QoR is the best available prediction of what the final turn will reach."
+    "text": "<b>Synthesis QoR report per drop.</b> The N2 QoR is the best available prediction of what the final turn will reach."
    }
   ],
   "risks": [
-   "Closure risk understated",
-   "Late RTL changes absorbed without assessment",
-   "All optimizations enabled for the first time at N2",
-   "Turn-1 feedback not incorporated",
-   "Treated as the final netlist"
+   "<b>Closure risk understated.</b> An optimistic risk statement at N2 removes the program's last opportunity to take a frequency or feature concession while it is still cheap.",
+   "<b>Late RTL changes absorbed without assessment.</b> A functional change arriving between N1 and N2 can invalidate the turn-1 closure work entirely.",
+   "<b>All optimizations enabled for the first time at N2.</b> Enabling power, low-power and physical awareness together for the first time produces a QoR nobody can attribute.",
+   "<b>Turn-1 feedback not incorporated.</b> N2 then repeats N1's physical problems, and turn 2 spends its time on the same issues.",
+   "<b>Treated as the final netlist.</b> N2 is not the FFN, and freezing behavior around it removes the RTL freeze discipline that <code>SYN-09</code> depends on."
   ],
   "roles": [
    {
@@ -23332,43 +23272,43 @@ export const activityDetails: Record<string, ActivityDetail> = {
   ],
   "criticalPath": true,
   "purpose": [
-   "Release the FFN—the final full netlist—against frozen RTL, with constraints frozen and equivalence proved, and declare that nothing functional changes after it.",
-   "The FFN is a commitment more than a deliverable. Everything after it is physical: <code>PD-13</code> closes on this netlist and <code>SO-02</code> signs off on what PD produces."
+   "Release the <b>FFN—the final full netlist</b>—against frozen RTL, with constraints frozen and equivalence proved, and declare that nothing functional changes after it.",
+   "The FFN is a commitment more than a deliverable. Everything after it is physical: <code>PD-13</code> closes on this netlist and <code>SO-02</code> signs off on what PD produces. A functional change after the FFN restarts both, which is why the freeze around it has to be real."
   ],
   "steps": [
    {
     "n": 1,
-    "text": "Define and document rTL freeze confirmation and final intake",
+    "text": "Confirm RTL freeze and take the final intake",
     "tat": 0.75,
     "lane": "main"
    },
    {
     "n": 2,
-    "text": "Finalize synthesis run",
+    "text": "Run the final synthesis",
     "tat": 1.25,
     "lane": "main"
    },
    {
     "n": 3,
-    "text": "Finalize constraint freeze",
+    "text": "Freeze the constraint set",
     "tat": 1,
     "lane": "par"
    },
    {
     "n": 4,
-    "text": "Finalize equivalence and UPF consistency verification",
+    "text": "Verify final equivalence and UPF consistency",
     "tat": 1,
     "lane": "main"
    },
    {
     "n": 5,
-    "text": "Hand off package assembly",
+    "text": "Assemble the handoff package for the final turn",
     "tat": 0.75,
     "lane": "par"
    },
    {
     "n": 6,
-    "text": "Release fFN and functional freeze declaration",
+    "text": "Release the FFN and declare functional freeze",
     "tat": 1,
     "lane": "main"
    }
@@ -23401,25 +23341,25 @@ export const activityDetails: Record<string, ActivityDetail> = {
    {
     "id": "SYN-D3",
     "rel": "produces",
-    "text": "FFN—final full netlist, release-tagged. The deliverable the milestone the stage ends on."
+    "text": "<b>FFN—final full netlist, release-tagged.</b> The final netlist is released and tagged here, and it is the milestone the stage ends on."
    },
    {
     "id": "SYN-D4",
     "rel": "gates",
-    "text": "Validated SDC constraint set. Constraints freeze with the FFN—closing against moving constraints is closing against nothing."
+    "text": "<b>Validated SDC constraint set.</b> Constraints freeze with the FFN—closing against moving constraints is closing against nothing."
    },
    {
     "id": "SYN-D8",
     "rel": "feeds",
-    "text": "Physical design handoff package per drop. The final handoff, and the one <code>PD-13</code> closes against."
+    "text": "<b>Physical design handoff package per drop.</b> The final handoff, and the one <code>PD-13</code> closes against."
    }
   ],
   "risks": [
-   "FFN released against RTL that is not actually frozen",
-   "Constraints still changing after the FFN",
-   "Equivalence not proved on the final netlist",
-   "Functional freeze declared and not enforced",
-   "Handoff package incomplete"
+   "<b>FFN released against RTL that is not actually frozen.</b> The final turn then closes against a moving netlist, and every change restarts it.",
+   "<b>Constraints still changing after the FFN.</b> A design closed against one constraint set and signed off against another has not been signed off.",
+   "<b>Equivalence not proved on the final netlist.</b> The last synthesis run is the one most likely to contain a transformation error, and the least likely to be checked under schedule pressure.",
+   "<b>Functional freeze declared and not enforced.</b> Post-FFN functional ECOs are sometimes unavoidable and must be exceptional, visible and costed.",
+   "<b>Handoff package incomplete.</b> The final turn needs constraints, UPF, DFT collateral and abstracts together; a missing item stops closure at its start."
   ],
   "roles": [
    {
@@ -23526,55 +23466,55 @@ export const activityDetails: Record<string, ActivityDetail> = {
   ],
   "criticalPath": false,
   "purpose": [
-   "Prove that every netlist still means what the RTL meant—formal equivalence per drop, including through DFT insertion, clock gating and low-power transformations.",
-   "Completing this work early provides a clear basis for downstream design decisions and reduces late rework, schedule risk, and integration issues."
+   "Prove that <b>every netlist still means what the RTL meant</b>—formal equivalence per drop, including through DFT insertion, clock gating and low-power transformations.",
+   "Synthesis rewrites the design, and the tools that do it are not infallible. Equivalence checking is the only evidence that the netlist implements the RTL that verification actually verified; without it, a transformation error is discovered in silicon as behavior nobody can trace to a bug."
   ],
   "steps": [
    {
     "n": 1,
-    "text": "Set up equivalence methodology and tool",
+    "text": "Set up the equivalence methodology and tools",
     "tat": 1.5,
     "lane": "main"
    },
    {
     "n": 2,
-    "text": "Define and document block-level equivalence per drop",
+    "text": "Check block-level equivalence per drop",
     "tat": 2,
     "lane": "main"
    },
    {
     "n": 3,
-    "text": "Define and document black-box and constraint handling for incomplete drops",
+    "text": "Handle black-boxes and constraints for incomplete drops",
     "tat": 2,
     "lane": "par"
    },
    {
     "n": 4,
-    "text": "Define and document chip-level equivalence per drop",
+    "text": "Check chip-level equivalence per drop",
     "tat": 3,
     "lane": "main"
    },
    {
     "n": 5,
-    "text": "Define and document dFT and clock gating equivalence handling",
+    "text": "Configure DFT and clock gating transformation handling",
     "tat": 2,
     "lane": "par"
    },
    {
     "n": 6,
-    "text": "Debug non-equivalence and resolution",
+    "text": "Debug and resolve the non-equivalences",
     "tat": 2.5,
     "lane": "main"
    },
    {
     "n": 7,
-    "text": "Define and document per-drop equivalence reporting",
+    "text": "Report equivalence results per drop",
     "tat": 2,
     "lane": "par"
    },
    {
     "n": 8,
-    "text": "Continuously checking across the drop sequence",
+    "text": "Run continuous checking across the drop sequence",
     "tat": 11,
     "lane": "main"
    }
@@ -23591,7 +23531,7 @@ export const activityDetails: Record<string, ActivityDetail> = {
    "Equivalence methodology and setup",
    "Per-drop block-level equivalence results",
    "Black-box and constraint handling record",
-   "Block and chip-level equivalence results per drop",
+   "Chip-level equivalence results per drop",
    "DFT and clock gating handling configuration",
    "Non-equivalence debug records",
    "Per-drop equivalence reports",
@@ -23611,20 +23551,20 @@ export const activityDetails: Record<string, ActivityDetail> = {
    {
     "id": "SYN-D6",
     "rel": "produces",
-    "text": "Formal equivalence clean report per drop. The deliverable \"per drop\" is what makes it a control rather than a final check."
+    "text": "<b>Formal equivalence clean report per drop.</b> The per-drop equivalence reports are produced here, and \"per drop\" is what makes them a control rather than a final check."
    },
    {
     "id": "SYN-D3",
     "rel": "gates",
-    "text": "FFN—final full netlist. An FFN that has not been proved equivalent is a netlist nobody can claim was verified."
+    "text": "<b>FFN—final full netlist.</b> An FFN that has not been proved equivalent is a netlist nobody can claim was verified."
    }
   ],
   "risks": [
-   "Equivalence run only on the final netlist",
-   "Non-equivalences waived to make progress",
-   "DFT transformations not modelled",
-   "Black-box handling too permissive",
-   "Debug capacity underestimated"
+   "<b>Equivalence run only on the final netlist.</b> A transformation error introduced at N1 is then found at the FFN, when the debug competes with tapeout.",
+   "<b>Non-equivalences waived to make progress.</b> Each waiver is a place where the netlist may not implement the verified RTL, and they accumulate quietly.",
+   "<b>DFT transformations not modelled.</b> The checker reports thousands of differences and everyone stops reading the report.",
+   "<b>Black-box handling too permissive.</b> Boxing out a block to get a clean result excludes exactly the logic that was not checked.",
+   "<b>Debug capacity underestimated.</b> A single real non-equivalence on a design this size can take a week to localize, and there is rarely a week available."
   ],
   "roles": [
    {
@@ -23728,43 +23668,43 @@ export const activityDetails: Record<string, ActivityDetail> = {
   ],
   "criticalPath": false,
   "purpose": [
-   "Report timing, area and power against the budget after every drop, and escalate when a block is diverging rather than when it has already blown its allocation.",
-   "Completing this work early provides a clear basis for downstream design decisions and reduces late rework, schedule risk, and integration issues."
+   "Report <b>timing, area and power against the budget after every drop</b>, and escalate when a block is diverging rather than when it has already blown its allocation.",
+   "QoR reported in absolute terms tells nobody anything. Reported against the <code>ARCH-06</code> allocation and trended across drops, it says which blocks are converging, which are not, and how much of the gap is still recoverable—which is the only version a program manager can act on."
   ],
   "steps": [
    {
     "n": 1,
-    "text": "Define and document reporting framework and budget ingestion",
+    "text": "Build the reporting framework and ingest the budgets",
     "tat": 1.5,
     "lane": "main"
    },
    {
     "n": 2,
-    "text": "Analyze per-drop timing report and",
+    "text": "Report and analyze timing per drop",
     "tat": 2,
     "lane": "main"
    },
    {
     "n": 3,
-    "text": "Compare budget and escalation rules",
+    "text": "Compare against budget and apply the escalation rules",
     "tat": 2,
     "lane": "par"
    },
    {
     "n": 4,
-    "text": "Define and document per-drop area and power report",
+    "text": "Report area and power per drop",
     "tat": 2,
     "lane": "main"
    },
    {
     "n": 5,
-    "text": "Analyze trend across the drop sequence",
+    "text": "Analyze trends across the drop sequence",
     "tat": 2,
     "lane": "par"
    },
    {
     "n": 6,
-    "text": "Continuously reporting across the stage",
+    "text": "Run continuous reporting across the stage",
     "tat": 16.5,
     "lane": "main"
    }
@@ -23779,10 +23719,10 @@ export const activityDetails: Record<string, ActivityDetail> = {
   ],
   "produces": [
    "Reporting framework with budget ingestion",
-   "Per-drop timing, area and power report",
+   "Per-drop timing reports",
    "Budget comparison per block",
    "Escalation records",
-   "Per-drop timing, area and power reports",
+   "Per-drop area and power reports",
    "Trend analysis across drops",
    "Reporting log across the stage"
   ],
@@ -23799,20 +23739,20 @@ export const activityDetails: Record<string, ActivityDetail> = {
    {
     "id": "SYN-D5",
     "rel": "produces",
-    "text": "Synthesis QoR report per drop against PPA targets. The deliverable \"against targets\" is what makes it usable."
+    "text": "<b>Synthesis QoR report per drop against PPA targets.</b> The per-drop QoR reports are produced here, and \"against targets\" is what makes them usable."
    },
    {
     "id": "SYN-D2",
     "rel": "feeds",
-    "text": "N1 and N2 netlist drops with QoR delta reports. The delta report accompanying each drop comes from here."
+    "text": "<b>N1 and N2 netlist drops with QoR delta reports.</b> The delta report accompanying each drop comes from here—the normalized comparison that says what changed between drops and why."
    }
   ],
   "risks": [
-   "QoR reported in absolute terms",
-   "No escalation rule",
-   "Reports not normalized across drops",
-   "Power reported at nominal only",
-   "Reporting stopping between drops"
+   "<b>QoR reported in absolute terms.</b> Numbers with no budget reference cannot be acted on, and everyone forms their own opinion of whether they are acceptable.",
+   "<b>No escalation rule.</b> Divergence noticed and not escalated becomes a surprise at the final turn, when there is nothing left to do about it.",
+   "<b>Reports not normalized across drops.</b> More RTL in a later drop makes the trend meaningless unless the comparison accounts for it.",
+   "<b>Power reported at nominal only.</b> The number that matters is at the product's operating point, and reporting at nominal understates it consistently.",
+   "<b>Reporting stopping between drops.</b> The interesting question is whether a block is improving, and that needs data between releases as well as at them."
   ],
   "roles": [
    {
@@ -23917,43 +23857,43 @@ export const activityDetails: Record<string, ActivityDetail> = {
   ],
   "criticalPath": false,
   "purpose": [
-   "Hand each netlist to physical design as a complete, accepted package—netlist, constraints, UPF, DFT collateral, abstracts—and review the QoR delta together rather than throwing results over a wall.",
-   "The handoff is where two teams either share a picture of the design or maintain two. Six M/M across the stage buys a structured package and a joint review per drop, and it prevents the pattern where physical design spends a week discovering what synthesis already knew."
+   "Hand each netlist to physical design as a <b>complete, accepted package</b>—netlist, constraints, UPF, DFT collateral, abstracts—and review the QoR delta together rather than throwing results over a wall.",
+   "The handoff is where two teams either share a picture of the design or maintain two. Six man-months across the stage buys a structured package and a joint review per drop, and it prevents the pattern where physical design spends a week discovering what synthesis already knew."
   ],
   "steps": [
    {
     "n": 1,
-    "text": "Define handoff package — contents and format",
+    "text": "Define the handoff package contents and format",
     "tat": 1,
     "lane": "main"
    },
    {
     "n": 2,
-    "text": "Define and document per-drop package assembly",
+    "text": "Assemble the package for each drop",
     "tat": 1.5,
     "lane": "main"
    },
    {
     "n": 3,
-    "text": "Define and document acceptance criteria agreed with physical design",
+    "text": "Agree acceptance criteria with physical design",
     "tat": 1.5,
     "lane": "par"
    },
    {
     "n": 4,
-    "text": "Review qoR delta with physical design per drop",
+    "text": "Review the QoR delta with physical design per drop",
     "tat": 1.5,
     "lane": "main"
    },
    {
     "n": 5,
-    "text": "Track issue between drops",
+    "text": "Track issues between drops",
     "tat": 1.5,
     "lane": "par"
    },
    {
     "n": 6,
-    "text": "Continuously handoff across the drop sequence",
+    "text": "Run the continuous handoff across the drop sequence",
     "tat": 18,
     "lane": "main"
    }
@@ -23972,7 +23912,7 @@ export const activityDetails: Record<string, ActivityDetail> = {
    "Acceptance criteria agreed with PD",
    "QoR delta review records",
    "Issue tracking between drops",
-   "Assembled packages per drop"
+   "Handoff log across the drop sequence"
   ],
   "producedBy": [
    1,
@@ -23986,20 +23926,20 @@ export const activityDetails: Record<string, ActivityDetail> = {
    {
     "id": "SYN-D8",
     "rel": "produces",
-    "text": "Physical design handoff package per drop. The deliverable acceptance rather than delivery is its standard."
+    "text": "<b>Physical design handoff package per drop.</b> The handoff packages are assembled and accepted here, and acceptance rather than delivery is the standard."
    },
    {
     "id": "SYN-D2",
     "rel": "feeds",
-    "text": "N1 and N2 netlist drops with QoR delta reports. The delta review is where the drop is actually transferred."
+    "text": "<b>N1 and N2 netlist drops with QoR delta reports.</b> The delta review is where the drop is actually transferred: the joint reading of the QoR delta is what turns a delivered package into an accepted one."
    }
   ],
   "risks": [
-   "Packages delivered without acceptance",
-   "QoR reviewed asynchronously",
-   "Issues not tracked between drops",
-   "Package contents changing between drops",
-   "Handoff treated as a synthesis milestone"
+   "<b>Packages delivered without acceptance.</b> Physical design discovers the gap mid-turn, and the turn absorbs the delay.",
+   "<b>QoR reviewed asynchronously.</b> A report read separately produces two interpretations, and the disagreement surfaces at the next escalation.",
+   "<b>Issues not tracked between drops.</b> Each handoff then starts fresh, and the same problems are raised at every drop.",
+   "<b>Package contents changing between drops.</b> Physical design automates against the format, and an inconsistent package breaks their flow.",
+   "<b>Handoff treated as a synthesis milestone.</b> It is a shared event; a handoff that PD has not accepted has not happened."
   ],
   "roles": [
    {
@@ -24048,7 +23988,7 @@ export const activityDetails: Record<string, ActivityDetail> = {
   ],
   "exit": [
    "Every package accepted rather than merely delivered",
-   "QoR reviewed jointly per drop",
+   "QoR delta read jointly at every drop, not asynchronously",
    "Issues tracked across drops rather than re-raised"
   ],
   "dependsOn": [
@@ -24099,43 +24039,43 @@ export const activityDetails: Record<string, ActivityDetail> = {
   ],
   "criticalPath": true,
   "purpose": [
-   "Build the flow—scripts, MMMC environment, decks, runtimes, capacity—and debug it on the N0 flow-flush netlist rather than on the netlist the schedule depends on.",
-   "Completing this work early provides a clear basis for downstream design decisions and reduces late rework, schedule risk, and integration issues."
+   "Build the flow—<b>scripts, MMMC environment, decks, runtimes, capacity</b>—and debug it on the N0 flow-flush netlist rather than on the netlist the schedule depends on.",
+   "This is why <code>SYN-03</code> releases a netlist nobody expects to close. Every flow problem—a deck that does not load, a scenario that does not converge, a runtime that exceeds the night—is found here on a throwaway database, weeks before the same problem would have cost a turn."
   ],
   "steps": [
    {
     "n": 1,
-    "text": "Define the flow scope and script framework",
+    "text": "Define the flow scope and build the script framework",
     "tat": 1.5,
     "lane": "main"
    },
    {
     "n": 2,
-    "text": "Define and document mMMC environment build across corners and modes",
+    "text": "Build the MMMC environment across corners and modes",
     "tat": 2,
     "lane": "main"
    },
    {
     "n": 3,
-    "text": "Integrate script, deck and library",
+    "text": "Integrate the scripts, decks and libraries",
     "tat": 1.5,
     "lane": "par"
    },
    {
     "n": 4,
-    "text": "Define and document n0 flow-flush run, end to end",
+    "text": "Run N0 through the flow end to end",
     "tat": 2,
     "lane": "main"
    },
    {
     "n": 5,
-    "text": "Define hierarchical and block-level flow",
+    "text": "Define the hierarchical and block-level flows",
     "tat": 1.5,
     "lane": "par"
    },
    {
     "n": 6,
-    "text": "Assess runtime baseline and capacity",
+    "text": "Measure the runtime baseline and assess capacity",
     "tat": 1.5,
     "lane": "main"
    }
@@ -24168,20 +24108,20 @@ export const activityDetails: Record<string, ActivityDetail> = {
    {
     "id": "PD-D1",
     "rel": "produces",
-    "text": "Flow setup release—MMMC environment, scripts and runtime baseline. The deliverable the runtime baseline is the part the schedule depends on."
+    "text": "<b>Flow setup release—MMMC environment, scripts and runtime baseline.</b> The flow, the MMMC environment and the runtime baseline are built here, and the runtime baseline is the part the schedule depends on."
    },
    {
     "id": "PD-D5",
     "rel": "feeds",
-    "text": "MCMM timing closure reports. The scenario set built here is what every later closure report is generated from."
+    "text": "<b>MCMM timing closure reports.</b> The scenario set built here is what every later closure report is generated from."
    }
   ],
   "risks": [
-   "Flow setup on the first real netlist",
-   "MMMC scenarios incomplete",
-   "Runtime not measured",
-   "Hierarchical flow deferred",
-   "Capacity not validated against booked"
+   "<b>Flow setup on the first real netlist.</b> Every flow problem then costs a turn, and the turns are the schedule.",
+   "<b>MMMC scenarios incomplete.</b> A corner or mode missing from the setup is one the design is never closed at, and it is found at <code>SO-02</code>.",
+   "<b>Runtime not measured.</b> A flow that works and takes two days per iteration produces a closure schedule nobody planned, discovered when closure starts.",
+   "<b>Hierarchical flow deferred.</b> A design this size cannot be closed flat; deferring the block-level flow means building it under pressure.",
+   "<b>Capacity assumed rather than booked.</b> The flow's peak concurrency is known here, and licences take weeks to procure."
   ],
   "roles": [
    {
@@ -24302,43 +24242,43 @@ export const activityDetails: Record<string, ActivityDetail> = {
   ],
   "criticalPath": true,
   "purpose": [
-   "Decide where everything physically goes—partitions, macros, block boundaries, pins, utilization—and freeze it, because everything downstream is built on it.",
-   "The floorplan is the most consequential and least reversible decision in the stage. Macro placement sets routing congestion, block boundaries set what can be closed independently, and pin placement sets the top-level routing burden."
+   "Decide <b>where everything physically goes</b>—partitions, macros, block boundaries, pins, utilization—and freeze it, because everything downstream is built on it.",
+   "The floorplan is the most consequential and least reversible decision in the stage. Macro placement sets routing congestion, block boundaries set what can be closed independently, and pin placement sets the top-level routing burden. A floorplan changed at turn 2 invalidates the clock trees, the power grid and the routing built on it."
   ],
   "steps": [
    {
     "n": 1,
-    "text": "Define partition against the design hierarchy",
+    "text": "Define the partitions against the design hierarchy",
     "tat": 2,
     "lane": "main"
    },
    {
     "n": 2,
-    "text": "Place macro — memories, PHYs, analog",
+    "text": "Place the macros — memories, PHYs, analog",
     "tat": 2.5,
     "lane": "main"
    },
    {
     "n": 3,
-    "text": "Plan standard cell area and utilization targets",
+    "text": "Plan standard cell area and set utilization targets",
     "tat": 2,
     "lane": "par"
    },
    {
     "n": 4,
-    "text": "Plan block boundary and pin",
+    "text": "Plan the block boundaries and pin placement",
     "tat": 2,
     "lane": "main"
    },
    {
     "n": 5,
-    "text": "Define keep-out, blockage and halo",
+    "text": "Define the keep-outs, blockages and halos",
     "tat": 1.5,
     "lane": "par"
    },
    {
     "n": 6,
-    "text": "Review floorplan and freeze",
+    "text": "Review the floorplan and freeze it",
     "tat": 2.5,
     "lane": "main"
    }
@@ -24371,20 +24311,20 @@ export const activityDetails: Record<string, ActivityDetail> = {
    {
     "id": "PD-D4",
     "rel": "produces",
-    "text": "Floorplan and PDN specification. The floorplan half; <code>PD-03</code> supplies the power grid it is built against."
+    "text": "<b>Floorplan and PDN specification.</b> The floorplan half; <code>PD-03</code> supplies the power grid it is built against."
    },
    {
     "id": "PD-D2",
     "rel": "feeds",
-    "text": "Turn 1 and Turn 2 databases. Every turn is placed and routed inside this floorplan; changing it invalidates the turns."
+    "text": "<b>Turn 1 and Turn 2 databases.</b> Every turn is placed and routed inside this floorplan; changing it invalidates the turns."
    }
   ],
   "risks": [
-   "Macro placement not congestion-aware",
-   "Floorplan changed after turn 1",
-   "Utilization set too high",
-   "Pin placement ignoring top-level routing",
-   "Partitions that do not match the design hierarchy"
+   "<b>Macro placement not congestion-aware.</b> Macros placed for access and not for the logic between them produce routing congestion that cannot be fixed at <code>PD-08</code>.",
+   "<b>Floorplan changed after turn 1.</b> Clock trees, power grid and routing are all built on it, and all of them are invalidated.",
+   "<b>Utilization set too high.</b> A dense floorplan closes area and cannot be routed or timing-closed, and the discovery comes after weeks of work.",
+   "<b>Pin placement ignoring top-level routing.</b> Block pins facing the wrong way make top-level routing expensive for the whole rest of the program.",
+   "<b>Partitions that do not match the design hierarchy.</b> Closing blocks that cut across logical boundaries makes timing budgets and equivalence checking harder for no gain."
   ],
   "roles": [
    {
@@ -24511,43 +24451,43 @@ export const activityDetails: Record<string, ActivityDetail> = {
   ],
   "criticalPath": false,
   "purpose": [
-   "Build the power delivery network—grid topology, straps, switches, decap—and prove by early IR analysis that it can feed the die at its power envelope.",
-   "The PDN is built early because everything routes around it. Grid density trades directly against routing resource: too sparse and IR drop eats timing margin, too dense and there is nothing left to route with."
+   "Build the <b>power delivery network</b>—grid topology, straps, switches, decap—and prove by early IR analysis that it can actually feed the die at its power envelope.",
+   "The PDN is built early because everything routes around it. Grid density trades directly against routing resource: too sparse and IR drop eats timing margin, too dense and there is nothing left to route with. Getting it wrong is discovered at <code>SO-04</code>, when the fix is a metal change across the whole die."
   ],
   "steps": [
    {
     "n": 1,
-    "text": "Define pDN topology and grid per domain",
+    "text": "Define the PDN topology and grid per domain",
     "tat": 1.5,
     "lane": "main"
    },
    {
     "n": 2,
-    "text": "Implement grid and strap insertion",
+    "text": "Implement the grid and insert the straps",
     "tat": 2,
     "lane": "main"
    },
    {
     "n": 3,
-    "text": "Plan power switch and always-on region",
+    "text": "Plan the power switches and always-on regions",
     "tat": 1.5,
     "lane": "par"
    },
    {
     "n": 4,
-    "text": "Analyze early static IR",
+    "text": "Run early static IR analysis on the placed design",
     "tat": 2,
     "lane": "main"
    },
    {
     "n": 5,
-    "text": "Plan decap and placement",
+    "text": "Plan and place the decap",
     "tat": 1.5,
     "lane": "par"
    },
    {
     "n": 6,
-    "text": "Define and document pDN refinement and freeze",
+    "text": "Refine the PDN and freeze it",
     "tat": 2.5,
     "lane": "main"
    }
@@ -24580,20 +24520,20 @@ export const activityDetails: Record<string, ActivityDetail> = {
    {
     "id": "PD-D4",
     "rel": "produces",
-    "text": "Floorplan and PDN specification. The power grid half of the deliverable, frozen alongside the floorplan it sits in."
+    "text": "<b>Floorplan and PDN specification.</b> The power grid half of the deliverable, frozen alongside the floorplan it sits in."
    },
    {
     "id": "PD-D5",
     "rel": "feeds",
-    "text": "MCMM timing closure reports. IR drop consumes timing margin, so the PDN's quality shows up in closure."
+    "text": "<b>MCMM timing closure reports.</b> IR drop consumes timing margin, so the PDN's quality shows up in closure."
    }
   ],
   "risks": [
-   "Grid density traded against routing without analysis",
-   "IR analyzed only statically",
-   "Decap placed where there is room",
-   "Power switches planned late",
-   "PDN frozen before power numbers are real"
+   "<b>Grid density traded against routing without analysis.</b> Both constraints are real, and choosing by feel produces either IR problems or congestion.",
+   "<b>IR analyzed only statically.</b> Dynamic IR under real switching is worse, and <code>SIPI-04</code> with the package model is worse again.",
+   "<b>Decap placed where there is room.</b> Decoupling works where the current is drawn, not where the floorplan left space.",
+   "<b>Power switches planned late.</b> They need area, always-on routing and their own control, and retrofitting them disturbs the floorplan.",
+   "<b>PDN frozen before power numbers are real.</b> A grid designed against estimates and fed a design that draws more is a grid that fails at signoff."
   ],
   "roles": [
    {
@@ -24718,43 +24658,43 @@ export const activityDetails: Record<string, ActivityDetail> = {
   ],
   "criticalPath": false,
   "purpose": [
-   "Turn the architecture's bump budget into an actual bump map and RDL, iterating with package design until both sides can build what the other needs.",
-   "The bump map is the contract between the die and the package, and it is negotiated rather than declared. Signal escape on the package constrains bump position; power delivery constrains bump count; and the die's floorplan constrains where either can go."
+   "Turn the architecture's bump budget into <b>an actual bump map and RDL</b>, iterating with package design until both sides can build what the other needs.",
+   "The bump map is the contract between the die and the package, and it is negotiated rather than declared. Signal escape on the package constrains bump position; power delivery constrains bump count; and the die's floorplan constrains where either can go. All three have to close at once."
   ],
   "steps": [
    {
     "n": 1,
-    "text": "Define bump map ingestion from the architecture budget",
+    "text": "Ingest the bump map from the architecture budget",
     "tat": 1.5,
     "lane": "main"
    },
    {
     "n": 2,
-    "text": "Plan rDL and redistribution",
+    "text": "Plan the RDL and redistribution",
     "tat": 2,
     "lane": "main"
    },
    {
     "n": 3,
-    "text": "Define and document power bump and rail assignment",
+    "text": "Assign the power bumps and rails",
     "tat": 1.5,
     "lane": "par"
    },
    {
     "n": 4,
-    "text": "Define package co-design iteration",
+    "text": "Iterate the co-design with package design",
     "tat": 2,
     "lane": "main"
    },
    {
     "n": 5,
-    "text": "Plan signal escape with the substrate",
+    "text": "Plan the signal escape with the substrate",
     "tat": 1.5,
     "lane": "par"
    },
    {
     "n": 6,
-    "text": "Release bump map freeze and interface file",
+    "text": "Freeze the bump map and release the interface files",
     "tat": 2.5,
     "lane": "main"
    }
@@ -24789,20 +24729,20 @@ export const activityDetails: Record<string, ActivityDetail> = {
    {
     "id": "PD-D7",
     "rel": "produces",
-    "text": "Bump map, RDL and package interface files. The deliverable it is consumed directly by package design."
+    "text": "<b>Bump map, RDL and package interface files.</b> The bump map, RDL and interface files are produced here and consumed directly by package design."
    },
    {
     "id": "PD-D4",
     "rel": "feeds",
-    "text": "Floorplan and PDN specification. Bump position constrains where power can be delivered, so the two documents have to agree."
+    "text": "<b>Floorplan and PDN specification.</b> Bump position constrains where power can be delivered, so the two documents have to agree."
    }
   ],
   "risks": [
-   "Bump map frozen late",
-   "Escape routing not checked on the package side",
-   "Power bump count reduced to fit signals",
-   "RDL treated as free",
-   "Co-design conducted by file exchange"
+   "<b>Bump map frozen late.</b> Package design and the substrate order both wait on it, and the substrate lead time makes the delay a wafer-out delay.",
+   "<b>Escape routing not checked on the package side.</b> A map that is optimal on the die and unroutable on the substrate has to be redone.",
+   "<b>Power bump count reduced to fit signals.</b> The signals that fit are then fed by a PDN that cannot deliver, and <code>SIPI-04</code> finds it.",
+   "<b>RDL treated as free.</b> Redistribution has its own rules and resistance, and a plan that ignores them produces IR and EM problems in the RDL itself.",
+   "<b>Co-design conducted by file exchange.</b> Two teams iterating asynchronously on the same interface converge slowly or not at all."
   ],
   "roles": [
    {
@@ -24916,43 +24856,43 @@ export const activityDetails: Record<string, ActivityDetail> = {
   ],
   "criticalPath": true,
   "purpose": [
-   "Run the first real turn on the N1 netlist—place, build clocks, route—and establish the QoR baseline that says how far the design is from closing.",
+   "Run the <b>first real turn on the N1 netlist</b>—place, build clocks, route—and establish the QoR baseline that says how far the design is from closing.",
    "Turn 1 is the first honest measurement of the design's physical difficulty. Everything before it was estimate; this produces real congestion, real timing and real power on a real floorplan, and the gap it reveals is what the next two turns exist to close."
   ],
   "steps": [
    {
     "n": 1,
-    "text": "Set up n1 intake and turn",
+    "text": "Take in N1 and set up the turn",
     "tat": 1,
     "lane": "main"
    },
    {
     "n": 2,
-    "text": "Place and optimization",
+    "text": "Place and optimize the design",
     "tat": 2,
     "lane": "main"
    },
    {
     "n": 3,
-    "text": "Analyze congestion and mitigation",
+    "text": "Analyze congestion and apply mitigation",
     "tat": 1.5,
     "lane": "par"
    },
    {
     "n": 4,
-    "text": "Define and document clock tree synthesis, first pass",
+    "text": "Synthesize the first-pass clock trees",
     "tat": 2,
     "lane": "main"
    },
    {
     "n": 5,
-    "text": "Analyze timing and first ECO round",
+    "text": "Analyze timing and run the first ECO round",
     "tat": 1.5,
     "lane": "par"
    },
    {
     "n": 6,
-    "text": "Define and document first full route",
+    "text": "Run the first full route",
     "tat": 2,
     "lane": "main"
    },
@@ -24964,7 +24904,7 @@ export const activityDetails: Record<string, ActivityDetail> = {
    },
    {
     "n": 8,
-    "text": "Define and document qoR baseline and feedback to synthesis",
+    "text": "Establish the QoR baseline and feed findings back to synthesis",
     "tat": 1,
     "lane": "main"
    }
@@ -24985,7 +24925,7 @@ export const activityDetails: Record<string, ActivityDetail> = {
    "First-round timing analysis and ECOs",
    "First full route",
    "Turn 1 placed and routed database",
-   "Timing and power analysis results",
+   "Turn-1 power analysis results",
    "QoR baseline",
    "Feedback list to synthesis and RTL"
   ],
@@ -25005,20 +24945,20 @@ export const activityDetails: Record<string, ActivityDetail> = {
    {
     "id": "PD-D2",
     "rel": "produces",
-    "text": "Turn 1 and Turn 2 databases with QoR delta reports. The first turn, and the baseline the second is measured against."
+    "text": "<b>Turn 1 and Turn 2 databases with QoR delta reports.</b> The first turn, and the baseline the second is measured against."
    },
    {
     "id": "PD-D5",
     "rel": "feeds",
-    "text": "MCMM timing closure reports. The violation burn-down starts here, with turn 1's numbers as its origin."
+    "text": "<b>MCMM timing closure reports.</b> The violation burn-down starts here, with turn 1's numbers as its origin."
    }
   ],
   "risks": [
-   "Turn 1 expected to close",
-   "Feedback not specific",
-   "Turn run on an incomplete netlist",
-   "Congestion mitigated locally",
-   "Clock tree built before the floorplan is stable"
+   "<b>Turn 1 expected to close.</b> It will not, and treating the gap as a crisis rather than as data produces panic instead of a plan.",
+   "<b>Feedback not specific.</b> \"Congestion is high\" changes nothing; \"the compute cluster is over 90% utilization in three regions and needs restructuring\" changes the next drop.",
+   "<b>Turn run on an incomplete netlist.</b> A baseline missing blocks understates the difficulty and misleads the closure plan.",
+   "<b>Congestion mitigated locally.</b> Fixing congestion by rip-up and reroute hides a structural problem that only synthesis or floorplan can solve.",
+   "<b>Clock tree built before the floorplan is stable.</b> A CTS on a floorplan that then changes is work thrown away."
   ],
   "roles": [
    {
@@ -25141,13 +25081,13 @@ export const activityDetails: Record<string, ActivityDetail> = {
   ],
   "criticalPath": true,
   "purpose": [
-   "Run the second turn on N2 and converge—congestion, timing and power—then quantify honestly how much closure risk remains for the final turn.",
-   "Turn 2 is where the design either starts converging or reveals that it will not. Its output is a number: how many violations remain, in which blocks, and whether the trend from turn 1 projects to closure."
+   "Run the <b>second turn on N2 and converge</b>—congestion, timing and power—then quantify honestly how much closure risk remains for the final turn.",
+   "Turn 2 is where the design either starts converging or reveals that it will not. Its output is a number: how many violations remain, in which blocks, and whether the trend from turn 1 projects to closure. That number is what the program uses to decide whether the tapeout date holds."
   ],
   "steps": [
    {
     "n": 1,
-    "text": "Assess n2 intake and delta against turn 1",
+    "text": "Take in N2 and assess the delta against turn 1",
     "tat": 1,
     "lane": "main"
    },
@@ -25159,37 +25099,37 @@ export const activityDetails: Record<string, ActivityDetail> = {
    },
    {
     "n": 3,
-    "text": "Define and document congestion hot-spot restructuring with synthesis",
+    "text": "Restructure congestion hot spots with synthesis",
     "tat": 1.5,
     "lane": "par"
    },
    {
     "n": 4,
-    "text": "Define and document clock tree refinement",
+    "text": "Refine the clock trees",
     "tat": 2,
     "lane": "main"
    },
    {
     "n": 5,
-    "text": "Define and document timing convergence and ECO rounds",
+    "text": "Converge timing through ECO rounds",
     "tat": 1.5,
     "lane": "par"
    },
    {
     "n": 6,
-    "text": "Route convergence",
+    "text": "Converge the route",
     "tat": 2,
     "lane": "main"
    },
    {
     "n": 7,
-    "text": "Define and document power and IR convergence",
+    "text": "Converge power and IR",
     "tat": 1.5,
     "lane": "par"
    },
    {
     "n": 8,
-    "text": "Close risk quantification for the final turn",
+    "text": "Quantify the closure risk for the final turn",
     "tat": 1,
     "lane": "main"
    }
@@ -25209,7 +25149,7 @@ export const activityDetails: Record<string, ActivityDetail> = {
    "Refined clock trees",
    "Timing convergence and ECO record",
    "Converged route",
-   "Timing and power convergence results",
+   "Power and IR convergence results",
    "Turn 2 placed and routed database",
    "Closure risk quantification"
   ],
@@ -25228,20 +25168,20 @@ export const activityDetails: Record<string, ActivityDetail> = {
    {
     "id": "PD-D2",
     "rel": "produces",
-    "text": "Turn 1 and Turn 2 databases with QoR delta reports. The second turn, and the last one before the netlist is frozen."
+    "text": "<b>Turn 1 and Turn 2 databases with QoR delta reports.</b> The second turn, and the last one before the netlist is frozen."
    },
    {
     "id": "PD-D5",
     "rel": "feeds",
-    "text": "MCMM timing closure reports. The burn-down trend across turns is what predicts whether the final turn closes."
+    "text": "<b>MCMM timing closure reports.</b> The burn-down trend across turns is what predicts whether the final turn closes."
    }
   ],
   "risks": [
-   "Closure risk understated at turn 2",
-   "Congestion fixed locally rather than structurally",
-   "Turn 2 not compared against turn 1",
-   "Power convergence deferred",
-   "Late RTL changes absorbed into turn 2"
+   "<b>Closure risk understated at turn 2.</b> This is the last point at which a frequency or feature concession is cheap, and an optimistic number removes the option.",
+   "<b>Congestion fixed locally rather than structurally.</b> Rip-up and reroute buys a turn and leaves the problem for the final one, when there is no time.",
+   "<b>Turn 2 not compared against turn 1.</b> The absolute number matters less than the trend, and only the delta says whether the design is converging.",
+   "<b>Power convergence deferred.</b> Power fixes change timing; leaving them to the final turn means re-closing timing after every one.",
+   "<b>Late RTL changes absorbed into turn 2.</b> A functional change mid-turn invalidates the comparison the turn exists to produce."
   ],
   "roles": [
    {
@@ -25357,55 +25297,55 @@ export const activityDetails: Record<string, ActivityDetail> = {
   ],
   "criticalPath": false,
   "purpose": [
-   "Build and refine the clock trees across turns—skew, insertion delay, jitter budget, power—for a design with dozens of domains and crossings between them.",
-   "Clock tree synthesis is rebuilt every turn and improved each time. Skew directly buys or costs timing margin; insertion delay costs power and OCV; and cross-domain paths need a defined phase relationship that only a deliberately built tree provides."
+   "Build and refine the <b>clock trees</b> across turns—skew, insertion delay, jitter budget, power—for a design with dozens of domains and crossings between them.",
+   "Clock tree synthesis is rebuilt every turn and improved each time. Skew directly buys or costs timing margin; insertion delay costs power and OCV; and cross-domain paths need a defined phase relationship that only a deliberately built tree provides. It is one of the few areas where a good result is worth several percent of frequency."
   ],
   "steps": [
    {
     "n": 1,
-    "text": "Implement clock architecture plan",
+    "text": "Plan the clock architecture implementation",
     "tat": 1.5,
     "lane": "main"
    },
    {
     "n": 2,
-    "text": "Define and document clock tree synthesis per domain",
+    "text": "Synthesize the clock trees per domain",
     "tat": 2.5,
     "lane": "main"
    },
    {
     "n": 3,
-    "text": "Define and document clock power optimization",
+    "text": "Optimize clock power",
     "tat": 2,
     "lane": "par"
    },
    {
     "n": 4,
-    "text": "Define and document insert skew and delay balancing",
+    "text": "Balance skew and insertion delay",
     "tat": 2.5,
     "lane": "main"
    },
    {
     "n": 5,
-    "text": "Define and document jitter and OCV budget management",
+    "text": "Manage the jitter and OCV budgets",
     "tat": 2,
     "lane": "par"
    },
    {
     "n": 6,
-    "text": "Define and document cross-domain and useful skew handling",
+    "text": "Handle cross-domain relationships and useful skew",
     "tat": 2.5,
     "lane": "main"
    },
    {
     "n": 7,
-    "text": "Define and document clock DRC and quality checking",
+    "text": "Run clock DRC and quality checks",
     "tat": 2,
     "lane": "par"
    },
    {
     "n": 8,
-    "text": "Continuously refinement across turns",
+    "text": "Refine the trees continuously across turns",
     "tat": 3,
     "lane": "main"
    }
@@ -25420,7 +25360,7 @@ export const activityDetails: Record<string, ActivityDetail> = {
   ],
   "produces": [
    "Clock architecture implementation plan",
-   "Clock tree implementation plan",
+   "Per-domain clock tree build configuration",
    "Synthesized clock trees per domain",
    "Clock power optimization results",
    "Skew and insertion delay results",
@@ -25444,20 +25384,20 @@ export const activityDetails: Record<string, ActivityDetail> = {
    {
     "id": "PD-D5",
     "rel": "feeds",
-    "text": "MCMM timing closure reports. Clock skew and insertion delay are inputs to every timing number in the report."
+    "text": "<b>MCMM timing closure reports.</b> Clock skew and insertion delay are inputs to every timing number in the report."
    },
    {
     "id": "PD-D2",
     "rel": "feeds",
-    "text": "Turn 1 and Turn 2 databases. Each turn contains its own clock tree, rebuilt and improved."
+    "text": "<b>Turn 1 and Turn 2 databases.</b> Each turn contains its own clock tree, rebuilt and improved."
    }
   ],
   "risks": [
-   "Clock power ignored",
-   "Useful skew applied without a plan",
-   "Cross-domain phase relationship undefined",
-   "Insertion delay allowed to grow",
-   "Tree quality not checked"
+   "<b>Clock power ignored.</b> The clock network is a large fraction of dynamic power on a design this size, and a tree optimized only for skew is expensive to run.",
+   "<b>Useful skew applied without a plan.</b> It buys margin and complicates every subsequent ECO, because moving one path's timing moves its neighbors'.",
+   "<b>Cross-domain phase relationship undefined.</b> Paths between domains cannot be closed reliably, and the failure appears as intermittent silicon behavior.",
+   "<b>Insertion delay allowed to grow.</b> Deep trees increase OCV derate and jitter accumulation, consuming the margin the skew balancing bought.",
+   "<b>Tree quality not checked.</b> Clock DRC violations—transition, capacitance, pulse width—degrade the tree in ways timing analysis reports as margin loss without explaining."
   ],
   "roles": [
    {
@@ -25574,55 +25514,55 @@ export const activityDetails: Record<string, ActivityDetail> = {
   ],
   "criticalPath": true,
   "purpose": [
-   "Route the design and drive it to DRC clean—global, detailed, antenna, via optimization—across every turn, on a die where routing resource is the scarcest commodity.",
-   "Routing is where the floorplan, the synthesis and the power grid are all judged. Sixteen weeks and forty M/M buys convergence on a design where congestion is structural rather than local, and where every metal layer is contested between signals, clocks and the power grid."
+   "Route the design and drive it to <b>DRC clean</b>—global, detailed, antenna, via optimization—across every turn, on a die where routing resource is the scarcest commodity.",
+   "Routing is where the floorplan, the synthesis and the power grid are all judged. Sixteen weeks and forty man-months buys convergence on a design where congestion is structural rather than local, and where every metal layer is contested between signals, clocks and the power grid."
   ],
   "steps": [
    {
     "n": 1,
-    "text": "Plan routing strategy and layer",
+    "text": "Define the routing strategy and layer plan",
     "tat": 1.5,
     "lane": "main"
    },
    {
     "n": 2,
-    "text": "Assess global routing and congestion",
+    "text": "Run global routing and assess congestion",
     "tat": 3,
     "lane": "main"
    },
    {
     "n": 3,
-    "text": "Define and document congestion-driven rip-up and reroute",
+    "text": "Run congestion-driven rip-up and reroute",
     "tat": 2.5,
     "lane": "par"
    },
    {
     "n": 4,
-    "text": "Route detailed",
+    "text": "Run detailed routing",
     "tat": 3.5,
     "lane": "main"
    },
    {
     "n": 5,
-    "text": "Define and document antenna and via optimization",
+    "text": "Optimize antennas and vias",
     "tat": 2.5,
     "lane": "par"
    },
    {
     "n": 6,
-    "text": "Define and document dRC convergence",
+    "text": "Converge DRC to clean",
     "tat": 4,
     "lane": "main"
    },
    {
     "n": 7,
-    "text": "Route quality and manufacturability",
+    "text": "Check routing quality and manufacturability",
     "tat": 2.5,
     "lane": "par"
    },
    {
     "n": 8,
-    "text": "Continuously routing across turns",
+    "text": "Route continuously across turns",
     "tat": 4,
     "lane": "main"
    }
@@ -25659,20 +25599,20 @@ export const activityDetails: Record<string, ActivityDetail> = {
    {
     "id": "PD-D6",
     "rel": "produces",
-    "text": "Interim physical DRC / LVS clean. This activity is the deliverable at each turn, and clean here is what makes <code>SO-03</code> tractable."
+    "text": "<b>Interim physical DRC / LVS clean.</b> The interim DRC / LVS clean is produced here at each turn, and clean here is what makes <code>SO-03</code> tractable."
    },
    {
     "id": "PD-D3",
     "rel": "feeds",
-    "text": "Final-turn routed database on the FFN. The final route is this activity's last execution."
+    "text": "<b>Final-turn routed database on the FFN.</b> The final route is this activity's last execution—the same routing and DRC convergence run one final time on the FFN database."
    }
   ],
   "risks": [
-   "Congestion treated as a routing problem",
-   "Antenna violations left late",
-   "DRC convergence assumed linear",
-   "Manufacturability ignored until signoff",
-   "Layer plan not respecting the PDN"
+   "<b>Congestion treated as a routing problem.</b> Structural congestion cannot be routed around, and rip-up cycles spent on it consume time without converging.",
+   "<b>Antenna violations left late.</b> Fixes need diodes or layer jumps, both of which need space that a fully routed design does not have.",
+   "<b>DRC convergence assumed linear.</b> The last violations are the hardest, and planning as if the rate is constant produces a schedule that misses.",
+   "<b>Manufacturability ignored until signoff.</b> DFM-clean routing is cheaper to produce than to retrofit, and <code>SO-08</code> finds what was not.",
+   "<b>Layer plan not respecting the PDN.</b> Signals and the power grid contend for the same upper layers, and a plan that ignores the grid produces conflicts everywhere."
   ],
   "roles": [
    {
@@ -25791,13 +25731,13 @@ export const activityDetails: Record<string, ActivityDetail> = {
   ],
   "criticalPath": true,
   "purpose": [
-   "Close timing across every corner and every mode—setup, hold, cross-corner, cross-mode—and drive the violation burn-down that decides the tapeout date.",
-   "Twenty-two weeks and sixty M/M, the largest activity in the stage. Multi-corner multi-mode closure on a large die is a long grind of analysis, ECO and re-analysis, and its burn-down curve is the single best predictor the program has of whether it will tape out on time."
+   "Close <b>timing across every corner and every mode</b>—setup, hold, cross-corner, cross-mode—and drive the violation burn-down that decides the tapeout date.",
+   "Twenty-two weeks and sixty man-months, the largest activity in the stage. Multi-corner multi-mode closure on a large die is a long grind of analysis, ECO and re-analysis, and its burn-down curve is the single best predictor the program has of whether it will tape out on time."
   ],
   "steps": [
    {
     "n": 1,
-    "text": "Define timing setup and MMMC scenario",
+    "text": "Set up timing and define the MMMC scenarios",
     "tat": 1.5,
     "lane": "main"
    },
@@ -25809,7 +25749,7 @@ export const activityDetails: Record<string, ActivityDetail> = {
    },
    {
     "n": 3,
-    "text": "Track violation burn-down and reporting",
+    "text": "Track and report the violation burn-down",
     "tat": 3,
     "lane": "par"
    },
@@ -25821,25 +25761,25 @@ export const activityDetails: Record<string, ActivityDetail> = {
    },
    {
     "n": 5,
-    "text": "Generate timing ECO and application",
+    "text": "Generate and apply timing ECOs",
     "tat": 3,
     "lane": "par"
    },
    {
     "n": 6,
-    "text": "Define and document cross-corner and cross-mode convergence",
+    "text": "Converge across corners and modes",
     "tat": 3.5,
     "lane": "main"
    },
    {
     "n": 7,
-    "text": "Correlate signoff timing with the SO flow",
+    "text": "Correlate against the signoff timing flow",
     "tat": 3,
     "lane": "par"
    },
    {
     "n": 8,
-    "text": "Continuously closure across turns",
+    "text": "Run continuous closure across turns",
     "tat": 11,
     "lane": "main"
    }
@@ -25856,7 +25796,7 @@ export const activityDetails: Record<string, ActivityDetail> = {
    "MMMC timing scenarios",
    "Setup timing closure results",
    "Violation burn-down tracking",
-   "Setup and hold closure results",
+   "Hold timing closure results",
    "Timing ECOs",
    "Cross-corner convergence results",
    "Signoff correlation findings",
@@ -25876,20 +25816,20 @@ export const activityDetails: Record<string, ActivityDetail> = {
    {
     "id": "PD-D5",
     "rel": "produces",
-    "text": "MCMM timing closure reports with violation burn-down across turns. The deliverable the burn-down is the program's best schedule predictor."
+    "text": "<b>MCMM timing closure reports with violation burn-down across turns.</b> The closure reports and the violation burn-down are produced here, and the burn-down is the program's best schedule predictor."
    },
    {
     "id": "PD-D3",
     "rel": "feeds",
-    "text": "Final-turn routed database. A database is only handed to signoff when this activity says it is closed."
+    "text": "<b>Final-turn routed database.</b> A database is only handed to signoff when this activity says it is closed."
    }
   ],
   "risks": [
-   "Closing at some corners and deferring others",
-   "Implementation and signoff timing diverging",
-   "Hold fixed after setup",
-   "Burn-down not tracked",
-   "ECO volume exceeding what the database can absorb"
+   "<b>Closing at some corners and deferring others.</b> The deferred corner is the one that fails, and it fails when there is no time to fix it.",
+   "<b>Implementation and signoff timing diverging.</b> A design closed in one tool and judged in another can be weeks from closure without anyone knowing.",
+   "<b>Hold fixed after setup.</b> Hold fixes add buffers that change setup, and doing them sequentially means iterating both.",
+   "<b>Burn-down not tracked.</b> Without a trend nobody can distinguish a design that is converging slowly from one that is not converging at all.",
+   "<b>ECO volume exceeding what the database can absorb.</b> Thousands of ECOs degrade the physical result, and at some point a re-run is cheaper than another ECO round."
   ],
   "roles": [
    {
@@ -26014,43 +25954,43 @@ export const activityDetails: Record<string, ActivityDetail> = {
   ],
   "criticalPath": false,
   "purpose": [
-   "Fix what the routing did to the electricals—crosstalk, noise, electromigration, dynamic IR—before signoff has to reject the design for them.",
+   "Fix what the routing did to the electricals—<b>crosstalk, noise, electromigration, dynamic IR</b>—before signoff has to reject the design for them.",
    "Signal and power integrity problems are created by routing and found by analysis. Crosstalk between adjacent nets, EM in high-current wires and dynamic IR under real switching are all consequences of physical decisions, and fixing them means changing routing that was closed for timing."
   ],
   "steps": [
    {
     "n": 1,
-    "text": "Analyze sI setup and crosstalk",
+    "text": "Set up SI and run the crosstalk analysis",
     "tat": 1.5,
     "lane": "main"
    },
    {
     "n": 2,
-    "text": "Size crosstalk fixing — spacing, shielding, buffer",
+    "text": "Fix crosstalk — spacing, shielding, buffer sizing",
     "tat": 2.5,
     "lane": "main"
    },
    {
     "n": 3,
-    "text": "Analyze noise and glitch",
+    "text": "Analyze noise and glitches",
     "tat": 2,
     "lane": "par"
    },
    {
     "n": 4,
-    "text": "Analyze electromigration and fixing",
+    "text": "Analyze and fix electromigration",
     "tat": 2.5,
     "lane": "main"
    },
    {
     "n": 5,
-    "text": "Define and document dynamic IR iteration with the PDN",
+    "text": "Iterate dynamic IR with the PDN",
     "tat": 2,
     "lane": "par"
    },
    {
     "n": 6,
-    "text": "Close sI and PI iteration and",
+    "text": "Iterate SI and PI to closure",
     "tat": 3.5,
     "lane": "main"
    }
@@ -26067,7 +26007,7 @@ export const activityDetails: Record<string, ActivityDetail> = {
    "SI setup and crosstalk analysis",
    "Crosstalk fixes — spacing, shielding, sizing",
    "Noise and glitch analysis results",
-   "Crosstalk analysis and fixes",
+   "Post-fix crosstalk re-analysis results",
    "EM analysis and routing fixes",
    "Dynamic IR results and PDN adjustments",
    "SI and PI closure records"
@@ -26076,7 +26016,7 @@ export const activityDetails: Record<string, ActivityDetail> = {
    1,
    2,
    3,
-   4,
+   2,
    4,
    5,
    6
@@ -26085,20 +26025,20 @@ export const activityDetails: Record<string, ActivityDetail> = {
    {
     "id": "PD-D6",
     "rel": "feeds",
-    "text": "Interim physical DRC / LVS clean. SI and EM fixes are routing changes, so they close together with DRC."
+    "text": "<b>Interim physical DRC / LVS clean.</b> SI and EM fixes are routing changes, so they close together with DRC."
    },
    {
     "id": "PD-D5",
     "rel": "feeds",
-    "text": "MCMM timing closure reports. Crosstalk-induced delay is part of timing, and SI fixes change timing in both directions."
+    "text": "<b>MCMM timing closure reports.</b> Crosstalk-induced delay is part of timing, and SI fixes change timing in both directions."
    }
   ],
   "risks": [
-   "SI analyzed after timing closes",
-   "EM checked only on power",
-   "Dynamic IR analyzed with uniform activity",
-   "Fixes applied without re-timing",
-   "Package effects excluded"
+   "<b>SI analyzed after timing closes.</b> Crosstalk delay is timing, and closing without it means closing against numbers that will move.",
+   "<b>EM checked only on power.</b> High-toggle signal nets on advanced nodes carry EM exposure too, and they are usually the ones nobody checks.",
+   "<b>Dynamic IR analyzed with uniform activity.</b> Real switching is bursty and localized, and uniform assumptions understate the worst case badly.",
+   "<b>Fixes applied without re-timing.</b> Shielding and spacing change delay, and a fix that breaks timing has moved the problem rather than solved it.",
+   "<b>Package effects excluded.</b> Die-only dynamic IR is optimistic; <code>SIPI-04</code> with package inductance is the number signoff will use."
   ],
   "roles": [
    {
@@ -26210,37 +26150,37 @@ export const activityDetails: Record<string, ActivityDetail> = {
   ],
   "criticalPath": false,
   "purpose": [
-   "Extract the chip power model the package co-verification needs—per domain, per mode, with realistic switching—and hand it over as a versioned artifact.",
+   "Extract the <b>chip power model</b> the package co-verification needs—per domain, per mode, with realistic switching—and hand it over as a versioned artifact.",
    "<code>SIPI-03</code> cannot analyze the die, package and board as one power delivery network without a model of the die's current draw. Producing that model is a small activity with an outsized dependency: without it the co-verification cannot start, and the co-verification gates mask release."
   ],
   "steps": [
    {
     "n": 1,
-    "text": "Define power model requirement with SIPI",
+    "text": "Define the power model requirements with SIPI",
     "tat": 1,
     "lane": "main"
    },
    {
     "n": 2,
-    "text": "Extract cPM per domain and operating mode",
+    "text": "Extract the CPM per domain and operating mode",
     "tat": 1.5,
     "lane": "main"
    },
    {
     "n": 3,
-    "text": "Select switching scenario for the extraction",
+    "text": "Select the switching scenarios for the extraction",
     "tat": 1,
     "lane": "par"
    },
    {
     "n": 4,
-    "text": "Validate model against internal IR analysis",
+    "text": "Validate the model against internal IR analysis",
     "tat": 1.5,
     "lane": "main"
    },
    {
     "n": 5,
-    "text": "Hand off and version control",
+    "text": "Hand the model off under version control",
     "tat": 1,
     "lane": "main"
    }
@@ -26271,20 +26211,20 @@ export const activityDetails: Record<string, ActivityDetail> = {
    {
     "id": "PD-D4",
     "rel": "feeds",
-    "text": "Floorplan and PDN specification. The power model is the PDN's behavior expressed for external consumers."
+    "text": "<b>Floorplan and PDN specification.</b> The power model is the PDN's behavior expressed for external consumers."
    },
    {
     "id": "PD-D7",
     "rel": "feeds",
-    "text": "Bump map, RDL and package interface files. The model is part of what the package side needs alongside the physical interface."
+    "text": "<b>Bump map, RDL and package interface files.</b> The model is part of what the package side needs alongside the physical interface."
    }
   ],
   "risks": [
-   "Model extracted under average activity",
-   "Delivered late",
-   "Model not validated",
-   "Single model for all modes",
-   "No version control"
+   "<b>Model extracted under average activity.</b> The package has to supply the transient, and an averaged model hides exactly the event that matters.",
+   "<b>Delivered late.</b> Co-verification is on the critical path to mask release, and it cannot start without this model.",
+   "<b>Model not validated.</b> A CPM that disagrees with the die's own IR analysis is wrong in one of the two places, and nobody knows which.",
+   "<b>Single model for all modes.</b> Different DVFS points and workloads draw very differently, and one model cannot represent them.",
+   "<b>No version control.</b> The package team analyzing against a stale model produces conclusions about a die that no longer exists."
   ],
   "roles": [
    {
@@ -26390,43 +26330,43 @@ export const activityDetails: Record<string, ActivityDetail> = {
   ],
   "criticalPath": false,
   "purpose": [
-   "Reorder and route the scan chains physically—shorter routes, less congestion—without destroying the chain-to-block mapping diagnosis depends on.",
-   "Scan chains as stitched by synthesis follow logical order and route terribly. Physical reordering fixes the routing and can scramble the relationship between chain position and physical location, which is exactly what failure diagnosis uses."
+   "Reorder and route the <b>scan chains physically</b>—shorter routes, less congestion—without destroying the chain-to-block mapping diagnosis depends on.",
+   "Scan chains as stitched by synthesis follow logical order and route terribly. Physical reordering fixes the routing and can scramble the relationship between chain position and physical location, which is exactly what failure diagnosis uses. Both constraints are real."
   ],
   "steps": [
    {
     "n": 1,
-    "text": "Analyze scan chain physical and routing cost",
+    "text": "Analyze the physical scan chains and their routing cost",
     "tat": 1,
     "lane": "main"
    },
    {
     "n": 2,
-    "text": "Route chain reordering for efficiency",
+    "text": "Reorder the chains for routing efficiency",
     "tat": 1.5,
     "lane": "main"
    },
    {
     "n": 3,
-    "text": "Map diagnosis preservation",
+    "text": "Preserve the diagnosis mapping through the reorder",
     "tat": 1,
     "lane": "par"
    },
    {
     "n": 4,
-    "text": "Route dFT-aware and shielding of test paths",
+    "text": "Route and shield the test paths DFT-aware",
     "tat": 1.5,
     "lane": "main"
    },
    {
     "n": 5,
-    "text": "Test clock routing and skew",
+    "text": "Route the test clocks and manage their skew",
     "tat": 1,
     "lane": "par"
    },
    {
     "n": 6,
-    "text": "Verify chain after reorder",
+    "text": "Verify the chains after the reorder",
     "tat": 2,
     "lane": "main"
    }
@@ -26459,20 +26399,20 @@ export const activityDetails: Record<string, ActivityDetail> = {
    {
     "id": "PD-D6",
     "rel": "feeds",
-    "text": "Interim physical DRC / LVS clean. Scan routing is routing, and it closes with everything else."
+    "text": "<b>Interim physical DRC / LVS clean.</b> Scan routing is routing, and it closes with everything else."
    },
    {
     "id": "PD-D3",
     "rel": "feeds",
-    "text": "Final-turn routed database. The chains in the final database are the ones ATPG patterns were generated against."
+    "text": "<b>Final-turn routed database.</b> The chains in the final database are the ones ATPG patterns were generated against."
    }
   ],
   "risks": [
-   "Reordering breaking diagnosis",
-   "Chains not verified after reorder",
-   "Patterns generated before the final reorder",
-   "Test clock skew ignored",
-   "Chain imbalance after reorder"
+   "<b>Reordering breaking diagnosis.</b> Failure analysis relies on mapping a failing bit to a physical location, and a scrambled chain removes that.",
+   "<b>Chains not verified after reorder.</b> A break makes everything behind it untestable, and ATE bring-up is a costly place to find that.",
+   "<b>Patterns generated before the final reorder.</b> Any chain change after <code>DFT-07</code> invalidates the pattern set and costs weeks of regeneration.",
+   "<b>Test clock skew ignored.</b> Scan shift reaches every flop, and skew on the shift clock produces shift failures that look like design bugs.",
+   "<b>Chain imbalance after reorder.</b> Physical reordering can lengthen one chain and shorten another, and shift time follows the longest."
   ],
   "roles": [
    {
@@ -26576,67 +26516,67 @@ export const activityDetails: Record<string, ActivityDetail> = {
   ],
   "criticalPath": true,
   "purpose": [
-   "Run the final turn on the FFN and close it completely—timing, power, DRC, LVS—with no functional change admitted and no next turn to fall back on.",
-   "Everything the stage has done is preparation for this. Fifty-five M/M over eleven weeks, on a frozen netlist, closing every corner and every mode to signoff standard."
+   "Run the <b>final turn on the FFN and close it completely</b>—timing, power, DRC, LVS—with no functional change admitted and no next turn to fall back on.",
+   "Everything the stage has done is preparation for this. Fifty-five man-months over eleven weeks, on a frozen netlist, closing every corner and every mode to signoff standard. The discipline that matters is refusing functional change: an ECO that alters behavior restarts verification, and there is no schedule for that."
   ],
   "steps": [
    {
     "n": 1,
-    "text": "Assess fFN intake and delta against N2",
+    "text": "Take in the FFN and assess the delta against N2",
     "tat": 1,
     "lane": "main"
    },
    {
     "n": 2,
-    "text": "Place on the final netlist",
+    "text": "Place the final netlist",
     "tat": 2,
     "lane": "main"
    },
    {
     "n": 3,
-    "text": "Define and document eCO-only change discipline and gatekeeping",
+    "text": "Enforce ECO-only change discipline and gatekeeping",
     "tat": 1.5,
     "lane": "par"
    },
    {
     "n": 4,
-    "text": "Finalize clock tree synthesis",
+    "text": "Synthesize the final clock trees",
     "tat": 2,
     "lane": "main"
    },
    {
     "n": 5,
-    "text": "Define and document power and IR final convergence",
+    "text": "Converge power and IR finally",
     "tat": 2,
     "lane": "par"
    },
    {
     "n": 6,
-    "text": "Finalize routing",
+    "text": "Run the final routing",
     "tat": 2.5,
     "lane": "main"
    },
    {
     "n": 7,
-    "text": "Define and document dRC and LVS convergence",
+    "text": "Converge DRC and LVS",
     "tat": 2,
     "lane": "par"
    },
    {
     "n": 8,
-    "text": "Finalize timing closure across all corners and modes",
+    "text": "Close final timing across all corners and modes",
     "tat": 2,
     "lane": "main"
    },
    {
     "n": 9,
-    "text": "Close reporting and remaining-violation disposition",
+    "text": "Report closure and disposition the remaining violations",
     "tat": 1.5,
     "lane": "par"
    },
    {
     "n": 10,
-    "text": "Hand off database freeze and signoff",
+    "text": "Freeze the database and hand it to signoff",
     "tat": 1.5,
     "lane": "main"
    }
@@ -26677,20 +26617,20 @@ export const activityDetails: Record<string, ActivityDetail> = {
    {
     "id": "PD-D3",
     "rel": "produces",
-    "text": "Final-turn routed database on the FFN, per block and top. The deliverable it is what signoff and tapeout consume."
+    "text": "<b>Final-turn routed database on the FFN, per block and top.</b> The final-turn routed database is closed and frozen here, and it is what signoff and tapeout consume."
    },
    {
     "id": "PD-D5",
     "rel": "feeds",
-    "text": "MCMM timing closure reports. The final turn's closure report is the one Design Freeze is granted against."
+    "text": "<b>MCMM timing closure reports.</b> The final turn's closure report is the one Design Freeze is granted against."
    }
   ],
   "risks": [
-   "Functional change admitted during the final turn",
-   "Closure gap larger than turn 2 predicted",
-   "ECO volume degrading the database",
-   "Remaining violations dispositioned informally",
-   "Database frozen before LVS is clean"
+   "<b>Functional change admitted during the final turn.</b> It restarts verification and equivalence, and no schedule allows for that at this point.",
+   "<b>Closure gap larger than turn 2 predicted.</b> If the prediction was optimistic, the discovery comes with no remaining turns and only concessions available.",
+   "<b>ECO volume degrading the database.</b> Thousands of ECOs on a final database produce a physical result worse than a clean re-run, but a re-run costs weeks.",
+   "<b>Remaining violations dispositioned informally.</b> Every violation that survives to signoff must be a named, accepted waiver rather than an oversight.",
+   "<b>Database frozen before LVS is clean.</b> A handoff that fails LVS at <code>SO-03</code> sends everything back with no time to spare."
   ],
   "roles": [
    {
@@ -26823,43 +26763,43 @@ export const activityDetails: Record<string, ActivityDetail> = {
   ],
   "criticalPath": false,
   "purpose": [
-   "Run the ECO machinery—flow, spare cells, metal-only strategy, impact tracking—that every turn depends on and that the final turn depends on absolutely.",
+   "Run the <b>ECO machinery</b>—flow, spare cells, metal-only strategy, impact tracking—that every turn depends on and that the final turn depends on absolutely.",
    "ECOs are how a closed design absorbs change without a full re-run. The infrastructure matters more than any individual ECO: a spare cell strategy decided at floorplan time determines whether a late fix is metal-only or needs a base layer change, and that distinction is worth several weeks and a mask set."
   ],
   "steps": [
    {
     "n": 1,
-    "text": "Set up eCO flow and methodology",
+    "text": "Set up the ECO flow and methodology",
     "tat": 1.5,
     "lane": "main"
    },
    {
     "n": 2,
-    "text": "Implement functional ECO capability",
+    "text": "Build the functional ECO implementation capability",
     "tat": 2.5,
     "lane": "main"
    },
    {
     "n": 3,
-    "text": "Assess eCO impact and tracking",
+    "text": "Assess and track the impact of each ECO",
     "tat": 2,
     "lane": "par"
    },
    {
     "n": 4,
-    "text": "Implement timing ECO",
+    "text": "Implement the timing ECOs",
     "tat": 2.5,
     "lane": "main"
    },
    {
     "n": 5,
-    "text": "Define and document spare cell and metal-only ECO strategy",
+    "text": "Establish the spare cell and metal-only ECO strategy",
     "tat": 2,
     "lane": "par"
    },
    {
     "n": 6,
-    "text": "Continuously ECO operation across turns",
+    "text": "Operate the ECO machinery continuously across turns",
     "tat": 11.5,
     "lane": "main"
    }
@@ -26892,20 +26832,20 @@ export const activityDetails: Record<string, ActivityDetail> = {
    {
     "id": "PD-D8",
     "rel": "produces",
-    "text": "ECO log and change control record. The deliverable the log is what makes a late database traceable to the design that was verified."
+    "text": "<b>ECO log and change control record.</b> The ECO log and change control record are maintained here, and the log is what makes a late database traceable to the design that was verified."
    },
    {
     "id": "PD-D3",
     "rel": "feeds",
-    "text": "Final-turn routed database. The final database is the FFN plus its ECO history, and the two are inseparable."
+    "text": "<b>Final-turn routed database.</b> The final database is the FFN plus its ECO history, and the two are inseparable."
    }
   ],
   "risks": [
-   "No spare cell strategy",
-   "ECOs applied without impact tracking",
-   "ECO volume unbounded",
-   "Functional and timing ECOs not distinguished",
-   "Spare cells consumed early"
+   "<b>No spare cell strategy.</b> A late functional fix then requires base layers and a full mask set rather than a metal-only change.",
+   "<b>ECOs applied without impact tracking.</b> A database with untracked changes cannot be reconciled against the netlist that was verified.",
+   "<b>ECO volume unbounded.</b> Beyond some number, the physical result degrades enough that a clean re-run would be better—and nobody notices the crossing point.",
+   "<b>Functional and timing ECOs not distinguished.</b> They have completely different verification consequences, and conflating them lets functional change in unnoticed.",
+   "<b>Spare cells consumed early.</b> Using them for convenience during turn 1 leaves none for the fix that actually needs them at tapeout."
   ],
   "roles": [
    {
@@ -27009,43 +26949,43 @@ export const activityDetails: Record<string, ActivityDetail> = {
   ],
   "criticalPath": false,
   "purpose": [
-   "Finish the die as a manufacturable object—seal ring, metal fill, dummy, alignment marks, identification—and verify that none of it broke what was closed.",
-   "Chip finishing is mechanical and it is not free. Metal fill changes coupling capacitance and therefore timing; the seal ring consumes die edge; and dummy fill interacts with the analog matching that <code>AMS-12</code> spent weeks building."
+   "Finish the die as a <b>manufacturable object</b>—seal ring, metal fill, dummy, alignment marks, identification—and verify that none of it broke what was closed.",
+   "Chip finishing is mechanical and it is not free. Metal fill changes coupling capacitance and therefore timing; the seal ring consumes die edge; and dummy fill interacts with the analog matching that <code>AMS-12</code> spent weeks building. Every one has to be applied and then re-verified."
   ],
   "steps": [
    {
     "n": 1,
-    "text": "Implement seal ring and die edge",
+    "text": "Implement the seal ring and die edge",
     "tat": 1,
     "lane": "main"
    },
    {
     "n": 2,
-    "text": "Define and document metal fill and density compliance",
+    "text": "Apply metal fill to density compliance",
     "tat": 1,
     "lane": "main"
    },
    {
     "n": 3,
-    "text": "Extract fill impact on timing and",
+    "text": "Analyze the fill impact on timing and extraction",
     "tat": 1,
     "lane": "par"
    },
    {
     "n": 4,
-    "text": "Define and document alignment marks, logos and die identification",
+    "text": "Place alignment marks, logos and die identification",
     "tat": 1.5,
     "lane": "main"
    },
    {
     "n": 5,
-    "text": "Define and document dummy and CMP compliance",
+    "text": "Apply dummy fill and meet CMP compliance",
     "tat": 1,
     "lane": "par"
    },
    {
     "n": 6,
-    "text": "Verify finishing against the closed database",
+    "text": "Verify the finishing against the closed database",
     "tat": 1.5,
     "lane": "main"
    }
@@ -27078,20 +27018,20 @@ export const activityDetails: Record<string, ActivityDetail> = {
    {
     "id": "PD-D3",
     "rel": "feeds",
-    "text": "Final-turn routed database. The database handed to tapeout is the finished one, and the finishing is part of it."
+    "text": "<b>Final-turn routed database.</b> The database handed to tapeout is the finished one, and the finishing is part of it."
    },
    {
     "id": "PD-D6",
     "rel": "feeds",
-    "text": "Interim physical DRC / LVS clean. Density and fill rules are DRC rules, and finishing is where they are met."
+    "text": "<b>Interim physical DRC / LVS clean.</b> Density and fill rules are DRC rules, and finishing is where they are met."
    }
   ],
   "risks": [
-   "Timing signed off before fill",
-   "Fill applied over analog matching structures",
-   "Seal ring area not reserved",
-   "Die identification omitted",
-   "Finishing treated as a checkbox"
+   "<b>Timing signed off before fill.</b> The taped-out database has fill and the signed-off one did not, which is a signoff against a different design.",
+   "<b>Fill applied over analog matching structures.</b> It disturbs the parasitics <code>AMS-12</code> tuned, and the damage is invisible until silicon characterization.",
+   "<b>Seal ring area not reserved.</b> Discovered late, it forces the die edge inward and moves the bump map.",
+   "<b>Die identification omitted.</b> Traceability at yield analysis and field return depends on being able to identify the die, and it cannot be added later.",
+   "<b>Finishing treated as a checkbox.</b> Each step changes the physical database, and each needs verification against what was closed."
   ],
   "roles": [
    {
@@ -27198,55 +27138,55 @@ export const activityDetails: Record<string, ActivityDetail> = {
   ],
   "criticalPath": true,
   "purpose": [
-   "Close the blocks independently and assemble them into a top level that meets timing across their boundaries—the hierarchical discipline a die this size requires.",
-   "A design of this size cannot be closed flat: runtime and capacity make it impossible. Hierarchical closure lets blocks converge in parallel, at the cost of interface budgets that have to be right."
+   "Close the <b>blocks independently and assemble them into a top level</b> that meets timing across their boundaries—the hierarchical discipline a die this size requires.",
+   "A design of this size cannot be closed flat: runtime and capacity make it impossible. Hierarchical closure lets blocks converge in parallel, at the cost of interface budgets that have to be right. A block that closes internally and misses its boundary budget has not helped."
   ],
   "steps": [
    {
     "n": 1,
-    "text": "Define block closure criteria and handoff",
+    "text": "Define the block closure criteria and handoff",
     "tat": 1.5,
     "lane": "main"
    },
    {
     "n": 2,
-    "text": "Close block-level",
+    "text": "Close the blocks at block level",
     "tat": 3,
     "lane": "main"
    },
    {
     "n": 3,
-    "text": "Close inter-block timing budget and interface",
+    "text": "Set inter-block timing budgets and close the interfaces",
     "tat": 2.5,
     "lane": "par"
    },
    {
     "n": 4,
-    "text": "Generate block abstract and timing model",
+    "text": "Generate the block abstracts and timing models",
     "tat": 3,
     "lane": "main"
    },
    {
     "n": 5,
-    "text": "Route top-level and feedthrough management",
+    "text": "Manage top-level routing and feedthroughs",
     "tat": 2.5,
     "lane": "par"
    },
    {
     "n": 6,
-    "text": "Define and document top-level assembly",
+    "text": "Assemble the top level",
     "tat": 3,
     "lane": "main"
    },
    {
     "n": 7,
-    "text": "Correlate hierarchical timing , block model against flat",
+    "text": "Correlate hierarchical timing — block model against flat",
     "tat": 2,
     "lane": "par"
    },
    {
     "n": 8,
-    "text": "Verify top-level integration",
+    "text": "Verify the top-level integration",
     "tat": 3.5,
     "lane": "main"
    }
@@ -27266,7 +27206,7 @@ export const activityDetails: Record<string, ActivityDetail> = {
    "Block abstracts and timing models",
    "Top-level routing and feedthroughs",
    "Assembled top level",
-   "Closed block databases",
+   "Hierarchical timing correlation results",
    "Assembled and verified top level"
   ],
   "producedBy": [
@@ -27283,20 +27223,20 @@ export const activityDetails: Record<string, ActivityDetail> = {
    {
     "id": "PD-D9",
     "rel": "produces",
-    "text": "Signoff-ready database handoff. This activity is the deliverable—the assembled top level signoff and tapeout actually consume."
+    "text": "<b>Signoff-ready database handoff.</b> The signoff-ready database is assembled here—the top level signoff and tapeout actually consume."
    },
    {
     "id": "PD-D3",
     "rel": "feeds",
-    "text": "Final-turn routed database on the FFN, per block and top. The per-block half of the deliverable comes from here."
+    "text": "<b>Final-turn routed database on the FFN, per block and top.</b> The per-block half of the deliverable comes from here: each closed block database, correlated against flat analysis, is what the top level is assembled from."
    }
   ],
   "risks": [
-   "Block models disagreeing with flat analysis",
-   "Interface budgets set late",
-   "Feedthroughs not planned",
-   "Blocks closed to different criteria",
-   "Top-level assembly left to the end"
+   "<b>Block models disagreeing with flat analysis.</b> The top level is then closed against an abstraction that does not represent the block.",
+   "<b>Interface budgets set late.</b> Blocks close internally and fail at their boundaries, and the fix requires reopening blocks that were declared done.",
+   "<b>Feedthroughs not planned.</b> Signals crossing a block have to be routed through it, and a block closed without feedthrough provision blocks the top level.",
+   "<b>Blocks closed to different criteria.</b> Without an enforced standard, each block closes to what its owner considered sufficient, and the top level inherits the weakest.",
+   "<b>Top-level assembly left to the end.</b> Assembly finds interface problems, and finding them after the final turn leaves no time to fix them."
   ],
   "roles": [
    {
@@ -27403,19 +27343,19 @@ export const activityDetails: Record<string, ActivityDetail> = {
   ],
   "criticalPath": true,
   "purpose": [
-   "Rehearse the entire signoff flow on the turn 2 database—decks, runtimes, capacity, violation triage—so the final turn is not the first time it runs at full chip.",
-   "Completing this work early provides a clear basis for downstream design decisions and reduces late rework, schedule risk, and integration issues."
+   "Rehearse the entire signoff flow on the <b>turn 2 database</b>—decks, runtimes, capacity, violation triage—so the final turn is not the first time it runs at full chip.",
+   "Signoff is a large, slow, deck-heavy flow, and the first run always finds problems that have nothing to do with the design. Finding them on turn 2 costs a week of a database nobody is waiting for; finding them on the final turn costs a week of the tapeout schedule."
   ],
   "steps": [
    {
     "n": 1,
-    "text": "Integrate signoff flow assembly and deck",
+    "text": "Assemble the signoff flow and integrate the decks",
     "tat": 1.5,
     "lane": "main"
    },
    {
     "n": 2,
-    "text": "Run a dry run on the turn 2 database",
+    "text": "Run the dry run on the turn 2 database",
     "tat": 2,
     "lane": "main"
    },
@@ -27427,13 +27367,13 @@ export const activityDetails: Record<string, ActivityDetail> = {
    },
    {
     "n": 4,
-    "text": "Triage violation process and tooling",
+    "text": "Build the violation triage process and tooling",
     "tat": 1,
     "lane": "par"
    },
    {
     "n": 5,
-    "text": "Define and document flow issue resolution and rehearsal findings",
+    "text": "Resolve the flow issues and record the rehearsal findings",
     "tat": 2.5,
     "lane": "main"
    }
@@ -27464,20 +27404,20 @@ export const activityDetails: Record<string, ActivityDetail> = {
    {
     "id": "SO-D7",
     "rel": "feeds",
-    "text": "Signoff summary and Design Freeze package. The rehearsal is what makes the real campaign's schedule credible."
+    "text": "<b>Signoff summary and Design Freeze package.</b> The rehearsal is what makes the real campaign's schedule credible."
    },
    {
     "id": "SO-D1",
     "rel": "feeds",
-    "text": "STA signoff reports. The flow that produces them is built and debugged here."
+    "text": "<b>STA signoff reports.</b> The flow that produces them is built and debugged here, so the first full-chip signoff run happens on a rehearsed flow rather than on the critical path."
    }
   ],
   "risks": [
-   "Dry run skipped for schedule",
-   "Runtime not measured",
-   "Dry run on an unrepresentative database",
-   "Triage tooling built during the real campaign",
-   "Findings not fixed before the final turn"
+   "<b>Dry run skipped for schedule.</b> The flow's first full-chip run then happens on the critical path, and every problem it finds costs tapeout days.",
+   "<b>Runtime not measured.</b> A signoff campaign planned without knowing its runtime is planned against a guess.",
+   "<b>Dry run on an unrepresentative database.</b> Turn 2 has to be close enough in size and structure that the runtimes and violation counts mean something.",
+   "<b>Triage tooling built during the real campaign.</b> Thousands of violations arrive at once, and sorting them by hand is how a week disappears.",
+   "<b>Findings not fixed before the final turn.</b> A rehearsal that identifies problems and does not resolve them has only produced a list."
   ],
   "roles": [
    {
@@ -27588,7 +27528,7 @@ export const activityDetails: Record<string, ActivityDetail> = {
   ],
   "criticalPath": true,
   "purpose": [
-   "Prove the final database meets timing at every corner and every mode, in the signoff tool, and dispose of every remaining violation as a fix or a signed waiver.",
+   "Prove the final database meets timing <b>at every corner and every mode, in the signoff tool</b>, and dispose of every remaining violation as a fix or a signed waiver.",
    "This is the largest activity in the stage and the one Design Freeze most depends on. It differs from <code>PD-09</code> in that it is judgment rather than optimization: the signoff tool, the foundry-agreed derates and the full corner set, with no ECO loop to fall back on."
   ],
   "steps": [
@@ -27612,25 +27552,25 @@ export const activityDetails: Record<string, ActivityDetail> = {
    },
    {
     "n": 4,
-    "text": "Triage violation and root-cause classification",
+    "text": "Triage violations and classify root causes",
     "tat": 2.5,
     "lane": "main"
    },
    {
     "n": 5,
-    "text": "Define and document eCO iteration with physical design",
+    "text": "Iterate ECOs with physical design",
     "tat": 2,
     "lane": "par"
    },
    {
     "n": 6,
-    "text": "Define and document cross-mode and test-mode timing signoff",
+    "text": "Sign off cross-mode and test-mode timing",
     "tat": 2,
     "lane": "par"
    },
    {
     "n": 7,
-    "text": "Close timing signoff and waiver disposition",
+    "text": "Close timing signoff and disposition the waivers",
     "tat": 3.5,
     "lane": "main"
    }
@@ -27646,7 +27586,7 @@ export const activityDetails: Record<string, ActivityDetail> = {
   "produces": [
    "Signoff STA setup",
    "Setup timing analysis across corners and modes",
-   "Setup and hold analysis across all corners and modes",
+   "Hold timing analysis across corners and modes",
    "Violation triage with root causes",
    "ECO requests to physical design",
    "Test-mode timing signoff",
@@ -27665,20 +27605,20 @@ export const activityDetails: Record<string, ActivityDetail> = {
    {
     "id": "SO-D1",
     "rel": "produces",
-    "text": "STA signoff reports across all corners and modes, with waiver list. The deliverable the waiver list is the part that carries risk into silicon."
+    "text": "<b>STA signoff reports across all corners and modes, with waiver list.</b> The STA signoff reports and the waiver list are produced here, and the waiver list is the part that carries risk into silicon."
    },
    {
     "id": "SO-D7",
     "rel": "feeds",
-    "text": "Signoff summary and Design Freeze package. Timing signoff is the largest single input to the freeze decision."
+    "text": "<b>Signoff summary and Design Freeze package.</b> Timing signoff is the largest single input to the freeze decision."
    }
   ],
   "risks": [
-   "Corners deferred to fit the schedule",
-   "Waivers granted without root cause",
-   "Test modes not signed off",
-   "Signoff and implementation disagreeing late",
-   "ECO loop reopening after signoff starts"
+   "<b>Corners deferred to fit the schedule.</b> The deferred corner is the one that fails, and it fails in silicon where there is no fix.",
+   "<b>Waivers granted without root cause.</b> A waived violation with no understood cause is a silicon risk being accepted blind.",
+   "<b>Test modes not signed off.</b> Scan shift and at-speed timing failures produce parts that work functionally and fail at ATE.",
+   "<b>Signoff and implementation disagreeing late.</b> If <code>SO-12</code> has not correlated the two, the first signoff run can show a design weeks from closure.",
+   "<b>ECO loop reopening after signoff starts.</b> Each ECO invalidates the analysis it was based on, and uncontrolled iteration never converges."
   ],
   "roles": [
    {
@@ -27806,31 +27746,31 @@ export const activityDetails: Record<string, ActivityDetail> = {
   ],
   "criticalPath": true,
   "purpose": [
-   "Run full-chip physical verification—DRC, LVS, antenna, density—to clean, on the database that will become masks.",
+   "Run <b>full-chip physical verification</b>—DRC, LVS, antenna, density—to clean, on the database that will become masks.",
    "Physical verification is binary and unforgiving: the foundry will not accept a database with violations it has not waived. On a die this size the runs take days, the violation counts start in the tens of thousands, and the last hundred are the ones that need a human."
   ],
   "steps": [
    {
     "n": 1,
-    "text": "Set up full-chip DRC and hierarchical run strategy",
+    "text": "Set up full-chip DRC and the hierarchical run strategy",
     "tat": 1.5,
     "lane": "main"
    },
    {
     "n": 2,
-    "text": "Triage full-chip DRC execution and violation",
+    "text": "Execute full-chip DRC and triage the violations",
     "tat": 3,
     "lane": "main"
    },
    {
     "n": 3,
-    "text": "Verify antenna and fixing",
+    "text": "Verify and fix antennas",
     "tat": 2,
     "lane": "par"
    },
    {
     "n": 4,
-    "text": "Debug lVS execution and mismatch",
+    "text": "Execute LVS and debug the mismatches",
     "tat": 2.5,
     "lane": "main"
    },
@@ -27842,7 +27782,7 @@ export const activityDetails: Record<string, ActivityDetail> = {
    },
    {
     "n": 6,
-    "text": "Verify physical closure and waiver preparation",
+    "text": "Close physical verification and prepare the waivers",
     "tat": 2,
     "lane": "main"
    }
@@ -27875,20 +27815,20 @@ export const activityDetails: Record<string, ActivityDetail> = {
    {
     "id": "SO-D2",
     "rel": "produces",
-    "text": "Clean DRC / LVS / antenna / density reports. The deliverable it is a precondition for mask release rather than an opinion."
+    "text": "<b>Clean DRC / LVS / antenna / density reports.</b> The clean reports are produced here, and they are a precondition for mask release rather than an opinion."
    },
    {
     "id": "SO-D7",
     "rel": "feeds",
-    "text": "Signoff summary and Design Freeze package. A design with open physical violations cannot be frozen."
+    "text": "<b>Signoff summary and Design Freeze package.</b> A design with open physical violations cannot be frozen; the clean or formally waived reports produced here are a freeze precondition."
    }
   ],
   "risks": [
-   "LVS mismatch traced late",
-   "Runs started too late",
-   "Antenna fixes needing space that is gone",
-   "Waivers assumed acceptable",
-   "Verification on a database that then changes"
+   "<b>LVS mismatch traced late.</b> Full-chip mismatches take days to localize, and they are frequently caused by macro views rather than by the design.",
+   "<b>Runs started too late.</b> Each full-chip run takes days, and the iteration count is what sets the schedule rather than any single run.",
+   "<b>Antenna fixes needing space that is gone.</b> Diodes and layer jumps need room, and a fully routed design has none.",
+   "<b>Waivers assumed acceptable.</b> Foundry waivers are granted case by case, and a design that assumes one will be granted may not tape out.",
+   "<b>Verification on a database that then changes.</b> Any ECO after a clean run invalidates it, and re-running costs days."
   ],
   "roles": [
    {
@@ -27999,19 +27939,19 @@ export const activityDetails: Record<string, ActivityDetail> = {
   ],
   "criticalPath": true,
   "purpose": [
-   "Sign off electromigration and IR drop—static and dynamic, with real switching—because a design that meets timing and fails EM will not survive its warranty.",
-   "EM and IR are reliability and performance at once. IR drop consumes timing margin the STA assumed; EM limits how long the part will work."
+   "Sign off <b>electromigration and IR drop</b>—static and dynamic, with real switching—because a design that meets timing and fails EM will not survive its warranty.",
+   "EM and IR are reliability and performance at once. IR drop consumes timing margin the STA assumed; EM limits how long the part will work. Both are analyzed on the final database with real activity, and both can send routing back for changes that reopen timing."
   ],
   "steps": [
    {
     "n": 1,
-    "text": "Define eM/IR setup and activity scenario",
+    "text": "Set up EM/IR and define the activity scenarios",
     "tat": 1.5,
     "lane": "main"
    },
    {
     "n": 2,
-    "text": "Analyze static IR drop and closure",
+    "text": "Analyze and close static IR drop",
     "tat": 2,
     "lane": "main"
    },
@@ -28023,19 +27963,19 @@ export const activityDetails: Record<string, ActivityDetail> = {
    },
    {
     "n": 4,
-    "text": "Analyze electromigration on power and signal",
+    "text": "Analyze electromigration on power and signal nets",
     "tat": 2,
     "lane": "main"
    },
    {
     "n": 5,
-    "text": "Assess iR-aware timing impact",
+    "text": "Assess the IR-aware timing impact",
     "tat": 1.5,
     "lane": "par"
    },
    {
     "n": 6,
-    "text": "Close eM/IR and waiver disposition",
+    "text": "Close EM/IR and disposition the waivers",
     "tat": 2.5,
     "lane": "main"
    }
@@ -28068,20 +28008,20 @@ export const activityDetails: Record<string, ActivityDetail> = {
    {
     "id": "SO-D3",
     "rel": "produces",
-    "text": "EM/IR and SI/PI signoff reports. The EM and IR half of the deliverable; <code>SO-05</code> supplies the SI/PI half."
+    "text": "<b>EM/IR and SI/PI signoff reports.</b> The EM and IR half of the deliverable; <code>SO-05</code> supplies the SI/PI half."
    },
    {
     "id": "SO-D1",
     "rel": "feeds",
-    "text": "STA signoff reports. IR-aware timing is timing, and the two signoffs have to be reconciled rather than reported separately."
+    "text": "<b>STA signoff reports.</b> IR-aware timing is timing, and the two signoffs have to be reconciled rather than reported separately."
    }
   ],
   "risks": [
-   "IR not back-annotated into timing",
-   "Dynamic IR analyzed with uniform activity",
-   "Package effects excluded",
-   "Signal EM overlooked",
-   "EM fixes reopening timing"
+   "<b>IR not back-annotated into timing.</b> The design is then signed off at a supply voltage it never sees, and the margin was never real.",
+   "<b>Dynamic IR analyzed with uniform activity.</b> Real switching is bursty and local, and uniform assumptions understate the worst case.",
+   "<b>Package effects excluded.</b> Die-only IR is optimistic; the number that matters includes the package inductance <code>SIPI-04</code> models.",
+   "<b>Signal EM overlooked.</b> High-toggle nets on advanced nodes carry real EM exposure, and checking only power misses them.",
+   "<b>EM fixes reopening timing.</b> Widening wires changes delay, and a fix applied after timing signoff invalidates it."
   ],
   "roles": [
    {
@@ -28195,43 +28135,43 @@ export const activityDetails: Record<string, ActivityDetail> = {
   ],
   "criticalPath": false,
   "purpose": [
-   "Sign off signal integrity—crosstalk delay, noise, glitch—on the final database, and confirm the numbers the timing signoff assumed.",
-   "Crosstalk is timing. Coupling between adjacent nets changes delay in both directions and can inject glitches that propagate as functional failures."
+   "Sign off <b>signal integrity</b>—crosstalk delay, noise, glitch—on the final database, and confirm the numbers the timing signoff assumed.",
+   "Crosstalk is timing. Coupling between adjacent nets changes delay in both directions and can inject glitches that propagate as functional failures. The analysis is separate from STA and its results feed straight back into it, which makes the two inseparable at signoff."
   ],
   "steps": [
    {
     "n": 1,
-    "text": "Extract sI signoff setup and coupling",
+    "text": "Set up SI signoff and extract the coupling",
     "tat": 1,
     "lane": "main"
    },
    {
     "n": 2,
-    "text": "Analyze crosstalk delay and timing impact",
+    "text": "Analyze crosstalk delay and its timing impact",
     "tat": 1.5,
     "lane": "main"
    },
    {
     "n": 3,
-    "text": "Analyze noise and glitch",
+    "text": "Analyze noise and glitches",
     "tat": 1.5,
     "lane": "par"
    },
    {
     "n": 4,
-    "text": "Analyze victim-aggressor on critical nets",
+    "text": "Run victim-aggressor analysis on the critical nets",
     "tat": 1.5,
     "lane": "main"
    },
    {
     "n": 5,
-    "text": "Reconcile power integrity signoff",
+    "text": "Reconcile the power integrity signoff",
     "tat": 1,
     "lane": "par"
    },
    {
     "n": 6,
-    "text": "Close sI signoff and reporting",
+    "text": "Close SI signoff and report",
     "tat": 2,
     "lane": "main"
    }
@@ -28264,20 +28204,20 @@ export const activityDetails: Record<string, ActivityDetail> = {
    {
     "id": "SO-D3",
     "rel": "produces",
-    "text": "EM/IR and SI/PI signoff reports. The signal integrity half of the deliverable."
+    "text": "<b>EM/IR and SI/PI signoff reports.</b> The signal integrity half of the deliverable—crosstalk delay, noise and glitch results reconciled into the timing signoff numbers."
    },
    {
     "id": "SO-D1",
     "rel": "feeds",
-    "text": "STA signoff reports. Crosstalk delay is part of the timing number, not a separate finding."
+    "text": "<b>STA signoff reports.</b> Crosstalk delay is part of the timing number, not a separate finding."
    }
   ],
   "risks": [
-   "Crosstalk reported and not reconciled with timing",
-   "Glitch analysis omitted",
-   "Analysis on a subset of nets",
-   "Fixes applied after timing signoff",
-   "Thresholds set by tool default"
+   "<b>Crosstalk reported and not reconciled with timing.</b> Two separate reports means the design is signed off against timing that excludes coupling.",
+   "<b>Glitch analysis omitted.</b> Noise on a static net can propagate as a functional failure that no timing analysis would show.",
+   "<b>Analysis on a subset of nets.</b> Coupling is a property of adjacency, and the critical net set is not the same as the coupled net set.",
+   "<b>Fixes applied after timing signoff.</b> Spacing and shielding change delay, and a late fix invalidates the timing it was meant to protect.",
+   "<b>Thresholds set by tool default.</b> Noise thresholds are a library and technology property, and defaults are either optimistic or unnecessarily punitive."
   ],
   "roles": [
    {
@@ -28383,13 +28323,13 @@ export const activityDetails: Record<string, ActivityDetail> = {
   ],
   "criticalPath": false,
   "purpose": [
-   "Review the chip-package-system co-verification result as a signoff item in its own right, rather than assuming the die-only analysis covers it.",
+   "Review the <b>chip-package-system co-verification result</b> as a signoff item in its own right, rather than assuming the die-only analysis covers it.",
    "<code>SIPI</code> analyzed the die, package and board as one electrical system. This activity brings that result into the signoff record and reconciles it against the die-only numbers—because where they disagree, the system-level answer is the one silicon will produce."
   ],
   "steps": [
    {
     "n": 1,
-    "text": "Define and document sIPI result intake and scope confirmation",
+    "text": "Take in the SIPI results and confirm the scope",
     "tat": 0.75,
     "lane": "main"
    },
@@ -28407,13 +28347,13 @@ export const activityDetails: Record<string, ActivityDetail> = {
    },
    {
     "n": 4,
-    "text": "Review power-aware timing correlation",
+    "text": "Review the power-aware timing correlation",
     "tat": 1,
     "lane": "par"
    },
    {
     "n": 5,
-    "text": "Verify co- signoff review and disposition",
+    "text": "Review the co-verification signoff and disposition the criteria",
     "tat": 2,
     "lane": "main"
    }
@@ -28444,20 +28384,20 @@ export const activityDetails: Record<string, ActivityDetail> = {
    {
     "id": "SO-D3",
     "rel": "feeds",
-    "text": "EM/IR and SI/PI signoff reports. The system-level results belong in the same report as the die-only ones, reconciled rather than filed separately."
+    "text": "<b>EM/IR and SI/PI signoff reports.</b> The system-level results belong in the same report as the die-only ones, reconciled rather than filed separately."
    },
    {
     "id": "SO-D7",
     "rel": "feeds",
-    "text": "Signoff summary and Design Freeze package. Co-verification signoff is a freeze precondition, since mask release follows it."
+    "text": "<b>Signoff summary and Design Freeze package.</b> Co-verification signoff is a freeze precondition, since mask release follows it."
    }
   ],
   "risks": [
-   "Co-verification treated as a package deliverable",
-   "Discrepancies explained rather than resolved",
-   "Channel compliance reviewed against internal assumptions",
-   "Review scheduled after Design Freeze",
-   "Power-aware timing not reviewed"
+   "<b>Co-verification treated as a package deliverable.</b> It constrains the die's signoff, and excluding it from the signoff record means freezing without it.",
+   "<b>Discrepancies explained rather than resolved.</b> Where die-only and system-level disagree, one is wrong, and the difference is real margin.",
+   "<b>Channel compliance reviewed against internal assumptions.</b> The interface specification's mask is what compliance means, and internal budgets can be more generous.",
+   "<b>Review scheduled after Design Freeze.</b> The freeze is what gates mask release, and a co-verification finding afterwards has nowhere to go.",
+   "<b>Power-aware timing not reviewed.</b> STA at nominal voltage and IR analysis showing droop are two views of the same design, and only the reconciliation is the truth."
   ],
   "roles": [
    {
@@ -28567,37 +28507,37 @@ export const activityDetails: Record<string, ActivityDetail> = {
   ],
   "criticalPath": false,
   "purpose": [
-   "Verify the reliability requirements the product will be qualified against—ESD paths, latch-up structures, soft error rate—on the final database rather than in the qualification lab.",
-   "Completing this work early provides a clear basis for downstream design decisions and reduces late rework, schedule risk, and integration issues."
+   "Verify the <b>reliability requirements</b> the product will be qualified against—ESD paths, latch-up structures, soft error rate—on the final database rather than in the qualification lab.",
+   "Qualification failures are the most expensive kind: they arrive after silicon, after packaging and after months of stress testing. Every one of these checks has a design-time equivalent, and running them here converts a possible respin into a layout fix."
   ],
   "steps": [
    {
     "n": 1,
-    "text": "Set up reliability requirement collection and rule",
+    "text": "Collect the reliability requirements and set up the rules",
     "tat": 1,
     "lane": "main"
    },
    {
     "n": 2,
-    "text": "Verify eSD path through the full chip",
+    "text": "Verify ESD paths through the full chip",
     "tat": 1.5,
     "lane": "main"
    },
    {
     "n": 3,
-    "text": "Verify latch-up structure and guard ring",
+    "text": "Verify latch-up structures and guard rings",
     "tat": 1.5,
     "lane": "par"
    },
    {
     "n": 4,
-    "text": "Define and document soft error rate and FIT estimation",
+    "text": "Estimate the soft error rate and FIT",
     "tat": 1.5,
     "lane": "par"
    },
    {
     "n": 5,
-    "text": "Close reliability and waiver disposition",
+    "text": "Close reliability and disposition the waivers",
     "tat": 3.5,
     "lane": "main"
    }
@@ -28628,20 +28568,20 @@ export const activityDetails: Record<string, ActivityDetail> = {
    {
     "id": "SO-D4",
     "rel": "produces",
-    "text": "Reliability reports—ESD, latch-up, FIT. The deliverable it is what <code>MP-03</code> will be measured against."
+    "text": "<b>Reliability reports—ESD, latch-up, FIT.</b> The reliability reports are produced here, and they are what <code>MP-03</code> will be measured against."
    },
    {
     "id": "SO-D7",
     "rel": "feeds",
-    "text": "Signoff summary and Design Freeze package. Reliability findings are part of the risk the freeze decision accepts."
+    "text": "<b>Signoff summary and Design Freeze package.</b> Reliability findings are part of the risk the freeze decision accepts."
    }
   ],
   "risks": [
-   "ESD verified as a strategy rather than a path",
-   "Latch-up checked only at the IO ring",
-   "Soft error rate not estimated",
-   "Reliability waivers granted without lifetime analysis",
-   "Analysis on a database that then changes"
+   "<b>ESD verified as a strategy rather than a path.</b> A clamp with no complete discharge path to it protects nothing, and only a full-chip trace finds the gap.",
+   "<b>Latch-up checked only at the IO ring.</b> Internal structures near power domain boundaries can latch up too, and they are rarely checked.",
+   "<b>Soft error rate not estimated.</b> FIT is a product requirement in many markets, and estimating it after qualification leaves no mitigation options.",
+   "<b>Reliability waivers granted without lifetime analysis.</b> A waiver with no quantified impact cannot be defended when qualification fails.",
+   "<b>Analysis on a database that then changes.</b> Late ECOs can break an ESD path, and nobody re-runs the check."
   ],
   "roles": [
    {
@@ -28747,37 +28687,37 @@ export const activityDetails: Record<string, ActivityDetail> = {
   ],
   "criticalPath": false,
   "purpose": [
-   "Check the design against manufacturability—lithography hotspots, CMP density, DFM recommended rules—so the foundry can print it at yield.",
-   "A DRC-clean design can still be difficult to manufacture. Litho hotspots print differently from what was drawn, and CMP density variation produces thickness variation that moves timing."
+   "Check the design against <b>manufacturability</b>—lithography hotspots, CMP density, DFM recommended rules—so the foundry can print it at yield.",
+   "A DRC-clean design can still be difficult to manufacture. Litho hotspots print differently from what was drawn, and CMP density variation produces thickness variation that moves timing. Both are checked with foundry-supplied models and both are cheaper to fix here than to yield-learn in production."
   ],
   "steps": [
    {
     "n": 1,
-    "text": "Set up dFM deck and model version confirmation",
+    "text": "Set up the DFM decks and confirm the model versions",
     "tat": 1,
     "lane": "main"
    },
    {
     "n": 2,
-    "text": "Analyze lithography hotspot detection and",
+    "text": "Detect and analyze lithography hotspots",
     "tat": 1.5,
     "lane": "main"
    },
    {
     "n": 3,
-    "text": "Simulate cMP and density",
+    "text": "Simulate CMP and density",
     "tat": 1.5,
     "lane": "par"
    },
    {
     "n": 4,
-    "text": "Define and document recommended rule compliance scoring",
+    "text": "Score recommended rule compliance",
     "tat": 1.5,
     "lane": "par"
    },
    {
     "n": 5,
-    "text": "Close hotspot fixing and DFM",
+    "text": "Fix the hotspots and close DFM",
     "tat": 3.5,
     "lane": "main"
    }
@@ -28808,20 +28748,20 @@ export const activityDetails: Record<string, ActivityDetail> = {
    {
     "id": "SO-D5",
     "rel": "produces",
-    "text": "DFM and lithography hotspot report. The deliverable its compliance score is a yield predictor."
+    "text": "<b>DFM and lithography hotspot report.</b> The DFM and hotspot report is produced here, and its compliance score is a yield predictor."
    },
    {
     "id": "SO-D2",
     "rel": "feeds",
-    "text": "Clean DRC / LVS / antenna / density reports. DFM fixes are layout changes and close alongside physical verification."
+    "text": "<b>Clean DRC / LVS / antenna / density reports.</b> DFM fixes are layout changes and close alongside physical verification."
    }
   ],
   "risks": [
-   "DFM checked after routing is frozen",
-   "Recommended rules ignored without scoring",
-   "Litho models outdated",
-   "CMP variation not linked to timing",
-   "Fixes applied without re-verification"
+   "<b>DFM checked after routing is frozen.</b> Hotspot fixes are layout changes, and a frozen database has no room for them.",
+   "<b>Recommended rules ignored without scoring.</b> The yield cost of ignoring them is real and unmeasured unless someone scores compliance.",
+   "<b>Litho models outdated.</b> Foundry models improve through the node's life, and an old model finds the wrong hotspots.",
+   "<b>CMP variation not linked to timing.</b> Thickness variation changes resistance and capacitance, and the timing impact is rarely fed back.",
+   "<b>Fixes applied without re-verification.</b> A DFM fix is a layout change, and it can create DRC or timing problems of its own."
   ],
   "roles": [
    {
@@ -28928,37 +28868,37 @@ export const activityDetails: Record<string, ActivityDetail> = {
   ],
   "criticalPath": true,
   "purpose": [
-   "Prove for the last time that the database being taped out is the design that was verified—final formal equivalence and netlist-to-layout consistency.",
-   "Between the FFN and the tapeout database sit hundreds of ECOs, a scan reorder, fill and finishing. Each was individually correct; the question is whether the composition still implements the RTL that <code>DV</code> signed off."
+   "Prove for the last time that the <b>database being taped out is the design that was verified</b>—final formal equivalence and netlist-to-layout consistency.",
+   "Between the FFN and the tapeout database sit hundreds of ECOs, a scan reorder, fill and finishing. Each was individually correct; the question is whether the composition still implements the RTL that <code>DV</code> signed off. This is the last check that answers it."
   ],
   "steps": [
    {
     "n": 1,
-    "text": "Finalize equivalence setup against the FFN and the RTL",
+    "text": "Set up final equivalence against the FFN and the RTL",
     "tat": 1,
     "lane": "main"
    },
    {
     "n": 2,
-    "text": "Define and document rTL to final netlist equivalence",
+    "text": "Prove RTL to final netlist equivalence",
     "tat": 1.5,
     "lane": "main"
    },
    {
     "n": 3,
-    "text": "Reconcile eCO against the change log",
+    "text": "Reconcile every difference against the ECO log",
     "tat": 1,
     "lane": "par"
    },
    {
     "n": 4,
-    "text": "Define and document netlist to layout consistency confirmation",
+    "text": "Confirm netlist to layout consistency",
     "tat": 1,
     "lane": "par"
    },
    {
     "n": 5,
-    "text": "Define and document non-equivalence resolution and final report",
+    "text": "Resolve the non-equivalences and issue the final report",
     "tat": 2.5,
     "lane": "main"
    }
@@ -28989,20 +28929,20 @@ export const activityDetails: Record<string, ActivityDetail> = {
    {
     "id": "SO-D6",
     "rel": "produces",
-    "text": "Final formal equivalence report. The deliverable it is the last evidence that verification's conclusions still apply."
+    "text": "<b>Final formal equivalence report.</b> The final equivalence report is produced here, and it is the last evidence that verification's conclusions still apply."
    },
    {
     "id": "SO-D7",
     "rel": "gates",
-    "text": "Signoff summary and Design Freeze package. Freezing a database that has not been proved equivalent freezes an unverified design."
+    "text": "<b>Signoff summary and Design Freeze package.</b> Freezing a database that has not been proved equivalent freezes an unverified design."
    }
   ],
   "risks": [
-   "Equivalence run against the FFN rather than the RTL",
-   "ECO log not reconciled",
-   "Non-equivalences waived under tapeout pressure",
-   "Run before the last ECO",
-   "Layout consistency assumed from LVS"
+   "<b>Equivalence run against the FFN rather than the RTL.</b> That proves the ECOs preserved the netlist and not that the netlist implements the verified design.",
+   "<b>ECO log not reconciled.</b> A difference that no ECO explains is an unapproved change, and it is exactly what this check exists to find.",
+   "<b>Non-equivalences waived under tapeout pressure.</b> Each waiver is a region where the silicon may not do what verification proved.",
+   "<b>Run before the last ECO.</b> Any change after the equivalence run invalidates it, and re-running takes days nobody has.",
+   "<b>Layout consistency assumed from LVS.</b> LVS compares layout to netlist; that the netlist is the right one is a separate claim."
   ],
   "roles": [
    {
@@ -29117,43 +29057,43 @@ export const activityDetails: Record<string, ActivityDetail> = {
   ],
   "criticalPath": true,
   "purpose": [
-   "Run the waiver review board—every violation that survives signoff, examined, owned and either fixed or accepted—and assemble the Design Freeze package.",
-   "Every large design tapes out with waivers. What distinguishes a controlled tapeout from a hopeful one is whether each waiver was understood, quantified and signed, or simply ran out of time."
+   "Run the <b>waiver review board</b>—every violation that survives signoff, examined, owned and either fixed or accepted—and assemble the Design Freeze package.",
+   "Every large design tapes out with waivers. What distinguishes a controlled tapeout from a hopeful one is whether each waiver was understood, quantified and signed, or simply ran out of time. This board is where that distinction is made, and its package is what the Go / No-Go decision reads."
   ],
   "steps": [
    {
     "n": 1,
-    "text": "Define and document waiver intake and classification across all signoff domains",
+    "text": "Take in and classify waivers across all signoff domains",
     "tat": 1,
     "lane": "main"
    },
    {
     "n": 2,
-    "text": "Define and document root cause and risk quantification per waiver",
+    "text": "Establish root cause and quantify risk per waiver",
     "tat": 1.5,
     "lane": "main"
    },
    {
     "n": 3,
-    "text": "Define and document foundry waiver alignment and submission",
+    "text": "Align and submit the foundry waivers",
     "tat": 1.5,
     "lane": "par"
    },
    {
     "n": 4,
-    "text": "Review board and disposition",
+    "text": "Run the board review and disposition each waiver",
     "tat": 1.5,
     "lane": "main"
    },
    {
     "n": 5,
-    "text": "Define and document residual risk statement",
+    "text": "Write the residual risk statement",
     "tat": 1,
     "lane": "par"
    },
    {
     "n": 6,
-    "text": "Define and document signoff summary and Design Freeze package assembly",
+    "text": "Assemble the signoff summary and Design Freeze package",
     "tat": 2,
     "lane": "main"
    }
@@ -29169,7 +29109,7 @@ export const activityDetails: Record<string, ActivityDetail> = {
   "produces": [
    "Classified waiver intake across signoff domains",
    "Root cause and risk quantification per waiver",
-   "Classified waiver register",
+   "Consolidated waiver register",
    "Foundry waiver submissions and responses",
    "Board disposition records",
    "Residual risk statement",
@@ -29178,7 +29118,7 @@ export const activityDetails: Record<string, ActivityDetail> = {
   "producedBy": [
    1,
    2,
-   3,
+   1,
    3,
    4,
    5,
@@ -29188,20 +29128,20 @@ export const activityDetails: Record<string, ActivityDetail> = {
    {
     "id": "SO-D7",
     "rel": "produces",
-    "text": "Signoff summary and Design Freeze package. The deliverable it is what the tapeout decision is taken on."
+    "text": "<b>Signoff summary and Design Freeze package.</b> The signoff summary and Design Freeze package are assembled here, and they are what the tapeout decision is taken on."
    },
    {
     "id": "SO-D1",
     "rel": "feeds",
-    "text": "STA signoff reports with waiver list. The timing waiver list is dispositioned here rather than inside the STA activity."
+    "text": "<b>STA signoff reports with waiver list.</b> The timing waiver list is dispositioned here rather than inside the STA activity."
    }
   ],
   "risks": [
-   "Waivers accumulated rather than reviewed",
-   "Foundry waivers submitted late",
-   "Risk quantified qualitatively",
-   "Board without authority",
-   "Residual risk not summarized"
+   "<b>Waivers accumulated rather than reviewed.</b> A register nobody dispositioned is a set of accepted risks nobody accepted.",
+   "<b>Foundry waivers submitted late.</b> Their review is on the foundry's schedule, and an unapproved waiver blocks mask release.",
+   "<b>Risk quantified qualitatively.</b> \"Low risk\" is not a basis for a tapeout decision; a stated failure mode and probability is.",
+   "<b>Board without authority.</b> A review that cannot refuse a waiver is a review that approves everything.",
+   "<b>Residual risk not summarized.</b> The Go / No-Go decision needs one statement of what is being accepted, not a register of two hundred entries."
   ],
   "roles": [
    {
@@ -29317,37 +29257,37 @@ export const activityDetails: Record<string, ActivityDetail> = {
   ],
   "criticalPath": false,
   "purpose": [
-   "Run gate-level simulation with the final SDF—the last dynamic check that the design behaves correctly with real timing on the database being taped out.",
+   "Run <b>gate-level simulation with the final SDF</b>—the last dynamic check that the design behaves correctly with real timing on the database being taped out.",
    "Static timing analysis proves paths meet constraints; it does not prove the design works. Simulating with final timing catches what STA structurally cannot—race conditions, reset behavior under real delays, and any place where the constraints described a design different from the one built."
   ],
   "steps": [
    {
     "n": 1,
-    "text": "Finalize SDF generation and simulation setup",
+    "text": "Generate the final SDF and set up the simulation",
     "tat": 1,
     "lane": "main"
    },
    {
     "n": 2,
-    "text": "Simulate timing-annotated functional",
+    "text": "Run timing-annotated functional simulation",
     "tat": 1.5,
     "lane": "main"
    },
    {
     "n": 3,
-    "text": "Simulate reset and initialization sequence",
+    "text": "Simulate the reset and initialization sequences",
     "tat": 1,
     "lane": "par"
    },
    {
     "n": 4,
-    "text": "Test mode simulation with final timing",
+    "text": "Simulate the test modes with final timing",
     "tat": 1,
     "lane": "par"
    },
    {
     "n": 5,
-    "text": "Debug failure and signoff reporting",
+    "text": "Debug the failures and report the signoff",
     "tat": 2.5,
     "lane": "main"
    }
@@ -29378,20 +29318,20 @@ export const activityDetails: Record<string, ActivityDetail> = {
    {
     "id": "SO-D7",
     "rel": "feeds",
-    "text": "Signoff summary and Design Freeze package. Dynamic evidence on the final database belongs in the freeze package alongside the static analysis."
+    "text": "<b>Signoff summary and Design Freeze package.</b> Dynamic evidence on the final database belongs in the freeze package alongside the static analysis."
    },
    {
     "id": "SO-D1",
     "rel": "feeds",
-    "text": "STA signoff reports. A gate-level failure with clean STA means the constraints described a different design, which is a timing finding."
+    "text": "<b>STA signoff reports.</b> A gate-level failure with clean STA means the constraints described a different design, which is a timing finding."
    }
   ],
   "risks": [
-   "Skipped because STA is clean",
-   "Run on an earlier database",
-   "Reset simulation omitted",
-   "X failures forced away",
-   "Runtime prohibiting meaningful scenarios"
+   "<b>Skipped because STA is clean.</b> They answer different questions, and the failures gate-level simulation finds are invisible to static analysis.",
+   "<b>Run on an earlier database.</b> A simulation against pre-final timing says nothing about the database being taped out.",
+   "<b>Reset simulation omitted.</b> Reset ordering under real delays is a common silicon failure and one of the cheapest to catch here.",
+   "<b>X failures forced away.</b> Initializing signals to make the simulation run hides exactly the uninitialized state that will fail at power-on.",
+   "<b>Runtime prohibiting meaningful scenarios.</b> Full-timing simulation is slow, and a scenario set trimmed to fit may exclude the case that matters."
   ],
   "roles": [
    {
@@ -29495,37 +29435,37 @@ export const activityDetails: Record<string, ActivityDetail> = {
   ],
   "criticalPath": false,
   "purpose": [
-   "Correlate the signoff flow against the foundry's own decks and the implementation tool, so that a number produced here means the same thing everywhere it is read.",
-   "Three parties analyze this design: the implementation tool, the signoff tool and the foundry. If they disagree, the design can be closed in one and rejected by another."
+   "Correlate the <b>signoff flow against the foundry's own decks and the implementation tool</b>, so that a number produced here means the same thing everywhere it is read.",
+   "Three parties analyze this design: the implementation tool, the signoff tool and the foundry. If they disagree, the design can be closed in one and rejected by another. Establishing the correlation early is what lets physical design close with the right margin instead of re-closing after signoff reports."
   ],
   "steps": [
    {
     "n": 1,
-    "text": "Select correlation methodology and reference case",
+    "text": "Define the correlation methodology and select reference cases",
     "tat": 1,
     "lane": "main"
    },
    {
     "n": 2,
-    "text": "Implement to signoff tool correlation",
+    "text": "Correlate the implementation tool against the signoff tool",
     "tat": 1.5,
     "lane": "main"
    },
    {
     "n": 3,
-    "text": "Correlate foundry deck and derate",
+    "text": "Correlate against the foundry decks and derates",
     "tat": 1,
     "lane": "par"
    },
    {
     "n": 4,
-    "text": "Extract and parasitic correlation",
+    "text": "Correlate extraction and parasitics",
     "tat": 1,
     "lane": "par"
    },
    {
     "n": 5,
-    "text": "Correlate findings and margin guidance",
+    "text": "Publish the correlation findings and margin guidance",
     "tat": 2.5,
     "lane": "main"
    }
@@ -29556,20 +29496,20 @@ export const activityDetails: Record<string, ActivityDetail> = {
    {
     "id": "SO-D1",
     "rel": "feeds",
-    "text": "STA signoff reports. Correlation is what makes the signoff numbers comparable to the ones physical design closed against."
+    "text": "<b>STA signoff reports.</b> Correlation is what makes the signoff numbers comparable to the ones physical design closed against."
    },
    {
     "id": "SO-D7",
     "rel": "feeds",
-    "text": "Signoff summary and Design Freeze package. A stated correlation is part of what makes the signoff result defensible to the foundry."
+    "text": "<b>Signoff summary and Design Freeze package.</b> A stated correlation is part of what makes the signoff result defensible to the foundry."
    }
   ],
   "risks": [
-   "Correlation established after signoff starts",
-   "Correlation on unrepresentative paths",
-   "Extraction differences overlooked",
-   "Margin guidance not adopted",
-   "Foundry decks assumed identical to internal ones"
+   "<b>Correlation established after signoff starts.</b> The gap is then discovered on the final database, when closing it means re-opening closure.",
+   "<b>Correlation on unrepresentative paths.</b> Tool differences concentrate on long, heavily coupled paths, and correlating on short clean ones shows agreement that does not generalize.",
+   "<b>Extraction differences overlooked.</b> Parasitic differences between flows can exceed timing tool differences and are less often checked.",
+   "<b>Margin guidance not adopted.</b> Correlation that physical design does not close against has produced information nobody used.",
+   "<b>Foundry decks assumed identical to internal ones.</b> Derates and corner definitions can differ in detail, and the foundry's version is the one that decides acceptance."
   ],
   "roles": [
    {
@@ -29672,31 +29612,31 @@ export const activityDetails: Record<string, ActivityDetail> = {
   ],
   "criticalPath": true,
   "purpose": [
-   "Assemble the final GDSII or OASIS database from the closed design—every block, every macro, every layer—and verify that the layer map the foundry will read matches the one the design was built with.",
+   "Assemble the <b>final GDSII or OASIS database</b> from the closed design—every block, every macro, every layer—and verify that the layer map the foundry will read matches the one the design was built with.",
    "This is a mechanical activity with no tolerance for error. A layer misassigned in the stream-out produces masks that are wrong in a way no verification would have caught, because the design was correct and the translation was not."
   ],
   "steps": [
    {
     "n": 1,
-    "text": "Close database intake and provenance check",
+    "text": "Take in the closure database and check its provenance",
     "tat": 0.5,
     "lane": "main"
    },
    {
     "n": 2,
-    "text": "Define and document gDSII / OASIS stream out from the closed database",
+    "text": "Stream out the GDSII / OASIS from the closed database",
     "tat": 0.75,
     "lane": "main"
    },
    {
     "n": 3,
-    "text": "Define and document macro and hard IP GDS merge",
+    "text": "Merge the macro and hard IP GDS",
     "tat": 0.5,
     "lane": "par"
    },
    {
     "n": 4,
-    "text": "Verify layer map against the foundry definition",
+    "text": "Verify the layer map against the foundry definition",
     "tat": 0.75,
     "lane": "main"
    }
@@ -29713,7 +29653,7 @@ export const activityDetails: Record<string, ActivityDetail> = {
    "Database checksum and provenance record",
    "Streamed GDSII / OASIS database",
    "Merged macro and hard IP GDS",
-   "Merged macro and IP layers",
+   "Layer-verified merged database",
    "Layer map verification record"
   ],
   "producedBy": [
@@ -29727,20 +29667,20 @@ export const activityDetails: Record<string, ActivityDetail> = {
    {
     "id": "TO-D1",
     "rel": "produces",
-    "text": "Released GDSII / OASIS database with checksum record. The deliverable the checksum is what makes every later reference unambiguous."
+    "text": "<b>Released GDSII / OASIS database with checksum record.</b> The released database and its checksum record are produced here, and the checksum is what makes every later reference unambiguous."
    },
    {
     "id": "TO-D2",
     "rel": "feeds",
-    "text": "Tapeout checklist with signoff matrix. Database assembly and layer verification are checklist entries in their own right."
+    "text": "<b>Tapeout checklist with signoff matrix.</b> Database assembly and layer verification are checklist entries in their own right."
    }
   ],
   "risks": [
-   "Layer map mismatch",
-   "Macro GDS from the wrong version",
-   "Stream-out from an unfrozen database",
-   "No checksum",
-   "Assembly compressed to hours"
+   "<b>Layer map mismatch.</b> A misassigned layer produces masks that are wrong in a way no design verification would have found.",
+   "<b>Macro GDS from the wrong version.</b> An abstract that matched and a layout that did not is discovered at LVS, or worse, not at all.",
+   "<b>Stream-out from an unfrozen database.</b> The design has to stop moving before it is streamed, or the streamed version is not the signed-off one.",
+   "<b>No checksum.</b> Without one, the question \"is this the database we signed off\" has no answer.",
+   "<b>Assembly compressed to hours.</b> Stream-out on a die this size takes real time, and rushing it is how a merge error is missed."
   ],
   "roles": [
    {
@@ -29847,37 +29787,37 @@ export const activityDetails: Record<string, ActivityDetail> = {
   ],
   "criticalPath": true,
   "purpose": [
-   "Re-run full-chip physical verification on the released database—not on the one signoff checked, but on the exact bytes going to the mask shop.",
-   "Between the signoff run and the released database sit stream-out, macro merge and possibly a late fix. Each is a chance to introduce something."
+   "Re-run <b>full-chip physical verification on the released database</b>—not on the one signoff checked, but on the exact bytes going to the mask shop.",
+   "Between the signoff run and the released database sit stream-out, macro merge and possibly a late fix. Each is a chance to introduce something. This re-run is short, expensive in compute and non-negotiable: it is the only check that the thing being released is the thing that was verified."
   ],
   "steps": [
    {
     "n": 1,
-    "text": "Verify setup on the released database",
+    "text": "Set up verification on the released database",
     "tat": 0.5,
     "lane": "main"
    },
    {
     "n": 2,
-    "text": "Define and document full-chip DRC re-run",
+    "text": "Re-run full-chip DRC",
     "tat": 0.75,
     "lane": "main"
    },
    {
     "n": 3,
-    "text": "Define and document density and fill re-check",
+    "text": "Re-check density and fill",
     "tat": 0.5,
     "lane": "par"
    },
    {
     "n": 4,
-    "text": "Define and document lVS and antenna re-run",
+    "text": "Re-run LVS and antenna",
     "tat": 0.75,
     "lane": "main"
    },
    {
     "n": 5,
-    "text": "Define and document checksum confirmation against the released database",
+    "text": "Confirm the checksums against the released database",
     "tat": 0.5,
     "lane": "par"
    }
@@ -29891,7 +29831,7 @@ export const activityDetails: Record<string, ActivityDetail> = {
    "Compute capacity for full-chip runs"
   ],
   "produces": [
-   "Verification results on the released database",
+   "Verification setup on the released database",
    "Full-chip DRC re-run results",
    "Density and fill confirmation",
    "LVS and antenna re-run results",
@@ -29908,20 +29848,20 @@ export const activityDetails: Record<string, ActivityDetail> = {
    {
     "id": "TO-D1",
     "rel": "feeds",
-    "text": "Released GDSII / OASIS database with checksum record. The release is only complete when the released bytes have been verified."
+    "text": "<b>Released GDSII / OASIS database with checksum record.</b> The release is only complete when the released bytes have been verified."
    },
    {
     "id": "TO-D2",
     "rel": "feeds",
-    "text": "Tapeout checklist with signoff matrix. Verification on the released database is one of the checklist's non-waivable entries."
+    "text": "<b>Tapeout checklist with signoff matrix.</b> Verification on the released database is one of the checklist's non-waivable entries."
    }
   ],
   "risks": [
-   "Skipped because signoff was clean",
-   "Run on the signoff database rather than the released one",
-   "Compute capacity unavailable",
-   "New violations discovered with no time to fix",
-   "Checksums not compared"
+   "<b>Skipped because signoff was clean.</b> Signoff checked a different database, and the difference between them is exactly what this run exists to catch.",
+   "<b>Run on the signoff database rather than the released one.</b> That repeats the earlier check and proves nothing new.",
+   "<b>Compute capacity unavailable.</b> A full-chip run takes days and needs to be scheduled, not requested.",
+   "<b>New violations discovered with no time to fix.</b> Which is why <code>SO-03</code> has to close cleanly rather than nearly.",
+   "<b>Checksums not compared.</b> Verifying one file and releasing another is a documented failure mode with a trivial defense."
   ],
   "roles": [
    {
@@ -30035,31 +29975,31 @@ export const activityDetails: Record<string, ActivityDetail> = {
   ],
   "criticalPath": true,
   "purpose": [
-   "Walk the tapeout checklist—every domain, every entry, evidence attached, owner signed—so the Go / No-Go decision is taken on facts rather than on confidence.",
+   "Walk the <b>tapeout checklist</b>—every domain, every entry, evidence attached, owner signed—so the Go / No-Go decision is taken on facts rather than on confidence.",
    "The checklist is the program's collected memory of what has to be true before masks are cut. Its value is entirely in the evidence: an entry ticked because the owner believes it is true is worth nothing, and the difference between a checklist and a ritual is whether anyone reads the attachments."
   ],
   "steps": [
    {
     "n": 1,
-    "text": "Define and document checklist assembly per domain",
+    "text": "Assemble the checklist per domain",
     "tat": 0.75,
     "lane": "main"
    },
    {
     "n": 2,
-    "text": "Define and document evidence collection per item",
+    "text": "Collect the evidence for each item",
     "tat": 1,
     "lane": "main"
    },
    {
     "n": 3,
-    "text": "Identify gap chasing and escalation",
+    "text": "Chase the gaps and escalate them",
     "tat": 0.75,
     "lane": "par"
    },
    {
     "n": 4,
-    "text": "Define and document owner signoff collection",
+    "text": "Collect the owner signoffs",
     "tat": 1.25,
     "lane": "main"
    }
@@ -30088,20 +30028,20 @@ export const activityDetails: Record<string, ActivityDetail> = {
    {
     "id": "TO-D2",
     "rel": "produces",
-    "text": "Tapeout checklist with signoff matrix. The deliverable the signoff matrix is what makes accountability explicit."
+    "text": "<b>Tapeout checklist with signoff matrix.</b> The completed checklist and its signoff matrix are assembled here, and the signoff matrix is what makes accountability explicit."
    },
    {
     "id": "TO-D4",
     "rel": "gates",
-    "text": "Go / No-Go decision minutes. The decision reads the checklist; entries without evidence are decisions being taken blind."
+    "text": "<b>Go / No-Go decision minutes.</b> The decision reads the checklist; entries without evidence are decisions being taken blind."
    }
   ],
   "risks": [
-   "Entries ticked without evidence",
-   "Signoff by proxy",
-   "Checklist assembled at tapeout",
-   "Domains missing from the checklist",
-   "Gaps escalated too late"
+   "<b>Entries ticked without evidence.</b> A checklist of assertions is a ritual, and it produces confidence rather than information.",
+   "<b>Signoff by proxy.</b> An entry signed by someone other than the accountable owner has moved the signature without moving the accountability.",
+   "<b>Checklist assembled at tapeout.</b> It should be maintained across the program; assembling it in the last week means discovering gaps with no time to close them.",
+   "<b>Domains missing from the checklist.</b> Test, package and reliability entries are easy to omit from a design-centred checklist and expensive to miss.",
+   "<b>Gaps escalated too late.</b> An unsigned entry three days before the Go / No-Go is a decision the meeting cannot take."
   ],
   "roles": [
    {
@@ -30205,31 +30145,31 @@ export const activityDetails: Record<string, ActivityDetail> = {
   ],
   "criticalPath": false,
   "purpose": [
-   "Take every open issue the program is carrying—bugs, waivers, unclosed items—and turn it into an accepted risk with a name against it.",
-   "No large program tapes out with nothing open. The question is whether what remains was assessed and accepted, or simply ran out of time."
+   "Take every open issue the program is carrying—<b>bugs, waivers, unclosed items</b>—and turn it into an accepted risk with a name against it.",
+   "No large program tapes out with nothing open. The question is whether what remains was assessed and accepted, or simply ran out of time. This activity converts a list of loose ends into a set of decisions, each with an owner, a consequence and a mitigation."
   ],
   "steps": [
    {
     "n": 1,
-    "text": "Verify open item consolidation across design, and test",
+    "text": "Consolidate open items across design, verification and test",
     "tat": 0.5,
     "lane": "main"
    },
    {
     "n": 2,
-    "text": "Assess risk classification and consequence",
+    "text": "Classify each risk and assess its consequence",
     "tat": 0.75,
     "lane": "main"
    },
    {
     "n": 3,
-    "text": "Define and document mitigation options per item",
+    "text": "Identify mitigation options per item",
     "tat": 0.5,
     "lane": "par"
    },
    {
     "n": 4,
-    "text": "Assess risk acceptance and owner assignment",
+    "text": "Accept each risk and assign its owner",
     "tat": 0.75,
     "lane": "main"
    }
@@ -30258,20 +30198,20 @@ export const activityDetails: Record<string, ActivityDetail> = {
    {
     "id": "TO-D3",
     "rel": "produces",
-    "text": "Open issue and risk acceptance record. The deliverable named ownership is what distinguishes acceptance from omission."
+    "text": "<b>Open issue and risk acceptance record.</b> The risk acceptance record is produced here, and named ownership is what distinguishes acceptance from omission."
    },
    {
     "id": "TO-D4",
     "rel": "feeds",
-    "text": "Go / No-Go decision minutes. The decision is largely a decision about this list."
+    "text": "<b>Go / No-Go decision minutes.</b> The decision is largely a decision about this list: what the meeting accepts is the classified risks and mitigations assembled here."
    }
   ],
   "risks": [
-   "Items carried without assessment",
-   "Risk stated qualitatively",
-   "Mitigations not identified",
-   "Test and package items excluded",
-   "Acceptance without an owner"
+   "<b>Items carried without assessment.</b> An open issue nobody classified is a risk being accepted without anyone accepting it.",
+   "<b>Risk stated qualitatively.</b> \"Low risk\" gives the decision room nothing; a failure mode, a probability and an affected population gives it a decision.",
+   "<b>Mitigations not identified.</b> Many silicon risks can be screened at test or worked around in software, and the option is worth knowing before the gate.",
+   "<b>Test and package items excluded.</b> Risk consolidation that covers only design misses the categories that most often cause a late problem.",
+   "<b>Acceptance without an owner.</b> An accepted risk with no name against it has nobody watching for it at bring-up."
   ],
   "roles": [
    {
@@ -30367,25 +30307,25 @@ export const activityDetails: Record<string, ActivityDetail> = {
   ],
   "criticalPath": true,
   "purpose": [
-   "Hold the Go / No-Go decision—the moment the program commits several million dollars of masks and a quarter of schedule to the design as it stands.",
-   "Half a week of activity and one M/M, preceded by three weeks of preparation. That ratio is correct: a gate argued in the room rather than before it is a gate whose outcome depends on who attended."
+   "Hold the <b>Go / No-Go decision</b>—the moment the program commits several million dollars of masks and a quarter of schedule to the design as it stands.",
+   "Half a week of activity and one man-month, preceded by three weeks of preparation. That ratio is correct: a gate argued in the room rather than before it is a gate whose outcome depends on who attended. The meeting exists to take a decision, record its conditions and name who owns them."
   ],
   "steps": [
    {
     "n": 1,
-    "text": "Make and document the pack presentation — checklist, risks, readiness decision",
+    "text": "Present the decision pack — checklist, risks, readiness",
     "tat": 0.2,
     "lane": "main"
    },
    {
     "n": 2,
-    "text": "Make and document the , conditions and dissent capture decision",
+    "text": "Take the decision and capture conditions and dissent",
     "tat": 0.2,
     "lane": "main"
    },
    {
     "n": 3,
-    "text": "Define and document minutes, distribution and condition assignment",
+    "text": "Issue the minutes and assign the conditions",
     "tat": 0.1,
     "lane": "main"
    }
@@ -30414,20 +30354,20 @@ export const activityDetails: Record<string, ActivityDetail> = {
    {
     "id": "TO-D4",
     "rel": "produces",
-    "text": "Go / No-Go decision minutes. The deliverable the conditions attached are as important as the decision itself."
+    "text": "<b>Go / No-Go decision minutes.</b> The decision minutes are produced here, and the conditions attached are as important as the decision itself."
    },
    {
     "id": "TO-D5",
     "rel": "gates",
-    "text": "FEOL MTO release package. Mask data is not released before this decision, whatever the schedule pressure."
+    "text": "<b>FEOL MTO release package.</b> Mask data is not released before this decision, whatever the schedule pressure."
    }
   ],
   "risks": [
-   "Decision taken because the date arrived",
-   "Conditions accepted verbally",
-   "Wrong people in the room",
-   "Dissent unrecorded",
-   "Material presented for the first time in the room"
+   "<b>Decision taken because the date arrived.</b> A gate that cannot say no is not a gate, and the organization learns that quickly.",
+   "<b>Conditions accepted verbally.</b> A Go granted \"subject to\" something unrecorded is an unconditional Go.",
+   "<b>Wrong people in the room.</b> The decision needs someone who can say no and someone who owns the consequence, and both have to attend.",
+   "<b>Dissent unrecorded.</b> It is the cheapest insurance available and it is routinely omitted.",
+   "<b>Material presented for the first time in the room.</b> A pack circulated on the day produces a decision based on whoever speaks most confidently."
   ],
   "roles": [
    {
@@ -30521,25 +30461,25 @@ export const activityDetails: Record<string, ActivityDetail> = {
   ],
   "criticalPath": true,
   "purpose": [
-   "Prepare and release the front-end layer data to the mask shop—the first of the two mask tapeouts, and the one that starts the fab clock.",
+   "Prepare and release the <b>front-end layer data</b> to the mask shop—the first of the two mask tapeouts, and the one that starts the fab clock.",
    "FEOL goes first because it is the longest lead item and the least likely to change. Releasing it now starts mask writing while the back-end layers are still absorbing late fixes, which is the entire reason the two releases are separated."
   ],
   "steps": [
    {
     "n": 1,
-    "text": "Select fEOL layer and data preparation",
+    "text": "Select the FEOL layers and prepare the data",
     "tat": 0.5,
     "lane": "main"
    },
    {
     "n": 2,
-    "text": "Prepare mask data handoff — fracture, OPC scope",
+    "text": "Hand off mask data preparation — fracture, OPC scope",
     "tat": 0.5,
     "lane": "main"
    },
    {
     "n": 3,
-    "text": "Define and document submission to the foundry and acceptance confirmation",
+    "text": "Submit to the foundry and confirm acceptance",
     "tat": 0.5,
     "lane": "main"
    }
@@ -30566,20 +30506,20 @@ export const activityDetails: Record<string, ActivityDetail> = {
    {
     "id": "TO-D5",
     "rel": "produces",
-    "text": "FEOL MTO release package and mask order confirmation. The deliverable it is what starts the mask and fab clock."
+    "text": "<b>FEOL MTO release package and mask order confirmation.</b> The FEOL release package and submission record are produced here, and they are what start the mask and fab clock."
    },
    {
     "id": "TO-D1",
     "rel": "feeds",
-    "text": "Released GDSII / OASIS database. The FEOL release is a subset of it, and the two must be traceable to the same checksum."
+    "text": "<b>Released GDSII / OASIS database.</b> The FEOL release is a subset of it, and the two must be traceable to the same checksum."
    }
   ],
   "risks": [
-   "Layer split wrong",
-   "Released before the Go / No-Go",
-   "MDP requirements misunderstood",
-   "Submission not acknowledged",
-   "Traceability lost between database and submission"
+   "<b>Layer split wrong.</b> A layer released as FEOL that later needs a fix cannot use the BEOL window, and the fix costs a new mask.",
+   "<b>Released before the Go / No-Go.</b> Schedule pressure makes this tempting and it removes the gate's authority entirely.",
+   "<b>MDP requirements misunderstood.</b> Fracture and OPC expectations differ per foundry, and a non-compliant submission is rejected.",
+   "<b>Submission not acknowledged.</b> A release nobody confirmed received is a release that may not have started the clock.",
+   "<b>Traceability lost between database and submission.</b> The submitted layers have to be provably from the checksummed database."
   ],
   "roles": [
    {
@@ -30679,25 +30619,25 @@ export const activityDetails: Record<string, ActivityDetail> = {
   ],
   "criticalPath": false,
   "purpose": [
-   "Confirm the FEOL mask order and get a mask shop schedule the program can plan wafer start against.",
-   "One M/M of administration that fixes a date the whole downstream schedule hangs on. Mask writing takes weeks, and knowing when the FEOL set will be ready is what tells <code>FAB-02</code> when wafers can start."
+   "Confirm the <b>FEOL mask order</b> and get a mask shop schedule the program can plan wafer start against.",
+   "One man-month of administration that fixes a date the whole downstream schedule hangs on. Mask writing takes weeks, and knowing when the FEOL set will be ready is what tells <code>FAB-02</code> when wafers can start."
   ],
   "steps": [
    {
     "n": 1,
-    "text": "Prepare mask order confirmation and purchase authorization",
+    "text": "Confirm the mask order and purchase authorization",
     "tat": 0.4,
     "lane": "main"
    },
    {
     "n": 2,
-    "text": "Prepare mask shop schedule confirmation",
+    "text": "Confirm the mask shop schedule",
     "tat": 0.3,
     "lane": "main"
    },
    {
     "n": 3,
-    "text": "Define and document delivery date communication to the program",
+    "text": "Communicate the delivery date to the program",
     "tat": 0.3,
     "lane": "main"
    }
@@ -30724,20 +30664,20 @@ export const activityDetails: Record<string, ActivityDetail> = {
    {
     "id": "TO-D5",
     "rel": "feeds",
-    "text": "FEOL MTO release package and mask order confirmation. The order confirmation half of the release record."
+    "text": "<b>FEOL MTO release package and mask order confirmation.</b> The order confirmation half of the release record—the confirmed order, schedule and delivery date that make the FEOL release actionable."
    },
    {
     "id": "TO-D8",
     "rel": "feeds",
-    "text": "Full mask set completion record. FEOL completion is the first half of the set."
+    "text": "<b>Full mask set completion record.</b> FEOL completion is the first half of the set; the completion date confirmed here is what wafer start is planned against."
    }
   ],
   "risks": [
-   "Order placed without confirmed pricing",
-   "Mask shop schedule assumed",
-   "Completion date not communicated",
-   "No escalation path",
-   "Order and submission mismatched"
+   "<b>Order placed without confirmed pricing.</b> Mask cost is a large line item and an unconfirmed order produces an invoice nobody budgeted.",
+   "<b>Mask shop schedule assumed.</b> Mask writing capacity is shared, and the completion date is the shop's to give rather than the program's to assume.",
+   "<b>Completion date not communicated.</b> Wafer start planning depends on it, and a date held by one person is a date the program does not have.",
+   "<b>No escalation path.</b> Mask shop delays happen, and knowing who to call is worth arranging before it is needed.",
+   "<b>Order and submission mismatched.</b> The order has to name the exact layer set that was submitted."
   ],
   "roles": [
    {
@@ -30829,43 +30769,43 @@ export const activityDetails: Record<string, ActivityDetail> = {
   ],
   "criticalPath": true,
   "purpose": [
-   "Use the four weeks between the two mask releases to make metal-layer fixes—the last window in which a design change is possible without a new front-end mask set.",
-   "This window is the reason the releases are split. FEOL masks are being cut and cannot change; BEOL is still open, and any fix implementable in metal can still be made."
+   "Use the <b>four weeks between the two mask releases</b> to make metal-layer fixes—the last window in which a design change is possible without a new front-end mask set.",
+   "This window is the reason the releases are split. FEOL masks are being cut and cannot change; BEOL is still open, and any fix implementable in metal can still be made. It is a genuine and finite opportunity, and it closes on a date."
   ],
   "steps": [
    {
     "n": 1,
-    "text": "Define and document fix window scope and admission rules",
+    "text": "Set the fix window scope and admission rules",
     "tat": 0.5,
     "lane": "main"
    },
    {
     "n": 2,
-    "text": "Implement metal-layer ECO",
+    "text": "Implement the metal-layer ECOs",
     "tat": 1.5,
     "lane": "main"
    },
    {
     "n": 3,
-    "text": "Assess fix prioritization and risk",
+    "text": "Prioritize the fixes and assess their risk",
     "tat": 1,
     "lane": "par"
    },
    {
     "n": 4,
-    "text": "Verify eCO per fix",
+    "text": "Verify each ECO",
     "tat": 1,
     "lane": "main"
    },
    {
     "n": 5,
-    "text": "Define and document equivalence and consistency check per fix",
+    "text": "Run equivalence and consistency checks per fix",
     "tat": 1,
     "lane": "par"
    },
    {
     "n": 6,
-    "text": "Define and document window close and BEOL database freeze",
+    "text": "Close the window and freeze the BEOL database",
     "tat": 1,
     "lane": "main"
    }
@@ -30898,20 +30838,20 @@ export const activityDetails: Record<string, ActivityDetail> = {
    {
     "id": "TO-D6",
     "rel": "produces",
-    "text": "BEOL ECO log covering the fix window. The deliverable the log is what makes the BEOL database traceable."
+    "text": "<b>BEOL ECO log covering the fix window.</b> The ECO log covering the window is produced here, and the log is what makes the BEOL database traceable."
    },
    {
     "id": "TO-D7",
     "rel": "feeds",
-    "text": "BEOL MTO release package. The database released to BEOL is the FEOL database plus this window's fixes."
+    "text": "<b>BEOL MTO release package.</b> The database released to BEOL is the FEOL database plus this window's fixes."
    }
   ],
   "risks": [
-   "Window used as general contingency",
-   "Fix requiring base layers",
-   "Verification per fix but not in combination",
-   "Window extended",
-   "Equivalence skipped for speed"
+   "<b>Window used as general contingency.</b> Fixes admitted without rules accumulate into a database that differs from the verified one in ways nobody assessed as a whole.",
+   "<b>Fix requiring base layers.</b> If <code>PD-14</code>'s spare cell strategy was not put in place, the fix cannot be made in metal and the window is useless.",
+   "<b>Verification per fix but not in combination.</b> Individually correct changes can interact, and the combined database needs a check of its own.",
+   "<b>Window extended.</b> BEOL mask release has a date; extending the window pushes the whole mask set and with it wafer start.",
+   "<b>Equivalence skipped for speed.</b> A metal ECO can change function, and the only detector is an equivalence run."
   ],
   "roles": [
    {
@@ -31015,31 +30955,31 @@ export const activityDetails: Record<string, ActivityDetail> = {
   ],
   "criticalPath": true,
   "purpose": [
-   "Re-verify the metal stack after the fix window—DRC, LVS, antenna, density on the changed layers—before the back-end data is released.",
-   "The BEOL database is not the one that was signed off. It carries the fix window's changes, and every one of them touched routing."
+   "Re-verify the <b>metal stack after the fix window</b>—DRC, LVS, antenna, density on the changed layers—before the back-end data is released.",
+   "The BEOL database is not the one that was signed off. It carries the fix window's changes, and every one of them touched routing. This re-verification is what makes the BEOL release as trustworthy as the FEOL one, and it has to fit inside the window's tail."
   ],
   "steps": [
    {
     "n": 1,
-    "text": "Verify re- scope on the changed layers",
+    "text": "Decide the re-verification scope from what the fixes touched",
     "tat": 0.5,
     "lane": "main"
    },
    {
     "n": 2,
-    "text": "Verify dRC and antenna on the metal stack",
+    "text": "Verify DRC and antenna on the metal stack",
     "tat": 1,
     "lane": "main"
    },
    {
     "n": 3,
-    "text": "Define and document timing impact confirmation for the applied fixes",
+    "text": "Confirm the timing impact of the applied fixes",
     "tat": 0.75,
     "lane": "par"
    },
    {
     "n": 4,
-    "text": "Define and document lVS and density re-check",
+    "text": "Re-check LVS and density",
     "tat": 1,
     "lane": "main"
    }
@@ -31068,20 +31008,20 @@ export const activityDetails: Record<string, ActivityDetail> = {
    {
     "id": "TO-D7",
     "rel": "feeds",
-    "text": "BEOL MTO release package. The release is only defensible if the changed layers were re-verified."
+    "text": "<b>BEOL MTO release package.</b> The release is only defensible if the changed layers were re-verified."
    },
    {
     "id": "TO-D6",
     "rel": "feeds",
-    "text": "BEOL ECO log. The log and the re-verification results are read together—what changed, and what was checked afterwards."
+    "text": "<b>BEOL ECO log.</b> The log and the re-verification results are read together—what changed, and what was checked afterwards."
    }
   ],
   "risks": [
-   "Scope too narrow",
-   "Timing not re-confirmed",
-   "Re-verification not fitting the window",
-   "LVS skipped because the change was metal-only",
-   "Results arriving after the release"
+   "<b>Scope too narrow.</b> A targeted re-run that misses an interaction between two fixes releases a violation into the mask set.",
+   "<b>Timing not re-confirmed.</b> Metal ECOs change delay, and a fix that breaks timing has replaced one problem with another.",
+   "<b>Re-verification not fitting the window.</b> Full-chip runs take days, and a window planned without them cannot accommodate them.",
+   "<b>LVS skipped because the change was metal-only.</b> Metal changes connectivity, which is exactly what LVS checks.",
+   "<b>Results arriving after the release.</b> Verifying after submission is verifying something already committed to masks."
   ],
   "roles": [
    {
@@ -31178,25 +31118,25 @@ export const activityDetails: Record<string, ActivityDetail> = {
   ],
   "criticalPath": true,
   "purpose": [
-   "Prepare and release the back-end layer data—the second mask tapeout, and the moment the design is fully committed to silicon.",
+   "Prepare and release the <b>back-end layer data</b>—the second mask tapeout, and the moment the design is fully committed to silicon.",
    "BEOL release is the real tapeout. After it nothing about the design can change without a new mask set, and the milestone the program has been working toward for eighty weeks is this submission being accepted."
   ],
   "steps": [
    {
     "n": 1,
-    "text": "Prepare bEOL layer data from the re-verified database",
+    "text": "Prepare the BEOL layer data from the re-verified database",
     "tat": 0.5,
     "lane": "main"
    },
    {
     "n": 2,
-    "text": "Prepare mask data handoff",
+    "text": "Hand off mask data preparation",
     "tat": 0.5,
     "lane": "main"
    },
    {
     "n": 3,
-    "text": "Define and document submission to the foundry and acceptance confirmation",
+    "text": "Submit to the foundry and confirm acceptance",
     "tat": 0.5,
     "lane": "main"
    }
@@ -31223,20 +31163,20 @@ export const activityDetails: Record<string, ActivityDetail> = {
    {
     "id": "TO-D7",
     "rel": "produces",
-    "text": "BEOL MTO release package and mask order confirmation. The deliverable the milestone the stage carries—Tapeout."
+    "text": "<b>BEOL MTO release package and mask order confirmation.</b> The BEOL release package is produced here, and it carries the milestone the stage exists for—Tapeout."
    },
    {
     "id": "TO-D6",
     "rel": "feeds",
-    "text": "BEOL ECO log. The released database is the FEOL one plus the logged fixes, and the two travel together."
+    "text": "<b>BEOL ECO log.</b> The released database is the FEOL one plus the logged fixes, and the two travel together."
    }
   ],
   "risks": [
-   "Layer set not complementary to FEOL",
-   "Released before re-verification completes",
-   "Submission rejected on format",
-   "No acceptance confirmation",
-   "Traceability broken"
+   "<b>Layer set not complementary to FEOL.</b> A layer released twice or omitted produces an incomplete or contradictory mask set.",
+   "<b>Released before re-verification completes.</b> The fix window's changes are then committed unchecked.",
+   "<b>Submission rejected on format.</b> BEOL layers have their own OPC and fracture requirements, and a rejection costs days against a running FEOL clock.",
+   "<b>No acceptance confirmation.</b> An unconfirmed release may not have started the second mask clock.",
+   "<b>Traceability broken.</b> The BEOL database differs from the checksummed original, and the difference has to be exactly the ECO log."
   ],
   "roles": [
    {
@@ -31330,25 +31270,25 @@ export const activityDetails: Record<string, ActivityDetail> = {
   ],
   "criticalPath": false,
   "purpose": [
-   "Confirm the BEOL order and track the mask set to completion, so that <code>FAB-05</code> knows when back-end layers will be available and the line does not stall mid-lot.",
-   "The BEOL masks are needed several weeks into wafer processing, not at wafer start. Tracking them to completion is what confirms that the parallel schedule the FEOL/BEOL split assumed holds."
+   "Confirm the <b>BEOL order and track the mask set to completion</b>, so that <code>FAB-05</code> knows when back-end layers will be available and the line does not stall mid-lot.",
+   "The BEOL masks are needed several weeks into wafer processing, not at wafer start. Tracking them to completion is what confirms that the parallel schedule the FEOL/BEOL split assumed actually holds."
   ],
   "steps": [
    {
     "n": 1,
-    "text": "Define and document bEOL mask order confirmation",
+    "text": "Confirm the BEOL mask order",
     "tat": 0.4,
     "lane": "main"
    },
    {
     "n": 2,
-    "text": "Track full mask set completion",
+    "text": "Track the full mask set to completion",
     "tat": 0.3,
     "lane": "main"
    },
    {
     "n": 3,
-    "text": "Prepare mask availability communication to fabrication",
+    "text": "Communicate mask availability to fabrication",
     "tat": 0.3,
     "lane": "main"
    }
@@ -31375,20 +31315,20 @@ export const activityDetails: Record<string, ActivityDetail> = {
    {
     "id": "TO-D8",
     "rel": "produces",
-    "text": "Full mask set completion record. The deliverable it is what confirms the split schedule held."
+    "text": "<b>Full mask set completion record.</b> The completion record is produced here, and it is what confirms the split schedule held."
    },
    {
     "id": "TO-D7",
     "rel": "feeds",
-    "text": "BEOL MTO release package and mask order confirmation. The order half of the BEOL release record."
+    "text": "<b>BEOL MTO release package and mask order confirmation.</b> The order half of the BEOL release record—the confirmed order against the exact submitted layer set."
    }
   ],
   "risks": [
-   "BEOL masks late against the wafer schedule",
-   "Completion tracked per layer rather than per set",
-   "Availability not communicated to fabrication",
-   "Order mismatched to submission",
-   "No contingency for a mask defect"
+   "<b>BEOL masks late against the wafer schedule.</b> Wafers reach the metallization steps and stop, which is worse than starting late.",
+   "<b>Completion tracked per layer rather than per set.</b> The set is usable when the last layer is done, and per-layer optimism hides that.",
+   "<b>Availability not communicated to fabrication.</b> The line plans against the date, and a date nobody passed on is a date the line does not have.",
+   "<b>Order mismatched to submission.</b> The order has to name exactly the layers submitted, and BEOL sets are large.",
+   "<b>No contingency for a mask defect.</b> Masks fail inspection sometimes, and a remake takes weeks."
   ],
   "roles": [
    {
@@ -31478,43 +31418,43 @@ export const activityDetails: Record<string, ActivityDetail> = {
   ],
   "criticalPath": true,
   "purpose": [
-   "Get the front-end mask set written, inspected and qualified—seven weeks of the mask shop's calendar that the program can watch but not accelerate.",
+   "Get the <b>front-end mask set written, inspected and qualified</b>—seven weeks of the mask shop's calendar that the program can watch but not accelerate.",
    "EUV mask sets at this node are slow and expensive to produce, and a single mask failing inspection means a remake measured in weeks. The program's role is oversight rather than execution: confirm the data was accepted, review inspection results and escalate when a layer slips."
   ],
   "steps": [
    {
     "n": 1,
-    "text": "Prepare mask data acceptance and mask data",
+    "text": "Confirm mask data acceptance and mask data preparation",
     "tat": 1,
     "lane": "main"
    },
    {
     "n": 2,
-    "text": "Define and document fEOL mask writing",
+    "text": "Track FEOL mask writing",
     "tat": 3,
     "lane": "main"
    },
    {
     "n": 3,
-    "text": "Prepare pellicle and handling",
+    "text": "Prepare pellicles and handling",
     "tat": 1.5,
     "lane": "par"
    },
    {
     "n": 4,
-    "text": "Prepare mask inspection and defect repair",
+    "text": "Review mask inspection and defect repair results",
     "tat": 2,
     "lane": "main"
    },
    {
     "n": 5,
-    "text": "Prepare mask defect disposition and remake decisions",
+    "text": "Disposition mask defects and take remake decisions",
     "tat": 1,
     "lane": "par"
    },
    {
     "n": 6,
-    "text": "Qualify mask and release to the line",
+    "text": "Qualify the mask set and release it to the line",
     "tat": 1,
     "lane": "main"
    }
@@ -31547,20 +31487,20 @@ export const activityDetails: Record<string, ActivityDetail> = {
    {
     "id": "FAB-D1",
     "rel": "produces",
-    "text": "FEOL and BEOL mask sets with qualification reports. The front-end half of the deliverable."
+    "text": "<b>FEOL and BEOL mask sets with qualification reports.</b> The front-end half of the deliverable: the written, inspected and qualified FEOL mask set with its inspection and disposition record."
    },
    {
     "id": "FAB-D5",
     "rel": "feeds",
-    "text": "Wafer-out forecast versus actual log. Mask completion is the first date the wafer-out forecast is built on."
+    "text": "<b>Wafer-out forecast versus actual log.</b> Mask completion is the first date the wafer-out forecast is built on."
    }
   ],
   "risks": [
-   "Mask defect requiring a remake",
-   "Inspection criteria not understood",
-   "Critical layers not prioritized",
-   "Data preparation rejected late",
-   "No visibility into progress"
+   "<b>Mask defect requiring a remake.</b> Weeks of schedule, and the program has no way to accelerate the replacement.",
+   "<b>Inspection criteria not understood.</b> Whether a defect is printing depends on layer and position, and the disposition needs design input the foundry does not have.",
+   "<b>Critical layers not prioritized.</b> Mask shops write in a sequence, and the layers on the critical path can sometimes be pulled forward if anyone asks.",
+   "<b>Data preparation rejected late.</b> MDP problems surface days after submission and consume the schedule silently.",
+   "<b>No visibility into progress.</b> A seven-week activity with no status reporting means the first news is either completion or a delay."
   ],
   "roles": [
    {
@@ -31656,25 +31596,25 @@ export const activityDetails: Record<string, ActivityDetail> = {
   ],
   "criticalPath": true,
   "purpose": [
-   "Start wafers the moment the front-end masks are qualified—lot definition, starting material, split strategy—because every day of delay here is a day at the far end of the program.",
+   "Start wafers <b>the moment the front-end masks are qualified</b>—lot definition, starting material, split strategy—because every day of delay here is a day at the far end of the program.",
    "A single week of activity that gates the remaining eleven. The decisions it carries are small and consequential: how many wafers, what splits, which lots are hot, and whether any material is held back for a second attempt."
   ],
   "steps": [
    {
     "n": 1,
-    "text": "Define wafer start authorization and lot",
+    "text": "Authorize wafer start and define the lots",
     "tat": 0.4,
     "lane": "main"
    },
    {
     "n": 2,
-    "text": "Make and document the starting material and lot split decision",
+    "text": "Decide the starting material and lot split strategy",
     "tat": 0.3,
     "lane": "main"
    },
    {
     "n": 3,
-    "text": "Define and document start confirmation and schedule communication",
+    "text": "Confirm the start and communicate the schedule",
     "tat": 0.3,
     "lane": "main"
    }
@@ -31701,20 +31641,20 @@ export const activityDetails: Record<string, ActivityDetail> = {
    {
     "id": "FAB-D2",
     "rel": "feeds",
-    "text": "Processed engineering-lot wafers. The lot definition here determines what comes out at the end."
+    "text": "<b>Processed engineering-lot wafers.</b> The lot definition here determines what comes out at the end."
    },
    {
     "id": "FAB-D5",
     "rel": "feeds",
-    "text": "Wafer-out forecast versus actual log. Wafer start is the point from which the forecast is measured."
+    "text": "<b>Wafer-out forecast versus actual log.</b> Wafer start is the point from which the forecast is measured."
    }
   ],
   "risks": [
-   "Start delayed after masks are ready",
-   "Wafer quantity too small",
-   "No process splits",
-   "Hot-lot status not invoked",
-   "Starting material not specified"
+   "<b>Start delayed after masks are ready.</b> Every day is a day at the far end of a schedule with no recovery mechanism.",
+   "<b>Wafer quantity too small.</b> Bring-up, characterization, qualification and customer samples all draw from this lot, and running short means a second lot and a quarter.",
+   "<b>No process splits.</b> A single condition gives one data point; splits reveal process sensitivity while there is still time to act on it.",
+   "<b>Hot-lot status not invoked.</b> The priority negotiated in <code>TECH-05</code> has to be requested at start, not assumed.",
+   "<b>Starting material not specified.</b> Substrate type and specification affect device behavior, and defaulting is how an unexpected variable enters."
   ],
   "roles": [
    {
@@ -31803,37 +31743,37 @@ export const activityDetails: Record<string, ActivityDetail> = {
   ],
   "criticalPath": false,
   "purpose": [
-   "Write and qualify the back-end mask set while front-end processing runs—the parallelism the FEOL/BEOL split was designed to create.",
+   "Write and qualify the <b>back-end mask set while front-end processing runs</b>—the parallelism the FEOL/BEOL split was designed to create.",
    "This activity is the payoff of the two-stage release. BEOL masks are written during the weeks the wafers spend in front-end processing, so the fix window cost the program nothing in schedule as long as these masks are ready when the lots reach metallization."
   ],
   "steps": [
    {
     "n": 1,
-    "text": "Prepare bEOL mask data acceptance and",
+    "text": "Confirm BEOL mask data acceptance and preparation",
     "tat": 0.5,
     "lane": "main"
    },
    {
     "n": 2,
-    "text": "Define and document bEOL mask writing",
+    "text": "Track BEOL mask writing",
     "tat": 2.5,
     "lane": "main"
    },
    {
     "n": 3,
-    "text": "Define and document defect disposition on inspected layers",
+    "text": "Disposition defects on the inspected layers",
     "tat": 1.5,
     "lane": "par"
    },
    {
     "n": 4,
-    "text": "Qualify inspection and",
+    "text": "Track inspection and qualification",
     "tat": 2,
     "lane": "main"
    },
    {
     "n": 5,
-    "text": "Release to the line ahead of metallization",
+    "text": "Release the masks to the line ahead of metallization",
     "tat": 1,
     "lane": "main"
    }
@@ -31849,7 +31789,7 @@ export const activityDetails: Record<string, ActivityDetail> = {
   "produces": [
    "BEOL mask data acceptance",
    "Written BEOL mask set",
-   "Qualified BEOL masks released to the line",
+   "Qualified BEOL mask set",
    "Inspection and defect disposition results",
    "BEOL mask inspection and qualification results",
    "BEOL masks released to the line"
@@ -31857,7 +31797,7 @@ export const activityDetails: Record<string, ActivityDetail> = {
   "producedBy": [
    1,
    2,
-   2,
+   4,
    3,
    4,
    5
@@ -31866,20 +31806,20 @@ export const activityDetails: Record<string, ActivityDetail> = {
    {
     "id": "FAB-D1",
     "rel": "produces",
-    "text": "FEOL and BEOL mask sets with qualification reports. The back-end half of the deliverable."
+    "text": "<b>FEOL and BEOL mask sets with qualification reports.</b> The back-end half of the deliverable: the BEOL mask set qualified and released to the line ahead of metallization."
    },
    {
     "id": "FAB-D5",
     "rel": "feeds",
-    "text": "Wafer-out forecast versus actual log. A BEOL mask delay stops lots mid-process, which the forecast has to reflect."
+    "text": "<b>Wafer-out forecast versus actual log.</b> A BEOL mask delay stops lots mid-process, which the forecast has to reflect."
    }
   ],
   "risks": [
-   "Masks late against metallization",
-   "Parallelism not validated against tracked",
-   "Defect disposition slower on BEOL layers",
-   "Metallization start estimate stale",
-   "No priority on the first metal layers"
+   "<b>Masks late against metallization.</b> Lots stop mid-process, which wastes fab capacity and is harder to recover from than a late start.",
+   "<b>Parallelism assumed rather than tracked.</b> The split only pays off if the BEOL schedule is actively compared against the front-end progress.",
+   "<b>Defect disposition slower on BEOL layers.</b> There are more of them, and a per-layer process that worked for FEOL can bottleneck here.",
+   "<b>Metallization start estimate stale.</b> The masks are needed against a moving date, and planning against the original estimate is planning against fiction.",
+   "<b>No priority on the first metal layers.</b> They are needed first and can often be written first if anyone asks."
   ],
   "roles": [
    {
@@ -31973,43 +31913,43 @@ export const activityDetails: Record<string, ActivityDetail> = {
   ],
   "criticalPath": true,
   "purpose": [
-   "Watch the wafers through front-end processing—transistor formation, contacts, local interconnect—and respond when the line reports something unexpected.",
+   "Watch the wafers through <b>front-end processing</b>—transistor formation, contacts, local interconnect—and respond when the line reports something unexpected.",
    "Eight weeks in which the program does almost nothing and cannot afford to do nothing. The lots are the foundry's to run; what belongs to the program is understanding the inline data, recognizing an excursion early and deciding what to do about it."
   ],
   "steps": [
    {
     "n": 1,
-    "text": "Release lot and front-end entry confirmation",
+    "text": "Confirm lot release and front-end entry",
     "tat": 1,
     "lane": "main"
    },
    {
     "n": 2,
-    "text": "Define and document transistor formation processing",
+    "text": "Track the wafers through transistor formation",
     "tat": 3,
     "lane": "main"
    },
    {
     "n": 3,
-    "text": "Monitor inline at front-end critical steps",
+    "text": "Monitor inline data at the front-end critical steps",
     "tat": 2,
     "lane": "par"
    },
    {
     "n": 4,
-    "text": "Define and document contact and local interconnect processing",
+    "text": "Track the wafers through contact and local interconnect",
     "tat": 3,
     "lane": "main"
    },
    {
     "n": 5,
-    "text": "Define and document excursion response and disposition",
+    "text": "Respond to excursions and disposition the lots",
     "tat": 1.5,
     "lane": "par"
    },
    {
     "n": 6,
-    "text": "Hand off front-end exit and to back end",
+    "text": "Confirm front-end exit and hand off to the back end",
     "tat": 1,
     "lane": "main"
    }
@@ -32028,7 +31968,7 @@ export const activityDetails: Record<string, ActivityDetail> = {
    "Inline monitoring findings at critical steps",
    "Wafers through contact and local interconnect",
    "Excursion responses and lot dispositions",
-   "Front-end processing progress",
+   "Front-end-complete wafers",
    "Front-end exit confirmation"
   ],
   "producedBy": [
@@ -32044,20 +31984,20 @@ export const activityDetails: Record<string, ActivityDetail> = {
    {
     "id": "FAB-D2",
     "rel": "feeds",
-    "text": "Processed engineering-lot wafers. Front-end processing is where the transistors are actually made."
+    "text": "<b>Processed engineering-lot wafers.</b> Front-end processing is where the transistors are actually made."
    },
    {
     "id": "FAB-D3",
     "rel": "feeds",
-    "text": "Inline, PCM and WAT data package. Front-end inline data is the earliest indication of how the lot is running."
+    "text": "<b>Inline, PCM and WAT data package.</b> Front-end inline data is the earliest indication of how the lot is running."
    }
   ],
   "risks": [
-   "Excursion response improvised",
-   "Inline data not reviewed by the program",
-   "Hot-lot priority lost mid-flow",
-   "Scrap decision taken too late",
-   "No second lot in reserve"
+   "<b>Excursion response improvised.</b> Without a framework the decision defaults to whatever is least disruptive rather than what is best for the lot.",
+   "<b>Inline data not reviewed by the program.</b> The foundry monitors its process; only the design team can say whether a deviation matters for this device.",
+   "<b>Hot-lot priority lost mid-flow.</b> Priority granted at start can quietly lapse, and nobody notices until the cycle time slips.",
+   "<b>Scrap decision taken too late.</b> A lot continuing through eight weeks of processing after a fatal excursion wastes capacity that a second lot needed.",
+   "<b>No second lot in reserve.</b> If the first lot is lost, having no material started means restarting the whole cycle."
   ],
   "roles": [
    {
@@ -32154,37 +32094,37 @@ export const activityDetails: Record<string, ActivityDetail> = {
   ],
   "criticalPath": true,
   "purpose": [
-   "Complete the wafers through back-end-of-line processing—metallization, vias, top metal, passivation—and finish the lot.",
+   "Complete the wafers through <b>back-end-of-line processing</b>—metallization, vias, top metal, passivation—and finish the lot.",
    "The back end is where the design's routing becomes physical. It is also where the BEOL masks are consumed, which makes it the point at which the FEOL/BEOL split either paid off invisibly or produces a stall that everyone notices."
   ],
   "steps": [
    {
     "n": 1,
-    "text": "Define and document back-end entry and mask availability confirmation",
+    "text": "Confirm back-end entry and BEOL mask availability",
     "tat": 0.5,
     "lane": "main"
    },
    {
     "n": 2,
-    "text": "Define and document metallization and via formation",
+    "text": "Track the wafers through metallization and via formation",
     "tat": 2,
     "lane": "main"
    },
    {
     "n": 3,
-    "text": "Monitor back-end inline",
+    "text": "Monitor back-end inline data",
     "tat": 1.5,
     "lane": "par"
    },
    {
     "n": 4,
-    "text": "Define and document top metal and passivation",
+    "text": "Track the wafers through top metal and passivation",
     "tat": 1.5,
     "lane": "main"
    },
    {
     "n": 5,
-    "text": "Process wafer completion and exit",
+    "text": "Confirm wafer completion and lot exit",
     "tat": 1,
     "lane": "main"
    }
@@ -32202,8 +32142,8 @@ export const activityDetails: Record<string, ActivityDetail> = {
    "Wafers through metallization and via formation",
    "Back-end inline monitoring findings",
    "Wafers through top metal and passivation",
-   "Metallized and via-formed wafers",
-   "Completed wafers with passivation",
+   "Completed engineering-lot wafers",
+   "Wafer count confirmation against the downstream requirement",
    "Lot exit confirmation"
   ],
   "producedBy": [
@@ -32219,20 +32159,20 @@ export const activityDetails: Record<string, ActivityDetail> = {
    {
     "id": "FAB-D2",
     "rel": "produces",
-    "text": "Processed engineering-lot wafers. This activity is where the wafers are finished—the deliverable the whole stage exists to produce."
+    "text": "<b>Processed engineering-lot wafers.</b> The wafers are finished here—the deliverable the whole stage exists to produce."
    },
    {
     "id": "FAB-D3",
     "rel": "feeds",
-    "text": "Inline, PCM and WAT data package. Back-end inline data completes the process record for the lot."
+    "text": "<b>Inline, PCM and WAT data package.</b> Back-end inline data completes the process record for the lot."
    }
   ],
   "risks": [
-   "BEOL masks not ready at back-end entry",
-   "Metallization defects detected late",
-   "Passivation and top metal treated as routine",
-   "Lot completion not confirmed against quantity",
-   "Process changes between split lots not tracked"
+   "<b>BEOL masks not ready at back-end entry.</b> Lots stall mid-process, consuming fab capacity and adding cycle time nobody planned.",
+   "<b>Metallization defects detected late.</b> Back-end defects affect yield directly, and inline detection is what allows a response.",
+   "<b>Passivation and top metal treated as routine.</b> They affect bump attachment and package assembly, and problems here surface at <code>ASSY-03</code>.",
+   "<b>Lot completion not confirmed against quantity.</b> Wafers lost during processing reduce the number available downstream, and the count has to be checked rather than assumed.",
+   "<b>Process changes between split lots not tracked.</b> If splits were run, which wafer had which condition has to be traceable to the end."
   ],
   "roles": [
    {
@@ -32330,43 +32270,43 @@ export const activityDetails: Record<string, ActivityDetail> = {
   ],
   "criticalPath": false,
   "purpose": [
-   "Watch the inline metrology and defect inspection data across the whole run, so an excursion is caught while the lot can still be saved rather than at final test.",
+   "Watch the <b>inline metrology and defect inspection data</b> across the whole run, so an excursion is caught while the lot can still be saved rather than at final test.",
    "The foundry monitors its process against its own control limits; the program needs to know whether a deviation matters for this device. A defect density excursion on a layer the design uses heavily is a different event from one on a layer it barely touches, and only the design team can tell the difference."
   ],
   "steps": [
    {
     "n": 1,
-    "text": "Select monitoring plan and critical step",
+    "text": "Build the monitoring plan and select the critical steps",
     "tat": 1,
     "lane": "main"
    },
    {
     "n": 2,
-    "text": "Review inline metrology data",
+    "text": "Review the inline metrology data",
     "tat": 2,
     "lane": "main"
    },
    {
     "n": 3,
-    "text": "Define and document excursion detection and escalation",
+    "text": "Detect excursions and escalate them",
     "tat": 2,
     "lane": "par"
    },
    {
     "n": 4,
-    "text": "Review defect inspection and classification",
+    "text": "Review and classify the defect inspection results",
     "tat": 2,
     "lane": "main"
    },
    {
     "n": 5,
-    "text": "Define and document defect Pareto and source attribution",
+    "text": "Build the defect Pareto and attribute sources",
     "tat": 2,
     "lane": "par"
    },
    {
     "n": 6,
-    "text": "Continuously monitoring across the lot",
+    "text": "Monitor continuously across the lot",
     "tat": 9,
     "lane": "main"
    }
@@ -32384,7 +32324,7 @@ export const activityDetails: Record<string, ActivityDetail> = {
    "Inline metrology review findings",
    "Excursion detections and escalations",
    "Reviewed and classified defect inspection results",
-   "Defect classification and Pareto",
+   "Defect Pareto",
    "Source attribution findings",
    "Inline monitoring log across the lot"
   ],
@@ -32401,20 +32341,20 @@ export const activityDetails: Record<string, ActivityDetail> = {
    {
     "id": "FAB-D3",
     "rel": "produces",
-    "text": "Inline, PCM and WAT data package. The inline half of the deliverable, and the earliest signal the program gets."
+    "text": "<b>Inline, PCM and WAT data package.</b> The inline half of the deliverable, and the earliest signal the program gets."
    },
    {
     "id": "FAB-D4",
     "rel": "feeds",
-    "text": "Wafer acceptance disposition record. Inline findings inform the acceptance decision rather than being separate from it."
+    "text": "<b>Wafer acceptance disposition record.</b> Inline findings inform the acceptance decision rather than being separate from it."
    }
   ],
   "risks": [
-   "Monitoring every step equally",
-   "Data reviewed only by the foundry",
-   "Excursions detected after the affected step",
-   "Defects classified but not attributed",
-   "Monitoring stopping at front-end exit"
+   "<b>Monitoring every step equally.</b> Attention spread evenly finds nothing; the design's sensitivities decide where to look.",
+   "<b>Data reviewed only by the foundry.</b> Process control answers whether the line is in control, not whether this device is affected.",
+   "<b>Excursions detected after the affected step.</b> Once the lot has moved on, the response options narrow sharply.",
+   "<b>Defects classified but not attributed.</b> Knowing the count without the source gives no basis for a corrective action.",
+   "<b>Monitoring stopping at front-end exit.</b> Back-end defects affect yield as much and are often less well monitored."
   ],
   "roles": [
    {
@@ -32516,19 +32456,19 @@ export const activityDetails: Record<string, ActivityDetail> = {
   ],
   "criticalPath": false,
   "purpose": [
-   "Read the e-test and PCM data—device parameters measured on structures in the scribe line—and compare them against what the models predicted.",
+   "Read the <b>e-test and PCM data</b>—device parameters measured on structures in the scribe line—and compare them against what the models predicted.",
    "PCM data arrives before packaged parts and answers process questions weeks earlier than the lab can. Threshold voltages, resistances, capacitances and ring oscillator frequencies measured on real silicon are the first hard evidence of whether the design's assumptions about the process were right."
   ],
   "steps": [
    {
     "n": 1,
-    "text": "Define and document pCM structure and parameter list confirmation",
+    "text": "Confirm the PCM structure and parameter list",
     "tat": 0.5,
     "lane": "main"
    },
    {
     "n": 2,
-    "text": "Review e-test data collection and",
+    "text": "Collect and review the e-test data",
     "tat": 1,
     "lane": "main"
    },
@@ -32540,7 +32480,7 @@ export const activityDetails: Record<string, ActivityDetail> = {
    },
    {
     "n": 4,
-    "text": "Compare parameter against target and model",
+    "text": "Compare the parameters against target and model",
     "tat": 1.5,
     "lane": "main"
    }
@@ -32569,20 +32509,20 @@ export const activityDetails: Record<string, ActivityDetail> = {
    {
     "id": "FAB-D3",
     "rel": "produces",
-    "text": "Inline, PCM and WAT data package. The PCM half of the deliverable, and the earliest device-level data available."
+    "text": "<b>Inline, PCM and WAT data package.</b> The PCM half of the deliverable, and the earliest device-level data available."
    },
    {
     "id": "FAB-D4",
     "rel": "feeds",
-    "text": "Wafer acceptance disposition record. Parameter deviations are part of what acceptance is decided on."
+    "text": "<b>Wafer acceptance disposition record.</b> Parameter deviations are part of what acceptance is decided on."
    }
   ],
   "risks": [
-   "PCM data not reviewed until parts arrive",
-   "Comparison against target only",
-   "Variability ignored",
-   "Split lots analyzed together",
-   "No link to the test chip results"
+   "<b>PCM data not reviewed until parts arrive.</b> It answers process questions weeks earlier and costs nothing extra to read.",
+   "<b>Comparison against target only.</b> The design was built against models; comparing against the model is what predicts silicon behavior.",
+   "<b>Variability ignored.</b> Across-wafer parameter spread predicts the bin distribution, and the mean alone does not.",
+   "<b>Split lots analyzed together.</b> If splits were run, aggregating them averages away exactly the information the splits were for.",
+   "<b>No link to the test chip results.</b> <code>TC-07</code> correlated models against silicon; this data either confirms that correlation or contradicts it."
   ],
   "roles": [
    {
@@ -32677,31 +32617,31 @@ export const activityDetails: Record<string, ActivityDetail> = {
   ],
   "criticalPath": true,
   "purpose": [
-   "Run wafer acceptance testing and decide whether the lot is accepted—the formal gate between the fab and everything downstream.",
-   "WAT is the contractual boundary. Parameters within specification mean the foundry delivered what was agreed; parameters outside mean a conversation about disposition, rework or credit."
+   "Run <b>wafer acceptance testing and decide whether the lot is accepted</b>—the formal gate between the fab and everything downstream.",
+   "WAT is the contractual boundary. Parameters within specification mean the foundry delivered what was agreed; parameters outside mean a conversation about disposition, rework or credit. Either way the decision has to be taken deliberately rather than by default."
   ],
   "steps": [
    {
     "n": 1,
-    "text": "Define and document acceptance criteria confirmation with the foundry",
+    "text": "Confirm the acceptance criteria with the foundry",
     "tat": 0.5,
     "lane": "main"
    },
    {
     "n": 2,
-    "text": "Review wAT execution and data",
+    "text": "Execute WAT and review the data",
     "tat": 1,
     "lane": "main"
    },
    {
     "n": 3,
-    "text": "Define out-of- escalation with the foundry",
+    "text": "Escalate out-of-specification results with the foundry",
     "tat": 0.75,
     "lane": "par"
    },
    {
     "n": 4,
-    "text": "Release lot disposition and decision",
+    "text": "Take the lot disposition and release decision",
     "tat": 1.5,
     "lane": "main"
    }
@@ -32730,20 +32670,20 @@ export const activityDetails: Record<string, ActivityDetail> = {
    {
     "id": "FAB-D4",
     "rel": "produces",
-    "text": "Wafer acceptance disposition record. The deliverable the record is what a later yield discussion refers back to."
+    "text": "<b>Wafer acceptance disposition record.</b> The disposition record is produced here, and it is what a later yield discussion refers back to."
    },
    {
     "id": "FAB-D2",
     "rel": "gates",
-    "text": "Processed engineering-lot wafers. Wafers are not released downstream until this decision is taken."
+    "text": "<b>Processed engineering-lot wafers.</b> Wafers are not released downstream until this decision is taken."
    }
   ],
   "risks": [
-   "Acceptance by default",
-   "Criteria not agreed in advance",
-   "Marginal lot rejected on principle",
-   "Deviations not documented",
-   "Disposition delayed"
+   "<b>Acceptance by default.</b> A lot released without a decision has been accepted by nobody, and the deviation is discovered later with no record.",
+   "<b>Criteria not agreed in advance.</b> Negotiating acceptance criteria after the data exists favors whoever is more motivated.",
+   "<b>Marginal lot rejected on principle.</b> On an engineering lot, silicon in the lab is usually worth more than a lot within every limit.",
+   "<b>Deviations not documented.</b> A parameter out of specification affects bring-up interpretation, and the bring-up team has to know.",
+   "<b>Disposition delayed.</b> Every day the lot sits undispositioned is a day of bring-up not happening."
   ],
   "roles": [
    {
@@ -32843,43 +32783,43 @@ export const activityDetails: Record<string, ActivityDetail> = {
   ],
   "criticalPath": false,
   "purpose": [
-   "Track the lots and maintain an honest wafer-out forecast, because ten downstream activities are planning against a date this activity owns.",
-   "Assembly, test, bring-up and qualification all schedule against wafer-out. The forecast will move—fab schedules do—and the program's exposure is not the movement but the surprise."
+   "Track the lots and <b>maintain an honest wafer-out forecast</b>, because ten downstream activities are planning against a date this activity owns.",
+   "Assembly, test, bring-up and qualification all schedule against wafer-out. The forecast will move—fab schedules do—and the program's exposure is not the movement but the surprise. Four man-months across eighteen weeks buys a date everyone can plan against and early warning when it changes."
   ],
   "steps": [
    {
     "n": 1,
-    "text": "Track wIP setup and reporting cadence",
+    "text": "Set up WIP tracking and the reporting cadence",
     "tat": 1,
     "lane": "main"
    },
    {
     "n": 2,
-    "text": "Define and document hot-lot priority management",
+    "text": "Manage the hot-lot priority",
     "tat": 2,
     "lane": "main"
    },
    {
     "n": 3,
-    "text": "Define and document escalation on schedule deviation",
+    "text": "Escalate schedule deviations",
     "tat": 2,
     "lane": "par"
    },
    {
     "n": 4,
-    "text": "Define and document wafer-out forecast maintenance",
+    "text": "Maintain the wafer-out forecast",
     "tat": 2,
     "lane": "main"
    },
    {
     "n": 5,
-    "text": "Forecast communication to downstream stages",
+    "text": "Communicate the forecast to downstream stages",
     "tat": 2,
     "lane": "par"
    },
    {
     "n": 6,
-    "text": "Continuously tracking across the run",
+    "text": "Track continuously across the run",
     "tat": 13,
     "lane": "main"
    }
@@ -32898,7 +32838,7 @@ export const activityDetails: Record<string, ActivityDetail> = {
    "Schedule deviation escalations",
    "Wafer-out forecast, maintained",
    "Forecast communications to downstream stages",
-   "Yield tracking log across the run"
+   "WIP tracking log across the run"
   ],
   "producedBy": [
    1,
@@ -32912,20 +32852,20 @@ export const activityDetails: Record<string, ActivityDetail> = {
    {
     "id": "FAB-D5",
     "rel": "produces",
-    "text": "Wafer-out forecast versus actual log. The deliverable its value is in being current rather than in being right the first time."
+    "text": "<b>Wafer-out forecast versus actual log.</b> The forecast-versus-actual log is maintained here, and its value is in being current rather than in being right the first time."
    },
    {
     "id": "FAB-D6",
     "rel": "feeds",
-    "text": "First Silicon availability notice. The notice is the forecast's final form."
+    "text": "<b>First Silicon availability notice.</b> The notice is the forecast's final form—the last wafer-out date this activity maintained becomes the availability the program declares."
    }
   ],
   "risks": [
-   "Forecast not updated",
-   "Hot-lot priority lapsing",
-   "Deviations not escalated",
-   "Forecast presented without confidence",
-   "Tracking limited to the fab"
+   "<b>Forecast not updated.</b> Downstream stages plan against a stale date and discover the change when the parts do not arrive.",
+   "<b>Hot-lot priority lapsing.</b> Priority is maintained by attention, and a lot that quietly loses it takes standard cycle time.",
+   "<b>Deviations not escalated.</b> A slip identified and not raised becomes a slip everyone discovers at the same time, too late to replan.",
+   "<b>Forecast presented without confidence.</b> A date with no stated uncertainty invites downstream teams to plan to the day.",
+   "<b>Tracking limited to the fab.</b> Wafer-out is not the same as parts available; sort, logistics and assembly all sit between."
   ],
   "roles": [
    {
@@ -33029,25 +32969,25 @@ export const activityDetails: Record<string, ActivityDetail> = {
   ],
   "criticalPath": true,
   "purpose": [
-   "Move the wafers from the fab to sort and assembly—shipment, customs, documentation—and confirm First Silicon is available.",
+   "Move the wafers from the fab to <b>sort and assembly</b>—shipment, customs, documentation—and confirm First Silicon is actually available.",
    "Wafers finished in a fab on another continent are not parts in a lab. Shipment, export documentation and customs sit between wafer-out and anyone touching silicon, and they are the part of the schedule most often left out of the plan entirely."
   ],
   "steps": [
    {
     "n": 1,
-    "text": "Plan shipment and documentation",
+    "text": "Plan the shipment and prepare the documentation",
     "tat": 0.5,
     "lane": "main"
    },
    {
     "n": 2,
-    "text": "Define and document customs and export control handling",
+    "text": "Handle customs and export control",
     "tat": 0.75,
     "lane": "main"
    },
    {
     "n": 3,
-    "text": "Define and document delivery to sort and assembly",
+    "text": "Deliver to sort and assembly and declare First Silicon",
     "tat": 0.75,
     "lane": "main"
    }
@@ -33076,20 +33016,20 @@ export const activityDetails: Record<string, ActivityDetail> = {
    {
     "id": "FAB-D6",
     "rel": "produces",
-    "text": "First Silicon availability notice. The deliverable it carries the stage's milestone."
+    "text": "<b>First Silicon availability notice.</b> The availability notice is issued here, and it carries the stage's milestone—First Silicon."
    },
    {
     "id": "FAB-D2",
     "rel": "feeds",
-    "text": "Processed engineering-lot wafers. Wafers become useful when they arrive, not when they are finished."
+    "text": "<b>Processed engineering-lot wafers.</b> Wafers become useful when they arrive, not when they are finished."
    }
   ],
   "risks": [
-   "Customs paperwork started at wafer-out",
-   "Export classification unresolved",
-   "Destination not ready",
-   "Shipment split without tracking",
-   "Milestone declared at wafer-out rather than at delivery"
+   "<b>Customs paperwork started at wafer-out.</b> It can be prepared during processing and takes a week if it is not.",
+   "<b>Export classification unresolved.</b> Advanced semiconductors carry export controls, and an unclassified shipment does not move.",
+   "<b>Destination not ready.</b> Wafers arriving at a sort facility with no probe card or no capacity wait there instead of in the fab.",
+   "<b>Shipment split without tracking.</b> Lots split across shipments for risk are useful only if which wafers went where is traceable.",
+   "<b>Milestone declared at wafer-out rather than at delivery.</b> First Silicon means silicon someone can touch, and declaring it early hides a week of transit."
   ],
   "roles": [
    {
@@ -33179,31 +33119,31 @@ export const activityDetails: Record<string, ActivityDetail> = {
   ],
   "criticalPath": true,
   "purpose": [
-   "Choose the package architecture—interposer type, substrate construction, layer count, body size—and commit to it, because everything from bump pitch to assembly capacity follows.",
-   "Completing this work early provides a clear basis for downstream design decisions and reduces late rework, schedule risk, and integration issues."
+   "Choose the <b>package architecture</b>—interposer type, substrate construction, layer count, body size—and commit to it, because everything from bump pitch to assembly capacity follows.",
+   "This decision has the same character as the monolithic-versus-chiplet call in <code>ARCH-02</code>: it looks like an engineering choice and it is a supply chain commitment. A 2.5D silicon interposer is a different supplier, a different capacity queue and a different cost structure from an organic bridge, and switching later is not practical."
   ],
   "steps": [
    {
     "n": 1,
-    "text": "Define package requirement consolidation — die size, power, interfaces, thermal",
+    "text": "Consolidate the package requirements — die size, power, interfaces, thermal",
     "tat": 1.5,
     "lane": "main"
    },
    {
     "n": 2,
-    "text": "Define architecture option — interposer, bridge, organic",
+    "text": "Define the architecture options — interposer, bridge, organic",
     "tat": 2,
     "lane": "main"
    },
    {
     "n": 3,
-    "text": "Define and document capability and capacity screen per option",
+    "text": "Screen capability and capacity per option",
     "tat": 1.5,
     "lane": "par"
    },
    {
     "n": 4,
-    "text": "Build substrate and layer count study",
+    "text": "Study substrate construction and layer count",
     "tat": 2,
     "lane": "main"
    },
@@ -33215,7 +33155,7 @@ export const activityDetails: Record<string, ActivityDetail> = {
    },
    {
     "n": 6,
-    "text": "Define architecture selection and",
+    "text": "Select the architecture and issue its specification",
     "tat": 2.5,
     "lane": "main"
    }
@@ -33231,7 +33171,7 @@ export const activityDetails: Record<string, ActivityDetail> = {
   "produces": [
    "Package requirement consolidation",
    "Defined package architecture options",
-   "Architecture options with capability assessment",
+   "Capability assessment per option",
    "Capacity screen per option",
    "Substrate construction study",
    "Cost comparison",
@@ -33250,20 +33190,20 @@ export const activityDetails: Record<string, ActivityDetail> = {
    {
     "id": "PKGD-D1",
     "rel": "produces",
-    "text": "Package architecture specification. The deliverable it is a supply chain commitment as much as a technical one."
+    "text": "<b>Package architecture specification.</b> The architecture specification is produced here, and it is a supply chain commitment as much as a technical one."
    },
    {
     "id": "PKGD-D7",
     "rel": "feeds",
-    "text": "Substrate and interposer PO with committed lead time. The architecture decides which supplier queue the program is standing in."
+    "text": "<b>Substrate and interposer PO with committed lead time.</b> The architecture decides which supplier queue the program is standing in."
    }
   ],
   "risks": [
-   "Architecture chosen without capacity",
-   "Decision taken after the bump map",
-   "Cost compared on the package alone",
-   "Thermal requirement not in the selection",
-   "Single option evaluated"
+   "<b>Architecture chosen without capacity.</b> Advanced packaging capacity is scarce and allocated far ahead; a technically ideal option with no allocation is not an option.",
+   "<b>Decision taken after the bump map.</b> Package architecture constrains bump pitch and field, and deciding afterwards means renegotiating the die.",
+   "<b>Cost compared on the package alone.</b> Interposer, substrate, assembly yield and test all differ per architecture, and comparing one line misleads.",
+   "<b>Thermal requirement not in the selection.</b> Package thermal resistance is architecture-dependent and sets the achievable power envelope.",
+   "<b>Single option evaluated.</b> Without an alternative the program has no negotiating position and no fallback if capacity is refused."
   ],
   "roles": [
    {
@@ -33382,43 +33322,43 @@ export const activityDetails: Record<string, ActivityDetail> = {
   ],
   "criticalPath": true,
   "purpose": [
-   "Negotiate the bump map with physical design—pitch, count, power-to-signal ratio, position—until both the die and the package can build what the other needs.",
-   "The bump field is where two design teams share one constraint. The die wants bumps where its logic is; the package wants them where its escape routing can reach; and the power delivery requirement takes most of the field regardless."
+   "Negotiate the <b>bump map with physical design</b>—pitch, count, power-to-signal ratio, position—until both the die and the package can build what the other needs.",
+   "The bump field is where two design teams share one constraint. The die wants bumps where its logic is; the package wants them where its escape routing can reach; and the power delivery requirement takes most of the field regardless. Convergence takes iteration, and the iteration has to finish before <code>PD-04</code> freezes."
   ],
   "steps": [
    {
     "n": 1,
-    "text": "Define bump pitch and field against the architecture",
+    "text": "Define the bump pitch and field against the architecture",
     "tat": 2,
     "lane": "main"
    },
    {
     "n": 2,
-    "text": "Define and document power-to-signal ratio derivation from the power envelope",
+    "text": "Derive the power-to-signal ratio from the power envelope",
     "tat": 1.5,
     "lane": "main"
    },
    {
     "n": 3,
-    "text": "Define and document signal bump assignment per interface",
+    "text": "Assign signal bumps per interface",
     "tat": 2,
     "lane": "par"
    },
    {
     "n": 4,
-    "text": "Define and document escape feasibility check against the substrate",
+    "text": "Check escape feasibility against the substrate",
     "tat": 2,
     "lane": "main"
    },
    {
     "n": 5,
-    "text": "Place die-side iteration with physical design",
+    "text": "Iterate die-side placement with physical design",
     "tat": 2,
     "lane": "par"
    },
    {
     "n": 6,
-    "text": "Hand off bump map convergence and",
+    "text": "Converge the bump map and hand it off",
     "tat": 4.5,
     "lane": "main"
    }
@@ -33451,20 +33391,20 @@ export const activityDetails: Record<string, ActivityDetail> = {
    {
     "id": "PKGD-D2",
     "rel": "produces",
-    "text": "Bump map and interposer / RDL database. The bump map half of the deliverable; <code>PKGD-03</code> supplies the interposer routing."
+    "text": "<b>Bump map and interposer / RDL database.</b> The bump map half of the deliverable; <code>PKGD-03</code> supplies the interposer routing."
    },
    {
     "id": "PKGD-D4",
     "rel": "feeds",
-    "text": "Package electrical design intent. Bump assignment determines channel quality before any routing is drawn."
+    "text": "<b>Package electrical design intent.</b> Bump assignment determines channel quality before any routing is drawn."
    }
   ],
   "risks": [
-   "Bump map converged on the die side only",
-   "Power bumps reduced to fit signals",
-   "Pitch chosen from the previous program",
-   "Signal assignment ignoring channel quality",
-   "Iteration continuing past the freeze date"
+   "<b>Bump map converged on the die side only.</b> A map that cannot escape on the substrate has to be redone, and by then the die may be placed around it.",
+   "<b>Power bumps reduced to fit signals.</b> The interfaces then work and the die cannot be fed, which <code>SIPI-04</code> finds much later.",
+   "<b>Pitch chosen from the previous program.</b> Pitch depends on the interposer technology and the assembly process, both of which may have changed.",
+   "<b>Signal assignment ignoring channel quality.</b> Which bump a high-speed signal uses affects its escape path and its crosstalk exposure.",
+   "<b>Iteration continuing past the freeze date.</b> <code>PD-04</code> and the substrate order both depend on this closing on time."
   ],
   "roles": [
    {
@@ -33578,49 +33518,49 @@ export const activityDetails: Record<string, ActivityDetail> = {
   ],
   "criticalPath": true,
   "purpose": [
-   "Route the interposer and its redistribution layers—the silicon layer that carries the die-to-HBM channels and everything else the substrate cannot.",
+   "Route the <b>interposer and its redistribution layers</b>—the silicon layer that carries the die-to-HBM channels and everything else the substrate cannot.",
    "On a 2.5D part the interposer carries the highest-density and highest-performance connections in the package. HBM channels alone run to thousands of nets at fine pitch, and their routing quality decides whether the memory interface trains at speed."
   ],
   "steps": [
    {
     "n": 1,
-    "text": "Route interposer layer stack and resource plan",
+    "text": "Plan the interposer layer stack and routing resource",
     "tat": 2,
     "lane": "main"
    },
    {
     "n": 2,
-    "text": "Route hBM channel and length management",
+    "text": "Route the HBM channels with length management",
     "tat": 4,
     "lane": "main"
    },
    {
     "n": 3,
-    "text": "Route die-to-die and remaining signal",
+    "text": "Route the die-to-die and remaining signals",
     "tat": 3,
     "lane": "par"
    },
    {
     "n": 4,
-    "text": "Define and document power and ground distribution on the interposer",
+    "text": "Design the power and ground distribution on the interposer",
     "tat": 3,
     "lane": "main"
    },
    {
     "n": 5,
-    "text": "Plan rDL routing and via",
+    "text": "Route the RDL and plan the vias",
     "tat": 2.5,
     "lane": "par"
    },
    {
     "n": 6,
-    "text": "Define interposer DRC and manufacturability",
+    "text": "Run interposer DRC and manufacturability checks",
     "tat": 2.5,
     "lane": "par"
    },
    {
     "n": 7,
-    "text": "Release interposer database",
+    "text": "Release the interposer database",
     "tat": 5,
     "lane": "main"
    }
@@ -33655,20 +33595,20 @@ export const activityDetails: Record<string, ActivityDetail> = {
    {
     "id": "PKGD-D2",
     "rel": "produces",
-    "text": "Bump map and interposer / RDL database. The interposer half of the deliverable—the routed silicon layer itself."
+    "text": "<b>Bump map and interposer / RDL database.</b> The interposer half of the deliverable—the routed silicon layer itself."
    },
    {
     "id": "PKGD-D4",
     "rel": "feeds",
-    "text": "Package electrical design intent. Interposer routing is the highest-performance part of the package's electrical behavior."
+    "text": "<b>Package electrical design intent.</b> Interposer routing is the highest-performance part of the package's electrical behavior."
    }
   ],
   "risks": [
-   "HBM channel lengths unmatched",
-   "Reference plane discontinuities",
-   "Interposer power distribution underprovisioned",
-   "Manufacturability checked late",
-   "Routing started before the bump map converges"
+   "<b>HBM channel lengths unmatched.</b> Skew across a wide parallel interface eats the training margin, and the failure appears at bring-up as a memory that will not train at speed.",
+   "<b>Reference plane discontinuities.</b> A channel crossing a plane split has an impedance discontinuity, and on HBM there are thousands of channels to get right.",
+   "<b>Interposer power distribution underprovisioned.</b> Current for two HBM stacks and the die passes through the interposer, and its resistance is part of the IR budget.",
+   "<b>Manufacturability checked late.</b> Interposer rules differ from die rules, and a design that violates them is a supplier rejection rather than a warning.",
+   "<b>Routing started before the bump map converges.</b> Every bump change is an interposer rework, and the rework is expensive at this density."
   ],
   "roles": [
    {
@@ -33785,49 +33725,49 @@ export const activityDetails: Record<string, ActivityDetail> = {
   ],
   "criticalPath": true,
   "purpose": [
-   "Design the substrate—stack-up, escape routing, power planes, package DRC—the organic carrier that connects the interposer to the board.",
+   "Design the <b>substrate</b>—stack-up, escape routing, power planes, package DRC—the organic carrier that connects the interposer to the board.",
    "The substrate is the part with the longest lead time and the least flexibility once ordered. Its layer count is fixed by escape routing needs and its cost scales with it, so the design converges on the smallest stack-up that can carry the escape—a trade made once and lived with."
   ],
   "steps": [
    {
     "n": 1,
-    "text": "Define stack-up and layer count decision",
+    "text": "Define the stack-up and decide the layer count",
     "tat": 2,
     "lane": "main"
    },
    {
     "n": 2,
-    "text": "Route escape from the interposer footprint",
+    "text": "Route the escape from the interposer footprint",
     "tat": 4,
     "lane": "main"
    },
    {
     "n": 3,
-    "text": "Define and document power and ground plane design",
+    "text": "Design the power and ground planes",
     "tat": 3,
     "lane": "par"
    },
    {
     "n": 4,
-    "text": "Define and document board-side ball assignment and breakout",
+    "text": "Assign the board-side balls and breakout",
     "tat": 3,
     "lane": "main"
    },
    {
     "n": 5,
-    "text": "Plan via structure and drill",
+    "text": "Plan the via structures and drills",
     "tat": 2.5,
     "lane": "par"
    },
    {
     "n": 6,
-    "text": "Define package DRC against supplier rules",
+    "text": "Run package DRC against the supplier rules",
     "tat": 2.5,
     "lane": "par"
    },
    {
     "n": 7,
-    "text": "Release substrate database",
+    "text": "Release the substrate database",
     "tat": 5,
     "lane": "main"
    }
@@ -33862,20 +33802,20 @@ export const activityDetails: Record<string, ActivityDetail> = {
    {
     "id": "PKGD-D3",
     "rel": "produces",
-    "text": "Substrate design files (Gerber / ODB++) and stack-up. The deliverable it is what the supplier manufactures from."
+    "text": "<b>Substrate design files (Gerber / ODB++) and stack-up.</b> The substrate design files and stack-up are produced here, and they are what the supplier manufactures from."
    },
    {
     "id": "PKGD-D7",
     "rel": "feeds",
-    "text": "Substrate and interposer PO with committed lead time. The order cannot be placed against a design that is not finished."
+    "text": "<b>Substrate and interposer PO with committed lead time.</b> The order cannot be placed against a design that is not finished."
    }
   ],
   "risks": [
-   "Layer count set before escape is attempted",
-   "Supplier rules obtained late",
-   "Power planes fragmented by escape routing",
-   "Ball map not agreed with the board",
-   "Design released before DRC closes"
+   "<b>Layer count set before escape is attempted.</b> A stack-up chosen for cost that cannot carry the escape has to be increased, and the cost model was built on the smaller number.",
+   "<b>Supplier rules obtained late.</b> Substrate rules vary by supplier and technology, and designing to generic rules produces a design one supplier can build.",
+   "<b>Power planes fragmented by escape routing.</b> Escape vias perforate the planes, and the resulting current path is what <code>SIPI-03</code> will analyze.",
+   "<b>Ball map not agreed with the board.</b> The substrate's board-side interface is the board's problem too, and changing it late affects both.",
+   "<b>Design released before DRC closes.</b> A supplier rejection costs weeks against a twenty-week lead time."
   ],
   "roles": [
    {
@@ -33991,43 +33931,43 @@ export const activityDetails: Record<string, ActivityDetail> = {
   ],
   "criticalPath": false,
   "purpose": [
-   "Route the package for signal integrity—length matching, reference continuity, via design, crosstalk separation—so the channels can carry what the interfaces need.",
-   "Package routing is where high-speed channels are made or ruined. A via with a long stub, a trace crossing a plane split, or a differential pair routed without its partner all cost margin that the PHY then has to make up."
+   "Route the package for <b>signal integrity</b>—length matching, reference continuity, via design, crosstalk separation—so the channels can carry what the interfaces need.",
+   "Package routing is where high-speed channels are made or ruined. A via with a long stub, a trace crossing a plane split, or a differential pair routed without its partner all cost margin that the PHY then has to make up. <code>SIPI-07</code> will measure the result; this activity is what determines it."
   ],
   "steps": [
    {
     "n": 1,
-    "text": "Allocate channel budget to the package",
+    "text": "Allocate the channel budget to the package",
     "tat": 1.5,
     "lane": "main"
    },
    {
     "n": 2,
-    "text": "Define and document length matching and skew control per interface",
+    "text": "Match lengths and control skew per interface",
     "tat": 2.5,
     "lane": "main"
    },
    {
     "n": 3,
-    "text": "Define and document reference plane continuity and return path design",
+    "text": "Design reference plane continuity and return paths",
     "tat": 2,
     "lane": "par"
    },
    {
     "n": 4,
-    "text": "Define and document via structure design and stub management",
+    "text": "Design the via structures and manage the stubs",
     "tat": 2,
     "lane": "main"
    },
    {
     "n": 5,
-    "text": "Define and document crosstalk separation and shielding",
+    "text": "Separate and shield against crosstalk",
     "tat": 2,
     "lane": "par"
    },
    {
     "n": 6,
-    "text": "Review routing against the SI requirements",
+    "text": "Review the routing against the SI requirements",
     "tat": 4,
     "lane": "main"
    }
@@ -34060,20 +34000,20 @@ export const activityDetails: Record<string, ActivityDetail> = {
    {
     "id": "PKGD-D4",
     "rel": "produces",
-    "text": "Package electrical design intent and model handoff to co-verification. The signal half of the deliverable—the design intent <code>SIPI</code> then verifies."
+    "text": "<b>Package electrical design intent and model handoff to co-verification.</b> The signal half of the deliverable—the design intent <code>SIPI</code> then verifies."
    },
    {
     "id": "PKGD-D3",
     "rel": "feeds",
-    "text": "Substrate design files and stack-up. SI-driven routing is part of what the substrate files contain."
+    "text": "<b>Substrate design files and stack-up.</b> SI-driven routing is part of what the substrate files contain."
    }
   ],
   "risks": [
-   "Via stubs unmanaged",
-   "Length matching without reference continuity",
-   "Channel budget not allocated",
-   "Crosstalk managed by spacing alone",
-   "Review after the substrate is released"
+   "<b>Via stubs unmanaged.</b> They resonate in band for the fastest interfaces, and the remedy—back-drilling or blind vias—is a substrate cost decision made too late.",
+   "<b>Length matching without reference continuity.</b> Matched traces over a split plane have matched delay and mismatched impedance.",
+   "<b>Channel budget not allocated.</b> Die, package and board each consume part of the loss budget, and without allocation each assumes the others left room.",
+   "<b>Crosstalk managed by spacing alone.</b> On a dense substrate there is no spare space, and the answer is usually reference and via design instead.",
+   "<b>Review after the substrate is released.</b> SI findings then have nowhere to go except into the PHY's margin."
   ],
   "roles": [
    {
@@ -34185,43 +34125,43 @@ export const activityDetails: Record<string, ActivityDetail> = {
   ],
   "criticalPath": false,
   "purpose": [
-   "Design the package power delivery—plane structure, via arrays, decoupling footprints—knowing that its electrical closure belongs to <code>SIPI</code> rather than to this activity.",
-   "The package sits between the die's instantaneous current demand and the board's slower supply. Its planes, vias and decoupling determine the impedance in the mid-frequency band where neither the die's on-chip decap nor the board's bulk capacitors help."
+   "Design the <b>package power delivery</b>—plane structure, via arrays, decoupling footprints—knowing that its electrical closure belongs to <code>SIPI</code> rather than to this activity.",
+   "The package sits between the die's instantaneous current demand and the board's slower supply. Its planes, vias and decoupling determine the impedance in the mid-frequency band where neither the die's on-chip decap nor the board's bulk capacitors help. Designing it is here; proving it works is co-verification."
   ],
   "steps": [
    {
     "n": 1,
-    "text": "Allocate package PDN topology and plane",
+    "text": "Define the package PDN topology and plane allocation",
     "tat": 2,
     "lane": "main"
    },
    {
     "n": 2,
-    "text": "Define and document power via array design and current capability",
+    "text": "Design the power via arrays and current capability",
     "tat": 2,
     "lane": "main"
    },
    {
     "n": 3,
-    "text": "Place decoupling capacitor footprint",
+    "text": "Place the decoupling capacitor footprints",
     "tat": 1.5,
     "lane": "par"
    },
    {
     "n": 4,
-    "text": "Define and document plane perforation and current path management",
+    "text": "Analyze plane perforation and manage the current paths",
     "tat": 2,
     "lane": "main"
    },
    {
     "n": 5,
-    "text": "Define interposer to substrate power transition",
+    "text": "Design the interposer-to-substrate power transition",
     "tat": 1.5,
     "lane": "par"
    },
    {
     "n": 6,
-    "text": "Verify pDN design intent handoff to co",
+    "text": "Hand the PDN design intent to co-verification",
     "tat": 3,
     "lane": "main"
    }
@@ -34254,20 +34194,20 @@ export const activityDetails: Record<string, ActivityDetail> = {
    {
     "id": "PKGD-D4",
     "rel": "produces",
-    "text": "Package electrical design intent and model handoff to co-verification. The power half of the deliverable, handed to <code>SIPI</code> for closure."
+    "text": "<b>Package electrical design intent and model handoff to co-verification.</b> The power half of the deliverable, handed to <code>SIPI</code> for closure."
    },
    {
     "id": "PKGD-D3",
     "rel": "feeds",
-    "text": "Substrate design files and stack-up. Plane allocation and via arrays are substrate content."
+    "text": "<b>Substrate design files and stack-up.</b> Plane allocation, via arrays and decap footprints are substrate content, so this design lands in the files the supplier manufactures from."
    }
   ],
   "risks": [
-   "Decoupling footprints too far from the current draw",
-   "Plane perforation ignored",
-   "Via array sized for DC only",
-   "Closure assumed to be someone else's problem",
-   "Interposer to substrate transition overlooked"
+   "<b>Decoupling footprints too far from the current draw.</b> Mounting position determines the loop inductance, and a capacitor mounted far away is a capacitor that does not help.",
+   "<b>Plane perforation ignored.</b> Escape vias perforate power planes, and the remaining current path can be far worse than the plane suggests.",
+   "<b>Via array sized for DC only.</b> Transient current is what the package has to supply, and DC sizing understates the requirement.",
+   "<b>Closure assumed to be someone else's problem.</b> If the design intent is not analysable, <code>SIPI</code> cannot close it and the iteration comes back here.",
+   "<b>Interposer to substrate transition overlooked.</b> The power path crosses two interfaces, and the transition is where its resistance concentrates."
   ],
   "roles": [
    {
@@ -34377,31 +34317,31 @@ export const activityDetails: Record<string, ActivityDetail> = {
   ],
   "criticalPath": false,
   "purpose": [
-   "Simulate the thermal and mechanical behavior of the package—heat path, warpage, co-planarity, TIM and lid—before any of it is built.",
-   "A package at this power dissipates hundreds of watts through a stack of materials with different expansion coefficients. The thermal path decides the achievable power envelope; the mechanical behavior decides whether the assembly survives reflow."
+   "Simulate the <b>thermal and mechanical behavior</b> of the package—heat path, warpage, co-planarity, TIM and lid—before any of it is built.",
+   "A package at this power dissipates hundreds of watts through a stack of materials with different expansion coefficients. The thermal path decides the achievable power envelope; the mechanical behavior decides whether the assembly survives reflow. Both are simulated here and measured on real vehicles in <code>PTV</code>."
   ],
   "steps": [
    {
     "n": 1,
-    "text": "Build thermal model — die, interposer, substrate, lid",
+    "text": "Build the thermal model — die, interposer, substrate, lid",
     "tat": 2,
     "lane": "main"
    },
    {
     "n": 2,
-    "text": "Simulate steady-state thermal and Rjc estimation",
+    "text": "Run steady-state thermal simulation and estimate Rjc",
     "tat": 2.5,
     "lane": "main"
    },
    {
     "n": 3,
-    "text": "Analyze hotspot and transient thermal",
+    "text": "Analyze hotspots and transient thermal behavior",
     "tat": 2,
     "lane": "par"
    },
    {
     "n": 4,
-    "text": "Select tIM and interface resistance study",
+    "text": "Select the TIM and study interface resistance",
     "tat": 2,
     "lane": "par"
    },
@@ -34419,7 +34359,7 @@ export const activityDetails: Record<string, ActivityDetail> = {
    },
    {
     "n": 7,
-    "text": "Define and document thermal and mechanical design recommendations",
+    "text": "Issue the thermal and mechanical design recommendations",
     "tat": 4.5,
     "lane": "main"
    }
@@ -34454,20 +34394,20 @@ export const activityDetails: Record<string, ActivityDetail> = {
    {
     "id": "PKGD-D5",
     "rel": "produces",
-    "text": "Thermal and mechanical (warpage) simulation reports. The deliverable <code>PTV</code> is what validates it."
+    "text": "<b>Thermal and mechanical (warpage) simulation reports.</b> The simulation reports are produced here, and <code>PTV</code> is what validates them."
    },
    {
     "id": "PKGD-D6",
     "rel": "feeds",
-    "text": "Test vehicle requirement specification for PTV. The simulations decide which mechanical and thermal risks the vehicles must measure."
+    "text": "<b>Test vehicle requirement specification for PTV.</b> The simulations decide which mechanical and thermal risks the vehicles must measure."
    }
   ],
   "risks": [
-   "Thermal simulated at uniform power",
-   "Warpage simulated at room temperature only",
-   "TIM performance taken from the datasheet",
-   "Material properties assumed",
-   "Results not fed into the vehicle plan"
+   "<b>Thermal simulated at uniform power.</b> An accelerator's power is concentrated in the compute clusters, and uniform assumptions understate the hotspot badly.",
+   "<b>Warpage simulated at room temperature only.</b> The failure happens at reflow peak, and the room-temperature number says nothing about it.",
+   "<b>TIM performance taken from the datasheet.</b> Interface resistance depends on bond line thickness and pressure, both of which are assembly properties.",
+   "<b>Material properties assumed.</b> Substrate and underfill properties vary by supplier and lot, and simulation is only as good as the inputs.",
+   "<b>Results not fed into the vehicle plan.</b> Simulation identifies which risks to measure, and a vehicle plan built independently measures the wrong things."
   ],
   "roles": [
    {
@@ -34584,31 +34524,31 @@ export const activityDetails: Record<string, ActivityDetail> = {
   ],
   "criticalPath": false,
   "purpose": [
-   "Tell PTV what the vehicles have to measure—which risks, which structures, which conditions—early enough that the vehicles can be designed, built and stressed before wafer-out.",
+   "Tell <b>PTV what the vehicles have to measure</b>—which risks, which structures, which conditions—early enough that the vehicles can be designed, built and stressed before wafer-out.",
    "The test vehicle program has a fifty-two week window and a hard gate at product wafer-out. Its requirements have to arrive while there is time to act on them, which is why this activity sits at week ten of a fifty-two week stage rather than after the package design is finished."
   ],
   "steps": [
    {
     "n": 1,
-    "text": "Define package risk identification for vehicle coverage",
+    "text": "Identify the package risks the vehicles must cover",
     "tat": 1,
     "lane": "main"
    },
    {
     "n": 2,
-    "text": "Define vehicle type requirements — mechanical, thermal, electrical",
+    "text": "Define the vehicle type requirements — mechanical, thermal, electrical",
     "tat": 1.5,
     "lane": "par"
    },
    {
     "n": 3,
-    "text": "Define measurement condition and structure",
+    "text": "Specify the measurement conditions and structures",
     "tat": 1.5,
     "lane": "main"
    },
    {
     "n": 4,
-    "text": "Review requirement handoff and PTV plan",
+    "text": "Hand off the requirements and review the PTV plan",
     "tat": 1.5,
     "lane": "main"
    }
@@ -34637,20 +34577,20 @@ export const activityDetails: Record<string, ActivityDetail> = {
    {
     "id": "PKGD-D6",
     "rel": "produces",
-    "text": "Test vehicle requirement specification for PTV. The deliverable its timing matters as much as its content."
+    "text": "<b>Test vehicle requirement specification for PTV.</b> The requirement specification is written and handed off here, and its timing matters as much as its content."
    },
    {
     "id": "PKGD-D5",
     "rel": "feeds",
-    "text": "Thermal and mechanical simulation reports. The vehicles measure what the simulations predicted, so the two are specified together."
+    "text": "<b>Thermal and mechanical simulation reports.</b> The vehicles measure what the simulations predicted, so the two are specified together."
    }
   ],
   "risks": [
-   "Requirements issued after the package design completes",
-   "Risks identified from the design rather than from experience",
-   "Electrical vehicle omitted",
-   "Conditions unspecified",
-   "No feedback loop defined"
+   "<b>Requirements issued after the package design completes.</b> The vehicle program then cannot finish before wafer-out, and the gate is missed.",
+   "<b>Risks identified from the design rather than from experience.</b> The failures that matter are the ones previous programs hit, and they are rarely visible in a design review.",
+   "<b>Electrical vehicle omitted.</b> Daisy-chain continuity and assembly yield are as important as thermal and mechanical, and they need their own vehicle.",
+   "<b>Conditions unspecified.</b> A vehicle measured at the wrong temperature or reflow profile answers a question nobody asked.",
+   "<b>No feedback loop defined.</b> The vehicle results have to change something, and the mechanism for that has to be agreed up front."
   ],
   "roles": [
    {
@@ -34752,13 +34692,13 @@ export const activityDetails: Record<string, ActivityDetail> = {
   ],
   "criticalPath": true,
   "purpose": [
-   "Select the substrate and interposer suppliers and book their lead time—a twenty-week commitment that sets the date the package can be built.",
-   "Completing this work early provides a clear basis for downstream design decisions and reduces late rework, schedule risk, and integration issues."
+   "Select the <b>substrate and interposer suppliers and book their lead time</b>—a twenty-week commitment that sets the date the package can be built.",
+   "Substrate lead time is the longest single external dependency in the back half of the program, and it is ordered against a design that is not finished. Selecting the supplier early, understanding their rules and booking capacity is what makes the order placeable the moment the design freezes."
   ],
   "steps": [
    {
     "n": 1,
-    "text": "Define and document engage supplier long-list and capability screen",
+    "text": "Screen the supplier long-list for capability",
     "tat": 1.5,
     "lane": "main"
    },
@@ -34770,25 +34710,25 @@ export const activityDetails: Record<string, ActivityDetail> = {
    },
    {
     "n": 3,
-    "text": "Define and document capacity and lead time confirmation",
+    "text": "Confirm capacity and lead time",
     "tat": 2,
     "lane": "par"
    },
    {
     "n": 4,
-    "text": "Define and document commercial negotiation and pricing",
+    "text": "Negotiate the commercial terms and pricing",
     "tat": 2,
     "lane": "par"
    },
    {
     "n": 5,
-    "text": "Qualify supplier selection and plan",
+    "text": "Select the supplier and set the qualification plan",
     "tat": 2.5,
     "lane": "main"
    },
    {
     "n": 6,
-    "text": "Book purchase order and lead time",
+    "text": "Place the purchase order and book the lead time",
     "tat": 4,
     "lane": "main"
    }
@@ -34821,20 +34761,20 @@ export const activityDetails: Record<string, ActivityDetail> = {
    {
     "id": "PKGD-D7",
     "rel": "produces",
-    "text": "Substrate and interposer PO with committed lead time. The deliverable the committed date is what wafer-out has to be planned against."
+    "text": "<b>Substrate and interposer PO with committed lead time.</b> The purchase order and its committed lead time are produced here, and the committed date is what wafer-out has to be planned against."
    },
    {
     "id": "PKGD-D3",
     "rel": "feeds",
-    "text": "Substrate design files and stack-up. Supplier rules determine what the substrate design can contain."
+    "text": "<b>Substrate design files and stack-up.</b> Supplier rules determine what the substrate design can contain."
    }
   ],
   "risks": [
-   "Order placed after wafer-out is committed",
-   "Supplier rules obtained after design starts",
-   "Capacity assumed",
-   "Single supplier with no alternative",
-   "Lead time quoted without a commitment"
+   "<b>Order placed after wafer-out is committed.</b> A twenty-week substrate against a fixed wafer-out date means wafers waiting for a package.",
+   "<b>Supplier rules obtained after design starts.</b> A substrate designed to generic rules may be unbuildable by the chosen supplier.",
+   "<b>Capacity assumed.</b> Advanced substrate capacity is constrained, and a supplier who can build it may not be able to build it when needed.",
+   "<b>Single supplier with no alternative.</b> A supply disruption then has no mitigation, and substrates are not quickly re-sourced.",
+   "<b>Lead time quoted without a commitment.</b> An indicative lead time is not a date, and the difference appears when the schedule depends on it."
   ],
   "roles": [
    {
@@ -34940,43 +34880,43 @@ export const activityDetails: Record<string, ActivityDetail> = {
   ],
   "criticalPath": false,
   "purpose": [
-   "Select the OSAT and define the assembly process—bonding, underfill, molding, lid attach—because the process determines what the package design has to accommodate.",
+   "Select the <b>OSAT and define the assembly process</b>—bonding, underfill, molding, lid attach—because the process determines what the package design has to accommodate.",
    "Assembly is not a service the package is handed to; it is a set of constraints the package is designed within. Bond force, reflow profile, underfill flow and lid attach all impose requirements, and choosing the OSAT late means designing a package that has to be adapted to whoever ends up building it."
   ],
   "steps": [
    {
     "n": 1,
-    "text": "Define and document oSAT capability screen for the package architecture",
+    "text": "Screen OSAT capability for the package architecture",
     "tat": 1.5,
     "lane": "main"
    },
    {
     "n": 2,
-    "text": "Define assembly process flow",
+    "text": "Define the assembly process flow",
     "tat": 2,
     "lane": "main"
    },
    {
     "n": 3,
-    "text": "Define and document bonding, underfill and molding process parameters",
+    "text": "Specify the bonding, underfill and molding parameters",
     "tat": 2,
     "lane": "par"
    },
    {
     "n": 4,
-    "text": "Hand off known-good-die and responsibility model",
+    "text": "Agree the known-good-die handoff and responsibility model",
     "tat": 1.5,
     "lane": "par"
    },
    {
     "n": 5,
-    "text": "Select oSAT and capacity commitment",
+    "text": "Select the OSAT and commit the capacity",
     "tat": 2,
     "lane": "main"
    },
    {
     "n": 6,
-    "text": "Define and document assembly agreement and process freeze plan",
+    "text": "Close the assembly agreement and process freeze plan",
     "tat": 3.5,
     "lane": "main"
    }
@@ -35009,20 +34949,20 @@ export const activityDetails: Record<string, ActivityDetail> = {
    {
     "id": "PKGD-D8",
     "rel": "produces",
-    "text": "OSAT assembly process flow and agreement. The deliverable the agreement includes the responsibility model."
+    "text": "<b>OSAT assembly process flow and agreement.</b> The process flow and assembly agreement are produced here, and the agreement includes the responsibility model."
    },
    {
     "id": "PKGD-D5",
     "rel": "feeds",
-    "text": "Thermal and mechanical simulation reports. The reflow profile the simulations use comes from the assembly process defined here."
+    "text": "<b>Thermal and mechanical simulation reports.</b> The reflow profile the simulations use comes from the assembly process defined here."
    }
   ],
   "risks": [
-   "OSAT selected after the package is designed",
-   "Advanced packaging capacity not committed",
-   "Known-good-die responsibility undefined",
-   "Process parameters left to the OSAT",
-   "Process frozen without vehicle data"
+   "<b>OSAT selected after the package is designed.</b> The design then has to be adapted to the assembler's process rather than developed with it.",
+   "<b>Advanced packaging capacity not committed.</b> The same constraint as the interposer, and it applies to assembly capacity independently.",
+   "<b>Known-good-die responsibility undefined.</b> The first failed lot is the wrong moment to discover nobody agreed who owns the die.",
+   "<b>Process parameters left to the OSAT.</b> Bond force and reflow profile affect warpage and CPI, and the package design has to know them.",
+   "<b>Process frozen without vehicle data.</b> <code>PTV-12</code> freezes the process window on evidence; freezing earlier means freezing on assumption."
   ],
   "roles": [
    {
@@ -35129,8 +35069,8 @@ export const activityDetails: Record<string, ActivityDetail> = {
   ],
   "criticalPath": true,
   "purpose": [
-   "Freeze the package design, close its DRC, release the tooling—and start the twenty-week substrate lead time that everything downstream waits on.",
-   "The freeze is a schedule event more than a design one. The substrate order cannot be placed against a moving design, and the lead time that follows is what sets when packages can be built."
+   "Freeze the <b>package design</b>, close its DRC, release the tooling—and start the twenty-week substrate lead time that everything downstream waits on.",
+   "The freeze is a schedule event more than a design one. The substrate order cannot be placed against a moving design, and the lead time that follows is what sets when packages can be built. Every week of delay here is a week at the far end, after wafer-out, where it is most visible and least recoverable."
   ],
   "steps": [
    {
@@ -35141,31 +35081,31 @@ export const activityDetails: Record<string, ActivityDetail> = {
    },
    {
     "n": 2,
-    "text": "Finalize package DRC and supplier rule compliance",
+    "text": "Run final package DRC and supplier rule compliance",
     "tat": 1.5,
     "lane": "main"
    },
    {
     "n": 3,
-    "text": "Define and document electrical intent confirmation against SIPI findings",
+    "text": "Confirm the electrical intent against the SIPI findings",
     "tat": 1,
     "lane": "par"
    },
    {
     "n": 4,
-    "text": "Release tooling and manufacturing data",
+    "text": "Release the tooling and manufacturing data",
     "tat": 1.5,
     "lane": "main"
    },
    {
     "n": 5,
-    "text": "Review supplier design and acceptance",
+    "text": "Run the supplier design review and obtain acceptance",
     "tat": 1.5,
     "lane": "par"
    },
    {
     "n": 6,
-    "text": "Release design freeze declaration and order",
+    "text": "Declare the design freeze and release the order",
     "tat": 2,
     "lane": "main"
    }
@@ -35198,20 +35138,20 @@ export const activityDetails: Record<string, ActivityDetail> = {
    {
     "id": "PKGD-D9",
     "rel": "produces",
-    "text": "Package Design Freeze package. The deliverable it carries the stage's milestone."
+    "text": "<b>Package Design Freeze package.</b> The freeze package is assembled and declared here, and it carries the stage's milestone."
    },
    {
     "id": "PKGD-D7",
     "rel": "gates",
-    "text": "Substrate and interposer PO with committed lead time. The order is released on this freeze; nothing before it starts the lead time."
+    "text": "<b>Substrate and interposer PO with committed lead time.</b> The order is released on this freeze; nothing before it starts the lead time."
    }
   ],
   "risks": [
-   "Freeze slipping",
-   "Frozen before co-verification completes",
-   "Supplier acceptance assumed",
-   "Tooling data incomplete",
-   "Late bump map change from the die side"
+   "<b>Freeze slipping.</b> Twenty weeks of substrate lead time follow it, and the delay lands after wafer-out where nothing can absorb it.",
+   "<b>Frozen before co-verification completes.</b> A <code>SIPI</code> finding after freeze is a package change against an order already placed.",
+   "<b>Supplier acceptance assumed.</b> A design frozen internally and rejected on manufacturability has not frozen anything except the schedule.",
+   "<b>Tooling data incomplete.</b> Manufacturing data is more than the design files, and a missing item stalls the order after it is placed.",
+   "<b>Late bump map change from the die side.</b> <code>PD-04</code> has to be frozen first, and a die-side change after this point is extremely expensive."
   ],
   "roles": [
    {
@@ -35334,43 +35274,43 @@ export const activityDetails: Record<string, ActivityDetail> = {
   ],
   "criticalPath": true,
   "purpose": [
-   "Decide which package risks the vehicles will retire—chip-package interaction, warpage, thermal, assembly yield—and what evidence would count as retiring them.",
+   "Decide <b>which package risks the vehicles will actually retire</b>—chip-package interaction, warpage, thermal, assembly yield—and what evidence would count as retiring them.",
    "The vehicle program has one shot and a hard gate at product wafer-out. Its value depends entirely on measuring the risks that would otherwise be discovered on real dies, and a vehicle plan built from what is easy to measure rather than from what is risky produces reassurance instead of information."
   ],
   "steps": [
    {
     "n": 1,
-    "text": "Assess risk intake from package design and previous programs",
+    "text": "Take in the risks from package design and previous programs",
     "tat": 1,
     "lane": "main"
    },
    {
     "n": 2,
-    "text": "Assess risk prioritization against product impact",
+    "text": "Prioritize the risks against product impact",
     "tat": 1.5,
     "lane": "main"
    },
    {
     "n": 3,
-    "text": "Define evidence — what would retire each risk",
+    "text": "Define the evidence that would retire each risk",
     "tat": 1.5,
     "lane": "par"
    },
    {
     "n": 4,
-    "text": "Allocate vehicle type per risk",
+    "text": "Allocate a vehicle type to each risk",
     "tat": 1.5,
     "lane": "main"
    },
    {
     "n": 5,
-    "text": "Define and document schedule feasibility against the wafer-out gate",
+    "text": "Check schedule feasibility against the wafer-out gate",
     "tat": 1,
     "lane": "par"
    },
    {
     "n": 6,
-    "text": "Define vehicle plan and risk coverage matrix",
+    "text": "Write the vehicle plan and risk coverage matrix",
     "tat": 2,
     "lane": "main"
    }
@@ -35388,7 +35328,7 @@ export const activityDetails: Record<string, ActivityDetail> = {
    "Package risk list with product impact",
    "Evidence definition per risk",
    "Vehicle type allocation",
-   "Schedule feasibility assessment result",
+   "Schedule feasibility finding",
    "Test vehicle plan and risk coverage matrix"
   ],
   "producedBy": [
@@ -35403,20 +35343,20 @@ export const activityDetails: Record<string, ActivityDetail> = {
    {
     "id": "PTV-D1",
     "rel": "produces",
-    "text": "Test vehicle plan and risk coverage matrix. The deliverable the matrix is what every later result is reported against."
+    "text": "<b>Test vehicle plan and risk coverage matrix.</b> The vehicle plan and risk coverage matrix are written here, and the matrix is what every later result is reported against."
    },
    {
     "id": "PTV-D9",
     "rel": "feeds",
-    "text": "Package validation complete record. Validation is complete when the matrix's risks are retired, which is why the matrix has to be right."
+    "text": "<b>Package validation complete record.</b> Validation is complete when the matrix's risks are retired, which is why the matrix has to be right."
    }
   ],
   "risks": [
-   "Plan built from what is measurable",
-   "Schedule not checked against the gate",
-   "Evidence undefined",
-   "Previous-program failures not consulted",
-   "Vehicle count driven by budget rather than by risk"
+   "<b>Plan built from what is measurable.</b> Easy measurements produce data; the risk list produces information, and the two are not the same set.",
+   "<b>Schedule not checked against the gate.</b> A fifty-two week program that finishes after wafer-out has validated nothing in time to matter.",
+   "<b>Evidence undefined.</b> Without agreeing in advance what would retire a risk, the results become an argument rather than a conclusion.",
+   "<b>Previous-program failures not consulted.</b> The package failure modes that recur are known, and they are the ones worth measuring.",
+   "<b>Vehicle count driven by budget rather than by risk.</b> Fewer vehicles means fewer risks retired, and the trade should be explicit."
   ],
   "roles": [
    {
@@ -35523,43 +35463,43 @@ export const activityDetails: Record<string, ActivityDetail> = {
   ],
   "criticalPath": false,
   "purpose": [
-   "Design the mechanical test vehicle—dummy die stack, representative bump array, substrate coupon—that carries the package's mechanical behavior without any of its electronics.",
+   "Design the <b>mechanical test vehicle</b>—dummy die stack, representative bump array, substrate coupon—that carries the package's mechanical behavior without any of its electronics.",
    "The MTV exists to be stressed. Its die are blank, its interposer is representative and its purpose is to reproduce the mechanical stack faithfully enough that warpage, co-planarity and CPI measured on it predict what the product will do."
   ],
   "steps": [
    {
     "n": 1,
-    "text": "Define and document mechanical representativeness requirements",
+    "text": "Define the mechanical representativeness requirements",
     "tat": 1.5,
     "lane": "main"
    },
    {
     "n": 2,
-    "text": "Define and document dummy die and die stack design",
+    "text": "Design the dummy die and die stack",
     "tat": 2,
     "lane": "main"
    },
    {
     "n": 3,
-    "text": "Define bump array design representative of the product",
+    "text": "Design a bump array representative of the product",
     "tat": 2,
     "lane": "par"
    },
    {
     "n": 4,
-    "text": "Define interposer and substrate coupon design",
+    "text": "Design the interposer and substrate coupons",
     "tat": 2.5,
     "lane": "main"
    },
    {
     "n": 5,
-    "text": "Integrate measurement feature — strain, reference marks",
+    "text": "Integrate the measurement features — strain, reference marks",
     "tat": 1.5,
     "lane": "par"
    },
    {
     "n": 6,
-    "text": "Release mTV design",
+    "text": "Release the MTV design",
     "tat": 3,
     "lane": "main"
    }
@@ -35592,20 +35532,20 @@ export const activityDetails: Record<string, ActivityDetail> = {
    {
     "id": "PTV-D2",
     "rel": "produces",
-    "text": "MTV, TTV and daisy-chain vehicle designs. The mechanical vehicle of the three."
+    "text": "<b>MTV, TTV and daisy-chain vehicle designs.</b> The mechanical vehicle of the three—the dummy die stack, representative bump array and coupon design that carry the package's mechanical behavior."
    },
    {
     "id": "PTV-D4",
     "rel": "feeds",
-    "text": "Warpage and co-planarity data across the reflow profile. What the MTV measures is bounded by how it was designed."
+    "text": "<b>Warpage and co-planarity data across the reflow profile.</b> What the MTV measures is bounded by how it was designed: the reference marks and strain features integrated here are what the warpage measurement reads."
    }
   ],
   "risks": [
-   "Vehicle not mechanically representative",
-   "Measurement features omitted",
-   "Bump array simplified",
-   "Design released before the product's stack is settled",
-   "Coupon size unrepresentative"
+   "<b>Vehicle not mechanically representative.</b> Different die thickness or underfill produces warpage that does not predict the product's.",
+   "<b>Measurement features omitted.</b> A vehicle with no reference marks or strain features can be measured externally and not internally.",
+   "<b>Bump array simplified.</b> Bump density and distribution drive local stress, and a uniform array does not reproduce the product's concentrations.",
+   "<b>Design released before the product's stack is settled.</b> A vehicle built on an assumption that changes measures the wrong package.",
+   "<b>Coupon size unrepresentative.</b> Warpage scales with body size, and a smaller coupon understates it."
   ],
   "roles": [
    {
@@ -35708,43 +35648,43 @@ export const activityDetails: Record<string, ActivityDetail> = {
   ],
   "criticalPath": false,
   "purpose": [
-   "Design the thermal test vehicle—embedded heaters and temperature sensors laid out to match the product's power map—so the package's thermal path can be measured rather than simulated.",
+   "Design the <b>thermal test vehicle</b>—embedded heaters and temperature sensors laid out to match the product's power map—so the package's thermal path can be measured rather than simulated.",
    "A TTV is a die that only makes heat, in the pattern the real die will make it. Uniform heaters measure an average the product will never experience; heaters matched to the compute cluster distribution measure the hotspot that decides the achievable power envelope."
   ],
   "steps": [
    {
     "n": 1,
-    "text": "Define and document power map translation into heater zones",
+    "text": "Translate the power map into heater zones",
     "tat": 1.5,
     "lane": "main"
    },
    {
     "n": 2,
-    "text": "Define and document heater array design and drive requirements",
+    "text": "Design the heater array and its drive requirements",
     "tat": 2,
     "lane": "main"
    },
    {
     "n": 3,
-    "text": "Place rTD and temperature sensor",
+    "text": "Place the RTD and temperature sensors",
     "tat": 2,
     "lane": "par"
    },
    {
     "n": 4,
-    "text": "Integrate tTV die and interposer",
+    "text": "Integrate the TTV die with the interposer",
     "tat": 2.5,
     "lane": "main"
    },
    {
     "n": 5,
-    "text": "Define and document calibration approach for the sensors",
+    "text": "Define the sensor calibration approach",
     "tat": 1.5,
     "lane": "par"
    },
    {
     "n": 6,
-    "text": "Release tTV design",
+    "text": "Release the TTV design",
     "tat": 3,
     "lane": "main"
    }
@@ -35777,20 +35717,20 @@ export const activityDetails: Record<string, ActivityDetail> = {
    {
     "id": "PTV-D2",
     "rel": "produces",
-    "text": "MTV, TTV and daisy-chain vehicle designs. The thermal vehicle of the three."
+    "text": "<b>MTV, TTV and daisy-chain vehicle designs.</b> The thermal vehicle of the three—the heater array matched to the product's power map and the sensor placement that makes gradients measurable."
    },
    {
     "id": "PTV-D6",
     "rel": "feeds",
-    "text": "Thermal characterization report with model correlation. What the TTV can measure bounds what the correlation can claim."
+    "text": "<b>Thermal characterization report with model correlation.</b> What the TTV can measure bounds what the correlation can claim."
    }
   ],
   "risks": [
-   "Uniform heaters",
-   "Sensors too few or badly placed",
-   "Sensor calibration not planned",
-   "Heater drive capability underspecified",
-   "Power map taken from an early estimate"
+   "<b>Uniform heaters.</b> They measure an average power distribution the product will never have, and the hotspot goes unmeasured.",
+   "<b>Sensors too few or badly placed.</b> Thermal gradients are what matter, and a single center sensor cannot see one.",
+   "<b>Sensor calibration not planned.</b> An uncalibrated RTD gives a relative number, and thermal resistance needs an absolute one.",
+   "<b>Heater drive capability underspecified.</b> Reproducing hundreds of watts through a test vehicle needs real power delivery, and the setup has to supply it.",
+   "<b>Power map taken from an early estimate.</b> The distribution changes through implementation, and a TTV built on the architecture-era map measures the wrong hotspot."
   ],
   "roles": [
    {
@@ -35891,43 +35831,43 @@ export const activityDetails: Record<string, ActivityDetail> = {
   ],
   "criticalPath": false,
   "purpose": [
-   "Design the daisy-chain electrical vehicle—continuity structures through every interconnect level—so assembly yield and interconnect integrity can be measured electrically.",
+   "Design the <b>daisy-chain electrical vehicle</b>—continuity structures through every interconnect level—so assembly yield and interconnect integrity can be measured electrically.",
    "Daisy chains turn assembly quality into a resistance measurement. Every bump, every via and every ball becomes part of a chain that either conducts or does not, which makes an otherwise invisible assembly process observable and quantifiable."
   ],
   "steps": [
    {
     "n": 1,
-    "text": "Define and document interconnect level inventory — bump, TSV, via, ball",
+    "text": "Inventory the interconnect levels — bump, TSV, via, ball",
     "tat": 1,
     "lane": "main"
    },
    {
     "n": 2,
-    "text": "Define and document daisy chain topology and segmentation design",
+    "text": "Design the daisy chain topology and segmentation",
     "tat": 2,
     "lane": "main"
    },
    {
     "n": 3,
-    "text": "Measure kelvin structures for resistance",
+    "text": "Design Kelvin structures for resistance measurement",
     "tat": 1.5,
     "lane": "par"
    },
    {
     "n": 4,
-    "text": "Map chain-to-location for defect localization",
+    "text": "Map each chain to its physical location for defect localization",
     "tat": 1.5,
     "lane": "main"
    },
    {
     "n": 5,
-    "text": "Measure probe and access design",
+    "text": "Design the probe and measurement access",
     "tat": 1.5,
     "lane": "par"
    },
    {
     "n": 6,
-    "text": "Release daisy-chain vehicle design",
+    "text": "Release the daisy-chain vehicle design",
     "tat": 3.5,
     "lane": "main"
    }
@@ -35960,20 +35900,20 @@ export const activityDetails: Record<string, ActivityDetail> = {
    {
     "id": "PTV-D2",
     "rel": "produces",
-    "text": "MTV, TTV and daisy-chain vehicle designs. The electrical vehicle of the three."
+    "text": "<b>MTV, TTV and daisy-chain vehicle designs.</b> The electrical vehicle of the three—segmented daisy chains, Kelvin structures and chain-to-location mapping that make assembly yield measurable and attributable."
    },
    {
     "id": "PTV-D3",
     "rel": "feeds",
-    "text": "Built vehicle lots with assembly travelers. The daisy-chain vehicle is what makes the build's quality measurable."
+    "text": "<b>Built vehicle lots with assembly travelers.</b> The daisy-chain vehicle is what makes the build's quality measurable."
    }
   ],
   "risks": [
-   "Chains too long",
-   "No Kelvin structures",
-   "Chain-to-location mapping omitted",
-   "Not all interconnect levels covered",
-   "Measurement access not planned"
+   "<b>Chains too long.</b> A single break makes the whole chain open, and the yield number carries no information about where or why.",
+   "<b>No Kelvin structures.</b> Two-wire resistance includes the probe path, and marginal interconnects are exactly where the difference matters.",
+   "<b>Chain-to-location mapping omitted.</b> A failing chain that cannot be located gives no basis for a process change.",
+   "<b>Not all interconnect levels covered.</b> Bump, TSV, via and ball each fail differently, and a vehicle covering only bumps misses the rest.",
+   "<b>Measurement access not planned.</b> A vehicle that can only be measured with equipment the OSAT does not have is a vehicle that is not measured."
   ],
   "roles": [
    {
@@ -36076,43 +36016,43 @@ export const activityDetails: Record<string, ActivityDetail> = {
   ],
   "criticalPath": true,
   "purpose": [
-   "Build the vehicle hardware—TV die, interposers, substrates—through the same suppliers and processes the product will use.",
-   "Sixteen weeks and six M/M: mostly waiting, on the same supplier queues the product will stand in. Using the real suppliers and the real processes is the point—a vehicle built through a different route measures a package the product will never have."
+   "Build the <b>vehicle hardware</b>—TV die, interposers, substrates—through the same suppliers and processes the product will use.",
+   "Sixteen weeks and six man-months: mostly waiting, on the same supplier queues the product will stand in. Using the real suppliers and the real processes is the point—a vehicle built through a different route measures a package the product will never have."
   ],
   "steps": [
    {
     "n": 1,
-    "text": "Define vehicle build planning and quantity",
+    "text": "Plan the vehicle build and define the quantities",
     "tat": 1.5,
     "lane": "main"
    },
    {
     "n": 2,
-    "text": "Define and document tV die fabrication — dummy, TTV and daisy-chain",
+    "text": "Fabricate the TV die — dummy, TTV and daisy-chain",
     "tat": 6,
     "lane": "main"
    },
    {
     "n": 3,
-    "text": "Define interposer vehicle build",
+    "text": "Build the interposer vehicles",
     "tat": 5,
     "lane": "par"
    },
    {
     "n": 4,
-    "text": "Define substrate vehicle build",
+    "text": "Build the substrate vehicles",
     "tat": 5.5,
     "lane": "main"
    },
    {
     "n": 5,
-    "text": "Qualify incoming inspection and material",
+    "text": "Run incoming inspection and qualify the materials",
     "tat": 2.5,
     "lane": "par"
    },
    {
     "n": 6,
-    "text": "Define and document material readiness for assembly",
+    "text": "Confirm material readiness for assembly",
     "tat": 3,
     "lane": "main"
    }
@@ -36129,7 +36069,7 @@ export const activityDetails: Record<string, ActivityDetail> = {
    "Vehicle build plan with quantities",
    "Fabricated TV die",
    "Interposer vehicles",
-   "Vehicle build plan and quantities",
+   "Substrate vehicle build record",
    "Substrate vehicles",
    "Incoming inspection records",
    "Materials ready for assembly"
@@ -36147,20 +36087,20 @@ export const activityDetails: Record<string, ActivityDetail> = {
    {
     "id": "PTV-D3",
     "rel": "produces",
-    "text": "Built vehicle lots with assembly travelers. The material half of the deliverable; <code>PTV-06</code> assembles them."
+    "text": "<b>Built vehicle lots with assembly travelers.</b> The material half of the deliverable; <code>PTV-06</code> assembles them."
    },
    {
     "id": "PTV-D9",
     "rel": "feeds",
-    "text": "Package validation complete record. Nothing can be validated before the vehicles exist."
+    "text": "<b>Package validation complete record.</b> Nothing can be validated before the vehicles exist, and building them through the product's own suppliers is what makes the results transferable."
    }
   ],
   "risks": [
-   "Vehicles built through a different process",
-   "Vehicle builds competing with product builds",
-   "Quantity too small for the DOE",
-   "Incoming inspection skipped",
-   "Build schedule not tracked against the gate"
+   "<b>Vehicles built through a different process.</b> A package assembled from materials the product will not use measures a package that will not exist.",
+   "<b>Vehicle builds competing with product builds.</b> Same suppliers, same queue; without sequencing one delays the other.",
+   "<b>Quantity too small for the DOE.</b> The process window study needs enough units to vary conditions, and a build sized for a single condition cannot support it.",
+   "<b>Incoming inspection skipped.</b> A vehicle built from out-of-specification material produces results that describe the material rather than the package.",
+   "<b>Build schedule not tracked against the gate.</b> Sixteen weeks of build inside a fifty-two week program leaves limited room for a slip."
   ],
   "roles": [
    {
@@ -36264,49 +36204,49 @@ export const activityDetails: Record<string, ActivityDetail> = {
   ],
   "criticalPath": true,
   "purpose": [
-   "Assemble the vehicles at the OSAT across a designed experiment—bond force, reflow profile, underfill, cure—so the assembly process window is measured rather than assumed.",
+   "Assemble the vehicles at the OSAT across a <b>designed experiment</b>—bond force, reflow profile, underfill, cure—so the assembly process window is measured rather than assumed.",
    "The process window is what <code>ASSY</code> will run to. Establishing it needs deliberate variation: units assembled at the edges of each parameter, not just at nominal, so that the window's boundaries are known rather than the center being confirmed."
   ],
   "steps": [
    {
     "n": 1,
-    "text": "Define and document dOE design across the assembly parameters",
+    "text": "Design the DOE across the assembly parameters",
     "tat": 1.5,
     "lane": "main"
    },
    {
     "n": 2,
-    "text": "Define and document bonding and die attach across conditions",
+    "text": "Bond and die-attach across the conditions",
     "tat": 2.5,
     "lane": "main"
    },
    {
     "n": 3,
-    "text": "Define and document underfill and cure across conditions",
+    "text": "Underfill and cure across the conditions",
     "tat": 2,
     "lane": "par"
    },
    {
     "n": 4,
-    "text": "Define and document molding, lid and TIM attach",
+    "text": "Mold and attach lids and TIM",
     "tat": 2,
     "lane": "main"
    },
    {
     "n": 5,
-    "text": "Define and document inline inspection during assembly — X-ray, CSAM",
+    "text": "Inspect inline during assembly — X-ray, CSAM",
     "tat": 2,
     "lane": "par"
    },
    {
     "n": 6,
-    "text": "Define and document assembly traveler and condition traceability",
+    "text": "Maintain assembly travelers with condition traceability",
     "tat": 2,
     "lane": "par"
    },
    {
     "n": 7,
-    "text": "Characterize assembled lot release to",
+    "text": "Release the assembled lots to characterization",
     "tat": 5,
     "lane": "main"
    }
@@ -36343,20 +36283,20 @@ export const activityDetails: Record<string, ActivityDetail> = {
    {
     "id": "PTV-D3",
     "rel": "produces",
-    "text": "Built vehicle lots with assembly travelers. The assembly half of the deliverable, with the condition traceability that makes it useful."
+    "text": "<b>Built vehicle lots with assembly travelers.</b> The assembly half of the deliverable, with the condition traceability that makes it useful."
    },
    {
     "id": "PTV-D8",
     "rel": "feeds",
-    "text": "Frozen assembly process window definition. The window is derived from this DOE, so its design determines what can be known."
+    "text": "<b>Frozen assembly process window definition.</b> The window is derived from this DOE, so its design determines what can be known."
    }
   ],
   "risks": [
-   "Assembly at nominal only",
-   "Condition traceability lost",
-   "DOE too large for the unit count",
-   "Inline inspection omitted",
-   "OSAT running its standard process"
+   "<b>Assembly at nominal only.</b> That confirms the center and says nothing about the boundaries, which is where production will occasionally operate.",
+   "<b>Condition traceability lost.</b> Units that cannot be attributed to their assembly conditions turn the DOE into an expensive single build.",
+   "<b>DOE too large for the unit count.</b> Varying every parameter needs units the build did not produce, and an under-powered DOE gives ambiguous results.",
+   "<b>Inline inspection omitted.</b> Assembly defects found only at final characterization cannot be attributed to a process step.",
+   "<b>OSAT running its standard process.</b> The point is deliberate variation, and an assembler defaulting to its recipe produces no window information."
   ],
   "roles": [
    {
@@ -36467,19 +36407,19 @@ export const activityDetails: Record<string, ActivityDetail> = {
   ],
   "criticalPath": false,
   "purpose": [
-   "Measure warpage and co-planarity across the reflow profile—not at room temperature, but at every point in the thermal cycle where the package deforms.",
+   "Measure <b>warpage and co-planarity across the reflow profile</b>—not at room temperature, but at every point in the thermal cycle where the package deforms.",
    "Warpage is the mechanism behind most 2.5D assembly failures. A package flat at room temperature can bow by more than a hundred microns at reflow peak, opening joints that then re-close as it cools—leaving a unit that looks fine and has intermittent connections."
   ],
   "steps": [
    {
     "n": 1,
-    "text": "Measure setup — shadow moiré or equivalent",
+    "text": "Set up the measurement — shadow moiré or equivalent",
     "tat": 1,
     "lane": "main"
    },
    {
     "n": 2,
-    "text": "Define and document room-temperature baseline across units",
+    "text": "Measure the room-temperature baseline across units",
     "tat": 1.5,
     "lane": "main"
    },
@@ -36497,13 +36437,13 @@ export const activityDetails: Record<string, ActivityDetail> = {
    },
    {
     "n": 5,
-    "text": "Correlate condition-to-warpage from the DOE",
+    "text": "Correlate condition to warpage from the DOE",
     "tat": 1.5,
     "lane": "par"
    },
    {
     "n": 6,
-    "text": "Compare against the PKGD-07 simulation",
+    "text": "Compare the results against the PKGD-07 simulation",
     "tat": 2.5,
     "lane": "main"
    }
@@ -36536,20 +36476,20 @@ export const activityDetails: Record<string, ActivityDetail> = {
    {
     "id": "PTV-D4",
     "rel": "produces",
-    "text": "Warpage and co-planarity data across the reflow profile. The deliverable the reflow-profile part is what distinguishes it from a room-temperature check."
+    "text": "<b>Warpage and co-planarity data across the reflow profile.</b> The warpage and co-planarity data set is measured here, and the reflow-profile coverage is what distinguishes it from a room-temperature check."
    },
    {
     "id": "PTV-D8",
     "rel": "feeds",
-    "text": "Frozen assembly process window definition. Warpage against condition is one of the window's defining constraints."
+    "text": "<b>Frozen assembly process window definition.</b> Warpage against condition is one of the window's defining constraints."
    }
   ],
   "risks": [
-   "Measured only at room temperature",
-   "Simulation comparison skipped",
-   "Co-planarity ignored",
-   "Too few units to see condition effects",
-   "Results not linked to assembly conditions"
+   "<b>Measured only at room temperature.</b> The failure occurs at reflow peak, and the room-temperature number is not predictive of it.",
+   "<b>Simulation comparison skipped.</b> Without correlation the model stays unvalidated, and the next package has to be measured from scratch.",
+   "<b>Co-planarity ignored.</b> Ball flatness determines whether the package mounts to the board reliably, and it is a separate property from warpage.",
+   "<b>Too few units to see condition effects.</b> Warpage varies unit to unit, and distinguishing a condition effect from noise needs population.",
+   "<b>Results not linked to assembly conditions.</b> Knowing the warpage without knowing which condition produced it gives no basis for a window."
   ],
   "roles": [
    {
@@ -36650,43 +36590,43 @@ export const activityDetails: Record<string, ActivityDetail> = {
   ],
   "criticalPath": true,
   "purpose": [
-   "Evaluate chip-package interaction—the stress the package puts into the die's low-k dielectric stack, and whether the bumps and back-end metal survive it.",
-   "CPI is the failure mode that makes 2.5D packaging risky at advanced nodes. Ultra-low-k dielectrics are mechanically weak, the package expands differently from the silicon, and the resulting stress concentrates exactly where the bumps meet the top metal."
+   "Evaluate <b>chip-package interaction</b>—the stress the package puts into the die's low-k dielectric stack, and whether the bumps and back-end metal survive it.",
+   "CPI is the failure mode that makes 2.5D packaging risky at advanced nodes. Ultra-low-k dielectrics are mechanically weak, the package expands differently from the silicon, and the resulting stress concentrates exactly where the bumps meet the top metal. It cracks or it does not, and simulation alone is not enough to know."
   ],
   "steps": [
    {
     "n": 1,
-    "text": "Select cPI stress evaluation plan and structure",
+    "text": "Plan the CPI stress evaluation and select the structures",
     "tat": 1.5,
     "lane": "main"
    },
    {
     "n": 2,
-    "text": "Define and document thermal cycling stress application",
+    "text": "Apply the thermal cycling stress",
     "tat": 3,
     "lane": "main"
    },
    {
     "n": 3,
-    "text": "Define bump and BEOL integrity inspection",
+    "text": "Inspect bump and BEOL integrity",
     "tat": 2.5,
     "lane": "par"
    },
    {
     "n": 4,
-    "text": "Define and document low-k and ULK crack detection",
+    "text": "Detect low-k and ULK cracks",
     "tat": 2.5,
     "lane": "main"
    },
    {
     "n": 5,
-    "text": "Analyze cross-section and failure on affected units",
+    "text": "Cross-section and analyze the affected units",
     "tat": 2,
     "lane": "par"
    },
    {
     "n": 6,
-    "text": "Assess cPI and design implications",
+    "text": "Compile the CPI assessment with its design implications",
     "tat": 4,
     "lane": "main"
    }
@@ -36719,20 +36659,20 @@ export const activityDetails: Record<string, ActivityDetail> = {
    {
     "id": "PTV-D5",
     "rel": "produces",
-    "text": "CPI stress assessment report—ULK, bump and BEOL integrity. The deliverable it is the most consequential result the vehicle program produces."
+    "text": "<b>CPI stress assessment report—ULK, bump and BEOL integrity.</b> The CPI stress assessment is produced here, and it is the most consequential result the vehicle program produces."
    },
    {
     "id": "PTV-D9",
     "rel": "feeds",
-    "text": "Package validation complete record. CPI is usually the risk the gate most depends on."
+    "text": "<b>Package validation complete record.</b> CPI is usually the risk the gate most depends on, and this assessment is the evidence that retires it or names it unretired."
    }
   ],
   "risks": [
-   "CPI evaluated by simulation alone",
-   "Insufficient thermal cycles",
-   "Cross-sectioning skipped",
-   "Only nominal units stressed",
-   "Findings arriving after package design freezes"
+   "<b>CPI evaluated by simulation alone.</b> Material behavior at these dimensions is not predictable to the accuracy the decision needs.",
+   "<b>Insufficient thermal cycles.</b> CPI failures accumulate; a short cycle count shows nothing and reassures wrongly.",
+   "<b>Cross-sectioning skipped.</b> Detection without localization gives no design implication, and the implication is the output that matters.",
+   "<b>Only nominal units stressed.</b> The DOE's edge conditions are where CPI is most likely, and testing only the center misses it.",
+   "<b>Findings arriving after package design freezes.</b> A CPI problem needs an underfill, bump or design change, none of which are available after <code>PKGD-11</code>."
   ],
   "roles": [
    {
@@ -36838,13 +36778,13 @@ export const activityDetails: Record<string, ActivityDetail> = {
   ],
   "criticalPath": false,
   "purpose": [
-   "Characterize the package's thermal performance—junction-to-case and junction-to-ambient resistance, TIM behavior, hotspot mapping—and correlate it against the simulation.",
+   "Characterize the package's <b>thermal performance</b>—junction-to-case and junction-to-ambient resistance, TIM behavior, hotspot mapping—and correlate it against the simulation.",
    "The thermal path decides the achievable power envelope, and the product is sold on that envelope. Measuring it on a TTV that reproduces the real power distribution is what turns a simulated Rjc into a number the datasheet can carry."
   ],
   "steps": [
    {
     "n": 1,
-    "text": "Measure thermal setup and sensor calibration",
+    "text": "Set up the thermal measurement and calibrate the sensors",
     "tat": 1.5,
     "lane": "main"
    },
@@ -36856,25 +36796,25 @@ export const activityDetails: Record<string, ActivityDetail> = {
    },
    {
     "n": 3,
-    "text": "Map hotspot across the heater zones",
+    "text": "Map hotspots across the heater zones",
     "tat": 2,
     "lane": "par"
    },
    {
     "n": 4,
-    "text": "Define and document tIM performance and bond line study",
+    "text": "Study TIM performance and bond line",
     "tat": 2,
     "lane": "main"
    },
    {
     "n": 5,
-    "text": "Measure transient thermal response",
+    "text": "Measure the transient thermal response",
     "tat": 1.5,
     "lane": "par"
    },
    {
     "n": 6,
-    "text": "Correlate against the PKGD-07 thermal model",
+    "text": "Correlate the results against the PKGD-07 thermal model",
     "tat": 3.5,
     "lane": "main"
    }
@@ -36907,20 +36847,20 @@ export const activityDetails: Record<string, ActivityDetail> = {
    {
     "id": "PTV-D6",
     "rel": "produces",
-    "text": "Thermal characterization report with model correlation. The deliverable the correlation is what makes the model reusable."
+    "text": "<b>Thermal characterization report with model correlation.</b> The characterization report with its model correlation is produced here, and the correlation is what makes the model reusable."
    },
    {
     "id": "PTV-D8",
     "rel": "feeds",
-    "text": "Frozen assembly process window definition. TIM bond line is an assembly parameter, and its thermal effect is measured here."
+    "text": "<b>Frozen assembly process window definition.</b> TIM bond line is an assembly parameter, and its thermal effect is measured here."
    }
   ],
   "risks": [
-   "TIM performance taken from the datasheet",
-   "Hotspot not measured",
-   "Simulation not correlated",
-   "Transient response ignored",
-   "Measured at a single ambient condition"
+   "<b>TIM performance taken from the datasheet.</b> Bond line thickness and pressure are assembly parameters, and the achieved performance differs from the specification.",
+   "<b>Hotspot not measured.</b> The average junction temperature is not what limits the part; the hottest zone is.",
+   "<b>Simulation not correlated.</b> The model then remains unvalidated, and every future thermal question needs another vehicle.",
+   "<b>Transient response ignored.</b> An accelerator's power is bursty, and the transient behavior determines whether the package can absorb a workload spike.",
+   "<b>Measured at a single ambient condition.</b> Rja depends on airflow and ambient, and one condition does not characterize the range the product will see."
   ],
   "roles": [
    {
@@ -37026,43 +36966,43 @@ export const activityDetails: Record<string, ActivityDetail> = {
   ],
   "criticalPath": true,
   "purpose": [
-   "Stress the vehicles through board-level reliability—temperature cycling, drop, bend—because the package has to survive being mounted in a system, not only being assembled.",
+   "Stress the vehicles through <b>board-level reliability</b>—temperature cycling, drop, bend—because the package has to survive being mounted in a system, not only being assembled.",
    "Board-level reliability is where the package meets the customer's manufacturing process. Solder joints crack under thermal cycling, boards flex during handling, and a package that passes component qualification and fails board-level testing is a package the customer cannot use."
   ],
   "steps": [
    {
     "n": 1,
-    "text": "Define and document board-level test plan and coupon board design",
+    "text": "Plan the board-level tests and design the coupon boards",
     "tat": 2,
     "lane": "main"
    },
    {
     "n": 2,
-    "text": "Define and document coupon board fabrication and vehicle mounting",
+    "text": "Fabricate the coupon boards and mount the vehicles",
     "tat": 2.5,
     "lane": "main"
    },
    {
     "n": 3,
-    "text": "Define and document temperature cycling to failure",
+    "text": "Run temperature cycling to failure",
     "tat": 4,
     "lane": "main"
    },
    {
     "n": 4,
-    "text": "Test drop and shock",
+    "text": "Run drop and shock testing",
     "tat": 2.5,
     "lane": "par"
    },
    {
     "n": 5,
-    "text": "Test bend and flex",
+    "text": "Run bend and flex testing",
     "tat": 2,
     "lane": "par"
    },
    {
     "n": 6,
-    "text": "Analyze failure mode and characteristic life",
+    "text": "Analyze the failure modes and establish characteristic life",
     "tat": 5.5,
     "lane": "main"
    }
@@ -37095,20 +37035,20 @@ export const activityDetails: Record<string, ActivityDetail> = {
    {
     "id": "PTV-D7",
     "rel": "produces",
-    "text": "Board-level reliability data on vehicles. The deliverable characteristic life is what customers will ask for."
+    "text": "<b>Board-level reliability data on vehicles.</b> The board-level reliability data is produced here, and characteristic life is what customers will ask for."
    },
    {
     "id": "PTV-D9",
     "rel": "feeds",
-    "text": "Package validation complete record. Board-level survival is part of what \"validated\" has to mean."
+    "text": "<b>Package validation complete record.</b> Board-level survival is part of what \"validated\" has to mean."
    }
   ],
   "risks": [
-   "Testing to a pass criterion rather than to failure",
-   "Coupon board unrepresentative",
-   "Started too late to finish",
-   "Failure modes not analyzed",
-   "Only one mounting condition"
+   "<b>Testing to a pass criterion rather than to failure.</b> A pass tells the customer nothing about margin; characteristic life does.",
+   "<b>Coupon board unrepresentative.</b> Board thickness and pad design affect solder joint stress, and a test board unlike the customer's predicts poorly.",
+   "<b>Started too late to finish.</b> Temperature cycling to failure takes months, and it is the longest test in the vehicle program.",
+   "<b>Failure modes not analyzed.</b> Knowing units failed at a cycle count without knowing how gives no route to improvement.",
+   "<b>Only one mounting condition.</b> Different customers mount differently, and the package's sensitivity to that is worth knowing."
   ],
   "roles": [
    {
@@ -37203,43 +37143,43 @@ export const activityDetails: Record<string, ActivityDetail> = {
   ],
   "criticalPath": false,
   "purpose": [
-   "Measure assembly yield electrically through the daisy chains, localize what failed, and turn that into process learning before the product is assembled.",
+   "Measure <b>assembly yield electrically</b> through the daisy chains, localize what failed, and turn that into process learning before the product is assembled.",
    "Assembly yield on a 2.5D package with hundreds of thousands of interconnects is not guaranteed. The daisy chains make it measurable, and the segmentation makes it attributable—which is what lets the OSAT fix a process problem rather than accept a yield number."
   ],
   "steps": [
    {
     "n": 1,
-    "text": "Measure continuity test setup and plan",
+    "text": "Set up the continuity test and measurement plan",
     "tat": 1,
     "lane": "main"
    },
    {
     "n": 2,
-    "text": "Measure chain continuity across units",
+    "text": "Measure chain continuity across the units",
     "tat": 2,
     "lane": "main"
    },
    {
     "n": 3,
-    "text": "Measure kelvin resistance on interconnects",
+    "text": "Measure Kelvin resistance on the interconnects",
     "tat": 1.5,
     "lane": "par"
    },
    {
     "n": 4,
-    "text": "Analyze failure localization from chain segmentation",
+    "text": "Localize failures from the chain segmentation",
     "tat": 2,
     "lane": "main"
    },
    {
     "n": 5,
-    "text": "Correlate condition-to-yield from the DOE",
+    "text": "Correlate condition to yield from the DOE",
     "tat": 1.5,
     "lane": "par"
    },
    {
     "n": 6,
-    "text": "Define and document assembly yield learning and process feedback",
+    "text": "Compile the yield learning and feed it back to the process",
     "tat": 4,
     "lane": "main"
    }
@@ -37272,20 +37212,20 @@ export const activityDetails: Record<string, ActivityDetail> = {
    {
     "id": "PTV-D3",
     "rel": "feeds",
-    "text": "Built vehicle lots with assembly travelers. The travelers' condition data is what makes this analysis possible."
+    "text": "<b>Built vehicle lots with assembly travelers.</b> The travelers' condition data is what makes this analysis possible."
    },
    {
     "id": "PTV-D8",
     "rel": "feeds",
-    "text": "Frozen assembly process window definition. Yield against condition is the window's most direct evidence."
+    "text": "<b>Frozen assembly process window definition.</b> Yield against condition is the window's most direct evidence."
    }
   ],
   "risks": [
-   "Yield measured without localization",
-   "Marginal interconnects passing continuity",
-   "Condition correlation not performed",
-   "Feedback arriving after the process freezes",
-   "Sample size too small for yield estimation"
+   "<b>Yield measured without localization.</b> A number with no location gives the OSAT nothing to act on.",
+   "<b>Marginal interconnects passing continuity.</b> A high-resistance joint conducts and will fail in the field; Kelvin measurement is what distinguishes it.",
+   "<b>Condition correlation not performed.</b> The DOE's whole purpose is to link yield to parameters, and skipping the analysis wastes the build.",
+   "<b>Feedback arriving after the process freezes.</b> Learning that cannot change the process window is learning with no consequence.",
+   "<b>Sample size too small for yield estimation.</b> Assembly yield is a rate, and estimating it needs enough units for the rate to be meaningful."
   ],
   "roles": [
    {
@@ -37384,13 +37324,13 @@ export const activityDetails: Record<string, ActivityDetail> = {
   ],
   "criticalPath": true,
   "purpose": [
-   "Freeze the assembly process window, feed the findings back into package design, and declare package validation complete—the gate product wafer-out has to clear.",
-   "This is the activity the whole stage exists for. It converts a large body of measurement into two things: a process window <code>ASSY</code> will run to, and a statement that the package has been validated."
+   "Freeze the <b>assembly process window</b>, feed the findings back into package design, and declare package validation complete—the gate product wafer-out has to clear.",
+   "This is the activity the whole stage exists for. It converts a large body of measurement into two things: a process window <code>ASSY</code> will run to, and a statement that the package has been validated. Product wafers must not come out before it is issued, because the alternative is learning about the package on real dies."
   ],
   "steps": [
    {
     "n": 1,
-    "text": "Characterize result consolidation across all vehicle",
+    "text": "Consolidate the results across all vehicle characterization",
     "tat": 1,
     "lane": "main"
    },
@@ -37402,25 +37342,25 @@ export const activityDetails: Record<string, ActivityDetail> = {
    },
    {
     "n": 3,
-    "text": "Define package design feedback and change requests",
+    "text": "Issue package design feedback and change requests",
     "tat": 1.5,
     "lane": "par"
    },
    {
     "n": 4,
-    "text": "Define assembly process window and freeze",
+    "text": "Define and freeze the assembly process window",
     "tat": 2,
     "lane": "main"
    },
    {
     "n": 5,
-    "text": "Define and document residual risk statement for unretired items",
+    "text": "Write the residual risk statement for unretired items",
     "tat": 1,
     "lane": "par"
    },
    {
     "n": 6,
-    "text": "Validate package complete declaration",
+    "text": "Declare package validation complete",
     "tat": 2.5,
     "lane": "main"
    }
@@ -37453,20 +37393,20 @@ export const activityDetails: Record<string, ActivityDetail> = {
    {
     "id": "PTV-D8",
     "rel": "produces",
-    "text": "Frozen assembly process window definition. The window <code>ASSY</code> will build the product to, derived from evidence rather than from the OSAT's standard recipe."
+    "text": "<b>Frozen assembly process window definition.</b> The window <code>ASSY</code> will build the product to, derived from evidence rather than from the OSAT's standard recipe."
    },
    {
     "id": "PTV-D9",
     "rel": "produces",
-    "text": "Package validation complete record—gate for product wafer-out. This activity carries the stage's milestone and the gate."
+    "text": "<b>Package validation complete record—gate for product wafer-out.</b> The validation-complete declaration—with every matrix risk marked retired or explicitly open—is issued here, and it is the gate product wafer-out waits on."
    }
   ],
   "risks": [
-   "Completion declared because the date arrived",
-   "Unretired risks not stated",
-   "Feedback arriving after PKGD-11",
-   "Process window frozen too wide",
-   "Window not transferred to the OSAT as a specification"
+   "<b>Completion declared because the date arrived.</b> The gate exists to be capable of holding wafer-out, and a declaration that cannot say no is not a gate.",
+   "<b>Unretired risks not stated.</b> A validation record that implies full coverage when some risks remain open misleads exactly the decision it informs.",
+   "<b>Feedback arriving after PKGD-11.</b> Package design changes are not available after the freeze, so vehicle findings have to land before it.",
+   "<b>Process window frozen too wide.</b> A window that accommodates every observed condition is not a window; the boundaries have to exclude what produced failures.",
+   "<b>Window not transferred to the OSAT as a specification.</b> A window that exists in a report and not in the assembly instructions will not be followed."
   ],
   "roles": [
    {
@@ -37584,43 +37524,43 @@ export const activityDetails: Record<string, ActivityDetail> = {
   ],
   "criticalPath": true,
   "purpose": [
-   "Get a chip power model that represents the die's current demand honestly—per domain, per mode, under the switching the product produces.",
+   "Get a <b>chip power model</b> that represents the die's current demand honestly—per domain, per mode, under the switching the product actually produces.",
    "Everything in this stage depends on this model. A CPM extracted under averaged activity understates the transient the package must supply, and every downstream conclusion inherits that error without any indication that it did."
   ],
   "steps": [
    {
     "n": 1,
-    "text": "Define model requirement with physical design",
+    "text": "Define the model requirements with physical design",
     "tat": 1,
     "lane": "main"
    },
    {
     "n": 2,
-    "text": "Select switching scenario from real workloads",
+    "text": "Select the switching scenarios from real workloads",
     "tat": 1.5,
     "lane": "main"
    },
    {
     "n": 3,
-    "text": "Decompose domain and mode",
+    "text": "Decompose by power domain and operating mode",
     "tat": 1.5,
     "lane": "par"
    },
    {
     "n": 4,
-    "text": "Extract cPM and assembly",
+    "text": "Extract and assemble the CPM",
     "tat": 2,
     "lane": "main"
    },
    {
     "n": 5,
-    "text": "Validate model against die-level IR analysis",
+    "text": "Validate the model against die-level IR analysis",
     "tat": 1.5,
     "lane": "par"
    },
    {
     "n": 6,
-    "text": "Release model and version control",
+    "text": "Release the model under version control",
     "tat": 2.5,
     "lane": "main"
    }
@@ -37639,7 +37579,7 @@ export const activityDetails: Record<string, ActivityDetail> = {
    "Domain and mode decomposition",
    "Assembled chip power model",
    "Validation against die-level IR",
-   "Extracted chip power model",
+   "Per-domain, per-mode model set",
    "Versioned model release"
   ],
   "producedBy": [
@@ -37655,20 +37595,20 @@ export const activityDetails: Record<string, ActivityDetail> = {
    {
     "id": "SIPI-D1",
     "rel": "produces",
-    "text": "Chip power model (CPM/CPS) release per domain and mode. The deliverable everything else in the stage consumes it."
+    "text": "<b>Chip power model (CPM/CPS) release per domain and mode.</b> The model set is extracted, validated and released here, and everything else in the stage consumes it."
    },
    {
     "id": "SIPI-D3",
     "rel": "feeds",
-    "text": "PDN impedance and dynamic IR co-simulation report. The model is the die-side input to every co-simulation."
+    "text": "<b>PDN impedance and dynamic IR co-simulation report.</b> The model is the die-side input to every co-simulation; the scenario selection made here decides what the PDN analysis can see."
    }
   ],
   "risks": [
-   "Model built on averaged activity",
-   "Single model for all modes",
-   "Not validated against die-level IR",
-   "Delivered late",
-   "Version drift"
+   "<b>Model built on averaged activity.</b> The transient is what the package must supply, and averaging removes exactly the event of interest.",
+   "<b>Single model for all modes.</b> DVFS points and workloads draw very differently, and one model represents none of them well.",
+   "<b>Not validated against die-level IR.</b> A CPM that disagrees with the die's own analysis is wrong somewhere, and nobody knows where.",
+   "<b>Delivered late.</b> The stage cannot start without it, and the stage gates mask release.",
+   "<b>Version drift.</b> Analysis run against a stale model produces conclusions about a die that has since changed."
   ],
   "roles": [
    {
@@ -37777,43 +37717,43 @@ export const activityDetails: Record<string, ActivityDetail> = {
   ],
   "criticalPath": true,
   "purpose": [
-   "Extract electrical models of the package and the board—3D field solution, S-parameters, RLC networks—so the system can be analyzed as one circuit rather than three assumptions.",
-   "Each of the three parties has been designing against a model of the other two. Extraction replaces those assumptions with a solved answer: what the interposer, substrate and board do electrically, at the frequencies the design cares about."
+   "Extract <b>electrical models of the package and the board</b>—3D field solution, S-parameters, RLC networks—so the system can be analyzed as one circuit rather than three assumptions.",
+   "Each of the three parties has been designing against a model of the other two. Extraction replaces those assumptions with a solved answer: what the interposer, substrate and board actually do electrically, at the frequencies the design cares about."
   ],
   "steps": [
    {
     "n": 1,
-    "text": "Define extraction scope and frequency range",
+    "text": "Define the extraction scope and frequency range",
     "tat": 1.5,
     "lane": "main"
    },
    {
     "n": 2,
-    "text": "Extract interposer model",
+    "text": "Extract the interposer model",
     "tat": 2,
     "lane": "main"
    },
    {
     "n": 3,
-    "text": "Extract substrate model",
+    "text": "Extract the substrate model",
     "tat": 2,
     "lane": "par"
    },
    {
     "n": 4,
-    "text": "Extract board and socket model",
+    "text": "Extract the board and socket models",
     "tat": 1.5,
     "lane": "par"
    },
    {
     "n": 5,
-    "text": "Define and document pDN network model assembly",
+    "text": "Assemble the PDN network model",
     "tat": 2,
     "lane": "main"
    },
    {
     "n": 6,
-    "text": "Validate model and correlation",
+    "text": "Validate and correlate the models",
     "tat": 2.5,
     "lane": "main"
    }
@@ -37846,20 +37786,20 @@ export const activityDetails: Record<string, ActivityDetail> = {
    {
     "id": "SIPI-D2",
     "rel": "produces",
-    "text": "Extracted package and board electrical models. The deliverable it is what turns three design intents into one analysable circuit."
+    "text": "<b>Extracted package and board electrical models.</b> The extracted models are produced here, and they are what turn three design intents into one analysable circuit."
    },
    {
     "id": "SIPI-D5",
     "rel": "feeds",
-    "text": "Channel compliance report per interface. Channel simulation runs on these models rather than on idealized transmission lines."
+    "text": "<b>Channel compliance report per interface.</b> Channel simulation runs on these models rather than on idealized transmission lines."
    }
   ],
   "risks": [
-   "Frequency range too narrow",
-   "Extraction on an unfinished design",
-   "Board model omitted",
-   "Models not validated",
-   "Socket and connector effects ignored"
+   "<b>Frequency range too narrow.</b> A model extracted for PDN analysis cannot support channel simulation, and re-extraction is expensive.",
+   "<b>Extraction on an unfinished design.</b> Package routing changes invalidate the model, and re-extraction is measured in weeks.",
+   "<b>Board model omitted.</b> The board is part of the PDN and part of the channel, and excluding it makes the analysis die-and-package only.",
+   "<b>Models not validated.</b> A 3D extraction has convergence and meshing choices, and an unvalidated result can be confidently wrong.",
+   "<b>Socket and connector effects ignored.</b> The bring-up platform includes them, and channel margin measured at bring-up will reflect them."
   ],
   "roles": [
    {
@@ -37975,43 +37915,43 @@ export const activityDetails: Record<string, ActivityDetail> = {
   ],
   "criticalPath": true,
   "purpose": [
-   "Simulate the die, package and board as one power delivery network and check its impedance against target across the frequency range that matters.",
-   "The three levels each cover a different band: on-die decap handles the highest frequencies, package decoupling the middle, board bulk capacitance the lowest. Analyzed separately each looks adequate; analyzed together the gaps between them appear, and those gaps are where the supply sags."
+   "Simulate the <b>die, package and board as one power delivery network</b> and check its impedance against target across the frequency range that matters.",
+   "The three levels each cover a different band: on-die decap handles the highest frequencies, package decoupling the middle, board bulk capacitance the lowest. Analyzed separately each looks adequate; analyzed together the gaps between them appear, and those gaps are where the supply actually sags."
   ],
   "steps": [
    {
     "n": 1,
-    "text": "Define and document impedance target derivation per domain",
+    "text": "Derive the impedance targets per domain",
     "tat": 1.5,
     "lane": "main"
    },
    {
     "n": 2,
-    "text": "Define and document combined die-package-board PDN assembly",
+    "text": "Assemble the combined die-package-board PDN",
     "tat": 2,
     "lane": "main"
    },
    {
     "n": 3,
-    "text": "Analyze dC resistance and static drop",
+    "text": "Analyze DC resistance and static drop",
     "tat": 1.5,
     "lane": "par"
    },
    {
     "n": 4,
-    "text": "Analyze aC impedance across frequency",
+    "text": "Analyze AC impedance across frequency",
     "tat": 2.5,
     "lane": "main"
    },
    {
     "n": 5,
-    "text": "Analyze anti-resonance identification and",
+    "text": "Identify and analyze the anti-resonances",
     "tat": 1.5,
     "lane": "par"
    },
    {
     "n": 6,
-    "text": "Define and document pDN findings and improvement recommendations",
+    "text": "Report the PDN findings and improvement recommendations",
     "tat": 3,
     "lane": "main"
    }
@@ -38044,20 +37984,20 @@ export const activityDetails: Record<string, ActivityDetail> = {
    {
     "id": "SIPI-D3",
     "rel": "produces",
-    "text": "PDN impedance and dynamic IR co-simulation report. The impedance half of the deliverable; <code>SIPI-04</code> supplies the dynamic IR half."
+    "text": "<b>PDN impedance and dynamic IR co-simulation report.</b> The impedance half of the deliverable; <code>SIPI-04</code> supplies the dynamic IR half."
    },
    {
     "id": "SIPI-D4",
     "rel": "feeds",
-    "text": "Decap budget and placement specification. The impedance profile is what the decap budget is designed to flatten."
+    "text": "<b>Decap budget and placement specification.</b> The impedance profile is what the decap budget is designed to flatten."
    }
   ],
   "risks": [
-   "Levels analyzed separately",
-   "Anti-resonances missed",
-   "Impedance target derived from a rule of thumb",
-   "DC analysis only",
-   "Findings without recommendations"
+   "<b>Levels analyzed separately.</b> Each looks adequate in isolation and the transitions between them are where the impedance peaks.",
+   "<b>Anti-resonances missed.</b> They occur at frequencies no single level would examine and can exceed target by a large factor.",
+   "<b>Impedance target derived from a rule of thumb.</b> The target follows from the current step and the allowable ripple, and a generic value is either wasteful or inadequate.",
+   "<b>DC analysis only.</b> Static drop is the easy half; the frequency-dependent behavior is where the problems are.",
+   "<b>Findings without recommendations.</b> An impedance plot that exceeds target tells the team there is a problem, not which level to fix."
   ],
   "roles": [
    {
@@ -38168,19 +38108,19 @@ export const activityDetails: Record<string, ActivityDetail> = {
   ],
   "criticalPath": true,
   "purpose": [
-   "Analyze dynamic voltage droop with the package's inductance included, under the switching profiles the product produces—the number the die-only analysis is optimistic about.",
+   "Analyze <b>dynamic voltage droop with the package's inductance included</b>, under the switching profiles the product actually produces—the number the die-only analysis is optimistic about.",
    "Die-only dynamic IR excludes the package's series inductance, which is the dominant impedance at the frequencies a workload burst excites. The difference between the two numbers is real margin, and it is the reason this stage exists rather than trusting <code>SO-04</code>."
   ],
   "steps": [
    {
     "n": 1,
-    "text": "Select transient scenario from the workload profiles",
+    "text": "Select the transient scenarios from the workload profiles",
     "tat": 1.5,
     "lane": "main"
    },
    {
     "n": 2,
-    "text": "Simulate combined transient with package inductance",
+    "text": "Run the combined transient simulation with package inductance",
     "tat": 2.5,
     "lane": "main"
    },
@@ -38192,19 +38132,19 @@ export const activityDetails: Record<string, ActivityDetail> = {
    },
    {
     "n": 4,
-    "text": "Compare against die-only IR results",
+    "text": "Compare against the die-only IR results",
     "tat": 1.5,
     "lane": "par"
    },
    {
     "n": 5,
-    "text": "Define and document worst-case scenario exploration",
+    "text": "Explore the worst-case scenarios",
     "tat": 1.5,
     "lane": "par"
    },
    {
     "n": 6,
-    "text": "Assess dynamic IR findings and margin",
+    "text": "Assess the dynamic IR margin and report the findings",
     "tat": 2,
     "lane": "main"
    }
@@ -38237,20 +38177,20 @@ export const activityDetails: Record<string, ActivityDetail> = {
    {
     "id": "SIPI-D3",
     "rel": "produces",
-    "text": "PDN impedance and dynamic IR co-simulation report. The dynamic IR half of the deliverable, and the number signoff should be using."
+    "text": "<b>PDN impedance and dynamic IR co-simulation report.</b> The dynamic IR half of the deliverable, and the number signoff should be using."
    },
    {
     "id": "SIPI-D7",
     "rel": "feeds",
-    "text": "Power-aware STA correlation report. Droop is what gets back-annotated into timing in <code>SIPI-09</code>."
+    "text": "<b>Power-aware STA correlation report.</b> Droop is what gets back-annotated into timing in <code>SIPI-09</code>."
    }
   ],
   "risks": [
-   "Package inductance excluded",
-   "Transient scenario too gentle",
-   "Droop duration ignored",
-   "Die-only comparison not made",
-   "Findings arriving after timing signoff"
+   "<b>Package inductance excluded.</b> It dominates at the frequencies a burst excites, and excluding it produces a comfortable and wrong answer.",
+   "<b>Transient scenario too gentle.</b> The worst case is a burst after idle, and a scenario built from steady-state activity never reaches it.",
+   "<b>Droop duration ignored.</b> A deep short droop and a shallow long one have different timing consequences, and only the magnitude is usually reported.",
+   "<b>Die-only comparison not made.</b> Without it nobody knows whether <code>SO-04</code>'s number is optimistic, and the two signoffs disagree silently.",
+   "<b>Findings arriving after timing signoff.</b> Droop consumes timing margin, and a late finding invalidates closure."
   ],
   "roles": [
    {
@@ -38360,43 +38300,43 @@ export const activityDetails: Record<string, ActivityDetail> = {
   ],
   "criticalPath": false,
   "purpose": [
-   "Allocate the decoupling budget across die, package and board—how much capacitance, of what type, mounted where—so the three levels cover the frequency range between them rather than overlapping.",
-   "Decoupling is a system-level allocation that is usually made three times independently. On-die capacitance is expensive in area, package capacitors are limited by mounting positions, and board bulk is cheap and slow."
+   "Allocate the <b>decoupling budget across die, package and board</b>—how much capacitance, of what type, mounted where—so the three levels cover the frequency range between them rather than overlapping.",
+   "Decoupling is a system-level allocation that is usually made three times independently. On-die capacitance is expensive in area, package capacitors are limited by mounting positions, and board bulk is cheap and slow. Optimizing them together is what covers the band; optimizing them separately leaves the middle uncovered."
   ],
   "steps": [
    {
     "n": 1,
-    "text": "Allocate frequency band across the three levels",
+    "text": "Allocate the frequency bands across the three levels",
     "tat": 1.5,
     "lane": "main"
    },
    {
     "n": 2,
-    "text": "Define and document on-die decap requirement and area cost",
+    "text": "Set the on-die decap requirement and cost its area",
     "tat": 1.5,
     "lane": "main"
    },
    {
     "n": 3,
-    "text": "Select package capacitor and mounting position",
+    "text": "Select the package capacitors and their mounting positions",
     "tat": 1.5,
     "lane": "par"
    },
    {
     "n": 4,
-    "text": "Prepare board bulk capacitance requirement",
+    "text": "Set the board bulk capacitance requirement",
     "tat": 1,
     "lane": "par"
    },
    {
     "n": 5,
-    "text": "Verify combined impedance with the allocation",
+    "text": "Verify the combined impedance with the allocation",
     "tat": 1.5,
     "lane": "main"
    },
    {
     "n": 6,
-    "text": "Define decap and handoff to each level",
+    "text": "Issue the decap specification and hand it to each level",
     "tat": 2.5,
     "lane": "main"
    }
@@ -38429,20 +38369,20 @@ export const activityDetails: Record<string, ActivityDetail> = {
    {
     "id": "SIPI-D4",
     "rel": "produces",
-    "text": "Decap budget and placement specification across die, package and board. The deliverable it is the only place the three levels are allocated together."
+    "text": "<b>Decap budget and placement specification across die, package and board.</b> The decap budget and placement specification is produced here, and it is the only place the three levels are allocated together."
    },
    {
     "id": "SIPI-D3",
     "rel": "feeds",
-    "text": "PDN impedance and dynamic IR co-simulation report. The allocation is verified against the impedance target it was designed to meet."
+    "text": "<b>PDN impedance and dynamic IR co-simulation report.</b> The allocation is verified against the impedance target it was designed to meet."
    }
   ],
   "risks": [
-   "Each level decoupled independently",
-   "Package capacitors placed where there is room",
-   "On-die decap area not costed",
-   "Allocation not verified",
-   "Specification not handed to each level"
+   "<b>Each level decoupled independently.</b> The bands overlap in places and leave gaps in others, and the gaps are where the impedance peaks.",
+   "<b>Package capacitors placed where there is room.</b> Mounting position determines loop inductance, and a capacitor far from the current draw contributes little.",
+   "<b>On-die decap area not costed.</b> It is die area, and treating it as free produces a design that traded logic for decoupling without anyone deciding to.",
+   "<b>Allocation not verified.</b> A budget that has not been re-simulated against the impedance target is a proposal rather than a solution.",
+   "<b>Specification not handed to each level.</b> A system allocation that stays in a report is not implemented by anyone."
   ],
   "roles": [
    {
@@ -38553,19 +38493,19 @@ export const activityDetails: Record<string, ActivityDetail> = {
   ],
   "criticalPath": false,
   "purpose": [
-   "Analyze simultaneous switching noise at the IO ring—the supply disturbance many outputs switching together inject into their own reference.",
+   "Analyze <b>simultaneous switching noise at the IO ring</b>—the supply disturbance many outputs switching together inject into their own reference.",
    "SSN is a local problem with system consequences. When a wide interface switches together, the current through the shared return path moves the reference the receivers are measuring against, and the resulting noise appears as jitter and reduced eye margin on the very interface that caused it."
   ],
   "steps": [
    {
     "n": 1,
-    "text": "Analyze sSN scope — which interfaces switch together",
+    "text": "Scope the SSN analysis — which interfaces switch together",
     "tat": 1,
     "lane": "main"
    },
    {
     "n": 2,
-    "text": "Define and document iO ring power and ground network modeling",
+    "text": "Model the IO ring power and ground network",
     "tat": 1.5,
     "lane": "main"
    },
@@ -38583,13 +38523,13 @@ export const activityDetails: Record<string, ActivityDetail> = {
    },
    {
     "n": 5,
-    "text": "Assess mitigation — bump assignment, decoupling",
+    "text": "Assess mitigations — bump assignment, decoupling",
     "tat": 1,
     "lane": "par"
    },
    {
     "n": 6,
-    "text": "Define and document sSN findings and interface impact",
+    "text": "Report the SSN findings and interface impact",
     "tat": 1,
     "lane": "main"
    }
@@ -38622,20 +38562,20 @@ export const activityDetails: Record<string, ActivityDetail> = {
    {
     "id": "SIPI-D5",
     "rel": "feeds",
-    "text": "Channel compliance report per interface. SSN degrades the eye of the interface that causes it, so it belongs in the same compliance assessment."
+    "text": "<b>Channel compliance report per interface.</b> SSN degrades the eye of the interface that causes it, so it belongs in the same compliance assessment."
    },
    {
     "id": "SIPI-D3",
     "rel": "feeds",
-    "text": "PDN impedance and dynamic IR co-simulation report. SSN is a local PDN problem and is reported alongside the global one."
+    "text": "<b>PDN impedance and dynamic IR co-simulation report.</b> SSN is a local PDN problem and is reported alongside the global one."
    }
   ],
   "risks": [
-   "SSN analyzed per pin rather than per interface",
-   "Reference shift not included in the eye budget",
-   "Mitigation identified after bump map freeze",
-   "Worst-case switching pattern not simulated",
-   "IO ring modelled as ideal"
+   "<b>SSN analyzed per pin rather than per interface.</b> The problem is simultaneity, and a single-pin analysis cannot see it.",
+   "<b>Reference shift not included in the eye budget.</b> Ground bounce moves the receiver's threshold, and excluding it overstates the margin.",
+   "<b>Mitigation identified after bump map freeze.</b> The most effective remedy is bump assignment, and it is unavailable after <code>PKGD-02</code> closes.",
+   "<b>Worst-case switching pattern not simulated.</b> All outputs switching the same direction simultaneously is the worst case and is rarely the default pattern.",
+   "<b>IO ring modelled as ideal.</b> The ring's own power distribution is what carries the return current, and idealizing it removes the effect being analyzed."
   ],
   "roles": [
    {
@@ -38742,19 +38682,19 @@ export const activityDetails: Record<string, ActivityDetail> = {
   ],
   "criticalPath": true,
   "purpose": [
-   "Simulate the high-speed channels end to end with extracted package models—insertion loss, crosstalk, return path, reflections—rather than against the idealized channel the PHY was designed to.",
-   "Every PHY closes its margin against an assumed channel. This activity produces the real one: interposer, substrate, board, socket, connectors and all their discontinuities."
+   "Simulate the <b>high-speed channels end to end with extracted package models</b>—insertion loss, crosstalk, return path, reflections—rather than against the idealized channel the PHY was designed to.",
+   "Every PHY closes its margin against an assumed channel. This activity produces the real one: interposer, substrate, board, socket, connectors and all their discontinuities. Where the real channel is worse than assumed, the margin the PHY reported never existed."
   ],
   "steps": [
    {
     "n": 1,
-    "text": "Define channel topology per interface",
+    "text": "Define the channel topology per interface",
     "tat": 1.5,
     "lane": "main"
    },
    {
     "n": 2,
-    "text": "Define and document end-to-end channel assembly from extracted models",
+    "text": "Assemble the end-to-end channels from the extracted models",
     "tat": 2,
     "lane": "main"
    },
@@ -38766,19 +38706,19 @@ export const activityDetails: Record<string, ActivityDetail> = {
    },
    {
     "n": 4,
-    "text": "Analyze crosstalk — near and far end",
+    "text": "Analyze near-end and far-end crosstalk",
     "tat": 2,
     "lane": "par"
    },
    {
     "n": 5,
-    "text": "Analyze return path and discontinuity",
+    "text": "Analyze return paths and discontinuities",
     "tat": 1.5,
     "lane": "par"
    },
    {
     "n": 6,
-    "text": "Characterize channel against the PHY assumption",
+    "text": "Characterize each channel against the PHY assumption",
     "tat": 3.5,
     "lane": "main"
    }
@@ -38811,20 +38751,20 @@ export const activityDetails: Record<string, ActivityDetail> = {
    {
     "id": "SIPI-D5",
     "rel": "produces",
-    "text": "Channel compliance report per interface, with margins. The deliverable the margin is stated against the real channel."
+    "text": "<b>Channel compliance report per interface, with margins.</b> The per-interface compliance report is produced here, and the margin is stated against the real channel."
    },
    {
     "id": "SIPI-D2",
     "rel": "feeds",
-    "text": "Extracted package and board electrical models. Channel simulation is the primary consumer of the extraction."
+    "text": "<b>Extracted package and board electrical models.</b> Channel simulation is the primary consumer of the extraction."
    }
   ],
   "risks": [
-   "Channel simulated on nominal models only",
-   "PHY assumption not reconciled",
-   "Crosstalk analyzed only at the near end",
-   "Socket and connector excluded",
-   "Findings after the package design freeze"
+   "<b>Channel simulated on nominal models only.</b> Manufacturing variation moves impedance and loss, and the compliance margin has to survive it.",
+   "<b>PHY assumption not reconciled.</b> The PHY closed against a budget; if the real channel is worse, the interface has no margin and nobody has noticed.",
+   "<b>Crosstalk analyzed only at the near end.</b> Far-end crosstalk on a long dense channel can dominate, and it behaves differently.",
+   "<b>Socket and connector excluded.</b> The bring-up platform includes them, and margin measured at bring-up will reflect them.",
+   "<b>Findings after the package design freeze.</b> Channel improvements are routing changes, and they are unavailable after <code>PKGD-11</code>."
   ],
   "roles": [
    {
@@ -38935,43 +38875,43 @@ export const activityDetails: Record<string, ActivityDetail> = {
   ],
   "criticalPath": true,
   "purpose": [
-   "Close the eye, jitter and BER budget per interface—combining channel loss, crosstalk, SSN, PHY equalization and jitter into one number that either meets the compliance mask or does not.",
+   "Close the <b>eye, jitter and BER budget per interface</b>—combining channel loss, crosstalk, SSN, PHY equalization and jitter into one number that either meets the compliance mask or does not.",
    "This is where all the electrical work resolves into a pass or a fail. Every contribution—the channel from <code>SIPI-07</code>, the noise from <code>SIPI-06</code>, the PLL jitter from <code>AMS-02</code> and the PHY's own equalization—lands in a single budget, and the interface either has margin or it is shipping on hope."
   ],
   "steps": [
    {
     "n": 1,
-    "text": "Allocate budget structure and contribution per interface",
+    "text": "Structure the budget and allocate contributions per interface",
     "tat": 1.5,
     "lane": "main"
    },
    {
     "n": 2,
-    "text": "Define and document jitter budget assembly — random, deterministic, correlated",
+    "text": "Assemble the jitter budget — random, deterministic, correlated",
     "tat": 2,
     "lane": "main"
    },
    {
     "n": 3,
-    "text": "Analyze statistical eye with equalization",
+    "text": "Run statistical eye analysis with equalization",
     "tat": 2,
     "lane": "par"
    },
    {
     "n": 4,
-    "text": "Define and document bER estimation and margin against the mask",
+    "text": "Estimate BER and margin against the mask",
     "tat": 2,
     "lane": "main"
    },
    {
     "n": 5,
-    "text": "Define and document sensitivity to channel and process variation",
+    "text": "Analyze sensitivity to channel and process variation",
     "tat": 1.5,
     "lane": "par"
    },
    {
     "n": 6,
-    "text": "Close budget and interface signoff",
+    "text": "Close the budget and sign off each interface",
     "tat": 2.5,
     "lane": "main"
    }
@@ -38990,7 +38930,7 @@ export const activityDetails: Record<string, ActivityDetail> = {
    "Statistical eye analysis results",
    "BER estimation and mask margin",
    "Variation sensitivity analysis",
-   "Assembled jitter budget per interface",
+   "Stated margin per interface against its mask",
    "Interface budget closure records"
   ],
   "producedBy": [
@@ -39006,20 +38946,20 @@ export const activityDetails: Record<string, ActivityDetail> = {
    {
     "id": "SIPI-D6",
     "rel": "produces",
-    "text": "Eye, jitter and BER budget closure record. This activity is the deliverable—the statement that each interface will work."
+    "text": "<b>Eye, jitter and BER budget closure record.</b> The budget closure record is produced here—the statement that each interface will work."
    },
    {
     "id": "SIPI-D5",
     "rel": "feeds",
-    "text": "Channel compliance report per interface. Compliance is a budget conclusion rather than a channel property alone."
+    "text": "<b>Channel compliance report per interface.</b> Compliance is a budget conclusion rather than a channel property alone."
    }
   ],
   "risks": [
-   "Jitter contributions summed naively",
-   "Equalization assumed at its maximum",
-   "Variation sensitivity ignored",
-   "SSN excluded from the budget",
-   "Interface failing the mask with no route to fix"
+   "<b>Jitter contributions summed naively.</b> Random and deterministic components combine differently, and getting it wrong produces a budget that is confidently wrong.",
+   "<b>Equalization assumed at its maximum.</b> A PHY closing only with full equalization has no adaptation range left for a worse-than-nominal channel.",
+   "<b>Variation sensitivity ignored.</b> The budget has to hold across manufacturing spread, not only at nominal.",
+   "<b>SSN excluded from the budget.</b> It is a real contribution and it degrades the interface that generates it.",
+   "<b>Interface failing the mask with no route to fix.</b> Late findings leave only channel changes, PHY changes or a rate reduction, and all three are expensive."
   ],
   "roles": [
    {
@@ -39132,31 +39072,31 @@ export const activityDetails: Record<string, ActivityDetail> = {
   ],
   "criticalPath": false,
   "purpose": [
-   "Back-annotate the voltage droop into static timing analysis—because a design signed off at nominal voltage was signed off at a voltage the die does not see.",
-   "Timing and power are analyzed by different teams with different tools, and the connection between them is usually a margin someone assumed. This activity replaces the assumption: the droop map from <code>SIPI-04</code> applied to the timing analysis, so that closure reflects the supply the logic has."
+   "Back-annotate the <b>voltage droop into static timing analysis</b>—because a design signed off at nominal voltage was signed off at a voltage the die does not see.",
+   "Timing and power are analyzed by different teams with different tools, and the connection between them is usually a margin someone assumed. This activity replaces the assumption: the droop map from <code>SIPI-04</code> applied to the timing analysis, so that closure reflects the supply the logic actually has."
   ],
   "steps": [
    {
     "n": 1,
-    "text": "Generate droop map per region and mode",
+    "text": "Generate the droop map per region and mode",
     "tat": 1,
     "lane": "main"
    },
    {
     "n": 2,
-    "text": "Analyze voltage-aware timing setup",
+    "text": "Set up voltage-aware timing analysis",
     "tat": 1.5,
     "lane": "main"
    },
    {
     "n": 3,
-    "text": "Analyze timing re- with back-annotated droop",
+    "text": "Re-analyze timing with the back-annotated droop",
     "tat": 1.5,
     "lane": "par"
    },
    {
     "n": 4,
-    "text": "Assess margin impact per timing path group",
+    "text": "Assess the margin impact per timing path group",
     "tat": 1.5,
     "lane": "main"
    },
@@ -39168,7 +39108,7 @@ export const activityDetails: Record<string, ActivityDetail> = {
    },
    {
     "n": 6,
-    "text": "Define and document power-aware timing findings and recommendations",
+    "text": "Report the power-aware timing findings and recommendations",
     "tat": 1,
     "lane": "main"
    }
@@ -39201,20 +39141,20 @@ export const activityDetails: Record<string, ActivityDetail> = {
    {
     "id": "SIPI-D7",
     "rel": "produces",
-    "text": "Power-aware STA correlation report. The deliverable it connects two signoffs that otherwise run independently."
+    "text": "<b>Power-aware STA correlation report.</b> The correlation report is produced here, and it connects two signoffs that otherwise run independently."
    },
    {
     "id": "SIPI-D3",
     "rel": "feeds",
-    "text": "PDN impedance and dynamic IR co-simulation report. The timing consequence is what makes the IR number actionable."
+    "text": "<b>PDN impedance and dynamic IR co-simulation report.</b> The timing consequence is what makes the IR number actionable."
    }
   ],
   "risks": [
-   "Flat voltage margin used instead",
-   "Analysis run after timing closure",
-   "Droop map too coarse",
-   "Reconciliation skipped",
-   "Recommendations global rather than regional"
+   "<b>Flat voltage margin used instead.</b> Droop is regional, and a flat margin is simultaneously wasteful where droop is low and inadequate where it is high.",
+   "<b>Analysis run after timing closure.</b> Findings then require reopening closure, which is expensive at this point in the schedule.",
+   "<b>Droop map too coarse.</b> Region granularity determines whether the analysis can distinguish a hot spot from an average.",
+   "<b>Reconciliation skipped.</b> Two signoffs with different voltage assumptions produce a design that satisfies neither cleanly.",
+   "<b>Recommendations global rather than regional.</b> The remedy is usually local—more decoupling or a PDN change in one region—and a global response over-corrects."
   ],
   "roles": [
    {
@@ -39317,43 +39257,43 @@ export const activityDetails: Record<string, ActivityDetail> = {
   ],
   "criticalPath": false,
   "purpose": [
-   "Couple the electrical and thermal analyses—because leakage rises with temperature, temperature rises with power, and the two feed each other until they settle somewhere the isolated analyses did not predict.",
-   "Electro-thermal coupling matters at this power density. A hotspot raises local leakage, which raises local power, which raises the hotspot."
+   "Couple the <b>electrical and thermal analyses</b>—because leakage rises with temperature, temperature rises with power, and the two feed each other until they settle somewhere the isolated analyses did not predict.",
+   "Electro-thermal coupling matters at this power density. A hotspot raises local leakage, which raises local power, which raises the hotspot. Analyzing power at a fixed temperature and temperature at a fixed power finds an equilibrium that is optimistic in exactly the region that matters."
   ],
   "steps": [
    {
     "n": 1,
-    "text": "Define and document coupling methodology and iteration scheme",
+    "text": "Define the coupling methodology and iteration scheme",
     "tat": 1,
     "lane": "main"
    },
    {
     "n": 2,
-    "text": "Integrate thermal model with the package model",
+    "text": "Integrate the thermal model with the package model",
     "tat": 1.5,
     "lane": "main"
    },
    {
     "n": 3,
-    "text": "Define and document leakage-temperature feedback modeling",
+    "text": "Model the leakage-temperature feedback",
     "tat": 1,
     "lane": "par"
    },
    {
     "n": 4,
-    "text": "Define and document coupled electro-thermal iteration to convergence",
+    "text": "Iterate the coupled electro-thermal analysis to convergence",
     "tat": 1.5,
     "lane": "main"
    },
    {
     "n": 5,
-    "text": "Assess hotspot and gradient",
+    "text": "Assess the hotspots and gradients",
     "tat": 1,
     "lane": "par"
    },
    {
     "n": 6,
-    "text": "Define and document findings against the isolated analyses",
+    "text": "Compare the findings against the isolated analyses",
     "tat": 1,
     "lane": "main"
    }
@@ -39386,20 +39326,20 @@ export const activityDetails: Record<string, ActivityDetail> = {
    {
     "id": "SIPI-D3",
     "rel": "feeds",
-    "text": "PDN impedance and dynamic IR co-simulation report. Temperature affects both resistance and leakage, and the coupled result is the honest one."
+    "text": "<b>PDN impedance and dynamic IR co-simulation report.</b> Temperature affects both resistance and leakage, and the coupled result is the honest one."
    },
    {
     "id": "SIPI-D7",
     "rel": "feeds",
-    "text": "Power-aware STA correlation report. Temperature affects timing as well as voltage, and both belong in the same correlation."
+    "text": "<b>Power-aware STA correlation report.</b> Temperature affects timing as well as voltage, and both belong in the same correlation."
    }
   ],
   "risks": [
-   "Analyses run at fixed temperature and fixed power",
-   "Leakage-temperature model too coarse",
-   "Non-convergence dismissed as a numerical issue",
-   "Package thermal model unvalidated",
-   "Gradient ignored in favor of peak temperature"
+   "<b>Analyses run at fixed temperature and fixed power.</b> The equilibrium the coupled analysis finds is worse, and it is the one that occurs.",
+   "<b>Leakage-temperature model too coarse.</b> The feedback is exponential, and a linear approximation understates the hotspot.",
+   "<b>Non-convergence dismissed as a numerical issue.</b> It can indicate a real thermal runaway risk and deserves investigation rather than a damping factor.",
+   "<b>Package thermal model unvalidated.</b> If <code>PTV-09</code> has not correlated it, the coupled analysis inherits an unknown error.",
+   "<b>Gradient ignored in favor of peak temperature.</b> Gradients drive mechanical stress and timing variation across the die, and the peak alone does not capture them."
   ],
   "roles": [
    {
@@ -39504,43 +39444,43 @@ export const activityDetails: Record<string, ActivityDetail> = {
   ],
   "criticalPath": true,
   "purpose": [
-   "Hold the co-verification signoff—every result reviewed against named exit criteria, dispositioned, and signed—because mask release depends on it.",
-   "This is the gate the stage exists to reach. Without a signoff with criteria, co-verification is a collection of analyses that each conclude something and together conclude nothing."
+   "Hold the <b>co-verification signoff</b>—every result reviewed against named exit criteria, dispositioned, and signed—because mask release depends on it.",
+   "This is the gate the stage exists to reach. Without a signoff with criteria, co-verification is a collection of analyses that each conclude something and together conclude nothing. The disposition here is what <code>SO-06</code> reviews and what makes the MTO gate at week 78 meaningful."
   ],
   "steps": [
    {
     "n": 1,
-    "text": "Define and document exit criteria confirmation across all analyses",
+    "text": "Confirm the exit criteria across all analyses",
     "tat": 0.75,
     "lane": "main"
    },
    {
     "n": 2,
-    "text": "Define and document result consolidation and margin summary",
+    "text": "Consolidate the results and summarize the margins",
     "tat": 1,
     "lane": "main"
    },
    {
     "n": 3,
-    "text": "Define and document open item disposition with die, package and board owners",
+    "text": "Disposition open items with the die, package and board owners",
     "tat": 1,
     "lane": "par"
    },
    {
     "n": 4,
-    "text": "Review signoff with design and package teams",
+    "text": "Run the signoff review with the design and package teams",
     "tat": 1.25,
     "lane": "main"
    },
    {
     "n": 5,
-    "text": "Define and document residual risk statement",
+    "text": "Write the residual risk statement",
     "tat": 0.75,
     "lane": "par"
    },
    {
     "n": 6,
-    "text": "Verify co- signoff declaration",
+    "text": "Declare the co-verification signoff",
     "tat": 1,
     "lane": "main"
    }
@@ -39559,7 +39499,7 @@ export const activityDetails: Record<string, ActivityDetail> = {
    "Open item dispositions with owners",
    "Signoff review record with design and package",
    "Residual risk statement",
-   "Signoff review record",
+   "Signed criteria disposition record",
    "Co-verification signoff declaration"
   ],
   "producedBy": [
@@ -39575,20 +39515,20 @@ export const activityDetails: Record<string, ActivityDetail> = {
    {
     "id": "SIPI-D8",
     "rel": "produces",
-    "text": "Chip-package-system co-verification signoff—tapeout gate. The deliverable it carries the stage's milestone."
+    "text": "<b>Chip-package-system co-verification signoff—tapeout gate.</b> The co-verification signoff is produced here, and it carries the stage's milestone."
    },
    {
     "id": "SIPI-D6",
     "rel": "gates",
-    "text": "Eye, jitter and BER budget closure record. An interface that has not closed its budget is an open item at this gate."
+    "text": "<b>Eye, jitter and BER budget closure record.</b> An interface that has not closed its budget is an open item at this gate."
    }
   ],
   "risks": [
-   "Signoff without exit criteria",
-   "Open items dispositioned without their owners",
-   "Signoff after the package design freeze",
-   "Residual risk not stated",
-   "Declared to meet the date"
+   "<b>Signoff without exit criteria.</b> The analyses each conclude something and together conclude nothing that can be signed.",
+   "<b>Open items dispositioned without their owners.</b> An item closed by the analysis team rather than by the die, package or board owner has not actually been closed.",
+   "<b>Signoff after the package design freeze.</b> Findings then have nowhere to go, and the freeze was taken without them.",
+   "<b>Residual risk not stated.</b> Some margin will be thin; saying which and how thin is what lets the tapeout decision be informed.",
+   "<b>Declared to meet the date.</b> The gate exists to be able to hold mask release, and one that cannot is not a gate."
   ],
   "roles": [
    {
@@ -39699,37 +39639,37 @@ export const activityDetails: Record<string, ActivityDetail> = {
   ],
   "criticalPath": true,
   "purpose": [
-   "Sort the wafers and pick the known-good die that will go into packages—because on a 2.5D part a bad die does not fail alone, it takes an interposer, two HBM stacks and an assembly with it.",
+   "Sort the wafers and pick the <b>known-good die</b> that will go into packages—because on a 2.5D part a bad die does not fail alone, it takes an interposer, two HBM stacks and an assembly with it.",
    "Known-good-die screening is what makes multi-die packaging economically viable. The coverage achieved at sort determines how many assembled units fail for reasons that were detectable on the wafer, and each of those is a package's worth of material lost."
   ],
   "steps": [
    {
     "n": 1,
-    "text": "Set up wafer receipt and sort on the probe station",
+    "text": "Receive the wafers and set up sort on the probe station",
     "tat": 0.5,
     "lane": "main"
    },
    {
     "n": 2,
-    "text": "Process wafer sort execution against the KGD criteria",
+    "text": "Execute wafer sort against the KGD criteria",
     "tat": 1,
     "lane": "main"
    },
    {
     "n": 3,
-    "text": "Define and document marginal die disposition",
+    "text": "Disposition the marginal die",
     "tat": 0.75,
     "lane": "par"
    },
    {
     "n": 4,
-    "text": "Select known-good-die and wafer mapping",
+    "text": "Select the known-good die and build the wafer maps",
     "tat": 1,
     "lane": "main"
    },
    {
     "n": 5,
-    "text": "Release die to assembly with traceability",
+    "text": "Release the die to assembly with traceability",
     "tat": 0.5,
     "lane": "main"
    }
@@ -39760,20 +39700,20 @@ export const activityDetails: Record<string, ActivityDetail> = {
    {
     "id": "ASSY-D1",
     "rel": "feeds",
-    "text": "Assembled units. Everything assembled starts from a die this activity selected."
+    "text": "<b>Assembled units.</b> Everything assembled starts from a die this activity selected."
    },
    {
     "id": "ASSY-D3",
     "rel": "feeds",
-    "text": "Assembly yield report and failure pareto. Assembly failures traceable to die quality belong against the sort coverage that let them through."
+    "text": "<b>Assembly yield report and failure pareto.</b> Assembly failures traceable to die quality belong against the sort coverage that let them through."
    }
   ],
   "risks": [
-   "KGD coverage below what the package economics need",
-   "Marginal criteria set against die cost",
-   "Traceability lost between wafer and package",
-   "Sort program not ready",
-   "Sorting only for function"
+   "<b>KGD coverage below what the package economics need.</b> Every escaped die costs an assembled unit, and the coverage target follows from that cost rather than from a test convention.",
+   "<b>Marginal criteria set against die cost.</b> On a 2.5D part the assembled unit is worth many times the die, and the reject threshold should reflect that.",
+   "<b>Traceability lost between wafer and package.</b> An assembly failure that cannot be traced back to a die and its wafer position cannot be attributed.",
+   "<b>Sort program not ready.</b> The probe card and program come from <code>TEST</code>, and a delay there stops assembly rather than delaying test.",
+   "<b>Sorting only for function.</b> Parametric marginality—leakage, Vmin—predicts field failure and is worth screening even when the die functions."
   ],
   "roles": [
    {
@@ -39883,37 +39823,37 @@ export const activityDetails: Record<string, ActivityDetail> = {
   ],
   "criticalPath": false,
   "purpose": [
-   "Procure and inspect the HBM stacks—bought components that go into the package alongside the program's own die, and that fail in ways the program does not control.",
+   "Procure and inspect the <b>HBM stacks</b>—bought components that go into the package alongside the program's own die, and that fail in ways the program does not control.",
    "HBM is a purchased part with its own supply constraints and its own quality distribution. Incoming inspection matters because an HBM stack that fails after assembly costs the whole unit, and the supplier's outgoing quality is not the program's to verify after the fact."
   ],
   "steps": [
    {
     "n": 1,
-    "text": "Define and document hBM procurement confirmation and delivery",
+    "text": "Confirm HBM procurement and take delivery",
     "tat": 0.5,
     "lane": "main"
    },
    {
     "n": 2,
-    "text": "Define incoming inspection against",
+    "text": "Run incoming inspection against the specification",
     "tat": 1,
     "lane": "main"
    },
    {
     "n": 3,
-    "text": "Review supplier test data",
+    "text": "Review the supplier test data",
     "tat": 0.75,
     "lane": "par"
    },
    {
     "n": 4,
-    "text": "Qualify stack and release to assembly",
+    "text": "Qualify the stacks and release them to assembly",
     "tat": 1,
     "lane": "main"
    },
    {
     "n": 5,
-    "text": "Define and document inventory and lot traceability",
+    "text": "Maintain inventory and lot traceability",
     "tat": 0.5,
     "lane": "main"
    }
@@ -39944,20 +39884,20 @@ export const activityDetails: Record<string, ActivityDetail> = {
    {
     "id": "ASSY-D1",
     "rel": "feeds",
-    "text": "Assembled units. HBM is part of every assembled unit, and its quality is part of the unit's."
+    "text": "<b>Assembled units.</b> HBM is part of every assembled unit, and its quality is part of the unit's."
    },
    {
     "id": "ASSY-D4",
     "rel": "feeds",
-    "text": "Package-level inspection and test data. Incoming HBM data belongs with the assembly's own inspection record."
+    "text": "<b>Package-level inspection and test data.</b> Incoming HBM data belongs with the assembly's own inspection record."
    }
   ],
   "risks": [
-   "HBM supply constrained",
-   "Incoming inspection skipped",
-   "Supplier data not reviewed",
-   "Lot traceability not maintained",
-   "Specification mismatch discovered at assembly"
+   "<b>HBM supply constrained.</b> It is a scarce component with long lead times, and a shortage stops assembly regardless of how many die are ready.",
+   "<b>Incoming inspection skipped.</b> A marginal stack bonded into a unit costs the whole unit, and the fault is only visible afterwards.",
+   "<b>Supplier data not reviewed.</b> The distribution the lot came from predicts its behavior, and the data is provided at no cost.",
+   "<b>Lot traceability not maintained.</b> An HBM-related failure that cannot be traced to a supplier lot cannot be escalated usefully.",
+   "<b>Specification mismatch discovered at assembly.</b> Stack height, bump pitch and thermal characteristics all have to match the package design."
   ],
   "roles": [
    {
@@ -40054,37 +39994,37 @@ export const activityDetails: Record<string, ActivityDetail> = {
   ],
   "criticalPath": true,
   "purpose": [
-   "Bond the die and HBM stacks to the interposer—micro-bump preparation and thermo-compression bonding—inside the process window the vehicles established.",
+   "Bond the die and HBM stacks to the interposer—<b>micro-bump preparation and thermo-compression bonding</b>—inside the process window the vehicles established.",
    "This is the step the whole PTV program existed to de-risk. Bond force, temperature and time were characterized on vehicles; here they are applied to real die, and the process window is either followed or the vehicle work was wasted."
   ],
   "steps": [
    {
     "n": 1,
-    "text": "Set up process to the frozen window",
+    "text": "Set up the process to the frozen window",
     "tat": 0.5,
     "lane": "main"
    },
    {
     "n": 2,
-    "text": "Prepare micro-bump and flux application",
+    "text": "Prepare the micro-bumps and apply flux",
     "tat": 1,
     "lane": "main"
    },
    {
     "n": 3,
-    "text": "Monitor bond parameter during the run",
+    "text": "Monitor the bond parameters during the run",
     "tat": 0.75,
     "lane": "par"
    },
    {
     "n": 4,
-    "text": "Define and document thermo-compression bonding of die and stacks",
+    "text": "Bond the die and stacks by thermo-compression",
     "tat": 1,
     "lane": "main"
    },
    {
     "n": 5,
-    "text": "Define and document post-bond inspection",
+    "text": "Inspect post-bond and record the travelers",
     "tat": 0.5,
     "lane": "main"
    }
@@ -40098,7 +40038,7 @@ export const activityDetails: Record<string, ActivityDetail> = {
    "Assembly process flow from PKGD-10"
   ],
   "produces": [
-   "Process setup to the frozen window",
+   "Process setup record against the frozen window",
    "Prepared micro-bumps",
    "Bond parameter monitoring data",
    "Bonded die and stack assemblies",
@@ -40117,20 +40057,20 @@ export const activityDetails: Record<string, ActivityDetail> = {
    {
     "id": "ASSY-D2",
     "rel": "produces",
-    "text": "Assembly travelers and process data. This activity is where the traveler starts and where the actual bond conditions are recorded."
+    "text": "<b>Assembly travelers and process data.</b> The traveler starts here, where the actual bond conditions are recorded per unit."
    },
    {
     "id": "ASSY-D1",
     "rel": "feeds",
-    "text": "Assembled units. Bonding is the step that makes a set of components into a package."
+    "text": "<b>Assembled units.</b> Bonding is the step that makes a set of components into a package."
    }
   ],
   "risks": [
-   "Running outside the frozen window",
-   "Bond parameters not documented per unit",
-   "Bump preparation inconsistent",
-   "Post-bond inspection sampled too thinly",
-   "Process drift across the run"
+   "<b>Running outside the frozen window.</b> The PTV program established boundaries; operating outside them discards the evidence it produced.",
+   "<b>Bond parameters not recorded per unit.</b> A failed unit cannot be attributed to its conditions, and the yield analysis loses its most useful variable.",
+   "<b>Bump preparation inconsistent.</b> Flux and surface condition affect joint formation, and variability here shows up as scattered yield.",
+   "<b>Post-bond inspection sampled too thinly.</b> Bonding defects are localized, and a sample that misses them lets them through to underfill where they are unfixable.",
+   "<b>Process drift across the run.</b> Long runs drift, and without monitoring the drift is only visible in the yield trend afterwards."
   ],
   "roles": [
    {
@@ -40234,37 +40174,37 @@ export const activityDetails: Record<string, ActivityDetail> = {
   ],
   "criticalPath": true,
   "purpose": [
-   "Attach the interposer to the substrate and underfill and mold the assembly—the steps that make it mechanically robust and that lock in whatever went before.",
-   "Underfill is irreversible. Once it has flowed and cured, a bonding defect underneath is permanent and invisible to everything except acoustic imaging."
+   "Attach the interposer to the substrate and <b>underfill and mold</b> the assembly—the steps that make it mechanically robust and that lock in whatever went before.",
+   "Underfill is irreversible. Once it has flowed and cured, a bonding defect underneath is permanent and invisible to everything except acoustic imaging. The step's quality—void-free flow, complete fillet, correct cure—determines whether the mechanical stress the package will see is distributed or concentrated."
   ],
   "steps": [
    {
     "n": 1,
-    "text": "Define interposer to substrate attach",
+    "text": "Attach the interposer to the substrate",
     "tat": 0.5,
     "lane": "main"
    },
    {
     "n": 2,
-    "text": "Define and document underfill dispense and flow",
+    "text": "Dispense and flow the underfill",
     "tat": 1,
     "lane": "main"
    },
    {
     "n": 3,
-    "text": "Define and document void and fillet inspection",
+    "text": "Inspect voids and fillet before cure",
     "tat": 0.75,
     "lane": "par"
    },
    {
     "n": 4,
-    "text": "Define and document underfill cure and molding",
+    "text": "Cure the underfill and mold the assembly",
     "tat": 1,
     "lane": "main"
    },
    {
     "n": 5,
-    "text": "Define and document post-mold inspection",
+    "text": "Inspect post-mold",
     "tat": 0.5,
     "lane": "main"
    }
@@ -40281,8 +40221,8 @@ export const activityDetails: Record<string, ActivityDetail> = {
    "Interposer-to-substrate attached assemblies",
    "Dispensed and flowed underfill",
    "Void and fillet inspection results",
-   "Underfilled assemblies",
-   "Cured and molded units",
+   "Cured and molded assemblies",
+   "Inspected post-mold units",
    "Post-mold inspection results"
   ],
   "producedBy": [
@@ -40297,20 +40237,20 @@ export const activityDetails: Record<string, ActivityDetail> = {
    {
     "id": "ASSY-D1",
     "rel": "feeds",
-    "text": "Assembled units. After molding the unit is mechanically complete."
+    "text": "<b>Assembled units.</b> After molding the unit is mechanically complete—attach, underfill and mold quality here decide the robustness the finished unit carries."
    },
    {
     "id": "ASSY-D4",
     "rel": "feeds",
-    "text": "Package-level inspection and test data. Void and fillet inspection results are part of the unit's quality record."
+    "text": "<b>Package-level inspection and test data.</b> Void and fillet inspection results are part of the unit's quality record."
    }
   ],
   "risks": [
-   "Underfill voids",
-   "Incomplete fillet",
-   "Cure profile deviation",
-   "Warpage during cure exceeding the window",
-   "Inspection only after molding"
+   "<b>Underfill voids.</b> They concentrate stress and are the mechanism behind delayed CPI failures, and they are invisible after cure without acoustic imaging.",
+   "<b>Incomplete fillet.</b> The fillet distributes stress at the die edge, and an incomplete one puts that stress into the die corner instead.",
+   "<b>Cure profile deviation.</b> Under-cured underfill has different mechanical properties, and the difference appears as reliability rather than as a visible defect.",
+   "<b>Warpage during cure exceeding the window.</b> The vehicle program measured it; running outside that window reintroduces the risk that was retired.",
+   "<b>Inspection only after molding.</b> Once molded the assembly cannot be examined usefully, and the inspection has to happen before."
   ],
   "roles": [
    {
@@ -40407,31 +40347,31 @@ export const activityDetails: Record<string, ActivityDetail> = {
   ],
   "criticalPath": true,
   "purpose": [
-   "Finish the package—TIM, lid and ball attach—and produce units that can be mounted, cooled and tested.",
+   "Finish the package—<b>TIM, lid and ball attach</b>—and produce units that can be mounted, cooled and tested.",
    "These are the last steps and they determine two things the product is judged on: the thermal interface that decides the achievable power envelope, and the ball array that decides whether the package mounts reliably. Both were characterized on vehicles and both are executed here."
   ],
   "steps": [
    {
     "n": 1,
-    "text": "Define and document tIM application and lid attach",
+    "text": "Apply the TIM and attach the lid",
     "tat": 0.5,
     "lane": "main"
    },
    {
     "n": 2,
-    "text": "Define and document ball attach and reflow",
+    "text": "Attach the balls and reflow",
     "tat": 0.75,
     "lane": "main"
    },
    {
     "n": 3,
-    "text": "Define and document lid flatness and co-planarity check",
+    "text": "Check lid flatness and co-planarity",
     "tat": 0.5,
     "lane": "par"
    },
    {
     "n": 4,
-    "text": "Finalize visual and dimensional inspection",
+    "text": "Run final visual and dimensional inspection",
     "tat": 0.75,
     "lane": "main"
    }
@@ -40462,20 +40402,20 @@ export const activityDetails: Record<string, ActivityDetail> = {
    {
     "id": "ASSY-D1",
     "rel": "produces",
-    "text": "Assembled units—bring-up, qualification and sample lots. This activity is where a unit becomes a finished package."
+    "text": "<b>Assembled units—bring-up, qualification and sample lots.</b> A unit becomes a finished package here: TIM, lid and ball attach produce the units the bring-up, qualification and sample lots are drawn from."
    },
    {
     "id": "ASSY-D4",
     "rel": "feeds",
-    "text": "Package-level inspection and test data. Dimensional and flatness data belongs with the unit's record."
+    "text": "<b>Package-level inspection and test data.</b> Dimensional and flatness data belongs with the unit's record."
    }
   ],
   "risks": [
-   "TIM bond line thicker than characterized",
-   "Lid flatness out of specification",
-   "Ball co-planarity outside the mounting window",
-   "Dimensional drift from the specification",
-   "Final inspection sampled rather than complete"
+   "<b>TIM bond line thicker than characterized.</b> Thermal resistance rises, and the power envelope the product was sold on shrinks.",
+   "<b>Lid flatness out of specification.</b> The cooling solution then contacts unevenly, which produces hotspots the thermal design did not predict.",
+   "<b>Ball co-planarity outside the mounting window.</b> The package does not mount reliably, and the customer discovers it during their assembly.",
+   "<b>Dimensional drift from the specification.</b> The package has to fit sockets, heatsinks and board footprints that were designed to the drawing.",
+   "<b>Final inspection sampled rather than complete.</b> On an engineering build every unit is precious, and a defect shipped to bring-up costs lab days."
   ],
   "roles": [
    {
@@ -40566,31 +40506,31 @@ export const activityDetails: Record<string, ActivityDetail> = {
   ],
   "criticalPath": false,
   "purpose": [
-   "Inspect the assemblies without taking them apart—X-ray for joints, acoustic imaging for delamination and voids, metrology for warpage—because most assembly defects are invisible from outside.",
-   "Completing this work early provides a clear basis for downstream design decisions and reduces late rework, schedule risk, and integration issues."
+   "Inspect the assemblies <b>without taking them apart</b>—X-ray for joints, acoustic imaging for delamination and voids, metrology for warpage—because most assembly defects are invisible from outside.",
+   "A 2.5D package hides everything that matters. The joints are under the die, the underfill is under the interposer, and the only way to see any of it non-destructively is through imaging. What this activity catches is what does not reach bring-up as an unexplained failure."
   ],
   "steps": [
    {
     "n": 1,
-    "text": "Define and document inspection plan and sampling strategy",
+    "text": "Set the inspection plan and sampling strategy",
     "tat": 0.5,
     "lane": "main"
    },
    {
     "n": 2,
-    "text": "Define and document x-ray inspection of joints and voids",
+    "text": "X-ray the joints and voids",
     "tat": 0.75,
     "lane": "main"
    },
    {
     "n": 3,
-    "text": "Define and document defect classification and disposition",
+    "text": "Classify and disposition the defects",
     "tat": 0.5,
     "lane": "par"
    },
    {
     "n": 4,
-    "text": "Define and document acoustic imaging and warpage metrology",
+    "text": "Run acoustic imaging and warpage metrology",
     "tat": 0.75,
     "lane": "main"
    }
@@ -40619,20 +40559,20 @@ export const activityDetails: Record<string, ActivityDetail> = {
    {
     "id": "ASSY-D4",
     "rel": "produces",
-    "text": "Package-level inspection and test data. This activity is the deliverable—the non-destructive record of what is inside each unit."
+    "text": "<b>Package-level inspection and test data.</b> The inspection record is produced here—the non-destructive record of what is inside each unit."
    },
    {
     "id": "ASSY-D3",
     "rel": "feeds",
-    "text": "Assembly yield report and failure pareto. Inspection findings are the physical evidence behind the yield numbers."
+    "text": "<b>Assembly yield report and failure pareto.</b> Inspection findings are the physical evidence behind the yield numbers."
    }
   ],
   "risks": [
-   "Sampling too thin on an engineering build",
-   "Defects classified inconsistently",
-   "Inspection only at the end",
-   "Warpage limits not applied",
-   "Findings not fed back to process"
+   "<b>Sampling too thin on an engineering build.</b> Full inspection is affordable at these quantities, and a defect reaching bring-up costs far more than the inspection would have.",
+   "<b>Defects classified inconsistently.</b> Without a scheme the same feature is a defect on Monday and acceptable on Tuesday, and the yield data becomes noise.",
+   "<b>Inspection only at the end.</b> Defects are cheapest to catch at the step that created them, and end-of-line inspection cannot attribute them.",
+   "<b>Warpage limits not applied.</b> The vehicle program set them; a unit outside them is a reliability risk regardless of whether it functions.",
+   "<b>Findings not fed back to process.</b> Inspection that produces a pass/fail and no process signal wastes most of its value."
   ],
   "roles": [
    {
@@ -40730,19 +40670,19 @@ export const activityDetails: Record<string, ActivityDetail> = {
   ],
   "criticalPath": false,
   "purpose": [
-   "Analyze the assembly yield, build the failure pareto, find the root causes with the OSAT and tune the process inside the window the vehicles defined.",
+   "Analyze the <b>assembly yield</b>, build the failure pareto, find the root causes with the OSAT and tune the process inside the window the vehicles defined.",
    "First-build assembly yield on a 2.5D part is rarely what the cost model assumed. This activity turns the gap into a set of attributed causes and process adjustments—and compares the result against what the vehicle program predicted, which is how the vehicle work gets validated in turn."
   ],
   "steps": [
    {
     "n": 1,
-    "text": "Define and document yield data collection across process steps",
+    "text": "Collect the yield data across process steps",
     "tat": 0.75,
     "lane": "main"
    },
    {
     "n": 2,
-    "text": "Analyze failure pareto by mode and process step",
+    "text": "Build the failure pareto by mode and process step",
     "tat": 1.25,
     "lane": "main"
    },
@@ -40754,19 +40694,19 @@ export const activityDetails: Record<string, ActivityDetail> = {
    },
    {
     "n": 4,
-    "text": "Analyze root cause with the OSAT",
+    "text": "Run root cause analysis with the OSAT",
     "tat": 1.5,
     "lane": "main"
    },
    {
     "n": 5,
-    "text": "Track corrective action",
+    "text": "Track the corrective actions",
     "tat": 1,
     "lane": "par"
    },
    {
     "n": 6,
-    "text": "Define and document process tuning inside the frozen window",
+    "text": "Tune the process inside the frozen window",
     "tat": 1.5,
     "lane": "main"
    }
@@ -40799,20 +40739,20 @@ export const activityDetails: Record<string, ActivityDetail> = {
    {
     "id": "ASSY-D3",
     "rel": "produces",
-    "text": "Assembly yield report and failure pareto. The deliverable the pareto is what the OSAT acts on."
+    "text": "<b>Assembly yield report and failure pareto.</b> The yield report and failure pareto are produced here, and the pareto is what the OSAT acts on."
    },
    {
     "id": "ASSY-D2",
     "rel": "feeds",
-    "text": "Assembly travelers and process data. Yield attribution depends on the traveler data, and the analysis feeds back into what travelers should capture."
+    "text": "<b>Assembly travelers and process data.</b> Yield attribution depends on the traveler data, and the analysis feeds back into what travelers should capture."
    }
   ],
   "risks": [
-   "Yield reported without attribution",
-   "Tuning outside the validated window",
-   "Vehicle prediction not compared",
-   "Root cause pursued without the OSAT",
-   "Corrective actions untracked"
+   "<b>Yield reported without attribution.</b> A number tells the program it has a problem; a pareto by process step tells the OSAT what to change.",
+   "<b>Tuning outside the validated window.</b> It may improve yield and it discards the reliability evidence the vehicles produced.",
+   "<b>Vehicle prediction not compared.</b> The comparison is what validates or invalidates the whole PTV program, and it is cheap to make.",
+   "<b>Root cause pursued without the OSAT.</b> Process knowledge sits with the assembler, and analysis without them produces hypotheses rather than causes.",
+   "<b>Corrective actions untracked.</b> An agreed action that nobody follows up is an action that did not happen."
   ],
   "roles": [
    {
@@ -40921,31 +40861,31 @@ export const activityDetails: Record<string, ActivityDetail> = {
   ],
   "criticalPath": false,
   "purpose": [
-   "Test the assembled packages electrically for opens, shorts and marginal joints before they go anywhere—the cheapest possible screen on the most expensive units the program has.",
+   "Test the assembled packages <b>electrically for opens, shorts and marginal joints</b> before they go anywhere—the cheapest possible screen on the most expensive units the program has.",
    "A package-level continuity test costs minutes and catches assembly failures that would otherwise consume lab days at bring-up. On units this expensive, screening before shipping is not optional economics."
   ],
   "steps": [
    {
     "n": 1,
-    "text": "Test setup and continuity criteria",
+    "text": "Set up the test and continuity criteria",
     "tat": 0.5,
     "lane": "main"
    },
    {
     "n": 2,
-    "text": "Define and document open and short test execution",
+    "text": "Execute the open and short tests",
     "tat": 0.75,
     "lane": "main"
    },
    {
     "n": 3,
-    "text": "Define and document marginal resistance screening",
+    "text": "Screen for marginal resistance",
     "tat": 0.5,
     "lane": "par"
    },
    {
     "n": 4,
-    "text": "Release failure disposition and unit",
+    "text": "Disposition the failures and release the units",
     "tat": 0.75,
     "lane": "main"
    }
@@ -40974,20 +40914,20 @@ export const activityDetails: Record<string, ActivityDetail> = {
    {
     "id": "ASSY-D4",
     "rel": "produces",
-    "text": "Package-level inspection and test data. The electrical half of the deliverable, alongside the imaging from <code>ASSY-06</code>."
+    "text": "<b>Package-level inspection and test data.</b> The electrical half of the deliverable, alongside the imaging from <code>ASSY-06</code>."
    },
    {
     "id": "ASSY-D1",
     "rel": "gates",
-    "text": "Assembled units. A unit that fails continuity is not released to bring-up, however scarce units are."
+    "text": "<b>Assembled units.</b> A unit that fails continuity is not released to bring-up, however scarce units are."
    }
   ],
   "risks": [
-   "Screening skipped because units are scarce",
-   "Continuity only, no resistance",
-   "Criteria not derived from vehicle data",
-   "Failures not fed to yield analysis",
-   "Test fixture damaging units"
+   "<b>Screening skipped because units are scarce.</b> A failed unit consumed at bring-up costs more lab time than the whole screen would have.",
+   "<b>Continuity only, no resistance.</b> Marginal joints conduct and fail later, and only a resistance measurement distinguishes them.",
+   "<b>Criteria not derived from vehicle data.</b> <code>PTV-11</code> measured what good and marginal look like, and the criteria should come from there.",
+   "<b>Failures not fed to yield analysis.</b> An electrical failure is yield data and belongs in the pareto.",
+   "<b>Test fixture damaging units.</b> On packages this expensive the fixture itself has to be qualified."
   ],
   "roles": [
    {
@@ -41084,37 +41024,37 @@ export const activityDetails: Record<string, ActivityDetail> = {
   ],
   "criticalPath": true,
   "purpose": [
-   "Allocate the finished units—bring-up, qualification, customer samples—and build to that allocation, because the first build never has enough for everyone.",
-   "Three groups need units simultaneously and all of them are on the critical path of something. Bring-up needs them to start debugging, qualification needs them to start a months-long stress campaign, and customers were promised samples."
+   "Allocate the finished units—<b>bring-up, qualification, customer samples</b>—and build to that allocation, because the first build never has enough for everyone.",
+   "Three groups need units simultaneously and all of them are on the critical path of something. Bring-up needs them to start debugging, qualification needs them to start a months-long stress campaign, and customers were promised samples. The allocation is a program decision, not an assembly one."
   ],
   "steps": [
    {
     "n": 1,
-    "text": "Allocate requirement collection from each consumer",
+    "text": "Collect the allocation requirements from each consumer",
     "tat": 0.5,
     "lane": "main"
    },
    {
     "n": 2,
-    "text": "Allocate unit and reservation",
+    "text": "Allocate and reserve the units",
     "tat": 1,
     "lane": "main"
    },
    {
     "n": 3,
-    "text": "Define and document contention resolution and escalation",
+    "text": "Resolve contention and escalate where needed",
     "tat": 0.5,
     "lane": "par"
    },
    {
     "n": 4,
-    "text": "Build to allocation across lots",
+    "text": "Build to the allocation across lots",
     "tat": 1,
     "lane": "main"
    },
    {
     "n": 5,
-    "text": "Release and traceability per allocation",
+    "text": "Release with traceability per allocation",
     "tat": 0.5,
     "lane": "main"
    }
@@ -41145,20 +41085,20 @@ export const activityDetails: Record<string, ActivityDetail> = {
    {
     "id": "ASSY-D5",
     "rel": "produces",
-    "text": "Unit allocation record across bring-up, qual and customers. The deliverable it settles a contention that would otherwise be settled by whoever asks loudest."
+    "text": "<b>Unit allocation record across bring-up, qual and customers.</b> The allocation record is produced here, and it settles a contention that would otherwise be settled by whoever asks loudest."
    },
    {
     "id": "ASSY-D1",
     "rel": "produces",
-    "text": "Assembled units—bring-up, qualification and sample lots. The units as allocated lots rather than as an undifferentiated build."
+    "text": "<b>Assembled units—bring-up, qualification and sample lots.</b> The units as allocated lots rather than as an undifferentiated build."
    }
   ],
   "risks": [
-   "Allocation decided by whoever asks first",
-   "Qualification starved",
-   "Customer samples cut",
-   "Build quantity below the sum of needs",
-   "Traceability lost per allocation"
+   "<b>Allocation decided by whoever asks first.</b> The three consumers have different downstream consequences, and the trade belongs to the program.",
+   "<b>Qualification starved.</b> Reliability stress runs for months; starting it late moves mass production directly.",
+   "<b>Customer samples cut.</b> They are frequently contractual, and missing them has commercial consequences the program may not see.",
+   "<b>Build quantity below the sum of needs.</b> Which is normal, and it means the shortfall has to be decided rather than discovered.",
+   "<b>Traceability lost per allocation.</b> A qualification failure has to be traceable to its lot and its assembly conditions."
   ],
   "roles": [
    {
@@ -41261,19 +41201,19 @@ export const activityDetails: Record<string, ActivityDetail> = {
   ],
   "criticalPath": true,
   "purpose": [
-   "Decide what the silicon will be validated on—how many platforms, in what configuration, at what quantity—before anyone draws a schematic.",
-   "Completing this work early provides a clear basis for downstream design decisions and reduces late rework, schedule risk, and integration issues."
+   "Decide <b>what the silicon will be validated on</b>—how many platforms, in what configuration, at what quantity—before anyone draws a schematic.",
+   "The board is the only way to touch the silicon, and its capability bounds everything bring-up and characterization can do. A platform that cannot reach a rail, cannot socket a part, or cannot be temperature-soaked closes off measurements that the qualification plan assumes are available."
   ],
   "steps": [
    {
     "n": 1,
-    "text": "Characterize validation requirement collection from bring-up, and qual",
+    "text": "Collect validation requirements from bring-up, characterization and qual",
     "tat": 1,
     "lane": "main"
    },
    {
     "n": 2,
-    "text": "Prepare platform topology options — socketed, soldered, mezzanine",
+    "text": "Define the platform topology options — socketed, soldered, mezzanine",
     "tat": 1,
     "lane": "main"
    },
@@ -41285,19 +41225,19 @@ export const activityDetails: Record<string, ActivityDetail> = {
    },
    {
     "n": 4,
-    "text": "Select topology with its trade-offs recorded",
+    "text": "Select the topology and record its trade-offs",
     "tat": 1.5,
     "lane": "main"
    },
    {
     "n": 5,
-    "text": "Define and document quantity and revision plan",
+    "text": "Set the quantity and revision plan",
     "tat": 1,
     "lane": "par"
    },
    {
     "n": 6,
-    "text": "Define platform",
+    "text": "Write the platform specification",
     "tat": 1.5,
     "lane": "main"
    }
@@ -41330,20 +41270,20 @@ export const activityDetails: Record<string, ActivityDetail> = {
    {
     "id": "EVB-D1",
     "rel": "produces",
-    "text": "Validation platform specification. The deliverable everything the board team builds derives from it."
+    "text": "<b>Validation platform specification.</b> The platform specification is written here, and everything the board team builds derives from it."
    },
    {
     "id": "EVB-D3",
     "rel": "informs",
-    "text": "Fabricated and assembled boards. The quantity and revision plan decides how many boards exist and when."
+    "text": "<b>Fabricated and assembled boards.</b> The quantity and revision plan decides how many boards exist and when."
    }
   ],
   "risks": [
-   "Requirements collected from bring-up only",
-   "Socket versus solder decided late",
-   "Quantity underestimated",
-   "Reuse not assessed",
-   "Specification written after design started"
+   "<b>Requirements collected from bring-up only.</b> Characterization and qualification also live on this platform, and their needs—soak capability, instrumented rails—differ.",
+   "<b>Socket versus solder decided late.</b> It changes the board, the mechanical design and the unit consumption, and reversing it costs a board revision.",
+   "<b>Quantity underestimated.</b> Boards are the constraint on parallel debug, and a second fabrication run costs two months.",
+   "<b>Reuse not assessed.</b> An adaptable existing platform is the cheapest schedule available and it is often never looked for.",
+   "<b>Specification written after design started.</b> The board then documents what was built rather than bounding what should be."
   ],
   "roles": [
    {
@@ -41450,55 +41390,55 @@ export const activityDetails: Record<string, ActivityDetail> = {
   ],
   "criticalPath": true,
   "purpose": [
-   "Design the EVB schematic—power tree, host interface, socket, clocking, debug headers—and its bill of materials.",
+   "Design the <b>EVB schematic</b>—power tree, host interface, socket, clocking, debug headers—and its bill of materials.",
    "The schematic is where the platform's capability is fixed. A rail without a sense point cannot be measured, a debug header omitted cannot be added, and a component with a 40-week lead time turns a board schedule into a procurement schedule."
   ],
   "steps": [
    {
     "n": 1,
-    "text": "Define and document block diagram and interface partition",
+    "text": "Draw the block diagram and partition the interfaces",
     "tat": 1,
     "lane": "main"
    },
    {
     "n": 2,
-    "text": "Define and document power tree and VRM schematic",
+    "text": "Design the power tree and VRM schematic",
     "tat": 2.5,
     "lane": "main"
    },
    {
     "n": 3,
-    "text": "Define and document clocking and reference schematic",
+    "text": "Design the clocking and reference schematic",
     "tat": 2,
     "lane": "par"
    },
    {
     "n": 4,
-    "text": "Define and document host interface and connector schematic",
+    "text": "Design the host interface and connector schematic",
     "tat": 2.5,
     "lane": "main"
    },
    {
     "n": 5,
-    "text": "Debug and instrumentation header design",
+    "text": "Design the debug and instrumentation headers",
     "tat": 2,
     "lane": "par"
    },
    {
     "n": 6,
-    "text": "Define and document socket and DUT interface schematic",
+    "text": "Design the socket and DUT interface schematic",
     "tat": 2,
     "lane": "main"
    },
    {
     "n": 7,
-    "text": "Build bOM and component sourcing check",
+    "text": "Build the BOM and check component sourcing",
     "tat": 1.5,
     "lane": "par"
    },
    {
     "n": 8,
-    "text": "Review schematic and release to layout",
+    "text": "Review the schematic and release it to layout",
     "tat": 2,
     "lane": "main"
    }
@@ -41535,20 +41475,20 @@ export const activityDetails: Record<string, ActivityDetail> = {
    {
     "id": "EVB-D2",
     "rel": "produces",
-    "text": "EVB schematics, BOM and layout database. The schematic half of the deliverable."
+    "text": "<b>EVB schematics, BOM and layout database.</b> The schematic half of the deliverable—the reviewed schematic and sourced BOM that layout is built from."
    },
    {
     "id": "EVB-D1",
     "rel": "informs",
-    "text": "Validation platform specification. Schematic decisions feed back into what the specification can promise."
+    "text": "<b>Validation platform specification.</b> Schematic decisions feed back into what the specification can promise."
    }
   ],
   "risks": [
-   "Rails without sense points",
-   "Long-lead components found after layout",
-   "Debug headers designed for the debugger nobody uses",
-   "Pin map changing after schematic release",
-   "Power tree sized without the real power envelope"
+   "<b>Rails without sense points.</b> A rail that cannot be measured cannot be characterized, and the omission is only discovered during bring-up.",
+   "<b>Long-lead components found after layout.</b> The substitution then costs a board revision instead of a schematic edit.",
+   "<b>Debug headers designed for the debugger nobody uses.</b> The tooling has to be agreed with validation rather than assumed.",
+   "<b>Pin map changing after schematic release.</b> The package pin map has to be frozen for the schematic to be worth reviewing.",
+   "<b>Power tree sized without the real power envelope.</b> A VRM sized to an early estimate cannot supply the silicon's actual transients."
   ],
   "roles": [
    {
@@ -41657,55 +41597,55 @@ export const activityDetails: Record<string, ActivityDetail> = {
   ],
   "criticalPath": true,
   "purpose": [
-   "Lay out the PCB with signal and power integrity simulated on the critical channels, because a validation board carrying PCIe Gen6 or CXL is itself a high-speed design.",
+   "Lay out the PCB with <b>signal and power integrity simulated on the critical channels</b>, because a validation board carrying PCIe Gen6 or CXL is itself a high-speed design.",
    "The board is in series with every interface measurement bring-up will make. A channel with a marginal board contribution produces link failures that look like silicon problems, and separating the two costs weeks of debug time that the simulation would have avoided."
   ],
   "steps": [
    {
     "n": 1,
-    "text": "Plan stack-up and impedance",
+    "text": "Plan the stack-up and impedance",
     "tat": 1.5,
     "lane": "main"
    },
    {
     "n": 2,
-    "text": "Place and floorplan",
+    "text": "Place the components and floorplan the board",
     "tat": 2.5,
     "lane": "main"
    },
    {
     "n": 3,
-    "text": "Simulate sI on the critical channels",
+    "text": "Simulate SI on the critical channels during routing",
     "tat": 2,
     "lane": "par"
    },
    {
     "n": 4,
-    "text": "Route high-speed channel",
+    "text": "Route the high-speed channels",
     "tat": 3,
     "lane": "main"
    },
    {
     "n": 5,
-    "text": "Simulate pI on the board PDN",
+    "text": "Simulate PI on the board PDN",
     "tat": 2,
     "lane": "par"
    },
    {
     "n": 6,
-    "text": "Define and document power plane and PDN layout",
+    "text": "Lay out the power planes and PDN",
     "tat": 2.5,
     "lane": "main"
    },
    {
     "n": 7,
-    "text": "Define and document thermal and mechanical layout constraints",
+    "text": "Apply the thermal and mechanical layout constraints",
     "tat": 2,
     "lane": "par"
    },
    {
     "n": 8,
-    "text": "Review dRC, and release to fabrication",
+    "text": "Run DRC, review and release to fabrication",
     "tat": 2.5,
     "lane": "main"
    }
@@ -41742,20 +41682,20 @@ export const activityDetails: Record<string, ActivityDetail> = {
    {
     "id": "EVB-D2",
     "rel": "produces",
-    "text": "EVB schematics, BOM and layout database. The layout half of the deliverable—what fabrication is built from."
+    "text": "<b>EVB schematics, BOM and layout database.</b> The layout half of the deliverable—what fabrication is built from."
    },
    {
     "id": "EVB-D3",
     "rel": "feeds",
-    "text": "Fabricated and assembled boards. Fabrication takes the released layout database directly."
+    "text": "<b>Fabricated and assembled boards.</b> Fabrication takes the released layout database directly; its DRC-clean release date is what starts the vendor cycle."
    }
   ],
   "risks": [
-   "Board channel contribution not budgeted",
-   "SI simulated after routing",
-   "Board PDN inadequate for the transient",
-   "Stack-up chosen for cost before impedance",
-   "Mechanical constraints applied last"
+   "<b>Board channel contribution not budgeted.</b> The SIPI channel budget covers package and board together, and a board that consumes more than its share leaves the silicon nothing.",
+   "<b>SI simulated after routing.</b> The result is a report rather than a design change, and fixing it costs a revision.",
+   "<b>Board PDN inadequate for the transient.</b> The silicon's di/dt is on the package model; a board PDN sized without it droops.",
+   "<b>Stack-up chosen for cost before impedance.</b> Controlled impedance on the high-speed layers is not negotiable, and a cheaper stack-up that misses it is not cheaper.",
+   "<b>Mechanical constraints applied last.</b> The cooling solution and socket need space, and finding that out after routing costs a revision."
   ],
   "roles": [
    {
@@ -41873,43 +41813,43 @@ export const activityDetails: Record<string, ActivityDetail> = {
   ],
   "criticalPath": true,
   "purpose": [
-   "Get the boards fabricated, assembled and inspected—an eight-week vendor cycle that is mostly waiting and entirely on the critical path to bring-up.",
+   "Get the boards <b>fabricated, assembled and inspected</b>—an eight-week vendor cycle that is mostly waiting and entirely on the critical path to bring-up.",
    "This is procurement work with an engineering tail. The board has to arrive before silicon does, its quantity has to match the parallel-debug plan, and every board that arrives faulty is a debug station that does not exist."
   ],
   "steps": [
    {
     "n": 1,
-    "text": "Select fabrication vendor and data release",
+    "text": "Select the fabrication vendor and release the data",
     "tat": 1,
     "lane": "main"
    },
    {
     "n": 2,
-    "text": "Define and document pCB fabrication",
+    "text": "Track PCB fabrication",
     "tat": 3,
     "lane": "main"
    },
    {
     "n": 3,
-    "text": "Define and document component procurement against lead times",
+    "text": "Procure the components against their lead times",
     "tat": 1.5,
     "lane": "par"
    },
    {
     "n": 4,
-    "text": "Prepare board assembly",
+    "text": "Assemble the boards",
     "tat": 2.5,
     "lane": "main"
    },
    {
     "n": 5,
-    "text": "Define and document first article inspection",
+    "text": "Run first article inspection",
     "tat": 1,
     "lane": "par"
    },
    {
     "n": 6,
-    "text": "Define and document incoming inspection and acceptance",
+    "text": "Run incoming inspection and accept the boards",
     "tat": 1.5,
     "lane": "main"
    }
@@ -41942,20 +41882,20 @@ export const activityDetails: Record<string, ActivityDetail> = {
    {
     "id": "EVB-D3",
     "rel": "produces",
-    "text": "Fabricated and assembled boards, rev A/B with quantity plan. This activity is the deliverable."
+    "text": "<b>Fabricated and assembled boards, rev A/B with quantity plan.</b> The board fleet is fabricated, assembled and inspected here, delivered at the quantity the parallel-debug plan needs."
    },
    {
     "id": "EVB-D2",
     "rel": "informs",
-    "text": "EVB schematics, BOM and layout database. Fabrication findings—DFM issues, substitutions—feed back into the database."
+    "text": "<b>EVB schematics, BOM and layout database.</b> Fabrication findings—DFM issues, substitutions—feed back into the database."
    }
   ],
   "risks": [
-   "Long-lead components blocking assembly",
-   "First article skipped",
-   "Quantity cut for cost",
-   "Boards arriving after silicon",
-   "Controlled impedance not verified"
+   "<b>Long-lead components blocking assembly.</b> The board is fabricated and waiting on one part, which is the most common way this activity slips.",
+   "<b>First article skipped.</b> An assembly error is then replicated across the entire run and discovered at bring-up.",
+   "<b>Quantity cut for cost.</b> Boards are the constraint on parallel debug, and the saving is repaid in serialized lab time.",
+   "<b>Boards arriving after silicon.</b> Silicon waiting on a board is the worst schedule outcome the program can produce.",
+   "<b>Controlled impedance not verified.</b> The stack-up was designed for it; the fabricated board has to be coupon-tested to confirm it."
   ],
   "roles": [
    {
@@ -42051,43 +41991,43 @@ export const activityDetails: Record<string, ActivityDetail> = {
   ],
   "criticalPath": false,
   "purpose": [
-   "Design and bring up the power delivery, VRM and telemetry on the platform—the rails the silicon runs on and the instrumentation that measures them.",
+   "Design and bring up the <b>power delivery, VRM and telemetry</b> on the platform—the rails the silicon runs on and the instrumentation that measures them.",
    "Characterization is mostly a power measurement. Shmoo needs rails that can be swept, power validation needs rails that can be measured accurately, and both need protection that trips before an expensive part is destroyed rather than after."
   ],
   "steps": [
    {
     "n": 1,
-    "text": "Define and document power tree requirement from the die and package",
+    "text": "Derive the power tree requirement from the die and package",
     "tat": 1,
     "lane": "main"
    },
    {
     "n": 2,
-    "text": "Select vRM and design",
+    "text": "Select and design the VRMs",
     "tat": 1.5,
     "lane": "main"
    },
    {
     "n": 3,
-    "text": "Define and document transient response design against the SIPI budget",
+    "text": "Design the transient response against the SIPI budget",
     "tat": 1.5,
     "lane": "par"
    },
    {
     "n": 4,
-    "text": "Monitor telemetry and design",
+    "text": "Design the telemetry and monitoring",
     "tat": 1.5,
     "lane": "main"
    },
    {
     "n": 5,
-    "text": "Define and document protection and sequencing design",
+    "text": "Design the protection and sequencing",
     "tat": 1.5,
     "lane": "par"
    },
    {
     "n": 6,
-    "text": "Validate power bring-up and on the board",
+    "text": "Bring up and validate the power subsystem on the board",
     "tat": 3,
     "lane": "main"
    }
@@ -42120,20 +42060,20 @@ export const activityDetails: Record<string, ActivityDetail> = {
    {
     "id": "EVB-D2",
     "rel": "feeds",
-    "text": "EVB schematics, BOM and layout database. The power subsystem design is part of the schematic package."
+    "text": "<b>EVB schematics, BOM and layout database.</b> The power subsystem design is part of the schematic package."
    },
    {
     "id": "EVB-D4",
     "rel": "feeds",
-    "text": "Board bring-up report and known issues. Power bring-up results are the first part of the board's own bring-up record."
+    "text": "<b>Board bring-up report and known issues.</b> Power bring-up results are the first part of the board's own bring-up record."
    }
   ],
   "risks": [
-   "Rails not sweepable across the shmoo range",
-   "Protection untested before a real part goes in",
-   "Telemetry accuracy insufficient",
-   "Transient response inadequate",
-   "Sequencing not matching the silicon's requirement"
+   "<b>Rails not sweepable across the shmoo range.</b> Characterization then cannot reach the corners the qualification plan requires.",
+   "<b>Protection untested before a real part goes in.</b> A sequencing fault destroys a first-silicon unit, and there are very few of them.",
+   "<b>Telemetry accuracy insufficient.</b> Power measurements at the resolution characterization needs demand real instrumentation, not a rough monitor.",
+   "<b>Transient response inadequate.</b> The die's di/dt is known from SIPI; a VRM that cannot follow it produces droop that looks like a silicon failure.",
+   "<b>Sequencing not matching the silicon's requirement.</b> The power-up order comes from the design, and getting it wrong is a common first-board fault."
   ],
   "roles": [
    {
@@ -42242,43 +42182,43 @@ export const activityDetails: Record<string, ActivityDetail> = {
   ],
   "criticalPath": false,
   "purpose": [
-   "Build the debug access—JTAG and trace pods, interposers, probe points—because silicon debug is bounded by what can be observed.",
+   "Build the <b>debug access</b>—JTAG and trace pods, interposers, probe points—because silicon debug is bounded by what can be observed.",
    "When first silicon does something unexpected, the difference between a day and a month is whether the state that explains it can be read out. The DFT infrastructure provides the internal access; this activity provides the physical path to it."
   ],
   "steps": [
    {
     "n": 1,
-    "text": "Debug requirements from validation and DFT",
+    "text": "Collect the debug requirements from validation and DFT",
     "tat": 1,
     "lane": "main"
    },
    {
     "n": 2,
-    "text": "Define and document jTAG and trace pod interface design",
+    "text": "Design the JTAG and trace pod interfaces",
     "tat": 1.5,
     "lane": "main"
    },
    {
     "n": 3,
-    "text": "Define and document logic analyser and scope access design",
+    "text": "Design the logic analyser and scope access",
     "tat": 1.5,
     "lane": "par"
    },
    {
     "n": 4,
-    "text": "Define interposer and probe access design",
+    "text": "Design the interposers and probe access",
     "tat": 1.5,
     "lane": "main"
    },
    {
     "n": 5,
-    "text": "Integrate software debug tool",
+    "text": "Integrate the software debug tooling",
     "tat": 1,
     "lane": "par"
    },
    {
     "n": 6,
-    "text": "Debug infrastructure validation",
+    "text": "Validate the debug infrastructure and document it",
     "tat": 3,
     "lane": "main"
    }
@@ -42313,20 +42253,20 @@ export const activityDetails: Record<string, ActivityDetail> = {
    {
     "id": "EVB-D5",
     "rel": "produces",
-    "text": "Debug and trace access documentation. The deliverable it is what the bring-up team reads at 2am."
+    "text": "<b>Debug and trace access documentation.</b> The access documentation is produced here, and it is what the bring-up team reads at 2am."
    },
    {
     "id": "EVB-D2",
     "rel": "feeds",
-    "text": "EVB schematics, BOM and layout database. Debug headers and access points are schematic and layout content."
+    "text": "<b>EVB schematics, BOM and layout database.</b> Debug headers and access points are schematic and layout content."
    }
   ],
   "risks": [
-   "Debug access designed without DFT",
-   "Trace bandwidth insufficient",
-   "Probe points unreachable once the cooling solution is mounted",
-   "Debug path unvalidated before silicon",
-   "Software tooling not integrated"
+   "<b>Debug access designed without DFT.</b> The internal observability comes from <code>DFT-08</code>, and the board access has to match what it exposes.",
+   "<b>Trace bandwidth insufficient.</b> Trace is only useful if it can keep up with the events being traced, and the bandwidth is a board design parameter.",
+   "<b>Probe points unreachable once the cooling solution is mounted.</b> The thermal solution and the probe access compete for the same physical space.",
+   "<b>Debug path unvalidated before silicon.</b> It is then debugged during the emergency it exists to resolve.",
+   "<b>Software tooling not integrated.</b> A hardware debug path with no software to drive it is not a debug path."
   ],
   "roles": [
    {
@@ -42431,43 +42371,43 @@ export const activityDetails: Record<string, ActivityDetail> = {
   ],
   "criticalPath": true,
   "purpose": [
-   "Bring the board itself up—with dummy parts or a socketed loopback—so that when silicon arrives, every failure is the silicon's.",
+   "Bring the <b>board itself up</b>—with dummy parts or a socketed loopback—so that when silicon arrives, every failure is the silicon's.",
    "This is the single highest-leverage activity in the stage. A board debugged before first silicon means bring-up starts on a known-good platform; a board debugged alongside first silicon means every anomaly has two possible causes and each takes days to separate."
   ],
   "steps": [
    {
     "n": 1,
-    "text": "Bring up plan and dummy part fitting",
+    "text": "Plan the bring-up and fit the dummy parts",
     "tat": 1,
     "lane": "main"
    },
    {
     "n": 2,
-    "text": "Verify power tree bring-up and rail",
+    "text": "Bring up the power tree and verify the rails",
     "tat": 1.5,
     "lane": "main"
    },
    {
     "n": 3,
-    "text": "Validate telemetry and protection",
+    "text": "Validate the telemetry and protection",
     "tat": 1.5,
     "lane": "par"
    },
    {
     "n": 4,
-    "text": "Validate clocking and reference",
+    "text": "Validate the clocking and references",
     "tat": 1.5,
     "lane": "main"
    },
    {
     "n": 5,
-    "text": "Define and document thermal solution fit check",
+    "text": "Check the thermal solution fit",
     "tat": 1.5,
     "lane": "par"
    },
    {
     "n": 6,
-    "text": "Validate interface loopback and signal",
+    "text": "Validate the interface loopbacks and signals",
     "tat": 3,
     "lane": "main"
    }
@@ -42492,30 +42432,30 @@ export const activityDetails: Record<string, ActivityDetail> = {
   "producedBy": [
    1,
    2,
+   6,
    3,
    4,
    5,
-   6,
-   2
+   6
   ],
   "rel": [
    {
     "id": "EVB-D4",
     "rel": "produces",
-    "text": "Board bring-up report and known issues. The deliverable the known-issues list is what stops board faults being mistaken for silicon faults."
+    "text": "<b>Board bring-up report and known issues.</b> The bring-up report and known-issues list are produced here, and the known-issues list is what stops board faults being mistaken for silicon faults."
    },
    {
     "id": "EVB-D3",
     "rel": "gates",
-    "text": "Fabricated and assembled boards. A board is not released to silicon bring-up until it has passed this."
+    "text": "<b>Fabricated and assembled boards.</b> A board is not released to silicon bring-up until it has passed this."
    }
   ],
   "risks": [
-   "Board bring-up deferred until silicon arrives",
-   "Known issues not documented",
-   "Dummy parts not representative",
-   "Only one board brought up",
-   "Thermal fit checked after silicon insertion"
+   "<b>Board bring-up deferred until silicon arrives.</b> Every anomaly then has two candidate causes, and separating them costs days each.",
+   "<b>Known issues not documented.</b> The bring-up team then rediscovers each board quirk independently, once per engineer.",
+   "<b>Dummy parts not representative.</b> A loopback that does not load the rails or exercise the channels validates less than it appears to.",
+   "<b>Only one board brought up.</b> Board-to-board variation is real, and a fleet where only one is characterized is a fleet with unknown members.",
+   "<b>Thermal fit checked after silicon insertion.</b> A cooling solution that does not fit is discovered with an irreplaceable part underneath it."
   ],
   "roles": [
    {
@@ -42617,43 +42557,43 @@ export const activityDetails: Record<string, ActivityDetail> = {
   ],
   "criticalPath": false,
   "purpose": [
-   "Design and validate the cooling for the lab platform—which is not the product's thermal solution, but has to remove the same power.",
+   "Design and validate the <b>cooling for the lab platform</b>—which is not the product's thermal solution, but has to remove the same power.",
    "A part that thermally throttles during characterization produces data about the cooling rather than about the silicon. The lab solution can be oversized and ugly in ways the product's cannot, and it should be, because measurement validity depends on it."
   ],
   "steps": [
    {
     "n": 1,
-    "text": "Define thermal requirement from the package envelope",
+    "text": "Derive the thermal requirement from the package envelope",
     "tat": 1,
     "lane": "main"
    },
    {
     "n": 2,
-    "text": "Select cooling solution",
+    "text": "Select the cooling solution",
     "tat": 1.5,
     "lane": "main"
    },
    {
     "n": 3,
-    "text": "Define and document airflow and enclosure design",
+    "text": "Design the airflow and enclosure",
     "tat": 1.5,
     "lane": "par"
    },
    {
     "n": 4,
-    "text": "Define and document mounting and interface design",
+    "text": "Design the mounting and interfaces",
     "tat": 1.5,
     "lane": "main"
    },
    {
     "n": 5,
-    "text": "Define and document temperature control and soak capability",
+    "text": "Build in temperature control and soak capability",
     "tat": 1,
     "lane": "par"
    },
    {
     "n": 6,
-    "text": "Validate thermal on the platform",
+    "text": "Validate the thermal solution on the platform",
     "tat": 3,
     "lane": "main"
    }
@@ -42686,20 +42626,20 @@ export const activityDetails: Record<string, ActivityDetail> = {
    {
     "id": "EVB-D1",
     "rel": "feeds",
-    "text": "Validation platform specification. Thermal capability is part of what the platform can promise."
+    "text": "<b>Validation platform specification.</b> Thermal capability is part of what the platform can promise."
    },
    {
     "id": "EVB-D4",
     "rel": "feeds",
-    "text": "Board bring-up report and known issues. Thermal validation results belong in the platform's own record."
+    "text": "<b>Board bring-up report and known issues.</b> Thermal validation results belong in the platform's own record."
    }
   ],
   "risks": [
-   "Cooling sized to the product's solution rather than to the lab's need",
-   "No temperature control, only cooling",
-   "Throttling during characterization",
-   "Mounting competing with probe access",
-   "Thermal validated only at nominal power"
+   "<b>Cooling sized to the product's solution rather than to the lab's need.</b> The lab platform can be oversized, and measurement validity is worth more than realism.",
+   "<b>No temperature control, only cooling.</b> Characterization needs the part held at a set point, including a hot one.",
+   "<b>Throttling during characterization.</b> The data then describes the cooling rather than the silicon, and it is often not noticed.",
+   "<b>Mounting competing with probe access.</b> The debug points and the heatsink want the same space, and the conflict has to be resolved in layout.",
+   "<b>Thermal validated only at nominal power.</b> The interesting measurements are at maximum power, which is where the solution is stressed."
   ],
   "roles": [
    {
@@ -42800,43 +42740,43 @@ export const activityDetails: Record<string, ActivityDetail> = {
   ],
   "criticalPath": false,
   "purpose": [
-   "Reserve the instruments and build the lab racks—because characterization needs equipment that is expensive, shared and booked months ahead.",
+   "Reserve the instruments and <b>build the lab racks</b>—because characterization needs equipment that is expensive, shared and booked months ahead.",
    "A high-speed oscilloscope or a BERT is a capital item with a queue in front of it. Discovering during bring-up that the scope with the right bandwidth is committed elsewhere for six weeks does not delay the measurement by six weeks—it delays everything downstream of it."
   ],
   "steps": [
    {
     "n": 1,
-    "text": "Characterize instrument requirement from the plan",
+    "text": "Derive the instrument requirement from the characterization plan",
     "tat": 1,
     "lane": "main"
    },
    {
     "n": 2,
-    "text": "Define and document instrument reservation and procurement",
+    "text": "Reserve and procure the instruments",
     "tat": 1.5,
     "lane": "main"
    },
    {
     "n": 3,
-    "text": "Define and document automation and control infrastructure",
+    "text": "Build the automation and control infrastructure",
     "tat": 1.5,
     "lane": "par"
    },
    {
     "n": 4,
-    "text": "Test rack build and cabling",
+    "text": "Build and cable the test racks",
     "tat": 1.5,
     "lane": "main"
    },
    {
     "n": 5,
-    "text": "Define and document lab space and power provisioning",
+    "text": "Provision the lab space and power",
     "tat": 1,
     "lane": "par"
    },
    {
     "n": 6,
-    "text": "Integrate rack and calibration",
+    "text": "Integrate and calibrate the racks",
     "tat": 3,
     "lane": "main"
    }
@@ -42871,20 +42811,20 @@ export const activityDetails: Record<string, ActivityDetail> = {
    {
     "id": "EVB-D6",
     "rel": "produces",
-    "text": "Lab setup and instrument reservation plan. The deliverable it is what stops bring-up queueing for a scope."
+    "text": "<b>Lab setup and instrument reservation plan.</b> The reservation plan and rack build come from here, and they are what stop bring-up queueing for a scope."
    },
    {
     "id": "EVB-D4",
     "rel": "informs",
-    "text": "Board bring-up report and known issues. The lab setup is the context every bring-up measurement is made in."
+    "text": "<b>Board bring-up report and known issues.</b> The lab setup is the context every bring-up measurement is made in."
    }
   ],
   "risks": [
-   "Instruments booked too late",
-   "Automation deferred to bring-up",
-   "Racks not calibrated",
-   "Lab power or space insufficient",
-   "Instrument bandwidth below the signal rate"
+   "<b>Instruments booked too late.</b> High-bandwidth equipment is shared and queued, and a six-week wait delays everything downstream.",
+   "<b>Automation deferred to bring-up.</b> It is then written under time pressure by people who should be debugging silicon.",
+   "<b>Racks not calibrated.</b> Measurements from an uncalibrated setup are unusable for characterization and often not questioned.",
+   "<b>Lab power or space insufficient.</b> A rack that cannot be powered is a rack that does not exist, and facilities lead times are long.",
+   "<b>Instrument bandwidth below the signal rate.</b> A scope that cannot resolve the edge produces a plausible and wrong measurement."
   ],
   "roles": [
    {
@@ -42982,43 +42922,43 @@ export const activityDetails: Record<string, ActivityDetail> = {
   ],
   "criticalPath": false,
   "purpose": [
-   "Provide the minimum host-side software needed to power on and talk to the part—boot, register access, enumeration, logging—without taking on the product's software stack.",
+   "Provide the <b>minimum host-side software</b> needed to power on and talk to the part—boot, register access, enumeration, logging—without taking on the product's software stack.",
    "SW/FW is outside this program's scope, but silicon cannot be brought up without something on the other end of the link. The boundary matters: this activity delivers exactly enough to reach first register read and no more, and where that line sits should be agreed rather than discovered."
   ],
   "steps": [
    {
     "n": 1,
-    "text": "Define handoff boundary with the firmware team",
+    "text": "Define the handoff boundary with the firmware team",
     "tat": 1,
     "lane": "main"
    },
    {
     "n": 2,
-    "text": "Define and document minimal boot and initialization software",
+    "text": "Write the minimal boot and initialization software",
     "tat": 1.5,
     "lane": "main"
    },
    {
     "n": 3,
-    "text": "Define and document host driver stub and enumeration",
+    "text": "Build the host driver stub and enumeration",
     "tat": 1.5,
     "lane": "par"
    },
    {
     "n": 4,
-    "text": "Define register access and diagnostic tooling",
+    "text": "Build the register access and diagnostic tooling",
     "tat": 1.5,
     "lane": "main"
    },
    {
     "n": 5,
-    "text": "Define and document logging and data capture",
+    "text": "Build the logging and data capture",
     "tat": 1,
     "lane": "par"
    },
    {
     "n": 6,
-    "text": "Validate host enablement on the platform",
+    "text": "Validate the host enablement on the platform",
     "tat": 3,
     "lane": "main"
    }
@@ -43051,20 +42991,20 @@ export const activityDetails: Record<string, ActivityDetail> = {
    {
     "id": "EVB-D4",
     "rel": "feeds",
-    "text": "Board bring-up report and known issues. Host enablement is validated as part of the platform and reported with it."
+    "text": "<b>Board bring-up report and known issues.</b> Host enablement is validated as part of the platform and reported with it."
    },
    {
     "id": "EVB-D5",
     "rel": "feeds",
-    "text": "Debug and trace access documentation. The diagnostic tooling is how debug access is actually used."
+    "text": "<b>Debug and trace access documentation.</b> The diagnostic tooling is how debug access is actually used."
    }
   ],
   "risks": [
-   "Boundary with firmware left implicit",
-   "Register map drifting from the RTL",
-   "Scope creeping into the product stack",
-   "Logging insufficient for post-mortem",
-   "Enablement unvalidated before silicon"
+   "<b>Boundary with firmware left implicit.</b> Either the work is duplicated or nobody does it, and both are discovered at power-on.",
+   "<b>Register map drifting from the RTL.</b> A diagnostic tool built against a stale map reads the wrong addresses and reports plausible nonsense.",
+   "<b>Scope creeping into the product stack.</b> Minimal enablement becomes a driver project, and the validation team stops validating.",
+   "<b>Logging insufficient for post-mortem.</b> A failure that cannot be reconstructed from the log has to be reproduced, which on first silicon may not be possible.",
+   "<b>Enablement unvalidated before silicon.</b> Software bugs then present as silicon bugs during the most expensive week of the program."
   ],
   "roles": [
    {
@@ -43166,55 +43106,55 @@ export const activityDetails: Record<string, ActivityDetail> = {
   ],
   "criticalPath": true,
   "purpose": [
-   "Decide what will be tested, where, and to what defect level—the plan every other activity in the stage implements.",
+   "Decide <b>what will be tested, where, and to what defect level</b>—the plan every other activity in the stage implements.",
    "Test is where quality is bought and where cost per unit is set, and the two trade directly. The plan is the document where that trade is made explicitly: a DPPM target implies coverage, coverage implies content, content implies test time, and test time is money on every unit ever shipped."
   ],
   "steps": [
    {
     "n": 1,
-    "text": "Define coverage requirement from the and DFT",
+    "text": "Derive the coverage requirement from the specification and DFT",
     "tat": 1,
     "lane": "main"
    },
    {
     "n": 2,
-    "text": "Test flow architecture — sort, final, characterization",
+    "text": "Define the test flow architecture — sort, final, characterization",
     "tat": 2,
     "lane": "main"
    },
    {
     "n": 3,
-    "text": "Define and document tester resource estimation",
+    "text": "Estimate the tester resources",
     "tat": 1.5,
     "lane": "par"
    },
    {
     "n": 4,
-    "text": "Build coverage matrix",
+    "text": "Construct the coverage matrix",
     "tat": 2,
     "lane": "main"
    },
    {
     "n": 5,
-    "text": "Define and document dPPM target derivation from the coverage",
+    "text": "Derive the DPPM target from the coverage",
     "tat": 1.5,
     "lane": "par"
    },
    {
     "n": 6,
-    "text": "Test insertion and binning strategy",
+    "text": "Set the test insertion and binning strategy",
     "tat": 1.5,
     "lane": "main"
    },
    {
     "n": 7,
-    "text": "Make and document the burn-in and screening decision",
+    "text": "Decide on burn-in and screening",
     "tat": 1,
     "lane": "par"
    },
    {
     "n": 8,
-    "text": "Plan review and release",
+    "text": "Review the plan and release it",
     "tat": 1.5,
     "lane": "main"
    }
@@ -43234,7 +43174,7 @@ export const activityDetails: Record<string, ActivityDetail> = {
    "Test coverage matrix",
    "DPPM target derivation",
    "Test insertion and binning strategy",
-   "Reviewed test plan",
+   "Plan review findings",
    "Burn-in and screening decision",
    "Reviewed and released test plan"
   ],
@@ -43245,7 +43185,7 @@ export const activityDetails: Record<string, ActivityDetail> = {
    4,
    5,
    6,
-   6,
+   8,
    7,
    8
   ],
@@ -43253,20 +43193,20 @@ export const activityDetails: Record<string, ActivityDetail> = {
    {
     "id": "TEST-D1",
     "rel": "produces",
-    "text": "Test plan and test coverage matrix. The deliverable every other TEST activity implements part of it."
+    "text": "<b>Test plan and test coverage matrix.</b> The test plan and coverage matrix are written here, and every other TEST activity implements part of them."
    },
    {
     "id": "TEST-D6",
     "rel": "informs",
-    "text": "Test time and test cost model. The flow architecture and insertion strategy set the cost model's structure."
+    "text": "<b>Test time and test cost model.</b> The flow architecture and insertion strategy set the cost model's structure."
    }
   ],
   "risks": [
-   "Coverage chosen without a DPPM target",
-   "Test time not budgeted at plan time",
-   "Burn-in decided late",
-   "Sort and final coverage overlapping without intent",
-   "DFT coverage not validated against measured"
+   "<b>Coverage chosen without a DPPM target.</b> There is then no way to say whether the test is sufficient, only whether it is thorough.",
+   "<b>Test time not budgeted at plan time.</b> Content accumulates and the cost per unit is discovered at production readiness when it is expensive to change.",
+   "<b>Burn-in decided late.</b> It is a capital and cycle-time commitment, and reversing it after qualification planning is expensive.",
+   "<b>Sort and final coverage overlapping without intent.</b> Testing the same thing twice costs money on every unit and often happens by accretion.",
+   "<b>DFT coverage assumed rather than measured.</b> The plan then promises a DPPM the actual pattern set cannot deliver."
   ],
   "roles": [
    {
@@ -43383,43 +43323,43 @@ export const activityDetails: Record<string, ActivityDetail> = {
   ],
   "criticalPath": false,
   "purpose": [
-   "Choose the ATE platform and book the tester time—a capital and capacity decision that has to be made long before there is anything to test.",
+   "Choose the <b>ATE platform</b> and book the tester time—a capital and capacity decision that has to be made long before there is anything to test.",
    "Tester capacity is a shared, scheduled resource. Program development time, characterization time and production capacity are all booked against the same pool, and a program that has not committed its slots competes with programs that have."
   ],
   "steps": [
    {
     "n": 1,
-    "text": "Define and document tester requirement from the test plan",
+    "text": "Derive the tester requirement from the test plan",
     "tat": 1,
     "lane": "main"
    },
    {
     "n": 2,
-    "text": "Define and document aTE platform evaluation against the requirement",
+    "text": "Evaluate the ATE platforms against the requirement",
     "tat": 1.5,
     "lane": "main"
    },
    {
     "n": 3,
-    "text": "Analyze instrument option and pin-count",
+    "text": "Analyze the instrument options and pin count",
     "tat": 1,
     "lane": "par"
    },
    {
     "n": 4,
-    "text": "Select platform and configuration",
+    "text": "Select and configure the platform",
     "tat": 1.5,
     "lane": "main"
    },
    {
     "n": 5,
-    "text": "Define and document cost per tested unit model",
+    "text": "Build the cost-per-tested-unit model",
     "tat": 1,
     "lane": "par"
    },
    {
     "n": 6,
-    "text": "Book tester time and capacity commitment",
+    "text": "Book the tester time and commit the capacity",
     "tat": 2,
     "lane": "main"
    }
@@ -43452,20 +43392,20 @@ export const activityDetails: Record<string, ActivityDetail> = {
    {
     "id": "TEST-D6",
     "rel": "feeds",
-    "text": "Test time and test cost model. The platform's cost per hour is the model's rate."
+    "text": "<b>Test time and test cost model.</b> The platform's cost per hour is the model's rate, and the cost-per-tested-unit model built here is the model's first version."
    },
    {
     "id": "TEST-D3",
     "rel": "informs",
-    "text": "Wafer sort and final test programs. Programs are written for a specific platform and its instrument set."
+    "text": "<b>Wafer sort and final test programs.</b> Programs are written for a specific platform and its instrument set."
    }
   ],
   "risks": [
-   "Tester time not booked ahead",
-   "Instrument options short of the interface rate",
-   "Pin count insufficient for parallel sites",
-   "Platform chosen on capital cost alone",
-   "Development capacity not separated from production"
+   "<b>Tester time not booked ahead.</b> Capacity is shared, and a program without commitments waits behind programs with them.",
+   "<b>Instrument options short of the interface rate.</b> High-speed content cannot be run, and the shortfall is discovered when the program is written.",
+   "<b>Pin count insufficient for parallel sites.</b> Multi-site conversion later becomes impossible, and test cost stays where it started.",
+   "<b>Platform chosen on capital cost alone.</b> Cost per tested unit depends on throughput as much as on the tester's price.",
+   "<b>Development capacity not separated from production.</b> Program debug then competes with the ramp it is meant to enable."
   ],
   "roles": [
    {
@@ -43570,19 +43510,19 @@ export const activityDetails: Record<string, ActivityDetail> = {
   ],
   "criticalPath": true,
   "purpose": [
-   "Design, fabricate and qualify the probe card—the physical interface between the tester and the wafer, and the longest lead time in the stage.",
+   "Design, fabricate and qualify the <b>probe card</b>—the physical interface between the tester and the wafer, and the longest lead time in the stage.",
    "Nothing can be sorted without it, and sort gates assembly. Twenty weeks of design and fabrication sit in front of the first wafer, which means the card has to be committed against a bump map that is frozen far earlier than most people expect."
   ],
   "steps": [
    {
     "n": 1,
-    "text": "Extract probe card requirement and bump map",
+    "text": "Extract the probe card requirement and bump map",
     "tat": 2,
     "lane": "main"
    },
    {
     "n": 2,
-    "text": "Define and document probe card design",
+    "text": "Design the probe card",
     "tat": 3,
     "lane": "main"
    },
@@ -43594,31 +43534,31 @@ export const activityDetails: Record<string, ActivityDetail> = {
    },
    {
     "n": 4,
-    "text": "Define and document probe card fabrication",
+    "text": "Track probe card fabrication",
     "tat": 8,
     "lane": "main"
    },
    {
     "n": 5,
-    "text": "Define and document touchdown life and cleaning strategy",
+    "text": "Define the touchdown life and cleaning strategy",
     "tat": 3,
     "lane": "par"
    },
    {
     "n": 6,
-    "text": "Qualify on the tester",
+    "text": "Qualify the card on the tester",
     "tat": 4,
     "lane": "main"
    },
    {
     "n": 7,
-    "text": "Define and document spare card and repair plan",
+    "text": "Set the spare card and repair plan",
     "tat": 2.5,
     "lane": "par"
    },
    {
     "n": 8,
-    "text": "Release to wafer sort",
+    "text": "Release the card to wafer sort",
     "tat": 3,
     "lane": "main"
    }
@@ -43655,20 +43595,20 @@ export const activityDetails: Record<string, ActivityDetail> = {
    {
     "id": "TEST-D2",
     "rel": "produces",
-    "text": "Qualified probe card and load board. The probe card half of the deliverable."
+    "text": "<b>Qualified probe card and load board.</b> The probe card half of the deliverable—designed, fabricated and qualified on the tester before wafers arrive, with its spare and repair plan."
    },
    {
     "id": "TEST-D3",
     "rel": "gates",
-    "text": "Wafer sort and final test programs. A sort program cannot be debugged on silicon without a qualified card."
+    "text": "<b>Wafer sort and final test programs.</b> A sort program cannot be debugged on silicon without a qualified card."
    }
   ],
   "risks": [
-   "Bump map changing after card release",
-   "Contact resistance out of specification",
-   "Planarity insufficient across the touchdown area",
-   "No spare card",
-   "Touchdown life below the wafer volume"
+   "<b>Bump map changing after card release.</b> Eight weeks of fabrication are lost, and sort—and therefore assembly—moves by that much.",
+   "<b>Contact resistance out of specification.</b> Marginal contact produces failures that look like silicon defects and corrupts the whole sort yield.",
+   "<b>Planarity insufficient across the touchdown area.</b> Some probes contact and some do not, and the pattern is subtle enough to be missed.",
+   "<b>No spare card.</b> A damaged card with a ten-week replacement stops sort entirely, and cards are damaged routinely.",
+   "<b>Touchdown life below the wafer volume.</b> Card degradation then appears as a yield trend that gets chased as a process problem."
   ],
   "roles": [
    {
@@ -43775,19 +43715,19 @@ export const activityDetails: Record<string, ActivityDetail> = {
   ],
   "criticalPath": false,
   "purpose": [
-   "Design, build and bring up the load board and socket—the package-level equivalent of the probe card, and what every final-test and characterization measurement passes through.",
+   "Design, build and bring up the <b>load board and socket</b>—the package-level equivalent of the probe card, and what every final-test and characterization measurement passes through.",
    "The load board carries the tester's signals to the package at full rate and delivers its power at full current. It is a high-speed board design in its own right, and its own contribution to a measurement has to be small enough that what is measured is the silicon."
   ],
   "steps": [
    {
     "n": 1,
-    "text": "Select load board requirement and socket",
+    "text": "Define the load board requirement and select the socket",
     "tat": 2,
     "lane": "main"
    },
    {
     "n": 2,
-    "text": "Define and document load board design with signal integrity",
+    "text": "Design the load board with signal integrity",
     "tat": 3.5,
     "lane": "main"
    },
@@ -43799,31 +43739,31 @@ export const activityDetails: Record<string, ActivityDetail> = {
    },
    {
     "n": 4,
-    "text": "Define and document fabrication and assembly",
+    "text": "Track fabrication and assembly",
     "tat": 5,
     "lane": "main"
    },
    {
     "n": 5,
-    "text": "Define and document power delivery design on the load board",
+    "text": "Design the power delivery on the load board",
     "tat": 2.5,
     "lane": "par"
    },
    {
     "n": 6,
-    "text": "Bring up on the tester",
+    "text": "Bring the board up on the tester",
     "tat": 3.5,
     "lane": "main"
    },
    {
     "n": 7,
-    "text": "Correlate fixture design",
+    "text": "Design the correlation fixture",
     "tat": 2,
     "lane": "par"
    },
    {
     "n": 8,
-    "text": "Release to final test",
+    "text": "Release the board to final test",
     "tat": 3,
     "lane": "main"
    }
@@ -43841,7 +43781,7 @@ export const activityDetails: Record<string, ActivityDetail> = {
    "Load board design with SI results",
    "Socket contact and life analysis",
    "Fabricated and assembled load board",
-   "Load board design",
+   "Load board power delivery analysis",
    "Load board power delivery design",
    "Tester bring-up results",
    "Correlation fixture",
@@ -43862,20 +43802,20 @@ export const activityDetails: Record<string, ActivityDetail> = {
    {
     "id": "TEST-D2",
     "rel": "produces",
-    "text": "Qualified probe card and load board. The load board half of the deliverable."
+    "text": "<b>Qualified probe card and load board.</b> The load board half of the deliverable—the socketed, SI-validated board brought up on the tester with its correlation fixture."
    },
    {
     "id": "TEST-D3",
     "rel": "gates",
-    "text": "Wafer sort and final test programs. The final test program is debugged on this hardware."
+    "text": "<b>Wafer sort and final test programs.</b> The final test program is debugged on this hardware; until the load board passes tester bring-up, final test development has nothing to run on."
    }
   ],
   "risks": [
-   "Load board power delivery droop",
-   "Socket insertion life below the test volume",
-   "Board channel loss consuming the measurement margin",
-   "Socket selected before the package is dimensioned",
-   "No correlation fixture"
+   "<b>Load board power delivery droop.</b> It produces at-speed failures that look exactly like silicon marginality and consume weeks of debug.",
+   "<b>Socket insertion life below the test volume.</b> Contact degrades, yield trends downward, and the cause is looked for in the process.",
+   "<b>Board channel loss consuming the measurement margin.</b> The interface test then fails on the board rather than on the part.",
+   "<b>Socket selected before the package is dimensioned.</b> A socket that does not fit the finished package is discovered very late.",
+   "<b>No correlation fixture.</b> ATE and bench results then cannot be reconciled, and both are distrusted."
   ],
   "roles": [
    {
@@ -43983,55 +43923,55 @@ export const activityDetails: Record<string, ActivityDetail> = {
   ],
   "criticalPath": true,
   "purpose": [
-   "Write the wafer sort test program—the screen that decides which die are worth assembling into a package.",
+   "Write the <b>wafer sort test program</b>—the screen that decides which die are worth assembling into a package.",
    "On a 2.5D part, sort is the most economically consequential test in the flow. Everything it lets through carries an interposer, two HBM stacks and an assembly with it, so its coverage is measured against package cost rather than against die cost."
   ],
   "steps": [
    {
     "n": 1,
-    "text": "Sort flow and test list definition",
+    "text": "Define the sort flow and test list",
     "tat": 2,
     "lane": "main"
    },
    {
     "n": 2,
-    "text": "Define and document dC and continuity test development",
+    "text": "Develop the DC and continuity tests",
     "tat": 3.5,
     "lane": "main"
    },
    {
     "n": 3,
-    "text": "Define and document parametric and process monitor test development",
+    "text": "Develop the parametric and process monitor tests",
     "tat": 2.5,
     "lane": "par"
    },
    {
     "n": 4,
-    "text": "Integrate scan and structural test",
+    "text": "Integrate the scan and structural content",
     "tat": 3.5,
     "lane": "main"
    },
    {
     "n": 5,
-    "text": "Define and document binning and wafer map output",
+    "text": "Build the binning and wafer map output",
     "tat": 2.5,
     "lane": "par"
    },
    {
     "n": 6,
-    "text": "Define and document functional and memory BIST content",
+    "text": "Develop the functional and memory BIST content",
     "tat": 3.5,
     "lane": "main"
    },
    {
     "n": 7,
-    "text": "Test limits and guard-band setting",
+    "text": "Set the test limits and guard bands",
     "tat": 2.5,
     "lane": "par"
    },
    {
     "n": 8,
-    "text": "Integrate program and debug on the tester",
+    "text": "Integrate and debug the program on the tester",
     "tat": 3.5,
     "lane": "main"
    }
@@ -44068,20 +44008,20 @@ export const activityDetails: Record<string, ActivityDetail> = {
    {
     "id": "TEST-D3",
     "rel": "produces",
-    "text": "Wafer sort and final test programs, release-tagged. The sort half of the deliverable."
+    "text": "<b>Wafer sort and final test programs, release-tagged.</b> The sort half of the deliverable—the debugged wafer sort program whose guard bands are set against package cost rather than convention."
    },
    {
     "id": "TEST-D1",
     "rel": "feeds",
-    "text": "Test plan and test coverage matrix. What the program actually achieves updates what the plan claimed."
+    "text": "<b>Test plan and test coverage matrix.</b> What the program actually achieves updates what the plan claimed."
    }
   ],
   "risks": [
-   "Guard bands set by convention",
-   "Coverage below what the package economics need",
-   "Program debugged only in simulation",
-   "Wafer map output not matching the assembly requirement",
-   "Test time growing without check"
+   "<b>Guard bands set by convention.</b> On a part where an escape costs an assembled package, the limits should be derived from that cost.",
+   "<b>Coverage below what the package economics need.</b> Assembly yield then absorbs the difference, at many times the price.",
+   "<b>Program debugged only in simulation.</b> Tester behavior differs from the model, and the difference is found on the first wafer.",
+   "<b>Wafer map output not matching the assembly requirement.</b> KGD selection depends on the map format, and a mismatch stops assembly.",
+   "<b>Test time growing without check.</b> Sort time multiplies across every wafer ever run, and content accretes silently."
   ],
   "roles": [
    {
@@ -44201,55 +44141,55 @@ export const activityDetails: Record<string, ActivityDetail> = {
   ],
   "criticalPath": false,
   "purpose": [
-   "Write the final test program that runs on the assembled package—at speed, at temperature, across every interface the product ships with.",
+   "Write the <b>final test program</b> that runs on the assembled package—at speed, at temperature, across every interface the product ships with.",
    "Final test is the last screen before a customer sees the part. It exercises what sort could not: the assembled interfaces, the HBM stacks, the full power envelope, and the at-speed behavior of a part that is now mechanically complete."
   ],
   "steps": [
    {
     "n": 1,
-    "text": "Finalize test flow definition",
+    "text": "Define the final test flow",
     "tat": 2,
     "lane": "main"
    },
    {
     "n": 2,
-    "text": "Define and document package-level DC and continuity content",
+    "text": "Develop the package-level DC and continuity content",
     "tat": 3.5,
     "lane": "main"
    },
    {
     "n": 3,
-    "text": "Define and document power and thermal test content",
+    "text": "Develop the power and thermal test content",
     "tat": 2.5,
     "lane": "par"
    },
    {
     "n": 4,
-    "text": "Define and document at-speed functional content",
+    "text": "Develop the at-speed functional content",
     "tat": 3.5,
     "lane": "main"
    },
    {
     "n": 5,
-    "text": "Define and document binning and grading content",
+    "text": "Develop the binning and grading content",
     "tat": 2.5,
     "lane": "par"
    },
    {
     "n": 6,
-    "text": "Define and document interface and HBM test content",
+    "text": "Develop the interface and HBM test content",
     "tat": 3.5,
     "lane": "main"
    },
    {
     "n": 7,
-    "text": "Finalize test limits and guard bands",
+    "text": "Set the final test limits and guard bands",
     "tat": 2.5,
     "lane": "par"
    },
    {
     "n": 8,
-    "text": "Integrate program and debug",
+    "text": "Integrate and debug the program",
     "tat": 3.5,
     "lane": "main"
    }
@@ -44286,20 +44226,20 @@ export const activityDetails: Record<string, ActivityDetail> = {
    {
     "id": "TEST-D3",
     "rel": "produces",
-    "text": "Wafer sort and final test programs, release-tagged. The final-test half of the deliverable."
+    "text": "<b>Wafer sort and final test programs, release-tagged.</b> The final-test half of the deliverable—the debugged package test program that exercises the assembled interfaces, HBM and full power envelope."
    },
    {
     "id": "TEST-D6",
     "rel": "feeds",
-    "text": "Test time and test cost model. Final test time is the larger half of the per-unit test cost."
+    "text": "<b>Test time and test cost model.</b> Final test time is the larger half of the per-unit test cost."
    }
   ],
   "risks": [
-   "HBM interface content insufficient",
-   "At-speed content not run at temperature",
-   "Binning content added late",
-   "Test time not tracked against the cost model",
-   "Program debugged without real assembled units"
+   "<b>HBM interface content insufficient.</b> The interfaces only exist after assembly, and a marginal one shipped is a field failure.",
+   "<b>At-speed content not run at temperature.</b> Timing marginality appears at the hot corner, and testing only at room temperature misses it.",
+   "<b>Binning content added late.</b> Grading is how the product line is built, and retrofitting it changes the flow and its cost.",
+   "<b>Test time not tracked against the cost model.</b> Final test dominates per-unit test cost and grows quietly.",
+   "<b>Program debugged without real assembled units.</b> The first units are precious, and the program has to be ready when they exist."
   ],
   "roles": [
    {
@@ -44412,55 +44352,55 @@ export const activityDetails: Record<string, ActivityDetail> = {
   ],
   "criticalPath": false,
   "purpose": [
-   "Build the characterization content—shmoos, corners, parametric sweeps, datasheet parameter measurement—that turns silicon into a specified product.",
-   "Production test asks whether a part passes. Characterization asks what the part does, across voltage, frequency and temperature, over a statistically meaningful sample."
+   "Build the <b>characterization content</b>—shmoos, corners, parametric sweeps, datasheet parameter measurement—that turns silicon into a specified product.",
+   "Production test asks whether a part passes. Characterization asks what the part actually does, across voltage, frequency and temperature, over a statistically meaningful sample. Every number in the datasheet comes from here, and so do the guard bands production test uses."
   ],
   "steps": [
    {
     "n": 1,
-    "text": "Characterize requirement from qualification and marketing",
+    "text": "Collect the characterization requirement from qualification and marketing",
     "tat": 1.5,
     "lane": "main"
    },
    {
     "n": 2,
-    "text": "Define and document shmoo and corner content",
+    "text": "Build the shmoo and corner content",
     "tat": 2.5,
     "lane": "main"
    },
    {
     "n": 3,
-    "text": "Define and document temperature and voltage sweep automation",
+    "text": "Automate the temperature and voltage sweeps",
     "tat": 2,
     "lane": "par"
    },
    {
     "n": 4,
-    "text": "Characterize parametric content",
+    "text": "Build the parametric characterization content",
     "tat": 2.5,
     "lane": "main"
    },
    {
     "n": 5,
-    "text": "Define and document statistical sample plan",
+    "text": "Design the statistical sample plan",
     "tat": 2,
     "lane": "par"
    },
    {
     "n": 6,
-    "text": "Define and document datasheet parameter test content",
+    "text": "Build the datasheet parameter test content",
     "tat": 2.5,
     "lane": "main"
    },
    {
     "n": 7,
-    "text": "Analyze data and reporting pipeline",
+    "text": "Build the data analysis and reporting pipeline",
     "tat": 1.5,
     "lane": "par"
    },
    {
     "n": 8,
-    "text": "Integrate content and correlation setup",
+    "text": "Integrate the content and set up correlation",
     "tat": 3,
     "lane": "main"
    }
@@ -44497,20 +44437,20 @@ export const activityDetails: Record<string, ActivityDetail> = {
    {
     "id": "TEST-D4",
     "rel": "produces",
-    "text": "Characterization test suite. The deliverable every datasheet number traces to it."
+    "text": "<b>Characterization test suite.</b> The characterization suite is built here, and every datasheet number traces to it."
    },
    {
     "id": "TEST-D6",
     "rel": "informs",
-    "text": "Test time and test cost model. Characterization guard bands set how much production test time is spent on margin."
+    "text": "<b>Test time and test cost model.</b> Characterization guard bands set how much production test time is spent on margin."
    }
   ],
   "risks": [
-   "Sample size too small for the claim",
-   "Corners not spanning the qualification range",
-   "Sweeps not automated",
-   "Datasheet parameters not traceable to a measurement",
-   "Analysis pipeline built after the data"
+   "<b>Sample size too small for the claim.</b> A datasheet parameter from a handful of units is a number without confidence behind it.",
+   "<b>Corners not spanning the qualification range.</b> Qualification then stresses conditions characterization never measured.",
+   "<b>Sweeps not automated.</b> Manual shmoo consumes engineer-weeks per corner, and the corners get quietly reduced.",
+   "<b>Datasheet parameters not traceable to a measurement.</b> A customer question about a number then has no answer.",
+   "<b>Analysis pipeline built after the data.</b> Data is collected in a format nobody can analyze, and the campaign is re-run."
   ],
   "roles": [
    {
@@ -44628,31 +44568,31 @@ export const activityDetails: Record<string, ActivityDetail> = {
   ],
   "criticalPath": true,
   "purpose": [
-   "Port the DFT patterns to the tester's format and debug them there—the step between a pattern that simulates and a pattern that runs.",
-   "ATPG produces patterns against an idealized model. The tester has finite memory, real timing resolution, protocol constraints and a specific pin electronics behavior."
+   "Port the <b>DFT patterns to the tester's format</b> and debug them there—the step between a pattern that simulates and a pattern that runs.",
+   "ATPG produces patterns against an idealized model. The tester has finite memory, real timing resolution, protocol constraints and a specific pin electronics behavior. Every one of those turns a pattern that passes in simulation into one that fails on hardware, and finding out which is the work."
   ],
   "steps": [
    {
     "n": 1,
-    "text": "Hand off aTPG pattern from DFT",
+    "text": "Take the ATPG pattern handoff from DFT",
     "tat": 1.5,
     "lane": "main"
    },
    {
     "n": 2,
-    "text": "Generate pattern translation to the tester format",
+    "text": "Translate the patterns to the tester format",
     "tat": 2,
     "lane": "main"
    },
    {
     "n": 3,
-    "text": "Generate pattern volume and memory-depth reduction",
+    "text": "Reduce pattern volume against the memory depth",
     "tat": 1.5,
     "lane": "par"
    },
    {
     "n": 4,
-    "text": "Map timing and protocol",
+    "text": "Map the timing and protocols",
     "tat": 2.5,
     "lane": "main"
    },
@@ -44664,19 +44604,19 @@ export const activityDetails: Record<string, ActivityDetail> = {
    },
    {
     "n": 6,
-    "text": "Simulate pattern against the tester model",
+    "text": "Simulate the patterns against the tester model",
     "tat": 2,
     "lane": "main"
    },
    {
     "n": 7,
-    "text": "Generate pattern regression and version control",
+    "text": "Put the patterns under regression and version control",
     "tat": 1.5,
     "lane": "par"
    },
    {
     "n": 8,
-    "text": "Debug pattern on silicon or emulation",
+    "text": "Debug the patterns on silicon or emulation",
     "tat": 2,
     "lane": "main"
    }
@@ -44713,20 +44653,20 @@ export const activityDetails: Record<string, ActivityDetail> = {
    {
     "id": "TEST-D5",
     "rel": "produces",
-    "text": "ATE-ready pattern set with debug log. This activity is the deliverable."
+    "text": "<b>ATE-ready pattern set with debug log.</b> The ATE-ready pattern set and its debug log are produced here—patterns translated, fitted to tester memory, simulated against the tester model and debugged to run."
    },
    {
     "id": "TEST-D3",
     "rel": "feeds",
-    "text": "Wafer sort and final test programs. Both programs run these patterns as their structural content."
+    "text": "<b>Wafer sort and final test programs.</b> Both programs run these patterns as their structural content."
    }
   ],
   "risks": [
-   "Pattern volume exceeding tester memory",
-   "Timing not mappable to the tester's resolution",
-   "Patterns not simulated against the tester model",
-   "Pattern set not versioned",
-   "Debug deferred until first silicon"
+   "<b>Pattern volume exceeding tester memory.</b> The set cannot be loaded at all, and reduction after ATPG loses coverage.",
+   "<b>Timing not mappable to the tester's resolution.</b> At-speed patterns then run at the wrong speed, silently.",
+   "<b>Patterns not simulated against the tester model.</b> Failures are then debugged on silicon at tester rates rather than in simulation.",
+   "<b>Pattern set not versioned.</b> A yield excursion cannot be correlated to a pattern change nobody recorded.",
+   "<b>Debug deferred until first silicon.</b> Pattern problems and silicon problems then arrive together and cannot be separated."
   ],
   "roles": [
    {
@@ -44836,55 +44776,55 @@ export const activityDetails: Record<string, ActivityDetail> = {
   ],
   "criticalPath": false,
   "purpose": [
-   "Reduce test time and test cost per unit—an activity that starts early, because content is far cheaper to not write than to remove.",
+   "Reduce <b>test time and test cost per unit</b>—an activity that starts early, because content is far cheaper to not write than to remove.",
    "Test time is paid on every unit for the product's whole life. A second saved at final test on a million units is real money, and the savings available at plan time are much larger than the ones available after the program is written and qualified."
   ],
   "steps": [
    {
     "n": 1,
-    "text": "Test time baseline measurement",
+    "text": "Measure the test time baseline",
     "tat": 1.5,
     "lane": "main"
    },
    {
     "n": 2,
-    "text": "Test time contributor analysis",
+    "text": "Analyze the test time contributors",
     "tat": 2,
     "lane": "main"
    },
    {
     "n": 3,
-    "text": "Define and document redundant coverage identification",
+    "text": "Identify redundant coverage",
     "tat": 1.5,
     "lane": "par"
    },
    {
     "n": 4,
-    "text": "Define and document content reduction and reordering",
+    "text": "Reduce and reorder the content",
     "tat": 2,
     "lane": "main"
    },
    {
     "n": 5,
-    "text": "Define and document adaptive and skip-on-fail strategy",
+    "text": "Build the adaptive and skip-on-fail strategy",
     "tat": 1.5,
     "lane": "par"
    },
    {
     "n": 6,
-    "text": "Assess parallelism and multi-site",
+    "text": "Assess parallelism and multi-site conversion",
     "tat": 1.75,
     "lane": "main"
    },
    {
     "n": 7,
-    "text": "Define and document tester resource cost per unit",
+    "text": "Compute the tester resource cost per unit",
     "tat": 1.25,
     "lane": "par"
    },
    {
     "n": 8,
-    "text": "Release cost model update and",
+    "text": "Update and release the cost model",
     "tat": 1.75,
     "lane": "main"
    }
@@ -44921,20 +44861,20 @@ export const activityDetails: Record<string, ActivityDetail> = {
    {
     "id": "TEST-D6",
     "rel": "produces",
-    "text": "Test time and test cost model. This activity is the deliverable."
+    "text": "<b>Test time and test cost model.</b> The cost model is produced here—with its yield assumption and the reductions that keep test time inside it."
    },
    {
     "id": "TEST-D1",
     "rel": "informs",
-    "text": "Test plan and test coverage matrix. Reduction decisions change what the plan promises, and the matrix has to follow."
+    "text": "<b>Test plan and test coverage matrix.</b> Reduction decisions change what the plan promises, and the matrix has to follow."
    }
   ],
   "risks": [
-   "Optimization started after qualification",
-   "Coverage traded away silently",
-   "Reordering not done",
-   "Multi-site assumed without pin count",
-   "Cost model without a yield assumption"
+   "<b>Optimization started after qualification.</b> Any content change then requires re-qualification, which is why this starts early.",
+   "<b>Coverage traded away silently.</b> Time reduction that loses coverage has to be an explicit decision against the DPPM target.",
+   "<b>Reordering not done.</b> It is free and it is the largest single lever, and it is routinely overlooked.",
+   "<b>Multi-site assumed without pin count.</b> The tester configuration from <code>TEST-02</code> has to support it, and retrofitting it does not work.",
+   "<b>Cost model without a yield assumption.</b> Cost per good unit depends on yield, and a model without it understates the cost."
   ],
   "roles": [
    {
@@ -45043,55 +44983,55 @@ export const activityDetails: Record<string, ActivityDetail> = {
   ],
   "criticalPath": false,
   "purpose": [
-   "Correlate ATE, bench and system results so that a part passing on the tester behaves the same way in a customer's system.",
+   "Correlate <b>ATE, bench and system results</b> so that a part passing on the tester behaves the same way in a customer's system.",
    "Three measurement environments produce three numbers for the same parameter, and they never agree exactly. What matters is whether the disagreement is understood: an unexplained gap between tester and system is either an escape path or an over-screen, and both are expensive."
   ],
   "steps": [
    {
     "n": 1,
-    "text": "Select correlation plan and unit",
+    "text": "Plan the correlation and select the units",
     "tat": 1,
     "lane": "main"
    },
    {
     "n": 2,
-    "text": "Correlate aTE-to-bench",
+    "text": "Correlate ATE against bench",
     "tat": 2,
     "lane": "main"
    },
    {
     "n": 3,
-    "text": "Measure uncertainty budget",
+    "text": "Build the measurement uncertainty budget",
     "tat": 1.5,
     "lane": "par"
    },
    {
     "n": 4,
-    "text": "Correlate aTE-to-system",
+    "text": "Correlate ATE against system",
     "tat": 2,
     "lane": "main"
    },
    {
     "n": 5,
-    "text": "Define and document golden unit designation and retention",
+    "text": "Designate and retain the golden units",
     "tat": 1.5,
     "lane": "par"
    },
    {
     "n": 6,
-    "text": "Analyze discrepancy and root cause",
+    "text": "Analyze the discrepancies and establish root causes",
     "tat": 1.5,
     "lane": "main"
    },
    {
     "n": 7,
-    "text": "Correlate regression setup",
+    "text": "Set up the correlation regression",
     "tat": 1,
     "lane": "par"
    },
    {
     "n": 8,
-    "text": "Release guard-band adjustment and",
+    "text": "Adjust the guard bands and release",
     "tat": 1.5,
     "lane": "main"
    }
@@ -45128,20 +45068,20 @@ export const activityDetails: Record<string, ActivityDetail> = {
    {
     "id": "TEST-D4",
     "rel": "feeds",
-    "text": "Characterization test suite. Correlation validates that characterization numbers hold outside the tester."
+    "text": "<b>Characterization test suite.</b> Correlation validates that characterization numbers hold outside the tester."
    },
    {
     "id": "TEST-D3",
     "rel": "feeds",
-    "text": "Wafer sort and final test programs. Guard-band adjustments from correlation go back into the programs."
+    "text": "<b>Wafer sort and final test programs.</b> Guard-band adjustments from correlation go back into the programs."
    }
   ],
   "risks": [
-   "Discrepancy accepted without root cause",
-   "Correlation on too few units",
-   "No golden units retained",
-   "System correlation skipped",
-   "Guard bands not updated"
+   "<b>Discrepancy accepted without root cause.</b> The gap is either an escape or an over-screen, and 'they just differ' resolves neither.",
+   "<b>Correlation on too few units.</b> Two units that agree prove very little about the population.",
+   "<b>No golden units retained.</b> Drift in the tester, the load board or the program then has nothing to be measured against.",
+   "<b>System correlation skipped.</b> ATE-to-bench is the easy half; ATE-to-system is the one the customer experiences.",
+   "<b>Guard bands not updated.</b> The correlation produced the information and nothing acted on it."
   ],
   "roles": [
    {
@@ -45251,55 +45191,55 @@ export const activityDetails: Record<string, ActivityDetail> = {
   ],
   "criticalPath": false,
   "purpose": [
-   "Build the test data infrastructure—STDF collection, parsing, a yield database and the analysis on top of it—so that test results become information rather than files.",
-   "Completing this work early provides a clear basis for downstream design decisions and reduces late rework, schedule risk, and integration issues."
+   "Build the <b>test data infrastructure</b>—STDF collection, parsing, a yield database and the analysis on top of it—so that test results become information rather than files.",
+   "Every yield decision the program makes for the rest of its life is made from this data. Without a pipeline, the data exists as per-lot files nobody can query, and questions that should take an hour take a week or go unasked."
   ],
   "steps": [
    {
     "n": 1,
-    "text": "Characterize data requirement from yield, quality and",
+    "text": "Collect the data requirements from yield, quality and characterization",
     "tat": 1,
     "lane": "main"
    },
    {
     "n": 2,
-    "text": "Define and document sTDF collection and parsing pipeline",
+    "text": "Build the STDF collection and parsing pipeline",
     "tat": 2,
     "lane": "main"
    },
    {
     "n": 3,
-    "text": "Define and document traceability keys — lot, wafer, unit, assembly",
+    "text": "Define the traceability keys — lot, wafer, unit, assembly",
     "tat": 1.5,
     "lane": "par"
    },
    {
     "n": 4,
-    "text": "Define and document yield database and schema",
+    "text": "Build the yield database and schema",
     "tat": 2,
     "lane": "main"
    },
    {
     "n": 5,
-    "text": "Define and document retention and archival policy",
+    "text": "Set the retention and archival policy",
     "tat": 1.5,
     "lane": "par"
    },
    {
     "n": 6,
-    "text": "Analyze and dashboard layer",
+    "text": "Build the analysis and dashboard layer",
     "tat": 1.5,
     "lane": "main"
    },
    {
     "n": 7,
-    "text": "Define and document alerting on yield excursions",
+    "text": "Set up alerting on yield excursions",
     "tat": 1,
     "lane": "par"
    },
    {
     "n": 8,
-    "text": "Define and document deployment and access provisioning",
+    "text": "Deploy the infrastructure and provision access",
     "tat": 1.5,
     "lane": "main"
    }
@@ -45336,20 +45276,20 @@ export const activityDetails: Record<string, ActivityDetail> = {
    {
     "id": "TEST-D7",
     "rel": "produces",
-    "text": "Test data infrastructure and yield database. This activity is the deliverable."
+    "text": "<b>Test data infrastructure and yield database.</b> The data infrastructure is built here—the STDF pipeline, traceability keys and yield database every later yield decision is made from."
    },
    {
     "id": "TEST-D1",
     "rel": "informs",
-    "text": "Test plan and test coverage matrix. What the data shows about actual failure modes updates the plan's assumptions."
+    "text": "<b>Test plan and test coverage matrix.</b> What the data shows about actual failure modes updates the plan's assumptions."
    }
   ],
   "risks": [
-   "Traceability keys added retroactively",
-   "Pipeline built after the first lots run",
-   "Retention policy absent",
-   "Dashboards without an alerting layer",
-   "Schema not covering characterization"
+   "<b>Traceability keys added retroactively.</b> Historical data then cannot be joined, and the most valuable early lots become unanalysable.",
+   "<b>Pipeline built after the first lots run.</b> The first silicon's data is the most informative the program will ever have, and it is the data most often lost.",
+   "<b>Retention policy absent.</b> Field returns arrive years later, and the test record for that unit has to still exist.",
+   "<b>Dashboards without an alerting layer.</b> A yield excursion is noticed at the weekly review rather than the same day.",
+   "<b>Schema not covering characterization.</b> Characterization data has a different shape, and a sort-only schema forces it into a separate silo."
   ],
   "roles": [
    {
@@ -45455,31 +45395,31 @@ export const activityDetails: Record<string, ActivityDetail> = {
   ],
   "criticalPath": true,
   "purpose": [
-   "Receive the first units, check them and mount them—a short activity whose only job is to make sure the most valuable objects the program has ever produced are not damaged before they are powered.",
+   "Receive the first units, <b>check them and mount them</b>—a short activity whose only job is to make sure the most valuable objects the program has ever produced are not damaged before they are powered.",
    "There are very few first-silicon units and each represents the whole program's schedule. A unit destroyed by a mounting error or an unnoticed shipping defect is not replaceable inside any useful timeframe."
   ],
   "steps": [
    {
     "n": 1,
-    "text": "Define and document sample receipt and incoming inspection",
+    "text": "Receive the samples and run incoming inspection",
     "tat": 0.5,
     "lane": "main"
    },
    {
     "n": 2,
-    "text": "Prepare board mounting and mechanical fit",
+    "text": "Mount the units and check mechanical fit",
     "tat": 0.5,
     "lane": "main"
    },
    {
     "n": 3,
-    "text": "Track unit register and allocation record",
+    "text": "Start the unit tracking register and allocation record",
     "tat": 0.5,
     "lane": "par"
    },
    {
     "n": 4,
-    "text": "Define and document pre-power checklist against the board's known issues",
+    "text": "Complete the pre-power checklist against the board known issues",
     "tat": 0.5,
     "lane": "main"
    }
@@ -45508,20 +45448,20 @@ export const activityDetails: Record<string, ActivityDetail> = {
    {
     "id": "BU-D1",
     "rel": "feeds",
-    "text": "Bring-up report with per-milestone health status. Receipt and mounting are the report's first entries."
+    "text": "<b>Bring-up report with per-milestone health status.</b> Receipt and mounting are the report's first entries—the inspection record and unit register every later result is attributed against."
    },
    {
     "id": "BU-D5",
     "rel": "informs",
-    "text": "Failure analysis reports. A unit's history starts here, and an FA needs to know how it was handled."
+    "text": "<b>Failure analysis reports.</b> A unit's history starts here, and an FA needs to know how it was handled."
    }
   ],
   "risks": [
-   "Handling damage on an irreplaceable unit",
-   "Mounting onto an unvalidated board",
-   "No unit tracking",
-   "Incoming inspection skipped in the rush",
-   "All units mounted at once"
+   "<b>Handling damage on an irreplaceable unit.</b> ESD or mechanical damage at mounting costs a unit the program cannot replace.",
+   "<b>Mounting onto an unvalidated board.</b> A board fault then destroys the part, and <code>EVB-07</code> exists to prevent exactly this.",
+   "<b>No unit tracking.</b> Every subsequent result has to be attributable to a specific unit and its history.",
+   "<b>Incoming inspection skipped in the rush.</b> Shipping damage is real and is much cheaper to find before power than after.",
+   "<b>All units mounted at once.</b> A systematic board or handling fault then takes the whole fleet rather than one unit."
   ],
   "roles": [
    {
@@ -45618,8 +45558,8 @@ export const activityDetails: Record<string, ActivityDetail> = {
   ],
   "criticalPath": true,
   "purpose": [
-   "Apply power for the first time—sequenced, current-limited and instrumented—and establish that the part is alive.",
-   "Completing this work early provides a clear basis for downstream design decisions and reduces late rework, schedule risk, and integration issues."
+   "Apply power for the first time—<b>sequenced, current-limited and instrumented</b>—and establish that the part is alive.",
+   "First power-on is the moment the whole design becomes physical. It is also the moment a shorted rail or a sequencing error can destroy a unit in milliseconds, which is why it is done with limits, with measurement, and with the ability to stop."
   ],
   "steps": [
    {
@@ -45630,25 +45570,25 @@ export const activityDetails: Record<string, ActivityDetail> = {
    },
    {
     "n": 2,
-    "text": "Define and document first power application with current limits",
+    "text": "Apply first power with current limits in place",
     "tat": 1,
     "lane": "main"
    },
    {
     "n": 3,
-    "text": "Triage anomaly on the first application",
+    "text": "Triage anomalies from the first application",
     "tat": 0.75,
     "lane": "par"
    },
    {
     "n": 4,
-    "text": "Define and document rail voltage and current profiling",
+    "text": "Profile the rail voltages and currents",
     "tat": 1,
     "lane": "main"
    },
    {
     "n": 5,
-    "text": "Define and document health check and go/no-go for the next step",
+    "text": "Run the health check and take the go/no-go decision",
     "tat": 0.5,
     "lane": "main"
    }
@@ -45679,20 +45619,20 @@ export const activityDetails: Record<string, ActivityDetail> = {
    {
     "id": "BU-D1",
     "rel": "feeds",
-    "text": "Bring-up report with per-milestone health status. Power-on is the first milestone and its result sets the program's tone."
+    "text": "<b>Bring-up report with per-milestone health status.</b> Power-on is the first milestone and its result sets the program's tone."
    },
    {
     "id": "BU-D2",
     "rel": "feeds",
-    "text": "Characterization data set. The first rail current measurements are the earliest real power data the program has."
+    "text": "<b>Characterization data set.</b> The first rail current measurements are the earliest real power data the program has."
    }
   ],
   "risks": [
-   "Power applied without current limits",
-   "Sequencing not verified against the specification",
-   "Rail currents not profiled",
-   "Multiple units powered before the first is understood",
-   "Anomalies pushed past to reach the next milestone"
+   "<b>Power applied without current limits.</b> A short then destroys the unit instead of revealing itself.",
+   "<b>Sequencing not verified against the specification.</b> A wrong power-up order damages the part and the fault is the platform's, not the silicon's.",
+   "<b>Rail currents not profiled.</b> The first real power data is available at exactly this moment and is easy to not capture.",
+   "<b>Multiple units powered before the first is understood.</b> A systematic fault then takes several units instead of one.",
+   "<b>Anomalies pushed past to reach the next milestone.</b> Something unexplained at power-on rarely stays harmless."
   ],
   "roles": [
    {
@@ -45797,31 +45737,31 @@ export const activityDetails: Record<string, ActivityDetail> = {
   ],
   "criticalPath": false,
   "purpose": [
-   "Validate reset, clocking and PLL lock—the infrastructure everything else depends on, and the layer where a fault masquerades as a fault somewhere else.",
+   "Validate <b>reset, clocking and PLL lock</b>—the infrastructure everything else depends on, and the layer where a fault masquerades as a fault somewhere else.",
    "A PLL that locks unreliably or a reset domain released in the wrong order produces symptoms all over the chip: boot failures, interface training failures, sporadic functional errors. Clearing this layer first means the failures found later are real."
   ],
   "steps": [
    {
     "n": 1,
-    "text": "Validate reference clock and input",
+    "text": "Validate the reference clocks and inputs",
     "tat": 0.5,
     "lane": "main"
    },
    {
     "n": 2,
-    "text": "Define and document pLL lock across the frequency range",
+    "text": "Verify PLL lock across the frequency range",
     "tat": 1,
     "lane": "main"
    },
    {
     "n": 3,
-    "text": "Verify reset sequence and domain release",
+    "text": "Verify the reset sequence and domain release order",
     "tat": 0.75,
     "lane": "par"
    },
    {
     "n": 4,
-    "text": "Verify clock tree and domain",
+    "text": "Verify the clock tree and domains",
     "tat": 1,
     "lane": "main"
    },
@@ -45858,20 +45798,20 @@ export const activityDetails: Record<string, ActivityDetail> = {
    {
     "id": "BU-D1",
     "rel": "feeds",
-    "text": "Bring-up report with per-milestone health status. Clocking and reset form the second milestone."
+    "text": "<b>Bring-up report with per-milestone health status.</b> Clocking and reset form the second milestone; clearing this layer is what makes every later failure attributable to something real."
    },
    {
     "id": "BU-D2",
     "rel": "feeds",
-    "text": "Characterization data set. PLL lock range and jitter are datasheet-relevant measurements."
+    "text": "<b>Characterization data set.</b> PLL lock range and jitter are datasheet-relevant measurements."
    }
   ],
   "risks": [
-   "PLL lock validated only at nominal",
-   "Reset domain release order not verified",
-   "Jitter unmeasured",
-   "Clock tree assumed correct because the part boots",
-   "Clock quality measured through the board without accounting for it"
+   "<b>PLL lock validated only at nominal.</b> The lock range matters because shmoo and characterization will operate outside nominal.",
+   "<b>Reset domain release order not verified.</b> The resulting failures appear anywhere on the chip and are attributed to the wrong block.",
+   "<b>Jitter unmeasured.</b> Interface training margin depends on it, and a jitter problem is then debugged inside the SerDes.",
+   "<b>Clock tree assumed correct because the part boots.</b> A misconfigured divider is compatible with booting and incompatible with performance.",
+   "<b>Clock quality measured through the board without accounting for it.</b> The board contributes jitter and its contribution has to be separated."
   ],
   "roles": [
    {
@@ -45978,43 +45918,43 @@ export const activityDetails: Record<string, ActivityDetail> = {
   ],
   "criticalPath": true,
   "purpose": [
-   "Boot the part—ROM, firmware load, register access, first functional response—and confirm that the design does what it was written to do.",
-   "Completing this work early provides a clear basis for downstream design decisions and reduces late rework, schedule risk, and integration issues."
+   "<b>Boot the part</b>—ROM, firmware load, register access, first functional response—and confirm that the design does what it was written to do.",
+   "First boot is the milestone that turns a powered die into a working processor. It is also the point at which the design, the firmware, the board and the host software are all exercised together for the first time, which is why it is the milestone most likely to expose an integration assumption nobody wrote down."
   ],
   "steps": [
    {
     "n": 1,
-    "text": "Define and document boot ROM and initialization sequence execution",
+    "text": "Execute the boot ROM and initialization sequence",
     "tat": 0.75,
     "lane": "main"
    },
    {
     "n": 2,
-    "text": "Hand off firmware load and",
+    "text": "Load the firmware and complete the handoff",
     "tat": 1.25,
     "lane": "main"
    },
    {
     "n": 3,
-    "text": "Triage boot failure",
+    "text": "Triage the boot failures",
     "tat": 1,
     "lane": "par"
    },
    {
     "n": 4,
-    "text": "Define register access and device identity read",
+    "text": "Read registers and confirm device identity",
     "tat": 1.25,
     "lane": "main"
    },
    {
     "n": 5,
-    "text": "Bring up first report and status broadcast",
+    "text": "Publish the first bring-up report and broadcast status",
     "tat": 1,
     "lane": "par"
    },
    {
     "n": 6,
-    "text": "Define and document functional smoke test",
+    "text": "Run the functional smoke tests",
     "tat": 0.75,
     "lane": "main"
    }
@@ -46047,20 +45987,20 @@ export const activityDetails: Record<string, ActivityDetail> = {
    {
     "id": "BU-D1",
     "rel": "produces",
-    "text": "Bring-up report with per-milestone health status. First boot is the report's central milestone and where it starts being published widely."
+    "text": "<b>Bring-up report with per-milestone health status.</b> First boot is the report's central milestone and where it starts being published widely."
    },
    {
     "id": "BU-D4",
     "rel": "feeds",
-    "text": "Errata list with workarounds. Boot-time deviations are the earliest errata the program records."
+    "text": "<b>Errata list with workarounds.</b> Boot-time deviations are the earliest errata the program records."
    }
   ],
   "risks": [
-   "Boot failure with no state visible",
-   "Firmware and hardware assumptions differing",
-   "Register map drift",
-   "Smoke test too shallow",
-   "Status not broadcast"
+   "<b>Boot failure with no state visible.</b> Without debug access the failure is a symptom with no information, and debug access comes from <code>EVB-06</code>.",
+   "<b>Firmware and hardware assumptions differing.</b> The handoff is where two teams' expectations meet, and nobody wrote them down.",
+   "<b>Register map drift.</b> The tool reads addresses the silicon does not implement and reports plausible garbage.",
+   "<b>Smoke test too shallow.</b> A part that boots and does nothing else has passed a milestone without demonstrating much.",
+   "<b>Status not broadcast.</b> First boot is the news the whole program is waiting for, and silence is read as failure."
   ],
   "roles": [
    {
@@ -46167,55 +46107,55 @@ export const activityDetails: Record<string, ActivityDetail> = {
   ],
   "criticalPath": true,
   "purpose": [
-   "Bring up the interfaces—PCIe/CXL link training, HBM training, die-to-die—which on this part is the largest single body of bring-up work and the most likely to produce a respin decision.",
+   "Bring up the <b>interfaces</b>—PCIe/CXL link training, HBM training, die-to-die—which on this part is the largest single body of bring-up work and the most likely to produce a respin decision.",
    "Interfaces are where design, package, board and protocol all meet. Training failures are notoriously hard to attribute because every layer can cause them, and the margin measurements taken here are what tell the program whether the part is comfortable or on the edge."
   ],
   "steps": [
    {
     "n": 1,
-    "text": "Bring up interface order and plan",
+    "text": "Set the interface bring-up order and plan",
     "tat": 1,
     "lane": "main"
    },
    {
     "n": 2,
-    "text": "Define and document pCIe/CXL link training",
+    "text": "Train the PCIe/CXL links",
     "tat": 2,
     "lane": "main"
    },
    {
     "n": 3,
-    "text": "Measure link margin and eye",
+    "text": "Measure link margins and eyes",
     "tat": 2,
     "lane": "par"
    },
    {
     "n": 4,
-    "text": "Define and document hBM interface training",
+    "text": "Train the HBM interfaces",
     "tat": 2.5,
     "lane": "main"
    },
    {
     "n": 5,
-    "text": "Debug training failure",
+    "text": "Debug the training failures",
     "tat": 2,
     "lane": "par"
    },
    {
     "n": 6,
-    "text": "Bring up die-to-die interface",
+    "text": "Bring up the die-to-die interfaces",
     "tat": 1.5,
     "lane": "main"
    },
    {
     "n": 7,
-    "text": "Define and document interoperability against host platforms",
+    "text": "Confirm interoperability against host platforms",
     "tat": 1.5,
     "lane": "par"
    },
    {
     "n": 8,
-    "text": "Define and document interface stability and compliance run",
+    "text": "Run the interface stability and compliance suite",
     "tat": 1,
     "lane": "main"
    }
@@ -46234,7 +46174,7 @@ export const activityDetails: Record<string, ActivityDetail> = {
    "Link margin and eye measurements",
    "HBM training results",
    "Training failure debug findings",
-   "Interface bring-up plan",
+   "Per-interface training parameter record",
    "Die-to-die interface results",
    "Interoperability results",
    "Interface stability and compliance data"
@@ -46254,20 +46194,20 @@ export const activityDetails: Record<string, ActivityDetail> = {
    {
     "id": "BU-D3",
     "rel": "produces",
-    "text": "Interface compliance results with training margins. The deliverable the margins are what say whether the part is comfortable."
+    "text": "<b>Interface compliance results with training margins.</b> The compliance results and training margins are measured here, and the margins are what say whether the part is comfortable."
    },
    {
     "id": "BU-D1",
     "rel": "feeds",
-    "text": "Bring-up report with per-milestone health status. Interface training is the milestone that decides whether the product works as designed."
+    "text": "<b>Bring-up report with per-milestone health status.</b> Interface training is the milestone that decides whether the product works as designed."
    }
   ],
   "risks": [
-   "Training success accepted without margin measurement",
-   "Failures not attributable across layers",
-   "HBM training treated as a vendor problem",
-   "Interoperability tested against one host",
-   "Compliance run deferred"
+   "<b>Training success accepted without margin measurement.</b> A zero-margin link works on the bench and fails in the field.",
+   "<b>Failures not attributable across layers.</b> Design, package, board and protocol can all cause the same symptom, and the SIPI predictions are what separate them.",
+   "<b>HBM training treated as a vendor problem.</b> The interface is the program's, and its training parameters have to be understood locally.",
+   "<b>Interoperability tested against one host.</b> Customers use many, and a link that only works with the lab's host is not compliant.",
+   "<b>Compliance run deferred.</b> Formal compliance is a gate for certification and takes lab time that has to be booked."
   ],
   "roles": [
    {
@@ -46393,25 +46333,25 @@ export const activityDetails: Record<string, ActivityDetail> = {
   ],
   "criticalPath": false,
   "purpose": [
-   "Validate the memory subsystem—controller, address map, bandwidth, latency, ECC—because on an AI accelerator the memory system is most of the performance.",
+   "Validate the <b>memory subsystem</b>—controller, address map, bandwidth, latency, ECC—because on an AI accelerator the memory system is most of the performance.",
    "HBM training establishes that the links work; this establishes that the memory system delivers. Bandwidth and latency against the architecture model is the measurement the product's performance claims rest on, and it is where architectural assumptions meet a real memory controller."
   ],
   "steps": [
    {
     "n": 1,
-    "text": "Define and document memory controller initialization and configuration",
+    "text": "Initialize and configure the memory controller",
     "tat": 1,
     "lane": "main"
    },
    {
     "n": 2,
-    "text": "Validate address map and pattern",
+    "text": "Validate the address map and patterns",
     "tat": 1.5,
     "lane": "main"
    },
    {
     "n": 3,
-    "text": "Validate eCC and error handling",
+    "text": "Validate ECC and error handling with injected errors",
     "tat": 1.5,
     "lane": "par"
    },
@@ -46423,7 +46363,7 @@ export const activityDetails: Record<string, ActivityDetail> = {
    },
    {
     "n": 5,
-    "text": "Define and document refresh and thermal behavior",
+    "text": "Check refresh and thermal behavior",
     "tat": 1.5,
     "lane": "par"
    },
@@ -46462,20 +46402,20 @@ export const activityDetails: Record<string, ActivityDetail> = {
    {
     "id": "BU-D2",
     "rel": "feeds",
-    "text": "Characterization data set. Memory bandwidth, latency and efficiency are core characterization results."
+    "text": "<b>Characterization data set.</b> Memory bandwidth, latency and efficiency are core characterization results."
    },
    {
     "id": "BU-D3",
     "rel": "feeds",
-    "text": "Interface compliance results with training margins. Sustained memory operation is what proves the trained interfaces hold."
+    "text": "<b>Interface compliance results with training margins.</b> Sustained memory operation is what proves the trained interfaces hold."
    }
   ],
   "risks": [
-   "ECC never exercised",
-   "Bandwidth measured without the model to compare against",
-   "Refresh behavior at temperature not checked",
-   "Address map validated only at the boundaries",
-   "Efficiency ignored in favor of peak"
+   "<b>ECC never exercised.</b> A correction path that has never corrected an injected error has not been validated.",
+   "<b>Bandwidth measured without the model to compare against.</b> A number without a target says nothing about whether the design met its intent.",
+   "<b>Refresh behavior at temperature not checked.</b> HBM refresh scales with temperature and the effect on bandwidth is real.",
+   "<b>Address map validated only at the boundaries.</b> Aliasing errors sit in the middle of the map and pass boundary tests.",
+   "<b>Efficiency ignored in favor of peak.</b> Peak bandwidth is a datasheet number; achieved efficiency is what workloads see."
   ],
   "roles": [
    {
@@ -46584,19 +46524,19 @@ export const activityDetails: Record<string, ActivityDetail> = {
   ],
   "criticalPath": false,
   "purpose": [
-   "Shmoo the part across voltage, frequency and temperature—the measurement that establishes how much margin the design has.",
+   "<b>Shmoo the part</b> across voltage, frequency and temperature—the measurement that establishes how much margin the design actually has.",
    "Every operating condition the product will be specified at comes out of this. The shmoo shows where the part stops working, and the distance between that boundary and the nominal operating point is the margin the datasheet, the guard bands and the qualification plan all depend on."
   ],
   "steps": [
    {
     "n": 1,
-    "text": "Set up shmoo plan and automation",
+    "text": "Plan the shmoo and set up the automation",
     "tat": 1,
     "lane": "main"
    },
    {
     "n": 2,
-    "text": "Define and document voltage-frequency shmoo at room temperature",
+    "text": "Run the voltage-frequency shmoo at room temperature",
     "tat": 1.5,
     "lane": "main"
    },
@@ -46608,19 +46548,19 @@ export const activityDetails: Record<string, ActivityDetail> = {
    },
    {
     "n": 4,
-    "text": "Define and document temperature-extended shmoo",
+    "text": "Extend the shmoo across temperature",
     "tat": 1.5,
     "lane": "main"
    },
    {
     "n": 5,
-    "text": "Define and document unit-to-unit variation across the fleet",
+    "text": "Measure unit-to-unit variation across the fleet",
     "tat": 1.5,
     "lane": "par"
    },
    {
     "n": 6,
-    "text": "Analyze shmoo and margin extraction",
+    "text": "Analyze the shmoo and extract the margins",
     "tat": 3,
     "lane": "main"
    }
@@ -46653,20 +46593,20 @@ export const activityDetails: Record<string, ActivityDetail> = {
    {
     "id": "BU-D2",
     "rel": "produces",
-    "text": "Characterization data set—V/F/T shmoo and power measurements. This activity is the deliverable."
+    "text": "<b>Characterization data set—V/F/T shmoo and power measurements.</b> The characterization data set is produced here—the V/F/T shmoo surfaces, power measurements and fleet variation data the specification is set against."
    },
    {
     "id": "BU-D1",
     "rel": "feeds",
-    "text": "Bring-up report with per-milestone health status. Margin is the strongest single indicator of whether the silicon is healthy."
+    "text": "<b>Bring-up report with per-milestone health status.</b> Margin is the strongest single indicator of whether the silicon is healthy."
    }
   ],
   "risks": [
-   "Shmoo on a single unit",
-   "Room temperature only",
-   "Manual sweeps",
-   "Thermal throttling inside the sweep",
-   "Margin measured but not fed into guard bands"
+   "<b>Shmoo on a single unit.</b> The result describes that unit and is used as if it described the population.",
+   "<b>Room temperature only.</b> The hot and cold corners are where the margin is smallest and where qualification will operate.",
+   "<b>Manual sweeps.</b> The corner count then gets reduced to fit the available engineer time, silently.",
+   "<b>Thermal throttling inside the sweep.</b> The shmoo then maps the cooling solution rather than the silicon.",
+   "<b>Margin measured but not fed into guard bands.</b> The data exists and production test still uses convention."
   ],
   "roles": [
    {
@@ -46783,19 +46723,19 @@ export const activityDetails: Record<string, ActivityDetail> = {
   ],
   "criticalPath": false,
   "purpose": [
-   "Measure real performance against the architecture model—the check on whether the product does what it was sold as doing.",
+   "Measure <b>real performance against the architecture model</b>—the check on whether the product does what it was sold as doing.",
    "The whole program was justified by a performance projection. This is where that projection meets a physical part running real workloads, and any gap has to be attributed: to the model, to the design, to the memory system, or to the software driving it."
   ],
   "steps": [
    {
     "n": 1,
-    "text": "Set up benchmark and workload",
+    "text": "Set up the benchmarks and workloads",
     "tat": 1,
     "lane": "main"
    },
    {
     "n": 2,
-    "text": "Measure performance across workloads",
+    "text": "Measure performance across the workloads",
     "tat": 1.5,
     "lane": "main"
    },
@@ -46813,13 +46753,13 @@ export const activityDetails: Record<string, ActivityDetail> = {
    },
    {
     "n": 5,
-    "text": "Define and document bottleneck profiling",
+    "text": "Profile the bottlenecks",
     "tat": 1.5,
     "lane": "par"
    },
    {
     "n": 6,
-    "text": "Analyze gap and attribution",
+    "text": "Analyze the gaps and attribute their causes",
     "tat": 2,
     "lane": "main"
    }
@@ -46852,20 +46792,20 @@ export const activityDetails: Record<string, ActivityDetail> = {
    {
     "id": "BU-D2",
     "rel": "feeds",
-    "text": "Characterization data set. Performance and efficiency measurements are part of the product's characterization."
+    "text": "<b>Characterization data set.</b> Performance and efficiency measurements are part of the product's characterization."
    },
    {
     "id": "BU-D1",
     "rel": "feeds",
-    "text": "Bring-up report with per-milestone health status. Performance against target is the milestone the business cares about most."
+    "text": "<b>Bring-up report with per-milestone health status.</b> Performance against target is the milestone the business cares about most."
    }
   ],
   "risks": [
-   "Performance measured on unrepresentative workloads",
-   "Gap reported without attribution",
-   "Software limiting the measurement",
-   "Efficiency ignored",
-   "Measured at a single operating point"
+   "<b>Performance measured on unrepresentative workloads.</b> A benchmark that is not what customers run produces a number that does not predict their experience.",
+   "<b>Gap reported without attribution.</b> Nobody can act on it, and the next program repeats the modeling error.",
+   "<b>Software limiting the measurement.</b> An immature stack understates the silicon, and the difference has to be established rather than assumed.",
+   "<b>Efficiency ignored.</b> Performance per watt is the metric this product class is bought on, and raw throughput alone misleads.",
+   "<b>Measured at a single operating point.</b> Real deployment spans conditions, and performance at nominal is not the whole picture."
   ],
   "roles": [
    {
@@ -46974,25 +46914,25 @@ export const activityDetails: Record<string, ActivityDetail> = {
   ],
   "criticalPath": true,
   "purpose": [
-   "Debug what is wrong—reproduce it, isolate it, extract the internal state, find the root cause, and get failure analysis where physical evidence is needed.",
+   "<b>Debug what is wrong</b>—reproduce it, isolate it, extract the internal state, find the root cause, and get failure analysis where physical evidence is needed.",
    "This is the activity the whole DFT and debug infrastructure investment exists to serve. It runs alongside every other bring-up activity because anomalies arrive from all of them, and its throughput largely determines how long bring-up takes."
   ],
   "steps": [
    {
     "n": 1,
-    "text": "Triage anomaly intake and process",
+    "text": "Run the anomaly intake and triage process",
     "tat": 1,
     "lane": "main"
    },
    {
     "n": 2,
-    "text": "Define and document reproduction and isolation",
+    "text": "Reproduce and isolate each anomaly",
     "tat": 2,
     "lane": "main"
    },
    {
     "n": 3,
-    "text": "Simulate and emulation cross-check",
+    "text": "Cross-check against simulation and emulation",
     "tat": 2,
     "lane": "par"
    },
@@ -47004,25 +46944,25 @@ export const activityDetails: Record<string, ActivityDetail> = {
    },
    {
     "n": 5,
-    "text": "Analyze design-team escalation and",
+    "text": "Escalate to the design team for analysis",
     "tat": 2,
     "lane": "par"
    },
    {
     "n": 6,
-    "text": "Define and document hypothesis test and root cause",
+    "text": "Test hypotheses and establish root causes",
     "tat": 2.5,
     "lane": "main"
    },
    {
     "n": 7,
-    "text": "Debug knowledge capture",
+    "text": "Capture the debug knowledge",
     "tat": 1.5,
     "lane": "par"
    },
    {
     "n": 8,
-    "text": "Analyze failure request and disposition",
+    "text": "Request failure analysis and disposition the findings",
     "tat": 2,
     "lane": "main"
    }
@@ -47059,20 +46999,20 @@ export const activityDetails: Record<string, ActivityDetail> = {
    {
     "id": "BU-D5",
     "rel": "produces",
-    "text": "Failure analysis reports. The deliverable physical FA is its most conclusive form."
+    "text": "<b>Failure analysis reports.</b> The failure analysis reports come from here, and physical FA is their most conclusive form."
    },
    {
     "id": "BU-D4",
     "rel": "feeds",
-    "text": "Errata list with workarounds. Every root cause found here becomes an errata entry or a fix."
+    "text": "<b>Errata list with workarounds.</b> Every root cause found here becomes an errata entry or a fix."
    }
   ],
   "risks": [
-   "Symptoms treated instead of causes",
-   "No path back to simulation",
-   "Design team engaged late",
-   "Units consumed by destructive FA too readily",
-   "Findings not captured"
+   "<b>Symptoms treated instead of causes.</b> A workaround without a root cause hides a mechanism that resurfaces in the field.",
+   "<b>No path back to simulation.</b> Debug then happens only on silicon, with limited visibility and long turnaround per hypothesis.",
+   "<b>Design team engaged late.</b> The people who wrote the logic can often recognize a symptom in minutes, and validation debugs alone for days first.",
+   "<b>Units consumed by destructive FA too readily.</b> Physical analysis destroys the unit, and there are very few.",
+   "<b>Findings not captured.</b> The same anomaly is then debugged twice by different engineers."
   ],
   "roles": [
    {
@@ -47189,13 +47129,13 @@ export const activityDetails: Record<string, ActivityDetail> = {
   ],
   "criticalPath": false,
   "purpose": [
-   "Turn what is wrong into a documented errata list with workarounds—the honest account of the silicon's behavior that customers and the next revision both need.",
-   "Every part ships with errata. What distinguishes a well-run program is that its errata are known, characterized, worked around and disclosed, rather than discovered by a customer."
+   "Turn what is wrong into a <b>documented errata list with workarounds</b>—the honest account of the silicon's behavior that customers and the next revision both need.",
+   "Every part ships with errata. What distinguishes a well-run program is that its errata are known, characterized, worked around and disclosed, rather than discovered by a customer. This activity is where debug findings become a product document."
   ],
   "steps": [
    {
     "n": 1,
-    "text": "Define and document errata intake and classification",
+    "text": "Take in and classify the errata",
     "tat": 1,
     "lane": "main"
    },
@@ -47207,25 +47147,25 @@ export const activityDetails: Record<string, ActivityDetail> = {
    },
    {
     "n": 3,
-    "text": "Define and document customer-visibility determination",
+    "text": "Determine customer visibility",
     "tat": 1.5,
     "lane": "par"
    },
    {
     "n": 4,
-    "text": "Validate workaround definition and",
+    "text": "Define and validate the workarounds on silicon",
     "tat": 1.5,
     "lane": "main"
    },
    {
     "n": 5,
-    "text": "Make and document the fix-versus-document input decision",
+    "text": "Provide the fix-versus-document input",
     "tat": 1,
     "lane": "par"
    },
    {
     "n": 6,
-    "text": "Release errata documentation and",
+    "text": "Document and release the errata",
     "tat": 3,
     "lane": "main"
    }
@@ -47258,20 +47198,20 @@ export const activityDetails: Record<string, ActivityDetail> = {
    {
     "id": "BU-D4",
     "rel": "produces",
-    "text": "Errata list with workarounds. The deliverable it is what ships alongside the product."
+    "text": "<b>Errata list with workarounds.</b> The errata list with its workarounds is produced here, and it is what ships alongside the product."
    },
    {
     "id": "BU-D6",
     "rel": "feeds",
-    "text": "Respin versus metal-fix decision record. Which errata are tolerable with a workaround is the decision's main input."
+    "text": "<b>Respin versus metal-fix decision record.</b> Which errata are tolerable with a workaround is the decision's main input."
    }
   ],
   "risks": [
-   "Workarounds documented but never validated",
-   "Severity assessed by engineering alone",
-   "Errata suppressed for commercial reasons",
-   "Errata list not versioned against silicon revision",
-   "Documentation deferred to the end"
+   "<b>Workarounds documented but never validated.</b> The mitigation then fails in the field and the errata gave false comfort.",
+   "<b>Severity assessed by engineering alone.</b> Customer impact depends on use models, and the assessment needs that perspective.",
+   "<b>Errata suppressed for commercial reasons.</b> Undisclosed known issues discovered by a customer damage far more than the disclosure would have.",
+   "<b>Errata list not versioned against silicon revision.</b> Which errata apply to which stepping becomes ambiguous the moment a second stepping exists.",
+   "<b>Documentation deferred to the end.</b> The context is freshest at root cause, and reconstructing it months later loses detail."
   ],
   "roles": [
    {
@@ -47372,13 +47312,13 @@ export const activityDetails: Record<string, ActivityDetail> = {
   ],
   "criticalPath": true,
   "purpose": [
-   "Decide whether the silicon needs a respin, a metal fix, or nothing—the single most consequential decision the program makes after tapeout.",
-   "A full-mask respin costs a mask set and roughly a quarter of schedule. A metal fix costs far less but can only reach defects in the routing layers."
+   "Decide whether the silicon needs a <b>respin, a metal fix, or nothing</b>—the single most consequential decision the program makes after tapeout.",
+   "A full-mask respin costs a mask set and roughly a quarter of schedule. A metal fix costs far less but can only reach defects in the routing layers. Shipping as-is with workarounds costs nothing now and possibly a great deal later. The decision has to weigh all three against evidence rather than optimism."
   ],
   "steps": [
    {
     "n": 1,
-    "text": "Define and document defect list and fix scoping",
+    "text": "Compile the defect list and scope the fixes",
     "tat": 0.75,
     "lane": "main"
    },
@@ -47390,7 +47330,7 @@ export const activityDetails: Record<string, ActivityDetail> = {
    },
    {
     "n": 3,
-    "text": "Define and document full-mask respin scoping",
+    "text": "Scope the full-mask respin",
     "tat": 0.75,
     "lane": "par"
    },
@@ -47402,13 +47342,13 @@ export const activityDetails: Record<string, ActivityDetail> = {
    },
    {
     "n": 5,
-    "text": "Define and document customer and market impact input",
+    "text": "Take the customer and market impact input",
     "tat": 0.75,
     "lane": "par"
    },
    {
     "n": 6,
-    "text": "Make and document the and its record decision",
+    "text": "Take the decision and record it",
     "tat": 1,
     "lane": "main"
    }
@@ -47441,20 +47381,20 @@ export const activityDetails: Record<string, ActivityDetail> = {
    {
     "id": "BU-D6",
     "rel": "produces",
-    "text": "Respin versus metal-fix decision record. The deliverable the record is what the program is held to."
+    "text": "<b>Respin versus metal-fix decision record.</b> The decision record is produced here, and the record is what the program is held to."
    },
    {
     "id": "BU-D4",
     "rel": "feeds",
-    "text": "Errata list with workarounds. Errata not fixed by the decision become permanent, documented behavior."
+    "text": "<b>Errata list with workarounds.</b> Errata not fixed by the decision become permanent, documented behavior."
    }
   ],
   "risks": [
-   "Decision made on schedule pressure alone",
-   "Metal-fix feasibility assumed",
-   "Margin data not weighed",
-   "Decision unrecorded",
-   "Customer input excluded"
+   "<b>Decision made on schedule pressure alone.</b> Shipping a part with a real defect to protect a date routinely costs more than the delay would have.",
+   "<b>Metal-fix feasibility assumed.</b> It is a physical question about which layers the fix touches, and it is often answered optimistically.",
+   "<b>Margin data not weighed.</b> A part with adequate function and no margin fails in the field, and the shmoo already said so.",
+   "<b>Decision unrecorded.</b> Six months later nobody can reconstruct what was known and what was accepted.",
+   "<b>Customer input excluded.</b> Whether an errata is tolerable depends on what customers do with the part."
   ],
   "roles": [
    {
@@ -47556,43 +47496,43 @@ export const activityDetails: Record<string, ActivityDetail> = {
   ],
   "criticalPath": false,
   "purpose": [
-   "Get samples to customers with everything they need to use them—screened units, documentation, errata, and a channel to report back.",
+   "Get <b>samples to customers</b> with everything they need to use them—screened units, documentation, errata, and a channel to report back.",
    "Customer samples start the evaluation cycle that decides design wins, and they start it months before mass production. What ships with the unit determines whether the customer's first week is productive or spent rediscovering issues the program already knows about."
   ],
   "steps": [
    {
     "n": 1,
-    "text": "Define and document sample readiness criteria",
+    "text": "Set the sample readiness criteria",
     "tat": 0.75,
     "lane": "main"
    },
    {
     "n": 2,
-    "text": "Select unit and screening for samples",
+    "text": "Select and screen the sample units",
     "tat": 1.25,
     "lane": "main"
    },
    {
     "n": 3,
-    "text": "Define and document customer documentation and errata pack",
+    "text": "Assemble the customer documentation and errata pack",
     "tat": 1,
     "lane": "par"
    },
    {
     "n": 4,
-    "text": "Release package assembly",
+    "text": "Assemble the release package",
     "tat": 1.5,
     "lane": "main"
    },
    {
     "n": 5,
-    "text": "Define and document feedback channel establishment",
+    "text": "Establish the feedback channel",
     "tat": 1,
     "lane": "par"
    },
    {
     "n": 6,
-    "text": "Set up sample shipment and support",
+    "text": "Ship the samples and set up support",
     "tat": 1.5,
     "lane": "main"
    }
@@ -47625,20 +47565,20 @@ export const activityDetails: Record<string, ActivityDetail> = {
    {
     "id": "BU-D7",
     "rel": "produces",
-    "text": "Customer sample release package. This activity is the deliverable—units plus everything needed to use them."
+    "text": "<b>Customer sample release package.</b> The release package is assembled here—units plus everything needed to use them."
    },
    {
     "id": "BU-D4",
     "rel": "feeds",
-    "text": "Errata list with workarounds. The errata pack that ships with samples is the errata list's first external use."
+    "text": "<b>Errata list with workarounds.</b> The errata pack that ships with samples is the errata list's first external use."
    }
   ],
   "risks": [
-   "Samples shipped without errata",
-   "Units not screened before shipping",
-   "Documentation lagging the silicon",
-   "No feedback channel",
-   "Samples shipped before the respin decision"
+   "<b>Samples shipped without errata.</b> The customer spends their first week rediscovering known issues and loses confidence in the part.",
+   "<b>Units not screened before shipping.</b> A marginal sample creates a customer-visible failure that the program cannot investigate remotely.",
+   "<b>Documentation lagging the silicon.</b> A datasheet describing behavior the sample does not have generates support load and doubt.",
+   "<b>No feedback channel.</b> Customer findings then arrive as rumor or not at all, and the program loses its earliest field data.",
+   "<b>Samples shipped before the respin decision.</b> If a respin follows, customers are evaluating a stepping that will not ship."
   ],
   "roles": [
    {
@@ -47733,43 +47673,43 @@ export const activityDetails: Record<string, ActivityDetail> = {
   ],
   "criticalPath": true,
   "purpose": [
-   "Define what qualification means for this product—which standards apply, which stresses run, on how many units, and against what acceptance criteria.",
-   "Completing this work early provides a clear basis for downstream design decisions and reduces late rework, schedule risk, and integration issues."
+   "Define <b>what qualification means for this product</b>—which standards apply, which stresses run, on how many units, and against what acceptance criteria.",
+   "Qualification is the evidence that the part survives its intended life. The plan is where that evidence is designed: too little and a customer's own qualification finds what yours did not, too much and months of chamber time are spent on stresses nobody required."
   ],
   "steps": [
    {
     "n": 1,
-    "text": "Select standard — JEDEC, AEC and customer applicability",
+    "text": "Select the applicable standards — JEDEC, AEC and customer",
     "tat": 1,
     "lane": "main"
    },
    {
     "n": 2,
-    "text": "Define stress matrix and sample size",
+    "text": "Define the stress matrix and sample sizes",
     "tat": 1.5,
     "lane": "main"
    },
    {
     "n": 3,
-    "text": "Qualify vehicle and lot definition",
+    "text": "Define the qualification vehicles and lots",
     "tat": 1,
     "lane": "par"
    },
    {
     "n": 4,
-    "text": "Book lab and chamber capacity",
+    "text": "Book the lab and chamber capacity",
     "tat": 1.5,
     "lane": "main"
    },
    {
     "n": 5,
-    "text": "Qualify customer requirement collection",
+    "text": "Collect the customer qualification requirements",
     "tat": 1,
     "lane": "par"
    },
    {
     "n": 6,
-    "text": "Plan review and release",
+    "text": "Review the plan and release it",
     "tat": 2,
     "lane": "main"
    }
@@ -47788,7 +47728,7 @@ export const activityDetails: Record<string, ActivityDetail> = {
    "Qualification vehicle and lot definition",
    "Chamber and lab bookings",
    "Customer requirement record",
-   "Released qualification plan",
+   "Customer-specific stress additions to the plan",
    "Reviewed and released qualification plan"
   ],
   "producedBy": [
@@ -47804,20 +47744,20 @@ export const activityDetails: Record<string, ActivityDetail> = {
    {
     "id": "MP-D1",
     "rel": "produces",
-    "text": "Qualification plan and JEDEC-compliant qualification report. The plan half of the deliverable; the report follows from executing it."
+    "text": "<b>Qualification plan and JEDEC-compliant qualification report.</b> The plan half of the deliverable; the report follows from executing it."
    },
    {
     "id": "MP-D5",
     "rel": "informs",
-    "text": "Production readiness review signoff. The plan defines what evidence the readiness review will be asked to accept."
+    "text": "<b>Production readiness review signoff.</b> The plan defines what evidence the readiness review will be asked to accept."
    }
   ],
   "risks": [
-   "Chamber capacity booked late",
-   "Sample sizes below the confidence the claim needs",
-   "Customer requirements collected after the plan",
-   "Three lots not planned",
-   "Use conditions not validated against specified"
+   "<b>Chamber capacity booked late.</b> Stress duration is fixed and capacity is shared, so a late booking moves mass production directly.",
+   "<b>Sample sizes below the confidence the claim needs.</b> A reliability claim from too few units does not support the specification.",
+   "<b>Customer requirements collected after the plan.</b> A customer-specific stress discovered later restarts a months-long campaign.",
+   "<b>Three lots not planned.</b> Standards generally require multiple production lots, and a single-lot qualification is not accepted.",
+   "<b>Use conditions assumed rather than specified.</b> The acceleration factors depend on them, and wrong conditions make the whole campaign non-representative."
   ],
   "roles": [
    {
@@ -47929,55 +47869,55 @@ export const activityDetails: Record<string, ActivityDetail> = {
   ],
   "criticalPath": true,
   "purpose": [
-   "Run the reliability stresses—HTOL, high-temperature storage, temperature cycling, uHAST, THB—that demonstrate the silicon survives its specified life.",
+   "Run the <b>reliability stresses</b>—HTOL, high-temperature storage, temperature cycling, uHAST, THB—that demonstrate the silicon survives its specified life.",
    "This is eighteen weeks of mostly waiting, and it is the longest fixed-duration item between first silicon and mass production. HTOL alone is a thousand hours; it cannot be shortened, only started earlier or run in parallel."
   ],
   "steps": [
    {
     "n": 1,
-    "text": "Characterize sample preparation and pre-stress",
+    "text": "Prepare the samples and run pre-stress characterization",
     "tat": 1.5,
     "lane": "main"
    },
    {
     "n": 2,
-    "text": "Define and document stress chamber loading and campaign start",
+    "text": "Load the stress chambers and start the campaign",
     "tat": 2,
     "lane": "main"
    },
    {
     "n": 3,
-    "text": "Define and document uHAST and THB execution",
+    "text": "Execute uHAST and THB",
     "tat": 3,
     "lane": "par"
    },
    {
     "n": 4,
-    "text": "Define and document hTOL execution",
+    "text": "Execute HTOL",
     "tat": 6,
     "lane": "main"
    },
    {
     "n": 5,
-    "text": "Define and document interim readouts at defined intervals",
+    "text": "Take interim readouts at the defined intervals",
     "tat": 3,
     "lane": "par"
    },
    {
     "n": 6,
-    "text": "Define and document temperature cycle and HTS execution",
+    "text": "Execute temperature cycle and HTS",
     "tat": 4.5,
     "lane": "main"
    },
    {
     "n": 7,
-    "text": "Analyze failure on stress failures",
+    "text": "Analyze the stress failures",
     "tat": 2.5,
     "lane": "par"
    },
    {
     "n": 8,
-    "text": "Finalize readout, analysis and report",
+    "text": "Take the final readout, analyze and report",
     "tat": 4,
     "lane": "main"
    }
@@ -48014,20 +47954,20 @@ export const activityDetails: Record<string, ActivityDetail> = {
    {
     "id": "MP-D2",
     "rel": "produces",
-    "text": "Reliability and package qualification data packages. The silicon-reliability half of the deliverable."
+    "text": "<b>Reliability and package qualification data packages.</b> The silicon-reliability half of the deliverable—stress results, interim readouts and failure mechanisms compiled into the reliability data package."
    },
    {
     "id": "MP-D1",
     "rel": "feeds",
-    "text": "Qualification plan and JEDEC-compliant qualification report. These are the results the report is written from."
+    "text": "<b>Qualification plan and JEDEC-compliant qualification report.</b> These are the results the report is written from; the stress matrix executed here is the plan's evidence."
    }
   ],
   "risks": [
-   "Campaign started late",
-   "No pre-stress characterization",
-   "Interim readouts skipped",
-   "Stress failures not analyzed",
-   "Units insufficient for the full matrix"
+   "<b>Campaign started late.</b> The duration is fixed, so every week of delay is a week of mass production delay, one for one.",
+   "<b>No pre-stress characterization.</b> Drift cannot be measured without a baseline, and a failure cannot be distinguished from a part that was always marginal.",
+   "<b>Interim readouts skipped.</b> Failures then arrive only at the end, with no time left to respond before the ramp.",
+   "<b>Stress failures not analyzed.</b> A failure without a mechanism cannot be judged as systematic or as a one-off, and the distinction decides the ramp.",
+   "<b>Units insufficient for the full matrix.</b> A stress dropped for lack of units is a gap in the qualification the customer will find."
   ],
   "roles": [
    {
@@ -48138,43 +48078,43 @@ export const activityDetails: Record<string, ActivityDetail> = {
   ],
   "criticalPath": false,
   "purpose": [
-   "Qualify the part's ESD and latch-up robustness—HBM and CDM discharge, and latch-up immunity—the handling-survival properties every downstream user depends on.",
+   "Qualify the part's <b>ESD and latch-up robustness</b>—HBM and CDM discharge, and latch-up immunity—the handling-survival properties every downstream user depends on.",
    "ESD failures happen in assembly lines, in labs and in the field, and they are almost never traced back to the part that could not take them. The classification levels are what tell a customer's manufacturing engineer how to handle the device."
   ],
   "steps": [
    {
     "n": 1,
-    "text": "Define and document eSD and latch-up test plan and pin classification",
+    "text": "Write the ESD and latch-up test plan and classify the pins",
     "tat": 1,
     "lane": "main"
    },
    {
     "n": 2,
-    "text": "Characterize hBM ESD",
+    "text": "Characterize HBM ESD",
     "tat": 1.5,
     "lane": "main"
    },
    {
     "n": 3,
-    "text": "Review pin classification and protection",
+    "text": "Review the pin classification and protection",
     "tat": 1,
     "lane": "par"
    },
    {
     "n": 4,
-    "text": "Characterize cDM ESD",
+    "text": "Characterize CDM ESD",
     "tat": 1.5,
     "lane": "main"
    },
    {
     "n": 5,
-    "text": "Analyze failure on ESD failures",
+    "text": "Analyze the ESD failures",
     "tat": 1,
     "lane": "par"
    },
    {
     "n": 6,
-    "text": "Define and document latch-up test and report",
+    "text": "Run the latch-up test and report",
     "tat": 2,
     "lane": "main"
    }
@@ -48207,20 +48147,20 @@ export const activityDetails: Record<string, ActivityDetail> = {
    {
     "id": "MP-D2",
     "rel": "feeds",
-    "text": "Reliability and package qualification data packages. ESD and latch-up classification are part of the qualification package."
+    "text": "<b>Reliability and package qualification data packages.</b> ESD and latch-up classification are part of the qualification package."
    },
    {
     "id": "MP-D8",
     "rel": "feeds",
-    "text": "Datasheet and product documentation set. ESD classification is a datasheet parameter every handler reads."
+    "text": "<b>Datasheet and product documentation set.</b> ESD classification is a datasheet parameter every handler reads."
    }
   ],
   "risks": [
-   "CDM underestimated for the package size",
-   "ESD failures not analyzed",
-   "Latch-up tested only at room temperature",
-   "Classification below what customer assembly requires",
-   "Pin classification incomplete"
+   "<b>CDM underestimated for the package size.</b> A large package stores far more charge, and the CDM level is usually the binding one.",
+   "<b>ESD failures not analyzed.</b> Which pin and which protection element failed is what makes the result actionable for a fix.",
+   "<b>Latch-up tested only at room temperature.</b> Latch-up susceptibility increases with temperature, and the hot corner is the real test.",
+   "<b>Classification below what customer assembly requires.</b> A part that cannot survive a customer's line is a part they cannot buy.",
+   "<b>Pin classification incomplete.</b> Untested pin combinations are unqualified pins, and there is no assumption to fall back on."
   ],
   "roles": [
    {
@@ -48331,55 +48271,55 @@ export const activityDetails: Record<string, ActivityDetail> = {
   ],
   "criticalPath": false,
   "purpose": [
-   "Qualify the package—moisture sensitivity, board-level reliability, drop and bend—which on a 2.5D structure is where the reliability risk concentrates.",
+   "Qualify the <b>package</b>—moisture sensitivity, board-level reliability, drop and bend—which on a 2.5D structure is where the reliability risk actually concentrates.",
    "The silicon's reliability is a well-understood function of process and use conditions. The package's is not: a large interposer on an organic substrate with two HBM stacks has thermal expansion mismatches on every interface, and this is where they are proven or found out."
   ],
   "steps": [
    {
     "n": 1,
-    "text": "Define and document mSL preconditioning and moisture classification",
+    "text": "Run MSL preconditioning and moisture classification",
     "tat": 1.5,
     "lane": "main"
    },
    {
     "n": 2,
-    "text": "Define and document board-level reliability — temperature cycling on board",
+    "text": "Run board-level reliability — temperature cycling on board",
     "tat": 2.5,
     "lane": "main"
    },
    {
     "n": 3,
-    "text": "Correlate solder joint reliability modeling",
+    "text": "Correlate the solder joint reliability model",
     "tat": 2,
     "lane": "par"
    },
    {
     "n": 4,
-    "text": "Test drop and bend",
+    "text": "Run drop and bend testing",
     "tat": 3,
     "lane": "main"
    },
    {
     "n": 5,
-    "text": "Define and document warpage and co-planarity tracked through stress",
+    "text": "Track warpage and co-planarity through stress",
     "tat": 2,
     "lane": "par"
    },
    {
     "n": 6,
-    "text": "Define and document package-level readout and acoustic imaging",
+    "text": "Run package-level readout and acoustic imaging",
     "tat": 2.5,
     "lane": "main"
    },
    {
     "n": 7,
-    "text": "Analyze failure on package failures",
+    "text": "Analyze the package failures",
     "tat": 1.5,
     "lane": "par"
    },
    {
     "n": 8,
-    "text": "Qualify analysis and report",
+    "text": "Analyze the results and write the qualification report",
     "tat": 2.5,
     "lane": "main"
    }
@@ -48416,20 +48356,20 @@ export const activityDetails: Record<string, ActivityDetail> = {
    {
     "id": "MP-D2",
     "rel": "produces",
-    "text": "Reliability and package qualification data packages. The package half of the deliverable."
+    "text": "<b>Reliability and package qualification data packages.</b> The package half of the deliverable—MSL classification, board-level life, drop and bend results with their failure analyses."
    },
    {
     "id": "MP-D1",
     "rel": "feeds",
-    "text": "Qualification plan and JEDEC-compliant qualification report. Package qualification is a required section of the report."
+    "text": "<b>Qualification plan and JEDEC-compliant qualification report.</b> Package qualification is a required section of the report; the results compiled here fill it."
    }
   ],
   "risks": [
-   "MSL classification worse than the assembly process needs",
-   "Board-level reliability short of the application requirement",
-   "PTV results not compared",
-   "Warpage measured only before stress",
-   "Failures attributed to the package without analysis"
+   "<b>MSL classification worse than the assembly process needs.</b> A high moisture sensitivity forces bake-and-handle procedures on every customer line.",
+   "<b>Board-level reliability short of the application requirement.</b> The joints, not the die, then set the product's life.",
+   "<b>PTV results not compared.</b> The vehicles predicted this behavior, and the comparison validates or invalidates the whole vehicle program.",
+   "<b>Warpage measured only before stress.</b> The interesting change is what stress does to it, and that requires measurement through the campaign.",
+   "<b>Failures attributed to the package without analysis.</b> A CPI failure and a solder joint failure need different fixes and look similar from outside."
   ],
   "roles": [
    {
@@ -48543,55 +48483,55 @@ export const activityDetails: Record<string, ActivityDetail> = {
   ],
   "criticalPath": true,
   "purpose": [
-   "Run yield learning continuously through the ramp—pareto, defect analysis, corrective action, and a yield model checked against the cost target.",
+   "Run <b>yield learning</b> continuously through the ramp—pareto, defect analysis, corrective action, and a yield model checked against the cost target.",
    "Yield is the difference between a product that makes money and one that does not, and first-ramp yield is never where the cost model assumed. This activity runs for the whole stage because yield learning is a rate, not an event: what matters is how fast the pareto's top item is removed and replaced by the next."
   ],
   "steps": [
    {
     "n": 1,
-    "text": "Define and document yield data pipeline and baseline establishment",
+    "text": "Build the yield data pipeline and establish the baseline",
     "tat": 2,
     "lane": "main"
    },
    {
     "n": 2,
-    "text": "Analyze failure pareto by bin and failure mode",
+    "text": "Build the failure pareto by bin and failure mode",
     "tat": 3.5,
     "lane": "main"
    },
    {
     "n": 3,
-    "text": "Analyze wafer-level spatial signature",
+    "text": "Analyze wafer-level spatial signatures",
     "tat": 3,
     "lane": "par"
    },
    {
     "n": 4,
-    "text": "Analyze defect and root cause",
+    "text": "Analyze defects and establish root causes",
     "tat": 4.5,
     "lane": "main"
    },
    {
     "n": 5,
-    "text": "Define and document assembly and test yield split",
+    "text": "Split the yield across assembly and test",
     "tat": 3,
     "lane": "par"
    },
    {
     "n": 6,
-    "text": "Define and document corrective action and yield improvement",
+    "text": "Drive corrective actions and yield improvement",
     "tat": 5,
     "lane": "main"
    },
    {
     "n": 7,
-    "text": "Define and document excursion detection and response",
+    "text": "Detect and respond to excursions",
     "tat": 3,
     "lane": "par"
    },
    {
     "n": 8,
-    "text": "Build yield model against the cost target",
+    "text": "Maintain the yield model against the cost target",
     "tat": 5,
     "lane": "main"
    }
@@ -48628,20 +48568,20 @@ export const activityDetails: Record<string, ActivityDetail> = {
    {
     "id": "MP-D4",
     "rel": "produces",
-    "text": "Yield model versus cost target report. The deliverable the model is what the business plan is checked against."
+    "text": "<b>Yield model versus cost target report.</b> The yield model and its comparison against the cost target are produced here, and the model is what the business plan is checked against."
    },
    {
     "id": "MP-D5",
     "rel": "feeds",
-    "text": "Production readiness review signoff. Yield at the readiness review is one of its principal acceptance criteria."
+    "text": "<b>Production readiness review signoff.</b> Yield at the readiness review is one of its principal acceptance criteria."
    }
   ],
   "risks": [
-   "Yield reported as one number",
-   "Spatial signatures not analyzed",
-   "Corrective actions not verified",
-   "Excursions detected at the weekly review",
-   "Yield model not checked against the cost target"
+   "<b>Yield reported as one number.</b> Die, assembly and test yield have different owners, and a combined figure directs nobody.",
+   "<b>Spatial signatures not analyzed.</b> Edge, center and radial patterns each point at a different process cause and are visible only on the wafer map.",
+   "<b>Corrective actions not verified.</b> An action taken without confirming the pareto moved is an action that may have done nothing.",
+   "<b>Excursions detected at the weekly review.</b> By then a week of material is affected, and detection has to be automatic.",
+   "<b>Yield model not checked against the cost target.</b> The gap between achieved and assumed yield is the product's margin, and it can go unnoticed for months."
   ],
   "roles": [
    {
@@ -48759,55 +48699,55 @@ export const activityDetails: Record<string, ActivityDetail> = {
   ],
   "criticalPath": true,
   "purpose": [
-   "Release the production test program—frozen, guard-band-validated, qualified and version-controlled—for every unit the product will ever ship.",
+   "Release the <b>production test program</b>—frozen, guard-band-validated, qualified and version-controlled—for every unit the product will ever ship.",
    "After this release, a change to test content requires re-qualification. That makes the release a genuine freeze, and it makes the guard-band validation that precedes it the last chance to be sure the limits neither throw away good parts nor let bad ones through."
   ],
   "steps": [
    {
     "n": 1,
-    "text": "Release candidate program freeze",
+    "text": "Freeze the release candidate program",
     "tat": 1,
     "lane": "main"
    },
    {
     "n": 2,
-    "text": "Characterize guard-band validation against",
+    "text": "Validate the guard bands against characterization",
     "tat": 2,
     "lane": "main"
    },
    {
     "n": 3,
-    "text": "Test escape and over-kill analysis",
+    "text": "Analyze test escapes and over-kill",
     "tat": 1.5,
     "lane": "par"
    },
    {
     "n": 4,
-    "text": "Validate production flow on volume lots",
+    "text": "Validate the production flow on volume lots",
     "tat": 2,
     "lane": "main"
    },
    {
     "n": 5,
-    "text": "Validate limit adjustment and re",
+    "text": "Adjust the limits and re-validate",
     "tat": 1.5,
     "lane": "par"
    },
    {
     "n": 6,
-    "text": "Qualify program and signoff",
+    "text": "Qualify the program and sign it off",
     "tat": 2,
     "lane": "main"
    },
    {
     "n": 7,
-    "text": "Correlate production tester porting and",
+    "text": "Port to the production testers and correlate",
     "tat": 1.25,
     "lane": "par"
    },
    {
     "n": 8,
-    "text": "Release and version control",
+    "text": "Release under version control",
     "tat": 2,
     "lane": "main"
    }
@@ -48844,20 +48784,20 @@ export const activityDetails: Record<string, ActivityDetail> = {
    {
     "id": "MP-D3",
     "rel": "produces",
-    "text": "Production test program release. The deliverable after it the content is frozen."
+    "text": "<b>Production test program release.</b> The program release is produced here, and after it the content is frozen."
    },
    {
     "id": "MP-D5",
     "rel": "feeds",
-    "text": "Production readiness review signoff. A released and qualified test program is a precondition for the review."
+    "text": "<b>Production readiness review signoff.</b> A released and qualified test program is a precondition for the review."
    }
   ],
   "risks": [
-   "Guard bands not validated against characterization",
-   "Over-kill unmeasured",
-   "Flow validated on one lot",
-   "Porting across the tester fleet without correlation",
-   "Released without version control"
+   "<b>Guard bands not validated against characterization.</b> Limits then rest on convention rather than on what the silicon actually does.",
+   "<b>Over-kill unmeasured.</b> Good parts are discarded on every lot and the loss is attributed to yield rather than to the limits.",
+   "<b>Flow validated on one lot.</b> Lot-to-lot variation is the thing the flow has to tolerate, and one lot cannot show it.",
+   "<b>Porting across the tester fleet without correlation.</b> Tester-to-tester differences then present as yield differences by machine.",
+   "<b>Released without version control.</b> A yield excursion cannot be correlated with a program change nobody can identify."
   ],
   "roles": [
    {
@@ -48971,31 +48911,31 @@ export const activityDetails: Record<string, ActivityDetail> = {
   ],
   "criticalPath": false,
   "purpose": [
-   "Convert production test to multi-site and cut test time—the change that makes the cost per unit sustainable at volume.",
+   "Convert production test to <b>multi-site</b> and cut test time—the change that makes the cost per unit sustainable at volume.",
    "Single-site testing is fine for a hundred units and ruinous for a million. Multi-site conversion multiplies throughput per tester and divides the capital needed for the ramp, and it is a real engineering exercise because parallel sites interfere with each other in ways single-site testing never reveals."
   ],
   "steps": [
    {
     "n": 1,
-    "text": "Define and document multi-site feasibility on the production hardware",
+    "text": "Assess multi-site feasibility on the production hardware",
     "tat": 1,
     "lane": "main"
    },
    {
     "n": 2,
-    "text": "Define and document multi-site load board and probe card conversion",
+    "text": "Convert the load board and probe card to multi-site",
     "tat": 2,
     "lane": "main"
    },
    {
     "n": 3,
-    "text": "Test time reduction on the released content",
+    "text": "Reduce test time on the released content",
     "tat": 1.5,
     "lane": "par"
    },
    {
     "n": 4,
-    "text": "Define and document parallel program adaptation",
+    "text": "Adapt the programs for parallel sites",
     "tat": 2,
     "lane": "main"
    },
@@ -49007,19 +48947,19 @@ export const activityDetails: Record<string, ActivityDetail> = {
    },
    {
     "n": 6,
-    "text": "Validate multi-site correlation and",
+    "text": "Correlate and validate the multi-site flow",
     "tat": 2,
     "lane": "main"
    },
    {
     "n": 7,
-    "text": "Define and document throughput and capacity model update",
+    "text": "Update the throughput and capacity model",
     "tat": 1.25,
     "lane": "par"
    },
    {
     "n": 8,
-    "text": "Release of the converted flow",
+    "text": "Release the converted flow",
     "tat": 2,
     "lane": "main"
    }
@@ -49034,7 +48974,7 @@ export const activityDetails: Record<string, ActivityDetail> = {
   ],
   "produces": [
    "Multi-site feasibility assessment",
-   "Converted multi-site hardware",
+   "Target site-count decision",
    "Converted multi-site load board and probe card",
    "Test time reduction on released content",
    "Adapted parallel programs",
@@ -49058,20 +48998,20 @@ export const activityDetails: Record<string, ActivityDetail> = {
    {
     "id": "MP-D3",
     "rel": "feeds",
-    "text": "Production test program release. The multi-site flow is a controlled revision of the released program."
+    "text": "<b>Production test program release.</b> The multi-site flow is a controlled revision of the released program."
    },
    {
     "id": "MP-D6",
     "rel": "feeds",
-    "text": "Ramp plan and supply commitment. Throughput per tester is what the capacity commitment is built from."
+    "text": "<b>Ramp plan and supply commitment.</b> Throughput per tester is what the capacity commitment is built from."
    }
   ],
   "risks": [
-   "Site-to-site bias undetected",
-   "Pin count insufficient for the site count",
-   "Parallel power delivery inadequate",
-   "Conversion done after the ramp starts",
-   "Time reduction changing coverage"
+   "<b>Site-to-site bias undetected.</b> It appears as a yield difference and is investigated as a process problem for weeks.",
+   "<b>Pin count insufficient for the site count.</b> The tester configuration from <code>TEST-02</code> bounds this, and it cannot be changed now.",
+   "<b>Parallel power delivery inadequate.</b> Four parts drawing full current through one load board droop in ways one part does not.",
+   "<b>Conversion done after the ramp starts.</b> Capital is then committed at single-site throughput and cannot be recovered.",
+   "<b>Time reduction changing coverage.</b> Any content change after MP-06 requires re-qualification, which is expensive at this point."
   ],
   "roles": [
    {
@@ -49174,19 +49114,19 @@ export const activityDetails: Record<string, ActivityDetail> = {
   ],
   "criticalPath": false,
   "purpose": [
-   "Validate the design across process corners using split lots—material deliberately fabricated at the edges of the process window.",
-   "Completing this work early provides a clear basis for downstream design decisions and reduces late rework, schedule risk, and integration issues."
+   "Validate the design across <b>process corners</b> using split lots—material deliberately fabricated at the edges of the process window.",
+   "Production silicon spans the process distribution, and the units bring-up characterized came from one lot near its center. Split lots produce the fast and slow corners on purpose, which is the only way to know whether the design's margin survives the population it will actually be built from."
   ],
   "steps": [
    {
     "n": 1,
-    "text": "Define and document split-lot design across process corners",
+    "text": "Design the split lots across the process corners",
     "tat": 1,
     "lane": "main"
    },
    {
     "n": 2,
-    "text": "Track split lot fabrication and",
+    "text": "Fabricate and track the split lots",
     "tat": 2,
     "lane": "main"
    },
@@ -49198,31 +49138,31 @@ export const activityDetails: Record<string, ActivityDetail> = {
    },
    {
     "n": 4,
-    "text": "Characterize corner on split material",
+    "text": "Characterize the corners on the split material",
     "tat": 2,
     "lane": "main"
    },
    {
     "n": 5,
-    "text": "Define and document design margin at the corners",
+    "text": "Assess the design margin at the corners",
     "tat": 1.5,
     "lane": "par"
    },
    {
     "n": 6,
-    "text": "Correlate corner-to-model",
+    "text": "Correlate the corners against the models",
     "tat": 2,
     "lane": "main"
    },
    {
     "n": 7,
-    "text": "Define and document process window recommendation",
+    "text": "Recommend the process window",
     "tat": 1.25,
     "lane": "par"
    },
    {
     "n": 8,
-    "text": "Define corner signoff and report",
+    "text": "Sign off the corners and report",
     "tat": 2,
     "lane": "main"
    }
@@ -49259,20 +49199,20 @@ export const activityDetails: Record<string, ActivityDetail> = {
    {
     "id": "MP-D4",
     "rel": "feeds",
-    "text": "Yield model versus cost target report. Corner yield is what the model has to predict across the real distribution."
+    "text": "<b>Yield model versus cost target report.</b> Corner yield is what the model has to predict across the real distribution."
    },
    {
     "id": "MP-D1",
     "rel": "feeds",
-    "text": "Qualification plan and JEDEC-compliant qualification report. Corner validation is part of demonstrating the design is production-worthy."
+    "text": "<b>Qualification plan and JEDEC-compliant qualification report.</b> Corner validation is part of demonstrating the design is production-worthy."
    }
   ],
   "risks": [
-   "Corner models optimistic against real silicon",
-   "Split lots not actually at the corners",
-   "Cpk not computed",
-   "Corner characterization skipped for schedule",
-   "Process window recommendation not fed back to the fab"
+   "<b>Corner models optimistic against real silicon.</b> The design was signed off against those models, and a gap here means the margin does not exist.",
+   "<b>Split lots not actually at the corners.</b> Material that drifted back toward center proves nothing about the edges.",
+   "<b>Cpk not computed.</b> Capability against the specification is what predicts production yield, and a pass/fail result does not.",
+   "<b>Corner characterization skipped for schedule.</b> The population's edges are then only seen in production, as an unexplained yield tail.",
+   "<b>Process window recommendation not fed back to the fab.</b> The data exists and the process keeps running at its original center point."
   ],
   "roles": [
    {
@@ -49381,43 +49321,43 @@ export const activityDetails: Record<string, ActivityDetail> = {
   ],
   "criticalPath": true,
   "purpose": [
-   "Hold the production readiness review—the cross-functional gate where every function states whether it is ready—and stand up change control for everything that follows.",
-   "This is the program's last formal decision point. After it, the product is in production and every change goes through customer notification."
+   "Hold the <b>production readiness review</b>—the cross-functional gate where every function states whether it is ready—and stand up change control for everything that follows.",
+   "This is the program's last formal decision point. After it, the product is in production and every change goes through customer notification. The review's value is that it forces each function to say ready or not ready on the record, which is a different act from being asked in a meeting whether there are any concerns."
   ],
   "steps": [
    {
     "n": 1,
-    "text": "Define and document readiness criteria and evidence collection",
+    "text": "Set the readiness criteria and collect the evidence",
     "tat": 1,
     "lane": "main"
    },
    {
     "n": 2,
-    "text": "Review cross-functional readiness",
+    "text": "Hold the cross-functional readiness review",
     "tat": 1.5,
     "lane": "main"
    },
    {
     "n": 3,
-    "text": "Define and document change control and document baseline",
+    "text": "Establish change control and the document baseline",
     "tat": 1,
     "lane": "par"
    },
    {
     "n": 4,
-    "text": "Track gap closure and conditional item",
+    "text": "Close the gaps and track the conditional items",
     "tat": 1.5,
     "lane": "main"
    },
    {
     "n": 5,
-    "text": "Define and document escalation of unresolved items",
+    "text": "Escalate the unresolved items",
     "tat": 1,
     "lane": "par"
    },
    {
     "n": 6,
-    "text": "Define and document signoff and PCN process establishment",
+    "text": "Sign off and establish the PCN process",
     "tat": 2,
     "lane": "main"
    }
@@ -49452,20 +49392,20 @@ export const activityDetails: Record<string, ActivityDetail> = {
    {
     "id": "MP-D5",
     "rel": "produces",
-    "text": "Production readiness review signoff. This activity is the deliverable—the record of who declared ready and on what evidence."
+    "text": "<b>Production readiness review signoff.</b> The readiness signoff is produced here—the record of who declared ready and on what evidence."
    },
    {
     "id": "MP-D9",
     "rel": "produces",
-    "text": "Mass Production release record. The formal statement that the product is in production, with its conditions."
+    "text": "<b>Mass Production release record.</b> The formal statement that the product is in production, with its conditions."
    }
   ],
   "risks": [
-   "Review held without evidence",
-   "Conditional items without owners or dates",
-   "Change control not established",
-   "Dissent not documented",
-   "Document baseline not frozen"
+   "<b>Review held without evidence.</b> Function-by-function assurances are not the same as qualification data, and a review that accepts them is not a gate.",
+   "<b>Conditional items without owners or dates.</b> The condition is then never closed and the pass was unconditional in practice.",
+   "<b>Change control not established.</b> Post-production changes then reach customers without notification, which is a contractual failure.",
+   "<b>Dissent not recorded.</b> A function that said not-ready and was overruled is the program's most valuable record if something goes wrong.",
+   "<b>Document baseline not frozen.</b> Which datasheet, which errata, which test program was released becomes ambiguous immediately."
   ],
   "roles": [
    {
@@ -49583,43 +49523,43 @@ export const activityDetails: Record<string, ActivityDetail> = {
   ],
   "criticalPath": true,
   "purpose": [
-   "Commit the supply chain and the ramp—wafers, substrates, HBM, assembly and test capacity—against a demand forecast, with the lead times and second sources that make the commitment real.",
-   "A ramp is a chain of commitments made months before the volume they serve. Substrates have long lead times, HBM is allocated across the industry, and assembly capacity is booked."
+   "Commit the <b>supply chain and the ramp</b>—wafers, substrates, HBM, assembly and test capacity—against a demand forecast, with the lead times and second sources that make the commitment real.",
+   "A ramp is a chain of commitments made months before the volume they serve. Substrates have long lead times, HBM is allocated across the industry, and assembly capacity is booked. Any one of them short stops the ramp, and none of them can be fixed quickly."
   ],
   "steps": [
    {
     "n": 1,
-    "text": "Define and document demand forecast and volume commitment",
+    "text": "Confirm the demand forecast and volume commitment",
     "tat": 1.5,
     "lane": "main"
    },
    {
     "n": 2,
-    "text": "Define and document wafer, substrate and HBM supply commitment",
+    "text": "Commit the wafer, substrate and HBM supply",
     "tat": 2.5,
     "lane": "main"
    },
    {
     "n": 3,
-    "text": "Analyze lead time and buffer",
+    "text": "Analyze lead times and buffers",
     "tat": 2,
     "lane": "par"
    },
    {
     "n": 4,
-    "text": "Define and document assembly and test capacity commitment",
+    "text": "Commit the assembly and test capacity",
     "tat": 2.5,
     "lane": "main"
    },
    {
     "n": 5,
-    "text": "Define and document cost per unit at volume",
+    "text": "Compute the cost per unit at volume",
     "tat": 2,
     "lane": "par"
    },
    {
     "n": 6,
-    "text": "Define and document ramp plan and build schedule",
+    "text": "Build the ramp plan and build schedule",
     "tat": 2.5,
     "lane": "main"
    },
@@ -49631,7 +49571,7 @@ export const activityDetails: Record<string, ActivityDetail> = {
    },
    {
     "n": 8,
-    "text": "Define and document supply chain risk and second-source plan",
+    "text": "Assess supply chain risk and set the second-source plan",
     "tat": 3,
     "lane": "main"
    }
@@ -49668,20 +49608,20 @@ export const activityDetails: Record<string, ActivityDetail> = {
    {
     "id": "MP-D6",
     "rel": "produces",
-    "text": "Ramp plan and supply commitment. This activity is the deliverable."
+    "text": "<b>Ramp plan and supply commitment.</b> The ramp plan and supply commitment are produced here—with every long-lead commitment, buffer and second-source position behind them."
    },
    {
     "id": "MP-D4",
     "rel": "feeds",
-    "text": "Yield model versus cost target report. Cost per unit at volume is where the yield model meets the actual supply cost."
+    "text": "<b>Yield model versus cost target report.</b> Cost per unit at volume is where the yield model meets the actual supply cost."
    }
   ],
   "risks": [
-   "HBM allocation insufficient",
-   "Substrate lead time underestimated",
-   "Ramp planned against an optimistic yield",
-   "No second source anywhere in the chain",
-   "Capacity committed before the readiness review"
+   "<b>HBM allocation insufficient.</b> It is allocated across the industry and a shortfall stops the ramp regardless of everything else.",
+   "<b>Substrate lead time underestimated.</b> Advanced substrates are long-lead and capacity-constrained, and the buffer has to reflect that.",
+   "<b>Ramp planned against an optimistic yield.</b> Volume commitments then require more wafer starts than were booked.",
+   "<b>No second source anywhere in the chain.</b> Every single-source node is a single point of failure for the whole product.",
+   "<b>Capacity committed before the readiness review.</b> A conditional readiness outcome then meets an unconditional supply commitment."
   ],
   "roles": [
    {
@@ -49795,55 +49735,55 @@ export const activityDetails: Record<string, ActivityDetail> = {
   ],
   "criticalPath": false,
   "purpose": [
-   "Obtain the compliance and certification the product cannot ship without—interface compliance, EMC and safety, and materials declarations.",
+   "Obtain the <b>compliance and certification</b> the product cannot ship without—interface compliance, EMC and safety, and materials declarations.",
    "These are gates rather than engineering activities: without a PCIe or CXL compliance listing, without EMC certification, without RoHS and REACH declarations, the product cannot be sold in most markets regardless of how well it works."
   ],
   "steps": [
    {
     "n": 1,
-    "text": "Define and document applicable standards and certification scope",
+    "text": "Scope the applicable standards and certifications",
     "tat": 1.5,
     "lane": "main"
    },
    {
     "n": 2,
-    "text": "Test pCIe/CXL compliance at a plugfest",
+    "text": "Run PCIe/CXL compliance testing at a plugfest",
     "tat": 2.5,
     "lane": "main"
    },
    {
     "n": 3,
-    "text": "Define and document compliance failure remediation",
+    "text": "Remediate the compliance failures",
     "tat": 2,
     "lane": "par"
    },
    {
     "n": 4,
-    "text": "Test eMC and safety",
+    "text": "Run EMC and safety testing",
     "tat": 2.5,
     "lane": "main"
    },
    {
     "n": 5,
-    "text": "Prepare documentation and declaration",
+    "text": "Prepare the documentation and declarations",
     "tat": 2,
     "lane": "par"
    },
    {
     "n": 6,
-    "text": "Define and document materials compliance — RoHS, REACH, conflict minerals",
+    "text": "Close materials compliance — RoHS, REACH, conflict minerals",
     "tat": 2.5,
     "lane": "main"
    },
    {
     "n": 7,
-    "text": "Define and document export classification",
+    "text": "Complete the export classification",
     "tat": 1.5,
     "lane": "par"
    },
    {
     "n": 8,
-    "text": "Define and document certificate issue and registration",
+    "text": "Obtain the certificates and registrations",
     "tat": 3,
     "lane": "main"
    }
@@ -49880,20 +49820,20 @@ export const activityDetails: Record<string, ActivityDetail> = {
    {
     "id": "MP-D7",
     "rel": "produces",
-    "text": "Compliance certificates. The deliverable without it the product cannot ship."
+    "text": "<b>Compliance certificates.</b> The certificates are obtained here, and without them the product cannot ship."
    },
    {
     "id": "MP-D8",
     "rel": "feeds",
-    "text": "Datasheet and product documentation set. Compliance statements and classifications are part of the product documentation."
+    "text": "<b>Datasheet and product documentation set.</b> Compliance statements and classifications are part of the product documentation."
    }
   ],
   "risks": [
-   "Plugfest date missed",
-   "Materials declarations not collected from suppliers",
-   "Compliance failure discovered at the plugfest",
-   "Export classification left late",
-   "Certification scope assessed for one region"
+   "<b>Plugfest date missed.</b> They occur a few times a year on fixed dates, and missing one delays the listing by a quarter.",
+   "<b>Materials declarations not collected from suppliers.</b> Every component in the package needs one, and collecting them takes months.",
+   "<b>Compliance failure discovered at the plugfest.</b> Pre-compliance testing exists precisely so that formal testing is a confirmation.",
+   "<b>Export classification left late.</b> A high-performance accelerator may be controlled, and the classification determines which markets exist.",
+   "<b>Certification scope assessed for one region.</b> Requirements differ by market, and a missing certification closes a region entirely."
   ],
   "roles": [
    {
@@ -50003,55 +49943,55 @@ export const activityDetails: Record<string, ActivityDetail> = {
   ],
   "criticalPath": false,
   "purpose": [
-   "Release the product documentation—datasheet, user guide, errata, application notes—the artefacts a customer receives alongside the silicon.",
+   "Release the <b>product documentation</b>—datasheet, user guide, errata, application notes—the artefacts a customer actually receives alongside the silicon.",
    "The documentation is the product as far as most customers experience it. A datasheet parameter that cannot be traced to a measurement, a programming model that omits a required sequence, or an errata list that lags the silicon each cost far more support effort than the writing would have."
   ],
   "steps": [
    {
     "n": 1,
-    "text": "Define and document documentation scope and ownership",
+    "text": "Set the documentation scope and ownership",
     "tat": 1.5,
     "lane": "main"
    },
    {
     "n": 2,
-    "text": "Characterize datasheet from data",
+    "text": "Write the datasheet from the characterization data",
     "tat": 2,
     "lane": "main"
    },
    {
     "n": 3,
-    "text": "Measure parameter traceability to",
+    "text": "Trace every parameter to its measurement",
     "tat": 1.5,
     "lane": "par"
    },
    {
     "n": 4,
-    "text": "Define and document user guide and programming model",
+    "text": "Write the user guide and programming model",
     "tat": 2,
     "lane": "main"
    },
    {
     "n": 5,
-    "text": "Define and document localization and format production",
+    "text": "Produce the localized and formatted outputs",
     "tat": 1.5,
     "lane": "par"
    },
    {
     "n": 6,
-    "text": "Define and document errata and application notes",
+    "text": "Write the errata and application notes",
     "tat": 2,
     "lane": "main"
    },
    {
     "n": 7,
-    "text": "Define and document revision and distribution control",
+    "text": "Establish revision and distribution control",
     "tat": 1.5,
     "lane": "par"
    },
    {
     "n": 8,
-    "text": "Review technical , approval and release",
+    "text": "Run the technical review, approve and release",
     "tat": 2.5,
     "lane": "main"
    }
@@ -50065,19 +50005,19 @@ export const activityDetails: Record<string, ActivityDetail> = {
    "Programming model from RTL-06 and ARCH-06"
   ],
   "produces": [
-   "Documentation scope and ownership",
+   "Documentation scope and ownership matrix",
    "Reviewed and released documentation set",
    "Datasheet",
    "Parameter traceability record",
    "User guide and programming model documentation",
    "Localized and formatted documentation outputs",
    "Errata and application notes",
-   "Revision and distribution control",
-   "Localized and formatted outputs"
+   "Revision and distribution control scheme",
+   "Approval and release record"
   ],
   "producedBy": [
    1,
-   1,
+   8,
    2,
    3,
    4,
@@ -50090,20 +50030,20 @@ export const activityDetails: Record<string, ActivityDetail> = {
    {
     "id": "MP-D8",
     "rel": "produces",
-    "text": "Datasheet and product documentation set. This activity is the deliverable."
+    "text": "<b>Datasheet and product documentation set.</b> The documentation set is produced here—the datasheet, user guide, errata and application notes released together under revision control."
    },
    {
     "id": "MP-D9",
     "rel": "feeds",
-    "text": "Mass Production release record. A released documentation set is part of what the release record attests to."
+    "text": "<b>Mass Production release record.</b> A released documentation set is part of what the release record attests to."
    }
   ],
   "risks": [
-   "Datasheet parameters without traceable measurements",
-   "Errata lagging the silicon",
-   "Programming model incomplete",
-   "Documentation written from specifications rather than measurements",
-   "No revision control on released documents"
+   "<b>Datasheet parameters without traceable measurements.</b> A customer question then has no answer, and the number cannot be defended.",
+   "<b>Errata lagging the silicon.</b> The most useful document ships out of date, which is worse than shipping it late.",
+   "<b>Programming model incomplete.</b> Required initialization sequences omitted from the guide become support cases, one per customer.",
+   "<b>Documentation written from specifications rather than measurements.</b> It then describes the intended product rather than the one shipping.",
+   "<b>No revision control on released documents.</b> Which datasheet revision a customer holds becomes unknowable."
   ],
   "roles": [
    {
