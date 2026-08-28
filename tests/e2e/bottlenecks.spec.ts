@@ -15,6 +15,34 @@ test.beforeEach(async ({ page }) => {
   await expect(page.locator(panel)).toBeVisible();
 });
 
+test('the columns say what they are counting', async ({ page }) => {
+  /* none of these figures is self-evident, and all of them count the same
+     thing — downstream work that has not started */
+  const head = page.locator(`${panel} .bn-head > span`);
+  await expect(head.nth(3)).toContainText('Work waiting');
+  await expect(head.nth(3)).toContainText('not yet started');
+  await expect(head.nth(4)).toContainText('Effort held');
+  await expect(head.nth(5)).toContainText('First blocked');
+});
+
+test('every figure on a row counts the same activities', async ({ page }) => {
+  const first = page.locator(`${panel} .bn`).first();
+  const waiting = Number((await first.locator('.bn-n').textContent())?.match(/(\d+) waiting/)?.[1]);
+
+  await first.locator('.bn-more').click();
+  const chips = await first.locator('.bn-chip').count();
+  const started = await first.locator('.bn-chip.started').count();
+  /* the row counts what has yet to start, not everything downstream */
+  expect(chips).toBeGreaterThan(waiting);
+  expect(chips - started).toBe(waiting);
+
+  const stages = Number((await first.locator('.bn-n').textContent())?.match(/(\d+) stages?/)?.[1]);
+  const stagesShown = await first.locator('.bn-stage').count();
+  /* and the stage count follows it, so a stage only reached by work already
+     under way is not counted as waiting */
+  expect(stages).toBeLessThan(stagesShown);
+});
+
 test('the heaviest blockage is read first', async ({ page }) => {
   const rows = page.locator(`${panel} .bn`);
   await expect(rows.first()).toBeVisible();

@@ -1474,6 +1474,20 @@ body.schedule-mode #schedule-view{opacity:1;visibility:visible;transform:none}
    and when the first of that work was due to start. Every figure is checkable,
    so none of them is a score. */
 .dash-panel{margin:0 0 34px}
+/* the header says what each column counts, because none of them is obvious
+   and all of them count the same thing: work that has not started */
+.bn-head{
+  display:grid;
+  grid-template-columns:5.2rem minmax(0,1.6fr) 7rem 8rem 8.5rem 8.5rem 1.6rem;
+  gap:14px;align-items:end;padding:2px 0 7px;border-bottom:1px solid var(--line-strong);
+  font-family:var(--mono);font-size:.6em;font-weight:700;letter-spacing:.1em;
+  text-transform:uppercase;color:var(--ink-3);
+}
+.bn-head>span{display:flex;flex-direction:column;gap:2px;min-width:0}
+.bn-head em{
+  font-style:normal;font-weight:400;font-size:.92em;letter-spacing:.02em;
+  text-transform:none;color:var(--line-strong);
+}
 .bn-list{list-style:none;margin:0;padding:0}
 .bn{border-bottom:1px solid var(--line)}
 .bn:last-child{border-bottom:0}

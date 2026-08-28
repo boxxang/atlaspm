@@ -61,19 +61,45 @@ export function Bottlenecks() {
       </div>
 
       {list.length ? (
-        <ul className="bn-list">
-          {list.map((b) => (
-            <Row
-              key={b.id}
-              b={b}
-              projectId={projectId}
-              shortOf={shortOf}
-              today={today}
-              open={open === b.id}
-              onToggle={() => setOpen(open === b.id ? null : b.id)}
-            />
-          ))}
-        </ul>
+        <>
+          <div className="bn-head" aria-hidden="true">
+            <span>Ref</span>
+            <span>
+              Overdue activity
+              <em>and the stage it sits in</em>
+            </span>
+            <span>
+              Late by
+              <em>its own deliverable</em>
+            </span>
+            <span>
+              Work waiting
+              <em>downstream, not yet started</em>
+            </span>
+            <span>
+              Effort held
+              <em>man-months of that work</em>
+            </span>
+            <span>
+              First blocked
+              <em>when it should have begun</em>
+            </span>
+            <span />
+          </div>
+          <ul className="bn-list">
+            {list.map((b) => (
+              <Row
+                key={b.id}
+                b={b}
+                projectId={projectId}
+                shortOf={shortOf}
+                today={today}
+                open={open === b.id}
+                onToggle={() => setOpen(open === b.id ? null : b.id)}
+              />
+            ))}
+          </ul>
+        </>
       ) : (
         <p className="dash-empty">
           Nothing that is overdue has work waiting behind it. A late deliverable with nothing
@@ -107,8 +133,6 @@ function Row({
     return [...map.entries()];
   }, [downstream]);
 
-  const waiting = b.downstream.filter((d) => d.waiting).length;
-
   return (
     <li className="bn" data-bn={b.id}>
       <div className="bn-row">
@@ -124,8 +148,10 @@ function Row({
           <em>{b.lateDeliverables.length} deliverable{b.lateDeliverables.length === 1 ? '' : 's'}</em>
         </span>
         <span className="bn-n">
-          {waiting} waiting
-          <em>{b.direct} direct · {b.stagesTouched} stages</em>
+          {b.waiting} waiting
+          <em>
+            {b.direct} direct · {b.stagesTouched} stage{b.stagesTouched === 1 ? '' : 's'}
+          </em>
         </span>
         <span className="bn-mm">
           {Math.round(b.manMonthsAtRisk)} MM

@@ -156,12 +156,15 @@ describe('how far the wait reaches', () => {
     const [b] = findBottlenecks(
       base({
         stages: [stage('a', 'A', { from: [0] }), stage('b', 'B')],
-        schedule: schedule(['a', 'b']),
+        schedule: schedule(['a', 'b'], at('2026-02-20')),
         deliverables: { a: [dlv('a1', '2026-02-15', false)], b: [] },
         feeds: { 'A-01': ['A-02', 'B-01'], 'B-01': ['B-02'] },
       }),
     );
     expect(b.downstream).toHaveLength(3);
+    /* B-01 sits at week 0 of a stage that started before today, so it is
+       already running; the wait still reaches both stages through B-02 */
+    expect(b.waiting).toBe(2);
     expect(b.stagesTouched).toBe(2);
   });
 
@@ -195,9 +198,43 @@ describe('the size of what is stuck', () => {
 
   it('marks how much of the waiting work moves the programme', () => {
     const [b] = findBottlenecks(
-      base({ feeds: { 'A-01': ['A-02', 'A-03'] }, critical: ['A-03'] }),
+      base({
+        schedule: schedule(['a'], at('2026-02-20')),
+        feeds: { 'A-01': ['A-02', 'A-03'] },
+        critical: ['A-03'],
+      }),
     );
     expect(b.criticalDownstream).toBe(1);
+  });
+
+  /*
+   * Every figure on a row answers the same question — what unblocking this
+   * would release — so work already under way counts towards none of them,
+   * however far downstream it sits.
+   */
+  it('leaves work already under way out of every figure on the row', () => {
+    const [b] = findBottlenecks(
+      base({
+        stages: [stage('a', 'A', { from: [0] }), stage('b', 'B')],
+        /* stage A began in January, so A-02 and A-03 are already running;
+           only B's activities are still ahead of today */
+        schedule: {
+          stages: {
+            a: { start: at('2026-01-01'), end: at('2026-02-12'), startOffsetWeeks: 0, durationWeeks: 6 },
+            b: { start: at('2026-03-05'), end: at('2026-04-16'), startOffsetWeeks: 0, durationWeeks: 6 },
+          },
+        } as unknown as Schedule,
+        deliverables: { a: [dlv('a1', '2026-02-15', false)], b: [] },
+        feeds: { 'A-01': ['A-02', 'B-01'], 'B-01': ['B-02'] },
+        critical: ['A-02', 'B-01'],
+      }),
+    );
+    expect(b.downstream).toHaveLength(3);
+    /* A-02 is downstream and shown, but it started — so it is in none of these */
+    expect(b.waiting).toBe(2);
+    expect(b.stagesTouched).toBe(1);
+    expect(b.criticalDownstream).toBe(1);
+    expect(b.downstream.find((d) => d.id === 'A-02')!.waiting).toBe(false);
   });
 });
 

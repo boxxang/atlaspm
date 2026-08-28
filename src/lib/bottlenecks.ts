@@ -82,8 +82,15 @@ export interface Bottleneck {
   direct: number;
   /** Every activity downstream of it, however many hops away. */
   downstream: BlockedActivity[];
+  /**
+   * The figures below all describe the same population: downstream work that
+   * has not started. Work already under way is downstream too, and it is in
+   * `downstream` so the reader can see it, but unblocking this activity does
+   * not release it — counting it here would answer a different question from
+   * the one the panel asks.
+   */
+  waiting: number;
   stagesTouched: number;
-  /** Effort of downstream work that has not started. */
   manMonthsAtRisk: number;
   criticalDownstream: number;
   /** The earliest start among the work that is waiting. */
@@ -188,6 +195,7 @@ export function findBottlenecks(input: BottleneckInput): Bottleneck[] {
         };
       });
 
+      /* One population for every figure on the row: what has yet to start. */
       const held = downstream.filter((d) => d.waiting);
       const starts = held.map((d) => d.start!.getTime()).sort((a, b) => a - b);
 
@@ -200,9 +208,10 @@ export function findBottlenecks(input: BottleneckInput): Bottleneck[] {
         lateDeliverables: late.sort((a, b) => b.days - a.days),
         direct: (feeds[id] ?? []).filter((d) => known.has(d) && d !== id).length,
         downstream,
-        stagesTouched: new Set(downstream.map((d) => d.stageId)).size,
+        waiting: held.length,
+        stagesTouched: new Set(held.map((d) => d.stageId)).size,
         manMonthsAtRisk: held.reduce((t, d) => t + d.manMonths, 0),
-        criticalDownstream: downstream.filter((d) => d.critical).length,
+        criticalDownstream: held.filter((d) => d.critical).length,
         firstBlockedStart: starts.length ? new Date(starts[0]) : null,
       });
     }
