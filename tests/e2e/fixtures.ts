@@ -15,9 +15,19 @@ import { seedProject } from '../../prisma/seedProject';
 export const TEST_DATABASE_URL =
   process.env.TEST_DATABASE_URL ?? `postgresql://${process.env.USER ?? 'postgres'}@localhost:5432/atlaspm_test`;
 
-/** The seeded program, and the route its detail view lives at. */
+/**
+ * The seeded program, and the route its detail view lives at.
+ *
+ * These specs cover the V1 program page, which moved to /classic when the
+ * prototype's shell went up beside it — see /p/[projectId]/classic/page.tsx.
+ * They are the regression net for screens the V2 phases have not replaced yet,
+ * and they go when their screens do.
+ */
 export const SEED_PROJECT_ID = 'atlasax1';
-export const SEED_PROJECT_PATH = `/p/${SEED_PROJECT_ID}`;
+export const SEED_PROJECT_PATH = `/p/${SEED_PROJECT_ID}/classic`;
+
+/** The prototype's shell, which /classic is being replaced by one phase at a time. */
+export const SHELL_PATH = `/p/${SEED_PROJECT_ID}`;
 
 let client: PrismaClient | null = null;
 const prisma = () =>

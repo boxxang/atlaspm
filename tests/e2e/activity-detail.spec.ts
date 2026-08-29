@@ -36,7 +36,7 @@ test.describe('opening an activity', () => {
 
     // and back to the programme it is dated against
     await page.locator('[data-ad-back]').click();
-    await page.waitForURL(/\/p\/atlasax1$/);
+    await page.waitForURL(/\/p\/atlasax1\/classic$/);
     await expect(page.locator('#roadmap')).toBeVisible();
   });
 

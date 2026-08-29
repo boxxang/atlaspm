@@ -65,7 +65,11 @@ function ProjectCard({ p }: { p: ProjectSummary }) {
 
   return (
     <div className="pl-card">
-      <Link className="pl-open" href={`/p/${p.id}`} aria-label={`Open ${p.name}`} />
+      {/* Opens the V1 page while the prototype's shell is still being filled in
+          — see /p/[projectId]/classic. PORTING_PLAN_V2 phase V2-8 drops the
+          suffix, and the shell (already routed at /p/:id) becomes what a card
+          opens. */}
+      <Link className="pl-open" href={`/p/${p.id}/classic`} aria-label={`Open ${p.name}`} />
 
       <div className="pl-title">
         <span className="pl-name">{p.name}</span>
@@ -203,7 +207,7 @@ function NewProjectCard({ profiles }: { profiles: readonly ProfileSummary[] }) {
       try {
         await createProject({ id, name: name.trim(), kickoff: fromISO(kickoff), profileId });
         setOpen(false);
-        router.push(`/p/${id}`);
+        router.push(`/p/${id}/classic`);
       } catch (e) {
         setError(e instanceof Error ? e.message : 'Could not create the program.');
       }

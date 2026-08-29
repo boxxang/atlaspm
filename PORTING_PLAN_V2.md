@@ -113,13 +113,40 @@ component should own. The colours stayed with the components.
 
 - **Accept:** ✅ 309 unit tests (was 221); `/lib` and `/data` still import no DOM.
 
-## Phase V2-3 — Shell and navigation
+## Phase V2-3 — Shell and navigation — **done**
 
-Left nav, routed views, the right rail. Nothing else moves until this exists,
-because every later phase renders into it.
+Left nav, routed views, the right rail — `.pshell` is a three-column grid, and
+every later phase renders a view into the middle of it.
 
-- **Accept (Playwright):** each nav entry routes; the rail follows the selection and
-  clears on navigation; deep links (`/p/:id/stage/:key/:tab`) restore the view.
+**Built beside the V1 page, not on top of it.** The V1 program page moved to
+`/p/:id/classic` and the shell took `/p/:id`. Replacing it outright would have
+turned 272 passing e2e tests red for five phases — exactly while the riskiest
+work happens — for screens that had not been replaced yet. So the V1 route stays
+until its screens genuinely go, and its specs stay green as the regression net.
+Program cards still open `/classic`; V2-8 drops the suffix and deletes the route.
+
+Other decisions:
+
+- **The tab is in the URL** (`/p/:id/stage/:key/:tab`), which the prototype does
+  not do — its hash carries only the stage. A tab is where you are, so a link
+  should reopen it. The list lives in `/lib/stageTabs.ts` rather than in the
+  component, because the route validates the segment on the server; an unknown
+  tab redirects to the default rather than 404ing, since the stage is real.
+- **The prototype's palette is scoped to `.pshell`**, not `:root`. It differs
+  from the reference — indigo `#5b5bd6` rather than blue `#256abf`, white ground
+  rather than warm — and `/classic` is still the reference's. Custom properties
+  inherit, so both are true at once. The block moves to `:root` when `/classic`
+  goes.
+- **The rail's selection is its own store**, not view state: every screen picks
+  into the same slot, and it clears on navigation because a step picked on one
+  screen is not selected on the next.
+- **Risks and Overdue carry no count yet**, and the Stages list has no COMPLETE
+  column. Both are derived from step state, which does not reach the browser
+  until V2-4 ships the step index. A missing number says "not counted yet"; a
+  zero would be a claim.
+
+- **Accept:** ✅ 14 shell checks in `tests/e2e/shell.spec.ts`; the V1 suite still
+  green (286 e2e total).
 
 ## Phase V2-4 — The stage page
 
@@ -155,7 +182,15 @@ The notes board, the handover flow, team add/edit.
 ## Phase V2-8 — Sweep
 
 Side-by-side against the prototype, screen by screen. Delete what V1 left behind
-that nothing renders any more.
+that nothing renders any more. Specifically:
+
+- delete `/p/[projectId]/classic` and `AppShell`, `Toolbar`, `Roadmap`,
+  `StagePanel`, `BoardModal` and anything only they render;
+- drop `/classic` from `ProjectList`'s card link and its create-and-open push,
+  and from `ActivityDetailView`'s back link;
+- move the `.pshell` token block to `:root` and delete the reference palette;
+- delete the V1 specs whose screens have gone, and `SEED_PROJECT_PATH` with
+  them.
 
 ---
 

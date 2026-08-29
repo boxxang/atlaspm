@@ -46,7 +46,7 @@ test.describe('program list', () => {
 
   test('a card opens its program, and the toolbar comes back', async ({ page }) => {
     await card(page, 'AtlasAX1').locator('.pl-open').click();
-    await expect(page).toHaveURL(/\/p\/atlasax1$/);
+    await expect(page).toHaveURL(/\/p\/atlasax1\/classic$/);
     await expect(page.locator('#project-name')).toHaveText('AtlasAX1');
     await selectStage(page, 'productDefinition');
 
@@ -56,7 +56,7 @@ test.describe('program list', () => {
   });
 
   test('the EDITED flag surfaces a manually edited schedule', async ({ page }) => {
-    await page.goto('/p/atlasax1');
+    await page.goto('/p/atlasax1/classic');
     const panel = page.locator('.stage-panel.selected');
     await selectStage(page, 'verification');
     const end = await panel.locator('[data-role="end-edit"]').inputValue();
@@ -179,7 +179,7 @@ test.describe('creating a program', () => {
     await expect(panel.locator('.board[data-kind="activities"] .b-row')).toHaveCount(1);
 
     // the seeded program is untouched
-    await page.goto('/p/atlasax1');
+    await page.goto('/p/atlasax1/classic');
     await selectStage(page, 'physicalDesign');
     await expect(
       page.locator('.stage-panel.selected .board[data-kind="activities"] .board-head .note'),
@@ -330,7 +330,7 @@ test.describe('switching programs without a page load', () => {
     await expect(
       page.locator('.stage-panel.selected .board[data-kind="risks"] .b-row'),
     ).toHaveCount(1);
-    await page.goto('/p/atlasax1');
+    await page.goto('/p/atlasax1/classic');
     await selectStage(page, 'productDefinition');
     // AtlasAX1's own risks, none of them the row just written to ZetaX6
     await expect(page.locator('.stage-panel.selected .board[data-kind="risks"] .b-row')).toHaveCount(
@@ -373,7 +373,7 @@ test.describe('deleting a program', () => {
     await page.locator('[data-confirm-del]').click();
     await expect(page.locator('.pl-card:not(.new)')).toHaveCount(1);
 
-    await page.goto('/p/atlasax1');
+    await page.goto('/p/atlasax1/classic');
     await expect(page.locator('#project-name')).toHaveText('AtlasAX1');
     expect(await milestoneDate(page, 'tapeout')).not.toBe('');
   });
