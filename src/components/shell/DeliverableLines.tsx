@@ -1,13 +1,15 @@
 'use client';
 
 import Link from 'next/link';
-import { detailDeliverables } from '@/data/activityIndex';
+import { activitySteps } from '@/data/activitySteps';
 import { attachmentUrl } from '@/lib/attachments';
-import { deliverableStatus } from '@/lib/deliverableStatus';
+import { deliverableStatus, deliverableStep } from '@/lib/deliverableStatus';
 import { fmtDate } from '@/lib/schedule';
 import type { Deliverable } from '@/data/types';
 import { useAppStore } from '@/store/useAppStore';
 import { useRailStore } from '@/store/railStore';
+import { IconClip } from './icons';
+import { useDeliverableRefs } from './useDeliverableRefs';
 
 /**
  * Key deliverables, as the rail lists them.
@@ -16,7 +18,17 @@ import { useRailStore } from '@/store/railStore';
  * than navigating anywhere — the reason to click a clip is to see the file.
  * There is no tick to click: a deliverable is completed by a handover, and the
  * box only reports what the handover says.
+ *
+ * The line under the title names the step that hands it over before it says the
+ * date, which is the mockup's wording: "PD-01 step 6 · due 09/26/2026" answers
+ * where the work is, and a date on its own does not.
  */
+const producers = Object.keys(activitySteps).map((ref) => ({
+  ref,
+  produces: activitySteps[ref].r.map(([id]) => id),
+  stepCount: activitySteps[ref].s.length,
+}));
+
 export function DeliverableLines({
   title,
   list,
@@ -36,13 +48,25 @@ export function DeliverableLines({
   const select = useRailStore((s) => s.select);
 
   const span = schedule.stages[stageId];
-  const refOf = (t: string) =>
-    Object.keys(detailDeliverables).find((r) => detailDeliverables[r] === t) ?? null;
+  const refOf = useDeliverableRefs();
   const done = list.filter((d) => d.done).length;
 
   return (
-    <div style={{ borderTop: '1px solid var(--line-soft)', marginTop: 14, paddingTop: 14 }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
+    <div
+      style={{
+        borderTop: '1px solid var(--line-soft)',
+        marginTop: 14,
+        paddingTop: 14,
+      }}
+    >
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: 8,
+          marginBottom: 10,
+        }}
+      >
         <span className="cap">{title}</span>
         <span className="pill" style={{ fontSize: 10.5 }}>
           {done}/{list.length}
@@ -61,9 +85,10 @@ export function DeliverableLines({
       ) : (
         list.map((d) => {
           const st = deliverableStatus(d, today, !!span && today >= span.start);
-          const ref = refOf(d.title);
+          const ref = refOf.get(d.id) ?? null;
           const handover = posts.find((p) => p.deliverableId === d.id && p.kind === 'handover');
           const files = handover?.attachments ?? [];
+          const ticked = deliverableStep(ref, producers);
           return (
             <div
               key={d.id}
@@ -84,13 +109,27 @@ export function DeliverableLines({
                 onClick={() => select({ kind: 'deliverable', stageId, deliverableId: d.id })}
               >
                 {d.done && (
-                  <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="3.4">
+                  <svg
+                    width="9"
+                    height="9"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="#fff"
+                    strokeWidth="3.4"
+                  >
                     <path d="M20 6 9 17l-5-5" />
                   </svg>
                 )}
               </button>
               <span style={{ flexGrow: 1, minWidth: 0 }}>
-                <span style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
+                <span
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 6,
+                    flexWrap: 'wrap',
+                  }}
+                >
                   {ref && (
                     <span className="ref" style={{ fontSize: 10.5, padding: '1px 6px' }}>
                       {ref}
@@ -106,7 +145,8 @@ export function DeliverableLines({
                       title={files[0].filename}
                       aria-label={`Open ${files[0].filename}`}
                     >
-                      📎{files.length}
+                      <IconClip />
+                      {files.length}
                     </a>
                   )}
                 </span>
@@ -122,14 +162,13 @@ export function DeliverableLines({
                   {d.title}
                 </span>
                 <span className="num" style={{ fontSize: 11, color: 'var(--ink-4)' }}>
+                  {ticked && `${ticked.act} step ${ticked.n} · `}
                   {d.done && d.completedAt ? (
                     `done ${fmtDate(d.completedAt)}`
                   ) : (
                     <span
                       style={
-                        st.kind === 'late'
-                          ? { color: 'var(--risk)', fontWeight: 600 }
-                          : undefined
+                        st.kind === 'late' ? { color: 'var(--risk)', fontWeight: 600 } : undefined
                       }
                     >
                       due {d.due ? fmtDate(d.due) : '—'}
@@ -147,7 +186,13 @@ export function DeliverableLines({
 
 export function StatusPill({ kind, label }: { kind: string; label: string }) {
   const cls =
-    kind === 'done' ? 'pill ok' : kind === 'late' ? 'pill risk' : kind === 'run' ? 'pill acc' : 'pill';
+    kind === 'done'
+      ? 'pill ok'
+      : kind === 'late'
+        ? 'pill risk'
+        : kind === 'run'
+          ? 'pill acc'
+          : 'pill';
   return (
     <span className={cls} style={{ fontSize: 10.5 }}>
       {label}

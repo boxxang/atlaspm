@@ -1,22 +1,17 @@
 'use client';
 
-import Link from 'next/link';
-import { deliverableStatus } from '@/lib/deliverableStatus';
-import { fmtDate } from '@/lib/schedule';
 import { useAppStore } from '@/store/useAppStore';
+import { DeliverableTable } from './DeliverableTable';
 
 /**
  * Every key deliverable on the programme, grouped by the stage that owns it.
  *
- * Grouped rather than given a stage column: a heading once beats the same word
- * repeated down nine rows, and it puts a stage's deliverables where they can be
- * read as a set. Completing one happens on its stage, where the handover is.
+ * The same table as a stage's own tab under each heading, so a handover is
+ * filed the same way wherever it is reached from.
  */
 export function ProgramDeliverables({ projectId }: { projectId: string }) {
   const stages = useAppStore((s) => s.stages);
   const deliverables = useAppStore((s) => s.deliverables);
-  const schedule = useAppStore((s) => s.schedule);
-  const today = useAppStore((s) => s.today);
 
   const groups = stages
     .map((s) => ({ stage: s, rows: deliverables[s.id] ?? [] }))
@@ -26,85 +21,30 @@ export function ProgramDeliverables({ projectId }: { projectId: string }) {
 
   return (
     <>
-      <header className="pview-head">
-        <h1 className="pview-title">Deliverables</h1>
-        <span className="pview-count">
-          {done}/{all.length}
+      <div className="hd">
+        <h1>Deliverables</h1>
+        <span className="pill">
+          {done} of {all.length}
         </span>
-        <span className="grow" />
-        <span className="pview-note">
-          Completed by a handover — a body, an artefact and the date it was accepted.
+        <span style={{ flexGrow: 1 }} />
+        <span style={{ fontSize: 12, color: 'var(--ink-3)' }}>
+          Completed by a handover — a body, an artefact and the date it was accepted
         </span>
-      </header>
-
-      <div className="pview-body">
-        <table className="ptable pboard" data-board>
-          <thead>
-            <tr>
-              <th className="pwrapcol">Key deliverable</th>
-              <th className="mid">Status</th>
-              <th className="mid num">Due</th>
-              <th className="mid num">Completed</th>
-            </tr>
-          </thead>
-          {groups.map((g) => {
-            const span = schedule.stages[g.stage.id];
-            return (
-              <tbody key={g.stage.id}>
-                <tr className="ptable-group">
-                  <th colSpan={4} scope="colgroup">
-                    <Link href={`/p/${projectId}/stage/${g.stage.id}/deliverables`}>
-                      {g.stage.title}
-                    </Link>
-                    <span className="pview-count">
-                      {g.rows.filter((d) => d.done).length}/{g.rows.length}
-                    </span>
-                  </th>
-                </tr>
-                {g.rows.map((d) => {
-                  /* Started once the stage has: which activity produces it is a
-                     stage-page question, and this list is about dates. */
-                  const status = deliverableStatus(
-                    d,
-                    today,
-                    !!span && today >= span.start,
-                  );
-                  return (
-                    <tr key={d.id} data-deliverable={d.id}>
-                      <th scope="row" className="pwrap pwrapcol">
-                        <Link
-                          href={`/p/${projectId}/stage/${g.stage.id}/deliverables?deliverable=${d.id}`}
-                        >
-                          {d.title}
-                        </Link>
-                      </th>
-                      <td className="mid">
-                        <span
-                          className={`pill ${
-                            status.kind === 'done'
-                              ? 'ok'
-                              : status.kind === 'late'
-                                ? 'risk'
-                                : status.kind === 'run'
-                                  ? 'run'
-                                  : ''
-                          }`}
-                        >
-                          {status.label}
-                        </span>
-                      </td>
-                      <td className={status.kind === 'late' ? 'mid num late' : 'mid num'}>
-                        {d.due ? fmtDate(d.due) : '—'}
-                      </td>
-                      <td className="mid num">{d.completedAt ? fmtDate(d.completedAt) : '—'}</td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            );
-          })}
-        </table>
       </div>
+      {groups.map((g) => (
+        <div key={g.stage.id}>
+          <div className="groupbar" style={{ cursor: 'default' }} data-group={g.stage.id}>
+            <b>{g.stage.title}</b>
+            <span className="pill" style={{ fontSize: 10.5 }}>
+              {g.stage.shortTitle}
+            </span>
+            <span style={{ fontSize: 12, color: 'var(--ink-3)' }}>
+              {g.rows.filter((d) => d.done).length}/{g.rows.length}
+            </span>
+          </div>
+          <DeliverableTable stageId={g.stage.id} list={g.rows} />
+        </div>
+      ))}
     </>
   );
 }

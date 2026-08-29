@@ -128,6 +128,9 @@ export interface AppState {
    * it is stored, the progress figures read it, and V1 reads it too, so it has
    * to agree with what the handover actually says.
    */
+  /** Hangs files off any post — a note, an update, a handover. */
+  attachToPost: (postId: string, files: FileList | File[]) => Promise<string[]>;
+  detachFromPost: (postId: string, attachmentId: string) => void;
   attachToHandover: (
     stageId: StageId,
     deliverableId: string,
@@ -539,6 +542,51 @@ export const useAppStore = create<AppState>()((set, get) => ({
        showing replies to something that is gone. */
     set((s) => ({ posts: s.posts.filter((p) => p.id !== id && p.parentId !== id) }));
     sync(api.deletePost(get().projectId, id));
+  },
+
+  attachToPost: async (postId, files) => {
+    const held = get().posts.find((p) => p.id === postId)?.attachments ?? [];
+    const accepted: File[] = [];
+    const problems: string[] = [];
+    for (const f of files) {
+      const reason = rejectFile(f, held.length + accepted.length);
+      if (reason) problems.push(rejectionMessage(reason, f.name));
+      else accepted.push(f);
+    }
+    if (!accepted.length) return problems;
+
+    const form = new FormData();
+    form.set('projectId', get().projectId);
+    form.set('statusUpdateId', postId);
+    for (const f of accepted) {
+      form.append('files', f);
+      form.append('ids', uid());
+    }
+    try {
+      /* the post has to be on the server before a row can point at it */
+      await flushWrites();
+      const saved = await api.uploadAttachments(form);
+      set((s) => ({
+        posts: s.posts.map((p) =>
+          p.id === postId ? { ...p, attachments: [...p.attachments, ...saved] } : p,
+        ),
+      }));
+    } catch (e) {
+      console.error('[atlaspm] post attachment upload failed', e);
+      problems.push('Upload failed — the files were not attached.');
+    }
+    return problems;
+  },
+
+  detachFromPost: (postId, attachmentId) => {
+    set((s) => ({
+      posts: s.posts.map((p) =>
+        p.id === postId
+          ? { ...p, attachments: p.attachments.filter((a) => a.id !== attachmentId) }
+          : p,
+      ),
+    }));
+    sync(api.deleteAttachment(get().projectId, attachmentId));
   },
 
   attachToHandover: async (stageId, deliverableId, postId, files) => {

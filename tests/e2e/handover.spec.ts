@@ -12,18 +12,21 @@ const DELIVERABLES = `${SHELL_PATH}/stage/physicalDesign/deliverables`;
 const rail = (page: import('./fixtures').Page) =>
   page.getByRole('complementary', { name: 'Details' });
 
+/* The handover opens inline under its row, where the mockup opens it. */
+const card = (page: import('./fixtures').Page) => page.locator('[data-handover]');
+
 const openFirstOpen = async (page: import('./fixtures').Page) => {
   await page.goto(DELIVERABLES);
   await expect(page.locator('[data-board] [data-deliverable]').first()).toBeVisible();
   const row = page.locator('[data-board] [data-deliverable]').filter({ hasNot: page.locator('.pill.ok') }).first();
-  const title = await row.locator('th[scope="row"]').innerText();
+  const title = await row.locator('.ell').first().innerText();
   await row.click();
-  await expect(rail(page)).toContainText('Handover');
+  await expect(card(page)).toContainText('Handover');
   return { row, title: title.trim() };
 };
 
 const attach = (page: import('./fixtures').Page, name: string, body: string) =>
-  rail(page)
+  card(page)
     .getByLabel('Attach an artefact')
     .setInputFiles({ name, mimeType: 'text/plain', buffer: Buffer.from(body) });
 
@@ -46,14 +49,14 @@ test.describe('the deliverables tab', () => {
     const delayed = page.locator('[data-board] [data-deliverable]').filter({ hasText: 'Delayed' });
     expect(await delayed.count()).toBeGreaterThan(0);
     /* and the date it is late against is drawn as late */
-    await expect(delayed.first().locator('.num.late')).toBeVisible();
+    await expect(delayed.first().locator('.num').first()).toBeVisible();
   });
 
   test('Delayed is not Overdue: it is not on the Overdue board', async ({ page }) => {
     await page.goto(`${SHELL_PATH}/stage/synthesis/deliverables`);
     await expect(page.locator('[data-board] [data-deliverable]').first()).toBeVisible();
     const title = (
-      await page.locator('[data-board] [data-deliverable]').filter({ hasText: 'Delayed' }).first().locator('th').innerText()
+      await page.locator('[data-board] [data-deliverable]').filter({ hasText: 'Delayed' }).first().locator('.ell').first().innerText()
     ).trim();
 
     await page.goto(`${SHELL_PATH}/overdue`);
@@ -65,35 +68,37 @@ test.describe('the deliverables tab', () => {
 });
 
 test.describe('handing one over', () => {
-  test('needs all three, and says which are missing', async ({ page }) => {
+  /* The rule is enforced by the date field itself: it stays disabled until
+     there is a body and something attached, so it cannot record an acceptance
+     of nothing. */
+  test('the date cannot be set until there is something to accept', async ({ page }) => {
     await openFirstOpen(page);
-    await expect(rail(page)).toContainText('Not handed over');
-    await expect(rail(page)).toContainText('what was handed over');
-    await expect(rail(page)).toContainText('an artefact');
-    await expect(rail(page)).toContainText('the date');
+    const date = card(page).getByLabel('Completed on');
+    await expect(date).toBeDisabled();
+    await expect(card(page)).toContainText('a handover with nothing handed over cannot be');
 
     /* the body alone is not enough */
-    await rail(page).getByLabel('What was handed over').fill('Released to the fab.');
-    await rail(page).getByLabel('Accepted').click();
-    await expect(rail(page)).toContainText('Not handed over');
-    await expect(rail(page)).not.toContainText('what was handed over');
+    await card(page).getByLabel('What was handed over').fill('Released to the fab.');
+    await expect(date).toBeDisabled();
 
-    /* nor the body and the artefact without a date */
+    /* the body and the artefact open it */
     await attach(page, 'release.txt', 'the artefact');
-    await expect(rail(page)).toContainText('release.txt');
-    await expect(rail(page)).toContainText('Not handed over');
+    await expect(card(page)).toContainText('release.txt');
+    await expect(date).toBeEnabled();
 
     /* all three, and it is complete */
-    await rail(page).getByLabel('Accepted').fill('2026-08-01');
-    await expect(rail(page).locator('.pill.ok')).toHaveText('Completed');
+    await date.fill('2026-08-01');
+    await card(page).getByRole('button', { name: /^(Post|Save)$/ }).click();
+    await expect(card(page).locator('.pill')).toContainText('Completed 08/01/2026');
   });
 
   test('completes the row, and survives a reload', async ({ page }) => {
     const { title } = await openFirstOpen(page);
-    await rail(page).getByLabel('What was handed over').fill('Signed off by the owner.');
+    await card(page).getByLabel('What was handed over').fill('Signed off by the owner.');
     await attach(page, 'signoff.txt', 'evidence');
-    await rail(page).getByLabel('Accepted').fill('2026-08-01');
-    await expect(rail(page).locator('.pill.ok')).toHaveText('Completed');
+    await card(page).getByLabel('Completed on').fill('2026-08-01');
+    await card(page).getByRole('button', { name: /^(Post|Save)$/ }).click();
+    await expect(card(page).locator('.pill')).toContainText('Completed 08/01/2026');
     await writesSettled(page);
 
     const row = page.locator('[data-board] [data-deliverable]').filter({ hasText: title });
@@ -108,12 +113,12 @@ test.describe('handing one over', () => {
 
   test('the clip opens the artefact itself', async ({ page }) => {
     const { title } = await openFirstOpen(page);
-    await rail(page).getByLabel('What was handed over').fill('Here it is.');
+    await card(page).getByLabel('What was handed over').fill('Here it is.');
     await attach(page, 'artefact.txt', 'the bytes');
-    await rail(page).getByLabel('Accepted').fill('2026-08-01');
+    await card(page).getByLabel('Completed on').fill('2026-08-01');
     await writesSettled(page);
 
-    const clip = page.locator('[data-board] [data-deliverable]').filter({ hasText: title }).locator('.pclip');
+    const clip = page.locator('[data-board] [data-deliverable]').filter({ hasText: title }).locator('.clip');
     await expect(clip).toBeVisible();
     const href = (await clip.getAttribute('href'))!;
     expect(href).toMatch(/^\/api\/attachments\//);
@@ -124,14 +129,16 @@ test.describe('handing one over', () => {
 
   test('removing the last artefact reopens it', async ({ page }) => {
     const { title } = await openFirstOpen(page);
-    await rail(page).getByLabel('What was handed over').fill('Filed.');
+    await card(page).getByLabel('What was handed over').fill('Filed.');
     await attach(page, 'only.txt', 'one');
-    await rail(page).getByLabel('Accepted').fill('2026-08-01');
-    await expect(rail(page).locator('.pill.ok')).toHaveText('Completed');
+    await card(page).getByLabel('Completed on').fill('2026-08-01');
+    await card(page).getByRole('button', { name: /^(Post|Save)$/ }).click();
+    await expect(card(page).locator('.pill')).toContainText('Completed 08/01/2026');
     await writesSettled(page);
 
-    await rail(page).getByRole('button', { name: 'Remove only.txt' }).click();
-    await expect(rail(page)).toContainText('Not handed over');
+    /* The record stays — somebody wrote it — but the evidence behind the claim
+       is gone, so the deliverable is no longer complete. */
+    await card(page).getByRole('button', { name: 'Remove only.txt' }).click();
     await expect(page.locator('[data-board] [data-deliverable]').filter({ hasText: title }).locator('.pill')).not.toHaveText(
       'Completed',
     );
@@ -145,24 +152,28 @@ test.describe('handing one over', () => {
 
   test('a handover takes comments, and they survive', async ({ page }) => {
     const { title } = await openFirstOpen(page);
-    await rail(page).getByLabel('What was handed over').fill('First cut.');
+    await card(page).getByLabel('What was handed over').fill('First cut.');
     await attach(page, 'cut.txt', 'x');
-    await rail(page).getByLabel('Accepted').fill('2026-08-01');
+    await card(page).getByLabel('Completed on').fill('2026-08-01');
     await writesSettled(page);
 
-    await rail(page).getByLabel('Reply…').fill('Checked against the spec — looks right.');
-    await rail(page).locator('.composer.small').getByRole('button', { name: 'Post' }).click();
-    await expect(rail(page).locator('.replies .post-text')).toHaveText(
+    await card(page).getByRole('button', { name: 'Post' }).click();
+    await card(page).getByRole('button', { name: '+ Comment' }).click();
+    await card(page)
+      .getByLabel('Comment on this handover')
+      .fill('Checked against the spec — looks right.');
+    await card(page).getByRole('button', { name: 'Comment', exact: true }).click();
+    await expect(card(page).locator('.replies .txt')).toHaveText(
       'Checked against the spec — looks right.',
     );
     await writesSettled(page);
 
-    /* the rail clears on a reload, so the same row has to be picked again by
-       name — .picked is gone and .first() is a different deliverable */
+    /* the card closes on a reload, so the same row has to be picked again by
+       name — .first() is a different deliverable */
     await page.reload();
     await expect(page.locator('[data-board] [data-deliverable]').first()).toBeVisible();
     await page.locator('[data-board] [data-deliverable]').filter({ hasText: title }).click();
-    await expect(rail(page).locator('.replies .post-text')).toContainText('Checked against');
+    await expect(card(page).locator('.replies .txt')).toContainText('Checked against');
   });
 });
 
@@ -179,18 +190,18 @@ test.describe('the team', () => {
   test('lists the stage lead alongside everyone else', async ({ page }) => {
     await openTeam(page);
     await expect(page.locator('[data-person="leader"]')).toContainText('Grace Park');
-    await expect(page.locator('[data-person="leader"] .pill')).toHaveText('Lead');
-    expect(await page.locator('tr[data-person]').count()).toBeGreaterThan(1);
+    await expect(page.locator('[data-person="leader"]')).toContainText('Stage leader');
+    expect(await page.locator('[data-person]').count()).toBeGreaterThan(1);
   });
 
   test('somebody added here can be put on a step straight away', async ({ page }) => {
     await openTeam(page);
-    await page.getByRole('button', { name: '+ Add someone' }).click();
+    await page.getByRole('button', { name: /Add someone/ }).click();
     await page.getByLabel('Name').fill('Yuna Cho');
-    await page.getByLabel('Role').fill('SI engineer');
+    await page.getByLabel('Responsibility').fill('SI engineer');
     await page.getByLabel('Email').fill('yuna.cho@example.com');
     await page.getByRole('button', { name: 'Save' }).click();
-    await expect(page.locator('tr[data-person]').filter({ hasText: 'Yuna Cho' })).toBeVisible();
+    await expect(page.locator('[data-person]').filter({ hasText: 'Yuna Cho' })).toBeVisible();
     await writesSettled(page);
 
     /* the owner picker reads this list, so a new person can be put on a step
@@ -205,10 +216,10 @@ test.describe('the team', () => {
 
   test('a person is edited in place, and the change sticks', async ({ page }) => {
     await openTeam(page);
-    const row = page.locator('tr[data-person]').nth(1);
+    const row = page.locator('[data-person]:not([data-person="leader"])').first();
     const id = await row.getAttribute('data-person');
     await row.getByRole('button', { name: 'Edit' }).click();
-    await page.getByLabel('Role').fill('Floorplan owner');
+    await page.getByLabel('Responsibility').fill('Floorplan owner');
     await page.getByRole('button', { name: 'Save' }).click();
     await expect(page.locator(`[data-person="${id}"]`)).toContainText('Floorplan owner');
     await writesSettled(page);
@@ -219,17 +230,20 @@ test.describe('the team', () => {
 
   test('a person is removed, and stays removed', async ({ page }) => {
     await openTeam(page);
-    const before = await page.locator('tr[data-person]').count();
+    const before = await page.locator('[data-person]').count();
     /* the lead cannot be removed from here, so this takes the first person who
        is not the lead */
-    const row = page.locator('tr[data-person]:not([data-person="leader"])').first();
+    const row = page.locator('[data-person]:not([data-person="leader"])').first();
     const id = await row.getAttribute('data-person');
-    await row.getByRole('button', { name: 'Remove' }).click();
+    /* Remove lives in the edit form, as the mockup puts it — a row you are only
+       looking at has no way to delete anybody by mistake. */
+    await row.getByRole('button', { name: 'Edit' }).click();
+    await page.getByRole('button', { name: 'Remove' }).click();
     await expect(page.locator(`[data-person="${id}"]`)).toHaveCount(0);
-    await expect(page.locator('tr[data-person]')).toHaveCount(before - 1);
+    await expect(page.locator('[data-person]')).toHaveCount(before - 1);
     await writesSettled(page);
 
     await page.reload();
-    await expect(page.locator('tr[data-person]')).toHaveCount(before - 1);
+    await expect(page.locator('[data-person]')).toHaveCount(before - 1);
   });
 });

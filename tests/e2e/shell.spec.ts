@@ -62,18 +62,23 @@ test.describe('the nav', () => {
 });
 
 test.describe('the rail', () => {
-  test('says nothing is picked until something is', async ({ page }) => {
+  /* With nothing picked the rail is not there, which is what the mockup does:
+     the screens that have no selection want the width more than they want a
+     column saying there is nothing to show. */
+  test('is not there at all until something is picked', async ({ page }) => {
     await page.goto(`${SHELL_PATH}/stages`);
-    const rail = page.getByRole('complementary', { name: 'Details' });
-    await expect(rail).toContainText('Pick a stage');
+    await expect(page.getByRole('complementary', { name: 'Details' })).toHaveCount(0);
   });
 
-  test('follows the selection', async ({ page }) => {
+  /* A row on the stages list opens that stage, as the mockup's does, and the
+     stage's rail answers for it without anything else being clicked. */
+  test('follows the stage you opened', async ({ page }) => {
     await page.goto(`${SHELL_PATH}/stages`);
+    await page.locator('[data-stage="physicalDesign"]').click();
     const rail = page.getByRole('complementary', { name: 'Details' });
-    await page.getByRole('row', { name: /Physical Design/ }).getByText('Grace Park').click();
     await expect(rail).toContainText('Properties');
     await expect(rail).toContainText('Grace Park');
+    await expect(rail).toContainText('Implement');
     await expect(rail).toContainText('30 weeks');
   });
 
@@ -102,8 +107,7 @@ test.describe('the rail', () => {
     const rail = page.getByRole('complementary', { name: 'Details' });
     await expect(rail).toContainText('Grace Park');
     await page.getByRole('navigation', { name: 'Program' }).getByRole('link', { name: /^Team/ }).click();
-    await expect(rail).toContainText('Pick a stage');
-    await expect(rail).not.toContainText('Grace Park');
+    await expect(rail).toHaveCount(0);
   });
 });
 
@@ -199,12 +203,21 @@ test.describe('at a laptop width', () => {
     expect(doc.table).toBeGreaterThan(700);
   });
 
-  test('the dashboard band stays one row of figures', async ({ page }) => {
+  /* The band wraps rather than overflowing, which is what the prototype's own
+     stylesheet does at this width: the pace panel — and, on a small laptop, the
+     last figure — drop onto a second row and stay readable. What must never
+     happen is a block hanging off the card's right edge, which is what forcing
+     it all onto one line produced. */
+  test('the dashboard band wraps rather than spilling off its edge', async ({ page }) => {
     await page.goto(`${SHELL_PATH}/stage/physicalDesign/activity`);
     await expect(page.locator('.sdash')).toBeVisible();
-    const tops = await page
-      .locator('.sdash .dstat')
-      .evaluateAll((els) => els.map((e) => Math.round(e.getBoundingClientRect().top)));
-    expect(new Set(tops).size, 'the stats wrapped onto more than one row').toBe(1);
+
+    const spill = await page.locator('.sdash').evaluate((el) => {
+      const card = el.getBoundingClientRect();
+      return Math.max(
+        ...[...el.children].map((c) => Math.round(c.getBoundingClientRect().right - card.right)),
+      );
+    });
+    expect(spill, 'something in the band hangs off its right edge').toBeLessThanOrEqual(1);
   });
 });

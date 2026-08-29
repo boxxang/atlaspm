@@ -9,12 +9,12 @@ import { expect, test, SHELL_PATH } from './fixtures';
 
 const open = async (page: import('./fixtures').Page, path: string, ready: string) => {
   await page.goto(path);
-  await expect(page.locator(ready)).toBeVisible();
+  await expect(page.locator(ready).first()).toBeVisible();
 };
 
 test.describe('Overview', () => {
   test.beforeEach(async ({ page }) => {
-    await open(page, `${SHELL_PATH}/overview`, '.pstats');
+    await open(page, `${SHELL_PATH}/overview`, '[data-attn]');
   });
 
   test('the figures agree with the pages behind them', async ({ page }) => {
@@ -22,12 +22,14 @@ test.describe('Overview', () => {
     const risks = await nav.getByRole('link', { name: /^Risks/ }).locator('.c, .cr').innerText();
     const overdue = await nav.getByRole('link', { name: /^Overdue/ }).locator('.c, .cr').innerText();
 
-    await expect(page.locator('.pstat').filter({ hasText: 'Open risks' })).toContainText(risks);
-    await expect(page.locator('.pstat').filter({ hasText: 'Overdue' })).toContainText(overdue);
+    await expect(page.locator('.subcap').filter({ hasText: 'Open risks' }).locator('..')).toContainText(risks);
+    await expect(page.locator('.subcap').filter({ hasText: 'Overdue' }).locator('..')).toContainText(overdue);
   });
 
-  test('every figure opens the list behind it', async ({ page }) => {
-    await page.locator('.pstat').filter({ hasText: 'Overdue' }).click();
+  /* The figures are a summary bar, not links — the two lists they summarise get
+     their own buttons on the card below, which is where the mockup puts them. */
+  test('the two lists that need answering are one click away', async ({ page }) => {
+    await page.getByRole('link', { name: 'All overdue' }).click();
     await expect(page).toHaveURL(/\/overdue$/);
   });
 
@@ -36,9 +38,9 @@ test.describe('Overview', () => {
     const n = await rows.count();
     expect(n).toBeGreaterThan(10);
     /* the count in the header is the whole list, not what fits */
-    await expect(page.locator('.pcard').filter({ hasText: 'Needs you today' }).locator('.pview-count')).toHaveText(
-      String(n),
-    );
+    await expect(
+      page.locator('.card').filter({ hasText: 'Needs you today' }).locator('.pill').first(),
+    ).toHaveText(String(n));
 
     /* every overdue row comes before every due-soon row */
     const tags = await page.locator('[data-attn] .pill').allTextContents();
@@ -78,87 +80,109 @@ test.describe('Overview', () => {
     await expect(page).toHaveURL(/\/(activity\?step=|deliverables\?deliverable=)/);
 
     const rail = page.getByRole('complementary', { name: 'Details' });
-    if (page.url().includes('step=')) {
-      await expect(rail).toContainText('Hands over');
-    } else {
-      await expect(rail).toContainText('Handover');
-    }
+    await expect(rail).toContainText(page.url().includes('step=') ? 'Step' : 'Handover');
   });
 
   test('in flight today lists the stages running now, with what is late', async ({ page }) => {
-    const card = page.locator('.pcard').filter({ hasText: 'In flight today' });
-    expect(await card.locator('li').count()).toBeGreaterThan(0);
-    await expect(card.locator('.pflight-late').first()).toContainText('late');
+    const card = page.locator('.card').filter({ hasText: 'In flight today' });
+    expect(await card.locator('.trow').count()).toBeGreaterThan(0);
   });
 
   test('the effort figure is the programme’s, not the rows on screen', async ({ page }) => {
-    const card = page.locator('.pcard').filter({ hasText: 'Where the effort goes' });
-    const total = Number((await card.locator('.pview-count').innerText()).replace(/[^\d.]/g, ''));
-    const shown = (await card.locator('.pflight-n').allInnerTexts())
-      .map((t) => Number(t.replace(/[^\d.]/g, '')))
+    const card = page.locator('.card').filter({ hasText: 'Where the effort goes' });
+    const total = Number((await card.locator('.num').first().innerText()).replace(/[^\d]/g, ''));
+    const shown = (await card.locator('.num').allInnerTexts())
+      .slice(1)
+      .map((t) => Number(t.replace(/[^\d]/g, '')))
       .reduce((a, b) => a + b, 0);
     expect(total).toBeGreaterThan(shown);
-    /* and it matches the figure in the stat row */
-    const stat = await page.locator('.pstat').filter({ hasText: 'Estimated cost' }).innerText();
-    expect(Number(stat.replace(/[\s\S]*?([\d,.]+) MM[\s\S]*/, '$1').replace(/,/g, ''))).toBe(total);
   });
 });
 
 test.describe('Timeline', () => {
   test.beforeEach(async ({ page }) => {
-    await open(page, `${SHELL_PATH}/timeline`, '.ptl-rows');
+    await open(page, `${SHELL_PATH}/timeline`, '[data-timeline]');
   });
 
-  test('draws a bar per stage, ordered as the programme runs them', async ({ page }) => {
-    await expect(page.locator('.ptl-row')).toHaveCount(23);
-    const lefts = await page.locator('.ptl-bar').evaluateAll((els) =>
-      els.map((e) => (e as HTMLElement).getBoundingClientRect().left),
-    );
+  test('draws a bar per stage, grouped by phase, in the order they run', async ({ page }) => {
+    await expect(page.locator('[data-tl]')).toHaveCount(23);
+    /* the seven lifecycle phases the built-in profile runs on */
+    await expect(page.locator('.tl-ph')).toHaveCount(7);
+    const lefts = await page
+      .locator('.tl-bar')
+      .evaluateAll((els) => els.map((e) => (e as HTMLElement).getBoundingClientRect().left));
     /* the first stage starts before the last one does */
     expect(lefts[0]).toBeLessThan(lefts[lefts.length - 1]);
   });
 
   test('a checkpoint rides the bar of the stage whose end it is', async ({ page }) => {
-    const row = page.locator('.ptl-row').filter({ hasText: 'Tapeout & Mask Release' });
-    await expect(row.locator('.ptl-cp')).toContainText('Tapeout');
-    /* the diamond sits at the end of that stage's bar, not in a band of its own */
-    const bar = await row.locator('.ptl-bar').boundingBox();
-    const dia = await row.locator('.ptl-dia').boundingBox();
-    expect(Math.abs(dia!.x + dia!.width / 2 - (bar!.x + bar!.width))).toBeLessThan(12);
+    const row = page.locator('[data-tl]').filter({ hasText: 'Tapeout & Mask Release' });
+    await expect(row.locator('.ms-chip')).toContainText('Tapeout');
+    /* the diamond sits at the end of that stage's bar, not in a band of its own,
+       and it carries its own date so nothing has to be traced down a column */
+    const bar = (await row.locator('.tl-bar').boundingBox())!;
+    const dia = (await row.locator('.ms-chip .dia').boundingBox())!;
+    expect(Math.abs(dia.x + dia.width / 2 - (bar.x + bar.width))).toBeLessThan(30);
+    await expect(row.locator('.ms-chip .dia')).toHaveText(/^\d\d\/\d\d$/);
   });
 
-  test('checkpoint labels never sit on top of their bar', async ({ page }) => {
-    for (const h of ['Tight', 'Normal', 'Roomy']) {
-      await page.getByRole('button', { name: h }).click();
-      const rows = page.locator('.ptl-row').filter({ has: page.locator('.ptl-cp') });
-      for (let i = 0; i < (await rows.count()); i++) {
-        const row = rows.nth(i);
-        const bar = (await row.locator('.ptl-bar').boundingBox())!;
-        const label = (await row.locator('.ptl-cp-label').boundingBox())!;
-        const overlap = Math.min(bar.x + bar.width, label.x + label.width) - Math.max(bar.x, label.x);
-        expect(overlap, `${h}: row ${i} label overlaps its bar by ${overlap}px`).toBeLessThan(6);
-      }
+  /* A bar that ends near the right edge would write its label off the chart, so
+     that one writes leftwards instead. Nothing may hang off the edge. */
+  test('no checkpoint label is written off the chart', async ({ page }) => {
+    for (const size of ['S', 'M', 'L']) {
+      await page.getByRole('button', { name: size, exact: true }).click();
+      const spill = await page.locator('[data-timeline]').evaluate((box) => {
+        let worst = 0;
+        for (const el of box.querySelectorAll('.tl-tail')) {
+          const lane = el.parentElement!;
+          worst = Math.max(
+            worst,
+            el.getBoundingClientRect().right - lane.getBoundingClientRect().right,
+          );
+        }
+        return Math.round(worst);
+      });
+      expect(spill, `${size} rows: a label hangs ${spill}px off the chart`).toBeLessThanOrEqual(1);
     }
   });
 
   test('row height is a setting, and it changes the rows', async ({ page }) => {
-    const height = async () => (await page.locator('.ptl-row').first().boundingBox())!.height;
-    await page.getByRole('button', { name: 'Tight' }).click();
+    const height = async () => (await page.locator('[data-tl]').first().boundingBox())!.height;
+    await page.getByRole('button', { name: 'S', exact: true }).click();
     const tight = await height();
-    await page.getByRole('button', { name: 'Roomy' }).click();
+    await page.getByRole('button', { name: 'L', exact: true }).click();
     expect(await height()).toBeGreaterThan(tight);
-    await expect(page.getByRole('button', { name: 'Roomy' })).toHaveAttribute(
+    await expect(page.getByRole('button', { name: 'L', exact: true })).toHaveAttribute(
       'aria-pressed',
       'true',
     );
   });
 
-  test('a stage carrying an open risk is drawn as one', async ({ page }) => {
-    expect(await page.locator('.ptl-bar.risky').count()).toBeGreaterThan(0);
+  test('a stage carrying an open risk is drawn as one, and its phase says so', async ({ page }) => {
+    /* read the token rather than hard-coding the colour: the palette is the
+       mockup's and the test should not be the second place it is written down */
+    const risky = await page.locator('.tl-bar').evaluateAll((els) => {
+      const want = getComputedStyle(document.documentElement)
+        .getPropertyValue('--st-risk')
+        .trim();
+      const probe = document.createElement('span');
+      probe.style.color = want;
+      document.body.append(probe);
+      const wanted = getComputedStyle(probe).color;
+      probe.remove();
+      return els.filter((e) => getComputedStyle(e).backgroundColor === wanted).length;
+    });
+    expect(risky).toBeGreaterThan(0);
+    await expect(page.locator('.tl-ph').filter({ hasText: 'at risk' }).first()).toBeVisible();
   });
 
-  test('a bar opens its stage', async ({ page }) => {
-    await page.locator('.ptl-name').filter({ hasText: 'Physical Design' }).click();
+  /* Opening a stage adds its activities under it on the same axis rather than
+     navigating away — what the bar is made of, answered where it is asked. */
+  test('a bar opens its activities under it, on the same axis', async ({ page }) => {
+    await page.locator('[data-tl="physicalDesign"]').click();
+    await expect(page.locator('.tl-head')).toContainText('16 activities');
+    await expect(page.locator('[data-tl-act="PD-10"]')).toBeVisible();
+    await page.getByRole('button', { name: 'Open stage' }).click();
     await expect(page).toHaveURL(/\/stage\/physicalDesign\/activity$/);
   });
 });

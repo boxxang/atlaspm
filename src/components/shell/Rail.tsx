@@ -1,12 +1,12 @@
 'use client';
 
-import { estimateCost, formatManMonths } from '@/lib/effort';
+import { phaseById } from '@/data/scheduleProfiles';
+import { formatManMonths } from '@/lib/effort';
 import { fmtDate } from '@/lib/schedule';
 import { useAppStore } from '@/store/useAppStore';
 import { useRailStore } from '@/store/railStore';
 import { ActivityPanel } from './ActivityPanel';
 import { DeliverableLines } from './DeliverableLines';
-import { HandoverPanel } from './HandoverPanel';
 import { Avatar } from './icons';
 import { StepPanel } from './StepPanel';
 import { useStageSteps } from './useStageSteps';
@@ -19,33 +19,27 @@ import { useStageSteps } from './useStageSteps';
  * A stage shows its properties, an activity shows where it has got to, a step
  * shows everything you can change about it, and a key deliverable shows the
  * handover that completes it.
+ *
+ * With nothing picked the rail is not there at all, which is what the mockup
+ * does: the Overview and the two cross-program boards want the width, and a
+ * 400px column saying "pick something" is worse than the width it costs.
  */
 export function Rail({ projectId }: { projectId: string }) {
   const selection = useRailStore((s) => s.selection);
 
+  if (selection.kind === 'none') return null;
+
   return (
     <aside id="peek" aria-label="Details">
-      {selection.kind === 'none' && (
-        <>
-          <div className="peek-hd">
-            <span className="cap">Details</span>
-          </div>
-          <div className="peek-body">
-            <p className="mono-note">Pick a stage, an activity or a step to see it here.</p>
-          </div>
-        </>
-      )}
       {selection.kind === 'stage' && (
         <StagePanel stageId={selection.stageId} projectId={projectId} />
       )}
       {selection.kind === 'activity' && <ActivityPanel act={selection.act} projectId={projectId} />}
-      {selection.kind === 'step' && <StepPanel act={selection.act} n={selection.n} />}
+      {selection.kind === 'step' && <StepPanel act={selection.act} n={selection.n} projectId={projectId} />}
+      {/* A deliverable opens its handover inline under its row, as the mockup
+          does, so the rail keeps showing the stage it belongs to. */}
       {selection.kind === 'deliverable' && (
-        <HandoverPanel
-          key={selection.deliverableId}
-          stageId={selection.stageId}
-          deliverableId={selection.deliverableId}
-        />
+        <StagePanel stageId={selection.stageId} projectId={projectId} />
       )}
     </aside>
   );
@@ -56,7 +50,6 @@ function StagePanel({ stageId, projectId }: { stageId: string; projectId: string
   const schedule = useAppStore((s) => s.schedule);
   const leaders = useAppStore((s) => s.leaders);
   const deliverables = useAppStore((s) => s.deliverables);
-  const costPerManMonth = useAppStore((s) => s.costPerManMonth);
   const activities = useStageSteps(stageId);
 
   const stage = stages.find((s) => s.id === stageId);
@@ -85,6 +78,9 @@ function StagePanel({ stageId, projectId }: { stageId: string; projectId: string
             <span style={{ color: 'var(--ink-4)' }}>Unassigned</span>
           )}
         </Prop>
+        <Prop k="Phase">
+          <span style={{ fontSize: 13 }}>{phaseById(stage.phaseId).label}</span>
+        </Prop>
         <Prop k="Starts">
           <span className="num">{fmtDate(span.start)}</span>
         </Prop>
@@ -102,7 +98,6 @@ function StagePanel({ stageId, projectId }: { stageId: string; projectId: string
         <Prop k="Effort">
           <span className="num">
             {formatManMonths(mm).replace(' MM', '')} M/M
-            {costPerManMonth ? ` · $${(estimateCost(mm, costPerManMonth) / 1e6).toFixed(1)}M` : ''}
           </span>
         </Prop>
 

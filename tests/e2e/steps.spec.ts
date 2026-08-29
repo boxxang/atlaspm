@@ -53,7 +53,11 @@ test.describe('the activity table', () => {
     await expect(page.locator('[data-act="PD-10"]')).toHaveClass(/open/);
     /* six steps, and the two parallel ones are marked as such */
     await expect(page.locator('[data-stepblock] [data-step]')).toHaveCount(6);
-    await expect(page.locator('[data-stepblock-cap]')).toContainText('2 run in parallel');
+    /* the STEP column's own header says whose steps these are and how many —
+       the mockup puts it there rather than in a caption row above the table */
+    await expect(page.locator('[data-stepblock] .chead')).toContainText(
+      'PD-10 — 6 steps, 2 run in parallel',
+    );
   });
 
   test('a second click closes it again', async ({ page }) => {
@@ -81,8 +85,8 @@ test.describe('picking a step', () => {
 
   test('selects it and only it', async ({ page }) => {
     await page.locator('[data-step="PD-10:2"]').click();
-    await expect(page.locator('[data-step="PD-10:2"]')).toHaveClass(/stepsel/);
-    await expect(page.locator('.trow.stepsel')).toHaveCount(1);
+    await expect(page.locator('[data-step="PD-10:2"]')).toHaveClass(/sel/);
+    await expect(page.locator('.steprow.sel')).toHaveCount(1);
   });
 
   test('does not close the block it is in', async ({ page }) => {
@@ -106,11 +110,11 @@ test.describe('picking a step', () => {
   test('the release step carries the activity’s key deliverables', async ({ page }) => {
     const rail = page.getByRole('complementary', { name: 'Details' });
     await page.locator('[data-step="PD-10:6"]').click();
-    await expect(rail).toContainText('Hands over');
+    await expect(rail).toContainText('Key deliverables');
     await expect(rail).toContainText('PD-D6');
     /* and the steps before it do not: they produce outputs, not deliverables */
     await page.locator('[data-step="PD-10:2"]').click();
-    await expect(rail).not.toContainText('Hands over');
+    await expect(rail).not.toContainText('PD-D6');
   });
 });
 
@@ -155,7 +159,7 @@ test.describe('changing a step', () => {
     await expect(page.locator('[data-step="PD-10:3"]')).toContainText('Completed');
     /* and ticking a row does not select it — the box is about the step, the
        row is about what the rail shows */
-    await expect(page.locator('[data-step="PD-10:2"]')).toHaveClass(/stepsel/);
+    await expect(page.locator('[data-step="PD-10:2"]')).toHaveClass(/sel/);
   });
 
   test('a moved due date is flagged as edited, and clearing it restores the plan', async ({
@@ -164,13 +168,16 @@ test.describe('changing a step', () => {
     const planned = await dueOf(page, 'PD-10:2');
 
     await rail(page).getByLabel('Due').fill('2027-12-01');
-    await expect(rail(page)).toContainText('edited');
+    /* a moved date offers the way back to the baseline, which is how the mockup
+       says the date was moved at all */
+    const reset = rail(page).getByRole('button', { name: 'reset' });
+    await expect(reset).toBeVisible();
     await expect(page.locator('[data-step="PD-10:2"]')).toContainText('12/01/2027');
     /* and it is not late against a date that far out */
     await expect(page.locator('[data-step="PD-10:2"]')).not.toContainText('Overdue');
 
-    await rail(page).getByLabel('Due').fill('');
-    await expect(rail(page)).not.toContainText('edited');
+    await reset.click();
+    await expect(rail(page).getByRole('button', { name: 'reset' })).toHaveCount(0);
     await expect(page.locator('[data-step="PD-10:2"]')).toContainText(planned);
   });
 
@@ -186,11 +193,10 @@ test.describe('changing a step', () => {
   });
 
   test('progress is recorded, and a completed step reads 100', async ({ page }) => {
-    await rail(page).getByLabel('Progress').fill('40');
+    await rail(page).getByLabel('Percent complete').fill('40');
     await expect(rail(page)).toContainText('40%');
     await rail(page).getByRole('button', { name: 'Mark complete' }).click();
     await expect(rail(page)).toContainText('100%');
-    await expect(rail(page).getByLabel('Progress')).toBeDisabled();
   });
 });
 
@@ -205,7 +211,7 @@ test.describe('handing an output over', () => {
   });
 
   test('completes the step and stamps the day it arrived', async ({ page }) => {
-    await expect(rail(page)).toContainText('Nothing handed over yet');
+    await expect(rail(page)).toContainText('Nothing attached yet');
     await rail(page)
       .getByLabel('Attach an output')
       .setInputFiles({ name: 'crosstalk-fixes.pdf', mimeType: 'application/pdf', buffer: Buffer.from('%PDF-1.4 fixes') });
@@ -245,7 +251,7 @@ test.describe('handing an output over', () => {
     await expect(page.locator('[data-step="PD-10:2"]')).toContainText('Completed');
 
     await rail(page).getByRole('button', { name: 'Remove draft.txt' }).click();
-    await expect(rail(page)).toContainText('Nothing handed over yet');
+    await expect(rail(page)).toContainText('Nothing attached yet');
     await expect(page.locator('[data-step="PD-10:2"]')).not.toContainText('Completed');
     await expect(page.locator('[data-step="PD-10:2"] input[type="checkbox"]')).not.toBeChecked();
   });
@@ -272,7 +278,7 @@ test.describe('handing an output over', () => {
     await page.goto(`${other}/stage/physicalDesign/activity`);
     await openActivity(page, 'PD-10');
     await page.locator('[data-step="PD-10:2"]').click();
-    await expect(rail(page)).toContainText('Nothing handed over yet');
+    await expect(rail(page)).toContainText('Nothing attached yet');
   });
 });
 

@@ -277,7 +277,7 @@ export function StagePage({
 
       {tab === 'activity' && <StageActivityTab stageId={stage.id} />}
       {tab === 'keyinfo' && <KeyInfoTab stageId={stage.id} />}
-      {tab === 'risks' && <StageRisksTab stageId={stage.id} projectId={projectId} />}
+      {tab === 'risks' && <StageRisksTab stageId={stage.id} />}
       {tab === 'deliverables' && <DeliverablesTab stageId={stage.id} />}
       {tab === 'team' && <TeamTab stageId={stage.id} />}
       {tab === 'board' && <CommsTab stageId={stage.id} />}

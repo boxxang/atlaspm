@@ -1,10 +1,12 @@
 'use client';
 
+import { Fragment, useState } from 'react';
 import { fmtDate } from '@/lib/schedule';
 import { isStepLate, type ResolvedStep } from '@/lib/steps';
 import { useAppStore } from '@/store/useAppStore';
 import { useRailStore } from '@/store/railStore';
 import { Chevron, ctVar, CTHead, type Col } from './ctable';
+import { useProgramWork } from './useProgramWork';
 import { useStageSteps, type StageActivity as Activity } from './useStageSteps';
 
 /**
@@ -31,10 +33,23 @@ export function StageActivityTab({ stageId }: { stageId: string }) {
   const select = useRailStore((s) => s.select);
   const today = useAppStore((s) => s.today);
 
-  /* Which activity is open: the one selected, or the one the selected step
-     belongs to — picking a step must not close the block it is in. */
-  const openRef =
-    selection.kind === 'activity' ? selection.act : selection.kind === 'step' ? selection.act : null;
+  /* Expanding and selecting are two things, as the mockup has them: the chevron
+     opens the steps and leaves the rail alone, the rest of the row does both.
+     One control doing only the second means you cannot read a step list without
+     losing the panel you were reading.
+
+     Picking a step opens the activity it is in — a step cannot be shown
+     otherwise — and that is adjusted during render rather than in an effect,
+     which would paint the closed block first and then open it. */
+  const stepAct = selection.kind === 'step' ? selection.act : null;
+  const [expanded, setExpanded] = useState<string | null>(stepAct);
+  const [lastStepAct, setLastStepAct] = useState<string | null>(stepAct);
+  if (stepAct && stepAct !== lastStepAct) {
+    setLastStepAct(stepAct);
+    setExpanded(stepAct);
+  }
+  const shown = expanded;
+  const toggle = (ref: string) => setExpanded(expanded === ref ? null : ref);
 
   if (!activities.length) {
     return <div className="empty">No activities are written up for this stage.</div>;
@@ -42,19 +57,19 @@ export function StageActivityTab({ stageId }: { stageId: string }) {
 
   return (
     <div
-      className={openRef ? 'ctable focused' : 'ctable'}
+      className={shown ? 'ctable focused' : 'ctable'}
       data-acts
-      data-focused={openRef ? '' : undefined}
+      data-focused={shown ? '' : undefined}
       style={{ ['--ct' as string]: ctVar(COLS) }}
     >
       <CTHead cols={COLS} />
       {activities.map((a) => {
-        const open = a.ref === openRef;
+        const open = a.ref === shown;
         const last = a.steps[a.steps.length - 1];
         const risky = a.steps.some((s) => isStepLate(s, today));
         const done = a.state.total > 0 && a.state.done >= a.state.total;
         return (
-          <div key={a.ref} style={{ display: 'contents' }}>
+          <Fragment key={a.ref}>
             <button
               type="button"
               className={
@@ -64,10 +79,20 @@ export function StageActivityTab({ stageId }: { stageId: string }) {
                 (open ? ' open' : '')
               }
               data-act={a.ref}
-              onClick={() => select({ kind: 'activity', act: a.ref })}
+              onClick={() => {
+                select({ kind: 'activity', act: a.ref });
+                toggle(a.ref);
+              }}
               aria-expanded={open}
             >
-              <span style={{ display: 'inline-flex' }}>
+              <span
+                style={{ display: 'inline-flex' }}
+                data-exp={a.ref}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  toggle(a.ref);
+                }}
+              >
                 <Chevron open={open} />
               </span>
               <span className="ref" style={{ justifySelf: 'start' }}>
@@ -105,7 +130,7 @@ export function StageActivityTab({ stageId }: { stageId: string }) {
               </span>
             </button>
             {open && <StepBlock a={a} />}
-          </div>
+          </Fragment>
         );
       })}
     </div>
@@ -113,7 +138,7 @@ export function StageActivityTab({ stageId }: { stageId: string }) {
 }
 
 /** The run of steps as a bar of segments — done, running now, still ahead. */
-function Segments({ steps }: { steps: readonly ResolvedStep[] }) {
+export function Segments({ steps }: { steps: readonly ResolvedStep[] }) {
   const today = useAppStore((s) => s.today);
   const current = steps.findIndex((s) => !s.done && today >= s.start);
   return (
@@ -161,14 +186,25 @@ function StateChip({ a }: { a: Activity }) {
   );
 }
 
+/**
+ * The steps inside an open activity.
+ *
+ * One table, as the mockup draws it: the STEP column's own header carries the
+ * activity's ref and how many steps there are, so there is no caption row above
+ * it repeating what the row you just clicked already said. POSTS is on the end
+ * because a step nobody has written about and a step with an argument on it
+ * should not look alike.
+ */
 const STEP_COLS: Col[] = [
-  ['chk', 26, ''],
-  ['n', 26, '#'],
-  ['title', null, 'STEP'],
-  ['out', 210, 'HANDS OVER'],
-  ['status', 92, 'STATUS'],
-  ['due', 84, 'DUE'],
-  ['done', 84, 'COMPLETED'],
+  ['pad', 6, ''],
+  ['cb', 18, ''],
+  ['n', 22, '#'],
+  ['step', null, 'STEP'],
+  ['status', 106, 'STATUS'],
+  ['output', 212, 'OUTPUT'],
+  ['due', 90, 'DUE'],
+  ['done', 96, 'COMPLETED'],
+  ['posts', 44, 'POSTS'],
 ];
 
 function StepBlock({ a }: { a: Activity }) {
@@ -176,85 +212,159 @@ function StepBlock({ a }: { a: Activity }) {
   const setStepState = useAppStore((s) => s.setStepState);
   const selection = useRailStore((s) => s.selection);
   const select = useRailStore((s) => s.select);
+  const posts = useAppStore((s) => s.posts);
+  const { risks } = useProgramWork();
   const parallel = a.steps.filter((s) => s.par).length;
+  const last = a.steps.length;
+  const firstRef = a.delivers[0]?.[0] ?? null;
+
+  const cols: Col[] = STEP_COLS.map((c) =>
+    c[0] === 'step'
+      ? [
+          c[0],
+          c[1],
+          `${a.ref} — ${a.steps.length} steps${parallel ? `, ${parallel} run in parallel` : ''}`,
+        ]
+      : c,
+  );
 
   return (
     <div className="stepwrap">
-      <div className="stepbox" data-stepblock>
-        <div className="steprow" data-stepblock-cap>
-          <span className="ref">{a.ref}</span>
-          <span style={{ fontSize: 11.5, color: 'var(--ink-3)' }}>
-            {a.steps.length} steps
-            {parallel > 0 && `, ${parallel} run in parallel`}
-          </span>
-        </div>
-        <div className="ctable" style={{ ['--ct' as string]: ctVar(STEP_COLS) }}>
-          <CTHead cols={STEP_COLS} />
-          {a.steps.map((s) => {
-            const picked =
-              selection.kind === 'step' && selection.act === a.ref && selection.n === s.n;
-            const late = isStepLate(s, today);
-            return (
-              <button
-                type="button"
-                key={s.n}
-                className={picked ? 'trow stepsel' : 'trow'}
-                data-step={`${a.ref}:${s.n}`}
-                onClick={() => select({ kind: 'step', act: a.ref, n: s.n })}
+      <div className="ctable stepbox" data-stepblock style={{ ['--ct' as string]: ctVar(cols) }}>
+        <CTHead cols={cols} cls="steprow hdr" />
+        {a.steps.map((s, i) => {
+          const picked = selection.kind === 'step' && selection.act === a.ref && selection.n === s.n;
+          const late = isStepLate(s, today);
+          const risky = risks.some((r) => r.act === a.ref && r.stepN === s.n);
+          const now = !s.done && today >= s.start && today <= s.end;
+          const mine = posts.filter(
+            (p) => p.activityRef === a.ref && p.stepN === s.n && !p.parentId,
+          ).length;
+          const out = a.outputs.get(s.n) ?? [];
+          return (
+            <div
+              key={s.n}
+              className={
+                'steprow stepclick' +
+                (risky ? ' rk' : now ? ' now' : '') +
+                (i === last - 1 ? ' last' : '') +
+                (picked ? ' sel' : '')
+              }
+              data-step={`${a.ref}:${s.n}`}
+              onClick={() => select({ kind: 'step', act: a.ref, n: s.n })}
+            >
+              <span />
+              <input
+                type="checkbox"
+                className="cb"
+                checked={s.done}
+                aria-label={`Step ${s.n} done`}
+                onClick={(e) => e.stopPropagation()}
+                onChange={(e) =>
+                  setStepState(a.ref, s.n, {
+                    done: e.target.checked,
+                    doneAt: e.target.checked ? new Date() : null,
+                  })
+                }
+              />
+              <span
+                className="num"
+                style={{
+                  fontSize: 11,
+                  color: now ? 'var(--accent)' : risky ? 'var(--risk-ink)' : 'var(--ink-3)',
+                  fontWeight: now || risky ? 700 : 400,
+                }}
               >
-                <span style={{ display: 'inline-flex' }}>
-                  <input
-                    type="checkbox"
-                    className="cb"
-                    checked={s.done}
-                    aria-label={`Step ${s.n} done`}
-                    onClick={(e) => e.stopPropagation()}
-                    onChange={(e) =>
-                      setStepState(a.ref, s.n, {
-                        done: e.target.checked,
-                        doneAt: e.target.checked ? new Date() : null,
-                      })
-                    }
-                  />
-                </span>
-                <span className="num" style={{ fontSize: 12, color: 'var(--ink-3)' }}>
-                  {s.n}
-                </span>
+                {s.n}
+              </span>
+              <span
+                className="ell"
+                style={{ display: 'flex', alignItems: 'center', gap: 8, minWidth: 0 }}
+              >
                 <span
-                  className="ell"
-                  style={{ display: 'flex', alignItems: 'center', gap: 6, textAlign: 'left' }}
+                  className={s.par ? 'par ell' : 'ell'}
+                  style={s.done ? { color: 'var(--ink-2)' } : undefined}
                 >
-                  {s.par && (
-                    <span className="par" title="Runs alongside the step before it">
-                      ⇥
-                    </span>
-                  )}
                   {s.text}
                 </span>
-                <span className="ell" style={{ fontSize: 11.5, color: 'var(--ink-3)' }}>
-                  {(a.outputs.get(s.n) ?? []).join(' · ') || '—'}
-                </span>
-                <span style={{ justifySelf: 'start' }}>
-                  <StatusPill step={s} late={late} today={today} />
-                </span>
-                <span
-                  className="num"
-                  data-due
-                  style={{
-                    fontSize: 12,
-                    color: late ? 'var(--risk)' : 'var(--ink-2)',
-                    fontWeight: late ? 600 : 400,
-                  }}
-                >
-                  {fmtDate(s.due)}
-                </span>
-                <span className="num" data-completed style={{ fontSize: 12, color: 'var(--ink-3)' }}>
-                  {s.doneAt ? fmtDate(s.doneAt) : '—'}
-                </span>
-              </button>
-            );
-          })}
-        </div>
+                {risky && (
+                  <span className="pill risk" style={{ fontSize: 10.5, flexShrink: 0 }}>
+                    RISK FLAGGED
+                  </span>
+                )}
+                {s.n === last && firstRef && (
+                  <span className="pill acc" style={{ fontSize: 10.5, flexShrink: 0 }}>
+                    TICKS {firstRef}
+                  </span>
+                )}
+              </span>
+              <span
+                style={{
+                  justifySelf: 'start',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 6,
+                  minWidth: 0,
+                }}
+              >
+                <StatusPill step={s} late={late} today={today} />
+                {now && s.pct > 0 && (
+                  <span
+                    className="num"
+                    style={{ fontSize: 10.5, color: 'var(--accent)', fontWeight: 600 }}
+                  >
+                    {s.pct}%
+                  </span>
+                )}
+              </span>
+              <span
+                style={{
+                  fontSize: 12,
+                  color: 'var(--ink-2)',
+                  lineHeight: 1.35,
+                  padding: '5px 0',
+                  minWidth: 0,
+                }}
+              >
+                {out.join(' · ')}
+              </span>
+              <span
+                className="num"
+                data-due
+                style={{
+                  fontSize: 12,
+                  fontWeight: late ? 600 : 400,
+                  color: late ? 'var(--risk)' : now ? 'var(--ink)' : 'var(--ink-3)',
+                }}
+              >
+                {fmtDate(s.due)}
+                {s.dueSet && (
+                  <span title="edited from the schedule baseline" style={{ color: 'var(--accent)' }}>
+                    {' '}
+                    *
+                  </span>
+                )}
+              </span>
+              <span
+                className="num"
+                data-completed
+                style={{ fontSize: 12, color: s.doneAt ? 'var(--ink-2)' : 'var(--ink-4)' }}
+              >
+                {s.doneAt ? fmtDate(s.doneAt) : '—'}
+              </span>
+              <span
+                className="r num"
+                style={{
+                  fontSize: 11,
+                  color: mine ? (risky ? 'var(--risk-ink)' : 'var(--ink-2)') : 'var(--ink-4)',
+                  fontWeight: mine && risky ? 700 : 400,
+                }}
+              >
+                {mine || '—'}
+              </span>
+            </div>
+          );
+        })}
       </div>
     </div>
   );

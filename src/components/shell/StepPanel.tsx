@@ -1,30 +1,41 @@
 'use client';
 
+import Link from 'next/link';
 import { useRef, useState } from 'react';
 import { attachmentUrl, formatBytes } from '@/lib/attachments';
-import { fmtDate, fromISO, toISO } from '@/lib/schedule';
+import { fmtDT, fromISO, toISO } from '@/lib/schedule';
 import { isStepLate, stepKey } from '@/lib/steps';
-import { detailActivityTitles, detailDeliverables } from '@/data/activityIndex';
+import { detailActivityTitles } from '@/data/activityIndex';
+import { RISK_AUTHOR } from '@/data/riskSeeds';
 import { useAppStore } from '@/store/useAppStore';
 import { useRailStore } from '@/store/railStore';
+import { DeliverableLines } from './DeliverableLines';
+import { Avatar, IconFile, IconPlus } from './icons';
 import { PostThread } from './PostThread';
+import { useDeliverableRefs } from './useDeliverableRefs';
 import { useActivitySteps } from './useStageSteps';
+import { useProgramWork } from './useProgramWork';
 
 /**
  * One step, in the rail: how far it has got, who is on it, when it is due, when
  * it was finished, and what it hands over.
  *
+ * The order is the prototype's, and the order is the argument: the two things
+ * people came to change — the percentage and the outputs — sit above the facts
+ * of the step, and the thread sits under both.
+ *
  * Everything here writes straight through. A step's percentage, owner and dates
  * are the sort of thing a TPM corrects in passing, and a panel that needed a
  * Save button would collect more abandoned edits than it prevented.
  */
-export function StepPanel({ act, n }: { act: string; n: number }) {
+export function StepPanel({ act, n, projectId }: { act: string; n: number; projectId: string }) {
   const a = useActivitySteps(act);
   const today = useAppStore((s) => s.today);
   const setStepState = useAppStore((s) => s.setStepState);
   const contacts = useAppStore((s) => s.contacts);
   const deliverables = useAppStore((s) => s.deliverables);
   const leaders = useAppStore((s) => s.leaders);
+  const select = useRailStore((s) => s.select);
   /* Closing a step goes back to the activity it is in, not to nothing. The rail
      follows the selection, and the selection above a step is the work it
      belongs to — emptying the rail loses the reader's place. */
@@ -33,6 +44,8 @@ export function StepPanel({ act, n }: { act: string; n: number }) {
   const posts = useAppStore((s) => s.posts);
   const attachToStep = useAppStore((s) => s.attachToStep);
   const detachFromStep = useAppStore((s) => s.detachFromStep);
+  const { risks } = useProgramWork();
+  const refOf = useDeliverableRefs();
   const file = useRef<HTMLInputElement>(null);
   const [problems, setProblems] = useState<string[]>([]);
 
@@ -40,23 +53,15 @@ export function StepPanel({ act, n }: { act: string; n: number }) {
   if (!a || !step) return null;
 
   const late = isStepLate(step, today);
-  const onThisStep = posts.filter(
-    (p) => p.activityRef === act && p.stepN === n && !p.parentId,
-  );
+  const risky = risks.some((r) => r.act === act && r.stepN === n);
+  const onThisStep = posts.filter((p) => p.activityRef === act && p.stepN === n && !p.parentId);
   /* Which key deliverables this step hands over. The release step — the last
      one — is what closes an activity, so it carries the activity's own; the
-     steps before it produce outputs, not deliverables. One resolver decides it
-     (deliverableStep), so the rail and the link cannot point at different
-     steps. */
+     steps before it produce outputs, not deliverables. */
   const rows = deliverables[a.activity.stageId] ?? [];
-  const handsOver =
-    n === a.steps.length
-      ? a.delivers.map(([ref]) => ({
-          ref,
-          title: detailDeliverables[ref] ?? ref,
-          row: rows.find((d) => d.title === detailDeliverables[ref]) ?? null,
-        }))
-      : [];
+  const mine = new Set(a.delivers.map(([ref]) => ref));
+  const handsOver = n === a.steps.length ? rows.filter((d) => mine.has(refOf.get(d.id) ?? '')) : [];
+  const firstRef = a.delivers[0]?.[0] ?? null;
   /* Who can be put on a step: the stage's leader and its contacts, which is the
      same list the Team tab shows. A role is not a person and does not appear. */
   const stageId = a.activity.stageId;
@@ -68,221 +73,322 @@ export function StepPanel({ act, n }: { act: string; n: number }) {
     <>
       <div className="peek-hd">
         <span className="ref">{a.ref}</span>
-        <span className="cap">
+        <b style={{ fontSize: 12.5 }}>
           Step {n} of {a.steps.length}
-        </span>
+        </b>
+        {step.par && (
+          <span className="pill" style={{ fontSize: 10.5 }}>
+            Parallel
+          </span>
+        )}
+        {risky && (
+          <span className="pill risk" style={{ fontSize: 10.5 }}>
+            Risk
+          </span>
+        )}
         <span style={{ flexGrow: 1 }} />
         <button type="button" className="btn sm" onClick={close} aria-label="Close details">
-          ×
+          ✕
         </button>
       </div>
+
       <div className="peek-body">
-      <h3 style={{ fontSize: 15, fontWeight: 600, lineHeight: 1.4, margin: '0 0 6px' }}>
-        {step.text}
-      </h3>
-      <p style={{ marginBottom: 14 }}>
-        {step.done ? (
-          <span className="pill ok">Completed</span>
-        ) : late ? (
-          <span className="pill risk">Overdue</span>
-        ) : today >= step.start ? (
-          <span className="pill acc">In progress</span>
-        ) : (
-          <span className="pill">Not started</span>
-        )}
-      </p>
-
-      <section className="sec-block">
-        <div className="sec-cap">
-          <span>Progress</span>
-          <span className="num">{step.pct}%</span>
-        </div>
-        <input
-          type="range"
-          min={0}
-          max={100}
-          step={5}
-          value={step.pct}
-          aria-label="Progress"
-          disabled={step.done}
-          onChange={(e) => setStepState(act, n, { pct: Number(e.target.value) })}
-        />
-        <p className="mono-note">
-          {step.done
-            ? 'A completed step is 100% by definition.'
-            : 'Record how far this step has got. 100% marks it Completed, the same as attaching an output.'}
-        </p>
-      </section>
-
-      <section className="sec-block">
-        <div className="sec-cap">
-          <span>Outputs</span>
-          <span className="num">{outputs.length}</span>
-          <button
-            type="button"
-            className="btn sm"
-            onClick={() => file.current?.click()}
-          >
-            + Attach
-          </button>
-        </div>
-        <input
-          ref={file}
-          type="file"
-          multiple
-          className="visually-hidden"
-          aria-label="Attach an output"
-          onChange={async (e) => {
-            const picked = e.target.files;
-            if (!picked?.length) return;
-            setProblems(await attachToStep(act, n, picked));
-            /* so picking the same file twice in a row still fires a change */
-            e.target.value = '';
+        <h2
+          style={{
+            fontSize: 16,
+            fontWeight: 600,
+            lineHeight: 1.4,
+            marginBottom: 11,
+            letterSpacing: '-.015em',
+            textWrap: 'balance',
           }}
-        />
-        {outputs.length === 0 ? (
-          <p className="mono-note">
-            Nothing handed over yet. Attaching an output marks the step Completed.
+        >
+          {step.text}
+        </h2>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 13 }}>
+          {step.done ? (
+            <span className="pill ok" style={{ fontSize: 10.5 }}>
+              Completed
+            </span>
+          ) : late ? (
+            <span className="pill risk" style={{ fontSize: 10.5 }}>
+              Overdue
+            </span>
+          ) : today >= step.start ? (
+            <span className="pill acc" style={{ fontSize: 10.5 }}>
+              In progress
+            </span>
+          ) : (
+            <span className="pill" style={{ fontSize: 10.5 }}>
+              Not started
+            </span>
+          )}
+          {n === a.steps.length && firstRef && (
+            <span className="pill acc" style={{ fontSize: 10.5 }}>
+              TICKS {firstRef}
+            </span>
+          )}
+        </div>
+
+        {/* progress — the number, the bar, and the handle that sets it */}
+        <div style={{ borderTop: '1px solid var(--line-soft)', paddingTop: 13 }}>
+          <div style={{ display: 'flex', alignItems: 'baseline', gap: 8, marginBottom: 9 }}>
+            <span className="cap">Progress</span>
+            <span style={{ flexGrow: 1 }} />
+            <b
+              className="num"
+              style={{
+                fontSize: 18,
+                letterSpacing: '-.02em',
+                color: step.pct ? 'var(--ink)' : 'var(--ink-4)',
+              }}
+            >
+              {step.pct}%
+            </b>
+          </div>
+          <input
+            className="rng"
+            type="range"
+            min={0}
+            max={100}
+            step={5}
+            value={step.pct}
+            aria-label="Percent complete"
+            style={{ background: rangeFill(step.pct, step.done) }}
+            onChange={(e) => setStepState(act, n, { pct: Number(e.target.value) })}
+          />
+          <p className="mono-note" style={{ marginTop: 7 }}>
+            Drag to record how far this step has got. 100% marks it Completed, the same as
+            attaching an output.
           </p>
-        ) : (
-          <ul className="attlist">
-            {outputs.map((o) => (
-              <li key={o.id}>
-                <a href={attachmentUrl(o.id)} target="_blank" rel="noreferrer">
-                  {o.filename}
-                </a>
-                <span className="mono-note">{formatBytes(o.size)}</span>
+        </div>
+
+        {/* what has actually been handed over */}
+        <div style={{ borderTop: '1px solid var(--line-soft)', marginTop: 15, paddingTop: 14 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
+            <span className="cap">Outputs</span>
+            <span className="pill" style={{ fontSize: 10.5 }}>
+              {outputs.length}
+            </span>
+            <span style={{ flexGrow: 1 }} />
+            <button type="button" className="btn sm" onClick={() => file.current?.click()}>
+              <IconPlus />
+              Attach
+            </button>
+          </div>
+          <input
+            ref={file}
+            type="file"
+            multiple
+            className="visually-hidden"
+            aria-label="Attach an output"
+            onChange={async (e) => {
+              const picked = e.target.files;
+              if (!picked?.length) return;
+              setProblems(await attachToStep(act, n, picked));
+              /* so picking the same file twice in a row still fires a change */
+              e.target.value = '';
+            }}
+          />
+          {outputs.length === 0 ? (
+            <p className="mono-note">
+              Nothing attached yet. Attaching an output marks this step Completed.
+            </p>
+          ) : (
+            outputs.map((o) => (
+              <div className="att" key={o.id}>
+                <span className="ic">
+                  <IconFile />
+                </span>
+                <span style={{ flexGrow: 1, minWidth: 0 }}>
+                  <a
+                    className="ell"
+                    style={{ display: 'block', fontSize: 12.5, fontWeight: 500 }}
+                    href={attachmentUrl(o.id)}
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    {o.filename}
+                  </a>
+                  <span
+                    className="num"
+                    style={{ fontSize: 11, color: 'var(--ink-4)', display: 'block', marginTop: 2 }}
+                  >
+                    File · {formatBytes(o.size)} · {RISK_AUTHOR}
+                    {step.doneAt ? ` · ${fmtDT(step.doneAt)}` : ''}
+                  </span>
+                </span>
                 <button
                   type="button"
-                  className="btn sm"
+                  className="x"
+                  title="Remove"
                   aria-label={`Remove ${o.filename}`}
                   onClick={() => detachFromStep(act, n, o.id)}
                 >
-                  ×
+                  ✕
                 </button>
-              </li>
-            ))}
-          </ul>
-        )}
-        {problems.map((p) => (
-          <p className="mono-note late" key={p}>
-            {p}
-          </p>
-        ))}
-      </section>
+              </div>
+            ))
+          )}
+          {problems.map((p) => (
+            <p className="mono-note late" key={p}>
+              {p}
+            </p>
+          ))}
+        </div>
 
-      {handsOver.length > 0 && (
-        <section className="sec-block">
-          <div className="sec-cap">
-            <span>Hands over</span>
-            <span className="num">
-              {handsOver.filter((h) => h.row?.done).length}/{handsOver.length}
+        {/* on most steps there are none, and then this says nothing rather than
+            saying nothing at length */}
+        {handsOver.length > 0 && (
+          <DeliverableLines
+            title="Key deliverables"
+            list={handsOver}
+            stageId={stageId}
+            projectId={projectId}
+            empty=""
+          />
+        )}
+
+        {/* the facts of the step, kept below the two things people came to change */}
+        <div style={{ borderTop: '1px solid var(--line-soft)', marginTop: 15, paddingTop: 11 }}>
+          <div className="prop">
+            <span className="pk">Activity</span>
+            <button
+              type="button"
+              className="ell"
+              style={{
+                justifySelf: 'start',
+                fontSize: 12.5,
+                color: 'var(--accent)',
+                fontWeight: 550,
+                maxWidth: '100%',
+              }}
+              title={detailActivityTitles[act] ?? act}
+              onClick={() => select({ kind: 'activity', act })}
+            >
+              {detailActivityTitles[act] ?? act}
+            </button>
+          </div>
+          <div className="prop">
+            <span className="pk">Owner</span>
+            <span style={{ display: 'flex', alignItems: 'center', gap: 7, minWidth: 0 }}>
+              {step.owner && <Avatar name={step.owner} small />}
+              <select
+                className="lnkin"
+                value={step.owner}
+                aria-label="Owner"
+                onChange={(e) => setStepState(act, n, { owner: e.target.value })}
+              >
+                <option value="">Unassigned</option>
+                {people.map((p) => (
+                  <option key={p} value={p}>
+                    {p}
+                  </option>
+                ))}
+              </select>
             </span>
           </div>
-          <ul className="attlist">
-            {handsOver.map((h) => (
-              <li key={h.ref}>
-                <span className="ref">{h.ref}</span>
-                <span className="listtitle">{h.title}</span>
-                {h.row?.due && (
-                  <span
-                    className={
-                      /* A key deliverable past its date with nothing handed over
-                         is Delayed, and the date is where you see it. */
-                      !h.row.done && h.row.due < today ? 'mono-note late' : 'mono-note'
-                    }
-                  >
-                    due {fmtDate(h.row.due)}
-                    {!h.row.done && h.row.due < today ? ' · delayed' : ''}
-                  </span>
-                )}
-              </li>
-            ))}
-          </ul>
-        </section>
-      )}
-
-      <dl className="props">
-        <dt>Activity</dt>
-        <dd>{detailActivityTitles[act] ?? act}</dd>
-
-        <dt>Owner</dt>
-        <dd>
-          <select
-            value={step.owner}
-            aria-label="Owner"
-            onChange={(e) => setStepState(act, n, { owner: e.target.value })}
-          >
-            <option value="">Unassigned</option>
-            {people.map((p) => (
-              <option key={p} value={p}>
-                {p}
-              </option>
-            ))}
-          </select>
-        </dd>
-
-        <dt>Lead role</dt>
-        <dd>{a.activity.role || '—'}</dd>
-
-        <dt>Due</dt>
-        <dd>
-          <input
-            type="date"
-            className={late ? 'late' : undefined}
-            value={toISO(step.due)}
-            aria-label="Due"
-            onChange={(e) =>
-              /* Clearing the field puts the step back on the schedule's own date
-                 rather than leaving it with none. */
-              setStepState(act, n, {
-                dueOverride: e.target.value ? fromISO(e.target.value) : null,
-              })
-            }
-          />
-          {step.dueSet && <span className="pill">edited</span>}
-          {late && <span className="pill risk" style={{ fontSize: 10.5 }}>overdue</span>}
-        </dd>
-
-        <dt>Completed</dt>
-        <dd>
-          <input
-            type="date"
-            value={step.doneAt ? toISO(step.doneAt) : ''}
-            aria-label="Completed"
-            onChange={(e) => {
-              const at = e.target.value ? fromISO(e.target.value) : null;
-              /* The date and the tick are one fact: a step with a completion
-                 date is complete, and clearing it reopens the step. */
-              setStepState(act, n, { doneAt: at, done: !!at });
-            }}
-          />
-        </dd>
-
-        <dt>TAT</dt>
-        <dd>{step.tat} weeks</dd>
-
-        <dt>Planned</dt>
-        <dd>
-          {fmtDate(step.start)} → {fmtDate(step.end)}
-        </dd>
-      </dl>
-
-      <section className="sec-block">
-        <div className="sec-cap">
-          <span>Updates on this step</span>
-          <span className="num">{onThisStep.length}</span>
+          <div className="prop">
+            <span className="pk">Lead role</span>
+            <span className="ell" style={{ fontSize: 13 }}>
+              {a.activity.role || '—'}
+            </span>
+          </div>
+          {/* Both dates stay editable after the fact — the upload sets the
+              completion date, and someone can still correct it when the file
+              went up a day late. */}
+          <div className="prop">
+            <span className="pk">Due</span>
+            <span style={{ display: 'flex', alignItems: 'center', gap: 7, minWidth: 0 }}>
+              <input
+                type="date"
+                className={late ? 'dateinp late' : 'dateinp'}
+                value={toISO(step.due)}
+                aria-label="Due"
+                onChange={(e) =>
+                  /* Clearing the field puts the step back on the schedule's own
+                     date rather than leaving it with none. */
+                  setStepState(act, n, {
+                    dueOverride: e.target.value ? fromISO(e.target.value) : null,
+                  })
+                }
+              />
+              {late && (
+                <span className="pill risk" style={{ fontSize: 10 }}>
+                  overdue
+                </span>
+              )}
+              {step.dueSet && (
+                <button
+                  type="button"
+                  style={{ fontSize: 11, color: 'var(--accent)', whiteSpace: 'nowrap' }}
+                  title="back to the schedule baseline"
+                  onClick={() => setStepState(act, n, { dueOverride: null })}
+                >
+                  reset
+                </button>
+              )}
+            </span>
+          </div>
+          <div className="prop">
+            <span className="pk">Completed</span>
+            <span style={{ display: 'flex', alignItems: 'center', gap: 7, minWidth: 0 }}>
+              <input
+                type="date"
+                className="dateinp"
+                value={step.doneAt ? toISO(step.doneAt) : ''}
+                aria-label="Completed"
+                onChange={(e) => {
+                  const at = e.target.value ? fromISO(e.target.value) : null;
+                  /* The date and the tick are one fact: a step with a completion
+                     date is complete, and clearing it reopens the step. */
+                  setStepState(act, n, { doneAt: at, done: !!at });
+                }}
+              />
+              {!step.doneAt && (
+                <span style={{ fontSize: 11, color: 'var(--ink-4)' }}>
+                  set when an output is attached
+                </span>
+              )}
+            </span>
+          </div>
+          <div className="prop">
+            <span className="pk">TAT</span>
+            <span className="num" style={{ fontSize: 13 }}>
+              {step.tat} week{step.tat === 1 ? '' : 's'}
+            </span>
+          </div>
+          {a.outputs.get(n) && a.outputs.get(n)!.length > 0 && (
+            <div className="prop" style={{ alignItems: 'start' }}>
+              <span className="pk" style={{ paddingTop: 2 }}>
+                Hands over
+              </span>
+              <span style={{ fontSize: 12.5, lineHeight: 1.45, color: 'var(--ink-body)' }}>
+                {a.outputs.get(n)!.join(' · ')}
+              </span>
+            </div>
+          )}
         </div>
-        <PostThread
-          posts={onThisStep}
-          target={{ kind: 'update', activityRef: act, stepN: n }}
-          placeholder={`What happened on step ${n}?`}
-          allowRisk
-          emptyText="No updates on this step yet."
-        />
-      </section>
 
+        {/* the thread, filtered to this step */}
+        <div style={{ borderTop: '1px solid var(--line-soft)', marginTop: 15, paddingTop: 13 }}>
+          <div style={{ display: 'flex', alignItems: 'baseline', gap: 8, marginBottom: 13 }}>
+            <span className="cap">Updates on this step</span>
+            <span className="pill" style={{ fontSize: 10.5 }}>
+              {onThisStep.length}
+            </span>
+          </div>
+          <PostThread
+            posts={onThisStep}
+            target={{ kind: 'update', activityRef: act, stepN: n }}
+            placeholder={`What happened on step ${n}…`}
+            fixedStep={n}
+            allowRisk
+            emptyText="No updates on this step yet."
+          />
+        </div>
       </div>
+
       <div className="peek-foot">
         <button
           type="button"
@@ -297,7 +403,23 @@ export function StepPanel({ act, n }: { act: string; n: number }) {
         >
           {step.done ? 'Reopen step' : 'Mark complete'}
         </button>
+        {step.done && (
+          <span className="num" style={{ fontSize: 11.5, color: 'var(--ok)', fontWeight: 600 }}>
+            Completed
+          </span>
+        )}
+        <span style={{ flexGrow: 1 }} />
+        <Link className="btn sm" href={`/p/${projectId}/activity/${act}`}>
+          Read {act} →
+        </Link>
       </div>
     </>
   );
 }
+
+/**
+ * The filled part of the range track, painted rather than left grey: a slider
+ * whose left side is not coloured reads as unset, whatever number is beside it.
+ */
+const rangeFill = (pct: number, done: boolean) =>
+  `linear-gradient(90deg, ${done ? 'var(--ok)' : 'var(--accent)'} ${pct}%, var(--muted) ${pct}%)`;

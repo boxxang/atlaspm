@@ -14,9 +14,9 @@ export type Col = [key: string, width: number | null, label: string];
 export const ctVar = (cols: readonly Col[]) =>
   cols.map(([, w]) => (w == null ? 'minmax(0,1fr)' : `${w}px`)).join(' ');
 
-export function CTHead({ cols }: { cols: readonly Col[] }) {
+export function CTHead({ cols, cls = 'thead' }: { cols: readonly Col[]; cls?: string }) {
   return (
-    <div className="thead chead">
+    <div className={`${cls} chead`}>
       {cols.map(([k, , label]) => (
         <span key={k} style={{ position: 'relative' }}>
           {label}

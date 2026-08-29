@@ -47,6 +47,7 @@ export function LeftNav({ projectId }: { projectId: string }) {
   const content = useAppStore((s) => s.content);
   const contacts = useAppStore((s) => s.contacts);
   const posts = useAppStore((s) => s.posts);
+  const leaders = useAppStore((s) => s.leaders);
   const today = useAppStore((s) => s.today);
   const { overdue, risks } = useProgramWork();
   const pathname = usePathname();
@@ -65,7 +66,11 @@ export function LeftNav({ projectId }: { projectId: string }) {
         ),
       0,
     );
-  const people = Object.values(contacts).flat().length;
+  /* Counts what the Team page lists, which includes each stage's lead — a
+     badge that disagrees with the page behind it is worse than no badge. */
+  const people =
+    Object.values(contacts).flat().length +
+    Object.values(leaders).filter((l) => l?.name).length;
 
   /* Which stage is open, so its neighbours can be listed under Stages. */
   const inStage = pathname.match(/\/stage\/([^/?]+)/)?.[1] ?? null;

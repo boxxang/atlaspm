@@ -1,6 +1,6 @@
-import { RisksPage } from '@/components/shell/RisksPage';
+import { CrossBoard } from '@/components/shell/CrossBoard';
 
 export default async function Risks({ params }: PageProps<'/p/[projectId]/risks'>) {
   const { projectId } = await params;
-  return <RisksPage projectId={projectId} />;
+  return <CrossBoard kind="risks" projectId={projectId} />;
 }

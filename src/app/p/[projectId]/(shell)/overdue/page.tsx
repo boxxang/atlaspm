@@ -1,6 +1,6 @@
-import { OverduePage } from '@/components/shell/OverduePage';
+import { CrossBoard } from '@/components/shell/CrossBoard';
 
 export default async function Overdue({ params }: PageProps<'/p/[projectId]/overdue'>) {
   const { projectId } = await params;
-  return <OverduePage projectId={projectId} />;
+  return <CrossBoard kind="overdue" projectId={projectId} />;
 }

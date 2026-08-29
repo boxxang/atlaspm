@@ -2834,11 +2834,9 @@ kbd{font:inherit;font-size:10.5px;border:1px solid var(--line);border-bottom-wid
 .ptable{min-width:720px}
 .pattn{min-width:860px}
 
-/* The dashboard band wrapped into an unreadable grid at narrow widths: six
-   stats and a pace panel on one row need the room. Below that it scrolls with
-   the rest of the page rather than reflowing into a puzzle. */
-.sdash{flex-wrap:nowrap;min-width:820px}
-.sdash-pace{min-width:260px}
+/* The dashboard band is left to wrap, which is what the prototype does: below
+   about 1400px the pace panel drops onto its own row under the six stats and
+   reads better there. Forcing it onto one line only pushed it off the edge. */
 .tabs{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none}
 .tabs::-webkit-scrollbar{display:none}
 .tab{flex-shrink:0}
@@ -2848,3 +2846,47 @@ kbd{font:inherit;font-size:10.5px;border:1px solid var(--line);border-bottom-wid
 @media (max-width:1500px){ .ptl{--tl-name:12rem;--tl-tail:11rem} }
 @media (max-width:1200px){ .ptl{--tl-name:9.5rem;--tl-tail:8rem} }
 .ptl{min-width:680px}
+
+/* ---------- overview: schedule chart, feed, columns ---------- */
+.ov-cols{display:grid;grid-template-columns:1fr 372px;gap:16px;margin-top:16px;align-items:start}
+@media (max-width:1400px){ .ov-cols{grid-template-columns:1fr 320px} }
+@media (max-width:1120px){ .ov-cols{grid-template-columns:minmax(0,1fr)} }
+.card-hd{
+  display:flex;align-items:center;gap:9px;padding:13px 16px;
+  border-bottom:1px solid var(--line-soft);
+}
+/* The checkpoint chart's header and its today divider share the row grid.
+   Named ms-hdrow, not ms-guide: the prototype already uses .ms-guide for the
+   vertical accent line on the concurrency chart, and reusing the name made this
+   header position:absolute and stack on top of the rows. */
+.ms-hdrow{
+  display:grid;grid-template-columns:206px 1fr 86px 60px;gap:10px;
+  padding-bottom:6px;border-bottom:1px solid var(--line);align-items:end;
+}
+.ms-split{
+  border-bottom:none;padding-bottom:0;margin:5px 0;align-items:center;
+}
+@media (max-width:1400px){
+  .ms-hdrow,.ms-row{grid-template-columns:150px 1fr 78px 56px}
+}
+/* Named ovfeed, not feedrow: .feedrow is the prototype's hover-reveal hook for
+   row actions, and giving it display:flex turned every team row from a grid
+   into a pile. */
+.ovfeed{display:flex;gap:11px;padding:10px 16px;border-bottom:1px solid var(--line-soft)}
+.ovfeed:last-child{border-bottom:none}
+/* two lines of a post, then an ellipsis — the feed is a prompt, not the thread */
+.ell2{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+
+/* A whole row that happens to be a link still reads as a row. */
+.trow{color:inherit}
+.trow:hover{color:inherit}
+.ms-row{color:inherit}
+.ms-row:hover{color:inherit}
+
+/* The timeline's own scroller. The chart's name column is a fixed 330px, so at
+   a narrow width the lane would be squeezed to nothing rather than the chart
+   scrolling — which is the one thing a Gantt must not do. */
+.ptl-scroll{overflow-x:auto}
+.ptl-scroll .tl{min-width:980px}
+.tl-legend{display:flex;align-items:center;gap:16px;padding:11px 20px;border-top:1px solid var(--line);
+  background:var(--sunken);flex-wrap:wrap}

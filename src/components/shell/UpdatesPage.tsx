@@ -1,17 +1,19 @@
 'use client';
 
-import Link from 'next/link';
+import { detailActivityTitles } from '@/data/activityIndex';
 import { activitySteps } from '@/data/activitySteps';
 import { fmtDT } from '@/lib/schedule';
 import { useAppStore } from '@/store/useAppStore';
+import { Avatar } from './icons';
 
 /**
  * Everything said on the programme, newest first.
  *
  * Both kinds: posts on steps, notes, handovers and their replies, and the
  * updates filed against the communication board's entries. They are different
- * tables — the second is V1's — and this is the one screen that has to show
- * them together, because "what has been said lately" does not care which.
+ * tables — the second is the older board's — and this is the one screen that
+ * has to show them together, because "what has been said lately" does not care
+ * which.
  */
 export function UpdatesPage({
   projectId,
@@ -29,25 +31,32 @@ export function UpdatesPage({
 
   const fromPosts = posts.map((p) => ({
     id: p.id,
-    when: p.editedAt ?? p.createdAt,
+    at: p.editedAt ?? p.createdAt,
     who: p.author,
     text: p.text,
-    kind: p.kind,
-    ref: p.activityRef,
     stageId: p.stageId ?? stageOfAct(p.activityRef),
+    act: p.activityRef,
+    stepN: p.stepN,
+    /* What the update is about, which is the line the mockup puts under the
+       name: a feed of texts with no subject reads as a chat log. */
+    title: p.activityRef ? (detailActivityTitles[p.activityRef] ?? p.activityRef) : null,
+    risk: p.kind === 'risk',
+    edited: !!p.editedAt,
   }));
-
   const fromItems = Object.entries(content).flatMap(([id, c]) =>
     (['keyinfo', 'activities', 'risks'] as const).flatMap((k) =>
       c[k].flatMap((it) =>
         it.updates.map((u) => ({
           id: u.id,
-          when: u.date,
+          at: u.date,
           who: it.owner,
           text: u.text,
-          kind: 'update',
-          ref: null as string | null,
           stageId: id,
+          act: null as string | null,
+          stepN: null as number | null,
+          title: it.title as string | null,
+          risk: k === 'risks',
+          edited: false,
         })),
       ),
     ),
@@ -55,64 +64,61 @@ export function UpdatesPage({
 
   const rows = [...fromPosts, ...fromItems]
     .filter((r) => !stageId || r.stageId === stageId)
-    .sort((a, b) => b.when.getTime() - a.when.getTime());
+    .sort((a, b) => b.at.getTime() - a.at.getTime());
 
-  const titleOf = (id: string | null) => stages.find((s) => s.id === id)?.title ?? '—';
+  const shortOf = (id: string | null) => stages.find((s) => s.id === id)?.shortTitle;
 
-  const table =
+  const feed =
     rows.length === 0 ? (
-      <p className="mono-note">Nothing has been said here yet.</p>
+      <div className="empty">
+        <p className="mono-note">Nothing has been said here yet.</p>
+      </div>
     ) : (
-      <table className="ptable pboard" data-board>
-        <thead>
-          <tr>
-            <th className="mid num">When</th>
-            <th className="mid">Who</th>
-            <th className="pwrapcol">Said</th>
-            {!stageId && <th className="mid">Stage</th>}
-            <th className="mid">Tag</th>
-          </tr>
-        </thead>
-        <tbody>
-          {rows.map((r) => (
-            <tr key={r.id} data-update={r.id}>
-              <td className="mid num prole">{fmtDT(r.when)}</td>
-              <td className="mid prole">{r.who || <span className="muted">—</span>}</td>
-              <th scope="row" className="pwrap pwrapcol">
-                {r.kind === 'risk' && <span className="pill risk">Risk</span>}
-                {r.kind === 'handover' && <span className="pill ok">Handover</span>}
-                {r.kind === 'reply' && <span className="pill">Reply</span>}
-                {r.text}
-              </th>
-              {!stageId && (
-                <td className="mid prole">
-                  {r.stageId ? (
-                    <Link href={`/p/${projectId}/stage/${r.stageId}/updates`}>
-                      {titleOf(r.stageId)}
-                    </Link>
-                  ) : (
-                    <span className="muted">—</span>
-                  )}
-                </td>
+      rows.map((p) => (
+        <div key={p.id} className="feedrow ovfeed" data-update={p.id}>
+          <Avatar name={p.who || '—'} />
+          <div style={{ flexGrow: 1, minWidth: 0 }}>
+            <div style={{ display: 'flex', alignItems: 'baseline', gap: 7, flexWrap: 'wrap' }}>
+              <b style={{ fontSize: 13 }}>{p.who || '—'}</b>
+              {shortOf(p.stageId) && (
+                <span className="pill" style={{ fontSize: 10.5 }}>
+                  {shortOf(p.stageId)}
+                </span>
               )}
-              <td className="mid">
-                {r.ref ? <span className="ref">{r.ref}</span> : <span className="muted">—</span>}
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+              {p.act && <span className="ref">{p.act}</span>}
+              {p.stepN != null && (
+                <span className="pill acc" style={{ fontSize: 10.5 }}>
+                  STEP {p.stepN}
+                </span>
+              )}
+              <span className="num" style={{ fontSize: 11.5, color: 'var(--ink-3)' }}>
+                {fmtDT(p.at)}
+              </span>
+              {p.risk && <span className="dot" style={{ background: 'var(--risk)' }} />}
+              {p.edited && <span className="edited">edited</span>}
+            </div>
+            {p.title && (
+              <div style={{ fontSize: 13, fontWeight: 500, marginTop: 2 }}>{p.title}</div>
+            )}
+            <div
+              style={{ fontSize: 13, color: 'var(--ink-2)', marginTop: 1, lineHeight: 1.45 }}
+            >
+              {p.text}
+            </div>
+          </div>
+        </div>
+      ))
     );
 
-  if (stageId) return table;
+  if (stageId) return <>{feed}</>;
 
   return (
     <>
-      <header className="pview-head">
-        <h1 className="pview-title">Updates</h1>
-        <span className="pview-count">{rows.length}</span>
-      </header>
-      <div className="pview-body">{table}</div>
+      <div className="hd">
+        <h1>Updates</h1>
+        <span className="pill">{rows.length}</span>
+      </div>
+      {feed}
     </>
   );
 }
