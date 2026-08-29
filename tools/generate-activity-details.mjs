@@ -9,7 +9,8 @@
  *
  * Writes /data/activityDetails.ts (the write-ups, server-side),
  * /data/activityIndex.ts (the small maps a browser may hold),
- * /data/activityDetailTypes.ts, and the engineeringView lists in
+ * /data/activitySteps.ts (the steps, which the browser needs because steps
+ * carry state), /data/activityDetailTypes.ts, and the engineeringView lists in
  * /data/journey.ts. Everything else in journey.ts is left alone.
  */
 import fs from 'node:fs';
@@ -228,6 +229,85 @@ const WRITTEN = new Set(writtenActivities);
 export const hasActivityDetail = (id: string): boolean => WRITTEN.has(id);
 `);
 
+/* ---------- the steps, compactly, for the browser ---------- */
+/*
+ * Steps carry state now — done, percent, owner, due, completed, outputs — and
+ * all of that is answered in the browser, which means the browser has to know
+ * what the steps are. It may not have the write-ups: they are a megabyte of
+ * prose and only the server reads them.
+ *
+ * So this is the third module: every activity's steps and the few facts the
+ * schedule needs to date them, and nothing else. Arrays rather than objects,
+ * because 1,649 steps of {n, text, tat, lane} spends more bytes on the four
+ * key names than on the content.
+ */
+const steps = {};
+for (const [id, d] of Object.entries(details)) {
+  steps[id] = {
+    st: d.stage,
+    w: d.window,
+    /* [n, text, weeks, parallel] — parallel omitted where it is false */
+    s: d.steps.map(x => x.lane === 'par' ? [x.n, x.text, x.tat, 1] : [x.n, x.text, x.tat]),
+    /* what each step hands over, index-aligned to `ob`, which names the step */
+    o: d.produces,
+    ob: d.producedBy,
+    /* the key deliverables it stands in some relation to: [ref, produces|feeds|
+       informs|gates]. The prose explaining each stays in the write-up. */
+    r: d.rel.map(x => [x.id, x.rel]),
+    /* the first role owns the activity: what a step with no owner falls back to */
+    ro: d.roles.length ? d.roles[0].r : '',
+  };
+}
+const stepCount = Object.values(steps).reduce((t, a) => t + a.s.length, 0);
+
+fs.writeFileSync(`${ROOT}/src/data/activitySteps.ts`, `/**
+ * Every activity's steps, compactly — ${stepCount} of them across ${Object.keys(steps).length} activities.
+ *
+ * The third data module, and the one the browser holds. A step carries state
+ * now (done, percent, owner, due, completed, outputs, posts), and that is
+ * answered in the browser, so the browser has to know what the steps are. It
+ * may not have /data/activityDetails.ts: that is a megabyte of prose the server
+ * reads one write-up of at a time.
+ *
+ * Tuples rather than objects. At ${stepCount} steps the four key names of
+ * {n, text, tat, lane} cost more than the content does, so a step is
+ * [n, text, weeks] and the flag is appended only where it is true.
+ *
+ * Generated from the same authoring document. Not edited by hand.
+ */
+
+/** [number, what it is, weeks it takes, 1 if it runs alongside the step before]. */
+export type StepTuple = [number, string, number] | [number, string, number, 1];
+
+/** How an activity stands to a key deliverable: it owns it, or it contributes. */
+export type DeliverableRelation = 'produces' | 'feeds' | 'informs' | 'gates';
+
+export interface ActivityStepEntry {
+  /** The stage that runs it. */
+  st: string;
+  /** [from, to] in weeks from the stage start. */
+  w: [number, number];
+  s: StepTuple[];
+  /** What each step hands over, in step order. */
+  o: string[];
+  /** Index-aligned to \`o\`: which step yields each output. */
+  ob: number[];
+  /** The key deliverables it relates to: [reference, how]. */
+  r: [string, DeliverableRelation][];
+  /** The role that owns it — what a step with nobody on it falls back to. */
+  ro: string;
+}
+
+/** Keyed by activity reference, in template order. */
+export const activitySteps: Record<string, ActivityStepEntry> = ${j1(steps)};
+
+export const stepsOf = (id: string): ActivityStepEntry | undefined => activitySteps[id];
+
+/** The activities a stage runs, in template order. */
+export const activitiesOfStage = (stage: string): string[] =>
+  Object.keys(activitySteps).filter((id) => activitySteps[id].st === stage);
+`);
+
 /* ---------- the titles the engineering table prints ---------- */
 let jr = fs.readFileSync(`${ROOT}/src/data/journey.ts`, 'utf8');
 let n = 0, changed = 0;
@@ -243,6 +323,7 @@ if (n !== D.stages.length) throw new Error(`expected 23 engineeringView blocks, 
 fs.writeFileSync(`${ROOT}/src/data/journey.ts`, jr);
 
 console.log(`details ${Object.keys(details).length} | titles ${Object.keys(titles).length} | deliverables ${Object.keys(deliverables).length} | glossary ${Object.keys(glossary).length}`);
+console.log(`steps ${stepCount} across ${Object.keys(steps).length} activities`);
 console.log(`engineeringView blocks rewritten: ${n}, titles changed: ${changed}`);
 if (dropped.size) console.log(`fields the document carries but never renders, dropped: ${[...dropped].join(', ')}`);
 if (realigned.length) {

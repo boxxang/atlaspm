@@ -5,6 +5,7 @@ import { useEffect } from 'react';
 import { fmtDate } from '@/lib/schedule';
 import { phaseById } from '@/data/scheduleProfiles';
 import { STAGE_TABS, tabLabel, type StageTab } from '@/lib/stageTabs';
+import { StageActivityTab } from './StageActivity';
 import { useAppStore } from '@/store/useAppStore';
 import { useRailStore } from '@/store/railStore';
 
@@ -114,16 +115,30 @@ export function StagePage({
           ))}
         </nav>
 
-        <p className="pview-todo">
-          <span className="pview-phase">V2-4</span>
-          The <b>{tabLabel(tab)}</b> tab: the activity table with
-          its steps, and the step panel in the rail — progress, owner, due and completed dates,
-          outputs, and the posts on that step.
-        </p>
+        {tab === 'activity' ? (
+          <StageActivityTab stageId={stage.id} />
+        ) : (
+          <p className="pview-todo">
+            <span className="pview-phase">{TAB_PHASE[tab]}</span>
+            The <b>{tabLabel(tab)}</b> tab.
+          </p>
+        )}
       </div>
     </>
   );
 }
+
+/* Which phase brings each of the other six, so a tab that is not filled in yet
+   says what it is waiting for rather than showing an empty page. */
+const TAB_PHASE: Record<StageTab, string> = {
+  activity: 'V2-4',
+  board: 'V2-6',
+  keyinfo: 'V2-6',
+  risks: 'V2-5',
+  deliverables: 'V2-6',
+  updates: 'V2-6',
+  team: 'V2-6',
+};
 
 function Fact({ label, value }: { label: string; value: string }) {
   return (

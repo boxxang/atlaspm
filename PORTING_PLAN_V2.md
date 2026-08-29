@@ -148,14 +148,44 @@ Other decisions:
 - **Accept:** ✅ 14 shell checks in `tests/e2e/shell.spec.ts`; the V1 suite still
   green (286 e2e total).
 
-## Phase V2-4 — The stage page
+## Phase V2-4 — The stage page — **done** (steps; posts pending)
 
-Dashboard band, seven tabs, the step table with its indented open block, the step
-panel in the rail (progress, owner, due/completed, outputs, updates).
+The activity table, the indented step block inside the open activity, and the
+step panel in the rail: progress, owner, due and completed dates, and outputs.
 
-- **Accept (Playwright):** opening a step selects it and only it; attaching an output
-  completes the step and stamps the upload date; the completion date is editable
-  afterwards; the deliverables a step hands over appear in its rail.
+**The browser needed the steps.** They were content — a megabyte of prose in
+`/data/activityDetails.ts`, server-only — and nothing about them was answerable
+in a browser. Now they carry state, so the generator emits a third module,
+`/data/activitySteps.ts`: 1,649 steps across 257 activities, 250 KB, tuples
+rather than objects because at that count the key names cost more than the
+content. `fromStepIndex` in `/lib/steps.ts` is where the wire shape ends.
+
+**An attachment gained a `projectId`.** The other three targets carry the
+programme implicitly — through the item, post or deliverable they hang off. An
+output attached to a step has no such row: "PD-10 step 2" names a step of every
+programme on the profile at once. Without the column, one programme's evidence
+showed on another's step. There is an e2e check for exactly that.
+
+Other decisions:
+
+- **`StepState.id` is minted by the database**, unlike every other id in the
+  schema. A step is addressed by (projectId, activityRef, stepN), which the
+  client already knows, so there is no optimistic row to keep an id in step with.
+- **The panel writes straight through**, with no Save button. A percentage, an
+  owner and a date are what a TPM corrects in passing.
+- **Attaching an output completes the step** and stamps the day it arrived;
+  removing the last one reopens it. The date stays editable, because work
+  finished last week and filed today should say last week.
+- **A step's key deliverables show on the release step only** — the last one.
+  The steps before it produce outputs, not deliverables.
+
+- **Accept:** ✅ 19 checks in `tests/e2e/steps.spec.ts`, covering all four
+  criteria.
+
+Still to come on this page, with the phases that own them: the dashboard band
+(V2-7's figures), and the other six tabs (V2-5 risks, V2-6 the rest). The posts
+on a step — the update thread and the risk flag — land in V2-5, which is where
+the risk redefinition is.
 
 ## Phase V2-5 — Risks, Overdue, Activities
 

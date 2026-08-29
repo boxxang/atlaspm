@@ -2409,3 +2409,146 @@ a.ad-ref:hover,a.ad-ref:focus-visible{border-color:var(--accent);background:var(
   .pshell{grid-template-columns:var(--pnav-w) minmax(0,1fr)}
   .prail{display:none}
 }
+
+/* ---------- the activity table, and the steps inside the open one ---------- */
+.pref{
+  font-size:11px;font-weight:600;padding:1.5px 6px;border-radius:var(--r-sm);
+  background:var(--accent-soft);color:var(--accent);
+  font-variant-numeric:tabular-nums;white-space:nowrap;
+}
+.pref.soft{background:var(--muted);color:var(--ink-2);margin-right:4px}
+.prole{color:var(--ink-3);font-size:12px}
+
+/* An open activity is the thing you are reading; the rest of the stage stays
+   visible around it but stops competing for attention. */
+.pacts.dimmed tbody tr.pact:not(.open){opacity:.42}
+.pacts.dimmed tbody tr.pact:not(.open):hover{opacity:1}
+.pact-open{
+  display:inline-flex;align-items:center;gap:6px;
+  border:none;background:none;padding:0;cursor:pointer;font:inherit;
+}
+.pact-caret{width:9px;color:var(--ink-4);font-size:11px}
+.pact.open .pact-caret{color:var(--accent)}
+.pact.open th[scope="row"]{color:var(--ink);font-weight:600}
+.pact.open{background:var(--accent-wash)}
+
+.ppips{display:inline-flex;gap:2px;margin-right:8px;vertical-align:-1px}
+.ppip{width:6px;height:9px;border-radius:1.5px;background:var(--st-future,#eceef0)}
+.ppip.done{background:var(--st-done,#d8dade)}
+.ppip.run{background:var(--st-run,#a8adb6)}
+.ppip.late{background:var(--risk)}
+.pdone{font-size:11.5px;color:var(--ink-3);font-variant-numeric:tabular-nums}
+.pdone.all{color:var(--ok);font-weight:600}
+
+/* The indent is the point: an open activity's steps sit inside it, not beside
+   it, so the eye knows which row it is reading about. */
+.pstepblock-row td{padding:0;background:var(--accent-wash);border-bottom:1px solid var(--line)}
+.pstepblock{
+  margin:0 0 6px 46px;padding:10px 14px 4px;overflow-x:auto;
+  border-left:2px solid var(--accent-line);
+  background:var(--bg);border-radius:0 var(--r-lg) var(--r-lg) 0;
+  box-shadow:var(--sh);
+}
+.pstepblock-cap{
+  display:flex;align-items:center;gap:9px;margin-bottom:6px;
+  font-size:11.5px;color:var(--ink-3);
+}
+.psteps{font-size:12.5px}
+.psteps thead th{background:var(--bg)}
+.pcheck-col{width:28px}
+.pstep{cursor:pointer}
+.pstep.picked{background:var(--accent-soft)}
+.pstep.picked th[scope="row"]{color:var(--accent);font-weight:600}
+.pstep-t.par{padding-left:22px;position:relative}
+.ppar{position:absolute;left:8px;color:var(--ink-4);font-size:11px}
+.ptable td.late,.ptable th.late{color:var(--risk);font-weight:600}
+
+.ppill{
+  display:inline-block;padding:1.5px 7px;border-radius:var(--r-sm);
+  font-size:10.5px;font-weight:600;white-space:nowrap;
+  background:var(--muted);color:var(--ink-3);
+}
+.ppill.ok{background:var(--ok-soft);color:var(--ok)}
+.ppill.run{background:var(--accent-soft);color:var(--accent)}
+.ppill.risk{background:var(--risk-soft);color:var(--risk)}
+.ppill.warn{background:var(--warn-soft);color:var(--warn-ink)}
+
+.visually-hidden{
+  position:absolute;width:1px;height:1px;margin:-1px;padding:0;
+  overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0;
+}
+
+/* ---------- the rail's panels ---------- */
+.prail-title{margin:0 0 6px;font-size:14px;font-weight:600;line-height:1.4}
+.prail-sub{margin:0 0 14px}
+.prail-sec{margin:0 0 16px}
+.prail-seccap{
+  display:flex;align-items:baseline;gap:8px;margin-bottom:6px;
+  font-size:10.5px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;
+  color:var(--ink-4);
+}
+.prail-seccap .num{margin-left:auto;color:var(--ink-3);letter-spacing:0}
+.prail-sec input[type="range"]{width:100%;accent-color:var(--accent)}
+.prail-hint{margin:5px 0 0;font-size:11.5px;line-height:1.5;color:var(--ink-3)}
+.prail-facts dd select,.prail-facts dd input[type="date"]{
+  font:inherit;font-size:12px;color:var(--ink);
+  border:1px solid var(--line);border-radius:var(--r-sm);
+  padding:2px 5px;background:var(--bg);max-width:100%;
+}
+.prail-facts dd input[type="date"].late{color:var(--risk);border-color:var(--risk-line)}
+.prail-facts dd{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.prail-flag{
+  font-size:10px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;
+  color:var(--ink-4);
+}
+.prail-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:10px}
+.prail-list li{display:flex;flex-direction:column;gap:2px}
+.prail-listtitle{font-size:12.5px;line-height:1.45;color:var(--ink-body)}
+.prail-foot{
+  position:sticky;bottom:0;margin-top:18px;padding:10px 0 4px;
+  background:var(--sunken);border-top:1px solid var(--line);
+}
+.pbtn{
+  height:28px;padding:0 12px;border:1px solid var(--line);border-radius:var(--r);
+  background:var(--bg);color:var(--ink-2);font:inherit;font-size:12.5px;cursor:pointer;
+}
+.pbtn:hover{border-color:var(--line-strong);color:var(--ink)}
+.pbtn.primary{
+  width:100%;border-color:var(--accent);background:var(--accent);color:#fff;font-weight:500;
+}
+.pbtn.primary:hover{background:var(--accent-hov);border-color:var(--accent-hov);color:#fff}
+
+/* Column widths, so the activity title gets the slack rather than the outputs.
+   Without these the DELIVERS column takes the width and the ACTIVITY column
+   wraps to four lines, which is the wrong way round.
+
+   Child combinators throughout: the step table is nested inside a row of the
+   activity table, so a plain descendant selector sets both tables' columns from
+   whichever rule matched last. */
+.pacts{table-layout:fixed;width:100%}
+.pacts > thead > tr > th:nth-child(1),.pacts > tbody > tr > td:nth-child(1){width:5.4rem}
+.pacts > thead > tr > th:nth-child(3),.pacts > tbody > tr > td:nth-child(3){width:9.5rem}
+.pacts > thead > tr > th:nth-child(4),.pacts > tbody > tr > td:nth-child(4){width:12rem;line-height:2}
+.pacts > thead > tr > th:nth-child(5),.pacts > tbody > tr > td:nth-child(5){width:6.2rem}
+.pacts > thead > tr > th:nth-child(6),.pacts > tbody > tr > td:nth-child(6){width:11rem}
+.pmuted{color:var(--ink-4)}
+.pout{color:var(--ink-3);font-size:11.5px;line-height:1.45}
+.psteps{table-layout:fixed;width:100%}
+.psteps > thead > tr > th:nth-child(1),.psteps > tbody > tr > td:nth-child(1){width:2rem}
+.psteps > thead > tr > th:nth-child(2),.psteps > tbody > tr > td:nth-child(2){width:2.2rem}
+.psteps > thead > tr > th:nth-child(4),.psteps > tbody > tr > td:nth-child(4){width:17rem}
+.psteps > thead > tr > th:nth-child(5),.psteps > tbody > tr > td:nth-child(5){width:6.5rem}
+.psteps > thead > tr > th:nth-child(6),.psteps > tbody > tr > td:nth-child(6){width:6rem}
+.psteps > thead > tr > th:nth-child(7),.psteps > tbody > tr > td:nth-child(7){width:6rem}
+
+.pact{cursor:pointer}
+
+.prail-hint.late{color:var(--risk);font-weight:600}
+
+.pbtn.tiny{height:22px;padding:0 8px;font-size:11.5px;margin-left:auto}
+.prail-atts{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:5px}
+.prail-atts li{display:flex;align-items:center;gap:7px;font-size:12px;min-width:0}
+.prail-atts a{color:var(--accent);text-decoration:none;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.prail-atts a:hover{text-decoration:underline}
+.prail-atts .prail-hint{margin:0;white-space:nowrap}
+.prail-atts .prail-x{margin-left:auto;flex:none}

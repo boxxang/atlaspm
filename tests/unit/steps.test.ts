@@ -1,9 +1,11 @@
 import { describe, expect, it } from 'vitest';
 import type { DetailStep } from '@/data/activityDetailTypes';
+import { activitySteps } from '@/data/activitySteps';
 import {
   activityState,
   allOverdue,
   doneStepKeys,
+  fromStepIndex,
   isStepLate,
   plannedSteps,
   resolveSteps,
@@ -239,5 +241,54 @@ describe('doneStepKeys', () => {
       }),
     );
     expect([...keys]).toEqual(['DEF-01:2']);
+  });
+});
+
+describe('fromStepIndex', () => {
+  it('reads the generated tuples back into named fields', () => {
+    const a = fromStepIndex('PD-10', {
+      st: 'physicalDesign',
+      w: [0, 6],
+      s: [
+        [1, 'Set up SI and run the crosstalk analysis', 2],
+        [2, 'Fix crosstalk', 2.5, 1],
+      ],
+      ro: 'SI/PI engineer',
+    });
+    expect(a.ref).toBe('PD-10');
+    expect(a.stageId).toBe('physicalDesign');
+    expect(a.role).toBe('SI/PI engineer');
+    expect(a.steps[0]).toEqual({ n: 1, text: 'Set up SI and run the crosstalk analysis', tat: 2, lane: 'main' });
+    expect(a.steps[1].lane).toBe('par');
+  });
+
+  it('reads the real index, and every activity in it dates its steps', () => {
+    const refs = Object.keys(activitySteps);
+    expect(refs.length).toBe(257);
+    const total = refs.reduce(
+      (n, ref) => n + plannedSteps(STAGE_START, fromStepIndex(ref, activitySteps[ref])).length,
+      0,
+    );
+    expect(total).toBe(1649);
+  });
+
+  it('never lets a step end before it starts', () => {
+    for (const ref of Object.keys(activitySteps)) {
+      for (const s of plannedSteps(STAGE_START, fromStepIndex(ref, activitySteps[ref]))) {
+        expect(s.end.getTime()).toBeGreaterThanOrEqual(s.start.getTime());
+      }
+    }
+  });
+
+  /* Two steps of the authoring document carry no duration, which the generator
+     warns about. They land as zero-width rather than as nothing, so they still
+     have a date to be late against. */
+  it('gives a step with no stated duration a date anyway', () => {
+    const zero = Object.keys(activitySteps).flatMap((ref) =>
+      plannedSteps(STAGE_START, fromStepIndex(ref, activitySteps[ref]))
+        .filter((s) => s.tat === 0)
+        .map((s) => `${ref}:${s.n}`),
+    );
+    expect(zero).toEqual(['TECH-07:6', 'TECH-08:6']);
   });
 });

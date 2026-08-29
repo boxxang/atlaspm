@@ -1,12 +1,17 @@
 // AtlasPM — domain model per CLAUDE.md.
 //
-// Provider is sqlite for local dev; the models stay Postgres-compatible so
-// production can switch the datasource without touching a model:
-//  - no SQLite-only types, no native type attributes
-//  - `kind` and `profileId` are String rather than enum (SQLite has no enums,
-//    and a String column migrates to Postgres unchanged)
-//  - ids are supplied by the caller (client-generated at mutation time, seed
-//    values at seed time) so optimistic UI and the database agree on them
+// Postgres everywhere — development, the e2e suite and the deployed app. There
+// was a period when local dev ran on SQLite and the models were kept portable
+// between the two; that is over, and Prisma fixes the provider at generate time
+// anyway, so there is no second engine to keep in step.
+//
+// `kind` columns are String rather than enum. They discriminate rows the app
+// reads by hand (a Post is an update, risk, note, handover or reply), and the
+// set changes as the app does; a String costs nothing and a migration.
+//
+// Ids are supplied by the caller — client-generated at mutation time, seed
+// values at seed time — so an optimistic row and the stored row share an
+// identity. StepState is the exception, and says why on the field.
 
 // Prisma 7 keeps the connection URL out of the schema: Migrate reads it from
 // prisma.config.ts, and PrismaClient gets a driver adapter (see src/lib/db.ts).
@@ -86,6 +91,7 @@ model Project {
   stageDetails StageDetail[]
   posts        Post[]
   stepStates   StepState[]
+  attachments  Attachment[]
 }
 
 /// The ONLY schedule mutation surface — baseline profiles are immutable code.
@@ -186,7 +192,10 @@ model Post {
 /// here is the programme's answer for one of them, and absent means "untouched",
 /// which is why every column is optional or defaulted.
 model StepState {
-  id          String @id
+  /// Minted here, unlike everywhere else in this schema, because a step is not
+  /// addressed by it: the identity is (projectId, activityRef, stepN), which
+  /// the client already knows. There is no optimistic row to keep in step with.
+  id          String @id @default(cuid())
   projectId   String
   activityRef String
   stepN       Int
@@ -218,6 +227,16 @@ model StepState {
 /// storage later means replacing `data` with a URL and nothing else.
 model Attachment {
   id     String  @id
+  /// Which programme it belongs to.
+  ///
+  /// The other three targets carry this implicitly — an attachment on an item,
+  /// a post or a deliverable reaches its programme through that row. An output
+  /// attached to a step has no such row: steps are content, addressed by
+  /// reference, and "PD-10 step 2" names a step of every programme at once. So
+  /// the programme is stated here, and it is stated on all four rather than only
+  /// where it is load-bearing — a column that is sometimes the answer and
+  /// sometimes null is a column nobody trusts.
+  projectId String
   itemId String?
   postId String?
   /// A deliverable's artefact — what makes it a delivered deliverable.
@@ -232,6 +251,7 @@ model Attachment {
   data           Bytes
   createdAt      DateTime
 
+  project     Project      @relation(fields: [projectId], references: [id], onDelete: Cascade)
   item        Item?        @relation(fields: [itemId], references: [id], onDelete: Cascade)
   post        Post?        @relation(fields: [postId], references: [id], onDelete: Cascade)
   deliverable Deliverable? @relation(fields: [deliverableId], references: [id], onDelete: Cascade)
@@ -239,6 +259,7 @@ model Attachment {
   @@index([itemId])
   @@index([postId])
   @@index([deliverableId])
+  @@index([projectId, activityRef, stepN])
 }
 
 model Deliverable {

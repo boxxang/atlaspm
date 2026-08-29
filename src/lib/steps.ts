@@ -210,3 +210,35 @@ export function allOverdue(
 /** The keys of every step handed over — what risk liveness is judged against. */
 export const doneStepKeys = (steps: readonly ResolvedStep[]): Set<string> =>
   new Set(steps.filter((s) => s.done).map((s) => stepKey(s.act, s.n)));
+
+/**
+ * The generated index in /data/activitySteps.ts, in the shape these functions
+ * read.
+ *
+ * That module stores a step as a tuple — [n, text, weeks] with the parallel
+ * flag appended only where it is true — because at 1,649 steps the key names
+ * cost more than the content. This is where that ends: everything above works
+ * on named fields, and nothing else in the app needs to know the wire shape.
+ */
+export function fromStepIndex(
+  ref: string,
+  entry: {
+    st: string;
+    w: readonly [number, number];
+    s: readonly (readonly [number, string, number] | readonly [number, string, number, 1])[];
+    ro: string;
+  },
+): ActivitySteps {
+  return {
+    ref,
+    stageId: entry.st,
+    window: entry.w,
+    steps: entry.s.map(([n, text, tat, par]) => ({
+      n,
+      text,
+      tat,
+      lane: par ? ('par' as const) : ('main' as const),
+    })),
+    role: entry.ro,
+  };
+}

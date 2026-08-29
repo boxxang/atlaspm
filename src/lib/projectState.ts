@@ -1,4 +1,5 @@
 import type {
+  AttachmentRef,
   Contact,
   Deliverable,
   ItemKind,
@@ -9,6 +10,9 @@ import type {
 } from '@/data/types';
 import type { StageOverrides } from '@/lib/schedule';
 import type { StageDetailOverride } from '@/lib/stageDetail';
+import { stepKey, type StepStateRecord } from '@/lib/steps';
+
+export type { StepStateRecord };
 
 /** Everything the client store needs to boot, as one serialisable payload. */
 export interface ProjectState {
@@ -27,6 +31,17 @@ export interface ProjectState {
   contacts: Record<StageId, Contact[]>;
   /** Per-program edits to the shared stage text, by stage. */
   stageDetails: Partial<Record<StageId, StageDetailOverride>>;
+  /**
+   * What has happened to each step, keyed the way steps are addressed —
+   * `activityRef:stepN`. Only steps somebody has touched are in here; the rest
+   * fall back to the plan in /data/activitySteps.ts.
+   */
+  stepStates: Record<string, StepStateRecord>;
+  /**
+   * The outputs handed over on each step, keyed the same way. Attaching one is
+   * what completes a step, so these are evidence rather than decoration.
+   */
+  stepOutputs: Record<string, AttachmentRef[]>;
 }
 
 /**
@@ -124,6 +139,19 @@ interface OverrideRow {
 interface StageDetailRow extends StageDetailOverride {
   stageId: string;
 }
+interface StepAttachmentRow extends AttachmentRow {
+  activityRef: string | null;
+  stepN: number | null;
+}
+interface StepStateRow {
+  activityRef: string;
+  stepN: number;
+  done: boolean;
+  doneAt: Date | null;
+  pct: number;
+  owner: string;
+  dueOverride: Date | null;
+}
 
 interface ProfileStageRow {
   key: string;
@@ -157,6 +185,8 @@ export function buildProjectState(project: {
   leaders: LeaderRow[];
   contacts: ContactRow[];
   stageDetails: StageDetailRow[];
+  stepStates: StepStateRow[];
+  attachments: StepAttachmentRow[];
 }): ProjectState {
   const profile: ScheduleProfile = {
     id: project.profile.id,
@@ -245,6 +275,31 @@ export function buildProjectState(project: {
     };
   }
 
+  /* Keyed by activity ref and step number, not by row id: steps are content,
+     and the address has to be the one the write-ups use. */
+  const stepStates: Record<string, StepStateRecord> = {};
+  for (const st of project.stepStates) {
+    stepStates[stepKey(st.activityRef, st.stepN)] = {
+      done: st.done,
+      doneAt: st.doneAt,
+      pct: st.pct,
+      owner: st.owner,
+      dueOverride: st.dueOverride,
+    };
+  }
+
+  const stepOutputs: Record<string, AttachmentRef[]> = {};
+  for (const at of project.attachments) {
+    if (!at.activityRef || at.stepN == null) continue;
+    const key = stepKey(at.activityRef, at.stepN);
+    (stepOutputs[key] ??= []).push({
+      id: at.id,
+      filename: at.filename,
+      mimeType: at.mimeType,
+      size: at.size,
+    });
+  }
+
   const stageDetails: Partial<Record<StageId, StageDetailOverride>> = {};
   for (const d of project.stageDetails) {
     if (!isStage(d.stageId)) continue;
@@ -272,5 +327,7 @@ export function buildProjectState(project: {
     leaders,
     contacts,
     stageDetails,
+    stepStates,
+    stepOutputs,
   };
 }

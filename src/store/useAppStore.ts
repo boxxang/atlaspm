@@ -8,6 +8,7 @@ import { resolveStages } from '@/lib/stages';
 import { rejectFile, rejectionMessage } from '@/lib/attachments';
 import { serialiseEffort, serialiseTat } from '@/lib/effort';
 import { isEmptyOverride, type StageDetailOverride } from '@/lib/stageDetail';
+import { stepKey, type StepStateRecord } from '@/lib/steps';
 import type {
   AttachmentRef,
   Contact,
@@ -66,6 +67,13 @@ export interface AppState {
   contacts: Record<StageId, Contact[]>;
   stageDetails: Partial<Record<StageId, StageDetailOverride>>;
   inline: Partial<Record<StageId, InlineState | null>>;
+  /**
+   * What has happened to each step, keyed `activityRef:stepN`. Absent means
+   * untouched — the plan in /data/activitySteps.ts answers for it.
+   */
+  stepStates: Record<string, StepStateRecord>;
+  /** The outputs handed over on each step, keyed `activityRef:stepN`. */
+  stepOutputs: Record<string, AttachmentRef[]>;
 
   hydrate: (initial: ProjectState, now?: Date) => void;
   setProjectName: (name: string) => void;
@@ -73,6 +81,22 @@ export interface AppState {
   setProfile: (id: string) => void;
   /** Picking the selected stage again clears it. */
   selectStage: (i: number | null) => void;
+  /**
+   * Edit one step. A partial patch, because the panel changes one field at a
+   * time and a step nobody has assigned should not lose its owner because its
+   * percentage moved.
+   */
+  setStepState: (act: string, n: number, patch: Partial<StepStateRecord>) => void;
+  /**
+   * Hand an output over on a step. Attaching one completes the step and stamps
+   * the day it was handed over, because that is what completing a step means —
+   * the artefact is here, not that somebody said so.
+   *
+   * Resolves with what the server refused, if anything.
+   */
+  attachToStep: (act: string, n: number, files: FileList | File[]) => Promise<string[]>;
+  /** Take one back. The last one out reopens the step. */
+  detachFromStep: (act: string, n: number, attachmentId: string) => void;
   editStageDate: (stageId: StageId, which: 'start' | 'end', date: Date) => void;
   /** Commit the staged dates. */
   applyScheduleDraft: () => void;
@@ -168,6 +192,15 @@ export const uid = () =>
  */
 const inFlight = new Set<Promise<unknown>>();
 
+/** What a step nobody has touched reads as, before a patch lands on it. */
+const UNTOUCHED_STEP: StepStateRecord = {
+  done: false,
+  doneAt: null,
+  pct: 0,
+  owner: '',
+  dueOverride: null,
+};
+
 const sync = (p: Promise<unknown>) => {
   inFlight.add(p);
   void p
@@ -225,6 +258,8 @@ export const useAppStore = create<AppState>()((set, get) => ({
   contacts: emptyMap<Contact[]>(() => []),
   stageDetails: {},
   inline: {},
+  stepStates: {},
+  stepOutputs: {},
 
   /* Server-rendered DB state in, client clock applied here: "today" belongs to
      the viewer's timezone, so it cannot come from the server render.
@@ -278,6 +313,8 @@ export const useAppStore = create<AppState>()((set, get) => ({
       leaders: initial.leaders,
       contacts: initial.contacts,
       stageDetails: initial.stageDetails,
+      stepStates: initial.stepStates,
+      stepOutputs: initial.stepOutputs,
       /* view state belongs to the program you were looking at, not the next one */
       currentStage: openStage,
       inline:
@@ -382,6 +419,72 @@ export const useAppStore = create<AppState>()((set, get) => ({
     set((s) => ({ inline: { ...s.inline, [stageId]: null } })),
 
   closeAllInline: () => set({ inline: {} }),
+
+  setStepState: (act, n, patch) => {
+    const key = stepKey(act, n);
+    set((s) => {
+      const prev = s.stepStates[key] ?? UNTOUCHED_STEP;
+      return { stepStates: { ...s.stepStates, [key]: { ...prev, ...patch } } };
+    });
+    sync(
+      api.saveStepState({
+        projectId: get().projectId,
+        activityRef: act,
+        stepN: n,
+        ...patch,
+      }),
+    );
+  },
+
+  attachToStep: async (act, n, files) => {
+    const key = stepKey(act, n);
+    const held = get().stepOutputs[key] ?? [];
+    const accepted: File[] = [];
+    const problems: string[] = [];
+    for (const file of files) {
+      const reason = rejectFile(file, held.length + accepted.length);
+      if (reason) problems.push(rejectionMessage(reason, file.name));
+      else accepted.push(file);
+    }
+    if (!accepted.length) return problems;
+
+    const form = new FormData();
+    form.set('projectId', get().projectId);
+    form.set('activityRef', act);
+    form.set('stepN', String(n));
+    for (const file of accepted) {
+      form.append('files', file);
+      form.append('ids', uid());
+    }
+    try {
+      const saved = await api.uploadAttachments(form);
+      set((s) => ({
+        stepOutputs: { ...s.stepOutputs, [key]: [...(s.stepOutputs[key] ?? []), ...saved] },
+      }));
+      /* The artefact arriving is the completion. The date is the day it was
+         handed over, which is today — and it stays editable afterwards, because
+         work finished last week and filed today should say last week. */
+      if (!get().stepStates[key]?.done) {
+        get().setStepState(act, n, { done: true, doneAt: new Date(), pct: 100 });
+      }
+    } catch (e) {
+      console.error('[atlaspm] step output upload failed', e);
+      problems.push('Upload failed — the files were not attached.');
+    }
+    return problems;
+  },
+
+  detachFromStep: (act, n, attachmentId) => {
+    const key = stepKey(act, n);
+    const left = (get().stepOutputs[key] ?? []).filter((a) => a.id !== attachmentId);
+    set((s) => ({ stepOutputs: { ...s.stepOutputs, [key]: left } }));
+    sync(api.deleteAttachment(get().projectId, attachmentId));
+    /* Nothing handed over is not a completed step. Taking the last output back
+       reopens it, the same way attaching the first one closed it. */
+    if (!left.length && get().stepStates[key]?.done) {
+      get().setStepState(act, n, { done: false, doneAt: null, pct: 0 });
+    }
+  },
 
   toggleDeliverable: (stageId, id, done) => {
     const completedAt = done ? new Date() : null;

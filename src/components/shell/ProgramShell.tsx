@@ -48,7 +48,7 @@ export function ProgramShell({
     <div className="pshell">
       <LeftNav projectId={initial.projectId} />
       <main className="pview">{children}</main>
-      <Rail />
+      <Rail projectId={initial.projectId} />
     </div>
   );
 }

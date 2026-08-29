@@ -35,6 +35,14 @@ export async function getProjectState(projectId: string): Promise<ProjectState |
       },
       contacts: { orderBy: { position: 'asc' } },
       stageDetails: true,
+      stepStates: true,
+      /* outputs handed over on a step; the other three kinds arrive nested
+         under the row they belong to */
+      attachments: {
+        where: { activityRef: { not: null } },
+        select: { ...ATTACHMENT_META, activityRef: true, stepN: true },
+        orderBy: { createdAt: 'asc' },
+      },
     },
   });
   return project ? buildProjectState(project) : null;

@@ -193,6 +193,52 @@ export async function setDeliverableDue(projectId: string, id: string, due: Date
   touch(projectId);
 }
 
+/* ---------- steps ---------- */
+
+/**
+ * What has happened to one step.
+ *
+ * Addressed by activity reference and step number rather than by a row id,
+ * because steps are content: they live in the generated write-ups and have no
+ * rows of their own. The upsert is on that pair, so the first time anyone
+ * touches a step is a create and every time after is an update, and nothing has
+ * to ask which.
+ *
+ * A partial patch: the panel edits one field at a time, and a step nobody has
+ * set an owner on should not have its owner cleared because its percentage
+ * moved.
+ */
+export async function saveStepState(input: {
+  projectId: string;
+  activityRef: string;
+  stepN: number;
+  done?: boolean;
+  doneAt?: Date | null;
+  pct?: number;
+  owner?: string;
+  dueOverride?: Date | null;
+}) {
+  const { projectId, activityRef, stepN, ...patch } = input;
+  await assertProject(projectId);
+  await prisma.stepState.upsert({
+    where: { projectId_activityRef_stepN: { projectId, activityRef, stepN } },
+    update: patch,
+    /* the defaults of an untouched step, so a first write of one field does not
+       invent values for the rest */
+    create: {
+      projectId,
+      activityRef,
+      stepN,
+      done: patch.done ?? false,
+      doneAt: patch.doneAt ?? null,
+      pct: patch.pct ?? 0,
+      owner: patch.owner ?? '',
+      dueOverride: patch.dueOverride ?? null,
+    },
+  });
+  touch(projectId);
+}
+
 export async function addDeliverable(input: {
   projectId: string;
   id: string;
@@ -585,8 +631,13 @@ export async function uploadAttachments(form: FormData): Promise<AttachmentMeta[
   /* the form still says statusUpdateId; the column it lands in is postId */
   const postId = String(form.get('statusUpdateId') ?? '') || null;
   const deliverableId = String(form.get('deliverableId') ?? '') || null;
-  if (!itemId && !postId && !deliverableId)
-    throw new Error('An attachment needs an item, a post or a deliverable.');
+  /* An output handed over on a step. Steps have no rows, so this pair is the
+     whole address — and it only means anything alongside the programme. */
+  const activityRef = String(form.get('activityRef') ?? '') || null;
+  const rawStep = form.get('stepN');
+  const stepN = rawStep == null || rawStep === '' ? null : Number(rawStep);
+  if (!itemId && !postId && !deliverableId && !(activityRef && stepN !== null))
+    throw new Error('An attachment needs an item, a post, a deliverable or a step.');
   await assertProject(projectId);
 
   const ids = form.getAll('ids').map(String);
@@ -606,9 +657,12 @@ export async function uploadAttachments(form: FormData): Promise<AttachmentMeta[
     await prisma.attachment.create({
       data: {
         ...meta,
+        projectId,
         itemId,
         postId,
         deliverableId,
+        activityRef,
+        stepN,
         data: Buffer.from(await file.arrayBuffer()),
         createdAt: new Date(),
       },
