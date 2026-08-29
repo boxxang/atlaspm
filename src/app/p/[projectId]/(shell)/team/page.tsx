@@ -1,9 +1,6 @@
-import { ComingWith } from '@/components/shell/ComingWith';
+import { ProgramTeam } from '@/components/shell/ProgramTeam';
 
-export default function TeamPage() {
-  return (
-    <ComingWith title="Team" phase="V2-6">
-      Everyone on the programme, and adding or correcting a person.
-    </ComingWith>
-  );
+export default async function Team({ params }: PageProps<'/p/[projectId]/team'>) {
+  const { projectId } = await params;
+  return <ProgramTeam projectId={projectId} />;
 }

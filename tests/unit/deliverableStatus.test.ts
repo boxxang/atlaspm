@@ -4,7 +4,6 @@ import {
   deliverableStep,
   handoverComplete,
   producerStarted,
-  recordComplete,
 } from '@/lib/deliverableStatus';
 
 const d = (iso: string) => new Date(`${iso}T00:00:00`);
@@ -113,12 +112,3 @@ describe('handoverComplete', () => {
   });
 });
 
-describe('recordComplete', () => {
-  const att = [{ id: 'a', filename: 'spec.pdf', mimeType: 'application/pdf', size: 1 }];
-
-  it('is the V1 rule, reading the deliverable’s own fields', () => {
-    expect(recordComplete({ note: 'Released.', attachments: att })).toBe(true);
-    expect(recordComplete({ note: '', attachments: att })).toBe(false);
-    expect(recordComplete({ note: 'Released.', attachments: [] })).toBe(false);
-  });
-});

@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useState, useSyncExternalStore, useTransition } from 'react';
+import { useMemo, useState, useSyncExternalStore, useTransition } from 'react';
 import { createProject, deleteProject } from '@/app/actions';
 import type { ProfileSummary, StageId } from '@/data/types';
 import { daysTo, dday, inFlightStageIds } from '@/lib/derive';
@@ -10,6 +10,8 @@ import { estimateCost, formatCost, formatManMonths } from '@/lib/effort';
 import type { ProjectSummary } from '@/lib/queries';
 import { computeSchedule, fmtDate, fromISO, startOfDay, toISO } from '@/lib/schedule';
 import { resolveStages } from '@/lib/stages';
+import { activitySteps } from '@/data/activitySteps';
+import { fromStepIndex, plannedSteps } from '@/lib/steps';
 
 /**
  * Anything that needs "today" waits for mount: the server has no business
@@ -55,7 +57,23 @@ function ProjectCard({ p }: { p: ProjectSummary }) {
     : 0;
 
   const today = mounted ? startOfDay(new Date()) : null;
-  const overdue = today ? p.openActivityDues.filter((d) => d < today).length : 0;
+  /* Overdue means a step past its date with nothing handed over — the same rule
+     the shell counts by, so the card and the program inside it agree. The count
+     happens here rather than in the query because lateness needs the viewer's
+     clock, not the server's. */
+  const overdue = useMemo(() => {
+    if (!today) return 0;
+    const done = new Set(p.doneSteps);
+    let n = 0;
+    for (const [ref, a] of Object.entries(activitySteps)) {
+      const span = schedule.stages[a.st];
+      if (!span) continue;
+      for (const step of plannedSteps(span.start, fromStepIndex(ref, a))) {
+        if (step.end < today && !done.has(`${ref}:${step.n}`)) n++;
+      }
+    }
+    return n;
+  }, [today, p.doneSteps, schedule]);
   /* Stages are concurrent, so a dozen can be in flight at once. The card names
      the one the program opens on — the lowest bar of them, same rule as the
      store's — rather than the first, which named a stage you never landed on. */
@@ -65,11 +83,7 @@ function ProjectCard({ p }: { p: ProjectSummary }) {
 
   return (
     <div className="pl-card">
-      {/* Opens the V1 page while the prototype's shell is still being filled in
-          — see /p/[projectId]/classic. PORTING_PLAN_V2 phase V2-8 drops the
-          suffix, and the shell (already routed at /p/:id) becomes what a card
-          opens. */}
-      <Link className="pl-open" href={`/p/${p.id}/classic`} aria-label={`Open ${p.name}`} />
+      <Link className="pl-open" href={`/p/${p.id}`} aria-label={`Open ${p.name}`} />
 
       <div className="pl-title">
         <span className="pl-name">{p.name}</span>
@@ -207,7 +221,7 @@ function NewProjectCard({ profiles }: { profiles: readonly ProfileSummary[] }) {
       try {
         await createProject({ id, name: name.trim(), kickoff: fromISO(kickoff), profileId });
         setOpen(false);
-        router.push(`/p/${id}/classic`);
+        router.push(`/p/${id}`);
       } catch (e) {
         setError(e instanceof Error ? e.message : 'Could not create the program.');
       }

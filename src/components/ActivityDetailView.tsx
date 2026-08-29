@@ -203,9 +203,7 @@ export function ActivityDetailView({
     <div className="ad" data-activity={activityId}>
       <header className="ad-bar">
         {/* Back to the programme this activity is dated against. */}
-        {/* back to the V1 page, which is where the reader came from until
-           phase V2-8 makes the shell what /p/:id opens */}
-        <Link className="ad-back" href={`/p/${projectId}/classic`} data-ad-back>
+        <Link className="ad-back" href={`/p/${projectId}`} data-ad-back>
           <BackIcon />
           <span>{project.projectName}</span>
         </Link>

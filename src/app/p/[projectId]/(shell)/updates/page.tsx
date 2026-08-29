@@ -1,9 +1,6 @@
-import { ComingWith } from '@/components/shell/ComingWith';
+import { UpdatesPage } from '@/components/shell/UpdatesPage';
 
-export default function UpdatesPage() {
-  return (
-    <ComingWith title="Updates" phase="V2-6">
-      Every post on the programme, newest first, with its replies.
-    </ComingWith>
-  );
+export default async function Updates({ params }: PageProps<'/p/[projectId]/updates'>) {
+  const { projectId } = await params;
+  return <UpdatesPage projectId={projectId} />;
 }

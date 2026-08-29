@@ -79,14 +79,23 @@ export interface ProjectSummary {
   edited: boolean;
   deliverablesDone: number;
   deliverablesTotal: number;
+  /**
+   * Risks flagged on steps and still open — the same thing the shell counts.
+   * A risk on a step that has been handed over has been answered, so the query
+   * excludes those rather than counting every risk ever raised.
+   */
   openRisks: number;
   items: number;
-  /** Due dates of open, dated activities — the client counts the overdue ones. */
-  openActivityDues: Date[];
+  /**
+   * Every step the program has finished, as `activityRef:stepN`. The card needs
+   * it to count what is late, and lateness needs the viewer's clock — so the
+   * count happens on the client and this is the input.
+   */
+  doneSteps: string[];
 }
 
 export async function getProjectSummaries(): Promise<ProjectSummary[]> {
-  const [projects, dlv, risks, items, dues] = await Promise.all([
+  const [projects, dlv, risks, items, doneSteps] = await Promise.all([
     prisma.project.findMany({
       orderBy: { createdAt: 'asc' },
       include: {
@@ -98,11 +107,17 @@ export async function getProjectSummaries(): Promise<ProjectSummary[]> {
       },
     }),
     prisma.deliverable.groupBy({ by: ['projectId', 'done'], _count: true }),
-    prisma.item.groupBy({ by: ['projectId'], where: { kind: 'risk' }, _count: true }),
+    /* Risks are posts on steps now. The ones whose step is done are answered,
+       which is a join the client already knows how to do — so both halves come
+       back and the filtering happens where the rule lives. */
+    prisma.post.findMany({
+      where: { kind: 'risk', activityRef: { not: null } },
+      select: { projectId: true, activityRef: true, stepN: true },
+    }),
     prisma.item.groupBy({ by: ['projectId'], _count: true }),
-    prisma.item.findMany({
-      where: { kind: 'activity', done: false, due: { not: null } },
-      select: { projectId: true, due: true },
+    prisma.stepState.findMany({
+      where: { done: true },
+      select: { projectId: true, activityRef: true, stepN: true },
     }),
   ]);
 
@@ -118,6 +133,11 @@ export async function getProjectSummaries(): Promise<ProjectSummary[]> {
       };
     }
     const mine = dlv.filter((d) => d.projectId === p.id);
+    const mineDone = new Set(
+      doneSteps
+        .filter((x) => x.projectId === p.id)
+        .map((x) => `${x.activityRef}:${x.stepN}`),
+    );
     return {
       id: p.id,
       name: p.name,
@@ -140,9 +160,16 @@ export async function getProjectSummaries(): Promise<ProjectSummary[]> {
       edited: p.overrides.length > 0,
       deliverablesDone: mine.filter((d) => d.done).reduce((n, d) => n + d._count, 0),
       deliverablesTotal: mine.reduce((n, d) => n + d._count, 0),
-      openRisks: sum(risks, p.id),
+      /* A risk on a step that has been handed over has been answered. Same rule
+         as everywhere else, applied here so the card and the shell cannot show
+         two different numbers for the same word. */
+      openRisks: risks.filter(
+        (r) =>
+          r.projectId === p.id &&
+          !mineDone.has(`${r.activityRef}:${r.stepN}`),
+      ).length,
       items: sum(items, p.id),
-      openActivityDues: dues.filter((d) => d.projectId === p.id).map((d) => d.due!),
+      doneSteps: [...mineDone],
     };
   });
 }

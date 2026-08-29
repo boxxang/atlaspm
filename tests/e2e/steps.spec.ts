@@ -267,7 +267,7 @@ test.describe('handing an output over', () => {
     await page.locator('.pf-kickoff').fill('2025-05-23');
     await page.locator('[data-create]').click();
     await page.waitForURL(/\/p\/second-/);
-    const other = new URL(page.url()).pathname.replace(/\/classic$/, '');
+    const other = new URL(page.url()).pathname.replace(/\/overview$/, '');
 
     await page.goto(`${other}/stage/physicalDesign/activity`);
     await openActivity(page, 'PD-10');

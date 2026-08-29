@@ -82,9 +82,3 @@ export const handoverComplete = (
 ): boolean =>
   !!post && post.text.trim().length > 0 && post.attachments.length > 0 && !!post.doneAt;
 
-/**
- * The V1 shape of the same rule, reading the fields stored on the deliverable
- * itself. Kept while `/classic` still files delivery records that way.
- */
-export const recordComplete = (d: Pick<Deliverable, 'note' | 'attachments'>): boolean =>
-  d.note.trim().length > 0 && d.attachments.length > 0;

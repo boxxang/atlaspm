@@ -4,8 +4,11 @@ import { getProjectState } from '@/lib/queries';
 
 /**
  * Every view of a programme renders inside the shell, so the programme is read
- * once here rather than once per screen. The route group keeps /classic — the
- * V1 page — outside it, which is the whole reason the group exists.
+ * once here rather than once per screen.
+ *
+ * The route group is a leftover of the port: it existed to keep the V1 page
+ * outside the shell while both were live. Nothing sits outside it now except
+ * the activity write-up, which is its own page for its own reason.
  *
  * Dynamic for the same reason the V1 page is: the programme comes out of the
  * database, and a prerender would serve whatever it held at build time.

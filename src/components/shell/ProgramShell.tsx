@@ -12,9 +12,8 @@ import { Rail } from './Rail';
  * The shell the prototype runs in: a nav on the left, one view at a time in the
  * middle, and a rail on the right that follows whatever is selected.
  *
- * The V1 program page put every stage in one long scroll under a toolbar. That
- * shape is still reachable at /p/[id]/classic while the screens are ported one
- * at a time; this is what replaces it.
+ * The V1 program page put every stage in one long scroll under a toolbar. This
+ * replaced it.
  *
  * Hydration waits for mount because "today" has to come from the viewer's
  * clock, not the server's — TODAY markers and overdue counts would otherwise be

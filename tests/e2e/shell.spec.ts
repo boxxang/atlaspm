@@ -145,10 +145,7 @@ test.describe('a stage', () => {
 });
 
 test.describe('the palette', () => {
-  /* One accent for the whole app, and it is the prototype's indigo. What is
-     still scoped to the shell is the rest of the prototype's theme — its white
-     ground and its greys — because the V1 page is still on the reference's warm
-     one. That half goes when /classic does. */
+  /* One accent for the whole app, and it is the prototype's indigo. */
   test('the accent is the prototype’s, at the root and in the shell alike', async ({ page }) => {
     await page.goto(SHELL_PATH);
     /* the shell renders nothing until it has hydrated, and "today" has to come
@@ -164,7 +161,7 @@ test.describe('the palette', () => {
     expect(accents.root).toBe('#5b5bd6');
   });
 
-  test('the shell keeps its own ground, which the V1 page does not share', async ({ page }) => {
+  test('the ground is the prototype’s white, not the reference’s warm one', async ({ page }) => {
     await page.goto(SHELL_PATH);
     await expect(page.locator('.pshell')).toHaveCSS('background-color', 'rgb(255, 255, 255)');
   });

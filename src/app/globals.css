@@ -2220,31 +2220,33 @@ a.ad-ref:hover,a.ad-ref:focus-visible{border-color:var(--accent);background:var(
 }
 
 /* ==========================================================================
-   The prototype's shell — nav, view, rail.
-
-   The prototype settled on its own palette: an indigo accent rather than the
-   reference's blue, a white ground rather than the warm one, and a wider range
-   of greys. It is the spec now, so these are the colours the app is heading to.
-
-   They are scoped to .pshell rather than :root because the V1 program page at
-   /p/:id/classic is still the reference's, and both have to be true until the
-   phase that deletes it. Custom properties inherit, so everything inside the
-   shell gets the new language and nothing outside it changes. When /classic
-   goes, this block moves to :root.
+   The shell — nav, view, rail. The prototype's palette is the app's now; what
+   is left above is the reference block, which only the program list and the
+   activity write-up still read.
    ========================================================================== */
-.pshell{
+/* The prototype's palette, now the app's. It was scoped here while the V1 page
+   still rendered the reference's warm theme; that route is gone, so this is
+   :root and the reference block above keeps only what the program list and the
+   activity write-up still read. */
+:root{
   --bg:#ffffff; --sunken:#fbfbfc; --hover:#f7f7f8; --muted:#f1f1f4; --shade:#eceef0;
-  --ink:#16181d; --ink-body:#3f434b; --ink-2:#62666d; --ink-3:#8b8f98; --ink-4:#b4b7bd;
-  --line-soft:#f0f0f2; --line:#e6e8eb; --line-strong:#d8dade;
-  /* --accent, --accent-soft and --risk are :root's now; these are the rest. */
+  --ink-body:#3f434b; --ink-4:#b4b7bd;
+  --line-soft:#f0f0f2;
   --accent-hov:#4747b8; --accent-wash:#f7f7fe; --accent-line:#cdcdf5;
   --risk-ink:#c5303a; --risk-soft:#fdeced; --risk-line:#f5cfd0;
   --warn:#f5a524; --warn-soft:#fef7e6; --warn-ink:#8a6a1f;
   --ok:#30a46c; --ok-soft:#e6f6ed;
+  --st-done:#d8dade; --st-run:#a8adb6; --st-future:#eceef0;
   --r-sm:5px; --r:6px; --r-lg:8px;
   --sh:0 1px 2px rgba(16,24,40,.04);
   --sh-pop:0 8px 28px rgba(16,24,40,.14);
   --pnav-w:220px; --prail-w:296px;
+}
+
+.pshell{
+  /* the shell's own greys, which the two surviving V1 screens do not share */
+  --ink:#16181d; --ink-2:#62666d; --ink-3:#8b8f98;
+  --line:#e6e8eb; --line-strong:#d8dade;
 
   display:grid;
   grid-template-columns:var(--pnav-w) minmax(0,1fr) var(--prail-w);
@@ -2769,3 +2771,9 @@ a.ad-ref:hover,a.ad-ref:focus-visible{border-color:var(--accent);background:var(
 .ptl-tail{display:flex;align-items:center;justify-content:flex-end;gap:9px;padding-left:9px}
 .ptl-n{font-size:11.5px;color:var(--ink-3);font-variant-numeric:tabular-nums;white-space:nowrap}
 .ptl-late{font-size:11px;color:var(--risk);font-weight:600;white-space:nowrap}
+.pcomms-body{
+  display:block;margin-top:3px;font-size:11.5px;line-height:1.5;color:var(--ink-3);
+}
+.pboard th[scope="row"] .ppill{margin-left:7px}
+.pboard th[scope="row"] a{color:inherit;text-decoration:none}
+.pboard th[scope="row"] a:hover{color:var(--accent)}

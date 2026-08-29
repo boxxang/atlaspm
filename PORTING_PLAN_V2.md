@@ -283,20 +283,42 @@ answer. The list scrolls, and a test checks every overdue step is on it.
 - **Accept:** ✅ 14 checks in `tests/e2e/overview.spec.ts`, covering all three
   criteria.
 
-## Phase V2-8 — Sweep
+## Phase V2-8 — Sweep — **done**
 
-Side-by-side against the prototype, screen by screen. Delete what V1 left behind
-that nothing renders any more. Specifically:
+The V1 page and everything only it rendered are gone: `/p/:id/classic`,
+`AppShell`, `Toolbar`, `Roadmap`, `StagePanel`, `BoardModal`, `Dashboard`,
+`Board`, `Bottlenecks`, `Gantt`, `StageGantt`, `SchedulePreview`,
+`StageEditor`, `DeliveryRecord`, `Contacts`, `ItemView`, `Deliverables`,
+`PotentialRisks`, `SettingsPopover`, `InlineArea`, `MailButton`,
+`OwnerSelect`, `ColGrip`, `WrapToggle`, `Popover`, `ProjectName`, `Tooltip`,
+`Attachments`, and `recordComplete`, which had no caller once `/classic` went.
+`src/components` holds the program list, the activity write-up, and `shell/`.
 
-- delete `/p/[projectId]/classic` and `AppShell`, `Toolbar`, `Roadmap`,
-  `StagePanel`, `BoardModal` and anything only they render;
-- drop `/classic` from `ProjectList`'s card link and its create-and-open push,
-  and from `ActivityDetailView`'s back link;
-- move the `.pshell` token block to `:root` and delete the reference palette;
-- delete the V1 specs whose screens have gone, and `SEED_PROJECT_PATH` with
-  them.
+The prototype's palette moved to `:root`. What is left of the reference block is
+only what the two surviving V1-era screens still read.
 
----
+**The program card was still answering with V1's arithmetic** — 23 open risks
+and 7 overdue, against the shell's 6 and 12, for the same two words. It counts
+`Post(kind:'risk')` on open steps and late steps now, so a card and the program
+inside it cannot disagree.
+
+### What the deletion cost
+
+Seventeen e2e specs went with their screens: ~250 checks down to 93. Deliberate,
+and agreed — the alternative was porting tests for screens that were about to be
+deleted. What is now **uncovered** and was not before:
+
+- schedule editing (dragging a stage date, the ripple, apply/discard);
+- stage editing (adding, deleting, reordering; profile forking);
+- the effort and cost editors;
+- display settings (text size, icon scale, column widths);
+- mail drafts;
+- the concurrency chart and its folding behaviour.
+
+Most of those have **no screen in the shell at all** yet, so the gap is a
+missing feature rather than a missing test. `programs.spec.ts` was rewritten to
+cover what the program list still does; `activity.spec.ts` replaces the V1 spec
+for the write-up page, which survived.
 
 ## Decisions made
 

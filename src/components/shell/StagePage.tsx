@@ -5,10 +5,12 @@ import { useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { fmtDate } from '@/lib/schedule';
 import { phaseById } from '@/data/scheduleProfiles';
-import { STAGE_TABS, tabLabel, type StageTab } from '@/lib/stageTabs';
+import { STAGE_TABS, type StageTab } from '@/lib/stageTabs';
 import { StageActivityTab } from './StageActivity';
 import { DeliverablesTab } from './DeliverablesTab';
+import { CommsTab } from './CommsTab';
 import { KeyInfoTab } from './KeyInfoTab';
+import { UpdatesPage } from './UpdatesPage';
 import { TeamTab } from './TeamTab';
 import { StageRisksTab } from './StageRisksTab';
 import { useAppStore } from '@/store/useAppStore';
@@ -38,6 +40,7 @@ export function StagePage({
   const deliverables = useAppStore((s) => s.deliverables);
   const select = useRailStore((s) => s.select);
   const posts = useAppStore((s) => s.posts);
+  const content = useAppStore((s) => s.content);
   const contacts = useAppStore((s) => s.contacts);
   const leaders = useAppStore((s) => s.leaders);
   const { risks } = useProgramWork();
@@ -103,6 +106,7 @@ export function StagePage({
     risks: String(stageRisks),
     deliverables: `${done}/${dl.length}`,
     team: String((contacts[stage.id]?.length ?? 0) + (leaders[stage.id]?.name ? 1 : 0)),
+    board: String(content[stage.id]?.activities.length ?? 0),
   };
 
   return (
@@ -175,24 +179,13 @@ export function StagePage({
         {tab === 'risks' && <StageRisksTab stageId={stage.id} projectId={projectId} />}
         {tab === 'deliverables' && <DeliverablesTab stageId={stage.id} />}
         {tab === 'team' && <TeamTab stageId={stage.id} />}
-        {TAB_PHASE[tab] && (
-          <p className="pview-todo">
-            <span className="pview-phase">{TAB_PHASE[tab]}</span>
-            The <b>{tabLabel(tab)}</b> tab.
-          </p>
-        )}
+        {tab === 'board' && <CommsTab stageId={stage.id} />}
+        {tab === 'updates' && <UpdatesPage projectId={projectId} stageId={stage.id} />}
+
       </div>
     </>
   );
 }
-
-/* Which phase brings each tab that is not filled in yet, so it says what it is
-   waiting for rather than showing an empty page. A tab that is built has no
-   entry here. */
-const TAB_PHASE: Partial<Record<StageTab, string>> = {
-  board: 'V2-7',
-  updates: 'V2-7',
-};
 
 function Fact({ label, value }: { label: string; value: string }) {
   return (
