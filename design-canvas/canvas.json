@@ -1,0 +1,260 @@
+{
+  "pages": [
+    {
+      "id": "page-1",
+      "name": "Direction E — the app"
+    },
+    {
+      "id": "page-2",
+      "name": "Explorations (set aside)"
+    }
+  ],
+  "artboards": [
+    {
+      "file": "Main.dc.html",
+      "title": "Overview",
+      "page": "page-1",
+      "x": 0,
+      "y": 0,
+      "w": 1440,
+      "h": 1000
+    },
+    {
+      "file": "Timeline.dc.html",
+      "title": "Timeline",
+      "page": "page-1",
+      "x": 1560,
+      "y": 0,
+      "w": 1440,
+      "h": 1000
+    },
+    {
+      "file": "Stage.dc.html",
+      "title": "Stage › Activity",
+      "page": "page-1",
+      "x": 3120,
+      "y": 0,
+      "w": 1440,
+      "h": 1000
+    },
+    {
+      "file": "StageWork.dc.html",
+      "title": "Stage › Activity, expanded",
+      "page": "page-1",
+      "x": 4680,
+      "y": 0,
+      "w": 1440,
+      "h": 1000
+    },
+    {
+      "file": "Risks.dc.html",
+      "title": "Risks (work view)",
+      "page": "page-1",
+      "x": 6240,
+      "y": 0,
+      "w": 1440,
+      "h": 1000
+    },
+    {
+      "file": "Programs.dc.html",
+      "title": "Programs",
+      "page": "page-1",
+      "x": 0,
+      "y": 1180,
+      "w": 1440,
+      "h": 900
+    },
+    {
+      "file": "Activity.dc.html",
+      "title": "Activity detail",
+      "page": "page-1",
+      "x": 1560,
+      "y": 1180,
+      "w": 1440,
+      "h": 1200
+    },
+    {
+      "file": "System.dc.html",
+      "title": "Design system",
+      "page": "page-1",
+      "x": 3120,
+      "y": 1180,
+      "w": 1440,
+      "h": 1010
+    },
+    {
+      "file": "MainToday.dc.html",
+      "title": "Today (baseline)",
+      "page": "page-1",
+      "x": 4680,
+      "y": 1180,
+      "w": 1440,
+      "h": 1560
+    },
+    {
+      "file": "MainA.dc.html",
+      "title": "A · Workbench",
+      "page": "page-2",
+      "x": 0,
+      "y": 0,
+      "w": 1440,
+      "h": 1000
+    },
+    {
+      "file": "MainB.dc.html",
+      "title": "B · Timeline-first",
+      "page": "page-2",
+      "x": 1560,
+      "y": 0,
+      "w": 1440,
+      "h": 1000
+    },
+    {
+      "file": "MainC.dc.html",
+      "title": "C · Document",
+      "page": "page-2",
+      "x": 3120,
+      "y": 0,
+      "w": 1440,
+      "h": 1300
+    },
+    {
+      "file": "MainD.dc.html",
+      "title": "D · Terminal density",
+      "page": "page-2",
+      "x": 4680,
+      "y": 0,
+      "w": 1440,
+      "h": 1000
+    },
+    {
+      "file": "MainF.dc.html",
+      "title": "F · Editorial",
+      "page": "page-2",
+      "x": 0,
+      "y": 1460,
+      "w": 1440,
+      "h": 1400
+    },
+    {
+      "file": "Tokens.dc.html",
+      "title": "Token audit (old palette)",
+      "page": "page-2",
+      "x": 1560,
+      "y": 1460,
+      "w": 1440,
+      "h": 1010
+    },
+    {
+      "file": "Model.dc.html",
+      "title": "Activity & step model",
+      "page": "page-1",
+      "x": 6240,
+      "y": 1180,
+      "w": 1440,
+      "h": 900
+    }
+  ],
+  "annotations": [
+    {
+      "id": "brief-e",
+      "page": "page-1",
+      "x": 0,
+      "y": -340,
+      "w": 1440,
+      "text": "Direction E — the whole app.\n\nSeven screens plus the baseline, all in one language: cool neutrals, 6px radii, 28px controls, indigo accent, real elevation, system-ui throughout.\n\nThe structural move is that work is first-class and stage is a property. Today everything is stage-first — pick a stage, then see its risks. Here the sidebar's views cut across all 23 stages, and a stage is a filter, a group header and a page of its own. Two of the four ways of opening things are gone: the Main/Dashboard toggle (Dashboard is now the Overview view) and the 1120px modal (now a peek panel or a page).\n\nReal AtlasAX1 seed, 23-stage built-in profile, 1440px."
+    },
+    {
+      "id": "n-over",
+      "page": "page-1",
+      "x": 0,
+      "y": -130,
+      "w": 1440,
+      "text": "OVERVIEW — the old Dashboard, no longer a mode you toggle into. Five stat cards, then the schedule kept deliberately first-class on the left (answering the fair objection that E demotes the timeline), the update feed under it, and in-flight stages plus checkpoints on the right."
+    },
+    {
+      "id": "n-time",
+      "page": "page-1",
+      "x": 1560,
+      "y": -130,
+      "w": 1440,
+      "text": "TIMELINE — a full view rather than a 240px strip. 26px rows grouped by lifecycle phase, so 23 stages are readable and a phase carries its own risk count. Bars are draggable: the selected one shows its handles and the tooltip states the ripple rule out loud. Zoom is week / month / quarter."
+    },
+    {
+      "id": "n-stage",
+      "page": "page-1",
+      "x": 3120,
+      "y": -152,
+      "w": 1440,
+      "text": "STAGE › ACTIVITY — the two lists have merged into one tab.\n\nThe template's 11 engineering activities for TEST, in work order, each showing STEPS as a segmented bar plus \"n of m\". Under them, a divider, then the free-form items added on this program. One list, two kinds, told apart by the ref chip and the step bar.\n\nReal data: TEST has 11 activities and 86 steps; 21 are done today. The deliverable rail now says which step ticks each deliverable — producedBy already names it on all 257 activities."
+    },
+    {
+      "id": "n-stagework",
+      "page": "page-1",
+      "x": 4680,
+      "y": -152,
+      "w": 1440,
+      "text": "STAGE › ACTIVITY, EXPANDED — TEST-03 opened in place. Its 8 authored steps become a checklist: parallel steps are marked and indented, each step shows what it adds, its window, and how many posts mention it. Step 8 carries \"TICKS TEST-D2\" — completing that step is what completes the deliverable.\n\nThe panel holds ONE thread for the activity, and each post carries an optional step tag. Look at the top post: it is tagged STEP 6, which has not started yet. That is the point of tagging rather than nesting — you flag a problem on the step it will hit, months before you get there."
+    },
+    {
+      "id": "n-risk",
+      "page": "page-1",
+      "x": 6240,
+      "y": -130,
+      "w": 1440,
+      "text": "RISKS — the cross-stage work view, and where a TPM starts the day. Grouped by stage rather than contained by it; the aggregate boards (Open Risks, Overdue, Status Updates) stop being a special modal and become saved views. Same peek panel as Stage › Activity, one level up."
+    },
+    {
+      "id": "n-prog",
+      "page": "page-1",
+      "x": 0,
+      "y": 1050,
+      "w": 1440,
+      "text": "PROGRAMS — today this page is one card in a mostly empty 1440px screen. Here it is a table that reads the same at one program and at twenty, with a preview panel so you can judge a program before entering it. Only AtlasAX1 exists in the seed, so only AtlasAX1 is shown — the empty state below the row is deliberate, not a placeholder."
+    },
+    {
+      "id": "n-act",
+      "page": "page-1",
+      "x": 1560,
+      "y": 1028,
+      "w": 1440,
+      "text": "ACTIVITY DETAIL — where \"Read TEST-03 →\" lands, and where a row in the Activity tab lands. A page, not a panel: it is long, it is linked, and it is the same on every program running this template.\n\n\"How it gets there\" is the same 8 steps you tick in the stage — here they are read with their full text and lane diagram, there they are worked.\n\nOpen question: today this page is Georgia and it is the best-reading screen in the app. E has no serif, so this is system-ui 15px / 1.65. Keeping the serif would make it the one deliberate exception."
+    },
+    {
+      "id": "n-sys",
+      "page": "page-1",
+      "x": 3120,
+      "y": 1050,
+      "w": 1440,
+      "text": "DESIGN SYSTEM — every value used on the seven screens, with the old-token-to-new mapping. This is the sheet the next step turns into globals.css. Note what gets deleted: --serif, --mono, --title-size, and one of the two caption systems."
+    },
+    {
+      "id": "n-today",
+      "page": "page-1",
+      "x": 4680,
+      "y": 1050,
+      "w": 1440,
+      "text": "TODAY — the baseline, for comparison. Top 1560px only; the scroll continues past it."
+    },
+    {
+      "id": "n-set-aside",
+      "page": "page-2",
+      "x": 0,
+      "y": -170,
+      "w": 1440,
+      "text": "Explorations, kept for reference. A/B/C were round one — three structures in the app's existing skin, which is why none of them answered \"it looks dated\". D and F were round two alongside E. The token audit at the end still measures the app as it stands today."
+    },
+    {
+      "id": "n-model",
+      "page": "page-1",
+      "x": 6240,
+      "y": 1050,
+      "w": 1440,
+      "text": "ACTIVITY & STEP MODEL — what changes in the schema, and the numbers that argue for it. Two new tables, both lazy, plus one optional field on StatusUpdate. The free-form Item stays, because work outside the template still has to be recorded somewhere."
+    }
+  ],
+  "launch": {
+    "view": "canvas",
+    "page": "page-1"
+  }
+}

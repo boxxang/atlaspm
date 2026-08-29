@@ -1,0 +1,211 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <style>
+    body { margin: 0; }
+    a { color: #256abf; } a:hover { color: #1b4f8f; }
+    .mono { font-family: ui-monospace,"SF Mono",Menlo,monospace; }
+    .cap { font-family: ui-monospace,"SF Mono",Menlo,monospace; font-size: 10.2px; font-weight: 700; letter-spacing: 1.43px; text-transform: uppercase; color: #898781; display: block; }
+    .lede { font-family: Georgia,"Times New Roman",serif; font-size: 16.15px; line-height: 1.62; color: #52514e; margin: 0 0 14px; }
+    .sec { border-top: 1px solid #e1e0d9; padding-top: 16px; margin-top: 28px; }
+    .idchip { font-family: ui-monospace,"SF Mono",Menlo,monospace; font-size: 11px; font-weight: 600; letter-spacing: .9px; color: #256abf; background: #e7effa; padding: 3px 8px; border-radius: 3px; }
+    .frow { display: grid; grid-template-columns: 44px 1fr 84px; align-items: center; gap: 10px; height: 16px; }
+    .ftrack { position: relative; height: 6px; }
+    .fbar { position: absolute; height: 6px; border-radius: 1px; }
+  </style>
+</helmet>
+
+<div style="width: 1440px; height: 1300px; background: #f9f9f7; font-family: system-ui,-apple-system,'Segoe UI',sans-serif; font-size: 15px; color: #0b0b0b; overflow: hidden;">
+
+  <!-- slim bar, exactly the Activity page's -->
+  <div style="height: 58px; border-bottom: 1px solid #e1e0d9; background: #f9f9f7; display: flex; align-items: center; padding: 0 22px; gap: 14px;">
+    <div style="display: flex; align-items: center; gap: 7px; border: 1px solid #e1e0d9; border-radius: 3px; padding: 5px 10px; background: #fcfcfb;">
+      <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#52514e" stroke-width="2.2"><path d="m15 18-6-6 6-6"/></svg>
+      <span class="mono" style="font-size: 9.5px; letter-spacing: 1px; text-transform: uppercase; color: #52514e;">Programs</span>
+    </div>
+    <span style="flex-grow: 1;"></span>
+    <span class="mono" style="font-size: 9.5px; letter-spacing: 1.1px; text-transform: uppercase; color: #898781;">Typical SoC &middot; 23 stages</span>
+    <span class="mono" style="font-size: 9.86px; letter-spacing: 1.08px; color: #d03b3b; border: 1px solid #d03b3b; border-radius: 3px; padding: 3px 9px;">23 OPEN RISKS</span>
+  </div>
+
+  <!-- ══════════ THE PROGRAM, AS A DOCUMENT ══════════ -->
+  <div style="max-width: 1100px; margin: 0 auto; padding: 26px 34px 18px;">
+
+    <!-- head -->
+    <div style="display: flex; align-items: center; gap: 12px;">
+      <span class="idchip">ATLASAX1</span>
+      <h1 style="font-size: 18.7px; font-weight: 650; letter-spacing: -0.19px; margin: 0;">Programme status &mdash; week 67 of 132</h1>
+      <span style="flex-grow: 1;"></span>
+      <span class="mono" style="font-size: 9.5px; letter-spacing: 1.1px; text-transform: uppercase; color: #898781;">Today 08/27/2026</span>
+    </div>
+
+    <!-- facts strip, the .ad-facts component -->
+    <div style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); border: 1px solid #e1e0d9; border-radius: 5px; background: #fcfcfb; margin-top: 16px;">
+      <div style="padding: 12px 16px; border-right: 1px solid #e1e0d9;">
+        <span class="cap" style="font-size: 9.52px; letter-spacing: 1.14px;">Runs</span>
+        <div class="mono" style="font-size: 16.3px; margin-top: 5px;">05/19/2025</div>
+        <div style="font-size: 11.5px; color: #898781; margin-top: 2px;">to 11/29/2027</div>
+      </div>
+      <div style="padding: 12px 16px; border-right: 1px solid #e1e0d9;">
+        <span class="cap" style="font-size: 9.52px; letter-spacing: 1.14px;">Tapeout</span>
+        <div class="mono" style="font-size: 16.3px; margin-top: 5px;">D&minus;138</div>
+        <div style="font-size: 11.5px; color: #898781; margin-top: 2px;">01/11/2027 &middot; BEOL MTO</div>
+      </div>
+      <div style="padding: 12px 16px; border-right: 1px solid #e1e0d9;">
+        <span class="cap" style="font-size: 9.52px; letter-spacing: 1.14px;">Delivers</span>
+        <div class="mono" style="font-size: 16.3px; margin-top: 5px;">87 / 167</div>
+        <div style="font-size: 11.5px; color: #898781; margin-top: 2px;">52% complete &middot; 8 overdue</div>
+      </div>
+      <div style="padding: 12px 16px;">
+        <span class="cap" style="font-size: 9.52px; letter-spacing: 1.14px;">Costs</span>
+        <div class="mono" style="font-size: 16.3px; margin-top: 5px;">$54.8M</div>
+        <div style="font-size: 11.5px; color: #898781; margin-top: 2px;">3653 M/M &times; $15,000</div>
+      </div>
+    </div>
+
+    <!-- two columns, exactly the Activity page's proportions -->
+    <div style="display: grid; grid-template-columns: 713px 287px; gap: 32px; margin-top: 26px;">
+
+      <!-- ─── reading column ─── -->
+      <div>
+        <div>
+          <span class="cap">Where it stands</span>
+          <p class="lede" style="margin-top: 10px;">Seven stages are running at once. Physical Design and Signoff carry the schedule; <strong>Package &amp; Substrate Design</strong> and <strong>Test Development</strong> carry the risk, and both feed the same tapeout.</p>
+          <p class="lede">Tapeout is 138 days out. Nothing between here and there has slack that is not already spent.</p>
+        </div>
+
+        <!-- the timeline, as a figure inside the document -->
+        <div style="border: 1px solid #e1e0d9; border-radius: 5px; background: #fcfcfb; padding: 14px 16px 12px; margin-top: 6px;">
+          <div style="display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 10px;">
+            <span class="cap" style="font-size: 9.52px;">Fig. 1 &mdash; 23 stages in program time</span>
+            <span class="mono" style="font-size: 9px; color: #256abf;">OPEN FULL TIMELINE &rarr;</span>
+          </div>
+          <div style="position: relative;">
+            <div style="position: absolute; left: calc(54px + (100% - 138px) * 0.475); top: 0; bottom: 12px; width: 1px; background: #256abf; z-index: 2;"></div>
+            <div class="frow"><span class="mono" style="font-size: 8.5px; color: #898781; text-align: right;">DEF</span><div class="ftrack"><div class="fbar" style="left: 0%; width: 5.7%; background: #d03b3b;"></div></div><span></span></div>
+            <div class="frow"><span class="mono" style="font-size: 8.5px; color: #898781; text-align: right;">ARCH</span><div class="ftrack"><div class="fbar" style="left: 4.3%; width: 12.9%; background: #c3c2b7;"></div></div><span></span></div>
+            <div class="frow"><span class="mono" style="font-size: 8.5px; color: #898781; text-align: right;">TECH</span><div class="ftrack"><div class="fbar" style="left: 0%; width: 10%; background: #c3c2b7;"></div></div><span></span></div>
+            <div class="frow"><span class="mono" style="font-size: 8.5px; color: #898781; text-align: right;">PDK</span><div class="ftrack"><div class="fbar" style="left: 5.7%; width: 25.7%; background: #c3c2b7;"></div></div><span></span></div>
+            <div class="frow"><span class="mono" style="font-size: 8.5px; color: #898781; text-align: right;">IPR</span><div class="ftrack"><div class="fbar" style="left: 2.9%; width: 15.7%; background: #c3c2b7;"></div></div><span></span></div>
+            <div class="frow"><span class="mono" style="font-size: 8.5px; color: #898781; text-align: right;">AMS</span><div class="ftrack"><div class="fbar" style="left: 12.9%; width: 30%; background: #c3c2b7;"></div></div><span></span></div>
+            <div class="frow"><span class="mono" style="font-size: 8.5px; color: #898781; text-align: right;">TC</span><div class="ftrack"><div class="fbar" style="left: 15.7%; width: 28.6%; background: #c3c2b7;"></div></div><span></span></div>
+            <div class="frow"><span class="mono" style="font-size: 8.5px; color: #898781; text-align: right;">RTL</span><div class="ftrack"><div class="fbar" style="left: 14.3%; width: 22.9%; background: #c3c2b7;"></div></div><span></span></div>
+            <div class="frow"><span class="mono" style="font-size: 8.5px; color: #898781; text-align: right;">DV</span><div class="ftrack"><div class="fbar" style="left: 18.6%; width: 28.6%; background: #c3c2b7;"></div></div><span></span></div>
+            <div class="frow"><span class="mono" style="font-size: 8.5px; color: #898781; text-align: right;">DFT</span><div class="ftrack"><div class="fbar" style="left: 12.9%; width: 28.6%; background: #c3c2b7;"></div></div><span></span></div>
+            <div class="frow"><span class="mono" style="font-size: 8.5px; color: #898781; text-align: right;">SYN</span><div class="ftrack"><div class="fbar" style="left: 30%; width: 17.1%; background: #b9b8ae;"></div></div><span></span></div>
+            <div class="frow"><span class="mono" style="font-size: 8.5px; color: #0b0b0b; text-align: right; font-weight: 700;">PD</span><div class="ftrack"><div class="fbar" style="left: 32.9%; width: 21.4%; background: #d03b3b;"></div></div><span class="mono" style="font-size: 8px; color: #d03b3b;">5 risks</span></div>
+            <div class="frow"><span class="mono" style="font-size: 8.5px; color: #0b0b0b; text-align: right; font-weight: 700;">SO</span><div class="ftrack"><div class="fbar" style="left: 44.3%; width: 11.4%; background: #d03b3b;"></div></div><span class="mono" style="font-size: 8px; color: #d03b3b;">2 risks</span></div>
+            <div class="frow"><span class="mono" style="font-size: 8.5px; color: #898781; text-align: right;">TO</span><div class="ftrack"><div class="fbar" style="left: 55.7%; width: 5.7%; background: #d99b9b;"></div></div><span></span></div>
+            <div class="frow"><span class="mono" style="font-size: 8.5px; color: #898781; text-align: right;">FAB</span><div class="ftrack"><div class="fbar" style="left: 56.4%; width: 13.6%; background: #b9b8ae;"></div></div><span></span></div>
+            <div class="frow"><span class="mono" style="font-size: 8.5px; color: #0b0b0b; text-align: right; font-weight: 700;">PKGD</span><div class="ftrack"><div class="fbar" style="left: 17.1%; width: 37.1%; background: #d03b3b;"></div></div><span class="mono" style="font-size: 8px; color: #d03b3b;">4 risks</span></div>
+            <div class="frow"><span class="mono" style="font-size: 8.5px; color: #0b0b0b; text-align: right; font-weight: 700;">PTV</span><div class="ftrack"><div class="fbar" style="left: 25.7%; width: 37.1%; background: #d03b3b;"></div></div><span class="mono" style="font-size: 8px; color: #d03b3b;">3 risks</span></div>
+            <div class="frow"><span class="mono" style="font-size: 8.5px; color: #0b0b0b; text-align: right; font-weight: 700;">SIPI</span><div class="ftrack"><div class="fbar" style="left: 35.7%; width: 18.6%; background: #d03b3b;"></div></div><span class="mono" style="font-size: 8px; color: #d03b3b;">2 risks</span></div>
+            <div class="frow"><span class="mono" style="font-size: 8.5px; color: #898781; text-align: right;">ASSY</span><div class="ftrack"><div class="fbar" style="left: 70%; width: 5.7%; background: #d99b9b;"></div></div><span></span></div>
+            <div class="frow"><span class="mono" style="font-size: 8.5px; color: #0b0b0b; text-align: right;">EVB</span><div class="ftrack"><div class="fbar" style="left: 37.1%; width: 27.1%; background: #b9b8ae;"></div></div><span></span></div>
+            <div class="frow" style="background: #e7effa;"><span class="mono" style="font-size: 8.5px; color: #256abf; text-align: right; font-weight: 700;">TEST</span><div class="ftrack"><div class="fbar" style="left: 38.6%; width: 30%; background: #d03b3b;"></div></div><span class="mono" style="font-size: 8px; color: #d03b3b;">1 risk</span></div>
+            <div class="frow"><span class="mono" style="font-size: 8.5px; color: #898781; text-align: right;">BU</span><div class="ftrack"><div class="fbar" style="left: 72.9%; width: 12.9%; background: #b9b8ae;"></div></div><span></span></div>
+            <div class="frow"><span class="mono" style="font-size: 8.5px; color: #898781; text-align: right;">MP</span><div class="ftrack"><div class="fbar" style="left: 75.7%; width: 18.6%; background: #b9b8ae;"></div></div><span></span></div>
+            <div style="display: grid; grid-template-columns: 44px 1fr 84px; gap: 10px; margin-top: 5px;"><span></span><div class="mono" style="display: flex; justify-content: space-between; font-size: 7.5px; color: #898781; border-top: 1px solid #e1e0d9; padding-top: 3px;"><span>JUN '25</span><span>JAN '26</span><span>TODAY</span><span>JAN '27</span><span>DEC '27</span></div><span></span></div>
+          </div>
+        </div>
+
+        <!-- what needs you today -->
+        <div class="sec">
+          <span class="cap">What needs you this week</span>
+          <div style="margin-top: 12px; display: flex; flex-direction: column; gap: 0;">
+            <div style="display: flex; gap: 12px; padding: 11px 0; border-bottom: 1px solid #e1e0d9;">
+              <span class="mono" style="font-size: 9.5px; color: #898781; width: 68px; flex-shrink: 0; padding-top: 3px;">08/23</span>
+              <div style="flex-grow: 1;">
+                <div style="font-size: 14.45px; color: #0b0b0b; display: flex; align-items: center; gap: 7px;"><span style="width: 5px; height: 5px; border-radius: 50%; background: #d03b3b;"></span><span class="mono" style="font-size: 9.5px; color: #256abf;">PD</span> Hold closure at SS / &minus;40&nbsp;&deg;C after CTS rework</div>
+                <div style="font-size: 13px; color: #52514e; margin-top: 3px;">Hold clean on 14/16 clusters after buffer insertion; remaining 2 clusters re-running tonight.</div>
+              </div>
+            </div>
+            <div style="display: flex; gap: 12px; padding: 11px 0; border-bottom: 1px solid #e1e0d9;">
+              <span class="mono" style="font-size: 9.5px; color: #898781; width: 68px; flex-shrink: 0; padding-top: 3px;">08/23</span>
+              <div style="flex-grow: 1;">
+                <div style="font-size: 14.45px; color: #0b0b0b; display: flex; align-items: center; gap: 7px;"><span style="width: 5px; height: 5px; border-radius: 50%; background: #d03b3b;"></span><span class="mono" style="font-size: 9.5px; color: #256abf;">ASSY</span> HBM3 allocation for qual builds unconfirmed</div>
+                <div style="font-size: 13px; color: #52514e; margin-top: 3px;">Supplier call: allocation letter expected next week; qual quantities committed verbally.</div>
+              </div>
+            </div>
+            <div style="display: flex; gap: 12px; padding: 11px 0; border-bottom: 1px solid #e1e0d9;">
+              <span class="mono" style="font-size: 9.5px; color: #898781; width: 68px; flex-shrink: 0; padding-top: 3px;">08/22</span>
+              <div style="flex-grow: 1;">
+                <div style="font-size: 14.45px; color: #0b0b0b; display: flex; align-items: center; gap: 7px;"><span style="width: 5px; height: 5px; border-radius: 50%; background: #d03b3b;"></span><span class="mono" style="font-size: 9.5px; color: #256abf;">SO</span> Closure window compresses if PD route slips past week 32</div>
+                <div style="font-size: 13px; color: #52514e; margin-top: 3px;">Tracking PD route daily; go/no-go checkpoint with PD lead set for Monday.</div>
+              </div>
+            </div>
+            <div class="mono" style="font-size: 9.5px; color: #256abf; letter-spacing: .8px; padding-top: 10px;">ALL 23 OPEN RISKS &middot; 8 OVERDUE &rarr;</div>
+          </div>
+        </div>
+
+        <!-- the open stage, as a document section -->
+        <div class="sec">
+          <div style="display: flex; align-items: center; gap: 10px;">
+            <span class="idchip">TEST</span>
+            <span style="font-size: 18.7px; font-weight: 650; letter-spacing: -0.19px;">Test Development</span>
+            <span style="flex-grow: 1;"></span>
+            <span class="mono" style="font-size: 9.5px; color: #898781; letter-spacing: 1px;">STAGE 21 / 23</span>
+          </div>
+          <p class="lede" style="margin-top: 12px;">Build the ability to test the product &mdash; tester platform, probe card and load board, sort and final programs &mdash; on a critical path set by probe card lead time, not by wafer-out.</p>
+          <div style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); border: 1px solid #e1e0d9; border-radius: 5px; background: #fcfcfb; margin-top: 4px;">
+            <div style="padding: 10px 13px; border-right: 1px solid #e1e0d9;"><span class="cap" style="font-size: 9.52px;">Runs</span><div class="mono" style="font-size: 13.5px; margin-top: 4px;">06/01/2026</div></div>
+            <div style="padding: 10px 13px; border-right: 1px solid #e1e0d9;"><span class="cap" style="font-size: 9.52px;">Takes</span><div class="mono" style="font-size: 13.5px; margin-top: 4px;">42W</div></div>
+            <div style="padding: 10px 13px; border-right: 1px solid #e1e0d9;"><span class="cap" style="font-size: 9.52px;">Costs</span><div class="mono" style="font-size: 13.5px; margin-top: 4px;">174 M/M</div></div>
+            <div style="padding: 10px 13px;"><span class="cap" style="font-size: 9.52px;">Leader</span><div style="font-size: 13.5px; margin-top: 4px; font-weight: 600;">Dae-hyun Jo</div></div>
+          </div>
+          <div style="margin-top: 18px;">
+            <span class="cap" style="font-size: 9.52px;">What it delivers &middot; 1 of 7 done</span>
+            <div style="display: flex; align-items: center; gap: 10px; padding: 8px 0; border-bottom: 1px solid #e1e0d9; margin-top: 8px;"><span style="width: 13px; height: 13px; background: #256abf; border-radius: 2px; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0;"><svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3.5"><path d="M20 6 9 17l-5-5"/></svg></span><span class="mono" style="font-size: 9.5px; color: #898781;">TEST-D1</span><span style="flex-grow: 1; font-size: 14px; color: #898781; text-decoration: line-through;">Test plan and test coverage matrix</span><span class="mono" style="font-size: 10.5px; color: #898781;">07/20/2026</span></div>
+            <div style="display: flex; align-items: center; gap: 10px; padding: 8px 0; border-bottom: 1px solid #e1e0d9;"><span style="width: 13px; height: 13px; border: 1px solid #c3c2b7; border-radius: 2px; flex-shrink: 0;"></span><span class="mono" style="font-size: 9.5px; color: #898781;">TEST-D2</span><span style="flex-grow: 1; font-size: 14px;">ATE-ready pattern set with debug hooks</span><span class="mono" style="font-size: 10.5px;">11/16/2026</span></div>
+            <div style="display: flex; align-items: center; gap: 10px; padding: 8px 0; border-bottom: 1px solid #e1e0d9;"><span style="width: 13px; height: 13px; border: 1px solid #c3c2b7; border-radius: 2px; flex-shrink: 0;"></span><span class="mono" style="font-size: 9.5px; color: #898781;">TEST-D3</span><span style="flex-grow: 1; font-size: 14px;">Test data infrastructure and yield dashboards</span><span class="mono" style="font-size: 10.5px;">12/14/2026</span></div>
+            <div class="mono" style="font-size: 9.5px; color: #256abf; letter-spacing: .8px; padding-top: 9px;">4 MORE &middot; 9 ENGINEERING ACTIVITIES &rarr;</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ─── sidebar, the Activity page's .ad-side ─── -->
+      <div style="border-left: 1px solid #e1e0d9; padding-left: 18px; font-size: 17px;">
+        <span class="cap" style="font-size: 9.52px;">Next checkpoints</span>
+        <div style="margin-top: 10px;">
+          <div style="padding: 7px 0; border-bottom: 1px solid #f0efe9;"><div style="font-size: 13.5px; font-weight: 600;">Package Design Freeze</div><div class="mono" style="font-size: 10px; color: #898781; margin-top: 2px;">11/02/2026 &middot; D&minus;68</div></div>
+          <div style="padding: 7px 0; border-bottom: 1px solid #f0efe9;"><div style="font-size: 13.5px; font-weight: 600;">Design Freeze</div><div class="mono" style="font-size: 10px; color: #898781; margin-top: 2px;">11/16/2026 &middot; D&minus;82</div></div>
+          <div style="padding: 7px 0; border-bottom: 1px solid #f0efe9; background: #e7effa; margin: 0 -6px; padding-left: 6px; padding-right: 6px;"><div style="font-size: 13.5px; font-weight: 700;">Tapeout (BEOL MTO)</div><div class="mono" style="font-size: 10px; color: #256abf; margin-top: 2px;">01/11/2027 &middot; D&minus;138</div></div>
+          <div style="padding: 7px 0; border-bottom: 1px solid #f0efe9;"><div style="font-size: 13.5px; font-weight: 600;">EVB Ready</div><div class="mono" style="font-size: 10px; color: #898781; margin-top: 2px;">02/08/2027 &middot; D&minus;166</div></div>
+        </div>
+
+        <span class="cap" style="font-size: 9.52px; margin-top: 24px;">In flight today &middot; 7</span>
+        <div style="display: flex; flex-wrap: wrap; gap: 5px; margin-top: 10px;">
+          <span class="mono" style="font-size: 9.5px; color: #d03b3b; border: 1px solid #d03b3b; border-radius: 10px; padding: 3px 9px;">PD</span>
+          <span class="mono" style="font-size: 9.5px; color: #d03b3b; border: 1px solid #d03b3b; border-radius: 10px; padding: 3px 9px;">SO</span>
+          <span class="mono" style="font-size: 9.5px; color: #d03b3b; border: 1px solid #d03b3b; border-radius: 10px; padding: 3px 9px;">PKGD</span>
+          <span class="mono" style="font-size: 9.5px; color: #d03b3b; border: 1px solid #d03b3b; border-radius: 10px; padding: 3px 9px;">PTV</span>
+          <span class="mono" style="font-size: 9.5px; color: #d03b3b; border: 1px solid #d03b3b; border-radius: 10px; padding: 3px 9px;">SIPI</span>
+          <span class="mono" style="font-size: 9.5px; color: #52514e; border: 1px solid #c3c2b7; border-radius: 10px; padding: 3px 9px;">EVB</span>
+          <span class="mono" style="font-size: 9.5px; color: #d03b3b; border: 1px solid #d03b3b; border-radius: 10px; padding: 3px 9px;">TEST</span>
+        </div>
+
+        <span class="cap" style="font-size: 9.52px; margin-top: 24px;">Where the effort goes</span>
+        <div style="margin-top: 10px;">
+          <div style="display: flex; justify-content: space-between; padding: 5px 0;"><span style="font-size: 13px;">Verification</span><span class="mono" style="font-size: 12px;">650</span></div>
+          <div style="display: flex; justify-content: space-between; padding: 5px 0;"><span style="font-size: 13px;">Physical Design</span><span class="mono" style="font-size: 12px;">449</span></div>
+          <div style="display: flex; justify-content: space-between; padding: 5px 0;"><span style="font-size: 13px;">RTL Design</span><span class="mono" style="font-size: 12px;">410</span></div>
+          <div style="display: flex; justify-content: space-between; padding: 5px 0;"><span style="font-size: 13px;">Package &amp; Substrate</span><span class="mono" style="font-size: 12px;">310</span></div>
+          <div style="display: flex; justify-content: space-between; padding: 5px 0; border-top: 1px solid #e1e0d9; margin-top: 3px;"><span class="mono" style="font-size: 9.5px; letter-spacing: 1px; text-transform: uppercase; color: #898781; padding-top: 4px;">Total</span><span class="mono" style="font-size: 12px; font-weight: 600; padding-top: 4px;">3653 M/M</span></div>
+        </div>
+
+        <span class="cap" style="font-size: 9.52px; margin-top: 24px;">Template</span>
+        <div style="margin-top: 8px; font-size: 13px; color: #52514e;">Typical SoC</div>
+        <div class="mono" style="font-size: 9.5px; color: #256abf; letter-spacing: .8px; margin-top: 6px;">EDIT STAGES &rarr;</div>
+      </div>
+    </div>
+  </div>
+</div>
+</x-dc>
+</body>
+</html>

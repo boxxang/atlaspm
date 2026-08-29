@@ -1,0 +1,150 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <style>
+    body { margin: 0; }
+    a { color: #5b5bd6; } a:hover { color: #4747b8; }
+    .ui { font-family: system-ui, -apple-system, "Segoe UI", sans-serif; letter-spacing: -0.011em; }
+    .card { border: 1px solid #e6e8eb; border-radius: 8px; background: #fff; box-shadow: 0 1px 2px rgba(16,24,40,.04); }
+    .h { font-size: 11px; font-weight: 600; color: #8b8f98; letter-spacing: .4px; text-transform: uppercase; }
+    .m { font-family: ui-monospace, Menlo, monospace; font-size: 12px; }
+    .num { font-variant-numeric: tabular-nums; }
+    .ent { border: 1.5px solid #d8dade; border-radius: 8px; background: #fff; }
+    .ent .t { font-family: ui-monospace, Menlo, monospace; font-size: 12.5px; font-weight: 600; padding: 8px 12px; border-bottom: 1px solid #f0f0f2; }
+    .ent .f { font-family: ui-monospace, Menlo, monospace; font-size: 11.5px; color: #62666d; padding: 4px 12px; }
+    .new { border-color: #5b5bd6; }
+    .new .t { background: #eeeefb; color: #4747b8; border-bottom-color: #cdcdf5; }
+    .tpl { border-color: #d8dade; background: #fbfbfc; }
+    .tpl .t { background: #f1f1f4; }
+    .tag { font-size: 10px; font-weight: 700; letter-spacing: .6px; padding: 1px 6px; border-radius: 4px; }
+  </style>
+</helmet>
+
+<div class="ui" style="width: 1440px; height: 900px; background: #fbfbfc; color: #16181d; font-size: 14px; padding: 24px 26px; overflow: hidden;">
+
+  <div style="display: flex; align-items: baseline; gap: 12px;">
+    <h1 style="font-size: 19px; font-weight: 600; letter-spacing: -0.02em; margin: 0;">Where progress gets recorded</h1>
+    <span style="font-size: 13px; color: #8b8f98;">the model behind the merged Activity tab</span>
+  </div>
+
+  <div style="display: flex; gap: 14px; margin-top: 14px;">
+    <div class="card" style="padding: 9px 14px;"><span class="h">Engineering activities</span><div class="num" style="font-size: 20px; font-weight: 600; margin-top: 2px;">257</div></div>
+    <div class="card" style="padding: 9px 14px;"><span class="h">Authored steps</span><div class="num" style="font-size: 20px; font-weight: 600; margin-top: 2px;">1,649</div><div style="font-size: 11px; color: #8b8f98;">avg 6.4 &middot; 34% parallel &middot; none missing</div></div>
+    <div class="card" style="padding: 9px 14px;"><span class="h">Deliverables</span><div class="num" style="font-size: 20px; font-weight: 600; margin-top: 2px;">167</div></div>
+    <div class="card" style="padding: 9px 14px; border-color: #f5cfd0; background: #fffafa;"><span class="h" style="color: #c5303a;">Real status updates in the seed</span><div class="num" style="font-size: 20px; font-weight: 600; margin-top: 2px; color: #e5484d;">41</div><div style="font-size: 11px; color: #8b8f98;">this is why steps do not each get a thread</div></div>
+  </div>
+
+  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 22px; margin-top: 20px;">
+
+    <!-- BEFORE -->
+    <div>
+      <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px;">
+        <span class="tag" style="background: #f1f1f4; color: #62666d;">TODAY</span>
+        <span style="font-size: 13.5px; font-weight: 600;">Progress is recorded against a retyped copy</span>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px; align-items: start;">
+        <div class="ent tpl">
+          <div class="t">ActivityDetail <span style="font-weight: 400; color: #8b8f98;">&mdash; template</span></div>
+          <div class="f">id &nbsp;<span style="color: #5b5bd6;">"TEST-03"</span></div>
+          <div class="f">steps[] &nbsp;<span style="color: #8b8f98;">{n, text, tat, lane}</span></div>
+          <div class="f">produces[] / producedBy[]</div>
+          <div class="f">window, roles, risks, effort</div>
+          <div style="padding: 8px 12px; border-top: 1px solid #f0f0f2; font-size: 11.5px; color: #8b8f98; line-height: 1.45;">Read-only. Nothing per-program attaches to it, and nothing attaches to a step at all.</div>
+        </div>
+
+        <div class="ent">
+          <div class="t">Item <span style="font-weight: 400; color: #8b8f98;">kind: activity</span></div>
+          <div class="f">title &nbsp;<span style="color: #e5484d;">"Probe card design, fabri&hellip;"</span></div>
+          <div class="f">owner, due, body, done</div>
+          <div class="f">deliverableId?</div>
+          <div class="f" style="color: #16181d;">updates[] &rarr; StatusUpdate</div>
+          <div style="padding: 8px 12px; border-top: 1px solid #f0f0f2; font-size: 11.5px; color: #8b8f98; line-height: 1.45;">Hand-typed. Its title is TEST-03's title, retyped &mdash; but nothing links them.</div>
+        </div>
+      </div>
+
+      <div style="margin-top: 14px; padding: 11px 14px; border: 1px solid #f5cfd0; border-radius: 8px; background: #fffafa;">
+        <div style="font-size: 12.5px; font-weight: 600; color: #c5303a; margin-bottom: 5px;">What breaks</div>
+        <p style="font-size: 12.5px; line-height: 1.55; color: #62666d; margin: 0;">The must-do list and the in-progress list are two lists you reconcile by eye. Steps &mdash; the level where work actually moves &mdash; carry nothing. And a deliverable is ticked on a third checklist, unconnected to either.</p>
+      </div>
+    </div>
+
+    <!-- AFTER -->
+    <div>
+      <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px;">
+        <span class="tag" style="background: #eeeefb; color: #4747b8;">PROPOSED</span>
+        <span style="font-size: 13.5px; font-weight: 600;">Progress attaches to the template, lazily</span>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px; align-items: start;">
+        <div style="display: flex; flex-direction: column; gap: 12px;">
+          <div class="ent tpl">
+            <div class="t">ActivityDetail <span style="font-weight: 400; color: #8b8f98;">&mdash; unchanged</span></div>
+            <div class="f">steps[] &middot; producedBy[]</div>
+          </div>
+
+          <div class="ent new">
+            <div class="t">ActivityProgress <span class="tag" style="background: #5b5bd6; color: #fff; margin-left: 4px;">NEW</span></div>
+            <div class="f">projectId, activityId <span style="color: #5b5bd6;">"TEST-03"</span></div>
+            <div class="f">owner, done</div>
+            <div class="f" style="color: #16181d;">updates[] &rarr; StatusUpdate</div>
+            <div style="padding: 8px 12px; border-top: 1px solid #f0f0f2; font-size: 11.5px; color: #8b8f98; line-height: 1.45;">Created on first touch. One thread per activity &mdash; the narrative stays readable.</div>
+          </div>
+
+          <div class="ent new">
+            <div class="t">StepProgress <span class="tag" style="background: #5b5bd6; color: #fff; margin-left: 4px;">NEW</span></div>
+            <div class="f">activityProgressId, n</div>
+            <div class="f">done, completedAt, owner?</div>
+            <div style="padding: 8px 12px; border-top: 1px solid #f0f0f2; font-size: 11.5px; color: #8b8f98; line-height: 1.45;">Also lazy: a row appears when a step is ticked or posted about. <strong style="color: #16181d; font-weight: 600;">Zero rows on day one</strong>, not 1,649.</div>
+          </div>
+        </div>
+
+        <div style="display: flex; flex-direction: column; gap: 12px;">
+          <div class="ent">
+            <div class="t">StatusUpdate</div>
+            <div class="f">text, createdAt</div>
+            <div class="f" style="color: #4747b8; background: #f7f7fe;">stepN? <span class="tag" style="background: #eeeefb; color: #4747b8;">NEW FIELD</span></div>
+            <div style="padding: 8px 12px; border-top: 1px solid #f0f0f2; font-size: 11.5px; color: #8b8f98; line-height: 1.45;">One optional tag, not a foreign key to a step row. A post about step 6 can be written before step 6 has started &mdash; which is how a risk gets flagged early.</div>
+          </div>
+
+          <div class="ent">
+            <div class="t">Item <span style="font-weight: 400; color: #8b8f98;">kind: activity</span></div>
+            <div class="f">title, owner, due, body</div>
+            <div class="f">updates[] &rarr; StatusUpdate</div>
+            <div style="padding: 8px 12px; border-top: 1px solid #f0f0f2; font-size: 11.5px; color: #8b8f98; line-height: 1.45;"><strong style="color: #16181d; font-weight: 600;">Stays.</strong> For work this program needs that the template does not have. No steps, its own thread, listed under &ldquo;Added on this program&rdquo;.</div>
+          </div>
+
+          <div class="ent">
+            <div class="t">Deliverable</div>
+            <div class="f">done, completedAt</div>
+            <div style="padding: 8px 12px; border-top: 1px solid #f0f0f2; font-size: 11.5px; color: #8b8f98; line-height: 1.45;">Ticked by the step that produces it. <span class="m" style="font-size: 11px; color: #5b5bd6;">producedBy</span> already names that step on all 257 activities &mdash; one whole checklist stops being a separate surface.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; margin-top: 20px;">
+    <div class="card" style="padding: 13px 15px;">
+      <div style="font-size: 12.5px; font-weight: 600; margin-bottom: 6px;">Why the thread sits on the activity, not the step</div>
+      <p style="font-size: 12.5px; line-height: 1.55; color: #62666d; margin: 0;">Real updates span steps. <em>&ldquo;Design kicked off with the vendor; contact-resistance analysis running alongside&rdquo;</em> is steps 2 and 3 at once. And 34% of steps run in parallel, so per-step threads would split one week's news into two lists you have to interleave. One thread, one optional step tag, keeps both facts.</p>
+    </div>
+    <div class="card" style="padding: 13px 15px;">
+      <div style="font-size: 12.5px; font-weight: 600; margin-bottom: 6px;">The one number the stage list needs</div>
+      <p style="font-size: 12.5px; line-height: 1.55; color: #62666d; margin: 0;"><strong style="color: #16181d;">&ldquo;On step 2 of 8&rdquo;</strong> falls straight out of the ticks &mdash; no percentage to invent, no separate status field to keep honest. It is what makes 11 activities scannable in a row each, and it is what the segmented bar draws.</p>
+    </div>
+    <div class="card" style="padding: 13px 15px; border-color: #f0d9a8; background: #fffdf6;">
+      <div style="font-size: 12.5px; font-weight: 600; margin-bottom: 6px; color: #8a6a1f;">Migration &mdash; the real cost</div>
+      <p style="font-size: 12.5px; line-height: 1.55; color: #62666d; margin: 0;">Existing <span class="m" style="font-size: 11px;">Item{kind:'activity'}</span> rows are not typed against the template, so they cannot be matched automatically. The screen offers a per-row <em>&ldquo;Looks like TEST-03 &middot; link?&rdquo;</em> on a title match and leaves the rest alone. Nothing is migrated without a person saying yes.</p>
+    </div>
+  </div>
+</div>
+</x-dc>
+</body>
+</html>

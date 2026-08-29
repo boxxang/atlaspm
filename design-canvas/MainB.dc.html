@@ -1,0 +1,193 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <style>
+    body { margin: 0; }
+    a { color: #256abf; } a:hover { color: #1b4f8f; }
+    .mono { font-family: ui-monospace,"SF Mono",Menlo,monospace; }
+    .cap { font-family: ui-monospace,"SF Mono",Menlo,monospace; font-size: 9px; font-weight: 600; letter-spacing: 1.2px; text-transform: uppercase; color: #898781; }
+    .phead { display: flex; align-items: center; gap: 8px; height: 22px; padding-left: 16px; background: #f2f1eb; border-top: 1px solid #e1e0d9; border-bottom: 1px solid #e1e0d9; }
+    .grow { display: grid; grid-template-columns: 210px 1fr; height: 24px; align-items: center; border-bottom: 1px solid #f0efe9; }
+    .gname { display: flex; align-items: center; gap: 8px; padding-left: 26px; }
+    .gcode { font-family: ui-monospace,"SF Mono",Menlo,monospace; font-size: 9px; font-weight: 700; color: #52514e; width: 34px; }
+    .gtitle { font-size: 11.5px; color: #52514e; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .lane { position: relative; height: 24px; }
+    .b { position: absolute; top: 7px; height: 10px; border-radius: 2px; }
+  </style>
+</helmet>
+
+<div style="width: 1440px; height: 1000px; background: #f9f9f7; font-family: system-ui,-apple-system,'Segoe UI',sans-serif; font-size: 15px; color: #0b0b0b; overflow: hidden; position: relative;">
+
+  <!-- ══════════ PROGRAM BAND — the dashboard, folded into a 52px header ══════════ -->
+  <div style="height: 52px; border-bottom: 1px solid #c3c2b7; background: #fcfcfb; display: flex; align-items: center; gap: 22px; padding: 0 22px;">
+    <div style="display: flex; align-items: center; gap: 8px;">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#898781" stroke-width="2.2"><path d="m15 18-6-6 6-6"/></svg>
+      <span class="mono" style="font-size: 16px; font-weight: 600; letter-spacing: -0.3px;">AtlasAX1</span>
+      <span class="mono" style="font-size: 9px; letter-spacing: .8px; text-transform: uppercase; color: #898781; border: 1px solid #e1e0d9; border-radius: 3px; padding: 2px 6px;">Typical SoC</span>
+    </div>
+
+    <div style="width: 1px; height: 26px; background: #e1e0d9;"></div>
+
+    <div style="display: flex; align-items: center; gap: 18px;">
+      <div style="display: flex; align-items: baseline; gap: 6px;"><span class="cap">Kick-off</span><span class="mono" style="font-size: 12px;">05/19/2025</span></div>
+      <div style="display: flex; align-items: baseline; gap: 6px;"><span class="cap">MTO</span><span class="mono" style="font-size: 12px;">01/11/2027</span><span class="mono" style="font-size: 10px; color: #256abf;">D&minus;138</span></div>
+      <div style="display: flex; align-items: baseline; gap: 6px;"><span class="cap">MP</span><span class="mono" style="font-size: 12px;">11/29/2027</span></div>
+    </div>
+
+    <span style="flex-grow: 1;"></span>
+
+    <!-- the four dashboard stats, live in the header instead of behind a mode toggle -->
+    <div style="display: flex; align-items: center; gap: 0; border: 1px solid #e1e0d9; border-radius: 4px; overflow: hidden; background: #f9f9f7;">
+      <div style="padding: 6px 13px; border-right: 1px solid #e1e0d9; display: flex; align-items: center; gap: 8px;">
+        <span class="cap">Progress</span><span class="mono" style="font-size: 14px; font-weight: 600;">52%</span>
+        <div style="width: 44px; height: 3px; background: #ecebe5; border-radius: 2px; position: relative;"><div style="position: absolute; width: 52%; height: 3px; background: #256abf; border-radius: 2px;"></div></div>
+      </div>
+      <div style="padding: 6px 13px; border-right: 1px solid #e1e0d9; display: flex; align-items: center; gap: 8px; background: #fdf4f4;">
+        <span class="cap" style="color: #b06060;">Open risks</span><span class="mono" style="font-size: 14px; font-weight: 600; color: #d03b3b;">23</span>
+      </div>
+      <div style="padding: 6px 13px; border-right: 1px solid #e1e0d9; display: flex; align-items: center; gap: 8px; background: #fdf4f4;">
+        <span class="cap" style="color: #b06060;">Overdue</span><span class="mono" style="font-size: 14px; font-weight: 600; color: #d03b3b;">8</span>
+      </div>
+      <div style="padding: 6px 13px; display: flex; align-items: center; gap: 8px;">
+        <span class="cap">Est. cost</span><span class="mono" style="font-size: 14px; font-weight: 600;">$54.8M</span>
+      </div>
+    </div>
+
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#52514e" stroke-width="1.6"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.6 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.6a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+  </div>
+
+  <!-- ══════════ TIME AXIS + MILESTONE LANE ══════════ -->
+  <div style="display: grid; grid-template-columns: 210px 1fr; border-bottom: 1px solid #c3c2b7; background: #fcfcfb;">
+    <div style="padding: 8px 0 6px 16px; display: flex; flex-direction: column; justify-content: flex-end;">
+      <span class="cap">23 stages &middot; 7 in flight</span>
+    </div>
+    <div style="position: relative; padding-right: 24px;">
+      <!-- milestone lane -->
+      <div style="position: relative; height: 30px;">
+        <div style="position: absolute; left: 17.1%; top: 9px;"><div style="width: 8px; height: 8px; background: #898781; transform: rotate(45deg);"></div></div>
+        <div style="position: absolute; left: 31.4%; top: 9px;"><div style="width: 8px; height: 8px; background: #898781; transform: rotate(45deg);"></div></div>
+        <div style="position: absolute; left: 37.1%; top: 9px;"><div style="width: 8px; height: 8px; background: #898781; transform: rotate(45deg);"></div></div>
+        <div style="position: absolute; left: 44.3%; top: 9px;"><div style="width: 8px; height: 8px; background: #898781; transform: rotate(45deg);"></div></div>
+        <div style="position: absolute; left: 54.3%; top: 6px; display: flex; align-items: center; gap: 5px;"><div style="width: 9px; height: 9px; background: #0b0b0b; transform: rotate(45deg);"></div><span class="mono" style="font-size: 8.5px; color: #52514e; white-space: nowrap;">Design Freeze</span></div>
+        <div style="position: absolute; left: 61.4%; top: 4px; display: flex; align-items: center; gap: 5px;"><div style="width: 12px; height: 12px; background: #256abf; transform: rotate(45deg);"></div><span class="mono" style="font-size: 9.5px; font-weight: 600; color: #256abf; white-space: nowrap;">Tapeout &middot; 01/11/2027 &middot; D&minus;138</span></div>
+        <div style="position: absolute; left: 75.7%; top: 6px; display: flex; align-items: center; gap: 5px;"><div style="width: 9px; height: 9px; background: #fcfcfb; border: 1.5px solid #0b0b0b; transform: rotate(45deg);"></div><span class="mono" style="font-size: 8.5px; color: #52514e; white-space: nowrap;">First Silicon</span></div>
+        <div style="position: absolute; left: 47.5%; top: 0; bottom: -4px; width: 1px; background: #256abf;"></div>
+      </div>
+      <!-- year / month scale -->
+      <div style="display: flex; border-top: 1px solid #e1e0d9; position: relative;">
+        <div class="mono" style="position: absolute; left: 47.5%; transform: translateX(-50%); top: 2px; font-size: 8.5px; color: #fff; background: #256abf; padding: 1px 6px; border-radius: 2px; letter-spacing: .6px; z-index: 2;">TODAY 08/27</div>
+        <div class="mono" style="flex-grow: 20; font-size: 9px; color: #898781; padding: 4px 0 4px 6px; border-right: 1px solid #e1e0d9;">2025</div>
+        <div class="mono" style="flex-grow: 52; font-size: 9px; color: #898781; padding: 4px 0 4px 6px; border-right: 1px solid #e1e0d9;">2026</div>
+        <div class="mono" style="flex-grow: 52; font-size: 9px; color: #898781; padding: 4px 0 4px 6px; border-right: 1px solid #e1e0d9;">2027</div>
+        <div class="mono" style="flex-grow: 16; font-size: 9px; color: #898781; padding: 4px 0 4px 6px;">2028</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════ THE TIMELINE IS THE PAGE ══════════ -->
+  <div style="position: relative;">
+    <div style="position: absolute; left: calc(210px + (100% - 234px) * 0.475); top: 0; bottom: 0; width: 1px; background: #256abf; z-index: 4; pointer-events: none;"></div>
+
+    <div class="phead"><span class="mono" style="font-size: 9px; font-weight: 700; letter-spacing: 1.3px; text-transform: uppercase; color: #52514e;">Define</span><span class="mono" style="font-size: 8.5px; color: #898781;">2 stages</span></div>
+    <div class="grow"><div class="gname"><span class="gcode">DEF</span><span class="gtitle">Product Definition</span></div><div class="lane" style="padding-right: 24px;"><div class="b" style="left: 0%; width: 5.7%; background: #d03b3b;"></div></div></div>
+    <div class="grow"><div class="gname"><span class="gcode">ARCH</span><span class="gtitle">Architecture</span></div><div class="lane" style="padding-right: 24px;"><div class="b" style="left: 4.3%; width: 12.9%; background: #c3c2b7;"></div></div></div>
+
+    <div class="phead"><span class="mono" style="font-size: 9px; font-weight: 700; letter-spacing: 1.3px; text-transform: uppercase; color: #52514e;">Technology &amp; IP Enablement</span><span class="mono" style="font-size: 8.5px; color: #898781;">5 stages</span></div>
+    <div class="grow"><div class="gname"><span class="gcode">TECH</span><span class="gtitle">Technology &amp; Foundry Selection</span></div><div class="lane" style="padding-right: 24px;"><div class="b" style="left: 0%; width: 10%; background: #c3c2b7;"></div></div></div>
+    <div class="grow"><div class="gname"><span class="gcode">PDK</span><span class="gtitle">PDK &amp; Design Enablement</span></div><div class="lane" style="padding-right: 24px;"><div class="b" style="left: 5.7%; width: 25.7%; background: #c3c2b7;"></div></div></div>
+    <div class="grow"><div class="gname"><span class="gcode">IPR</span><span class="gtitle">IP Strategy &amp; Readiness</span></div><div class="lane" style="padding-right: 24px;"><div class="b" style="left: 2.9%; width: 15.7%; background: #c3c2b7;"></div></div></div>
+    <div class="grow"><div class="gname"><span class="gcode">AMS</span><span class="gtitle">Custom, AMS &amp; Memory IP</span></div><div class="lane" style="padding-right: 24px;"><div class="b" style="left: 12.9%; width: 30%; background: #c3c2b7;"></div></div></div>
+    <div class="grow"><div class="gname"><span class="gcode">TC</span><span class="gtitle">Test Chip / MPW Shuttle</span></div><div class="lane" style="padding-right: 24px;"><div class="b" style="left: 15.7%; width: 28.6%; background: #c3c2b7;"></div></div></div>
+
+    <div class="phead"><span class="mono" style="font-size: 9px; font-weight: 700; letter-spacing: 1.3px; text-transform: uppercase; color: #52514e;">Design &amp; Verify</span><span class="mono" style="font-size: 8.5px; color: #898781;">3 stages</span></div>
+    <div class="grow"><div class="gname"><span class="gcode">RTL</span><span class="gtitle">RTL Design &amp; Integration</span></div><div class="lane" style="padding-right: 24px;"><div class="b" style="left: 14.3%; width: 22.9%; background: #c3c2b7;"></div></div></div>
+    <div class="grow"><div class="gname"><span class="gcode">DV</span><span class="gtitle">Verification</span></div><div class="lane" style="padding-right: 24px;"><div class="b" style="left: 18.6%; width: 28.6%; background: #c3c2b7;"></div></div></div>
+    <div class="grow"><div class="gname"><span class="gcode">DFT</span><span class="gtitle">DFT Architecture</span></div><div class="lane" style="padding-right: 24px;"><div class="b" style="left: 12.9%; width: 28.6%; background: #c3c2b7;"></div></div></div>
+
+    <div class="phead"><span class="mono" style="font-size: 9px; font-weight: 700; letter-spacing: 1.3px; text-transform: uppercase; color: #52514e;">Implement</span><span class="mono" style="font-size: 8.5px; color: #898781;">3 stages &middot; 2 in flight</span></div>
+    <div class="grow"><div class="gname"><span class="gcode">SYN</span><span class="gtitle">Logic Synthesis &amp; Netlist Drops</span></div><div class="lane" style="padding-right: 24px;"><div class="b" style="left: 30%; width: 17.1%; background: #c3c2b7;"></div></div></div>
+    <div class="grow" style="background: #fdf7f7;"><div class="gname"><span class="gcode" style="color: #0b0b0b;">PD</span><span class="gtitle" style="color: #0b0b0b; font-weight: 600;">Physical Design</span></div><div class="lane" style="padding-right: 24px;"><div class="b" style="left: 32.9%; width: 21.4%; background: #d03b3b;"></div><span class="mono" style="position: absolute; left: 54.8%; top: 6px; font-size: 8.5px; color: #d03b3b;">5 risks</span></div></div>
+    <div class="grow" style="background: #fdf7f7;"><div class="gname"><span class="gcode" style="color: #0b0b0b;">SO</span><span class="gtitle" style="color: #0b0b0b; font-weight: 600;">Signoff</span></div><div class="lane" style="padding-right: 24px;"><div class="b" style="left: 44.3%; width: 11.4%; background: #d03b3b;"></div><span class="mono" style="position: absolute; left: 56.5%; top: 6px; font-size: 8.5px; color: #d03b3b;">2 risks</span></div></div>
+
+    <div class="phead"><span class="mono" style="font-size: 9px; font-weight: 700; letter-spacing: 1.3px; text-transform: uppercase; color: #52514e;">Manufacture</span><span class="mono" style="font-size: 8.5px; color: #898781;">2 stages</span></div>
+    <div class="grow"><div class="gname"><span class="gcode">TO</span><span class="gtitle">Tapeout &amp; Mask Release (MTO)</span></div><div class="lane" style="padding-right: 24px;"><div class="b" style="left: 55.7%; width: 5.7%; background: #d99b9b;"></div></div></div>
+    <div class="grow"><div class="gname"><span class="gcode">FAB</span><span class="gtitle">Fabrication</span></div><div class="lane" style="padding-right: 24px;"><div class="b" style="left: 56.4%; width: 13.6%; background: #b9b8ae;"></div></div></div>
+
+    <div class="phead"><span class="mono" style="font-size: 9px; font-weight: 700; letter-spacing: 1.3px; text-transform: uppercase; color: #52514e;">Integrate</span><span class="mono" style="font-size: 8.5px; color: #898781;">4 stages &middot; 3 in flight</span></div>
+    <div class="grow" style="background: #fdf7f7;"><div class="gname"><span class="gcode" style="color: #0b0b0b;">PKGD</span><span class="gtitle" style="color: #0b0b0b; font-weight: 600;">Package &amp; Substrate Design</span></div><div class="lane" style="padding-right: 24px;"><div class="b" style="left: 17.1%; width: 37.1%; background: #d03b3b;"></div></div></div>
+    <div class="grow" style="background: #fdf7f7;"><div class="gname"><span class="gcode" style="color: #0b0b0b;">PTV</span><span class="gtitle" style="color: #0b0b0b; font-weight: 600;">Package Test Vehicle (CPI / TTV)</span></div><div class="lane" style="padding-right: 24px;"><div class="b" style="left: 25.7%; width: 37.1%; background: #d03b3b;"></div></div></div>
+    <div class="grow" style="background: #fdf7f7;"><div class="gname"><span class="gcode" style="color: #0b0b0b;">SIPI</span><span class="gtitle" style="color: #0b0b0b; font-weight: 600;">Chip-Package-System Co-Verification</span></div><div class="lane" style="padding-right: 24px;"><div class="b" style="left: 35.7%; width: 18.6%; background: #d03b3b;"></div></div></div>
+    <div class="grow"><div class="gname"><span class="gcode">ASSY</span><span class="gtitle">Assembly &amp; Package Build</span></div><div class="lane" style="padding-right: 24px;"><div class="b" style="left: 70%; width: 5.7%; background: #d99b9b;"></div></div></div>
+
+    <div class="phead"><span class="mono" style="font-size: 9px; font-weight: 700; letter-spacing: 1.3px; text-transform: uppercase; color: #52514e;">Validate &amp; Ramp</span><span class="mono" style="font-size: 8.5px; color: #898781;">4 stages &middot; 2 in flight</span></div>
+    <div class="grow" style="background: #fdf7f7;"><div class="gname"><span class="gcode" style="color: #0b0b0b;">EVB</span><span class="gtitle" style="color: #0b0b0b; font-weight: 600;">Validation Hardware / EVB</span></div><div class="lane" style="padding-right: 24px;"><div class="b" style="left: 37.1%; width: 27.1%; background: #b9b8ae;"></div></div></div>
+    <div class="grow" style="background: #e7effa; border-bottom: 1px solid #b9cbe8;"><div class="gname" style="border-left: 2px solid #256abf; padding-left: 24px;"><span class="gcode" style="color: #0b0b0b;">TEST</span><span class="gtitle" style="color: #0b0b0b; font-weight: 700;">Test Development</span></div><div class="lane" style="padding-right: 24px;"><div class="b" style="left: 38.6%; width: 30%; background: #d03b3b; box-shadow: 0 0 0 2px #e7effa, 0 0 0 3px #256abf;"></div></div></div>
+    <div class="grow"><div class="gname"><span class="gcode">BU</span><span class="gtitle">Silicon Bring-up</span></div><div class="lane" style="padding-right: 24px;"><div class="b" style="left: 72.9%; width: 12.9%; background: #b9b8ae;"></div></div></div>
+    <div class="grow"><div class="gname"><span class="gcode">MP</span><span class="gtitle">Qualification &amp; Production</span></div><div class="lane" style="padding-right: 24px;"><div class="b" style="left: 75.7%; width: 18.6%; background: #b9b8ae;"></div></div></div>
+  </div>
+
+  <!-- ══════════ DRAWER — the stage opens over the timeline, not below it ══════════ -->
+  <div style="position: absolute; right: 0; top: 52px; bottom: 0; width: 452px; background: #fcfcfb; border-left: 1px solid #c3c2b7; box-shadow: -18px 0 40px rgba(11,11,11,.10); display: flex; flex-direction: column;">
+    <div style="padding: 16px 20px 14px; border-bottom: 1px solid #e1e0d9;">
+      <div style="display: flex; align-items: center; gap: 9px;">
+        <span class="mono" style="font-size: 11px; font-weight: 600; color: #256abf; background: #e7effa; padding: 3px 8px; border-radius: 3px; letter-spacing: .9px;">TEST</span>
+        <span class="mono" style="font-size: 9px; letter-spacing: 1px; text-transform: uppercase; color: #898781;">21 / 23 &middot; Validate &amp; Ramp</span>
+        <span style="flex-grow: 1;"></span>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#898781" stroke-width="2"><path d="M18 6 6 18M6 6l12 12"/></svg>
+      </div>
+      <h2 style="font-size: 22px; font-weight: 650; letter-spacing: -0.4px; margin: 10px 0 5px;">Test Development</h2>
+      <div style="font-size: 13.5px; color: #52514e;">Probe card lead time is the critical path.</div>
+    </div>
+
+    <!-- facts -->
+    <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); border-bottom: 1px solid #e1e0d9;">
+      <div style="padding: 10px 20px; border-right: 1px solid #e1e0d9;"><div class="cap">Runs</div><div class="mono" style="font-size: 13px; margin-top: 3px;">06/01/2026 &rarr; 03/22/2027</div></div>
+      <div style="padding: 10px 20px;"><div class="cap">Takes / Costs</div><div class="mono" style="font-size: 13px; margin-top: 3px;">42W &middot; 174 M/M</div></div>
+      <div style="padding: 10px 20px; border-right: 1px solid #e1e0d9; border-top: 1px solid #e1e0d9;"><div class="cap">Leader</div><div style="font-size: 13px; margin-top: 3px; font-weight: 600;">Dae-hyun Jo</div></div>
+      <div style="padding: 10px 20px; border-top: 1px solid #e1e0d9;"><div class="cap">Delivers</div><div class="mono" style="font-size: 13px; margin-top: 3px;">1 / 7 &middot; next 11/16</div></div>
+    </div>
+
+    <!-- tabs inside the drawer -->
+    <div style="display: flex; border-bottom: 1px solid #c3c2b7; padding: 0 12px;">
+      <div style="padding: 9px 11px; border-bottom: 2px solid #0b0b0b; margin-bottom: -1px; font-size: 12px; font-weight: 650;">Overview</div>
+      <div style="padding: 9px 11px; font-size: 12px; color: #52514e;">Activity <span class="mono" style="font-size: 9px; color: #898781;">2</span></div>
+      <div style="padding: 9px 11px; font-size: 12px; color: #52514e;">Info <span class="mono" style="font-size: 9px; color: #898781;">2</span></div>
+      <div style="padding: 9px 11px; font-size: 12px; color: #d03b3b;">Risk <span class="mono" style="font-size: 9px;">1</span></div>
+      <div style="padding: 9px 11px; font-size: 12px; color: #52514e;">Deliver <span class="mono" style="font-size: 9px; color: #898781;">1/7</span></div>
+      <div style="padding: 9px 11px; font-size: 12px; color: #52514e;">Team</div>
+    </div>
+
+    <div style="flex-grow: 1; overflow: hidden; padding: 16px 20px;">
+      <p style="font-family: Georgia,'Times New Roman',serif; font-size: 15px; line-height: 1.6; color: #52514e; margin: 0 0 18px;">Build the ability to test the product &mdash; tester platform, probe card and load board, sort and final programs &mdash; on a critical path set by probe card lead time, not by wafer-out.</p>
+
+      <div style="border: 1px solid #efc9c9; border-radius: 5px; background: #fdf4f4; padding: 11px 13px; margin-bottom: 18px;">
+        <div class="cap" style="color: #b06060; margin-bottom: 6px;">Open risk &middot; 08/18/2026</div>
+        <div style="font-size: 13px; font-weight: 600; line-height: 1.4;">Probe card qualification lands two weeks before wafer-out</div>
+      </div>
+
+      <div class="cap" style="margin-bottom: 8px; display: block;">Engineering activities &middot; 9 &middot; 174 M/M</div>
+      <div style="display: grid; grid-template-columns: 56px 1fr 34px; font-size: 12.5px; border-bottom: 1px solid #e1e0d9; padding: 7px 0; align-items: center;"><span class="mono" style="font-size: 9.5px; color: #256abf;">TEST-01</span><span>Test Plan and Coverage Strategy</span><span class="mono" style="text-align: right; font-size: 10px;">8w</span></div>
+      <div style="display: grid; grid-template-columns: 56px 1fr 34px; font-size: 12.5px; border-bottom: 1px solid #e1e0d9; padding: 7px 0; align-items: center;"><span class="mono" style="font-size: 9.5px; color: #256abf;">TEST-02</span><span>ATE Platform Selection</span><span class="mono" style="text-align: right; font-size: 10px;">6w</span></div>
+      <div style="display: grid; grid-template-columns: 56px 1fr 34px; font-size: 12.5px; border-bottom: 1px solid #e1e0d9; padding: 7px 0; align-items: center; background: #fdf4f4;"><span class="mono" style="font-size: 9.5px; color: #256abf;">TEST-03</span><span style="display: flex; align-items: center; gap: 6px;"><span style="width: 5px; height: 5px; border-radius: 50%; background: #d03b3b;"></span>Probe Card Design &amp; Qualification</span><span class="mono" style="text-align: right; font-size: 10px;">20w</span></div>
+      <div style="display: grid; grid-template-columns: 56px 1fr 34px; font-size: 12.5px; border-bottom: 1px solid #e1e0d9; padding: 7px 0; align-items: center;"><span class="mono" style="font-size: 9.5px; color: #256abf;">TEST-04</span><span>Load Board / DUT Board</span><span class="mono" style="text-align: right; font-size: 10px;">17w</span></div>
+      <div style="display: grid; grid-template-columns: 56px 1fr 34px; font-size: 12.5px; border-bottom: 1px solid #e1e0d9; padding: 7px 0; align-items: center;"><span class="mono" style="font-size: 9.5px; color: #256abf;">TEST-05</span><span>Wafer Sort Test Program</span><span class="mono" style="text-align: right; font-size: 10px;">16w</span></div>
+      <div class="mono" style="font-size: 9.5px; color: #898781; padding-top: 8px; letter-spacing: .6px;">+ 4 MORE</div>
+    </div>
+
+    <div style="border-top: 1px solid #e1e0d9; padding: 11px 20px; display: flex; gap: 8px;">
+      <span class="mono" style="font-size: 9.5px; letter-spacing: 1px; text-transform: uppercase; border: 1px solid #c3c2b7; border-radius: 3px; padding: 6px 11px; color: #52514e;">Edit dates</span>
+      <span class="mono" style="font-size: 9.5px; letter-spacing: 1px; text-transform: uppercase; border-radius: 3px; padding: 6px 11px; background: #0b0b0b; color: #f9f9f7;">+ Add entry</span>
+      <span style="flex-grow: 1;"></span>
+      <span class="mono" style="font-size: 9.5px; letter-spacing: 1px; text-transform: uppercase; color: #256abf; padding: 6px 0;">Open full page &rarr;</span>
+    </div>
+  </div>
+</div>
+</x-dc>
+</body>
+</html>

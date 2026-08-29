@@ -1,0 +1,196 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&display=swap">
+  <style>
+    body { margin: 0; }
+    a { color: #c8362a; } a:hover { color: #97281f; }
+    .disp { font-family: "Instrument Serif", Georgia, "Times New Roman", serif; font-weight: 400; }
+    .txt  { font-family: "Newsreader", Georgia, "Times New Roman", serif; }
+    .m    { font-family: ui-monospace, "SF Mono", Menlo, monospace; }
+    .kick { font-family: ui-monospace, "SF Mono", Menlo, monospace; font-size: 10px; font-weight: 700; letter-spacing: 2.2px; text-transform: uppercase; }
+    .rule-h { height: 4px; background: #000; }
+    .rule-m { height: 2px; background: #000; }
+    .rule-t { height: 1px; background: #000; }
+    .idx { display: flex; align-items: baseline; gap: 8px; padding: 3px 0; border-bottom: 1px solid #ddd8cc; }
+  </style>
+</helmet>
+
+<div style="width: 1440px; height: 1400px; background: #faf8f3; color: #000; overflow: hidden; padding: 0 46px;">
+
+  <!-- ═══ MASTHEAD ═══ -->
+  <div class="rule-t" style="margin-top: 26px;"></div>
+  <div style="display: flex; align-items: flex-end; justify-content: space-between; padding: 12px 0 8px;">
+    <div class="disp" style="font-size: 76px; line-height: .86; letter-spacing: -0.02em;">AtlasAX<span style="color: #c8362a;">1</span></div>
+    <div style="text-align: right; padding-bottom: 8px;">
+      <div class="kick">Programme Briefing</div>
+      <div class="m" style="font-size: 11px; letter-spacing: 1px; margin-top: 5px;">NO. 67 &nbsp;&middot;&nbsp; THU 27 AUG 2026 &nbsp;&middot;&nbsp; WEEK 67 OF 132</div>
+      <div class="m" style="font-size: 11px; letter-spacing: 1px; margin-top: 3px; color: #6e6a60;">TYPICAL SoC &nbsp;&middot;&nbsp; 23 STAGES &nbsp;&middot;&nbsp; 7 IN FLIGHT</div>
+    </div>
+  </div>
+  <div class="rule-h"></div>
+
+  <!-- ═══ THE LEAD — the page argues, it does not tile ═══ -->
+  <div style="display: grid; grid-template-columns: 1fr 330px; gap: 40px; padding: 26px 0 24px;">
+    <div>
+      <div class="kick" style="color: #c8362a;">Lead &middot; Tapeout</div>
+      <h1 class="disp" style="font-size: 58px; line-height: 1.02; letter-spacing: -0.015em; margin: 12px 0 0; max-width: 20ch;">Two package risks and a probe card now sit between AtlasAX1 and an 11 January tapeout.</h1>
+      <div style="display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 26px; margin-top: 22px;">
+        <p class="txt" style="font-size: 17px; line-height: 1.5; margin: 0; color: #1a1814;">Nine of twenty-three stages carry open risk, and five of them are running today. Physical Design and Signoff hold the critical path; <span style="border-bottom: 2px solid #c8362a;">Package &amp; Substrate Design</span> and <span style="border-bottom: 2px solid #c8362a;">Test Development</span> hold the exposure, and every one of them ends in the same mask order.</p>
+        <p class="txt" style="font-size: 17px; line-height: 1.5; margin: 0; color: #1a1814;">Eight deliverables are past their target date. None of the four checkpoints between here and tapeout has slack that has not already been spent once.</p>
+      </div>
+    </div>
+
+    <!-- the numbers, boxed like a stock table -->
+    <div style="border: 2px solid #000; background: #fff;">
+      <div class="kick" style="padding: 9px 14px; border-bottom: 2px solid #000; background: #000; color: #faf8f3;">At a glance</div>
+      <div style="padding: 4px 14px 12px;">
+        <div style="display: flex; align-items: baseline; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #ddd8cc;"><span class="m" style="font-size: 10px; letter-spacing: 1.4px; color: #6e6a60;">TAPEOUT</span><span class="disp" style="font-size: 34px; line-height: 1;">D&minus;138</span></div>
+        <div style="display: flex; align-items: baseline; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #ddd8cc;"><span class="m" style="font-size: 10px; letter-spacing: 1.4px; color: #6e6a60;">PROGRESS</span><span class="disp" style="font-size: 34px; line-height: 1;">52%</span></div>
+        <div style="display: flex; align-items: baseline; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #ddd8cc;"><span class="m" style="font-size: 10px; letter-spacing: 1.4px; color: #6e6a60;">OPEN RISKS</span><span class="disp" style="font-size: 34px; line-height: 1; color: #c8362a;">23</span></div>
+        <div style="display: flex; align-items: baseline; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #ddd8cc;"><span class="m" style="font-size: 10px; letter-spacing: 1.4px; color: #6e6a60;">OVERDUE</span><span class="disp" style="font-size: 34px; line-height: 1; color: #c8362a;">8</span></div>
+        <div style="display: flex; align-items: baseline; justify-content: space-between; padding: 10px 0;"><span class="m" style="font-size: 10px; letter-spacing: 1.4px; color: #6e6a60;">EFFORT</span><span class="disp" style="font-size: 34px; line-height: 1;">$54.8M</span></div>
+        <div class="m" style="font-size: 10px; color: #6e6a60; letter-spacing: .6px;">3,653 M/M &times; $15,000</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="rule-m"></div>
+
+  <!-- ═══ THREE COLUMNS — what moved, what is late, what is next ═══ -->
+  <div style="display: grid; grid-template-columns: 1fr 1fr 330px; gap: 0; border-bottom: 2px solid #000;">
+
+    <div style="padding: 18px 30px 22px 0; border-right: 1px solid #000;">
+      <div class="kick">What moved this week</div>
+      <div style="margin-top: 14px;">
+        <div style="padding-bottom: 14px; border-bottom: 1px solid #ddd8cc; margin-bottom: 14px;">
+          <div style="display: flex; align-items: baseline; gap: 8px;"><span class="m" style="font-size: 10px; color: #c8362a; font-weight: 700; letter-spacing: 1.2px;">PD</span><span class="m" style="font-size: 10px; color: #6e6a60;">23 AUG</span></div>
+          <div class="disp" style="font-size: 25px; line-height: 1.15; margin: 5px 0 6px;">Hold closure at SS / &minus;40 &deg;C after CTS rework</div>
+          <p class="txt" style="font-size: 15.5px; line-height: 1.5; margin: 0; color: #3a352c;">Hold clean on 14 of 16 clusters after buffer insertion; the remaining two are re-running tonight.</p>
+        </div>
+        <div style="padding-bottom: 14px; border-bottom: 1px solid #ddd8cc; margin-bottom: 14px;">
+          <div style="display: flex; align-items: baseline; gap: 8px;"><span class="m" style="font-size: 10px; color: #c8362a; font-weight: 700; letter-spacing: 1.2px;">ASSY</span><span class="m" style="font-size: 10px; color: #6e6a60;">23 AUG</span></div>
+          <div class="disp" style="font-size: 25px; line-height: 1.15; margin: 5px 0 6px;">HBM3 allocation for qual builds unconfirmed</div>
+          <p class="txt" style="font-size: 15.5px; line-height: 1.5; margin: 0; color: #3a352c;">Supplier call: the allocation letter is expected next week; qual quantities committed verbally only.</p>
+        </div>
+        <div>
+          <div style="display: flex; align-items: baseline; gap: 8px;"><span class="m" style="font-size: 10px; color: #c8362a; font-weight: 700; letter-spacing: 1.2px;">SO</span><span class="m" style="font-size: 10px; color: #6e6a60;">22 AUG</span></div>
+          <div class="disp" style="font-size: 25px; line-height: 1.15; margin: 5px 0 6px;">Closure window compresses if PD route slips past week 32</div>
+          <p class="txt" style="font-size: 15.5px; line-height: 1.5; margin: 0; color: #3a352c;">Tracking the PD route daily; a go/no-go checkpoint with the PD lead is set for Monday.</p>
+        </div>
+      </div>
+    </div>
+
+    <div style="padding: 18px 30px 22px; border-right: 1px solid #000;">
+      <div class="kick">Past its date &middot; <span style="color: #c8362a;">Eight</span></div>
+      <div style="margin-top: 14px;">
+        <div style="display: grid; grid-template-columns: 1fr 78px; gap: 10px; padding: 8px 0; border-bottom: 1px solid #ddd8cc; align-items: baseline;"><span class="txt" style="font-size: 16px;">Timing ECO closure report <span class="m" style="font-size: 10px; color: #6e6a60;">PD</span></span><span class="m" style="font-size: 11px; color: #c8362a; text-align: right;">&minus;34 d</span></div>
+        <div style="display: grid; grid-template-columns: 1fr 78px; gap: 10px; padding: 8px 0; border-bottom: 1px solid #ddd8cc; align-items: baseline;"><span class="txt" style="font-size: 16px;">Substrate stack-up sign-off <span class="m" style="font-size: 10px; color: #6e6a60;">PKGD</span></span><span class="m" style="font-size: 11px; color: #c8362a; text-align: right;">&minus;21 d</span></div>
+        <div style="display: grid; grid-template-columns: 1fr 78px; gap: 10px; padding: 8px 0; border-bottom: 1px solid #ddd8cc; align-items: baseline;"><span class="txt" style="font-size: 16px;">Coverage closure memo <span class="m" style="font-size: 10px; color: #6e6a60;">DV</span></span><span class="m" style="font-size: 11px; color: #c8362a; text-align: right;">&minus;18 d</span></div>
+        <div style="display: grid; grid-template-columns: 1fr 78px; gap: 10px; padding: 8px 0; border-bottom: 1px solid #ddd8cc; align-items: baseline;"><span class="txt" style="font-size: 16px;">CPI correlation package <span class="m" style="font-size: 10px; color: #6e6a60;">SIPI</span></span><span class="m" style="font-size: 11px; color: #c8362a; text-align: right;">&minus;12 d</span></div>
+        <div style="display: grid; grid-template-columns: 1fr 78px; gap: 10px; padding: 8px 0; border-bottom: 1px solid #ddd8cc; align-items: baseline;"><span class="txt" style="font-size: 16px;">Netlist drop 4 release note <span class="m" style="font-size: 10px; color: #6e6a60;">SYN</span></span><span class="m" style="font-size: 11px; color: #c8362a; text-align: right;">&minus;9 d</span></div>
+        <div style="display: grid; grid-template-columns: 1fr 78px; gap: 10px; padding: 8px 0; border-bottom: 1px solid #ddd8cc; align-items: baseline;"><span class="txt" style="font-size: 16px;">Signoff corner matrix <span class="m" style="font-size: 10px; color: #6e6a60;">SO</span></span><span class="m" style="font-size: 11px; color: #c8362a; text-align: right;">&minus;6 d</span></div>
+        <div class="m" style="font-size: 10.5px; letter-spacing: 1.2px; padding-top: 10px; color: #c8362a;">TWO MORE &rarr;</div>
+      </div>
+    </div>
+
+    <div style="padding: 18px 0 22px 30px;">
+      <div class="kick">Checkpoints ahead</div>
+      <div style="margin-top: 14px;">
+        <div style="padding: 9px 0; border-bottom: 1px solid #ddd8cc;"><div class="txt" style="font-size: 17px; font-weight: 500;">Package Design Freeze</div><div class="m" style="font-size: 10.5px; color: #6e6a60; margin-top: 3px;">02 NOV 2026 &middot; D&minus;68</div></div>
+        <div style="padding: 9px 0; border-bottom: 1px solid #ddd8cc;"><div class="txt" style="font-size: 17px; font-weight: 500;">Design Freeze</div><div class="m" style="font-size: 10.5px; color: #6e6a60; margin-top: 3px;">16 NOV 2026 &middot; D&minus;82</div></div>
+        <div style="padding: 9px 0; border-bottom: 2px solid #000; background: #c8362a; color: #faf8f3; margin: 0 -8px; padding-left: 8px; padding-right: 8px;"><div class="txt" style="font-size: 17px; font-weight: 600;">Tapeout &mdash; BEOL MTO</div><div class="m" style="font-size: 10.5px; margin-top: 3px; opacity: .85;">11 JAN 2027 &middot; D&minus;138</div></div>
+        <div style="padding: 9px 0; border-bottom: 1px solid #ddd8cc;"><div class="txt" style="font-size: 17px; font-weight: 500;">EVB Ready</div><div class="m" style="font-size: 10.5px; color: #6e6a60; margin-top: 3px;">08 FEB 2027 &middot; D&minus;166</div></div>
+        <div style="padding: 9px 0;"><div class="txt" style="font-size: 17px; font-weight: 500;">First Silicon</div><div class="m" style="font-size: 10.5px; color: #6e6a60; margin-top: 3px;">05 APR 2027 &middot; D&minus;222</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ FIG. 1 — the timeline, printed ═══ -->
+  <div style="padding: 20px 0 0;">
+    <div style="display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 12px;">
+      <div class="kick">Fig. 1 &mdash; the twenty-three stages, in programme time</div>
+      <div class="m" style="font-size: 10px; letter-spacing: 1.2px; color: #6e6a60;">&#9632; AT RISK &nbsp; &#9642; RUNNING &nbsp; &#9633; NOT STARTED</div>
+    </div>
+    <div style="position: relative; border-top: 1px solid #000; border-bottom: 1px solid #000; padding: 10px 0;">
+      <div style="position: absolute; left: calc(66px + (100% - 66px) * 0.475); top: 0; bottom: 0; width: 2px; background: #c8362a; z-index: 2;"></div>
+      <div class="m" style="position: absolute; left: calc(66px + (100% - 66px) * 0.475); top: -22px; transform: translateX(-50%); font-size: 10px; letter-spacing: 1.4px; color: #c8362a; font-weight: 700;">TODAY</div>
+
+      <div style="display: grid; grid-template-columns: 66px 1fr; align-items: center; height: 15px;"><span class="m" style="font-size: 9px; color: #6e6a60;">DEF</span><div style="position: relative; height: 8px;"><div style="position: absolute; left: 0%; width: 5.7%; height: 8px; background: #c8362a;"></div></div></div>
+      <div style="display: grid; grid-template-columns: 66px 1fr; align-items: center; height: 15px;"><span class="m" style="font-size: 9px; color: #6e6a60;">ARCH</span><div style="position: relative; height: 8px;"><div style="position: absolute; left: 4.3%; width: 12.9%; height: 8px; background: #b8b2a4;"></div></div></div>
+      <div style="display: grid; grid-template-columns: 66px 1fr; align-items: center; height: 15px;"><span class="m" style="font-size: 9px; color: #6e6a60;">TECH</span><div style="position: relative; height: 8px;"><div style="position: absolute; left: 0%; width: 10%; height: 8px; background: #b8b2a4;"></div></div></div>
+      <div style="display: grid; grid-template-columns: 66px 1fr; align-items: center; height: 15px;"><span class="m" style="font-size: 9px; color: #6e6a60;">PDK</span><div style="position: relative; height: 8px;"><div style="position: absolute; left: 5.7%; width: 25.7%; height: 8px; background: #b8b2a4;"></div></div></div>
+      <div style="display: grid; grid-template-columns: 66px 1fr; align-items: center; height: 15px;"><span class="m" style="font-size: 9px; color: #6e6a60;">IPR</span><div style="position: relative; height: 8px;"><div style="position: absolute; left: 2.9%; width: 15.7%; height: 8px; background: #b8b2a4;"></div></div></div>
+      <div style="display: grid; grid-template-columns: 66px 1fr; align-items: center; height: 15px;"><span class="m" style="font-size: 9px; color: #6e6a60;">AMS</span><div style="position: relative; height: 8px;"><div style="position: absolute; left: 12.9%; width: 30%; height: 8px; background: #b8b2a4;"></div></div></div>
+      <div style="display: grid; grid-template-columns: 66px 1fr; align-items: center; height: 15px;"><span class="m" style="font-size: 9px; color: #6e6a60;">TC</span><div style="position: relative; height: 8px;"><div style="position: absolute; left: 15.7%; width: 28.6%; height: 8px; background: #b8b2a4;"></div></div></div>
+      <div style="display: grid; grid-template-columns: 66px 1fr; align-items: center; height: 15px;"><span class="m" style="font-size: 9px; color: #6e6a60;">RTL</span><div style="position: relative; height: 8px;"><div style="position: absolute; left: 14.3%; width: 22.9%; height: 8px; background: #b8b2a4;"></div></div></div>
+      <div style="display: grid; grid-template-columns: 66px 1fr; align-items: center; height: 15px;"><span class="m" style="font-size: 9px; color: #6e6a60;">DV</span><div style="position: relative; height: 8px;"><div style="position: absolute; left: 18.6%; width: 28.6%; height: 8px; background: #b8b2a4;"></div></div></div>
+      <div style="display: grid; grid-template-columns: 66px 1fr; align-items: center; height: 15px;"><span class="m" style="font-size: 9px; color: #6e6a60;">DFT</span><div style="position: relative; height: 8px;"><div style="position: absolute; left: 12.9%; width: 28.6%; height: 8px; background: #b8b2a4;"></div></div></div>
+      <div style="display: grid; grid-template-columns: 66px 1fr; align-items: center; height: 15px;"><span class="m" style="font-size: 9px; color: #6e6a60;">SYN</span><div style="position: relative; height: 8px;"><div style="position: absolute; left: 30%; width: 17.1%; height: 8px; background: #8a8478;"></div></div></div>
+      <div style="display: grid; grid-template-columns: 66px 1fr; align-items: center; height: 15px;"><span class="m" style="font-size: 9px; color: #000; font-weight: 700;">PD</span><div style="position: relative; height: 8px;"><div style="position: absolute; left: 32.9%; width: 21.4%; height: 8px; background: #c8362a;"></div></div></div>
+      <div style="display: grid; grid-template-columns: 66px 1fr; align-items: center; height: 15px;"><span class="m" style="font-size: 9px; color: #000; font-weight: 700;">SO</span><div style="position: relative; height: 8px;"><div style="position: absolute; left: 44.3%; width: 11.4%; height: 8px; background: #c8362a;"></div></div></div>
+      <div style="display: grid; grid-template-columns: 66px 1fr; align-items: center; height: 15px;"><span class="m" style="font-size: 9px; color: #6e6a60;">TO</span><div style="position: relative; height: 8px;"><div style="position: absolute; left: 55.7%; width: 5.7%; height: 8px; border: 1.5px solid #c8362a;"></div></div></div>
+      <div style="display: grid; grid-template-columns: 66px 1fr; align-items: center; height: 15px;"><span class="m" style="font-size: 9px; color: #6e6a60;">FAB</span><div style="position: relative; height: 8px;"><div style="position: absolute; left: 56.4%; width: 13.6%; height: 8px; border: 1.5px solid #8a8478;"></div></div></div>
+      <div style="display: grid; grid-template-columns: 66px 1fr; align-items: center; height: 15px;"><span class="m" style="font-size: 9px; color: #000; font-weight: 700;">PKGD</span><div style="position: relative; height: 8px;"><div style="position: absolute; left: 17.1%; width: 37.1%; height: 8px; background: #c8362a;"></div></div></div>
+      <div style="display: grid; grid-template-columns: 66px 1fr; align-items: center; height: 15px;"><span class="m" style="font-size: 9px; color: #000; font-weight: 700;">PTV</span><div style="position: relative; height: 8px;"><div style="position: absolute; left: 25.7%; width: 37.1%; height: 8px; background: #c8362a;"></div></div></div>
+      <div style="display: grid; grid-template-columns: 66px 1fr; align-items: center; height: 15px;"><span class="m" style="font-size: 9px; color: #000; font-weight: 700;">SIPI</span><div style="position: relative; height: 8px;"><div style="position: absolute; left: 35.7%; width: 18.6%; height: 8px; background: #c8362a;"></div></div></div>
+      <div style="display: grid; grid-template-columns: 66px 1fr; align-items: center; height: 15px;"><span class="m" style="font-size: 9px; color: #6e6a60;">ASSY</span><div style="position: relative; height: 8px;"><div style="position: absolute; left: 70%; width: 5.7%; height: 8px; border: 1.5px solid #c8362a;"></div></div></div>
+      <div style="display: grid; grid-template-columns: 66px 1fr; align-items: center; height: 15px;"><span class="m" style="font-size: 9px; color: #000;">EVB</span><div style="position: relative; height: 8px;"><div style="position: absolute; left: 37.1%; width: 27.1%; height: 8px; background: #8a8478;"></div></div></div>
+      <div style="display: grid; grid-template-columns: 66px 1fr; align-items: center; height: 15px;"><span class="m" style="font-size: 9px; color: #000; font-weight: 700;">TEST</span><div style="position: relative; height: 8px;"><div style="position: absolute; left: 38.6%; width: 30%; height: 8px; background: #c8362a;"></div></div></div>
+      <div style="display: grid; grid-template-columns: 66px 1fr; align-items: center; height: 15px;"><span class="m" style="font-size: 9px; color: #6e6a60;">BU</span><div style="position: relative; height: 8px;"><div style="position: absolute; left: 72.9%; width: 12.9%; height: 8px; border: 1.5px solid #8a8478;"></div></div></div>
+      <div style="display: grid; grid-template-columns: 66px 1fr; align-items: center; height: 15px;"><span class="m" style="font-size: 9px; color: #6e6a60;">MP</span><div style="position: relative; height: 8px;"><div style="position: absolute; left: 75.7%; width: 18.6%; height: 8px; border: 1.5px solid #8a8478;"></div></div></div>
+
+      <div style="display: grid; grid-template-columns: 66px 1fr; margin-top: 6px;"><span></span><div class="m" style="display: flex; justify-content: space-between; font-size: 9px; color: #6e6a60; letter-spacing: .8px;"><span>MAY '25</span><span>JAN '26</span><span>JAN '27</span><span>DEC '27</span></div></div>
+    </div>
+  </div>
+
+  <!-- ═══ THE INDEX — navigation is a table of contents ═══ -->
+  <div style="padding: 18px 0 0;">
+    <div class="kick" style="margin-bottom: 12px;">The index &mdash; every stage, its leader, its exposure</div>
+    <div style="display: grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap: 0 34px;">
+      <div>
+        <div class="idx"><span class="m" style="font-size: 9.5px; color: #6e6a60; width: 16px;">1</span><span class="txt" style="font-size: 15px; flex-grow: 1;">Product Definition</span><span class="m" style="font-size: 9.5px; color: #c8362a;">5R</span></div>
+        <div class="idx"><span class="m" style="font-size: 9.5px; color: #6e6a60; width: 16px;">2</span><span class="txt" style="font-size: 15px; flex-grow: 1;">Architecture</span><span class="m" style="font-size: 9.5px; color: #6e6a60;">&mdash;</span></div>
+        <div class="idx"><span class="m" style="font-size: 9.5px; color: #6e6a60; width: 16px;">3</span><span class="txt" style="font-size: 15px; flex-grow: 1;">Technology &amp; Foundry</span><span class="m" style="font-size: 9.5px; color: #6e6a60;">&mdash;</span></div>
+        <div class="idx"><span class="m" style="font-size: 9.5px; color: #6e6a60; width: 16px;">4</span><span class="txt" style="font-size: 15px; flex-grow: 1;">PDK &amp; Design Enablement</span><span class="m" style="font-size: 9.5px; color: #6e6a60;">&mdash;</span></div>
+        <div class="idx"><span class="m" style="font-size: 9.5px; color: #6e6a60; width: 16px;">5</span><span class="txt" style="font-size: 15px; flex-grow: 1;">IP Strategy &amp; Readiness</span><span class="m" style="font-size: 9.5px; color: #6e6a60;">&mdash;</span></div>
+        <div class="idx"><span class="m" style="font-size: 9.5px; color: #6e6a60; width: 16px;">6</span><span class="txt" style="font-size: 15px; flex-grow: 1;">Custom, AMS &amp; Memory IP</span><span class="m" style="font-size: 9.5px; color: #6e6a60;">&mdash;</span></div>
+      </div>
+      <div>
+        <div class="idx"><span class="m" style="font-size: 9.5px; color: #6e6a60; width: 16px;">7</span><span class="txt" style="font-size: 15px; flex-grow: 1;">Test Chip / MPW Shuttle</span><span class="m" style="font-size: 9.5px; color: #6e6a60;">&mdash;</span></div>
+        <div class="idx"><span class="m" style="font-size: 9.5px; color: #6e6a60; width: 16px;">8</span><span class="txt" style="font-size: 15px; flex-grow: 1;">RTL Design &amp; Integration</span><span class="m" style="font-size: 9.5px; color: #6e6a60;">&mdash;</span></div>
+        <div class="idx"><span class="m" style="font-size: 9.5px; color: #6e6a60; width: 16px;">9</span><span class="txt" style="font-size: 15px; flex-grow: 1;">Verification</span><span class="m" style="font-size: 9.5px; color: #6e6a60;">1L</span></div>
+        <div class="idx"><span class="m" style="font-size: 9.5px; color: #6e6a60; width: 16px;">10</span><span class="txt" style="font-size: 15px; flex-grow: 1;">DFT Architecture</span><span class="m" style="font-size: 9.5px; color: #6e6a60;">&mdash;</span></div>
+        <div class="idx"><span class="m" style="font-size: 9.5px; color: #6e6a60; width: 16px;">11</span><span class="txt" style="font-size: 15px; flex-grow: 1;">Logic Synthesis</span><span class="m" style="font-size: 9.5px; color: #6e6a60;">1L</span></div>
+        <div class="idx" style="border-bottom: 2px solid #000;"><span class="m" style="font-size: 9.5px; color: #000; width: 16px; font-weight: 700;">12</span><span class="txt" style="font-size: 15px; flex-grow: 1; font-weight: 600;">Physical Design</span><span class="m" style="font-size: 9.5px; color: #c8362a; font-weight: 700;">5R 3L</span></div>
+      </div>
+      <div>
+        <div class="idx" style="border-bottom: 2px solid #000;"><span class="m" style="font-size: 9.5px; color: #000; width: 16px; font-weight: 700;">13</span><span class="txt" style="font-size: 15px; flex-grow: 1; font-weight: 600;">Signoff</span><span class="m" style="font-size: 9.5px; color: #c8362a; font-weight: 700;">2R 1L</span></div>
+        <div class="idx"><span class="m" style="font-size: 9.5px; color: #6e6a60; width: 16px;">14</span><span class="txt" style="font-size: 15px; flex-grow: 1;">Tapeout &amp; Mask Release</span><span class="m" style="font-size: 9.5px; color: #c8362a;">1R</span></div>
+        <div class="idx"><span class="m" style="font-size: 9.5px; color: #6e6a60; width: 16px;">15</span><span class="txt" style="font-size: 15px; flex-grow: 1;">Fabrication</span><span class="m" style="font-size: 9.5px; color: #6e6a60;">&mdash;</span></div>
+        <div class="idx" style="border-bottom: 2px solid #000;"><span class="m" style="font-size: 9.5px; color: #000; width: 16px; font-weight: 700;">16</span><span class="txt" style="font-size: 15px; flex-grow: 1; font-weight: 600;">Package &amp; Substrate Design</span><span class="m" style="font-size: 9.5px; color: #c8362a; font-weight: 700;">4R 2L</span></div>
+        <div class="idx" style="border-bottom: 2px solid #000;"><span class="m" style="font-size: 9.5px; color: #000; width: 16px; font-weight: 700;">17</span><span class="txt" style="font-size: 15px; flex-grow: 1; font-weight: 600;">Package Test Vehicle</span><span class="m" style="font-size: 9.5px; color: #c8362a; font-weight: 700;">3R</span></div>
+        <div class="idx" style="border-bottom: 2px solid #000;"><span class="m" style="font-size: 9.5px; color: #000; width: 16px; font-weight: 700;">18</span><span class="txt" style="font-size: 15px; flex-grow: 1; font-weight: 600;">Chip-Package-System Co-Ver</span><span class="m" style="font-size: 9.5px; color: #c8362a; font-weight: 700;">2R 1L</span></div>
+      </div>
+      <div>
+        <div class="idx"><span class="m" style="font-size: 9.5px; color: #6e6a60; width: 16px;">19</span><span class="txt" style="font-size: 15px; flex-grow: 1;">Assembly &amp; Package Build</span><span class="m" style="font-size: 9.5px; color: #c8362a;">1R</span></div>
+        <div class="idx"><span class="m" style="font-size: 9.5px; color: #000; width: 16px;">20</span><span class="txt" style="font-size: 15px; flex-grow: 1;">Validation Hardware / EVB</span><span class="m" style="font-size: 9.5px; color: #6e6a60;">&mdash;</span></div>
+        <div class="idx" style="border-bottom: 2px solid #000;"><span class="m" style="font-size: 9.5px; color: #000; width: 16px; font-weight: 700;">21</span><span class="txt" style="font-size: 15px; flex-grow: 1; font-weight: 600;">Test Development</span><span class="m" style="font-size: 9.5px; color: #c8362a; font-weight: 700;">1R</span></div>
+        <div class="idx"><span class="m" style="font-size: 9.5px; color: #6e6a60; width: 16px;">22</span><span class="txt" style="font-size: 15px; flex-grow: 1;">Silicon Bring-up</span><span class="m" style="font-size: 9.5px; color: #6e6a60;">&mdash;</span></div>
+        <div class="idx"><span class="m" style="font-size: 9.5px; color: #6e6a60; width: 16px;">23</span><span class="txt" style="font-size: 15px; flex-grow: 1;">Qualification &amp; Production</span><span class="m" style="font-size: 9.5px; color: #6e6a60;">&mdash;</span></div>
+        <div class="m" style="font-size: 9.5px; color: #6e6a60; letter-spacing: 1px; padding-top: 7px;">R RISKS &nbsp; L LATE &nbsp; &mdash; CLEAR</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="rule-h" style="margin-top: 18px;"></div>
+</div>
+</x-dc>
+</body>
+</html>

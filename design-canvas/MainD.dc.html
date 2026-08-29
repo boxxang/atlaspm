@@ -1,0 +1,158 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&display=swap">
+  <style>
+    body { margin: 0; }
+    a { color: #0050e6; } a:hover { color: #003bb0; }
+    .m { font-family: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, monospace; }
+    .r { display: grid; grid-template-columns: 26px 46px 208px 76px 76px 38px 46px 52px 34px 34px 88px 1fr; align-items: center; height: 22px; padding: 0 16px; border-bottom: 1px solid #f0f1f3; font-size: 11.5px; }
+    .r.head { height: 24px; border-bottom: 1px solid #d1d5db; font-size: 9.5px; font-weight: 600; letter-spacing: .9px; text-transform: uppercase; color: #9ca3af; }
+    .r.alt { background: #fafafa; }
+    .n { text-align: right; padding-right: 9px; }
+    .tl { position: relative; height: 22px; }
+    .bar { position: absolute; top: 8px; height: 6px; }
+    .sub { display: grid; grid-template-columns: 26px 46px 208px 76px 76px 38px 46px 52px 34px 34px 88px 1fr; align-items: center; height: 21px; padding: 0 16px; font-size: 11px; background: #f4f7fd; border-bottom: 1px solid #e6ecf8; color: #14161a; }
+    .dim { color: #9ca3af; }
+    .mu { color: #6b7280; }
+  </style>
+</helmet>
+
+<div class="m" style="width: 1440px; height: 1000px; background: #ffffff; color: #14161a; font-size: 12px; overflow: hidden; display: flex; flex-direction: column;">
+
+  <!-- ═══ COMMAND BAR — no toolbar, no modes, no toggle ═══ -->
+  <div style="height: 36px; flex-shrink: 0; border-bottom: 1px solid #14161a; display: flex; align-items: center; gap: 0; padding: 0 16px;">
+    <span style="font-size: 13px; font-weight: 700; letter-spacing: -0.2px;">AtlasAX1</span>
+    <span class="dim" style="margin: 0 10px;">/</span>
+    <span class="mu" style="font-size: 11px;">typicalSoC</span>
+    <span class="dim" style="margin: 0 10px;">/</span>
+    <span class="mu" style="font-size: 11px;">23 stages</span>
+
+    <span style="flex-grow: 1;"></span>
+
+    <div style="display: flex; align-items: center; gap: 0; font-size: 11px;">
+      <span style="padding: 0 12px; border-left: 1px solid #e5e7eb;"><span class="dim">KO </span>05/19/25</span>
+      <span style="padding: 0 12px; border-left: 1px solid #e5e7eb;"><span class="dim">MTO </span>01/11/27<span style="color: #0050e6; font-weight: 600;"> D-138</span></span>
+      <span style="padding: 0 12px; border-left: 1px solid #e5e7eb;"><span class="dim">MP </span>11/29/27</span>
+      <span style="padding: 0 12px; border-left: 1px solid #e5e7eb;"><span class="dim">DONE </span><span style="font-weight: 600;">87/167</span></span>
+      <span style="padding: 0 12px; border-left: 1px solid #e5e7eb; color: #e5484d;"><span style="opacity: .65;">RISK </span><span style="font-weight: 700;">23</span></span>
+      <span style="padding: 0 12px; border-left: 1px solid #e5e7eb; color: #e5484d;"><span style="opacity: .65;">LATE </span><span style="font-weight: 700;">8</span></span>
+      <span style="padding: 0 0 0 12px; border-left: 1px solid #e5e7eb;"><span class="dim">$</span>54.8M</span>
+    </div>
+  </div>
+
+  <!-- ═══ FILTER LINE — where a modal used to be ═══ -->
+  <div style="height: 30px; flex-shrink: 0; display: flex; align-items: center; gap: 6px; padding: 0 16px; border-bottom: 1px solid #e5e7eb; background: #fafafa; font-size: 10.5px;">
+    <span style="border: 1px solid #14161a; background: #14161a; color: #fff; padding: 2px 8px; font-weight: 500;">ALL 23</span>
+    <span style="border: 1px solid #d1d5db; padding: 2px 8px; color: #6b7280;">IN FLIGHT 7</span>
+    <span style="border: 1px solid #f2b8b5; color: #e5484d; padding: 2px 8px;">AT RISK 9</span>
+    <span style="border: 1px solid #d1d5db; padding: 2px 8px; color: #6b7280;">LATE 8</span>
+    <span style="border: 1px solid #d1d5db; padding: 2px 8px; color: #6b7280;">DONE 6</span>
+    <span style="flex-grow: 1;"></span>
+    <span class="dim" style="letter-spacing: .4px;">&#8984;K jump &middot; / filter &middot; &#8629; expand &middot; E edit dates</span>
+  </div>
+
+  <!-- ═══ THE APP IS ONE TABLE ═══ -->
+  <div style="flex-grow: 1; overflow: hidden; position: relative;">
+    <div style="position: absolute; left: calc(770px + (100% - 786px) * 0.475); top: 0; bottom: 0; width: 1px; background: #0050e6; z-index: 3;"></div>
+
+    <div class="r head"><span class="n">#</span><span>CODE</span><span>STAGE</span><span>START</span><span>END</span><span class="n">TAT</span><span class="n">M/M</span><span class="n">DELIV</span><span class="n">RSK</span><span class="n">LATE</span><span>LEAD</span><span style="padding-left: 6px;">'25 &#8212;&#8212;&#8212;&#8212;&#8212; '26 &#8212;&#8212;&#8212;&#8212;&#8212; '27 &#8212;&#8212;</span></div>
+
+    <div class="r"><span class="n dim">1</span><span style="font-weight: 600;">DEF</span><span>Product Definition</span><span class="mu">05/19/25</span><span class="mu">07/14/25</span><span class="n">8w</span><span class="n">28</span><span class="n">6/6</span><span class="n" style="color:#e5484d; font-weight:600;">5</span><span class="n dim">&middot;</span><span class="mu">N. Feld</span><div class="tl"><div class="bar" style="left:0%; width:5.7%; background:#e5484d;"></div></div></div>
+    <div class="r alt"><span class="n dim">2</span><span style="font-weight: 600;">ARCH</span><span>Architecture</span><span class="mu">06/30/25</span><span class="mu">11/03/25</span><span class="n">18w</span><span class="n">111</span><span class="n">7/7</span><span class="n dim">&middot;</span><span class="n dim">&middot;</span><span class="mu">S. Ha</span><div class="tl"><div class="bar" style="left:4.3%; width:12.9%; background:#c9ccd2;"></div></div></div>
+    <div class="r"><span class="n dim">3</span><span style="font-weight: 600;">TECH</span><span>Technology &amp; Foundry Selection</span><span class="mu">05/19/25</span><span class="mu">08/25/25</span><span class="n">14w</span><span class="n">26</span><span class="n">5/5</span><span class="n dim">&middot;</span><span class="n dim">&middot;</span><span class="mu">I. Brooks</span><div class="tl"><div class="bar" style="left:0%; width:10%; background:#c9ccd2;"></div></div></div>
+    <div class="r alt"><span class="n dim">4</span><span style="font-weight: 600;">PDK</span><span>PDK &amp; Design Enablement</span><span class="mu">07/14/25</span><span class="mu">03/23/26</span><span class="n">36w</span><span class="n">92</span><span class="n">8/8</span><span class="n dim">&middot;</span><span class="n dim">&middot;</span><span class="mu">S. Ha</span><div class="tl"><div class="bar" style="left:5.7%; width:25.7%; background:#c9ccd2;"></div></div></div>
+    <div class="r"><span class="n dim">5</span><span style="font-weight: 600;">IPR</span><span>IP Strategy &amp; Readiness</span><span class="mu">06/16/25</span><span class="mu">11/17/25</span><span class="n">22w</span><span class="n">47</span><span class="n">6/6</span><span class="n dim">&middot;</span><span class="n dim">&middot;</span><span class="mu">N. Feld</span><div class="tl"><div class="bar" style="left:2.9%; width:15.7%; background:#c9ccd2;"></div></div></div>
+    <div class="r alt"><span class="n dim">6</span><span style="font-weight: 600;">AMS</span><span>Custom, AMS &amp; Memory IP</span><span class="mu">09/22/25</span><span class="mu">07/13/26</span><span class="n">42w</span><span class="n">296</span><span class="n">9/9</span><span class="n dim">&middot;</span><span class="n dim">&middot;</span><span class="mu">Y. Tanaka</span><div class="tl"><div class="bar" style="left:12.9%; width:30%; background:#c9ccd2;"></div></div></div>
+    <div class="r"><span class="n dim">7</span><span style="font-weight: 600;">TC</span><span>Test Chip / MPW Shuttle</span><span class="mu">10/20/25</span><span class="mu">07/27/26</span><span class="n">40w</span><span class="n">83</span><span class="n">6/6</span><span class="n dim">&middot;</span><span class="n dim">&middot;</span><span class="mu">D. Jo</span><div class="tl"><div class="bar" style="left:15.7%; width:28.6%; background:#c9ccd2;"></div></div></div>
+    <div class="r alt"><span class="n dim">8</span><span style="font-weight: 600;">RTL</span><span>RTL Design &amp; Integration</span><span class="mu">10/06/25</span><span class="mu">05/18/26</span><span class="n">32w</span><span class="n">410</span><span class="n">9/9</span><span class="n dim">&middot;</span><span class="n dim">&middot;</span><span class="mu">L. Berg</span><div class="tl"><div class="bar" style="left:14.3%; width:22.9%; background:#c9ccd2;"></div></div></div>
+    <div class="r"><span class="n dim">9</span><span style="font-weight: 600;">DV</span><span>Verification</span><span class="mu">11/17/25</span><span class="mu">08/24/26</span><span class="n">40w</span><span class="n">650</span><span class="n">8/9</span><span class="n dim">&middot;</span><span class="n" style="color:#e5484d;">1</span><span class="mu">L. Berg</span><div class="tl"><div class="bar" style="left:18.6%; width:26.5%; background:#c9ccd2;"></div><div class="bar" style="left:45.1%; width:2.1%; background:#f5a524;"></div></div></div>
+    <div class="r alt"><span class="n dim">10</span><span style="font-weight: 600;">DFT</span><span>DFT Architecture</span><span class="mu">09/22/25</span><span class="mu">06/29/26</span><span class="n">40w</span><span class="n">138</span><span class="n">7/7</span><span class="n dim">&middot;</span><span class="n dim">&middot;</span><span class="mu">D. Jo</span><div class="tl"><div class="bar" style="left:12.9%; width:28.6%; background:#c9ccd2;"></div></div></div>
+    <div class="r"><span class="n dim">11</span><span style="font-weight: 600;">SYN</span><span>Logic Synthesis &amp; Netlist Drops</span><span class="mu">03/09/26</span><span class="mu">08/24/26</span><span class="n">24w</span><span class="n">136</span><span class="n">5/6</span><span class="n dim">&middot;</span><span class="n" style="color:#e5484d;">1</span><span class="mu">T. Rivera</span><div class="tl"><div class="bar" style="left:30%; width:17.1%; background:#c9ccd2;"></div></div></div>
+
+    <div class="r alt" style="background:#fef6f6;"><span class="n dim">12</span><span style="font-weight: 700;">PD</span><span style="font-weight: 600;">Physical Design</span><span class="mu">04/06/26</span><span class="mu">11/02/26</span><span class="n">30w</span><span class="n">449</span><span class="n">4/9</span><span class="n" style="color:#e5484d; font-weight:700;">5</span><span class="n" style="color:#e5484d;">3</span><span class="mu">J. Park</span><div class="tl"><div class="bar" style="left:32.9%; width:14.6%; background:#e5484d;"></div><div class="bar" style="left:47.5%; width:6.8%; background:#f6b6b8;"></div></div></div>
+    <div class="r" style="background:#fef6f6;"><span class="n dim">13</span><span style="font-weight: 700;">SO</span><span style="font-weight: 600;">Signoff</span><span class="mu">07/27/26</span><span class="mu">11/16/26</span><span class="n">16w</span><span class="n">159</span><span class="n">1/7</span><span class="n" style="color:#e5484d; font-weight:700;">2</span><span class="n" style="color:#e5484d;">1</span><span class="mu">T. Rivera</span><div class="tl"><div class="bar" style="left:44.3%; width:3.2%; background:#e5484d;"></div><div class="bar" style="left:47.5%; width:8.2%; background:#f6b6b8;"></div></div></div>
+
+    <div class="r"><span class="n dim">14</span><span style="font-weight: 600;">TO</span><span>Tapeout &amp; Mask Release (MTO)</span><span class="mu">11/16/26</span><span class="mu">01/11/27</span><span class="n">8w</span><span class="n">37</span><span class="n">0/5</span><span class="n" style="color:#e5484d;">1</span><span class="n dim">&middot;</span><span class="mu">T. Rivera</span><div class="tl"><div class="bar" style="left:55.7%; width:5.7%; background:#f6b6b8;"></div></div></div>
+    <div class="r alt"><span class="n dim">15</span><span style="font-weight: 600;">FAB</span><span>Fabrication</span><span class="mu">11/23/26</span><span class="mu">04/05/27</span><span class="n">19w</span><span class="n">18</span><span class="n">0/4</span><span class="n dim">&middot;</span><span class="n dim">&middot;</span><span class="mu">I. Brooks</span><div class="tl"><div class="bar" style="left:56.4%; width:13.6%; background:#e5e7eb;"></div></div></div>
+
+    <div class="r" style="background:#fef6f6;"><span class="n dim">16</span><span style="font-weight: 700;">PKGD</span><span style="font-weight: 600;">Package &amp; Substrate Design</span><span class="mu">11/03/25</span><span class="mu">11/02/26</span><span class="n">52w</span><span class="n">310</span><span class="n">5/8</span><span class="n" style="color:#e5484d; font-weight:700;">4</span><span class="n" style="color:#e5484d;">2</span><span class="mu">Y. Tanaka</span><div class="tl"><div class="bar" style="left:17.1%; width:30.4%; background:#e5484d;"></div><div class="bar" style="left:47.5%; width:6.7%; background:#f6b6b8;"></div></div></div>
+    <div class="r alt" style="background:#fef6f6;"><span class="n dim">17</span><span style="font-weight: 700;">PTV</span><span style="font-weight: 600;">Package Test Vehicle (CPI / TTV)</span><span class="mu">01/26/26</span><span class="mu">01/25/27</span><span class="n">52w</span><span class="n">46</span><span class="n">3/7</span><span class="n" style="color:#e5484d; font-weight:700;">3</span><span class="n dim">&middot;</span><span class="mu">Y. Tanaka</span><div class="tl"><div class="bar" style="left:25.7%; width:21.8%; background:#e5484d;"></div><div class="bar" style="left:47.5%; width:15.3%; background:#f6b6b8;"></div></div></div>
+    <div class="r" style="background:#fef6f6;"><span class="n dim">18</span><span style="font-weight: 700;">SIPI</span><span style="font-weight: 600;">Chip-Package-System Co-Verification</span><span class="mu">05/04/26</span><span class="mu">11/02/26</span><span class="n">26w</span><span class="n">64</span><span class="n">2/6</span><span class="n" style="color:#e5484d; font-weight:700;">2</span><span class="n" style="color:#e5484d;">1</span><span class="mu">N. Coleman</span><div class="tl"><div class="bar" style="left:35.7%; width:11.8%; background:#e5484d;"></div><div class="bar" style="left:47.5%; width:6.8%; background:#f6b6b8;"></div></div></div>
+
+    <div class="r alt"><span class="n dim">19</span><span style="font-weight: 600;">ASSY</span><span>Assembly &amp; Package Build</span><span class="mu">04/05/27</span><span class="mu">05/31/27</span><span class="n">8w</span><span class="n">22</span><span class="n">0/4</span><span class="n" style="color:#e5484d;">1</span><span class="n dim">&middot;</span><span class="mu">Y. Tanaka</span><div class="tl"><div class="bar" style="left:70%; width:5.7%; background:#e5e7eb;"></div></div></div>
+    <div class="r"><span class="n dim">20</span><span style="font-weight: 600;">EVB</span><span>Validation Hardware / EVB</span><span class="mu">05/18/26</span><span class="mu">02/08/27</span><span class="n">38w</span><span class="n">96</span><span class="n">2/6</span><span class="n dim">&middot;</span><span class="n dim">&middot;</span><span class="mu">G. Holt</span><div class="tl"><div class="bar" style="left:37.1%; width:10.4%; background:#c9ccd2;"></div><div class="bar" style="left:47.5%; width:16.7%; background:#e5e7eb;"></div></div></div>
+
+    <!-- ═══ EXPANDED IN PLACE — no panel, no modal, no second screen ═══ -->
+    <div class="r" style="background: #e8effc; border-bottom: none; border-top: 1px solid #0050e6;"><span class="n" style="color:#0050e6;">21</span><span style="font-weight: 700;">TEST</span><span style="font-weight: 700;">Test Development</span><span class="mu">06/01/26</span><span class="mu">03/22/27</span><span class="n">42w</span><span class="n">174</span><span class="n">1/7</span><span class="n" style="color:#e5484d; font-weight:700;">1</span><span class="n dim">&middot;</span><span class="mu">D. Jo</span><div class="tl"><div class="bar" style="left:38.6%; width:8.9%; background:#e5484d;"></div><div class="bar" style="left:47.5%; width:21.1%; background:#f6b6b8;"></div></div></div>
+
+    <div class="sub" style="font-size: 10px; letter-spacing: .7px; color: #6b7280; height: 20px; border-bottom: 1px solid #cfdcf5;"><span></span><span></span><span>&#8627; PROBE CARD LEAD TIME IS THE CRITICAL PATH</span><span>OPENED</span><span>DUE</span><span class="n">TAT</span><span class="n">M/M</span><span class="n">STATE</span><span class="n">RSK</span><span class="n"></span><span>OWNER</span><span></span></div>
+    <div class="sub"><span></span><span class="dim" style="font-size:9.5px;">A</span><span style="padding-left: 12px;">TEST-01 Test Plan and Coverage Strategy</span><span class="mu">06/01/26</span><span class="mu">07/27/26</span><span class="n">8w</span><span class="n">12</span><span class="n" style="color:#30a46c;">done</span><span class="n dim">&middot;</span><span class="n dim">&middot;</span><span class="mu">D. Jo</span><div class="tl"><div class="bar" style="left:38.6%; width:5.7%; background:#30a46c; height:4px; top:9px;"></div></div></div>
+    <div class="sub"><span></span><span class="dim" style="font-size:9.5px;">A</span><span style="padding-left: 12px;">TEST-02 ATE Platform Selection &amp; Tester Time</span><span class="mu">06/15/26</span><span class="mu">07/27/26</span><span class="n">6w</span><span class="n">4</span><span class="n" style="color:#30a46c;">done</span><span class="n dim">&middot;</span><span class="n dim">&middot;</span><span class="mu">G. Holt</span><div class="tl"><div class="bar" style="left:39.6%; width:4.3%; background:#30a46c; height:4px; top:9px;"></div></div></div>
+    <div class="sub" style="background:#fdeeee; border-bottom-color:#f6d5d5;"><span></span><span class="dim" style="font-size:9.5px;">A</span><span style="padding-left: 12px; font-weight: 600;">TEST-03 Probe Card Design, Fab &amp; Qualification</span><span class="mu">07/06/26</span><span class="mu">10/19/26</span><span class="n">20w</span><span class="n">16</span><span class="n" style="color:#e5484d; font-weight:600;">risk</span><span class="n" style="color:#e5484d; font-weight:700;">1</span><span class="n dim">&middot;</span><span class="mu">K. Abe</span><div class="tl"><div class="bar" style="left:41%; width:14.3%; background:#e5484d; height:4px; top:9px;"></div></div></div>
+    <div class="sub" style="background:#fdeeee; border-bottom-color:#f6d5d5;"><span></span><span style="font-size:9.5px; color:#e5484d;">R</span><span style="padding-left: 24px; color:#e5484d;">Probe card qualification lands two weeks before wafer-out</span><span class="mu" colspan="2">08/18/26</span><span class="mu"></span><span class="n"></span><span class="n"></span><span class="n" style="color:#e5484d;">open</span><span class="n"></span><span class="n"></span><span class="mu">D. Jo</span><div class="tl"></div></div>
+    <div class="sub" style="background:#fdeeee; border-bottom-color:#f6d5d5;"><span></span><span class="dim" style="font-size:9.5px;">U</span><span style="padding-left: 36px;" class="mu">08/19 &mdash; design frozen, released to vendor; qual slot booked wk44</span><span class="mu"></span><span class="mu"></span><span class="n"></span><span class="n"></span><span class="n"></span><span class="n"></span><span class="n"></span><span class="mu"></span><div class="tl"></div></div>
+    <div class="sub"><span></span><span class="dim" style="font-size:9.5px;">A</span><span style="padding-left: 12px;">TEST-04 Load Board / DUT Board Bring-Up</span><span class="mu">08/17/26</span><span class="mu">12/14/26</span><span class="n">17w</span><span class="n">16</span><span class="n mu">open</span><span class="n dim">&middot;</span><span class="n dim">&middot;</span><span class="mu">K. Abe</span><div class="tl"><div class="bar" style="left:44.6%; width:12.1%; background:#8c93a1; height:4px; top:9px;"></div></div></div>
+    <div class="sub"><span></span><span class="dim" style="font-size:9.5px;">D</span><span style="padding-left: 12px;">TEST-D2 ATE-ready pattern set with debug hooks</span><span class="mu">&mdash;</span><span class="mu">11/16/26</span><span class="n"></span><span class="n"></span><span class="n mu">open</span><span class="n dim">&middot;</span><span class="n dim">&middot;</span><span class="mu">D. Jo</span><div class="tl"><div class="bar" style="left:54.2%; width:2px; background:#14161a; height:8px; top:7px;"></div></div></div>
+    <div class="sub" style="color: #6b7280; border-bottom: 1px solid #0050e6;"><span></span><span></span><span style="padding-left: 12px;">+ 5 activities &middot; 5 deliverables &middot; 2 key info &middot; 3 contacts</span><span class="mu"></span><span class="mu"></span><span class="n"></span><span class="n"></span><span class="n"></span><span class="n"></span><span class="n"></span><span class="mu"></span><div class="tl"></div></div>
+
+    <div class="r"><span class="n dim">22</span><span style="font-weight: 600;">BU</span><span>Silicon Bring-up</span><span class="mu">05/03/27</span><span class="mu">09/06/27</span><span class="n">18w</span><span class="n">54</span><span class="n">0/5</span><span class="n dim">&middot;</span><span class="n dim">&middot;</span><span class="mu">G. Holt</span><div class="tl"><div class="bar" style="left:72.9%; width:12.9%; background:#e5e7eb;"></div></div></div>
+    <div class="r alt"><span class="n dim">23</span><span style="font-weight: 600;">MP</span><span>Qualification &amp; Production</span><span class="mu">05/31/27</span><span class="mu">11/29/27</span><span class="n">26w</span><span class="n">88</span><span class="n">0/6</span><span class="n dim">&middot;</span><span class="n dim">&middot;</span><span class="mu">N. Coleman</span><div class="tl"><div class="bar" style="left:75.7%; width:18.6%; background:#e5e7eb;"></div></div></div>
+
+    <!-- milestone rail, pinned under the table -->
+    <div style="display: grid; grid-template-columns: 770px 1fr; border-top: 1px solid #14161a; height: 26px; align-items: center;">
+      <span style="padding-left: 16px; font-size: 9.5px; letter-spacing: .9px; color: #9ca3af; font-weight: 600;">CHECKPOINTS</span>
+      <div style="position: relative; height: 26px;">
+        <span style="position: absolute; left: 17.1%; top: 8px; font-size: 9px; color: #9ca3af;">&#9670;</span>
+        <span style="position: absolute; left: 31.4%; top: 8px; font-size: 9px; color: #9ca3af;">&#9670;</span>
+        <span style="position: absolute; left: 37.1%; top: 8px; font-size: 9px; color: #9ca3af;">&#9670;</span>
+        <span style="position: absolute; left: 44.3%; top: 8px; font-size: 9px; color: #9ca3af;">&#9670;</span>
+        <span style="position: absolute; left: 54.3%; top: 6px; font-size: 10px; color: #14161a;">&#9670;<span style="font-size: 9px; margin-left: 3px;">Design Freeze 11/16</span></span>
+        <span style="position: absolute; left: 61.4%; top: 5px; font-size: 12px; color: #0050e6; font-weight: 700;">&#9670;<span style="font-size: 9.5px; margin-left: 3px;">TAPEOUT 01/11/27 D-138</span></span>
+        <span style="position: absolute; left: 75.7%; top: 6px; font-size: 10px; color: #14161a;">&#9670;<span style="font-size: 9px; margin-left: 3px;">First Si</span></span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ BOTTOM PANE — the dashboard's job, as a second table ═══ -->
+  <div style="height: 186px; flex-shrink: 0; border-top: 1px solid #14161a; background: #fafafa; display: flex;">
+    <div style="flex-grow: 1; border-right: 1px solid #e5e7eb; overflow: hidden;">
+      <div style="height: 24px; display: flex; align-items: center; padding: 0 16px; border-bottom: 1px solid #e5e7eb; font-size: 9.5px; letter-spacing: .9px; font-weight: 600; color: #9ca3af;">
+        <span style="color: #e5484d;">OPEN RISKS 23</span><span style="margin: 0 10px; color: #e5e7eb;">|</span><span>OVERDUE 8</span><span style="margin: 0 10px; color: #e5e7eb;">|</span><span>UPDATES 41</span>
+        <span style="flex-grow: 1;"></span><span class="dim">SORTED BY UPDATED</span>
+      </div>
+      <div style="display: grid; grid-template-columns: 74px 46px 1fr 88px; align-items: center; height: 21px; padding: 0 16px; font-size: 11px; border-bottom: 1px solid #f0f1f3; background: #fff;"><span class="mu">08/23 09:02</span><span style="color:#e5484d; font-weight:600;">PD</span><span>Hold closure at SS / &minus;40 &deg;C after CTS rework</span><span class="mu">J. Park</span></div>
+      <div style="display: grid; grid-template-columns: 74px 46px 1fr 88px; align-items: center; height: 21px; padding: 0 16px; font-size: 11px; border-bottom: 1px solid #f0f1f3;"><span class="mu">08/23 09:02</span><span style="color:#e5484d; font-weight:600;">ASSY</span><span>HBM3 allocation for qual builds unconfirmed</span><span class="mu">Y. Tanaka</span></div>
+      <div style="display: grid; grid-template-columns: 74px 46px 1fr 88px; align-items: center; height: 21px; padding: 0 16px; font-size: 11px; border-bottom: 1px solid #f0f1f3; background: #fff;"><span class="mu">08/22 09:02</span><span style="color:#e5484d; font-weight:600;">PD</span><span>Routing congestion &mdash; NoC crossbar region</span><span class="mu">N. Coleman</span></div>
+      <div style="display: grid; grid-template-columns: 74px 46px 1fr 88px; align-items: center; height: 21px; padding: 0 16px; font-size: 11px; border-bottom: 1px solid #f0f1f3;"><span class="mu">08/22 09:02</span><span style="color:#e5484d; font-weight:600;">SO</span><span>Closure window compresses if PD route slips past week 32</span><span class="mu">T. Rivera</span></div>
+      <div style="display: grid; grid-template-columns: 74px 46px 1fr 88px; align-items: center; height: 21px; padding: 0 16px; font-size: 11px; border-bottom: 1px solid #f0f1f3; background: #fff;"><span class="mu">08/21 09:02</span><span style="color:#e5484d; font-weight:600;">PD</span><span>IR-drop hotspot under compute clusters 9&ndash;12</span><span class="mu">I. Berg</span></div>
+      <div style="display: grid; grid-template-columns: 74px 46px 1fr 88px; align-items: center; height: 21px; padding: 0 16px; font-size: 11px; border-bottom: 1px solid #f0f1f3;"><span class="mu">08/18 09:02</span><span style="color:#e5484d; font-weight:600;">DEF</span><span>Requirements not signed off by all stakeholders</span><span class="mu">N. Feld</span></div>
+      <div style="padding: 5px 16px; font-size: 10px; color: #9ca3af; letter-spacing: .5px;">+ 17 MORE &mdash; &#8595; to walk, &#8629; to open in the table above</div>
+    </div>
+
+    <div style="width: 300px; flex-shrink: 0; padding: 0;">
+      <div style="height: 24px; display: flex; align-items: center; padding: 0 16px; border-bottom: 1px solid #e5e7eb; font-size: 9.5px; letter-spacing: .9px; font-weight: 600; color: #9ca3af;">EFFORT &amp; COST</div>
+      <div style="padding: 10px 16px; display: flex; flex-direction: column; gap: 7px;">
+        <div style="display: flex; justify-content: space-between; font-size: 11.5px;"><span class="mu">Verification</span><span>650 <span class="dim">MM</span></span></div>
+        <div style="height: 3px; background: #e5e7eb;"><div style="width: 100%; height: 3px; background: #8c93a1;"></div></div>
+        <div style="display: flex; justify-content: space-between; font-size: 11.5px;"><span class="mu">Physical Design</span><span>449 <span class="dim">MM</span></span></div>
+        <div style="height: 3px; background: #e5e7eb;"><div style="width: 69%; height: 3px; background: #e5484d;"></div></div>
+        <div style="display: flex; justify-content: space-between; font-size: 11.5px;"><span class="mu">RTL Design</span><span>410 <span class="dim">MM</span></span></div>
+        <div style="height: 3px; background: #e5e7eb;"><div style="width: 63%; height: 3px; background: #8c93a1;"></div></div>
+        <div style="display: flex; justify-content: space-between; font-size: 11.5px;"><span class="mu">Package &amp; Substrate</span><span>310 <span class="dim">MM</span></span></div>
+        <div style="height: 3px; background: #e5e7eb;"><div style="width: 48%; height: 3px; background: #e5484d;"></div></div>
+        <div style="display: flex; justify-content: space-between; font-size: 12px; border-top: 1px solid #d1d5db; padding-top: 8px; margin-top: 3px;"><span style="font-weight: 600;">3653 MM</span><span style="font-weight: 600;">$54,795,000</span></div>
+        <div style="font-size: 10px; color: #9ca3af;">&times; $15,000 / MM &mdash; click to edit</div>
+      </div>
+    </div>
+  </div>
+</div>
+</x-dc>
+</body>
+</html>

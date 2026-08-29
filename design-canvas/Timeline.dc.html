@@ -1,0 +1,170 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <style>
+    body { margin: 0; }
+    a { color: #5b5bd6; } a:hover { color: #4747b8; }
+    .ui { font-family: system-ui, -apple-system, "Segoe UI", sans-serif; letter-spacing: -0.011em; }
+    .nav { display: flex; align-items: center; gap: 9px; height: 29px; padding: 0 9px; border-radius: 6px; font-size: 13px; color: #62666d; }
+    .nav.on { background: #eeeefb; color: #16181d; font-weight: 550; }
+    .sec { font-size: 10.5px; font-weight: 600; letter-spacing: .5px; text-transform: uppercase; color: #8b8f98; padding: 0 9px; margin: 16px 0 5px; }
+    .av { width: 20px; height: 20px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-size: 9px; font-weight: 600; color: #fff; flex-shrink: 0; }
+    .pill { font-size: 11px; padding: 2px 7px; border-radius: 5px; background: #f1f1f4; color: #62666d; font-weight: 500; }
+    .btn { height: 28px; display: inline-flex; align-items: center; gap: 6px; padding: 0 11px; border: 1px solid #e6e8eb; border-radius: 6px; font-size: 12.5px; color: #16181d; background: #fff; box-shadow: 0 1px 2px rgba(16,24,40,.04); }
+    .ph { display: grid; grid-template-columns: 250px 1fr; height: 25px; align-items: center; background: #f7f7f8; border-top: 1px solid #e6e8eb; border-bottom: 1px solid #f0f0f2; }
+    .tr { display: grid; grid-template-columns: 250px 1fr; height: 26px; align-items: center; border-bottom: 1px solid #f7f7f8; }
+    .nm { display: flex; align-items: center; gap: 8px; padding-left: 30px; }
+    .bar { position: absolute; top: 8px; height: 10px; border-radius: 3px; }
+    .num { font-variant-numeric: tabular-nums; }
+  </style>
+</helmet>
+
+<div class="ui" style="width: 1440px; height: 1000px; background: #ffffff; color: #16181d; font-size: 14px; display: flex; overflow: hidden;">
+
+  <!-- ═══ SIDEBAR ═══ -->
+  <div style="width: 232px; flex-shrink: 0; background: #fbfbfc; border-right: 1px solid #e6e8eb; display: flex; flex-direction: column; padding: 10px 8px;">
+    <div style="display: flex; align-items: center; gap: 9px; padding: 5px 9px 5px 6px; border-radius: 6px;">
+      <div style="width: 22px; height: 22px; border-radius: 6px; background: #16181d; color: #fff; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700;">A</div>
+      <div style="flex-grow: 1;"><div style="font-size: 13px; font-weight: 600;">AtlasAX1</div></div>
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#8b8f98" stroke-width="2.2"><path d="m7 15 5 5 5-5M7 9l5-5 5 5"/></svg>
+    </div>
+    <div style="display: flex; align-items: center; gap: 8px; height: 29px; padding: 0 9px; margin-top: 8px; border: 1px solid #e6e8eb; border-radius: 6px; background: #fff;">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#8b8f98" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+      <span style="font-size: 12.5px; color: #8b8f98; flex-grow: 1;">Search</span><span style="font-size: 11px; color: #b4b7bd;">&#8984;K</span>
+    </div>
+
+    <div class="sec">Program</div>
+    <div class="nav"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#62666d" stroke-width="1.9"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg>Overview</div>
+    <div class="nav on"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#16181d" stroke-width="1.9"><path d="M4 6h9M4 12h16M4 18h6"/></svg>Timeline</div>
+    <div class="nav"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#62666d" stroke-width="1.9"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 10h18"/></svg>Stages<span style="flex-grow: 1;"></span><span style="font-size: 11px; color: #b4b7bd;">23</span></div>
+
+    <div class="sec">Work</div>
+    <div class="nav"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#e5484d" stroke-width="1.9"><path d="M12 9v4M12 17h.01"/><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z"/></svg>Risks<span style="flex-grow: 1;"></span><span style="font-size: 11px; font-weight: 600; color: #fff; background: #e5484d; padding: 1px 6px; border-radius: 9px;">23</span></div>
+    <div class="nav"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#62666d" stroke-width="1.9"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>Overdue<span style="flex-grow: 1;"></span><span style="font-size: 11px; font-weight: 600; color: #e5484d;">8</span></div>
+    <div class="nav"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#62666d" stroke-width="1.9"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg>Activities<span style="flex-grow: 1;"></span><span style="font-size: 11px; color: #b4b7bd;">184</span></div>
+    <div class="nav"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#62666d" stroke-width="1.9"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>Deliverables<span style="flex-grow: 1;"></span><span style="font-size: 11px; color: #b4b7bd;">87/167</span></div>
+    <div class="nav"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#62666d" stroke-width="1.9"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>Updates<span style="flex-grow: 1;"></span><span style="font-size: 11px; color: #b4b7bd;">41</span></div>
+
+    <div class="sec">People</div>
+    <div class="nav"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#62666d" stroke-width="1.9"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/></svg>Team<span style="flex-grow: 1;"></span><span style="font-size: 11px; color: #b4b7bd;">28</span></div>
+
+    <span style="flex-grow: 1;"></span>
+    <div style="border-top: 1px solid #e6e8eb; padding-top: 9px; margin: 0 -8px; padding-left: 8px; padding-right: 8px;">
+      <div class="nav" style="font-size: 12.5px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#62666d" stroke-width="1.9"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M8 4v16"/></svg>Typical SoC<span style="flex-grow: 1;"></span><span style="font-size: 11px; color: #b4b7bd;">edit</span></div>
+      <div class="nav" style="font-size: 12.5px;"><div class="av" style="background: #5b5bd6; width: 18px; height: 18px; font-size: 8px;">SW</div>Sangwook</div>
+    </div>
+  </div>
+
+  <!-- ═══ TIMELINE — a first-class view, not a 240px strip ═══ -->
+  <div style="flex-grow: 1; display: flex; flex-direction: column; min-width: 0;">
+
+    <div style="height: 48px; flex-shrink: 0; border-bottom: 1px solid #e6e8eb; display: flex; align-items: center; gap: 10px; padding: 0 20px;">
+      <span style="font-size: 15px; font-weight: 600;">Timeline</span>
+      <span class="pill">23 stages</span>
+      <span style="flex-grow: 1;"></span>
+      <div class="btn"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#62666d" stroke-width="2"><path d="M3 6h18M7 12h10M11 18h2"/></svg>Filter</div>
+      <div style="display: flex; border: 1px solid #e6e8eb; border-radius: 6px; overflow: hidden; box-shadow: 0 1px 2px rgba(16,24,40,.04); height: 28px;">
+        <div style="padding: 0 11px; display: flex; align-items: center; font-size: 12.5px; color: #62666d; border-right: 1px solid #e6e8eb;">Week</div>
+        <div style="padding: 0 11px; display: flex; align-items: center; font-size: 12.5px; color: #62666d; border-right: 1px solid #e6e8eb;">Month</div>
+        <div style="padding: 0 11px; display: flex; align-items: center; font-size: 12.5px; background: #f1f1f4; font-weight: 550;">Quarter</div>
+      </div>
+      <div class="btn">Today</div>
+      <div class="btn" style="background: #5b5bd6; color: #fff; border-color: #5b5bd6;">Edit template</div>
+    </div>
+
+    <!-- axis + milestones -->
+    <div style="flex-shrink: 0; border-bottom: 1px solid #e6e8eb;">
+      <div style="display: grid; grid-template-columns: 250px 1fr;">
+        <div style="padding: 0 0 0 20px; display: flex; align-items: flex-end; padding-bottom: 7px;"><span style="font-size: 11px; font-weight: 600; color: #8b8f98; letter-spacing: .4px; text-transform: uppercase;">Stage</span></div>
+        <div style="position: relative; padding-right: 20px;">
+          <div style="position: relative; height: 30px;">
+            <div style="position: absolute; left: 17.1%; top: 11px;"><span style="display: block; width: 8px; height: 8px; border: 1.5px solid #8b8f98; transform: rotate(45deg);"></span></div>
+            <div style="position: absolute; left: 31.4%; top: 11px;"><span style="display: block; width: 8px; height: 8px; border: 1.5px solid #8b8f98; transform: rotate(45deg);"></span></div>
+            <div style="position: absolute; left: 37.1%; top: 11px;"><span style="display: block; width: 8px; height: 8px; border: 1.5px solid #8b8f98; transform: rotate(45deg);"></span></div>
+            <div style="position: absolute; left: 44.3%; top: 11px;"><span style="display: block; width: 8px; height: 8px; border: 1.5px solid #8b8f98; transform: rotate(45deg);"></span></div>
+            <div style="position: absolute; left: 54.3%; top: 8px; display: flex; align-items: center; gap: 6px;"><span style="display: block; width: 9px; height: 9px; background: #62666d; transform: rotate(45deg);"></span><span style="font-size: 11px; color: #62666d; white-space: nowrap;">Design Freeze</span></div>
+            <div style="position: absolute; left: 61.4%; top: 5px; display: flex; align-items: center; gap: 7px; background: #eeeefb; border: 1px solid #cdcdf5; border-radius: 6px; padding: 2px 9px 2px 7px;"><span style="display: block; width: 9px; height: 9px; background: #5b5bd6; transform: rotate(45deg);"></span><span style="font-size: 11.5px; color: #4747b8; font-weight: 600; white-space: nowrap;">Tapeout &middot; 01/11/2027 &middot; D&minus;138</span></div>
+            <div style="position: absolute; left: 47.5%; top: 0; bottom: -6px; width: 1px; background: #5b5bd6;"></div>
+          </div>
+          <div style="display: flex; border-top: 1px solid #f0f0f2; position: relative;">
+            <div style="position: absolute; left: 47.5%; transform: translateX(-50%); top: 3px; font-size: 10.5px; color: #fff; background: #5b5bd6; padding: 1px 7px; border-radius: 4px; font-weight: 600; z-index: 2;">Today</div>
+            <div style="flex-grow: 20; font-size: 11px; color: #8b8f98; padding: 5px 0 5px 8px; border-right: 1px solid #f0f0f2;">2025</div>
+            <div style="flex-grow: 52; font-size: 11px; color: #8b8f98; padding: 5px 0 5px 8px; border-right: 1px solid #f0f0f2;">2026</div>
+            <div style="flex-grow: 52; font-size: 11px; color: #8b8f98; padding: 5px 0 5px 8px; border-right: 1px solid #f0f0f2;">2027</div>
+            <div style="flex-grow: 16; font-size: 11px; color: #8b8f98; padding: 5px 0 5px 8px;">2028</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- grouped rows -->
+    <div style="flex-grow: 1; overflow: hidden; position: relative;">
+      <div style="position: absolute; left: calc(250px + (100% - 270px) * 0.475); top: 0; bottom: 0; width: 1px; background: #5b5bd6; z-index: 4; pointer-events: none;"></div>
+
+      <div class="ph" style="border-top: none;"><span style="padding-left: 20px; font-size: 11.5px; font-weight: 600; color: #62666d;">Define<span class="pill" style="margin-left: 7px; font-size: 10.5px;">2</span></span><span></span></div>
+      <div class="tr"><div class="nm"><span class="pill" style="font-size: 10.5px; width: 40px; text-align: center;">DEF</span><span style="font-size: 12.5px; color: #62666d; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">Product Definition</span></div><div style="position: relative; height: 26px; padding-right: 20px;"><div class="bar" style="left: 0%; width: 5.7%; background: #e5484d;"></div></div></div>
+      <div class="tr"><div class="nm"><span class="pill" style="font-size: 10.5px; width: 40px; text-align: center;">ARCH</span><span style="font-size: 12.5px; color: #62666d; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">Architecture</span></div><div style="position: relative; height: 26px; padding-right: 20px;"><div class="bar" style="left: 4.3%; width: 12.9%; background: #d8dade;"></div></div></div>
+
+      <div class="ph"><span style="padding-left: 20px; font-size: 11.5px; font-weight: 600; color: #62666d;">Technology &amp; IP Enablement<span class="pill" style="margin-left: 7px; font-size: 10.5px;">5</span></span><span></span></div>
+      <div class="tr"><div class="nm"><span class="pill" style="font-size: 10.5px; width: 40px; text-align: center;">TECH</span><span style="font-size: 12.5px; color: #62666d; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">Technology &amp; Foundry Selection</span></div><div style="position: relative; height: 26px; padding-right: 20px;"><div class="bar" style="left: 0%; width: 10%; background: #d8dade;"></div></div></div>
+      <div class="tr"><div class="nm"><span class="pill" style="font-size: 10.5px; width: 40px; text-align: center;">PDK</span><span style="font-size: 12.5px; color: #62666d; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">PDK &amp; Design Enablement</span></div><div style="position: relative; height: 26px; padding-right: 20px;"><div class="bar" style="left: 5.7%; width: 25.7%; background: #d8dade;"></div></div></div>
+      <div class="tr"><div class="nm"><span class="pill" style="font-size: 10.5px; width: 40px; text-align: center;">IPR</span><span style="font-size: 12.5px; color: #62666d; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">IP Strategy &amp; Readiness</span></div><div style="position: relative; height: 26px; padding-right: 20px;"><div class="bar" style="left: 2.9%; width: 15.7%; background: #d8dade;"></div></div></div>
+      <div class="tr"><div class="nm"><span class="pill" style="font-size: 10.5px; width: 40px; text-align: center;">AMS</span><span style="font-size: 12.5px; color: #62666d; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">Custom, AMS &amp; Memory IP Development</span></div><div style="position: relative; height: 26px; padding-right: 20px;"><div class="bar" style="left: 12.9%; width: 30%; background: #d8dade;"></div></div></div>
+      <div class="tr"><div class="nm"><span class="pill" style="font-size: 10.5px; width: 40px; text-align: center;">TC</span><span style="font-size: 12.5px; color: #62666d; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">Test Chip / MPW Shuttle</span></div><div style="position: relative; height: 26px; padding-right: 20px;"><div class="bar" style="left: 15.7%; width: 28.6%; background: #d8dade;"></div></div></div>
+
+      <div class="ph"><span style="padding-left: 20px; font-size: 11.5px; font-weight: 600; color: #62666d;">Design &amp; Verify<span class="pill" style="margin-left: 7px; font-size: 10.5px;">3</span></span><span></span></div>
+      <div class="tr"><div class="nm"><span class="pill" style="font-size: 10.5px; width: 40px; text-align: center;">RTL</span><span style="font-size: 12.5px; color: #62666d; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">RTL Design &amp; Integration</span></div><div style="position: relative; height: 26px; padding-right: 20px;"><div class="bar" style="left: 14.3%; width: 22.9%; background: #d8dade;"></div></div></div>
+      <div class="tr"><div class="nm"><span class="pill" style="font-size: 10.5px; width: 40px; text-align: center;">DV</span><span style="font-size: 12.5px; color: #62666d; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">Verification</span></div><div style="position: relative; height: 26px; padding-right: 20px;"><div class="bar" style="left: 18.6%; width: 28.6%; background: #d8dade;"></div></div></div>
+      <div class="tr"><div class="nm"><span class="pill" style="font-size: 10.5px; width: 40px; text-align: center;">DFT</span><span style="font-size: 12.5px; color: #62666d; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">DFT Architecture</span></div><div style="position: relative; height: 26px; padding-right: 20px;"><div class="bar" style="left: 12.9%; width: 28.6%; background: #d8dade;"></div></div></div>
+
+      <div class="ph"><span style="padding-left: 20px; font-size: 11.5px; font-weight: 600; color: #62666d;">Implement<span class="pill" style="margin-left: 7px; font-size: 10.5px;">3</span><span class="pill" style="margin-left: 5px; font-size: 10.5px; background: #fdeced; color: #c5303a; font-weight: 600;">2 at risk</span></span><span></span></div>
+      <div class="tr"><div class="nm"><span class="pill" style="font-size: 10.5px; width: 40px; text-align: center;">SYN</span><span style="font-size: 12.5px; color: #62666d; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">Logic Synthesis &amp; Netlist Drops</span></div><div style="position: relative; height: 26px; padding-right: 20px;"><div class="bar" style="left: 30%; width: 17.1%; background: #a8adb6;"></div></div></div>
+      <!-- selected bar, with drag handles and a hover card -->
+      <div class="tr" style="background: #f7f7fe;"><div class="nm"><span class="pill" style="font-size: 10.5px; width: 40px; text-align: center; background: #e2e2e6;">PD</span><span style="font-size: 12.5px; color: #16181d; font-weight: 550; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">Physical Design</span></div><div style="position: relative; height: 26px; padding-right: 20px;">
+        <div class="bar" style="left: 32.9%; width: 21.4%; background: #e5484d; box-shadow: 0 0 0 2px #f7f7fe, 0 0 0 3px #5b5bd6;"></div>
+        <div style="position: absolute; left: 32.9%; top: 8px; width: 3px; height: 10px; background: #5b5bd6; border-radius: 2px 0 0 2px; transform: translateX(-3px);"></div>
+        <div style="position: absolute; left: 54.3%; top: 8px; width: 3px; height: 10px; background: #5b5bd6; border-radius: 0 2px 2px 0;"></div>
+        <div style="position: absolute; left: 55.6%; top: -12px; z-index: 6; background: #16181d; color: #fff; border-radius: 7px; padding: 8px 11px; box-shadow: 0 6px 20px rgba(16,24,40,.18); white-space: nowrap;">
+          <div style="font-size: 12px; font-weight: 600;">Physical Design</div>
+          <div class="num" style="font-size: 11.5px; opacity: .78; margin-top: 3px;">04/06/2026 &rarr; 11/02/2026 &middot; 30w &middot; 449 M/M</div>
+          <div style="font-size: 11px; opacity: .62; margin-top: 4px;">Drag an edge to change TAT &mdash; later stages shift with it</div>
+        </div>
+      </div></div>
+      <div class="tr"><div class="nm"><span class="pill" style="font-size: 10.5px; width: 40px; text-align: center;">SO</span><span style="font-size: 12.5px; color: #16181d; font-weight: 550; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">Signoff</span></div><div style="position: relative; height: 26px; padding-right: 20px;"><div class="bar" style="left: 44.3%; width: 11.4%; background: #e5484d;"></div></div></div>
+
+      <div class="ph"><span style="padding-left: 20px; font-size: 11.5px; font-weight: 600; color: #62666d;">Manufacture<span class="pill" style="margin-left: 7px; font-size: 10.5px;">2</span></span><span></span></div>
+      <div class="tr"><div class="nm"><span class="pill" style="font-size: 10.5px; width: 40px; text-align: center;">TO</span><span style="font-size: 12.5px; color: #62666d; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">Tapeout &amp; Mask Release (MTO)</span></div><div style="position: relative; height: 26px; padding-right: 20px;"><div class="bar" style="left: 55.7%; width: 5.7%; background: #f3b9bb;"></div></div></div>
+      <div class="tr"><div class="nm"><span class="pill" style="font-size: 10.5px; width: 40px; text-align: center;">FAB</span><span style="font-size: 12.5px; color: #62666d; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">Fabrication</span></div><div style="position: relative; height: 26px; padding-right: 20px;"><div class="bar" style="left: 56.4%; width: 13.6%; background: #eceef0;"></div></div></div>
+
+      <div class="ph"><span style="padding-left: 20px; font-size: 11.5px; font-weight: 600; color: #62666d;">Integrate<span class="pill" style="margin-left: 7px; font-size: 10.5px;">4</span><span class="pill" style="margin-left: 5px; font-size: 10.5px; background: #fdeced; color: #c5303a; font-weight: 600;">4 at risk</span></span><span></span></div>
+      <div class="tr"><div class="nm"><span class="pill" style="font-size: 10.5px; width: 40px; text-align: center;">PKGD</span><span style="font-size: 12.5px; color: #16181d; font-weight: 550; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">Package &amp; Substrate Design</span></div><div style="position: relative; height: 26px; padding-right: 20px;"><div class="bar" style="left: 17.1%; width: 37.1%; background: #e5484d;"></div></div></div>
+      <div class="tr"><div class="nm"><span class="pill" style="font-size: 10.5px; width: 40px; text-align: center;">PTV</span><span style="font-size: 12.5px; color: #16181d; font-weight: 550; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">Package Test Vehicle (CPI / TTV)</span></div><div style="position: relative; height: 26px; padding-right: 20px;"><div class="bar" style="left: 25.7%; width: 37.1%; background: #e5484d;"></div></div></div>
+      <div class="tr"><div class="nm"><span class="pill" style="font-size: 10.5px; width: 40px; text-align: center;">SIPI</span><span style="font-size: 12.5px; color: #16181d; font-weight: 550; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">Chip-Package-System Co-Verification</span></div><div style="position: relative; height: 26px; padding-right: 20px;"><div class="bar" style="left: 35.7%; width: 18.6%; background: #e5484d;"></div></div></div>
+      <div class="tr"><div class="nm"><span class="pill" style="font-size: 10.5px; width: 40px; text-align: center;">ASSY</span><span style="font-size: 12.5px; color: #62666d; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">Assembly &amp; Package Build</span></div><div style="position: relative; height: 26px; padding-right: 20px;"><div class="bar" style="left: 70%; width: 5.7%; background: #f3b9bb;"></div></div></div>
+
+      <div class="ph"><span style="padding-left: 20px; font-size: 11.5px; font-weight: 600; color: #62666d;">Validate &amp; Ramp<span class="pill" style="margin-left: 7px; font-size: 10.5px;">4</span><span class="pill" style="margin-left: 5px; font-size: 10.5px; background: #fdeced; color: #c5303a; font-weight: 600;">1 at risk</span></span><span></span></div>
+      <div class="tr"><div class="nm"><span class="pill" style="font-size: 10.5px; width: 40px; text-align: center;">EVB</span><span style="font-size: 12.5px; color: #16181d; font-weight: 550; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">Validation Hardware / EVB</span></div><div style="position: relative; height: 26px; padding-right: 20px;"><div class="bar" style="left: 37.1%; width: 27.1%; background: #a8adb6;"></div></div></div>
+      <div class="tr"><div class="nm"><span class="pill" style="font-size: 10.5px; width: 40px; text-align: center;">TEST</span><span style="font-size: 12.5px; color: #16181d; font-weight: 550; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">Test Development</span></div><div style="position: relative; height: 26px; padding-right: 20px;"><div class="bar" style="left: 38.6%; width: 30%; background: #e5484d;"></div></div></div>
+      <div class="tr"><div class="nm"><span class="pill" style="font-size: 10.5px; width: 40px; text-align: center;">BU</span><span style="font-size: 12.5px; color: #62666d; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">Silicon Bring-up</span></div><div style="position: relative; height: 26px; padding-right: 20px;"><div class="bar" style="left: 72.9%; width: 12.9%; background: #eceef0;"></div></div></div>
+      <div class="tr" style="border-bottom: none;"><div class="nm"><span class="pill" style="font-size: 10.5px; width: 40px; text-align: center;">MP</span><span style="font-size: 12.5px; color: #62666d; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">Qualification &amp; Production</span></div><div style="position: relative; height: 26px; padding-right: 20px;"><div class="bar" style="left: 75.7%; width: 18.6%; background: #eceef0;"></div></div></div>
+    </div>
+
+    <div style="height: 34px; flex-shrink: 0; border-top: 1px solid #e6e8eb; display: flex; align-items: center; gap: 16px; padding: 0 20px; background: #fbfbfc;">
+      <span style="display: flex; align-items: center; gap: 6px; font-size: 11.5px; color: #62666d;"><span style="width: 12px; height: 6px; border-radius: 3px; background: #d8dade;"></span>Complete</span>
+      <span style="display: flex; align-items: center; gap: 6px; font-size: 11.5px; color: #62666d;"><span style="width: 12px; height: 6px; border-radius: 3px; background: #a8adb6;"></span>In flight</span>
+      <span style="display: flex; align-items: center; gap: 6px; font-size: 11.5px; color: #62666d;"><span style="width: 12px; height: 6px; border-radius: 3px; background: #e5484d;"></span>In flight, open risk</span>
+      <span style="display: flex; align-items: center; gap: 6px; font-size: 11.5px; color: #62666d;"><span style="width: 12px; height: 6px; border-radius: 3px; background: #eceef0;"></span>Not started</span>
+      <span style="flex-grow: 1;"></span>
+      <span class="pill" style="background: #fef7e6; color: #8a6a1f;">Schedule has manual date edits &mdash; reset</span>
+    </div>
+  </div>
+</div>
+</x-dc>
+</body>
+</html>

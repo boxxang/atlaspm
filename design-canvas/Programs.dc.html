@@ -1,0 +1,150 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <style>
+    body { margin: 0; }
+    a { color: #5b5bd6; } a:hover { color: #4747b8; }
+    .ui { font-family: system-ui, -apple-system, "Segoe UI", sans-serif; letter-spacing: -0.011em; }
+    .pill { font-size: 11px; padding: 2px 7px; border-radius: 5px; background: #f1f1f4; color: #62666d; font-weight: 500; }
+    .btn { height: 28px; display: inline-flex; align-items: center; gap: 6px; padding: 0 11px; border: 1px solid #e6e8eb; border-radius: 6px; font-size: 12.5px; color: #16181d; background: #fff; box-shadow: 0 1px 2px rgba(16,24,40,.04); }
+    .av { width: 20px; height: 20px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-size: 9px; font-weight: 600; color: #fff; flex-shrink: 0; }
+    .num { font-variant-numeric: tabular-nums; }
+    .prow { display: grid; grid-template-columns: 26px 1fr 120px 108px 92px 62px 62px 90px 92px; align-items: center; gap: 14px; height: 52px; padding: 0 20px; border-bottom: 1px solid #f0f0f2; }
+    .hd { font-size: 11px; font-weight: 600; color: #8b8f98; letter-spacing: .3px; }
+  </style>
+</helmet>
+
+<div class="ui" style="width: 1440px; height: 900px; background: #ffffff; color: #16181d; font-size: 14px; display: flex; flex-direction: column; overflow: hidden;">
+
+  <!-- ═══ APP BAR — no program chosen yet, so no program sidebar ═══ -->
+  <div style="height: 48px; flex-shrink: 0; border-bottom: 1px solid #e6e8eb; display: flex; align-items: center; gap: 12px; padding: 0 20px; background: #fbfbfc;">
+    <div style="display: flex; align-items: center; gap: 8px;">
+      <div style="width: 22px; height: 22px; border-radius: 6px; background: #16181d; color: #fff; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700;">A</div>
+      <span style="font-size: 14px; font-weight: 600;">AtlasPM</span>
+    </div>
+    <div style="display: flex; align-items: center; gap: 8px; height: 28px; padding: 0 10px; margin-left: 14px; width: 320px; border: 1px solid #e6e8eb; border-radius: 6px; background: #fff;">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#8b8f98" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+      <span style="font-size: 12.5px; color: #8b8f98; flex-grow: 1;">Search programs, stages, risks&hellip;</span><span style="font-size: 11px; color: #b4b7bd;">&#8984;K</span>
+    </div>
+    <span style="flex-grow: 1;"></span>
+    <div class="av" style="background: #5b5bd6;">SW</div>
+  </div>
+
+  <div style="flex-grow: 1; display: flex; min-height: 0;">
+
+    <!-- ═══ LIST ═══ -->
+    <div style="flex-grow: 1; display: flex; flex-direction: column; min-width: 0; border-right: 1px solid #e6e8eb;">
+
+      <div style="height: 56px; flex-shrink: 0; display: flex; align-items: center; gap: 10px; padding: 0 20px;">
+        <span style="font-size: 17px; font-weight: 600; letter-spacing: -0.02em;">Programs</span>
+        <span class="pill">1</span>
+        <span style="flex-grow: 1;"></span>
+        <div class="btn"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#62666d" stroke-width="2"><path d="M3 6h18M7 12h10M11 18h2"/></svg>Filter</div>
+        <div class="btn"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#62666d" stroke-width="2"><path d="M3 6h18M3 12h12M3 18h6"/></svg>Sort: Tapeout</div>
+        <div class="btn" style="background: #5b5bd6; color: #fff; border-color: #5b5bd6;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4"><path d="M12 5v14M5 12h14"/></svg>New program</div>
+      </div>
+
+      <div class="prow" style="height: 32px; border-bottom: 1px solid #e6e8eb; background: #fbfbfc;">
+        <span></span><span class="hd">PROGRAM</span><span class="hd">IN FLIGHT NOW</span><span class="hd">PROGRESS</span><span class="hd">TAPEOUT</span><span class="hd" style="text-align: right;">RISKS</span><span class="hd" style="text-align: right;">LATE</span><span class="hd" style="text-align: right;">EFFORT</span><span class="hd" style="text-align: right;">EST. COST</span>
+      </div>
+
+      <!-- the one real program -->
+      <div class="prow" style="background: #f7f7fe; height: 58px;">
+        <div style="width: 26px; height: 26px; border-radius: 7px; background: #16181d; color: #fff; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700;">A</div>
+        <div style="min-width: 0;">
+          <div style="display: flex; align-items: center; gap: 8px;"><span style="font-size: 14.5px; font-weight: 600;">AtlasAX1</span><span class="pill" style="font-size: 10.5px; background: #fef7e6; color: #8a6a1f;">Edited</span></div>
+          <div style="font-size: 12px; color: #8b8f98; margin-top: 2px;">Typical SoC &middot; 23 stages &middot; kickoff 05/19/2025</div>
+        </div>
+        <div style="display: flex; align-items: center; gap: 4px;">
+          <span class="pill" style="font-size: 10px; background: #fdeced; color: #c5303a; font-weight: 600;">PD</span>
+          <span class="pill" style="font-size: 10px; background: #fdeced; color: #c5303a; font-weight: 600;">SO</span>
+          <span class="pill" style="font-size: 10px;">+5</span>
+        </div>
+        <div>
+          <div style="display: flex; align-items: baseline; gap: 6px;"><span class="num" style="font-size: 14px; font-weight: 600;">52%</span><span class="num" style="font-size: 11.5px; color: #8b8f98;">87/167</span></div>
+          <div style="height: 4px; background: #e6e8eb; border-radius: 3px; margin-top: 5px;"><div style="width: 52%; height: 4px; background: #5b5bd6; border-radius: 3px;"></div></div>
+        </div>
+        <div><div class="num" style="font-size: 13.5px; font-weight: 600;">D&minus;138</div><div class="num" style="font-size: 11.5px; color: #8b8f98; margin-top: 2px;">01/11/2027</div></div>
+        <span class="num" style="text-align: right; font-size: 14px; font-weight: 600; color: #e5484d;">23</span>
+        <span class="num" style="text-align: right; font-size: 14px; font-weight: 600; color: #e5484d;">8</span>
+        <span class="num" style="text-align: right; font-size: 13.5px; color: #62666d;">3,653 <span style="font-size: 11px; color: #b4b7bd;">M/M</span></span>
+        <span class="num" style="text-align: right; font-size: 13.5px; color: #62666d;">$54.8M</span>
+      </div>
+
+      <!-- create row, inline -->
+      <div class="prow" style="height: 52px; color: #8b8f98;">
+        <div style="width: 26px; height: 26px; border-radius: 7px; border: 1.5px dashed #d8dade; display: flex; align-items: center; justify-content: center;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#b4b7bd" stroke-width="2.4"><path d="M12 5v14M5 12h14"/></svg></div>
+        <span style="font-size: 13.5px;">New program &mdash; name it, set an expected kickoff, pick a template</span>
+        <span></span><span></span><span></span><span></span><span></span><span></span><span></span>
+      </div>
+
+      <!-- honest empty state for the rest of the page -->
+      <div style="flex-grow: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; padding: 0 40px;">
+        <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="#d8dade" stroke-width="1.4"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 10h18M9 10v10"/></svg>
+        <div style="font-size: 14px; font-weight: 600; color: #62666d;">One program so far</div>
+        <p style="font-size: 13px; line-height: 1.55; color: #8b8f98; margin: 0; text-align: center; max-width: 46ch;">This list is where a TPM holding several tape-outs starts the day &mdash; sorted by whichever one is closest to its mask order. It reads the same at one program and at twenty.</p>
+        <div class="btn" style="margin-top: 4px;">Import from a schedule profile</div>
+      </div>
+    </div>
+
+    <!-- ═══ PREVIEW — read the program before you enter it ═══ -->
+    <div style="width: 400px; flex-shrink: 0; display: flex; flex-direction: column; background: #fbfbfc;">
+      <div style="padding: 18px 20px 16px; border-bottom: 1px solid #e6e8eb;">
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <div style="width: 30px; height: 30px; border-radius: 8px; background: #16181d; color: #fff; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700;">A</div>
+          <div style="flex-grow: 1;">
+            <div style="font-size: 16px; font-weight: 600; letter-spacing: -0.015em;">AtlasAX1</div>
+            <div style="font-size: 12px; color: #8b8f98; margin-top: 1px;">Week 67 of 132</div>
+          </div>
+        </div>
+        <div class="btn" style="width: 100%; justify-content: center; background: #5b5bd6; color: #fff; border-color: #5b5bd6; height: 32px; margin-top: 14px; font-size: 13px; font-weight: 550;">Open program</div>
+      </div>
+
+      <div style="padding: 16px 20px; border-bottom: 1px solid #e6e8eb;">
+        <div style="font-size: 11px; font-weight: 600; color: #8b8f98; letter-spacing: .4px; text-transform: uppercase; margin-bottom: 12px;">Next checkpoints</div>
+        <div style="display: flex; align-items: center; gap: 10px; padding: 6px 0;"><span style="width: 8px; height: 8px; border: 1.5px solid #8b8f98; transform: rotate(45deg); flex-shrink: 0;"></span><span style="font-size: 13px; flex-grow: 1;">Package Design Freeze</span><span class="num pill" style="font-size: 11px;">D&minus;68</span></div>
+        <div style="display: flex; align-items: center; gap: 10px; padding: 6px 0;"><span style="width: 8px; height: 8px; border: 1.5px solid #8b8f98; transform: rotate(45deg); flex-shrink: 0;"></span><span style="font-size: 13px; flex-grow: 1;">Design Freeze</span><span class="num pill" style="font-size: 11px;">D&minus;82</span></div>
+        <div style="display: flex; align-items: center; gap: 10px; padding: 6px 0;"><span style="width: 9px; height: 9px; background: #5b5bd6; transform: rotate(45deg); flex-shrink: 0;"></span><span style="font-size: 13px; flex-grow: 1; font-weight: 600;">Tapeout (BEOL MTO)</span><span class="num pill" style="font-size: 11px; background: #eeeefb; color: #5b5bd6; font-weight: 600;">D&minus;138</span></div>
+      </div>
+
+      <div style="padding: 16px 20px; border-bottom: 1px solid #e6e8eb;">
+        <div style="display: flex; align-items: baseline; gap: 8px; margin-bottom: 12px;">
+          <span style="font-size: 11px; font-weight: 600; color: #8b8f98; letter-spacing: .4px; text-transform: uppercase;">Needs attention</span>
+        </div>
+        <div style="display: flex; align-items: center; gap: 10px; padding: 6px 0;"><span style="width: 7px; height: 7px; border-radius: 50%; background: #e5484d; flex-shrink: 0;"></span><span style="font-size: 13px; flex-grow: 1;">Open risks</span><span class="num" style="font-size: 13.5px; font-weight: 600; color: #e5484d;">23</span></div>
+        <div style="display: flex; align-items: center; gap: 10px; padding: 6px 0;"><span style="width: 7px; height: 7px; border-radius: 50%; background: #e5484d; flex-shrink: 0;"></span><span style="font-size: 13px; flex-grow: 1;">Past target date</span><span class="num" style="font-size: 13.5px; font-weight: 600; color: #e5484d;">8</span></div>
+        <div style="display: flex; align-items: center; gap: 10px; padding: 6px 0;"><span style="width: 7px; height: 7px; border-radius: 50%; background: #f5a524; flex-shrink: 0;"></span><span style="font-size: 13px; flex-grow: 1;">No update in over 7 days</span><span class="num" style="font-size: 13.5px; font-weight: 600; color: #62666d;">6</span></div>
+      </div>
+
+      <div style="padding: 16px 20px; flex-grow: 1;">
+        <div style="font-size: 11px; font-weight: 600; color: #8b8f98; letter-spacing: .4px; text-transform: uppercase; margin-bottom: 12px;">Schedule</div>
+        <div style="position: relative;">
+          <div style="position: absolute; left: 47.5%; top: 0; bottom: 14px; width: 1px; background: #5b5bd6; z-index: 2;"></div>
+          <div style="position: relative; height: 8px; margin-bottom: 3px;"><div style="position: absolute; left: 0%; width: 5.7%; height: 5px; background: #e5484d; border-radius: 3px;"></div></div>
+          <div style="position: relative; height: 8px; margin-bottom: 3px;"><div style="position: absolute; left: 4.3%; width: 12.9%; height: 5px; background: #d8dade; border-radius: 3px;"></div></div>
+          <div style="position: relative; height: 8px; margin-bottom: 3px;"><div style="position: absolute; left: 5.7%; width: 25.7%; height: 5px; background: #d8dade; border-radius: 3px;"></div></div>
+          <div style="position: relative; height: 8px; margin-bottom: 3px;"><div style="position: absolute; left: 12.9%; width: 30%; height: 5px; background: #d8dade; border-radius: 3px;"></div></div>
+          <div style="position: relative; height: 8px; margin-bottom: 3px;"><div style="position: absolute; left: 18.6%; width: 28.6%; height: 5px; background: #d8dade; border-radius: 3px;"></div></div>
+          <div style="position: relative; height: 8px; margin-bottom: 3px;"><div style="position: absolute; left: 32.9%; width: 21.4%; height: 5px; background: #e5484d; border-radius: 3px;"></div></div>
+          <div style="position: relative; height: 8px; margin-bottom: 3px;"><div style="position: absolute; left: 44.3%; width: 11.4%; height: 5px; background: #e5484d; border-radius: 3px;"></div></div>
+          <div style="position: relative; height: 8px; margin-bottom: 3px;"><div style="position: absolute; left: 17.1%; width: 37.1%; height: 5px; background: #e5484d; border-radius: 3px;"></div></div>
+          <div style="position: relative; height: 8px; margin-bottom: 3px;"><div style="position: absolute; left: 25.7%; width: 37.1%; height: 5px; background: #e5484d; border-radius: 3px;"></div></div>
+          <div style="position: relative; height: 8px; margin-bottom: 3px;"><div style="position: absolute; left: 38.6%; width: 30%; height: 5px; background: #e5484d; border-radius: 3px;"></div></div>
+          <div style="position: relative; height: 8px; margin-bottom: 3px;"><div style="position: absolute; left: 56.4%; width: 13.6%; height: 5px; background: #eceef0; border-radius: 3px;"></div></div>
+          <div style="position: relative; height: 8px; margin-bottom: 3px;"><div style="position: absolute; left: 75.7%; width: 18.6%; height: 5px; background: #eceef0; border-radius: 3px;"></div></div>
+          <div style="display: flex; justify-content: space-between; font-size: 10px; color: #b4b7bd; margin-top: 5px;"><span>May '25</span><span>Today</span><span>Dec '27</span></div>
+        </div>
+        <div style="font-size: 12px; color: #5b5bd6; font-weight: 500; margin-top: 12px;">All 23 stages &rarr;</div>
+      </div>
+    </div>
+  </div>
+</div>
+</x-dc>
+</body>
+</html>

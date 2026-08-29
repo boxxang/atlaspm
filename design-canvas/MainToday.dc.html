@@ -1,0 +1,225 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <style>
+    body { margin: 0; }
+    a { color: #256abf; } a:hover { color: #1b4f8f; }
+    .t-cap { font-family: ui-monospace,"SF Mono",Menlo,monospace; font-size: 8.7px; letter-spacing: 1.04px; text-transform: uppercase; color: #898781; }
+    .t-mono { font-family: ui-monospace,"SF Mono",Menlo,monospace; }
+    .t-scap { font-family: system-ui,-apple-system,sans-serif; font-size: 8.9px; font-weight: 600; letter-spacing: 1.16px; text-transform: uppercase; color: #898781; }
+  </style>
+</helmet>
+
+<div style="width: 1440px; height: 1560px; background: #f9f9f7; font-family: system-ui,-apple-system,'Segoe UI',sans-serif; font-size: 15px; color: #0b0b0b; overflow: hidden; position: relative;">
+
+  <!-- ================= TOOLBAR (58px) ================= -->
+  <div style="height: 58px; border-bottom: 1px solid #e1e0d9; background: #f9f9f7; display: flex; align-items: center; gap: 20px; padding: 0 24px;">
+    <div class="t-mono" style="font-size: 9.5px; letter-spacing: 1px; text-transform: uppercase; color: #52514e; border: 1px solid #e1e0d9; border-radius: 3px; padding: 5px 10px; background: #fcfcfb;">&lsaquo; Programs</div>
+    <div style="flex-grow: 1; display: flex; align-items: center; justify-content: center; gap: 18px;">
+      <div class="t-mono" style="font-size: 15px; font-weight: 600; letter-spacing: -0.2px;">AtlasAX1</div>
+      <div style="display: flex; gap: 14px;">
+        <div style="display: flex; align-items: baseline; gap: 5px;"><span class="t-cap">Kick-off</span><span class="t-mono" style="font-size: 10.8px; color: #52514e;">05/19/2025</span></div>
+        <div style="display: flex; align-items: baseline; gap: 5px;"><span class="t-cap">MTO</span><span class="t-mono" style="font-size: 10.8px; color: #52514e;">01/11/2027</span></div>
+        <div style="display: flex; align-items: baseline; gap: 5px;"><span class="t-cap">MP</span><span class="t-mono" style="font-size: 10.8px; color: #52514e;">11/29/2027</span></div>
+      </div>
+      <div style="display: flex; align-items: center; gap: 7px;">
+        <span class="t-cap">Milestone template</span>
+        <div style="border: 1px solid #c3c2b7; border-radius: 3px; padding: 4px 8px; font-size: 12px; background: #fcfcfb;">Typical SoC &#9662;</div>
+      </div>
+      <div class="t-mono" style="font-size: 9.5px; letter-spacing: 1px; text-transform: uppercase; border: 1px solid #c3c2b7; border-radius: 3px; padding: 5px 9px; background: #fcfcfb;">Edit template</div>
+      <div style="width: 17px; height: 17px; border: 1px solid #c3c2b7; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 9px; color: #898781;">i</div>
+    </div>
+    <div style="display: flex; align-items: center; gap: 12px;">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#52514e" stroke-width="1.6"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.6 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.6a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+      <div style="display: flex; border: 1px solid #c3c2b7; border-radius: 3px; overflow: hidden;">
+        <div class="t-mono" style="font-size: 9.5px; letter-spacing: 1px; text-transform: uppercase; padding: 5px 11px; background: #0b0b0b; color: #f9f9f7;">Main</div>
+        <div class="t-mono" style="font-size: 9.5px; letter-spacing: 1px; text-transform: uppercase; padding: 5px 11px; color: #52514e;">Dashboard</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= PHASE BANDS ================= -->
+  <div style="display: flex; height: 26px; align-items: center; border-bottom: 1px solid #e1e0d9;">
+    <div class="t-mono" style="flex-grow: 24; font-size: 9.5px; letter-spacing: 1.4px; text-transform: uppercase; color: #898781; text-align: center;">Technology &amp; IP Enablement</div>
+    <div class="t-mono" style="flex-grow: 8; font-size: 9.5px; letter-spacing: 1.4px; text-transform: uppercase; color: #898781; text-align: center; border-left: 1px solid #e1e0d9;">Design &amp; V&#8230;</div>
+    <div class="t-mono" style="flex-grow: 14; font-size: 9.5px; letter-spacing: 1.4px; text-transform: uppercase; color: #898781; text-align: center; border-left: 1px solid #e1e0d9;">Integrate</div>
+    <div class="t-mono" style="flex-grow: 14; font-size: 9.5px; letter-spacing: 1.4px; text-transform: uppercase; color: #898781; text-align: center; border-left: 1px solid #e1e0d9;">Implement</div>
+    <div class="t-mono" style="flex-grow: 20; font-size: 9.5px; letter-spacing: 1.4px; text-transform: uppercase; color: #0b0b0b; text-align: center; border-left: 1px solid #e1e0d9; font-weight: 600;">Validate &amp; Ramp</div>
+    <div class="t-mono" style="flex-grow: 22; font-size: 9.5px; letter-spacing: 1.4px; text-transform: uppercase; color: #898781; text-align: center; border-left: 1px solid #e1e0d9;">Manufacture</div>
+  </div>
+
+  <!-- ================= CONCURRENCY CHART ================= -->
+  <div style="padding: 8px 24px 10px; border-bottom: 1px solid #e1e0d9; position: relative;">
+    <div style="display: flex; align-items: baseline; gap: 10px; margin-bottom: 4px;">
+      <span class="t-scap">Concurrency</span>
+      <span style="font-size: 9.5px; color: #898781;">stages overlap by design &mdash; select a bar to open it</span>
+    </div>
+
+    <!-- month axis -->
+    <div style="display: flex; margin-left: 62px; border-bottom: 1px solid #e1e0d9; padding-bottom: 2px; position: relative;">
+      <div class="t-mono" style="position: absolute; left: 47.5%; top: -11px; transform: translateX(-50%); font-size: 8.4px; color: #256abf; letter-spacing: .6px; white-space: nowrap;">TODAY 8/27</div>
+      <div class="t-mono" style="flex-grow: 1; font-size: 8px; color: #898781; text-align: center;">JUN</div><div class="t-mono" style="flex-grow: 1; font-size: 8px; color: #898781; text-align: center;">JUL</div><div class="t-mono" style="flex-grow: 1; font-size: 8px; color: #898781; text-align: center;">AUG</div><div class="t-mono" style="flex-grow: 1; font-size: 8px; color: #898781; text-align: center;">SEP</div><div class="t-mono" style="flex-grow: 1; font-size: 8px; color: #898781; text-align: center;">OCT</div><div class="t-mono" style="flex-grow: 1; font-size: 8px; color: #898781; text-align: center;">NOV</div><div class="t-mono" style="flex-grow: 1; font-size: 8px; color: #898781; text-align: center;">DEC</div><div class="t-mono" style="flex-grow: 1; font-size: 8px; color: #898781; text-align: center;">JAN '26</div><div class="t-mono" style="flex-grow: 1; font-size: 8px; color: #898781; text-align: center;">FEB</div><div class="t-mono" style="flex-grow: 1; font-size: 8px; color: #898781; text-align: center;">MAR</div><div class="t-mono" style="flex-grow: 1; font-size: 8px; color: #898781; text-align: center;">APR</div><div class="t-mono" style="flex-grow: 1; font-size: 8px; color: #898781; text-align: center;">MAY</div><div class="t-mono" style="flex-grow: 1; font-size: 8px; color: #898781; text-align: center;">JUN</div><div class="t-mono" style="flex-grow: 1; font-size: 8px; color: #898781; text-align: center;">JUL</div><div class="t-mono" style="flex-grow: 1; font-size: 8px; color: #898781; text-align: center;">AUG</div><div class="t-mono" style="flex-grow: 1; font-size: 8px; color: #898781; text-align: center;">SEP</div><div class="t-mono" style="flex-grow: 1; font-size: 8px; color: #898781; text-align: center;">OCT</div><div class="t-mono" style="flex-grow: 1; font-size: 8px; color: #898781; text-align: center;">NOV</div><div class="t-mono" style="flex-grow: 1; font-size: 8px; color: #898781; text-align: center;">DEC</div><div class="t-mono" style="flex-grow: 1; font-size: 8px; color: #898781; text-align: center;">JAN '27</div><div class="t-mono" style="flex-grow: 1; font-size: 8px; color: #898781; text-align: center;">FEB</div><div class="t-mono" style="flex-grow: 1; font-size: 8px; color: #898781; text-align: center;">MAR</div><div class="t-mono" style="flex-grow: 1; font-size: 8px; color: #898781; text-align: center;">APR</div><div class="t-mono" style="flex-grow: 1; font-size: 8px; color: #898781; text-align: center;">MAY</div><div class="t-mono" style="flex-grow: 1; font-size: 8px; color: #898781; text-align: center;">JUN</div><div class="t-mono" style="flex-grow: 1; font-size: 8px; color: #898781; text-align: center;">JUL</div><div class="t-mono" style="flex-grow: 1; font-size: 8px; color: #898781; text-align: center;">AUG</div><div class="t-mono" style="flex-grow: 1; font-size: 8px; color: #898781; text-align: center;">SEP</div><div class="t-mono" style="flex-grow: 1; font-size: 8px; color: #898781; text-align: center;">OCT</div><div class="t-mono" style="flex-grow: 1; font-size: 8px; color: #898781; text-align: center;">NOV</div><div class="t-mono" style="flex-grow: 1; font-size: 8px; color: #898781; text-align: center;">DEC</div>
+    </div>
+
+    <!-- rows -->
+    <div style="position: relative; margin-top: 3px;">
+      <div style="position: absolute; left: calc(62px + (100% - 62px) * 0.475); top: 0; bottom: 0; width: 1px; background: #256abf; z-index: 3;"></div>
+
+      <div style="display: flex; align-items: center; height: 14px;"><div class="t-mono" style="width: 62px; font-size: 9px; color: #52514e; text-align: right; padding-right: 7px;">07.TC</div><div style="flex-grow: 1; position: relative; height: 8px;"><div style="position: absolute; left: 15.7%; width: 28.6%; height: 8px; background: #c3c2b7; border-radius: 2px;"></div><div class="t-mono" style="position: absolute; left: 16.4%; top: -1px; font-size: 7px; color: #52514e;">83 MM</div></div></div>
+      <div style="display: flex; align-items: center; height: 14px;"><div class="t-mono" style="width: 62px; font-size: 9px; color: #52514e; text-align: right; padding-right: 7px;">08.RTL</div><div style="flex-grow: 1; position: relative; height: 8px;"><div style="position: absolute; left: 14.3%; width: 22.9%; height: 8px; background: #c3c2b7; border-radius: 2px;"></div><div class="t-mono" style="position: absolute; left: 15%; top: -1px; font-size: 7px; color: #52514e;">410 MM</div></div></div>
+      <div style="display: flex; align-items: center; height: 14px;"><div class="t-mono" style="width: 62px; font-size: 9px; color: #52514e; text-align: right; padding-right: 7px;">09.DV</div><div style="flex-grow: 1; position: relative; height: 8px;"><div style="position: absolute; left: 18.6%; width: 28.6%; height: 8px; background: #c3c2b7; border-radius: 2px;"></div><div class="t-mono" style="position: absolute; left: 19.3%; top: -1px; font-size: 7px; color: #52514e;">650 MM</div></div></div>
+      <div style="display: flex; align-items: center; height: 14px;"><div class="t-mono" style="width: 62px; font-size: 9px; color: #52514e; text-align: right; padding-right: 7px;">10.DFT</div><div style="flex-grow: 1; position: relative; height: 8px;"><div style="position: absolute; left: 12.9%; width: 28.6%; height: 8px; background: #c3c2b7; border-radius: 2px;"></div><div class="t-mono" style="position: absolute; left: 13.6%; top: -1px; font-size: 7px; color: #52514e;">138 MM</div></div></div>
+      <div style="display: flex; align-items: center; height: 14px;"><div class="t-mono" style="width: 62px; font-size: 9px; color: #52514e; text-align: right; padding-right: 7px;">11.SYN</div><div style="flex-grow: 1; position: relative; height: 8px;"><div style="position: absolute; left: 30%; width: 17.1%; height: 8px; background: #c3c2b7; border-radius: 2px;"></div><div class="t-mono" style="position: absolute; left: 30.7%; top: -1px; font-size: 7px; color: #52514e;">136 MM</div></div></div>
+      <div style="display: flex; align-items: center; height: 14px;"><div class="t-mono" style="width: 62px; font-size: 9px; color: #52514e; text-align: right; padding-right: 7px;">12.PD</div><div style="flex-grow: 1; position: relative; height: 8px;"><div style="position: absolute; left: 32.9%; width: 21.4%; height: 8px; background: #d99b9b; border-radius: 2px;"></div><div style="position: absolute; left: 32.9%; width: 14.6%; height: 8px; background: #d03b3b; border-radius: 2px 0 0 2px;"></div><div class="t-mono" style="position: absolute; left: 33.6%; top: -1px; font-size: 7px; color: #fff;">449 MM</div></div></div>
+      <div style="display: flex; align-items: center; height: 14px;"><div class="t-mono" style="width: 62px; font-size: 9px; color: #52514e; text-align: right; padding-right: 7px;">13.SO</div><div style="flex-grow: 1; position: relative; height: 8px;"><div style="position: absolute; left: 44.3%; width: 11.4%; height: 8px; background: #d99b9b; border-radius: 2px;"></div><div style="position: absolute; left: 44.3%; width: 3.2%; height: 8px; background: #d03b3b; border-radius: 2px 0 0 2px;"></div><div class="t-mono" style="position: absolute; left: 45%; top: -1px; font-size: 7px; color: #7a2020;">159 MM</div></div></div>
+      <div style="display: flex; align-items: center; height: 14px;"><div class="t-mono" style="width: 62px; font-size: 9px; color: #52514e; text-align: right; padding-right: 7px;">14.TO</div><div style="flex-grow: 1; position: relative; height: 8px;"><div style="position: absolute; left: 55.7%; width: 5.7%; height: 8px; background: #d99b9b; border-radius: 2px;"></div><div class="t-mono" style="position: absolute; left: 56.4%; top: -1px; font-size: 7px; color: #7a2020;">37 MM</div></div></div>
+      <div style="display: flex; align-items: center; height: 14px;"><div class="t-mono" style="width: 62px; font-size: 9px; color: #52514e; text-align: right; padding-right: 7px;">15.FAB</div><div style="flex-grow: 1; position: relative; height: 8px;"><div style="position: absolute; left: 56.4%; width: 13.6%; height: 8px; background: #256abf; border-radius: 2px;"></div></div></div>
+      <div style="display: flex; align-items: center; height: 14px;"><div class="t-mono" style="width: 62px; font-size: 9px; color: #52514e; text-align: right; padding-right: 7px;">16.PKGD</div><div style="flex-grow: 1; position: relative; height: 8px;"><div style="position: absolute; left: 17.1%; width: 37.1%; height: 8px; background: #d99b9b; border-radius: 2px;"></div><div style="position: absolute; left: 17.1%; width: 30.4%; height: 8px; background: #d03b3b; border-radius: 2px 0 0 2px;"></div><div class="t-mono" style="position: absolute; left: 17.8%; top: -1px; font-size: 7px; color: #fff;">310 MM</div></div></div>
+      <div style="display: flex; align-items: center; height: 14px;"><div class="t-mono" style="width: 62px; font-size: 9px; color: #52514e; text-align: right; padding-right: 7px;">17.PTV</div><div style="flex-grow: 1; position: relative; height: 8px;"><div style="position: absolute; left: 25.7%; width: 37.1%; height: 8px; background: #d99b9b; border-radius: 2px;"></div><div style="position: absolute; left: 25.7%; width: 21.8%; height: 8px; background: #d03b3b; border-radius: 2px 0 0 2px;"></div><div class="t-mono" style="position: absolute; left: 26.4%; top: -1px; font-size: 7px; color: #fff;">46 MM</div></div></div>
+
+      <!-- milestone diamonds, overlaid on the rows as in the app -->
+      <div style="position: absolute; left: 62px; right: 0; top: 0;">
+        <div style="position: absolute; left: 44.3%; top: -2px; display: flex; align-items: center; gap: 4px;"><div style="width: 10px; height: 10px; background: #0b0b0b; transform: rotate(45deg);"></div><span class="t-mono" style="font-size: 8px; background: #f9f9f7; padding: 1px 4px; border: 1px solid #e1e0d9; white-space: nowrap;">Test Chip Silicon</span></div>
+        <div style="position: absolute; left: 37.1%; top: 12px; display: flex; align-items: center; gap: 4px;"><div style="width: 10px; height: 10px; background: #0b0b0b; transform: rotate(45deg);"></div><span class="t-mono" style="font-size: 8px; background: #f9f9f7; padding: 1px 4px; border: 1px solid #e1e0d9; white-space: nowrap;">RTL Freeze</span></div>
+        <div style="position: absolute; left: 47.1%; top: 26px; display: flex; align-items: center; gap: 4px;"><div style="width: 10px; height: 10px; background: #0b0b0b; transform: rotate(45deg);"></div><span class="t-mono" style="font-size: 8px; background: #f9f9f7; padding: 1px 4px; border: 1px solid #e1e0d9; white-space: nowrap;">DV Closure</span></div>
+        <div style="position: absolute; left: 47.1%; top: 54px; display: flex; align-items: center; gap: 4px;"><div style="width: 10px; height: 10px; background: #0b0b0b; transform: rotate(45deg);"></div><span class="t-mono" style="font-size: 8px; background: #f9f9f7; padding: 1px 4px; border: 1px solid #e1e0d9; white-space: nowrap;">FFN Release</span></div>
+        <div style="position: absolute; left: 54.3%; top: 82px; display: flex; align-items: center; gap: 4px;"><div style="width: 10px; height: 10px; background: #fcfcfb; border: 1.5px solid #0b0b0b; transform: rotate(45deg);"></div><span class="t-mono" style="font-size: 8px; background: #f9f9f7; padding: 1px 4px; border: 1px solid #e1e0d9; white-space: nowrap;">Design Freeze</span></div>
+        <div style="position: absolute; left: 61.4%; top: 96px; display: flex; align-items: center; gap: 4px;"><div style="width: 11px; height: 11px; background: #0b0b0b; transform: rotate(45deg);"></div><span class="t-mono" style="font-size: 8.5px; font-weight: 600; background: #f9f9f7; padding: 2px 5px; border: 1px solid #c3c2b7; white-space: nowrap;">Tapeout (BEOL MTO)</span></div>
+        <div style="position: absolute; left: 70%; top: 110px; display: flex; align-items: center; gap: 4px;"><div style="width: 10px; height: 10px; background: #fcfcfb; border: 1.5px solid #0b0b0b; transform: rotate(45deg);"></div><span class="t-mono" style="font-size: 8px; background: #f9f9f7; padding: 1px 4px; border: 1px solid #e1e0d9; white-space: nowrap;">First Silicon</span></div>
+        <div style="position: absolute; left: 54.3%; top: 124px; display: flex; align-items: center; gap: 4px;"><div style="width: 10px; height: 10px; background: #0b0b0b; transform: rotate(45deg);"></div><span class="t-mono" style="font-size: 8px; background: #f9f9f7; padding: 1px 4px; border: 1px solid #e1e0d9; white-space: nowrap;">Package Design Freeze</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= STAGE PANEL ================= -->
+  <div style="padding: 30px 40px 0; display: flex; flex-direction: column; gap: 0;">
+    <div class="t-mono" style="font-size: 10.2px; letter-spacing: 1.84px; text-transform: uppercase; color: #898781;">Phase 7 &mdash; Validate &amp; Ramp</div>
+    <div style="display: flex; align-items: center; gap: 10px; margin-top: 8px;">
+      <span class="t-mono" style="font-size: 12px; color: #256abf;">21 / 23</span>
+      <span class="t-mono" style="font-size: 9.5px; letter-spacing: 1px; color: #898781; border: 1px solid #e1e0d9; padding: 2px 6px; border-radius: 3px;">TEST</span>
+    </div>
+    <h2 style="font-size: 41.6px; font-weight: 650; letter-spacing: -0.75px; text-transform: uppercase; margin: 8px 0 6px; line-height: 1.05;">Test Development</h2>
+    <div style="font-size: 15.75px; color: #52514e;">Probe card lead time is the critical path.</div>
+
+    <!-- leader row -->
+    <div style="display: flex; align-items: center; gap: 12px; margin-top: 22px; padding-bottom: 12px; border-bottom: 1px solid #e1e0d9;">
+      <span class="t-scap">Stage Leader</span>
+      <span style="font-weight: 600; font-size: 14px;">Dae-hyun Jo</span>
+      <span class="t-mono" style="font-size: 11px; color: #898781;">+82 10-5550-6620 &middot; daehyun.jo@example.com</span>
+      <span class="t-mono" style="font-size: 9px; letter-spacing: 1px; text-transform: uppercase; color: #898781; border: 1px solid #e1e0d9; padding: 3px 7px; border-radius: 3px;">Edit</span>
+    </div>
+
+    <!-- dates row -->
+    <div style="display: flex; align-items: center; gap: 14px; padding: 14px 0; border-bottom: 1px solid #e1e0d9;">
+      <div class="t-mono" style="font-size: 13px; border: 1px solid #c3c2b7; border-radius: 3px; padding: 5px 9px; background: #fcfcfb;">06/01/2026 &#128197;</div>
+      <span style="color: #c3c2b7;">&#9473;</span>
+      <div class="t-mono" style="font-size: 13px;">42 <span style="font-size: 10px; color: #898781;">W TAT</span></div>
+      <span style="color: #c3c2b7;">&#9473;</span>
+      <div class="t-mono" style="font-size: 13px; border: 1px solid #c3c2b7; border-radius: 3px; padding: 5px 9px; background: #fcfcfb;">03/22/2027 &#128197;</div>
+    </div>
+
+    <!-- stage details header -->
+    <div style="display: flex; align-items: baseline; gap: 10px; margin-top: 26px;">
+      <div style="font-size: 17px; font-weight: 650; letter-spacing: -0.2px; text-transform: uppercase;">Stage Details</div>
+      <span class="t-mono" style="font-size: 11px; color: #898781;">Test Development</span>
+      <span style="flex-grow: 1;"></span>
+      <span class="t-mono" style="font-size: 9px; letter-spacing: 1px; text-transform: uppercase; color: #898781; border: 1px solid #e1e0d9; padding: 3px 8px; border-radius: 3px;">&lsaquo; Close</span>
+    </div>
+    <p style="font-size: 14.5px; color: #52514e; line-height: 1.5; margin: 12px 0 0; max-width: 640px;">Build the ability to test the product &mdash; tester platform, probe card and load board, sort and final programs &mdash; on a critical path set by probe card lead time, not by wafer-out.</p>
+
+    <!-- two tables -->
+    <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 40px; margin-top: 26px;">
+      <div>
+        <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px;">
+          <span class="t-mono" style="font-size: 10px; letter-spacing: 1px; text-transform: uppercase; background: #0b0b0b; color: #f9f9f7; padding: 4px 9px; border-radius: 3px;">Engineering</span>
+          <span class="t-mono" style="font-size: 10px; letter-spacing: 1px; text-transform: uppercase; color: #52514e; padding: 4px 9px; border: 1px solid #e1e0d9; border-radius: 3px;">Program</span>
+        </div>
+        <div style="display: grid; grid-template-columns: 54px 1fr 42px 38px; gap: 0; font-size: 8.9px; letter-spacing: 1.16px; text-transform: uppercase; color: #898781; font-weight: 600; border-bottom: 1px solid #c3c2b7; padding-bottom: 5px;"><span>ID</span><span>Activity</span><span style="text-align:right">TAT</span><span style="text-align:right">M/M</span></div>
+        <div style="display: grid; grid-template-columns: 54px 1fr 42px 38px; font-size: 13px; border-bottom: 1px solid #e1e0d9; padding: 7px 0; align-items: center;"><span class="t-mono" style="font-size: 10px; color: #898781;">TEST&ndash;01</span><span>Test Plan and Coverage Strategy Definition</span><span class="t-mono" style="text-align:right; font-size: 11px;">8w</span><span class="t-mono" style="text-align:right; font-size: 11px;">12</span></div>
+        <div style="display: grid; grid-template-columns: 54px 1fr 42px 38px; font-size: 13px; border-bottom: 1px solid #e1e0d9; padding: 7px 0; align-items: center;"><span class="t-mono" style="font-size: 10px; color: #898781;">TEST&ndash;02</span><span>ATE Platform Selection and Tester Time Booking</span><span class="t-mono" style="text-align:right; font-size: 11px;">6w</span><span class="t-mono" style="text-align:right; font-size: 11px;">4</span></div>
+        <div style="display: grid; grid-template-columns: 54px 1fr 42px 38px; font-size: 13px; border-bottom: 1px solid #e1e0d9; padding: 7px 0; align-items: center;"><span class="t-mono" style="font-size: 10px; color: #898781;">TEST&ndash;03</span><span>Probe Card Design, Fabrication, and Qualification</span><span class="t-mono" style="text-align:right; font-size: 11px;">20w</span><span class="t-mono" style="text-align:right; font-size: 11px;">16</span></div>
+        <div style="display: grid; grid-template-columns: 54px 1fr 42px 38px; font-size: 13px; border-bottom: 1px solid #e1e0d9; padding: 7px 0; align-items: center;"><span class="t-mono" style="font-size: 10px; color: #898781;">TEST&ndash;04</span><span>Load Board / DUT Board Design, Fabrication, and Bring-Up</span><span class="t-mono" style="text-align:right; font-size: 11px;">17w</span><span class="t-mono" style="text-align:right; font-size: 11px;">16</span></div>
+        <div style="display: grid; grid-template-columns: 54px 1fr 42px 38px; font-size: 13px; border-bottom: 1px solid #e1e0d9; padding: 7px 0; align-items: center;"><span class="t-mono" style="font-size: 10px; color: #898781;">TEST&ndash;05</span><span>Wafer Sort Test Program Development</span><span class="t-mono" style="text-align:right; font-size: 11px;">16w</span><span class="t-mono" style="text-align:right; font-size: 11px;">30</span></div>
+        <div style="display: grid; grid-template-columns: 54px 1fr 42px 38px; font-size: 13px; border-bottom: 1px solid #e1e0d9; padding: 7px 0; align-items: center;"><span class="t-mono" style="font-size: 10px; color: #898781;">TEST&ndash;06</span><span>Final / Package Test Program Development</span><span class="t-mono" style="text-align:right; font-size: 11px;">16w</span><span class="t-mono" style="text-align:right; font-size: 11px;">28</span></div>
+        <div style="display: grid; grid-template-columns: 54px 1fr 42px 38px; font-size: 13px; border-bottom: 1px solid #e1e0d9; padding: 7px 0; align-items: center;"><span class="t-mono" style="font-size: 10px; color: #898781;">TEST&ndash;07</span><span>Characterization Test Suite Development</span><span class="t-mono" style="text-align:right; font-size: 11px;">12w</span><span class="t-mono" style="text-align:right; font-size: 11px;">20</span></div>
+        <div style="display: grid; grid-template-columns: 54px 1fr 42px 38px; font-size: 13px; border-bottom: 1px solid #e1e0d9; padding: 7px 0; align-items: center;"><span class="t-mono" style="font-size: 10px; color: #898781;">TEST&ndash;08</span><span>DFT Pattern Porting to ATE Format and Pattern Debug</span><span class="t-mono" style="text-align:right; font-size: 11px;">10w</span><span class="t-mono" style="text-align:right; font-size: 11px;">16</span></div>
+        <div style="display: grid; grid-template-columns: 54px 1fr 42px 38px; font-size: 13px; border-bottom: 1px solid #e1e0d9; padding: 7px 0; align-items: center;"><span class="t-mono" style="font-size: 10px; color: #898781;">TEST&ndash;09</span><span>Test Time and Cost Optimization</span><span class="t-mono" style="text-align:right; font-size: 11px;">9w</span><span class="t-mono" style="text-align:right; font-size: 11px;">12</span></div>
+        <div style="display: flex; justify-content: space-between; padding-top: 9px;"><span class="t-scap">Stage effort</span><span class="t-mono" style="font-size: 13px; font-weight: 600;">174 <span style="font-size: 9px; color: #898781;">MM</span></span></div>
+      </div>
+
+      <div>
+        <div style="display: flex; align-items: baseline; gap: 8px; margin-bottom: 12px;">
+          <span class="t-scap">Key Deliverables</span>
+          <span class="t-mono" style="font-size: 8.5px; color: #898781;">1/7 COMPLETE</span>
+        </div>
+        <div style="display: grid; grid-template-columns: 54px 1fr 78px 78px; font-size: 8.9px; letter-spacing: 1.16px; text-transform: uppercase; color: #898781; font-weight: 600; border-bottom: 1px solid #c3c2b7; padding-bottom: 5px;"><span>ID</span><span>Deliverable</span><span>Due</span><span>Completed</span></div>
+        <div style="display: grid; grid-template-columns: 54px 1fr 78px 78px; font-size: 13px; border-bottom: 1px solid #e1e0d9; padding: 7px 0; align-items: center;"><span class="t-mono" style="font-size: 10px; color: #898781;">TEST&ndash;D1</span><span style="display: flex; align-items: center; gap: 7px;"><span style="width: 12px; height: 12px; background: #256abf; border-radius: 2px; display: inline-flex; align-items: center; justify-content: center;"><svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3.5"><path d="M20 6 9 17l-5-5"/></svg></span><span style="text-decoration: line-through; color: #898781;">Test plan and test coverage matrix</span></span><span class="t-mono" style="font-size: 10.5px;">07/27/2026</span><span class="t-mono" style="font-size: 10.5px;">07/20/2026</span></div>
+        <div style="display: grid; grid-template-columns: 54px 1fr 78px 78px; font-size: 13px; border-bottom: 1px solid #e1e0d9; padding: 7px 0; align-items: center;"><span class="t-mono" style="font-size: 10px; color: #898781;">TEST&ndash;D2</span><span style="display: flex; align-items: center; gap: 7px;"><span style="width: 12px; height: 12px; border: 1px solid #c3c2b7; border-radius: 2px;"></span><span>ATE-ready pattern set with debug &#8230;</span></span><span class="t-mono" style="font-size: 10.5px;">11/16/2026</span><span class="t-mono" style="font-size: 10.5px; color: #898781;">&ndash;</span></div>
+        <div style="display: grid; grid-template-columns: 54px 1fr 78px 78px; font-size: 13px; border-bottom: 1px solid #e1e0d9; padding: 7px 0; align-items: center;"><span class="t-mono" style="font-size: 10px; color: #898781;">TEST&ndash;D3</span><span style="display: flex; align-items: center; gap: 7px;"><span style="width: 12px; height: 12px; border: 1px solid #c3c2b7; border-radius: 2px;"></span><span>Test data infrastructure and yield &#8230;</span></span><span class="t-mono" style="font-size: 10.5px;">12/14/2026</span><span class="t-mono" style="font-size: 10.5px; color: #898781;">&ndash;</span></div>
+        <div style="display: grid; grid-template-columns: 54px 1fr 78px 78px; font-size: 13px; border-bottom: 1px solid #e1e0d9; padding: 7px 0; align-items: center;"><span class="t-mono" style="font-size: 10px; color: #898781;">TEST&ndash;D4</span><span style="display: flex; align-items: center; gap: 7px;"><span style="width: 12px; height: 12px; border: 1px solid #c3c2b7; border-radius: 2px;"></span><span>Qualified probe card and load board</span></span><span class="t-mono" style="font-size: 10.5px;">12/28/2026</span><span class="t-mono" style="font-size: 10.5px; color: #898781;">&ndash;</span></div>
+        <div style="display: grid; grid-template-columns: 54px 1fr 78px 78px; font-size: 13px; border-bottom: 1px solid #e1e0d9; padding: 7px 0; align-items: center;"><span class="t-mono" style="font-size: 10px; color: #898781;">TEST&ndash;D5</span><span style="display: flex; align-items: center; gap: 7px;"><span style="width: 12px; height: 12px; border: 1px solid #c3c2b7; border-radius: 2px;"></span><span>Characterisation test suite</span></span><span class="t-mono" style="font-size: 10.5px;">02/08/2027</span><span class="t-mono" style="font-size: 10.5px; color: #898781;">&ndash;</span></div>
+        <div style="display: grid; grid-template-columns: 54px 1fr 78px 78px; font-size: 13px; border-bottom: 1px solid #e1e0d9; padding: 7px 0; align-items: center;"><span class="t-mono" style="font-size: 10px; color: #898781;">TEST&ndash;D6</span><span style="display: flex; align-items: center; gap: 7px;"><span style="width: 12px; height: 12px; border: 1px solid #c3c2b7; border-radius: 2px;"></span><span>Test time and test cost model</span></span><span class="t-mono" style="font-size: 10.5px;">03/01/2027</span><span class="t-mono" style="font-size: 10.5px; color: #898781;">&ndash;</span></div>
+        <div style="display: grid; grid-template-columns: 54px 1fr 78px 78px; font-size: 13px; border-bottom: 1px solid #e1e0d9; padding: 7px 0; align-items: center;"><span class="t-mono" style="font-size: 10px; color: #898781;">TEST&ndash;D7</span><span style="display: flex; align-items: center; gap: 7px;"><span style="width: 12px; height: 12px; border: 1px solid #c3c2b7; border-radius: 2px;"></span><span>Wafer sort and final test programs&#8230;</span></span><span class="t-mono" style="font-size: 10.5px;">03/22/2027</span><span class="t-mono" style="font-size: 10.5px; color: #898781;">&ndash;</span></div>
+      </div>
+    </div>
+
+    <!-- boards -->
+    <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 40px; margin-top: 34px;">
+      <div>
+        <div style="display: flex; align-items: baseline; gap: 8px; margin-bottom: 10px;">
+          <span style="font-size: 13px; font-weight: 650; letter-spacing: .4px; text-transform: uppercase;">Activity</span>
+          <span class="t-mono" style="font-size: 9px; color: #898781;">2 items &middot; 1 update</span>
+          <span style="flex-grow: 1;"></span>
+          <span class="t-mono" style="font-size: 9px; color: #52514e; border: 1px solid #e1e0d9; border-radius: 3px; padding: 3px 7px;">All deliverables &#9662;</span>
+          <span class="t-mono" style="font-size: 9px; color: #52514e; border: 1px solid #e1e0d9; border-radius: 3px; padding: 3px 7px;">+ Add</span>
+        </div>
+        <div style="display: grid; grid-template-columns: 74px 1fr 52px 74px; font-size: 8.9px; letter-spacing: 1.16px; text-transform: uppercase; color: #898781; font-weight: 600; border-bottom: 1px solid #c3c2b7; padding-bottom: 5px;"><span>Updated</span><span>Title</span><span>Owner</span><span>Due</span></div>
+        <div style="display: grid; grid-template-columns: 74px 1fr 52px 74px; font-size: 13px; padding: 8px 0 3px;"><span class="t-mono" style="font-size: 10px; color: #898781;">08/19/2026</span><span>Probe card design, fabrication and qua&#8230;</span><span class="t-mono" style="font-size: 10.5px;">D. Jo</span><span class="t-mono" style="font-size: 10.5px;">10/19/2026</span></div>
+        <div style="font-size: 10px; color: #898781; padding: 0 0 8px 74px; border-bottom: 1px solid #e1e0d9;" class="t-mono">&#8735; 08/19/2026 &mdash; Probe card design frozen and released to the vendor; qualification slot boo&#8230;</div>
+        <div style="display: grid; grid-template-columns: 74px 1fr 52px 74px; font-size: 13px; padding: 8px 0; border-bottom: 1px solid #e1e0d9;"><span class="t-mono" style="font-size: 10px; color: #898781;">08/18/2026</span><span>Wafer sort test program development</span><span class="t-mono" style="font-size: 10.5px;">D. Jo</span><span class="t-mono" style="font-size: 10.5px;">12/28/2026</span></div>
+        <div style="margin-top: 12px;"><span class="t-mono" style="font-size: 9px; letter-spacing: 1px; text-transform: uppercase; border: 1px solid #e1e0d9; border-radius: 3px; padding: 5px 10px; color: #52514e;">Show more</span></div>
+      </div>
+
+      <div style="display: flex; flex-direction: column; gap: 26px;">
+        <div>
+          <div style="display: flex; align-items: baseline; gap: 8px; margin-bottom: 10px;">
+            <span style="font-size: 13px; font-weight: 650; letter-spacing: .4px; text-transform: uppercase;">Key Information</span>
+            <span class="t-mono" style="font-size: 9px; color: #898781;">2 items</span>
+            <span style="flex-grow: 1;"></span>
+            <span class="t-mono" style="font-size: 9px; color: #52514e; border: 1px solid #e1e0d9; border-radius: 3px; padding: 3px 7px;">+ Add</span>
+          </div>
+          <div style="display: grid; grid-template-columns: 74px 1fr 52px; font-size: 8.9px; letter-spacing: 1.16px; text-transform: uppercase; color: #898781; font-weight: 600; border-bottom: 1px solid #c3c2b7; padding-bottom: 5px;"><span>Updated</span><span>Title</span><span>Owner</span></div>
+          <div style="display: grid; grid-template-columns: 74px 1fr 52px; font-size: 13px; padding: 8px 0; border-bottom: 1px solid #e1e0d9;"><span class="t-mono" style="font-size: 10px; color: #898781;">08/18/2026</span><span>Probe card carries a twenty-week lead time &mdash; ordere&#8230;</span><span class="t-mono" style="font-size: 10.5px;">D. Jo</span></div>
+          <div style="display: grid; grid-template-columns: 74px 1fr 52px; font-size: 13px; padding: 8px 0; border-bottom: 1px solid #e1e0d9;"><span class="t-mono" style="font-size: 10px; color: #898781;">08/18/2026</span><span>Sort and final programs built on the DFT pattern release</span><span class="t-mono" style="font-size: 10.5px;">D. Jo</span></div>
+          <div style="margin-top: 12px;"><span class="t-mono" style="font-size: 9px; letter-spacing: 1px; text-transform: uppercase; border: 1px solid #e1e0d9; border-radius: 3px; padding: 5px 10px; color: #52514e;">Show more</span></div>
+        </div>
+        <div>
+          <div style="display: flex; align-items: baseline; gap: 8px; margin-bottom: 10px;">
+            <span style="font-size: 13px; font-weight: 650; letter-spacing: .4px; text-transform: uppercase;">Risk</span>
+            <span class="t-mono" style="font-size: 9px; color: #898781;">1 open</span>
+            <span style="flex-grow: 1;"></span>
+            <span class="t-mono" style="font-size: 9px; color: #52514e; border: 1px solid #e1e0d9; border-radius: 3px; padding: 3px 7px;">Potential risks</span>
+            <span class="t-mono" style="font-size: 9px; color: #52514e; border: 1px solid #e1e0d9; border-radius: 3px; padding: 3px 7px;">+ Add</span>
+          </div>
+          <div style="display: grid; grid-template-columns: 74px 1fr 52px; font-size: 8.9px; letter-spacing: 1.16px; text-transform: uppercase; color: #898781; font-weight: 600; border-bottom: 1px solid #c3c2b7; padding-bottom: 5px;"><span>Updated</span><span>Title</span><span>Owner</span></div>
+          <div style="display: grid; grid-template-columns: 74px 1fr 52px; font-size: 13px; padding: 8px 0; border-bottom: 1px solid #e1e0d9;"><span class="t-mono" style="font-size: 10px; color: #898781;">08/18/2026</span><span style="display: flex; align-items: center; gap: 6px;"><span style="width: 5px; height: 5px; border-radius: 50%; background: #d03b3b;"></span>Probe card qualification lands two weeks before wa&#8230;</span><span class="t-mono" style="font-size: 10.5px;">D. Jo</span></div>
+          <div style="margin-top: 12px;"><span class="t-mono" style="font-size: 9px; letter-spacing: 1px; text-transform: uppercase; border: 1px solid #e1e0d9; border-radius: 3px; padding: 5px 10px; color: #52514e;">Show more</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- scroll continues indicator -->
+  <div style="position: absolute; left: 0; right: 0; bottom: 0; height: 76px; background: linear-gradient(to bottom, rgba(249,249,247,0), #f9f9f7 62%); display: flex; align-items: flex-end; justify-content: center; padding-bottom: 12px;">
+    <span class="t-mono" style="font-size: 10px; color: #898781; letter-spacing: 1px;">&darr; engineering contacts, and the scroll continues</span>
+  </div>
+</div>
+</x-dc>
+</body>
+</html>

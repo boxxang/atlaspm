@@ -1,0 +1,165 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <style>
+    body { margin: 0; }
+    a { color: #256abf; } a:hover { color: #1b4f8f; }
+    .mono { font-family: ui-monospace,"SF Mono",Menlo,monospace; }
+    .cap { font-family: ui-monospace,"SF Mono",Menlo,monospace; font-size: 10.2px; font-weight: 700; letter-spacing: 1.43px; text-transform: uppercase; color: #898781; display: block; }
+    .sw { display: flex; align-items: center; gap: 10px; padding: 6px 0; }
+    .chip { width: 30px; height: 30px; border-radius: 4px; border: 1px solid rgba(11,11,11,.10); flex-shrink: 0; }
+    .tname { font-family: ui-monospace,"SF Mono",Menlo,monospace; font-size: 11px; color: #0b0b0b; width: 116px; }
+    .tval { font-family: ui-monospace,"SF Mono",Menlo,monospace; font-size: 10.5px; color: #898781; width: 74px; }
+    .tuse { font-size: 12px; color: #52514e; }
+    .card { border: 1px solid #e1e0d9; border-radius: 5px; background: #fcfcfb; padding: 16px 18px; }
+    .flag { font-family: ui-monospace,"SF Mono",Menlo,monospace; font-size: 9px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; padding: 2px 7px; border-radius: 3px; }
+  </style>
+</helmet>
+
+<div style="width: 1440px; height: 1010px; background: #f9f9f7; font-family: system-ui,-apple-system,'Segoe UI',sans-serif; font-size: 15px; color: #0b0b0b; padding: 26px 34px; overflow: hidden;">
+
+  <div style="display: flex; align-items: baseline; gap: 12px; margin-bottom: 4px;">
+    <h1 style="font-size: 18.7px; font-weight: 650; letter-spacing: -0.19px; margin: 0;">Token audit &mdash; what exists, and what all three directions need</h1>
+    <span class="mono" style="font-size: 10px; color: #898781;">measured from the running app, 08/27/2026</span>
+  </div>
+  <p style="font-family: Georgia,'Times New Roman',serif; font-size: 15px; line-height: 1.55; color: #52514e; margin: 0 0 18px; max-width: 96ch;">Every value on the left is real &mdash; read off <span class="mono" style="font-size: 13px;">globals.css</span> and the live DOM. The right-hand column is what a redesign has to add regardless of which direction wins, because these gaps are what force each screen to improvise.</p>
+
+  <div style="display: grid; grid-template-columns: 400px 452px 1fr; gap: 22px;">
+
+    <!-- ═══ COLOR ═══ -->
+    <div class="card">
+      <span class="cap">Colour &mdash; today, 10 tokens</span>
+      <div style="margin-top: 12px;">
+        <div class="sw"><div class="chip" style="background: #f9f9f7;"></div><span class="tname">--page</span><span class="tval">#f9f9f7</span><span class="tuse">page ground</span></div>
+        <div class="sw"><div class="chip" style="background: #fcfcfb;"></div><span class="tname">--surface</span><span class="tval">#fcfcfb</span><span class="tuse">cards, inputs</span></div>
+        <div class="sw"><div class="chip" style="background: #0b0b0b;"></div><span class="tname">--ink</span><span class="tval">#0b0b0b</span><span class="tuse">titles, values</span></div>
+        <div class="sw"><div class="chip" style="background: #52514e;"></div><span class="tname">--ink-2</span><span class="tval">#52514e</span><span class="tuse">body</span></div>
+        <div class="sw"><div class="chip" style="background: #898781;"></div><span class="tname">--ink-3</span><span class="tval">#898781</span><span class="tuse">captions</span></div>
+        <div class="sw"><div class="chip" style="background: #e1e0d9;"></div><span class="tname">--line</span><span class="tval">#e1e0d9</span><span class="tuse">hairlines</span></div>
+        <div class="sw"><div class="chip" style="background: #c3c2b7;"></div><span class="tname">--line-strong</span><span class="tval">#c3c2b7</span><span class="tuse">table heads, controls</span></div>
+        <div class="sw"><div class="chip" style="background: #256abf;"></div><span class="tname">--accent</span><span class="tval">#256abf</span><span class="tuse">today, links, IDs</span></div>
+        <div class="sw"><div class="chip" style="background: #e7effa;"></div><span class="tname">--accent-soft</span><span class="tval">#e7effa</span><span class="tuse">selection, ID chips</span></div>
+        <div class="sw"><div class="chip" style="background: #d03b3b;"></div><span class="tname">--risk</span><span class="tval">#d03b3b</span><span class="tuse">risk, overdue</span></div>
+      </div>
+
+      <div style="border-top: 1px solid #e1e0d9; margin-top: 14px; padding-top: 14px;">
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <span class="flag" style="background: #e7effa; color: #256abf;">Add</span>
+          <span class="cap" style="display: inline;">Stage state, 4 values</span>
+        </div>
+        <p style="font-size: 12.5px; color: #52514e; line-height: 1.5; margin: 8px 0 10px;">A bar is done, running, running-with-risk, or not started. Today only two of those have a colour, so every screen invents the rest &mdash; the roadmap uses <span class="mono" style="font-size: 11px;">#d99b9b</span>, the dashboard uses grey, the cards use a border.</p>
+        <div class="sw"><div class="chip" style="background: #c3c2b7;"></div><span class="tname">--st-done</span><span class="tval">#c3c2b7</span><span class="tuse">complete</span></div>
+        <div class="sw"><div class="chip" style="background: #256abf;"></div><span class="tname">--st-running</span><span class="tval">#256abf</span><span class="tuse">in flight</span></div>
+        <div class="sw"><div class="chip" style="background: #d03b3b;"></div><span class="tname">--st-at-risk</span><span class="tval">#d03b3b</span><span class="tuse">in flight, open risk</span></div>
+        <div class="sw"><div class="chip" style="background: #ecebe5;"></div><span class="tname">--st-future</span><span class="tval">#ecebe5</span><span class="tuse">not started</span></div>
+        <div class="sw"><div class="chip" style="background: #fdf4f4;"></div><span class="tname">--risk-soft</span><span class="tval">#fdf4f4</span><span class="tuse">risk row wash &mdash; has no token today</span></div>
+      </div>
+    </div>
+
+    <!-- ═══ TYPE ═══ -->
+    <div class="card">
+      <span class="cap">Type &mdash; today, 13 sizes and no ramp</span>
+      <p style="font-size: 12.5px; color: #52514e; line-height: 1.5; margin: 8px 0 12px;">Measured on one screen. Sizes land wherever an <span class="mono" style="font-size: 11px;">em</span> multiplier put them, so nothing lines up between the roadmap, the dashboard and the activity page.</p>
+      <div style="display: flex; flex-wrap: wrap; gap: 4px; margin-bottom: 16px;">
+        <span class="mono" style="font-size: 10px; border: 1px solid #e1e0d9; border-radius: 3px; padding: 3px 7px; color: #52514e;">8.7</span>
+        <span class="mono" style="font-size: 10px; border: 1px solid #e1e0d9; border-radius: 3px; padding: 3px 7px; color: #52514e;">8.9</span>
+        <span class="mono" style="font-size: 10px; border: 1px solid #e1e0d9; border-radius: 3px; padding: 3px 7px; color: #52514e;">9.5</span>
+        <span class="mono" style="font-size: 10px; border: 1px solid #e1e0d9; border-radius: 3px; padding: 3px 7px; color: #52514e;">9.9</span>
+        <span class="mono" style="font-size: 10px; border: 1px solid #e1e0d9; border-radius: 3px; padding: 3px 7px; color: #52514e;">10.2</span>
+        <span class="mono" style="font-size: 10px; border: 1px solid #e1e0d9; border-radius: 3px; padding: 3px 7px; color: #52514e;">10.8</span>
+        <span class="mono" style="font-size: 10px; border: 1px solid #e1e0d9; border-radius: 3px; padding: 3px 7px; color: #52514e;">12.2</span>
+        <span class="mono" style="font-size: 10px; border: 1px solid #e1e0d9; border-radius: 3px; padding: 3px 7px; color: #52514e;">14.5</span>
+        <span class="mono" style="font-size: 10px; border: 1px solid #e1e0d9; border-radius: 3px; padding: 3px 7px; color: #52514e;">15.0</span>
+        <span class="mono" style="font-size: 10px; border: 1px solid #e1e0d9; border-radius: 3px; padding: 3px 7px; color: #52514e;">15.8</span>
+        <span class="mono" style="font-size: 10px; border: 1px solid #e1e0d9; border-radius: 3px; padding: 3px 7px; color: #52514e;">16.2</span>
+        <span class="mono" style="font-size: 10px; border: 1px solid #e1e0d9; border-radius: 3px; padding: 3px 7px; color: #52514e;">16.3</span>
+        <span class="mono" style="font-size: 10px; border: 1px solid #e1e0d9; border-radius: 3px; padding: 3px 7px; color: #52514e;">18.7</span>
+        <span class="mono" style="font-size: 10px; border: 1px solid #d03b3b; border-radius: 3px; padding: 3px 7px; color: #d03b3b;">41.6</span>
+      </div>
+
+      <div style="border-top: 1px solid #e1e0d9; padding-top: 14px;">
+        <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px;">
+          <span class="flag" style="background: #e7effa; color: #256abf;">Add</span>
+          <span class="cap" style="display: inline;">Seven steps, three faces</span>
+        </div>
+        <div style="display: grid; grid-template-columns: 92px 1fr; gap: 0 12px; align-items: baseline;">
+          <span class="mono" style="font-size: 9.5px; color: #898781;">--t-mark 26</span><span style="font-size: 26px; font-weight: 650; letter-spacing: -0.5px; padding: 3px 0;">Test Development</span>
+          <span class="mono" style="font-size: 9.5px; color: #898781;">--t-head 19</span><span style="font-size: 18.7px; font-weight: 650; letter-spacing: -0.19px; padding: 3px 0;">Programme status</span>
+          <span class="mono" style="font-size: 9.5px; color: #898781;">--t-read 16</span><span style="font-family: Georgia,serif; font-size: 16.15px; line-height: 1.62; color: #52514e; padding: 3px 0;">Georgia, for anything longer than a line</span>
+          <span class="mono" style="font-size: 9.5px; color: #898781;">--t-body 14</span><span style="font-size: 14px; color: #0b0b0b; padding: 3px 0;">Table rows, list items, controls</span>
+          <span class="mono" style="font-size: 9.5px; color: #898781;">--t-data 13</span><span class="mono" style="font-size: 13px; padding: 3px 0;">05/19/2025 &middot; 174 M/M &middot; D&minus;138</span>
+          <span class="mono" style="font-size: 9.5px; color: #898781;">--t-meta 11</span><span class="mono" style="font-size: 11px; color: #52514e; padding: 3px 0;">TEST-03 &middot; owner &middot; timestamps</span>
+          <span class="mono" style="font-size: 9.5px; color: #898781;">--t-cap 10</span><span class="mono" style="font-size: 10.2px; font-weight: 700; letter-spacing: 1.43px; text-transform: uppercase; color: #898781; padding: 3px 0;">Section captions</span>
+        </div>
+        <p style="font-size: 12.5px; color: #52514e; line-height: 1.5; margin: 12px 0 0;">The 41.6px uppercase stage banner has no step. It is the one size on the page that exists to be big, and it is what makes the stage panel start halfway down the screen.</p>
+      </div>
+    </div>
+
+    <!-- ═══ STRUCTURE ═══ -->
+    <div style="display: flex; flex-direction: column; gap: 22px;">
+      <div class="card">
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <span class="flag" style="background: #fdf4f4; color: #d03b3b;">Fix</span>
+          <span class="cap" style="display: inline;">Two caption systems, one job</span>
+        </div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 12px;">
+          <div style="border: 1px solid #e1e0d9; border-radius: 4px; padding: 10px 12px; background: #f9f9f7;">
+            <div style="font-family: system-ui, sans-serif; font-size: 8.9px; font-weight: 600; letter-spacing: 1.16px; text-transform: uppercase; color: #898781;">Key Deliverables</div>
+            <div class="mono" style="font-size: 9.5px; color: #898781; margin-top: 7px;">.cap &mdash; sans 8.9 / 600</div>
+            <div class="mono" style="font-size: 9.5px; color: #52514e; margin-top: 3px;">roadmap, boards, dashboard</div>
+          </div>
+          <div style="border: 1px solid #e1e0d9; border-radius: 4px; padding: 10px 12px; background: #f9f9f7;">
+            <div class="mono" style="font-size: 10.2px; font-weight: 700; letter-spacing: 1.43px; text-transform: uppercase; color: #898781;">Why it exists</div>
+            <div class="mono" style="font-size: 9.5px; color: #898781; margin-top: 7px;">.ad-sec .cap &mdash; mono 10.2 / 700</div>
+            <div class="mono" style="font-size: 9.5px; color: #52514e; margin-top: 3px;">activity detail only</div>
+          </div>
+        </div>
+        <p style="font-size: 12.5px; color: #52514e; line-height: 1.5; margin: 12px 0 0;">Same role, two faces, two sizes, two weights. Pick the mono one &mdash; it is the one on the screen that already reads as designed &mdash; and delete the other.</p>
+      </div>
+
+      <div class="card">
+        <span class="cap">Geometry &mdash; today</span>
+        <div style="display: flex; gap: 20px; margin-top: 12px; align-items: flex-end;">
+          <div style="text-align: center;"><div style="width: 46px; height: 34px; border: 1px solid #c3c2b7; border-radius: 3px; background: #fcfcfb;"></div><div class="mono" style="font-size: 9.5px; color: #898781; margin-top: 5px;">3px</div><div class="mono" style="font-size: 8.5px; color: #898781;">chips</div></div>
+          <div style="text-align: center;"><div style="width: 46px; height: 34px; border: 1px solid #c3c2b7; border-radius: 5px; background: #fcfcfb;"></div><div class="mono" style="font-size: 9.5px; color: #898781; margin-top: 5px;">5px</div><div class="mono" style="font-size: 8.5px; color: #898781;">cards</div></div>
+          <div style="text-align: center;"><div style="width: 46px; height: 34px; border: 1px solid #c3c2b7; border-radius: 10px; background: #fcfcfb;"></div><div class="mono" style="font-size: 9.5px; color: #898781; margin-top: 5px;">10px</div><div class="mono" style="font-size: 8.5px; color: #898781;">pills</div></div>
+          <div style="flex-grow: 1;">
+            <div style="height: 1px; background: #e1e0d9; margin-bottom: 8px;"></div>
+            <div class="mono" style="font-size: 9.5px; color: #898781;">--line-w 1.25px</div>
+            <div style="height: 1px; background: #c3c2b7; margin: 8px 0;"></div>
+            <div class="mono" style="font-size: 9.5px; color: #898781;">--line-strong on table heads</div>
+          </div>
+        </div>
+        <div style="border-top: 1px solid #e1e0d9; margin-top: 14px; padding-top: 12px;">
+          <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 9px;">
+            <span class="flag" style="background: #e7effa; color: #256abf;">Add</span>
+            <span class="cap" style="display: inline;">One spacing scale</span>
+          </div>
+          <div style="display: flex; align-items: flex-end; gap: 6px;">
+            <div style="width: 4px; height: 12px; background: #256abf;"></div>
+            <div style="width: 8px; height: 18px; background: #256abf;"></div>
+            <div style="width: 12px; height: 24px; background: #256abf;"></div>
+            <div style="width: 16px; height: 30px; background: #256abf;"></div>
+            <div style="width: 24px; height: 38px; background: #256abf;"></div>
+            <div style="width: 32px; height: 46px; background: #256abf;"></div>
+            <span class="mono" style="font-size: 9.5px; color: #898781; padding-bottom: 2px;">4 &middot; 8 &middot; 12 &middot; 16 &middot; 24 &middot; 32</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="card" style="background: #f4f3ee; border-color: #c3c2b7;">
+        <span class="cap">The structural constraint every direction inherits</span>
+        <p style="font-family: Georgia,'Times New Roman',serif; font-size: 15px; line-height: 1.6; color: #52514e; margin: 10px 0 0;">A programme has <strong>12 to 23 stages</strong>, set by its profile, not by the code. Any layout that assumes a stage count &mdash; a fixed-height chart, a row of tabs, a grid of cards &mdash; breaks on the profile it was not drawn against. The 23-stage built-in is the honest test case, and it is the one every artboard here is drawn with.</p>
+      </div>
+    </div>
+  </div>
+</div>
+</x-dc>
+</body>
+</html>

@@ -1,0 +1,181 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <style>
+    body { margin: 0; }
+    a { color: #5b5bd6; } a:hover { color: #4747b8; }
+    .ui { font-family: system-ui, -apple-system, "Segoe UI", sans-serif; letter-spacing: -0.011em; }
+    .card { border: 1px solid #e6e8eb; border-radius: 8px; background: #fff; box-shadow: 0 1px 2px rgba(16,24,40,.04); padding: 16px 18px; }
+    .h { font-size: 11px; font-weight: 600; color: #8b8f98; letter-spacing: .4px; text-transform: uppercase; }
+    .sw { display: grid; grid-template-columns: 26px 118px 74px 1fr; align-items: center; gap: 10px; padding: 4px 0; }
+    .chip { width: 26px; height: 26px; border-radius: 6px; border: 1px solid rgba(16,24,40,.08); }
+    .tk { font-family: ui-monospace, Menlo, monospace; font-size: 11.5px; color: #16181d; }
+    .hex { font-family: ui-monospace, Menlo, monospace; font-size: 11px; color: #8b8f98; }
+    .use { font-size: 12px; color: #62666d; }
+    .pill { font-size: 11px; padding: 2px 7px; border-radius: 5px; background: #f1f1f4; color: #62666d; font-weight: 500; }
+    .btn { height: 28px; display: inline-flex; align-items: center; gap: 6px; padding: 0 11px; border: 1px solid #e6e8eb; border-radius: 6px; font-size: 12.5px; color: #16181d; background: #fff; box-shadow: 0 1px 2px rgba(16,24,40,.04); }
+    .av { width: 20px; height: 20px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-size: 9px; font-weight: 600; color: #fff; }
+    .num { font-variant-numeric: tabular-nums; }
+  </style>
+</helmet>
+
+<div class="ui" style="width: 1440px; height: 1010px; background: #fbfbfc; color: #16181d; font-size: 14px; padding: 24px 26px; overflow: hidden;">
+
+  <div style="display: flex; align-items: baseline; gap: 12px;">
+    <h1 style="font-size: 19px; font-weight: 600; letter-spacing: -0.02em; margin: 0;">Design system &mdash; direction E</h1>
+    <span style="font-size: 13px; color: #8b8f98;">what goes into <span class="tk">globals.css</span> <span class="tk">:root</span> in the next step</span>
+  </div>
+  <p style="font-size: 13.5px; line-height: 1.55; color: #62666d; margin: 6px 0 18px; max-width: 120ch;">The old palette is warm (<span class="tk">#f9f9f7</span> paper, <span class="tk">#e1e0d9</span> lines). This one is cool and neutral, which is what makes the change read as new before a single layout moves. Every value below appears on the four screen artboards.</p>
+
+  <div style="display: grid; grid-template-columns: 372px 372px 1fr; gap: 16px;">
+
+    <!-- COLOUR -->
+    <div class="card">
+      <div class="h">Surfaces &amp; ink</div>
+      <div style="margin-top: 10px;">
+        <div class="sw"><div class="chip" style="background: #ffffff;"></div><span class="tk">--bg</span><span class="hex">#ffffff</span><span class="use">page</span></div>
+        <div class="sw"><div class="chip" style="background: #fbfbfc;"></div><span class="tk">--bg-sunken</span><span class="hex">#fbfbfc</span><span class="use">sidebar, group headers</span></div>
+        <div class="sw"><div class="chip" style="background: #f7f7f8;"></div><span class="tk">--bg-hover</span><span class="hex">#f7f7f8</span><span class="use">row hover</span></div>
+        <div class="sw"><div class="chip" style="background: #f1f1f4;"></div><span class="tk">--bg-muted</span><span class="hex">#f1f1f4</span><span class="use">pills, tracks</span></div>
+        <div class="sw"><div class="chip" style="background: #16181d;"></div><span class="tk">--ink</span><span class="hex">#16181d</span><span class="use">titles, values</span></div>
+        <div class="sw"><div class="chip" style="background: #3f434b;"></div><span class="tk">--ink-body</span><span class="hex">#3f434b</span><span class="use">long-form body</span></div>
+        <div class="sw"><div class="chip" style="background: #62666d;"></div><span class="tk">--ink-2</span><span class="hex">#62666d</span><span class="use">secondary rows</span></div>
+        <div class="sw"><div class="chip" style="background: #8b8f98;"></div><span class="tk">--ink-3</span><span class="hex">#8b8f98</span><span class="use">captions, labels</span></div>
+        <div class="sw"><div class="chip" style="background: #b4b7bd;"></div><span class="tk">--ink-4</span><span class="hex">#b4b7bd</span><span class="use">placeholder, counts</span></div>
+        <div class="sw"><div class="chip" style="background: #f0f0f2;"></div><span class="tk">--line-soft</span><span class="hex">#f0f0f2</span><span class="use">row separators</span></div>
+        <div class="sw"><div class="chip" style="background: #e6e8eb;"></div><span class="tk">--line</span><span class="hex">#e6e8eb</span><span class="use">panels, controls</span></div>
+        <div class="sw"><div class="chip" style="background: #d8dade;"></div><span class="tk">--line-strong</span><span class="hex">#d8dade</span><span class="use">checkboxes, handles</span></div>
+      </div>
+
+      <div style="border-top: 1px solid #f0f0f2; margin-top: 12px; padding-top: 12px;">
+        <div class="h">Accent &amp; semantic</div>
+        <div style="margin-top: 10px;">
+          <div class="sw"><div class="chip" style="background: #5b5bd6;"></div><span class="tk">--accent</span><span class="hex">#5b5bd6</span><span class="use">today, links, primary</span></div>
+          <div class="sw"><div class="chip" style="background: #eeeefb;"></div><span class="tk">--accent-soft</span><span class="hex">#eeeefb</span><span class="use">nav active, ID chips</span></div>
+          <div class="sw"><div class="chip" style="background: #f7f7fe;"></div><span class="tk">--accent-wash</span><span class="hex">#f7f7fe</span><span class="use">selected row</span></div>
+          <div class="sw"><div class="chip" style="background: #e5484d;"></div><span class="tk">--risk</span><span class="hex">#e5484d</span><span class="use">open risk, overdue</span></div>
+          <div class="sw"><div class="chip" style="background: #fdeced;"></div><span class="tk">--risk-soft</span><span class="hex">#fdeced</span><span class="use">risk badge ground</span></div>
+          <div class="sw"><div class="chip" style="background: #fffafa;"></div><span class="tk">--risk-wash</span><span class="hex">#fffafa</span><span class="use">at-risk row</span></div>
+          <div class="sw"><div class="chip" style="background: #f5a524;"></div><span class="tk">--warn</span><span class="hex">#f5a524</span><span class="use">slipping, stale</span></div>
+          <div class="sw"><div class="chip" style="background: #30a46c;"></div><span class="tk">--ok</span><span class="hex">#30a46c</span><span class="use">done, resolved</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- STAGE STATE + TYPE -->
+    <div style="display: flex; flex-direction: column; gap: 16px;">
+      <div class="card">
+        <div class="h">Stage state &mdash; the four the app never had</div>
+        <p style="font-size: 12.5px; line-height: 1.5; color: #62666d; margin: 8px 0 10px;">A bar is complete, in flight, in flight with open risk, or not started. Today only two have a token, so the roadmap, the dashboard and the cards each invent the rest.</p>
+        <div class="sw"><div class="chip" style="background: #d8dade;"></div><span class="tk">--st-done</span><span class="hex">#d8dade</span><span class="use">complete</span></div>
+        <div class="sw"><div class="chip" style="background: #a8adb6;"></div><span class="tk">--st-running</span><span class="hex">#a8adb6</span><span class="use">in flight, clear</span></div>
+        <div class="sw"><div class="chip" style="background: #e5484d;"></div><span class="tk">--st-at-risk</span><span class="hex">#e5484d</span><span class="use">in flight, open risk</span></div>
+        <div class="sw"><div class="chip" style="background: #f3b9bb;"></div><span class="tk">--st-at-risk-fut</span><span class="hex">#f3b9bb</span><span class="use">future part of an at-risk bar</span></div>
+        <div class="sw"><div class="chip" style="background: #eceef0;"></div><span class="tk">--st-future</span><span class="hex">#eceef0</span><span class="use">not started</span></div>
+        <div style="margin-top: 12px; padding: 10px 12px; border: 1px solid #f0f0f2; border-radius: 6px; background: #fbfbfc;">
+          <div style="position: relative; height: 10px; margin-bottom: 7px;"><div style="position: absolute; left: 0; width: 34%; height: 10px; background: #d8dade; border-radius: 3px;"></div></div>
+          <div style="position: relative; height: 10px; margin-bottom: 7px;"><div style="position: absolute; left: 12%; width: 46%; height: 10px; background: #a8adb6; border-radius: 3px;"></div></div>
+          <div style="position: relative; height: 10px; margin-bottom: 7px;"><div style="position: absolute; left: 20%; width: 30%; height: 10px; background: #e5484d; border-radius: 3px 0 0 3px;"></div><div style="position: absolute; left: 50%; width: 26%; height: 10px; background: #f3b9bb; border-radius: 0 3px 3px 0;"></div><div style="position: absolute; left: 50%; top: -3px; bottom: -3px; width: 1px; background: #5b5bd6;"></div></div>
+          <div style="position: relative; height: 10px;"><div style="position: absolute; left: 62%; width: 30%; height: 10px; background: #eceef0; border-radius: 3px;"></div></div>
+        </div>
+      </div>
+
+      <div class="card" style="flex-grow: 1;">
+        <div class="h">Type &mdash; one family, seven steps</div>
+        <p style="font-size: 12.5px; line-height: 1.5; color: #62666d; margin: 8px 0 12px;"><span class="tk">system-ui</span> throughout at <span class="tk">letter-spacing: -0.011em</span>. Numbers get <span class="tk">font-variant-numeric: tabular-nums</span> so columns of dates and M/M line up. Georgia is dropped &mdash; there is no serif left in the app.</p>
+        <div style="display: grid; grid-template-columns: 96px 1fr; gap: 0 12px; align-items: baseline;">
+          <span class="tk" style="color: #8b8f98;">--t-1 &nbsp;26</span><span style="font-size: 26px; font-weight: 600; letter-spacing: -0.025em; padding: 3px 0;">Page &amp; document titles</span>
+          <span class="tk" style="color: #8b8f98;">--t-2 &nbsp;22</span><span style="font-size: 22px; font-weight: 600; letter-spacing: -0.02em; padding: 3px 0;">Stage titles</span>
+          <span class="tk" style="color: #8b8f98;">--t-3 &nbsp;17</span><span style="font-size: 17px; font-weight: 600; letter-spacing: -0.015em; padding: 3px 0;">Panel titles, big facts</span>
+          <span class="tk" style="color: #8b8f98;">--t-4 &nbsp;15</span><span style="font-size: 15px; line-height: 1.65; padding: 3px 0;">Reading text &mdash; 1.65 line-height, 72ch measure</span>
+          <span class="tk" style="color: #8b8f98;">--t-5 &nbsp;13.5</span><span style="font-size: 13.5px; padding: 3px 0;">Table rows and list items</span>
+          <span class="tk" style="color: #8b8f98;">--t-6 &nbsp;12.5</span><span style="font-size: 12.5px; color: #62666d; padding: 3px 0;">Controls, properties, meta</span>
+          <span class="tk" style="color: #8b8f98;">--t-7 &nbsp;11</span><span style="font-size: 11px; font-weight: 600; color: #8b8f98; letter-spacing: .4px; text-transform: uppercase; padding: 3px 0;">Section captions</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- COMPONENTS + MIGRATION -->
+    <div style="display: flex; flex-direction: column; gap: 16px;">
+      <div class="card">
+        <div class="h">Components</div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 12px;">
+          <div>
+            <div style="font-size: 12px; color: #8b8f98; margin-bottom: 7px;">Buttons &mdash; 28px, r6</div>
+            <div style="display: flex; gap: 7px; flex-wrap: wrap;">
+              <span class="btn" style="background: #5b5bd6; color: #fff; border-color: #5b5bd6;">Primary</span>
+              <span class="btn">Default</span>
+              <span class="btn" style="border-color: #cceada; color: #30a46c;">Resolve</span>
+            </div>
+          </div>
+          <div>
+            <div style="font-size: 12px; color: #8b8f98; margin-bottom: 7px;">Pills &amp; badges &mdash; r5</div>
+            <div style="display: flex; gap: 6px; flex-wrap: wrap; align-items: center;">
+              <span class="pill">TEST</span>
+              <span class="pill" style="background: #fdeced; color: #c5303a; font-weight: 600;">Blocks MTO</span>
+              <span class="pill" style="background: #eeeefb; color: #5b5bd6; font-weight: 600;">DEF-01</span>
+              <span style="font-size: 11px; font-weight: 600; color: #fff; background: #e5484d; padding: 1px 6px; border-radius: 9px;">23</span>
+            </div>
+          </div>
+          <div>
+            <div style="font-size: 12px; color: #8b8f98; margin-bottom: 7px;">Status dots &mdash; 7px</div>
+            <div style="display: flex; gap: 12px; align-items: center;">
+              <span style="display: flex; align-items: center; gap: 5px; font-size: 12px; color: #62666d;"><span style="width: 7px; height: 7px; border-radius: 50%; background: #30a46c;"></span>done</span>
+              <span style="display: flex; align-items: center; gap: 5px; font-size: 12px; color: #62666d;"><span style="width: 7px; height: 7px; border-radius: 50%; background: #a8adb6;"></span>open</span>
+              <span style="display: flex; align-items: center; gap: 5px; font-size: 12px; color: #62666d;"><span style="width: 7px; height: 7px; border-radius: 50%; background: #e5484d;"></span>risk</span>
+            </div>
+          </div>
+          <div>
+            <div style="font-size: 12px; color: #8b8f98; margin-bottom: 7px;">Avatars &mdash; 20px, initials</div>
+            <div style="display: flex; gap: 5px;">
+              <span class="av" style="background: #d6624a;">JP</span><span class="av" style="background: #2f6fb8;">DJ</span><span class="av" style="background: #3d7f6e;">KA</span><span class="av" style="background: #8b6cc9;">YT</span><span class="av" style="background: #b07d2e;">GH</span>
+            </div>
+          </div>
+        </div>
+        <div style="display: flex; gap: 22px; margin-top: 16px; padding-top: 14px; border-top: 1px solid #f0f0f2;">
+          <div><div style="font-size: 12px; color: #8b8f98; margin-bottom: 7px;">Radii</div><div style="display: flex; gap: 8px; align-items: flex-end;">
+            <div style="text-align: center;"><div style="width: 34px; height: 26px; border: 1px solid #d8dade; border-radius: 5px; background: #fff;"></div><div class="tk" style="font-size: 10px; color: #8b8f98; margin-top: 4px;">5</div></div>
+            <div style="text-align: center;"><div style="width: 34px; height: 26px; border: 1px solid #d8dade; border-radius: 6px; background: #fff;"></div><div class="tk" style="font-size: 10px; color: #8b8f98; margin-top: 4px;">6</div></div>
+            <div style="text-align: center;"><div style="width: 34px; height: 26px; border: 1px solid #d8dade; border-radius: 8px; background: #fff;"></div><div class="tk" style="font-size: 10px; color: #8b8f98; margin-top: 4px;">8</div></div>
+          </div></div>
+          <div><div style="font-size: 12px; color: #8b8f98; margin-bottom: 7px;">Elevation</div><div style="display: flex; gap: 10px;">
+            <div style="width: 60px; height: 26px; border: 1px solid #e6e8eb; border-radius: 6px; background: #fff; box-shadow: 0 1px 2px rgba(16,24,40,.04);"></div>
+            <div style="width: 60px; height: 26px; border-radius: 7px; background: #16181d; box-shadow: 0 6px 20px rgba(16,24,40,.18);"></div>
+          </div><div class="tk" style="font-size: 10px; color: #8b8f98; margin-top: 4px;">card / tooltip</div></div>
+          <div><div style="font-size: 12px; color: #8b8f98; margin-bottom: 7px;">Row heights</div><div class="tk" style="font-size: 11px; color: #62666d; line-height: 1.7;">nav 29 &middot; table 38<br>timeline 26 &middot; header 48</div></div>
+        </div>
+      </div>
+
+      <div class="card" style="flex-grow: 1;">
+        <div class="h">Migration &mdash; old token to new</div>
+        <div style="display: grid; grid-template-columns: 122px 22px 1fr 1fr; gap: 6px 10px; align-items: center; margin-top: 12px; font-size: 12px;">
+          <span class="tk" style="color: #8b8f98;">--page</span><span style="color: #b4b7bd;">&rarr;</span><span class="tk">--bg</span><span style="color: #62666d;">warm off-white to pure white</span>
+          <span class="tk" style="color: #8b8f98;">--surface</span><span style="color: #b4b7bd;">&rarr;</span><span class="tk">--bg-sunken</span><span style="color: #62666d;">role inverts &mdash; sidebar is now the tinted one</span>
+          <span class="tk" style="color: #8b8f98;">--ink</span><span style="color: #b4b7bd;">&rarr;</span><span class="tk">--ink</span><span style="color: #62666d;">#0b0b0b to #16181d, cooler</span>
+          <span class="tk" style="color: #8b8f98;">--ink-2 / -3</span><span style="color: #b4b7bd;">&rarr;</span><span class="tk">--ink-2 / -3 / -4</span><span style="color: #62666d;">two greys become four</span>
+          <span class="tk" style="color: #8b8f98;">--line / -strong</span><span style="color: #b4b7bd;">&rarr;</span><span class="tk">--line-soft / --line / -strong</span><span style="color: #62666d;">two become three</span>
+          <span class="tk" style="color: #8b8f98;">--accent</span><span style="color: #b4b7bd;">&rarr;</span><span class="tk">--accent</span><span style="color: #62666d;">#256abf blue to #5b5bd6 indigo</span>
+          <span class="tk" style="color: #8b8f98;">--risk</span><span style="color: #b4b7bd;">&rarr;</span><span class="tk">--risk</span><span style="color: #62666d;">#d03b3b to #e5484d, plus soft and wash</span>
+          <span class="tk" style="color: #8b8f98;">--fs-base 15px</span><span style="color: #b4b7bd;">&rarr;</span><span class="tk">--t-1 &hellip; --t-7</span><span style="color: #62666d;">em cascade replaced by 7 fixed steps</span>
+          <span class="tk" style="color: #8b8f98;">--serif</span><span style="color: #b4b7bd;">&rarr;</span><span style="color: #e5484d; font-family: ui-monospace, Menlo, monospace; font-size: 11.5px;">deleted</span><span style="color: #62666d;">no serif remains</span>
+          <span class="tk" style="color: #8b8f98;">--mono</span><span style="color: #b4b7bd;">&rarr;</span><span style="color: #e5484d; font-family: ui-monospace, Menlo, monospace; font-size: 11.5px;">deleted</span><span style="color: #62666d;">tabular-nums replaces it for data</span>
+          <span class="tk" style="color: #8b8f98;">.cap + .ad-sec .cap</span><span style="color: #b4b7bd;">&rarr;</span><span class="tk">--t-7</span><span style="color: #62666d;">two caption systems collapse to one</span>
+          <span class="tk" style="color: #8b8f98;">--title-size 2.6rem</span><span style="color: #b4b7bd;">&rarr;</span><span style="color: #e5484d; font-family: ui-monospace, Menlo, monospace; font-size: 11.5px;">deleted</span><span style="color: #62666d;">the 41.6px uppercase banner goes</span>
+        </div>
+        <div style="margin-top: 14px; padding: 11px 13px; border: 1px solid #f5cfd0; border-radius: 6px; background: #fffafa;">
+          <div style="font-size: 12.5px; font-weight: 600; color: #c5303a; margin-bottom: 4px;">The constraint that outlives the palette</div>
+          <p style="font-size: 12.5px; line-height: 1.5; color: #62666d; margin: 0;">A program has 12&ndash;23 stages, set by its profile, not by the code. The sidebar, the timeline rows and the stage list are all authored against the 23-stage built-in for that reason.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</x-dc>
+</body>
+</html>
