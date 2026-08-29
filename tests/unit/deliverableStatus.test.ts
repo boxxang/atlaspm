@@ -4,6 +4,7 @@ import {
   deliverableStep,
   handoverComplete,
   producerStarted,
+  recordComplete,
 } from '@/lib/deliverableStatus';
 
 const d = (iso: string) => new Date(`${iso}T00:00:00`);
@@ -84,11 +85,40 @@ describe('deliverableStep', () => {
 
 describe('handoverComplete', () => {
   const att = [{ id: 'a', filename: 'spec.pdf', mimeType: 'application/pdf', size: 1 }];
+  const on = d('2025-05-02');
 
-  it('needs both the artefact and somebody saying what was handed over', () => {
-    expect(handoverComplete({ note: 'Released to the fab.', attachments: att })).toBe(true);
-    expect(handoverComplete({ note: '', attachments: att })).toBe(false);
-    expect(handoverComplete({ note: '   ', attachments: att })).toBe(false);
-    expect(handoverComplete({ note: 'Released.', attachments: [] })).toBe(false);
+  it('needs the artefact, the word, and the date it was accepted', () => {
+    expect(handoverComplete({ text: 'Released to the fab.', attachments: att, doneAt: on })).toBe(
+      true,
+    );
+  });
+
+  it('is not done without something said', () => {
+    expect(handoverComplete({ text: '', attachments: att, doneAt: on })).toBe(false);
+    expect(handoverComplete({ text: '   ', attachments: att, doneAt: on })).toBe(false);
+  });
+
+  it('is not done without the artefact', () => {
+    expect(handoverComplete({ text: 'Released.', attachments: [], doneAt: on })).toBe(false);
+  });
+
+  /* a handover with no date is a record of what was sent, not a claim that it
+     is finished */
+  it('is not done without a date it was accepted', () => {
+    expect(handoverComplete({ text: 'Released.', attachments: att, doneAt: null })).toBe(false);
+  });
+
+  it('is not done when nothing has been filed at all', () => {
+    expect(handoverComplete(null)).toBe(false);
+  });
+});
+
+describe('recordComplete', () => {
+  const att = [{ id: 'a', filename: 'spec.pdf', mimeType: 'application/pdf', size: 1 }];
+
+  it('is the V1 rule, reading the deliverable’s own fields', () => {
+    expect(recordComplete({ note: 'Released.', attachments: att })).toBe(true);
+    expect(recordComplete({ note: '', attachments: att })).toBe(false);
+    expect(recordComplete({ note: 'Released.', attachments: [] })).toBe(false);
   });
 });

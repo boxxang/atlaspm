@@ -219,13 +219,41 @@ Other decisions:
 - **Accept:** ✅ 13 checks in `tests/e2e/boards.spec.ts`, including "a risk drops
   off the moment its step is handed over" and the badge/page agreement.
 
-## Phase V2-6 — Key info, deliverables, team
+## Phase V2-6 — Key info, deliverables, team — **done**
 
-The notes board, the handover flow, team add/edit.
+The notes board, the handover flow, team add/edit — and the post write path all
+three needed, which V2-4 had deferred.
 
-- **Accept (Playwright):** a deliverable cannot be completed without a body and an
-  attachment; the clip opens the file from `/api/attachments/:id`; removing the
-  last attachment reopens the deliverable.
+**`Post` gained `stageId`.** It could point at an item, a step or a deliverable,
+and a key-info note is about none of those: it belongs to the stage. The plan
+already said a note was a post on a stage; there was no column for the stage.
+
+**The handover rule grew a third half.** `handoverComplete` was a body and an
+attachment; it is now a body, an attachment **and a date it was accepted**. A
+handover without a date is a record of what was sent, not a claim that it is
+finished — and the schema had said exactly that on `Post.doneAt` since V2-1.
+The old two-field rule survives as `recordComplete` while `/classic` still files
+delivery records that way.
+
+**A deliverable's stored `done` follows its handover.** The flag is derived, but
+it is also a column the progress figures and the V1 page read. `syncHandoverDone`
+derives it in one place and writes it there, so the two cannot disagree.
+
+Other decisions:
+
+- **One `PostThread` for all four surfaces.** They differ only in which target
+  they hand it. Replies do not nest: one indent, no argument about the second.
+- **Editing sends the text, not the post.** Spreading a stored post back at the
+  server hands Prisma an `attachments` array and a `createdAt` it has no columns
+  for — and the write fails behind an optimistic update that already showed the
+  new wording, which is the worst shape a bug can take. Found by a test.
+- **The stage lead is listed with everyone else** on the Team tab, marked rather
+  than duplicated. The question the tab answers is "who do I talk to", and a
+  separate box for the lead makes that two questions.
+
+- **Accept:** ✅ 9 checks in `tests/e2e/posts.spec.ts` and 12 in
+  `tests/e2e/handover.spec.ts`, covering all three criteria plus "Delayed is not
+  Overdue".
 
 ## Phase V2-7 — Overview and timeline
 

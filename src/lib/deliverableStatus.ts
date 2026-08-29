@@ -70,8 +70,21 @@ export function deliverableStep(
 
 /**
  * A deliverable is complete because the artefact is here and somebody said what
- * was handed over — not because a box was ticked. Both halves, or it is not
- * done.
+ * was handed over — not because a box was ticked.
+ *
+ * Three halves, in fact: a body, at least one attachment, and a date it was
+ * accepted. A handover without a date is a record of what was sent, not a claim
+ * that it is finished; a handover with no file attached is a claim with nothing
+ * behind it.
  */
-export const handoverComplete = (d: Pick<Deliverable, 'note' | 'attachments'>): boolean =>
+export const handoverComplete = (
+  post: { text: string; attachments: readonly unknown[]; doneAt: Date | null } | null,
+): boolean =>
+  !!post && post.text.trim().length > 0 && post.attachments.length > 0 && !!post.doneAt;
+
+/**
+ * The V1 shape of the same rule, reading the fields stored on the deliverable
+ * itself. Kept while `/classic` still files delivery records that way.
+ */
+export const recordComplete = (d: Pick<Deliverable, 'note' | 'attachments'>): boolean =>
   d.note.trim().length > 0 && d.attachments.length > 0;

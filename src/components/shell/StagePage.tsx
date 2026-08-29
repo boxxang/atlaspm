@@ -6,7 +6,9 @@ import { fmtDate } from '@/lib/schedule';
 import { phaseById } from '@/data/scheduleProfiles';
 import { STAGE_TABS, tabLabel, type StageTab } from '@/lib/stageTabs';
 import { StageActivityTab } from './StageActivity';
+import { DeliverablesTab } from './DeliverablesTab';
 import { KeyInfoTab } from './KeyInfoTab';
+import { TeamTab } from './TeamTab';
 import { StageRisksTab } from './StageRisksTab';
 import { useAppStore } from '@/store/useAppStore';
 import { useRailStore } from '@/store/railStore';
@@ -35,6 +37,8 @@ export function StagePage({
   const deliverables = useAppStore((s) => s.deliverables);
   const select = useRailStore((s) => s.select);
   const posts = useAppStore((s) => s.posts);
+  const contacts = useAppStore((s) => s.contacts);
+  const leaders = useAppStore((s) => s.leaders);
   const { risks } = useProgramWork();
 
   const stage = stages.find((s) => s.id === stageKey);
@@ -71,6 +75,7 @@ export function StagePage({
     keyinfo: String(posts.filter((p) => p.stageId === stage.id && p.kind === 'note').length),
     risks: String(stageRisks),
     deliverables: `${done}/${dl.length}`,
+    team: String((contacts[stage.id]?.length ?? 0) + (leaders[stage.id]?.name ? 1 : 0)),
   };
 
   return (
@@ -141,6 +146,8 @@ export function StagePage({
         {tab === 'activity' && <StageActivityTab stageId={stage.id} />}
         {tab === 'keyinfo' && <KeyInfoTab stageId={stage.id} />}
         {tab === 'risks' && <StageRisksTab stageId={stage.id} projectId={projectId} />}
+        {tab === 'deliverables' && <DeliverablesTab stageId={stage.id} />}
+        {tab === 'team' && <TeamTab stageId={stage.id} />}
         {TAB_PHASE[tab] && (
           <p className="pview-todo">
             <span className="pview-phase">{TAB_PHASE[tab]}</span>
@@ -156,10 +163,8 @@ export function StagePage({
    waiting for rather than showing an empty page. A tab that is built has no
    entry here. */
 const TAB_PHASE: Partial<Record<StageTab, string>> = {
-  board: 'V2-6',
-  deliverables: 'V2-6',
-  updates: 'V2-6',
-  team: 'V2-6',
+  board: 'V2-7',
+  updates: 'V2-7',
 };
 
 function Fact({ label, value }: { label: string; value: string }) {

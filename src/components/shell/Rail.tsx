@@ -4,6 +4,7 @@ import { fmtDate } from '@/lib/schedule';
 import { useAppStore } from '@/store/useAppStore';
 import { useRailStore } from '@/store/railStore';
 import { ActivityPanel } from './ActivityPanel';
+import { HandoverPanel } from './HandoverPanel';
 import { StepPanel } from './StepPanel';
 
 /**
@@ -12,8 +13,8 @@ import { StepPanel } from './StepPanel';
  * inside a view.
  *
  * A stage shows its properties, an activity shows where it has got to, a step
- * shows everything you can change about it. The deliverable panel arrives with
- * the handover flow.
+ * shows everything you can change about it, and a key deliverable shows the
+ * handover that completes it.
  */
 export function Rail({ projectId }: { projectId: string }) {
   const selection = useRailStore((s) => s.selection);
@@ -29,11 +30,11 @@ export function Rail({ projectId }: { projectId: string }) {
       )}
       {selection.kind === 'step' && <StepPanel act={selection.act} n={selection.n} />}
       {selection.kind === 'deliverable' && (
-        <p className="prail-empty">
-          <span className="pview-phase">V2-6</span>
-          The handover that completes {selection.deliverableId}: a body, an attachment and a
-          completion date.
-        </p>
+        <HandoverPanel
+          key={selection.deliverableId}
+          stageId={selection.stageId}
+          deliverableId={selection.deliverableId}
+        />
       )}
     </aside>
   );

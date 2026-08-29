@@ -8,6 +8,7 @@ import { resolveStages } from '@/lib/stages';
 import { rejectFile, rejectionMessage } from '@/lib/attachments';
 import { serialiseEffort, serialiseTat } from '@/lib/effort';
 import { isEmptyOverride, type StageDetailOverride } from '@/lib/stageDetail';
+import { handoverComplete } from '@/lib/deliverableStatus';
 import { stepKey, type StepStateRecord } from '@/lib/steps';
 import type {
   AttachmentRef,
@@ -122,6 +123,20 @@ export interface AppState {
   }) => void;
   /** Change what a post says. Only the text and, on a handover, its date. */
   editPost: (id: string, text: string, doneAt?: Date | null) => void;
+  /**
+   * Attach an artefact to a handover. The deliverable's own done flag follows —
+   * it is stored, the progress figures read it, and V1 reads it too, so it has
+   * to agree with what the handover actually says.
+   */
+  attachToHandover: (
+    stageId: StageId,
+    deliverableId: string,
+    postId: string,
+    files: FileList | File[],
+  ) => Promise<string[]>;
+  detachFromHandover: (stageId: StageId, deliverableId: string, attachmentId: string) => void;
+  /** Recompute a deliverable's stored done flag from its handover. */
+  syncHandoverDone: (stageId: StageId, deliverableId: string) => void;
   /** Delete a post, and the replies under it. */
   deletePost: (id: string) => void;
   editStageDate: (stageId: StageId, which: 'start' | 'end', date: Date) => void;
@@ -227,6 +242,10 @@ const UNTOUCHED_STEP: StepStateRecord = {
   owner: '',
   dueOverride: null,
 };
+
+/** Two dates that are the same day, or both absent. */
+const sameDay = (a: Date | null, b: Date | null) =>
+  a === b || (!!a && !!b && a.getTime() === b.getTime());
 
 const sync = (p: Promise<unknown>) => {
   inFlight.add(p);
@@ -520,6 +539,79 @@ export const useAppStore = create<AppState>()((set, get) => ({
        showing replies to something that is gone. */
     set((s) => ({ posts: s.posts.filter((p) => p.id !== id && p.parentId !== id) }));
     sync(api.deletePost(get().projectId, id));
+  },
+
+  attachToHandover: async (stageId, deliverableId, postId, files) => {
+    const held = get().posts.find((p) => p.id === postId)?.attachments ?? [];
+    const accepted: File[] = [];
+    const problems: string[] = [];
+    for (const f of files) {
+      const reason = rejectFile(f, held.length + accepted.length);
+      if (reason) problems.push(rejectionMessage(reason, f.name));
+      else accepted.push(f);
+    }
+    if (!accepted.length) return problems;
+
+    const form = new FormData();
+    form.set('projectId', get().projectId);
+    form.set('statusUpdateId', postId);
+    for (const f of accepted) {
+      form.append('files', f);
+      form.append('ids', uid());
+    }
+    try {
+      /* the post has to be on the server before a row can point at it */
+      await flushWrites();
+      const saved = await api.uploadAttachments(form);
+      set((s) => ({
+        posts: s.posts.map((p) =>
+          p.id === postId ? { ...p, attachments: [...p.attachments, ...saved] } : p,
+        ),
+      }));
+      get().syncHandoverDone(stageId, deliverableId);
+    } catch (e) {
+      console.error('[atlaspm] handover attachment upload failed', e);
+      problems.push('Upload failed — the files were not attached.');
+    }
+    return problems;
+  },
+
+  detachFromHandover: (stageId, deliverableId, attachmentId) => {
+    set((s) => ({
+      posts: s.posts.map((p) => ({
+        ...p,
+        attachments: p.attachments.filter((a) => a.id !== attachmentId),
+      })),
+    }));
+    sync(api.deleteAttachment(get().projectId, attachmentId));
+    get().syncHandoverDone(stageId, deliverableId);
+  },
+
+  /**
+   * Keep the deliverable's stored done flag in step with its handover.
+   *
+   * The flag is derived — a handover with a body, an artefact and a date — but
+   * it is also stored, because the progress figures and the V1 page both read
+   * the column. Deriving it in one place and writing it there is what keeps the
+   * two from disagreeing.
+   */
+  syncHandoverDone: (stageId, deliverableId) => {
+    const post = get().posts.find(
+      (p) => p.deliverableId === deliverableId && p.kind === 'handover',
+    );
+    const done = handoverComplete(post ?? null);
+    const completedAt = done ? (post?.doneAt ?? null) : null;
+    const current = get().deliverables[stageId]?.find((d) => d.id === deliverableId);
+    if (!current || (current.done === done && sameDay(current.completedAt, completedAt))) return;
+    set((s) => ({
+      deliverables: {
+        ...s.deliverables,
+        [stageId]: s.deliverables[stageId].map((d) =>
+          d.id === deliverableId ? { ...d, done, completedAt } : d,
+        ),
+      },
+    }));
+    sync(api.setDeliverableDone(get().projectId, deliverableId, done, completedAt));
   },
 
   attachToStep: async (act, n, files) => {
