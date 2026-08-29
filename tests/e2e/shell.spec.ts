@@ -165,3 +165,46 @@ test.describe('the palette', () => {
     await expect(page.locator('body')).toHaveCSS('background-color', 'rgb(255, 255, 255)');
   });
 });
+
+/**
+ * Laptop widths.
+ *
+ * The chrome costs 232px of nav plus a rail before the view gets anything, and
+ * the tables inside it are fixed columns with one flexible column taking the
+ * slack. On a wide screen that is fine; at 1280 the slack ran out and the
+ * activity title — the thing a row is about — collapsed to a single character.
+ *
+ * These run at Playwright's default 1280×720, which is the width that broke.
+ */
+test.describe('at a laptop width', () => {
+  test('the column a row is about is still readable', async ({ page }) => {
+    await page.goto(`${SHELL_PATH}/stage/physicalDesign/activity`);
+    await expect(page.locator('[data-act]').first()).toBeVisible();
+
+    const title = page.locator('[data-act="PD-01"] .ell').first();
+    const box = (await title.boundingBox())!;
+    expect(box.width, 'the activity title needs room to be a title').toBeGreaterThan(120);
+  });
+
+  test('a table that cannot fit scrolls rather than crushing', async ({ page }) => {
+    await page.goto(`${SHELL_PATH}/stage/physicalDesign/activity`);
+    await expect(page.locator('[data-act]').first()).toBeVisible();
+
+    /* the pane scrolls sideways; the page itself never does */
+    const doc = await page.evaluate(() => ({
+      docOverflows: document.documentElement.scrollWidth > document.documentElement.clientWidth,
+      table: document.querySelector('[data-acts]')!.getBoundingClientRect().width,
+    }));
+    expect(doc.docOverflows, 'the page must not scroll sideways as a whole').toBe(false);
+    expect(doc.table).toBeGreaterThan(700);
+  });
+
+  test('the dashboard band stays one row of figures', async ({ page }) => {
+    await page.goto(`${SHELL_PATH}/stage/physicalDesign/activity`);
+    await expect(page.locator('.sdash')).toBeVisible();
+    const tops = await page
+      .locator('.sdash .dstat')
+      .evaluateAll((els) => els.map((e) => Math.round(e.getBoundingClientRect().top)));
+    expect(new Set(tops).size, 'the stats wrapped onto more than one row').toBe(1);
+  });
+});

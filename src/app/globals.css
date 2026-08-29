@@ -2805,3 +2805,46 @@ kbd{font:inherit;font-size:10.5px;border:1px solid var(--line);border-bottom-wid
 .ptl-tail{display:flex;align-items:center;justify-content:flex-end;gap:9px;padding-left:9px}
 .ptl-n{font-size:11.5px;color:var(--ink-3);font-variant-numeric:tabular-nums;white-space:nowrap}
 .ptl-late{font-size:11px;color:var(--risk);font-weight:600;white-space:nowrap}
+
+/* ==========================================================================
+   Laptop widths.
+
+   The chrome is 232px of nav plus 400px of rail before the view gets anything,
+   and the tables inside it are fixed-width columns with one flexible column
+   taking the slack. On a wide screen that is fine. At 1280 the slack runs out
+   and the flexible column — the activity title, the thing the row is about —
+   collapses to a single letter.
+
+   So: the rail narrows in two steps, and a table that cannot fit scrolls
+   sideways inside its own pane rather than crushing its content. A column you
+   have to scroll to is legible; a column squeezed to 1ch is not.
+   ========================================================================== */
+@media (max-width:1500px){ #peek{width:344px} }
+@media (max-width:1320px){ #peek{width:300px} }
+@media (max-width:1120px){ #peek{display:none} }
+@media (max-width:900px){ #side{width:188px} }
+
+/* Tables keep their columns and scroll rather than squash. The minimum is the
+   sum of the fixed columns plus a readable share for the flexible one — the
+   activity table spends 602px on fixed columns before the title gets anything,
+   so the floor has to clear that by the width of a title, not by a little. */
+.scroll{overflow-x:auto}
+.ctable{min-width:900px}
+.ctable .ctable{min-width:880px}
+.ptable{min-width:720px}
+.pattn{min-width:860px}
+
+/* The dashboard band wrapped into an unreadable grid at narrow widths: six
+   stats and a pace panel on one row need the room. Below that it scrolls with
+   the rest of the page rather than reflowing into a puzzle. */
+.sdash{flex-wrap:nowrap;min-width:820px}
+.sdash-pace{min-width:260px}
+.tabs{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none}
+.tabs::-webkit-scrollbar{display:none}
+.tab{flex-shrink:0}
+
+/* The timeline's name and tail columns are a large fixed cost on a small
+   screen; they shrink before the chart itself does. */
+@media (max-width:1500px){ .ptl{--tl-name:12rem;--tl-tail:11rem} }
+@media (max-width:1200px){ .ptl{--tl-name:9.5rem;--tl-tail:8rem} }
+.ptl{min-width:680px}
