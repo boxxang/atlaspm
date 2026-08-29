@@ -69,35 +69,49 @@ them:
 
 ---
 
-## Phase V2-1 — Data model
+## Phase V2-1 — Data model — **done** (`ed5308d`)
 
-Decide the shape before writing any of it. The prototype has four things that are
-the same thing — a post with a body, attachments and replies — and the app already
-has `Item`, `StatusUpdate` and `Attachment`. Choose between:
+**Decision: (a), one `Post` model.** `StatusUpdate` is folded into it. `kind` carries
+`update | risk | note | handover | reply` — a discriminator rather than four booleans
+or four tables — and the target is whichever of `itemId`, `deliverableId` or
+`activityRef` + `stepN` applies. `parentId` nests a reply under what it answers.
+`Attachment` hangs off a post rather than off a status update, and carries
+`activityRef`/`stepN` for an output attached straight to a step.
 
-- **(a) one `Post` model** with a polymorphic target (step / deliverable / stage note)
-  plus `parentId` for replies, folding `StatusUpdate` into it; or
-- **(b) extend what is there** — `StatusUpdate` gains a parent and new foreign keys.
+The reason for (a) over (b): the prototype renders one post, one reply thread and one
+attachment strip in four screens. Under (b) those would be four shapes that merely
+look alike, and every screen would have to know which it was holding.
 
-(a) is the prototype's own model and makes the four screens one renderer. (b) is a
-smaller migration. Write the decision and the reason into this file before coding.
+`StepState` addresses a step by `activityRef` + `stepN` within a project, not by a row
+id, because steps are content — they live in `/data/activityDetails.ts` and have no
+rows. Renumbering an activity must not silently move somebody's completion onto a
+different step, so the address is the one the write-ups use.
 
-Also needed: `StepState` (activity ref + step number + project → done, doneAt, pct,
-owner, dueOverride), and a `Note` model unless notes become `Item(kind:"keyinfo")`
-with a body and attachments, which they nearly are already.
+Notes did **not** get a model. A key-info note is `Post(kind:"note")` on a stage; the
+board is a list of posts, which is what it looks like.
 
-- **Accept:** migration applies to a copy of the seeded database; `npm test` green;
-  no UI yet.
+The TypeScript layer still says `StatusUpdate`/`updates` on the item-board path. The
+tables are the expensive thing to change later, so they went first; the names get
+corrected when V2-5/6 rewrite those screens.
 
-## Phase V2-2 — Pure logic, tests first
+- **Accept:** ✅ schema pushed and reseeded; 221 unit and 272 e2e green.
 
-Port from the prototype, do not reinvent: `stepDueDate` / `stepLate` / `stepDoneAt`,
-`allOverdue`, risk derivation from flagged posts, `delivStatus` including **Delayed**,
-`delivStep`, the stage dashboard's pace figures, and the Overview `attention()`
-ladder (Overdue → Due soon → Stale risk, with the mask-order bonus scoped inside a
-band so it never promotes across one).
+## Phase V2-2 — Pure logic, tests first — **done**
 
-- **Accept:** Vitest covers each; `/lib` and `/data` still import no DOM.
+Five modules, ported rather than reinvented:
+
+| module | what it settles |
+|---|---|
+| `/lib/steps.ts` | `plannedSteps` (parallel lanes included), `resolveSteps`, `isStepLate`, `stageDoneAt`, `activityState`, `allOverdue` |
+| `/lib/risks.ts` | a risk is a flagged post on a step, open while that step is |
+| `/lib/deliverableStatus.ts` | Completed → **Delayed** → In progress → Not started; `deliverableStep`; `handoverComplete` |
+| `/lib/attention.ts` | the Overdue → Due soon → Stale risk ladder, banded so tapeout never promotes across one |
+| `/lib/stagePace.ts` | steps done against window spent, and the verdict on the gap |
+
+Each returns plain data — a `kind` and its numbers, never a colour or a label the
+component should own. The colours stayed with the components.
+
+- **Accept:** ✅ 309 unit tests (was 221); `/lib` and `/data` still import no DOM.
 
 ## Phase V2-3 — Shell and navigation
 
