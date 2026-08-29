@@ -36,10 +36,10 @@ export async function getProjectState(projectId: string): Promise<ProjectState |
       contacts: { orderBy: { position: 'asc' } },
       stageDetails: true,
       stepStates: true,
-      /* posts that hang off a step rather than a board item — updates and the
-         ones flagged as risks */
+      /* every post that is not a V1 board item's: step updates and risks, stage
+         notes, deliverable handovers, and the replies under them */
       posts: {
-        where: { activityRef: { not: null } },
+        where: { itemId: null },
         include: { attachments: { select: ATTACHMENT_META } },
         orderBy: { createdAt: 'desc' },
       },

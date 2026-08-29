@@ -193,6 +193,53 @@ export async function setDeliverableDue(projectId: string, id: string, due: Date
   touch(projectId);
 }
 
+/* ---------- posts ---------- */
+
+/**
+ * Write a post.
+ *
+ * One action for all of it, because a post is one shape wherever it lands: an
+ * update on a step, a risk flagged on that step, a note on a stage's key-info
+ * board, the handover that completes a deliverable, or a reply under any of
+ * them. Exactly one target is set — a reply sets `parentId` and nothing else,
+ * because it belongs to its parent and the parent knows where it is.
+ *
+ * The id comes from the caller so the optimistic row and the stored row are the
+ * same row.
+ */
+export async function savePost(input: {
+  projectId: string;
+  id: string;
+  kind: string;
+  text: string;
+  author: string;
+  activityRef?: string | null;
+  stepN?: number | null;
+  stageId?: string | null;
+  deliverableId?: string | null;
+  itemId?: string | null;
+  parentId?: string | null;
+  doneAt?: Date | null;
+}) {
+  const { projectId, id, ...post } = input;
+  await assertProject(projectId);
+  await prisma.post.upsert({
+    where: { id },
+    /* An edit changes what was said and when it was said again — never who said
+       it, and never where it lives. */
+    update: { text: post.text, editedAt: new Date(), doneAt: post.doneAt ?? null },
+    create: { id, projectId, createdAt: new Date(), ...post },
+  });
+  touch(projectId);
+}
+
+/** Delete a post. Its replies and attachments go with it, by cascade. */
+export async function deletePost(projectId: string, id: string) {
+  await assertProject(projectId);
+  await prisma.post.delete({ where: { id } });
+  touch(projectId);
+}
+
 /* ---------- steps ---------- */
 
 /**

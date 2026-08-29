@@ -34,7 +34,7 @@ export interface ProgramWork {
 export function useProgramWork(): ProgramWork {
   const schedule = useAppStore((s) => s.schedule);
   const stepStates = useAppStore((s) => s.stepStates);
-  const stepPosts = useAppStore((s) => s.stepPosts);
+  const posts = useAppStore((s) => s.posts);
   const today = useAppStore((s) => s.today);
 
   return useMemo(() => {
@@ -50,7 +50,7 @@ export function useProgramWork(): ProgramWork {
     return {
       steps,
       overdue: allOverdue(resolved, today),
-      risks: openRisks(stepPosts, doneStepKeys(steps), STAGE_OF),
+      risks: openRisks(posts, doneStepKeys(steps), STAGE_OF),
     };
-  }, [schedule, stepStates, stepPosts, today]);
+  }, [schedule, stepStates, posts, today]);
 }

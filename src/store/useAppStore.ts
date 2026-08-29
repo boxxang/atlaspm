@@ -3,7 +3,7 @@
 import { create } from 'zustand';
 import * as api from '@/app/actions';
 import { BUILTIN_PROFILE, STAGE_ORDER } from '@/data/scheduleProfiles';
-import type { ProjectState, StepPost } from '@/lib/projectState';
+import type { ProgramPost, ProjectState } from '@/lib/projectState';
 import { resolveStages } from '@/lib/stages';
 import { rejectFile, rejectionMessage } from '@/lib/attachments';
 import { serialiseEffort, serialiseTat } from '@/lib/effort';
@@ -74,8 +74,11 @@ export interface AppState {
   stepStates: Record<string, StepStateRecord>;
   /** The outputs handed over on each step, keyed `activityRef:stepN`. */
   stepOutputs: Record<string, AttachmentRef[]>;
-  /** Posts on steps — updates, and the ones flagged as risks. Newest first. */
-  stepPosts: StepPost[];
+  /**
+   * Every post that is not a V1 board item's — step updates and risks, stage
+   * notes, deliverable handovers, and the replies under them. Newest first.
+   */
+  posts: ProgramPost[];
 
   hydrate: (initial: ProjectState, now?: Date) => void;
   setProjectName: (name: string) => void;
@@ -99,6 +102,28 @@ export interface AppState {
   attachToStep: (act: string, n: number, files: FileList | File[]) => Promise<string[]>;
   /** Take one back. The last one out reopens the step. */
   detachFromStep: (act: string, n: number, attachmentId: string) => void;
+
+  /**
+   * Write a post, or edit one that exists. One call for all of them — an update
+   * on a step, a risk, a note on a stage, a handover, a reply — because a post
+   * is one shape wherever it lands.
+   */
+  savePost: (post: {
+    id: string;
+    kind: string;
+    text: string;
+    author: string;
+    activityRef?: string | null;
+    stepN?: number | null;
+    stageId?: string | null;
+    deliverableId?: string | null;
+    parentId?: string | null;
+    doneAt?: Date | null;
+  }) => void;
+  /** Change what a post says. Only the text and, on a handover, its date. */
+  editPost: (id: string, text: string, doneAt?: Date | null) => void;
+  /** Delete a post, and the replies under it. */
+  deletePost: (id: string) => void;
   editStageDate: (stageId: StageId, which: 'start' | 'end', date: Date) => void;
   /** Commit the staged dates. */
   applyScheduleDraft: () => void;
@@ -262,7 +287,7 @@ export const useAppStore = create<AppState>()((set, get) => ({
   inline: {},
   stepStates: {},
   stepOutputs: {},
-  stepPosts: [],
+  posts: [],
 
   /* Server-rendered DB state in, client clock applied here: "today" belongs to
      the viewer's timezone, so it cannot come from the server render.
@@ -318,7 +343,7 @@ export const useAppStore = create<AppState>()((set, get) => ({
       stageDetails: initial.stageDetails,
       stepStates: initial.stepStates,
       stepOutputs: initial.stepOutputs,
-      stepPosts: initial.stepPosts,
+      posts: initial.posts,
       /* view state belongs to the program you were looking at, not the next one */
       currentStage: openStage,
       inline:
@@ -438,6 +463,63 @@ export const useAppStore = create<AppState>()((set, get) => ({
         ...patch,
       }),
     );
+  },
+
+  savePost: (post) => {
+    const now = new Date();
+    set((s) => ({
+      posts: [
+        {
+          activityRef: null,
+          stepN: null,
+          stageId: null,
+          deliverableId: null,
+          parentId: null,
+          doneAt: null,
+          ...post,
+          createdAt: now,
+          editedAt: null,
+          attachments: [],
+        },
+        ...s.posts,
+      ],
+    }));
+    sync(api.savePost({ projectId: get().projectId, ...post }));
+  },
+
+  /**
+   * An edit changes what was said and stamps when it was said again. It never
+   * changes who said it, where it lives, or what kind of post it is — so only
+   * the text travels, rather than the whole row. Spreading a stored post back
+   * at the server sends it fields it has no columns for.
+   */
+  editPost: (id, text, doneAt) => {
+    const now = new Date();
+    const existing = get().posts.find((p) => p.id === id);
+    if (!existing) return;
+    set((s) => ({
+      posts: s.posts.map((p) =>
+        p.id === id ? { ...p, text, editedAt: now, doneAt: doneAt === undefined ? p.doneAt : doneAt } : p,
+      ),
+    }));
+    sync(
+      api.savePost({
+        projectId: get().projectId,
+        id,
+        kind: existing.kind,
+        text,
+        author: existing.author,
+        doneAt: doneAt === undefined ? existing.doneAt : doneAt,
+      }),
+    );
+  },
+
+  deletePost: (id) => {
+    /* A reply belongs to its parent, so deleting the parent takes the thread —
+       the database cascades, and the store has to agree or the screen keeps
+       showing replies to something that is gone. */
+    set((s) => ({ posts: s.posts.filter((p) => p.id !== id && p.parentId !== id) }));
+    sync(api.deletePost(get().projectId, id));
   },
 
   attachToStep: async (act, n, files) => {

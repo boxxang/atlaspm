@@ -162,6 +162,10 @@ model Post {
   /// addressed by the reference the write-up uses — "PD-10" — and the step number.
   activityRef String?
   stepN       Int?
+  /// A note on a stage's key-info board: something the programme learned that is
+  /// worth finding again. It belongs to the stage rather than to any one piece of
+  /// work in it, which is why it needs a target of its own.
+  stageId String?
   /// The handover that completes a deliverable.
   deliverableId String?
   /// A reply. Replies do not nest: a reply's parent is always a top-level post.
@@ -183,6 +187,7 @@ model Post {
   @@index([deliverableId])
   @@index([projectId, kind])
   @@index([projectId, activityRef, stepN])
+  @@index([projectId, stageId])
 }
 
 /// What has happened to one step of one activity.

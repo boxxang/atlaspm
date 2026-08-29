@@ -103,7 +103,8 @@ test.describe('a stage', () => {
     await page.goto(`${SHELL_PATH}/stage/physicalDesign`);
     await expect(page.getByRole('heading', { name: 'Physical Design', level: 1 })).toBeVisible();
     await expect(page.getByText('12 of 23')).toBeVisible();
-    await expect(page.getByRole('link', { name: 'Activity', exact: true })).toHaveAttribute(
+    /* the tab carries its count now, so the accessible name is "Activity 16" */
+    await expect(page.getByRole('link', { name: /^Activity/ })).toHaveAttribute(
       'aria-current',
       'page',
     );

@@ -43,24 +43,29 @@ export interface ProjectState {
    */
   stepOutputs: Record<string, AttachmentRef[]>;
   /**
-   * Every post that hangs off a step rather than a board item: updates, and the
-   * ones flagged as risks. A risk is a post on a step now, so this is where the
-   * risk boards read from.
+   * Every post that is not a V1 board item's: updates and risks on steps, notes
+   * on a stage's key-info board, deliverable handovers, and the replies under
+   * any of them. One list, because they are one shape.
    */
-  stepPosts: StepPost[];
+  posts: ProgramPost[];
 }
 
-/** A post on one step of one activity, with its replies. */
-export interface StepPost {
+/** A post, wherever it lands. Exactly one target is set; a reply sets parentId. */
+export interface ProgramPost {
   id: string;
+  /** update | risk | note | handover | reply */
   kind: string;
   text: string;
   author: string;
   createdAt: Date;
   editedAt: Date | null;
-  activityRef: string;
+  activityRef: string | null;
   stepN: number | null;
+  stageId: string | null;
+  deliverableId: string | null;
   parentId: string | null;
+  /** Set on a handover: the day the deliverable was accepted. */
+  doneAt: Date | null;
   attachments: AttachmentRef[];
 }
 
@@ -163,7 +168,7 @@ interface StepAttachmentRow extends AttachmentRow {
   activityRef: string | null;
   stepN: number | null;
 }
-interface StepPostRow {
+interface ProgramPostRow {
   id: string;
   kind: string;
   text: string;
@@ -172,7 +177,10 @@ interface StepPostRow {
   editedAt: Date | null;
   activityRef: string | null;
   stepN: number | null;
+  stageId: string | null;
+  deliverableId: string | null;
   parentId: string | null;
+  doneAt: Date | null;
   attachments?: AttachmentRow[];
 }
 interface StepStateRow {
@@ -219,7 +227,7 @@ export function buildProjectState(project: {
   stageDetails: StageDetailRow[];
   stepStates: StepStateRow[];
   attachments: StepAttachmentRow[];
-  posts: StepPostRow[];
+  posts: ProgramPostRow[];
 }): ProjectState {
   const profile: ScheduleProfile = {
     id: project.profile.id,
@@ -333,22 +341,21 @@ export function buildProjectState(project: {
     });
   }
 
-  const stepPosts: StepPost[] = [];
-  for (const p of project.posts) {
-    if (!p.activityRef) continue;
-    stepPosts.push({
-      id: p.id,
-      kind: p.kind,
-      text: p.text,
-      author: p.author,
-      createdAt: p.createdAt,
-      editedAt: p.editedAt,
-      activityRef: p.activityRef,
-      stepN: p.stepN,
-      parentId: p.parentId,
-      attachments: p.attachments ?? [],
-    });
-  }
+  const posts: ProgramPost[] = project.posts.map((p) => ({
+    id: p.id,
+    kind: p.kind,
+    text: p.text,
+    author: p.author,
+    createdAt: p.createdAt,
+    editedAt: p.editedAt,
+    activityRef: p.activityRef,
+    stepN: p.stepN,
+    stageId: p.stageId,
+    deliverableId: p.deliverableId,
+    parentId: p.parentId,
+    doneAt: p.doneAt,
+    attachments: p.attachments ?? [],
+  }));
 
   const stageDetails: Partial<Record<StageId, StageDetailOverride>> = {};
   for (const d of project.stageDetails) {
@@ -379,6 +386,6 @@ export function buildProjectState(project: {
     stageDetails,
     stepStates,
     stepOutputs,
-    stepPosts,
+    posts,
   };
 }

@@ -26,11 +26,11 @@ import { useProgramWork } from './useProgramWork';
 export function RisksPage({ projectId }: { projectId: string }) {
   const { risks: found } = useProgramWork();
   const risks = [...found].sort((a, b) => a.updatedAt.getTime() - b.updatedAt.getTime());
-  const stepPosts = useAppStore((s) => s.stepPosts);
+  const posts = useAppStore((s) => s.posts);
   const today = useAppStore((s) => s.today);
 
   const repliesOf = (postId: string) =>
-    stepPosts
+    posts
       .filter((p) => p.parentId === postId)
       .sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime());
 

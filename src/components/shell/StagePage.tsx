@@ -6,8 +6,11 @@ import { fmtDate } from '@/lib/schedule';
 import { phaseById } from '@/data/scheduleProfiles';
 import { STAGE_TABS, tabLabel, type StageTab } from '@/lib/stageTabs';
 import { StageActivityTab } from './StageActivity';
+import { KeyInfoTab } from './KeyInfoTab';
+import { StageRisksTab } from './StageRisksTab';
 import { useAppStore } from '@/store/useAppStore';
 import { useRailStore } from '@/store/railStore';
+import { useProgramWork } from './useProgramWork';
 
 /**
  * One stage: its write-up, the band of figures across the top, and seven tabs.
@@ -31,6 +34,8 @@ export function StagePage({
   const schedule = useAppStore((s) => s.schedule);
   const deliverables = useAppStore((s) => s.deliverables);
   const select = useRailStore((s) => s.select);
+  const posts = useAppStore((s) => s.posts);
+  const { risks } = useProgramWork();
 
   const stage = stages.find((s) => s.id === stageKey);
   const index = stages.findIndex((s) => s.id === stageKey);
@@ -57,6 +62,16 @@ export function StagePage({
   const done = dl.filter((d) => d.done).length;
   const prev = index > 0 ? stages[index - 1] : null;
   const next = index < stages.length - 1 ? stages[index + 1] : null;
+
+  /* The badge and the tab behind it read the same thing. A tab whose contents
+     are not built yet carries no number rather than a zero. */
+  const stageRisks = risks.filter((r) => r.stageId === stage.id).length;
+  const counts: Partial<Record<StageTab, string>> = {
+    activity: String(stage.engineeringView.length),
+    keyinfo: String(posts.filter((p) => p.stageId === stage.id && p.kind === 'note').length),
+    risks: String(stageRisks),
+    deliverables: `${done}/${dl.length}`,
+  };
 
   return (
     <>
@@ -102,22 +117,31 @@ export function StagePage({
         </div>
 
         <nav className="ptabs" aria-label="Stage sections">
-          {STAGE_TABS.map((t) => (
-            <Link
-              key={t.slug}
-              href={`/p/${projectId}/stage/${stage.id}/${t.slug}`}
-              className="ptab"
-              aria-current={t.slug === tab ? 'page' : undefined}
-              onMouseDown={() => select({ kind: 'stage', stageId: stage.id })}
-            >
-              {t.label}
-            </Link>
-          ))}
+          {STAGE_TABS.map((t) => {
+            const n = counts[t.slug];
+            return (
+              <Link
+                key={t.slug}
+                href={`/p/${projectId}/stage/${stage.id}/${t.slug}`}
+                className="ptab"
+                aria-current={t.slug === tab ? 'page' : undefined}
+                onMouseDown={() => select({ kind: 'stage', stageId: stage.id })}
+              >
+                {t.label}
+                {n !== undefined && (
+                  <span className={t.slug === 'risks' && risks.length ? 'ptab-n risk' : 'ptab-n'}>
+                    {n}
+                  </span>
+                )}
+              </Link>
+            );
+          })}
         </nav>
 
-        {tab === 'activity' ? (
-          <StageActivityTab stageId={stage.id} />
-        ) : (
+        {tab === 'activity' && <StageActivityTab stageId={stage.id} />}
+        {tab === 'keyinfo' && <KeyInfoTab stageId={stage.id} />}
+        {tab === 'risks' && <StageRisksTab stageId={stage.id} projectId={projectId} />}
+        {TAB_PHASE[tab] && (
           <p className="pview-todo">
             <span className="pview-phase">{TAB_PHASE[tab]}</span>
             The <b>{tabLabel(tab)}</b> tab.
@@ -128,13 +152,11 @@ export function StagePage({
   );
 }
 
-/* Which phase brings each of the other six, so a tab that is not filled in yet
-   says what it is waiting for rather than showing an empty page. */
-const TAB_PHASE: Record<StageTab, string> = {
-  activity: 'V2-4',
+/* Which phase brings each tab that is not filled in yet, so it says what it is
+   waiting for rather than showing an empty page. A tab that is built has no
+   entry here. */
+const TAB_PHASE: Partial<Record<StageTab, string>> = {
   board: 'V2-6',
-  keyinfo: 'V2-6',
-  risks: 'V2-5',
   deliverables: 'V2-6',
   updates: 'V2-6',
   team: 'V2-6',

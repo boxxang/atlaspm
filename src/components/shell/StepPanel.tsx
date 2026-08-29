@@ -7,6 +7,7 @@ import { isStepLate, stepKey } from '@/lib/steps';
 import { detailActivityTitles, detailDeliverables } from '@/data/activityIndex';
 import { useAppStore } from '@/store/useAppStore';
 import { useRailStore } from '@/store/railStore';
+import { PostThread } from './PostThread';
 import { useActivitySteps } from './useStageSteps';
 
 /**
@@ -26,6 +27,7 @@ export function StepPanel({ act, n }: { act: string; n: number }) {
   const leaders = useAppStore((s) => s.leaders);
   const clear = useRailStore((s) => s.clear);
   const outputs = useAppStore((s) => s.stepOutputs)[stepKey(act, n)] ?? [];
+  const posts = useAppStore((s) => s.posts);
   const attachToStep = useAppStore((s) => s.attachToStep);
   const detachFromStep = useAppStore((s) => s.detachFromStep);
   const file = useRef<HTMLInputElement>(null);
@@ -35,6 +37,9 @@ export function StepPanel({ act, n }: { act: string; n: number }) {
   if (!a || !step) return null;
 
   const late = isStepLate(step, today);
+  const onThisStep = posts.filter(
+    (p) => p.activityRef === act && p.stepN === n && !p.parentId,
+  );
   /* Which key deliverables this step hands over. The release step — the last
      one — is what closes an activity, so it carries the activity's own; the
      steps before it produce outputs, not deliverables. One resolver decides it
@@ -256,6 +261,20 @@ export function StepPanel({ act, n }: { act: string; n: number }) {
           {fmtDate(step.start)} → {fmtDate(step.end)}
         </dd>
       </dl>
+
+      <section className="prail-sec">
+        <div className="prail-seccap">
+          <span>Updates on this step</span>
+          <span className="num">{onThisStep.length}</span>
+        </div>
+        <PostThread
+          posts={onThisStep}
+          target={{ kind: 'update', activityRef: act, stepN: n }}
+          placeholder={`What happened on step ${n}?`}
+          allowRisk
+          emptyText="No updates on this step yet."
+        />
+      </section>
 
       <footer className="prail-foot">
         <button

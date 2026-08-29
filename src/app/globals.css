@@ -2591,3 +2591,45 @@ a.ad-ref:hover,a.ad-ref:focus-visible{border-color:var(--accent);background:var(
 .preply-text{grid-column:1/-1;font-size:12.5px;line-height:1.5;color:var(--ink-body)}
 .ptable-group th a{color:inherit;text-decoration:none}
 .ptable-group th a:hover{color:var(--accent)}
+
+/* ---------- posts ---------- */
+.pthread{display:flex;flex-direction:column;gap:12px}
+.pcomposer{display:flex;flex-direction:column;gap:6px}
+.pcomposer textarea{
+  width:100%;font:inherit;font-size:12.5px;line-height:1.5;color:var(--ink);
+  border:1px solid var(--line);border-radius:var(--r);padding:7px 9px;
+  background:var(--bg);resize:vertical;
+}
+.pcomposer textarea:focus{outline:none;border-color:var(--accent)}
+.pcomposer-acts{display:flex;align-items:center;gap:10px;justify-content:flex-end}
+.pcomposer-risk{
+  display:inline-flex;align-items:center;gap:5px;margin-right:auto;
+  font-size:11.5px;color:var(--ink-3);
+}
+.pcomposer.small textarea{font-size:12px;padding:5px 8px}
+.pposts{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:14px}
+.pposts > li{display:flex;flex-direction:column;gap:6px}
+.ppost{display:flex;flex-direction:column;gap:4px}
+.ppost-head{display:flex;align-items:baseline;gap:7px;flex-wrap:wrap}
+.ppost-who{font-size:12px;font-weight:600;color:var(--ink-2)}
+.ppost-when{font-size:11px;color:var(--ink-4);font-variant-numeric:tabular-nums}
+.ppost-act{
+  border:none;background:none;padding:0;cursor:pointer;
+  font:inherit;font-size:11px;color:var(--ink-4);
+}
+.ppost-act:hover{color:var(--accent)}
+.ppost-text{margin:0;font-size:12.5px;line-height:1.55;color:var(--ink-body);white-space:pre-wrap}
+.ppost.editing textarea{
+  width:100%;font:inherit;font-size:12.5px;line-height:1.5;
+  border:1px solid var(--accent);border-radius:var(--r);padding:7px 9px;
+}
+.ppost-acts{display:flex;gap:6px;justify-content:flex-end}
+/* the rail's replies are the same indent the boards use */
+.prail .preplies{margin:6px 0;padding-left:12px}
+.prail .preplies li{display:block}
+.ptab-n{
+  margin-left:6px;font-size:10.5px;color:var(--ink-4);
+  font-variant-numeric:tabular-nums;font-weight:400;
+}
+.ptab-n.risk{color:var(--risk);font-weight:600}
+.pnotes{max-width:70ch}
