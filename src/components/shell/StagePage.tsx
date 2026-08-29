@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { useEffect } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { fmtDate } from '@/lib/schedule';
 import { phaseById } from '@/data/scheduleProfiles';
 import { STAGE_TABS, tabLabel, type StageTab } from '@/lib/stageTabs';
@@ -40,15 +41,41 @@ export function StagePage({
   const contacts = useAppStore((s) => s.contacts);
   const leaders = useAppStore((s) => s.leaders);
   const { risks } = useProgramWork();
+  const params = useSearchParams();
 
   const stage = stages.find((s) => s.id === stageKey);
   const index = stages.findIndex((s) => s.id === stageKey);
 
-  /* Opening a stage selects it, so the rail answers the question the page is
-     about before anything on it has been clicked. */
+  /**
+   * What the rail opens on.
+   *
+   * A stage on its own selects itself, so the rail answers the question the page
+   * is about before anything has been clicked. A link that names a step or a
+   * deliverable — the Overview's rows do — selects that instead.
+   *
+   * It travels in the URL rather than being set before the navigation, because
+   * the shell clears the rail on every route change: setting it first and
+   * navigating second is a race the clear always wins.
+   */
+  const wantStep = params.get('step');
+  const wantDeliverable = params.get('deliverable');
   useEffect(() => {
-    if (stage) useRailStore.setState({ selection: { kind: 'stage', stageId: stage.id } });
-  }, [stage]);
+    if (!stage) return;
+    if (wantStep) {
+      const [act, n] = wantStep.split(':');
+      if (act && n) {
+        useRailStore.setState({ selection: { kind: 'step', act, n: Number(n) } });
+        return;
+      }
+    }
+    if (wantDeliverable) {
+      useRailStore.setState({
+        selection: { kind: 'deliverable', stageId: stage.id, deliverableId: wantDeliverable },
+      });
+      return;
+    }
+    useRailStore.setState({ selection: { kind: 'stage', stageId: stage.id } });
+  }, [stage, wantStep, wantDeliverable]);
 
   if (!stage) {
     return (

@@ -2653,3 +2653,119 @@ a.ad-ref:hover,a.ad-ref:focus-visible{border-color:var(--accent);background:var(
 .pperson-edit td{padding:5px 10px}
 .pteam .ppill{margin-left:7px}
 .pteam .ppost-act{margin:0 4px}
+
+/* ---------- overview ---------- */
+.pstats{
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));
+  border:1px solid var(--line);border-radius:var(--r-lg);background:var(--sunken);
+  margin-bottom:18px;overflow:hidden;
+}
+.pstat{padding:12px 18px;border-right:1px solid var(--line);display:block;text-decoration:none;color:inherit}
+.pstat:last-child{border-right:none}
+.pstat.go:hover{background:var(--hover)}
+.pstat-sub{display:block;margin-top:2px;font-size:11.5px;color:var(--ink-3)}
+.pfact-n.risk{color:var(--risk)}
+.pcard{
+  border:1px solid var(--line);border-radius:var(--r-lg);background:var(--bg);
+  margin-bottom:18px;overflow:hidden;
+}
+.pcard-head{
+  display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;
+  padding:11px 16px;border-bottom:1px solid var(--line);background:var(--sunken);
+}
+.pcard-title{margin:0;font-size:13.5px;font-weight:600}
+.pcard-note{font-size:11.5px;color:var(--ink-3)}
+.pcard .ptable{margin:0}
+.pcard .pview-todo{padding:14px 16px}
+/* All of it, and it scrolls — the cap that used to keep this short is what
+   hid thirteen overdue things from the list that says what to answer. */
+.pattn-scroll{max-height:420px;overflow-y:auto}
+.pattn-row{cursor:pointer}
+.poverview-cols{display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:18px}
+.pflight{list-style:none;margin:0;padding:6px 16px 12px;display:flex;flex-direction:column;gap:9px}
+.pflight li{display:grid;grid-template-columns:minmax(0,1fr) 90px auto auto;gap:10px;align-items:center}
+.pflight-name{display:flex;align-items:center;gap:7px;min-width:0;color:inherit;text-decoration:none;font-size:12.5px}
+.pflight-name:hover{color:var(--accent)}
+.pbar{display:block;height:6px;background:var(--muted);border-radius:3px;overflow:hidden}
+.pbar > i{display:block;height:6px;background:var(--accent);border-radius:3px}
+.pflight-n{font-size:11.5px;color:var(--ink-3);font-variant-numeric:tabular-nums;white-space:nowrap}
+.pflight-late{font-size:11px;color:var(--risk);font-weight:600;white-space:nowrap}
+/* the timing phrase is the column's whole job — it should not wrap */
+.pattn > thead > tr > th:nth-child(4),
+.pattn > tbody > tr > td:nth-child(4){width:9.5rem;white-space:nowrap}
+.pattn > thead > tr > th:nth-child(2),
+.pattn > tbody > tr > td:nth-child(2){width:6rem}
+.pattn-scroll{max-height:min(52vh,460px)}
+
+/* ---------- timeline ---------- */
+.ptl-setting{display:inline-flex;align-items:center;gap:6px}
+.ptl-setting .pbtn[aria-pressed="true"]{
+  border-color:var(--accent);color:var(--accent);background:var(--accent-soft);
+}
+/* the tail leaves room for a checkpoint label at the far right of the chart */
+.ptl{--tl-name:15rem;--tl-tail:15rem;position:relative}
+.ptl-years{
+  position:relative;height:20px;margin-left:var(--tl-name);margin-right:var(--tl-tail);
+  border-bottom:1px solid var(--line);
+}
+.ptl-year{
+  position:absolute;top:2px;transform:translateX(-50%);
+  font-size:11.5px;font-weight:600;color:var(--ink-3);
+}
+.ptl-year::after{
+  content:"";position:absolute;left:50%;top:16px;width:1px;height:9999px;
+  background:var(--line-soft);
+}
+.ptl-today{position:absolute;top:2px;transform:translateX(-50%);font-size:10.5px;color:var(--accent)}
+.ptl-rows{list-style:none;margin:0;padding:0}
+.ptl-row{
+  display:grid;
+  grid-template-columns:var(--tl-name) minmax(0,1fr) var(--tl-tail);
+  align-items:center;gap:8px;height:var(--tl-row);
+}
+.ptl-name{
+  display:flex;align-items:center;gap:7px;min-width:0;
+  color:inherit;text-decoration:none;font-size:12.5px;
+}
+/* One truncating class for the shell, since `.ell` is the prototype's and was
+   never ported. The rows are a fixed height, so a long name has to ellipse
+   rather than wrap into the row below it. */
+.ell{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ptl-name .ell{flex:1}
+.ptl-name:hover{color:var(--accent)}
+.ptl-track{position:relative;height:100%}
+.ptl-bar{
+  position:absolute;top:50%;transform:translateY(-50%);height:9px;
+  background:var(--shade);border-radius:5px;overflow:hidden;min-width:3px;
+}
+.ptl-bar > i{display:block;height:9px;background:var(--st-run,#a8adb6);border-radius:5px}
+.ptl-bar.risky{background:var(--risk-soft)}
+.ptl-bar.risky > i{background:var(--risk)}
+.ptl-now{position:absolute;top:0;bottom:0;width:1px;background:var(--accent);opacity:.55}
+
+/* A checkpoint rides the bar of the stage whose end it is.
+
+   Only the diamond is centred on the date. Centring the whole group put half the
+   label back over the bar it had just been moved off — and flipping the label to
+   the left near the right edge did the same thing, because a checkpoint sits at
+   its stage's END and everything to the left of it *is* that bar. So the label
+   always flows right, and the chart reserves room for it. */
+.ptl-cp{
+  position:absolute;top:50%;transform:translateY(-50%);
+  display:flex;align-items:center;gap:5px;margin-left:-4.5px;
+}
+.ptl-dia{
+  display:block;width:9px;height:9px;flex:none;
+  background:var(--bg);border:1.5px solid var(--ink-3);transform:rotate(45deg);
+}
+.ptl-dia.major{background:var(--accent);border-color:var(--accent)}
+.ptl-cp-label{
+  display:flex;align-items:baseline;gap:5px;white-space:nowrap;
+  background:var(--bg);padding:0 3px;border-radius:3px;
+  font-size:10.5px;color:var(--ink-2);pointer-events:none;
+}
+.ptl-cp-date{color:var(--ink-4);font-variant-numeric:tabular-nums}
+/* the counts sit inside the tail the labels are given room in */
+.ptl-tail{display:flex;align-items:center;justify-content:flex-end;gap:9px;padding-left:9px}
+.ptl-n{font-size:11.5px;color:var(--ink-3);font-variant-numeric:tabular-nums;white-space:nowrap}
+.ptl-late{font-size:11px;color:var(--risk);font-weight:600;white-space:nowrap}

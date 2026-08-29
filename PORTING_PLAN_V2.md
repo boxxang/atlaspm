@@ -255,12 +255,33 @@ Other decisions:
   `tests/e2e/handover.spec.ts`, covering all three criteria plus "Delayed is not
   Overdue".
 
-## Phase V2-7 — Overview and timeline
+## Phase V2-7 — Overview and timeline — **done**
 
-`Needs you today`, the schedule chart, checkpoints on their stage bars, row height.
+*Needs you today*, the stat row, in-flight stages, the effort split, and the
+timeline with checkpoints on their stage bars and row height as a setting.
 
-- **Accept:** every row of *Needs you today* goes somewhere; no item is hidden from
-  it; checkpoint labels never overlap at any row height.
+**The rail selection travels in the URL.** The Overview's rows open the work
+they are about, and setting the rail before navigating is a race the shell's
+clear-on-navigation always wins. So a row links to `?step=PD-10:2` or
+`?deliverable=…` and the stage page reads it — which also makes the link one
+somebody can send.
+
+**A deliverable row goes to the step that hands it over**, not to the
+deliverables list: the thing to do about a late deliverable is the work that
+produces it. Only one nobody produces falls back to the list.
+
+**Checkpoint labels never flip.** Flipping them left near the right edge put
+them straight back over their own bar — a checkpoint sits at its stage's *end*,
+so everything to the left of it is that bar. They always flow right and the
+chart reserves a tail for them. There is a test that measures the overlap at
+every row height.
+
+**Nothing is capped.** The prototype's per-tag limit meant that with seventeen
+things overdue, thirteen were missing from the one list that says what to
+answer. The list scrolls, and a test checks every overdue step is on it.
+
+- **Accept:** ✅ 14 checks in `tests/e2e/overview.spec.ts`, covering all three
+  criteria.
 
 ## Phase V2-8 — Sweep
 

@@ -1,9 +1,6 @@
-import { ComingWith } from '@/components/shell/ComingWith';
+import { TimelinePage } from '@/components/shell/TimelinePage';
 
-export default function TimelinePage() {
-  return (
-    <ComingWith title="Timeline" phase="V2-7">
-      The stage bars with their checkpoints riding on top of them, and row height as a display setting.
-    </ComingWith>
-  );
+export default async function Timeline({ params }: PageProps<'/p/[projectId]/timeline'>) {
+  const { projectId } = await params;
+  return <TimelinePage projectId={projectId} />;
 }
