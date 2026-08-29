@@ -12,8 +12,22 @@ import { expect, test, SHELL_PATH, writesSettled } from './fixtures';
 const STAGE = `${SHELL_PATH}/stage/physicalDesign/activity`;
 
 const openActivity = async (page: import('./fixtures').Page, ref: string) => {
+  await expect(page.locator('tr.pact').first()).toBeVisible();
   await page.locator(`[data-act="${ref}"]`).click();
   await expect(page.locator('.pstepblock')).toBeVisible();
+};
+
+/**
+ * The seed's kickoff is 66 weeks before the day it runs, so every date in the
+ * programme moves with the clock. Nothing here may hardcode one: these read the
+ * date off the screen and assert what is true about it instead.
+ */
+const dueOf = async (page: import('./fixtures').Page, step: string) =>
+  (await page.locator(`[data-step="${step}"] [data-due]`).innerText()).trim();
+
+const asDate = (mmddyyyy: string) => {
+  const [m, d, y] = mmddyyyy.split('/').map(Number);
+  return new Date(y, m - 1, d);
 };
 
 test.describe('the activity table', () => {
@@ -52,7 +66,10 @@ test.describe('the activity table', () => {
     await openActivity(page, 'PD-10');
     const step1 = page.locator('[data-step="PD-10:1"]');
     await expect(step1).toContainText('Overdue');
-    await expect(step1.locator('.num.late')).toHaveText('08/11/2026');
+    /* and the date it is late against is drawn as late, and is in the past */
+    const late = step1.locator('.num.late');
+    await expect(late).toBeVisible();
+    expect(asDate(await late.innerText()).getTime()).toBeLessThan(Date.now());
   });
 });
 
@@ -80,8 +97,10 @@ test.describe('picking a step', () => {
     await expect(rail).toContainText('Fix crosstalk');
     await expect(rail).toContainText('SI/PI engineer');
     await expect(rail.getByLabel('Owner')).toHaveValue('');
-    await expect(rail.getByLabel('Due')).toHaveValue('2026-08-28');
     await expect(rail.getByLabel('Completed')).toHaveValue('');
+    /* the rail and the row are held to the same date */
+    const [m, d, y] = (await dueOf(page, 'PD-10:2')).split('/');
+    await expect(rail.getByLabel('Due')).toHaveValue(`${y}-${m}-${d}`);
   });
 
   test('the release step carries the activity’s key deliverables', async ({ page }) => {
@@ -142,15 +161,17 @@ test.describe('changing a step', () => {
   test('a moved due date is flagged as edited, and clearing it restores the plan', async ({
     page,
   }) => {
-    await rail(page).getByLabel('Due').fill('2026-12-01');
+    const planned = await dueOf(page, 'PD-10:2');
+
+    await rail(page).getByLabel('Due').fill('2027-12-01');
     await expect(rail(page)).toContainText('edited');
-    await expect(page.locator('[data-step="PD-10:2"]')).toContainText('12/01/2026');
-    /* and it stops being overdue, because the date it is held to has moved */
-    await expect(page.locator('[data-step="PD-10:2"]')).toContainText('In progress');
+    await expect(page.locator('[data-step="PD-10:2"]')).toContainText('12/01/2027');
+    /* and it is not late against a date that far out */
+    await expect(page.locator('[data-step="PD-10:2"]')).not.toContainText('Overdue');
 
     await rail(page).getByLabel('Due').fill('');
     await expect(rail(page)).not.toContainText('edited');
-    await expect(page.locator('[data-step="PD-10:2"]')).toContainText('08/28/2026');
+    await expect(page.locator('[data-step="PD-10:2"]')).toContainText(planned);
   });
 
   test('an owner comes from the stage’s own people', async ({ page }) => {
@@ -252,5 +273,55 @@ test.describe('handing an output over', () => {
     await openActivity(page, 'PD-10');
     await page.locator('[data-step="PD-10:2"]').click();
     await expect(rail(page)).toContainText('Nothing handed over yet');
+  });
+});
+
+/**
+ * What a fresh install looks like.
+ *
+ * A programme half way through its baseline has finished most of the work whose
+ * window has closed, and is stuck on a few things. Both halves matter: without
+ * the first it reads as 0 of 1,649 with everything overdue, and without the
+ * second the Overdue list is empty, which is not a programme either.
+ */
+test.describe('the seeded programme', () => {
+  test('has finished the work behind it', async ({ page }) => {
+    await page.goto(`${SHELL_PATH}/stage/productDefinition/activity`);
+    await expect(page.locator('tr.pact').first()).toBeVisible();
+    /* Product Definition is the first stage and long closed, so every one of
+       its activities is complete. */
+    const rows = page.locator('tr.pact .pdone');
+    const counts = await rows.allInnerTexts();
+    expect(counts.length).toBeGreaterThan(0);
+    for (const c of counts) {
+      const [done, total] = c.split('/').map(Number);
+      expect(done, `a closed stage should be finished, saw ${c}`).toBe(total);
+    }
+  });
+
+  test('is stuck on a few things, and stuck at the frontier', async ({ page }) => {
+    await page.goto(`${SHELL_PATH}/stage/physicalDesign/activity`);
+    await expect(page.locator('tr.pact').first()).toBeVisible();
+    /* an in-flight stage has work still open */
+    const partial = page.locator('tr.pact').filter({ hasNot: page.locator('.pdone.all') });
+    expect(await partial.count()).toBeGreaterThan(0);
+  });
+
+  test('never shows an open step behind a finished one', async ({ page }) => {
+    await page.goto(`${SHELL_PATH}/stage/physicalDesign/activity`);
+    await expect(page.locator('tr.pact').first()).toBeVisible();
+    const refs = await page.locator('tr.pact').evaluateAll((rows) =>
+      rows.map((r) => r.getAttribute('data-act')!),
+    );
+    for (const ref of refs) {
+      await page.locator(`[data-act="${ref}"]`).click();
+      const pattern = (
+        await page
+          .locator('.pstepblock .pstep input[type="checkbox"]')
+          .evaluateAll((boxes) => boxes.map((b) => ((b as HTMLInputElement).checked ? 'D' : 'o')))
+      ).join('');
+      expect(pattern, `${ref} runs ${pattern}`).toMatch(/^D*o*$/);
+      await page.locator(`[data-act="${ref}"]`).click();
+    }
   });
 });

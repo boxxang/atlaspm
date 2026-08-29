@@ -851,21 +851,31 @@ test.describe('the folded chart carries its dates', () => {
     );
     expect([...xs].sort((a, b) => a - b)).toEqual(xs);
 
-    // move a due date in the sheet below and the marker follows
+    /* Move a due date in the sheet below and the marker follows. The new date
+       is derived from the one the deliverable already has, not written down
+       here: the seed is dated from today, so a hardcoded date eventually lands
+       on the date the row already had, and a marker asked to move nowhere does
+       not move. */
     const open = marks.filter({ hasText: 'ECO log' });
     const before = (await open.boundingBox())!.x;
     await editDeliverables(page);
-    await selectedPanel(page)
+    const field = selectedPanel(page)
       .locator('.dlv-list li')
       .filter({ hasText: 'ECO log' })
-      .locator('input.dlv-due')
-      .fill('2026-10-24');
+      .locator('input.dlv-due');
+    const [y, m, d] = (await field.inputValue()).split('-').map(Number);
+    const later = new Date(y, m - 1, d);
+    later.setDate(later.getDate() + 30);
+    const p2 = (n: number) => String(n).padStart(2, '0');
+    await field.fill(`${later.getFullYear()}-${p2(later.getMonth() + 1)}-${p2(later.getDate())}`);
     await page.locator('#roadmap').hover({ position: { x: 8, y: 8 } });
     await fold(page);
     const moved = page.locator('#rm-gantt .g-row.current .g-dlv').filter({
       hasText: 'ECO log',
     });
-    await expect(moved.locator('.g-dlv-date')).toHaveText('10/24');
+    await expect(moved.locator('.g-dlv-date')).toHaveText(
+      `${later.getMonth() + 1}/${later.getDate()}`,
+    );
     expect((await moved.boundingBox())!.x).toBeGreaterThan(before);
   });
 });

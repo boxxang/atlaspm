@@ -9,6 +9,9 @@ import { BUILTIN_PROFILE, STAGE_ORDER } from '../src/data/scheduleProfiles';
 import { ensureBuiltinProfile } from '../src/lib/builtinProfile';
 import { DB_KIND } from '../src/lib/projectState';
 import { addWeeks, computeSchedule, startOfDay } from '../src/lib/schedule';
+import { fromStepIndex, plannedSteps } from '../src/lib/steps';
+import { seedStepStates } from '../src/lib/stepSeed';
+import { activitySteps } from '../src/data/activitySteps';
 import type { PrismaClient } from '../src/generated/prisma/client';
 
 export const PROJECT_ID = 'atlasax1';
@@ -18,6 +21,9 @@ export interface SeedCounts {
   items: number;
   updates: number;
   deliverables: number;
+  /** Steps the seed marks finished, and the ones it deliberately leaves late. */
+  stepsDone: number;
+  stepsLate: number;
   kickoff: Date;
   projectName: string;
 }
@@ -109,14 +115,50 @@ export async function seedProject(prisma: PrismaClient, now = new Date()): Promi
       ),
     ),
   );
+  /* What the programme has already finished. Without this a fresh install reads
+     as 0 of 1,649 steps done with everything overdue, which is not a programme
+     anybody recognises — and with only this it reads as one where nothing has
+     ever slipped, which is not one either. See /lib/stepSeed.ts. */
+  const stages = STAGE_ORDER.map((id) => ({
+    id,
+    start: schedule.stages[id].start,
+    end: schedule.stages[id].end,
+  }));
+  const activities = Object.keys(activitySteps).map((ref) =>
+    fromStepIndex(ref, activitySteps[ref]),
+  );
+  const done = seedStepStates({ stages, activities, today });
+  /* What is left late: every step whose window has closed, minus the ones the
+     seed finished. That difference is the Overdue list on a fresh install. */
+  const closed = activities.reduce((n, a) => {
+    const span = schedule.stages[a.stageId];
+    return span ? n + plannedSteps(span.start, a).filter((d) => d.end < today).length : n;
+  }, 0);
+
   await prisma.item.createMany({ data: items });
   await prisma.post.createMany({ data: updates });
+  await prisma.stepState.createMany({
+    data: done.map((d) => ({
+      id: `${PROJECT_ID}:step:${d.activityRef}:${d.stepN}`,
+      projectId: PROJECT_ID,
+      activityRef: d.activityRef,
+      stepN: d.stepN,
+      done: true,
+      /* the day the plan said, not the day the seed ran */
+      doneAt: d.doneAt,
+      pct: 100,
+      owner: '',
+      dueOverride: null,
+    })),
+  });
 
   return {
     stages: journeyData.length,
     items: items.length,
     updates: updates.length,
     deliverables: STAGE_ORDER.reduce((n, id) => n + seed.deliverables[id].length, 0),
+    stepsDone: done.length,
+    stepsLate: closed - done.length,
     kickoff,
     projectName: seed.projectName,
   };

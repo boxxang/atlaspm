@@ -203,8 +203,12 @@ function StepBlock({ a }: { a: Activity }) {
                 <td>
                   <StatusPill step={s} late={late} today={today} />
                 </td>
-                <td className={late ? 'num late' : 'num'}>{fmtDate(s.due)}</td>
-                <td className="num">{s.doneAt ? fmtDate(s.doneAt) : '—'}</td>
+                <td className={late ? 'num late' : 'num'} data-due>
+                  {fmtDate(s.due)}
+                </td>
+                <td className="num" data-completed>
+                  {s.doneAt ? fmtDate(s.doneAt) : '—'}
+                </td>
               </tr>
             );
           })}

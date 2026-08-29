@@ -239,8 +239,27 @@ that nothing renders any more. Specifically:
 
 ## Do not port
 
-- The prototype's seeding leaves six activities deliberately stalled so the Overdue
-  list is not empty on a demo. It is a demo device. The app must not ship it.
 - Attachment metadata without bytes. The prototype records a file's name and size
   because localStorage cannot hold it; the app has `Attachment.data` and a route
   that serves it.
+
+### Reversed: the stalled activities
+
+This list used to say the prototype's six deliberately-stalled activities were a
+demo device the app must not ship. The user asked for them, and they were right
+to: a seeded programme with no step state reads as 0 of 1,649 done with every
+past-due step overdue, which is not a programme anybody recognises — and one
+where nothing has ever slipped is not one either.
+
+So `/lib/stepSeed.ts` ports it, with two corrections to the prototype's version:
+
+- **Finished work is a prefix, not a filter.** "Its window has closed" is not
+  monotonic in step number — a parallel step starts where the main step before it
+  started, so it can end after the main step that follows. Filtering on the date
+  alone finished step 5 while step 4 was still open, which is the exact shape the
+  prototype had to be fixed out of. Caught by a test over all 257 activities.
+- **A limit of none means none.** `pickStalls` checked its limit after pushing,
+  so asking for zero stalls still produced one.
+
+Seeded today: 1,039 steps done, 12 left late across 6 stages, closed stages 100%
+and future stages untouched.
