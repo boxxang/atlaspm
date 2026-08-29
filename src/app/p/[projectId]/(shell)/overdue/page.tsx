@@ -1,9 +1,6 @@
-import { ComingWith } from '@/components/shell/ComingWith';
+import { OverduePage } from '@/components/shell/OverduePage';
 
-export default function OverduePage() {
-  return (
-    <ComingWith title="Overdue" phase="V2-5">
-      Every step past its due date with nothing handed over. Overdue means steps now, not items, so this waits on step state.
-    </ComingWith>
-  );
+export default async function Overdue({ params }: PageProps<'/p/[projectId]/overdue'>) {
+  const { projectId } = await params;
+  return <OverduePage projectId={projectId} />;
 }

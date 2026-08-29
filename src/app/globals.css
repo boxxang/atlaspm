@@ -14,9 +14,15 @@
   --ink-3:#898781;
   --line:#e1e0d9;
   --line-strong:#c3c2b7;
-  --accent:#256abf;
-  --accent-soft:#e7effa;
-  --risk:#d03b3b;
+  /* The single accent, and risk. Indigo rather than the reference's blue: the
+     prototype is the spec now and these are its values, so they are here rather
+     than scoped to the shell — one accent for the whole app, which is what the
+     rule in CLAUDE.md has always said. The rest of the prototype's palette (its
+     white ground, its wider range of greys) stays on .pshell, because it is a
+     whole theme and the V1 page is still the reference's warm one. */
+  --accent:#5b5bd6;
+  --accent-soft:#eeeefb;
+  --risk:#e5484d;
   /* adjustable via settings (each default ±5 steps) */
   --fs-base:15px;
   --icon-scale:2;
@@ -2230,9 +2236,9 @@ a.ad-ref:hover,a.ad-ref:focus-visible{border-color:var(--accent);background:var(
   --bg:#ffffff; --sunken:#fbfbfc; --hover:#f7f7f8; --muted:#f1f1f4; --shade:#eceef0;
   --ink:#16181d; --ink-body:#3f434b; --ink-2:#62666d; --ink-3:#8b8f98; --ink-4:#b4b7bd;
   --line-soft:#f0f0f2; --line:#e6e8eb; --line-strong:#d8dade;
-  --accent:#5b5bd6; --accent-hov:#4747b8; --accent-soft:#eeeefb; --accent-wash:#f7f7fe;
-  --accent-line:#cdcdf5;
-  --risk:#e5484d; --risk-ink:#c5303a; --risk-soft:#fdeced; --risk-line:#f5cfd0;
+  /* --accent, --accent-soft and --risk are :root's now; these are the rest. */
+  --accent-hov:#4747b8; --accent-wash:#f7f7fe; --accent-line:#cdcdf5;
+  --risk-ink:#c5303a; --risk-soft:#fdeced; --risk-line:#f5cfd0;
   --warn:#f5a524; --warn-soft:#fef7e6; --warn-ink:#8a6a1f;
   --ok:#30a46c; --ok-soft:#e6f6ed;
   --r-sm:5px; --r:6px; --r-lg:8px;
@@ -2552,3 +2558,36 @@ a.ad-ref:hover,a.ad-ref:focus-visible{border-color:var(--accent);background:var(
 .prail-atts a:hover{text-decoration:underline}
 .prail-atts .prail-hint{margin:0;white-space:nowrap}
 .prail-atts .prail-x{margin-left:auto;flex:none}
+
+/* ---------- the cross-programme boards ---------- */
+/* Headings centred over the short columns, left over the one that reads as a
+   sentence — a centred heading above wrapped prose points at nothing. */
+.pboard th.mid,.pboard td.mid{text-align:center}
+.pboard th.mid.num,.pboard td.mid.num{text-align:center}
+/* The prose column takes the slack; the short ones are pinned. Without this the
+   sentence wraps to six lines beside half a screen of empty space. */
+.pboard{table-layout:fixed;width:100%}
+.pboard > thead > tr > th:not(.pwrapcol),
+.pboard > tbody > tr > td:not(.pwrapcol){width:7.5rem}
+/* named, not counted: column two is the step number on two boards and the
+   activity title on the third */
+.pboard > thead > tr > th.pnarrow,
+.pboard > tbody > tr > td.pnarrow{width:4rem}
+.pwrap{white-space:normal;line-height:1.55;width:auto}
+.pview-note{font-size:11.5px;color:var(--ink-3)}
+.pboard tbody th[scope="row"]{font-weight:500}
+.pboard .late{color:var(--risk);font-weight:600}
+
+/* A risk's replies, under the risk they answer. The indent is the point: this
+   is the argument, and it belongs visibly inside the thing it is about. */
+.preplies{
+  list-style:none;margin:8px 0 2px;padding:0 0 0 14px;
+  border-left:2px solid var(--line);
+  display:flex;flex-direction:column;gap:7px;
+}
+.preplies li{display:grid;grid-template-columns:auto auto 1fr;gap:4px 8px;align-items:baseline}
+.preply-who{font-size:11.5px;font-weight:600;color:var(--ink-2)}
+.preply-when{font-size:11px;color:var(--ink-4);font-variant-numeric:tabular-nums}
+.preply-text{grid-column:1/-1;font-size:12.5px;line-height:1.5;color:var(--ink-body)}
+.ptable-group th a{color:inherit;text-decoration:none}
+.ptable-group th a:hover{color:var(--accent)}

@@ -1,9 +1,6 @@
-import { ComingWith } from '@/components/shell/ComingWith';
+import { ActivitiesPage } from '@/components/shell/ActivitiesPage';
 
-export default function ActivitiesPage() {
-  return (
-    <ComingWith title="Activities" phase="V2-5">
-      All 257 activities, grouped by the stage that runs them.
-    </ComingWith>
-  );
+export default async function Activities({ params }: PageProps<'/p/[projectId]/activities'>) {
+  const { projectId } = await params;
+  return <ActivitiesPage projectId={projectId} />;
 }

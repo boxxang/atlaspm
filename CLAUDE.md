@@ -28,7 +28,11 @@ open it in a browser, serve the directory — Chrome refuses `file://` for this.
   UI renders data; data never imports UI.
 - Keep the visual language: light documentation theme, design tokens as CSS
   variables (they are all in `:root` of the reference), system font stacks,
-  single accent #256abf, risk #d03b3b. Do not introduce a component library.
+  single accent #5b5bd6, risk #e5484d — the prototype's, not the reference's,
+  because the prototype is the spec. The rest of the prototype's palette (white
+  ground, its greys) is scoped to `.pshell` while `/p/:id/classic` still renders
+  the reference's warm theme; it moves to `:root` when that route goes. Do not
+  introduce a component library.
 - All dates display as MM/DD/YYYY via one shared formatter. All user-facing text
   is English.
 

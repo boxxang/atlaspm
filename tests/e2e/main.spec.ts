@@ -243,7 +243,7 @@ test.describe('roadmap', () => {
     // Physical Design holds open risks — risk color wins over past-gray
     const risky = page.locator('#rm-gantt .g-row[data-index="11"] .g-bar');
     await expect(risky).toHaveClass(/risky/);
-    await expect(risky).toHaveCSS('background-color', 'rgb(208, 59, 59)');
+    await expect(risky).toHaveCSS('background-color', 'rgb(229, 72, 77)');
     await expect(risky.locator('.past-seg')).toHaveCount(0);
   });
 });
@@ -443,8 +443,8 @@ test.describe('stage panel', () => {
   test('overdue activity dues render red', async ({ page }) => {
     await selectStage(page, 'physicalDesign');
     const overdue = selectedPanel(page).locator('.board[data-kind="activities"] .b-due.overdue');
-    await expect(overdue.first()).toHaveCSS('color', 'rgb(208, 59, 59)');
-    await expect(overdue.last()).toHaveCSS('color', 'rgb(208, 59, 59)');
+    await expect(overdue.first()).toHaveCSS('color', 'rgb(229, 72, 77)');
+    await expect(overdue.last()).toHaveCSS('color', 'rgb(229, 72, 77)');
   });
 });
 

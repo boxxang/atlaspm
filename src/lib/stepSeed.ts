@@ -18,6 +18,7 @@
  * Pure: no DOM, no database, no clock of its own.
  */
 import type { StageId } from '@/data/types';
+import { RISK_AUTHOR, riskSeeds } from '@/data/riskSeeds';
 import { plannedSteps, type ActivitySteps, type PlannedStep } from './steps';
 
 /**
@@ -118,6 +119,62 @@ export function seedStepStates(input: StepSeedInput): SeededStep[] {
       if (leaveOpen.has(`${a.ref}:${d.n}`)) continue;
       out.push({ activityRef: a.ref, stepN: d.n, doneAt: d.end });
     }
+  }
+  return out;
+}
+
+/** A risk the seed raises, on the step where the work actually stopped. */
+export interface SeededRisk {
+  activityRef: string;
+  stepN: number;
+  text: string;
+  author: string;
+  /** When it was raised: the day the step went past its date. */
+  createdAt: Date;
+}
+
+/**
+ * One risk per stalled activity, flagged on its first open step.
+ *
+ * Not a migration of the old risk board. Those were `Item(kind:'risk')` rows
+ * entered in the abstract, with nothing tying them to the work they were about;
+ * matching them to steps by title would have been guesswork, and guesswork that
+ * puts a risk on the wrong step is worse than no risk at all. These are written
+ * for the stage in /data/riskSeeds.ts and raised where the work stopped, so the
+ * Risks board and the Overdue board point at the same steps and explain each
+ * other.
+ *
+ * Raised on the day the step went past its date, not on the day the seed ran —
+ * a risk nobody has touched for three weeks should say so.
+ */
+export function seedRisks(input: StepSeedInput): SeededRisk[] {
+  const { stages, activities, today } = input;
+  const depth = input.stallDepth ?? STALL_DEPTH;
+  const spans = new Map(stages.map((s) => [s.id, s]));
+  const out: SeededRisk[] = [];
+
+  for (const ref of pickStalls(input)) {
+    const a = activities.find((x) => x.ref === ref);
+    const span = a && spans.get(a.stageId);
+    if (!a || !span) continue;
+    const text = riskSeeds[a.stageId];
+    if (!text) continue;
+    const steps = plannedSteps(span.start, a);
+    /* The frontier: the first step the stall leaves open. seedStepStates
+       finishes the prefix minus the last `depth` of it, so the frontier sits
+       that far back — not at the end of the prefix, which is a step the stall
+       has already opened past. */
+    const stuck = steps[Math.max(0, finishedPrefix(steps, today).length - depth)];
+    if (!stuck) continue;
+    out.push({
+      activityRef: ref,
+      stepN: stuck.n,
+      text,
+      author: RISK_AUTHOR,
+      /* raised the day it went past its date, so a risk nobody has touched for
+         three weeks says three weeks rather than today */
+      createdAt: stuck.end < today ? stuck.end : stuck.start,
+    });
   }
   return out;
 }

@@ -187,12 +187,37 @@ Still to come on this page, with the phases that own them: the dashboard band
 on a step — the update thread and the risk flag — land in V2-5, which is where
 the risk redefinition is.
 
-## Phase V2-5 — Risks, Overdue, Activities
+## Phase V2-5 — Risks, Overdue, Activities — **done**
 
-The three cross-programme pages, and the risk redefinition with its migration.
+The three cross-programme pages, and the risk redefinition.
 
-- **Accept:** the sidebar count, the stage tab badge and the page agree; a step
-  flagged as a risk appears within one render; a completed step drops its flag.
+**Not a migration.** The plan said "the risk redefinition with its migration",
+meaning the 23 seeded `Item(kind:'risk')` rows would be matched to the steps
+their titles echo, as the prototype does. Matching prose to steps is guesswork,
+and a risk on the wrong step is worse than no risk. So the V2 risks are written
+instead — one per stage in `/data/riskSeeds.ts` — and raised on the step where
+the work actually stopped, which means the Risks board and the Overdue board
+point at the same activities and explain each other.
+
+The old rows stay for now. They are `Item`, the new ones are `Post`; the two do
+not collide, V1 still renders the old board, and both go with `/classic`.
+
+Other decisions:
+
+- **One resolver.** `useProgramWork` resolves every activity's steps once; the
+  nav badge and both boards read it, so a count and its page cannot disagree.
+  There is a test that reads the badge and counts the rows.
+- **Risks are ordered longest-unanswered first**, not newest first. The resolver
+  returns newest-first, which is right for a thread and wrong for a list of what
+  needs answering.
+- **No stage column on either board.** Every row carries its activity reference
+  and the reference says which stage — a column repeating it is noise. Headings
+  centred over the short columns, left over the one that reads as a sentence.
+- **Replies sit indented under the risk they answer**, because how a risk was
+  argued down is the part worth reading.
+
+- **Accept:** ✅ 13 checks in `tests/e2e/boards.spec.ts`, including "a risk drops
+  off the moment its step is handed over" and the badge/page agreement.
 
 ## Phase V2-6 — Key info, deliverables, team
 
@@ -224,18 +249,29 @@ that nothing renders any more. Specifically:
 
 ---
 
+## Decisions made
+
+- **Overdue counts steps, and only steps.** The prototype's sidebar counts late
+  steps while its Overview card counts late steps *and* late deliverables, which
+  made the same word mean two things on one screen. Overdue is a step past its
+  due date with nothing handed over; a key deliverable past its date is
+  **Delayed**, which is a different word for a different thing and already has
+  one. Every count in the app reads `allOverdue`.
+- **The accent is the prototype's indigo (`#5b5bd6`), everywhere.** Not scoped:
+  `:root` carries it, along with `--accent-soft` and `--risk`, and CLAUDE.md
+  names them. The rest of the prototype's theme — white ground, its greys — is
+  still on `.pshell` because `/classic` is on the reference's warm one, and that
+  half moves to `:root` when the route goes.
+- **Ownership of a step** picks from the programme's people and shows
+  `Unassigned` otherwise. The template's lead *role* is a different field and is
+  shown under its own heading, never under OWNER.
+
 ## Decisions still open
 
-- **Overdue's scope.** The prototype's sidebar counts late *steps* (10); the Overview
-  card counts late steps *and* late deliverables (17). Deliberate there, probably
-  wrong here. Pick one.
 - **PDFs inline.** `/api/attachments/[id]` serves only raster images inline and
   downloads everything else, on purpose — inline user content from our own origin is
   an XSS hole. Opening a PDF in the browser needs a separate origin or signed
   storage URLs. Decide before promising "the clip opens the file".
-- **Ownership of a step.** The prototype picks from the programme's people and shows
-  `Unassigned` otherwise. The template's lead *role* is a different field and must
-  not be shown in a column headed OWNER.
 
 ## Do not port
 

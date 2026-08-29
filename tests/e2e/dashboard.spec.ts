@@ -61,7 +61,10 @@ test.describe('stat tiles', () => {
     const risks = stat(page, 'Open Risks');
     await expect(risks.locator('.v')).toHaveText('23');
     await expect(risks).toHaveClass(/alert/);
-    await expect(risks.locator('.v')).toHaveCSS('color', 'rgb(208, 59, 59)');
+    /* --risk, which is the prototype's #e5484d now rather than the reference's
+       #d03b3b: the app has one accent and one risk colour, and they are the
+       prototype's because the prototype is the spec. */
+    await expect(risks.locator('.v')).toHaveCSS('color', 'rgb(229, 72, 77)');
     /* the stages that carry them, in stage order */
     await expect(risks.locator('.sub')).toContainText('Product Definition, Physical Design');
     await expect(risks.locator('.sub')).toContainText('Test Development');
@@ -127,7 +130,7 @@ test.describe('milestones, in-flight and updates', () => {
     const pd = chips.filter({ hasText: 'Physical Design' });
     await expect(pd).toHaveCount(1);
     await expect(pd).toHaveClass(/risky/);
-    await expect(pd).toHaveCSS('color', 'rgb(208, 59, 59)');
+    await expect(pd).toHaveCSS('color', 'rgb(229, 72, 77)');
   });
 
   test('recent updates are a two-line feed, newest first, capped at 6', async ({ page }) => {

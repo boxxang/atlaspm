@@ -13,7 +13,7 @@ seedProject(prisma)
     console.log(
       `Seeded ${c.projectName}: ${c.stages} stages, ${c.items} items, ` +
         `${c.updates} status updates, ${c.deliverables} deliverables, ` +
-        `${c.stepsDone} steps done and ${c.stepsLate} left late. ` +
+        `${c.stepsDone} steps done, ${c.stepsLate} left late, ${c.risks} risks. ` +
         `Kickoff ${c.kickoff.toDateString()}.`,
     );
     return prisma.$disconnect();

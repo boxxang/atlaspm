@@ -5,18 +5,22 @@ import { usePathname } from 'next/navigation';
 import { useMemo } from 'react';
 import { writtenActivities } from '@/data/activityIndex';
 import { useAppStore } from '@/store/useAppStore';
+import { useProgramWork } from './useProgramWork';
 
 /**
  * The left nav: where the programme is, in three groups.
  *
  * PROGRAM is the shapes of the whole thing, WORK is the lists you answer, and
  * PEOPLE is who answers them. The counts are as much the point as the names —
- * a TPM reads "Overdue 10" without opening it.
+ * a TPM reads "Overdue 12" without opening it.
  *
- * Risks and Overdue carry no count yet. Both now mean something about steps,
- * and step state does not reach the browser until the step index ships with the
- * stage page. A missing badge says "not counted yet"; a zero would say "none",
- * which is a different claim and not one this can make.
+ * Overdue counts steps, and only steps: a step past its due date with nothing
+ * handed over. A key deliverable past its date is Delayed, which is a different
+ * word for a different thing and has its own place to be said — counting both
+ * under one word made the same figure mean two things on two screens.
+ *
+ * Risks and Overdue read the resolver the boards read, so a badge and its page
+ * cannot disagree about the number.
  */
 
 interface NavEntry {
@@ -37,6 +41,7 @@ function useNavGroups(projectId: string): NavGroup[] {
   const content = useAppStore((s) => s.content);
   const contacts = useAppStore((s) => s.contacts);
   const leaders = useAppStore((s) => s.leaders);
+  const { overdue, risks } = useProgramWork();
 
   return useMemo(() => {
     const base = `/p/${projectId}`;
@@ -67,8 +72,18 @@ function useNavGroups(projectId: string): NavGroup[] {
       {
         title: 'Work',
         items: [
-          { href: `${base}/risks`, label: 'Risks', tone: 'risk' },
-          { href: `${base}/overdue`, label: 'Overdue', tone: 'risk' },
+          {
+            href: `${base}/risks`,
+            label: 'Risks',
+            count: String(risks.length),
+            tone: risks.length ? 'risk' : undefined,
+          },
+          {
+            href: `${base}/overdue`,
+            label: 'Overdue',
+            count: String(overdue.length),
+            tone: overdue.length ? 'risk' : undefined,
+          },
           {
             href: `${base}/activities`,
             label: 'Activities',
@@ -87,7 +102,7 @@ function useNavGroups(projectId: string): NavGroup[] {
         items: [{ href: `${base}/team`, label: 'Team', count: String(people) }],
       },
     ];
-  }, [projectId, stages, deliverables, content, contacts, leaders]);
+  }, [projectId, stages, deliverables, content, contacts, leaders, overdue, risks]);
 }
 
 export function LeftNav({ projectId }: { projectId: string }) {

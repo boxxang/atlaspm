@@ -40,14 +40,18 @@ test.describe('the nav', () => {
     }
   });
 
-  test('counts it can prove are there, and the two it cannot are not', async ({ page }) => {
+  test('carries the counts, including the two that mean steps', async ({ page }) => {
     const nav = page.getByRole('navigation', { name: 'Program' });
     await expect(nav.getByRole('link', { name: /^Stages/ })).toContainText('23');
     await expect(nav.getByRole('link', { name: /^Deliverables/ })).toContainText('/167');
-    /* Risks and Overdue mean steps now, and step state does not reach the
-       browser yet. No badge until it does — a zero would be a claim. */
-    await expect(nav.getByRole('link', { name: /^Risks/ })).toHaveText('Risks');
-    await expect(nav.getByRole('link', { name: /^Overdue/ })).toHaveText('Overdue');
+    /* The seed stalls six activities two steps deep and raises a risk on each,
+       so both of these are non-zero and drawn as something to answer. */
+    await expect(nav.getByRole('link', { name: /^Risks/ })).toContainText('6');
+    await expect(nav.getByRole('link', { name: /^Overdue/ }).locator('.pnav-n')).toHaveClass(
+      /risk/,
+    );
+    const overdue = await nav.getByRole('link', { name: /^Overdue/ }).locator('.pnav-n').innerText();
+    expect(Number(overdue)).toBeGreaterThan(0);
   });
 
   test('a stage page keeps the Stages entry lit', async ({ page }) => {
@@ -140,15 +144,15 @@ test.describe('a stage', () => {
 });
 
 test.describe('the palette', () => {
-  /* The prototype's colours are the ones the app is heading to, but the V1 page
-     at /classic is still the reference's — so they are scoped to the shell
-     until that route goes. Both have to be true at once. */
-  test('the shell carries the prototype tokens, and the root still carries the reference ones', async ({
-    page,
-  }) => {
+  /* One accent for the whole app, and it is the prototype's indigo. What is
+     still scoped to the shell is the rest of the prototype's theme — its white
+     ground and its greys — because the V1 page is still on the reference's warm
+     one. That half goes when /classic does. */
+  test('the accent is the prototype’s, at the root and in the shell alike', async ({ page }) => {
     await page.goto(SHELL_PATH);
-    const shell = page.locator('.pshell');
-    await expect(shell).toHaveCSS('background-color', 'rgb(255, 255, 255)');
+    /* the shell renders nothing until it has hydrated, and "today" has to come
+       from the browser's clock, so there is a frame with no .pshell to read */
+    await expect(page.locator('.pshell')).toBeVisible();
     const accents = await page.evaluate(() => ({
       shell: getComputedStyle(document.querySelector('.pshell')!)
         .getPropertyValue('--accent')
@@ -156,6 +160,11 @@ test.describe('the palette', () => {
       root: getComputedStyle(document.documentElement).getPropertyValue('--accent').trim(),
     }));
     expect(accents.shell).toBe('#5b5bd6');
-    expect(accents.root).toBe('#256abf');
+    expect(accents.root).toBe('#5b5bd6');
+  });
+
+  test('the shell keeps its own ground, which the V1 page does not share', async ({ page }) => {
+    await page.goto(SHELL_PATH);
+    await expect(page.locator('.pshell')).toHaveCSS('background-color', 'rgb(255, 255, 255)');
   });
 });

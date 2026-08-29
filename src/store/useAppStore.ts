@@ -3,7 +3,7 @@
 import { create } from 'zustand';
 import * as api from '@/app/actions';
 import { BUILTIN_PROFILE, STAGE_ORDER } from '@/data/scheduleProfiles';
-import type { ProjectState } from '@/lib/projectState';
+import type { ProjectState, StepPost } from '@/lib/projectState';
 import { resolveStages } from '@/lib/stages';
 import { rejectFile, rejectionMessage } from '@/lib/attachments';
 import { serialiseEffort, serialiseTat } from '@/lib/effort';
@@ -74,6 +74,8 @@ export interface AppState {
   stepStates: Record<string, StepStateRecord>;
   /** The outputs handed over on each step, keyed `activityRef:stepN`. */
   stepOutputs: Record<string, AttachmentRef[]>;
+  /** Posts on steps — updates, and the ones flagged as risks. Newest first. */
+  stepPosts: StepPost[];
 
   hydrate: (initial: ProjectState, now?: Date) => void;
   setProjectName: (name: string) => void;
@@ -260,6 +262,7 @@ export const useAppStore = create<AppState>()((set, get) => ({
   inline: {},
   stepStates: {},
   stepOutputs: {},
+  stepPosts: [],
 
   /* Server-rendered DB state in, client clock applied here: "today" belongs to
      the viewer's timezone, so it cannot come from the server render.
@@ -315,6 +318,7 @@ export const useAppStore = create<AppState>()((set, get) => ({
       stageDetails: initial.stageDetails,
       stepStates: initial.stepStates,
       stepOutputs: initial.stepOutputs,
+      stepPosts: initial.stepPosts,
       /* view state belongs to the program you were looking at, not the next one */
       currentStage: openStage,
       inline:

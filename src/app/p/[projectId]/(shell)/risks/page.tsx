@@ -1,9 +1,6 @@
-import { ComingWith } from '@/components/shell/ComingWith';
+import { RisksPage } from '@/components/shell/RisksPage';
 
-export default function RisksPage() {
-  return (
-    <ComingWith title="Risks" phase="V2-5">
-      Every open risk, ranked, with the replies that answered it indented underneath. A risk is a flag on a step now, so this waits on step state.
-    </ComingWith>
-  );
+export default async function Risks({ params }: PageProps<'/p/[projectId]/risks'>) {
+  const { projectId } = await params;
+  return <RisksPage projectId={projectId} />;
 }

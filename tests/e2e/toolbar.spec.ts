@@ -21,8 +21,11 @@ test.describe('design tokens', () => {
   test('root carries the reference token values', async ({ page }) => {
     expect(await cssVar(page, '--page')).toBe('#f9f9f7');
     expect(await cssVar(page, '--ink')).toBe('#0b0b0b');
-    expect(await cssVar(page, '--accent')).toBe('#256abf');
-    expect(await cssVar(page, '--risk')).toBe('#d03b3b');
+    /* Accent and risk are the prototype's — one accent for the whole app, and
+       the prototype is the spec. The rest of the ground is still the
+       reference's, and goes when /classic does. */
+    expect(await cssVar(page, '--accent')).toBe('#5b5bd6');
+    expect(await cssVar(page, '--risk')).toBe('#e5484d');
     expect(await cssVar(page, '--line')).toBe('#e1e0d9');
     expect(await cssVar(page, '--fs-base')).toBe('15px');
     expect(await cssVar(page, '--toolbar-h')).toBe('58px');

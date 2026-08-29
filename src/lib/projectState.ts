@@ -42,6 +42,26 @@ export interface ProjectState {
    * what completes a step, so these are evidence rather than decoration.
    */
   stepOutputs: Record<string, AttachmentRef[]>;
+  /**
+   * Every post that hangs off a step rather than a board item: updates, and the
+   * ones flagged as risks. A risk is a post on a step now, so this is where the
+   * risk boards read from.
+   */
+  stepPosts: StepPost[];
+}
+
+/** A post on one step of one activity, with its replies. */
+export interface StepPost {
+  id: string;
+  kind: string;
+  text: string;
+  author: string;
+  createdAt: Date;
+  editedAt: Date | null;
+  activityRef: string;
+  stepN: number | null;
+  parentId: string | null;
+  attachments: AttachmentRef[];
 }
 
 /**
@@ -143,6 +163,18 @@ interface StepAttachmentRow extends AttachmentRow {
   activityRef: string | null;
   stepN: number | null;
 }
+interface StepPostRow {
+  id: string;
+  kind: string;
+  text: string;
+  author: string;
+  createdAt: Date;
+  editedAt: Date | null;
+  activityRef: string | null;
+  stepN: number | null;
+  parentId: string | null;
+  attachments?: AttachmentRow[];
+}
 interface StepStateRow {
   activityRef: string;
   stepN: number;
@@ -187,6 +219,7 @@ export function buildProjectState(project: {
   stageDetails: StageDetailRow[];
   stepStates: StepStateRow[];
   attachments: StepAttachmentRow[];
+  posts: StepPostRow[];
 }): ProjectState {
   const profile: ScheduleProfile = {
     id: project.profile.id,
@@ -300,6 +333,23 @@ export function buildProjectState(project: {
     });
   }
 
+  const stepPosts: StepPost[] = [];
+  for (const p of project.posts) {
+    if (!p.activityRef) continue;
+    stepPosts.push({
+      id: p.id,
+      kind: p.kind,
+      text: p.text,
+      author: p.author,
+      createdAt: p.createdAt,
+      editedAt: p.editedAt,
+      activityRef: p.activityRef,
+      stepN: p.stepN,
+      parentId: p.parentId,
+      attachments: p.attachments ?? [],
+    });
+  }
+
   const stageDetails: Partial<Record<StageId, StageDetailOverride>> = {};
   for (const d of project.stageDetails) {
     if (!isStage(d.stageId)) continue;
@@ -329,5 +379,6 @@ export function buildProjectState(project: {
     stageDetails,
     stepStates,
     stepOutputs,
+    stepPosts,
   };
 }

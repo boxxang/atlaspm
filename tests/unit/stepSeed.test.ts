@@ -3,7 +3,8 @@ import { activitySteps } from '@/data/activitySteps';
 import { BUILTIN_PROFILE, STAGE_ORDER } from '@/data/scheduleProfiles';
 import { addWeeks, computeSchedule, startOfDay } from '@/lib/schedule';
 import { fromStepIndex, plannedSteps, type ActivitySteps } from '@/lib/steps';
-import { pickStalls, seedStepStates, STALL_DEPTH } from '@/lib/stepSeed';
+import { pickStalls, seedRisks, seedStepStates, STALL_DEPTH } from '@/lib/stepSeed';
+import { riskSeeds } from '@/data/riskSeeds';
 import type { DetailStep } from '@/data/activityDetailTypes';
 
 const d = (iso: string) => new Date(`${iso}T00:00:00`);
@@ -219,5 +220,64 @@ describe('the seeded programme, on its real schedule', () => {
   it('has finished a serious amount of the programme', () => {
     expect(done.length).toBeGreaterThan(100);
     expect(done.length).toBeLessThan(1649);
+  });
+});
+
+describe('the risks it raises', () => {
+  const today = startOfDay(new Date());
+  const schedule = computeSchedule(addWeeks(today, -66), BUILTIN_PROFILE, {});
+  const stages = STAGE_ORDER.map((id) => ({
+    id,
+    start: schedule.stages[id].start,
+    end: schedule.stages[id].end,
+  }));
+  const activities = Object.keys(activitySteps).map((ref) =>
+    fromStepIndex(ref, activitySteps[ref]),
+  );
+  const input = { stages, activities, today };
+  const risks = seedRisks(input);
+  const doneKeys = new Set(
+    seedStepStates(input).map((x) => `${x.activityRef}:${x.stepN}`),
+  );
+
+  it('raises one per stalled activity, and no more', () => {
+    expect(risks.length).toBe(pickStalls(input).length);
+    expect(risks.length).toBeGreaterThan(1);
+  });
+
+  /* This is the whole reason they are seeded here rather than migrated from the
+     old board: a risk has to be on work that is actually stuck, or the Risks
+     page and the Overdue page describe different programmes. */
+  it('puts every risk on a step that is open and past its date', () => {
+    for (const r of risks) {
+      const key = `${r.activityRef}:${r.stepN}`;
+      expect(doneKeys.has(key), `${key} should still be open`).toBe(false);
+      const a = activities.find((x) => x.ref === r.activityRef)!;
+      const span = schedule.stages[a.stageId];
+      const step = plannedSteps(span.start, a).find((s) => s.n === r.stepN)!;
+      expect(step.end.getTime(), `${key} should be past its date`).toBeLessThan(today.getTime());
+    }
+  });
+
+  it('says something true about the stage it is on', () => {
+    for (const r of risks) {
+      const a = activities.find((x) => x.ref === r.activityRef)!;
+      expect(r.text).toBe(riskSeeds[a.stageId]);
+      expect(r.text.length).toBeGreaterThan(80);
+    }
+  });
+
+  it('dates each one to when the work went late, not to when the seed ran', () => {
+    for (const r of risks) {
+      expect(r.createdAt.getTime()).toBeLessThanOrEqual(today.getTime());
+    }
+    /* and they are not all the same day, which is what a fixed stamp looks like */
+    expect(new Set(risks.map((r) => r.createdAt.getTime())).size).toBeGreaterThan(1);
+  });
+
+  it('has a risk written for every stage, so any stall can raise one', () => {
+    for (const id of STAGE_ORDER) {
+      expect(riskSeeds[id], `no risk written for ${id}`).toBeTruthy();
+    }
   });
 });

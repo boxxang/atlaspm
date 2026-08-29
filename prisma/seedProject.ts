@@ -10,7 +10,7 @@ import { ensureBuiltinProfile } from '../src/lib/builtinProfile';
 import { DB_KIND } from '../src/lib/projectState';
 import { addWeeks, computeSchedule, startOfDay } from '../src/lib/schedule';
 import { fromStepIndex, plannedSteps } from '../src/lib/steps';
-import { seedStepStates } from '../src/lib/stepSeed';
+import { seedRisks, seedStepStates } from '../src/lib/stepSeed';
 import { activitySteps } from '../src/data/activitySteps';
 import type { PrismaClient } from '../src/generated/prisma/client';
 
@@ -24,6 +24,8 @@ export interface SeedCounts {
   /** Steps the seed marks finished, and the ones it deliberately leaves late. */
   stepsDone: number;
   stepsLate: number;
+  /** Risks raised on the steps where the work stopped. */
+  risks: number;
   kickoff: Date;
   projectName: string;
 }
@@ -128,6 +130,7 @@ export async function seedProject(prisma: PrismaClient, now = new Date()): Promi
     fromStepIndex(ref, activitySteps[ref]),
   );
   const done = seedStepStates({ stages, activities, today });
+  const risks = seedRisks({ stages, activities, today });
   /* What is left late: every step whose window has closed, minus the ones the
      seed finished. That difference is the Overdue list on a fresh install. */
   const closed = activities.reduce((n, a) => {
@@ -137,6 +140,22 @@ export async function seedProject(prisma: PrismaClient, now = new Date()): Promi
 
   await prisma.item.createMany({ data: items });
   await prisma.post.createMany({ data: updates });
+  /* One risk per stalled activity, flagged on the step where it stopped. The
+     old Item(kind:'risk') rows above are V1's board and are left alone: a risk
+     is a post on a step now, and the two are different tables. Both go when
+     /classic does. */
+  await prisma.post.createMany({
+    data: risks.map((r) => ({
+      id: `${PROJECT_ID}:risk:${r.activityRef}:${r.stepN}`,
+      projectId: PROJECT_ID,
+      kind: 'risk',
+      text: r.text,
+      author: r.author,
+      createdAt: r.createdAt,
+      activityRef: r.activityRef,
+      stepN: r.stepN,
+    })),
+  });
   await prisma.stepState.createMany({
     data: done.map((d) => ({
       id: `${PROJECT_ID}:step:${d.activityRef}:${d.stepN}`,
@@ -159,6 +178,7 @@ export async function seedProject(prisma: PrismaClient, now = new Date()): Promi
     deliverables: STAGE_ORDER.reduce((n, id) => n + seed.deliverables[id].length, 0),
     stepsDone: done.length,
     stepsLate: closed - done.length,
+    risks: risks.length,
     kickoff,
     projectName: seed.projectName,
   };
