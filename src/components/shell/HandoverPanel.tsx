@@ -67,31 +67,31 @@ export function HandoverPanel({
 
   return (
     <>
-      <header className="prail-head">
-        <h2 className="prail-cap">Handover</h2>
-        <button type="button" className="prail-x" onClick={clear} aria-label="Close details">
+      <header className="peek-hd">
+        <h2 className="cap">Handover</h2>
+        <button type="button" className="btn sm" onClick={clear} aria-label="Close details">
           ×
         </button>
       </header>
 
-      <h3 className="prail-title">{deliverable.title}</h3>
-      <p className="prail-sub">
+      <h3 className="peek-title">{deliverable.title}</h3>
+      <p className="peek-sub">
         {done ? (
-          <span className="ppill ok">Completed</span>
+          <span className="pill ok">Completed</span>
         ) : (
-          <span className="ppill">Not handed over</span>
+          <span className="pill">Not handed over</span>
         )}
         {deliverable.due && (
-          <span className="prail-hint"> · due {fmtDate(deliverable.due)}</span>
+          <span className="mono-note"> · due {fmtDate(deliverable.due)}</span>
         )}
       </p>
 
-      <section className="prail-sec">
-        <div className="prail-seccap">
+      <section className="sec-block">
+        <div className="sec-cap">
           <span>What was handed over</span>
         </div>
         <textarea
-          className="phandover-text"
+          className="lnkin ta"
           rows={4}
           value={draft}
           aria-label="What was handed over"
@@ -105,11 +105,11 @@ export function HandoverPanel({
         />
       </section>
 
-      <section className="prail-sec">
-        <div className="prail-seccap">
+      <section className="sec-block">
+        <div className="sec-cap">
           <span>Artefacts</span>
           <span className="num">{files.length}</span>
-          <button type="button" className="pbtn tiny" onClick={() => file.current?.click()}>
+          <button type="button" className="btn sm" onClick={() => file.current?.click()}>
             + Attach
           </button>
         </div>
@@ -128,20 +128,20 @@ export function HandoverPanel({
           }}
         />
         {files.length === 0 ? (
-          <p className="prail-hint">
+          <p className="mono-note">
             Nothing attached. A handover with no artefact is a claim with nothing behind it.
           </p>
         ) : (
-          <ul className="prail-atts">
+          <ul className="attlist">
             {files.map((a) => (
               <li key={a.id}>
                 <a href={attachmentUrl(a.id)} target="_blank" rel="noreferrer">
                   {a.filename}
                 </a>
-                <span className="prail-hint">{formatBytes(a.size)}</span>
+                <span className="mono-note">{formatBytes(a.size)}</span>
                 <button
                   type="button"
-                  className="prail-x"
+                  className="btn sm"
                   aria-label={`Remove ${a.filename}`}
                   onClick={() => detachFromHandover(stageId, deliverableId, a.id)}
                 >
@@ -152,13 +152,13 @@ export function HandoverPanel({
           </ul>
         )}
         {problems.map((p) => (
-          <p className="prail-hint late" key={p}>
+          <p className="mono-note late" key={p}>
             {p}
           </p>
         ))}
       </section>
 
-      <dl className="prail-facts">
+      <dl className="props">
         <dt>Accepted</dt>
         <dd>
           <input
@@ -173,7 +173,7 @@ export function HandoverPanel({
       </dl>
 
       {!done && (
-        <p className="prail-hint">
+        <p className="mono-note">
           Needs a body, an artefact and the date it was accepted. Missing:{' '}
           {[
             !draft.trim() && 'what was handed over',
@@ -187,8 +187,8 @@ export function HandoverPanel({
       )}
 
       {handover && (
-        <section className="prail-sec">
-          <div className="prail-seccap">
+        <section className="sec-block">
+          <div className="sec-cap">
             <span>Comments</span>
           </div>
           <PostThread
@@ -199,7 +199,7 @@ export function HandoverPanel({
           />
           <button
             type="button"
-            className="pbtn tiny"
+            className="btn sm"
             onClick={() => deletePost(handover.id)}
           >
             Delete handover

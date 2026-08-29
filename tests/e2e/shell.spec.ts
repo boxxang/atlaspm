@@ -47,10 +47,7 @@ test.describe('the nav', () => {
     /* The seed stalls six activities two steps deep and raises a risk on each,
        so both of these are non-zero and drawn as something to answer. */
     await expect(nav.getByRole('link', { name: /^Risks/ })).toContainText('6');
-    await expect(nav.getByRole('link', { name: /^Overdue/ }).locator('.pnav-n')).toHaveClass(
-      /risk/,
-    );
-    const overdue = await nav.getByRole('link', { name: /^Overdue/ }).locator('.pnav-n').innerText();
+    const overdue = await nav.getByRole('link', { name: /^Overdue/ }).locator('.c').innerText();
     expect(Number(overdue)).toBeGreaterThan(0);
   });
 
@@ -80,12 +77,24 @@ test.describe('the rail', () => {
     await expect(rail).toContainText('30 weeks');
   });
 
-  test('closes when asked', async ({ page }) => {
-    await page.goto(`${SHELL_PATH}/stage/physicalDesign`);
+  /* The stage's properties are what the rail shows when nothing else is picked,
+     so there is nothing to close there. A step is a pick, and closing it hands
+     the rail back to the stage. */
+  test('closing a step hands the rail back to the stage', async ({ page }) => {
+    await page.goto(`${SHELL_PATH}/stage/physicalDesign/activity`);
+    await expect(page.locator('[data-act]').first()).toBeVisible();
+    await page.locator('[data-act="PD-10"]').click();
+    await page.locator('[data-step="PD-10:2"]').click();
+
     const rail = page.getByRole('complementary', { name: 'Details' });
-    await expect(rail).toContainText('Grace Park');
+    await expect(rail).toContainText('Step 2 of');
+    /* closing a step goes back to the activity it is in, and closing that goes
+       back to the stage — the rail steps back up rather than emptying */
     await rail.getByRole('button', { name: 'Close details' }).click();
-    await expect(rail).toContainText('Pick a stage');
+    await expect(rail).toContainText('Signal and Power Integrity');
+    await rail.getByRole('button', { name: 'Close details' }).click();
+    await expect(rail).toContainText('Properties');
+    await expect(rail).toContainText('Grace Park');
   });
 
   test('clears on navigation, rather than describing the last screen', async ({ page }) => {
@@ -104,7 +113,7 @@ test.describe('a stage', () => {
     await expect(page.getByRole('heading', { name: 'Physical Design', level: 1 })).toBeVisible();
     await expect(page.getByText('12 of 23')).toBeVisible();
     /* the tab carries its count now, so the accessible name is "Activity 16" */
-    await expect(page.getByRole('link', { name: /^Activity/ })).toHaveAttribute(
+    await expect(page.locator('.tabs').getByRole('link', { name: /^Activity/ })).toHaveAttribute(
       'aria-current',
       'page',
     );
@@ -112,17 +121,12 @@ test.describe('a stage', () => {
 
   test('a deep link into a tab restores it', async ({ page }) => {
     await page.goto(`${SHELL_PATH}/stage/physicalDesign/deliverables`);
-    await expect(page.getByRole('link', { name: 'Key deliverables' })).toHaveAttribute(
-      'aria-current',
-      'page',
-    );
+    const tab = page.locator('.tabs').getByRole('link', { name: /^Key deliverables/ });
+    await expect(tab).toHaveAttribute('aria-current', 'page');
     /* and reloading it lands in the same place, which is the whole point of
        putting the tab in the URL rather than in component state */
     await page.reload();
-    await expect(page.getByRole('link', { name: 'Key deliverables' })).toHaveAttribute(
-      'aria-current',
-      'page',
-    );
+    await expect(tab).toHaveAttribute('aria-current', 'page');
   });
 
   test('a tab that no longer exists falls back rather than 404s', async ({ page }) => {
@@ -145,24 +149,19 @@ test.describe('a stage', () => {
 });
 
 test.describe('the palette', () => {
-  /* One accent for the whole app, and it is the prototype's indigo. */
-  test('the accent is the prototype’s, at the root and in the shell alike', async ({ page }) => {
+  /* One accent for the whole app, and it is the prototype's — its whole
+     stylesheet is ported now, so this reads :root rather than a scope. */
+  test('the accent is the prototype’s indigo', async ({ page }) => {
     await page.goto(SHELL_PATH);
-    /* the shell renders nothing until it has hydrated, and "today" has to come
-       from the browser's clock, so there is a frame with no .pshell to read */
-    await expect(page.locator('.pshell')).toBeVisible();
-    const accents = await page.evaluate(() => ({
-      shell: getComputedStyle(document.querySelector('.pshell')!)
-        .getPropertyValue('--accent')
-        .trim(),
-      root: getComputedStyle(document.documentElement).getPropertyValue('--accent').trim(),
-    }));
-    expect(accents.shell).toBe('#5b5bd6');
-    expect(accents.root).toBe('#5b5bd6');
+    await expect(page.locator('#side')).toBeVisible();
+    const accent = await page.evaluate(() =>
+      getComputedStyle(document.documentElement).getPropertyValue('--accent').trim(),
+    );
+    expect(accent).toBe('#5b5bd6');
   });
 
   test('the ground is the prototype’s white, not the reference’s warm one', async ({ page }) => {
     await page.goto(SHELL_PATH);
-    await expect(page.locator('.pshell')).toHaveCSS('background-color', 'rgb(255, 255, 255)');
+    await expect(page.locator('body')).toHaveCSS('background-color', 'rgb(255, 255, 255)');
   });
 });

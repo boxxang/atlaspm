@@ -37,7 +37,7 @@ export function TimelinePage({ projectId }: { projectId: string }) {
   const rowPx = ROW_HEIGHTS.find((h) => h.id === height)!.px;
 
   const spans = stages.map((s) => schedule.stages[s.id]).filter(Boolean);
-  if (!spans.length) return <p className="pview-todo">This program has no stages.</p>;
+  if (!spans.length) return <p className="mono-note">This program has no stages.</p>;
   const start = new Date(Math.min(...spans.map((s) => s.start.getTime())));
   const end = new Date(Math.max(...spans.map((s) => s.end.getTime())));
   const span = end.getTime() - start.getTime();
@@ -57,14 +57,14 @@ export function TimelinePage({ projectId }: { projectId: string }) {
       <header className="pview-head">
         <h1 className="pview-title">Timeline</h1>
         <span className="pview-count">{stages.length} stages</span>
-        <span className="pview-spacer" />
+        <span className="grow" />
         <span className="ptl-setting">
           <span className="pfact-cap">Row height</span>
           {ROW_HEIGHTS.map((h) => (
             <button
               key={h.id}
               type="button"
-              className="pbtn tiny"
+              className="btn sm"
               aria-pressed={h.id === height}
               onClick={() => setHeight(h.id)}
             >

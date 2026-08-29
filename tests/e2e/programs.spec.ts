@@ -10,12 +10,13 @@ import { expect, test, type Page } from './fixtures';
  * The schedule editing and stage editing those tests also covered have no screen
  * in the shell yet. That is a gap, not a decision — see PORTING_PLAN_V2.
  */
-const card = (page: Page, name: string) => page.locator('.pl-card').filter({ hasText: name });
+const card = (page: Page, name: string) =>
+  page.locator('[data-program]').filter({ hasText: name });
 
 test.describe('the program list', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto('/');
-    await expect(page.locator('.pl-card').first()).toBeVisible();
+    await expect(page.locator('[data-program]').first()).toBeVisible();
   });
 
   test('lists the seeded program with what it is running on', async ({ page }) => {
@@ -24,7 +25,7 @@ test.describe('the program list', () => {
   });
 
   test('a card opens the program in the shell', async ({ page }) => {
-    await card(page, 'AtlasAX1').locator('.pl-open').click();
+    await card(page, 'AtlasAX1').click();
     await expect(page).toHaveURL(/\/p\/atlasax1\/overview$/);
     await expect(page.getByRole('navigation', { name: 'Program' })).toContainText('AtlasAX1');
   });
@@ -46,14 +47,18 @@ test.describe('the program list', () => {
     ).toContainText('0');
   });
 
+  /* Deleting lives in the preview rail — the row itself is a link into the
+     program, so it cannot also carry a destructive button. */
   test('a program is deleted, and asks first', async ({ page }) => {
-    const before = await page.locator('.pl-card').count();
-    await card(page, 'AtlasAX1').locator('[data-del-project]').click();
-    await page.locator('[data-cancel-del]').click();
-    await expect(page.locator('.pl-card')).toHaveCount(before);
+    const before = await page.locator('[data-program]').count();
+    const peek = page.getByRole('complementary', { name: 'Program preview' });
 
-    await card(page, 'AtlasAX1').locator('[data-del-project]').click();
-    await page.locator('[data-confirm-del]').click();
-    await expect(page.locator('.pl-card')).toHaveCount(before - 1);
+    await peek.locator('[data-del-project]').click();
+    await peek.locator('[data-cancel-del]').click();
+    await expect(page.locator('[data-program]')).toHaveCount(before);
+
+    await peek.locator('[data-del-project]').click();
+    await peek.locator('[data-confirm-del]').click();
+    await expect(page.locator('[data-program]')).toHaveCount(before - 1);
   });
 });

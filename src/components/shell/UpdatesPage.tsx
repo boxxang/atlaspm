@@ -61,9 +61,9 @@ export function UpdatesPage({
 
   const table =
     rows.length === 0 ? (
-      <p className="pview-todo">Nothing has been said here yet.</p>
+      <p className="mono-note">Nothing has been said here yet.</p>
     ) : (
-      <table className="ptable pboard">
+      <table className="ptable pboard" data-board>
         <thead>
           <tr>
             <th className="mid num">When</th>
@@ -77,11 +77,11 @@ export function UpdatesPage({
           {rows.map((r) => (
             <tr key={r.id} data-update={r.id}>
               <td className="mid num prole">{fmtDT(r.when)}</td>
-              <td className="mid prole">{r.who || <span className="pmuted">—</span>}</td>
+              <td className="mid prole">{r.who || <span className="muted">—</span>}</td>
               <th scope="row" className="pwrap pwrapcol">
-                {r.kind === 'risk' && <span className="ppill risk">Risk</span>}
-                {r.kind === 'handover' && <span className="ppill ok">Handover</span>}
-                {r.kind === 'reply' && <span className="ppill">Reply</span>}
+                {r.kind === 'risk' && <span className="pill risk">Risk</span>}
+                {r.kind === 'handover' && <span className="pill ok">Handover</span>}
+                {r.kind === 'reply' && <span className="pill">Reply</span>}
                 {r.text}
               </th>
               {!stageId && (
@@ -91,12 +91,12 @@ export function UpdatesPage({
                       {titleOf(r.stageId)}
                     </Link>
                   ) : (
-                    <span className="pmuted">—</span>
+                    <span className="muted">—</span>
                   )}
                 </td>
               )}
               <td className="mid">
-                {r.ref ? <span className="pref">{r.ref}</span> : <span className="pmuted">—</span>}
+                {r.ref ? <span className="ref">{r.ref}</span> : <span className="muted">—</span>}
               </td>
             </tr>
           ))}

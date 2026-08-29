@@ -18,7 +18,7 @@ export function CommsTab({ stageId }: { stageId: string }) {
 
   if (items.length === 0) {
     return (
-      <p className="pview-todo">
+      <p className="mono-note">
         Nothing added on this programme yet. The Activity tab holds what the template names;
         anything else this stage has to track goes here.
       </p>
@@ -26,7 +26,7 @@ export function CommsTab({ stageId }: { stageId: string }) {
   }
 
   return (
-    <table className="ptable pboard">
+    <table className="ptable pboard" data-board>
       <thead>
         <tr>
           <th className="pwrapcol">Entry</th>
@@ -44,15 +44,15 @@ export function CommsTab({ stageId }: { stageId: string }) {
             <tr key={it.id} data-item={it.id}>
               <th scope="row" className="pwrap pwrapcol">
                 {it.title}
-                {it.done && <span className="ppill ok">Done</span>}
-                {late && <span className="ppill risk">Overdue</span>}
+                {it.done && <span className="pill ok">Done</span>}
+                {late && <span className="pill risk">Overdue</span>}
                 {it.body && <span className="pcomms-body">{it.body}</span>}
               </th>
-              <td className="mid prole">{towards?.title ?? <span className="pmuted">—</span>}</td>
+              <td className="mid prole">{towards?.title ?? <span className="muted">—</span>}</td>
               <td className={late ? 'mid num late' : 'mid num'}>
                 {it.due ? fmtDate(it.due) : '—'}
               </td>
-              <td className="mid prole">{it.owner || <span className="pmuted">Unassigned</span>}</td>
+              <td className="mid prole">{it.owner || <span className="muted">Unassigned</span>}</td>
               <td className="mid num prole">{it.updates.length || '—'}</td>
             </tr>
           );

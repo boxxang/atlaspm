@@ -14,8 +14,8 @@ const rail = (page: import('./fixtures').Page) =>
 
 const openFirstOpen = async (page: import('./fixtures').Page) => {
   await page.goto(DELIVERABLES);
-  await expect(page.locator('.pdeliv').first()).toBeVisible();
-  const row = page.locator('.pdeliv').filter({ hasNot: page.locator('.ppill.ok') }).first();
+  await expect(page.locator('[data-board] [data-deliverable]').first()).toBeVisible();
+  const row = page.locator('[data-board] [data-deliverable]').filter({ hasNot: page.locator('.pill.ok') }).first();
   const title = await row.locator('th[scope="row"]').innerText();
   await row.click();
   await expect(rail(page)).toContainText('Handover');
@@ -30,9 +30,9 @@ const attach = (page: import('./fixtures').Page, name: string, body: string) =>
 test.describe('the deliverables tab', () => {
   test('lists the stage’s key deliverables with a status word each', async ({ page }) => {
     await page.goto(DELIVERABLES);
-    await expect(page.locator('.pdeliv').first()).toBeVisible();
-    await expect(page.locator('.pdeliv')).toHaveCount(9);
-    const words = await page.locator('.pdeliv .ppill').allTextContents();
+    await expect(page.locator('[data-board] [data-deliverable]').first()).toBeVisible();
+    await expect(page.locator('[data-board] [data-deliverable]')).toHaveCount(9);
+    const words = await page.locator('[data-deliverable] .pill').allTextContents();
     for (const w of words) {
       expect(['Completed', 'Delayed', 'In progress', 'Not started']).toContain(w);
     }
@@ -42,8 +42,8 @@ test.describe('the deliverables tab', () => {
      schedule — Physical Design's are all still ahead of their dates. */
   test('a deliverable past its date with nothing handed over reads Delayed', async ({ page }) => {
     await page.goto(`${SHELL_PATH}/stage/synthesis/deliverables`);
-    await expect(page.locator('.pdeliv').first()).toBeVisible();
-    const delayed = page.locator('.pdeliv').filter({ hasText: 'Delayed' });
+    await expect(page.locator('[data-board] [data-deliverable]').first()).toBeVisible();
+    const delayed = page.locator('[data-board] [data-deliverable]').filter({ hasText: 'Delayed' });
     expect(await delayed.count()).toBeGreaterThan(0);
     /* and the date it is late against is drawn as late */
     await expect(delayed.first().locator('.num.late')).toBeVisible();
@@ -51,16 +51,16 @@ test.describe('the deliverables tab', () => {
 
   test('Delayed is not Overdue: it is not on the Overdue board', async ({ page }) => {
     await page.goto(`${SHELL_PATH}/stage/synthesis/deliverables`);
-    await expect(page.locator('.pdeliv').first()).toBeVisible();
+    await expect(page.locator('[data-board] [data-deliverable]').first()).toBeVisible();
     const title = (
-      await page.locator('.pdeliv').filter({ hasText: 'Delayed' }).first().locator('th').innerText()
+      await page.locator('[data-board] [data-deliverable]').filter({ hasText: 'Delayed' }).first().locator('th').innerText()
     ).trim();
 
     await page.goto(`${SHELL_PATH}/overdue`);
-    await expect(page.locator('.pboard, .pview-todo')).toBeVisible();
+    await expect(page.locator('[data-board], .pview-todo')).toBeVisible();
     /* Overdue counts steps. A late deliverable says Delayed where deliverables
        are listed, and does not appear here. */
-    await expect(page.locator('.pboard')).not.toContainText(title);
+    await expect(page.locator('[data-board]')).not.toContainText(title);
   });
 });
 
@@ -85,7 +85,7 @@ test.describe('handing one over', () => {
 
     /* all three, and it is complete */
     await rail(page).getByLabel('Accepted').fill('2026-08-01');
-    await expect(rail(page).locator('.ppill.ok')).toHaveText('Completed');
+    await expect(rail(page).locator('.pill.ok')).toHaveText('Completed');
   });
 
   test('completes the row, and survives a reload', async ({ page }) => {
@@ -93,15 +93,15 @@ test.describe('handing one over', () => {
     await rail(page).getByLabel('What was handed over').fill('Signed off by the owner.');
     await attach(page, 'signoff.txt', 'evidence');
     await rail(page).getByLabel('Accepted').fill('2026-08-01');
-    await expect(rail(page).locator('.ppill.ok')).toHaveText('Completed');
+    await expect(rail(page).locator('.pill.ok')).toHaveText('Completed');
     await writesSettled(page);
 
-    const row = page.locator('.pdeliv').filter({ hasText: title });
-    await expect(row.locator('.ppill')).toHaveText('Completed');
+    const row = page.locator('[data-board] [data-deliverable]').filter({ hasText: title });
+    await expect(row.locator('.pill')).toHaveText('Completed');
     await expect(row).toContainText('08/01/2026');
 
     await page.reload();
-    await expect(page.locator('.pdeliv').filter({ hasText: title }).locator('.ppill')).toHaveText(
+    await expect(page.locator('[data-board] [data-deliverable]').filter({ hasText: title }).locator('.pill')).toHaveText(
       'Completed',
     );
   });
@@ -113,7 +113,7 @@ test.describe('handing one over', () => {
     await rail(page).getByLabel('Accepted').fill('2026-08-01');
     await writesSettled(page);
 
-    const clip = page.locator('.pdeliv').filter({ hasText: title }).locator('.pclip');
+    const clip = page.locator('[data-board] [data-deliverable]').filter({ hasText: title }).locator('.pclip');
     await expect(clip).toBeVisible();
     const href = (await clip.getAttribute('href'))!;
     expect(href).toMatch(/^\/api\/attachments\//);
@@ -127,19 +127,19 @@ test.describe('handing one over', () => {
     await rail(page).getByLabel('What was handed over').fill('Filed.');
     await attach(page, 'only.txt', 'one');
     await rail(page).getByLabel('Accepted').fill('2026-08-01');
-    await expect(rail(page).locator('.ppill.ok')).toHaveText('Completed');
+    await expect(rail(page).locator('.pill.ok')).toHaveText('Completed');
     await writesSettled(page);
 
     await rail(page).getByRole('button', { name: 'Remove only.txt' }).click();
     await expect(rail(page)).toContainText('Not handed over');
-    await expect(page.locator('.pdeliv').filter({ hasText: title }).locator('.ppill')).not.toHaveText(
+    await expect(page.locator('[data-board] [data-deliverable]').filter({ hasText: title }).locator('.pill')).not.toHaveText(
       'Completed',
     );
     await writesSettled(page);
 
     await page.reload();
     await expect(
-      page.locator('.pdeliv').filter({ hasText: title }).locator('.ppill'),
+      page.locator('[data-board] [data-deliverable]').filter({ hasText: title }).locator('.pill'),
     ).not.toHaveText('Completed');
   });
 
@@ -151,8 +151,8 @@ test.describe('handing one over', () => {
     await writesSettled(page);
 
     await rail(page).getByLabel('Reply…').fill('Checked against the spec — looks right.');
-    await rail(page).locator('.pcomposer.small').getByRole('button', { name: 'Post' }).click();
-    await expect(rail(page).locator('.preplies .ppost-text')).toHaveText(
+    await rail(page).locator('.composer.small').getByRole('button', { name: 'Post' }).click();
+    await expect(rail(page).locator('.replies .post-text')).toHaveText(
       'Checked against the spec — looks right.',
     );
     await writesSettled(page);
@@ -160,9 +160,9 @@ test.describe('handing one over', () => {
     /* the rail clears on a reload, so the same row has to be picked again by
        name — .picked is gone and .first() is a different deliverable */
     await page.reload();
-    await expect(page.locator('.pdeliv').first()).toBeVisible();
-    await page.locator('.pdeliv').filter({ hasText: title }).click();
-    await expect(rail(page).locator('.preplies .ppost-text')).toContainText('Checked against');
+    await expect(page.locator('[data-board] [data-deliverable]').first()).toBeVisible();
+    await page.locator('[data-board] [data-deliverable]').filter({ hasText: title }).click();
+    await expect(rail(page).locator('.replies .post-text')).toContainText('Checked against');
   });
 });
 
@@ -179,7 +179,7 @@ test.describe('the team', () => {
   test('lists the stage lead alongside everyone else', async ({ page }) => {
     await openTeam(page);
     await expect(page.locator('[data-person="leader"]')).toContainText('Grace Park');
-    await expect(page.locator('[data-person="leader"] .ppill')).toHaveText('Lead');
+    await expect(page.locator('[data-person="leader"] .pill')).toHaveText('Lead');
     expect(await page.locator('tr[data-person]').count()).toBeGreaterThan(1);
   });
 
@@ -196,7 +196,7 @@ test.describe('the team', () => {
     /* the owner picker reads this list, so a new person can be put on a step
        without a reload */
     await page.goto(`${SHELL_PATH}/stage/physicalDesign/activity`);
-    await expect(page.locator('tr.pact').first()).toBeVisible();
+    await expect(page.locator('[data-act]').first()).toBeVisible();
     await page.locator('[data-act="PD-10"]').click();
     await page.locator('[data-step="PD-10:2"]').click();
     await rail(page).getByLabel('Owner').selectOption('Yuna Cho');

@@ -19,8 +19,8 @@ test.describe('Overview', () => {
 
   test('the figures agree with the pages behind them', async ({ page }) => {
     const nav = page.getByRole('navigation', { name: 'Program' });
-    const risks = await nav.getByRole('link', { name: /^Risks/ }).locator('.pnav-n').innerText();
-    const overdue = await nav.getByRole('link', { name: /^Overdue/ }).locator('.pnav-n').innerText();
+    const risks = await nav.getByRole('link', { name: /^Risks/ }).locator('.c, .cr').innerText();
+    const overdue = await nav.getByRole('link', { name: /^Overdue/ }).locator('.c, .cr').innerText();
 
     await expect(page.locator('.pstat').filter({ hasText: 'Open risks' })).toContainText(risks);
     await expect(page.locator('.pstat').filter({ hasText: 'Overdue' })).toContainText(overdue);
@@ -41,7 +41,7 @@ test.describe('Overview', () => {
     );
 
     /* every overdue row comes before every due-soon row */
-    const tags = await page.locator('[data-attn] .ppill').allTextContents();
+    const tags = await page.locator('[data-attn] .pill').allTextContents();
     const lastOverdue = tags.lastIndexOf('Overdue');
     const firstOther = tags.findIndex((t) => t !== 'Overdue');
     if (firstOther !== -1) expect(lastOverdue).toBeLessThan(firstOther);
@@ -50,7 +50,7 @@ test.describe('Overview', () => {
   test('every overdue step is on it — none are capped away', async ({ page }) => {
     const nav = page.getByRole('navigation', { name: 'Program' });
     const overdue = Number(
-      await nav.getByRole('link', { name: /^Overdue/ }).locator('.pnav-n').innerText(),
+      await nav.getByRole('link', { name: /^Overdue/ }).locator('.c, .cr').innerText(),
     );
     const steps = await page.locator('[data-attn^="s:"]').count();
     expect(steps).toBe(overdue);
@@ -65,7 +65,7 @@ test.describe('Overview', () => {
     await expect(page).toHaveURL(new RegExp(`/stage/\\w+/activity\\?step=${act}:${n}$`));
     const rail = page.getByRole('complementary', { name: 'Details' });
     await expect(rail).toContainText(`Step ${n} of`);
-    await expect(rail.locator('.pref')).toHaveText(act);
+    await expect(rail.locator('.ref')).toHaveText(act);
   });
 
   /* A deliverable row goes to the step that hands it over, not to the

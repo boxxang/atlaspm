@@ -26,7 +26,7 @@ export function TeamTab({ stageId }: { stageId: string }) {
 
   return (
     <div className="pteam">
-      <table className="ptable pboard">
+      <table className="ptable pboard" data-board>
         <thead>
           <tr>
             <th className="pwrapcol">Name</th>
@@ -43,11 +43,11 @@ export function TeamTab({ stageId }: { stageId: string }) {
             <tr data-person="leader">
               <th scope="row" className="pwrap pwrapcol">
                 {leader.name}
-                <span className="ppill">Lead</span>
+                <span className="pill">Lead</span>
               </th>
-              <td className="prole">Stage lead</td>
-              <td className="prole">{leader.email || '—'}</td>
-              <td className="prole">{leader.phone || '—'}</td>
+              <td className="soft">Stage lead</td>
+              <td className="soft">{leader.email || '—'}</td>
+              <td className="soft">{leader.phone || '—'}</td>
               <td className="mid">
                 <button type="button" className="ppost-act" onClick={() => setEditing('leader')}>
                   Edit
@@ -83,9 +83,9 @@ export function TeamTab({ stageId }: { stageId: string }) {
                 <th scope="row" className="pwrap pwrapcol">
                   {c.name}
                 </th>
-                <td className="prole">{c.role || '—'}</td>
-                <td className="prole">{c.email || '—'}</td>
-                <td className="prole">{c.phone || '—'}</td>
+                <td className="soft">{c.role || '—'}</td>
+                <td className="soft">{c.email || '—'}</td>
+                <td className="soft">{c.phone || '—'}</td>
                 <td className="mid">
                   <button type="button" className="ppost-act" onClick={() => setEditing(c.id)}>
                     Edit
@@ -114,7 +114,7 @@ export function TeamTab({ stageId }: { stageId: string }) {
           ) : (
             <tr>
               <td colSpan={5}>
-                <button type="button" className="pbtn tiny" onClick={() => setEditing('new')}>
+                <button type="button" className="btn sm" onClick={() => setEditing('new')}>
                   + Add someone
                 </button>
               </td>
@@ -170,7 +170,7 @@ function PersonRow({
       <td className="mid">
         <button
           type="button"
-          className="pbtn tiny"
+          className="btn sm"
           disabled={!draft.name.trim()}
           onClick={() => onSave({ ...draft, name: draft.name.trim() })}
         >

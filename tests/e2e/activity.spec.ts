@@ -29,7 +29,7 @@ test.describe('an activity write-up', () => {
 
   test('the rail links to it from the activity it is about', async ({ page }) => {
     await page.goto(`${SHELL_PATH}/stage/physicalDesign/activity`);
-    await expect(page.locator('tr.pact').first()).toBeVisible();
+    await expect(page.locator('[data-act]').first()).toBeVisible();
     await page.locator('[data-act="PD-10"]').click();
 
     const rail = page.getByRole('complementary', { name: 'Details' });

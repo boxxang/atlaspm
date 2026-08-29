@@ -13,7 +13,7 @@ import { expect, test, SHELL_PATH, writesSettled } from './fixtures';
    to be told to wait for the table first. */
 const openBoard = async (page: import('./fixtures').Page, path: string) => {
   await page.goto(path);
-  await expect(page.locator('.pboard, .pview-todo')).toBeVisible();
+  await expect(page.locator('[data-board], .pview-todo')).toBeVisible();
 };
 
 test.describe('Risks', () => {
@@ -22,36 +22,36 @@ test.describe('Risks', () => {
   });
 
   test('lists what the seed flagged, and agrees with the nav', async ({ page }) => {
-    const rows = page.locator('.pboard tbody tr');
+    const rows = page.locator('[data-board] tbody tr');
     await expect(rows).toHaveCount(6);
     const badge = await page
       .getByRole('navigation', { name: 'Program' })
       .getByRole('link', { name: /^Risks/ })
-      .locator('.pnav-n')
+      .locator('.c, .cr')
       .innerText();
     expect(Number(badge)).toBe(6);
   });
 
   test('each row says which step it is flagged on', async ({ page }) => {
-    const first = page.locator('.pboard tbody tr').first();
-    await expect(first.locator('.pref')).toHaveText(/^[A-Z]+-\d\d$/);
+    const first = page.locator('[data-board] tbody tr').first();
+    await expect(first.locator('.ref')).toHaveText(/^[A-Z]+-\d\d$/);
     /* and the reference goes to the stage that runs it */
-    await expect(first.locator('.pref')).toHaveAttribute('href', /\/stage\/\w+\/activity$/);
+    await expect(first.locator('.ref')).toHaveAttribute('href', /\/stage\/\w+\/activity$/);
   });
 
   test('a risk nobody has answered in a week reads Stale', async ({ page }) => {
     /* the seed raises each risk on the day its step went late, and some of
        those are months back */
-    await expect(page.locator('.ppill.warn').first()).toHaveText('Stale');
+    await expect(page.locator('.pill.warn').first()).toHaveText('Stale');
   });
 
   test('the risk text is not truncated', async ({ page }) => {
-    const text = await page.locator('.pboard tbody th[scope="row"]').first().innerText();
+    const text = await page.locator('[data-board] tbody th[scope="row"]').first().innerText();
     expect(text.length).toBeGreaterThan(80);
   });
 
   test('there is no stage column, because the reference already says it', async ({ page }) => {
-    const heads = await page.locator('.pboard thead th').allTextContents();
+    const heads = await page.locator('[data-board] thead th').allTextContents();
     expect(heads.map((h) => h.trim())).toEqual([
       'Activity',
       'Step',
@@ -63,19 +63,19 @@ test.describe('Risks', () => {
   });
 
   test('a risk drops off the moment its step is handed over', async ({ page }) => {
-    const first = page.locator('.pboard tbody tr').first();
-    const ref = await first.locator('.pref').innerText();
+    const first = page.locator('[data-board] tbody tr').first();
+    const ref = await first.locator('.ref').innerText();
     const step = (await first.locator('td.num').first().innerText()).trim();
-    const href = (await first.locator('.pref').getAttribute('href'))!;
+    const href = (await first.locator('.ref').getAttribute('href'))!;
 
     await page.goto(href);
-    await expect(page.locator('tr.pact').first()).toBeVisible();
+    await expect(page.locator('[data-act]').first()).toBeVisible();
     await page.locator(`[data-act="${ref}"]`).click();
     await page.locator(`[data-step="${ref}:${step}"] input[type="checkbox"]`).check();
     await writesSettled(page);
 
     await openBoard(page, `${SHELL_PATH}/risks`);
-    await expect(page.locator('.pboard tbody tr')).toHaveCount(5);
+    await expect(page.locator('[data-board] tbody tr')).toHaveCount(5);
     /* the post is still in the thread — it stopped counting, it did not vanish */
     await expect(
       page.getByRole('navigation', { name: 'Program' }).getByRole('link', { name: /^Risks/ }),
@@ -89,27 +89,27 @@ test.describe('Overdue', () => {
   });
 
   test('lists late steps, soonest due first, and agrees with the nav', async ({ page }) => {
-    const rows = page.locator('.pboard tbody tr');
+    const rows = page.locator('[data-board] tbody tr');
     const n = await rows.count();
     expect(n).toBeGreaterThan(0);
     const badge = await page
       .getByRole('navigation', { name: 'Program' })
       .getByRole('link', { name: /^Overdue/ })
-      .locator('.pnav-n')
+      .locator('.c, .cr')
       .innerText();
     expect(Number(badge)).toBe(n);
 
-    const dues = await page.locator('.pboard tbody td.num.late').allInnerTexts();
+    const dues = await page.locator('[data-board] tbody td.num.late').allInnerTexts();
     const dates = dues.filter((t) => t.includes('/')).map((t) => new Date(t).getTime());
     expect([...dates].sort((a, b) => a - b)).toEqual(dates);
   });
 
   test('says Unassigned rather than leaving the owner blank', async ({ page }) => {
-    await expect(page.locator('.pboard tbody .pmuted').first()).toHaveText('Unassigned');
+    await expect(page.locator('[data-board] tbody .muted').first()).toHaveText('Unassigned');
   });
 
   test('counts steps only — a delayed deliverable is not on this list', async ({ page }) => {
-    const heads = await page.locator('.pboard thead th').allTextContents();
+    const heads = await page.locator('[data-board] thead th').allTextContents();
     expect(heads.map((h) => h.trim())).toEqual([
       'Activity',
       'Step',
@@ -120,24 +120,24 @@ test.describe('Overdue', () => {
       'Owner',
     ]);
     /* every row is a step: each carries a step number */
-    for (const cell of await page.locator('.pboard tbody td.num').allInnerTexts()) {
+    for (const cell of await page.locator('[data-board] tbody td.num').allInnerTexts()) {
       expect(cell.trim()).not.toBe('');
     }
   });
 
   test('a step handed over leaves the list', async ({ page }) => {
-    const before = await page.locator('.pboard tbody tr').count();
-    const first = page.locator('.pboard tbody tr').first();
+    const before = await page.locator('[data-board] tbody tr').count();
+    const first = page.locator('[data-board] tbody tr').first();
     const target = (await first.getAttribute('data-overdue'))!;
     const [ref, step] = target.split(':');
-    await page.goto((await first.locator('.pref').getAttribute('href'))!);
-    await expect(page.locator('tr.pact').first()).toBeVisible();
+    await page.goto((await first.locator('.ref').getAttribute('href'))!);
+    await expect(page.locator('[data-act]').first()).toBeVisible();
     await page.locator(`[data-act="${ref}"]`).click();
     await page.locator(`[data-step="${ref}:${step}"] input[type="checkbox"]`).check();
     await writesSettled(page);
 
     await openBoard(page, `${SHELL_PATH}/overdue`);
-    await expect(page.locator('.pboard tbody tr')).toHaveCount(before - 1);
+    await expect(page.locator('[data-board] tbody tr')).toHaveCount(before - 1);
   });
 });
 
@@ -147,7 +147,7 @@ test.describe('Activities', () => {
   });
 
   test('lists all of them, grouped by the stage that runs them', async ({ page }) => {
-    await expect(page.locator('.pboard tbody tr[data-activity]')).toHaveCount(257);
+    await expect(page.locator('[data-board] tbody tr[data-activity]')).toHaveCount(257);
     await expect(page.locator('.ptable-group')).toHaveCount(23);
   });
 
@@ -158,7 +158,7 @@ test.describe('Activities', () => {
       'href',
       /\/stage\/\w+\/activity$/,
     );
-    await expect(page.locator('[data-activity="DEF-01"] .pref')).toHaveAttribute(
+    await expect(page.locator('[data-activity="DEF-01"] .ref')).toHaveAttribute(
       'href',
       /\/activity\/DEF-01$/,
     );
@@ -168,8 +168,11 @@ test.describe('Activities', () => {
     page,
   }) => {
     /* Product Definition closed long ago: every one of its activities is done */
-    await expect(page.locator('[data-activity="DEF-01"] .pdone')).toHaveClass(/all/);
+    await expect(page.locator('[data-activity="DEF-01"] [data-done]')).toHaveAttribute(
+      'data-all',
+      '',
+    );
     /* and somewhere on the programme there is a late count */
-    expect(await page.locator('.pboard tbody .late').count()).toBeGreaterThan(0);
+    expect(await page.locator('[data-board] tbody .late').count()).toBeGreaterThan(0);
   });
 });

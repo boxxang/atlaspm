@@ -23,7 +23,7 @@ export function ComingWith({
         <h1 className="pview-title">{title}</h1>
       </header>
       <div className="pview-body">
-        <p className="pview-todo">
+        <p className="mono-note">
           <span className="pview-phase">{phase}</span>
           {children}
         </p>

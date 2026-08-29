@@ -33,7 +33,7 @@ export function ProgramTeam({ projectId }: { projectId: string }) {
       </header>
 
       <div className="pview-body">
-        <table className="ptable pboard">
+        <table className="ptable pboard" data-board>
           <thead>
             <tr>
               <th className="pwrapcol">Name</th>
@@ -54,11 +54,11 @@ export function ProgramTeam({ projectId }: { projectId: string }) {
                 <tr data-person={`${g.stage.id}:leader`}>
                   <th scope="row" className="pwrap pwrapcol">
                     {g.lead.name}
-                    <span className="ppill">Lead</span>
+                    <span className="pill">Lead</span>
                   </th>
-                  <td className="prole">Stage lead</td>
-                  <td className="prole">{g.lead.email || '—'}</td>
-                  <td className="prole">{g.lead.phone || '—'}</td>
+                  <td className="soft">Stage lead</td>
+                  <td className="soft">{g.lead.email || '—'}</td>
+                  <td className="soft">{g.lead.phone || '—'}</td>
                 </tr>
               )}
               {g.rows.map((c) => (
@@ -66,9 +66,9 @@ export function ProgramTeam({ projectId }: { projectId: string }) {
                   <th scope="row" className="pwrap pwrapcol">
                     {c.name}
                   </th>
-                  <td className="prole">{c.role || '—'}</td>
-                  <td className="prole">{c.email || '—'}</td>
-                  <td className="prole">{c.phone || '—'}</td>
+                  <td className="soft">{c.role || '—'}</td>
+                  <td className="soft">{c.email || '—'}</td>
+                  <td className="soft">{c.phone || '—'}</td>
                 </tr>
               ))}
             </tbody>

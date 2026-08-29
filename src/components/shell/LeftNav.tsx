@@ -2,52 +2,61 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { useMemo } from 'react';
 import { writtenActivities } from '@/data/activityIndex';
+import { RISK_AUTHOR } from '@/data/riskSeeds';
 import { useAppStore } from '@/store/useAppStore';
+import {
+  Avatar,
+  IconActivities,
+  IconDeliverables,
+  IconLate,
+  IconOverview,
+  IconProfile,
+  IconRisk,
+  IconSearch,
+  IconStages,
+  IconSwitch,
+  IconTeam,
+  IconTimeline,
+  IconUpdates,
+} from './icons';
 import { useProgramWork } from './useProgramWork';
 
 /**
- * The left nav: where the programme is, in three groups.
+ * The left nav, as the prototype draws it.
  *
- * PROGRAM is the shapes of the whole thing, WORK is the lists you answer, and
- * PEOPLE is who answers them. The counts are as much the point as the names —
- * a TPM reads "Overdue 12" without opening it.
+ * Three groups: PROGRAM is the shapes of the whole thing, WORK is the lists you
+ * answer, PEOPLE is who answers them. The counts are as much the point as the
+ * names — a TPM reads "Overdue 12" without opening it — and Risks wears its
+ * count as a filled pill rather than a plain number, because it is the one that
+ * should catch the eye first.
+ *
+ * Inside a stage the nav opens a short list of its neighbours, so moving one
+ * stage along does not mean going back to the list.
  *
  * Overdue counts steps, and only steps: a step past its due date with nothing
  * handed over. A key deliverable past its date is Delayed, which is a different
- * word for a different thing and has its own place to be said — counting both
- * under one word made the same figure mean two things on two screens.
- *
- * Risks and Overdue read the resolver the boards read, so a badge and its page
- * cannot disagree about the number.
+ * word for a different thing and has its own place to be said.
  */
-
-interface NavEntry {
-  href: string;
-  label: string;
-  count?: string;
-  tone?: 'risk';
-}
-
-interface NavGroup {
-  title: string;
-  items: NavEntry[];
-}
-
-function useNavGroups(projectId: string): NavGroup[] {
+export function LeftNav({ projectId }: { projectId: string }) {
+  const projectName = useAppStore((s) => s.projectName);
+  const profile = useAppStore((s) => s.profile);
   const stages = useAppStore((s) => s.stages);
+  const schedule = useAppStore((s) => s.schedule);
   const deliverables = useAppStore((s) => s.deliverables);
   const content = useAppStore((s) => s.content);
   const contacts = useAppStore((s) => s.contacts);
-  const leaders = useAppStore((s) => s.leaders);
+  const posts = useAppStore((s) => s.posts);
+  const today = useAppStore((s) => s.today);
   const { overdue, risks } = useProgramWork();
+  const pathname = usePathname();
 
-  return useMemo(() => {
-    const base = `/p/${projectId}`;
-    const allDeliv = Object.values(deliverables).flat();
-    const done = allDeliv.filter((d) => d.done).length;
-    const updates = Object.values(content).reduce(
+  const base = `/p/${projectId}`;
+  const allDeliv = Object.values(deliverables).flat();
+  const done = allDeliv.filter((d) => d.done).length;
+  const updates =
+    posts.length +
+    Object.values(content).reduce(
       (n, c) =>
         n +
         (['keyinfo', 'activities', 'risks'] as const).reduce(
@@ -56,100 +65,160 @@ function useNavGroups(projectId: string): NavGroup[] {
         ),
       0,
     );
-    /* A stage's leader is a person too, and the Team tab lists them alongside
-       the contacts — so the count has to, or the nav and the page disagree. */
-    const people = Object.values(contacts).flat().length + Object.keys(leaders).length;
+  const people = Object.values(contacts).flat().length;
 
-    return [
-      {
-        title: 'Program',
-        items: [
-          { href: `${base}/overview`, label: 'Overview' },
-          { href: `${base}/timeline`, label: 'Timeline' },
-          { href: `${base}/stages`, label: 'Stages', count: String(stages.length) },
-        ],
-      },
-      {
-        title: 'Work',
-        items: [
-          {
-            href: `${base}/risks`,
-            label: 'Risks',
-            count: String(risks.length),
-            tone: risks.length ? 'risk' : undefined,
-          },
-          {
-            href: `${base}/overdue`,
-            label: 'Overdue',
-            count: String(overdue.length),
-            tone: overdue.length ? 'risk' : undefined,
-          },
-          {
-            href: `${base}/activities`,
-            label: 'Activities',
-            count: String(writtenActivities.length),
-          },
-          {
-            href: `${base}/deliverables`,
-            label: 'Deliverables',
-            count: `${done}/${allDeliv.length}`,
-          },
-          { href: `${base}/updates`, label: 'Updates', count: String(updates) },
-        ],
-      },
-      {
-        title: 'People',
-        items: [{ href: `${base}/team`, label: 'Team', count: String(people) }],
-      },
-    ];
-  }, [projectId, stages, deliverables, content, contacts, leaders, overdue, risks]);
-}
+  /* Which stage is open, so its neighbours can be listed under Stages. */
+  const inStage = pathname.match(/\/stage\/([^/?]+)/)?.[1] ?? null;
+  const index = inStage ? stages.findIndex((s) => s.id === inStage) : -1;
+  const neighbours = index >= 0 ? stages.slice(Math.max(0, index - 1), index + 3) : [];
 
-export function LeftNav({ projectId }: { projectId: string }) {
-  const projectName = useAppStore((s) => s.projectName);
-  const profile = useAppStore((s) => s.profile);
-  const groups = useNavGroups(projectId);
-  const pathname = usePathname();
+  const barColour = (id: string) => {
+    const span = schedule.stages[id];
+    if (!span) return 'var(--st-future)';
+    if (today > span.end) return 'var(--st-done)';
+    if (today < span.start) return 'var(--st-future)';
+    return risks.some((r) => r.stageId === id) ? 'var(--st-risk)' : 'var(--st-run)';
+  };
 
   return (
-    <nav className="pnav" aria-label="Program">
-      <Link href="/" className="pnav-head" title="All programs">
-        <span className="pnav-mark" aria-hidden="true">
-          {projectName.slice(0, 1).toUpperCase()}
+    <nav id="side" aria-label="Program">
+      <Link className="brand" href="/" title="All programs">
+        <span className="mark">{projectName.slice(0, 1).toUpperCase()}</span>
+        <span style={{ flexGrow: 1 }}>
+          <span style={{ fontSize: 13, fontWeight: 600, display: 'block' }}>{projectName}</span>
         </span>
-        <span className="pnav-name">{projectName}</span>
+        <IconSwitch />
       </Link>
 
-      {groups.map((g) => (
-        <div className="pnav-group" key={g.title}>
-          <h2 className="pnav-cap">{g.title}</h2>
-          <ul>
-            {g.items.map((it) => (
-              <li key={it.href}>
-                <Link
-                  href={it.href}
-                  className="pnav-item"
-                  aria-current={isCurrent(pathname, it.href) ? 'page' : undefined}
-                >
-                  <span className="pnav-label">{it.label}</span>
-                  {it.count !== undefined && (
-                    <span className={it.tone === 'risk' ? 'pnav-n risk' : 'pnav-n'}>
-                      {it.count}
-                    </span>
-                  )}
-                </Link>
-              </li>
-            ))}
-          </ul>
-        </div>
-      ))}
+      <div className="search">
+        <IconSearch />
+        <span style={{ flexGrow: 1 }}>Search</span>
+        <span style={{ fontSize: 11, color: 'var(--ink-4)' }}>⌘K</span>
+      </div>
 
-      <div className="pnav-foot">
-        <span className="pnav-profile" title={profile.label}>
+      <div className="sec">Program</div>
+      <NavItem here={pathname} href={`${base}/overview`} label="Overview" icon={<IconOverview />} />
+      <NavItem here={pathname} href={`${base}/timeline`} label="Timeline" icon={<IconTimeline />} />
+      <NavItem
+        here={pathname}
+        href={`${base}/stages`}
+        label="Stages"
+        icon={<IconStages />}
+        extra={<span className="c">{stages.length}</span>}
+      />
+      {neighbours.length > 0 && (
+        <div style={{ padding: '3px 0 3px 22px', display: 'flex', flexDirection: 'column' }}>
+          {neighbours.map((s) => (
+            <Link
+              key={s.id}
+              className={s.id === inStage ? 'substage on' : 'substage'}
+              href={`${base}/stage/${s.id}/activity`}
+              data-substage={s.id}
+            >
+              <span className="dot" style={{ background: barColour(s.id) }} />
+              {s.stage} · {s.shortTitle}
+            </Link>
+          ))}
+        </div>
+      )}
+
+      <div className="sec">Work</div>
+      <NavItem
+        here={pathname}
+        href={`${base}/risks`}
+        label="Risks"
+        icon={<IconRisk />}
+        extra={<span className="cr">{risks.length}</span>}
+      />
+      <NavItem
+        here={pathname}
+        href={`${base}/overdue`}
+        label="Overdue"
+        icon={<IconLate />}
+        extra={
+          <span className="c" style={{ color: 'var(--risk)', fontWeight: 600 }}>
+            {overdue.length}
+          </span>
+        }
+      />
+      <NavItem
+        here={pathname}
+        href={`${base}/activities`}
+        label="Activities"
+        icon={<IconActivities />}
+        extra={<span className="c">{writtenActivities.length}</span>}
+      />
+      <NavItem
+        here={pathname}
+        href={`${base}/deliverables`}
+        label="Deliverables"
+        icon={<IconDeliverables />}
+        extra={
+          <span className="c">
+            {done}/{allDeliv.length}
+          </span>
+        }
+      />
+      <NavItem
+        here={pathname}
+        href={`${base}/updates`}
+        label="Updates"
+        icon={<IconUpdates />}
+        extra={<span className="c">{updates}</span>}
+      />
+
+      <div className="sec">People</div>
+      <NavItem
+        here={pathname}
+        href={`${base}/team`}
+        label="Team"
+        icon={<IconTeam />}
+        extra={<span className="c">{people}</span>}
+      />
+
+      <div className="side-foot">
+        <Link className="nav" style={{ fontSize: 12.5 }} href={`${base}/stages`}>
+          <IconProfile />
           {profile.label}
-        </span>
+          <span className="g" />
+          <span className="c">edit</span>
+        </Link>
+        <div className="nav" style={{ fontSize: 12.5 }}>
+          <Avatar name={RISK_AUTHOR} small />
+          {RISK_AUTHOR.split(' ')[0]}
+        </div>
       </div>
     </nav>
+  );
+}
+
+/**
+ * One entry. Defined here rather than inside LeftNav: a component created
+ * during render is a new type on every render, and React throws the old
+ * subtree away each time — which is invisible until something in it holds
+ * state, and then baffling.
+ */
+function NavItem({
+  here,
+  href,
+  label,
+  icon,
+  extra,
+}: {
+  here: string;
+  href: string;
+  label: string;
+  icon: React.ReactNode;
+  extra?: React.ReactNode;
+}) {
+  const on = isCurrent(here, href);
+  return (
+    <Link href={href} className={on ? 'nav on' : 'nav'} aria-current={on ? 'page' : undefined}>
+      {icon}
+      {label}
+      <span className="g" />
+      {extra}
+    </Link>
   );
 }
 

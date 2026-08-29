@@ -39,7 +39,7 @@ export function RisksPage({ projectId }: { projectId: string }) {
       <header className="pview-head">
         <h1 className="pview-title">Risks</h1>
         <span className="pview-count">{risks.length}</span>
-        <span className="pview-spacer" />
+        <span className="grow" />
         <span className="pview-note">
           Flagged on a step, and answered by handing that step over.
         </span>
@@ -47,9 +47,9 @@ export function RisksPage({ projectId }: { projectId: string }) {
 
       <div className="pview-body">
         {risks.length === 0 ? (
-          <p className="pview-todo">Nothing is flagged. Every step carrying a risk is done.</p>
+          <p className="mono-note">Nothing is flagged. Every step carrying a risk is done.</p>
         ) : (
-          <table className="ptable pboard">
+          <table className="ptable pboard" data-board>
             <thead>
               <tr>
                 <th className="mid">Activity</th>
@@ -68,7 +68,7 @@ export function RisksPage({ projectId }: { projectId: string }) {
                   <tr key={r.id}>
                     <td className="mid">
                       <Link
-                        className="pref"
+                        className="ref"
                         href={`/p/${projectId}/stage/${r.stageId}/activity`}
                         title={detailActivityTitles[r.act] ?? r.act}
                       >
@@ -79,19 +79,19 @@ export function RisksPage({ projectId }: { projectId: string }) {
                     <th scope="row" className="pwrap pwrapcol">
                       {r.title}
                       {replies.length > 0 && (
-                        <ul className="preplies">
+                        <ul className="replies">
                           {replies.map((p) => (
                             <li key={p.id}>
-                              <span className="preply-who">{p.author}</span>
-                              <span className="preply-when">{fmtDate(p.createdAt)}</span>
-                              <span className="preply-text">{p.text}</span>
+                              <span className="post-who">{p.author}</span>
+                              <span className="post-when">{fmtDate(p.createdAt)}</span>
+                              <span className="post-text">{p.text}</span>
                             </li>
                           ))}
                         </ul>
                       )}
                     </th>
                     <td className="mid">
-                      <span className={quiet > 7 ? 'ppill warn' : 'ppill run'}>
+                      <span className={quiet > 7 ? 'pill warn' : 'pill acc'}>
                         {quiet > 7 ? 'Stale' : 'Open'}
                       </span>
                     </td>

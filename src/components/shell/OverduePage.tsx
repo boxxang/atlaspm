@@ -26,7 +26,7 @@ export function OverduePage({ projectId }: { projectId: string }) {
       <header className="pview-head">
         <h1 className="pview-title">Overdue</h1>
         <span className="pview-count">{overdue.length}</span>
-        <span className="pview-spacer" />
+        <span className="grow" />
         <span className="pview-note">
           A step past its date with nothing handed over. Oldest first.
         </span>
@@ -34,9 +34,9 @@ export function OverduePage({ projectId }: { projectId: string }) {
 
       <div className="pview-body">
         {overdue.length === 0 ? (
-          <p className="pview-todo">Nothing is late. Every step past its date has been handed over.</p>
+          <p className="mono-note">Nothing is late. Every step past its date has been handed over.</p>
         ) : (
-          <table className="ptable pboard">
+          <table className="ptable pboard" data-board>
             <thead>
               <tr>
                 <th className="mid">Activity</th>
@@ -53,7 +53,7 @@ export function OverduePage({ projectId }: { projectId: string }) {
                 <tr key={o.id} data-overdue={`${o.act}:${o.stepN}`}>
                   <td className="mid">
                     <Link
-                      className="pref"
+                      className="ref"
                       href={`/p/${projectId}/stage/${o.stageId}/activity`}
                       title={detailActivityTitles[o.act] ?? o.act}
                     >
@@ -65,12 +65,12 @@ export function OverduePage({ projectId }: { projectId: string }) {
                     {o.title}
                   </th>
                   <td className="mid">
-                    <span className="ppill risk">Overdue</span>
+                    <span className="pill risk">Overdue</span>
                   </td>
                   <td className="mid num late">{fmtDate(o.due)}</td>
                   <td className="mid num late">{daysSince(o.due, today)} days</td>
                   <td className="mid">
-                    {o.owner || <span className="pmuted">Unassigned</span>}
+                    {o.owner || <span className="muted">Unassigned</span>}
                   </td>
                 </tr>
               ))}

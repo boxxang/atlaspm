@@ -53,7 +53,7 @@ export function ActivitiesPage({ projectId }: { projectId: string }) {
       </header>
 
       <div className="pview-body">
-        <table className="ptable pboard">
+        <table className="ptable pboard" data-board>
           <thead>
             <tr>
               <th className="mid">Ref</th>
@@ -77,7 +77,7 @@ export function ActivitiesPage({ projectId }: { projectId: string }) {
               {g.rows.map((r) => (
                 <tr key={r.ref} data-activity={r.ref}>
                   <td className="mid">
-                    <Link className="pref" href={`/p/${projectId}/activity/${r.ref}`}>
+                    <Link className="ref" href={`/p/${projectId}/activity/${r.ref}`}>
                       {r.ref}
                     </Link>
                   </td>
@@ -85,15 +85,19 @@ export function ActivitiesPage({ projectId }: { projectId: string }) {
                     {r.title}
                   </th>
                   <td className="mid num">
-                    <span className={r.state.done === r.state.total ? 'pdone all' : 'pdone'}>
+                    <span
+                      className={r.state.done === r.state.total ? 'num done-all' : 'num'}
+                      data-done={`${r.state.done}/${r.state.total}`}
+                      data-all={r.state.done === r.state.total ? '' : undefined}
+                    >
                       {r.state.done}/{r.state.total}
                     </span>
                   </td>
                   <td className="mid num">
-                    {r.late ? <span className="late">{r.late}</span> : <span className="pmuted">—</span>}
+                    {r.late ? <span className="late">{r.late}</span> : <span className="muted">—</span>}
                   </td>
                   <td className="mid num">{r.ends ? fmtDate(r.ends) : '—'}</td>
-                  <td className="prole">{r.role || '—'}</td>
+                  <td className="soft">{r.role || '—'}</td>
                 </tr>
               ))}
             </tbody>

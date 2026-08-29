@@ -29,7 +29,7 @@ export function StageRisksTab({
 
   if (mine.length === 0) {
     return (
-      <p className="pview-todo">
+      <p className="mono-note">
         Nothing flagged on this stage. Flag a risk from the step it is about, on the{' '}
         <Link href={`/p/${projectId}/stage/${stageId}/activity`}>Activity</Link> tab.
       </p>
@@ -37,7 +37,7 @@ export function StageRisksTab({
   }
 
   return (
-    <table className="ptable pboard">
+    <table className="ptable pboard" data-board>
       <thead>
         <tr>
           <th className="mid">Activity</th>
@@ -51,7 +51,7 @@ export function StageRisksTab({
         {mine.map((r) => (
           <tr key={r.id}>
             <td className="mid">
-              <span className="pref">{r.act}</span>
+              <span className="ref">{r.act}</span>
             </td>
             <td className="mid num pnarrow">{r.stepN ?? '—'}</td>
             <th scope="row" className="pwrap pwrapcol">

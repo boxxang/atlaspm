@@ -12,9 +12,9 @@ import { expect, test, SHELL_PATH, writesSettled } from './fixtures';
 const STAGE = `${SHELL_PATH}/stage/physicalDesign/activity`;
 
 const openActivity = async (page: import('./fixtures').Page, ref: string) => {
-  await expect(page.locator('tr.pact').first()).toBeVisible();
+  await expect(page.locator('[data-act]').first()).toBeVisible();
   await page.locator(`[data-act="${ref}"]`).click();
-  await expect(page.locator('.pstepblock')).toBeVisible();
+  await expect(page.locator('[data-stepblock]')).toBeVisible();
 };
 
 /**
@@ -36,7 +36,7 @@ test.describe('the activity table', () => {
   });
 
   test('lists the stage’s activities with what each hands over', async ({ page }) => {
-    const rows = page.locator('tr.pact');
+    const rows = page.locator('[data-act]');
     await expect(rows).toHaveCount(16);
     const pd10 = page.locator('[data-act="PD-10"]');
     await expect(pd10).toContainText('Signal and Power Integrity Iteration');
@@ -47,19 +47,19 @@ test.describe('the activity table', () => {
   });
 
   test('opens an activity in place, and dims the rest of the stage', async ({ page }) => {
-    await expect(page.locator('.pstepblock')).toHaveCount(0);
+    await expect(page.locator('[data-stepblock]')).toHaveCount(0);
     await openActivity(page, 'PD-10');
-    await expect(page.locator('table.pacts')).toHaveClass(/dimmed/);
+    await expect(page.locator('[data-acts]')).toHaveAttribute('data-focused', '');
     await expect(page.locator('[data-act="PD-10"]')).toHaveClass(/open/);
     /* six steps, and the two parallel ones are marked as such */
-    await expect(page.locator('.pstepblock .pstep')).toHaveCount(6);
-    await expect(page.locator('.pstepblock-cap')).toContainText('2 run in parallel');
+    await expect(page.locator('[data-stepblock] [data-step]')).toHaveCount(6);
+    await expect(page.locator('[data-stepblock-cap]')).toContainText('2 run in parallel');
   });
 
   test('a second click closes it again', async ({ page }) => {
     await openActivity(page, 'PD-10');
     await page.locator('[data-act="PD-10"]').click();
-    await expect(page.locator('.pstepblock')).toHaveCount(0);
+    await expect(page.locator('[data-stepblock]')).toHaveCount(0);
   });
 
   test('a step past its date with nothing handed over says Overdue', async ({ page }) => {
@@ -67,7 +67,7 @@ test.describe('the activity table', () => {
     const step1 = page.locator('[data-step="PD-10:1"]');
     await expect(step1).toContainText('Overdue');
     /* and the date it is late against is drawn as late, and is in the past */
-    const late = step1.locator('.num.late');
+    const late = step1.locator('[data-due]');
     await expect(late).toBeVisible();
     expect(asDate(await late.innerText()).getTime()).toBeLessThan(Date.now());
   });
@@ -81,13 +81,13 @@ test.describe('picking a step', () => {
 
   test('selects it and only it', async ({ page }) => {
     await page.locator('[data-step="PD-10:2"]').click();
-    await expect(page.locator('[data-step="PD-10:2"]')).toHaveClass(/picked/);
-    await expect(page.locator('.pstep.picked')).toHaveCount(1);
+    await expect(page.locator('[data-step="PD-10:2"]')).toHaveClass(/stepsel/);
+    await expect(page.locator('.trow.stepsel')).toHaveCount(1);
   });
 
   test('does not close the block it is in', async ({ page }) => {
     await page.locator('[data-step="PD-10:2"]').click();
-    await expect(page.locator('.pstepblock')).toBeVisible();
+    await expect(page.locator('[data-stepblock]')).toBeVisible();
   });
 
   test('fills the rail with everything about it', async ({ page }) => {
@@ -155,7 +155,7 @@ test.describe('changing a step', () => {
     await expect(page.locator('[data-step="PD-10:3"]')).toContainText('Completed');
     /* and ticking a row does not select it — the box is about the step, the
        row is about what the rail shows */
-    await expect(page.locator('[data-step="PD-10:2"]')).toHaveClass(/picked/);
+    await expect(page.locator('[data-step="PD-10:2"]')).toHaveClass(/stepsel/);
   });
 
   test('a moved due date is flagged as edited, and clearing it restores the plan', async ({
@@ -287,10 +287,10 @@ test.describe('handing an output over', () => {
 test.describe('the seeded programme', () => {
   test('has finished the work behind it', async ({ page }) => {
     await page.goto(`${SHELL_PATH}/stage/productDefinition/activity`);
-    await expect(page.locator('tr.pact').first()).toBeVisible();
+    await expect(page.locator('[data-act]').first()).toBeVisible();
     /* Product Definition is the first stage and long closed, so every one of
        its activities is complete. */
-    const rows = page.locator('tr.pact .pdone');
+    const rows = page.locator('[data-act] [data-done]');
     const counts = await rows.allInnerTexts();
     expect(counts.length).toBeGreaterThan(0);
     for (const c of counts) {
@@ -301,23 +301,23 @@ test.describe('the seeded programme', () => {
 
   test('is stuck on a few things, and stuck at the frontier', async ({ page }) => {
     await page.goto(`${SHELL_PATH}/stage/physicalDesign/activity`);
-    await expect(page.locator('tr.pact').first()).toBeVisible();
+    await expect(page.locator('[data-act]').first()).toBeVisible();
     /* an in-flight stage has work still open */
-    const partial = page.locator('tr.pact').filter({ hasNot: page.locator('.pdone.all') });
+    const partial = page.locator('[data-act]').filter({ hasNot: page.locator('[data-all]') });
     expect(await partial.count()).toBeGreaterThan(0);
   });
 
   test('never shows an open step behind a finished one', async ({ page }) => {
     await page.goto(`${SHELL_PATH}/stage/physicalDesign/activity`);
-    await expect(page.locator('tr.pact').first()).toBeVisible();
-    const refs = await page.locator('tr.pact').evaluateAll((rows) =>
+    await expect(page.locator('[data-act]').first()).toBeVisible();
+    const refs = await page.locator('[data-act]').evaluateAll((rows) =>
       rows.map((r) => r.getAttribute('data-act')!),
     );
     for (const ref of refs) {
       await page.locator(`[data-act="${ref}"]`).click();
       const pattern = (
         await page
-          .locator('.pstepblock .pstep input[type="checkbox"]')
+          .locator('[data-stepblock] [data-step] input[type="checkbox"]')
           .evaluateAll((boxes) => boxes.map((b) => ((b as HTMLInputElement).checked ? 'D' : 'o')))
       ).join('');
       expect(pattern, `${ref} runs ${pattern}`).toMatch(/^D*o*$/);

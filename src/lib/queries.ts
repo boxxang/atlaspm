@@ -4,6 +4,7 @@ import { prisma } from './db';
 import { buildProjectState, type ProjectState } from './projectState';
 import { resolveStageDetail } from './stageDetail';
 import { resolveStages } from './stages';
+import { activitySteps } from '@/data/activitySteps';
 
 const ATTACHMENT_META = { id: true, filename: true, mimeType: true, size: true } as const;
 import type {
@@ -85,6 +86,13 @@ export interface ProjectSummary {
    * excludes those rather than counting every risk ever raised.
    */
   openRisks: number;
+  /** Of those, the ones nobody has said anything about in a week. */
+  staleRisks: number;
+  /**
+   * Stages carrying an open risk. The card's schedule strip draws them red, the
+   * same as every other chart in the app — which needs the stage, not the count.
+   */
+  riskyStages: string[];
   items: number;
   /**
    * Every step the program has finished, as `activityRef:stepN`. The card needs
@@ -93,6 +101,11 @@ export interface ProjectSummary {
    */
   doneSteps: string[];
 }
+
+/* Which stage runs which activity — a property of the generated write-ups, not
+   of any one program, so it is built once. */
+const stageOfActivity: Record<string, string> = {};
+for (const [ref, a] of Object.entries(activitySteps)) stageOfActivity[ref] = a.st;
 
 export async function getProjectSummaries(): Promise<ProjectSummary[]> {
   const [projects, dlv, risks, items, doneSteps] = await Promise.all([
@@ -112,7 +125,13 @@ export async function getProjectSummaries(): Promise<ProjectSummary[]> {
        back and the filtering happens where the rule lives. */
     prisma.post.findMany({
       where: { kind: 'risk', activityRef: { not: null } },
-      select: { projectId: true, activityRef: true, stepN: true },
+      select: {
+        projectId: true,
+        activityRef: true,
+        stepN: true,
+        createdAt: true,
+        editedAt: true,
+      },
     }),
     prisma.item.groupBy({ by: ['projectId'], _count: true }),
     prisma.stepState.findMany({
@@ -138,6 +157,12 @@ export async function getProjectSummaries(): Promise<ProjectSummary[]> {
         .filter((x) => x.projectId === p.id)
         .map((x) => `${x.activityRef}:${x.stepN}`),
     );
+    /* A risk on a step that has been handed over has been answered. Same rule
+       as everywhere else, applied here so a card and the program inside it
+       cannot show two different numbers for the same word. */
+    const open = risks.filter(
+      (r) => r.projectId === p.id && !mineDone.has(`${r.activityRef}:${r.stepN}`),
+    );
     return {
       id: p.id,
       name: p.name,
@@ -160,14 +185,18 @@ export async function getProjectSummaries(): Promise<ProjectSummary[]> {
       edited: p.overrides.length > 0,
       deliverablesDone: mine.filter((d) => d.done).reduce((n, d) => n + d._count, 0),
       deliverablesTotal: mine.reduce((n, d) => n + d._count, 0),
-      /* A risk on a step that has been handed over has been answered. Same rule
-         as everywhere else, applied here so the card and the shell cannot show
-         two different numbers for the same word. */
-      openRisks: risks.filter(
-        (r) =>
-          r.projectId === p.id &&
-          !mineDone.has(`${r.activityRef}:${r.stepN}`),
+      openRisks: open.length,
+      /* "Nobody has answered this in a week" is a fact about the post, not
+         about the viewer's clock — a week is a week in any timezone — so it is
+         counted here rather than shipped to the browser to be counted again. */
+      staleRisks: open.filter(
+        (r) => Date.now() - (r.editedAt ?? r.createdAt).getTime() > 7 * 864e5,
       ).length,
+      riskyStages: [
+        ...new Set(
+          open.map((r) => stageOfActivity[r.activityRef ?? '']).filter((x): x is string => !!x),
+        ),
+      ],
       items: sum(items, p.id),
       doneSteps: [...mineDone],
     };

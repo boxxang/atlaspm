@@ -25,7 +25,10 @@ export function StepPanel({ act, n }: { act: string; n: number }) {
   const contacts = useAppStore((s) => s.contacts);
   const deliverables = useAppStore((s) => s.deliverables);
   const leaders = useAppStore((s) => s.leaders);
-  const clear = useRailStore((s) => s.clear);
+  /* Closing a step goes back to the activity it is in, not to nothing. The rail
+     follows the selection, and the selection above a step is the work it
+     belongs to — emptying the rail loses the reader's place. */
+  const close = () => useRailStore.setState({ selection: { kind: 'activity', act } });
   const outputs = useAppStore((s) => s.stepOutputs)[stepKey(act, n)] ?? [];
   const posts = useAppStore((s) => s.posts);
   const attachToStep = useAppStore((s) => s.attachToStep);
@@ -63,31 +66,34 @@ export function StepPanel({ act, n }: { act: string; n: number }) {
 
   return (
     <>
-      <header className="prail-head">
-        <span className="pref">{a.ref}</span>
-        <h2 className="prail-cap">
+      <div className="peek-hd">
+        <span className="ref">{a.ref}</span>
+        <span className="cap">
           Step {n} of {a.steps.length}
-        </h2>
-        <button type="button" className="prail-x" onClick={clear} aria-label="Close details">
+        </span>
+        <span style={{ flexGrow: 1 }} />
+        <button type="button" className="btn sm" onClick={close} aria-label="Close details">
           ×
         </button>
-      </header>
-
-      <h3 className="prail-title">{step.text}</h3>
-      <p className="prail-sub">
+      </div>
+      <div className="peek-body">
+      <h3 style={{ fontSize: 15, fontWeight: 600, lineHeight: 1.4, margin: '0 0 6px' }}>
+        {step.text}
+      </h3>
+      <p style={{ marginBottom: 14 }}>
         {step.done ? (
-          <span className="ppill ok">Completed</span>
+          <span className="pill ok">Completed</span>
         ) : late ? (
-          <span className="ppill risk">Overdue</span>
+          <span className="pill risk">Overdue</span>
         ) : today >= step.start ? (
-          <span className="ppill run">In progress</span>
+          <span className="pill acc">In progress</span>
         ) : (
-          <span className="ppill">Not started</span>
+          <span className="pill">Not started</span>
         )}
       </p>
 
-      <section className="prail-sec">
-        <div className="prail-seccap">
+      <section className="sec-block">
+        <div className="sec-cap">
           <span>Progress</span>
           <span className="num">{step.pct}%</span>
         </div>
@@ -101,20 +107,20 @@ export function StepPanel({ act, n }: { act: string; n: number }) {
           disabled={step.done}
           onChange={(e) => setStepState(act, n, { pct: Number(e.target.value) })}
         />
-        <p className="prail-hint">
+        <p className="mono-note">
           {step.done
             ? 'A completed step is 100% by definition.'
             : 'Record how far this step has got. 100% marks it Completed, the same as attaching an output.'}
         </p>
       </section>
 
-      <section className="prail-sec">
-        <div className="prail-seccap">
+      <section className="sec-block">
+        <div className="sec-cap">
           <span>Outputs</span>
           <span className="num">{outputs.length}</span>
           <button
             type="button"
-            className="pbtn tiny"
+            className="btn sm"
             onClick={() => file.current?.click()}
           >
             + Attach
@@ -135,20 +141,20 @@ export function StepPanel({ act, n }: { act: string; n: number }) {
           }}
         />
         {outputs.length === 0 ? (
-          <p className="prail-hint">
+          <p className="mono-note">
             Nothing handed over yet. Attaching an output marks the step Completed.
           </p>
         ) : (
-          <ul className="prail-atts">
+          <ul className="attlist">
             {outputs.map((o) => (
               <li key={o.id}>
                 <a href={attachmentUrl(o.id)} target="_blank" rel="noreferrer">
                   {o.filename}
                 </a>
-                <span className="prail-hint">{formatBytes(o.size)}</span>
+                <span className="mono-note">{formatBytes(o.size)}</span>
                 <button
                   type="button"
-                  className="prail-x"
+                  className="btn sm"
                   aria-label={`Remove ${o.filename}`}
                   onClick={() => detachFromStep(act, n, o.id)}
                 >
@@ -159,31 +165,31 @@ export function StepPanel({ act, n }: { act: string; n: number }) {
           </ul>
         )}
         {problems.map((p) => (
-          <p className="prail-hint late" key={p}>
+          <p className="mono-note late" key={p}>
             {p}
           </p>
         ))}
       </section>
 
       {handsOver.length > 0 && (
-        <section className="prail-sec">
-          <div className="prail-seccap">
+        <section className="sec-block">
+          <div className="sec-cap">
             <span>Hands over</span>
             <span className="num">
               {handsOver.filter((h) => h.row?.done).length}/{handsOver.length}
             </span>
           </div>
-          <ul className="prail-list">
+          <ul className="attlist">
             {handsOver.map((h) => (
               <li key={h.ref}>
-                <span className="pref soft">{h.ref}</span>
-                <span className="prail-listtitle">{h.title}</span>
+                <span className="ref">{h.ref}</span>
+                <span className="listtitle">{h.title}</span>
                 {h.row?.due && (
                   <span
                     className={
                       /* A key deliverable past its date with nothing handed over
                          is Delayed, and the date is where you see it. */
-                      !h.row.done && h.row.due < today ? 'prail-hint late' : 'prail-hint'
+                      !h.row.done && h.row.due < today ? 'mono-note late' : 'mono-note'
                     }
                   >
                     due {fmtDate(h.row.due)}
@@ -196,7 +202,7 @@ export function StepPanel({ act, n }: { act: string; n: number }) {
         </section>
       )}
 
-      <dl className="prail-facts">
+      <dl className="props">
         <dt>Activity</dt>
         <dd>{detailActivityTitles[act] ?? act}</dd>
 
@@ -234,8 +240,8 @@ export function StepPanel({ act, n }: { act: string; n: number }) {
               })
             }
           />
-          {step.dueSet && <span className="prail-flag">edited</span>}
-          {late && <span className="ppill risk">overdue</span>}
+          {step.dueSet && <span className="pill">edited</span>}
+          {late && <span className="pill risk" style={{ fontSize: 10.5 }}>overdue</span>}
         </dd>
 
         <dt>Completed</dt>
@@ -262,8 +268,8 @@ export function StepPanel({ act, n }: { act: string; n: number }) {
         </dd>
       </dl>
 
-      <section className="prail-sec">
-        <div className="prail-seccap">
+      <section className="sec-block">
+        <div className="sec-cap">
           <span>Updates on this step</span>
           <span className="num">{onThisStep.length}</span>
         </div>
@@ -276,10 +282,11 @@ export function StepPanel({ act, n }: { act: string; n: number }) {
         />
       </section>
 
-      <footer className="prail-foot">
+      </div>
+      <div className="peek-foot">
         <button
           type="button"
-          className="pbtn primary"
+          className="btn pri"
           onClick={() =>
             setStepState(act, n, {
               done: !step.done,
@@ -290,7 +297,7 @@ export function StepPanel({ act, n }: { act: string; n: number }) {
         >
           {step.done ? 'Reopen step' : 'Mark complete'}
         </button>
-      </footer>
+      </div>
     </>
   );
 }

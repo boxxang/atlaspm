@@ -155,10 +155,10 @@ function NeedsYouToday({ projectId }: { projectId: string }) {
         </span>
       </header>
       {rows.length === 0 ? (
-        <p className="pview-todo">Nothing is late, close, or unanswered.</p>
+        <p className="mono-note">Nothing is late, close, or unanswered.</p>
       ) : (
         <div className="pattn-scroll">
-          <table className="ptable pboard pattn">
+          <table className="ptable pboard pattn" data-board>
             <thead>
               <tr>
                 <th className="mid">Status</th>
@@ -173,7 +173,7 @@ function NeedsYouToday({ projectId }: { projectId: string }) {
               {rows.map((r) => (
                 <tr key={r.key} data-attn={r.key} onClick={() => open(r)} className="pattn-row">
                   <td className="mid">
-                    <span className={`ppill ${r.tag === 'Overdue' ? 'risk' : 'warn'}`}>{r.tag}</span>
+                    <span className={`pill ${r.tag === 'Overdue' ? 'risk' : 'warn'}`}>{r.tag}</span>
                   </td>
                   <td className="mid prole">{r.type}</td>
                   <th scope="row" className="pwrap pwrapcol">
@@ -181,10 +181,10 @@ function NeedsYouToday({ projectId }: { projectId: string }) {
                   </th>
                   <td className={r.tag === 'Overdue' ? 'mid late' : 'mid prole'}>{r.why}</td>
                   <td className="mid">
-                    {r.ref ? <span className="pref">{r.ref}</span> : <span className="pmuted">—</span>}
+                    {r.ref ? <span className="ref">{r.ref}</span> : <span className="muted">—</span>}
                   </td>
                   <td className="mid">
-                    {r.owner || <span className="pmuted">Unassigned</span>}
+                    {r.owner || <span className="muted">Unassigned</span>}
                   </td>
                 </tr>
               ))}

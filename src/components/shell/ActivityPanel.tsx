@@ -18,7 +18,9 @@ import { useActivitySteps } from './useStageSteps';
 export function ActivityPanel({ act, projectId }: { act: string; projectId: string }) {
   const a = useActivitySteps(act);
   const deliverables = useAppStore((s) => s.deliverables);
-  const clear = useRailStore((s) => s.clear);
+  /* And closing an activity goes back to the stage that runs it. */
+  const close = () =>
+    useRailStore.setState({ selection: { kind: 'stage', stageId: a?.activity.stageId ?? '' } });
 
   if (!a) return null;
 
@@ -36,17 +38,17 @@ export function ActivityPanel({ act, projectId }: { act: string; projectId: stri
 
   return (
     <>
-      <header className="prail-head">
-        <span className="pref">{a.ref}</span>
-        <h2 className="prail-cap">Activity</h2>
-        <button type="button" className="prail-x" onClick={clear} aria-label="Close details">
+      <header className="peek-hd">
+        <span className="ref">{a.ref}</span>
+        <h2 className="cap">Activity</h2>
+        <button type="button" className="btn sm" onClick={close} aria-label="Close details">
           ×
         </button>
       </header>
 
-      <h3 className="prail-title">{detailActivityTitles[act] ?? act}</h3>
+      <h3 className="peek-title">{detailActivityTitles[act] ?? act}</h3>
 
-      <dl className="prail-facts">
+      <dl className="props">
         <dt>On step</dt>
         <dd>
           {a.state.done} of {a.state.total}
@@ -62,17 +64,17 @@ export function ActivityPanel({ act, projectId }: { act: string; projectId: stri
       </dl>
 
       {handsOver.length > 0 && (
-        <section className="prail-sec">
-          <div className="prail-seccap">
+        <section className="sec-block">
+          <div className="sec-cap">
             <span>Key deliverables</span>
             <span className="num">{handsOver.filter((h) => h.row?.done).length}/{handsOver.length}</span>
           </div>
-          <ul className="prail-list">
+          <ul className="attlist">
             {handsOver.map((h) => (
               <li key={h.ref}>
-                <span className="pref soft">{h.ref}</span>
-                <span className="prail-listtitle">{h.title}</span>
-                <span className="prail-hint">
+                <span className="ref">{h.ref}</span>
+                <span className="listtitle">{h.title}</span>
+                <span className="mono-note">
                   {a.ref} {h.how} it
                   {h.row?.due ? ` · due ${fmtDate(h.row.due)}` : ''}
                 </span>

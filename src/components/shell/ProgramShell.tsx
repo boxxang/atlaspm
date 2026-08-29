@@ -9,11 +9,13 @@ import { LeftNav } from './LeftNav';
 import { Rail } from './Rail';
 
 /**
- * The shell the prototype runs in: a nav on the left, one view at a time in the
- * middle, and a rail on the right that follows whatever is selected.
+ * The shell, laid out the way the prototype lays it out: a nav down the left, a
+ * header strip, the view, and a rail on the right that follows the selection.
  *
- * The V1 program page put every stage in one long scroll under a toolbar. This
- * replaced it.
+ * The ids are the prototype's — #app, #side, #main, #view, #peek — because its
+ * stylesheet is ported verbatim and addresses them. Following its markup rather
+ * than deriving one is the point of this pass: an approximation is how you end
+ * up with a screen that is nearly the mockup.
  *
  * Hydration waits for mount because "today" has to come from the viewer's
  * clock, not the server's — TODAY markers and overdue counts would otherwise be
@@ -34,9 +36,9 @@ export function ProgramShell({
     hydrate(initial);
   }, [hydrate, initial]);
 
-  /* The rail clears on navigation. A step picked on one stage has nothing to
-     say on the next screen, and a rail still showing it would be claiming a
-     selection that is no longer on the page. */
+  /* The rail clears on navigation. A step picked on one screen has nothing to
+     say on the next, and a rail still showing it would be claiming a selection
+     that is no longer on the page. A view that wants one sets it from the URL. */
   useEffect(() => {
     useRailStore.getState().clear();
   }, [pathname]);
@@ -44,10 +46,16 @@ export function ProgramShell({
   if (!hydrated) return null;
 
   return (
-    <div className="pshell">
+    <div id="app">
       <LeftNav projectId={initial.projectId} />
-      <main className="pview">{children}</main>
-      <Rail projectId={initial.projectId} />
+      <div id="main">
+        <div className="body">
+          <div className="scroll" id="view">
+            {children}
+          </div>
+          <Rail projectId={initial.projectId} />
+        </div>
+      </div>
     </div>
   );
 }

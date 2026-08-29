@@ -43,11 +43,11 @@ export function DeliverablesTab({ stageId }: { stageId: string }) {
   };
 
   if (deliverables.length === 0) {
-    return <p className="pview-todo">This stage has no key deliverables.</p>;
+    return <p className="mono-note">This stage has no key deliverables.</p>;
   }
 
   return (
-    <table className="ptable pboard">
+    <table className="ptable pboard" data-board>
       <thead>
         <tr>
           <th className="pwrapcol">Key deliverable</th>
@@ -91,7 +91,7 @@ export function DeliverablesTab({ stageId }: { stageId: string }) {
                 )}
               </th>
               <td className="mid">
-                <span className={`ppill ${pillTone(status.kind)}`}>{status.label}</span>
+                <span className={`pill ${pillTone(status.kind)}`}>{status.label}</span>
               </td>
               <td className={status.kind === 'late' ? 'mid num late' : 'mid num'}>
                 {d.due ? fmtDate(d.due) : '—'}

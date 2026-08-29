@@ -52,7 +52,7 @@ export function PostThread({
       .sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime());
 
   return (
-    <div className="pthread">
+    <div className="thread">
       <Composer
         placeholder={placeholder}
         allowRisk={allowRisk}
@@ -69,13 +69,13 @@ export function PostThread({
       />
 
       {tops.length === 0 ? (
-        <p className="prail-hint">{emptyText}</p>
+        <p className="mono-note">{emptyText}</p>
       ) : (
-        <ul className="pposts">
+        <ul className="posts">
           {tops.map((p) => (
             <li key={p.id}>
               <Post post={p} />
-              <ul className="preplies">
+              <ul className="replies">
                 {repliesTo(p.id).map((r) => (
                   <li key={r.id}>
                     <Post post={r} />
@@ -105,12 +105,12 @@ function Post({ post }: { post: ProgramPost }) {
 
   if (editing) {
     return (
-      <div className="ppost editing">
+      <div className="post editing">
         <textarea value={draft} onChange={(e) => setDraft(e.target.value)} rows={3} aria-label="Edit post" />
-        <div className="ppost-acts">
+        <div className="post-acts">
           <button
             type="button"
-            className="pbtn tiny"
+            className="btn sm"
             disabled={!draft.trim()}
             onClick={() => {
               editPost(post.id, draft.trim());
@@ -121,7 +121,7 @@ function Post({ post }: { post: ProgramPost }) {
           </button>
           <button
             type="button"
-            className="pbtn tiny"
+            className="btn sm"
             onClick={() => {
               setDraft(post.text);
               setEditing(false);
@@ -135,29 +135,29 @@ function Post({ post }: { post: ProgramPost }) {
   }
 
   return (
-    <div className="ppost" data-post={post.id}>
-      <div className="ppost-head">
-        {post.kind === 'risk' && <span className="ppill risk">Risk</span>}
-        <span className="ppost-who">{post.author}</span>
-        <span className="ppost-when">{fmtDT(post.createdAt)}</span>
-        {post.editedAt && <span className="ppost-when">· edited</span>}
-        <span className="pview-spacer" />
-        <button type="button" className="ppost-act" onClick={() => setEditing(true)}>
+    <div className="post" data-post={post.id}>
+      <div className="post-head">
+        {post.kind === 'risk' && <span className="pill risk">Risk</span>}
+        <span className="post-who">{post.author}</span>
+        <span className="post-when">{fmtDT(post.createdAt)}</span>
+        {post.editedAt && <span className="post-when">· edited</span>}
+        <span className="grow" />
+        <button type="button" className="post-act" onClick={() => setEditing(true)}>
           Edit
         </button>
-        <button type="button" className="ppost-act" onClick={() => deletePost(post.id)}>
+        <button type="button" className="post-act" onClick={() => deletePost(post.id)}>
           Delete
         </button>
       </div>
-      <p className="ppost-text">{post.text}</p>
+      <p className="post-text">{post.text}</p>
       {post.attachments.length > 0 && (
-        <ul className="prail-atts">
+        <ul className="attlist">
           {post.attachments.map((a) => (
             <li key={a.id}>
               <a href={attachmentUrl(a.id)} target="_blank" rel="noreferrer">
                 {a.filename}
               </a>
-              <span className="prail-hint">{formatBytes(a.size)}</span>
+              <span className="mono-note">{formatBytes(a.size)}</span>
             </li>
           ))}
         </ul>
@@ -188,7 +188,7 @@ function Composer({
   };
 
   return (
-    <div className={small ? 'pcomposer small' : 'pcomposer'}>
+    <div className={small ? 'composer small' : 'composer'}>
       <textarea
         value={text}
         placeholder={placeholder}
@@ -196,14 +196,14 @@ function Composer({
         rows={small ? 1 : 2}
         onChange={(e) => setText(e.target.value)}
       />
-      <div className="pcomposer-acts">
+      <div className="composer-acts">
         {allowRisk && (
-          <label className="pcomposer-risk">
+          <label className="composer-risk">
             <input type="checkbox" checked={risk} onChange={(e) => setRisk(e.target.checked)} />
             risk
           </label>
         )}
-        <button type="button" className="pbtn tiny" disabled={!text.trim()} onClick={post}>
+        <button type="button" className="btn sm" disabled={!text.trim()} onClick={post}>
           Post
         </button>
       </div>

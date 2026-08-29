@@ -31,14 +31,14 @@ export function ProgramDeliverables({ projectId }: { projectId: string }) {
         <span className="pview-count">
           {done}/{all.length}
         </span>
-        <span className="pview-spacer" />
+        <span className="grow" />
         <span className="pview-note">
           Completed by a handover — a body, an artefact and the date it was accepted.
         </span>
       </header>
 
       <div className="pview-body">
-        <table className="ptable pboard">
+        <table className="ptable pboard" data-board>
           <thead>
             <tr>
               <th className="pwrapcol">Key deliverable</th>
@@ -80,7 +80,7 @@ export function ProgramDeliverables({ projectId }: { projectId: string }) {
                       </th>
                       <td className="mid">
                         <span
-                          className={`ppill ${
+                          className={`pill ${
                             status.kind === 'done'
                               ? 'ok'
                               : status.kind === 'late'
