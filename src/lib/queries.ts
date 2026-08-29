@@ -24,7 +24,8 @@ export async function getProjectState(projectId: string): Promise<ProjectState |
       /* metadata only — the bytes are streamed by /api/attachments/[id] */
       items: {
         include: {
-          updates: { include: { attachments: { select: ATTACHMENT_META } } },
+          /* posts on a board item — what V1 called status updates */
+          posts: { include: { attachments: { select: ATTACHMENT_META } } },
           attachments: { select: ATTACHMENT_META },
         },
       },

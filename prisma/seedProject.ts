@@ -99,6 +99,9 @@ export async function seedProject(prisma: PrismaClient, now = new Date()): Promi
       seed.content[stageId][kind].flatMap((it) =>
         it.updates.map((u) => ({
           id: u.id,
+          projectId: PROJECT_ID,
+          kind: 'update',
+          author: it.owner,
           itemId: it.id,
           text: u.text,
           createdAt: u.date,
@@ -107,7 +110,7 @@ export async function seedProject(prisma: PrismaClient, now = new Date()): Promi
     ),
   );
   await prisma.item.createMany({ data: items });
-  await prisma.statusUpdate.createMany({ data: updates });
+  await prisma.post.createMany({ data: updates });
 
   return {
     stages: journeyData.length,

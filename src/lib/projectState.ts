@@ -77,7 +77,7 @@ interface ItemRow {
   done: boolean;
   updatedAt: Date;
   deliverableId?: string | null;
-  updates: {
+  posts: {
     id: string;
     text: string;
     createdAt: Date;
@@ -187,7 +187,9 @@ export function buildProjectState(project: {
       /* DB column is updatedAt (CLAUDE.md); the UI type calls it updated */
       updated: row.updatedAt,
       attachments: row.attachments ?? [],
-      updates: row.updates
+      /* the row calls them posts, because a post on an item is one of four things
+         a post can be; the UI type still calls this list updates */
+      updates: row.posts
         .map((u) => ({
           id: u.id,
           text: u.text,

@@ -84,6 +84,8 @@ model Project {
   leaders      Leader[]
   contacts     Contact[]
   stageDetails StageDetail[]
+  posts        Post[]
+  stepStates   StepState[]
 }
 
 /// The ONLY schedule mutation surface — baseline profiles are immutable code.
@@ -120,7 +122,7 @@ model Item {
   deliverableId String?
 
   project     Project        @relation(fields: [projectId], references: [id], onDelete: Cascade)
-  updates     StatusUpdate[]
+  posts       Post[]
   attachments Attachment[]
   deliverable Deliverable?   @relation(fields: [deliverableId], references: [id], onDelete: SetNull)
 
@@ -128,19 +130,86 @@ model Item {
   @@index([deliverableId])
 }
 
-model StatusUpdate {
+/// Something somebody wrote, with whatever they attached and the replies under it.
+///
+/// Four surfaces in the app are this one shape — an update posted on a step, a risk
+/// flagged on a step, a note on a stage's key-info board, and the handover that
+/// completes a deliverable — so they are one table rather than four, and one
+/// renderer rather than four. This started life as StatusUpdate, which was the same
+/// row with only one place to hang from.
+///
+/// Exactly one target is set. A reply sets `parentId` and nothing else: it belongs
+/// to its parent, and the parent knows where it is.
+model Post {
   id        String   @id
-  itemId    String
+  projectId String
+  /// update | risk | note | handover | reply
+  kind      String
   text      String
+  author    String
   createdAt DateTime
+  editedAt  DateTime?
 
-  item        Item         @relation(fields: [itemId], references: [id], onDelete: Cascade)
+  /// The V1 target: a post on a board item. Still how the boards work.
+  itemId String?
+  /// A post on one step of one activity. Steps are content, not rows, so they are
+  /// addressed by the reference the write-up uses — "PD-10" — and the step number.
+  activityRef String?
+  stepN       Int?
+  /// The handover that completes a deliverable.
+  deliverableId String?
+  /// A reply. Replies do not nest: a reply's parent is always a top-level post.
+  parentId String?
+
+  /// Set on a handover: the day the deliverable was accepted. A handover without
+  /// one is a record of what was sent, not a claim that it is finished.
+  doneAt DateTime?
+
+  project     Project      @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  item        Item?        @relation(fields: [itemId], references: [id], onDelete: Cascade)
+  deliverable Deliverable? @relation(fields: [deliverableId], references: [id], onDelete: Cascade)
+  parent      Post?        @relation("PostReplies", fields: [parentId], references: [id], onDelete: Cascade)
+  replies     Post[]       @relation("PostReplies")
   attachments Attachment[]
 
   @@index([itemId])
+  @@index([parentId])
+  @@index([deliverableId])
+  @@index([projectId, kind])
+  @@index([projectId, activityRef, stepN])
 }
 
-/// Files attached to an item or to one of its status updates.
+/// What has happened to one step of one activity.
+///
+/// The steps themselves are content — /data/activityDetails.ts, generated from the
+/// authoring document — so there is no Step table to hang a foreign key on. A row
+/// here is the programme's answer for one of them, and absent means "untouched",
+/// which is why every column is optional or defaulted.
+model StepState {
+  id          String @id
+  projectId   String
+  activityRef String
+  stepN       Int
+
+  done   Boolean   @default(false)
+  /// When it was handed over — stamped by the first output attached to it.
+  doneAt DateTime?
+  /// 0-100, typed by hand. A done step reads 100 whatever this says.
+  pct    Int       @default(0)
+  /// Who is answerable. Empty means unassigned; the template's lead *role* is a
+  /// different thing and does not belong here.
+  owner  String    @default("")
+  /// Overrides the date the schedule computes for this step. Null keeps the
+  /// baseline, so clearing an override is a delete rather than a recalculation.
+  dueOverride DateTime?
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@unique([projectId, activityRef, stepN])
+  @@index([projectId])
+}
+
+/// Files attached to an item, to a post, to a deliverable, or to one step.
 ///
 /// Bytes live in the database rather than on disk: the deploy target is
 /// Vercel, whose filesystem is read-only and whose instances do not outlive a
@@ -148,23 +217,27 @@ model StatusUpdate {
 /// That caps the sensible file size (see MAX_ATTACHMENT_BYTES); moving to object
 /// storage later means replacing `data` with a URL and nothing else.
 model Attachment {
-  id             String   @id
-  itemId         String?
-  statusUpdateId String?
+  id     String  @id
+  itemId String?
+  postId String?
   /// A deliverable's artefact — what makes it a delivered deliverable.
-  deliverableId  String?
+  deliverableId String?
+  /// The output a step hands over. Attaching one is what completes the step, so
+  /// this is evidence rather than decoration.
+  activityRef String?
+  stepN       Int?
   filename       String
   mimeType       String
   size           Int
   data           Bytes
   createdAt      DateTime
 
-  item        Item?         @relation(fields: [itemId], references: [id], onDelete: Cascade)
-  update      StatusUpdate? @relation(fields: [statusUpdateId], references: [id], onDelete: Cascade)
-  deliverable Deliverable?  @relation(fields: [deliverableId], references: [id], onDelete: Cascade)
+  item        Item?        @relation(fields: [itemId], references: [id], onDelete: Cascade)
+  post        Post?        @relation(fields: [postId], references: [id], onDelete: Cascade)
+  deliverable Deliverable? @relation(fields: [deliverableId], references: [id], onDelete: Cascade)
 
   @@index([itemId])
-  @@index([statusUpdateId])
+  @@index([postId])
   @@index([deliverableId])
 }
 
@@ -185,6 +258,7 @@ model Deliverable {
   project     Project      @relation(fields: [projectId], references: [id], onDelete: Cascade)
   attachments Attachment[]
   items       Item[]
+  posts       Post[]
 
   @@index([projectId, stageId])
 }

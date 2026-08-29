@@ -143,7 +143,9 @@ export async function postUpdate(input: {
 }) {
   const { projectId, ...su } = input;
   await prisma.$transaction([
-    prisma.statusUpdate.create({ data: su }),
+    /* kind 'update' is a post on a board item — the same table now holds risks
+       flagged on a step, key-info notes and deliverable handovers */
+    prisma.post.create({ data: { ...su, projectId, kind: 'update', author: '' } }),
     prisma.item.update({ where: { id: su.itemId }, data: { updatedAt: su.createdAt } }),
   ]);
   touch(projectId);
@@ -151,12 +153,12 @@ export async function postUpdate(input: {
 
 /** Editing rewrites the text only — createdAt is the honest post time. */
 export async function editUpdate(projectId: string, id: string, text: string) {
-  await prisma.statusUpdate.update({ where: { id }, data: { text } });
+  await prisma.post.update({ where: { id }, data: { text } });
   touch(projectId);
 }
 
 export async function deleteUpdate(projectId: string, id: string) {
-  await prisma.statusUpdate.delete({ where: { id } });
+  await prisma.post.delete({ where: { id } });
   touch(projectId);
 }
 
@@ -580,10 +582,11 @@ export async function saveStageDetail(
 export async function uploadAttachments(form: FormData): Promise<AttachmentMeta[]> {
   const projectId = String(form.get('projectId') ?? '');
   const itemId = String(form.get('itemId') ?? '') || null;
-  const statusUpdateId = String(form.get('statusUpdateId') ?? '') || null;
+  /* the form still says statusUpdateId; the column it lands in is postId */
+  const postId = String(form.get('statusUpdateId') ?? '') || null;
   const deliverableId = String(form.get('deliverableId') ?? '') || null;
-  if (!itemId && !statusUpdateId && !deliverableId)
-    throw new Error('An attachment needs an item, an update or a deliverable.');
+  if (!itemId && !postId && !deliverableId)
+    throw new Error('An attachment needs an item, a post or a deliverable.');
   await assertProject(projectId);
 
   const ids = form.getAll('ids').map(String);
@@ -604,7 +607,7 @@ export async function uploadAttachments(form: FormData): Promise<AttachmentMeta[
       data: {
         ...meta,
         itemId,
-        statusUpdateId,
+        postId,
         deliverableId,
         data: Buffer.from(await file.arrayBuffer()),
         createdAt: new Date(),

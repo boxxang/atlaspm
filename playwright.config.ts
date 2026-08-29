@@ -26,6 +26,8 @@ export default defineConfig({
     env: { DATABASE_URL: TEST_DATABASE_URL },
     url: baseURL,
     reuseExistingServer: false,
-    timeout: 120_000,
+    /* Cold start is a schema push plus Turbopack's first compile of the
+       route the health check hits, which alone has taken over a minute. */
+    timeout: 300_000,
   },
 });
