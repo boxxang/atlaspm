@@ -1,20 +1,27 @@
 # AtlasPM — Next.js Port
 
 AtlasPM is a semiconductor program-management web app (TPM tool). A fully working
-single-file prototype lives at `reference/index.html` — **it is the spec.** Every
-behavior, layout, and interaction in that file must survive the port unless
-PORTING_PLAN.md says otherwise.
+single-file prototype lives at `design-canvas/atlaspm-prototype.html` — **it is the
+spec.** Every behavior, layout and interaction in it must survive unless
+`PORTING_PLAN_V2.md` says otherwise.
+
+`reference/index.html` was the spec for the original port and the app matches it.
+It is now history: the prototype has gone well past it, and where the two disagree
+the prototype wins. Do not port from `reference/index.html` again.
+
+The prototype is generated. Edit `design-canvas/proto/app.template.html`, then run
+`node design-canvas/proto/build.mjs`, which pours the three JSON payloads into it
+and writes `atlaspm-prototype.html`. Editing the built file is silently lost. To
+open it in a browser, serve the directory — Chrome refuses `file://` for this.
 
 ## Working rules
 
-- Follow `PORTING_PLAN.md` phase by phase. Do not start a phase before the previous
-  one's acceptance criteria pass. One commit (or a few) per phase, message
-  `phase-N: <summary>`.
-- Before writing code in any phase, read the relevant section of
-  `reference/index.html`. The prototype already contains the intended module
-  boundaries as comment banners: `/data/scheduleProfiles.ts`, `/data/journey.ts`,
-  `/data/projectSeed.ts`, `/components/stageViz.ts`, `/lib/scheduleCalculator.ts`.
-  Extract them 1:1 first; refactor only after tests pass.
+- Follow `PORTING_PLAN_V2.md` phase by phase. Do not start a phase before the
+  previous one's acceptance criteria pass. One commit (or a few) per phase.
+  `PORTING_PLAN.md` covers the original port and is finished; keep it for history.
+- Before writing code in any phase, open the prototype and use the screen you are
+  about to change. It is the only place the intended behaviour is complete, and
+  reading its source is not the same as watching what it does.
 - Pure logic (schedule calculator, date-edit ripple, progress/overdue derivations)
   gets unit tests BEFORE the UI that uses it.
 - Never put schedule assumptions, seed content, or date math inside components.
@@ -69,12 +76,32 @@ Which stages exist is a property of a program's profile, never of the code:
 order. Components read `useAppStore(s => s.stages)`; `journeyData` is content
 that stages inherit, not the list of them.
 
+## What the prototype changed (and the app does not have yet)
+
+Most of these redefine things the app already stores, so they are not additive:
+
+- **Steps carry state.** An activity's steps are static content today
+  (`/data/activityDetails.ts`, generated, server-only). The prototype gives each
+  step a done flag, a percent, an owner, a due date, a completion date, attached
+  outputs and a post thread. None of that has a table.
+- **A risk is a flag on a step**, not an `Item(kind:"risk")`. The sidebar count,
+  the overview, the timeline colours and the bottleneck rows all read this, so it
+  is decided before any screen that shows it.
+- **Overdue is a step past its due date**, not an item past its target date.
+- **A deliverable is completed by a handover** — a post with a body, at least one
+  attachment and a completion date — not by ticking a box. `Attachment.deliverableId`
+  already anticipates this.
+- Key info is a board of notes with bodies and attachments; posts everywhere take
+  comments; steps, risks, notes and handovers are all "a post with attachments and
+  replies", which is one shape, not four.
+
 ## Derived values (never stored)
 
 Stage dates (kickoff + offsets), milestones (anchored to stage ends), progress %
-(done deliverables / total), overdue count (!done && due < today), risk-red bars
-(stage has ≥1 open risk), TODAY markers. These are computed exactly as in the
-reference — port the formulas, do not reinvent.
+(done deliverables / total), overdue (a step whose due date has passed with nothing
+handed over), risk-red bars (a stage with a live risk flag), TODAY markers. Port the
+formulas from the prototype, do not reinvent — and note that overdue and risk are the
+two the prototype redefined, so the old shapes in the app are wrong, not merely older.
 
 ## Verification habit
 
