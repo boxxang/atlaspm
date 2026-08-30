@@ -1,4 +1,4 @@
-import type { MilestoneDef, ProfileStageDef } from '@/data/types';
+import type { ProfileStageDef } from '@/data/types';
 
 /**
  * Starting a program on a subset of a template's stages.
@@ -31,7 +31,6 @@ export class StageChoiceError extends Error {}
 export function pickStages(
   base: readonly ProfileStageDef[],
   keep: readonly string[],
-  milestoneOf: Readonly<Record<string, MilestoneDef>>,
 ): ProfileStageDef[] {
   const wanted = new Set(keep);
 
@@ -41,13 +40,6 @@ export function pickStages(
   const kept = base.filter((s) => wanted.has(s.key));
   if (!kept.length) throw new StageChoiceError('A program needs at least one stage.');
 
-  for (const s of base) {
-    const ms = milestoneOf[s.key];
-    if (ms?.major && !wanted.has(s.key)) {
-      throw new StageChoiceError(`${s.title} carries ${ms.label} and has to stay.`);
-    }
-  }
-
   const shift = Math.min(...kept.map((s) => s.startOffsetWeeks));
   return kept.map((s, order) => ({
     ...s,
@@ -55,16 +47,6 @@ export function pickStages(
     startOffsetWeeks: s.startOffsetWeeks - shift,
   }));
 }
-
-/**
- * The stages a chooser must leave ticked. Only the three carrying a major
- * checkpoint: locking all fifteen that carry any checkpoint would leave eight
- * stages to choose between, which is not a choice worth offering.
- */
-export const requiredStages = (
-  base: readonly ProfileStageDef[],
-  milestoneOf: Readonly<Record<string, MilestoneDef>>,
-): Set<string> => new Set(base.filter((s) => milestoneOf[s.key]?.major).map((s) => s.key));
 
 /**
  * Where week zero falls when the date somebody typed is not the program's

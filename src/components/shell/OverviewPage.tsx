@@ -30,7 +30,11 @@ export function OverviewPage({ projectId }: { projectId: string }) {
   const allDeliv = Object.values(deliverables).flat();
   const doneDeliv = allDeliv.filter((d) => d.done).length;
   const progress = allDeliv.length ? Math.round((doneDeliv / allDeliv.length) * 100) : 0;
-  const days = Math.round((schedule.tapeout.getTime() - today.getTime()) / 864e5);
+  /* A program that does not run Tapeout has no tapeout date, and the stat says
+     so rather than counting down to the end of whatever its last stage is. */
+  const days = schedule.tapeout
+    ? Math.round((schedule.tapeout.getTime() - today.getTime()) / 864e5)
+    : null;
   const mm = stages.reduce((n, s) => n + s.engineeringEffort.reduce((a, e) => a + e, 0), 0);
 
   const spans = stages.map((s) => schedule.stages[s.id]).filter(Boolean);
@@ -62,8 +66,8 @@ export function OverviewPage({ projectId }: { projectId: string }) {
           <Stat k="Progress" v={`${progress}%`} s={`${doneDeliv} of ${allDeliv.length} deliverables`} />
           <Stat
             k="Tapeout"
-            v={days >= 0 ? `D−${days}` : `D+${Math.abs(days)}`}
-            s={fmtDate(schedule.tapeout)}
+            v={days === null ? 'None' : days >= 0 ? `D−${days}` : `D+${Math.abs(days)}`}
+            s={schedule.tapeout ? fmtDate(schedule.tapeout) : 'no tapeout on this program'}
           />
           <Stat k="Open risks" v={String(risks.length)} s={`across ${riskStages} stages`} tone />
           <Stat k="Overdue" v={String(overdue.length)} s="past target date" tone={overdue.length > 0} />

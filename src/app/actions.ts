@@ -595,7 +595,7 @@ export async function createProject(input: {
   let profile = template;
 
   if (input.stageKeys && input.stageKeys.length !== template.stages.length) {
-    const stages = pickStages(template.stages, input.stageKeys, stageMilestone);
+    const stages = pickStages(template.stages, input.stageKeys);
     profileId = `${input.id}:stages`;
     await prisma.profile.create({
       data: {

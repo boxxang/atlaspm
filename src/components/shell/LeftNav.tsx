@@ -2,7 +2,6 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { writtenActivities } from '@/data/activityIndex';
 import { RISK_AUTHOR } from '@/data/riskSeeds';
 import { useAppStore } from '@/store/useAppStore';
 import {
@@ -49,7 +48,8 @@ export function LeftNav({ projectId }: { projectId: string }) {
   const posts = useAppStore((s) => s.posts);
   const leaders = useAppStore((s) => s.leaders);
   const today = useAppStore((s) => s.today);
-  const { overdue, risks } = useProgramWork();
+  const work = useProgramWork();
+  const { overdue, risks } = work;
   const pathname = usePathname();
 
   const base = `/p/${projectId}`;
@@ -167,7 +167,9 @@ export function LeftNav({ projectId }: { projectId: string }) {
         href={`${base}/activities`}
         label="Activities"
         icon={<IconActivities />}
-        extra={<span className="c">{writtenActivities.length}</span>}
+        /* The activities on this program's stages, not every one the app has
+           a write-up for: a program running three stages does not have 257. */
+        extra={<span className="c">{new Set(work.steps.map((s) => s.act)).size}</span>}
       />
       <NavItem
         here={pathname}

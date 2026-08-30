@@ -243,19 +243,57 @@ test.describe('the program list', () => {
       await expect(page.locator('[data-new-program]')).toContainText('23 of 23');
     });
 
-    /* The three the countdowns read cannot be dropped; everything else can.
-       They are disabled, so the click never lands rather than being undone. */
-    test('locks the stages the checkpoints hang off, and only those', async ({ page }) => {
+    /* Any stage can go, including the three the countdowns read. A program
+       that does not tape out is a real program — a derivative doing only the
+       package work, a study that stops at signoff — and the screens say so. */
+    test('every stage can be unticked, including the checkpoint ones', async ({ page }) => {
       await pick(page);
-      await expect(page.locator('[data-pick][aria-disabled="true"]')).toHaveCount(3);
-      for (const key of ['tapeout', 'fabrication', 'qualification']) {
-        await expect(page.locator(`[data-pick="${key}"]`)).toHaveAttribute('aria-disabled', 'true');
+      await expect(page.locator('[data-pick][aria-disabled="true"]')).toHaveCount(0);
+
+      await page.locator('[data-pick-all]').click();
+      await expect(page.locator('[data-pick][data-on]')).toHaveCount(0);
+      await expect(page.locator('[data-new-program]')).toContainText('0 of 23');
+
+      /* and Create refuses a program with nothing in it */
+      await page.locator('.pf-name').fill('Empty');
+      await page.locator('[data-create]').click();
+      await expect(page.locator('[data-new-program] .err')).toContainText('at least one stage');
+    });
+
+    test('a program without Tapeout says No tapeout wherever a date would go', async ({ page }) => {
+      await pick(page);
+      await page.locator('.pf-name').fill('PackageOnly');
+      await page.locator('.pf-kickoff').fill('2027-03-01');
+      await page.locator('[data-pick-all]').click();
+      for (const key of ['packageDesign', 'packageTestVehicle', 'packaging']) {
+        await page.locator(`[data-pick="${key}"]`).click();
       }
-      /* one that carries a lesser checkpoint is not locked */
-      const testChip = page.locator('[data-pick="testChip"]');
-      await expect(testChip).not.toHaveAttribute('aria-disabled', 'true');
-      await testChip.click();
-      await expect(testChip).not.toHaveAttribute('data-on', '');
+      await expect(page.locator('[data-new-program]')).toContainText('3 of 23');
+      await page.locator('[data-create]').click();
+      await page.waitForURL(/\/p\/packageonly-[^/]*\/overview$/);
+
+      /* the Overview's top stat */
+      const tapeoutStat = page.locator('.card').first();
+      await expect(tapeoutStat).toContainText('no tapeout on this program');
+
+      /* and the counts are this program's, not the template's */
+      const nav = page.getByRole('navigation', { name: 'Program' });
+      await expect(nav.getByRole('link', { name: /^Stages/ })).toContainText('3');
+      await expect(nav.getByRole('link', { name: /^Activities/ })).not.toContainText('257');
+      await page.getByRole('link', { name: /^Activities/ }).click();
+      await expect(page.locator('.hd')).toContainText('across 3 stages');
+
+      /* the list's column, and the preview rail's countdown, which shows the
+         checkpoints of the stages this program does run */
+      await page.goto('/');
+      const row = page.locator('[data-program]').filter({ hasText: 'PackageOnly' });
+      await expect(row.locator('[data-tapeout]')).toHaveText('No tapeout');
+
+      await row.click({ position: { x: 5, y: 5 }, trial: true });
+      await row.hover();
+      const peek = page.getByRole('complementary', { name: 'Program preview' });
+      await expect(peek).toContainText('Package Design Freeze');
+      await expect(peek).not.toContainText('Tapeout (BEOL MTO)');
     });
 
     test('starts the program on what was left ticked', async ({ page }) => {

@@ -153,8 +153,12 @@ describe('scheduling a profile that is not the built-in one', () => {
     /* every built-in stage carries a checkpoint, so the one kept brings its
        own — and the added stage, which is nobody's baseline, brings none */
     expect(s.milestones.map((m) => m.id)).toEqual(['programGoNoGo']);
-    // and the three toolbar dates fall back to where the program actually ends
-    expect(fmtDate(s.production)).toBe('07/21/2027');
+    /* and the three dates the countdowns read are simply absent, because this
+       program runs none of the stages that carry them. Nothing stands in: the
+       end of its last stage is not a production date. */
+    expect(s.tapeout).toBeNull();
+    expect(s.firstSilicon).toBeNull();
+    expect(s.production).toBeNull();
   });
 
   it('keeps the milestones whose stages survive', () => {
@@ -167,6 +171,6 @@ describe('scheduling a profile that is not the built-in one', () => {
     const s = computeSchedule(KICKOFF, profile, {});
     expect(s.milestones.map((m) => m.id)).toEqual(['archFreeze', 'tapeoutBeolMto']);
     expect(milestoneDefs.length).toBeGreaterThan(s.milestones.length);
-    expect(fmtDate(s.tapeout)).toBe(fmtDate(s.stages.tapeout.end));
+    expect(fmtDate(s.tapeout!)).toBe(fmtDate(s.stages.tapeout.end));
   });
 });

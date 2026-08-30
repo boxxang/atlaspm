@@ -66,9 +66,9 @@ describe('(a) baseline schedule for kickoff 05/12/2027', () => {
   });
 
   it('exposes the three toolbar dates and the program length', () => {
-    expect(fmtDate(s.tapeout)).toBe('01/03/2029');
-    expect(fmtDate(s.firstSilicon)).toBe('03/28/2029');
-    expect(fmtDate(s.production)).toBe('11/21/2029');
+    expect(fmtDate(s.tapeout!)).toBe('01/03/2029');
+    expect(fmtDate(s.firstSilicon!)).toBe('03/28/2029');
+    expect(fmtDate(s.production!)).toBe('11/21/2029');
     expect(s.totalWeeks).toBe(132);
   });
 
@@ -140,7 +140,7 @@ describe('(b) DV end edit ripples downstream', () => {
     const delta =
       (s.stages.tapeout.end.getTime() - base.stages.tapeout.end.getTime()) / 864e5;
     expect(Math.round(delta)).toBe(28);
-    expect(fmtDate(s.tapeout)).toBe('01/31/2029');
+    expect(fmtDate(s.tapeout!)).toBe('01/31/2029');
   });
 
   it('shifts every later stage by the same 28 days, and no earlier one', () => {

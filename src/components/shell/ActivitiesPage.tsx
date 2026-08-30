@@ -41,9 +41,12 @@ function Count() {
 
 function Steps() {
   const { steps } = useProgramWork();
+  /* This program's stages, not the template's twenty-three — a program can be
+     started on fewer, and the line would be counting a chart nobody is on. */
+  const n = useAppStore((s) => s.stages).length;
   return (
     <span style={{ fontSize: 12, color: 'var(--ink-3)' }}>
-      {steps.length.toLocaleString()} steps across 23 stages
+      {steps.length.toLocaleString()} steps across {n} stage{n === 1 ? '' : 's'}
     </span>
   );
 }

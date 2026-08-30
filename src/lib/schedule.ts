@@ -73,9 +73,15 @@ export interface Schedule {
   stages: Record<StageId, StageSchedule>;
   totalWeeks: number;
   milestones: Milestone[];
-  tapeout: Date;
-  firstSilicon: Date;
-  production: Date;
+  /**
+   * The three dates the countdowns read. Null when the program does not run
+   * the stage that carries one — a program can be started without them, and a
+   * screen that showed the end of the last stage under the word "Tapeout"
+   * would be printing a number that is not the thing it is labelled.
+   */
+  tapeout: Date | null;
+  firstSilicon: Date | null;
+  production: Date | null;
 }
 
 export function computeSchedule(
@@ -109,13 +115,10 @@ export function computeSchedule(
       return { ...m, week, date: m.anchor.at === 'end' ? s.end : s.start };
     });
 
-  /* The toolbar's three dates are milestone dates. Deleting a stage that
-     carries one is blocked in the editor, so the fallback is only reached by a
-     profile built without it — then the program simply ends when it ends. */
-  const lastEnd = profile.stages.length
-    ? new Date(Math.max(...profile.stages.map((st) => stages[st.key].end.getTime())))
-    : new Date(kickoff);
-  const endOf = (key: StageId) => stages[key]?.end ?? lastEnd;
+  /* The three dates are milestone dates, and nothing stands in for them. A
+     program that does not run Fabrication has no First Silicon; saying so is
+     the only honest answer, and it is one the screens can draw. */
+  const endOf = (key: StageId) => stages[key]?.end ?? null;
 
   return {
     stages,

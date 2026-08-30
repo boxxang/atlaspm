@@ -13,7 +13,8 @@ export interface ListRow {
   id: string;
   name: string;
   kickoff: Date;
-  tapeout: Date;
+  /** Null on a program that does not run the stage carrying it. */
+  tapeout: Date | null;
   openRisks: number;
   staleRisks: number;
   overdue: number;
@@ -56,8 +57,10 @@ export const matches = (r: ListRow, k: FilterKey): boolean => {
  * remember, rather than whatever the database happened to return.
  */
 export function sortRows(rows: readonly ListRow[], key: SortKey): ListRow[] {
-  const soonest = (a: ListRow, b: ListRow) =>
-    a.tapeout.getTime() - b.tapeout.getTime() || a.name.localeCompare(b.name);
+  /* A program with no tapeout sorts last under every ordering that falls back
+     to this one: it is not near its mask order, it does not have one. */
+  const at = (r: ListRow) => r.tapeout?.getTime() ?? Number.POSITIVE_INFINITY;
+  const soonest = (a: ListRow, b: ListRow) => at(a) - at(b) || a.name.localeCompare(b.name);
 
   const by: Record<SortKey, (a: ListRow, b: ListRow) => number> = {
     tapeout: soonest,

@@ -99,8 +99,12 @@ export function CrossBoard({ kind, projectId }: { kind: Kind; projectId: string 
   /* A stage that closes before tapeout, which is what "blocks the mask order"
      actually means — a property of the stage, not of the row. */
   const blocksMto = (stageId: string) => {
+    const mto = schedule.tapeout;
+    /* No tapeout, nothing to block: the filter answers nobody rather than
+       silently meaning "before the program ends". */
+    if (!mto) return false;
     const end = schedule.stages[stageId]?.end;
-    return !!end && end <= schedule.tapeout && end >= today;
+    return !!end && end <= mto && end >= today;
   };
   const passes = (r: Row) =>
     filter === 'mto'

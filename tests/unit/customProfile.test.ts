@@ -1,11 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { BUILTIN_PROFILE, stageMilestone } from '@/data/scheduleProfiles';
-import {
-  kickoffForAnchor,
-  pickStages,
-  requiredStages,
-  StageChoiceError,
-} from '@/lib/customProfile';
+import { computeSchedule } from '@/lib/schedule';
+import { kickoffForAnchor, pickStages, StageChoiceError } from '@/lib/customProfile';
 import type { MilestoneDef, ProfileStageDef } from '@/data/types';
 
 const stage = (
@@ -25,11 +21,10 @@ const stage = (
 });
 
 const BASE = [stage('a', 0, 0), stage('b', 1, 4), stage('c', 2, 12), stage('d', 3, 20)];
-const NO_MILESTONES: Record<string, MilestoneDef> = {};
 
 describe('starting a program on some of a template’s stages', () => {
   it('keeps the chosen stages, in the template’s order', () => {
-    const out = pickStages(BASE, ['d', 'a', 'c'], NO_MILESTONES);
+    const out = pickStages(BASE, ['d', 'a', 'c']);
     expect(out.map((s) => s.key)).toEqual(['a', 'c', 'd']);
     expect(out.map((s) => s.order)).toEqual([0, 1, 2]);
   });
@@ -38,66 +33,66 @@ describe('starting a program on some of a template’s stages', () => {
      happen before what, so they survive. Dropping b leaves the eight weeks
      between a and c exactly where they were. */
   it('leaves the offsets between the stages it kept alone', () => {
-    const out = pickStages(BASE, ['a', 'c', 'd'], NO_MILESTONES);
+    const out = pickStages(BASE, ['a', 'c', 'd']);
     expect(out.map((s) => s.startOffsetWeeks)).toEqual([0, 12, 20]);
   });
 
   /* But kickoff means kickoff: drop the stages at the front and the run moves
      back to week zero rather than starting three months into its own plan. */
   it('shifts the run so the first stage it kept starts at kickoff', () => {
-    const out = pickStages(BASE, ['c', 'd'], NO_MILESTONES);
+    const out = pickStages(BASE, ['c', 'd']);
     expect(out.map((s) => s.startOffsetWeeks)).toEqual([0, 8]);
     /* and nothing else about the shape moved */
     expect(out.map((s) => s.durationWeeks)).toEqual([4, 4]);
   });
 
   it('refuses a program with no stages at all', () => {
-    expect(() => pickStages(BASE, [], NO_MILESTONES)).toThrow(StageChoiceError);
+    expect(() => pickStages(BASE, [])).toThrow(StageChoiceError);
   });
 
   it('refuses a stage the template does not have', () => {
-    expect(() => pickStages(BASE, ['a', 'zz'], NO_MILESTONES)).toThrow(/No such stage: zz/);
+    expect(() => pickStages(BASE, ['a', 'zz'])).toThrow(/No such stage: zz/);
   });
 
-  /* A major checkpoint hangs off the end of a stage. Without the stage there is
-     no tapeout, and a program with no tapeout is not one anybody meant to
-     start. */
-  it('will not let a stage carrying a major checkpoint be dropped', () => {
-    const anchored = { b: { id: 'm', label: 'Tapeout', major: true } as MilestoneDef };
-    expect(() => pickStages(BASE, ['a', 'c'], anchored)).toThrow(/carries Tapeout/);
-    expect(pickStages(BASE, ['a', 'b'], anchored).map((s) => s.key)).toEqual(['a', 'b']);
-  });
-
-  /* A lesser one leaves with its stage. A program with no test chip has no
-     Test Chip Silicon date, and should not claim one. */
-  it('lets a stage carrying a minor checkpoint go', () => {
-    const anchored = { b: { id: 'm', label: 'Test Chip Silicon' } as MilestoneDef };
-    expect(pickStages(BASE, ['a', 'c'], anchored).map((s) => s.key)).toEqual(['a', 'c']);
+  /* Any stage can go, including the ones carrying the checkpoints every
+     countdown reads. A derivative doing only the package work is a real
+     program; what it must not do is show a tapeout date it does not have. */
+  it('lets any stage go, whatever it carries', () => {
+    expect(pickStages(BASE, ['a', 'c']).map((s) => s.key)).toEqual(['a', 'c']);
+    expect(pickStages(BASE, ['d']).map((s) => s.key)).toEqual(['d']);
   });
 });
 
 describe('against the profile the app actually ships', () => {
-  it('locks the three stages the countdowns need, and no more', () => {
-    const must = requiredStages(BUILTIN_PROFILE.stages, stageMilestone);
-    expect([...must].sort()).toEqual(['fabrication', 'qualification', 'tapeout']);
-  });
-
-  /* The point of the feature: most of the 23 can go. */
-  it('leaves the great majority of the stages optional', () => {
-    const must = requiredStages(BUILTIN_PROFILE.stages, stageMilestone);
-    expect(BUILTIN_PROFILE.stages.length - must.size).toBeGreaterThan(15);
+  /* A program that stops at signoff: no tapeout, no fabrication, no
+     production. The three dates are null rather than standing in for
+     something else, which is what lets the screens say "No tapeout". */
+  it('a program without those stages simply has no such dates', () => {
+    const stages = pickStages(
+      BUILTIN_PROFILE.stages,
+      BUILTIN_PROFILE.stages
+        .map((s) => s.key)
+        .filter((k) => !['tapeout', 'fabrication', 'qualification'].includes(k)),
+    );
+    const s = computeSchedule(new Date(2026, 0, 5), { ...BUILTIN_PROFILE, stages }, {});
+    expect(s.tapeout).toBeNull();
+    expect(s.firstSilicon).toBeNull();
+    expect(s.production).toBeNull();
+    /* and it keeps the checkpoints of the stages it does run */
+    expect(s.milestones.map((m) => m.anchor.stage)).not.toContain('tapeout');
+    expect(s.milestones.length).toBe(stages.length);
   });
 
   it('keeping everything gives back the profile unchanged', () => {
     const all = BUILTIN_PROFILE.stages.map((s) => s.key);
-    const out = pickStages(BUILTIN_PROFILE.stages, all, stageMilestone);
+    const out = pickStages(BUILTIN_PROFILE.stages, all);
     expect(out).toEqual([...BUILTIN_PROFILE.stages]);
   });
 
-  it('a program on the required stages alone still has every milestone', () => {
-    const must = [...requiredStages(BUILTIN_PROFILE.stages, stageMilestone)];
-    const out = pickStages(BUILTIN_PROFILE.stages, must, stageMilestone);
-    expect(out.length).toBe(must.length);
+  it('a handful of stages from the middle still starts at kickoff', () => {
+    const some = ['tapeout', 'fabrication', 'qualification'];
+    const out = pickStages(BUILTIN_PROFILE.stages, some);
+    expect(out.length).toBe(some.length);
     /* something starts at kickoff — not necessarily the first row, since
        stages overlap and order is not start order */
     expect(Math.min(...out.map((s) => s.startOffsetWeeks))).toBe(0);
@@ -129,7 +124,7 @@ describe('anchoring the plan to a stage other than the first', () => {
 
   /* The two work together: pick the stages, then anchor on one of them. */
   it('anchors on the trimmed list, not on the template', () => {
-    const kept = pickStages(BASE, ['c', 'd'], NO_MILESTONES);
+    const kept = pickStages(BASE, ['c', 'd']);
     /* c is the first kept stage, so it is week zero and the date is the date */
     expect(day(kickoffForAnchor(kept, 'c', new Date(Date.UTC(2026, 2, 2))))).toBe('2026-03-02');
     /* d is eight weeks after c once the run has been shifted */

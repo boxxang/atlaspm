@@ -203,8 +203,9 @@ describe('schedule position', () => {
   });
 
   it('counts down to Tapeout', () => {
-    expect(daysTo(schedule.tapeout, TODAY)).toBe(141);
-    expect(dday(schedule.tapeout, TODAY)).toBe('D−141');
+    expect(schedule.tapeout).not.toBeNull();
+    expect(daysTo(schedule.tapeout!, TODAY)).toBe(141);
+    expect(dday(schedule.tapeout!, TODAY)).toBe('D−141');
   });
 
   it('prints D+ for dates already past', () => {

@@ -29,6 +29,9 @@ const KIND_LABEL: Record<ItemKind, string> = {
 
 const SIGNATURE = '—\nComposed in AtlasPM. Review before sending.';
 
+/** A schedule date and its countdown, or a plain statement that there is none. */
+const when = (d: Date | null, today: Date) => (d ? `${fmtDate(d)}  ${dday(d, today)}` : 'none');
+
 /** Dashboard → a status summary someone can read without opening the tool. */
 export function programSummaryDraft(input: {
   projectName: string;
@@ -55,9 +58,11 @@ export function programSummaryDraft(input: {
     ]),
 
     section('SCHEDULE', [
-      `  ${row('Tapeout', `${fmtDate(schedule.tapeout)}  ${dday(schedule.tapeout, today)}`)}`,
-      `  ${row('First Silicon', `${fmtDate(schedule.firstSilicon)}  ${dday(schedule.firstSilicon, today)}`)}`,
-      `  ${row('Production', `${fmtDate(schedule.production)}  ${dday(schedule.production, today)}`)}`,
+      /* A date the program does not have is said to be missing, not left out —
+       a summary silently short of a line reads as an oversight. */
+      `  ${row('Tapeout', when(schedule.tapeout, today))}`,
+      `  ${row('First Silicon', when(schedule.firstSilicon, today))}`,
+      `  ${row('Production', when(schedule.production, today))}`,
     ]),
 
     section('ATTENTION', [

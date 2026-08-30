@@ -7,7 +7,7 @@ import { createProject, deleteProject } from '@/app/actions';
 import { activitySteps } from '@/data/activitySteps';
 import { BUILTIN_PROFILE, lifecyclePhases, stageMilestone } from '@/data/scheduleProfiles';
 import type { ProfileSummary } from '@/data/types';
-import { kickoffForAnchor, pickStages, requiredStages } from '@/lib/customProfile';
+import { kickoffForAnchor, pickStages } from '@/lib/customProfile';
 import { estimateCost } from '@/lib/effort';
 import {
   FILTERS,
@@ -426,7 +426,10 @@ function ProgramRow({ p, on, onPick }: { p: ProjectSummary; on: boolean; onPick:
   const pct = p.deliverablesTotal
     ? Math.round((p.deliverablesDone / p.deliverablesTotal) * 100)
     : 0;
-  const days = today ? Math.round((schedule.tapeout.getTime() - today.getTime()) / 864e5) : null;
+  const days =
+    today && schedule.tapeout
+      ? Math.round((schedule.tapeout.getTime() - today.getTime()) / 864e5)
+      : null;
 
   return (
     <Link
@@ -482,13 +485,21 @@ function ProgramRow({ p, on, onPick }: { p: ProjectSummary; on: boolean; onPick:
           <i style={{ width: `${pct}%` }} />
         </span>
       </span>
-      <span>
-        <b className="num" style={{ fontSize: 13.5, display: 'block' }}>
-          {days === null ? '—' : days >= 0 ? `D−${days}` : `D+${Math.abs(days)}`}
-        </b>
-        <span className="num" style={{ fontSize: 11.5, color: 'var(--ink-3)' }}>
-          {fmtDate(schedule.tapeout)}
-        </span>
+      {/* A program that does not run Tapeout has no tapeout date. Saying so is
+          the only honest cell: the end of its last stage is not a mask order. */}
+      <span data-tapeout>
+        {schedule.tapeout ? (
+          <>
+            <b className="num" style={{ fontSize: 13.5, display: 'block' }}>
+              {days === null ? '—' : days >= 0 ? `D−${days}` : `D+${Math.abs(days)}`}
+            </b>
+            <span className="num" style={{ fontSize: 11.5, color: 'var(--ink-3)' }}>
+              {fmtDate(schedule.tapeout)}
+            </span>
+          </>
+        ) : (
+          <span style={{ fontSize: 12.5, color: 'var(--ink-4)' }}>No tapeout</span>
+        )}
       </span>
       <span className="r num" style={{ fontSize: 14, fontWeight: 600, color: 'var(--risk)' }}>
         {p.openRisks}
@@ -528,6 +539,10 @@ function ProgramPeek({ project }: { project: ProjectSummary }) {
     ? Math.max(1, Math.round((today.getTime() - project.kickoff.getTime()) / 864e5 / 7))
     : 1;
   const total = Math.round((last - first) / 864e5 / 7);
+  const ahead = schedule.milestones
+    .filter((m) => (today ? m.date > today : true))
+    .sort((a, b) => a.date.getTime() - b.date.getTime())
+    .slice(0, 3);
 
   return (
     <aside id="peek" aria-label="Program preview" style={{ background: 'var(--sunken)' }}>
@@ -565,11 +580,18 @@ function ProgramPeek({ project }: { project: ProjectSummary }) {
         <div className="cap" style={{ marginBottom: 12 }}>
           Next checkpoints
         </div>
-        {schedule.milestones
-          .filter((m) => (today ? m.date > today : true))
-          .sort((a, b) => a.date.getTime() - b.date.getTime())
-          .slice(0, 3)
-          .map((m) => (
+        {/* Whatever this program's own stages carry — computeSchedule keeps only
+            the checkpoints whose stage the profile runs, so a program cut down
+            to a handful shows that handful's, and one that does not tape out
+            never mentions a tapeout. */}
+        {ahead.length === 0 && (
+          <p className="mono-note" data-no-checkpoints>
+            {schedule.milestones.length === 0
+              ? 'This program runs no stage that closes on a checkpoint.'
+              : 'Every checkpoint on this program is behind it.'}
+          </p>
+        )}
+        {ahead.map((m) => (
             <div
               key={m.id}
               style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '6px 0' }}
@@ -597,7 +619,7 @@ function ProgramPeek({ project }: { project: ProjectSummary }) {
                   : ''}
               </span>
             </div>
-          ))}
+        ))}
       </div>
 
       <div className="prev-sec">
@@ -762,7 +784,6 @@ function NewProgramDialog({
   const [keep, setKeep] = useState<Set<string>>(
     () => new Set(BUILTIN_PROFILE.stages.map((s) => s.key)),
   );
-  const locked = requiredStages(BUILTIN_PROFILE.stages, stageMilestone);
 
   /* The stages as this program would run them, and the one the date is pinned
      to. Anchoring on the first is the ordinary case and means the date is the
@@ -770,7 +791,7 @@ function NewProgramDialog({
      stage starts, and week zero is worked out from it. */
   const stages = useMemo(() => {
     try {
-      return customising ? pickStages(BUILTIN_PROFILE.stages, [...keep], stageMilestone) : [];
+      return customising ? pickStages(BUILTIN_PROFILE.stages, [...keep]) : [];
     } catch {
       return [];
     }
@@ -920,12 +941,11 @@ function NewProgramDialog({
         {customising && (
           <Field
             label="Stages"
-            hint="Everything the template names, ticked. Untick what this chip does not do — the three the countdowns read cannot go."
+            hint="Everything the template names, ticked. Untick what this chip does not do. A checkpoint leaves with its stage: a program without Tapeout & Mask Release reads No tapeout rather than counting down to a date it does not have."
             count={`${keep.size} of ${BUILTIN_PROFILE.stages.length}`}
           >
             <StagePicker
               keep={keep}
-              locked={locked}
               onToggle={(key, on) =>
                 setKeep((prev) => {
                   const next = new Set(prev);
@@ -935,7 +955,7 @@ function NewProgramDialog({
                 })
               }
               onAll={(on) =>
-                setKeep(on ? new Set(BUILTIN_PROFILE.stages.map((s) => s.key)) : new Set(locked))
+                setKeep(on ? new Set(BUILTIN_PROFILE.stages.map((s) => s.key)) : new Set())
               }
             />
           </Field>
@@ -1001,18 +1021,16 @@ function Field({
  * programs is "all of them" and the ones being asked about are the handful a
  * particular chip does not do — no test chip, no package of its own, no EVB.
  *
- * The stages a milestone hangs off cannot be unticked. Tapeout, First Silicon
- * and Mass Production are what the whole schedule counts down to, and a program
- * that dropped the stage carrying one would have nothing to count down to.
+ * Any of them can go, including the three the countdowns read. A program that
+ * does not tape out is a real program; the screens say so rather than counting
+ * down to a date it does not have.
  */
 function StagePicker({
   keep,
-  locked,
   onToggle,
   onAll,
 }: {
   keep: ReadonlySet<string>;
-  locked: ReadonlySet<string>;
   onToggle: (key: string, on: boolean) => void;
   onAll: (on: boolean) => void;
 }) {
@@ -1021,12 +1039,9 @@ function StagePicker({
     <div className="stagepick" data-stage-picker>
       <div className="stagepick-hd">
         <span className="cap">Stages this program runs</span>
-        <span style={{ fontSize: 11, color: 'var(--ink-3)' }}>
-          three are fixed — the countdowns read them
-        </span>
         <span style={{ flexGrow: 1 }} />
         <button type="button" className="btn sm" data-pick-all onClick={() => onAll(!all)}>
-          {all ? 'Clear optional' : 'Select all'}
+          {all ? 'Clear all' : 'Select all'}
         </button>
       </div>
 
@@ -1043,7 +1058,6 @@ function StagePicker({
             </div>
             {mine.map((st) => {
               const on = keep.has(st.key);
-              const fixed = locked.has(st.key);
               return (
                 <button
                   type="button"
@@ -1051,11 +1065,9 @@ function StagePicker({
                   className="stagepick-row"
                   role="checkbox"
                   aria-checked={on}
-                  aria-disabled={fixed || undefined}
                   data-pick={st.key}
                   data-on={on ? '' : undefined}
-                  title={fixed ? `${st.title} carries a checkpoint and has to stay` : undefined}
-                  onClick={() => !fixed && onToggle(st.key, !on)}
+                  onClick={() => onToggle(st.key, !on)}
                 >
                   {/* the whole row is the control, so the box is only the
                       drawing of it and takes no click of its own */}
@@ -1074,16 +1086,11 @@ function StagePicker({
                   {/* what closing this stage marks. The three the countdowns
                       read are locked on; the rest leave with their stage. */}
                   {stageMilestone[st.key] && (
-                    <span className={fixed ? 'pill acc' : 'pill'} style={{ fontSize: 10 }}>
+                    <span
+                      className={stageMilestone[st.key].major ? 'pill acc' : 'pill'}
+                      style={{ fontSize: 10 }}
+                    >
                       {stageMilestone[st.key].label}
-                    </span>
-                  )}
-                  {/* Said on the row, not only in a hover title: three rows that
-                      look tickable and are not is what makes Clear optional
-                      read as broken. */}
-                  {fixed && (
-                    <span className="reqmark" style={{ fontSize: 10 }}>
-                      Required
                     </span>
                   )}
                   <span style={{ flexGrow: 1 }} />
