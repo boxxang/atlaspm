@@ -1,5 +1,11 @@
 import { describe, expect, it } from 'vitest';
-import { ATTN_BAND, ATTN_MTO, attention, type AttentionInput } from '@/lib/attention';
+import {
+  ATTN_BAND,
+  ATTN_MTO,
+  NEXT_UP,
+  attention,
+  type AttentionInput,
+} from '@/lib/attention';
 import type { OverdueStep } from '@/lib/steps';
 import type { DerivedRisk } from '@/lib/risks';
 
@@ -160,9 +166,13 @@ describe('what each row says', () => {
 });
 
 describe('what it leaves out', () => {
-  it('ignores a deliverable more than three weeks away', () => {
+  /* Three weeks is the horizon for "due soon". Beyond it a deliverable is not
+     something today needs, though it does turn up under Coming up next when
+     nothing else does — as Next up, which is a different claim. */
+  it('does not call a deliverable more than three weeks away due soon', () => {
     const rows = attention(
       input({
+        overdue: [overdue()],
         deliverables: [
           {
             id: 'D1',
@@ -176,7 +186,7 @@ describe('what it leaves out', () => {
         ],
       }),
     );
-    expect(rows).toEqual([]);
+    expect(rows.map((r) => r.type)).toEqual(['Step']);
   });
 
   it('ignores one already handed over, and one with no date at all', () => {
@@ -250,5 +260,99 @@ describe('closing before tapeout', () => {
   it('is false when the programme has no tapeout date', () => {
     const [row] = attention(input({ overdue: [overdue()], tapeout: null }));
     expect(row.blocks).toBe(false);
+  });
+});
+
+/**
+ * A program with nothing wrong with it — one just started, or one on top of
+ * its work — used to get an empty panel headed "Needs you today". Silence is
+ * not an answer to that question; the work coming up is.
+ */
+describe('when nothing is overdue and no risk is unanswered', () => {
+  const soon = (n: number) => new Date(TODAY.getTime() + n * 864e5);
+  const step = (n: number, title: string) =>
+    overdue({ id: `up:A:${n}`, act: 'A', stepN: n, title, due: soon(n) });
+
+  it('falls back to the nearest dates ahead, soonest first', () => {
+    const rows = attention(
+      input({ upcoming: [step(9, 'later'), step(2, 'sooner'), step(5, 'middle')] }),
+    );
+    expect(rows.map((r) => r.title)).toEqual(['sooner', 'middle', 'later']);
+    expect(rows.every((r) => r.tag === 'Next up')).toBe(true);
+    expect(rows[0].why).toBe('due in 2 days');
+  });
+
+  /* A deliverable inside three weeks is Due soon, which is one of the three
+     bands — so the fallback only meets deliverables beyond that horizon, and
+     it puts them in the same order as the steps. */
+  it('takes steps and deliverables together, in one order', () => {
+    const rows = attention(
+      input({
+        upcoming: [step(25, 'a step in 25 days'), step(40, 'a step in 40 days')],
+        deliverables: [
+          {
+            id: 'D1',
+            title: 'a deliverable in 30 days',
+            stageId: 'def',
+            due: soon(30),
+            done: false,
+            ref: 'DEF-D1',
+            step: null,
+          },
+        ],
+      }),
+    );
+    expect(rows.map((r) => r.type)).toEqual(['Step', 'Deliverable', 'Step']);
+    expect(rows[1].title).toBe('a deliverable in 30 days');
+  });
+
+  /* And the moment one of them is inside the three-week horizon it is Due
+     soon, which is a band — so this is not the empty case at all. */
+  it('is not reached when a deliverable is already due soon', () => {
+    const rows = attention(
+      input({
+        upcoming: [step(1, 'a step tomorrow')],
+        deliverables: [
+          {
+            id: 'D1',
+            title: 'a deliverable in three days',
+            stageId: 'def',
+            due: soon(3),
+            done: false,
+            ref: null,
+            step: null,
+          },
+        ],
+      }),
+    );
+    expect(rows.map((r) => r.tag)).toEqual(['Due soon']);
+  });
+
+  it('stops at seven — a morning\'s work, not the whole plan', () => {
+    const many = Array.from({ length: 30 }, (_, i) => step(i + 1, `step ${i + 1}`));
+    const rows = attention(input({ upcoming: many }));
+    expect(rows).toHaveLength(NEXT_UP);
+    expect(rows.at(-1)!.title).toBe(`step ${NEXT_UP}`);
+  });
+
+  /* The moment anything is actually wrong, the fallback gets out of the way:
+     one overdue step outranks every date in the future. */
+  it('gives way as soon as there is something wrong', () => {
+    const rows = attention(
+      input({ overdue: [overdue()], upcoming: [step(1, 'tomorrow'), step(2, 'the day after')] }),
+    );
+    expect(rows).toHaveLength(1);
+    expect(rows[0].tag).toBe('Overdue');
+  });
+
+  it('says nothing at all when there is nothing ahead either', () => {
+    expect(attention(input())).toEqual([]);
+    expect(attention(input({ upcoming: [] }))).toEqual([]);
+  });
+
+  /* It ranks by date, not by score — every row is in the same band. */
+  it('scores them all alike, so the order is the calendar', () => {
+    const rows = attention(input({ upcoming: [step(1, 'a'), step(4, 'b')] }));
+    expect(new Set(rows.map((r) => r.score))).toEqual(new Set([ATTN_BAND.next]));
   });
 });

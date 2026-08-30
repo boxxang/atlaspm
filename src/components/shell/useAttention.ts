@@ -16,7 +16,7 @@ import { useProgramWork } from './useProgramWork';
  * hands it over — plus the stage ends that decide what closes before tapeout.
  */
 export function useAttention(): AttentionRow[] {
-  const { overdue, risks } = useProgramWork();
+  const { overdue, upcoming, risks } = useProgramWork();
   const deliverables = useAppStore((s) => s.deliverables);
   const schedule = useAppStore((s) => s.schedule);
   const today = useAppStore((s) => s.today);
@@ -58,6 +58,7 @@ export function useAttention(): AttentionRow[] {
       risks,
       stageEnds,
       tapeout: schedule.tapeout ?? null,
+      upcoming,
     });
-  }, [overdue, risks, deliverables, schedule, today]);
+  }, [overdue, upcoming, risks, deliverables, schedule, today]);
 }

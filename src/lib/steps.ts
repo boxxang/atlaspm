@@ -180,6 +180,36 @@ export interface OverdueStep {
 }
 
 /**
+ * Every open step whose date is still ahead, soonest first.
+ *
+ * The same shape as an overdue step, because it is the same thing at a
+ * different moment — what a program with nothing wrong with it should be
+ * working on next.
+ */
+export function allUpcoming(
+  activities: readonly { activity: ActivitySteps; steps: readonly ResolvedStep[] }[],
+  today: Date,
+): OverdueStep[] {
+  const out: OverdueStep[] = [];
+  for (const { activity, steps } of activities) {
+    for (const s of steps) {
+      if (s.done || s.due < today) continue;
+      out.push({
+        id: `up:${s.act}:${s.n}`,
+        act: s.act,
+        stepN: s.n,
+        stageId: s.stageId,
+        title: s.text,
+        owner: s.owner,
+        role: activity.role ?? '',
+        due: s.due,
+      });
+    }
+  }
+  return out.sort((a, b) => a.due.getTime() - b.due.getTime());
+}
+
+/**
  * Overdue is a step past its due date with nothing handed over — not an item
  * past a target date, which is what it used to mean. Soonest-due first, so the
  * list reads as the order the work fell over in.

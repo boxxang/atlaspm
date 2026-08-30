@@ -60,12 +60,17 @@ test.describe('the program list', () => {
       /* the row it was launched from is still there behind it */
       await expect(page.locator('[data-new-project-row]')).toBeAttached();
 
-      for (const label of ['Program name', 'Template', 'Expected kickoff']) {
+      for (const label of [
+        'Program name',
+        'Template',
+        'Expected kickoff',
+        'Cost per man-month',
+      ]) {
         await expect(dlg.locator('.dlg-label').filter({ hasText: label })).toBeVisible();
       }
       /* every field carries its sentence, and the date's says which date */
       const hints = await dlg.locator('.dlg-hint').allTextContents();
-      expect(hints).toHaveLength(3);
+      expect(hints).toHaveLength(4);
       expect(hints.every((h) => h.length > 20)).toBe(true);
       await expect(dlg).toContainText('The day the first stage begins');
     });
@@ -142,6 +147,74 @@ test.describe('the program list', () => {
         page.locator('[data-program]').filter({ hasText: 'AtlasAnchored' }),
       ).toContainText('kickoff 10/12/2025');
     });
+  });
+
+  /* A rate has to be asked for: nothing else in the app sets one, so a
+     program created without it could never show a cost at all. */
+  test.describe('what a program costs', () => {
+    test('the dialog asks the rate and shows what it comes to', async ({ page }) => {
+      await page.locator('[data-new-project]').click();
+      const dlg = page.locator('[data-new-program]');
+      await expect(dlg.locator('.dlg-label').filter({ hasText: 'Cost per man-month' })).toBeVisible();
+      await expect(page.locator('[data-est-cost]')).toContainText('M/M');
+
+      await page.locator('.pf-rate').fill('0');
+      await expect(page.locator('[data-est-cost]')).toHaveText('no cost estimate');
+    });
+
+    test('the program it makes carries the figure through', async ({ page }) => {
+      await page.locator('[data-new-project]').click();
+      await page.locator('.pf-name').fill('Priced');
+      await page.locator('.pf-kickoff').fill('2029-01-01');
+      await page.locator('.pf-rate').fill('20000');
+      await page.locator('[data-create]').click();
+      await page.waitForURL(/\/p\/priced-[^/]*\/overview$/);
+
+      /* the Overview's stat, and the list's column */
+      await expect(page.locator('.card').first()).toContainText('$');
+      await page.goto('/');
+      const row = page.locator('[data-program]').filter({ hasText: 'Priced' });
+      await expect(row).toContainText('$');
+    });
+
+    test('a rate of zero leaves the column empty rather than claiming a number', async ({
+      page,
+    }) => {
+      await page.locator('[data-new-project]').click();
+      await page.locator('.pf-name').fill('Unpriced');
+      await page.locator('.pf-kickoff').fill('2029-01-01');
+      await page.locator('.pf-rate').fill('0');
+      await page.locator('[data-create]').click();
+      await page.waitForURL(/\/p\/unpriced-[^/]*\/overview$/);
+      await expect(page.locator('.card').first()).not.toContainText('$');
+    });
+  });
+
+  /* An empty panel headed "Needs you today" answers the question with silence.
+     A program with nothing wrong gets the work instead. */
+  test('a program with nothing wrong is shown what is coming up', async ({ page }) => {
+    await page.locator('[data-new-project]').click();
+    await page.locator('.pf-name').fill('Fresh');
+    /* kicking off shortly, so nothing can be overdue yet */
+    await page.locator('.pf-kickoff').fill('2029-01-01');
+    await page.locator('[data-create]').click();
+    await page.waitForURL(/\/p\/fresh-[^/]*\/overview$/);
+
+    const nav = page.getByRole('navigation', { name: 'Program' });
+    await expect(nav.getByRole('link', { name: /^Overdue/ })).toContainText('0');
+    await expect(nav.getByRole('link', { name: /^Risks/ })).toContainText('0');
+
+    /* the heading is not crying wolf, and the rows are the nearest dates */
+    await expect(page.getByText('Coming up next')).toBeVisible();
+    await expect(page.getByText('Needs you today')).toHaveCount(0);
+    const rows = page.locator('[data-attn]');
+    await expect(rows).toHaveCount(7);
+    await expect(rows.first()).toContainText('Next up');
+
+    const days = await rows.evaluateAll((els) =>
+      els.map((e) => Number(/due in (\d+) day/.exec(e.textContent ?? '')?.[1] ?? 0)),
+    );
+    expect(days).toEqual([...days].sort((a, b) => a - b));
   });
 
   /* The toolbar's two buttons were decoration. They order and narrow the list

@@ -133,6 +133,7 @@ function Stat({ k, v, s, tone }: { k: string; v: string; s: string; tone?: boole
  */
 function NeedsYouToday({ projectId }: { projectId: string }) {
   const rows = useAttention();
+  const nextUp = rows.length > 0 && rows.every((r) => r.tag === 'Next up');
   const stages = useAppStore((s) => s.stages);
   const router = useRouter();
 
@@ -159,11 +160,15 @@ function NeedsYouToday({ projectId }: { projectId: string }) {
           flexWrap: 'wrap',
         }}
       >
-        <b style={{ fontSize: 14 }}>Needs you today</b>
-        <span className={rows.length ? 'pill risk' : 'pill'}>{rows.length}</span>
+        {/* The heading says which list this is. With nothing overdue and no
+            risk unanswered the panel is not empty — it is the next seven dates,
+            and calling that "needs you today" would be crying wolf. */}
+        <b style={{ fontSize: 14 }}>{nextUp ? 'Coming up next' : 'Needs you today'}</b>
+        <span className={rows.length && !nextUp ? 'pill risk' : 'pill'}>{rows.length}</span>
         <span style={{ fontSize: 12, color: 'var(--ink-3)' }}>
-          overdue, then due inside three weeks, then risks nobody has answered — anything before the
-          mask order first
+          {nextUp
+            ? 'nothing is overdue and no risk is unanswered — the nearest dates ahead, in the order they fall'
+            : 'overdue, then due inside three weeks, then risks nobody has answered — anything before the mask order first'}
         </span>
         <span style={{ flexGrow: 1 }} />
         <Link className="btn sm" href={`/p/${projectId}/risks`}>
@@ -201,7 +206,9 @@ function NeedsYouToday({ projectId }: { projectId: string }) {
               >
                 <span style={{ justifySelf: 'start', marginTop: 1 }}>
                   <span
-                    className={r.tag === 'Overdue' ? 'pill risk' : 'pill warn'}
+                    className={
+                      r.tag === 'Overdue' ? 'pill risk' : r.tag === 'Next up' ? 'pill' : 'pill warn'
+                    }
                     style={{ fontSize: 10.5 }}
                   >
                     {r.tag}

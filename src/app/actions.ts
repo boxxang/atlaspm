@@ -586,6 +586,8 @@ export async function createProject(input: {
   profileId: string;
   /** A subset of the template's stages; omitted means all of them. */
   stageKeys?: string[];
+  /** Fully-loaded rate. Without one the cost column can only ever be empty. */
+  costPerManMonth?: number;
 }) {
   const name = input.name.trim();
   if (!name) throw new Error('A program needs a name.');
@@ -630,6 +632,10 @@ export async function createProject(input: {
       name,
       kickoff: input.kickoff,
       profileId,
+      costPerManMonth:
+        Number.isFinite(input.costPerManMonth) && input.costPerManMonth! >= 0
+          ? input.costPerManMonth!
+          : 0,
       deliverables: {
         /* Dated by the stage's own plan, which says the week each artefact is
            due — the week the work that makes it finishes. A stage with no plan

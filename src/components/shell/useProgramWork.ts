@@ -5,6 +5,7 @@ import { activitySteps } from '@/data/activitySteps';
 import { openRisks, type DerivedRisk } from '@/lib/risks';
 import {
   allOverdue,
+  allUpcoming,
   doneStepKeys,
   fromStepIndex,
   resolveSteps,
@@ -28,6 +29,8 @@ for (const [ref, a] of Object.entries(activitySteps)) STAGE_OF[ref] = a.st;
 export interface ProgramWork {
   steps: ResolvedStep[];
   overdue: OverdueStep[];
+  /** Open steps whose date is still ahead, soonest first. */
+  upcoming: OverdueStep[];
   risks: DerivedRisk[];
 }
 
@@ -50,6 +53,7 @@ export function useProgramWork(): ProgramWork {
     return {
       steps,
       overdue: allOverdue(resolved, today),
+      upcoming: allUpcoming(resolved, today),
       risks: openRisks(posts, doneStepKeys(steps), STAGE_OF),
     };
   }, [schedule, stepStates, posts, today]);

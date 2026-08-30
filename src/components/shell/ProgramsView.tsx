@@ -5,6 +5,8 @@ import { useRouter } from 'next/navigation';
 import { useEffect, useMemo, useRef, useState, useSyncExternalStore, useTransition } from 'react';
 import { createProject, deleteProject } from '@/app/actions';
 import { activitySteps } from '@/data/activitySteps';
+import { journeyData } from '@/data/journey';
+import { SEED_COST_PER_MAN_MONTH } from '@/data/projectSeed';
 import { BUILTIN_PROFILE, lifecyclePhases, stageMilestone } from '@/data/scheduleProfiles';
 import type { ProfileSummary } from '@/data/types';
 import { kickoffForAnchor, pickStages } from '@/lib/customProfile';
@@ -772,6 +774,7 @@ function NewProgramDialog({
   const [name, setName] = useState('');
   const [date, setDate] = useState(toISO(new Date()));
   const [choice, setChoice] = useState(profiles[0]?.id ?? '');
+  const [rate, setRate] = useState(String(SEED_COST_PER_MAN_MONTH));
   const [error, setError] = useState('');
   const [pending, start] = useTransition();
   const box = useRef<HTMLDialogElement>(null);
@@ -800,6 +803,12 @@ function NewProgramDialog({
   const anchorKey = stages.some((s) => s.key === anchor) ? anchor : (stages[0]?.key ?? '');
   const anchorStage = stages.find((s) => s.key === anchorKey);
   const anchored = !!anchorStage && anchorStage.startOffsetWeeks > 0;
+  /* What the program's stages add up to, so the rate can be checked against a
+     figure rather than typed into the dark. */
+  const effort = (customising ? stages : BUILTIN_PROFILE.stages).reduce((n, st) => {
+    const content = journeyData.find((j) => j.id === (st.baseKey ?? st.key));
+    return n + (content?.engineeringEffort ?? []).reduce((a, e) => a + e, 0);
+  }, 0);
 
   /* Escape and the backdrop close it; the browser handles the focus trap. */
   useEffect(() => {
@@ -832,6 +841,7 @@ function NewProgramDialog({
           kickoff,
           profileId: baseId,
           stageKeys: customising ? [...keep] : undefined,
+          costPerManMonth: Number(rate) || 0,
         });
         router.push(`/p/${id}/overview`);
       } catch (e) {
@@ -936,6 +946,27 @@ function NewProgramDialog({
               Program kickoff {fmtDate(kickoffForAnchor(stages, anchorKey, fromISO(date)))}
             </span>
           )}
+        </Field>
+
+        <Field
+          label="Cost per man-month"
+          hint="A fully-loaded engineering rate. The program's effort is multiplied by it to get the estimated cost on the list and the Overview; leave it at zero and that column stays empty until somebody sets one."
+        >
+          <input
+            className="pf-rate lnkin"
+            type="number"
+            min={0}
+            step={500}
+            aria-label="Cost per man-month"
+            value={rate}
+            onChange={(e) => setRate(e.target.value)}
+            style={{ minWidth: 140 }}
+          />
+          <span className="num" style={{ fontSize: 11.5, color: 'var(--ink-3)' }} data-est-cost>
+            {Number(rate) > 0
+              ? `≈ $${(estimateCost(effort, Number(rate)) / 1e6).toFixed(1)}M over ${effort.toLocaleString()} M/M`
+              : 'no cost estimate'}
+          </span>
         </Field>
 
         {customising && (

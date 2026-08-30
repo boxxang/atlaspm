@@ -6,6 +6,12 @@
  * about in a week. They are not comparable on their own terms, so they are
  * scored into bands: overdue outranks due-soon outranks stale, always.
  *
+ * When none of the three has anything to say — a program just started, or one
+ * genuinely on top of its work — the list falls back to what is coming: the
+ * seven nearest due dates, steps and deliverables together, in the order they
+ * fall. An empty panel headed "Needs you today" answers the question with
+ * silence; this answers it with the work.
+ *
  * The bands are 1000 apart and the widest spread inside one is a few hundred,
  * so a band is never jumped. The bonus for closing before tapeout is worth 300
  * — enough to order things within a band, not enough to promote one out of it.
@@ -19,7 +25,9 @@ import { DAY, startOfDay } from './schedule';
 import type { DerivedRisk } from './risks';
 import type { OverdueStep } from './steps';
 
-export const ATTN_BAND = { overdue: 3000, soon: 2000, stale: 1000 } as const;
+export const ATTN_BAND = { overdue: 3000, soon: 2000, stale: 1000, next: 0 } as const;
+/** How many are worth showing when there is nothing wrong: a morning's work. */
+export const NEXT_UP = 7;
 /** What closing before tapeout is worth: order inside a band, never across one. */
 export const ATTN_MTO = 300;
 
@@ -28,7 +36,7 @@ const SOON_DAYS = 21;
 /** How long a risk goes unanswered before it is stale. */
 const STALE_DAYS = 7;
 
-export type AttentionTag = 'Overdue' | 'Due soon' | 'Stale risk';
+export type AttentionTag = 'Overdue' | 'Due soon' | 'Stale risk' | 'Next up';
 export type AttentionType = 'Step' | 'Deliverable';
 
 export interface AttentionRow {
@@ -69,6 +77,8 @@ export interface AttentionInput {
   /** Stage end dates — what "closes before tapeout" is measured against. */
   stageEnds: Readonly<Record<StageId, Date>>;
   tapeout: Date | null;
+  /** Open steps whose date is still ahead, for the fallback. */
+  upcoming?: readonly OverdueStep[];
 }
 
 const daysSince = (d: Date, today: Date) =>
@@ -166,10 +176,87 @@ export function attention(input: AttentionInput): AttentionRow[] {
     });
   }
 
+  /* Nothing is wrong. Rather than an empty panel, the next seven dates: the
+     work to be getting on with, in the order it falls due. Steps and
+     deliverables together, because a morning is spent on both. */
+  if (by.size === 0) return nextUp(input);
+
   /* Ranked, and all of it. There used to be a per-tag cap here — four overdue,
      three due soon, two stale — so that every band got a showing. It meant that
      with seventeen things overdue, thirteen of them were missing from the list
      of what needs answering today, which is the one thing this exists to say.
      The list scrolls instead. */
   return [...by.values()].sort((a, b) => b.score - a.score);
+}
+
+/** The nearest seven dates ahead, steps and deliverables in one order. */
+function nextUp(input: AttentionInput): AttentionRow[] {
+  const { today, stageEnds, tapeout } = input;
+  const blocks = (stageId: StageId) => {
+    const end = stageEnds[stageId];
+    return !!(end && tapeout && end <= tapeout && end >= today);
+  };
+  const inDays = (d: Date) => Math.round((startOfDay(d).getTime() - today.getTime()) / DAY);
+  const why = (n: number) => (n === 0 ? 'due today' : `due in ${plural(n, 'day')}`);
+
+  /* Sorted on the date, which is not part of a row — so it is carried
+     alongside rather than added to the shape every other band would then have
+     to fill in. */
+  const rows: { at: number; row: AttentionRow }[] = [];
+
+  for (const s of input.upcoming ?? []) {
+    const n = inDays(s.due);
+    rows.push({
+      at: s.due.getTime(),
+      row: {
+        key: `s:${s.act}:${s.stepN}`,
+        tag: 'Next up',
+        type: 'Step',
+        title: s.title,
+        why: why(n),
+        stageId: s.stageId,
+        owner: s.owner,
+        ref: s.act,
+        step: { act: s.act, n: s.stepN },
+        deliverableId: null,
+        blocks: blocks(s.stageId),
+        score: ATTN_BAND.next,
+      },
+    });
+  }
+
+  for (const d of input.deliverables) {
+    if (d.done || !d.due) continue;
+    const n = inDays(d.due);
+    if (n < 0) continue;
+    rows.push({
+      at: d.due.getTime(),
+      row: {
+        key: `d:${d.id}`,
+        tag: 'Next up',
+        type: 'Deliverable',
+        title: d.title,
+        why: why(n),
+        stageId: d.stageId,
+        owner: '',
+        ref: d.ref,
+        step: d.step,
+        deliverableId: d.id,
+        blocks: blocks(d.stageId),
+        score: ATTN_BAND.next,
+      },
+    });
+  }
+
+  /* Soonest first, and a deliverable before the step that hands it over when
+     they fall on the same day — the deliverable is the thing being asked for. */
+  return rows
+    .sort(
+      (a, b) =>
+        a.at - b.at ||
+        a.row.type.localeCompare(b.row.type) ||
+        a.row.title.localeCompare(b.row.title),
+    )
+    .slice(0, NEXT_UP)
+    .map((r) => r.row);
 }
