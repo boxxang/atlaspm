@@ -47,6 +47,89 @@ test.describe('the program list', () => {
     ).toContainText('0');
   });
 
+  /* Not every chip does every stage. Picking the template's customised entry
+     opens the 23 and starts the program on what is left ticked. */
+  test.describe('on some of the template’s stages', () => {
+    const pick = async (page: Page) => {
+      await page.locator('[data-new-project]').click();
+      await page.locator('.pf-profile').selectOption({ label: 'Typical SoC (Customized)' });
+      await expect(page.locator('[data-stage-picker]')).toBeVisible();
+    };
+
+    test('offers all 23, ticked, and says how many', async ({ page }) => {
+      await pick(page);
+      await expect(page.locator('[data-pick]')).toHaveCount(23);
+      await expect(page.locator('[data-pick][data-on]')).toHaveCount(23);
+      await expect(page.locator('[data-new-program-form]')).toContainText('23 of 23 stages');
+    });
+
+    /* The three the countdowns read cannot be dropped; everything else can.
+       They are disabled, so the click never lands rather than being undone. */
+    test('locks the stages the checkpoints hang off, and only those', async ({ page }) => {
+      await pick(page);
+      await expect(page.locator('[data-pick][aria-disabled="true"]')).toHaveCount(3);
+      for (const key of ['tapeout', 'fabrication', 'qualification']) {
+        await expect(page.locator(`[data-pick="${key}"]`)).toHaveAttribute('aria-disabled', 'true');
+      }
+      /* one that carries a lesser checkpoint is not locked */
+      const testChip = page.locator('[data-pick="testChip"]');
+      await expect(testChip).not.toHaveAttribute('aria-disabled', 'true');
+      await testChip.click();
+      await expect(testChip).not.toHaveAttribute('data-on', '');
+    });
+
+    test('starts the program on what was left ticked', async ({ page }) => {
+      await pick(page);
+      await page.locator('.pf-name').fill('AtlasTrim');
+      await page.locator('.pf-kickoff').fill('2027-03-01');
+
+      for (const key of ['testChip', 'validationHardware', 'testDevelopment']) {
+        await page.locator(`[data-pick="${key}"]`).click();
+        await expect(page.locator(`[data-pick="${key}"]`)).not.toHaveAttribute('data-on', '');
+      }
+      await expect(page.locator('[data-new-program-form]')).toContainText('20 of 23 stages');
+
+      await page.locator('[data-create]').click();
+      await page.waitForURL(/\/p\/atlastrim-[^/]*\/overview$/);
+
+      const nav = page.getByRole('navigation', { name: 'Program' });
+      await expect(nav.getByRole('link', { name: /^Stages/ })).toContainText('20');
+
+      /* the three that were unticked are not on it, and the rest are */
+      await page.getByRole('link', { name: /^Stages/ }).click();
+      await expect(page.locator('[data-stage="testChip"]')).toHaveCount(0);
+      await expect(page.locator('[data-stage="tapeout"]')).toBeVisible();
+      await expect(page.locator('[data-stage]')).toHaveCount(20);
+    });
+
+    /* The template it was cut from is not changed, and the cut-down list is
+       not offered to the next program — it describes one program only. */
+    test('leaves the template alone', async ({ page }) => {
+      await pick(page);
+      await page.locator('.pf-name').fill('AtlasCut');
+      await page.locator('.pf-kickoff').fill('2027-03-01');
+      await page.locator('[data-pick="testChip"]').click();
+      await page.locator('[data-create]').click();
+      await page.waitForURL(/\/p\/atlascut-[^/]*\/overview$/);
+
+      await page.goto('/');
+      await expect(page.locator('[data-program]').first()).toBeVisible();
+      await page.locator('[data-new-project]').click();
+      const options = await page.locator('.pf-profile option').allTextContents();
+      expect(options).toEqual(['Typical SoC', 'Typical SoC (Customized)']);
+
+      await page.locator('.pf-profile').selectOption({ label: 'Typical SoC' });
+      await expect(page.locator('[data-stage-picker]')).toHaveCount(0);
+      await page.locator('.pf-name').fill('AtlasWhole');
+      await page.locator('.pf-kickoff').fill('2027-03-01');
+      await page.locator('[data-create]').click();
+      await page.waitForURL(/\/p\/atlaswhole-[^/]*\/overview$/);
+      await expect(
+        page.getByRole('navigation', { name: 'Program' }).getByRole('link', { name: /^Stages/ }),
+      ).toContainText('23');
+    });
+  });
+
   /* Deleting lives in the preview rail — the row itself is a link into the
      program, so it cannot also carry a destructive button. */
   test('a program is deleted, and asks first', async ({ page }) => {

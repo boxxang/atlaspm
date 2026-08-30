@@ -3,6 +3,7 @@
 import { revalidatePath } from 'next/cache';
 import { stageMilestone } from '@/data/scheduleProfiles';
 import type { ItemKind, ScheduleProfile, StageBaseline, StageId } from '@/data/types';
+import { pickStages } from '@/lib/customProfile';
 import { prisma } from '@/lib/db';
 import { DB_KIND } from '@/lib/projectState';
 import { resolveStages } from '@/lib/stages';
@@ -571,16 +572,54 @@ async function assertProfileNameFree(name: string) {
  *
  * Leaders and contacts stay empty too: journeyData's are example names, and
  * putting them on a real program would be inventing its staffing.
+ *
+ * `stageKeys` starts the program on some of the template's stages rather than
+ * all of them. That is a different stage list, so it is a different profile:
+ * the program gets a private one of its own — not a template, so it is never
+ * offered to anybody else — by exactly the mechanism that editing a program's
+ * stages already uses. The template itself is untouched, which is the point.
  */
 export async function createProject(input: {
   id: string;
   name: string;
   kickoff: Date;
   profileId: string;
+  /** A subset of the template's stages; omitted means all of them. */
+  stageKeys?: string[];
 }) {
-  const profile = await loadProfile(input.profileId);
   const name = input.name.trim();
   if (!name) throw new Error('A program needs a name.');
+
+  const template = await loadProfile(input.profileId);
+  let profileId = input.profileId;
+  let profile = template;
+
+  if (input.stageKeys && input.stageKeys.length !== template.stages.length) {
+    const stages = pickStages(template.stages, input.stageKeys, stageMilestone);
+    profileId = `${input.id}:stages`;
+    await prisma.profile.create({
+      data: {
+        id: profileId,
+        name: `${name} stages`,
+        builtin: false,
+        template: false,
+        stages: {
+          create: stages.map((st) => ({
+            id: `${profileId}:${st.key}`,
+            key: st.key,
+            order: st.order,
+            title: st.title,
+            shortTitle: st.shortTitle,
+            phaseId: st.phaseId,
+            baseKey: st.baseKey,
+            startOffsetWeeks: st.startOffsetWeeks,
+            durationWeeks: st.durationWeeks,
+          })),
+        },
+      },
+    });
+    profile = { ...template, id: profileId, template: false, builtin: false, stages };
+  }
 
   const schedule = computeSchedule(input.kickoff, profile, {});
   const stages = resolveStages(profile);
@@ -590,7 +629,7 @@ export async function createProject(input: {
       id: input.id,
       name,
       kickoff: input.kickoff,
-      profileId: input.profileId,
+      profileId,
       deliverables: {
         /* Dated by the stage's own plan, which says the week each artefact is
            due — the week the work that makes it finishes. A stage with no plan

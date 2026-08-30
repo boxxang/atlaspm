@@ -5,12 +5,22 @@ import { useRouter } from 'next/navigation';
 import { useMemo, useState, useSyncExternalStore, useTransition } from 'react';
 import { createProject, deleteProject } from '@/app/actions';
 import { activitySteps } from '@/data/activitySteps';
+import { BUILTIN_PROFILE, lifecyclePhases, stageMilestone } from '@/data/scheduleProfiles';
 import type { ProfileSummary } from '@/data/types';
+import { requiredStages } from '@/lib/customProfile';
 import { estimateCost } from '@/lib/effort';
 import type { ProjectSummary } from '@/lib/queries';
 import { computeSchedule, fmtDate, fromISO, startOfDay, toISO } from '@/lib/schedule';
 import { fromStepIndex, plannedSteps } from '@/lib/steps';
-import { Avatar, IconEmptyList, IconFilter, IconPlus, IconSearch, IconSort } from './icons';
+import {
+  Avatar,
+  IconEmptyList,
+  IconFilter,
+  IconPlus,
+  IconSearch,
+  IconSort,
+  IconTick,
+} from './icons';
 
 /**
  * The programs screen: a table, not a grid of cards.
@@ -533,6 +543,13 @@ function PeekLine({ dot, label, n, tone }: { dot: string; label: string; n: numb
   );
 }
 
+/**
+ * The value the template picker carries for "the built-in stages, but not all
+ * of them". It is not a profile — the profile is made at Create, out of what
+ * was ticked — so it needs a value no profile can have.
+ */
+const CUSTOM = 'custom:';
+
 function NewProgramRow({
   profiles,
   onClose,
@@ -543,18 +560,35 @@ function NewProgramRow({
   const router = useRouter();
   const [name, setName] = useState('');
   const [kickoff, setKickoff] = useState(toISO(new Date()));
-  const [profileId, setProfileId] = useState(profiles[0]?.id ?? '');
+  const [choice, setChoice] = useState(profiles[0]?.id ?? '');
   const [error, setError] = useState('');
   const [pending, start] = useTransition();
+
+  const customising = choice.startsWith(CUSTOM);
+  const baseId = customising ? choice.slice(CUSTOM.length) : choice;
+  /* Which stages a customised program runs. Everything, until somebody says
+     otherwise — a program that starts with nothing ticked would make the reader
+     build it from scratch to answer a question they did not ask. */
+  const [keep, setKeep] = useState<Set<string>>(
+    () => new Set(BUILTIN_PROFILE.stages.map((s) => s.key)),
+  );
+  const locked = requiredStages(BUILTIN_PROFILE.stages, stageMilestone);
 
   const submit = () => {
     if (!name.trim()) return setError('Give the program a name.');
     if (!kickoff) return setError('Pick an expected kickoff date.');
+    if (customising && keep.size === 0) return setError('Pick at least one stage.');
     setError('');
     const id = `${name.trim().toLowerCase().replace(/[^a-z0-9]+/g, '-')}-${Math.random().toString(36).slice(2, 7)}`;
     start(async () => {
       try {
-        await createProject({ id, name: name.trim(), kickoff: fromISO(kickoff), profileId });
+        await createProject({
+          id,
+          name: name.trim(),
+          kickoff: fromISO(kickoff),
+          profileId: baseId,
+          stageKeys: customising ? [...keep] : undefined,
+        });
         router.push(`/p/${id}/overview`);
       } catch (e) {
         setError(e instanceof Error ? e.message : 'Could not create the program.');
@@ -563,7 +597,11 @@ function NewProgramRow({
   };
 
   return (
-    <div className="trow" style={{ gridTemplateColumns: '30px 1fr', minHeight: 52, gap: 11 }}>
+    <div
+      className="trow"
+      data-new-program-form
+      style={{ gridTemplateColumns: '30px 1fr', minHeight: 52, gap: 11 }}
+    >
       <span />
       <span style={{ display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap' }}>
         <input
@@ -585,14 +623,21 @@ function NewProgramRow({
         <select
           className="pf-profile dateinp"
           aria-label="Template"
-          value={profileId}
-          onChange={(e) => setProfileId(e.target.value)}
+          value={choice}
+          onChange={(e) => setChoice(e.target.value)}
         >
-          {profiles.map((p) => (
+          {profiles.map((p) => [
             <option key={p.id} value={p.id}>
               {p.label}
-            </option>
-          ))}
+            </option>,
+            /* Only the built-in profile can be customised: it is the one whose
+               stages the app knows how to draw and write up. */
+            p.builtin ? (
+              <option key={`${CUSTOM}${p.id}`} value={`${CUSTOM}${p.id}`}>
+                {p.label} (Customized)
+              </option>
+            ) : null,
+          ])}
         </select>
         <button className="btn pri sm" type="button" data-create disabled={pending} onClick={submit}>
           {pending ? 'Creating…' : 'Create'}
@@ -605,7 +650,125 @@ function NewProgramRow({
             {error}
           </span>
         )}
+        {customising && (
+          <span className="num" style={{ fontSize: 12, color: 'var(--ink-3)' }}>
+            {keep.size} of {BUILTIN_PROFILE.stages.length} stages
+          </span>
+        )}
       </span>
+
+      {customising && (
+        <StagePicker
+          keep={keep}
+          locked={locked}
+          onToggle={(key, on) =>
+            setKeep((prev) => {
+              const next = new Set(prev);
+              if (on) next.add(key);
+              else next.delete(key);
+              return next;
+            })
+          }
+          onAll={(on) =>
+            setKeep(on ? new Set(BUILTIN_PROFILE.stages.map((s) => s.key)) : new Set(locked))
+          }
+        />
+      )}
+    </div>
+  );
+}
+
+/**
+ * Which of the template's stages the new program runs.
+ *
+ * Grouped by phase and ticked to start with, because the answer for most
+ * programs is "all of them" and the ones being asked about are the handful a
+ * particular chip does not do — no test chip, no package of its own, no EVB.
+ *
+ * The stages a milestone hangs off cannot be unticked. Tapeout, First Silicon
+ * and Mass Production are what the whole schedule counts down to, and a program
+ * that dropped the stage carrying one would have nothing to count down to.
+ */
+function StagePicker({
+  keep,
+  locked,
+  onToggle,
+  onAll,
+}: {
+  keep: ReadonlySet<string>;
+  locked: ReadonlySet<string>;
+  onToggle: (key: string, on: boolean) => void;
+  onAll: (on: boolean) => void;
+}) {
+  const all = keep.size === BUILTIN_PROFILE.stages.length;
+  return (
+    <div className="stagepick" data-stage-picker>
+      <div className="stagepick-hd">
+        <span className="cap">Stages this program runs</span>
+        <span style={{ flexGrow: 1 }} />
+        <button type="button" className="btn sm" data-pick-all onClick={() => onAll(!all)}>
+          {all ? 'Clear optional' : 'Select all'}
+        </button>
+      </div>
+
+      {lifecyclePhases.map(({ id, label }) => {
+        const mine = BUILTIN_PROFILE.stages.filter((s) => s.phaseId === id);
+        if (!mine.length) return null;
+        return (
+          <div key={id}>
+            <div className="groupbar" style={{ cursor: 'default' }}>
+              <b>{label}</b>
+              <span className="pill" style={{ fontSize: 10.5 }}>
+                {mine.filter((s) => keep.has(s.key)).length}/{mine.length}
+              </span>
+            </div>
+            {mine.map((st) => {
+              const on = keep.has(st.key);
+              const fixed = locked.has(st.key);
+              return (
+                <button
+                  type="button"
+                  key={st.key}
+                  className="stagepick-row"
+                  role="checkbox"
+                  aria-checked={on}
+                  aria-disabled={fixed || undefined}
+                  data-pick={st.key}
+                  data-on={on ? '' : undefined}
+                  title={fixed ? `${st.title} carries a checkpoint and has to stay` : undefined}
+                  onClick={() => !fixed && onToggle(st.key, !on)}
+                >
+                  {/* the whole row is the control, so the box is only the
+                      drawing of it and takes no click of its own */}
+                  <span className={on ? 'cb on' : 'cb'} aria-hidden="true">
+                    {on && <IconTick />}
+                  </span>
+                  <span className="pill" style={{ fontSize: 10.5, width: 46, textAlign: 'center' }}>
+                    {st.shortTitle}
+                  </span>
+                  <span
+                    className="ell"
+                    style={{ fontSize: 13, color: on ? undefined : 'var(--ink-4)' }}
+                  >
+                    {st.title}
+                  </span>
+                  {/* what closing this stage marks. The three the countdowns
+                      read are locked on; the rest leave with their stage. */}
+                  {stageMilestone[st.key] && (
+                    <span className={fixed ? 'pill acc' : 'pill'} style={{ fontSize: 10 }}>
+                      {stageMilestone[st.key].label}
+                    </span>
+                  )}
+                  <span style={{ flexGrow: 1 }} />
+                  <span className="num" style={{ fontSize: 11.5, color: 'var(--ink-4)' }}>
+                    {st.durationWeeks}w
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+        );
+      })}
     </div>
   );
 }

@@ -2896,3 +2896,22 @@ kbd{font:inherit;font-size:10.5px;border:1px solid var(--line);border-bottom-wid
 .ptl-scroll .tl{min-width:980px}
 .tl-legend{display:flex;align-items:center;gap:16px;padding:11px 20px;border-top:1px solid var(--line);
   background:var(--sunken);flex-wrap:wrap}
+
+/* ── choosing a new program's stages ─────────────
+   The block that opens under the new-program row when the template picked is
+   a customised one. It scrolls at eight rows or so rather than pushing Create
+   off the screen — the list is twenty-three long and the button that uses it
+   has to stay in sight. */
+.stagepick{grid-column:1 / -1;margin:2px 0 10px;border:1px solid var(--accent-line);border-radius:var(--r-lg);
+  background:var(--bg);overflow:hidden;max-height:340px;overflow-y:auto;overscroll-behavior:contain}
+.stagepick-hd{display:flex;align-items:center;gap:8px;padding:9px 14px;background:var(--accent-soft);
+  border-bottom:1px solid var(--accent-line);position:sticky;top:0;z-index:2}
+/* Only the block's own header sticks. Sticking the phase bars too left one
+   escaping the top of the scroller as its section went past, and a row
+   half-hidden under it at every boundary — the list is short enough that
+   scrolling past a phase heading costs nothing. */
+.stagepick-row{display:flex;align-items:center;gap:9px;width:100%;text-align:left;padding:6px 14px;
+  min-height:30px;border-bottom:1px solid var(--line-soft)}
+.stagepick-row:hover{background:var(--hover)}
+.stagepick-row[aria-disabled="true"]{cursor:default}
+.stagepick-row[aria-disabled="true"]:hover{background:transparent}
