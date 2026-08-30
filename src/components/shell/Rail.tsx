@@ -51,7 +51,14 @@ export function Rail({ projectId }: { projectId: string }) {
         <StagePanel stageId={selection.stageId} projectId={projectId} />
       )}
       {selection.kind === 'activity' && <ActivityPanel act={selection.act} projectId={projectId} />}
-      {selection.kind === 'step' && <StepPanel act={selection.act} n={selection.n} projectId={projectId} />}
+      {selection.kind === 'step' && <StepPanel
+          /* keyed on the step: moving to another one starts a fresh panel
+             rather than carrying a half-finished edit across to it */
+          key={`${selection.act}:${selection.n}`}
+          act={selection.act}
+          n={selection.n}
+          projectId={projectId}
+        />}
       {/* A deliverable opens its handover inline under its row, as the mockup
           does, so the rail keeps showing the stage it belongs to. */}
       {selection.kind === 'deliverable' && (

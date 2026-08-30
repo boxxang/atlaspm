@@ -100,11 +100,13 @@ test.describe('picking a step', () => {
     await expect(rail).toContainText('Step 2 of 6');
     await expect(rail).toContainText('Fix crosstalk');
     await expect(rail).toContainText('SI/PI engineer');
-    await expect(rail.getByLabel('Owner')).toHaveValue('');
-    await expect(rail.getByLabel('Completed')).toHaveValue('');
+    /* the facts read as facts until Edit is pressed — no owner picker and no
+       date fields sitting open on a panel nobody came to change */
+    await expect(rail).toContainText('Unassigned');
+    await expect(rail.getByLabel('Owner')).toHaveCount(0);
+    await expect(rail.getByLabel('Due')).toHaveCount(0);
     /* the rail and the row are held to the same date */
-    const [m, d, y] = (await dueOf(page, 'PD-10:2')).split('/');
-    await expect(rail.getByLabel('Due')).toHaveValue(`${y}-${m}-${d}`);
+    await expect(rail).toContainText(await dueOf(page, 'PD-10:2'));
   });
 
   test('the release step carries the activity’s key deliverables', async ({ page }) => {
@@ -128,6 +130,15 @@ test.describe('changing a step', () => {
   const rail = (page: import('./fixtures').Page) =>
     page.getByRole('complementary', { name: 'Details' });
 
+  /* Owner and the two dates are read-only until Edit, and a change is not made
+     until Save — so every test that touches one opens the editor first. */
+  const editFacts = async (page: import('./fixtures').Page) => {
+    await rail(page).locator('[data-edit-facts]').click();
+  };
+  const saveFacts = async (page: import('./fixtures').Page) => {
+    await rail(page).getByRole('button', { name: 'Save' }).click();
+  };
+
   test('marking it complete stamps the date and survives a reload', async ({ page }) => {
     await rail(page).getByRole('button', { name: 'Mark complete' }).click();
     await expect(page.locator('[data-step="PD-10:2"]')).toContainText('Completed');
@@ -141,7 +152,9 @@ test.describe('changing a step', () => {
 
   test('the completion date is editable afterwards', async ({ page }) => {
     await rail(page).getByRole('button', { name: 'Mark complete' }).click();
+    await editFacts(page);
     await rail(page).getByLabel('Completed').fill('2026-07-01');
+    await saveFacts(page);
     await writesSettled(page);
     await page.reload();
     await openActivity(page, 'PD-10');
@@ -150,7 +163,9 @@ test.describe('changing a step', () => {
 
   test('clearing the completion date reopens the step', async ({ page }) => {
     await rail(page).getByRole('button', { name: 'Mark complete' }).click();
+    await editFacts(page);
     await rail(page).getByLabel('Completed').fill('');
+    await saveFacts(page);
     await expect(page.locator('[data-step="PD-10:2"]').getByRole('checkbox')).not.toBeChecked();
   });
 
@@ -167,29 +182,63 @@ test.describe('changing a step', () => {
   }) => {
     const planned = await dueOf(page, 'PD-10:2');
 
+    await editFacts(page);
     await rail(page).getByLabel('Due').fill('2027-12-01');
-    /* a moved date offers the way back to the baseline, which is how the mockup
-       says the date was moved at all */
-    const reset = rail(page).getByRole('button', { name: 'reset' });
-    await expect(reset).toBeVisible();
+    await saveFacts(page);
     await expect(page.locator('[data-step="PD-10:2"]')).toContainText('12/01/2027');
     /* and it is not late against a date that far out */
     await expect(page.locator('[data-step="PD-10:2"]')).not.toContainText('Overdue');
 
-    await reset.click();
-    await expect(rail(page).getByRole('button', { name: 'reset' })).toHaveCount(0);
+    /* a moved date offers the way back to the baseline, which is how the mockup
+       says the date was moved at all */
+    await editFacts(page);
+    await rail(page).getByRole('button', { name: 'reset' }).click();
+    await saveFacts(page);
     await expect(page.locator('[data-step="PD-10:2"]')).toContainText(planned);
   });
 
   test('an owner comes from the stage’s own people', async ({ page }) => {
+    await editFacts(page);
     const owner = rail(page).getByLabel('Owner');
     await expect(owner.locator('option')).toContainText(['Unassigned', 'Grace Park']);
     await owner.selectOption('Grace Park');
+    await saveFacts(page);
+    await expect(rail(page)).toContainText('Grace Park');
     await writesSettled(page);
+
     await page.reload();
     await openActivity(page, 'PD-10');
     await page.locator('[data-step="PD-10:2"]').click();
-    await expect(rail(page).getByLabel('Owner')).toHaveValue('Grace Park');
+    await expect(rail(page)).toContainText('Grace Park');
+  });
+
+  /* The gate itself: nothing moves until Save, and Cancel puts back what was
+     there. A panel whose fields write straight through has no Cancel to mean
+     anything, which is why they are drafts now. */
+  test('nothing changes until Save, and Cancel puts it back', async ({ page }) => {
+    const planned = await dueOf(page, 'PD-10:2');
+
+    await editFacts(page);
+    await rail(page).getByLabel('Due').fill('2027-12-01');
+    await rail(page).getByLabel('Owner').selectOption('Grace Park');
+    /* still the old date on the row behind it */
+    await expect(page.locator('[data-step="PD-10:2"]')).toContainText(planned);
+
+    await rail(page).getByRole('button', { name: 'Cancel' }).click();
+    await expect(page.locator('[data-step="PD-10:2"]')).toContainText(planned);
+    await expect(rail(page)).toContainText('Unassigned');
+    await expect(rail(page).getByLabel('Due')).toHaveCount(0);
+  });
+
+  /* and a half-finished edit does not follow you to the next step */
+  test('moving to another step closes the editor', async ({ page }) => {
+    await editFacts(page);
+    await rail(page).getByLabel('Owner').selectOption('Grace Park');
+    await page.locator('[data-step="PD-10:3"]').click();
+
+    await expect(rail(page)).toContainText('Step 3 of 6');
+    await expect(rail(page).getByLabel('Owner')).toHaveCount(0);
+    await expect(rail(page)).toContainText('Unassigned');
   });
 
   test('progress is recorded, and a completed step reads 100', async ({ page }) => {

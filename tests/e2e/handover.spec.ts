@@ -270,8 +270,10 @@ test.describe('the team', () => {
     await expect(page.locator('[data-act]').first()).toBeVisible();
     await page.locator('[data-act="PD-10"]').click();
     await page.locator('[data-step="PD-10:2"]').click();
+    await rail(page).locator('[data-edit-facts]').click();
     await rail(page).getByLabel('Owner').selectOption('Yuna Cho');
-    await expect(rail(page).getByLabel('Owner')).toHaveValue('Yuna Cho');
+    await rail(page).getByRole('button', { name: 'Save' }).click();
+    await expect(rail(page)).toContainText('Yuna Cho');
   });
 
   test('a person is edited in place, and the change sticks', async ({ page }) => {

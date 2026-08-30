@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { useRef, useState } from 'react';
 import { attachmentUrl, formatBytes } from '@/lib/attachments';
-import { fmtDT, fromISO, toISO } from '@/lib/schedule';
+import { fmtDate, fmtDT, fromISO, toISO } from '@/lib/schedule';
 import { isStepLate, stepKey } from '@/lib/steps';
 import { detailActivityTitles } from '@/data/activityIndex';
 import { RISK_AUTHOR } from '@/data/riskSeeds';
@@ -48,6 +48,10 @@ export function StepPanel({ act, n, projectId }: { act: string; n: number; proje
   const refOf = useDeliverableRefs();
   const file = useRef<HTMLInputElement>(null);
   const [problems, setProblems] = useState<string[]>([]);
+  /* The three fields the panel lets you change, held as a draft while Edit is
+     open so Cancel means something. Keyed on the step below, so moving to
+     another step closes the editor rather than carrying the draft to it. */
+  const [draft, setDraft] = useState<Facts | null>(null);
 
   const step = a?.steps.find((s) => s.n === n);
   if (!a || !step) return null;
@@ -68,6 +72,30 @@ export function StepPanel({ act, n, projectId }: { act: string; n: number; proje
   const people = [leaders[stageId]?.name, ...(contacts[stageId] ?? []).map((c) => c.name)]
     .filter((x): x is string => !!x)
     .filter((x, i, all) => all.indexOf(x) === i);
+
+  const editingFacts = draft !== null;
+  const shownOwner = editingFacts ? draft.owner : step.owner;
+  const startFacts = () =>
+    setDraft({
+      owner: step.owner,
+      due: toISO(step.due),
+      doneAt: step.doneAt ? toISO(step.doneAt) : '',
+    });
+  const cancelFacts = () => setDraft(null);
+  const saveFacts = () => {
+    if (!draft) return;
+    const at = draft.doneAt ? fromISO(draft.doneAt) : null;
+    setStepState(act, n, {
+      owner: draft.owner,
+      /* Clearing the date puts the step back on the schedule's own, and the
+         completion date and the tick are one fact: a step with a date is
+         complete, and clearing it reopens the step. */
+      dueOverride: draft.due ? fromISO(draft.due) : null,
+      doneAt: at,
+      done: !!at,
+    });
+    setDraft(null);
+  };
 
   return (
     <>
@@ -249,8 +277,32 @@ export function StepPanel({ act, n, projectId }: { act: string; n: number; proje
           />
         )}
 
-        {/* the facts of the step, kept below the two things people came to change */}
+        {/* The facts of the step, kept below the two things people came to
+            change. Read-only until Edit: the prototype leaves owner and both
+            dates live, which is fine for a TPM correcting one in passing and
+            not fine for everybody else reading the panel — a select and two
+            date fields sitting open look like a form waiting to be filled in,
+            and one stray click changes a date nobody meant to touch. */}
         <div style={{ borderTop: '1px solid var(--line-soft)', marginTop: 15, paddingTop: 11 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 9 }}>
+            <span className="cap">Details</span>
+            <span style={{ flexGrow: 1 }} />
+            {editingFacts ? (
+              <>
+                <button type="button" className="btn sm" onClick={cancelFacts}>
+                  Cancel
+                </button>
+                <button type="button" className="btn pri sm" onClick={saveFacts}>
+                  Save
+                </button>
+              </>
+            ) : (
+              <button type="button" className="btn sm" data-edit-facts onClick={startFacts}>
+                Edit
+              </button>
+            )}
+          </div>
+
           <div className="prop">
             <span className="pk">Activity</span>
             <button
@@ -269,95 +321,120 @@ export function StepPanel({ act, n, projectId }: { act: string; n: number; proje
               {detailActivityTitles[act] ?? act}
             </button>
           </div>
+
           <div className="prop">
             <span className="pk">Owner</span>
             <span style={{ display: 'flex', alignItems: 'center', gap: 7, minWidth: 0 }}>
-              {step.owner && <Avatar name={step.owner} small />}
-              <select
-                className="lnkin"
-                value={step.owner}
-                aria-label="Owner"
-                onChange={(e) => setStepState(act, n, { owner: e.target.value })}
-              >
-                <option value="">Unassigned</option>
-                {people.map((p) => (
-                  <option key={p} value={p}>
-                    {p}
-                  </option>
-                ))}
-              </select>
+              {shownOwner && <Avatar name={shownOwner} small />}
+              {editingFacts ? (
+                <select
+                  className="lnkin"
+                  value={draft.owner}
+                  aria-label="Owner"
+                  onChange={(e) => setDraft({ ...draft, owner: e.target.value })}
+                >
+                  <option value="">Unassigned</option>
+                  {people.map((p) => (
+                    <option key={p} value={p}>
+                      {p}
+                    </option>
+                  ))}
+                </select>
+              ) : (
+                <span
+                  className="ell"
+                  style={{ fontSize: 13, color: shownOwner ? undefined : 'var(--ink-4)' }}
+                >
+                  {shownOwner || 'Unassigned'}
+                </span>
+              )}
             </span>
           </div>
+
           <div className="prop">
             <span className="pk">Lead role</span>
             <span className="ell" style={{ fontSize: 13 }}>
               {a.activity.role || '—'}
             </span>
           </div>
-          {/* Both dates stay editable after the fact — the upload sets the
-              completion date, and someone can still correct it when the file
+
+          {/* Both dates stay correctable after the fact — the upload sets the
+              completion date, and someone can still put it right when the file
               went up a day late. */}
           <div className="prop">
             <span className="pk">Due</span>
             <span style={{ display: 'flex', alignItems: 'center', gap: 7, minWidth: 0 }}>
-              <input
-                type="date"
-                className={late ? 'dateinp late' : 'dateinp'}
-                value={toISO(step.due)}
-                aria-label="Due"
-                onChange={(e) =>
+              {editingFacts ? (
+                <input
+                  type="date"
+                  className={late ? 'dateinp late' : 'dateinp'}
+                  value={draft.due}
+                  aria-label="Due"
                   /* Clearing the field puts the step back on the schedule's own
                      date rather than leaving it with none. */
-                  setStepState(act, n, {
-                    dueOverride: e.target.value ? fromISO(e.target.value) : null,
-                  })
-                }
-              />
+                  onChange={(e) => setDraft({ ...draft, due: e.target.value })}
+                />
+              ) : (
+                <span
+                  className="num"
+                  style={{
+                    fontSize: 13,
+                    color: late ? 'var(--risk)' : undefined,
+                    fontWeight: late ? 600 : 400,
+                  }}
+                >
+                  {fmtDate(step.due)}
+                </span>
+              )}
               {late && (
                 <span className="pill risk" style={{ fontSize: 10 }}>
                   overdue
                 </span>
               )}
-              {step.dueSet && (
+              {editingFacts && step.dueSet && (
                 <button
                   type="button"
                   style={{ fontSize: 11, color: 'var(--accent)', whiteSpace: 'nowrap' }}
                   title="back to the schedule baseline"
-                  onClick={() => setStepState(act, n, { dueOverride: null })}
+                  onClick={() => setDraft({ ...draft, due: '' })}
                 >
                   reset
                 </button>
               )}
             </span>
           </div>
+
           <div className="prop">
             <span className="pk">Completed</span>
             <span style={{ display: 'flex', alignItems: 'center', gap: 7, minWidth: 0 }}>
-              <input
-                type="date"
-                className="dateinp"
-                value={step.doneAt ? toISO(step.doneAt) : ''}
-                aria-label="Completed"
-                onChange={(e) => {
-                  const at = e.target.value ? fromISO(e.target.value) : null;
-                  /* The date and the tick are one fact: a step with a completion
-                     date is complete, and clearing it reopens the step. */
-                  setStepState(act, n, { doneAt: at, done: !!at });
-                }}
-              />
-              {!step.doneAt && (
+              {editingFacts ? (
+                <input
+                  type="date"
+                  className="dateinp"
+                  value={draft.doneAt}
+                  aria-label="Completed"
+                  onChange={(e) => setDraft({ ...draft, doneAt: e.target.value })}
+                />
+              ) : (
+                <span className="num" style={{ fontSize: 13 }}>
+                  {step.doneAt ? fmtDate(step.doneAt) : '—'}
+                </span>
+              )}
+              {!step.doneAt && !editingFacts && (
                 <span style={{ fontSize: 11, color: 'var(--ink-4)' }}>
                   set when an output is attached
                 </span>
               )}
             </span>
           </div>
+
           <div className="prop">
             <span className="pk">TAT</span>
             <span className="num" style={{ fontSize: 13 }}>
               {step.tat} week{step.tat === 1 ? '' : 's'}
             </span>
           </div>
+
           {a.outputs.get(n) && a.outputs.get(n)!.length > 0 && (
             <div className="prop" style={{ alignItems: 'start' }}>
               <span className="pk" style={{ paddingTop: 2 }}>
@@ -423,6 +500,14 @@ export function StepPanel({ act, n, projectId }: { act: string; n: number; proje
  * The filled part of the range track, painted rather than left grey: a slider
  * whose left side is not coloured reads as unset, whatever number is beside it.
  */
+/** What Edit opens: the three things about a step somebody corrects by hand. */
+interface Facts {
+  owner: string;
+  /** yyyy-mm-dd, as the date inputs carry it; empty means "the plan's own". */
+  due: string;
+  doneAt: string;
+}
+
 const rangeFill = (pct: number, done: boolean) => {
   const c = done ? 'var(--ok)' : 'var(--accent)';
   return `linear-gradient(to right,${c} 0%,${c} ${pct}%,var(--muted) ${pct}%,var(--muted) 100%)`;
