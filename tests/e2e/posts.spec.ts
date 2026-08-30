@@ -111,6 +111,34 @@ test.describe('posting on a step', () => {
     await expect(rail(page)).toContainText('No updates on this step yet.');
   });
 
+  /* A blank line is how a post separates two thoughts and an indent is how it
+     quotes a log line. Collapsing both is the browser's default, not a
+     decision anybody made. */
+  test('a post keeps the line breaks and spacing it was written with', async ({ page }) => {
+    await openStep(page, 'PD-10', 4);
+    const typed = 'First line.\n\nSecond paragraph.\n    indented   with   gaps';
+    await rail(page).getByLabel('What happened on step 4…').fill(typed);
+    await rail(page).getByRole('button', { name: 'Post' }).click();
+
+    const body = rail(page).locator('.post .txt').first();
+    await expect(body).toHaveText(typed);
+    /* rendered, not merely stored: three lines of text occupy three lines */
+    const lines = await body.evaluate((el) => {
+      const style = getComputedStyle(el);
+      return {
+        ws: style.whiteSpace,
+        rows: Math.round(el.getBoundingClientRect().height / parseFloat(style.lineHeight)),
+      };
+    });
+    expect(lines.ws).toBe('pre-wrap');
+    expect(lines.rows).toBeGreaterThanOrEqual(4);
+    await writesSettled(page);
+
+    await page.reload();
+    await openStep(page, 'PD-10', 4);
+    await expect(rail(page).locator('.post .txt').first()).toHaveText(typed);
+  });
+
   test('ticking risk makes it a risk, and the boards pick it up', async ({ page }) => {
     await openStep(page, 'PD-08', 5);
     await rail(page).getByLabel('What happened on step 5…').fill('Antenna fixes need another routing turn.');

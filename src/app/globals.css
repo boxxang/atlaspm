@@ -2414,7 +2414,12 @@ button.clip:hover{background:var(--accent-line)}
 .pk{font-size:12.5px;color:var(--ink-3)}
 .post{display:flex;gap:10px;margin-bottom:15px}
 .post .who{display:flex;align-items:center;gap:7px;flex-wrap:wrap}
-.post .txt{font-size:13.5px;line-height:1.5;margin-top:4px}
+/* What somebody typed, as they typed it. Blank lines are how a post separates
+   two thoughts and indentation is how it quotes a log line; collapsing both is
+   the browser's default, not a decision. break-word so a pasted path cannot
+   push the rail wider than it is. */
+.post .txt{font-size:13.5px;line-height:1.5;margin-top:4px;white-space:pre-wrap;
+  overflow-wrap:break-word}
 .acts{display:flex;gap:2px;opacity:0;transition:opacity .12s}
 /* only the post or reply actually under the cursor shows its controls */
 .post:hover .postacts,.reply:hover .postacts,.feedrow:hover .acts,.acts:focus-within{opacity:1}
@@ -2443,7 +2448,8 @@ button.clip:hover{background:var(--accent-line)}
 .addreply{position:relative}
 .addreply::before{content:"";position:absolute;left:-16px;top:9px;width:10px;height:2px;background:var(--accent-line)}
 .reply .who{display:flex;align-items:center;gap:7px;flex-wrap:wrap}
-.reply .txt{font-size:13px;line-height:1.5;margin-top:3px;color:var(--ink-body)}
+.reply .txt{font-size:13px;line-height:1.5;margin-top:3px;color:var(--ink-body);
+  white-space:pre-wrap;overflow-wrap:break-word}
 .addreply{align-self:flex-start;font-size:11.5px;color:var(--accent);font-weight:550}
 .addreply:hover{color:var(--accent-hov)}
 .btn.dng{color:var(--risk-ink);border-color:var(--risk-line);background:var(--risk-soft)}

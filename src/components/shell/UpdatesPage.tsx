@@ -101,7 +101,15 @@ export function UpdatesPage({
               <div style={{ fontSize: 13, fontWeight: 500, marginTop: 2 }}>{p.title}</div>
             )}
             <div
-              style={{ fontSize: 13, color: 'var(--ink-2)', marginTop: 1, lineHeight: 1.45 }}
+              /* the whole body, as it was typed — this row is not a preview */
+              style={{
+                fontSize: 13,
+                color: 'var(--ink-2)',
+                marginTop: 1,
+                lineHeight: 1.45,
+                whiteSpace: 'pre-wrap',
+                overflowWrap: 'break-word',
+              }}
             >
               {p.text}
             </div>
