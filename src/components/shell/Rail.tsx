@@ -1,10 +1,11 @@
 'use client';
 
+import { usePathname } from 'next/navigation';
 import { phaseById } from '@/data/scheduleProfiles';
 import { formatManMonths } from '@/lib/effort';
 import { fmtDate } from '@/lib/schedule';
 import { useAppStore } from '@/store/useAppStore';
-import { useRailStore } from '@/store/railStore';
+import { useRailStore, type RailSelection } from '@/store/railStore';
 import { ActivityPanel } from './ActivityPanel';
 import { DeliverableLines } from './DeliverableLines';
 import { Avatar } from './icons';
@@ -23,9 +24,24 @@ import { useStageSteps } from './useStageSteps';
  * With nothing picked the rail is not there at all, which is what the mockup
  * does: the Overview and the two cross-program boards want the width, and a
  * 400px column saying "pick something" is worse than the width it costs.
+ *
+ * A stage screen is the exception, and it is derived here rather than asserted
+ * by the stage page. The rail clears on every navigation — moving between a
+ * stage's tabs is a navigation, and clicking the open activity a second time is
+ * "never mind" — and in the mockup neither of those empties the rail, because
+ * `VIEWS.stage` always draws the stage's properties under whatever else is
+ * picked. Deriving the floor from the route is the only version of that which
+ * cannot come apart: an effect racing the shell's clear works or not depending
+ * on which of them React runs last.
  */
 export function Rail({ projectId }: { projectId: string }) {
-  const selection = useRailStore((s) => s.selection);
+  const picked = useRailStore((s) => s.selection);
+  const stages = useAppStore((s) => s.stages);
+  const route = usePathname().match(/\/stage\/([^/?]+)/)?.[1] ?? null;
+  /* a route naming a stage this program does not run has nothing to show */
+  const onStage = route && stages.some((s) => s.id === route) ? route : null;
+  const selection: RailSelection =
+    picked.kind === 'none' && onStage ? { kind: 'stage', stageId: onStage } : picked;
 
   if (selection.kind === 'none') return null;
 

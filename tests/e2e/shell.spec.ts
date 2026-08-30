@@ -70,6 +70,33 @@ test.describe('the rail', () => {
     await expect(page.getByRole('complementary', { name: 'Details' })).toHaveCount(0);
   });
 
+  /* On a stage screen the rail is never empty: the stage's own properties are
+     the floor under whatever else is picked, as they are in the mockup. Both of
+     these used to empty it — moving tabs is a navigation, and clicking the open
+     row again is "never mind". */
+  test('a stage keeps its properties under everything, tab to tab', async ({ page }) => {
+    await page.goto(`${SHELL_PATH}/stage/physicalDesign/activity`);
+    const rail = page.getByRole('complementary', { name: 'Details' });
+    await expect(rail).toContainText('Properties');
+
+    for (const tab of ['Team', 'Key info', 'Key deliverables', 'Updates']) {
+      await page.locator('.tabs').getByRole('link', { name: new RegExp(`^${tab}`) }).click();
+      await expect(rail, `the rail went away on ${tab}`).toContainText('Properties');
+    }
+  });
+
+  test('un-picking an activity falls back to the stage, not to nothing', async ({ page }) => {
+    await page.goto(`${SHELL_PATH}/stage/physicalDesign/activity`);
+    const rail = page.getByRole('complementary', { name: 'Details' });
+    await expect(page.locator('[data-act]').first()).toBeVisible();
+
+    await page.locator('[data-act="PD-10"]').click();
+    await expect(rail).toContainText('Signal and Power Integrity');
+    await page.locator('[data-act="PD-10"]').click();
+    await expect(rail).toContainText('Properties');
+    await expect(rail).toContainText('Grace Park');
+  });
+
   /* A row on the stages list opens that stage, as the mockup's does, and the
      stage's rail answers for it without anything else being clicked. */
   test('follows the stage you opened', async ({ page }) => {

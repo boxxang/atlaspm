@@ -58,10 +58,10 @@ export function StagePage({
   /**
    * What the rail opens on.
    *
-   * A stage on its own selects itself, so the rail answers the question the page
-   * is about before anything has been clicked. A link that names an activity, a
-   * step or a deliverable — the Overview's rows and the Timeline's do — selects
-   * that instead.
+   * Only what a link explicitly named. A stage screen with nothing picked shows
+   * the stage's own properties, but that floor is derived in the rail from the
+   * route rather than asserted here — see Rail — so that moving between tabs
+   * and un-picking a row both land on it without this effect having to re-run.
    *
    * It travels in the URL rather than being set before the navigation, because
    * the shell clears the rail on every route change: setting it first and
@@ -89,7 +89,6 @@ export function StagePage({
       });
       return;
     }
-    useRailStore.setState({ selection: { kind: 'stage', stageId: stage.id } });
   }, [stage, wantStep, wantAct, wantDeliverable]);
 
   if (!stage) {
