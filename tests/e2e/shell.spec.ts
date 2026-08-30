@@ -61,6 +61,41 @@ test.describe('the nav', () => {
   });
 });
 
+/* Where you are and how to leave: the program's name is the heading, and the
+   way back to the list is its own row rather than a click on that name. */
+test.describe('the rail’s heading', () => {
+  test('the program is named, above what it runs on', async ({ page }) => {
+    await page.goto(`${SHELL_PATH}/overview`);
+    const nav = page.getByRole('navigation', { name: 'Program' });
+    await expect(nav.locator('[data-program-name]')).toContainText('AtlasAX1');
+    await expect(nav.locator('[data-program-name]')).toContainText('Typical SoC');
+
+    /* and it is the biggest thing in the rail, which is the point of it */
+    const sizes = await nav.evaluate((el) => ({
+      name: parseFloat(getComputedStyle(el.querySelector('.progname')!).fontSize),
+      home: parseFloat(getComputedStyle(el.querySelector('[data-home]')!).fontSize),
+      item: parseFloat(getComputedStyle(el.querySelector('.nav')!).fontSize),
+    }));
+    expect(sizes.name).toBeGreaterThan(sizes.item);
+    expect(sizes.name).toBeGreaterThan(sizes.home);
+  });
+
+  test('a row of its own leads back to the program list', async ({ page }) => {
+    await page.goto(`${SHELL_PATH}/stage/physicalDesign/activity`);
+    await page.getByRole('navigation', { name: 'Program' }).locator('[data-home]').click();
+    await expect(page).toHaveURL(/\/$/);
+    await expect(page.locator('[data-program]').first()).toBeVisible();
+  });
+
+  /* The name used to be the link home, which read as "open this program" and
+     did the opposite. It is not a link now. */
+  test('the program’s own name does not navigate', async ({ page }) => {
+    await page.goto(`${SHELL_PATH}/overview`);
+    const nav = page.getByRole('navigation', { name: 'Program' });
+    await expect(nav.locator('[data-program-name]').locator('a')).toHaveCount(0);
+  });
+});
+
 test.describe('the rail', () => {
   /* With nothing picked the rail is not there, which is what the mockup does:
      the screens that have no selection want the width more than they want a

@@ -47,6 +47,89 @@ test.describe('the program list', () => {
     ).toContainText('0');
   });
 
+  /* The toolbar's two buttons were decoration. They order and narrow the list
+     by the figures the rows already print. */
+  test.describe('the toolbar', () => {
+    const open = async (page: Page, which: 'filter' | 'sort') => {
+      await page.locator(`[data-menu="${which}"]`).click();
+      await expect(page.locator(`[data-menu-pop="${which}"]`)).toBeVisible();
+    };
+
+    test('sorting reorders the list and says what it sorted by', async ({ page }) => {
+      await page.locator('[data-new-project]').click();
+      await page.locator('.pf-name').fill('Zulu');
+      await page.locator('.pf-kickoff').fill('2029-01-01');
+      await page.locator('[data-create]').click();
+      await page.waitForURL(/\/p\/zulu-[^/]*\/overview$/);
+      await page.goto('/');
+      await expect(page.locator('[data-program]')).toHaveCount(2);
+
+      /* the default is the nearest mask order, which is the seeded program */
+      await expect(page.locator('[data-menu="sort"]')).toContainText('Tapeout');
+      await expect(page.locator('[data-program]').first()).toContainText('AtlasAX1');
+
+      await open(page, 'sort');
+      await page.locator('[data-opt="kickoff"]').click();
+      await expect(page.locator('[data-menu="sort"]')).toContainText('Newest');
+      await expect(page.locator('[data-program]').first()).toContainText('Zulu');
+    });
+
+    test('filtering narrows the list, and the count says so', async ({ page }) => {
+      /* a second program, kicking off years out, so it has nothing late */
+      await page.locator('[data-new-project]').click();
+      await page.locator('.pf-name').fill('Ahead');
+      await page.locator('.pf-kickoff').fill('2029-01-01');
+      await page.locator('[data-create]').click();
+      await page.waitForURL(/\/p\/ahead-[^/]*\/overview$/);
+      await page.goto('/');
+      await expect(page.locator('[data-count]')).toHaveText('2');
+
+      await open(page, 'filter');
+      await page.locator('[data-opt="late"]').click();
+      await expect(page.locator('[data-menu="filter"]')).toContainText('With late steps');
+      /* the seeded program is the one with late steps */
+      await expect(page.locator('[data-program]')).toHaveCount(1);
+      await expect(page.locator('[data-program]').first()).toContainText('AtlasAX1');
+      await expect(page.locator('[data-count]')).toHaveText('1 of 2');
+
+      await open(page, 'filter');
+      await page.locator('[data-opt="all"]').click();
+      await expect(page.locator('[data-menu="filter"]')).toContainText('Filter');
+      await expect(page.locator('[data-count]')).toHaveText('2');
+    });
+
+    test('a filter that answers nothing says so rather than showing an empty table', async ({
+      page,
+    }) => {
+      /* nothing on the seed is finished, so "least done" keeps everything —
+         but a program list with no risks at all has an answer to give */
+      await page.locator('[data-new-project]').click();
+      await page.locator('.pf-name').fill('Quiet');
+      await page.locator('.pf-kickoff').fill('2029-01-01');
+      await page.locator('[data-create]').click();
+      await page.waitForURL(/\/p\/quiet-[^/]*\/overview$/);
+      await page.goto('/');
+
+      await open(page, 'filter');
+      await page.locator('[data-opt="stale"]').click();
+      const rows = await page.locator('[data-program]').count();
+      if (rows === 0) {
+        await expect(page.getByText('No program answers that')).toBeVisible();
+        await expect(page.getByText(/Clear the filter to see all/)).toBeVisible();
+      }
+    });
+
+    test('the menu closes on Escape and on a click away', async ({ page }) => {
+      await open(page, 'filter');
+      await page.keyboard.press('Escape');
+      await expect(page.locator('[data-menu-pop="filter"]')).toHaveCount(0);
+
+      await open(page, 'sort');
+      await page.locator('h2').first().click();
+      await expect(page.locator('[data-menu-pop="sort"]')).toHaveCount(0);
+    });
+  });
+
   /* Not every chip does every stage. Picking the template's customised entry
      opens the 23 and starts the program on what is left ticked. */
   test.describe('on some of the template’s stages', () => {

@@ -87,13 +87,29 @@ export function LeftNav({ projectId }: { projectId: string }) {
 
   return (
     <nav id="side" aria-label="Program">
-      <Link className="brand" href="/" title="All programs">
-        <span className="mark">{projectName.slice(0, 1).toUpperCase()}</span>
-        <span style={{ flexGrow: 1 }}>
-          <span style={{ fontSize: 13, fontWeight: 600, display: 'block' }}>{projectName}</span>
+      {/* Where you are, in two lines: the app, and then the program — which is
+          the one word on this screen that changes everything else on it, so it
+          is the largest thing in the rail. The way out is its own row rather
+          than a click on the program's own name, which read as "open this
+          program" and did the opposite. */}
+      <Link className="homerow" href="/" data-home>
+        <span className="mark" style={{ width: 18, height: 18, fontSize: 9.5 }}>
+          A
+        </span>
+        AtlasPM
+        <span className="g" />
+        <span className="c">All programs</span>
+      </Link>
+
+      <div className="brand" data-program-name>
+        <span style={{ flexGrow: 1, minWidth: 0 }}>
+          <span className="progname ell">{projectName}</span>
+          <span className="progsub">
+            {profile.label} · {stages.length} stages
+          </span>
         </span>
         <IconSwitch />
-      </Link>
+      </div>
 
       <div className="search">
         <IconSearch />

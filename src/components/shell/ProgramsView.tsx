@@ -2,15 +2,22 @@
 
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useMemo, useState, useSyncExternalStore, useTransition } from 'react';
+import { useEffect, useMemo, useRef, useState, useSyncExternalStore, useTransition } from 'react';
 import { createProject, deleteProject } from '@/app/actions';
 import { activitySteps } from '@/data/activitySteps';
 import { BUILTIN_PROFILE, lifecyclePhases, stageMilestone } from '@/data/scheduleProfiles';
 import type { ProfileSummary } from '@/data/types';
 import { requiredStages } from '@/lib/customProfile';
 import { estimateCost } from '@/lib/effort';
+import {
+  FILTERS,
+  listPrograms,
+  SORTS,
+  type FilterKey,
+  type SortKey,
+} from '@/lib/programList';
 import type { ProjectSummary } from '@/lib/queries';
-import { computeSchedule, fmtDate, fromISO, startOfDay, toISO } from '@/lib/schedule';
+import { computeSchedule, fmtDate, fromISO, startOfDay, toISO, type Schedule } from '@/lib/schedule';
 import { fromStepIndex, plannedSteps } from '@/lib/steps';
 import {
   Avatar,
@@ -42,8 +49,46 @@ export function ProgramsView({
   projects: ProjectSummary[];
   profiles: ProfileSummary[];
 }) {
+  const [filter, setFilter] = useState<FilterKey>('all');
+  const [sort, setSort] = useState<SortKey>('tapeout');
+  const today = useToday();
+
+  /* The figures the toolbar sorts and narrows by are the ones the rows print,
+     resolved here so a program's place in the list and the numbers on it cannot
+     disagree. Lateness needs the viewer's clock, so before it is known every
+     program counts as nothing late rather than as something. */
+  const rows = useMemo(
+    () =>
+      projects.map((p) => {
+        const schedule = computeSchedule(p.kickoff, p.profile, p.overrides);
+        return {
+          id: p.id,
+          name: p.name,
+          kickoff: p.kickoff,
+          tapeout: schedule.tapeout,
+          openRisks: p.openRisks,
+          staleRisks: p.staleRisks,
+          overdue: today ? overdueSteps(p, schedule, today) : 0,
+          progressPct: p.deliverablesTotal
+            ? Math.round((p.deliverablesDone / p.deliverablesTotal) * 100)
+            : 0,
+          inFlight: today ? stagesRunning(p, schedule, today) : [],
+        };
+      }),
+    [projects, today],
+  );
+
+  const order = useMemo(() => listPrograms(rows, filter, sort), [rows, filter, sort]);
+  const shown = useMemo(
+    () => order.map((r) => projects.find((p) => p.id === r.id)!),
+    [order, projects],
+  );
+
   const [picked, setPicked] = useState(projects[0]?.id ?? null);
-  const selected = projects.find((p) => p.id === picked) ?? projects[0] ?? null;
+  /* What the rail shows: whatever is picked, unless narrowing has just taken it
+     off the list — then the top of the list, which is what the reader is
+     looking at. */
+  const selected = shown.find((p) => p.id === picked) ?? shown[0] ?? null;
 
   return (
     <div id="app">
@@ -62,7 +107,17 @@ export function ProgramsView({
 
         <div className="body">
           <div className="scroll" id="view">
-            <ProgramTable projects={projects} picked={picked} onPick={setPicked} profiles={profiles} />
+            <ProgramTable
+              projects={shown}
+              total={projects.length}
+              picked={selected?.id ?? null}
+              onPick={setPicked}
+              profiles={profiles}
+              filter={filter}
+              sort={sort}
+              onFilter={setFilter}
+              onSort={setSort}
+            />
           </div>
           {selected && <ProgramPeek project={selected} />}
         </div>
@@ -75,16 +130,29 @@ const COLS = { gridTemplateColumns: '30px 1fr 140px 116px 100px 62px 62px 92px 9
 
 function ProgramTable({
   projects,
+  total,
   picked,
   onPick,
   profiles,
+  filter,
+  sort,
+  onFilter,
+  onSort,
 }: {
   projects: ProjectSummary[];
+  /** Before narrowing — the count says "6 of 9" when a filter is on. */
+  total: number;
   picked: string | null;
   onPick: (id: string) => void;
   profiles: ProfileSummary[];
+  filter: FilterKey;
+  sort: SortKey;
+  onFilter: (k: FilterKey) => void;
+  onSort: (k: SortKey) => void;
 }) {
   const [adding, setAdding] = useState(false);
+  const filterLabel = FILTERS.find((f) => f.key === filter)!.label;
+  const sortLabel = SORTS.find((o) => o.key === sort)!.label;
 
   return (
     <>
@@ -99,16 +167,27 @@ function ProgramTable({
         }}
       >
         <h2 style={{ fontSize: 17, fontWeight: 600, letterSpacing: '-.02em' }}>Programs</h2>
-        <span className="pill">{projects.length}</span>
+        <span className="pill" data-count>
+          {projects.length === total ? total : `${projects.length} of ${total}`}
+        </span>
         <span style={{ flexGrow: 1 }} />
-        <button className="btn sm" type="button">
-          <IconFilter />
-          Filter
-        </button>
-        <button className="btn sm" type="button">
-          <IconSort />
-          Sort: Tapeout
-        </button>
+        <PickMenu
+          hook="filter"
+          icon={<IconFilter />}
+          label={filter === 'all' ? 'Filter' : filterLabel}
+          on={filter !== 'all'}
+          options={FILTERS}
+          chosen={filter}
+          onChoose={onFilter}
+        />
+        <PickMenu
+          hook="sort"
+          icon={<IconSort />}
+          label={`Sort: ${sortLabel}`}
+          options={SORTS}
+          chosen={sort}
+          onChoose={onSort}
+        />
         <button className="btn pri sm" type="button" data-new-project onClick={() => setAdding(true)}>
           <IconPlus light />
           New program
@@ -167,17 +246,148 @@ function ProgramTable({
         <div className="empty" style={{ paddingTop: 44 }}>
           <IconEmptyList />
           <div style={{ fontSize: 14, fontWeight: 600, color: 'var(--ink-2)' }}>
-            {projects.length === 1 ? 'One program so far' : 'No programs yet'}
+            {total === 0
+              ? 'No programs yet'
+              : projects.length === 0
+                ? 'No program answers that'
+                : 'One program so far'}
           </div>
           <p className="mono-note" style={{ maxWidth: '46ch' }}>
-            This list is where a TPM holding several tape-outs starts the day — sorted by whichever
-            one is closest to its mask order. It reads the same at one program and at twenty.
+            {projects.length === 0 && total > 0
+              ? `Nothing here is ${filterLabel.toLowerCase()}. Clear the filter to see all ${total}.`
+              : 'This list is where a TPM holding several tape-outs starts the day — sorted by whichever one is closest to its mask order. It reads the same at one program and at twenty.'}
           </p>
         </div>
       )}
     </>
   );
 }
+
+/**
+ * One toolbar button that drops open a list of choices.
+ *
+ * The same shape as the mockup's other menus — a button, a popover of rows with
+ * a label and a line of explanation — because a filter whose entries say only
+ * "Stale" makes the reader guess what the app means by it.
+ *
+ * It closes on a choice, on Escape and on a click anywhere else, which is what
+ * a menu that is not a modal has to do.
+ */
+function PickMenu<K extends string>({
+  hook,
+  icon,
+  label,
+  on = false,
+  options,
+  chosen,
+  onChoose,
+}: {
+  hook: string;
+  icon: React.ReactNode;
+  label: string;
+  /** Draw it as active — a filter that is on should look on. */
+  on?: boolean;
+  options: readonly { key: K; label: string; hint?: string }[];
+  chosen: K;
+  onChoose: (k: K) => void;
+}) {
+  const [open, setOpen] = useState(false);
+  const box = useRef<HTMLSpanElement>(null);
+
+  useEffect(() => {
+    if (!open) return;
+    const away = (e: MouseEvent) => {
+      if (!box.current?.contains(e.target as Node)) setOpen(false);
+    };
+    const esc = (e: KeyboardEvent) => e.key === 'Escape' && setOpen(false);
+    document.addEventListener('mousedown', away);
+    document.addEventListener('keydown', esc);
+    return () => {
+      document.removeEventListener('mousedown', away);
+      document.removeEventListener('keydown', esc);
+    };
+  }, [open]);
+
+  return (
+    <span className="menu" ref={box} style={{ display: 'inline-flex' }}>
+      <button
+        type="button"
+        className={on || open ? 'btn sm on' : 'btn sm'}
+        data-menu={hook}
+        aria-expanded={open}
+        onClick={() => setOpen((o) => !o)}
+      >
+        {icon}
+        {label}
+        <svg
+          width="9"
+          height="9"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="#8b8f98"
+          strokeWidth="2.6"
+          style={{ transform: open ? 'rotate(180deg)' : undefined }}
+          aria-hidden="true"
+        >
+          <path d="m6 9 6 6 6-6" />
+        </svg>
+      </button>
+      {open && (
+        <div className="menu-pop" data-menu-pop={hook}>
+          {options.map((o) => (
+            <button
+              key={o.key}
+              type="button"
+              className="mi"
+              data-opt={o.key}
+              aria-current={o.key === chosen || undefined}
+              onClick={() => {
+                onChoose(o.key);
+                setOpen(false);
+              }}
+            >
+              <span style={{ width: 13, flexShrink: 0, color: 'var(--accent)' }}>
+                {o.key === chosen ? '✓' : ''}
+              </span>
+              <span>
+                {o.label}
+                {o.hint && <span className="d">{o.hint}</span>}
+              </span>
+            </button>
+          ))}
+        </div>
+      )}
+    </span>
+  );
+}
+
+/**
+ * Every step past its date with nothing handed over — the rule the program's
+ * own screens use, so a row and the program it opens agree. It takes today as
+ * an argument rather than reading the clock, because the toolbar needs the same
+ * number for every program at once.
+ */
+function overdueSteps(p: ProjectSummary, schedule: Schedule, today: Date): number {
+  const done = new Set(p.doneSteps);
+  let n = 0;
+  for (const [ref, a] of Object.entries(activitySteps)) {
+    const span = schedule.stages[a.st];
+    if (!span) continue;
+    for (const step of plannedSteps(span.start, fromStepIndex(ref, a))) {
+      if (step.end < today && !done.has(`${ref}:${step.n}`)) n++;
+    }
+  }
+  return n;
+}
+
+/** The stages whose window is open today. */
+const stagesRunning = (p: ProjectSummary, schedule: Schedule, today: Date): string[] =>
+  p.profile.stages
+    .map((s) => s.key)
+    .filter((k) => {
+      const span = schedule.stages[k];
+      return !!span && span.start <= today && today <= span.end;
+    });
 
 /** Today, from the browser's clock — never the server's. */
 function useToday(): Date | null {
@@ -196,35 +406,13 @@ function useProgramFigures(p: ProjectSummary) {
     [p.kickoff, p.profile, p.overrides],
   );
 
-  /* Overdue means a step past its date with nothing handed over — the rule the
-     program's own screens use, so a row and the program it opens agree. It is
-     counted here rather than in the query because lateness needs the viewer's
-     clock. */
-  const overdue = useMemo(() => {
-    if (!today) return 0;
-    const done = new Set(p.doneSteps);
-    let n = 0;
-    for (const [ref, a] of Object.entries(activitySteps)) {
-      const span = schedule.stages[a.st];
-      if (!span) continue;
-      for (const step of plannedSteps(span.start, fromStepIndex(ref, a))) {
-        if (step.end < today && !done.has(`${ref}:${step.n}`)) n++;
-      }
-    }
-    return n;
-  }, [today, p.doneSteps, schedule]);
-
+  const overdue = useMemo(
+    () => (today ? overdueSteps(p, schedule, today) : 0),
+    [today, p, schedule],
+  );
   const inFlight = useMemo(
-    () =>
-      today
-        ? p.profile.stages
-            .map((s) => s.key)
-            .filter((k) => {
-              const span = schedule.stages[k];
-              return span && span.start <= today && today <= span.end;
-            })
-        : [],
-    [today, p.profile.stages, schedule],
+    () => (today ? stagesRunning(p, schedule, today) : []),
+    [today, p, schedule],
   );
 
   return { today, schedule, overdue, inFlight };

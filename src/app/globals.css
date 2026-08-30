@@ -2915,3 +2915,23 @@ kbd{font:inherit;font-size:10.5px;border:1px solid var(--line);border-bottom-wid
 .stagepick-row:hover{background:var(--hover)}
 .stagepick-row[aria-disabled="true"]{cursor:default}
 .stagepick-row[aria-disabled="true"]:hover{background:transparent}
+
+/* The chosen row in a toolbar menu. The tick already says which one it is, so
+   this only has to make it findable at a glance. */
+.mi[aria-current]{background:var(--accent-wash)}
+.mi[aria-current] > span:last-child{font-weight:600}
+
+/* ── the rail's heading ──────────────────────────
+   The program's name is what every figure under it is about, so it is the
+   largest thing in the rail rather than a 13px line beside an icon. Above it,
+   a quieter row for the app and the way back out — which used to be the same
+   click as the program's own name, and so read as "open this program". */
+.homerow{display:flex;align-items:center;gap:8px;padding:4px 9px 4px 6px;border-radius:var(--r);
+  width:100%;font-size:12px;color:var(--ink-3);font-weight:550}
+.homerow:hover{background:var(--hover);color:var(--ink-2)}
+.homerow .c{font-size:11px;color:var(--ink-4)}
+.homerow:hover .c{color:var(--accent)}
+.brand{cursor:default}
+.brand:hover{background:transparent}
+.progname{display:block;font-size:17px;font-weight:650;letter-spacing:-.02em;line-height:1.2}
+.progsub{display:block;font-size:11px;color:var(--ink-4);margin-top:2px}
