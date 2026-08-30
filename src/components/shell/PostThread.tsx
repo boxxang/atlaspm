@@ -40,6 +40,8 @@ export function PostThread({
   steps,
   /** The step this thread is already about — shown as a chip, not a choice. */
   fixedStep,
+  /** Square off the bar's corners, for a composer that fills its own box. */
+  squareBar = false,
   /** Show which step each post is about — an activity's thread does, a step's does not. */
   showStep = false,
   emptyText,
@@ -57,6 +59,7 @@ export function PostThread({
   allowRisk?: boolean;
   steps?: readonly { n: number; text: string }[];
   fixedStep?: number | null;
+  squareBar?: boolean;
   showStep?: boolean;
   emptyText: string;
 }) {
@@ -109,6 +112,7 @@ export function PostThread({
           allowRisk={allowRisk}
           steps={steps}
           fixedStep={fixedStep}
+          squareBar={squareBar}
           onPost={(text, risk, stepN) =>
             savePost({
               ...target,
@@ -397,6 +401,7 @@ function Composer({
   allowRisk = false,
   steps,
   fixedStep,
+  squareBar = false,
   submitLabel = 'Post',
 }: {
   placeholder: string;
@@ -405,6 +410,7 @@ function Composer({
   allowRisk?: boolean;
   steps?: readonly { n: number; text: string }[];
   fixedStep?: number | null;
+  squareBar?: boolean;
   submitLabel?: string;
 }) {
   const [text, setText] = useState('');
@@ -430,7 +436,7 @@ function Composer({
           if (e.key === 'Escape' && onCancel) onCancel();
         }}
       />
-      <div className="bar">
+      <div className="bar" style={squareBar ? { height: 'auto', borderRadius: 0 } : undefined}>
         {fixedStep != null && <span className="stepsel">Step {fixedStep}</span>}
         {steps && (
           <select

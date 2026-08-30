@@ -136,7 +136,7 @@ test.describe('changing a step', () => {
     await page.reload();
     await openActivity(page, 'PD-10');
     await expect(page.locator('[data-step="PD-10:2"]')).toContainText('Completed');
-    await expect(page.locator('[data-step="PD-10:2"] input[type="checkbox"]')).toBeChecked();
+    await expect(page.locator('[data-step="PD-10:2"]').getByRole('checkbox')).toBeChecked();
   });
 
   test('the completion date is editable afterwards', async ({ page }) => {
@@ -151,11 +151,11 @@ test.describe('changing a step', () => {
   test('clearing the completion date reopens the step', async ({ page }) => {
     await rail(page).getByRole('button', { name: 'Mark complete' }).click();
     await rail(page).getByLabel('Completed').fill('');
-    await expect(page.locator('[data-step="PD-10:2"] input[type="checkbox"]')).not.toBeChecked();
+    await expect(page.locator('[data-step="PD-10:2"]').getByRole('checkbox')).not.toBeChecked();
   });
 
   test('the checkbox in the table does the same thing', async ({ page }) => {
-    await page.locator('[data-step="PD-10:3"] input[type="checkbox"]').check();
+    await page.locator('[data-step="PD-10:3"]').getByRole('checkbox').check();
     await expect(page.locator('[data-step="PD-10:3"]')).toContainText('Completed');
     /* and ticking a row does not select it — the box is about the step, the
        row is about what the rail shows */
@@ -253,7 +253,7 @@ test.describe('handing an output over', () => {
     await rail(page).getByRole('button', { name: 'Remove draft.txt' }).click();
     await expect(rail(page)).toContainText('Nothing attached yet');
     await expect(page.locator('[data-step="PD-10:2"]')).not.toContainText('Completed');
-    await expect(page.locator('[data-step="PD-10:2"] input[type="checkbox"]')).not.toBeChecked();
+    await expect(page.locator('[data-step="PD-10:2"]').getByRole('checkbox')).not.toBeChecked();
   });
 
   test('an output belongs to one program, not to every program with that step', async ({
@@ -323,8 +323,11 @@ test.describe('the seeded programme', () => {
       await page.locator(`[data-act="${ref}"]`).click();
       const pattern = (
         await page
-          .locator('[data-stepblock] [data-step] input[type="checkbox"]')
-          .evaluateAll((boxes) => boxes.map((b) => ((b as HTMLInputElement).checked ? 'D' : 'o')))
+          .locator('[data-stepblock] [data-step]')
+          .getByRole('checkbox')
+          .evaluateAll((boxes) =>
+            boxes.map((b) => (b.getAttribute('aria-checked') === 'true' ? 'D' : 'o')),
+          )
       ).join('');
       expect(pattern, `${ref} runs ${pattern}`).toMatch(/^D*o*$/);
       await page.locator(`[data-act="${ref}"]`).click();

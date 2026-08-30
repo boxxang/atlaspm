@@ -10,7 +10,7 @@ import { RISK_AUTHOR } from '@/data/riskSeeds';
 import { useAppStore } from '@/store/useAppStore';
 import { useRailStore } from '@/store/railStore';
 import { DeliverableLines } from './DeliverableLines';
-import { Avatar, IconFile, IconPlus } from './icons';
+import { Avatar, IconFile, IconPlus, IconTick } from './icons';
 import { PostThread } from './PostThread';
 import { useDeliverableRefs } from './useDeliverableRefs';
 import { useActivitySteps } from './useStageSteps';
@@ -172,7 +172,7 @@ export function StepPanel({ act, n, projectId }: { act: string; n: number; proje
             </span>
             <span style={{ flexGrow: 1 }} />
             <button type="button" className="btn sm" onClick={() => file.current?.click()}>
-              <IconPlus />
+              <IconPlus size={11} />
               Attach
             </button>
           </div>
@@ -383,6 +383,7 @@ export function StepPanel({ act, n, projectId }: { act: string; n: number; proje
             target={{ kind: 'update', activityRef: act, stepN: n }}
             placeholder={`What happened on step ${n}…`}
             fixedStep={n}
+            squareBar
             allowRisk
             emptyText="No updates on this step yet."
           />
@@ -401,6 +402,7 @@ export function StepPanel({ act, n, projectId }: { act: string; n: number; proje
             })
           }
         >
+          {!step.done && <IconTick size={11} />}
           {step.done ? 'Reopen step' : 'Mark complete'}
         </button>
         {step.done && (
@@ -421,5 +423,7 @@ export function StepPanel({ act, n, projectId }: { act: string; n: number; proje
  * The filled part of the range track, painted rather than left grey: a slider
  * whose left side is not coloured reads as unset, whatever number is beside it.
  */
-const rangeFill = (pct: number, done: boolean) =>
-  `linear-gradient(90deg, ${done ? 'var(--ok)' : 'var(--accent)'} ${pct}%, var(--muted) ${pct}%)`;
+const rangeFill = (pct: number, done: boolean) => {
+  const c = done ? 'var(--ok)' : 'var(--accent)';
+  return `linear-gradient(to right,${c} 0%,${c} ${pct}%,var(--muted) ${pct}%,var(--muted) 100%)`;
+};

@@ -164,7 +164,7 @@ test.describe('posting on a step', () => {
     await rail(page).getByRole('button', { name: 'Post' }).click();
     await writesSettled(page);
 
-    await page.locator('[data-step="PD-08:5"] input[type="checkbox"]').check();
+    await page.locator('[data-step="PD-08:5"]').getByRole('checkbox').check();
     await writesSettled(page);
     await expect(
       page.getByRole('navigation', { name: 'Program' }).getByRole('link', { name: /^Risks/ }),

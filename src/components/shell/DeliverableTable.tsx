@@ -9,7 +9,7 @@ import { useAppStore } from '@/store/useAppStore';
 import { useRailStore } from '@/store/railStore';
 import { ctVar, CTHead, type Col } from './ctable';
 import { HandoverPanel } from './HandoverPanel';
-import { IconClip } from './icons';
+import { IconClip, IconTick } from './icons';
 import { useDeliverableRefs } from './useDeliverableRefs';
 import { useStageSteps } from './useStageSteps';
 
@@ -104,18 +104,7 @@ export function DeliverableTable({
                 select({ kind: 'deliverable', stageId, deliverableId: d.id });
               }}
             >
-              {d.done && (
-                <svg
-                  width="9"
-                  height="9"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="#fff"
-                  strokeWidth="3.4"
-                >
-                  <path d="M20 6 9 17l-5-5" />
-                </svg>
-              )}
+              {d.done && <IconTick />}
             </button>
             <span style={{ justifySelf: 'start' }}>
               {ref ? (

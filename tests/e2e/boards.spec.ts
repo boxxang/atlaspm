@@ -78,7 +78,7 @@ test.describe('Risks', () => {
     /* a link that names a step opens the block it is in, so there is nothing to
        click first — clicking the activity row here would fold it away again */
     await expect(page.locator('[data-act]').first()).toBeVisible();
-    await page.locator(`[data-step="${ref}:${step}"] input[type="checkbox"]`).check();
+    await page.locator(`[data-step="${ref}:${step}"]`).getByRole('checkbox').check();
     await writesSettled(page);
 
     await openBoard(page, `${SHELL_PATH}/risks`);
@@ -141,7 +141,7 @@ test.describe('Overdue', () => {
     /* a link that names a step opens the block it is in, so there is nothing to
        click first — clicking the activity row here would fold it away again */
     await expect(page.locator('[data-act]').first()).toBeVisible();
-    await page.locator(`[data-step="${ref}:${step}"] input[type="checkbox"]`).check();
+    await page.locator(`[data-step="${ref}:${step}"]`).getByRole('checkbox').check();
     await writesSettled(page);
 
     await openBoard(page, `${SHELL_PATH}/overdue`);

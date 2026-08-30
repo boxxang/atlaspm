@@ -7,6 +7,7 @@ import { isStepLate, type ResolvedStep } from '@/lib/steps';
 import { useAppStore } from '@/store/useAppStore';
 import { useRailStore } from '@/store/railStore';
 import { Chevron, ctVar, CTHead, type Col } from './ctable';
+import { CheckBox } from './icons';
 import { useProgramWork } from './useProgramWork';
 import { useStageSteps, type StageActivity as Activity } from './useStageSteps';
 
@@ -266,17 +267,11 @@ function StepBlock({ a }: { a: Activity }) {
               onClick={() => select({ kind: 'step', act: a.ref, n: s.n })}
             >
               <span />
-              <input
-                type="checkbox"
-                className="cb"
-                checked={s.done}
-                aria-label={`Step ${s.n} done`}
-                onClick={(e) => e.stopPropagation()}
-                onChange={(e) =>
-                  setStepState(a.ref, s.n, {
-                    done: e.target.checked,
-                    doneAt: e.target.checked ? new Date() : null,
-                  })
+              <CheckBox
+                on={s.done}
+                label={`Step ${s.n} done`}
+                onToggle={(next) =>
+                  setStepState(a.ref, s.n, { done: next, doneAt: next ? new Date() : null })
                 }
               />
               <span

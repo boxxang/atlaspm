@@ -102,8 +102,8 @@ export const IconSearch = () => (
   </S>
 );
 
-export const IconPlus = ({ light = false }: { light?: boolean }) => (
-  <S size={12} stroke={light ? '#fff' : '#62666d'} width={2.4}>
+export const IconPlus = ({ light = false, size = 12 }: { light?: boolean; size?: number }) => (
+  <S size={size} stroke={light ? '#fff' : '#62666d'} width={2.4}>
     <path d="M12 5v14M5 12h14" />
   </S>
 );
@@ -156,6 +156,56 @@ export const IconRiskLarge = () => (
     <path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z" />
   </S>
 );
+
+/**
+ * The tick inside a checked box. Its own export because the box is drawn as a
+ * button rather than an <input>: a native checkbox paints its own mark in the
+ * browser's accent colour and ignores the border radius, so it comes out square
+ * and the wrong indigo next to everything else on the row.
+ */
+export const IconTick = ({ size = 9 }: { size?: number }) => (
+  <svg
+    width={size}
+    height={size}
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="#fff"
+    strokeWidth={size > 9 ? 3 : 3.4}
+    aria-hidden="true"
+  >
+    <path d="M20 6 9 17l-5-5" />
+  </svg>
+);
+
+/** A checkbox, drawn rather than native. */
+export function CheckBox({
+  on,
+  label,
+  title,
+  onToggle,
+}: {
+  on: boolean;
+  label: string;
+  title?: string;
+  onToggle?: (next: boolean) => void;
+}) {
+  return (
+    <button
+      type="button"
+      className={on ? 'cb on' : 'cb'}
+      role="checkbox"
+      aria-checked={on}
+      aria-label={label}
+      title={title}
+      onClick={(e) => {
+        e.stopPropagation();
+        onToggle?.(!on);
+      }}
+    >
+      {on && <IconTick />}
+    </button>
+  );
+}
 
 export const IconEmptyList = () => (
   <S size={34} stroke="#d8dade" width={1.4}>

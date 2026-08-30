@@ -8,7 +8,7 @@ import { fmtDate } from '@/lib/schedule';
 import type { Deliverable } from '@/data/types';
 import { useAppStore } from '@/store/useAppStore';
 import { useRailStore } from '@/store/railStore';
-import { IconClip } from './icons';
+import { IconClip, IconTick } from './icons';
 import { useDeliverableRefs } from './useDeliverableRefs';
 
 /**
@@ -108,18 +108,7 @@ export function DeliverableLines({
                 aria-label={`Open the handover for ${d.title}`}
                 onClick={() => select({ kind: 'deliverable', stageId, deliverableId: d.id })}
               >
-                {d.done && (
-                  <svg
-                    width="9"
-                    height="9"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="#fff"
-                    strokeWidth="3.4"
-                  >
-                    <path d="M20 6 9 17l-5-5" />
-                  </svg>
-                )}
+                {d.done && <IconTick />}
               </button>
               <span style={{ flexGrow: 1, minWidth: 0 }}>
                 <span
