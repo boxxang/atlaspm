@@ -2964,3 +2964,10 @@ kbd{font:inherit;font-size:10.5px;border:1px solid var(--line);border-bottom-wid
 .dlg-control{display:flex;align-items:center;gap:9px;flex-wrap:wrap;margin-top:8px}
 .dlg-control > .lnkin{flex-grow:0;min-width:230px}
 .dlg-control > .stagepick{margin:0;width:100%;max-height:260px}
+
+/* A stage the program cannot be built without. Its box is drawn ticked and
+   inert rather than tickable — a control that looks live and ignores the click
+   is what made "Clear optional" read as broken. */
+.stagepick-row[aria-disabled="true"] .cb{opacity:.55}
+.reqmark{color:var(--ink-4);border:1px dashed var(--line-strong);border-radius:var(--r-sm);
+  padding:0 5px;letter-spacing:.02em;flex-shrink:0}

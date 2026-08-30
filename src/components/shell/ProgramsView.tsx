@@ -1021,6 +1021,9 @@ function StagePicker({
     <div className="stagepick" data-stage-picker>
       <div className="stagepick-hd">
         <span className="cap">Stages this program runs</span>
+        <span style={{ fontSize: 11, color: 'var(--ink-3)' }}>
+          three are fixed — the countdowns read them
+        </span>
         <span style={{ flexGrow: 1 }} />
         <button type="button" className="btn sm" data-pick-all onClick={() => onAll(!all)}>
           {all ? 'Clear optional' : 'Select all'}
@@ -1073,6 +1076,14 @@ function StagePicker({
                   {stageMilestone[st.key] && (
                     <span className={fixed ? 'pill acc' : 'pill'} style={{ fontSize: 10 }}>
                       {stageMilestone[st.key].label}
+                    </span>
+                  )}
+                  {/* Said on the row, not only in a hover title: three rows that
+                      look tickable and are not is what makes Clear optional
+                      read as broken. */}
+                  {fixed && (
+                    <span className="reqmark" style={{ fontSize: 10 }}>
+                      Required
                     </span>
                   )}
                   <span style={{ flexGrow: 1 }} />
