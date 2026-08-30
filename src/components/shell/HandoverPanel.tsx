@@ -6,6 +6,7 @@ import { RISK_AUTHOR } from '@/data/riskSeeds';
 import { attachmentUrl, formatBytes } from '@/lib/attachments';
 import { deliverableStep, handoverComplete } from '@/lib/deliverableStatus';
 import { activitySteps } from '@/data/activitySteps';
+import type { ProgramPost } from '@/lib/projectState';
 import { fmtDate, fmtDT, fromISO, toISO } from '@/lib/schedule';
 import { uid, useAppStore } from '@/store/useAppStore';
 import { Avatar, IconFile, IconPlus } from './icons';
@@ -72,6 +73,9 @@ export function HandoverPanel({
   /* null while the handover reads as posted; 'edit' reopens it, 'delete' asks. */
   const [mode, setMode] = useState<'edit' | 'delete' | null>(null);
   const [commenting, setCommenting] = useState(false);
+  /* Which comment is open for editing, or being asked about before deletion.
+     One at a time, as everywhere else a post can be edited. */
+  const [comment, setComment] = useState<{ id: string; kind: 'edit' | 'delete' } | null>(null);
   const file = useRef<HTMLInputElement>(null);
 
   if (!deliverable) return null;
@@ -324,28 +328,14 @@ export function HandoverPanel({
 
                   <div className="replies xreplies">
                     {replies.map((r) => (
-                      <div className="reply" key={r.id}>
-                        <Avatar name={r.author} small />
-                        <div style={{ flexGrow: 1, minWidth: 0 }}>
-                          <div className="who">
-                            <b style={{ fontSize: 12.5 }}>{r.author}</b>
-                            <span className="num" style={{ fontSize: 11, color: 'var(--ink-3)' }}>
-                              {fmtDT(r.createdAt)}
-                            </span>
-                            <span style={{ flexGrow: 1 }} />
-                            <span className="acts">
-                              <button
-                                type="button"
-                                className="del"
-                                onClick={() => deletePost(r.id)}
-                              >
-                                Delete
-                              </button>
-                            </span>
-                          </div>
-                          <div className="txt">{r.text}</div>
-                        </div>
-                      </div>
+                      <Reply
+                        key={r.id}
+                        reply={r}
+                        editing={comment?.id === r.id ? comment.kind : null}
+                        onEdit={() => setComment({ id: r.id, kind: 'edit' })}
+                        onDelete={() => setComment({ id: r.id, kind: 'delete' })}
+                        onStop={() => setComment(null)}
+                      />
                     ))}
                     {commenting ? (
                       <div className="reply">
@@ -379,6 +369,128 @@ export function HandoverPanel({
             )
           )}
         </div>
+      </div>
+    </div>
+  );
+}
+
+/**
+ * One comment on a handover.
+ *
+ * It takes the same three actions every other post takes — read, correct,
+ * remove — because it is the same thing. A comment that can only be deleted
+ * makes a typo permanent or makes the argument disappear, and neither is what
+ * somebody reaching for it wants.
+ */
+function Reply({
+  reply,
+  editing,
+  onEdit,
+  onDelete,
+  onStop,
+}: {
+  reply: ProgramPost;
+  editing: 'edit' | 'delete' | null;
+  onEdit: () => void;
+  onDelete: () => void;
+  onStop: () => void;
+}) {
+  const editPost = useAppStore((s) => s.editPost);
+  const deletePost = useAppStore((s) => s.deletePost);
+  const [draft, setDraft] = useState(reply.text);
+
+  return (
+    <div className="reply" data-comment={reply.id}>
+      <Avatar name={reply.author} small />
+      <div style={{ flexGrow: 1, minWidth: 0 }}>
+        {editing !== 'edit' && (
+          <div className="who">
+            <b style={{ fontSize: 12.5 }}>{reply.author}</b>
+            <span className="num" style={{ fontSize: 11, color: 'var(--ink-3)' }}>
+              {fmtDT(reply.createdAt)}
+            </span>
+            {reply.editedAt && <span className="edited">edited</span>}
+            {editing === null && (
+              <>
+                <span style={{ flexGrow: 1 }} />
+                <span className="acts">
+                  <button type="button" onClick={onEdit}>
+                    Edit
+                  </button>
+                  <button type="button" className="del" onClick={onDelete}>
+                    Delete
+                  </button>
+                </span>
+              </>
+            )}
+          </div>
+        )}
+
+        {editing === 'edit' ? (
+          <div className="composer">
+            <textarea
+              value={draft}
+              aria-label="Edit comment"
+              autoFocus
+              onChange={(e) => setDraft(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Escape') {
+                  setDraft(reply.text);
+                  onStop();
+                }
+                if (e.key === 'Enter' && (e.metaKey || e.ctrlKey) && draft.trim()) {
+                  editPost(reply.id, draft.trim());
+                  onStop();
+                }
+              }}
+            />
+            <div className="bar">
+              <span style={{ fontSize: 11, color: 'var(--ink-4)' }}>⌘↵ saves · esc cancels</span>
+              <span style={{ flexGrow: 1 }} />
+              <button
+                type="button"
+                className="btn sm"
+                onClick={() => {
+                  setDraft(reply.text);
+                  onStop();
+                }}
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                className="btn pri sm"
+                disabled={!draft.trim()}
+                onClick={() => {
+                  editPost(reply.id, draft.trim());
+                  onStop();
+                }}
+              >
+                Save
+              </button>
+            </div>
+          </div>
+        ) : editing === 'delete' ? (
+          <div className="delconf">
+            Delete this comment?
+            <span style={{ flexGrow: 1 }} />
+            <button type="button" className="btn sm" onClick={onStop}>
+              Keep
+            </button>
+            <button
+              type="button"
+              className="btn sm dng"
+              onClick={() => {
+                deletePost(reply.id);
+                onStop();
+              }}
+            >
+              Delete
+            </button>
+          </div>
+        ) : (
+          <div className="txt">{reply.text}</div>
+        )}
       </div>
     </div>
   );

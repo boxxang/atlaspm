@@ -189,6 +189,52 @@ test.describe('handing one over', () => {
     await page.locator('[data-board] [data-deliverable]').filter({ hasText: title }).click();
     await expect(card(page).locator('.replies .txt')).toContainText('Checked against');
   });
+
+  /* A comment is a post like any other: correctable, and removed only after
+     being asked about. Delete alone made a typo permanent. */
+  test('a comment is corrected in place, and says it was edited', async ({ page }) => {
+    const { title } = await openFirstOpen(page);
+    await card(page).getByLabel('What was handed over').fill('Filed.');
+    await attach(page, 'x.txt', 'x');
+    await card(page).getByRole('button', { name: 'Post' }).click();
+    await card(page).getByRole('button', { name: '+ Comment' }).click();
+    await card(page).getByLabel('Comment on this handover').fill('Fisrt reading.');
+    await card(page).getByRole('button', { name: 'Comment', exact: true }).click();
+
+    const comment = card(page).locator('[data-comment]');
+    await comment.getByRole('button', { name: 'Edit' }).click();
+    await page.getByLabel('Edit comment').fill('First reading — checked twice.');
+    await page.getByRole('button', { name: 'Save' }).click();
+    await expect(comment.locator('.txt')).toHaveText('First reading — checked twice.');
+    await expect(comment).toContainText('edited');
+    await writesSettled(page);
+
+    await page.reload();
+    await page.locator('[data-board] [data-deliverable]').filter({ hasText: title }).click();
+    await expect(card(page).locator('[data-comment] .txt')).toHaveText(
+      'First reading — checked twice.',
+    );
+  });
+
+  test('a comment is removed only after being asked about', async ({ page }) => {
+    await openFirstOpen(page);
+    await card(page).getByLabel('What was handed over').fill('Filed.');
+    await attach(page, 'y.txt', 'y');
+    await card(page).getByRole('button', { name: 'Post' }).click();
+    await card(page).getByRole('button', { name: '+ Comment' }).click();
+    await card(page).getByLabel('Comment on this handover').fill('Delete me.');
+    await card(page).getByRole('button', { name: 'Comment', exact: true }).click();
+
+    const comment = card(page).locator('[data-comment]');
+    await comment.getByRole('button', { name: 'Delete' }).click();
+    /* changing your mind leaves it where it was */
+    await comment.getByRole('button', { name: 'Keep' }).click();
+    await expect(comment.locator('.txt')).toHaveText('Delete me.');
+
+    await comment.getByRole('button', { name: 'Delete' }).click();
+    await comment.locator('.delconf').getByRole('button', { name: 'Delete' }).click();
+    await expect(card(page).locator('[data-comment]')).toHaveCount(0);
+  });
 });
 
 test.describe('the team', () => {
