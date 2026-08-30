@@ -2971,3 +2971,11 @@ kbd{font:inherit;font-size:10.5px;border:1px solid var(--line);border-bottom-wid
 .stagepick-row[aria-disabled="true"] .cb{opacity:.55}
 .reqmark{color:var(--ink-4);border:1px dashed var(--line-strong);border-radius:var(--r-sm);
   padding:0 5px;letter-spacing:.02em;flex-shrink:0}
+
+/* The estimated cost reads as a stat and behaves as a control: the rate behind
+   it is an assumption, and an assumption has to be changeable from where it is
+   read. Same shape as the stat beside it, so the bar does not look uneven. */
+.coststat{display:flex;flex-direction:column;align-items:flex-start;text-align:left;
+  border-radius:var(--r);padding:2px 6px;margin:-2px -6px}
+.coststat:hover{background:var(--hover)}
+.coststat[aria-expanded="true"]{background:var(--accent-wash)}

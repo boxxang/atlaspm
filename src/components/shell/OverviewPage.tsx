@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { activitySteps } from '@/data/activitySteps';
 import { estimateCost } from '@/lib/effort';
@@ -24,7 +25,6 @@ export function OverviewPage({ projectId }: { projectId: string }) {
   const schedule = useAppStore((s) => s.schedule);
   const stages = useAppStore((s) => s.stages);
   const kickoff = useAppStore((s) => s.kickoff);
-  const costPerManMonth = useAppStore((s) => s.costPerManMonth);
   const today = useAppStore((s) => s.today);
 
   const allDeliv = Object.values(deliverables).flat();
@@ -71,18 +71,7 @@ export function OverviewPage({ projectId }: { projectId: string }) {
           />
           <Stat k="Open risks" v={String(risks.length)} s={`across ${riskStages} stages`} tone />
           <Stat k="Overdue" v={String(overdue.length)} s="past target date" tone={overdue.length > 0} />
-          <div style={{ paddingRight: 18 }}>
-            <div className="subcap">Estimated cost</div>
-            <div
-              className="num"
-              style={{ fontSize: 20, fontWeight: 600, letterSpacing: '-.02em', marginTop: 3 }}
-            >
-              {costPerManMonth ? `$${(estimateCost(mm, costPerManMonth) / 1e6).toFixed(1)}M` : '—'}
-            </div>
-            <div style={{ fontSize: 11.5, color: 'var(--ink-3)', marginTop: 1 }}>
-              {Math.round(mm).toLocaleString()} M/M
-            </div>
-          </div>
+          <CostStat manMonths={mm} />
         </div>
 
         <NeedsYouToday projectId={projectId} />
@@ -119,6 +108,108 @@ function Stat({ k, v, s, tone }: { k: string; v: string; s: string; tone?: boole
         {v}
       </div>
       <div style={{ fontSize: 11.5, color: 'var(--ink-3)', marginTop: 1 }}>{s}</div>
+    </div>
+  );
+}
+
+/**
+ * The estimated cost, and the rate behind it.
+ *
+ * The rate is the one figure on this bar that is somebody's assumption rather
+ * than something the program's own data says, so it is the one that has to be
+ * changeable from where it is read. It was asked for once at creation and
+ * could never be revisited, which is how a program ends up quoting a number
+ * nobody believes any more.
+ */
+function CostStat({ manMonths }: { manMonths: number }) {
+  const rate = useAppStore((s) => s.costPerManMonth);
+  const currency = useAppStore((s) => s.currency);
+  const setCostRate = useAppStore((s) => s.setCostRate);
+  const [open, setOpen] = useState(false);
+  const [draft, setDraft] = useState(String(rate));
+  const box = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!open) return;
+    const away = (e: MouseEvent) => {
+      if (!box.current?.contains(e.target as Node)) setOpen(false);
+    };
+    const esc = (e: KeyboardEvent) => e.key === 'Escape' && setOpen(false);
+    document.addEventListener('mousedown', away);
+    document.addEventListener('keydown', esc);
+    return () => {
+      document.removeEventListener('mousedown', away);
+      document.removeEventListener('keydown', esc);
+    };
+  }, [open]);
+
+  const save = () => {
+    const n = Number(draft);
+    setCostRate(Number.isFinite(n) && n >= 0 ? n : 0, currency);
+    setOpen(false);
+  };
+
+  return (
+    <div className="menu" ref={box} style={{ paddingRight: 18 }}>
+      <button
+        type="button"
+        className="coststat"
+        data-edit-rate
+        aria-expanded={open}
+        title={rate ? `${rate.toLocaleString()} per man-month — click to change` : 'Set a rate'}
+        onClick={() => {
+          setDraft(String(rate));
+          setOpen((o) => !o);
+        }}
+      >
+        <span className="subcap">Estimated cost</span>
+        <span
+          className="num"
+          style={{ fontSize: 20, fontWeight: 600, letterSpacing: '-.02em', marginTop: 3 }}
+        >
+          {rate ? `$${(estimateCost(manMonths, rate) / 1e6).toFixed(1)}M` : '—'}
+        </span>
+        <span style={{ fontSize: 11.5, color: 'var(--ink-3)', marginTop: 1 }}>
+          {Math.round(manMonths).toLocaleString()} M/M
+          {rate ? ` · $${rate.toLocaleString()}/MM` : ' · no rate set'}
+        </span>
+      </button>
+
+      {/* right-aligned: the cost is the last stat on the bar, so a popover
+          hanging off its left edge runs off the screen */}
+      {open && (
+        <div className="menu-pop" data-rate-pop style={{ minWidth: 268, padding: 12 }}>
+          <div style={{ fontSize: 12.5, fontWeight: 600 }}>Cost per man-month</div>
+          <p className="mono-note" style={{ margin: '3px 0 9px', maxWidth: '38ch' }}>
+            A fully-loaded engineering rate. The program&rsquo;s{' '}
+            {Math.round(manMonths).toLocaleString()} M/M are multiplied by it; zero leaves the
+            figure blank.
+          </p>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 7 }}>
+            <input
+              className="lnkin"
+              type="number"
+              min={0}
+              step={500}
+              autoFocus
+              aria-label="Cost per man-month"
+              value={draft}
+              onChange={(e) => setDraft(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') save();
+              }}
+            />
+            <button type="button" className="btn pri sm" data-save-rate onClick={save}>
+              Save
+            </button>
+          </div>
+          <p className="mono-note" style={{ marginTop: 8 }} data-rate-preview>
+            {Number(draft) > 0
+              ? `≈ $${(estimateCost(manMonths, Number(draft)) / 1e6).toFixed(1)}M`
+              : 'no cost estimate'}
+          </p>
+        </div>
+      )}
     </div>
   );
 }

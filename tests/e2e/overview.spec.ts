@@ -1,4 +1,4 @@
-import { expect, test, SHELL_PATH } from './fixtures';
+import { expect, test, SHELL_PATH, writesSettled } from './fixtures';
 
 /**
  * Overview and Timeline.
@@ -96,6 +96,61 @@ test.describe('Overview', () => {
       .map((t) => Number(t.replace(/[^\d]/g, '')))
       .reduce((a, b) => a + b, 0);
     expect(total).toBeGreaterThan(shown);
+  });
+});
+
+/* The rate behind the estimate is somebody's assumption, not something the
+   program's data says — so it is changed from where it is read. */
+test.describe('the estimated cost', () => {
+  test.beforeEach(async ({ page }) => {
+    await open(page, `${SHELL_PATH}/overview`, '[data-edit-rate]');
+  });
+
+  test('says the rate it used, and opens on a click', async ({ page }) => {
+    await expect(page.locator('[data-edit-rate]')).toContainText('/MM');
+    await expect(page.locator('[data-rate-pop]')).toHaveCount(0);
+    await page.locator('[data-edit-rate]').click();
+    await expect(page.locator('[data-rate-pop]')).toBeVisible();
+  });
+
+  test('a new rate is applied and stays applied', async ({ page }) => {
+    const before = await page.locator('[data-edit-rate] .num').innerText();
+
+    await page.locator('[data-edit-rate]').click();
+    await page.getByLabel('Cost per man-month').fill('30000');
+    /* what it comes to, before committing */
+    await expect(page.locator('[data-rate-preview]')).toContainText('$');
+    await page.locator('[data-save-rate]').click();
+
+    await expect(page.locator('[data-rate-pop]')).toHaveCount(0);
+    await expect(page.locator('[data-edit-rate]')).toContainText('$30,000/MM');
+    const after = await page.locator('[data-edit-rate] .num').innerText();
+    expect(after).not.toBe(before);
+    await writesSettled(page);
+
+    await page.reload();
+    await expect(page.locator('[data-edit-rate] .num')).toHaveText(after);
+  });
+
+  /* Zero is a real answer — "nobody has set a rate" — and it leaves the figure
+     blank rather than printing a nought. */
+  test('zero blanks the figure rather than claiming one', async ({ page }) => {
+    await page.locator('[data-edit-rate]').click();
+    await page.getByLabel('Cost per man-month').fill('0');
+    await expect(page.locator('[data-rate-preview]')).toHaveText('no cost estimate');
+    await page.locator('[data-save-rate]').click();
+
+    await expect(page.locator('[data-edit-rate] .num')).toHaveText('—');
+    await expect(page.locator('[data-edit-rate]')).toContainText('no rate set');
+  });
+
+  test('closes on Escape without changing anything', async ({ page }) => {
+    const before = await page.locator('[data-edit-rate] .num').innerText();
+    await page.locator('[data-edit-rate]').click();
+    await page.getByLabel('Cost per man-month').fill('99000');
+    await page.keyboard.press('Escape');
+    await expect(page.locator('[data-rate-pop]')).toHaveCount(0);
+    await expect(page.locator('[data-edit-rate] .num')).toHaveText(before);
   });
 });
 
