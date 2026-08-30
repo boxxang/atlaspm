@@ -316,14 +316,35 @@ describe('a checkpoint belongs to the stage it is anchored to', () => {
     );
   });
 
-  it('a stage with no checkpoint of its own is given none', () => {
+  /* Each of the colliding stages gets its own, never the neighbour's. */
+  it('stages that close together keep their own checkpoints', () => {
     const of = (id: string) => schedule.milestones.filter((m) => m.anchor.stage === id);
-    /* Physical Design ends the day Package Design Freeze falls, and has no
-       checkpoint of its own. */
-    expect(of('physicalDesign')).toHaveLength(0);
+    expect(of('physicalDesign').map((m) => m.label)).toEqual(['PD Database Handoff']);
     expect(of('packageDesign').map((m) => m.label)).toEqual(['Package Design Freeze']);
-    /* and the other collision: Verification and Synthesis close together */
+    expect(of('chipPackageCoVerification').map((m) => m.label)).toEqual([
+      'Co-Verification Signoff',
+    ]);
     expect(of('verification').map((m) => m.label)).toEqual(['DV Closure']);
     expect(of('synthesis').map((m) => m.label)).toEqual(['FFN Release']);
+  });
+
+  /* The rule the seed now keeps: every stage closes on something, and on
+     exactly one thing. A stage whose end date nobody can name is a stage
+     nobody can give you the status of. */
+  it('every stage carries exactly one checkpoint', () => {
+    for (const st of BUILTIN_PROFILE.stages) {
+      const mine = schedule.milestones.filter((m) => m.anchor.stage === st.key);
+      expect(mine, `${st.key} carries ${mine.length}`).toHaveLength(1);
+    }
+    expect(schedule.milestones).toHaveLength(BUILTIN_PROFILE.stages.length);
+  });
+
+  /* and only three of them are what the countdowns read */
+  it('three of them are major, and they are the ones every screen counts to', () => {
+    expect(schedule.milestones.filter((m) => m.major).map((m) => m.label)).toEqual([
+      'Tapeout (BEOL MTO)',
+      'First Silicon',
+      'Mass Production',
+    ]);
   });
 });

@@ -216,12 +216,17 @@ describe('schedule position', () => {
     expect(up.map((m) => m.id)).toEqual([
       'dvClosure',
       'ffnRelease',
+      'pdDatabaseHandoff',
       'packageDesignFreeze',
+      'coVerificationSignoff',
       'designFreeze',
       'tapeoutBeolMto',
+      'assemblyWindowFreeze',
       'evbReady',
       'probeCardReady',
       'firstSilicon',
+      'firstAssembledUnits',
+      'customerSamples',
       'massProduction',
     ]);
     expect(up.map((m) => m.date.getTime())).toEqual(

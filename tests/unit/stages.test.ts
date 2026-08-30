@@ -150,8 +150,9 @@ describe('scheduling a profile that is not the built-in one', () => {
     expect(fmtDate(s.stages.stg_new.start)).toBe('06/09/2027');
     expect(fmtDate(s.stages.stg_new.end)).toBe('07/21/2027');
     expect(s.totalWeeks).toBe(10);
-    // no architecture, no Arch Freeze
-    expect(s.milestones).toHaveLength(0);
+    /* every built-in stage carries a checkpoint, so the one kept brings its
+       own — and the added stage, which is nobody's baseline, brings none */
+    expect(s.milestones.map((m) => m.id)).toEqual(['programGoNoGo']);
     // and the three toolbar dates fall back to where the program actually ends
     expect(fmtDate(s.production)).toBe('07/21/2027');
   });

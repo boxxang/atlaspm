@@ -67,26 +67,43 @@ const BASELINES: Record<string, { startOffsetWeeks: number; durationWeeks: numbe
 };
 
 /**
- * The checkpoints a TPM is held to — fifteen of them, one per decision the
- * program cannot walk back. Engineering runs on many more gates than these
- * (DFT architecture, co-verification signoff, package validation); they belong
- * to the stage that owns them, not to the program's checkpoint list.
+ * The checkpoints a TPM is held to: one per stage, named for the decision that
+ * stage cannot walk back. Every stage closes on something — a stage whose end
+ * date nobody can name is a stage nobody can tell you the status of — so every
+ * stage carries one, and each is the last of that stage's own deliverables
+ * rather than a gate invented for the chart.
+ *
+ * Three are major: Tapeout, First Silicon and Mass Production. Those are what
+ * the countdowns on every screen count down to, and they are the three a
+ * program cannot be started without (see /lib/customProfile). The other twenty
+ * belong to their stage and leave with it.
+ *
+ * Listed in stage order, which is not date order — stages overlap, and the
+ * screens that show these sort by date themselves.
  */
 export const milestoneDefs = [
+  { id: "programGoNoGo", label: "Program Go / No-Go", anchor: { stage: "productDefinition", at: "end" } },
   { id: "archFreeze", label: "Arch Freeze", anchor: { stage: "architecture", at: "end" } },
+  { id: "foundryCommit", label: "Foundry Commit", anchor: { stage: "technology", at: "end" } },
   { id: "pdk10Release", label: "PDK 1.0 Release", anchor: { stage: "pdk", at: "end" } },
   { id: "ipPlanFreeze", label: "IP Plan Freeze", anchor: { stage: "ipReadiness", at: "end" } },
   { id: "amsMacroHandoff", label: "AMS Macro Handoff", anchor: { stage: "amsIp", at: "end" } },
   { id: "testChipSilicon", label: "Test Chip Silicon", anchor: { stage: "testChip", at: "end" } },
   { id: "rtlFreeze", label: "RTL Freeze", anchor: { stage: "rtl", at: "end" } },
   { id: "dvClosure", label: "DV Closure", anchor: { stage: "verification", at: "end" } },
+  { id: "dftSignoff", label: "DFT Signoff", anchor: { stage: "dft", at: "end" } },
   { id: "ffnRelease", label: "FFN Release", anchor: { stage: "synthesis", at: "end" } },
+  { id: "pdDatabaseHandoff", label: "PD Database Handoff", anchor: { stage: "physicalDesign", at: "end" } },
   { id: "designFreeze", label: "Design Freeze", anchor: { stage: "signoff", at: "end" } },
   { id: "tapeoutBeolMto", label: "Tapeout (BEOL MTO)", anchor: { stage: "tapeout", at: "end" }, major: true },
   { id: "firstSilicon", label: "First Silicon", anchor: { stage: "fabrication", at: "end" }, major: true },
   { id: "packageDesignFreeze", label: "Package Design Freeze", anchor: { stage: "packageDesign", at: "end" } },
+  { id: "assemblyWindowFreeze", label: "Assembly Window Freeze", anchor: { stage: "packageTestVehicle", at: "end" } },
+  { id: "coVerificationSignoff", label: "Co-Verification Signoff", anchor: { stage: "chipPackageCoVerification", at: "end" } },
+  { id: "firstAssembledUnits", label: "First Assembled Units", anchor: { stage: "packaging", at: "end" } },
   { id: "evbReady", label: "EVB Ready", anchor: { stage: "validationHardware", at: "end" } },
   { id: "probeCardReady", label: "Probe Card Ready", anchor: { stage: "testDevelopment", at: "end" } },
+  { id: "customerSamples", label: "Customer Samples", anchor: { stage: "bringup", at: "end" } },
   { id: "massProduction", label: "Mass Production", anchor: { stage: "qualification", at: "end" }, major: true },
 ] satisfies readonly MilestoneDef[];
 
