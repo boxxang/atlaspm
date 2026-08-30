@@ -43,9 +43,11 @@ const producers = Object.keys(activitySteps).map((ref) => ({
 
 export function DeliverableTable({
   stageId,
+  projectId,
   list,
 }: {
   stageId: string;
+  projectId: string;
   list: readonly Deliverable[];
 }) {
   const posts = useAppStore((s) => s.posts);
@@ -187,7 +189,7 @@ export function DeliverableTable({
             </span>
           </div>
           {open && (
-            <HandoverPanel key={d.id} stageId={stageId} deliverableId={d.id} />
+            <HandoverPanel key={d.id} stageId={stageId} deliverableId={d.id} projectId={projectId} />
           )}
           </div>
         );

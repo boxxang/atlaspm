@@ -185,4 +185,23 @@ test.describe('Timeline', () => {
     await page.getByRole('button', { name: 'Open stage' }).click();
     await expect(page).toHaveURL(/\/stage\/physicalDesign\/activity$/);
   });
+
+  /* And an activity row goes to the work, not to the write-up: the stage's
+     Activity tab with that activity already open and in the rail. Landing on a
+     page of prose is a different question from the one the chart asked. */
+  test('an activity row opens that activity where the work is', async ({ page }) => {
+    await page.locator('[data-tl="physicalDesign"]').click();
+    await page.locator('[data-tl-act="PD-10"]').click();
+    await expect(page).toHaveURL(/\/stage\/physicalDesign\/activity\?act=PD-10$/);
+
+    /* open, without a second click */
+    await expect(page.locator('[data-act="PD-10"]')).toHaveClass(/open/);
+    await expect(page.locator('[data-stepblock] .chead')).toContainText('PD-10');
+    const rail = page.getByRole('complementary', { name: 'Details' });
+    await expect(rail).toContainText('Signal and Power Integrity');
+
+    /* and it still closes on a click, rather than being pinned open by the URL */
+    await page.locator('[data-act="PD-10"]').click();
+    await expect(page.locator('[data-stepblock]')).toHaveCount(0);
+  });
 });

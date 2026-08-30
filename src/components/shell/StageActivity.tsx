@@ -1,5 +1,6 @@
 'use client';
 
+import { useSearchParams } from 'next/navigation';
 import { Fragment, useState } from 'react';
 import { fmtDate } from '@/lib/schedule';
 import { isStepLate, type ResolvedStep } from '@/lib/steps';
@@ -32,21 +33,32 @@ export function StageActivityTab({ stageId }: { stageId: string }) {
   const selection = useRailStore((s) => s.selection);
   const select = useRailStore((s) => s.select);
   const today = useAppStore((s) => s.today);
+  /* which activity the URL asked for, and whether the rail has caught up */
+  const wantAct = useSearchParams().get('act');
+  const openAct = selection.kind === 'activity' ? selection.act : null;
 
   /* Expanding and selecting are two things, as the mockup has them: the chevron
      opens the steps and leaves the rail alone, the rest of the row does both.
      One control doing only the second means you cannot read a step list without
      losing the panel you were reading.
 
-     Picking a step opens the activity it is in — a step cannot be shown
-     otherwise — and that is adjusted during render rather than in an effect,
-     which would paint the closed block first and then open it. */
-  const stepAct = selection.kind === 'step' ? selection.act : null;
-  const [expanded, setExpanded] = useState<string | null>(stepAct);
-  const [lastStepAct, setLastStepAct] = useState<string | null>(stepAct);
-  if (stepAct && stepAct !== lastStepAct) {
-    setLastStepAct(stepAct);
-    setExpanded(stepAct);
+     A link that names a step or an activity — the Timeline's rows, the
+     Overview's, the risk card's "Open step" — opens the block it is in. A step
+     cannot be shown otherwise, and an activity arrived at from elsewhere should
+     be open on arrival rather than needing a second click. It is adjusted
+     during render rather than in an effect, which would paint the closed block
+     first and then open it.
+
+     Keyed on the arriving reference, not on the selection: the row click below
+     selects an activity too, and reacting to that would make the toggle unable
+     to close what it just opened. */
+  const arriving =
+    selection.kind === 'step' ? selection.act : wantAct && wantAct === openAct ? wantAct : null;
+  const [expanded, setExpanded] = useState<string | null>(arriving);
+  const [lastArriving, setLastArriving] = useState<string | null>(arriving);
+  if (arriving && arriving !== lastArriving) {
+    setLastArriving(arriving);
+    setExpanded(arriving);
   }
   const shown = expanded;
   const toggle = (ref: string) => setExpanded(expanded === ref ? null : ref);

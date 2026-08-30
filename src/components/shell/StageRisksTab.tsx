@@ -1,10 +1,10 @@
 'use client';
 
+import Link from 'next/link';
 import { useState } from 'react';
 import { fmtDate } from '@/lib/schedule';
 import { isStepLate } from '@/lib/steps';
 import { useAppStore } from '@/store/useAppStore';
-import { useRailStore } from '@/store/railStore';
 import { ctVar, CTHead, type Col } from './ctable';
 import { Avatar, IconRiskLarge } from './icons';
 import { PostThread } from './PostThread';
@@ -36,11 +36,16 @@ const COLS: Col[] = [
   ['owner', 130, 'RAISED BY'],
 ];
 
-export function StageRisksTab({ stageId }: { stageId: string }) {
+export function StageRisksTab({
+  stageId,
+  projectId,
+}: {
+  stageId: string;
+  projectId: string;
+}) {
   const { risks } = useProgramWork();
   const today = useAppStore((s) => s.today);
   const posts = useAppStore((s) => s.posts);
-  const select = useRailStore((s) => s.select);
   const activities = useStageSteps(stageId);
   const [open, setOpen] = useState<string | null>(null);
 
@@ -195,13 +200,12 @@ export function StageRisksTab({ stageId }: { stageId: string }) {
                       {replies.length} {replies.length === 1 ? 'reply' : 'replies'}
                     </span>
                     {r.stepN != null && (
-                      <button
-                        type="button"
+                      <Link
                         className="btn sm"
-                        onClick={() => select({ kind: 'step', act: r.act, n: r.stepN as number })}
+                        href={`/p/${projectId}/stage/${stageId}/activity?step=${r.act}:${r.stepN}`}
                       >
                         Open step →
-                      </button>
+                      </Link>
                     )}
                   </div>
                   <div className="riskcard-body">

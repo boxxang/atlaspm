@@ -2824,15 +2824,21 @@ kbd{font:inherit;font-size:10.5px;border:1px solid var(--line);border-bottom-wid
 @media (max-width:1120px){ #peek{display:none} }
 @media (max-width:900px){ #side{width:188px} }
 
-/* Tables keep their columns and scroll rather than squash. The minimum is the
-   sum of the fixed columns plus a readable share for the flexible one — the
-   activity table spends 602px on fixed columns before the title gets anything,
-   so the floor has to clear that by the width of a title, not by a little. */
+/* Tables shrink their one flexible column and scroll only when that is no
+   longer enough, which is what the prototype does. An unconditional floor was
+   wrong: at 1512px with the rail open it made a 900px table inside an 880px
+   pane, so the last column sat under the rail and the pane scrolled 58px for
+   no reason. The floors below apply only below the width where the flexible
+   column starts to collapse — the prototype has none and shows a title six
+   pixels wide on a 1280px laptop — and .scroll is what makes that a scroll
+   rather than a clip. */
 .scroll{overflow-x:auto}
-.ctable{min-width:900px}
-.ctable .ctable{min-width:880px}
-.ptable{min-width:720px}
-.pattn{min-width:860px}
+@media (max-width:1300px){
+  .ctable{min-width:900px}
+  .ctable .ctable{min-width:880px}
+  .ptable{min-width:720px}
+  .pattn{min-width:860px}
+}
 
 /* The dashboard band is left to wrap, which is what the prototype does: below
    about 1400px the pace panel drops onto its own row under the six stats and

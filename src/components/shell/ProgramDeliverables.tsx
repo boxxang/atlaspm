@@ -42,7 +42,7 @@ export function ProgramDeliverables({ projectId }: { projectId: string }) {
               {g.rows.filter((d) => d.done).length}/{g.rows.length}
             </span>
           </div>
-          <DeliverableTable stageId={g.stage.id} list={g.rows} />
+          <DeliverableTable stageId={g.stage.id} projectId={projectId} list={g.rows} />
         </div>
       ))}
     </>

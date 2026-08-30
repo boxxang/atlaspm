@@ -59,14 +59,16 @@ export function StagePage({
    * What the rail opens on.
    *
    * A stage on its own selects itself, so the rail answers the question the page
-   * is about before anything has been clicked. A link that names a step or a
-   * deliverable — the Overview's rows do — selects that instead.
+   * is about before anything has been clicked. A link that names an activity, a
+   * step or a deliverable — the Overview's rows and the Timeline's do — selects
+   * that instead.
    *
    * It travels in the URL rather than being set before the navigation, because
    * the shell clears the rail on every route change: setting it first and
    * navigating second is a race the clear always wins.
    */
   const wantStep = params.get('step');
+  const wantAct = params.get('act');
   const wantDeliverable = params.get('deliverable');
   useEffect(() => {
     if (!stage) return;
@@ -77,6 +79,10 @@ export function StagePage({
         return;
       }
     }
+    if (wantAct) {
+      useRailStore.setState({ selection: { kind: 'activity', act: wantAct } });
+      return;
+    }
     if (wantDeliverable) {
       useRailStore.setState({
         selection: { kind: 'deliverable', stageId: stage.id, deliverableId: wantDeliverable },
@@ -84,7 +90,7 @@ export function StagePage({
       return;
     }
     useRailStore.setState({ selection: { kind: 'stage', stageId: stage.id } });
-  }, [stage, wantStep, wantDeliverable]);
+  }, [stage, wantStep, wantAct, wantDeliverable]);
 
   if (!stage) {
     return (
@@ -277,8 +283,8 @@ export function StagePage({
 
       {tab === 'activity' && <StageActivityTab stageId={stage.id} />}
       {tab === 'keyinfo' && <KeyInfoTab stageId={stage.id} />}
-      {tab === 'risks' && <StageRisksTab stageId={stage.id} />}
-      {tab === 'deliverables' && <DeliverablesTab stageId={stage.id} />}
+      {tab === 'risks' && <StageRisksTab stageId={stage.id} projectId={projectId} />}
+      {tab === 'deliverables' && <DeliverablesTab stageId={stage.id} projectId={projectId} />}
       {tab === 'team' && <TeamTab stageId={stage.id} />}
       {tab === 'board' && <CommsTab stageId={stage.id} />}
       {tab === 'updates' && <UpdatesPage projectId={projectId} stageId={stage.id} />}

@@ -366,6 +366,7 @@ export function TimelinePage({ projectId }: { projectId: string }) {
 function StageBreakdown({
   stageId,
   projectId,
+  title,
   weeks,
   from,
   to,
@@ -454,8 +455,12 @@ function StageBreakdown({
             key={a.ref}
             className="tl-sub"
             data-tl-act={a.ref}
-            title={`Open ${a.ref}`}
-            onClick={() => router.push(`/p/${projectId}/activity/${a.ref}`)}
+            title={`Open ${a.ref} in ${title}`}
+            /* to the stage's Activity tab with this activity open, which is
+               where the work is — not to the write-up, which is prose */
+            onClick={() =>
+              router.push(`/p/${projectId}/stage/${stageId}/activity?act=${a.ref}`)
+            }
           >
             <span className="nm">
               <span style={{ width: 4, flexShrink: 0 }} />

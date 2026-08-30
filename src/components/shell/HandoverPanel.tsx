@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import { useRef, useState } from 'react';
 import { RISK_AUTHOR } from '@/data/riskSeeds';
 import { attachmentUrl, formatBytes } from '@/lib/attachments';
@@ -7,7 +8,6 @@ import { deliverableStep, handoverComplete } from '@/lib/deliverableStatus';
 import { activitySteps } from '@/data/activitySteps';
 import { fmtDate, fmtDT, fromISO, toISO } from '@/lib/schedule';
 import { uid, useAppStore } from '@/store/useAppStore';
-import { useRailStore } from '@/store/railStore';
 import { Avatar, IconFile, IconPlus } from './icons';
 import { useDeliverableRefs } from './useDeliverableRefs';
 
@@ -42,9 +42,11 @@ const producers = Object.keys(activitySteps).map((ref) => ({
 export function HandoverPanel({
   stageId,
   deliverableId,
+  projectId,
 }: {
   stageId: string;
   deliverableId: string;
+  projectId: string;
 }) {
   const deliverable = useAppStore((s) => s.deliverables)[stageId]?.find(
     (d) => d.id === deliverableId,
@@ -56,7 +58,6 @@ export function HandoverPanel({
   const attachToHandover = useAppStore((s) => s.attachToHandover);
   const detachFromHandover = useAppStore((s) => s.detachFromHandover);
   const syncHandoverDone = useAppStore((s) => s.syncHandoverDone);
-  const select = useRailStore((s) => s.select);
   const refOf = useDeliverableRefs();
 
   const handover = posts.find((p) => p.deliverableId === deliverableId && p.kind === 'handover');
@@ -120,13 +121,12 @@ export function HandoverPanel({
           <span className="cap">Handover</span>
           <span style={{ flexGrow: 1 }} />
           {step && (
-            <button
-              type="button"
+            <Link
               className="btn sm"
-              onClick={() => select({ kind: 'step', act: step.act, n: step.n })}
+              href={`/p/${projectId}/stage/${stageId}/activity?step=${step.act}:${step.n}`}
             >
               Open {step.act} step {step.n} →
-            </button>
+            </Link>
           )}
           {handover && !editing && (
             <>

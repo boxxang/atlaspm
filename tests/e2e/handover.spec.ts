@@ -111,6 +111,20 @@ test.describe('handing one over', () => {
     );
   });
 
+  /* The card's "Open PD-02 step 6 →" is the way from a handover to the step
+     that produces it, and it has to go there — the step lives on another tab. */
+  test('it leads to the step that hands it over', async ({ page }) => {
+    await openFirstOpen(page);
+    const go = card(page).getByRole('link', { name: /^Open .* step \d+ →$/ });
+    await expect(go).toBeVisible();
+    const label = (await go.innerText()).match(/Open (\S+) step (\d+)/)!;
+    await go.click();
+    await expect(page).toHaveURL(
+      new RegExp(`/activity\\?step=${label[1]}:${label[2]}$`),
+    );
+    await expect(page.locator(`[data-step="${label[1]}:${label[2]}"]`)).toHaveClass(/sel/);
+  });
+
   test('the clip opens the artefact itself', async ({ page }) => {
     const { title } = await openFirstOpen(page);
     await card(page).getByLabel('What was handed over').fill('Here it is.');
