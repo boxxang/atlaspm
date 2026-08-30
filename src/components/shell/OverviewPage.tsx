@@ -369,8 +369,8 @@ function NeedsYouToday({ projectId }: { projectId: string }) {
         </span>
         <span style={{ fontSize: 12, color: 'var(--ink-3)' }}>
           {nextUp
-            ? 'nothing is overdue and no risk is unanswered — the nearest dates ahead, in the order they fall'
-            : 'overdue, then due inside three weeks, then risks nobody has answered, then what is coming — worst first'}
+            ? 'nothing is flagged or overdue — the nearest dates ahead, in the order they fall'
+            : 'risks first, then overdue, then due inside three weeks, then what is coming — worst first'}
         </span>
         <span style={{ flexGrow: 1 }} />
         <RowLimit limit={limit} onChoose={setLimit} shown={rows.length} total={all.length} />
@@ -411,7 +411,11 @@ function NeedsYouToday({ projectId }: { projectId: string }) {
                 <span style={{ justifySelf: 'start', marginTop: 1 }}>
                   <span
                     className={
-                      r.tag === 'Overdue' ? 'pill risk' : r.tag === 'Next up' ? 'pill' : 'pill warn'
+                      r.tag === 'Risk' || r.tag === 'Overdue'
+                        ? 'pill risk'
+                        : r.tag === 'Next up'
+                          ? 'pill'
+                          : 'pill warn'
                     }
                     style={{ fontSize: 10.5 }}
                   >
@@ -426,8 +430,8 @@ function NeedsYouToday({ projectId }: { projectId: string }) {
                   style={{
                     fontSize: 12,
                     marginTop: 2,
-                    fontWeight: r.tag === 'Overdue' ? 600 : 400,
-                    color: r.tag === 'Overdue' ? 'var(--risk)' : 'var(--ink-2)',
+                    fontWeight: r.tag === 'Risk' || r.tag === 'Overdue' ? 600 : 400,
+                    color: r.tag === 'Risk' || r.tag === 'Overdue' ? 'var(--risk)' : 'var(--ink-2)',
                   }}
                 >
                   {r.why}

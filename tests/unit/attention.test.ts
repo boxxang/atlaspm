@@ -78,8 +78,10 @@ describe('the bands', () => {
         risks: [risk({ updatedAt: d('2024-01-01') })],
       }),
     );
-    // the risk has gone unanswered for over a year; it still sits below due-soon
-    expect(rows.map((r) => r.tag)).toEqual(['Due soon', 'Stale risk']);
+    /* the deliverable closes before tapeout and the risk does not, and the
+       risk still comes first: the bonus orders inside a band, never across */
+    expect(rows.map((r) => r.tag)).toEqual(['Stale risk', 'Due soon']);
+    expect(rows[1].blocks).toBe(true);
   });
 
   it('orders inside a band by how late, and gives closing before tapeout the edge', () => {
@@ -197,11 +199,21 @@ describe('what it leaves out', () => {
     expect(rows).toEqual([]);
   });
 
-  it('ignores a risk that was answered this week', () => {
-    expect(attention(input({ risks: [risk({ updatedAt: d('2025-05-28') })] }))).toEqual([]);
+  /* A risk answered this week is still open, and still the most useful thing
+     on the screen. Only the wording changes: Risk, not Stale risk. */
+  it('lists a risk answered this week, saying when it was raised', () => {
+    const rows = attention(input({ risks: [risk({ updatedAt: d('2025-05-28') })] }));
+    expect(rows.map((r) => r.tag)).toEqual(['Risk']);
+    expect(rows[0].why).toBe('raised 4 days ago');
   });
 
-  it('caps nothing — every overdue step is on the list', () => {
+  it('says so when nobody has answered one in a week', () => {
+    const rows = attention(input({ risks: [risk({ updatedAt: d('2025-05-01') })] }));
+    expect(rows.map((r) => r.tag)).toEqual(['Stale risk']);
+    expect(rows[0].why).toBe('no update in 31 days');
+  });
+
+  it('caps nothing that is wrong — every overdue step is on the list', () => {
     const many = Array.from({ length: 17 }, (_, i) =>
       overdue({ id: `od:A-${i}:1`, act: `A-${i}`, due: d('2025-05-01') }),
     );
@@ -210,17 +222,33 @@ describe('what it leaves out', () => {
 });
 
 describe('one row per thing', () => {
-  it('keeps the louder reason when a step is both overdue and carrying a stale risk', () => {
+  /* A step that is both flagged and late is one row, filed as the risk — the
+     flag is a person's judgement about work still running, and the date having
+     passed is arithmetic. The row says both. */
+  it('files a step that is both flagged and overdue as the risk', () => {
     const rows = attention(
       input({
-        overdue: [overdue({ stepN: 2 })],
-        risks: [risk({ updatedAt: d('2024-01-01') })],
+        overdue: [overdue({ stepN: 2, due: d('2025-05-22') })],
+        risks: [risk({ stepN: 2, updatedAt: d('2024-01-01') })],
       }),
     );
-    // different keys — a risk is keyed on the post, not the step — so both show,
-    // but the overdue row is unambiguously first
-    expect(rows[0].tag).toBe('Overdue');
-    expect(rows.length).toBe(2);
+    expect(rows).toHaveLength(1);
+    expect(rows[0].tag).toBe('Stale risk');
+    expect(rows[0].why).toContain('10 days past due');
+    expect(rows[0].step).toEqual({ act: 'DEF-01', n: 2 });
+  });
+
+  /* An overdue step nobody flagged stays Overdue. */
+  it('leaves an unflagged overdue step as overdue', () => {
+    const rows = attention(
+      input({
+        overdue: [overdue({ stepN: 9 })],
+        /* answered yesterday, so it reads Risk rather than Stale risk */
+        risks: [risk({ stepN: 2, updatedAt: d('2025-05-31') })],
+      }),
+    );
+    expect(rows.map((r) => r.tag)).toEqual(['Risk', 'Overdue']);
+    expect(rows[1].step).toEqual({ act: 'DEF-01', n: 9 });
   });
 
   it('collapses two claims on the same deliverable to the worse one', () => {

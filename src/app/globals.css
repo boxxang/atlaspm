@@ -2417,7 +2417,17 @@ button.clip:hover{background:var(--accent-line)}
 .post .txt{font-size:13.5px;line-height:1.5;margin-top:4px}
 .acts{display:flex;gap:2px;opacity:0;transition:opacity .12s}
 /* only the post or reply actually under the cursor shows its controls */
-.post:hover > div > .who .acts,.reply:hover .acts,.feedrow:hover .acts,.acts:focus-within{opacity:1}
+.post:hover .postacts,.reply:hover .postacts,.feedrow:hover .acts,.acts:focus-within{opacity:1}
+/* Under the body, so hiding them costs no space. The prototype has them on the
+   name's line, which leaves a row of blank between who wrote it and what they
+   wrote on every post that is not being hovered. */
+.postacts{margin-top:5px}
+
+/* The body reads as a quoted thing rather than as loose text under a name —
+   the outline is what separates one post from the next now that the actions
+   are not sitting between them. */
+.post > div > .txt,.reply > div > .txt{border:1px solid var(--line-soft);border-radius:var(--r);
+  padding:7px 10px;background:var(--sunken)}
 .acts button{font-size:11.5px;color:var(--ink-3);padding:1px 5px;border-radius:4px}
 .acts button:hover{color:var(--accent);background:var(--accent-soft)}
 .acts button.del:hover{color:var(--risk-ink);background:var(--risk-soft)}
@@ -2712,28 +2722,13 @@ kbd{font:inherit;font-size:10.5px;border:1px solid var(--line);border-bottom-wid
 .ta{width:100%;resize:vertical;padding:7px 9px;line-height:1.5;border-radius:var(--r)}
 
 .thread{display:flex;flex-direction:column;gap:12px}
-.composer{display:flex;flex-direction:column;gap:6px}
-.composer textarea{
-  width:100%;font:inherit;font-size:12.5px;line-height:1.5;color:var(--ink);
-  border:1px solid var(--line);border-radius:var(--r);padding:7px 9px;background:var(--bg);resize:vertical;
-}
-.composer textarea:focus{outline:none;border-color:var(--accent)}
-.composer-acts{display:flex;align-items:center;gap:10px;justify-content:flex-end}
-.composer-risk{display:inline-flex;align-items:center;gap:5px;margin-right:auto;font-size:11.5px;color:var(--ink-3)}
-.composer.small textarea{font-size:12px;padding:5px 8px}
-.posts{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:14px}
-.posts > li{display:flex;flex-direction:column;gap:6px}
-.post{display:flex;flex-direction:column;gap:4px}
-.post-head{display:flex;align-items:baseline;gap:7px;flex-wrap:wrap}
-.post-who{font-size:12px;font-weight:600;color:var(--ink-2)}
-.post-when{font-size:11px;color:var(--ink-4);font-variant-numeric:tabular-nums}
-.post-text{margin:0;font-size:12.5px;line-height:1.55;color:var(--ink-body);white-space:pre-wrap}
-.post.editing textarea{width:100%;font:inherit;font-size:12.5px;line-height:1.5;border:1px solid var(--accent);border-radius:var(--r);padding:7px 9px}
-.post-acts{display:flex;gap:6px;justify-content:flex-end}
-.replies{
-  list-style:none;margin:6px 0 2px;padding:0 0 0 14px;
-  border-left:2px solid var(--line);display:flex;flex-direction:column;gap:8px;
-}
+
+/* The V1 thread's stylesheet used to sit here — .posts, .post-head, .post-text
+   and a second .composer/.post/.replies. It went unused when the thread was
+   rewritten to the prototype's markup, but it was declared later in the file
+   and so still won: .post came out as a column, which stacked every avatar
+   above its own name, and .composer textarea drew a second border inside the
+   composer's own. The prototype's rules above are the only ones now. */
 
 /* ---------- overview ---------- */
 .pstats{

@@ -157,24 +157,19 @@ function Post({
     <div className="post" data-post={post.id}>
       <Avatar name={post.author} />
       <div style={{ flexGrow: 1, minWidth: 0 }}>
-        <WhoLine
-          post={post}
-          showStep={showStep}
-          live={live}
-          mode={mode}
-          setMode={setMode}
-          onReply={onReply}
-        />
+        <WhoLine post={post} showStep={showStep} live={live} />
         <PostBody post={post} mode={mode} setMode={setMode} />
         {showStep && live && <RiskLine />}
+        <PostActions post={post} mode={mode} setMode={setMode} onReply={onReply} />
         {(replies.length > 0 || replying) && (
           <div className="replies">
             {replies.map((r) => (
               <div className="reply" key={r.id}>
                 <Avatar name={r.author} small />
                 <div style={{ flexGrow: 1, minWidth: 0 }}>
-                  <WhoLine post={r} showStep={false} live={false} mode={mode} setMode={setMode} />
+                  <WhoLine post={r} showStep={false} live={false} />
                   <PostBody post={r} mode={mode} setMode={setMode} />
+                  <PostActions post={r} mode={mode} setMode={setMode} />
                 </div>
               </div>
             ))}
@@ -210,18 +205,11 @@ function WhoLine({
   post,
   showStep,
   live,
-  mode,
-  setMode,
-  onReply,
 }: {
   post: ProgramPost;
   showStep: boolean;
   live: boolean;
-  mode: Mode;
-  setMode: (m: Mode) => void;
-  onReply?: () => void;
 }) {
-  const busy = mode?.id === post.id;
   return (
     <div className="who">
       <b style={{ fontSize: post.parentId ? 12.5 : 13 }}>{post.author}</b>
@@ -250,28 +238,43 @@ function WhoLine({
         {fmtDT(post.createdAt)}
       </span>
       {post.editedAt && <span className="edited">edited</span>}
-      {!busy && (
-        <>
-          <span style={{ flexGrow: 1 }} />
-          <span className="acts">
-            {onReply && (
-              <button type="button" onClick={onReply}>
-                Reply
-              </button>
-            )}
-            <button type="button" onClick={() => setMode({ id: post.id, kind: 'edit' })}>
-              Edit
-            </button>
-            <button
-              type="button"
-              className="del"
-              onClick={() => setMode({ id: post.id, kind: 'delete' })}
-            >
-              Delete
-            </button>
-          </span>
-        </>
+    </div>
+  );
+}
+
+/**
+ * Reply, Edit, Delete — under the post rather than beside the name.
+ *
+ * They hide until the post is hovered, and on the name's line that left a row
+ * of empty space between who wrote it and what they wrote: the gap read as a
+ * layout bug on every post, all the time, to save a line on the one being
+ * pointed at. Under the body it costs nothing when hidden.
+ */
+function PostActions({
+  post,
+  mode,
+  setMode,
+  onReply,
+}: {
+  post: ProgramPost;
+  mode: Mode;
+  setMode: (m: Mode) => void;
+  onReply?: () => void;
+}) {
+  if (mode?.id === post.id) return null;
+  return (
+    <div className="acts postacts">
+      {onReply && (
+        <button type="button" onClick={onReply}>
+          Reply
+        </button>
       )}
+      <button type="button" onClick={() => setMode({ id: post.id, kind: 'edit' })}>
+        Edit
+      </button>
+      <button type="button" className="del" onClick={() => setMode({ id: post.id, kind: 'delete' })}>
+        Delete
+      </button>
     </div>
   );
 }

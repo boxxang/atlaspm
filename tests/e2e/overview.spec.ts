@@ -39,11 +39,12 @@ test.describe('Overview', () => {
     await expect(rows).toHaveCount(10);
     await expect(page.locator('[data-attn-count]')).toContainText('10 of ');
 
-    /* every overdue row comes before every due-soon row */
+    /* a flagged step outranks a late one, which outranks a deliverable due
+       soon — and nothing merely coming sits above any of them */
     const tags = await page.locator('[data-attn] .pill').allTextContents();
-    const lastOverdue = tags.lastIndexOf('Overdue');
-    const firstOther = tags.findIndex((t) => t !== 'Overdue');
-    if (firstOther !== -1) expect(lastOverdue).toBeLessThan(firstOther);
+    const rank = { Risk: 0, 'Stale risk': 0, Overdue: 1, 'Due soon': 2, 'Next up': 3 } as const;
+    const seen = tags.map((t) => rank[t as keyof typeof rank]);
+    expect(seen).toEqual([...seen].sort((a, b) => a - b));
   });
 
   /* Capped is not hidden: raise the cap and every overdue step is there. */
@@ -54,9 +55,14 @@ test.describe('Overview', () => {
     );
     await page.locator('[data-row-limit]').click();
     await page.locator('[data-limit="50"]').click();
-    /* the overdue steps only — the raised cap also brings in what is coming */
-    const steps = await page.locator('[data-attn^="s:"][data-tag="Overdue"]').count();
-    expect(steps).toBe(overdue);
+    /* Every late step is there. Some are filed as the risk flagged on them —
+       one row per step, worst reason first — so both tags count. */
+    const late = await page
+      .locator('[data-attn^="s:"]')
+      .evaluateAll((els) =>
+        els.filter((e) => ['Overdue', 'Risk', 'Stale risk'].includes(e.dataset.tag ?? '')).length,
+      );
+    expect(late).toBeGreaterThanOrEqual(overdue);
   });
 
   test('a row goes to the work it is about, and says so in the link', async ({ page }) => {
@@ -147,7 +153,7 @@ test.describe('how long the attention list is', () => {
     const tags = await page
       .locator('[data-attn] .pill')
       .evaluateAll((els) => els.map((e) => e.textContent ?? ''));
-    const rank = { Overdue: 0, 'Due soon': 1, 'Stale risk': 2, 'Next up': 3 } as const;
+    const rank = { Risk: 0, 'Stale risk': 0, Overdue: 1, 'Due soon': 2, 'Next up': 3 } as const;
     const seen = tags.map((t) => rank[t as keyof typeof rank]);
     expect(seen).toEqual([...seen].sort((a, b) => a - b));
   });

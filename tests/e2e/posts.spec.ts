@@ -146,7 +146,8 @@ test.describe('posting on a step', () => {
 
     /* deleting the parent takes the thread — a reply to nothing is not a post */
     await rail(page)
-      .locator('.thread > .post > div > .who')
+      /* the actions sit under the body now, not on the name's line */
+      .locator('.thread > .post > div > .postacts')
       .getByRole('button', { name: 'Delete' })
       .click();
     await rail(page).locator('.delconf').getByRole('button', { name: 'Delete' }).click();

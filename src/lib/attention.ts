@@ -1,10 +1,17 @@
 /**
  * /lib/attention.ts — what needs answering today, ranked.
  *
- * Three things can want a TPM's attention: a step past its due date, a key
- * deliverable that is late or nearly due, and a risk nobody has said anything
- * about in a week. They are not comparable on their own terms, so they are
- * scored into bands: overdue outranks due-soon outranks stale, always.
+ * Four things can want a TPM's attention: a step somebody has flagged a risk
+ * on, a step past its due date, a key deliverable that is late or nearly due,
+ * and what is coming. They are not comparable on their own terms, so they are
+ * scored into bands: a flagged step outranks an overdue one outranks a
+ * deliverable due soon, always.
+ *
+ * A flagged step is top because somebody wrote down that it is in trouble.
+ * That is a person's judgement about work still running, and it outranks a
+ * date having passed — which is arithmetic. A step that is both is one row,
+ * filed as the risk: the flag is the more useful thing to know, and the row
+ * says the step is late underneath it.
  *
  * Under the three sits a fourth: what is coming. It is not a fallback for an
  * empty list — a program with one late step and nothing else has answered the
@@ -25,7 +32,7 @@ import { DAY, startOfDay } from './schedule';
 import type { DerivedRisk } from './risks';
 import type { OverdueStep } from './steps';
 
-export const ATTN_BAND = { overdue: 3000, soon: 2000, stale: 1000, next: 0 } as const;
+export const ATTN_BAND = { risk: 4000, overdue: 3000, soon: 2000, stale: 1000, next: 0 } as const;
 /** How many rows the panel shows before it starts scrolling for the rest. */
 export const ATTN_LIMIT = 10;
 /** What the reader can set it to. */
@@ -35,10 +42,10 @@ export const ATTN_MTO = 300;
 
 /** How close a deliverable has to be before it is worth saying anything. */
 const SOON_DAYS = 21;
-/** How long a risk goes unanswered before it is stale. */
+/** How long a risk goes unanswered before the row says so. */
 const STALE_DAYS = 7;
 
-export type AttentionTag = 'Overdue' | 'Due soon' | 'Stale risk' | 'Next up';
+export type AttentionTag = 'Risk' | 'Overdue' | 'Due soon' | 'Stale risk' | 'Next up';
 export type AttentionType = 'Step' | 'Deliverable';
 
 export interface AttentionRow {
@@ -157,26 +164,36 @@ export function attention(input: AttentionInput): AttentionRow[] {
     );
   }
 
-  /* A risk carries no date of its own, so it is judged on how long it has gone
-     unanswered. It is flagged on a step and answered on that step, so it is a
-     step here too. */
+  /* Every open risk, not only the ones that have gone quiet — a risk raised
+     this morning is the most useful thing on the screen, and waiting a week to
+     mention it is how the list came to have none on it at all.
+
+     Keyed on the step, not on the risk, so a step that is also overdue is one
+     row rather than two saying the same thing. The higher score wins, and the
+     risk band is above the overdue one, so it is filed as the risk.
+
+     A risk carries no date of its own, so it is ordered on how long it has
+     gone unanswered: the one nobody has touched sits above the one somebody
+     answered an hour ago. */
   for (const r of input.risks) {
     const quiet = daysSince(r.updatedAt, today);
-    if (quiet <= STALE_DAYS) continue;
     const blocks = blocksTapeout(r.stageId);
+    const late = input.overdue.find((o) => o.act === r.act && o.stepN === r.stepN);
     push({
-      key: `r:${r.id}`,
-      tag: 'Stale risk',
+      key: r.stepN == null ? `r:${r.id}` : `s:${r.act}:${r.stepN}`,
+      tag: quiet > STALE_DAYS ? 'Stale risk' : 'Risk',
       type: 'Step',
       title: r.title,
-      why: `no update in ${quiet} days`,
+      why:
+        (quiet > STALE_DAYS ? `no update in ${quiet} days` : quiet === 0 ? 'raised today' : `raised ${plural(quiet, 'day')} ago`) +
+        (late ? `, ${plural(daysSince(late.due, today), 'day')} past due` : ''),
       stageId: r.stageId,
       owner: r.owner,
       ref: r.act,
       step: r.stepN == null ? null : { act: r.act, n: r.stepN },
       deliverableId: null,
       blocks,
-      score: ATTN_BAND.stale + quiet + (blocks ? ATTN_MTO : 0),
+      score: ATTN_BAND.risk + quiet + (blocks ? ATTN_MTO : 0),
     });
   }
 
