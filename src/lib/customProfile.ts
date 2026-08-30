@@ -65,3 +65,29 @@ export const requiredStages = (
   base: readonly ProfileStageDef[],
   milestoneOf: Readonly<Record<string, MilestoneDef>>,
 ): Set<string> => new Set(base.filter((s) => milestoneOf[s.key]?.major).map((s) => s.key));
+
+/**
+ * Where week zero falls when the date somebody typed is not the program's
+ * start but the start of a stage partway through it.
+ *
+ * A program is not always planned from its own beginning. "Physical Design
+ * starts in March" is the fixed point on a great many programs — the rest of
+ * the plan is read backwards and forwards from it — and being made to convert
+ * that into a kickoff date by hand is how a schedule ends up a week out.
+ *
+ * So the anchor stage's start is pinned to the date given, and the kickoff is
+ * derived: everything before the anchor lands earlier, everything after it
+ * later, and every offset stays as the template wrote it. Anchoring on the
+ * first stage gives back the date unchanged, which is the ordinary case.
+ */
+export function kickoffForAnchor(
+  stages: readonly ProfileStageDef[],
+  anchorKey: string,
+  anchorStarts: Date,
+): Date {
+  const anchor = stages.find((s) => s.key === anchorKey);
+  if (!anchor) throw new StageChoiceError(`No such stage: ${anchorKey}`);
+  const out = new Date(anchorStarts);
+  out.setDate(out.getDate() - Math.round(anchor.startOffsetWeeks * 7));
+  return out;
+}

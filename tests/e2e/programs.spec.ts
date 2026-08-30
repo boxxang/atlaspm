@@ -47,6 +47,103 @@ test.describe('the program list', () => {
     ).toContainText('0');
   });
 
+  /* Creating happens in a dialog, and every field says what it is for — the
+     dates especially, since a bare date input on a form about a three-year
+     program does not say which of its dates it is. */
+  test.describe('the new-program dialog', () => {
+    test('opens over the list, and every field explains itself', async ({ page }) => {
+      await expect(page.locator('[data-new-program]')).toHaveCount(0);
+      await page.locator('[data-new-project]').click();
+
+      const dlg = page.locator('[data-new-program]');
+      await expect(dlg).toBeVisible();
+      /* the row it was launched from is still there behind it */
+      await expect(page.locator('[data-new-project-row]')).toBeAttached();
+
+      for (const label of ['Program name', 'Template', 'Expected kickoff']) {
+        await expect(dlg.locator('.dlg-label').filter({ hasText: label })).toBeVisible();
+      }
+      /* every field carries its sentence, and the date's says which date */
+      const hints = await dlg.locator('.dlg-hint').allTextContents();
+      expect(hints).toHaveLength(3);
+      expect(hints.every((h) => h.length > 20)).toBe(true);
+      await expect(dlg).toContainText('The day the first stage begins');
+    });
+
+    test('closes on Escape and on Cancel, without making anything', async ({ page }) => {
+      const before = await page.locator('[data-program]').count();
+
+      await page.locator('[data-new-project]').click();
+      await page.keyboard.press('Escape');
+      await expect(page.locator('[data-new-program]')).toHaveCount(0);
+
+      await page.locator('[data-new-project]').click();
+      await page.locator('[data-new-program]').getByRole('button', { name: 'Cancel' }).click();
+      await expect(page.locator('[data-new-program]')).toHaveCount(0);
+
+      await expect(page.locator('[data-program]')).toHaveCount(before);
+    });
+
+    test('says what is missing rather than making a nameless program', async ({ page }) => {
+      await page.locator('[data-new-project]').click();
+      await page.locator('[data-create]').click();
+      await expect(page.locator('[data-new-program] .err')).toContainText('name');
+      await expect(page).toHaveURL('/');
+    });
+  });
+
+  /* The date is not always the program's own start. "Physical Design begins in
+     March" is the fixed point on a great many programs, and converting that
+     into a kickoff by hand is how a schedule ends up a week out. */
+  test.describe('aligning the plan to a stage', () => {
+    const open = async (page: Page) => {
+      await page.locator('[data-new-project]').click();
+      await page.locator('.pf-profile').selectOption('custom:typicalSoC');
+      await expect(page.locator('.pf-anchor')).toBeVisible();
+    };
+
+    test('the first stage is the anchor to begin with, and the date is the kickoff', async ({
+      page,
+    }) => {
+      await open(page);
+      await expect(page.locator('.pf-anchor')).toHaveValue('productDefinition');
+      await expect(page.locator('[data-new-program]')).toContainText('Expected kickoff');
+      /* nothing is derived, because the date is already week zero */
+      await expect(page.locator('[data-derived]')).toHaveCount(0);
+    });
+
+    test('choosing another stage renames the date and works week zero out', async ({ page }) => {
+      await open(page);
+      await page.locator('.pf-kickoff').fill('2026-08-30');
+      await page.locator('.pf-anchor').selectOption('physicalDesign');
+
+      /* the field is no longer asking for a kickoff */
+      await expect(page.locator('[data-new-program]')).toContainText('PD starts');
+      await expect(page.locator('[data-new-program]')).toContainText('Week zero is 46 weeks before');
+      /* 46 weeks before 08/30/2026 */
+      await expect(page.locator('[data-derived]')).toContainText('10/12/2025');
+    });
+
+    test('the program is built around the date the anchor was given', async ({ page }) => {
+      await open(page);
+      await page.locator('.pf-name').fill('AtlasAnchored');
+      await page.locator('.pf-kickoff').fill('2026-08-30');
+      await page.locator('.pf-anchor').selectOption('physicalDesign');
+      await page.locator('[data-create]').click();
+      await page.waitForURL(/\/p\/atlasanchored-[^/]*\/overview$/);
+
+      /* Physical Design starts on the day that was typed, not the kickoff */
+      await page.getByRole('link', { name: /^Stages/ }).click();
+      const row = page.locator('[data-stage="physicalDesign"]');
+      await expect(row).toContainText('08/30/2026');
+      /* and week zero landed where the dialog said it would */
+      await page.goto('/');
+      await expect(
+        page.locator('[data-program]').filter({ hasText: 'AtlasAnchored' }),
+      ).toContainText('kickoff 10/12/2025');
+    });
+  });
+
   /* The toolbar's two buttons were decoration. They order and narrow the list
      by the figures the rows already print. */
   test.describe('the toolbar', () => {
@@ -135,7 +232,7 @@ test.describe('the program list', () => {
   test.describe('on some of the template’s stages', () => {
     const pick = async (page: Page) => {
       await page.locator('[data-new-project]').click();
-      await page.locator('.pf-profile').selectOption({ label: 'Typical SoC (Customized)' });
+      await page.locator('.pf-profile').selectOption('custom:typicalSoC');
       await expect(page.locator('[data-stage-picker]')).toBeVisible();
     };
 
@@ -143,7 +240,7 @@ test.describe('the program list', () => {
       await pick(page);
       await expect(page.locator('[data-pick]')).toHaveCount(23);
       await expect(page.locator('[data-pick][data-on]')).toHaveCount(23);
-      await expect(page.locator('[data-new-program-form]')).toContainText('23 of 23 stages');
+      await expect(page.locator('[data-new-program]')).toContainText('23 of 23');
     });
 
     /* The three the countdowns read cannot be dropped; everything else can.
@@ -170,7 +267,7 @@ test.describe('the program list', () => {
         await page.locator(`[data-pick="${key}"]`).click();
         await expect(page.locator(`[data-pick="${key}"]`)).not.toHaveAttribute('data-on', '');
       }
-      await expect(page.locator('[data-new-program-form]')).toContainText('20 of 23 stages');
+      await expect(page.locator('[data-new-program]')).toContainText('20 of 23');
 
       await page.locator('[data-create]').click();
       await page.waitForURL(/\/p\/atlastrim-[^/]*\/overview$/);
@@ -198,10 +295,12 @@ test.describe('the program list', () => {
       await page.goto('/');
       await expect(page.locator('[data-program]').first()).toBeVisible();
       await page.locator('[data-new-project]').click();
-      const options = await page.locator('.pf-profile option').allTextContents();
-      expect(options).toEqual(['Typical SoC', 'Typical SoC (Customized)']);
+      const options = await page.locator('.pf-profile option').evaluateAll((os) =>
+        os.map((o) => (o as HTMLOptionElement).value),
+      );
+      expect(options).toEqual(['typicalSoC', 'custom:typicalSoC']);
 
-      await page.locator('.pf-profile').selectOption({ label: 'Typical SoC' });
+      await page.locator('.pf-profile').selectOption('typicalSoC');
       await expect(page.locator('[data-stage-picker]')).toHaveCount(0);
       await page.locator('.pf-name').fill('AtlasWhole');
       await page.locator('.pf-kickoff').fill('2027-03-01');

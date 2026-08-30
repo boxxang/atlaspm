@@ -7,7 +7,7 @@ import { createProject, deleteProject } from '@/app/actions';
 import { activitySteps } from '@/data/activitySteps';
 import { BUILTIN_PROFILE, lifecyclePhases, stageMilestone } from '@/data/scheduleProfiles';
 import type { ProfileSummary } from '@/data/types';
-import { requiredStages } from '@/lib/customProfile';
+import { kickoffForAnchor, pickStages, requiredStages } from '@/lib/customProfile';
 import { estimateCost } from '@/lib/effort';
 import {
   FILTERS,
@@ -213,9 +213,10 @@ function ProgramTable({
         <ProgramRow key={p.id} p={p} on={p.id === picked} onPick={() => onPick(p.id)} />
       ))}
 
-      {adding ? (
-        <NewProgramRow profiles={profiles} onClose={() => setAdding(false)} />
-      ) : (
+      {/* The dialog is in the top layer, so the row it was launched from stays
+          where it was rather than being replaced by it. */}
+      {adding && <NewProgramDialog profiles={profiles} onClose={() => setAdding(false)} />}
+      {
         <button
           type="button"
           className="trow"
@@ -240,7 +241,7 @@ function ProgramTable({
             New program — name it, set an expected kickoff, pick a template
           </span>
         </button>
-      )}
+      }
 
       {projects.length <= 1 && (
         <div className="empty" style={{ paddingTop: 44 }}>
@@ -738,7 +739,7 @@ function PeekLine({ dot, label, n, tone }: { dot: string; label: string; n: numb
  */
 const CUSTOM = 'custom:';
 
-function NewProgramRow({
+function NewProgramDialog({
   profiles,
   onClose,
 }: {
@@ -747,10 +748,11 @@ function NewProgramRow({
 }) {
   const router = useRouter();
   const [name, setName] = useState('');
-  const [kickoff, setKickoff] = useState(toISO(new Date()));
+  const [date, setDate] = useState(toISO(new Date()));
   const [choice, setChoice] = useState(profiles[0]?.id ?? '');
   const [error, setError] = useState('');
   const [pending, start] = useTransition();
+  const box = useRef<HTMLDialogElement>(null);
 
   const customising = choice.startsWith(CUSTOM);
   const baseId = customising ? choice.slice(CUSTOM.length) : choice;
@@ -762,18 +764,51 @@ function NewProgramRow({
   );
   const locked = requiredStages(BUILTIN_PROFILE.stages, stageMilestone);
 
+  /* The stages as this program would run them, and the one the date is pinned
+     to. Anchoring on the first is the ordinary case and means the date is the
+     program's own kickoff; anchoring anywhere else means the date is when that
+     stage starts, and week zero is worked out from it. */
+  const stages = useMemo(() => {
+    try {
+      return customising ? pickStages(BUILTIN_PROFILE.stages, [...keep], stageMilestone) : [];
+    } catch {
+      return [];
+    }
+  }, [customising, keep]);
+  const [anchor, setAnchor] = useState<string>('');
+  const anchorKey = stages.some((s) => s.key === anchor) ? anchor : (stages[0]?.key ?? '');
+  const anchorStage = stages.find((s) => s.key === anchorKey);
+  const anchored = !!anchorStage && anchorStage.startOffsetWeeks > 0;
+
+  /* Escape and the backdrop close it; the browser handles the focus trap. */
+  useEffect(() => {
+    const el = box.current;
+    if (!el) return;
+    if (!el.open) el.showModal();
+    const cancel = (e: Event) => {
+      e.preventDefault();
+      onClose();
+    };
+    el.addEventListener('cancel', cancel);
+    return () => el.removeEventListener('cancel', cancel);
+  }, [onClose]);
+
   const submit = () => {
     if (!name.trim()) return setError('Give the program a name.');
-    if (!kickoff) return setError('Pick an expected kickoff date.');
+    if (!date) return setError('Pick a date for it to start from.');
     if (customising && keep.size === 0) return setError('Pick at least one stage.');
     setError('');
     const id = `${name.trim().toLowerCase().replace(/[^a-z0-9]+/g, '-')}-${Math.random().toString(36).slice(2, 7)}`;
+    const kickoff =
+      customising && anchorKey
+        ? kickoffForAnchor(stages, anchorKey, fromISO(date))
+        : fromISO(date);
     start(async () => {
       try {
         await createProject({
           id,
           name: name.trim(),
-          kickoff: fromISO(kickoff),
+          kickoff,
           profileId: baseId,
           stageKeys: customising ? [...keep] : undefined,
         });
@@ -785,84 +820,177 @@ function NewProgramRow({
   };
 
   return (
-    <div
-      className="trow"
-      data-new-program-form
-      style={{ gridTemplateColumns: '30px 1fr', minHeight: 52, gap: 11 }}
-    >
-      <span />
-      <span style={{ display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap' }}>
-        <input
-          className="pf-name dateinp"
-          autoFocus
-          placeholder="Program name"
-          aria-label="Name"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          style={{ width: 180 }}
-        />
-        <input
-          className="pf-kickoff dateinp"
-          type="date"
-          aria-label="Kickoff"
-          value={kickoff}
-          onChange={(e) => setKickoff(e.target.value)}
-        />
-        <select
-          className="pf-profile dateinp"
-          aria-label="Template"
-          value={choice}
-          onChange={(e) => setChoice(e.target.value)}
+    <dialog className="dlg" ref={box} data-new-program aria-label="New program">
+      <div className="dlg-hd">
+        <span className="mark">A</span>
+        <b style={{ fontSize: 14.5 }}>New program</b>
+        <span style={{ flexGrow: 1 }} />
+        <button type="button" className="btn sm" onClick={onClose} aria-label="Close">
+          ✕
+        </button>
+      </div>
+
+      <div className="dlg-body">
+        <Field
+          label="Program name"
+          hint="What this chip is called inside the company. It heads every screen the program has."
         >
-          {profiles.map((p) => [
-            <option key={p.id} value={p.id}>
-              {p.label}
-            </option>,
-            /* Only the built-in profile can be customised: it is the one whose
-               stages the app knows how to draw and write up. */
-            p.builtin ? (
-              <option key={`${CUSTOM}${p.id}`} value={`${CUSTOM}${p.id}`}>
-                {p.label} (Customized)
-              </option>
-            ) : null,
-          ])}
-        </select>
-        <button className="btn pri sm" type="button" data-create disabled={pending} onClick={submit}>
-          {pending ? 'Creating…' : 'Create'}
-        </button>
-        <button className="btn sm" type="button" onClick={onClose}>
-          Cancel
-        </button>
+          <input
+            className="pf-name lnkin"
+            autoFocus
+            placeholder="AtlasBX2"
+            aria-label="Program name"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+          />
+        </Field>
+
+        <Field
+          label="Template"
+          hint={
+            customising
+              ? 'The stage list to cut down. The program gets its own copy — the template is not changed.'
+              : 'The stage list, the schedule offsets and the checkpoints the program starts with.'
+          }
+        >
+          <select
+            className="pf-profile lnkin"
+            aria-label="Template"
+            value={choice}
+            onChange={(e) => setChoice(e.target.value)}
+          >
+            {profiles.map((p) => [
+              <option key={p.id} value={p.id}>
+                {p.label} · {p.stageCount} stages
+              </option>,
+              /* Only the built-in profile can be customised: it is the one whose
+                 stages the app knows how to draw and write up. */
+              p.builtin ? (
+                <option key={`${CUSTOM}${p.id}`} value={`${CUSTOM}${p.id}`}>
+                  {p.label} (Customized) · pick the stages
+                </option>
+              ) : null,
+            ])}
+          </select>
+        </Field>
+
+        {customising && (
+          <Field
+            label="Aligned to"
+            hint="The stage whose start the date below is. Everything before it is planned backwards from there, everything after it forwards — the offsets between stages do not move."
+          >
+            <select
+              className="pf-anchor lnkin"
+              aria-label="Aligned to"
+              value={anchorKey}
+              onChange={(e) => setAnchor(e.target.value)}
+            >
+              {stages.map((st, i) => (
+                <option key={st.key} value={st.key}>
+                  {st.title}
+                  {i === 0 ? ' — the program kickoff' : ` — week ${st.startOffsetWeeks}`}
+                </option>
+              ))}
+            </select>
+          </Field>
+        )}
+
+        <Field
+          label={anchored ? `${anchorStage!.shortTitle} starts` : 'Expected kickoff'}
+          hint={
+            anchored
+              ? `The day ${anchorStage!.title} begins. Week zero is ${anchorStage!.startOffsetWeeks} weeks before it, and every date on the program is measured from there.`
+              : 'The day the first stage begins. Every stage date, checkpoint and countdown is measured from it, and it can be changed later.'
+          }
+        >
+          <input
+            className="pf-kickoff lnkin"
+            type="date"
+            aria-label={anchored ? `${anchorStage!.shortTitle} starts` : 'Expected kickoff'}
+            value={date}
+            onChange={(e) => setDate(e.target.value)}
+          />
+          {anchored && date && (
+            <span className="num" style={{ fontSize: 11.5, color: 'var(--ink-3)' }} data-derived>
+              Program kickoff {fmtDate(kickoffForAnchor(stages, anchorKey, fromISO(date)))}
+            </span>
+          )}
+        </Field>
+
+        {customising && (
+          <Field
+            label="Stages"
+            hint="Everything the template names, ticked. Untick what this chip does not do — the three the countdowns read cannot go."
+            count={`${keep.size} of ${BUILTIN_PROFILE.stages.length}`}
+          >
+            <StagePicker
+              keep={keep}
+              locked={locked}
+              onToggle={(key, on) =>
+                setKeep((prev) => {
+                  const next = new Set(prev);
+                  if (on) next.add(key);
+                  else next.delete(key);
+                  return next;
+                })
+              }
+              onAll={(on) =>
+                setKeep(on ? new Set(BUILTIN_PROFILE.stages.map((s) => s.key)) : new Set(locked))
+              }
+            />
+          </Field>
+        )}
+      </div>
+
+      <div className="dlg-foot">
         {error && (
           <span className="err" style={{ fontSize: 12, color: 'var(--risk)' }}>
             {error}
           </span>
         )}
-        {customising && (
-          <span className="num" style={{ fontSize: 12, color: 'var(--ink-3)' }}>
-            {keep.size} of {BUILTIN_PROFILE.stages.length} stages
+        <span style={{ flexGrow: 1 }} />
+        <button className="btn sm" type="button" onClick={onClose}>
+          Cancel
+        </button>
+        <button className="btn pri sm" type="button" data-create disabled={pending} onClick={submit}>
+          {pending ? 'Creating…' : 'Create program'}
+        </button>
+      </div>
+    </dialog>
+  );
+}
+
+/**
+ * One labelled field, with the sentence saying what it is for.
+ *
+ * The dates were the reason for this: a bare date input on a form about a
+ * three-year program does not say which of its dates it is, and the answer now
+ * changes depending on what the program is aligned to.
+ */
+function Field({
+  label,
+  hint,
+  count,
+  children,
+}: {
+  label: string;
+  hint: string;
+  count?: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <label className="dlg-field">
+      <span className="dlg-label">
+        {label}
+        {count && (
+          <span className="pill" style={{ fontSize: 10.5, marginLeft: 7 }}>
+            {count}
           </span>
         )}
       </span>
-
-      {customising && (
-        <StagePicker
-          keep={keep}
-          locked={locked}
-          onToggle={(key, on) =>
-            setKeep((prev) => {
-              const next = new Set(prev);
-              if (on) next.add(key);
-              else next.delete(key);
-              return next;
-            })
-          }
-          onAll={(on) =>
-            setKeep(on ? new Set(BUILTIN_PROFILE.stages.map((s) => s.key)) : new Set(locked))
-          }
-        />
-      )}
-    </div>
+      <span className="dlg-hint">{hint}</span>
+      <span className="dlg-control">{children}</span>
+    </label>
   );
 }
 

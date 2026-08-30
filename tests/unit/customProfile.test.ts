@@ -1,6 +1,11 @@
 import { describe, expect, it } from 'vitest';
 import { BUILTIN_PROFILE, stageMilestone } from '@/data/scheduleProfiles';
-import { pickStages, requiredStages, StageChoiceError } from '@/lib/customProfile';
+import {
+  kickoffForAnchor,
+  pickStages,
+  requiredStages,
+  StageChoiceError,
+} from '@/lib/customProfile';
 import type { MilestoneDef, ProfileStageDef } from '@/data/types';
 
 const stage = (
@@ -96,5 +101,38 @@ describe('against the profile the app actually ships', () => {
     /* something starts at kickoff — not necessarily the first row, since
        stages overlap and order is not start order */
     expect(Math.min(...out.map((s) => s.startOffsetWeeks))).toBe(0);
+  });
+});
+
+describe('anchoring the plan to a stage other than the first', () => {
+  const day = (d: Date) => d.toISOString().slice(0, 10);
+
+  it('gives the date back unchanged when the anchor is the first stage', () => {
+    expect(day(kickoffForAnchor(BASE, 'a', new Date(Date.UTC(2026, 2, 2))))).toBe('2026-03-02');
+  });
+
+  /* "Physical Design starts in March" is the fixed point on a great many
+     programs. Anchoring on c, twelve weeks in, puts week zero twelve weeks
+     earlier — and c then starts on the day that was typed. */
+  it('puts week zero before the date when the anchor is partway through', () => {
+    const kickoff = kickoffForAnchor(BASE, 'c', new Date(Date.UTC(2026, 2, 2)));
+    expect(day(kickoff)).toBe('2025-12-08');
+    /* twelve weeks later is the date asked for */
+    const back = new Date(kickoff);
+    back.setDate(back.getDate() + 12 * 7);
+    expect(day(back)).toBe('2026-03-02');
+  });
+
+  it('refuses an anchor the list does not have', () => {
+    expect(() => kickoffForAnchor(BASE, 'zz', new Date())).toThrow(StageChoiceError);
+  });
+
+  /* The two work together: pick the stages, then anchor on one of them. */
+  it('anchors on the trimmed list, not on the template', () => {
+    const kept = pickStages(BASE, ['c', 'd'], NO_MILESTONES);
+    /* c is the first kept stage, so it is week zero and the date is the date */
+    expect(day(kickoffForAnchor(kept, 'c', new Date(Date.UTC(2026, 2, 2))))).toBe('2026-03-02');
+    /* d is eight weeks after c once the run has been shifted */
+    expect(day(kickoffForAnchor(kept, 'd', new Date(Date.UTC(2026, 2, 2))))).toBe('2026-01-05');
   });
 });
