@@ -273,7 +273,10 @@ function ScheduleCard({
   const rows = [...schedule.milestones]
     .sort((a, b) => a.date.getTime() - b.date.getTime())
     .map((m) => {
-      const stage = stages.find((s) => schedule.stages[s.id]?.end.getTime() === m.date.getTime());
+      /* The stage the checkpoint hangs off, by its anchor. Matching on the date
+         attributed it to whichever stage happened to close first that day —
+         and three of them close together. */
+      const stage = stages.find((s) => s.id === m.anchor.stage);
       return { m, stage, passed: m.date < today, risky: !!stage && risky.has(stage.id) };
     });
 

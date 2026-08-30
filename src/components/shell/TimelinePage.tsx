@@ -89,8 +89,11 @@ export function TimelinePage({ projectId }: { projectId: string }) {
 
   const riskyStages = new Set(risks.map((r) => r.stageId));
   const risksOn = (id: string) => risks.filter((r) => r.stageId === id).length;
-  const cpOf = (id: string) =>
-    schedule.milestones.find((m) => m.date.getTime() === schedule.stages[id]?.end.getTime());
+  /* By the stage the checkpoint is anchored to, never by the date. Three
+     stages can close on the same day — Physical Design, Package & Substrate
+     Design and Chip-Package-System Co-Verification all do — and matching on
+     the date put Package Design Freeze on the first of them. */
+  const cpOf = (id: string) => schedule.milestones.find((m) => m.anchor.stage === id);
 
   const barColour = (id: string) => {
     const sp = schedule.stages[id];

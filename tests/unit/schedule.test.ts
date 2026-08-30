@@ -1,5 +1,10 @@
 import { describe, expect, it } from 'vitest';
-import { STAGE_ORDER, milestoneDefs, scheduleProfiles } from '@/data/scheduleProfiles';
+import {
+  BUILTIN_PROFILE,
+  STAGE_ORDER,
+  milestoneDefs,
+  scheduleProfiles,
+} from '@/data/scheduleProfiles';
 import { journeyData } from '@/data/journey';
 import type { StageId } from '@/data/types';
 import {
@@ -277,5 +282,48 @@ describe('formatters', () => {
     expect(addWeeks(new Date(2027, 4, 12), 1)).toEqual(new Date(2027, 4, 19));
     expect(addWeeks(new Date(2027, 4, 12), 1 / 7)).toEqual(new Date(2027, 4, 13));
     expect(addWeeks(new Date(2027, 4, 12), -30)).toEqual(new Date(2026, 9, 14));
+  });
+});
+
+/**
+ * Three stages of the built-in profile close on the same day, and two more do
+ * as a pair. Anything pairing a checkpoint with a stage has to go by the
+ * anchor: matching on the date put Package Design Freeze on Physical Design,
+ * which carries no checkpoint at all.
+ */
+describe('a checkpoint belongs to the stage it is anchored to', () => {
+  const schedule = computeSchedule(new Date(2025, 4, 24), BUILTIN_PROFILE, {});
+
+  it('every checkpoint lands on its own stage’s end', () => {
+    for (const m of schedule.milestones) {
+      expect(m.date.getTime()).toBe(schedule.stages[m.anchor.stage].end.getTime());
+    }
+  });
+
+  /* The coincidence this is guarding against. If the seed ever changes so that
+     these no longer collide, the guard is still right — but the reader should
+     know the collision was real. */
+  it('several stages really do close on the same day', () => {
+    const byDay = new Map<number, string[]>();
+    for (const st of BUILTIN_PROFILE.stages) {
+      const t = schedule.stages[st.key].end.getTime();
+      byDay.set(t, [...(byDay.get(t) ?? []), st.key]);
+    }
+    const shared = [...byDay.values()].filter((keys) => keys.length > 1);
+    expect(shared.length).toBeGreaterThan(0);
+    expect(shared.some((keys) => keys.includes('physicalDesign') && keys.includes('packageDesign'))).toBe(
+      true,
+    );
+  });
+
+  it('a stage with no checkpoint of its own is given none', () => {
+    const of = (id: string) => schedule.milestones.filter((m) => m.anchor.stage === id);
+    /* Physical Design ends the day Package Design Freeze falls, and has no
+       checkpoint of its own. */
+    expect(of('physicalDesign')).toHaveLength(0);
+    expect(of('packageDesign').map((m) => m.label)).toEqual(['Package Design Freeze']);
+    /* and the other collision: Verification and Synthesis close together */
+    expect(of('verification').map((m) => m.label)).toEqual(['DV Closure']);
+    expect(of('synthesis').map((m) => m.label)).toEqual(['FFN Release']);
   });
 });
