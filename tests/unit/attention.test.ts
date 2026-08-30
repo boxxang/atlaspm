@@ -1,11 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import {
-  ATTN_BAND,
-  ATTN_MTO,
-  NEXT_UP,
-  attention,
-  type AttentionInput,
-} from '@/lib/attention';
+import { ATTN_BAND, ATTN_MTO, ATTN_LIMIT, attention, type AttentionInput } from '@/lib/attention';
 import type { OverdueStep } from '@/lib/steps';
 import type { DerivedRisk } from '@/lib/risks';
 
@@ -167,12 +161,13 @@ describe('what each row says', () => {
 
 describe('what it leaves out', () => {
   /* Three weeks is the horizon for "due soon". Beyond it a deliverable is not
-     something today needs, though it does turn up under Coming up next when
-     nothing else does — as Next up, which is a different claim. */
+     something today needs — it appears lower down as Next up, which is a
+     different claim, so the band is what this checks. */
   it('does not call a deliverable more than three weeks away due soon', () => {
     const rows = attention(
       input({
         overdue: [overdue()],
+        limit: 1,
         deliverables: [
           {
             id: 'D1',
@@ -268,7 +263,7 @@ describe('closing before tapeout', () => {
  * its work — used to get an empty panel headed "Needs you today". Silence is
  * not an answer to that question; the work coming up is.
  */
-describe('when nothing is overdue and no risk is unanswered', () => {
+describe('topping the list up with what is coming', () => {
   const soon = (n: number) => new Date(TODAY.getTime() + n * 864e5);
   const step = (n: number, title: string) =>
     overdue({ id: `up:A:${n}`, act: 'A', stepN: n, title, due: soon(n) });
@@ -306,9 +301,9 @@ describe('when nothing is overdue and no risk is unanswered', () => {
     expect(rows[1].title).toBe('a deliverable in 30 days');
   });
 
-  /* And the moment one of them is inside the three-week horizon it is Due
-     soon, which is a band — so this is not the empty case at all. */
-  it('is not reached when a deliverable is already due soon', () => {
+  /* Bands first, always: a deliverable due in three days outranks a step due
+     tomorrow, because one is a commitment and the other is a plan. */
+  it('keeps every band above everything merely coming', () => {
     const rows = attention(
       input({
         upcoming: [step(1, 'a step tomorrow')],
@@ -325,24 +320,55 @@ describe('when nothing is overdue and no risk is unanswered', () => {
         ],
       }),
     );
-    expect(rows.map((r) => r.tag)).toEqual(['Due soon']);
+    expect(rows.map((r) => r.tag)).toEqual(['Due soon', 'Next up']);
   });
 
-  it('stops at seven — a morning\'s work, not the whole plan', () => {
+  it('fills to the limit and no further', () => {
     const many = Array.from({ length: 30 }, (_, i) => step(i + 1, `step ${i + 1}`));
     const rows = attention(input({ upcoming: many }));
-    expect(rows).toHaveLength(NEXT_UP);
-    expect(rows.at(-1)!.title).toBe(`step ${NEXT_UP}`);
+    expect(rows).toHaveLength(ATTN_LIMIT);
+    expect(rows.at(-1)!.title).toBe(`step ${ATTN_LIMIT}`);
+
+    expect(attention(input({ upcoming: many, limit: 5 }))).toHaveLength(5);
+    expect(attention(input({ upcoming: many, limit: 20 }))).toHaveLength(20);
   });
 
-  /* The moment anything is actually wrong, the fallback gets out of the way:
-     one overdue step outranks every date in the future. */
-  it('gives way as soon as there is something wrong', () => {
-    const rows = attention(
-      input({ overdue: [overdue()], upcoming: [step(1, 'tomorrow'), step(2, 'the day after')] }),
-    );
-    expect(rows).toHaveLength(1);
+  /* The case this exists for: one late step answered the question in two
+     seconds and then left the panel blank for the rest of the day. */
+  it('sits under whatever is wrong rather than replacing it', () => {
+    const many = Array.from({ length: 30 }, (_, i) => step(i + 1, `step ${i + 1}`));
+    const rows = attention(input({ overdue: [overdue()], upcoming: many }));
+    expect(rows).toHaveLength(ATTN_LIMIT);
     expect(rows[0].tag).toBe('Overdue');
+    expect(rows.slice(1).every((r) => r.tag === 'Next up')).toBe(true);
+  });
+
+  /* And when there is more wrong than the list is long, none of the room goes
+     to work that is merely coming: the whole list is what is wrong. */
+  it('gives no room to the future when the present has filled the list', () => {
+    const lots = Array.from({ length: 14 }, (_, i) =>
+      overdue({ id: `od:A:${i}`, act: 'A', stepN: i, due: d('2025-05-01') }),
+    );
+    const rows = attention(input({ overdue: lots, upcoming: [step(1, 'tomorrow')] }));
+    expect(rows).toHaveLength(14);
+    expect(rows.every((r) => r.tag === 'Overdue')).toBe(true);
+  });
+
+  /* A deliverable inside three weeks is already in the list as Due soon. It
+     must not turn up again below as Next up. */
+  it('never says the same thing twice', () => {
+    const deliverable = {
+      id: 'D1',
+      title: 'PRD',
+      stageId: 'def' as const,
+      due: soon(3),
+      done: false,
+      ref: null,
+      step: null,
+    };
+    const rows = attention(input({ deliverables: [deliverable], upcoming: [step(9, 'a step')] }));
+    expect(rows.filter((r) => r.key === 'd:D1')).toHaveLength(1);
+    expect(rows.map((r) => r.tag)).toEqual(['Due soon', 'Next up']);
   });
 
   it('says nothing at all when there is nothing ahead either', () => {

@@ -208,7 +208,7 @@ test.describe('the program list', () => {
     await expect(page.getByText('Coming up next')).toBeVisible();
     await expect(page.getByText('Needs you today')).toHaveCount(0);
     const rows = page.locator('[data-attn]');
-    await expect(rows).toHaveCount(7);
+    await expect(rows).toHaveCount(10);
     await expect(rows.first()).toContainText('Next up');
 
     const days = await rows.evaluateAll((els) =>

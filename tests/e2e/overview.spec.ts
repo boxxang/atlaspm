@@ -33,14 +33,11 @@ test.describe('Overview', () => {
     await expect(page).toHaveURL(/\/overdue$/);
   });
 
-  test('Needs you today is ranked, and hides nothing', async ({ page }) => {
+  test('Needs you today is ranked, and says what it left out', async ({ page }) => {
     const rows = page.locator('[data-attn]');
-    const n = await rows.count();
-    expect(n).toBeGreaterThan(10);
-    /* the count in the header is the whole list, not what fits */
-    await expect(
-      page.locator('.card').filter({ hasText: 'Needs you today' }).locator('.pill').first(),
-    ).toHaveText(String(n));
+    /* the list is capped; the header says how much there is behind the cap */
+    await expect(rows).toHaveCount(10);
+    await expect(page.locator('[data-attn-count]')).toContainText('10 of ');
 
     /* every overdue row comes before every due-soon row */
     const tags = await page.locator('[data-attn] .pill').allTextContents();
@@ -49,12 +46,16 @@ test.describe('Overview', () => {
     if (firstOther !== -1) expect(lastOverdue).toBeLessThan(firstOther);
   });
 
-  test('every overdue step is on it — none are capped away', async ({ page }) => {
+  /* Capped is not hidden: raise the cap and every overdue step is there. */
+  test('every overdue step is reachable by raising the cap', async ({ page }) => {
     const nav = page.getByRole('navigation', { name: 'Program' });
     const overdue = Number(
       await nav.getByRole('link', { name: /^Overdue/ }).locator('.c, .cr').innerText(),
     );
-    const steps = await page.locator('[data-attn^="s:"]').count();
+    await page.locator('[data-row-limit]').click();
+    await page.locator('[data-limit="50"]').click();
+    /* the overdue steps only — the raised cap also brings in what is coming */
+    const steps = await page.locator('[data-attn^="s:"][data-tag="Overdue"]').count();
     expect(steps).toBe(overdue);
   });
 
@@ -96,6 +97,59 @@ test.describe('Overview', () => {
       .map((t) => Number(t.replace(/[^\d]/g, '')))
       .reduce((a, b) => a + b, 0);
     expect(total).toBeGreaterThan(shown);
+  });
+});
+
+/* One late step used to answer the question in two seconds and leave the panel
+   blank for the rest of the day. The list is topped up with what is coming, to
+   a length the reader sets. */
+test.describe('how long the attention list is', () => {
+  test.beforeEach(async ({ page }) => {
+    await open(page, `${SHELL_PATH}/overview`, '[data-attn]');
+  });
+
+  test('shows ten by default, and says how many there are', async ({ page }) => {
+    await expect(page.locator('[data-attn]')).toHaveCount(10);
+    await expect(page.locator('[data-row-limit]')).toContainText('Top 10');
+    /* the seed has more wrong than that, so the count says both numbers */
+    await expect(page.locator('[data-attn-count]')).toContainText('10 of ');
+  });
+
+  test('the length is the reader’s to set, and is remembered', async ({ page }) => {
+    await page.locator('[data-row-limit]').click();
+    await page.locator('[data-limit="20"]').click();
+    await expect(page.locator('[data-attn]')).toHaveCount(20);
+    await expect(page.locator('[data-row-limit]')).toContainText('Top 20');
+
+    await page.reload();
+    await expect(page.locator('[data-attn]')).toHaveCount(20);
+
+    await page.locator('[data-row-limit]').click();
+    await page.locator('[data-limit="5"]').click();
+    await expect(page.locator('[data-attn]')).toHaveCount(5);
+  });
+
+  /* The list is capped, not truncated out of sight: it still scrolls, and the
+     rest is one click away. */
+  test('scrolls rather than growing the page', async ({ page }) => {
+    await page.locator('[data-row-limit]').click();
+    await page.locator('[data-limit="50"]').click();
+    const scrolls = await page
+      .locator('.attn-list')
+      .evaluate((el) => el.scrollHeight > el.clientHeight);
+    expect(scrolls).toBe(true);
+  });
+
+  /* Worst first, always: nothing merely coming sits above something wrong. */
+  test('orders by urgency, with what is coming underneath', async ({ page }) => {
+    await page.locator('[data-row-limit]').click();
+    await page.locator('[data-limit="50"]').click();
+    const tags = await page
+      .locator('[data-attn] .pill')
+      .evaluateAll((els) => els.map((e) => e.textContent ?? ''));
+    const rank = { Overdue: 0, 'Due soon': 1, 'Stale risk': 2, 'Next up': 3 } as const;
+    const seen = tags.map((t) => rank[t as keyof typeof rank]);
+    expect(seen).toEqual([...seen].sort((a, b) => a - b));
   });
 });
 

@@ -7,8 +7,10 @@ import { activitySteps } from '@/data/activitySteps';
 import { estimateCost } from '@/lib/effort';
 import { fmtDate, fmtDT } from '@/lib/schedule';
 import { useAppStore } from '@/store/useAppStore';
+import { ATTN_LIMIT, ATTN_LIMITS } from '@/lib/attention';
 import { Avatar, IconMail } from './icons';
 import { useAttention } from './useAttention';
+import { useRowLimit } from './useRowLimit';
 import { useProgramWork } from './useProgramWork';
 
 /**
@@ -215,6 +217,102 @@ function CostStat({ manMonths }: { manMonths: number }) {
 }
 
 /**
+ * How many rows the panel shows before it scrolls.
+ *
+ * A reader's preference, not the program's, so it is remembered in the browser
+ * and offered where it applies rather than buried in a settings screen. The
+ * list still scrolls past the number — the setting decides how much is worth
+ * seeing without scrolling, not how much exists.
+ */
+function RowLimit({
+  limit,
+  shown,
+  total,
+  onChoose,
+}: {
+  limit: number;
+  shown: number;
+  total: number;
+  onChoose: (n: number) => void;
+}) {
+  const [open, setOpen] = useState(false);
+  const box = useRef<HTMLSpanElement>(null);
+
+  useEffect(() => {
+    if (!open) return;
+    const away = (e: MouseEvent) => {
+      if (!box.current?.contains(e.target as Node)) setOpen(false);
+    };
+    const esc = (e: KeyboardEvent) => e.key === 'Escape' && setOpen(false);
+    document.addEventListener('mousedown', away);
+    document.addEventListener('keydown', esc);
+    return () => {
+      document.removeEventListener('mousedown', away);
+      document.removeEventListener('keydown', esc);
+    };
+  }, [open]);
+
+  return (
+    <span className="menu" ref={box} style={{ display: 'inline-flex' }}>
+      <button
+        type="button"
+        className={open ? 'btn sm on' : 'btn sm'}
+        data-row-limit
+        aria-expanded={open}
+        title="How many rows to show"
+        onClick={() => setOpen((o) => !o)}
+      >
+        Top {limit}
+        <svg
+          width="9"
+          height="9"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="#8b8f98"
+          strokeWidth="2.6"
+          style={{ transform: open ? 'rotate(180deg)' : undefined }}
+          aria-hidden="true"
+        >
+          <path d="m6 9 6 6 6-6" />
+        </svg>
+      </button>
+      {open && (
+        <div className="menu-pop" data-limit-pop>
+          {ATTN_LIMITS.map((n) => (
+            <button
+              key={n}
+              type="button"
+              className="mi"
+              data-limit={n}
+              aria-current={n === limit || undefined}
+              onClick={() => {
+                onChoose(n);
+                setOpen(false);
+              }}
+            >
+              <span style={{ width: 13, flexShrink: 0, color: 'var(--accent)' }}>
+                {n === limit ? '✓' : ''}
+              </span>
+              <span>
+                Top {n}
+                <span className="d">
+                  {n === ATTN_LIMIT ? 'the default' : `${n} rows before it scrolls`}
+                </span>
+              </span>
+            </button>
+          ))}
+          <p className="mono-note" style={{ padding: '6px 9px 2px' }}>
+            {shown < total
+              ? `Showing ${shown} of ${total}. The rest are under All overdue and All risks.`
+              : `Showing all ${shown}.`}
+          </p>
+        </div>
+      )}
+    </span>
+  );
+}
+
+/**
  * The list the screen exists for.
  *
  * Every row goes somewhere: a step to the step, a deliverable to the step that
@@ -223,8 +321,16 @@ function CostStat({ manMonths }: { manMonths: number }) {
  * list that says what to answer. It scrolls instead.
  */
 function NeedsYouToday({ projectId }: { projectId: string }) {
-  const rows = useAttention();
+  const [limit, setLimit] = useRowLimit();
+  /* Everything, so the header can say how much there is; the panel shows the
+     first `limit` of it. Anything left out is one click away under All
+     overdue, and the count says how much that is. */
+  const all = useAttention(limit);
+  const rows = all.slice(0, limit);
+  /* Nothing is actually wrong: every row is work coming up, so the heading
+     should not claim otherwise. */
   const nextUp = rows.length > 0 && rows.every((r) => r.tag === 'Next up');
+  const wrong = all.filter((r) => r.tag !== 'Next up').length;
   const stages = useAppStore((s) => s.stages);
   const router = useRouter();
 
@@ -255,13 +361,19 @@ function NeedsYouToday({ projectId }: { projectId: string }) {
             risk unanswered the panel is not empty — it is the next seven dates,
             and calling that "needs you today" would be crying wolf. */}
         <b style={{ fontSize: 14 }}>{nextUp ? 'Coming up next' : 'Needs you today'}</b>
-        <span className={rows.length && !nextUp ? 'pill risk' : 'pill'}>{rows.length}</span>
+        {/* the count is what is wrong, not how many rows there are: the rest
+            of the list is work coming up, and counting it as trouble would be
+            crying wolf. */}
+        <span className={wrong ? 'pill risk' : 'pill'} data-attn-count>
+          {wrong > rows.length ? `${rows.length} of ${wrong}` : wrong || rows.length}
+        </span>
         <span style={{ fontSize: 12, color: 'var(--ink-3)' }}>
           {nextUp
             ? 'nothing is overdue and no risk is unanswered — the nearest dates ahead, in the order they fall'
-            : 'overdue, then due inside three weeks, then risks nobody has answered — anything before the mask order first'}
+            : 'overdue, then due inside three weeks, then risks nobody has answered, then what is coming — worst first'}
         </span>
         <span style={{ flexGrow: 1 }} />
+        <RowLimit limit={limit} onChoose={setLimit} shown={rows.length} total={all.length} />
         <Link className="btn sm" href={`/p/${projectId}/risks`}>
           All risks
         </Link>
@@ -293,6 +405,7 @@ function NeedsYouToday({ projectId }: { projectId: string }) {
                 className="attn"
                 key={r.key}
                 data-attn={r.key}
+                data-tag={r.tag}
                 onClick={() => open(r)}
               >
                 <span style={{ justifySelf: 'start', marginTop: 1 }}>

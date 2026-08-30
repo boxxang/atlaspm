@@ -15,7 +15,7 @@ import { useProgramWork } from './useProgramWork';
  * join it needs — which deliverable carries which reference, and which step
  * hands it over — plus the stage ends that decide what closes before tapeout.
  */
-export function useAttention(): AttentionRow[] {
+export function useAttention(limit: number): AttentionRow[] {
   const { overdue, upcoming, risks } = useProgramWork();
   const deliverables = useAppStore((s) => s.deliverables);
   const schedule = useAppStore((s) => s.schedule);
@@ -59,6 +59,7 @@ export function useAttention(): AttentionRow[] {
       stageEnds,
       tapeout: schedule.tapeout ?? null,
       upcoming,
+      limit,
     });
-  }, [overdue, upcoming, risks, deliverables, schedule, today]);
+  }, [overdue, upcoming, risks, deliverables, schedule, today, limit]);
 }

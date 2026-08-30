@@ -6,11 +6,11 @@
  * about in a week. They are not comparable on their own terms, so they are
  * scored into bands: overdue outranks due-soon outranks stale, always.
  *
- * When none of the three has anything to say — a program just started, or one
- * genuinely on top of its work — the list falls back to what is coming: the
- * seven nearest due dates, steps and deliverables together, in the order they
- * fall. An empty panel headed "Needs you today" answers the question with
- * silence; this answers it with the work.
+ * Under the three sits a fourth: what is coming. It is not a fallback for an
+ * empty list — a program with one late step and nothing else has answered the
+ * question in two seconds and then has a blank panel for the rest of the day —
+ * so the nearest dates ahead top the list up to a readable length, always
+ * below anything actually wrong. How long that is, the reader decides.
  *
  * The bands are 1000 apart and the widest spread inside one is a few hundred,
  * so a band is never jumped. The bonus for closing before tapeout is worth 300
@@ -26,8 +26,10 @@ import type { DerivedRisk } from './risks';
 import type { OverdueStep } from './steps';
 
 export const ATTN_BAND = { overdue: 3000, soon: 2000, stale: 1000, next: 0 } as const;
-/** How many are worth showing when there is nothing wrong: a morning's work. */
-export const NEXT_UP = 7;
+/** How many rows the panel shows before it starts scrolling for the rest. */
+export const ATTN_LIMIT = 10;
+/** What the reader can set it to. */
+export const ATTN_LIMITS = [5, 10, 20, 50] as const;
 /** What closing before tapeout is worth: order inside a band, never across one. */
 export const ATTN_MTO = 300;
 
@@ -77,8 +79,10 @@ export interface AttentionInput {
   /** Stage end dates — what "closes before tapeout" is measured against. */
   stageEnds: Readonly<Record<StageId, Date>>;
   tapeout: Date | null;
-  /** Open steps whose date is still ahead, for the fallback. */
+  /** Open steps whose date is still ahead, for the top-up. */
   upcoming?: readonly OverdueStep[];
+  /** How long a list to build. Anything wrong is always in it. */
+  limit?: number;
 }
 
 const daysSince = (d: Date, today: Date) =>
@@ -176,21 +180,24 @@ export function attention(input: AttentionInput): AttentionRow[] {
     });
   }
 
-  /* Nothing is wrong. Rather than an empty panel, the next seven dates: the
-     work to be getting on with, in the order it falls due. Steps and
-     deliverables together, because a morning is spent on both. */
-  if (by.size === 0) return nextUp(input);
+  /* Everything wrong, worst first. There is no per-tag cap: with seventeen
+     things overdue, a cap of four would leave thirteen out of the one list
+     that says what to answer. */
+  const wrong = [...by.values()].sort((a, b) => b.score - a.score);
 
-  /* Ranked, and all of it. There used to be a per-tag cap here — four overdue,
-     three due soon, two stale — so that every band got a showing. It meant that
-     with seventeen things overdue, thirteen of them were missing from the list
-     of what needs answering today, which is the one thing this exists to say.
-     The list scrolls instead. */
-  return [...by.values()].sort((a, b) => b.score - a.score);
+  /* Then the work coming up, enough of it to fill a readable list. Never
+     above anything wrong, and never repeating a row already there — a
+     deliverable due next week is Due soon, and saying it twice helps nobody. */
+  const room = Math.max(0, (input.limit ?? ATTN_LIMIT) - wrong.length);
+  return room > 0 ? [...wrong, ...nextUp(input, room, by)] : wrong;
 }
 
-/** The nearest seven dates ahead, steps and deliverables in one order. */
-function nextUp(input: AttentionInput): AttentionRow[] {
+/** The nearest dates ahead, steps and deliverables in one order. */
+function nextUp(
+  input: AttentionInput,
+  room: number,
+  taken: ReadonlyMap<string, AttentionRow>,
+): AttentionRow[] {
   const { today, stageEnds, tapeout } = input;
   const blocks = (stageId: StageId) => {
     const end = stageEnds[stageId];
@@ -251,12 +258,13 @@ function nextUp(input: AttentionInput): AttentionRow[] {
   /* Soonest first, and a deliverable before the step that hands it over when
      they fall on the same day — the deliverable is the thing being asked for. */
   return rows
+    .filter((r) => !taken.has(r.row.key))
     .sort(
       (a, b) =>
         a.at - b.at ||
         a.row.type.localeCompare(b.row.type) ||
         a.row.title.localeCompare(b.row.title),
     )
-    .slice(0, NEXT_UP)
+    .slice(0, room)
     .map((r) => r.row);
 }
