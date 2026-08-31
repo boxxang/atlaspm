@@ -327,17 +327,12 @@ test.describe('at a laptop width', () => {
       scroll: el.scrollWidth,
     }));
     expect(pane.scroll).toBeLessThanOrEqual(pane.client + 1);
-    /* OUTPUT is deliberately one line — it is repeated in full in the rail
-       under Hands over, and wrapping it to four lines is what made the table
-       look ragged. Every other cell wraps. */
     const hidden = await page
       .locator('[data-acts] .trow > *, [data-stepblock] .steprow > *')
       .evaluateAll((els) =>
         els.filter(
           (e) =>
-            (e as HTMLElement).dataset.col !== 'Output' &&
-            getComputedStyle(e).whiteSpace === 'nowrap' &&
-            (e.textContent ?? '').length > 18,
+            getComputedStyle(e).whiteSpace === 'nowrap' && (e.textContent ?? '').length > 18,
         ).length,
       );
     expect(hidden).toBe(0);

@@ -327,15 +327,10 @@ function StepBlock({ a }: { a: Activity }) {
                   </span>
                 )}
               </span>
-              {/* One line, truncated. It wraps to four in a narrow column and
-                  that is what made the table look ragged — and it is the one
-                  column here that is repeated in full in the rail, under Hands
-                  over, so the row can afford to cut it. */}
               <span
-                className="ell"
+                className="wrapcell"
                 data-col="Output"
-                title={out.join(' · ')}
-                style={{ fontSize: 12, color: 'var(--ink-2)', minWidth: 0 }}
+                style={{ fontSize: 12, color: 'var(--ink-2)', lineHeight: 1.35 }}
               >
                 {out.join(' · ')}
               </span>

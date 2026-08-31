@@ -2866,12 +2866,6 @@ kbd{font:inherit;font-size:10.5px;border:1px solid var(--line);border-bottom-wid
   .ell2{-webkit-line-clamp:none;display:block}
 }
 
-/* Stacked, the output has the whole width and no neighbour to squeeze, so it
-   says all of itself rather than trailing off. */
-@media (max-width:1180px){
-  .stepbox > .steprow > [data-col='Output']{white-space:normal;overflow:visible;
-    text-overflow:clip;overflow-wrap:break-word}
-}
 
 /* The fixed columns give ground before the flexible one does — that is in
    ctVar, where the column set is built, rather than in a media query here.
