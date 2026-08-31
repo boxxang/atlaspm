@@ -36,6 +36,30 @@ for (const [ref, a] of Object.entries(activitySteps)) {
 }
 
 /**
+ * A stage reads as a plan, so its activities come out in the order they start.
+ *
+ * Template order is a logical grouping — the main flow first, then the
+ * long-running activities that watch over it — and it is what the generated
+ * index preserves. It is the wrong order to read a schedule in: the interposer
+ * and substrate build opens the assembly stage and was authored last, so a
+ * table in index order put the first work at the bottom.
+ *
+ * Sorting here and not in the index is deliberate. Reference IDs are derived
+ * from position (/lib/rowIds.ts), so reordering the index would renumber every
+ * activity of the stage and break the cross-references the write-ups are full
+ * of. This reorders what is shown; ASSY-10 stays ASSY-10 and simply moves to
+ * the top, where the plan says it belongs.
+ *
+ * Ties go to the shorter activity and then to the reference, so a stage whose
+ * activities all start together still comes out in an order somebody can
+ * remember rather than whatever the index happened to hold.
+ */
+const byStart = (a: StageActivity, b: StageActivity): number =>
+  a.activity.window[0] - b.activity.window[0] ||
+  a.activity.window[1] - b.activity.window[1] ||
+  a.ref.localeCompare(b.ref);
+
+/**
  * A stage's activities with their steps resolved: the plan from the generated
  * index, the record from the store, and the dates the schedule puts them on.
  *
@@ -72,7 +96,7 @@ export function useStageSteps(stageId: string): StageActivity[] {
         delivers: entry.r,
         outputs,
       };
-    });
+    }).sort(byStart);
   }, [stageId, schedule, stepStates, today]);
 }
 

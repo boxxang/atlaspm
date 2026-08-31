@@ -19,12 +19,15 @@ import { useStageSteps, type StageActivity as Activity } from './useStageSteps';
  * the table dims. That indent and that dimming are the whole point — an open
  * activity has to be somewhere you can see the rest of the stage around.
  */
+/* Start-ordered (see /shell/useStageSteps.ts), so the two date columns read as
+   the plan does: when the work opens, and when it is due to close. */
 const COLS: Col[] = [
   ['chk', 16, ''],
   ['ref', 72, 'REF'],
   ['title', null, 'ACTIVITY'],
   ['steps', 128, 'STEPS'],
   ['delivers', 92, 'DELIVERS'],
+  ['starts', 80, 'STARTS'],
   ['ends', 80, 'ENDS'],
   ['lead', 148, 'LEAD ROLE'],
 ];
@@ -78,6 +81,7 @@ export function StageActivityTab({ stageId }: { stageId: string }) {
       <CTHead cols={COLS} />
       {activities.map((a) => {
         const open = a.ref === shown;
+        const first = a.steps[0];
         const last = a.steps[a.steps.length - 1];
         const risky = a.steps.some((s) => isStepLate(s, today));
         const done = a.state.total > 0 && a.state.done >= a.state.total;
@@ -135,6 +139,9 @@ export function StageActivityTab({ stageId }: { stageId: string }) {
                     {a.delivers[0][0]}
                   </span>
                 )}
+              </span>
+              <span className="num" style={{ fontSize: 12.5, color: 'var(--ink-3)' }}>
+                {first ? fmtDate(first.start) : '—'}
               </span>
               <span className="num" style={{ fontSize: 12.5, color: 'var(--ink-2)' }}>
                 {last ? fmtDate(last.due) : '—'}
