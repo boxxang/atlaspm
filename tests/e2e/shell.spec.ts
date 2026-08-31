@@ -252,17 +252,85 @@ test.describe('at a laptop width', () => {
     expect(box.width, 'the activity title needs room to be a title').toBeGreaterThan(120);
   });
 
-  test('a table that cannot fit scrolls rather than crushing', async ({ page }) => {
+  /* The table fills its pane and wraps inside it. It used to be given a floor
+     and made to scroll sideways, which put half a row off the edge — a row you
+     have to scroll to finish reading is barely better than one you cannot
+     read. */
+  test('a table fills its pane rather than scrolling sideways', async ({ page }) => {
     await page.goto(`${SHELL_PATH}/stage/physicalDesign/activity`);
     await expect(page.locator('[data-act]').first()).toBeVisible();
 
-    /* the pane scrolls sideways; the page itself never does */
-    const doc = await page.evaluate(() => ({
-      docOverflows: document.documentElement.scrollWidth > document.documentElement.clientWidth,
-      table: document.querySelector('[data-acts]')!.getBoundingClientRect().width,
+    const m = await page.evaluate(() => {
+      const pane = document.querySelector('#view')!;
+      return {
+        docOverflows: document.documentElement.scrollWidth > document.documentElement.clientWidth,
+        table: Math.round(document.querySelector('[data-acts]')!.getBoundingClientRect().width),
+        pane: pane.clientWidth,
+        paneScroll: pane.scrollWidth,
+      };
+    });
+    expect(m.docOverflows, 'the page must not scroll sideways as a whole').toBe(false);
+    expect(m.paneScroll, 'the pane must not scroll sideways either').toBeLessThanOrEqual(
+      m.pane + 1,
+    );
+    expect(m.table).toBeLessThanOrEqual(m.pane + 1);
+  });
+
+  /* Narrow, the tables wrap rather than truncating or scrolling: every word is
+     on screen, the rows are simply taller. */
+  test('a stage’s tables wrap rather than cutting the text off', async ({ page }) => {
+    await page.setViewportSize({ width: 1180, height: 800 });
+    await page.goto(`${SHELL_PATH}/stage/physicalDesign/activity?act=PD-10`);
+    await expect(page.locator('[data-stepblock]')).toBeVisible();
+
+    /* nothing is ellipsised away: every cell wraps and shows its whole text */
+    const hidden = await page.locator('[data-acts] .trow .ell').evaluateAll((els) =>
+      els.filter((e) => {
+        const s = getComputedStyle(e);
+        return s.whiteSpace === 'nowrap' || s.textOverflow === 'ellipsis';
+      }).length,
+    );
+    expect(hidden, 'a cell is still cutting its text off').toBe(0);
+
+    /* and it wraps rather than pushing the pane sideways */
+    const pane = await page.locator('#view').evaluate((el) => ({
+      client: el.clientWidth,
+      scroll: el.scrollWidth,
     }));
-    expect(doc.docOverflows, 'the page must not scroll sideways as a whole').toBe(false);
-    expect(doc.table).toBeGreaterThan(700);
+    expect(pane.scroll).toBeLessThanOrEqual(pane.client + 1);
+
+    /* the step block too, and no cell spills past the table it is in */
+    const stepHidden = await page.locator('[data-stepblock] .steprow .ell').evaluateAll((els) =>
+      els.filter((e) => getComputedStyle(e).whiteSpace === 'nowrap').length,
+    );
+    expect(stepHidden, 'a step cell is still cutting its text off').toBe(0);
+
+    const spill = await page.locator('[data-stepblock]').evaluate((box) => {
+      const right = box.getBoundingClientRect().right;
+      let worst = 0;
+      for (const el of box.querySelectorAll('.steprow > *')) {
+        worst = Math.max(worst, Math.round(el.getBoundingClientRect().right - right));
+      }
+      return worst;
+    });
+    expect(spill, 'a step cell hangs off the table').toBeLessThanOrEqual(1);
+  });
+
+  test('the same holds with the rail open beside it', async ({ page }) => {
+    await page.setViewportSize({ width: 1400, height: 800 });
+    await page.goto(`${SHELL_PATH}/stage/physicalDesign/activity?step=PD-10:2`);
+    await expect(page.locator('[data-stepblock]')).toBeVisible();
+    await expect(page.getByRole('complementary', { name: 'Details' })).toBeVisible();
+
+    const pane = await page.locator('#view').evaluate((el) => ({
+      client: el.clientWidth,
+      scroll: el.scrollWidth,
+    }));
+    expect(pane.scroll).toBeLessThanOrEqual(pane.client + 1);
+    const hidden = await page
+      .locator('[data-acts] .trow .ell, [data-stepblock] .steprow .ell')
+      .evaluateAll((els) => els.filter((e) => getComputedStyle(e).whiteSpace === 'nowrap').length);
+    expect(hidden).toBe(0);
   });
 
   /* The band wraps rather than overflowing, which is what the prototype's own

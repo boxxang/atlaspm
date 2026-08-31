@@ -2406,7 +2406,7 @@ button.clip:hover{background:var(--accent-line)}
 .clip{display:inline-flex;align-items:center;gap:3px;font-size:10.5px;font-weight:600;color:var(--accent);background:var(--accent-soft);border-radius:4px;padding:0 5px;vertical-align:1px}
 
 /* ── peek panel ──────────────────────────────────── */
-#peek{width:400px;flex-shrink:0;border-left:1px solid var(--line);display:flex;flex-direction:column;background:var(--bg);min-height:0}
+#peek{width:520px;flex-shrink:0;border-left:1px solid var(--line);display:flex;flex-direction:column;background:var(--bg);min-height:0}
 .peek-hd{height:44px;flex-shrink:0;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:9px;padding:0 16px}
 .peek-body{flex-grow:1;overflow-y:auto;padding:15px 16px 20px}
 .peek-foot{border-top:1px solid var(--line);padding:11px 16px;display:flex;gap:8px;align-items:center;flex-shrink:0}
@@ -2820,25 +2820,70 @@ kbd{font:inherit;font-size:10.5px;border:1px solid var(--line);border-bottom-wid
    sideways inside its own pane rather than crushing its content. A column you
    have to scroll to is legible; a column squeezed to 1ch is not.
    ========================================================================== */
-@media (max-width:1500px){ #peek{width:344px} }
-@media (max-width:1320px){ #peek{width:300px} }
+@media (max-width:1500px){ #peek{width:447px} }
+@media (max-width:1320px){ #peek{width:390px} }
 @media (max-width:1120px){ #peek{display:none} }
 @media (max-width:900px){ #side{width:188px} }
 
-/* Tables shrink their one flexible column and scroll only when that is no
-   longer enough, which is what the prototype does. An unconditional floor was
-   wrong: at 1512px with the rail open it made a 900px table inside an 880px
-   pane, so the last column sat under the rail and the pane scrolled 58px for
-   no reason. The floors below apply only below the width where the flexible
-   column starts to collapse — the prototype has none and shows a title six
-   pixels wide on a 1280px laptop — and .scroll is what makes that a scroll
-   rather than a clip. */
+/* Narrow windows wrap rather than truncate or scroll.
+
+   The prototype ellipsises and lets the flexible column collapse, which on a
+   small laptop showed an activity title six pixels wide. Floors and a sideways
+   scroll fixed the collapse and traded it for content off the edge of the
+   pane — a row you have to scroll to finish reading is barely better than one
+   you cannot read at all.
+
+   So below the width where the flexible column starts to squeeze, the cells
+   that carry sentences wrap and the row grows to fit them. Everything stays on
+   screen and everything is readable; the rows are simply taller, which on a
+   narrow window is the right trade. The fixed columns give up some width at
+   the same time so the flexible one has something to wrap inside.
+
+   .scroll keeps overflow-x:auto as a backstop for anything that still cannot
+   fit — a table nobody has thought about at 600px should scroll, not clip. */
 .scroll{overflow-x:auto}
-@media (max-width:1300px){
-  .ctable{min-width:900px}
-  .ctable .ctable{min-width:880px}
-  .ptable{min-width:720px}
-  .pattn{min-width:860px}
+
+@media (max-width:1400px){
+  .ctable .trow .ell,
+  .ctable .steprow .ell,
+  .thead.chead > span,
+  .steprow.hdr > span{white-space:normal;overflow:visible;text-overflow:clip;
+    overflow-wrap:break-word}
+  /* a wrapped cell makes the row taller; the rest sit at its top rather than
+     floating in the middle of a three-line neighbour */
+  .ctable > .trow,
+  .stepbox > .steprow{align-items:start;padding-top:8px;padding-bottom:8px}
+  .ell2{-webkit-line-clamp:none;display:block}
+}
+
+/* The fixed columns are sized for a wide window. Narrow, they are what leaves
+   the flexible column nothing, so they give up a third and the sentence gets
+   the room. Set with !important because the grid template is an inline style
+   computed from the column set — this overrides the width, not the columns. */
+@media (max-width:1400px){
+  .ctable[data-acts]{--ct:16px 62px minmax(0,1fr) 96px 74px 68px 96px !important}
+  .stepbox{--ct:6px 18px 22px minmax(0,1fr) 84px 132px 74px 78px 34px !important}
+}
+
+/* Narrower than that, nine columns do not fit however they are divided: the
+   step table is left with under 500px once the rail has taken its share. So
+   the row stops being a row. The step keeps the width, and the five figures
+   about it stack underneath, each labelled with the column header it lost —
+   which is why the cells carry data-col. Nothing is dropped and nothing is
+   cut; a row is simply six lines instead of one.
+
+   The header goes with the layout it described. */
+@media (max-width:1180px){
+  .ctable[data-acts]{--ct:16px 58px minmax(0,1fr) 84px 66px 62px 78px !important}
+
+  .stepbox > .steprow{--ct:6px 18px 22px minmax(0,1fr) !important;
+    padding-top:9px;padding-bottom:9px;row-gap:3px}
+  .stepbox > .steprow.hdr{display:none}
+  .stepbox > .steprow > *:nth-child(n+5){grid-column:4;justify-self:start !important}
+  .stepbox > .steprow > [data-col]:nth-child(n+5)::before{content:attr(data-col) ": ";
+    color:var(--ink-4);font-size:10.5px;letter-spacing:.02em}
+  /* an empty figure says nothing rather than "Output: " with a dash after it */
+  .stepbox > .steprow > [data-col]:nth-child(n+5):empty{display:none}
 }
 
 /* The dashboard band is left to wrap, which is what the prototype does: below

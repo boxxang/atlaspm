@@ -286,6 +286,7 @@ function StepBlock({ a }: { a: Activity }) {
               </span>
               <span
                 className="ell"
+                data-col="Step"
                 style={{ display: 'flex', alignItems: 'center', gap: 8, minWidth: 0 }}
               >
                 <span
@@ -306,6 +307,7 @@ function StepBlock({ a }: { a: Activity }) {
                 )}
               </span>
               <span
+                data-col="Status"
                 style={{
                   justifySelf: 'start',
                   display: 'flex',
@@ -325,6 +327,7 @@ function StepBlock({ a }: { a: Activity }) {
                 )}
               </span>
               <span
+                data-col="Output"
                 style={{
                   fontSize: 12,
                   color: 'var(--ink-2)',
@@ -338,6 +341,7 @@ function StepBlock({ a }: { a: Activity }) {
               <span
                 className="num"
                 data-due
+                data-col="Due"
                 style={{
                   fontSize: 12,
                   fontWeight: late ? 600 : 400,
@@ -355,12 +359,14 @@ function StepBlock({ a }: { a: Activity }) {
               <span
                 className="num"
                 data-completed
+                data-col="Completed"
                 style={{ fontSize: 12, color: s.doneAt ? 'var(--ink-2)' : 'var(--ink-4)' }}
               >
                 {s.doneAt ? fmtDate(s.doneAt) : '—'}
               </span>
               <span
                 className="r num"
+                data-col="Posts"
                 style={{
                   fontSize: 11,
                   color: mine ? (risky ? 'var(--risk-ink)' : 'var(--ink-2)') : 'var(--ink-4)',
