@@ -32,9 +32,17 @@ export interface SeedCounts {
 
 export async function seedProject(prisma: PrismaClient, now = new Date()): Promise<SeedCounts> {
   const today = startOfDay(now);
-  /* Default kickoff = 66 weeks before today, half way through the 132-week
-     baseline: physical design is mid-flight, signoff is ramping, and the
-     package and test workstreams are in the thick of it. */
+  /* Kickoff sits 66 weeks before today, which puts physical design mid-flight,
+     signoff ramping, and the package and test workstreams in the thick of it.
+
+     A fixed offset, deliberately, and not half of the profile's span. This is
+     the fixture the end-to-end suite is written against — which activity is
+     stalled and which step carries a seeded risk both fall out of where today
+     lands in the plan — so deriving it would move the whole fixture every time
+     a baseline changed, and the suite would break for a reason that has
+     nothing to do with what changed. It was once described as half of a
+     132-week baseline; the span is 136 now, and the offset still does its job,
+     which is why it stays put. */
   const kickoff = addWeeks(today, -66);
   const schedule = computeSchedule(kickoff, BUILTIN_PROFILE, {});
   const seed = createProjectSeed({ schedule, now });
