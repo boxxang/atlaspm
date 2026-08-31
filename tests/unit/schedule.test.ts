@@ -53,23 +53,23 @@ describe('(a) baseline schedule for kickoff 05/12/2027', () => {
       physicalDesign: ['03/29/2028', '10/25/2028'],
       signoff: ['07/19/2028', '11/08/2028'],
       tapeout: ['11/08/2028', '01/03/2029'],
-      fabrication: ['11/15/2028', '03/28/2029'],
+      fabrication: ['11/22/2028', '04/04/2029'],
       packageDesign: ['10/27/2027', '10/25/2028'],
       packageTestVehicle: ['01/19/2028', '01/17/2029'],
       chipPackageCoVerification: ['04/26/2028', '10/25/2028'],
-      packaging: ['03/28/2029', '05/23/2029'],
+      packaging: ['10/25/2028', '05/30/2029'],
       validationHardware: ['05/10/2028', '01/31/2029'],
       testDevelopment: ['05/24/2028', '03/14/2029'],
-      bringup: ['04/25/2029', '08/29/2029'],
-      qualification: ['05/23/2029', '11/21/2029'],
+      bringup: ['05/23/2029', '09/26/2029'],
+      qualification: ['06/20/2029', '12/19/2029'],
     });
   });
 
   it('exposes the three toolbar dates and the program length', () => {
     expect(fmtDate(s.tapeout!)).toBe('01/03/2029');
-    expect(fmtDate(s.firstSilicon!)).toBe('03/28/2029');
-    expect(fmtDate(s.production!)).toBe('11/21/2029');
-    expect(s.totalWeeks).toBe(132);
+    expect(fmtDate(s.firstSilicon!)).toBe('04/04/2029');
+    expect(fmtDate(s.production!)).toBe('12/19/2029');
+    expect(s.totalWeeks).toBe(136);
   });
 
   it('keeps stages overlapping — the program is concurrent by design', () => {

@@ -36,9 +36,33 @@ export const STAGE_ORDER = [
 ] as const satisfies readonly StageId[];
 
 /**
- * Baselines of the built-in stages, in weeks from kickoff. The span is 132
+ * Baselines of the built-in stages, in weeks from kickoff. The span is 136
  * weeks: a new architecture on a leading node with 2.5D packaging, benchmarked
  * against reported schedule anchors in docs/stage-template-v2.html.
+ *
+ * The back end was re-derived against the template's own anchors and against
+ * published cycle times (see docs/schedule-audit.html). Two of them did not
+ * hold, and both were a stage starting before the thing it consumes exists:
+ *
+ * Fabrication began at week 79, but FEOL mask data does not reach the mask
+ * shop until TO-06 releases it in week 80 — which is the week the template's
+ * own "FEOL mask tapeout" anchor names. Mask fabrication cannot precede the
+ * mask order, so the stage starts at 80.
+ *
+ * Bring-up began at week 102 and its first step is receiving samples, but die
+ * attach does not finish until 103 and lid/ball attach until 106. There was
+ * nothing to receive. It starts at 106, where the packages actually exist.
+ *
+ * Packaging and qualification move with them, keeping the gaps the template
+ * asserts.
+ *
+ * Assembly then opens 23 weeks earlier still — at week 76, on the package
+ * design freeze rather than on wafer-out. It was not assembly that moved: the
+ * production interposer and substrate are built there (ASSY-10, ASSY-11), and
+ * a plan in which they simply appear at die attach is a plan that has not
+ * scheduled its longest external lead time. The line work itself is unchanged
+ * and still runs weeks 99 to 107, so nothing downstream moved and the stage
+ * still closes on Assembled Units.
  */
 const BASELINES: Record<string, { startOffsetWeeks: number; durationWeeks: number }> = {
   productDefinition: { startOffsetWeeks: 0, durationWeeks: 8 },
@@ -55,15 +79,15 @@ const BASELINES: Record<string, { startOffsetWeeks: number; durationWeeks: numbe
   physicalDesign: { startOffsetWeeks: 46, durationWeeks: 30 },
   signoff: { startOffsetWeeks: 62, durationWeeks: 16 },
   tapeout: { startOffsetWeeks: 78, durationWeeks: 8 },
-  fabrication: { startOffsetWeeks: 79, durationWeeks: 19 },
+  fabrication: { startOffsetWeeks: 80, durationWeeks: 19 },
   packageDesign: { startOffsetWeeks: 24, durationWeeks: 52 },
   packageTestVehicle: { startOffsetWeeks: 36, durationWeeks: 52 },
   chipPackageCoVerification: { startOffsetWeeks: 50, durationWeeks: 26 },
-  packaging: { startOffsetWeeks: 98, durationWeeks: 8 },
+  packaging: { startOffsetWeeks: 76, durationWeeks: 31 },
   validationHardware: { startOffsetWeeks: 52, durationWeeks: 38 },
   testDevelopment: { startOffsetWeeks: 54, durationWeeks: 42 },
-  bringup: { startOffsetWeeks: 102, durationWeeks: 18 },
-  qualification: { startOffsetWeeks: 106, durationWeeks: 26 },
+  bringup: { startOffsetWeeks: 106, durationWeeks: 18 },
+  qualification: { startOffsetWeeks: 110, durationWeeks: 26 },
 };
 
 /**

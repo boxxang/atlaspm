@@ -1,0 +1,367 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Typical SoC Schedule Audit</title>
+<style>
+:root{
+  --page:#f9f9f7; --surface:#fcfcfb; --sunken:#f2f1ec;
+  --ink:#0b0b0b; --ink-2:#52514e; --ink-3:#898781;
+  --line:#e1e0d9; --line-strong:#c3c2b7;
+  --accent:#5b5bd6; --accent-soft:#eeeefb;
+  --risk:#e5484d; --risk-soft:#fbeced;
+  --held:#5f7a52; --held-soft:#eef2ea;
+  --watch:#9a6f21; --watch-soft:#f7f1e4;
+  --sans:ui-sans-serif,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  --mono:ui-monospace,SFMono-Regular,"SF Mono",Menlo,Consolas,"Liberation Mono",monospace;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --page:#121211; --surface:#1a1a18; --sunken:#232321;
+    --ink:#f2f1ec; --ink-2:#b3b1a9; --ink-3:#87857e;
+    --line:#2e2e2b; --line-strong:#484640;
+    --accent:#9c9cf0; --accent-soft:#26264a;
+    --risk:#f0787c; --risk-soft:#3a2224;
+    --held:#95b384; --held-soft:#232c1f;
+    --watch:#d3a552; --watch-soft:#33291a;
+  }
+}
+:root[data-theme="dark"]{
+  --page:#121211; --surface:#1a1a18; --sunken:#232321;
+  --ink:#f2f1ec; --ink-2:#b3b1a9; --ink-3:#87857e;
+  --line:#2e2e2b; --line-strong:#484640;
+  --accent:#9c9cf0; --accent-soft:#26264a;
+  --risk:#f0787c; --risk-soft:#3a2224;
+  --held:#95b384; --held-soft:#232c1f;
+  --watch:#d3a552; --watch-soft:#33291a;
+}
+
+*{box-sizing:border-box}
+body{
+  margin:0; background:var(--page); color:var(--ink);
+  font-family:var(--sans); font-size:15px; line-height:1.55;
+  -webkit-font-smoothing:antialiased;
+}
+.wrap{max-width:66rem; margin:0 auto; padding:56px 28px 96px; display:flex; flex-direction:column; gap:52px}
+
+/* ---------- masthead ---------- */
+.mast{display:flex; flex-direction:column; gap:14px; padding-bottom:26px; border-bottom:2px solid var(--ink)}
+.eyebrow{font-family:var(--mono); font-size:11px; letter-spacing:.14em; text-transform:uppercase; color:var(--ink-3)}
+h1{margin:0; font-size:clamp(28px,4.2vw,40px); line-height:1.1; font-weight:650; letter-spacing:-.02em; text-wrap:balance}
+.standfirst{margin:0; max-width:62ch; color:var(--ink-2); font-size:16.5px}
+
+/* ---------- verdict strip ---------- */
+.verdict{display:grid; grid-template-columns:repeat(auto-fit,minmax(160px,1fr)); gap:1px; background:var(--line); border:1px solid var(--line); border-radius:6px; overflow:hidden}
+.vcell{background:var(--surface); padding:14px 16px; display:flex; flex-direction:column; gap:3px}
+.vnum{font-family:var(--mono); font-size:26px; font-weight:600; letter-spacing:-.02em; font-variant-numeric:tabular-nums; line-height:1.1}
+.vlabel{font-size:12.5px; color:var(--ink-2)}
+.vcell.is-held .vnum{color:var(--held)}
+.vcell.is-changed .vnum{color:var(--accent)}
+.vcell.is-watch .vnum{color:var(--watch)}
+
+/* ---------- sections ---------- */
+section{display:flex; flex-direction:column; gap:18px}
+h2{margin:0; font-size:20px; font-weight:640; letter-spacing:-.01em; display:flex; align-items:baseline; gap:11px}
+h2 .kicker{font-family:var(--mono); font-size:11px; font-weight:500; letter-spacing:.12em; text-transform:uppercase; color:var(--ink-3)}
+h3{margin:0; font-size:15.5px; font-weight:620}
+p{margin:0; max-width:70ch; color:var(--ink-2)}
+p.lede{color:var(--ink); max-width:72ch}
+
+/* ---------- tables ---------- */
+.scroller{overflow-x:auto; border:1px solid var(--line); border-radius:6px; background:var(--surface)}
+table{border-collapse:collapse; width:100%; min-width:640px; font-size:13.5px}
+thead th{
+  position:sticky; top:0; background:var(--sunken); text-align:left;
+  font-family:var(--mono); font-size:10.5px; letter-spacing:.1em; text-transform:uppercase;
+  color:var(--ink-2); font-weight:600; padding:9px 12px; border-bottom:1px solid var(--line-strong); white-space:nowrap;
+}
+tbody td{padding:10px 12px; border-bottom:1px solid var(--line); vertical-align:top; color:var(--ink-2)}
+tbody tr:last-child td{border-bottom:none}
+td.subject{color:var(--ink); font-weight:530}
+.num{font-family:var(--mono); font-variant-numeric:tabular-nums; white-space:nowrap; font-size:12.5px}
+.was{color:var(--ink-3); text-decoration:line-through; text-decoration-thickness:1px}
+.now{color:var(--accent); font-weight:600}
+.code{font-family:var(--mono); font-size:11.5px; color:var(--ink-3)}
+
+/* verdict pill + stripe */
+td.verd{white-space:nowrap}
+.pill{display:inline-flex; align-items:center; gap:5px; font-family:var(--mono); font-size:10.5px; letter-spacing:.06em; text-transform:uppercase; font-weight:600; padding:2px 7px; border-radius:3px}
+.pill.held{background:var(--held-soft); color:var(--held)}
+.pill.changed{background:var(--accent-soft); color:var(--accent)}
+.pill.watch{background:var(--watch-soft); color:var(--watch)}
+tr.r-changed td.subject{box-shadow:inset 3px 0 0 var(--accent)}
+tr.r-watch td.subject{box-shadow:inset 3px 0 0 var(--watch)}
+tr.r-changed td.subject, tr.r-watch td.subject{padding-left:15px}
+
+/* ---------- findings ---------- */
+.finding{border:1px solid var(--line); border-left:3px solid var(--risk); border-radius:6px; background:var(--surface); padding:18px 20px; display:flex; flex-direction:column; gap:12px}
+.fhead{display:flex; flex-wrap:wrap; align-items:baseline; gap:10px}
+.ftag{font-family:var(--mono); font-size:10.5px; letter-spacing:.1em; text-transform:uppercase; color:var(--risk); font-weight:600}
+.trace{display:flex; flex-direction:column; gap:0; border:1px solid var(--line); border-radius:5px; overflow:hidden; font-size:13px}
+.trace-row{display:grid; grid-template-columns:minmax(88px,auto) minmax(96px,auto) 1fr; gap:14px; padding:7px 12px; background:var(--sunken); border-bottom:1px solid var(--line); align-items:baseline}
+.trace-row:last-child{border-bottom:none}
+.trace-row.bad{background:var(--risk-soft)}
+.trace-row .id{font-family:var(--mono); font-size:11.5px; font-weight:600; color:var(--ink)}
+.trace-row .wk{font-family:var(--mono); font-size:11.5px; font-variant-numeric:tabular-nums; color:var(--ink-2)}
+.trace-row .what{color:var(--ink-2); font-size:12.5px}
+.fix{font-size:13.5px; color:var(--ink); padding-top:2px; border-top:1px solid var(--line); padding-top:12px}
+.fix b{font-weight:640}
+
+/* ---------- sources ---------- */
+ol.src{margin:0; padding:0; list-style:none; display:flex; flex-direction:column; gap:1px; background:var(--line); border:1px solid var(--line); border-radius:6px; overflow:hidden}
+ol.src li{background:var(--surface); padding:11px 14px; display:grid; grid-template-columns:minmax(0,20rem) 1fr; gap:16px; align-items:baseline; font-size:13px}
+ol.src .who{color:var(--ink); font-weight:560}
+ol.src .who span{display:block; font-family:var(--mono); font-size:11px; color:var(--ink-3); font-weight:400; letter-spacing:.02em}
+ol.src .fig{color:var(--ink-2)}
+@media (max-width:640px){ ol.src li{grid-template-columns:1fr; gap:5px} }
+
+a{color:var(--accent); text-decoration:none; border-bottom:1px solid color-mix(in srgb, var(--accent) 35%, transparent)}
+a:hover{border-bottom-color:var(--accent)}
+a:focus-visible{outline:2px solid var(--accent); outline-offset:2px; border-radius:2px}
+
+footer{border-top:1px solid var(--line); padding-top:20px; font-size:12.5px; color:var(--ink-3); display:flex; flex-direction:column; gap:6px}
+footer code{font-family:var(--mono); font-size:11.5px; color:var(--ink-2)}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="mast">
+    <div class="eyebrow">AtlasPM · Typical SoC template · schedule review</div>
+    <h1>Where the plan started work it could not have started</h1>
+    <p class="standfirst">Every stage and step target in the built-in 23-stage template, measured from kickoff and checked against published semiconductor cycle times. Three passes: the schedule as authored, then the back end re-checked on 2.5D terms rather than conventional flip-chip, then the production interposer and substrate build added as tracked work and the whole thing re-reviewed.</p>
+  </header>
+
+  <div class="verdict">
+    <div class="vcell is-held"><div class="vnum">18</div><div class="vlabel">anchors held as authored</div></div>
+    <div class="vcell is-changed"><div class="vnum">2</div><div class="vlabel">did not — both corrected</div></div>
+    <div class="vcell is-watch"><div class="vnum">2</div><div class="vlabel">flagged, not changed</div></div>
+    <div class="vcell"><div class="vnum">132&#8202;→&#8202;136</div><div class="vlabel">weeks, kickoff to mass production</div></div>
+  </div>
+
+  <section>
+    <h2><span class="kicker">Changed</span> Four baselines moved</h2>
+    <p class="lede">Both failures were the same mistake in two places: a stage scheduled to begin before the thing it consumes exists. Nothing was shortened and no duration changed — four stages start later, and the two behind them follow to keep the gaps the template asserts.</p>
+
+    <div class="scroller">
+      <table>
+        <thead>
+          <tr><th>Stage</th><th>Was</th><th>Now</th><th>Checkpoint it carries</th><th>Why it moved</th></tr>
+        </thead>
+        <tbody>
+          <tr class="r-changed">
+            <td class="subject">Fabrication<br><span class="code">FAB</span></td>
+            <td class="num was">w79 → w98</td>
+            <td class="num now">w80 → w99</td>
+            <td>First Silicon</td>
+            <td>FEOL mask fabrication was scheduled to begin a week before the mask data reaches the mask shop. Week 80 is the template's own “FEOL mask tapeout” anchor.</td>
+          </tr>
+          <tr class="r-changed">
+            <td class="subject">Assembly &amp; Package Build<br><span class="code">ASSY</span></td>
+            <td class="num was">w98 → w106</td>
+            <td class="num now">w99 → w107</td>
+            <td>Assembled Units</td>
+            <td>Follows the wafers. Known-good-die sort cannot start before the lot leaves the fab.</td>
+          </tr>
+          <tr class="r-changed">
+            <td class="subject">Silicon Bring-up<br><span class="code">BU</span></td>
+            <td class="num was">w102 → w120</td>
+            <td class="num now">w106 → w124</td>
+            <td>Bring-up Complete</td>
+            <td>Its first step receives samples. Die attach did not finish until week 103 and lid attach until 106, so there was nothing to receive.</td>
+          </tr>
+          <tr class="r-changed">
+            <td class="subject">Qualification &amp; Production<br><span class="code">MP</span></td>
+            <td class="num was">w106 → w132</td>
+            <td class="num now">w110 → w136</td>
+            <td>Mass Production</td>
+            <td>Keeps its four-week lag behind bring-up, which is what puts characterised silicon into the qual lots.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>What a program on the reference kickoff now reads</h3>
+    <p>Kickoff 05/12/2027 — the schedule the unit suite pins. Tapeout does not move: everything corrected sits behind the mask order.</p>
+    <div class="scroller">
+      <table>
+        <thead><tr><th>Checkpoint</th><th>Was</th><th>Now</th><th>Slip</th></tr></thead>
+        <tbody>
+          <tr><td class="subject">Tapeout (BEOL MTO)</td><td class="num">01/03/2029</td><td class="num">01/03/2029</td><td class="num">—</td></tr>
+          <tr class="r-changed"><td class="subject">First Silicon</td><td class="num was">03/28/2029</td><td class="num now">04/04/2029</td><td class="num">+1 week</td></tr>
+          <tr class="r-changed"><td class="subject">Assembled Units</td><td class="num was">05/23/2029</td><td class="num now">05/30/2029</td><td class="num">+1 week</td></tr>
+          <tr class="r-changed"><td class="subject">Bring-up Complete</td><td class="num was">08/29/2029</td><td class="num now">09/26/2029</td><td class="num">+4 weeks</td></tr>
+          <tr class="r-changed"><td class="subject">Mass Production</td><td class="num was">11/21/2029</td><td class="num now">12/19/2029</td><td class="num">+4 weeks</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section>
+    <h2><span class="kicker">Finding 1</span> Masks were being written before the data was sent</h2>
+    <div class="finding">
+      <div class="fhead"><span class="ftag">Dependency violation</span><span style="color:var(--ink-2);font-size:13.5px">FAB-01 preceded TO-06 by one week</span></div>
+      <div class="trace">
+        <div class="trace-row"><span class="id">TO-05</span><span class="wk">w79.5 – w80</span><span class="what">Go / No-Go decision meeting</span></div>
+        <div class="trace-row"><span class="id">TO-06</span><span class="wk">w80 – w81.5</span><span class="what">FEOL layer data preparation and MTO release to the mask shop</span></div>
+        <div class="trace-row"><span class="id">TO-07</span><span class="wk">w81 – w82</span><span class="what">FEOL mask order confirmation and mask shop scheduling</span></div>
+        <div class="trace-row bad"><span class="id">FAB-01</span><span class="wk">w79 – w86</span><span class="what">FEOL mask set fabrication — began before the release above, and before the Go / No-Go</span></div>
+      </div>
+      <p class="fix"><b>Corrected.</b> Fabrication starts at week 80, so FEOL mask fabrication opens the same week the data goes out. The template's own anchor table already named week 80 as “FEOL mask tapeout — front-end data out first; the BEOL fix window opens here”, and TO-08's BEOL fix window does open at 80. The baseline disagreed with the anchor it was written against.</p>
+    </div>
+  </section>
+
+  <section>
+    <h2><span class="kicker">Finding 2</span> Bring-up received parts that had not been built</h2>
+    <div class="finding">
+      <div class="fhead"><span class="ftag">Dependency violation</span><span style="color:var(--ink-2);font-size:13.5px">BU-01 preceded lid attach by four weeks</span></div>
+      <div class="trace">
+        <div class="trace-row bad"><span class="id">BU-01</span><span class="wk">w102 – w103.5</span><span class="what">Sample receipt, incoming inspection and board mounting — nothing existed to receive</span></div>
+        <div class="trace-row"><span class="id">ASSY-03</span><span class="wk">w100 – w103</span><span class="what">Die attach, micro-bump and thermo-compression bonding</span></div>
+        <div class="trace-row"><span class="id">ASSY-04</span><span class="wk">w101 – w104</span><span class="what">Interposer and substrate assembly, underfill, molding</span></div>
+        <div class="trace-row"><span class="id">ASSY-05</span><span class="wk">w103 – w105</span><span class="what">Lid / TIM attach and ball attach — the first complete package</span></div>
+        <div class="trace-row"><span class="id">ASSY-09</span><span class="wk">w103 – w106</span><span class="what">Unit build for bring-up, qualification and customer samples</span></div>
+      </div>
+      <p class="fix"><b>Corrected.</b> Bring-up starts at week 106, where lid and ball attach close on the shifted assembly window. The template's own anchor put assembled units at week 104 while bring-up began at 102 — the plan contradicted itself by two weeks, and by four against the activity that actually finishes a package.</p>
+    </div>
+  </section>
+
+  <section>
+    <h2><span class="kicker">Held</span> Everything else the searches could test</h2>
+    <p>Twenty-two anchors in all across both passes, checked against eleven published cycle-time figures. Where the template's number sits inside the reported band it was left exactly as authored — a schedule is not improved by moving numbers that were already right.</p>
+    <div class="scroller">
+      <table>
+        <thead><tr><th>Anchor</th><th>Reported</th><th>Template</th><th></th></tr></thead>
+        <tbody>
+          <tr><td class="subject">Kickoff → mass production</td><td>18 – 36 months for a complex SoC above 5M gates, plus 3 – 4 months for fab and packaging</td><td class="num">136 w = 31.3 mo</td><td class="verd"><span class="pill held">Held</span></td></tr>
+          <tr><td class="subject">RTL freeze</td><td>8 – 10 months of block work plus integration</td><td class="num">w52 = 12.0 mo</td><td class="verd"><span class="pill held">Held</span></td></tr>
+          <tr><td class="subject">Verification share of front-end effort</td><td>60 – 70% of the development cycle</td><td class="num">61.3%</td><td class="verd"><span class="pill held">Held</span></td></tr>
+          <tr><td class="subject">DV closure ahead of tapeout</td><td>closes 2 – 3 months before tapeout</td><td class="num">12 w = 2.8 mo</td><td class="verd"><span class="pill held">Held</span></td></tr>
+          <tr><td class="subject">Design freeze / signoff complete</td><td>16 – 22 months</td><td class="num">w78 = 18.0 mo</td><td class="verd"><span class="pill held">Held</span></td></tr>
+          <tr><td class="subject">EUV mask set — write and inspect</td><td>4 – 8 weeks at an advanced node</td><td class="num">FEOL 7 w · BEOL 6 w</td><td class="verd"><span class="pill held">Held</span></td></tr>
+          <tr><td class="subject">Wafer processing, hot lot</td><td>14 – 16 w standard at 3nm; hot lots cut several weeks</td><td class="num">12 w</td><td class="verd"><span class="pill held">Held</span></td></tr>
+          <tr><td class="subject">MPW shuttle turnaround</td><td>12 – 16 weeks, design freeze to die delivery</td><td class="num">TC-05 · 16 w</td><td class="verd"><span class="pill held">Held</span></td></tr>
+          <tr><td class="subject">Wafer out → first unit in the lab</td><td>follows the assembly window; first complete package closes it</td><td class="num">7 w</td><td class="verd"><span class="pill held">Held</span></td></tr>
+          <tr><td class="subject">Silicon bring-up to power-on</td><td>2 – 6 weeks</td><td class="num">BU-01…03 · 5 w</td><td class="verd"><span class="pill held">Held</span></td></tr>
+          <tr><td class="subject">Post-silicon validation</td><td>a few weeks to several months</td><td class="num">18 w</td><td class="verd"><span class="pill held">Held</span></td></tr>
+          <tr><td class="subject">Test program development</td><td>8 – 12 weeks post-silicon</td><td class="num">MP-06 · 9 w</td><td class="verd"><span class="pill held">Held</span></td></tr>
+          <tr><td class="subject">Reliability stress</td><td>HTOL 1000 h = 6 w; temp cycle 1000 cycles = 6 – 8 w</td><td class="num">MP-02 · 18 w</td><td class="verd"><span class="pill held">Held</span></td></tr>
+          <tr><td class="subject">Qualification → production release</td><td>6 – 12 months on JEDEC; 9 – 18 for AEC-Q100</td><td class="num">26 w = 6.0 mo</td><td class="verd"><span class="pill held">Held</span></td></tr>
+          <tr><td class="subject">Yield learning and ramp</td><td>8 – 16 weeks</td><td class="num">MP-05 · 20 w</td><td class="verd"><span class="pill held">Held</span></td></tr>
+          <tr><td class="subject">2.5D package assembly</td><td>8 – 12 weeks intrinsic CoWoS cycle; production data puts CoWoS packaging ~8 weeks before shipment</td><td class="num">8 w</td><td class="verd"><span class="pill held">Held</span></td></tr>
+          <tr><td class="subject">Architecture freeze</td><td>no published figure found</td><td class="num">w24 = 5.5 mo</td><td class="verd"><span class="pill watch">No source</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p>One row is left marked <b>No source</b>: nothing published pins an architecture-freeze date, so week 24 stands on the template’s own reasoning. The two 2.5D rows that carried that mark in the first pass no longer do — see below.</p>
+  </section>
+
+
+  <section>
+    <h2><span class="kicker">Second pass</span> The assembly window, checked on 2.5D terms</h2>
+    <p class="lede">The first pass could only measure the 8-week package build against conventional flip-chip figures, where it looked two weeks long. Measured against 2.5D it is not long — it is at the <em>bottom</em> of the band, and the template earns that by running a package test vehicle first.</p>
+
+    <div class="scroller">
+      <table>
+        <thead><tr><th>2.5D anchor</th><th>Reported</th><th>Template</th><th></th></tr></thead>
+        <tbody>
+          <tr><td class="subject">CoWoS assembly cycle</td><td>8 – 12 weeks intrinsic; CoWoS packaging runs roughly 8 weeks before shipment in volume</td><td class="num">ASSY · 8 w</td><td class="verd"><span class="pill held">Held</span></td></tr>
+          <tr><td class="subject">HBM procured before packaging opens</td><td>HBM is consumed at least 8 weeks before shipment, and must be in hand before CoWoS begins</td><td class="num">ASSY-02 · w99 – 102</td><td class="verd"><span class="pill held">Held</span></td></tr>
+          <tr><td class="subject">Package-level reliability</td><td>MSL precondition 168 – 192 h plus three reflows, then temperature cycle 1000 cycles at 6 – 8 weeks</td><td class="num">MP-04 · 12 w</td><td class="verd"><span class="pill held">Held</span></td></tr>
+          <tr class="r-watch"><td class="subject">Substrate and interposer runway</td><td>ABF/FCBGA substrate 12 – 16 weeks typical, up to 30 in a tight market; silicon interposer 2 – 5 months</td><td class="num">26 w of calendar</td><td class="verd"><span class="pill watch">Thin</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>Why eight weeks is defensible here and would not be everywhere</h3>
+    <p>Eight weeks is the volume-production number for a package that has been built before. A first build of a new 2.5D stack normally sits at the top of the 8 – 12 week band instead, because the process window is still being found. This template does not pay that penalty, because it finds the window somewhere else: <span class="code">PTV-06</span> puts the assembly through a process-window DOE in weeks 64 – 75, and <span class="code">PTV-12</span> freezes it at week 88 — eleven weeks before production assembly opens. Delete the package test vehicle programme and the assembly window has to grow to twelve.</p>
+
+    <h3>The one thing this pass did surface</h3>
+    <p>It is not inside the assembly window. It is the empty stretch in front of it — the time the interposer and the substrate have to be built in, which the published figures say must be complete at the moment silicon leaves the fab.</p>
+    <div class="scroller">
+      <table>
+        <thead><tr><th>Fixed point</th><th>Week</th><th>What it settles</th></tr></thead>
+        <tbody>
+          <tr><td class="subject">Supplier selection and lead-time booking closes <span class="code">PKGD-09</span></td><td class="num">w56</td><td>Capacity is reserved, 46 weeks ahead</td></tr>
+          <tr><td class="subject">Package design freeze and tooling release <span class="code">PKGD-11</span></td><td class="num">w76</td><td>The order can actually be placed</td></tr>
+          <tr><td class="subject">Wafers leave the fab <span class="code">FAB</span></td><td class="num">w99</td><td>Interposer and substrate must already exist</td></tr>
+          <tr><td class="subject">Interposer and substrate assembly <span class="code">ASSY-04</span></td><td class="num">w102</td><td>They are consumed here</td></tr>
+          <tr class="r-watch"><td class="subject">Runway, tooling release to consumption</td><td class="num">26 w</td><td>Against 12 – 16 weeks nominal, 30 in a tight market</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p>Twenty-six weeks clears a 16-week substrate with ten to spare and a 22-week interposer with four. It does not clear the 30-week substrate the same sources report from the 2022 – 2024 peak. That is a single-point buffer absorbing two independent supply chains, and it is the buffer that disappears first when advanced packaging is tight — which is the market these sources describe.</p>
+    <p>No date was changed for it in this pass, because nothing in the plan was provably wrong: the calendar was there. What was missing was a row — the template had no activity that <em>fabricated</em> the production interposer or substrate. <span class="code">PTV-05</span> built the test-vehicle one, and the production part simply appeared at <span class="code">ASSY-04</span>. That row was added in the third pass below, and the margin it exposes is measured there.</p>
+  </section>
+
+
+  <section>
+    <h2><span class="kicker">Third pass</span> The missing work, scheduled</h2>
+    <p class="lede">The second pass ended by saying the interposer and substrate build was 26 weeks of untracked calendar on the critical path, and that adding a row for it was a content change rather than a schedule one. That change was then asked for. Here is what it did.</p>
+
+    <div class="scroller">
+      <table>
+        <thead><tr><th>Added</th><th>Runs</th><th>Effort</th><th>Against the reported lead time</th></tr></thead>
+        <tbody>
+          <tr class="r-changed"><td class="subject">Production Silicon Interposer Fabrication<br><span class="code">ASSY-10 · 8 steps</span></td><td class="num">w76 – w96<br>20 weeks</td><td class="num">8 MM</td><td>Silicon interposer 2 – 5 months, i.e. 9 – 22 weeks. Twenty sits upper-middle: a mask set of its own, TSV and RDL build, micro-bump, then acceptance and warpage screening.</td></tr>
+          <tr class="r-changed"><td class="subject">Production Package Substrate Build<br><span class="code">ASSY-11 · 7 steps</span></td><td class="num">w76 – w92<br>16 weeks</td><td class="num">6 MM</td><td>ABF/FCBGA substrate 12 – 16 weeks typical. Sixteen is the top of the nominal band — laminate allocation, build-up and escape routing, then screening before the lots ship.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <p>Both start in week 76, the week <span class="code">PKGD-11</span> freezes the package and releases tooling — which is the earliest either can start and the latest either should. The stage that carries them, Assembly &amp; Package Build, therefore opens at 76 instead of 99.</p>
+
+    <div class="scroller">
+      <table>
+        <thead><tr><th>Stage</th><th>Was</th><th>Now</th><th>Effect</th></tr></thead>
+        <tbody>
+          <tr class="r-changed"><td class="subject">Assembly &amp; Package Build<br><span class="code">ASSY</span></td><td class="num was">w99 → w107<br>8 weeks</td><td class="num now">w76 → w107<br>31 weeks</td><td>Opens on the package design freeze rather than on wafer-out. The line work itself is untouched and still runs w99 – w107, so the stage still closes on Assembled Units and <b>nothing downstream moved</b>.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>What the re-review says</h3>
+    <p>Every checkpoint is where the second pass left it. The programme is still 136 weeks; tapeout, first silicon, assembled units, bring-up and mass production did not move by a day. What changed is that 26 weeks of critical-path lead time is now work with dates on it, and the margin it was hiding can be read off:</p>
+
+    <div class="scroller">
+      <table>
+        <thead><tr><th>Item</th><th>Ready</th><th>Needed</th><th>Margin</th><th></th></tr></thead>
+        <tbody>
+          <tr><td class="subject">Interposer <span class="code">ASSY-10</span></td><td class="num">w96</td><td class="num">w101 · die attach</td><td class="num">5 weeks</td><td class="verd"><span class="pill held">Holds</span></td></tr>
+          <tr class="r-watch"><td class="subject">Substrate <span class="code">ASSY-11</span></td><td class="num">w92</td><td class="num">w102 · interposer attach</td><td class="num">10 weeks</td><td class="verd"><span class="pill watch">Thin</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <p>At the top of its band — 22 weeks — the interposer still lands in week 98, three weeks clear of die attach. It holds under its own worst case.</p>
+    <p>The substrate does not. Sixteen weeks is already the top of the <em>quiet-market</em> band, and the same sources report 30 weeks when advanced packaging is tight and past 40 at the 2022 – 2024 peak. A 30-week build started in week 76 delivers in week 106, four weeks after the assembly that consumes it. Ten weeks of margin against an item that has historically stretched fourteen past nominal is not a margin.</p>
+    <p><b>No date was moved for this.</b> Padding the plan against a peak-market lead time would be inventing slack, not scheduling; the schedule states the nominal case, and it now states it in a place a TPM can watch. What the addition bought is exactly that: <span class="code">PKGD-09</span> books the capacity in week 56, <span class="code">PKGD-11</span> releases tooling in week 76, and the two builds now report against dates instead of appearing at die attach. A new <b>package material gate</b> was recorded at week 76 alongside the MTO and wafer-out gates — package frozen and tooling released before the lots start, because they take longer than the die does.</p>
+  </section>
+
+  <section>
+    <h2><span class="kicker">Sources</span> Eleven searches, eleven figures</h2>
+    <ol class="src">
+      <li><div class="who">Battling Fab Cycle Times<span>Semiconductor Engineering</span></div><div class="fig">Tapeout to first silicon 8 – 12 weeks typical, 14 – 20 weeks at advanced processes; hot lots and hand-carry cut several weeks.</div></li>
+      <li><div class="who">Foundry Engagement Guide<span>Silicon Analysts</span></div><div class="fig">Mask write and inspection 2 – 4 weeks mature, 4 – 8 weeks advanced EUV. Fab cycle ~8 weeks at 28nm, 10 – 12 at 7nm, 14 – 16 at 3nm.</div></li>
+      <li><div class="who">ASIC Tapeout Timelines<span>AnySilicon</span></div><div class="fig">Under 500K gates 6 – 12 months; 500K – 5M gates 12 – 18; above 5M gates 18 – 36, plus 3 – 4 months for fabrication and packaging. Verification, not planning, sets RTL-freeze-to-tapeout.</div></li>
+      <li><div class="who">The Productization Cycle Time in Semiconductor Development<span>Chetan Arvind Patil</span></div><div class="fig">First-silicon readiness 4 – 6 weeks; bring-up 2 – 6; test program development 8 – 12; package assembly 4 – 6; reliability qualification 6 – 12; yield ramp 8 – 16; customer validation 4 – 8.</div></li>
+      <li><div class="who">AEC-Q100 Rev-J and qualification practice<span>AEC Council · RF Essentials</span></div><div class="fig">HTOL 1000 hours = 42 days over 231 units from 3 lots; temperature cycling 1000 cycles = 6 – 8 weeks; full automotive qualification 9 – 18 months, fastest cycle ~3.</div></li>
+      <li><div class="who">Post-Silicon Validation Methodology in SoC<span>Electronics For You · SoC Labs</span></div><div class="fig">A stable power-on recipe takes days to a week; full post-silicon validation runs weeks to several months and is over half of total validation cost.</div></li>
+      <li><div class="who">MPW schedules and shuttle programs<span>VLSI Shuttle · Muse Semiconductor · AnySilicon</span></div><div class="fig">Multi-project wafer turnaround 8 – 16 weeks; TSMC typically 12 – 16 weeks from design freeze to die delivery.</div></li>
+      <li><div class="who">SoC development guides<span>ACL Digital · ChipVerify</span></div><div class="fig">Concept to silicon 12 – 24 months for complex SoCs; verification consumes 60 – 70% of the development cycle.</div></li>
+      <li><div class="who">AI chip supply chain constraints<span>Epoch AI</span></div><div class="fig">Logic dies are fabricated roughly 16 weeks before shipment; CoWoS packaging occurs roughly 8 weeks before shipment; HBM must be procured before CoWoS packaging begins.</div></li>
+      <li><div class="who">CoWoS bottleneck and allocation analyses<span>Silicon Analysts · SemiAnalysis · Introl</span></div><div class="fig">Intrinsic CoWoS cycle time 8 – 12 weeks for final assembly and test; booking lead times of 52 – 78 weeks reflect capacity, not process.</div></li>
+      <li><div class="who">ASIC packaging landscape · substrates and interposers<span>imec IC-Link · SemiconductorX</span></div><div class="fig">ABF substrate lead time 12 – 16 weeks typical and up to 30 in high demand; silicon interposer fabrication 2 – 5 months. Interposers and substrates must be ready at the moment silicon leaves the fab.</div></li>
+    </ol>
+  </section>
+
+  <footer>
+    <div>Applied to <code>src/data/scheduleProfiles.ts</code> (BASELINES), <code>docs/activitydetails_v9.html</code> (the authoring document the app data is generated from), and mirrored into <code>docs/stage-template-v2.json</code> — span, stage windows, the three gates, and the anchor table. <code>src/data/activityDetails.ts</code>, <code>activityIndex.ts</code>, <code>activitySteps.ts</code> and the <code>journey.ts</code> activity lists were regenerated, not hand-edited.</div>
+    <div>Row IDs are derived from position, so the two new activities append as <code>ASSY-10</code> and <code>ASSY-11</code> rather than inserting at the front — inserting would renumber the stage and break every cross-reference pointing at it.</div>
+    <div>Template now 259 activities and 1,664 steps across 23 stages, 3,667 man-months. 401 unit tests and 138 end-to-end tests pass; typecheck clean.</div>
+  </footer>
+
+</div>
+</body>
+</html>
