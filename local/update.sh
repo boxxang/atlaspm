@@ -101,7 +101,9 @@ launchctl kickstart -k "gui/$UID/$LABEL" 2>/dev/null || \
   launchctl bootstrap "gui/$UID" "$HOME/Library/LaunchAgents/$LABEL.plist"
 
 for i in $(seq 1 30); do
-  if curl -fsS -o /dev/null --max-time 3 "http://127.0.0.1:$PORT/"; then
+  # -s without -S: a refused connection is the expected state while it boots,
+  # not something to print thirty times.
+  if curl -fs -o /dev/null --max-time 3 "http://127.0.0.1:$PORT/" 2>/dev/null; then
     printf '\n\033[1mUpdated.\033[0m  http://127.0.0.1:%s  is answering on %s\n' "$PORT" "$(git rev-parse --short HEAD)"
     exit 0
   fi

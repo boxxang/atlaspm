@@ -61,12 +61,22 @@ machine was asleep, launchd runs it on wake.
 
 ## Updating
 
-    cd ~/atlaspm && git pull && npm ci && npm run build
-    launchctl kickstart -k gui/$UID/com.atlaspm.server
+    ~/atlaspm/local/update.sh
 
-`npm run build` runs `prisma db push` first, so a schema change applies itself.
-If the update drops a column or table that holds rows, the build stops rather
-than destroying data — that is deliberate. Move the data first, then build.
+The order it works in is the point. It **backs up before anything moves**,
+because `prisma db push` has no reverse — once a column is gone, the dump is
+the only way back. Then it builds the new version **while the old one is still
+serving**, and restarts only if that build succeeded. A broken update therefore
+leaves you running the version that worked, with the checkout rolled back and a
+fresh backup already on disk.
+
+The build applies the schema itself. If the update would drop a column or table
+that holds rows, `db push` refuses and the build stops — that is the safety
+doing its job, not a bug. Move the data by hand, then run the update again.
+
+It insists the checkout is on `main`. A detached HEAD or another branch is
+either a deliberate pin or an accident, and it says which it thinks it is
+rather than quietly moving you.
 
 ## Restoring
 
