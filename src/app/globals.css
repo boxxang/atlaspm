@@ -2406,7 +2406,7 @@ button.clip:hover{background:var(--accent-line)}
 .clip{display:inline-flex;align-items:center;gap:3px;font-size:10.5px;font-weight:600;color:var(--accent);background:var(--accent-soft);border-radius:4px;padding:0 5px;vertical-align:1px}
 
 /* ── peek panel ──────────────────────────────────── */
-#peek{width:520px;flex-shrink:0;border-left:1px solid var(--line);display:flex;flex-direction:column;background:var(--bg);min-height:0}
+#peek{width:442px;flex-shrink:0;border-left:1px solid var(--line);display:flex;flex-direction:column;background:var(--bg);min-height:0}
 .peek-hd{height:44px;flex-shrink:0;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:9px;padding:0 16px}
 .peek-body{flex-grow:1;overflow-y:auto;padding:15px 16px 20px}
 .peek-foot{border-top:1px solid var(--line);padding:11px 16px;display:flex;gap:8px;align-items:center;flex-shrink:0}
@@ -2820,8 +2820,8 @@ kbd{font:inherit;font-size:10.5px;border:1px solid var(--line);border-bottom-wid
    sideways inside its own pane rather than crushing its content. A column you
    have to scroll to is legible; a column squeezed to 1ch is not.
    ========================================================================== */
-@media (max-width:1500px){ #peek{width:447px} }
-@media (max-width:1320px){ #peek{width:390px} }
+@media (max-width:1500px){ #peek{width:380px} }
+@media (max-width:1320px){ #peek{width:332px} }
 @media (max-width:1120px){ #peek{display:none} }
 @media (max-width:900px){ #side{width:188px} }
 
@@ -2843,39 +2843,41 @@ kbd{font:inherit;font-size:10.5px;border:1px solid var(--line);border-bottom-wid
    fit — a table nobody has thought about at 600px should scroll, not clip. */
 .scroll{overflow-x:auto}
 
+/* A cell that carries a sentence wraps. Not below a breakpoint — always, the
+   way the Overview's attention list has always worked: its ITEM column is a
+   plain span with min-width:0 and no ellipsis, so a long title takes two lines
+   and the row grows. Wide, there is room and nothing wraps; narrow, the words
+   are all still there.
+
+   Ellipsis is right for a fixed-width label — a stage's short title, an email
+   in a 200px column — and wrong for the one column the row is about. */
+.wrapcell{min-width:0;overflow-wrap:break-word}
+.ctable > .trow,
+.stepbox > .steprow{align-items:start;padding-top:8px;padding-bottom:8px}
+.ctable > .trow.hdr,
+.stepbox > .steprow.hdr,
+.thead.chead{align-items:end}
+
 @media (max-width:1400px){
-  .ctable .trow .ell,
-  .ctable .steprow .ell,
   .thead.chead > span,
-  .steprow.hdr > span{white-space:normal;overflow:visible;text-overflow:clip;
-    overflow-wrap:break-word}
-  /* a wrapped cell makes the row taller; the rest sit at its top rather than
-     floating in the middle of a three-line neighbour */
-  .ctable > .trow,
-  .stepbox > .steprow{align-items:start;padding-top:8px;padding-bottom:8px}
+  .steprow.hdr > span{white-space:normal;overflow-wrap:break-word}
   .ell2{-webkit-line-clamp:none;display:block}
 }
 
-/* The fixed columns are sized for a wide window. Narrow, they are what leaves
-   the flexible column nothing, so they give up a third and the sentence gets
-   the room. Set with !important because the grid template is an inline style
-   computed from the column set — this overrides the width, not the columns. */
-@media (max-width:1400px){
-  .ctable[data-acts]{--ct:16px 62px minmax(0,1fr) 96px 74px 68px 96px !important}
-  .stepbox{--ct:6px 18px 22px minmax(0,1fr) 84px 132px 74px 78px 34px !important}
-}
+/* The fixed columns give ground before the flexible one does — that is in
+   ctVar, where the column set is built, rather than in a media query here.
+   Overriding --ct by width was the wrong lever: it replaced the whole set,
+   including the floor that keeps the sentence readable.
 
-/* Narrower than that, nine columns do not fit however they are divided: the
-   step table is left with under 500px once the rail has taken its share. So
-   the row stops being a row. The step keeps the width, and the five figures
-   about it stack underneath, each labelled with the column header it lost —
-   which is why the cells carry data-col. Nothing is dropped and nothing is
-   cut; a row is simply six lines instead of one.
+   Narrow enough and nine columns do not fit however they are divided: the step
+   table is left with under 500px once the rail has taken its share. So the row
+   stops being a row. The step keeps the width, and the five figures about it
+   stack underneath, each labelled with the column header it lost — which is
+   why the cells carry data-col. Nothing is dropped and nothing is cut; a row
+   is simply six lines instead of one.
 
    The header goes with the layout it described. */
 @media (max-width:1180px){
-  .ctable[data-acts]{--ct:16px 58px minmax(0,1fr) 84px 66px 62px 78px !important}
-
   .stepbox > .steprow{--ct:6px 18px 22px minmax(0,1fr) !important;
     padding-top:9px;padding-bottom:9px;row-gap:3px}
   .stepbox > .steprow.hdr{display:none}

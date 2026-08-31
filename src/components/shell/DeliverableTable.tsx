@@ -122,9 +122,10 @@ export function DeliverableTable({
               }}
             >
               <span
-                className="ell"
+                className="wrapcell"
                 style={{
                   minWidth: 0,
+                  lineHeight: 1.4,
                   color: d.done ? 'var(--ink-3)' : undefined,
                 }}
               >

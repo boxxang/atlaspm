@@ -89,7 +89,10 @@ export function StagesList({ projectId }: { projectId: string }) {
                 <span className="pill" style={{ fontSize: 10.5, justifySelf: 'start' }}>
                   {s.shortTitle}
                 </span>
-                <span className="ell" style={{ display: 'flex', alignItems: 'center', gap: 7 }}>
+                <span
+                  className="wrapcell"
+                  style={{ display: 'flex', alignItems: 'center', gap: 7, lineHeight: 1.4 }}
+                >
                   {rk && <span className="dot" style={{ background: 'var(--risk)' }} />}
                   {s.title}
                 </span>

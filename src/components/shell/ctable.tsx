@@ -8,11 +8,21 @@
  * `--ct` custom property so head and body cannot drift apart.
  *
  * `null` for a width means "take the slack" — exactly one column should.
+ *
+ * The widths are what a column wants, not what it must have. A fixed column is
+ * `minmax(0,Npx)` so it gives ground when the window is narrow, and the
+ * flexible one keeps a floor so it is the last to be squeezed rather than the
+ * first: it is the column the row is about, and at `minmax(0,1fr)` it
+ * collapsed to forty pixels and wrapped a title one letter per line while the
+ * fixed columns sat at their full width beside it.
  */
 export type Col = [key: string, width: number | null, label: string];
 
+/** Below this the flexible column stops giving ground and the pane scrolls. */
+const FLEX_MIN = 168;
+
 export const ctVar = (cols: readonly Col[]) =>
-  cols.map(([, w]) => (w == null ? 'minmax(0,1fr)' : `${w}px`)).join(' ');
+  cols.map(([, w]) => (w == null ? `minmax(${FLEX_MIN}px,1fr)` : `minmax(0,${w}px)`)).join(' ');
 
 export function CTHead({ cols, cls = 'thead' }: { cols: readonly Col[]; cls?: string }) {
   return (

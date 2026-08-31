@@ -247,7 +247,7 @@ test.describe('at a laptop width', () => {
     await page.goto(`${SHELL_PATH}/stage/physicalDesign/activity`);
     await expect(page.locator('[data-act]').first()).toBeVisible();
 
-    const title = page.locator('[data-act="PD-01"] .ell').first();
+    const title = page.locator('[data-act="PD-01"] .wrapcell').first();
     const box = (await title.boundingBox())!;
     expect(box.width, 'the activity title needs room to be a title').toBeGreaterThan(120);
   });

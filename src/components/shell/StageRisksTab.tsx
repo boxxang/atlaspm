@@ -109,19 +109,20 @@ export function StageRisksTab({
               </span>
               <span style={{ minWidth: 0 }}>
                 <span
-                  className="ell"
-                  style={{ display: 'block', fontWeight: 500, textAlign: 'left' }}
+                  className="wrapcell"
+                  style={{ display: 'block', fontWeight: 500, textAlign: 'left', lineHeight: 1.4 }}
                 >
                   {r.title}
                 </span>
                 <span
-                  className="ell"
+                  className="wrapcell"
                   style={{
                     display: 'block',
                     fontSize: 11.5,
                     color: 'var(--ink-3)',
                     marginTop: 3,
                     textAlign: 'left',
+                    lineHeight: 1.4,
                   }}
                 >
                   {step?.text ?? 'Not matched to a step on this stage'}

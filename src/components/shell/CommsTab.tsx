@@ -97,8 +97,8 @@ export function CommsTab({ stageId }: { stageId: string }) {
               />
               <span style={{ minWidth: 0 }}>
                 <span
-                  className="ell"
-                  style={{ display: 'block', fontWeight: 500, textAlign: 'left' }}
+                  className="wrapcell"
+                  style={{ display: 'block', fontWeight: 500, textAlign: 'left', lineHeight: 1.4 }}
                 >
                   {it.title}
                 </span>
@@ -113,7 +113,10 @@ export function CommsTab({ stageId }: { stageId: string }) {
                     >
                       {fmtDate(latest.date)}
                     </span>
-                    <span className="ell" style={{ fontSize: 12.5, color: 'var(--ink-2)' }}>
+                    <span
+                      className="wrapcell"
+                      style={{ fontSize: 12.5, color: 'var(--ink-2)', lineHeight: 1.4 }}
+                    >
                       {latest.text}
                     </span>
                   </span>

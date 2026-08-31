@@ -112,11 +112,12 @@ export function StageActivityTab({ stageId }: { stageId: string }) {
                 {a.ref}
               </span>
               <span
-                className="ell"
+                className="wrapcell"
                 style={{
                   display: 'flex',
                   alignItems: 'center',
                   gap: 7,
+                  lineHeight: 1.4,
                   color: done ? 'var(--ink-2)' : undefined,
                   fontWeight: risky ? 600 : undefined,
                 }}
@@ -138,7 +139,7 @@ export function StageActivityTab({ stageId }: { stageId: string }) {
               <span className="num" style={{ fontSize: 12.5, color: 'var(--ink-2)' }}>
                 {last ? fmtDate(last.due) : '—'}
               </span>
-              <span className="ell" style={{ fontSize: 12, color: 'var(--ink-3)' }}>
+              <span className="wrapcell" style={{ fontSize: 12, color: 'var(--ink-3)', lineHeight: 1.4 }}>
                 {a.activity.role}
               </span>
             </button>
@@ -285,12 +286,12 @@ function StepBlock({ a }: { a: Activity }) {
                 {s.n}
               </span>
               <span
-                className="ell"
+                className="wrapcell"
                 data-col="Step"
-                style={{ display: 'flex', alignItems: 'center', gap: 8, minWidth: 0 }}
+                style={{ display: 'flex', alignItems: 'center', gap: 8, minWidth: 0, lineHeight: 1.4 }}
               >
                 <span
-                  className={s.par ? 'par ell' : 'ell'}
+                  className={s.par ? 'par wrapcell' : 'wrapcell'}
                   style={s.done ? { color: 'var(--ink-2)' } : undefined}
                 >
                   {s.text}

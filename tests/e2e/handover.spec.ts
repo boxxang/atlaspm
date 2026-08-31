@@ -19,7 +19,7 @@ const openFirstOpen = async (page: import('./fixtures').Page) => {
   await page.goto(DELIVERABLES);
   await expect(page.locator('[data-board] [data-deliverable]').first()).toBeVisible();
   const row = page.locator('[data-board] [data-deliverable]').filter({ hasNot: page.locator('.pill.ok') }).first();
-  const title = await row.locator('.ell').first().innerText();
+  const title = await row.locator('.wrapcell').first().innerText();
   await row.click();
   await expect(card(page)).toContainText('Handover');
   return { row, title: title.trim() };
@@ -56,7 +56,7 @@ test.describe('the deliverables tab', () => {
     await page.goto(`${SHELL_PATH}/stage/synthesis/deliverables`);
     await expect(page.locator('[data-board] [data-deliverable]').first()).toBeVisible();
     const title = (
-      await page.locator('[data-board] [data-deliverable]').filter({ hasText: 'Delayed' }).first().locator('.ell').first().innerText()
+      await page.locator('[data-board] [data-deliverable]').filter({ hasText: 'Delayed' }).first().locator('.wrapcell').first().innerText()
     ).trim();
 
     await page.goto(`${SHELL_PATH}/overdue`);

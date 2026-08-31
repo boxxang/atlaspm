@@ -93,13 +93,13 @@ export function TeamTable({ stageId }: { stageId: string }) {
             style={{ ...COLS, background: p.lead ? 'var(--accent-wash)' : undefined }}
           >
             <Avatar name={p.name} />
-            <span className="ell" style={p.lead ? { fontWeight: 600 } : undefined}>
+            <span className="wrapcell" style={p.lead ? { fontWeight: 600 } : undefined}>
               {p.name}
             </span>
-            <span className="ell" style={{ fontSize: 12.5, color: 'var(--ink-2)' }}>
+            <span className="wrapcell" style={{ fontSize: 12.5, color: 'var(--ink-2)' }}>
               {p.role}
             </span>
-            <span className="ell" style={{ fontSize: 12.5, color: 'var(--ink-2)' }}>
+            <span className="wrapcell" style={{ fontSize: 12.5, color: 'var(--ink-2)' }}>
               {p.email}
             </span>
             <span className="num" style={{ fontSize: 12.5, color: 'var(--ink-2)' }}>
