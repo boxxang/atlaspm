@@ -97,6 +97,11 @@ export interface ItemInput {
   due: Date | null;
   done: boolean;
   updatedAt: Date;
+  /** Who raised it — the board's original poster. */
+  author?: string;
+  /** What the post is about: an activity, and optionally a step of it. */
+  activityRef?: string | null;
+  stepN?: number | null;
   /** The key deliverable this activity is work towards, if any. */
   deliverableId?: string | null;
 }
@@ -112,6 +117,9 @@ export async function saveItem(input: ItemInput) {
     due: input.due,
     done: input.done,
     updatedAt: input.updatedAt,
+    author: input.author ?? '',
+    activityRef: input.activityRef ?? null,
+    stepN: input.stepN ?? null,
     deliverableId: input.deliverableId ?? null,
   };
   await prisma.item.upsert({
@@ -140,13 +148,16 @@ export async function postUpdate(input: {
   id: string;
   itemId: string;
   text: string;
+  author: string;
   createdAt: Date;
 }) {
   const { projectId, ...su } = input;
   await prisma.$transaction([
     /* kind 'update' is a post on a board item — the same table now holds risks
-       flagged on a step, key-info notes and deliverable handovers */
-    prisma.post.create({ data: { ...su, projectId, kind: 'update', author: '' } }),
+       flagged on a step, key-info notes and deliverable handovers. The author
+       is recorded rather than blanked: a comment on the communication board is
+       somebody's, and a board of anonymous replies answers nothing. */
+    prisma.post.create({ data: { ...su, projectId, kind: 'update' } }),
     prisma.item.update({ where: { id: su.itemId }, data: { updatedAt: su.createdAt } }),
   ]);
   touch(projectId);

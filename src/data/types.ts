@@ -152,6 +152,8 @@ export interface AttachmentRef {
 export interface StatusUpdate {
   id: string;
   text: string;
+  /** Who wrote it. The column was always there; only the board reads it. */
+  author: string;
   date: Date;
   attachments: AttachmentRef[];
 }
@@ -163,6 +165,12 @@ export interface Item {
   deliverableId?: string | null;
   body: string;
   owner: string;
+  /** Who raised it, which is not always who is carrying it. */
+  author: string;
+  /** The activity the post is about, if it is about one. */
+  activityRef?: string | null;
+  /** The step of that activity, if the poster went that far. */
+  stepN?: number | null;
   due: Date | null;
   done: boolean;
   /** Newest update's date, else the stage end (done) or a recent stamp. */

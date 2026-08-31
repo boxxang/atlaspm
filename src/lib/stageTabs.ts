@@ -9,12 +9,16 @@
  */
 export const STAGE_TABS = [
   { slug: 'activity', label: 'Activity' },
-  { slug: 'board', label: 'Communication board' },
   { slug: 'keyinfo', label: 'Key info' },
   { slug: 'risks', label: 'Risks' },
   { slug: 'deliverables', label: 'Key deliverables' },
   { slug: 'updates', label: 'Updates' },
   { slug: 'team', label: 'Team' },
+  /* Last, and marked N/A: the board is where a stage gets talked about, and
+     nobody is talking yet — the tool is one TPM's. It works, and it is the
+     first thing that becomes real when a second person arrives, so it keeps
+     its place rather than being hidden. */
+  { slug: 'board', label: 'Communication board (N/A)' },
 ] as const;
 
 export type StageTab = (typeof STAGE_TABS)[number]['slug'];

@@ -113,6 +113,9 @@ interface ItemRow {
   title: string;
   body: string;
   owner: string;
+  author?: string;
+  activityRef?: string | null;
+  stepN?: number | null;
   due: Date | null;
   done: boolean;
   updatedAt: Date;
@@ -120,6 +123,7 @@ interface ItemRow {
   posts: {
     id: string;
     text: string;
+    author?: string;
     createdAt: Date;
     attachments?: AttachmentRow[];
   }[];
@@ -252,6 +256,9 @@ export function buildProjectState(project: {
       title: row.title,
       body: row.body,
       owner: row.owner,
+      author: row.author ?? '',
+      activityRef: row.activityRef ?? null,
+      stepN: row.stepN ?? null,
       due: row.due,
       done: row.done,
       deliverableId: row.deliverableId ?? null,
@@ -264,6 +271,7 @@ export function buildProjectState(project: {
         .map((u) => ({
           id: u.id,
           text: u.text,
+          author: u.author ?? '',
           date: u.createdAt,
           attachments: u.attachments ?? [],
         }))

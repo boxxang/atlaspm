@@ -90,9 +90,12 @@ export function createProjectSeed({
   };
   const W = (stage: StageId, weeks: number) => addWeeks(sc[stage].start, weeks);
   const E = (stage: StageId) => new Date(sc[stage].end);
-  const U = (days: number, text: string, hrs = 0): StatusUpdate => ({
+  /* A comment carries its writer. Where the seed does not name one it is the
+     stage lead's, which is who would have written it. */
+  const U = (days: number, text: string, hrs = 0, author = ''): StatusUpdate => ({
     id: uid(),
     text,
+    author,
     date: ago(days, hrs),
     attachments: [],
   });
@@ -105,10 +108,16 @@ export function createProjectSeed({
     id: uid(),
     title: t,
     owner: o || leaders[stage].short,
+    /* who raised it: the seed's entries were raised by whoever carries them */
+    author: o || leaders[stage].short,
+    activityRef: null,
+    stepN: null,
     body,
     due,
     done: dn,
-    updates: ups,
+    /* A comment the seed left unsigned is the entry's own author's — the
+       thread is a conversation, and an unsigned line in one reads as a bug. */
+    updates: ups.map((u) => (u.author ? u : { ...u, author: o || leaders[stage].short })),
     attachments: [],
     updated: ups.length ? ups[0].date : dn ? E(stage) : ago(6),
   });
@@ -206,7 +215,7 @@ export function createProjectSeed({
       I("productDefinition", "Initial die size estimate 19–21 mm per side, carrying ±15% until floorplan"),
       I("productDefinition", "IP licensing budget approved; PCIe Gen5 PHY and HBM3 controller are buy, not build"),
       I("productDefinition", "Program staffing plan approved at 80% of request — verification is the shortfall"),
-      I("productDefinition", "Schedule baseline uses the Typical SoC profile; 132 weeks kickoff to mass production"),
+      I("productDefinition", "Schedule baseline uses the Typical SoC profile; 136 weeks kickoff to mass production"),
       I("productDefinition", "Board power envelope 75 W is a customer requirement, not an engineering target"),
     ],
     acts: [
@@ -223,7 +232,7 @@ export function createProjectSeed({
       I("productDefinition", "Third-party IP make/buy shortlist", { o: "Seojin Ha", due: W("productDefinition", 3), dn: true }),
       I("productDefinition", "Feasibility gate review pack", { o: "Seojin Ha", due: W("productDefinition", 3), dn: true }),
       I("productDefinition", "Business case & exec approval", { due: E("productDefinition"), dn: true,
-        ups: [U(196, "Approved at exec staff review; budget released against the 132-week baseline.")] }),
+        ups: [U(196, "Approved at exec staff review; budget released against the 136-week baseline.")] }),
       I("productDefinition", "Program charter & staffing plan", { due: E("productDefinition"), dn: true }),
       I("productDefinition", "Anchor customer requirement interviews", { o: "N. Feld", due: W("productDefinition", 2), dn: true }),
     ],
@@ -533,7 +542,7 @@ export function createProjectSeed({
           ups: [U(3, "Freeze holds pending the last bump map delta from the PD final turn.")] }),
       ],
       risks: [
-        I("packageDesign", "Substrate arrival buffer only two weeks against wafer-out", { o: "Y. Tanaka" }),
+        I("packageDesign", "Substrate build now tracked as ASSY-11 — ten weeks of margin, and none of it against a tight market", { o: "Y. Tanaka" }),
       ],
     });
 

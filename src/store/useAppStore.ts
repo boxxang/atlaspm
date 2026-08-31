@@ -3,6 +3,7 @@
 import { create } from 'zustand';
 import * as api from '@/app/actions';
 import { BUILTIN_PROFILE, STAGE_ORDER } from '@/data/scheduleProfiles';
+import { RISK_AUTHOR } from '@/data/riskSeeds';
 import type { ProgramPost, ProjectState } from '@/lib/projectState';
 import { resolveStages } from '@/lib/stages';
 import { rejectFile, rejectionMessage } from '@/lib/attachments';
@@ -199,7 +200,13 @@ export interface AppState {
   saveItem: (stageId: StageId, kind: ItemKind, itemId: string | null, f: ItemFields) => Item;
   deleteItem: (stageId: StageId, kind: ItemKind, itemId: string) => void;
   /** Returns the new update's id, so attachments can reference it. */
-  postUpdate: (stageId: StageId, kind: ItemKind, itemId: string, text: string) => string;
+  postUpdate: (
+    stageId: StageId,
+    kind: ItemKind,
+    itemId: string,
+    text: string,
+    author?: string,
+  ) => string;
   saveUpdate: (
     stageId: StageId,
     kind: ItemKind,
@@ -218,6 +225,17 @@ export interface ItemFields {
   due: Date | null;
   /** Which key deliverable this is work towards. Activities only. */
   deliverableId?: string | null;
+  /** Who raised it. Set when the post is written and never rewritten by an edit. */
+  author?: string;
+  /** What the post is about: an activity, and optionally a step of it. */
+  activityRef?: string | null;
+  stepN?: number | null;
+  /**
+   * Optional so the ordinary save leaves it alone: an edit form has no opinion
+   * about whether the entry is finished, and the tick that does is a different
+   * gesture. New items are created open regardless.
+   */
+  done?: boolean;
 }
 
 /**
@@ -1042,6 +1060,7 @@ export const useAppStore = create<AppState>()((set, get) => ({
       title,
       body: '',
       owner: get().leaders[stageId].short,
+      author: RISK_AUTHOR,
       due: null,
       done: false,
       updated: new Date(),
@@ -1063,7 +1082,17 @@ export const useAppStore = create<AppState>()((set, get) => ({
       : undefined;
     const saved: Item = existing
       ? { ...existing, ...f, updated: new Date() }
-      : { id: uid(), ...f, done: false, updated: new Date(), updates: [], attachments: [] };
+      : {
+          id: uid(),
+          author: '',
+          activityRef: null,
+          stepN: null,
+          ...f,
+          done: false,
+          updated: new Date(),
+          updates: [],
+          attachments: [],
+        };
     set((s) => ({
       content: {
         ...s.content,
@@ -1092,8 +1121,8 @@ export const useAppStore = create<AppState>()((set, get) => ({
     sync(api.deleteItem(get().projectId, itemId));
   },
 
-  postUpdate: (stageId, kind, itemId, text) => {
-    const su: StatusUpdate = { id: uid(), text, date: new Date(), attachments: [] };
+  postUpdate: (stageId, kind, itemId, text, author = RISK_AUTHOR) => {
+    const su: StatusUpdate = { id: uid(), text, author, date: new Date(), attachments: [] };
     set((s) => ({
       content: mapItem(s.content, stageId, kind, itemId, (it) => ({
         ...it,
@@ -1101,7 +1130,16 @@ export const useAppStore = create<AppState>()((set, get) => ({
         updated: su.date,
       })),
     }));
-    sync(api.postUpdate({ projectId: get().projectId, id: su.id, itemId, text, createdAt: su.date }));
+    sync(
+      api.postUpdate({
+        projectId: get().projectId,
+        id: su.id,
+        itemId,
+        text,
+        author,
+        createdAt: su.date,
+      }),
+    );
     return su.id;
   },
 

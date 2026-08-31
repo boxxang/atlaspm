@@ -119,6 +119,17 @@ model Item {
   title     String
   body      String    @default("")
   owner     String
+  /// Who opened it. The communication board is a board people post on, so the
+  /// person who started a thread is a different fact from the person carrying
+  /// the work — `owner` answers who is on it, this answers who raised it.
+  /// Defaulted rather than required: the other two boards have no posters.
+  author    String    @default("")
+  /// What the post is about, when it is about one piece of work. The stage is
+  /// already known from stageId; this narrows it to an activity and, if the
+  /// poster went that far, to a step of it. Steps are content addressed by
+  /// reference, so they are named the way every other step reference is.
+  activityRef String?
+  stepN       Int?
   due       DateTime?
   done      Boolean   @default(false)
   updatedAt DateTime

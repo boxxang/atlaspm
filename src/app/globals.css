@@ -2355,6 +2355,25 @@ a:hover{color:var(--accent-hov)}
           border-top:1px solid var(--accent-line);border-bottom:1px solid var(--accent-line)}
 .stepwrap::before,.riskwrap::before,.notewrap::before,.delivwrap::before{content:"";position:absolute;left:27px;top:0;bottom:16px;width:2px;border-radius:2px;background:var(--accent-line)}
 .stepwrap::after,.riskwrap::after,.notewrap::after,.delivwrap::after{content:"";position:absolute;left:27px;top:29px;width:24px;height:2px;background:var(--accent-line)}
+/* ── the communication board ─────────────────────
+   A post is read as a window rather than as a row: the body in full, the
+   comments under it, and edit and delete behind the read rather than on the
+   row where they would be hit while scanning. */
+.post-head{display:flex;gap:11px;align-items:flex-start;padding:14px 0 10px;border-bottom:1px solid var(--line-soft)}
+.post-body-txt{margin:11px 0 4px;font-size:13.5px;line-height:1.6;color:var(--ink);
+  white-space:pre-wrap;overflow-wrap:break-word;max-width:74ch}
+.board-comments{display:flex;flex-direction:column;gap:13px;margin-top:9px}
+.board-comment{display:flex;gap:9px;align-items:flex-start}
+.board-comment .post-body-txt{font-size:13px;margin:3px 0 0;color:var(--ink-2)}
+.board-comment-acts{display:flex;gap:11px;margin-top:4px}
+.board-comment-acts button{background:none;border:none;padding:0;cursor:pointer;
+  font-size:11.5px;color:var(--ink-3);font-family:inherit}
+.board-comment-acts button:hover{color:var(--ink)}
+.board-comment-acts button.dng:hover{color:var(--risk)}
+/* The board's own tick. The steps' drawn CheckBox is a button and may not sit
+   inside a row that is itself clickable, so the board uses an input. */
+.cbx{width:14px;height:14px;accent-color:var(--accent);cursor:pointer;margin:3px 0 0}
+
 .stepbox,.riskcard,.notecard,.delivcard{border:1px solid var(--accent-line);border-radius:var(--r-lg);overflow:hidden;background:var(--bg);
          box-shadow:0 6px 20px rgba(37,53,110,.10)}
 /* the risk thread, at the width of the page rather than of the rail */
