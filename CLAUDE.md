@@ -110,8 +110,74 @@ two the prototype redefined, so the old shapes in the app are wrong, not merely 
 ## Verification habit
 
 After each phase: `npm run lint && npm run test`, then the phase's Playwright
-checks, then eyeball against `reference/index.html` side by side. If a pixel-level
-question comes up, the reference wins.
+checks, then eyeball against the prototype side by side — served, not on
+`file://`. If a pixel-level question comes up, the prototype wins; it is the
+spec, and this line used to name `reference/index.html`, which the top of this
+file has already retired.
+
+## Shipping it
+
+The app is what deploys; the prototype is the spec and never ships. Vercel is
+wired to the GitHub repo and builds `main`, so a push to `main` is a release.
+Work on a branch, merge with `--ff-only`, push. A failed build leaves the last
+good deployment serving, which is the one thing that has consistently saved us.
+
+Before merging, with no `next dev` running (it holds :3000 and Playwright will
+not start):
+
+    npm run test && npx tsc --noEmit && npx playwright test && npm run lint
+
+If the prototype changed, `node design-canvas/proto/build.mjs` — the built file
+is generated and editing it is silently lost.
+
+### When `prisma/schema.prisma` changed
+
+This is the only thing that makes a release risky, because **the schema has to
+reach the database before the code that needs it**. There is no migration
+history: the repo is on `prisma db push`, which is declarative and moves no
+data.
+
+Apply it from a machine that can reach the database, never from the build:
+
+    # Neon console -> Connection string -> the host WITHOUT `-pooler`
+    # into .env.production.local as DATABASE_URL
+    set -a && . ./.env.production.local && set +a
+    npx prisma migrate diff --from-config-datasource --to-schema prisma/schema.prisma
+    npx prisma db push        # never --accept-data-loss
+    git push origin main      # code second
+
+The `migrate diff` is not optional. It reads the live database rather than
+assuming it matches some commit, and it is how we found that production was
+three tables behind rather than the three columns we had assumed.
+
+An additive change — a nullable column, one with a default, a new table — has
+no broken window: the running code ignores what it does not know about. A
+destructive one does. Dropping or renaming anything breaks the deployed code
+the instant it lands, so either take the outage knowingly or do it in two
+releases: add the new shape, deploy, move the data, then drop the old shape.
+`db push` will not move the data for you.
+
+### Three traps, each of which cost a deploy
+
+**Do not put `prisma db push` in the build.** It reads well — the schema could
+never lag the code again — and it fails: Vercel's build cannot reach the
+database. Two production deploys died on it before the idea was abandoned. The
+underlying reason is still unknown; `npx vercel inspect <id> --logs` would say.
+
+**`vercel env pull` cannot read `DATABASE_URL`.** It is stored Sensitive, so
+the pull writes the literal string `[SENSITIVE]` and Prisma rejects it as a
+malformed URL. Get the string from the Neon console.
+
+**Use the direct host, not the pooled one.** `db push` is DDL and PgBouncer is
+in transaction mode; the pooled string is for the app at runtime and is what
+Vercel's `DATABASE_URL` should stay set to.
+
+### Seeding
+
+`npx prisma db seed` deletes and recreates `atlasax1` alone — other programs
+are left. Run it against production only after a baseline moved: deliverable
+and item dates are computed from the schedule and then stored, so they are
+stale the moment the schedule changes. Nothing else is a reason to run it.
 
 <!-- BEGIN:nextjs-agent-rules -->
 
