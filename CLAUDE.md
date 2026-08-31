@@ -137,40 +137,62 @@ reach the database before the code that needs it**. There is no migration
 history: the repo is on `prisma db push`, which is declarative and moves no
 data.
 
-Apply it from a machine that can reach the database, never from the build:
+`npm run build` is `prisma db push && next build`, so an ordinary deploy
+carries its own schema and there is nothing extra to do. The push reaches the
+database fine from Vercel's build — that was doubted once, wrongly, and the
+build logs settle it.
 
-    # Neon console -> Connection string -> the host WITHOUT `-pooler`
+An additive change — a nullable column, one with a default, a new table — goes
+through on its own. The running code ignores what it does not know about, so
+there is no window where the two disagree.
+
+A destructive one stops the deploy, and is meant to. `db push` refuses to drop
+a table or column that holds rows without `--accept-data-loss`, which is not a
+flag to add to a build. A deploy that fails leaves the last good one serving,
+so the failure costs nothing and buys the chance to think. Handle it by hand:
+
+    # Neon console -> Connection string -> the host WITHOUT `-pooler`,
     # into .env.production.local as DATABASE_URL
     set -a && . ./.env.production.local && set +a
     npx prisma migrate diff --from-config-datasource --to-schema prisma/schema.prisma
-    npx prisma db push        # never --accept-data-loss
-    git push origin main      # code second
+    ... move the data, then apply ...
+    rm .env.production.local  # fetched fresh each time, not kept
+
+That file is fetched for the occasion and deleted after, rather than left
+lying around for the next time. `.gitignore` covers it, but a gitignore only
+stops a commit — it does nothing about the scripts, backups and agents that
+read the working directory, and this is a long-lived production credential.
+Two minutes in the Neon console is the whole cost of not keeping it.
 
 The `migrate diff` is not optional. It reads the live database rather than
 assuming it matches some commit, and it is how we found that production was
 three tables behind rather than the three columns we had assumed.
 
-An additive change — a nullable column, one with a default, a new table — has
-no broken window: the running code ignores what it does not know about. A
-destructive one does. Dropping or renaming anything breaks the deployed code
-the instant it lands, so either take the outage knowingly or do it in two
-releases: add the new shape, deploy, move the data, then drop the old shape.
-`db push` will not move the data for you.
+Better still, do not put the release in that position: add the new shape and
+deploy, move the data, then drop the old shape in a second release. `db push`
+moves no data, ever.
 
-### Three traps, each of which cost a deploy
+### What was learned the expensive way
 
-**Do not put `prisma db push` in the build.** It reads well — the schema could
-never lag the code again — and it fails: Vercel's build cannot reach the
-database. Two production deploys died on it before the idea was abandoned. The
-underlying reason is still unknown; `npx vercel inspect <id> --logs` would say.
+**Read the build log before concluding anything about the build.** Two deploys
+failed on `prisma db push` and were read as proof that Vercel's build could not
+reach the database. It reaches it fine. The first failure was a flag that does
+not exist (`--skip-generate`), and the second was the safety refusing to drop a
+table holding thirty rows — both plainly stated in the log nobody had opened.
+`npx vercel inspect <deployment-id> --logs` is the whole diagnosis, and it is
+cheaper than a theory.
 
 **`vercel env pull` cannot read `DATABASE_URL`.** It is stored Sensitive, so
 the pull writes the literal string `[SENSITIVE]` and Prisma rejects it as a
 malformed URL. Get the string from the Neon console.
 
-**Use the direct host, not the pooled one.** `db push` is DDL and PgBouncer is
-in transaction mode; the pooled string is for the app at runtime and is what
-Vercel's `DATABASE_URL` should stay set to.
+**For a hand-run migration, use the direct host** — the Neon connection string
+whose host has no `-pooler`. Prisma and Neon both advise it for DDL, and the
+one reset done here went through it. Whether the pooled host would also have
+worked was never tested: the build reached the database through the pooled
+string and compared schemas fine, so the pooled host is at least not the
+blanket problem it was once written up as. Vercel's `DATABASE_URL` stays
+pooled either way — that is the right string for the app at runtime.
 
 ### Seeding
 
