@@ -2850,18 +2850,27 @@ kbd{font:inherit;font-size:10.5px;border:1px solid var(--line);border-bottom-wid
    are all still there.
 
    Ellipsis is right for a fixed-width label — a stage's short title, an email
-   in a 200px column — and wrong for the one column the row is about. */
+   in a 200px column — and wrong for the one column the row is about.
+
+   A wrapped cell only makes the row as tall as its own lines. The row keeps
+   the mockup's spacing otherwise: no vertical padding, min-height carrying the
+   height, and every cell centred against the tallest one. Adding padding and
+   top-aligning them — which is what this rule used to do — left the short
+   cells floating at the top of a three-line neighbour and pushed every row
+   apart whether anything had wrapped or not. */
 .wrapcell{min-width:0;overflow-wrap:break-word}
-.ctable > .trow,
-.stepbox > .steprow{align-items:start;padding-top:8px;padding-bottom:8px}
-.ctable > .trow.hdr,
-.stepbox > .steprow.hdr,
-.thead.chead{align-items:end}
 
 @media (max-width:1400px){
   .thead.chead > span,
   .steprow.hdr > span{white-space:normal;overflow-wrap:break-word}
   .ell2{-webkit-line-clamp:none;display:block}
+}
+
+/* Stacked, the output has the whole width and no neighbour to squeeze, so it
+   says all of itself rather than trailing off. */
+@media (max-width:1180px){
+  .stepbox > .steprow > [data-col='Output']{white-space:normal;overflow:visible;
+    text-overflow:clip;overflow-wrap:break-word}
 }
 
 /* The fixed columns give ground before the flexible one does — that is in
