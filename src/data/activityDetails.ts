@@ -3,7 +3,7 @@
  * activity is for, the steps it runs, what it needs, what it produces, who is
  * on it, and what to watch.
  *
- * All 257 activities of the 23 stages are written. Weeks are weeks from the
+ * All 259 activities of the 23 stages are written. Weeks are weeks from the
  * stage start; the programme turns them into dates.
  *
  * The source is a separate authoring document — docs/activitydetails_v9.html —
@@ -39592,8 +39592,8 @@ export const activityDetails: Record<string, ActivityDetail> = {
  "ASSY-01": {
   "stage": "packaging",
   "window": [
-   0,
-   3
+   23,
+   26
   ],
   "criticalPath": true,
   "purpose": [
@@ -39776,8 +39776,8 @@ export const activityDetails: Record<string, ActivityDetail> = {
  "ASSY-02": {
   "stage": "packaging",
   "window": [
-   0,
-   3
+   23,
+   26
   ],
   "criticalPath": false,
   "purpose": [
@@ -39947,8 +39947,8 @@ export const activityDetails: Record<string, ActivityDetail> = {
  "ASSY-03": {
   "stage": "packaging",
   "window": [
-   2,
-   5
+   25,
+   28
   ],
   "criticalPath": true,
   "purpose": [
@@ -40127,8 +40127,8 @@ export const activityDetails: Record<string, ActivityDetail> = {
  "ASSY-04": {
   "stage": "packaging",
   "window": [
-   3,
-   6
+   26,
+   29
   ],
   "criticalPath": true,
   "purpose": [
@@ -40300,8 +40300,8 @@ export const activityDetails: Record<string, ActivityDetail> = {
  "ASSY-05": {
   "stage": "packaging",
   "window": [
-   5,
-   7
+   28,
+   30
   ],
   "criticalPath": true,
   "purpose": [
@@ -40459,8 +40459,8 @@ export const activityDetails: Record<string, ActivityDetail> = {
  "ASSY-06": {
   "stage": "packaging",
   "window": [
-   3,
-   5
+   26,
+   28
   ],
   "criticalPath": false,
   "purpose": [
@@ -40623,8 +40623,8 @@ export const activityDetails: Record<string, ActivityDetail> = {
  "ASSY-07": {
   "stage": "packaging",
   "window": [
-   3,
-   8
+   26,
+   31
   ],
   "criticalPath": false,
   "purpose": [
@@ -40814,8 +40814,8 @@ export const activityDetails: Record<string, ActivityDetail> = {
  "ASSY-08": {
   "stage": "packaging",
   "window": [
-   6,
-   8
+   29,
+   31
   ],
   "criticalPath": false,
   "purpose": [
@@ -40977,8 +40977,8 @@ export const activityDetails: Record<string, ActivityDetail> = {
  "ASSY-09": {
   "stage": "packaging",
   "window": [
-   5,
-   8
+   28,
+   31
   ],
   "criticalPath": true,
   "purpose": [
@@ -41150,6 +41150,392 @@ export const activityDetails: Record<string, ActivityDetail> = {
    ]
   },
   "terms": []
+ },
+ "ASSY-10": {
+  "stage": "packaging",
+  "window": [
+   0,
+   20
+  ],
+  "criticalPath": true,
+  "purpose": [
+   "Build the <b>production interposer</b> the assembly consumes—a silicon wafer run of its own, with its own mask set, started the week the package design freezes and finished before a single die is attached.",
+   "On a 2.5D part the interposer is not a purchased commodity; it is a second silicon product on a second schedule. Nothing in the assembly window can begin without it, and its lead time is measured in months rather than weeks, so it is started against the frozen database rather than against the wafers coming out of <code>FAB</code>."
+  ],
+  "steps": [
+   {
+    "n": 1,
+    "text": "Release the frozen interposer database and mask tooling to the foundry",
+    "tat": 1.5,
+    "lane": "main"
+   },
+   {
+    "n": 2,
+    "text": "Interposer mask set fabrication and inspection",
+    "tat": 4,
+    "lane": "main"
+   },
+   {
+    "n": 3,
+    "text": "Interposer wafer start and through-silicon via formation",
+    "tat": 3,
+    "lane": "main"
+   },
+   {
+    "n": 4,
+    "text": "Redistribution layer and top-metal build on the interposer",
+    "tat": 4,
+    "lane": "main"
+   },
+   {
+    "n": 5,
+    "text": "Inline metrology and defect monitoring across the interposer run",
+    "tat": 6,
+    "lane": "par"
+   },
+   {
+    "n": 6,
+    "text": "Micro-bump and under-bump metallization",
+    "tat": 2.5,
+    "lane": "main"
+   },
+   {
+    "n": 7,
+    "text": "Interposer wafer acceptance test and warpage screening",
+    "tat": 2.5,
+    "lane": "main"
+   },
+   {
+    "n": 8,
+    "text": "Known-good interposer release and inventory handover to the OSAT",
+    "tat": 2.5,
+    "lane": "main"
+   }
+  ],
+  "flowNote": "Step 2 is the one that cannot be compressed. The interposer needs a mask set like any other silicon, and ordering it is gated on the same design freeze as the substrate—which is why both start in the same week and why that week, not the tapeout, is the real commitment point for the package.",
+  "consumes": [
+   "Frozen interposer and RDL database from PKGD-11",
+   "Interposer routing design from PKGD-03",
+   "Foundry interposer capacity booked at PKGD-09",
+   "Bump map and pitch from PKGD-02",
+   "Assembly process window frozen at PTV-12"
+  ],
+  "produces": [
+   "Interposer database and mask tooling released to the foundry",
+   "Interposer mask set, inspected and qualified",
+   "Interposer wafers started with TSV formation complete",
+   "Interposer RDL and top-metal build complete",
+   "Inline metrology and defect record for the run",
+   "Micro-bump and UBM formation complete",
+   "Interposer wafer acceptance and warpage data",
+   "Known-good interposer inventory released to assembly"
+  ],
+  "producedBy": [
+   1,
+   2,
+   3,
+   4,
+   5,
+   6,
+   7,
+   8
+  ],
+  "rel": [
+   {
+    "id": "ASSY-D1",
+    "rel": "feeds",
+    "text": "<b>Assembled units.</b> No interposer, no unit—this is the part the whole 2.5D stack is built on."
+   },
+   {
+    "id": "ASSY-D2",
+    "rel": "feeds",
+    "text": "<b>Assembly travelers and process data.</b> Interposer lot and wafer identity is what makes an assembled unit traceable back to its base."
+   }
+  ],
+  "risks": [
+   "<b>Started against wafer-out rather than against the design freeze.</b> The interposer takes months, and a program that orders it when the die is ready has already lost the assembly slot.",
+   "<b>Mask tooling treated as part of the die tapeout.</b> It is a separate mask set on a separate release, and it is gated on <code>PKGD-11</code> rather than on <code>TO-11</code>.",
+   "<b>Warpage screened only at assembly.</b> An interposer that warps outside the window fails at bonding, where the die it takes with it is already expensive.",
+   "<b>Capacity booked but not converted to a wafer start.</b> A reservation is not a lot; the start date is what has to be tracked.",
+   "<b>No known-good screening before handover.</b> An unscreened interposer moves the yield loss into the assembly, which is the most expensive place to find it."
+  ],
+  "roles": [
+   {
+    "r": "Package engineer",
+    "d": "Owns the interposer build and its acceptance criteria"
+   },
+   {
+    "r": "Foundry interface",
+    "d": "Wafer starts, capacity and lot tracking"
+   },
+   {
+    "r": "Mask operations",
+    "d": "Interposer tooling release and mask set completion"
+   },
+   {
+    "r": "Quality engineer",
+    "d": "Wafer acceptance and warpage screening"
+   },
+   {
+    "r": "Supply chain",
+    "d": "Inventory position and handover to the OSAT"
+   }
+  ],
+  "effort": [
+   [
+    "Interposer wafer processing",
+    3
+   ],
+   [
+    "Mask set and tooling",
+    2
+   ],
+   [
+    "Acceptance and screening",
+    1.5
+   ],
+   [
+    "Lot tracking and handover",
+    1.5
+   ]
+  ],
+  "entry": [
+   "Interposer database frozen and DRC clean at PKGD-11",
+   "Foundry interposer capacity confirmed against PKGD-09",
+   "Bump map and pitch final"
+  ],
+  "exit": [
+   "Mask set complete and inspected",
+   "Wafer acceptance and warpage inside the assembly window",
+   "Known-good interposer inventory released with traceability"
+  ],
+  "dependsOn": [
+   "PKGD-11",
+   "PKGD-03",
+   "PKGD-09"
+  ],
+  "dependsNote": null,
+  "feedsInto": [
+   "ASSY-03",
+   "ASSY-04"
+  ],
+  "measuredBy": [
+   "Weeks from design freeze to interposer availability",
+   "Interposer wafer acceptance rate",
+   "Warpage distribution against the assembly window"
+  ],
+  "links": {
+   "dependsOn": [
+    "PKGD-02",
+    "PKGD-03",
+    "PKGD-09",
+    "PKGD-11",
+    "PTV-12"
+   ],
+   "feedsInto": [
+    "ASSY-03",
+    "ASSY-04"
+   ],
+   "runsWith": [
+    "ASSY-11"
+   ],
+   "revisedBy": [],
+   "feedsBackInto": []
+  },
+  "terms": [
+   "TSV",
+   "RDL",
+   "OSAT",
+   "CoWoS"
+  ]
+ },
+ "ASSY-11": {
+  "stage": "packaging",
+  "window": [
+   0,
+   16
+  ],
+  "criticalPath": true,
+  "purpose": [
+   "Build the <b>production package substrate</b>—the organic carrier the interposer sits on—at the supplier, against the stack-up frozen at <code>PKGD-11</code>.",
+   "Substrate lead time is the longest single external commitment in the back end and the one least under the program's control. It is ordered off the design freeze, not off the wafers, and in a tight advanced-packaging market it is the item that decides whether assembly starts on time."
+  ],
+  "steps": [
+   {
+    "n": 1,
+    "text": "Release the frozen substrate stack-up and tooling to the supplier",
+    "tat": 1.5,
+    "lane": "main"
+   },
+   {
+    "n": 2,
+    "text": "Laminate material allocation and lot commitment",
+    "tat": 3,
+    "lane": "main"
+   },
+   {
+    "n": 3,
+    "text": "Substrate core, build-up layers and fine-line escape routing",
+    "tat": 5,
+    "lane": "main"
+   },
+   {
+    "n": 4,
+    "text": "Supplier line monitoring and lot-to-lot variability review",
+    "tat": 7,
+    "lane": "par"
+   },
+   {
+    "n": 5,
+    "text": "Surface finish, solder resist and stiffener processing",
+    "tat": 2.5,
+    "lane": "main"
+   },
+   {
+    "n": 6,
+    "text": "Substrate electrical test, coplanarity and warpage screening",
+    "tat": 2,
+    "lane": "main"
+   },
+   {
+    "n": 7,
+    "text": "Incoming inspection and release of substrate lots to the OSAT",
+    "tat": 2,
+    "lane": "main"
+   }
+  ],
+  "flowNote": "Step 2 is where the schedule is actually won or lost. Laminate allocation is a queue position at the supplier, and the programs that hold one booked it at <code>PKGD-09</code>, twenty weeks before this activity opens.",
+  "consumes": [
+   "Frozen substrate stack-up and tooling from PKGD-11",
+   "Escape routing and package DRC from PKGD-04",
+   "Substrate supplier capacity booked at PKGD-09",
+   "Warpage and co-planarity limits from PKGD-07",
+   "Board-level reliability results from PTV-10"
+  ],
+  "produces": [
+   "Substrate stack-up and tooling released to the supplier",
+   "Laminate allocation and material lot commitment",
+   "Substrate build complete through escape routing",
+   "Supplier line monitoring and variability record",
+   "Surface finish and stiffener processing complete",
+   "Substrate electrical test, coplanarity and warpage data",
+   "Substrate lots released to assembly with traceability"
+  ],
+  "producedBy": [
+   1,
+   2,
+   3,
+   4,
+   5,
+   6,
+   7
+  ],
+  "rel": [
+   {
+    "id": "ASSY-D1",
+    "rel": "feeds",
+    "text": "<b>Assembled units.</b> The substrate is the carrier every unit is built onto; it gates <code>ASSY-04</code> outright."
+   },
+   {
+    "id": "ASSY-D2",
+    "rel": "feeds",
+    "text": "<b>Assembly travelers and process data.</b> Substrate lot identity travels with the unit and is what a warpage failure is attributed against."
+   }
+  ],
+  "risks": [
+   "<b>Lead time assumed rather than confirmed.</b> Twelve to sixteen weeks is the quiet-market figure; it has run to thirty, and the plan carries one buffer for both this and the interposer.",
+   "<b>Laminate allocation not held.</b> Capacity booked at <code>PKGD-09</code> has to be converted to a material commitment, or the queue position is somebody else's.",
+   "<b>Coplanarity screened at the OSAT instead of the supplier.</b> A substrate rejected at incoming has already consumed its whole lead time.",
+   "<b>Single-sourced with no second supplier qualified.</b> The substrate is the longest external item and the one with the fewest alternatives.",
+   "<b>Stiffener and surface finish changed after the freeze.</b> A late change here restarts the build rather than adjusting it."
+  ],
+  "roles": [
+   {
+    "r": "Package engineer",
+    "d": "Owns the substrate build and acceptance"
+   },
+   {
+    "r": "Supply chain",
+    "d": "Laminate allocation, lead time and supplier escalation"
+   },
+   {
+    "r": "Supplier quality",
+    "d": "Line monitoring and lot disposition"
+   },
+   {
+    "r": "Quality engineer",
+    "d": "Coplanarity and warpage screening at incoming"
+   },
+   {
+    "r": "Program management",
+    "d": "Lead-time risk against the assembly start"
+   }
+  ],
+  "effort": [
+   [
+    "Substrate build oversight",
+    2
+   ],
+   [
+    "Material allocation and expediting",
+    1.5
+   ],
+   [
+    "Incoming screening",
+    1.5
+   ],
+   [
+    "Supplier quality",
+    1
+   ]
+  ],
+  "entry": [
+   "Substrate stack-up frozen and package DRC clean at PKGD-11",
+   "Supplier capacity and laminate allocation confirmed",
+   "Warpage and coplanarity limits agreed"
+  ],
+  "exit": [
+   "Electrical test and coplanarity inside the agreed limits",
+   "Warpage screened at the supplier, not only at incoming",
+   "Substrate lots released to the OSAT with lot traceability"
+  ],
+  "dependsOn": [
+   "PKGD-11",
+   "PKGD-04",
+   "PKGD-09"
+  ],
+  "dependsNote": null,
+  "feedsInto": [
+   "ASSY-04",
+   "ASSY-05"
+  ],
+  "measuredBy": [
+   "Weeks from design freeze to substrate availability",
+   "Incoming acceptance rate by lot",
+   "Coplanarity and warpage distribution against limits"
+  ],
+  "links": {
+   "dependsOn": [
+    "PKGD-04",
+    "PKGD-07",
+    "PKGD-09",
+    "PKGD-11",
+    "PTV-10"
+   ],
+   "feedsInto": [
+    "ASSY-04",
+    "ASSY-05"
+   ],
+   "runsWith": [
+    "ASSY-10"
+   ],
+   "revisedBy": [],
+   "feedsBackInto": []
+  },
+  "terms": [
+   "OSAT",
+   "CPI"
+  ]
  },
  "EVB-01": {
   "stage": "validationHardware",

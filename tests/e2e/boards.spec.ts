@@ -155,7 +155,7 @@ test.describe('Activities', () => {
   });
 
   test('lists all of them, grouped by the stage that runs them', async ({ page }) => {
-    await expect(page.locator('[data-activity]')).toHaveCount(257);
+    await expect(page.locator('[data-activity]')).toHaveCount(259);
     await expect(page.locator('.groupbar')).toHaveCount(23);
   });
 

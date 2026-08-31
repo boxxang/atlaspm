@@ -229,6 +229,8 @@ export const detailActivityTitles: Record<string, string> = {
  "ASSY-07": "Assembly Yield Analysis and Process Tuning",
  "ASSY-08": "Package-Level Open / Short and Continuity Test",
  "ASSY-09": "Unit Build and Allocation for Bring-Up, Qualification, and Samples",
+ "ASSY-10": "Production Silicon Interposer Fabrication",
+ "ASSY-11": "Production Package Substrate Build",
  "EVB-01": "Validation Platform Requirements and Topology Definition",
  "EVB-02": "EVB Schematic Design and BOM",
  "EVB-03": "PCB Layout with High-Speed Channel SI/PI Simulation",
@@ -1583,6 +1585,8 @@ export const writtenActivities: string[] = [
  "ASSY-07",
  "ASSY-08",
  "ASSY-09",
+ "ASSY-10",
+ "ASSY-11",
  "EVB-01",
  "EVB-02",
  "EVB-03",
@@ -1631,7 +1635,7 @@ export const writtenActivities: string[] = [
 ];
 
 /**
- * What each activity feeds, as the write-ups state it — 1285 edges, 748 of
+ * What each activity feeds, as the write-ups state it — 1289 edges, 748 of
  * them crossing a stage boundary. This is the programme's dependency graph, and
  * it is here rather than with the write-ups because it is small and a browser
  * needs it: it is what says who waits when something is late.
@@ -3200,6 +3204,14 @@ export const activityFeeds: Record<string, string[]> = {
   "MP-03",
   "MP-04"
  ],
+ "ASSY-10": [
+  "ASSY-03",
+  "ASSY-04"
+ ],
+ "ASSY-11": [
+  "ASSY-04",
+  "ASSY-05"
+ ],
  "EVB-01": [
   "EVB-02",
   "EVB-04",
@@ -3559,6 +3571,8 @@ export const criticalPathActivities: string[] = [
  "ASSY-04",
  "ASSY-05",
  "ASSY-09",
+ "ASSY-10",
+ "ASSY-11",
  "EVB-01",
  "EVB-02",
  "EVB-03",

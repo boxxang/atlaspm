@@ -264,12 +264,12 @@ describe('fromStepIndex', () => {
 
   it('reads the real index, and every activity in it dates its steps', () => {
     const refs = Object.keys(activitySteps);
-    expect(refs.length).toBe(257);
+    expect(refs.length).toBe(259);
     const total = refs.reduce(
       (n, ref) => n + plannedSteps(STAGE_START, fromStepIndex(ref, activitySteps[ref])).length,
       0,
     );
-    expect(total).toBe(1649);
+    expect(total).toBe(1664);
   });
 
   it('never lets a step end before it starts', () => {

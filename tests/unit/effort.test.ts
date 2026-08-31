@@ -81,8 +81,8 @@ describe('the seeded program', () => {
 
   it('adds up to the program total the card shows', () => {
     const total = sumEffort(STAGE_ORDER.flatMap((id) => SEED_EFFORT[id]));
-    expect(total).toBe(3653);
-    expect(estimateCost(total, SEED_COST_PER_MAN_MONTH)).toBe(54_795_000);
+    expect(total).toBe(3667);
+    expect(estimateCost(total, SEED_COST_PER_MAN_MONTH)).toBe(55_005_000);
   });
 
   it('resolves through the stage detail merge', () => {

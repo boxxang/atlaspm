@@ -1,5 +1,5 @@
 /**
- * Every activity's steps, compactly — 1649 of them across 257 activities.
+ * Every activity's steps, compactly — 1664 of them across 259 activities.
  *
  * The third data module, and the one the browser holds. A step carries state
  * now (done, percent, owner, due, completed, outputs, posts), and that is
@@ -7,7 +7,7 @@
  * may not have /data/activityDetails.ts: that is a megabyte of prose the server
  * reads one write-up of at a time.
  *
- * Tuples rather than objects. At 1649 steps the four key names of
+ * Tuples rather than objects. At 1664 steps the four key names of
  * {n, text, tat, lane} cost more than the content does, so a step is
  * [n, text, weeks] and the flag is appended only where it is true.
  *
@@ -14611,8 +14611,8 @@ export const activitySteps: Record<string, ActivityStepEntry> = {
  "ASSY-01": {
   "st": "packaging",
   "w": [
-   0,
-   3
+   23,
+   26
   ],
   "s": [
    [
@@ -14671,8 +14671,8 @@ export const activitySteps: Record<string, ActivityStepEntry> = {
  "ASSY-02": {
   "st": "packaging",
   "w": [
-   0,
-   3
+   23,
+   26
   ],
   "s": [
    [
@@ -14731,8 +14731,8 @@ export const activitySteps: Record<string, ActivityStepEntry> = {
  "ASSY-03": {
   "st": "packaging",
   "w": [
-   2,
-   5
+   25,
+   28
   ],
   "s": [
    [
@@ -14793,8 +14793,8 @@ export const activitySteps: Record<string, ActivityStepEntry> = {
  "ASSY-04": {
   "st": "packaging",
   "w": [
-   3,
-   6
+   26,
+   29
   ],
   "s": [
    [
@@ -14855,8 +14855,8 @@ export const activitySteps: Record<string, ActivityStepEntry> = {
  "ASSY-05": {
   "st": "packaging",
   "w": [
-   5,
-   7
+   28,
+   30
   ],
   "s": [
    [
@@ -14910,8 +14910,8 @@ export const activitySteps: Record<string, ActivityStepEntry> = {
  "ASSY-06": {
   "st": "packaging",
   "w": [
-   3,
-   5
+   26,
+   28
   ],
   "s": [
    [
@@ -14963,8 +14963,8 @@ export const activitySteps: Record<string, ActivityStepEntry> = {
  "ASSY-07": {
   "st": "packaging",
   "w": [
-   3,
-   8
+   26,
+   31
   ],
   "s": [
    [
@@ -15031,8 +15031,8 @@ export const activitySteps: Record<string, ActivityStepEntry> = {
  "ASSY-08": {
   "st": "packaging",
   "w": [
-   6,
-   8
+   29,
+   31
   ],
   "s": [
    [
@@ -15084,8 +15084,8 @@ export const activitySteps: Record<string, ActivityStepEntry> = {
  "ASSY-09": {
   "st": "packaging",
   "w": [
-   5,
-   8
+   28,
+   31
   ],
   "s": [
    [
@@ -15140,6 +15140,161 @@ export const activitySteps: Record<string, ActivityStepEntry> = {
    ]
   ],
   "ro": "Program manager"
+ },
+ "ASSY-10": {
+  "st": "packaging",
+  "w": [
+   0,
+   20
+  ],
+  "s": [
+   [
+    1,
+    "Release the frozen interposer database and mask tooling to the foundry",
+    1.5
+   ],
+   [
+    2,
+    "Interposer mask set fabrication and inspection",
+    4
+   ],
+   [
+    3,
+    "Interposer wafer start and through-silicon via formation",
+    3
+   ],
+   [
+    4,
+    "Redistribution layer and top-metal build on the interposer",
+    4
+   ],
+   [
+    5,
+    "Inline metrology and defect monitoring across the interposer run",
+    6,
+    1
+   ],
+   [
+    6,
+    "Micro-bump and under-bump metallization",
+    2.5
+   ],
+   [
+    7,
+    "Interposer wafer acceptance test and warpage screening",
+    2.5
+   ],
+   [
+    8,
+    "Known-good interposer release and inventory handover to the OSAT",
+    2.5
+   ]
+  ],
+  "o": [
+   "Interposer database and mask tooling released to the foundry",
+   "Interposer mask set, inspected and qualified",
+   "Interposer wafers started with TSV formation complete",
+   "Interposer RDL and top-metal build complete",
+   "Inline metrology and defect record for the run",
+   "Micro-bump and UBM formation complete",
+   "Interposer wafer acceptance and warpage data",
+   "Known-good interposer inventory released to assembly"
+  ],
+  "ob": [
+   1,
+   2,
+   3,
+   4,
+   5,
+   6,
+   7,
+   8
+  ],
+  "r": [
+   [
+    "ASSY-D1",
+    "feeds"
+   ],
+   [
+    "ASSY-D2",
+    "feeds"
+   ]
+  ],
+  "ro": "Package engineer"
+ },
+ "ASSY-11": {
+  "st": "packaging",
+  "w": [
+   0,
+   16
+  ],
+  "s": [
+   [
+    1,
+    "Release the frozen substrate stack-up and tooling to the supplier",
+    1.5
+   ],
+   [
+    2,
+    "Laminate material allocation and lot commitment",
+    3
+   ],
+   [
+    3,
+    "Substrate core, build-up layers and fine-line escape routing",
+    5
+   ],
+   [
+    4,
+    "Supplier line monitoring and lot-to-lot variability review",
+    7,
+    1
+   ],
+   [
+    5,
+    "Surface finish, solder resist and stiffener processing",
+    2.5
+   ],
+   [
+    6,
+    "Substrate electrical test, coplanarity and warpage screening",
+    2
+   ],
+   [
+    7,
+    "Incoming inspection and release of substrate lots to the OSAT",
+    2
+   ]
+  ],
+  "o": [
+   "Substrate stack-up and tooling released to the supplier",
+   "Laminate allocation and material lot commitment",
+   "Substrate build complete through escape routing",
+   "Supplier line monitoring and variability record",
+   "Surface finish and stiffener processing complete",
+   "Substrate electrical test, coplanarity and warpage data",
+   "Substrate lots released to assembly with traceability"
+  ],
+  "ob": [
+   1,
+   2,
+   3,
+   4,
+   5,
+   6,
+   7
+  ],
+  "r": [
+   [
+    "ASSY-D1",
+    "feeds"
+   ],
+   [
+    "ASSY-D2",
+    "feeds"
+   ]
+  ],
+  "ro": "Package engineer"
  },
  "EVB-01": {
   "st": "validationHardware",

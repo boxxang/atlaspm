@@ -89,7 +89,7 @@ describe('activity references in a write-up', () => {
 
 describe('which activities open a page', () => {
   it('knows the written ones and refuses everything else', () => {
-    expect(writtenActivities).toHaveLength(257);
+    expect(writtenActivities).toHaveLength(259);
     expect(hasActivityDetail('DEF-01')).toBe(true);
     expect(hasActivityDetail('MP-12')).toBe(true);
     /* the shape of a row ID, but no row has it */
@@ -116,7 +116,7 @@ describe('the table, the index and the write-ups name the same activities', () =
     const rows = journeyData.flatMap((s) =>
       s.engineeringView.map((_, i) => activityRowId(s.shortTitle, i)),
     );
-    expect(rows).toHaveLength(257);
+    expect(rows).toHaveLength(259);
     expect(rows.filter((id) => !hasActivityDetail(id))).toEqual([]);
   });
 

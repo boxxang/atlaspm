@@ -1058,8 +1058,8 @@ export const journeyData = [
   {
     id: "packaging", stage: 19, title: "Assembly & Package Build", shortTitle: "ASSY",
     tagline: "The journey leaves the die.",
-    description: "Stack, bond and build the units — known-good die, HBM stacks, underfill, lid — and learn the assembly yield on the parts bring-up and qualification will consume.",
-    activities: ["Known-good-die sort", "Bonding & underfill", "Inline inspection", "Unit allocation"],
+    description: "Build the package and then the units. The interposer and the substrate are ordered off the design freeze and take months, so they start long before the die exists; then stack, bond and build — known-good die, HBM stacks, underfill, lid — and learn the assembly yield on the parts bring-up and qualification will consume.",
+    activities: ["Interposer & substrate build", "Known-good-die sort", "Bonding & underfill", "Inline inspection", "Unit allocation"],
     /* Listed in the order this stage's plan produces them. */
     deliverables: [
       "Assembly travelers and process data",
@@ -1077,20 +1077,27 @@ export const journeyData = [
       "X-Ray, CSAM, and Warpage Inline Inspection",
       "Assembly Yield Analysis and Process Tuning",
       "Package-Level Open / Short and Continuity Test",
-      "Unit Build and Allocation for Bring-Up, Qualification, and Samples"
+      "Unit Build and Allocation for Bring-Up, Qualification, and Samples",
+      "Production Silicon Interposer Fabrication",
+      "Production Package Substrate Build"
     ],
     /** Elapsed weeks per engineering activity; negative marks one that runs continuously. */
-    engineeringTat: [3, 3, 3, 3, 2, 2, 5, 2, 3],
-    engineeringEffort: [5, 2, 6, 5, 3, 3, 6, 3, 3],
-    /* The plan this stage runs to, in weeks from its start. Eight weeks of line work: known-good die and HBM in at the start, bonding and assembly through the middle, and the units out at the end. */
-    engineeringStart: [0, 0, 2, 3, 5, 3, 3, 6, 5],
+    engineeringTat: [3, 3, 3, 3, 2, 2, 5, 2, 3, 20, 16],
+    engineeringEffort: [5, 2, 6, 5, 3, 3, 6, 3, 3, 8, 6],
+    /* The plan this stage runs to, in weeks from its start. The stage opens on the
+       package design freeze, not on wafer-out: the interposer and the substrate are
+       built first and take five months between them. The eight weeks of line work —
+       known-good die and HBM in, bonding and assembly through the middle, units out —
+       run at the end, on top of parts that now exist. */
+    engineeringStart: [23, 23, 25, 26, 28, 26, 26, 29, 28, 0, 0],
     /* Which activity produces each deliverable, and the week it is due. */
     deliverableFrom: [3, 4, 7, 6, 8],
-    deliverableWeek: [6, 7, 8, 8, 8],
+    deliverableWeek: [29, 30, 31, 31, 31],
     risks: ["Assembly yield", "Material availability", "Inspection escapes"],
     potentialRisks: [
       "Known-good-die test coverage insufficient",
       "HBM stack supply timing",
+      "Interposer or substrate lead time consuming the assembly slot",
       "Assembly running outside the frozen process window",
       "Unit allocation contended between bring-up and qual",
       "Yield learning starting on the first build"
