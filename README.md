@@ -3,8 +3,12 @@
 A semiconductor program-management tool (TPM view of an SoC program): roadmap,
 per-stage boards, deliverables, risks and a program dashboard.
 
-`reference/index.html` is the single-file prototype and the spec for this port —
-see `CLAUDE.md` and `PORTING_PLAN.md`.
+`design-canvas/atlaspm-prototype.html` is the single-file prototype and the spec
+for this port. `reference/index.html` was the spec for the original port and is
+now history — where the two disagree, the prototype wins. See `CLAUDE.md` and
+`PORTING_PLAN_V2.md`.
+
+Korean: [README.ko.md](README.ko.md).
 
 ## Getting started
 
@@ -23,7 +27,7 @@ npm run dev         # http://localhost:3000
 
 `npm run db:reset` pushes and reseeds — AtlasAX1 comes back exactly as it was.
 
-The seed's kickoff is 30 weeks before the day you seed, so "today" always lands
+The seed's kickoff is 66 weeks before the day you seed, so "today" always lands
 mid-program (in Physical Design), the way the prototype boots. Deliverables are
 dated across their stage rather than all on its last day, and finished ones are
 stamped a few days either side of their due date, so a seeded program reads like
@@ -36,7 +40,7 @@ the other stages carry the prototype's own content.
 
 | Script | What it does |
 | --- | --- |
-| `npm run dev` / `build` / `start` | Next.js |
+| `npm run dev` / `build` / `start` | Next.js. `build` runs `prisma db push` first |
 | `npm run lint` / `typecheck` | ESLint / `tsc --noEmit` |
 | `npm test` | Vitest — pure logic in `/src/lib` and `/src/data` |
 | `npm run e2e` | Playwright — see *Testing* below |
@@ -308,8 +312,8 @@ that is a read/write swap rather than a redesign.
 ## Testing
 
 ```bash
-npm test          # 173 unit tests: schedule engine, stages/profiles, derivations, effort, mail, purity
-npm run e2e       # 266 Playwright tests
+npm test          # 401 unit tests: schedule engine, stages/profiles, derivations, effort, mail, purity
+npm run e2e       # 147 Playwright tests
 ```
 
 The e2e suite runs against its own database (`atlaspm_test`) on port 3100, so it
@@ -331,7 +335,8 @@ and reduced-motion.
 
 ### Comparing against the prototype
 
-Open `reference/index.html` next to a production build (`npm run build && npm start`)
+Open the prototype next to a production build (`npm run build && npm start`) — it
+refuses `file://`, so serve it: `cd design-canvas && python3 -m http.server 8765`
 — a dev build adds Next's dev-tools badge, which is the only thing that differs.
 Page geometry was verified identical at 1920/1440/1280/1100/900/640: toolbar,
 roadmap, gantt, stage panel, boards and total page height all match to 0.1px.
@@ -339,22 +344,27 @@ roadmap, gantt, stage panel, boards and total page height all match to 0.1px.
 ## Deploying
 
 Auth is out of scope for this pass, so anything deployed is world-readable and
-world-writable. Put it behind access control before it holds anything real.
+world-writable. Put it behind access control before it holds anything real — or
+do not deploy it at all and run it on one machine instead, which is what
+[`local/`](local/README.md) is for.
 
-1. **Database.** Provision Postgres (Neon, Supabase, RDS). In
-   `prisma/schema.prisma` change the datasource to `provider = "postgresql"`,
-   and in `src/lib/db.ts` swap `PrismaBetterSqlite3` for
-   `@prisma/adapter-pg`. No model changes are needed.
-2. **Migrations.** Local dev uses `prisma db push`, which is fine for a schema
-   that is still moving. Before the first deploy, cut a baseline migration
-   (`prisma migrate dev --name init`) and run `prisma migrate deploy` on release
-   so production schema changes are reviewable and repeatable.
-3. **Environment.** Set `DATABASE_URL`. Nothing else is required.
-4. **Seed.** Run `prisma db seed` once against the new database, or write a real
-   project through the UI. The seed's kickoff is relative to the day it runs.
-5. **Vercel.** `npm run build` and `npm start` are the standard commands. The
-   `/` route is `force-dynamic` because it reads the database on every request,
-   so it will not be prerendered at build time.
+Vercel builds `main` from the GitHub repository, so a push to `main` is a
+release. Work on a branch, merge `--ff-only`, push.
+
+`npm run build` is `prisma db push && next build`, so a deploy carries its own
+schema. An additive change — a nullable column, one with a default, a new table
+— applies itself. A destructive one stops the build, which is the safety rather
+than a fault: a failed build leaves the last good deployment serving, so it
+costs nothing and buys the chance to move the data by hand first.
+
+There is no `prisma/migrations`. This repo is on declarative `db push`, and
+**`db push` moves no data, ever.**
+
+The `/` route is `force-dynamic` because it reads the database on every request,
+so it is not prerendered at build time.
+
+The full procedure, and the traps that were learned the expensive way, are in
+`CLAUDE.md` under *Shipping it*.
 
 ### Known accessibility gaps
 

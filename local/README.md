@@ -1,5 +1,7 @@
 # Running AtlasPM on your own machine
 
+> Korean: [README.ko.md](README.ko.md)
+
 The deployed copy is a demo. This is the one you put real work in: it runs on
 your machine, stores everything in a Postgres database on your machine, and
 never talks to anything else.
