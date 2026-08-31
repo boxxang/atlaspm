@@ -213,6 +213,35 @@ button.clip:hover{background:var(--accent-line)}
 /* ── outputs menu + attachments ──────────────────── */
 .menu{position:relative}
 .menu-pop.left{right:auto;left:0}
+/* ── dialogs and the communication board ─────────
+   Lifted from the app's globals.css so the two cannot drift. */
+.dlg{inset:0;margin:auto;width:min(620px,calc(100vw - 32px));max-height:calc(100vh - 64px);padding:0;border:none;
+  border-radius:var(--r-lg);background:var(--bg);color:var(--ink);box-shadow:var(--sh-pop);
+  display:flex;flex-direction:column;overflow:hidden}
+.dlg::backdrop{background:rgba(16,24,40,.32);backdrop-filter:blur(2px)}
+.dlg-hd{display:flex;align-items:center;gap:9px;padding:12px 16px;background:var(--sunken);
+  border-bottom:1px solid var(--line);flex-shrink:0}
+.dlg-body{padding:4px 18px 8px;overflow-y:auto;display:flex;flex-direction:column}
+.dlg-foot{display:flex;align-items:center;gap:8px;padding:11px 16px;background:var(--sunken);
+  border-top:1px solid var(--line);flex-shrink:0}
+.dlg-field{display:block;padding:13px 0;border-bottom:1px solid var(--line-soft)}
+.dlg-field:last-child{border-bottom:none}
+.dlg-label{display:block;font-size:12.5px;font-weight:600}
+.dlg-hint{display:block;font-size:11.5px;line-height:1.45;color:var(--ink-3);margin-top:2px;
+  max-width:64ch}
+.dlg-control{display:flex;align-items:center;gap:9px;flex-wrap:wrap;margin-top:8px}
+.post-head{display:flex;gap:11px;align-items:flex-start;padding:14px 0 10px;border-bottom:1px solid var(--line-soft)}
+.post-body-txt{margin:11px 0 4px;font-size:13.5px;line-height:1.6;color:var(--ink);
+  white-space:pre-wrap;overflow-wrap:break-word;max-width:74ch}
+.board-comments{display:flex;flex-direction:column;gap:13px;margin-top:9px}
+.board-comment{display:flex;gap:9px;align-items:flex-start}
+.board-comment .post-body-txt{font-size:13px;margin:3px 0 0;color:var(--ink-2)}
+.board-comment-acts{display:flex;gap:11px;margin-top:4px}
+.board-comment-acts button{background:none;border:none;padding:0;cursor:pointer;
+  font-size:11.5px;color:var(--ink-3);font-family:inherit}
+.board-comment-acts button:hover{color:var(--ink)}
+.board-comment-acts button.dng:hover{color:var(--risk)}
+.cbx{width:14px;height:14px;accent-color:var(--accent);cursor:pointer;margin:3px 0 0}
 .menu-pop{position:absolute;right:0;top:calc(100% + 5px);z-index:20;min-width:224px;background:var(--bg);border:1px solid var(--line);border-radius:var(--r-lg);box-shadow:var(--sh-pop);padding:5px}
 .mi{display:flex;align-items:flex-start;gap:9px;padding:7px 9px;border-radius:var(--r-sm);font-size:12.5px;text-align:left;width:100%}
 .mi:hover{background:var(--accent-wash)}
@@ -445,6 +474,14 @@ ST.people = ST.people || {}; ST.newPeople = ST.newPeople || []; ST.gone = ST.gon
    the ones taken back out, and whatever is attached to each */
 ST.tlRow = ST.tlRow || "normal";
 ST.notes = ST.notes || []; ST.noteEdits = ST.noteEdits || {}; ST.noteGone = ST.noteGone || {}; ST.noteAtt = ST.noteAtt || {};
+/* the communication board: posts written here, edits to the ones seeded with the
+   programme, the ones taken back out, and the same three for their comments */
+ST.bPosts = ST.bPosts || []; ST.bEdits = ST.bEdits || {}; ST.bGone = ST.bGone || {};
+ST.bComments = ST.bComments || []; ST.bCommentEdits = ST.bCommentEdits || {}; ST.bCommentGone = ST.bCommentGone || {};
+/* Which post is open, and what is half-typed in it, is where the reader is
+   standing rather than anything the programme knows. It is cleared on load: a
+   window that reopened itself on every reload would block the page it is on. */
+ST.bWin = null; ST.bCommentEditing = null; ST.bCommentDraft = "";
 /* what has been handed over for a key deliverable, and what was said about it */
 /* One handover post per key deliverable: what was handed over, what came with it, the
    date it was accepted, and the conversation about it. Attachments and comments used to
@@ -737,7 +774,28 @@ function inFlightStep(key){
   }
   return open || any;
 }
-const freeItems = st => (itemsByStage[st] || []).filter(i => i.kind === "activity");
+/* One list for the communication board: what the programme was seeded with, with
+   any edits laid over it, plus what has been posted here since — and without what
+   has been taken back out. Same shape as the key-info board below it. */
+function freeItems(st){
+  const seeded = (itemsByStage[st] || []).filter(i => i.kind === "activity");
+  const mine = ST.bPosts.filter(i => i.stageId === st);
+  return seeded.concat(mine)
+    .filter(i => !ST.bGone[i.id])
+    .map(i => ST.bEdits[i.id] ? Object.assign({}, i, ST.bEdits[i.id]) : i);
+}
+/* A post's comments, oldest first: a conversation is read in the order it happened. */
+function commentsOf(id){
+  const seeded = (updatesByItem[id] || []);
+  const mine = ST.bComments.filter(c => c.itemId === id);
+  return seeded.concat(mine)
+    .filter(c => !ST.bCommentGone[c.id])
+    .map(c => ST.bCommentEdits[c.id] ? Object.assign({}, c, { text: ST.bCommentEdits[c.id] }) : c)
+    .sort((x, y) => new Date(x.createdAt) - new Date(y.createdAt));
+}
+/* What a post is about, in the words the board prints. */
+function aboutOf(i){ return i.activityRef ? (i.stepN ? i.activityRef + " · step " + i.stepN : i.activityRef) : null; }
+const posterOf = i => i.author || i.owner || "";
 const keyItems  = st => (itemsByStage[st] || []).filter(i => i.kind === "keyinfo");
 /* One list for the key-info board: what the programme was seeded with (with any edits
    laid over it) and what has been written here since. Newest first — a board people
@@ -1798,9 +1856,14 @@ VIEWS.stage = function(){
     '<div class="seg-ctl"><button data-stage="'+(STAGES[Math.max(0,s.order-1)].key)+'">‹</button><button data-stage="'+(STAGES[Math.min(22,s.order+1)].key)+'">›</button></div>'+
     '<button class="btn pri sm"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4"><path d="M12 5v14M5 12h14"/></svg>New</button>';
 
-  const tabs = [["activity","Activity",acts.length],["comms","Communication board",free.length],
+  /* The board sits last and says N/A: it is where a stage gets talked about,
+     and the tool is one TPM's, so there is nobody to talk to yet. It keeps its
+     place rather than being hidden — it is the first thing that becomes real
+     when a second person arrives. */
+  const tabs = [["activity","Activity",acts.length],
     ["keyinfo","Key info",ki.length],["risks","Risks",rk],
-    ["deliverables","Key deliverables",dl.filter(delivDone).length+"/"+dl.length],["updates","Updates",upd],["team","Team",ct.length]];
+    ["deliverables","Key deliverables",dl.filter(delivDone).length+"/"+dl.length],["updates","Updates",upd],["team","Team",ct.length],
+    ["comms","Communication board (N/A)",free.length]];
   const header =
     '<div style="padding:18px 20px 0">'+
       /* the dashboard below says all of this, with the numbers behind it */
@@ -1819,10 +1882,7 @@ VIEWS.stage = function(){
       '<input class="lnkin" id="nq" style="width:270px;flex-grow:0" autocomplete="off" placeholder="Filter these notes…">'+
       '<button class="btn pri sm" data-notenew="'+key+'"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4"><path d="M12 5v14M5 12h14"/></svg>New note</button>'+
       '<span style="flex-grow:1"></span><span style="font-size:12px;color:var(--ink-3)">'+ki.length+' note'+(ki.length===1?"":"s")+' · what this programme has taught so far</span></div>'
-    : tab === "comms"
-    ? '<div class="filterbar"><button class="btn sm">Status: All</button><button class="btn sm">Owner: All</button>'+
-      '<button class="btn pri sm"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4"><path d="M12 5v14M5 12h14"/></svg>New entry</button>'+
-      '<span style="flex-grow:1"></span><span style="font-size:12px;color:var(--ink-3)">Work this programme is tracking that the template does not name</span></div>'
+    /* the communication board builds its own bar, next to the table it belongs to */
     : "";
   let body = "";
   if (tab === "activity")      body = stageActivity(key);
@@ -1833,7 +1893,14 @@ VIEWS.stage = function(){
   else if (tab === "updates")  body = updatesFor(key);
   else if (tab === "team")     body = teamFor(key);
 
-  $("#view").innerHTML = header + fbar + body;
+  $("#view").innerHTML = header + fbar + body + boardWindow();
+  /* A post window belongs in the top layer, so the row it was opened from stays
+     where it was. Escape closes it, as it does every other dialog. */
+  const bw = $("[data-bwin]");
+  if (bw && !bw.open) {
+    bw.showModal();
+    bw.addEventListener("cancel", ev => { ev.preventDefault(); ST.bWin = null; render(); });
+  }
   renderRail(key, s, steps, done, dl);
 };
 /* A stage read in one line each: how much of the work is done, how much of the window
@@ -1897,9 +1964,17 @@ function stageStateLabel(s){
   return "In flight · week "+w+" of "+t;
 }
 function stageActivity(key){
-  const acts = actsByStage[key] || [];
+  /* Start-ordered, because a stage reads as a plan. Template order is a logical
+     grouping — the main flow, then the long-running work that watches it — and it
+     put the assembly stage's first activity, the interposer and substrate build,
+     at the bottom. Sorted here rather than in the index: reference IDs come from
+     position, so reordering the index would renumber the stage. */
+  const acts = (actsByStage[key] || []).slice().sort((x,y) => {
+    const [xs,xe] = actWindow(x), [ys,ye] = actWindow(y);
+    return xs - ys || xe - ye || x.localeCompare(y);
+  });
   const COLS = [["chk",16,""],["ref",72,"REF"],["title",null,"ACTIVITY"],["steps",128,"STEPS"],
-                ["delivers",92,"DELIVERS"],["ends",80,"ENDS"],["lead",148,"LEAD ROLE"]];
+                ["delivers",92,"DELIVERS"],["starts",80,"STARTS"],["ends",80,"ENDS"],["lead",148,"LEAD ROLE"]];
   const anyOpen = acts.some(id => SEL && SEL.exp === id);
   let out = '<div class="ctable'+(anyOpen?" focused":"")+'" style="--ct:'+ctVar("act",COLS)+'">'+cthead("act",COLS);
   for (const id of acts) {
@@ -1911,6 +1986,7 @@ function stageActivity(key){
       '<span class="ell" style="display:flex;align-items:center;gap:7px;'+(st.k==="done"?"color:var(--ink-2)":"")+(st.risky?";font-weight:600":"")+'">'+(st.risky?'<span class="dot" style="background:var(--risk)"></span>':"")+esc(a.t)+'</span>'+
       '<span style="display:flex;align-items:center;gap:8px">'+segFor(id)+stateChip(st)+'</span>'+
       '<span style="justify-self:start;min-width:0">'+(refs[0]?'<span class="pill" style="font-size:10.5px">'+esc(refs[0])+'</span>':"")+'</span>'+
+      '<span class="num" style="font-size:12.5px;color:var(--ink-3)">'+fmtShort(ws)+'</span>'+
       '<span class="num" style="font-size:12.5px;color:var(--ink-2)">'+fmtShort(we)+'</span>'+
       '<span class="ell" style="font-size:12px;color:var(--ink-3)">'+esc(owner)+'</span>'+
     '</button>';
@@ -1920,37 +1996,138 @@ function stageActivity(key){
 }
 /* Everything people added on this programme: not in the template, no steps, its own
    thread. This is where the stage actually gets talked about. */
+/**
+ * The communication board: where the people on this programme talk to each other.
+ *
+ * Not a work list — the Activity tab is the work. The two facts a post is useless
+ * without are the ones the table leads with: what it is about, and who raised it.
+ * ABOUT is the post's own claim rather than a guess at one, and POSTED BY is who
+ * opened the thread, which is not always who is carrying it.
+ *
+ * Opening a post opens it as a window. Reading a thread is not something to do in
+ * a table row, and edit and delete belong behind the read rather than on the row
+ * where they would be hit while scanning.
+ */
 function stageComms(key){
   const items = freeItems(key);
-  if (!items.length) return '<div class="empty"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#d8dade" stroke-width="1.5"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>'+
-    '<p class="mono-note" style="max-width:48ch">Nothing added on this programme yet. The Activity tab holds the '+(actsByStage[key]||[]).length+' activities the template names; anything else this stage needs to track goes here.</p></div>';
-  const COLS = [["chk",16,""],["title",null,"ENTRY"],["match",128,"MATCHES"],["delivers",108,"DELIVERS"],["due",84,"DUE"],["owner",120,"OWNER"]];
-  return '<div class="ctable" style="--ct:'+ctVar("comms",COLS)+'">'+cthead("comms",COLS)+
+  const COLS = [["chk",16,""],["title",null,"POST"],["about",132,"ABOUT"],["by",132,"POSTED BY"],["comments",76,"COMMENTS"],["due",84,"DUE"]];
+  const head =
+    '<div class="filterbar">'+
+      '<button class="btn pri sm" data-bnew><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4"><path d="M12 5v14M5 12h14"/></svg>New post</button>'+
+      '<span style="flex-grow:1"></span>'+
+      '<span style="font-size:12px;color:var(--ink-3)">What the people on this stage are asking each other</span>'+
+    '</div>';
+  if (!items.length) return head +
+    '<div class="empty"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#d8dade" stroke-width="1.5"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>'+
+    '<p class="mono-note" style="max-width:52ch">Nothing posted on this stage yet. This is where the people on the programme talk to each other — a decision that needs making, an answer needed from another team, something the rest of the stage has to know.</p></div>';
+  return head + '<div class="ctable" style="--ct:'+ctVar("comms",COLS)+'">'+cthead("comms",COLS)+
     items.map(i => {
-      const ups = (updatesByItem[i.id]||[]).slice().sort((x,y)=> new Date(y.createdAt)-new Date(x.createdAt));
-      const guess = guessAct(i.title, key), late = isOverdue(i);
+      const ups = commentsOf(i.id).slice().reverse();
+      const late = isOverdue(i), about = aboutOf(i), who = posterOf(i);
       const dref = i.deliverableId ? SEED.deliverables.find(d=>d.id===i.deliverableId) : null;
-      return '<button class="trow'+(SEL&&SEL.item===i.id?" on":"")+'" data-item="'+i.id+'" style="align-items:start;padding-top:10px;padding-bottom:10px">'+
-        '<span class="dot" style="background:'+(i.done?"var(--ok)":late?"var(--risk)":"var(--st-run)")+';margin-top:5px"></span>'+
-        '<span style="min-width:0"><span class="ell" style="display:block;font-weight:500">'+esc(i.title)+'</span>'+
+      return '<div class="trow" data-bopen="'+i.id+'" style="align-items:start;padding-top:10px;padding-bottom:10px">'+
+        '<span data-bdone="'+i.id+'" style="margin-top:2px;display:inline-flex"><input type="checkbox" class="cbx"'+(i.done?" checked":"")+' aria-label="Settled"></span>'+
+        '<span style="min-width:0"><span class="ell" style="display:block;font-weight:500'+(i.done?";color:var(--ink-2)":"")+'">'+esc(i.title)+'</span>'+
           (ups.length
             ? '<span style="display:flex;align-items:baseline;gap:7px;margin-top:3px"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#b4b7bd" stroke-width="2" style="flex-shrink:0"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>'+
               '<span class="num" style="font-size:11px;color:var(--ink-4);flex-shrink:0">'+fmtShort(new Date(ups[0].createdAt))+'</span>'+
-              '<span class="ell" style="font-size:12.5px;color:var(--ink-2)">'+esc(ups[0].text)+'</span></span>'
-            : '<span style="display:block;font-size:12px;color:var(--ink-4);margin-top:3px">No updates yet</span>')+
+              '<span class="ell" style="font-size:12.5px;color:var(--ink-2)">'+(ups[0].author?esc(ups[0].author)+": ":"")+esc(ups[0].text)+'</span></span>'
+            : '<span style="display:block;font-size:12px;color:var(--ink-4);margin-top:3px">No replies yet</span>')+
         '</span>'+
-        '<span style="justify-self:start">'+(guess?'<span class="pill acc" style="font-size:10.5px">'+esc(guess)+' · link?</span>':'<span style="font-size:11.5px;color:var(--ink-4)">—</span>')+'</span>'+
-        '<span style="justify-self:start;min-width:0">'+(dref
-          ? (delivRef(dref)
-             ? '<span class="pill" style="font-size:10.5px" title="'+esc(dref.title)+'">'+esc(delivRef(dref))+'</span>'
-             : '<span class="ell" style="font-size:11.5px;color:var(--ink-3)" title="'+esc(dref.title)+'">'+esc(dref.title)+'</span>')
-          : '<span style="font-size:11.5px;color:var(--ink-4)">—</span>')+'</span>'+
+        '<span style="justify-self:start;min-width:0">'+(about
+          ? '<span class="pill acc" style="font-size:10.5px">'+esc(about)+'</span>'
+          : '<span style="font-size:11.5px;color:var(--ink-4)">Stage-wide</span>')+
+          (dref && delivRef(dref) ? '<span class="pill" style="font-size:10px;margin-top:3px" title="'+esc(dref.title)+'">'+esc(delivRef(dref))+'</span>' : "")+'</span>'+
+        '<span style="display:flex;align-items:center;gap:6px;min-width:0">'+(who?av(who,true)+'<span class="ell" style="font-size:12px;color:var(--ink-2)">'+esc(who)+'</span>':"")+'</span>'+
+        '<span class="num" style="font-size:12.5px;color:var(--ink-3)">'+(ups.length||"—")+'</span>'+
         '<span class="num" style="font-size:12.5px;color:'+(late?"var(--risk)":"var(--ink-2)")+'">'+(i.due?fmtShort(new Date(i.due)):"—")+'</span>'+
-        '<span style="display:flex;align-items:center;gap:6px;min-width:0">'+(i.owner?av(i.owner,true)+'<span class="ell" style="font-size:12px;color:var(--ink-2)">'+esc(i.owner)+'</span>':"")+'</span>'+
-      '</button>';
+      '</div>';
     }).join("")+
-    '<div class="trow" style="color:var(--ink-4)"><span></span><span>Add an entry this stage needs to track…</span><span></span><span></span><span></span><span></span></div>'+
+    '<div class="trow" data-bnew style="color:var(--ink-4)"><span></span><span>Post something to this stage…</span><span></span><span></span><span></span><span></span></div>'+
     '</div>';
+}
+
+/**
+ * One post, as a window: what was said, what it is about, who said it, and the
+ * conversation under it. Reading is the default and editing is a mode — a board
+ * is read far more often than it is written.
+ */
+function boardWindow(){
+  const w = ST.bWin; if (!w) return "";
+  const key = w.stage, acts = actsByStage[key] || [];
+  const item = w.id ? freeItems(key).find(i => i.id === w.id) : null;
+  if (w.id && !item) return "";
+  const editing = w.edit || !w.id;
+  const d = w.draft || {};
+  const steps = d.activityRef ? stepDates(d.activityRef) : [];
+  const about = item ? aboutOf(item) : null;
+  const body =
+    editing
+      ? '<label class="dlg-field"><span class="dlg-label">Subject</span>'+
+          '<span class="dlg-hint">What somebody scanning the board needs to see.</span>'+
+          '<span class="dlg-control"><input class="lnkin" data-bf="title" style="flex-grow:1;font-weight:600" value="'+esc(d.title||"")+'"></span></label>'+
+        '<label class="dlg-field"><span class="dlg-label">Post</span>'+
+          '<span class="dlg-hint">What you are asking, deciding or telling the rest of the stage.</span>'+
+          '<span class="dlg-control"><textarea class="notebody" data-bf="body" style="min-height:96px;width:100%">'+esc(d.body||"")+'</textarea></span></label>'+
+        '<label class="dlg-field"><span class="dlg-label">What it is about</span>'+
+          '<span class="dlg-hint">The activity this concerns, and the step of it if you know which. Leave it blank for something that belongs to the stage rather than to one piece of work.</span>'+
+          '<span class="dlg-control">'+
+            '<select class="lnkin" data-bf="activityRef"><option value="">Stage-wide</option>'+
+              acts.map(a => '<option value="'+a+'"'+(d.activityRef===a?" selected":"")+'>'+esc(a)+' — '+esc((ACTS[a]||{}).t||"")+'</option>').join("")+
+            '</select>'+
+            '<select class="lnkin" data-bf="stepN"'+(d.activityRef?"":" disabled")+'><option value="">Any step</option>'+
+              steps.map(x => '<option value="'+x.n+'"'+(String(d.stepN)===String(x.n)?" selected":"")+'>Step '+x.n+' — '+esc(x.text)+'</option>').join("")+
+            '</select>'+
+          '</span></label>'+
+        '<label class="dlg-field"><span class="dlg-label">Owner and date</span>'+
+          '<span class="dlg-hint">Who is on it, and when it needs an answer. A post past its date shows as overdue.</span>'+
+          '<span class="dlg-control">'+
+            '<input class="lnkin" data-bf="owner" placeholder="Who is on it" value="'+esc(d.owner||"")+'">'+
+            '<input class="lnkin" type="date" data-bf="due" value="'+esc(d.due||"")+'">'+
+          '</span></label>'
+      : '<div class="post-head">'+av(posterOf(item))+
+          '<div style="min-width:0"><div style="font-weight:600;font-size:15px;line-height:1.35">'+esc(item.title)+'</div>'+
+          '<div style="font-size:12px;color:var(--ink-3);margin-top:2px">Posted by <b style="color:var(--ink-2)">'+esc(posterOf(item))+'</b> · '+fmt(new Date(item.updatedAt))+
+            (item.due?' · due '+fmt(new Date(item.due)):"")+'</div></div></div>'+
+        (item.body ? '<p class="post-body-txt">'+esc(item.body)+'</p>'
+                   : '<p class="mono-note" style="margin:10px 0">No detail was written — the subject is the whole post.</p>')+
+        (function(){
+          const cs = commentsOf(item.id);
+          return '<div class="dlg-field"><span class="dlg-label">'+(cs.length?cs.length+" comment"+(cs.length>1?"s":""):"Comments")+'</span>'+
+            '<div class="board-comments">'+
+              cs.map(c => '<div class="board-comment" data-bcomment="'+c.id+'">'+av(c.author||item.owner,true)+
+                '<div style="min-width:0;flex-grow:1">'+
+                  '<div style="font-size:11.5px;color:var(--ink-3)"><b style="color:var(--ink-2)">'+esc(c.author||item.owner)+'</b> · '+fmt(new Date(c.createdAt))+'</div>'+
+                  (ST.bCommentEditing === c.id
+                    ? '<textarea class="notebody" data-bcedit style="min-height:56px;width:100%;margin-top:4px">'+esc(c.text)+'</textarea>'+
+                      '<div style="display:flex;gap:6px;margin-top:5px"><button class="btn sm" data-bccancel>Cancel</button><button class="btn pri sm" data-bcsave="'+c.id+'">Save</button></div>'
+                    : '<p class="post-body-txt" style="margin:3px 0 0">'+esc(c.text)+'</p>'+
+                      '<div class="board-comment-acts"><button data-bcedit-open="'+c.id+'">Edit</button><button class="dng" data-bcdel="'+c.id+'">Delete</button></div>')+
+                '</div></div>').join("")+
+              '<div class="board-comment">'+av(ME,true)+
+                '<div style="flex-grow:1"><textarea class="notebody" data-bcnew placeholder="Reply to this post…" style="min-height:58px;width:100%">'+esc(ST.bCommentDraft||"")+'</textarea>'+
+                '<div style="display:flex;gap:7px;margin-top:6px;align-items:center"><span style="flex-grow:1"></span>'+
+                '<button class="btn pri sm" data-bcpost="'+item.id+'">Comment</button></div></div></div>'+
+            '</div></div>';
+        })();
+  return '<dialog class="dlg" data-bwin>'+
+    '<div class="dlg-hd"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#8b8f96" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>'+
+      '<span style="font-weight:600;font-size:13.5px">'+(w.id?"Post":"New post")+'</span>'+
+      (about?'<span class="pill acc" style="font-size:10.5px">'+esc(about)+'</span>':"")+
+      '<span style="flex-grow:1"></span><button class="btn sm" data-bclose>Close</button></div>'+
+    '<div class="dlg-body">'+body+'</div>'+
+    '<div class="dlg-foot">'+
+      (item && !editing
+        ? (w.asking
+            ? '<span style="font-size:12px;color:var(--ink-2)">Delete this post and its comments?</span>'+
+              '<button class="btn sm" data-bdelcancel>Keep</button><button class="btn sm dng" data-bdelok="'+item.id+'">Delete</button>'
+            : '<button class="btn sm dng" data-bdelask>Delete</button>')
+        : "")+
+      '<span style="flex-grow:1"></span>'+
+      (editing
+        ? '<button class="btn sm" data-bcancel>Cancel</button><button class="btn pri sm" data-bsave>'+(w.id?"Save post":"Post it")+'</button>'
+        : '<button class="btn sm" data-bedit>Edit</button>')+
+    '</div></dialog>';
 }
 function chev(open){ return '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="'+(open?"#5b5bd6":"#b4b7bd")+'" stroke-width="2.4">'+(open?'<path d="m6 9 6 6 6-6"/>':'<path d="m9 18 6-6-6-6"/>')+"</svg>"; }
 /* People retype a template activity in their own words — "Market & customer
@@ -2356,6 +2533,25 @@ function noteEditor(nt, key){
         '<button class="btn sm" data-notecancel>Cancel</button>'+
         '<button class="btn pri sm" data-notesave="'+(nt ? nt.id : "new:"+key)+'">Save note</button></div>'+
     '</div></div>';
+}
+/* Writing a post: a new one is appended to the overlay, an edit is laid over
+   the seeded row. Who raised it is stamped once and never rewritten — an edit
+   changes what the post says, not who is on the hook for having said it. */
+function saveBoardPost(){
+  const w = ST.bWin; if (!w) return;
+  const read = k => { const el = $('[data-bf="'+k+'"]'); return el ? el.value : ""; };
+  const f = { title: read("title").trim(), body: read("body"), owner: read("owner").trim(),
+              due: read("due") || null, activityRef: read("activityRef") || null,
+              stepN: read("activityRef") && read("stepN") ? Number(read("stepN")) : null };
+  if (!f.title) return;
+  if (w.id) { ST.bEdits[w.id] = Object.assign({}, ST.bEdits[w.id], f, { updatedAt:new Date().toISOString() });
+              w.edit = false; w.draft = null; }
+  else {
+    ST.bPosts.push(Object.assign({ id:"bp-"+Date.now(), stageId:w.stage, kind:"activity",
+      author:ME, done:false, deliverableId:null, updatedAt:new Date().toISOString() }, f));
+    ST.bWin = null;
+  }
+  save(); render();
 }
 function saveNote(target){
   const el = id => { const n = $("#"+id); return n ? n.value : ""; };
@@ -3009,7 +3205,8 @@ VIEWS.activities = function(){
           '<span class="ell">'+esc(ACTS[id].t)+'</span>'+
           '<span style="display:flex;align-items:center;gap:8px">'+segFor(id)+stateChip(st)+'</span>'+
           '<span class="num" style="font-size:12.5px;color:var(--ink-2)">'+fmtShort(ws)+'</span>'+
-          '<span class="num" style="font-size:12.5px;color:var(--ink-2)">'+fmtShort(we)+'</span>'+
+          '<span class="num" style="font-size:12.5px;color:var(--ink-3)">'+fmtShort(ws)+'</span>'+
+      '<span class="num" style="font-size:12.5px;color:var(--ink-2)">'+fmtShort(we)+'</span>'+
           '<span class="ell" style="font-size:12px;color:var(--ink-3)">'+esc(owner)+'</span></button>';
       }).join("");
   }).join("");
@@ -3145,7 +3342,7 @@ function head(title, extra, right){
 
 /* ═══ events ══════════════════════════════════════ */
 document.addEventListener("click", e => {
-  const t = e.target.closest("[data-goact],[data-stage-tab],[data-search],[data-go],[data-tl],[data-stage],[data-tab],[data-act],[data-item],[data-exp],[data-step],[data-deliv],[data-post],[data-read],[data-open],[data-close-peek],[data-stepsel],[data-closestep],[data-outmenu],[data-out],[data-addlink],[data-adddeliv],[data-rmatt],[data-poststep],[data-stepdone],[data-editpost],[data-delpost],[data-savepost],[data-canceledit],[data-canceldel],[data-confirmdel],[data-actsel],[data-gostep],[data-teamedit],[data-teamnew],[data-teamcancel],[data-teamsave],[data-teamremove],[data-riskopen],[data-replyto],[data-replycancel],[data-replysave],[data-delivopen],[data-delivclip],[data-delivattach],[data-delivlink],[data-delivlinkcancel],[data-delivaddlink],[data-rmdelivatt],[data-dpedit],[data-dpcancel],[data-dpsave],[data-dpdel],[data-dpdelcancel],[data-dpdelok],[data-drnewopen],[data-drnew],[data-drnewcancel],[data-dredit],[data-drsave],[data-drcancel],[data-drdel],[data-drdelcancel],[data-drdelok],[data-xf],[data-rowh],[data-stepduereset],[data-noteopen],[data-noteedit],[data-notenew],[data-notecancel],[data-notesave],[data-notedel],[data-noteattach],[data-notelink],[data-notelinkcancel],[data-noteaddlink],[data-rmnoteatt]");
+  const t = e.target.closest("[data-goact],[data-stage-tab],[data-search],[data-go],[data-tl],[data-stage],[data-tab],[data-act],[data-item],[data-exp],[data-step],[data-deliv],[data-post],[data-read],[data-open],[data-close-peek],[data-stepsel],[data-closestep],[data-outmenu],[data-out],[data-addlink],[data-adddeliv],[data-rmatt],[data-poststep],[data-stepdone],[data-editpost],[data-delpost],[data-savepost],[data-canceledit],[data-canceldel],[data-confirmdel],[data-actsel],[data-gostep],[data-teamedit],[data-teamnew],[data-teamcancel],[data-teamsave],[data-teamremove],[data-riskopen],[data-replyto],[data-replycancel],[data-replysave],[data-delivopen],[data-delivclip],[data-delivattach],[data-delivlink],[data-delivlinkcancel],[data-delivaddlink],[data-rmdelivatt],[data-dpedit],[data-dpcancel],[data-dpsave],[data-dpdel],[data-dpdelcancel],[data-dpdelok],[data-drnewopen],[data-drnew],[data-drnewcancel],[data-dredit],[data-drsave],[data-drcancel],[data-drdel],[data-drdelcancel],[data-drdelok],[data-xf],[data-rowh],[data-stepduereset],[data-noteopen],[data-noteedit],[data-notenew],[data-notecancel],[data-notesave],[data-notedel],[data-noteattach],[data-notelink],[data-notelinkcancel],[data-noteaddlink],[data-rmnoteatt],[data-bopen],[data-bdone],[data-bnew],[data-bclose],[data-bedit],[data-bcancel],[data-bsave],[data-bdelask],[data-bdelcancel],[data-bdelok],[data-bcpost],[data-bcedit-open],[data-bcsave],[data-bccancel],[data-bcdel]");
   /* a click anywhere off the attach menu puts it away */
   if ((OUTM || CLIPOPEN) && !e.target.closest(".menu")) { OUTM = CLIPOPEN = null; if (!t) return render(); }
   if (!t) return;
@@ -3175,6 +3372,46 @@ document.addEventListener("click", e => {
   if (t.hasAttribute("data-notenew")) { e.stopPropagation(); const k = t.getAttribute("data-notenew");
     clearPostUI(); NOTEED = "new:"+k; SEL = Object.assign({}, SEL, { note:null });
     render(); const f = $("#ntitle"); if (f) f.focus(); return; }
+  /* ── the communication board ─────────────────────────────
+     One window, held in ST.bWin: which post, whether it is being read or
+     edited, and the draft being typed. Every gesture writes the overlay and
+     re-renders, which is how the rest of this file works too. */
+  if (t.hasAttribute("data-bdone")) { e.stopPropagation(); const id = t.getAttribute("data-bdone");
+    const it = freeItems(ROUTE.a || STAGES[20].key).find(x => x.id === id); if (!it) return;
+    ST.bEdits[id] = Object.assign({}, ST.bEdits[id], { done: !it.done }); save(); return render(); }
+  if (t.hasAttribute("data-bopen")) { e.stopPropagation();
+    ST.bWin = { stage: ROUTE.a || STAGES[20].key, id: t.getAttribute("data-bopen"), edit:false };
+    ST.bCommentDraft = ""; ST.bCommentEditing = null; return render(); }
+  if (t.hasAttribute("data-bnew")) { e.stopPropagation();
+    ST.bWin = { stage: ROUTE.a || STAGES[20].key, id:null, edit:true, draft:{ title:"", body:"", owner:"", due:"", activityRef:"", stepN:"" } };
+    return render(); }
+  if (t.hasAttribute("data-bclose") || t.hasAttribute("data-bcancel")) { e.stopPropagation();
+    if (t.hasAttribute("data-bcancel") && ST.bWin && ST.bWin.id) { ST.bWin.edit = false; ST.bWin.draft = null; return render(); }
+    ST.bWin = null; return render(); }
+  if (t.hasAttribute("data-bedit")) { e.stopPropagation();
+    const it = freeItems(ST.bWin.stage).find(x => x.id === ST.bWin.id); if (!it) return;
+    ST.bWin.edit = true;
+    ST.bWin.draft = { title:it.title||"", body:it.body||"", owner:it.owner||"", due:it.due?String(it.due).slice(0,10):"",
+                      activityRef:it.activityRef||"", stepN:it.stepN==null?"":String(it.stepN) };
+    return render(); }
+  if (t.hasAttribute("data-bsave")) { e.stopPropagation(); return saveBoardPost(); }
+  if (t.hasAttribute("data-bdelask"))    { e.stopPropagation(); ST.bWin.asking = true;  return render(); }
+  if (t.hasAttribute("data-bdelcancel")) { e.stopPropagation(); ST.bWin.asking = false; return render(); }
+  if (t.hasAttribute("data-bdelok")) { e.stopPropagation();
+    ST.bGone[t.getAttribute("data-bdelok")] = true; ST.bWin = null; save(); return render(); }
+  if (t.hasAttribute("data-bcpost")) { e.stopPropagation();
+    const box = $("[data-bcnew]"), txt = box ? box.value.trim() : ""; if (!txt) return;
+    ST.bComments.push({ id:"bc-"+Date.now()+"-"+Math.round(Math.random()*1e4), itemId:t.getAttribute("data-bcpost"),
+                        text:txt, author:ME, createdAt:new Date().toISOString() });
+    ST.bCommentDraft = ""; save(); return render(); }
+  if (t.hasAttribute("data-bcedit-open")) { e.stopPropagation();
+    ST.bCommentEditing = t.getAttribute("data-bcedit-open"); return render(); }
+  if (t.hasAttribute("data-bccancel")) { e.stopPropagation(); ST.bCommentEditing = null; return render(); }
+  if (t.hasAttribute("data-bcsave")) { e.stopPropagation();
+    const box = $("[data-bcedit]"), txt = box ? box.value.trim() : ""; if (!txt) return;
+    ST.bCommentEdits[t.getAttribute("data-bcsave")] = txt; ST.bCommentEditing = null; save(); return render(); }
+  if (t.hasAttribute("data-bcdel")) { e.stopPropagation();
+    ST.bCommentGone[t.getAttribute("data-bcdel")] = true; save(); return render(); }
   if (t.hasAttribute("data-notecancel")) { e.stopPropagation(); NOTEED = NOTEDRAFT = null; return render(); }
   if (t.hasAttribute("data-notesave"))   { e.stopPropagation(); return saveNote(t.getAttribute("data-notesave")); }
   if (t.hasAttribute("data-notedel"))    { e.stopPropagation(); return deleteNote(t.getAttribute("data-notedel")); }
@@ -3303,6 +3540,15 @@ document.addEventListener("input", e => {
 });
 document.addEventListener("change", e => {
   if (!e.target.matches) return;
+  /* The post window is re-rendered from ST, so what has been typed has to live
+     there: every field writes the draft, and choosing an activity redraws so the
+     step picker can offer that activity's steps rather than staying shut. */
+  if (e.target.matches("[data-bf]") && ST.bWin) {
+    const k = e.target.getAttribute("data-bf");
+    ST.bWin.draft = Object.assign({}, ST.bWin.draft, { [k]: e.target.value });
+    if (k === "activityRef") { ST.bWin.draft.stepN = ""; return render(); }
+    return;
+  }
   if (e.target.matches("#stpct") && SEL && SEL.step) {
     const [id, n] = SEL.step.split(":");
     return setStepPct(id, +n, +e.target.value), render();
@@ -3327,6 +3573,12 @@ document.addEventListener("change", e => {
   }
 });
 document.addEventListener("input", e => {
+  if (e.target.matches && e.target.matches("[data-bf]") && ST.bWin) {
+    ST.bWin.draft = Object.assign({}, ST.bWin.draft, { [e.target.getAttribute("data-bf")]: e.target.value });
+    return;
+  }
+  if (e.target.matches && e.target.matches("[data-bcnew]")) { ST.bCommentDraft = e.target.value; return; }
+
   if (!e.target.matches) return;
   if (e.target.matches("#ed")) EDITTXT = e.target.value;
   else if (e.target.matches("#rp")) REPLYTXT = e.target.value;
