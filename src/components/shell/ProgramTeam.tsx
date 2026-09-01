@@ -9,7 +9,7 @@ import { peopleOf, TeamTable } from './TeamTable';
  * The same table as a stage's own Team tab under each heading, so a person is
  * added the same way wherever the question is asked.
  */
-export function ProgramTeam({ projectId }: { projectId: string }) {
+export function ProgramTeam() {
   const stages = useAppStore((s) => s.stages);
   const contacts = useAppStore((s) => s.contacts);
   const leaders = useAppStore((s) => s.leaders);

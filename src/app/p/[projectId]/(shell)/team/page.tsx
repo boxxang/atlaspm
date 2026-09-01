@@ -1,6 +1,7 @@
 import { ProgramTeam } from '@/components/shell/ProgramTeam';
 
-export default async function Team({ params }: PageProps<'/p/[projectId]/team'>) {
-  const { projectId } = await params;
-  return <ProgramTeam projectId={projectId} />;
+/* The programme is already in the store by the time the shell renders, so the
+   route parameter is not read here. */
+export default function Team() {
+  return <ProgramTeam />;
 }

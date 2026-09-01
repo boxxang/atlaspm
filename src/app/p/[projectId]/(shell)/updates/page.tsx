@@ -1,6 +1,7 @@
 import { UpdatesPage } from '@/components/shell/UpdatesPage';
 
-export default async function Updates({ params }: PageProps<'/p/[projectId]/updates'>) {
-  const { projectId } = await params;
-  return <UpdatesPage projectId={projectId} />;
+/* The programme is already in the store by the time the shell renders, so the
+   route parameter is not read here. */
+export default function Updates() {
+  return <UpdatesPage />;
 }

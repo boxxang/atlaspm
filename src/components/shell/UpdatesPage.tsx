@@ -16,10 +16,8 @@ import { Avatar } from './icons';
  * which.
  */
 export function UpdatesPage({
-  projectId,
   stageId,
 }: {
-  projectId: string;
   /** Given, this is the stage's own Updates tab rather than the programme's. */
   stageId?: string;
 }) {

@@ -14,7 +14,20 @@ const eslintConfig = defineConfig([
     "next-env.d.ts",
     // Generated Prisma client — vendor output, not source.
     "src/generated/**",
+    // Node scripts that build the activity library. Not app source, and not
+    // ESM: they are run with `node tools/...`, where `require` is the idiom.
+    "tools/**",
   ]),
+  {
+    rules: {
+      // `const { attachments: _a, ...rest } = row` is how a field is dropped;
+      // the binding it needs is not an unused variable.
+      "@typescript-eslint/no-unused-vars": [
+        "warn",
+        { argsIgnorePattern: "^_", varsIgnorePattern: "^_", ignoreRestSiblings: true },
+      ],
+    },
+  },
 ]);
 
 export default eslintConfig;

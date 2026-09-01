@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest';
-import { BUILTIN_PROFILE, stageMilestone } from '@/data/scheduleProfiles';
+import { BUILTIN_PROFILE } from '@/data/scheduleProfiles';
 import { computeSchedule } from '@/lib/schedule';
 import { kickoffForAnchor, pickStages, StageChoiceError } from '@/lib/customProfile';
-import type { MilestoneDef, ProfileStageDef } from '@/data/types';
+import type { ProfileStageDef } from '@/data/types';
 
 const stage = (
   key: string,
