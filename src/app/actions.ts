@@ -643,6 +643,8 @@ export async function createProject(input: {
       },
     },
   });
+  await copyActivities(input.profileId, profileId);
+
   const profile: ScheduleProfile = {
     ...template,
     id: profileId,
@@ -702,6 +704,48 @@ export async function deleteProject(projectId: string) {
 /* ---------- templates ---------- */
 
 /**
+ * Copy a profile's activities and their steps onto another profile.
+ *
+ * Refs survive the copy, which is the whole point: the copy shows the same
+ * write-ups, and a programme made from it records work against the same
+ * references its template names.
+ */
+async function copyActivities(fromProfileId: string, toProfileId: string) {
+  const rows = await prisma.profileActivity.findMany({
+    where: { profileId: fromProfileId },
+    orderBy: { order: 'asc' },
+    include: { steps: { orderBy: { n: 'asc' } } },
+  });
+  if (!rows.length) return;
+
+  await prisma.profileActivity.createMany({
+    data: rows.map((a) => ({
+      id: `${toProfileId}:act:${a.ref}`,
+      profileId: toProfileId,
+      stageKey: a.stageKey,
+      ref: a.ref,
+      order: a.order,
+      title: a.title,
+      windowFrom: a.windowFrom,
+      windowTo: a.windowTo,
+      baseRef: a.baseRef,
+    })),
+  });
+
+  const steps = rows.flatMap((a) =>
+    a.steps.map((s) => ({
+      id: `${toProfileId}:act:${a.ref}:${s.n}`,
+      activityId: `${toProfileId}:act:${a.ref}`,
+      n: s.n,
+      text: s.text,
+      tat: s.tat,
+      lane: s.lane,
+    })),
+  );
+  if (steps.length) await prisma.profileStep.createMany({ data: steps });
+}
+
+/**
  * Copy a template so it can be edited.
  *
  * The built-in one is read-only, so this is the only way to change what it
@@ -745,6 +789,7 @@ export async function duplicateProfile(input: {
       },
     },
   });
+  await copyActivities(input.sourceId, input.newId);
   revalidatePath('/');
   revalidatePath('/templates');
   return input.newId;
