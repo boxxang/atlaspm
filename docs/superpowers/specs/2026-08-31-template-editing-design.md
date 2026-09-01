@@ -88,12 +88,23 @@ start a programme from it — where "start a programme" now means copying the
 chosen template into a private profile for that programme rather than pointing at
 the template. This alone delivers "make my own template".
 
-**Phase 2 — activities.** Introduce `ProfileActivity`, seeded from the generated
-index with `baseRef` set for every built-in activity. Add, edit and delete
-activities in a template; programme creation copies the rows into that
-programme's private profile alongside its stages.
+**Phase 2 — activities and their steps, together.** Introduce `ProfileActivity`
+and `ProfileStep`, seeded from the generated index with `baseRef` set for every
+built-in activity. Add, edit and delete activities and the steps inside them;
+programme creation copies the rows into that programme's private profile
+alongside its stages.
 
-**Phase 3 — steps.** Introduce `ProfileStep` and the materialise-on-edit rule.
+These were two phases until the plan for the first one was written, and
+splitting them turned out to be wrong on two counts. An activity with no steps
+is not a usable thing in this app — steps carry the dates, the completion, the
+overdue and the risk, so an activity added without them is an empty row that
+cannot be filled until the next phase. And the eleven modules that read
+`activitySteps` would have to be refactored twice: once for a resolver that
+takes steps from code only, then again for one that takes them from code or the
+database. One resolver, one refactor, one phase.
+
+The cost is a wider surface to verify at once, which is what the split was
+protecting. That protection was worth less than the two problems it created.
 
 ## Reference identity
 
