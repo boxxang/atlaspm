@@ -1,8 +1,8 @@
 'use client';
 
+import { useProgramActivities } from './useProgramActivities';
 import { useMemo } from 'react';
 import { detailDeliverables } from '@/data/activityIndex';
-import { activitySteps } from '@/data/activitySteps';
 import { attention, type AttentionRow } from '@/lib/attention';
 import { deliverableStep } from '@/lib/deliverableStatus';
 import { useAppStore } from '@/store/useAppStore';
@@ -16,6 +16,7 @@ import { useProgramWork } from './useProgramWork';
  * hands it over — plus the stage ends that decide what closes before tapeout.
  */
 export function useAttention(limit: number): AttentionRow[] {
+  const activitySteps = useProgramActivities();
   const { overdue, upcoming, risks } = useProgramWork();
   const deliverables = useAppStore((s) => s.deliverables);
   const schedule = useAppStore((s) => s.schedule);
@@ -61,5 +62,5 @@ export function useAttention(limit: number): AttentionRow[] {
       upcoming,
       limit,
     });
-  }, [overdue, upcoming, risks, deliverables, schedule, today, limit]);
+  }, [activitySteps, overdue, upcoming, risks, deliverables, schedule, today, limit]);
 }

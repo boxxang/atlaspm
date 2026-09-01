@@ -4,6 +4,9 @@ import { create } from 'zustand';
 import * as api from '@/app/actions';
 import { BUILTIN_PROFILE, STAGE_ORDER } from '@/data/scheduleProfiles';
 import { RISK_AUTHOR } from '@/data/riskSeeds';
+import { activitySteps, type ActivityStepEntry } from '@/data/activitySteps';
+import { detailActivityTitles } from '@/data/activityIndex';
+import { resolveActivities, resolvedTitles } from '@/lib/resolveActivities';
 import type { ProgramPost, ProjectState } from '@/lib/projectState';
 import { resolveStages } from '@/lib/stages';
 import { rejectFile, rejectionMessage } from '@/lib/attachments';
@@ -82,6 +85,16 @@ export interface AppState {
    */
   posts: ProgramPost[];
 
+  /**
+   * The activities this program runs, resolved.
+   *
+   * Was a module constant shared by every program, which stopped being true
+   * once a template could be edited: two programs on two templates run
+   * different lists. The shape is unchanged, so every reader that took the
+   * constant takes this instead.
+   */
+  activities: Record<string, ActivityStepEntry>;
+  activityTitles: Record<string, string>;
   hydrate: (initial: ProjectState, now?: Date) => void;
   setProjectName: (name: string) => void;
   setKickoff: (d: Date) => void;
@@ -328,6 +341,8 @@ export const useAppStore = create<AppState>()((set, get) => ({
   stepStates: {},
   stepOutputs: {},
   posts: [],
+  activities: {},
+  activityTitles: {},
 
   /* Server-rendered DB state in, client clock applied here: "today" belongs to
      the viewer's timezone, so it cannot come from the server render.
@@ -364,6 +379,8 @@ export const useAppStore = create<AppState>()((set, get) => ({
     set({
       hydrated: true,
       projectId: initial.projectId,
+      activities: resolveActivities(initial.activities, activitySteps),
+      activityTitles: resolvedTitles(initial.activities, detailActivityTitles),
       today,
       projectName: initial.projectName,
       kickoff: initial.kickoff,

@@ -5,6 +5,9 @@ import { buildProjectState, type ProjectState } from './projectState';
 import { resolveStageDetail } from './stageDetail';
 import { resolveStages } from './stages';
 import { activitySteps } from '@/data/activitySteps';
+import { resolveActivities, type ActivityRow } from './resolveActivities';
+import { computeSchedule } from './schedule';
+import { fromStepIndex, plannedSteps } from './steps';
 
 const ATTACHMENT_META = { id: true, filename: true, mimeType: true, size: true } as const;
 import type {
@@ -19,7 +22,17 @@ export async function getProjectState(projectId: string): Promise<ProjectState |
   const project = await prisma.project.findUnique({
     where: { id: projectId },
     include: {
-      profile: { include: { stages: { orderBy: { order: 'asc' } } } },
+      profile: {
+        include: {
+          stages: { orderBy: { order: 'asc' } },
+          /* The program's own activities: which ones exist is a property of
+             the program now that a template can be edited. */
+          activities: {
+            orderBy: { order: 'asc' },
+            include: { steps: { orderBy: { n: 'asc' } } },
+          },
+        },
+      },
       overrides: true,
       leaders: true,
       /* metadata only — the bytes are streamed by /api/attachments/[id] */
@@ -100,6 +113,17 @@ export interface ProjectSummary {
    * count happens on the client and this is the input.
    */
   doneSteps: string[];
+  /**
+   * When each still-open step is due, as epoch milliseconds, sorted.
+   *
+   * The card counts how many of these are behind the viewer's own clock. It
+   * used to enumerate every activity in the browser to work that out, which
+   * stopped being possible once each program ran its own list — and computing
+   * the count here instead would have moved "today" to the server, which is
+   * exactly what the app refuses to do: an overdue count belongs to the
+   * timezone of whoever is looking at it.
+   */
+  openStepEnds: number[];
 }
 
 /* Which stage runs which activity — a property of the generated write-ups, not
@@ -112,7 +136,17 @@ export async function getProjectSummaries(): Promise<ProjectSummary[]> {
     prisma.project.findMany({
       orderBy: { createdAt: 'asc' },
       include: {
-        profile: { include: { stages: { orderBy: { order: 'asc' } } } },
+        profile: {
+        include: {
+          stages: { orderBy: { order: 'asc' } },
+          /* The program's own activities: which ones exist is a property of
+             the program now that a template can be edited. */
+          activities: {
+            orderBy: { order: 'asc' },
+            include: { steps: { orderBy: { n: 'asc' } } },
+          },
+        },
+      },
         overrides: true,
         stageDetails: {
           select: { stageId: true, engineeringView: true, engineeringEffort: true },
@@ -199,6 +233,7 @@ export async function getProjectSummaries(): Promise<ProjectSummary[]> {
       ],
       items: sum(items, p.id),
       doneSteps: [...mineDone],
+      openStepEnds: openStepEndsFor(p, mineDone),
     };
   });
 }
@@ -220,6 +255,69 @@ function programManMonths(
     return n + resolveStageDetail(stage, detail ?? null).manMonths;
   }, 0);
   return Math.round(total * 10) / 10;
+}
+
+
+/**
+ * When each of a programme's still-open steps is due.
+ *
+ * Resolved here because the activity list is the programme's own now, and the
+ * card must not have to hold every programme's whole index to print one
+ * number. What is sent is the dates, not the count: the count depends on
+ * "today", and today belongs to the browser.
+ */
+function openStepEndsFor(
+  p: {
+    kickoff: Date;
+    profile: {
+      id: string;
+      name: string;
+      builtin: boolean;
+      template: boolean;
+      stages: ProfileStageDef[];
+      activities?: {
+        ref: string;
+        stageKey: string;
+        order: number;
+        title: string;
+        windowFrom: number;
+        windowTo: number;
+        baseRef: string | null;
+        steps?: { n: number; text: string; tat: number; lane: string }[];
+      }[];
+    };
+  },
+  done: Set<string>,
+): number[] {
+  const rows: ActivityRow[] = (p.profile.activities ?? []).map((a) => ({
+    ref: a.ref,
+    stageKey: a.stageKey,
+    order: a.order,
+    title: a.title,
+    windowFrom: a.windowFrom,
+    windowTo: a.windowTo,
+    baseRef: a.baseRef ?? null,
+    steps: (a.steps ?? []).map((st) => ({ n: st.n, text: st.text, tat: st.tat, lane: st.lane })),
+  }));
+  const resolved = resolveActivities(rows, activitySteps);
+  const schedule = computeSchedule(p.kickoff, {
+    id: p.profile.id,
+    label: p.profile.name,
+    builtin: p.profile.builtin,
+    template: p.profile.template,
+    stages: p.profile.stages,
+  }, {});
+
+  const ends: number[] = [];
+  for (const [ref, a] of Object.entries(resolved)) {
+    const span = schedule.stages[a.st];
+    /* an activity whose stage this programme's profile does not run */
+    if (!span) continue;
+    for (const step of plannedSteps(span.start, fromStepIndex(ref, a))) {
+      if (!done.has(`${ref}:${step.n}`)) ends.push(step.end.getTime());
+    }
+  }
+  return ends.sort((x, y) => x - y);
 }
 
 /** Every profile a program can run on, oldest first, built-in leading. */

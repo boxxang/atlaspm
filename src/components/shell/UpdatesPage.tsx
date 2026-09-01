@@ -1,7 +1,7 @@
 'use client';
 
+import { useProgramActivities } from './useProgramActivities';
 import { detailActivityTitles } from '@/data/activityIndex';
-import { activitySteps } from '@/data/activitySteps';
 import { fmtDT } from '@/lib/schedule';
 import { useAppStore } from '@/store/useAppStore';
 import { Avatar } from './icons';
@@ -27,7 +27,8 @@ export function UpdatesPage({
   const content = useAppStore((s) => s.content);
   const stages = useAppStore((s) => s.stages);
 
-  const stageOfAct = (ref: string | null) => (ref ? (activitySteps[ref]?.st ?? null) : null);
+  const activitySteps = useProgramActivities();
+    const stageOfAct = (ref: string | null) => (ref ? (activitySteps[ref]?.st ?? null) : null);
 
   const fromPosts = posts.map((p) => ({
     id: p.id,

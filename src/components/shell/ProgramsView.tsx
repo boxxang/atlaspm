@@ -4,7 +4,6 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useEffect, useMemo, useRef, useState, useSyncExternalStore, useTransition } from 'react';
 import { createProject, deleteProject } from '@/app/actions';
-import { activitySteps } from '@/data/activitySteps';
 import { journeyData } from '@/data/journey';
 import { SEED_COST_PER_MAN_MONTH } from '@/data/projectSeed';
 import { BUILTIN_PROFILE, lifecyclePhases, stageMilestone } from '@/data/scheduleProfiles';
@@ -20,7 +19,8 @@ import {
 } from '@/lib/programList';
 import type { ProjectSummary } from '@/lib/queries';
 import { computeSchedule, fmtDate, fromISO, startOfDay, toISO, type Schedule } from '@/lib/schedule';
-import { fromStepIndex, plannedSteps } from '@/lib/steps';
+
+
 import {
   Avatar,
   IconEmptyList,
@@ -70,7 +70,7 @@ export function ProgramsView({
           tapeout: schedule.tapeout,
           openRisks: p.openRisks,
           staleRisks: p.staleRisks,
-          overdue: today ? overdueSteps(p, schedule, today) : 0,
+          overdue: today ? overdueSteps(p, today) : 0,
           progressPct: p.deliverablesTotal
             ? Math.round((p.deliverablesDone / p.deliverablesTotal) * 100)
             : 0,
@@ -373,17 +373,20 @@ function PickMenu<K extends string>({
  * an argument rather than reading the clock, because the toolbar needs the same
  * number for every program at once.
  */
-function overdueSteps(p: ProjectSummary, schedule: Schedule, today: Date): number {
-  const done = new Set(p.doneSteps);
-  let n = 0;
-  for (const [ref, a] of Object.entries(activitySteps)) {
-    const span = schedule.stages[a.st];
-    if (!span) continue;
-    for (const step of plannedSteps(span.start, fromStepIndex(ref, a))) {
-      if (step.end < today && !done.has(`${ref}:${step.n}`)) n++;
-    }
-  }
-  return n;
+/**
+ * How many of this programme's open steps are behind us.
+ *
+ * The dates come from the server, already resolved against the programme's own
+ * activity list; the comparison happens here, because "today" is the viewer's
+ * and not the server's. Counting in the browser used to mean holding every
+ * activity in the browser, which stopped being possible when each programme
+ * started running its own list.
+ */
+function overdueSteps(p: ProjectSummary, today: Date): number {
+  const now = today.getTime();
+  /* Sorted, so the first one at or after today ends the count. */
+  const at = p.openStepEnds.findIndex((t) => t >= now);
+  return at === -1 ? p.openStepEnds.length : at;
 }
 
 /** The stages whose window is open today. */
@@ -413,8 +416,8 @@ function useProgramFigures(p: ProjectSummary) {
   );
 
   const overdue = useMemo(
-    () => (today ? overdueSteps(p, schedule, today) : 0),
-    [today, p, schedule],
+    () => (today ? overdueSteps(p, today) : 0),
+    [today, p],
   );
   const inFlight = useMemo(
     () => (today ? stagesRunning(p, schedule, today) : []),

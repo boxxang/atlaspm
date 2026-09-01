@@ -1,6 +1,7 @@
 'use client';
 
-import { activitySteps } from '@/data/activitySteps';
+import { useMemo } from 'react';
+import { useProgramActivities } from './useProgramActivities';
 import { attachmentUrl } from '@/lib/attachments';
 import { deliverableStatus, deliverableStep, producerStarted } from '@/lib/deliverableStatus';
 import { fmtDate } from '@/lib/schedule';
@@ -35,12 +36,6 @@ const COLS: Col[] = [
   ['done', 88, 'COMPLETED'],
 ];
 
-const producers = Object.keys(activitySteps).map((ref) => ({
-  ref,
-  produces: activitySteps[ref].r.map(([id]) => id),
-  stepCount: activitySteps[ref].s.length,
-}));
-
 export function DeliverableTable({
   stageId,
   projectId,
@@ -50,6 +45,19 @@ export function DeliverableTable({
   projectId: string;
   list: readonly Deliverable[];
 }) {
+  const activitySteps = useProgramActivities();
+  /* Which activity hands over which deliverable — the programme's own list,
+     since a template can change it. */
+  const producers = useMemo(
+    () =>
+      Object.keys(activitySteps).map((ref) => ({
+        ref,
+        produces: activitySteps[ref].r.map(([id]) => id),
+        stepCount: activitySteps[ref].s.length,
+      })),
+    [activitySteps],
+  );
+
   const posts = useAppStore((s) => s.posts);
   const schedule = useAppStore((s) => s.schedule);
   const today = useAppStore((s) => s.today);

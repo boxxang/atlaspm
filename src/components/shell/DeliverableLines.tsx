@@ -1,7 +1,8 @@
 'use client';
 
+import { useProgramActivities } from './useProgramActivities';
+import { useMemo } from 'react';
 import Link from 'next/link';
-import { activitySteps } from '@/data/activitySteps';
 import { attachmentUrl } from '@/lib/attachments';
 import { deliverableStatus, deliverableStep } from '@/lib/deliverableStatus';
 import { fmtDate } from '@/lib/schedule';
@@ -23,12 +24,6 @@ import { useDeliverableRefs } from './useDeliverableRefs';
  * date, which is the mockup's wording: "PD-01 step 6 · due 09/26/2026" answers
  * where the work is, and a date on its own does not.
  */
-const producers = Object.keys(activitySteps).map((ref) => ({
-  ref,
-  produces: activitySteps[ref].r.map(([id]) => id),
-  stepCount: activitySteps[ref].s.length,
-}));
-
 export function DeliverableLines({
   title,
   list,
@@ -46,6 +41,18 @@ export function DeliverableLines({
   const schedule = useAppStore((s) => s.schedule);
   const today = useAppStore((s) => s.today);
   const select = useRailStore((s) => s.select);
+  const activitySteps = useProgramActivities();
+  /* Which activity hands over which deliverable, and how many steps it runs —
+     the programme's own list, since a template can change it. */
+  const producers = useMemo(
+    () =>
+      Object.keys(activitySteps).map((ref) => ({
+        ref,
+        produces: activitySteps[ref].r.map(([id]) => id),
+        stepCount: activitySteps[ref].s.length,
+      })),
+    [activitySteps],
+  );
 
   const span = schedule.stages[stageId];
   const refOf = useDeliverableRefs();

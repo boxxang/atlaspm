@@ -1,9 +1,9 @@
 'use client';
 
+import { useProgramActivities } from './useProgramActivities';
 import Link from 'next/link';
 import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { activitySteps } from '@/data/activitySteps';
 import { estimateCost } from '@/lib/effort';
 import { fmtDate, fmtDT } from '@/lib/schedule';
 import { useAppStore } from '@/store/useAppStore';
@@ -810,7 +810,8 @@ function RecentUpdates({ projectId }: { projectId: string }) {
   const content = useAppStore((s) => s.content);
   const stages = useAppStore((s) => s.stages);
 
-  const stageOfAct = (ref: string | null) => (ref ? (activitySteps[ref]?.st ?? null) : null);
+  const activitySteps = useProgramActivities();
+    const stageOfAct = (ref: string | null) => (ref ? (activitySteps[ref]?.st ?? null) : null);
   const fromPosts = posts.map((p) => ({
     id: p.id,
     at: p.editedAt ?? p.createdAt,

@@ -1,8 +1,7 @@
 'use client';
 
 import { useMemo } from 'react';
-import { activitySteps } from '@/data/activitySteps';
-import { detailActivityTitles } from '@/data/activityIndex';
+import { useProgramActivities, useProgramActivityTitles } from './useProgramActivities';
 import {
   activityState,
   fromStepIndex,
@@ -24,15 +23,6 @@ export interface StageActivity {
   delivers: readonly (readonly [string, string])[];
   /** What each step hands over, keyed by step number. */
   outputs: ReadonlyMap<number, string[]>;
-}
-
-/* The index is generated and never changes, so which activities a stage runs is
-   worked out once for the module rather than on every render. */
-const BY_STAGE = new Map<string, string[]>();
-for (const [ref, a] of Object.entries(activitySteps)) {
-  const list = BY_STAGE.get(a.st);
-  if (list) list.push(ref);
-  else BY_STAGE.set(a.st, [ref]);
 }
 
 /**
@@ -70,11 +60,24 @@ export function useStageSteps(stageId: string): StageActivity[] {
   const schedule = useAppStore((s) => s.schedule);
   const stepStates = useAppStore((s) => s.stepStates);
   const today = useAppStore((s) => s.today);
+  const activitySteps = useProgramActivities();
+  const detailActivityTitles = useProgramActivityTitles();
+  /* Which activities a stage runs is the programme's own list now, so it is
+     grouped per programme rather than once for the module. */
+  const byStage = useMemo(() => {
+    const m = new Map<string, string[]>();
+    for (const [ref, a] of Object.entries(activitySteps)) {
+      const list = m.get(a.st);
+      if (list) list.push(ref);
+      else m.set(a.st, [ref]);
+    }
+    return m;
+  }, [activitySteps]);
 
   return useMemo(() => {
     const span = schedule.stages[stageId];
     if (!span) return [];
-    return (BY_STAGE.get(stageId) ?? []).map((ref) => {
+    return (byStage.get(stageId) ?? []).map((ref) => {
       const entry = activitySteps[ref];
       const activity = fromStepIndex(ref, entry);
       const steps = resolveSteps(span.start, activity, stepStates);
@@ -97,12 +100,12 @@ export function useStageSteps(stageId: string): StageActivity[] {
         outputs,
       };
     }).sort(byStart);
-  }, [stageId, schedule, stepStates, today]);
+  }, [stageId, schedule, stepStates, today, activitySteps, detailActivityTitles, byStage]);
 }
 
 /** One activity, wherever it runs — for the rail, which is given a ref alone. */
 export function useActivitySteps(ref: string): StageActivity | null {
-  const entry = activitySteps[ref];
+  const entry = useProgramActivities()[ref];
   const stage = entry?.st ?? '';
   const all = useStageSteps(stage);
   return all.find((a) => a.ref === ref) ?? null;

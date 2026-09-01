@@ -8,6 +8,7 @@ import type {
   StageContent,
   StageId,
 } from '@/data/types';
+import type { ActivityRow } from '@/lib/resolveActivities';
 import type { StageOverrides } from '@/lib/schedule';
 import type { StageDetailOverride } from '@/lib/stageDetail';
 import { stepKey, type StepStateRecord } from '@/lib/steps';
@@ -22,6 +23,15 @@ export interface ProjectState {
   /** The program's profile, stages and all — which stages exist is a property
       of the program, not of the code. */
   profile: ScheduleProfile;
+  /**
+   * The activities this program runs, unresolved.
+   *
+   * Which activities exist is a property of the program too, now that a
+   * template can be edited: two programs on two templates run different lists.
+   * Resolved against the generated library by /lib/resolveActivities on the
+   * way into the store, so every reader keeps the shape it already had.
+   */
+  activities: ActivityRow[];
   costPerManMonth: number;
   currency: string;
   overrides: StageOverrides;
@@ -105,6 +115,17 @@ export const emptyLists = <T>(stageIds: readonly StageId[]): Record<StageId, T[]
 };
 
 /* ---------- row shapes, structural so this module stays client-safe ---------- */
+
+interface ProfileActivityRow {
+  ref: string;
+  stageKey: string;
+  order: number;
+  title: string;
+  windowFrom: number;
+  windowTo: number;
+  baseRef: string | null;
+  steps?: { n: number; text: string; tat: number; lane: string }[];
+}
 
 interface ItemRow {
   id: string;
@@ -222,6 +243,7 @@ export function buildProjectState(project: {
     builtin: boolean;
     template: boolean;
     stages: ProfileStageRow[];
+    activities?: ProfileActivityRow[];
   };
   overrides: OverrideRow[];
   items: ItemRow[];
@@ -233,6 +255,22 @@ export function buildProjectState(project: {
   attachments: StepAttachmentRow[];
   posts: ProgramPostRow[];
 }): ProjectState {
+  const activities: ActivityRow[] = (project.profile.activities ?? []).map((a) => ({
+    ref: a.ref,
+    stageKey: a.stageKey,
+    order: a.order,
+    title: a.title,
+    windowFrom: a.windowFrom,
+    windowTo: a.windowTo,
+    baseRef: a.baseRef ?? null,
+    steps: (a.steps ?? []).map((st) => ({
+      n: st.n,
+      text: st.text,
+      tat: st.tat,
+      lane: st.lane,
+    })),
+  }));
+
   const profile: ScheduleProfile = {
     id: project.profile.id,
     label: project.profile.name,
@@ -380,6 +418,7 @@ export function buildProjectState(project: {
   }
 
   return {
+    activities,
     projectId: project.id,
     projectName: project.name,
     kickoff: project.kickoff,

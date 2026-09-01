@@ -1,7 +1,7 @@
 'use client';
 
+import { useProgramActivities } from './useProgramActivities';
 import { useMemo } from 'react';
-import { activitySteps } from '@/data/activitySteps';
 import { openRisks, type DerivedRisk } from '@/lib/risks';
 import {
   allOverdue,
@@ -13,10 +13,6 @@ import {
   type ResolvedStep,
 } from '@/lib/steps';
 import { useAppStore } from '@/store/useAppStore';
-
-/* Which stage runs which activity never changes, so the join is built once. */
-const STAGE_OF: Record<string, string> = {};
-for (const [ref, a] of Object.entries(activitySteps)) STAGE_OF[ref] = a.st;
 
 /**
  * The programme's work, resolved once: every activity's steps, what is late,
@@ -35,12 +31,18 @@ export interface ProgramWork {
 }
 
 export function useProgramWork(): ProgramWork {
+  const activitySteps = useProgramActivities();
   const schedule = useAppStore((s) => s.schedule);
   const stepStates = useAppStore((s) => s.stepStates);
   const posts = useAppStore((s) => s.posts);
   const today = useAppStore((s) => s.today);
 
   return useMemo(() => {
+    /* Which stage runs which activity — the programme's own join now, since a
+       template decides which activities exist. */
+    const stageOf: Record<string, string> = {};
+    for (const [ref, a] of Object.entries(activitySteps)) stageOf[ref] = a.st;
+
     const resolved: { activity: ReturnType<typeof fromStepIndex>; steps: ResolvedStep[] }[] = [];
     for (const ref of Object.keys(activitySteps)) {
       const activity = fromStepIndex(ref, activitySteps[ref]);
@@ -54,7 +56,7 @@ export function useProgramWork(): ProgramWork {
       steps,
       overdue: allOverdue(resolved, today),
       upcoming: allUpcoming(resolved, today),
-      risks: openRisks(posts, doneStepKeys(steps), STAGE_OF),
+      risks: openRisks(posts, doneStepKeys(steps), stageOf),
     };
-  }, [schedule, stepStates, posts, today]);
+  }, [activitySteps, schedule, stepStates, posts, today]);
 }
