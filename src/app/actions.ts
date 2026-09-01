@@ -682,6 +682,132 @@ export async function deleteProject(projectId: string) {
   revalidatePath('/');
 }
 
+/* ---------- templates ---------- */
+
+/**
+ * Copy a template so it can be edited.
+ *
+ * The built-in one is read-only, so this is the only way to change what it
+ * says: take a copy under a name of your own and edit that. Duplicating is
+ * explicit rather than a fork that happens behind the edit, because a
+ * baseline that changes without anybody choosing it is not a baseline.
+ *
+ * Stage keys survive the copy, which is what lets a programme created from the
+ * copy inherit the same text, drawings and standard deliverables.
+ */
+export async function duplicateProfile(input: {
+  sourceId: string;
+  newId: string;
+  name: string;
+}): Promise<string> {
+  const name = input.name.trim();
+  if (!name) throw new Error('A template needs a name.');
+  await assertProfileNameFree(name);
+
+  const source = await loadProfile(input.sourceId);
+
+  await prisma.profile.create({
+    data: {
+      id: input.newId,
+      name,
+      builtin: false,
+      /* Listed in the pickers: the point of a copy is to start programmes on it. */
+      template: true,
+      stages: {
+        create: source.stages.map((st) => ({
+          id: `${input.newId}:${st.key}`,
+          key: st.key,
+          order: st.order,
+          title: st.title,
+          shortTitle: st.shortTitle,
+          phaseId: st.phaseId,
+          baseKey: st.baseKey,
+          startOffsetWeeks: st.startOffsetWeeks,
+          durationWeeks: st.durationWeeks,
+        })),
+      },
+    },
+  });
+  revalidatePath('/');
+  revalidatePath('/templates');
+  return input.newId;
+}
+
+/**
+ * Rewrite a template's stages.
+ *
+ * Distinct from `saveProjectStages`, which is about one programme and forks a
+ * private profile to protect the others. This edits a template in place,
+ * because that is what a template is for — and it refuses the built-in one,
+ * which is the baseline every schedule here was verified against.
+ */
+export async function saveProfileStages(input: {
+  profileId: string;
+  name?: string;
+  stages: StageInput[];
+}): Promise<void> {
+  const profile = await prisma.profile.findUnique({
+    where: { id: input.profileId },
+    select: { id: true, name: true, builtin: true },
+  });
+  if (!profile) throw new Error(`Unknown template: ${input.profileId}`);
+  if (profile.builtin) {
+    throw new Error('The built-in template is read-only. Duplicate it to make changes.');
+  }
+  if (!input.stages.length) throw new Error('A template needs at least one stage.');
+
+  const keys = new Set<string>();
+  for (const st of input.stages) {
+    if (!st.title.trim()) throw new Error('Every stage needs a title.');
+    if (keys.has(st.key)) throw new Error(`Duplicate stage: ${st.key}`);
+    keys.add(st.key);
+  }
+
+  const name = input.name?.trim();
+  if (name && name !== profile.name) await assertProfileNameFree(name);
+
+  await prisma.$transaction([
+    prisma.profileStage.deleteMany({ where: { profileId: profile.id } }),
+    prisma.profile.update({
+      where: { id: profile.id },
+      data: {
+        ...(name ? { name } : {}),
+        stages: {
+          create: input.stages.map((st, order) => ({
+            id: `${profile.id}:${st.key}`,
+            key: st.key,
+            order,
+            title: st.title.trim(),
+            shortTitle: st.shortTitle.trim() || st.title.trim().slice(0, 4).toUpperCase(),
+            phaseId: st.phaseId,
+            baseKey: st.baseKey,
+            startOffsetWeeks: st.startOffsetWeeks,
+            durationWeeks: st.durationWeeks,
+          })),
+        },
+      },
+    }),
+  ]);
+  revalidatePath('/');
+  revalidatePath('/templates');
+}
+
+/** Removing a template. The built-in one and any in use are refused. */
+export async function deleteProfile(profileId: string): Promise<void> {
+  const profile = await prisma.profile.findUnique({
+    where: { id: profileId },
+    select: { builtin: true, _count: { select: { projects: true } } },
+  });
+  if (!profile) throw new Error(`Unknown template: ${profileId}`);
+  if (profile.builtin) throw new Error('The built-in template cannot be deleted.');
+  if (profile._count.projects > 0) {
+    throw new Error(`${profile._count.projects} program(s) still run on this template.`);
+  }
+  await prisma.profile.delete({ where: { id: profileId } });
+  revalidatePath('/');
+  revalidatePath('/templates');
+}
+
 /* ---------- stage detail ---------- */
 
 /**
