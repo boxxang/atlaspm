@@ -99,6 +99,30 @@ Most of these redefine things the app already stores, so they are not additive:
   comments; steps, risks, notes and handovers are all "a post with attachments and
   replies", which is one shape, not four.
 
+## What the app has that the prototype does not
+
+Editing a schedule template — duplicating one, adding and removing its stages,
+and editing the activities and steps inside them — exists in the app and has no
+counterpart in the prototype. **Do not delete it as a divergence.** It was
+asked for directly, designed in
+`docs/superpowers/specs/2026-08-31-template-editing-design.md`, and built
+against that spec; the prototype simply never had the idea.
+
+It cannot be ported as things stand, and the reason is structural rather than
+effort. The prototype has one programme (`SEED.project`) and no notion of a
+profile at all — `profileId` and `Profile` appear nowhere in it, and its
+programme list, Filter, Sort and New program are drawn but inert. The rule the
+feature turns on is that **a programme copies its template at creation and is
+independent from then on**, and a file with one programme and no templates has
+nowhere to express it. Building the buttons anyway would be a mock-up of a
+mock-up: a control that cannot do the thing it names is worse than no control,
+and worse still in the file the app is supposed to be checked against.
+
+So the direction reversed here, once. The prototype leads on everything else,
+and where the two disagree about anything else it still wins. If it ever grows
+a programmes-and-templates model, port the screens then — the editors, the
+read-only built-in, and the copy at creation — and this note comes out.
+
 ## Derived values (never stored)
 
 Stage dates (kickoff + offsets), milestones (anchored to stage ends), progress %
