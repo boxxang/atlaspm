@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Fragment, useEffect, useRef, useState } from 'react';
 import {
@@ -62,6 +63,11 @@ export function TemplatesView({ profiles }: { profiles: TemplateRow[] }) {
   return (
     <div style={{ padding: '22px 26px', display: 'flex', flexDirection: 'column', gap: 16 }}>
       <div className="filterbar">
+        {/* The other half of the Templates button on the programs list: a screen
+            you can reach and not leave is a screen people stop opening. */}
+        <Link href="/" className="crumb" data-go-programs>
+          ‹ Programs
+        </Link>
         <h1 style={{ fontSize: 20, fontWeight: 640, margin: 0 }}>Templates</h1>
         <span style={{ flexGrow: 1 }} />
         <span style={{ fontSize: 12, color: 'var(--ink-3)' }}>
@@ -291,6 +297,9 @@ function StageDialog({
 }) {
   const box = useRef<HTMLDialogElement>(null);
   const [stages, setStages] = useState<ProfileStageDef[] | null>(null);
+  /* Renaming and re-staging are one act of editing this template, so they share
+     a form and a save rather than being two screens with two buttons. */
+  const [name, setName] = useState(label);
   const [acts, setActs] = useState<{ stageKey: string; shortTitle: string } | null>(null);
   const [err, setErr] = useState('');
   const [pending, setPending] = useState(false);
@@ -331,6 +340,7 @@ function StageDialog({
     try {
       await saveProfileStages({
         profileId,
+        name,
         stages: stages.map((st) => ({
           key: st.key,
           title: st.title,
@@ -357,7 +367,18 @@ function StageDialog({
       aria-label={`Stages of ${label}`}
     >
       <div className="dlg-hd">
-        <span style={{ fontWeight: 600, fontSize: 13.5 }}>{label}</span>
+        <input
+          className="lnkin"
+          style={{ fontWeight: 600, fontSize: 13.5, flexGrow: 1, maxWidth: 380 }}
+          aria-label="Template name"
+          autoComplete="off"
+          data-tpl-rename
+          value={name}
+          onChange={(e) => {
+            setErr('');
+            setName(e.target.value);
+          }}
+        />
         <span style={{ flexGrow: 1 }} />
         <button type="button" className="btn sm" onClick={onClose}>
           Close
@@ -495,7 +516,7 @@ function StageDialog({
           type="button"
           className="btn pri sm"
           data-tpl-save
-          disabled={pending || !stages}
+          disabled={pending || !stages || !name.trim()}
           onClick={submit}
         >
           {pending ? 'Saving…' : 'Save template'}

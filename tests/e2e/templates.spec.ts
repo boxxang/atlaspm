@@ -8,6 +8,7 @@ import { expect, test, type Page } from '@playwright/test';
  * the two things these tests hold still.
  */
 const NAME = 'E2E copy of Typical SoC';
+const RENAMED = 'E2E renamed template';
 
 const open = async (page: Page) => {
   await page.goto('/templates');
@@ -15,12 +16,15 @@ const open = async (page: Page) => {
 };
 
 const sweep = async (page: Page) => {
-  for (let i = 0; i < 4; i++) {
-    const stray = page.locator('[data-template]').filter({ hasText: NAME }).first();
+  for (let i = 0; i < 8; i++) {
+    const stray = page
+      .locator('[data-template]')
+      .filter({ hasText: /E2E (copy of Typical SoC|renamed template)/ })
+      .first();
     if (!(await stray.count())) return;
     await stray.locator('[data-tpl-ask]').click();
     await stray.locator('[data-tpl-delete]').click();
-    await expect(page.locator('[data-template]').filter({ hasText: NAME })).toHaveCount(0);
+    await expect(stray).toHaveCount(0);
   }
 };
 
@@ -170,5 +174,46 @@ test.describe('templates', () => {
        the deleted one's — that is what stops recorded work being repointed. */
     await expect(rows.nth(1)).toHaveAttribute('data-activity-row', thirdRef!);
     await expect(page.locator(`[data-activity-row="${secondRef}"]`)).toHaveCount(0);
+  });
+
+  /* Renaming and re-staging are one act of editing this template, so they share
+     a form and a save button rather than being two screens. */
+  test('renames the copy, and the new name survives a reload', async ({ page }) => {
+    await duplicate(page);
+    await page
+      .locator('[data-template]')
+      .filter({ hasText: NAME })
+      .locator('[data-edit-template]')
+      .click();
+    await expect(page.locator('[data-tpl-rename]')).toHaveValue(NAME);
+    await page.locator('[data-tpl-rename]').fill(RENAMED);
+    await page.locator('[data-stage-dialog] [data-tpl-save]').click();
+    await expect(page.locator('[data-stage-dialog]')).toHaveCount(0);
+
+    await expect(page.locator('[data-template]').filter({ hasText: RENAMED })).toHaveCount(1);
+    await open(page);
+    await expect(page.locator('[data-template]').filter({ hasText: RENAMED })).toHaveCount(1);
+    await expect(page.locator('[data-template]').filter({ hasText: NAME })).toHaveCount(0);
+  });
+
+  test('refuses a rename onto a name another template holds', async ({ page }) => {
+    await duplicate(page);
+    await page
+      .locator('[data-template]')
+      .filter({ hasText: NAME })
+      .locator('[data-edit-template]')
+      .click();
+    await page.locator('[data-tpl-rename]').fill('Typical SoC');
+    await page.locator('[data-stage-dialog] [data-tpl-save]').click();
+    await expect(page.locator('[data-stage-dialog] .err')).toBeVisible();
+    /* still open, still the copy — a refused save changes nothing */
+    await expect(page.locator('[data-stage-dialog]')).toHaveCount(1);
+  });
+
+  test('goes back to the programs list', async ({ page }) => {
+    await open(page);
+    await page.locator('[data-go-programs]').click();
+    await expect(page).toHaveURL(/\/$/);
+    await expect(page.locator('[data-program]').first()).toBeVisible();
   });
 });
