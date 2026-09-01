@@ -190,6 +190,9 @@ function ProgramTable({
           chosen={sort}
           onChoose={onSort}
         />
+        <Link href="/templates" className="btn sm" data-go-templates>
+          Templates
+        </Link>
         <button className="btn pri sm" type="button" data-new-project onClick={() => setAdding(true)}>
           <IconPlus light />
           New program
