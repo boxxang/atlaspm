@@ -5,7 +5,7 @@ import { buildProjectState, type ProjectState } from './projectState';
 import { resolveStageDetail } from './stageDetail';
 import { resolveStages } from './stages';
 import { activitySteps } from '@/data/activitySteps';
-import { resolveActivities, type ActivityRow } from './resolveActivities';
+import { inheritedActivities, resolveActivities, type ActivityRow } from './resolveActivities';
 import { computeSchedule } from './schedule';
 import { fromStepIndex, plannedSteps } from './steps';
 
@@ -299,7 +299,10 @@ function openStepEndsFor(
     baseRef: a.baseRef ?? null,
     steps: (a.steps ?? []).map((st) => ({ n: st.n, text: st.text, tat: st.tat, lane: st.lane })),
   }));
-  const resolved = resolveActivities(rows, activitySteps);
+  const resolved = resolveActivities(
+    rows.length ? rows : inheritedActivities(p.profile.stages.map((st) => st.key), activitySteps),
+    activitySteps,
+  );
   const schedule = computeSchedule(p.kickoff, {
     id: p.profile.id,
     label: p.profile.name,

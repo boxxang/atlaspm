@@ -8,7 +8,8 @@ import type {
   StageContent,
   StageId,
 } from '@/data/types';
-import type { ActivityRow } from '@/lib/resolveActivities';
+import { inheritedActivities, type ActivityRow } from '@/lib/resolveActivities';
+import { activitySteps } from '@/data/activitySteps';
 import type { StageOverrides } from '@/lib/schedule';
 import type { StageDetailOverride } from '@/lib/stageDetail';
 import { stepKey, type StepStateRecord } from '@/lib/steps';
@@ -255,7 +256,7 @@ export function buildProjectState(project: {
   attachments: StepAttachmentRow[];
   posts: ProgramPostRow[];
 }): ProjectState {
-  const activities: ActivityRow[] = (project.profile.activities ?? []).map((a) => ({
+  const storedActivities: ActivityRow[] = (project.profile.activities ?? []).map((a) => ({
     ref: a.ref,
     stageKey: a.stageKey,
     order: a.order,
@@ -270,6 +271,15 @@ export function buildProjectState(project: {
       lane: st.lane,
     })),
   }));
+
+  /* A profile written before activities were stored has stages and nothing
+     else. It falls back to what it was showing then rather than to nothing. */
+  const activities = storedActivities.length
+    ? storedActivities
+    : inheritedActivities(
+        project.profile.stages.map((st) => st.key),
+        activitySteps,
+      );
 
   const profile: ScheduleProfile = {
     id: project.profile.id,

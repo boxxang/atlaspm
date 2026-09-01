@@ -695,10 +695,35 @@ export async function createProject(input: {
   return input.id;
 }
 
-/** Cascades through items, updates, deliverables, leaders and contacts. */
+/**
+ * Cascades through items, updates, deliverables, leaders and contacts.
+ *
+ * And takes the programme's private stage list with it. Every programme now
+ * gets one at creation — that is the blueprint rule — so without this a
+ * deleted programme would leave a profile and its couple of hundred activity
+ * rows behind for nobody. A profile is only removed when it is the
+ * programme's own: not built-in, not published as a template, and not shared
+ * with another programme.
+ */
 export async function deleteProject(projectId: string) {
-  await prisma.project.delete({ where: { id: await assertProject(projectId) } });
+  const id = await assertProject(projectId);
+  const project = await prisma.project.findUnique({
+    where: { id },
+    select: { profileId: true },
+  });
+  await prisma.project.delete({ where: { id } });
+
+  if (project) {
+    const profile = await prisma.profile.findUnique({
+      where: { id: project.profileId },
+      select: { builtin: true, template: true, _count: { select: { projects: true } } },
+    });
+    if (profile && !profile.builtin && !profile.template && profile._count.projects === 0) {
+      await prisma.profile.delete({ where: { id: project.profileId } });
+    }
+  }
   revalidatePath('/');
+  revalidatePath('/templates');
 }
 
 /* ---------- templates ---------- */
