@@ -6,8 +6,25 @@
  * program on. Takes the client rather than importing it, so `prisma db seed`
  * (a plain script) and the server can share one implementation.
  */
+import { activitySteps } from '@/data/activitySteps';
+import { detailActivityTitles } from '@/data/activityIndex';
 import { BUILTIN_PROFILE } from '@/data/scheduleProfiles';
 import type { PrismaClient } from '@/generated/prisma/client';
+
+/** Every built-in activity, as the rows a profile carries. */
+const builtinActivities = Object.entries(activitySteps).map(([ref, a], order) => ({
+  ref,
+  stageKey: a.st,
+  order,
+  title: detailActivityTitles[ref] ?? ref,
+  windowFrom: a.w[0],
+  windowTo: a.w[1],
+  /* Inherited: the row carries the list and the schedule, and the steps and
+     write-up stay in the generated modules the browser already holds. Seeding
+     them is what lets a copy of this template be edited without first moving a
+     megabyte of authored prose into the database. */
+  baseRef: ref,
+}));
 
 export const BUILTIN_PROFILE_ID = BUILTIN_PROFILE.id;
 
@@ -15,7 +32,7 @@ export const BUILTIN_PROFILE_ID = BUILTIN_PROFILE.id;
 export async function ensureBuiltinProfile(prisma: PrismaClient): Promise<void> {
   const existing = await prisma.profile.findUnique({
     where: { id: BUILTIN_PROFILE.id },
-    include: { stages: true },
+    include: { stages: true, _count: { select: { activities: true } } },
   });
   /* The common case by far: it is already there and already matches. Reading
      first keeps every page render off the write path — and two renders racing
@@ -62,6 +79,16 @@ export async function ensureBuiltinProfile(prisma: PrismaClient): Promise<void> 
         key: { notIn: BUILTIN_PROFILE.stages.map((st) => st.key) },
       },
     });
+    /* Same rule as the stages: code is the source of truth for this one
+       profile, so the rows are written to match rather than merged. */
+    await prisma.profileActivity.deleteMany({ where: { profileId: BUILTIN_PROFILE.id } });
+    await prisma.profileActivity.createMany({
+      data: builtinActivities.map((a) => ({
+        id: `${BUILTIN_PROFILE.id}:act:${a.ref}`,
+        profileId: BUILTIN_PROFILE.id,
+        ...a,
+      })),
+    });
   } catch (e) {
     /* Another request wrote the same rows first — its version is this version. */
     if (!isUniqueViolation(e)) throw e;
@@ -84,9 +111,14 @@ function matches(stored: {
   builtin: boolean;
   template: boolean;
   stages: StoredStage[];
+  _count: { activities: number };
 }): boolean {
   if (stored.name !== BUILTIN_PROFILE.label || !stored.builtin || !stored.template) return false;
   if (stored.stages.length !== BUILTIN_PROFILE.stages.length) return false;
+  /* Counted rather than compared row by row: 259 activities on every page
+     render is the wrong place to be thorough, and the only thing that writes
+     them is this function. */
+  if (stored._count.activities !== builtinActivities.length) return false;
   return BUILTIN_PROFILE.stages.every((st) => {
     const row = stored.stages.find((r) => r.key === st.key);
     return (

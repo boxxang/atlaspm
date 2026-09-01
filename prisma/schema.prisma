@@ -39,8 +39,9 @@ model Profile {
   template  Boolean  @default(false)
   createdAt DateTime @default(now())
 
-  stages   ProfileStage[]
-  projects Project[]
+  stages     ProfileStage[]
+  activities ProfileActivity[]
+  projects   Project[]
 }
 
 /// One stage of a profile. `key` is what every per-program row (items,
@@ -67,6 +68,54 @@ model ProfileStage {
 
   @@unique([profileId, key])
   @@index([profileId])
+}
+
+/// An activity a template's stage runs.
+///
+/// Inherited or owned, never half of each. `baseRef` names the built-in
+/// activity whose steps and write-up this one shows, the way
+/// ProfileStage.baseKey names the stage whose text and drawing it shows; null
+/// means the activity was added or edited here and owns its steps in ProfileStep.
+model ProfileActivity {
+  id        String @id
+  profileId String
+  /// The stage it belongs to, by key rather than by row: stage keys survive a
+  /// copy, which is what lets an activity travel with its stage.
+  stageKey  String
+  /// Stored, not derived from position. Deleting the third of eleven leaves a
+  /// gap, and a gap is correct — the alternative is silently repointing
+  /// somebody's recorded work at a different activity.
+  ref       String
+  order     Int
+  title     String
+  /// Weeks from the stage's own start.
+  windowFrom Float
+  windowTo   Float
+  /// The built-in activity this one shows; null for one added or edited here.
+  baseRef   String?
+
+  profile Profile       @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  steps   ProfileStep[]
+
+  @@unique([profileId, ref])
+  @@index([profileId, stageKey])
+}
+
+/// A step of an owned activity. An inherited activity has none of these.
+model ProfileStep {
+  id         String @id
+  activityId String
+  n          Int
+  text       String
+  /// Weeks.
+  tat        Float
+  /// main | par — a parallel step runs alongside the main step before it.
+  lane       String @default("main")
+
+  activity ProfileActivity @relation(fields: [activityId], references: [id], onDelete: Cascade)
+
+  @@unique([activityId, n])
+  @@index([activityId])
 }
 
 model Project {
