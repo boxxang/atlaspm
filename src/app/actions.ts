@@ -604,35 +604,52 @@ export async function createProject(input: {
   if (!name) throw new Error('A program needs a name.');
 
   const template = await loadProfile(input.profileId);
-  let profileId = input.profileId;
-  let profile = template;
 
-  if (input.stageKeys && input.stageKeys.length !== template.stages.length) {
-    const stages = pickStages(template.stages, input.stageKeys);
-    profileId = `${input.id}:stages`;
-    await prisma.profile.create({
-      data: {
-        id: profileId,
-        name: `${name} stages`,
-        builtin: false,
-        template: false,
-        stages: {
-          create: stages.map((st) => ({
-            id: `${profileId}:${st.key}`,
-            key: st.key,
-            order: st.order,
-            title: st.title,
-            shortTitle: st.shortTitle,
-            phaseId: st.phaseId,
-            baseKey: st.baseKey,
-            startOffsetWeeks: st.startOffsetWeeks,
-            durationWeeks: st.durationWeeks,
-          })),
-        },
+  /* A template is a blueprint, not a live reference. The programme takes a copy
+     of the stages it was created on and is independent from then on, so editing
+     the template afterwards reschedules nothing already running.
+
+     The copy happened before this, but only when somebody picked a subset of
+     the stages; a programme taking all of them pointed at the shared template
+     row and moved whenever it did. Copying always is what turns the rule from
+     usually true into true, and it is what makes template editing safe to
+     offer at all. */
+  const stageDefs =
+    input.stageKeys && input.stageKeys.length !== template.stages.length
+      ? pickStages(template.stages, input.stageKeys)
+      : [...template.stages];
+
+  const profileId = `${input.id}:stages`;
+  await prisma.profile.create({
+    data: {
+      id: profileId,
+      name: `${name} stages`,
+      builtin: false,
+      /* Not offered in the pickers: this is one programme's stage list, not
+         something to start another programme from. */
+      template: false,
+      stages: {
+        create: stageDefs.map((st) => ({
+          id: `${profileId}:${st.key}`,
+          key: st.key,
+          order: st.order,
+          title: st.title,
+          shortTitle: st.shortTitle,
+          phaseId: st.phaseId,
+          baseKey: st.baseKey,
+          startOffsetWeeks: st.startOffsetWeeks,
+          durationWeeks: st.durationWeeks,
+        })),
       },
-    });
-    profile = { ...template, id: profileId, template: false, builtin: false, stages };
-  }
+    },
+  });
+  const profile: ScheduleProfile = {
+    ...template,
+    id: profileId,
+    template: false,
+    builtin: false,
+    stages: stageDefs,
+  };
 
   const schedule = computeSchedule(input.kickoff, profile, {});
   const stages = resolveStages(profile);
