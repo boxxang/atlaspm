@@ -50,3 +50,7 @@ next-env.d.ts
 *.db
 *.db-journal
 /src/generated/
+
+# scratch and stray output
+/.scratch/
+/undefined/
