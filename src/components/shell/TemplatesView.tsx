@@ -1,8 +1,14 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-import { useEffect, useRef, useState } from 'react';
-import { deleteProfile, duplicateProfile, saveProfileStages } from '@/app/actions';
+import { Fragment, useEffect, useRef, useState } from 'react';
+import {
+  deleteProfile,
+  duplicateProfile,
+  saveProfileStages,
+  saveTemplateActivities,
+} from '@/app/actions';
+import { activitySteps as activityLibrary } from '@/data/activitySteps';
 import { lifecyclePhases } from '@/data/scheduleProfiles';
 import type { ProfileStageDef } from '@/data/types';
 import { uid } from '@/store/useAppStore';
@@ -259,10 +265,10 @@ function NameDialog({
 
 const STAGE_COLS: Col[] = [
   ['title', null, 'STAGE'],
-  ['phase', 156, 'BAND'],
-  ['start', 90, 'STARTS wk'],
-  ['dur', 82, 'WEEKS'],
-  ['acts', 150, ''],
+  ['phase', 140, 'BAND'],
+  ['start', 84, 'STARTS wk'],
+  ['dur', 76, 'WEEKS'],
+  ['acts', 250, ''],
 ];
 
 /**
@@ -285,6 +291,7 @@ function StageDialog({
 }) {
   const box = useRef<HTMLDialogElement>(null);
   const [stages, setStages] = useState<ProfileStageDef[] | null>(null);
+  const [acts, setActs] = useState<{ stageKey: string; shortTitle: string } | null>(null);
   const [err, setErr] = useState('');
   const [pending, setPending] = useState(false);
   useModal(box, onClose);
@@ -420,6 +427,14 @@ function StageDialog({
                   <button
                     type="button"
                     className="btn sm"
+                    data-edit-activities
+                    onClick={() => setActs({ stageKey: st.key, shortTitle: st.shortTitle })}
+                  >
+                    Activities
+                  </button>
+                  <button
+                    type="button"
+                    className="btn sm"
                     data-move-up
                     aria-label="Move up"
                     disabled={i === 0}
@@ -484,6 +499,402 @@ function StageDialog({
           onClick={submit}
         >
           {pending ? 'Saving…' : 'Save template'}
+        </button>
+      </div>
+      {acts && (
+        <ActivityDialog
+          profileId={profileId}
+          stageKey={acts.stageKey}
+          shortTitle={acts.shortTitle}
+          onClose={() => setActs(null)}
+        />
+      )}
+    </dialog>
+  );
+}
+
+interface EditActivity {
+  ref: string;
+  title: string;
+  windowFrom: number;
+  windowTo: number;
+  baseRef: string | null;
+  steps: { n: number; text: string; tat: number; lane: string }[];
+}
+
+const ACT_COLS: Col[] = [
+  ['title', null, 'ACTIVITY'],
+  ['ref', 96, 'REF'],
+  ['from', 84, 'FROM wk'],
+  ['to', 76, 'TO wk'],
+  ['acts', 190, ''],
+];
+
+/**
+ * The activities inside one stage of a template, and the steps inside them.
+ *
+ * An activity is inherited or owned. Opening its steps copies the library's
+ * onto the row and drops its baseRef — the materialise rule, applied the moment
+ * somebody starts editing rather than when they save, so what is on screen is
+ * what will be stored.
+ *
+ * A reference is an identity, not a position. An added activity takes the next
+ * number this stage has never used, and a deleted one's number is never
+ * reissued: recorded work is keyed on the string.
+ */
+function ActivityDialog({
+  profileId,
+  stageKey,
+  shortTitle,
+  onClose,
+}: {
+  profileId: string;
+  stageKey: string;
+  shortTitle: string;
+  onClose: () => void;
+}) {
+  const box = useRef<HTMLDialogElement>(null);
+  const [rows, setRows] = useState<EditActivity[] | null>(null);
+  const [openSteps, setOpenSteps] = useState<string | null>(null);
+  const [err, setErr] = useState('');
+  const [pending, setPending] = useState(false);
+  useModal(box, onClose);
+
+  useEffect(() => {
+    let live = true;
+    fetch(`/api/profiles/${profileId}/activities?stage=${encodeURIComponent(stageKey)}`)
+      .then((r) => r.json())
+      .then((got: EditActivity[]) => {
+        if (live) setRows(got.map((a) => ({ ...a, steps: a.steps ?? [] })));
+      })
+      .catch((e) => live && setErr(message(e)));
+    return () => {
+      live = false;
+    };
+  }, [profileId, stageKey]);
+
+  /* The next number this stage has never used. Reissuing a deleted one would
+     point somebody's recorded work at different work. */
+  const freshRef = (cur: EditActivity[]) => {
+    const used = cur
+      .map((a) => Number(a.ref.split('-').pop()))
+      .filter((n) => Number.isFinite(n)) as number[];
+    const next = (used.length ? Math.max(...used) : 0) + 1;
+    return `${shortTitle}-${String(next).padStart(2, '0')}`;
+  };
+
+  /* Materialise: an activity whose steps are being edited stops inheriting and
+     owns every one of them from here on. */
+  const materialise = (a: EditActivity, library: readonly (readonly [number, string, number, number?])[]) =>
+    a.baseRef
+      ? {
+          ...a,
+          baseRef: null,
+          steps: library.map((s, i) => ({
+            n: i + 1,
+            text: String(s[1]),
+            tat: Number(s[2]),
+            lane: s[3] ? 'par' : 'main',
+          })),
+        }
+      : a;
+
+  const libraryFor = (a: EditActivity) =>
+    a.baseRef ? (activityLibrary[a.baseRef]?.s ?? []) : [];
+
+  const edit = (fn: (cur: EditActivity[]) => EditActivity[]) => {
+    setErr('');
+    setRows((cur) => {
+      if (!cur) return cur;
+      try {
+        return fn(cur);
+      } catch (e) {
+        setErr(message(e));
+        return cur;
+      }
+    });
+  };
+
+  const submit = async () => {
+    if (!rows) return;
+    setErr('');
+    setPending(true);
+    try {
+      await saveTemplateActivities({ profileId, stageKey, activities: rows });
+      onClose();
+    } catch (e) {
+      setErr(message(e));
+      setPending(false);
+    }
+  };
+
+  return (
+    <dialog
+      className="dlg"
+      style={{ width: 'min(1000px, calc(100vw - 32px))' }}
+      ref={box}
+      data-act-dialog
+      aria-label={`Activities of ${shortTitle}`}
+    >
+      <div className="dlg-hd">
+        <span style={{ fontWeight: 600, fontSize: 13.5 }}>{shortTitle} · activities</span>
+        <span style={{ flexGrow: 1 }} />
+        <button type="button" className="btn sm" onClick={onClose}>
+          Close
+        </button>
+      </div>
+      <div className="dlg-body">
+        {!rows ? (
+          <p className="mono-note">Reading the stage…</p>
+        ) : (
+          <div className="ctable" style={{ ['--ct' as string]: ctVar(ACT_COLS) }}>
+            <CTHead cols={ACT_COLS} />
+            {rows.map((a) => (
+              <Fragment key={a.ref}>
+                <div className="trow" data-activity-row={a.ref}>
+                  <input
+                    className="lnkin"
+                    data-act-title
+                    value={a.title}
+                    onChange={(e) =>
+                      edit((cur) =>
+                        cur.map((x) => (x.ref === a.ref ? { ...x, title: e.target.value } : x)),
+                      )
+                    }
+                  />
+                  <span className="pill" style={{ fontSize: 10.5, justifySelf: 'start' }}>
+                    {a.ref}
+                  </span>
+                  <input
+                    className="lnkin num"
+                    type="number"
+                    min={0}
+                    step={1}
+                    data-act-from
+                    value={a.windowFrom}
+                    onChange={(e) =>
+                      edit((cur) =>
+                        cur.map((x) =>
+                          x.ref === a.ref ? { ...x, windowFrom: Number(e.target.value) } : x,
+                        ),
+                      )
+                    }
+                  />
+                  <input
+                    className="lnkin num"
+                    type="number"
+                    min={1}
+                    step={1}
+                    data-act-to
+                    value={a.windowTo}
+                    onChange={(e) =>
+                      edit((cur) =>
+                        cur.map((x) =>
+                          x.ref === a.ref ? { ...x, windowTo: Number(e.target.value) } : x,
+                        ),
+                      )
+                    }
+                  />
+                  <span style={{ display: 'flex', gap: 5, justifySelf: 'end' }}>
+                    <button
+                      type="button"
+                      className="btn sm"
+                      data-edit-steps
+                      onClick={() => {
+                        edit((cur) =>
+                          cur.map((x) => (x.ref === a.ref ? materialise(x, libraryFor(x)) : x)),
+                        );
+                        setOpenSteps(openSteps === a.ref ? null : a.ref);
+                      }}
+                    >
+                      {openSteps === a.ref ? 'Hide steps' : `Steps (${
+                        a.baseRef ? libraryFor(a).length : a.steps.length
+                      })`}
+                    </button>
+                    <button
+                      type="button"
+                      className="btn sm dng"
+                      data-del-activity
+                      onClick={() => edit((cur) => cur.filter((x) => x.ref !== a.ref))}
+                    >
+                      Remove
+                    </button>
+                  </span>
+                </div>
+                {openSteps === a.ref && (
+                  <div className="entrysteps">
+                    {a.steps.map((st, i) => (
+                      <div className="steprow-edit" key={st.n} data-step-row={String(st.n)}>
+                        <span className="num" style={{ color: 'var(--ink-3)', fontSize: 12 }}>
+                          {i + 1}
+                        </span>
+                        <input
+                          className="lnkin"
+                          data-step-text
+                          value={st.text}
+                          onChange={(e) =>
+                            edit((cur) =>
+                              cur.map((x) =>
+                                x.ref === a.ref
+                                  ? {
+                                      ...x,
+                                      steps: x.steps.map((y) =>
+                                        y.n === st.n ? { ...y, text: e.target.value } : y,
+                                      ),
+                                    }
+                                  : x,
+                              ),
+                            )
+                          }
+                        />
+                        <input
+                          className="lnkin num"
+                          type="number"
+                          min={0}
+                          step={0.5}
+                          data-step-tat
+                          value={st.tat}
+                          onChange={(e) =>
+                            edit((cur) =>
+                              cur.map((x) =>
+                                x.ref === a.ref
+                                  ? {
+                                      ...x,
+                                      steps: x.steps.map((y) =>
+                                        y.n === st.n ? { ...y, tat: Number(e.target.value) } : y,
+                                      ),
+                                    }
+                                  : x,
+                              ),
+                            )
+                          }
+                        />
+                        <select
+                          className="lnkin"
+                          data-step-lane
+                          value={st.lane}
+                          onChange={(e) =>
+                            edit((cur) =>
+                              cur.map((x) =>
+                                x.ref === a.ref
+                                  ? {
+                                      ...x,
+                                      steps: x.steps.map((y) =>
+                                        y.n === st.n ? { ...y, lane: e.target.value } : y,
+                                      ),
+                                    }
+                                  : x,
+                              ),
+                            )
+                          }
+                        >
+                          <option value="main">after the last</option>
+                          <option value="par">alongside it</option>
+                        </select>
+                        <button
+                          type="button"
+                          className="btn sm dng"
+                          data-del-step
+                          onClick={() =>
+                            edit((cur) =>
+                              cur.map((x) =>
+                                x.ref === a.ref
+                                  ? { ...x, steps: x.steps.filter((y) => y.n !== st.n) }
+                                  : x,
+                              ),
+                            )
+                          }
+                        >
+                          Remove
+                        </button>
+                      </div>
+                    ))}
+                    <div className="steprow-edit">
+                      <span />
+                      <button
+                        type="button"
+                        className="btn sm"
+                        data-add-step
+                        onClick={() =>
+                          edit((cur) =>
+                            cur.map((x) =>
+                              x.ref === a.ref
+                                ? {
+                                    ...x,
+                                    steps: [
+                                      ...x.steps,
+                                      {
+                                        n: (x.steps.at(-1)?.n ?? 0) + 1,
+                                        text: 'New step',
+                                        tat: 1,
+                                        lane: 'main',
+                                      },
+                                    ],
+                                  }
+                                : x,
+                            ),
+                          )
+                        }
+                      >
+                        <IconPlus />
+                        Add a step
+                      </button>
+                      <span />
+                      <span />
+                      <span />
+                    </div>
+                  </div>
+                )}
+              </Fragment>
+            ))}
+            <div className="trow">
+              <button
+                type="button"
+                className="btn sm"
+                data-add-activity
+                onClick={() =>
+                  edit((cur) => [
+                    ...cur,
+                    {
+                      ref: freshRef(cur),
+                      title: 'New activity',
+                      windowFrom: 0,
+                      windowTo: 4,
+                      baseRef: null,
+                      steps: [{ n: 1, text: 'New step', tat: 1, lane: 'main' }],
+                    },
+                  ])
+                }
+              >
+                <IconPlus />
+                Add an activity
+              </button>
+              <span />
+              <span />
+              <span />
+              <span />
+            </div>
+          </div>
+        )}
+      </div>
+      <div className="dlg-foot">
+        {err && (
+          <span className="err" style={{ fontSize: 12, color: 'var(--risk)' }}>
+            {err}
+          </span>
+        )}
+        <span style={{ flexGrow: 1 }} />
+        <button type="button" className="btn sm" onClick={onClose}>
+          Cancel
+        </button>
+        <button
+          type="button"
+          className="btn pri sm"
+          data-tpl-save
+          disabled={pending || !rows}
+          onClick={submit}
+        >
+          {pending ? 'Saving…' : 'Save activities'}
         </button>
       </div>
     </dialog>

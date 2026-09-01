@@ -101,4 +101,74 @@ test.describe('templates', () => {
     await expect(moved.locator('[data-stage-start]')).toHaveValue(start);
     await expect(page.locator('[data-stage-row]').nth(1)).toHaveAttribute('data-stage-row', key!);
   });
+
+  /* Editing a step materialises the whole activity: it stops inheriting and
+     owns every step, so no reader ever consults two sources at once. */
+  test('adds an activity to a stage, and gives it a step', async ({ page }) => {
+    await duplicate(page);
+    await page
+      .locator('[data-template]')
+      .filter({ hasText: NAME })
+      .locator('[data-edit-template]')
+      .click();
+    await page.locator('[data-stage-row="productDefinition"] [data-edit-activities]').click();
+    /* The dialog fetches its list, so wait for a row before counting — count()
+       does not retry the way an expect does. */
+    await expect(page.locator('[data-activity-row]').first()).toBeVisible();
+    const before = await page.locator('[data-activity-row]').count();
+
+    await page.locator('[data-add-activity]').click();
+    await expect(page.locator('[data-activity-row]')).toHaveCount(before + 1);
+
+    const added = page.locator('[data-activity-row]').last();
+    await added.locator('[data-act-title]').fill('Stakeholder sign-off');
+    await added.locator('[data-edit-steps]').click();
+    await page.locator('[data-add-step]').click();
+    await page
+      .locator('[data-step-row]')
+      .last()
+      .locator('[data-step-text]')
+      .fill('Collect the signatures');
+    await page.locator('[data-step-row]').last().locator('[data-step-tat]').fill('2');
+    await page.locator('[data-act-dialog] [data-tpl-save]').click();
+    await expect(page.locator('[data-act-dialog]')).toHaveCount(0);
+
+    await open(page);
+    await page
+      .locator('[data-template]')
+      .filter({ hasText: NAME })
+      .locator('[data-edit-template]')
+      .click();
+    await page.locator('[data-stage-row="productDefinition"] [data-edit-activities]').click();
+    /* The title lives in an input, so it is asserted on the value — hasText
+       reads text content and would never see it. */
+    await expect(page.locator('[data-activity-row]').first()).toBeVisible();
+    await expect(
+      page.locator('[data-activity-row] [data-act-title]').last(),
+    ).toHaveValue('Stakeholder sign-off');
+    await expect(page.locator('[data-activity-row]')).toHaveCount(before + 1);
+  });
+
+  test('removes an activity, and the gap in the numbering stays', async ({ page }) => {
+    await duplicate(page);
+    await page
+      .locator('[data-template]')
+      .filter({ hasText: NAME })
+      .locator('[data-edit-template]')
+      .click();
+    await page.locator('[data-stage-row="productDefinition"] [data-edit-activities]').click();
+
+    const rows = page.locator('[data-activity-row]');
+    await expect(rows.first()).toBeVisible();
+    const before = await rows.count();
+    const secondRef = await rows.nth(1).getAttribute('data-activity-row');
+    const thirdRef = await rows.nth(2).getAttribute('data-activity-row');
+
+    await rows.nth(1).locator('[data-del-activity]').click();
+    await expect(rows).toHaveCount(before - 1);
+    /* The one that followed keeps its own reference rather than sliding into
+       the deleted one's — that is what stops recorded work being repointed. */
+    await expect(rows.nth(1)).toHaveAttribute('data-activity-row', thirdRef!);
+    await expect(page.locator(`[data-activity-row="${secondRef}"]`)).toHaveCount(0);
+  });
 });

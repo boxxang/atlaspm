@@ -854,6 +854,82 @@ export async function saveProfileStages(input: {
   revalidatePath('/templates');
 }
 
+
+/**
+ * Rewrite one stage's activities in a template.
+ *
+ * Editing any step of an inherited activity materialises all of them: the row
+ * drops its baseRef and owns every step from then on. An activity is inherited
+ * or owned, never half of each, so nothing downstream has to consult two
+ * sources for one activity.
+ */
+export async function saveTemplateActivities(input: {
+  profileId: string;
+  stageKey: string;
+  activities: {
+    ref: string;
+    title: string;
+    windowFrom: number;
+    windowTo: number;
+    baseRef: string | null;
+    steps: { n: number; text: string; tat: number; lane: string }[];
+  }[];
+}): Promise<void> {
+  const profile = await prisma.profile.findUnique({
+    where: { id: input.profileId },
+    select: { id: true, builtin: true },
+  });
+  if (!profile) throw new Error(`Unknown template: ${input.profileId}`);
+  if (profile.builtin) {
+    throw new Error('The built-in template is read-only. Duplicate it to make changes.');
+  }
+
+  const refs = new Set<string>();
+  for (const a of input.activities) {
+    if (!a.title.trim()) throw new Error('Every activity needs a title.');
+    if (refs.has(a.ref)) throw new Error(`Duplicate activity: ${a.ref}`);
+    refs.add(a.ref);
+    if (a.windowTo <= a.windowFrom) throw new Error(`${a.ref} has to end after it starts.`);
+    if (!a.baseRef && !a.steps.length) {
+      throw new Error(`${a.ref} needs at least one step.`);
+    }
+  }
+
+  await prisma.$transaction([
+    prisma.profileActivity.deleteMany({
+      where: { profileId: profile.id, stageKey: input.stageKey },
+    }),
+    ...input.activities.map((a, order) =>
+      prisma.profileActivity.create({
+        data: {
+          id: `${profile.id}:act:${a.ref}`,
+          profileId: profile.id,
+          stageKey: input.stageKey,
+          ref: a.ref,
+          order,
+          title: a.title.trim(),
+          windowFrom: a.windowFrom,
+          windowTo: a.windowTo,
+          baseRef: a.baseRef,
+          steps: a.baseRef
+            ? undefined
+            : {
+                create: a.steps.map((st, i) => ({
+                  id: `${profile.id}:act:${a.ref}:${i + 1}`,
+                  n: i + 1,
+                  text: st.text.trim(),
+                  tat: st.tat,
+                  lane: st.lane === 'par' ? 'par' : 'main',
+                })),
+              },
+        },
+      }),
+    ),
+  ]);
+  revalidatePath('/');
+  revalidatePath('/templates');
+}
+
 /** Removing a template. The built-in one and any in use are refused. */
 export async function deleteProfile(profileId: string): Promise<void> {
   const profile = await prisma.profile.findUnique({

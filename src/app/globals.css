@@ -2359,6 +2359,15 @@ a:hover{color:var(--accent-hov)}
    A post is read as a window rather than as a row: the body in full, the
    comments under it, and edit and delete behind the read rather than on the
    row where they would be hit while scanning. */
+/* ── the template's step editor ───────────────────
+   Steps hang under the activity they belong to rather than in a table of their
+   own, so the nesting on screen is the nesting in the data. */
+.entrysteps{grid-column:1 / -1;display:flex;flex-direction:column;gap:5px;
+  padding:9px 14px 11px 30px;background:var(--sunken);border-bottom:1px solid var(--line-soft)}
+.steprow-edit{display:grid;grid-template-columns:22px minmax(0,1fr) 76px 150px 92px;
+  gap:8px;align-items:center}
+.steprow-edit .lnkin{width:100%}
+
 .post-head{display:flex;gap:11px;align-items:flex-start;padding:14px 0 10px;border-bottom:1px solid var(--line-soft)}
 .post-body-txt{margin:11px 0 4px;font-size:13.5px;line-height:1.6;color:var(--ink);
   white-space:pre-wrap;overflow-wrap:break-word;max-width:74ch}
