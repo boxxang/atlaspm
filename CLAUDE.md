@@ -149,7 +149,12 @@ good deployment serving, which is the one thing that has consistently saved us.
 Before merging, with no `next dev` running (it holds :3000 and Playwright will
 not start):
 
-    npm run test && npx tsc --noEmit && npx playwright test && npm run lint
+    npm run test && npm run typecheck && npx playwright test && npm run lint
+
+`npm run typecheck`, not a bare `npx tsc --noEmit`: `PageProps`,
+`LayoutProps` and `RouteContext` are globals Next generates into `.next/types`,
+so `tsc` alone reports thirteen `TS2304`s on a tree where `.next` was cleared
+and nothing has been built yet. The script runs `next typegen` first.
 
 If the prototype changed, `node design-canvas/proto/build.mjs` — the built file
 is generated and editing it is silently lost.
