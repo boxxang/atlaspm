@@ -844,20 +844,20 @@ export async function saveProfileStages(input: {
   }
   if (!input.stages.length) throw new Error('A template needs at least one stage.');
 
-  /* The prefix is stored in the shape a reference carries it, so the rule is
-     applied once, here, rather than at each place one is read. */
-  const stages = input.stages.map((st) => ({
-    ...st,
-    shortTitle: normalizePrefix(st.shortTitle),
-  }));
-
   const keys = new Set<string>();
-  for (const st of stages) {
+  for (const st of input.stages) {
     if (!st.title.trim()) throw new Error('Every stage needs a title.');
     if (keys.has(st.key)) throw new Error(`Duplicate stage: ${st.key}`);
     keys.add(st.key);
   }
-  assertPrefixes(stages);
+  /* Judged on what was sent, then stored in the shape a reference carries it.
+     Normalising first would turn a prefix of Korean jamo into an empty one and
+     answer with "needs a prefix", which is not what went wrong. */
+  assertPrefixes(input.stages);
+  const stages = input.stages.map((st) => ({
+    ...st,
+    shortTitle: normalizePrefix(st.shortTitle),
+  }));
 
   const name = input.name?.trim();
   if (name && name !== profile.name) await assertProfileNameFree(name);

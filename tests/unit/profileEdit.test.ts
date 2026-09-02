@@ -5,11 +5,13 @@ import {
   duplicatePrefixes,
   moveStage,
   normalizePrefix,
+  prefixCharsOk,
   refRenames,
   removeStage,
   retimeStage,
   setStagePrefix,
   StageEditError,
+  typedPrefix,
 } from '@/lib/profileEdit';
 import type { ProfileStageDef } from '@/data/types';
 
@@ -128,7 +130,9 @@ describe('a stage prefix', () => {
   /* The prefix is what every reference in the stage is built from — DEF-01 is
      the first activity of the stage whose prefix is DEF — so it is stored the
      way it is printed and there is no second form to keep in step. */
-  it('is normalised to the shape a reference can carry', () => {
+  /* The canonical form, used where a prefix is compared or stored — never on
+     the way in from the keyboard. */
+  it('has one canonical form, for comparing and storing', () => {
     expect(normalizePrefix('  cus ')).toBe('CUS');
     expect(normalizePrefix('pkg-d')).toBe('PKGD');
     expect(normalizePrefix('a b c')).toBe('ABC');
@@ -136,9 +140,45 @@ describe('a stage prefix', () => {
     expect(normalizePrefix('!!')).toBe('');
   });
 
-  it('is set on the one stage named, and normalised on the way in', () => {
-    const out = setStagePrefix(BASE, 'b', ' cus ');
+  /* Typing removes nothing. Stripping a character the field cannot use looks
+     exactly like a dead field: a Korean input source answers the `d` key with
+     `ㅇ`, and swallowing it left nothing on screen while digits — which never
+     reach an input method — went in fine. What cannot be a prefix is reported
+     rather than deleted, which is how the duplicate rule already behaves. */
+  it('keeps what was typed, upper-cased, and swallows nothing', () => {
+    expect(typedPrefix(' cus ')).toBe(' CUS ');
+    expect(typedPrefix('ㅇㄷ')).toBe('ㅇㄷ');
+    expect(typedPrefix('cus-t')).toBe('CUS-T');
+    expect(typedPrefix('verylongprefix')).toBe('VERYLO');
+  });
+
+  it('is set on the one stage named', () => {
+    const out = setStagePrefix(BASE, 'b', 'cus');
     expect(out.map((s) => s.shortTitle)).toEqual(['A', 'CUS', 'C']);
+  });
+
+  /* Upper-casing a half-composed syllable rewrites the value under the input
+     method and destroys the composition. While one is running, the field holds
+     exactly what it is given. */
+  it('leaves a composing input method alone', () => {
+    expect(setStagePrefix(BASE, 'b', 'ㅇ', true)[1].shortTitle).toBe('ㅇ');
+    expect(setStagePrefix(BASE, 'b', 'de', true)[1].shortTitle).toBe('de');
+  });
+
+  it('says which characters a prefix may hold', () => {
+    expect(prefixCharsOk('CUS')).toBe(true);
+    expect(prefixCharsOk('PD2')).toBe(true);
+    expect(prefixCharsOk('ㅇㄷ')).toBe(false);
+    expect(prefixCharsOk('CUS-T')).toBe(false);
+    expect(prefixCharsOk('')).toBe(false);
+  });
+
+  /* The message has to name the value and say what to do about it, because
+     the reason the field looks broken is invisible from inside it. */
+  it('refuses a prefix no reference could carry, and names it', () => {
+    const hangul = setStagePrefix(BASE, 'b', 'ㅇㄷ');
+    expect(() => assertPrefixes(hangul)).toThrow(/ㅇㄷ/);
+    expect(() => assertPrefixes(hangul)).toThrow(/English/);
   });
 
   it('refuses a stage that is not there', () => {

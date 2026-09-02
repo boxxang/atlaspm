@@ -19,6 +19,7 @@ import {
   duplicatePrefixes,
   moveStage,
   normalizePrefix,
+  prefixCharsOk,
   removeStage,
   retimeStage,
   setStagePrefix,
@@ -436,11 +437,17 @@ function StageDialog({
                   spellCheck={false}
                   maxLength={6}
                   value={st.shortTitle}
-                  onChange={(e) =>
-                    edit((cur) => setStagePrefix(cur, st.key, e.target.value))
-                  }
+                  onChange={(e) => {
+                    /* Mid-composition the value is left exactly as given: an
+                       input method building a syllable loses it if the field
+                       rewrites the value underneath it. */
+                    const composing = (e.nativeEvent as InputEvent).isComposing === true;
+                    const raw = e.target.value;
+                    edit((cur) => setStagePrefix(cur, st.key, raw, composing));
+                  }}
                   style={
-                    clashing.has(normalizePrefix(st.shortTitle)) || !st.shortTitle
+                    !prefixCharsOk(st.shortTitle) ||
+                    clashing.has(normalizePrefix(st.shortTitle))
                       ? { color: 'var(--risk)', borderColor: 'var(--risk)' }
                       : undefined
                   }

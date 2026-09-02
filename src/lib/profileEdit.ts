@@ -43,8 +43,26 @@ const freshKey = (stages: readonly ProfileStageDef[]): string => {
  */
 const PREFIX_MAX = 6;
 
+/** The canonical form: what a prefix is compared and stored as. */
 export const normalizePrefix = (raw: string): string =>
   raw.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, PREFIX_MAX);
+
+/**
+ * What the field holds while it is being typed.
+ *
+ * It upper-cases and it stops at the length a prefix can be, and it removes
+ * nothing else. Stripping on the way in looked exactly like a dead field: a
+ * Korean input source answers the `d` key with `ㅇ`, which `normalizePrefix`
+ * deleted before it could be seen, while digits — which never reach an input
+ * method — went in fine. So the field reported taking only numbers.
+ *
+ * What cannot be in a prefix is reported instead, which is how the duplicate
+ * rule already behaves.
+ */
+export const typedPrefix = (raw: string): string => raw.toUpperCase().slice(0, PREFIX_MAX);
+
+/** Whether a typed prefix is one a reference could carry. */
+export const prefixCharsOk = (raw: string): boolean => /^[A-Z0-9]+$/.test(raw.trim().toUpperCase());
 
 /** `NEW`, `NEW2`, … — an added stage must not arrive already clashing. */
 const freshPrefix = (stages: readonly ProfileStageDef[]): string => {
@@ -65,9 +83,12 @@ export function setStagePrefix(
   stages: readonly ProfileStageDef[],
   key: string,
   raw: string,
+  /* An input method mid-composition: upper-casing a half-formed syllable
+     rewrites the value underneath it and the composition dies. */
+  composing = false,
 ): ProfileStageDef[] {
   find(stages, key);
-  const shortTitle = normalizePrefix(raw);
+  const shortTitle = composing ? raw.slice(0, PREFIX_MAX) : typedPrefix(raw);
   return stages.map((s) => (s.key === key ? { ...s, shortTitle } : s));
 }
 
@@ -85,9 +106,19 @@ export function duplicatePrefixes(stages: readonly { shortTitle: string }[]): st
 export function assertPrefixes(
   stages: readonly { title: string; shortTitle: string }[],
 ): void {
-  const blank = stages.find((s) => !normalizePrefix(s.shortTitle));
+  const blank = stages.find((s) => !s.shortTitle.trim());
   if (blank) {
     throw new StageEditError(`"${blank.title}" needs a prefix — it is what DEF-01 is made of.`);
+  }
+  /* Before the duplicate check, because two prefixes that cannot be prefixes
+     are not a clash — and because this is the message that explains a field
+     that looks like it only takes numbers. */
+  const odd = stages.find((s) => !prefixCharsOk(s.shortTitle));
+  if (odd) {
+    throw new StageEditError(
+      `A prefix is letters and digits only, so "${odd.shortTitle.trim()}" cannot be one. ` +
+        'Switch your keyboard to English to type it.',
+    );
   }
   const dup = duplicatePrefixes(stages);
   if (dup.length) {

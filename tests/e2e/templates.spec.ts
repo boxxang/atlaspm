@@ -199,9 +199,15 @@ test.describe('templates', () => {
       page.locator('[data-stage-row="new-2"] [data-stage-prefix]'),
     ).toHaveValue('NEW2');
 
-    /* Typed the way a reference carries it: lower case and punctuation do not
-       survive the field. */
+    /* Upper-cased as it is typed, and nothing is removed — a character a
+       reference cannot carry is reported rather than swallowed, because
+       swallowing it is what made the field look like it took only digits. */
     await added.locator('[data-stage-prefix]').fill('cus-t');
+    await expect(added.locator('[data-stage-prefix]')).toHaveValue('CUS-T');
+    await expect(page.locator('[data-stage-dialog] .err')).toContainText('CUS-T');
+    await expect(page.locator('[data-stage-dialog] [data-tpl-save]')).toBeDisabled();
+
+    await added.locator('[data-stage-prefix]').fill('cust');
     await expect(added.locator('[data-stage-prefix]')).toHaveValue('CUST');
 
     await page.locator('[data-stage-dialog] [data-tpl-save]').click();
@@ -216,6 +222,28 @@ test.describe('templates', () => {
     await expect(
       page.locator('[data-stage-row="new-1"] [data-stage-prefix]'),
     ).toHaveValue('CUST');
+  });
+
+  /* The bug this rule was written for: a Korean input source answers the `d`
+     key with `ㅇ`, the field deleted it before it could be seen, and the field
+     reported taking only digits. It has to survive long enough to be named. */
+  test('keeps a character it cannot use, and says why', async ({ page }) => {
+    await duplicate(page);
+    await page
+      .locator('[data-template]')
+      .filter({ hasText: NAME })
+      .locator('[data-edit-template]')
+      .click();
+
+    const field = page.locator('[data-stage-row="productDefinition"] [data-stage-prefix]');
+    await field.fill('ㅇㄷ');
+    await expect(field).toHaveValue('ㅇㄷ');
+    await expect(page.locator('[data-stage-dialog] .err')).toContainText('letters and digits');
+    await expect(page.locator('[data-stage-dialog] [data-tpl-save]')).toBeDisabled();
+
+    await field.fill('def');
+    await expect(field).toHaveValue('DEF');
+    await expect(page.locator('[data-stage-dialog] [data-tpl-save]')).toBeEnabled();
   });
 
   test('refuses two stages that would share a prefix', async ({ page }) => {
