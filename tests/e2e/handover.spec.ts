@@ -258,7 +258,7 @@ test.describe('the team', () => {
     await openTeam(page);
     await page.getByRole('button', { name: /Add someone/ }).click();
     await page.getByLabel('Name').fill('Yuna Cho');
-    await page.getByLabel('Responsibility').fill('SI engineer');
+    await page.getByLabel('Responsibility, typed').fill('SI engineer');
     await page.getByLabel('Email').fill('yuna.cho@example.com');
     await page.getByRole('button', { name: 'Save' }).click();
     await expect(page.locator('[data-person]').filter({ hasText: 'Yuna Cho' })).toBeVisible();
@@ -281,13 +281,124 @@ test.describe('the team', () => {
     const row = page.locator('[data-person]:not([data-person="leader"])').first();
     const id = await row.getAttribute('data-person');
     await row.getByRole('button', { name: 'Edit' }).click();
-    await page.getByLabel('Responsibility').fill('Floorplan owner');
+    await page.getByLabel('Responsibility, typed').fill('Floorplan owner');
     await page.getByRole('button', { name: 'Save' }).click();
     await expect(page.locator(`[data-person="${id}"]`)).toContainText('Floorplan owner');
     await writesSettled(page);
 
     await page.reload();
     await expect(page.locator(`[data-person="${id}"]`)).toContainText('Floorplan owner');
+  });
+
+  /* The stage's lead field had no way in: the row exists only once a name is
+     in it, so a stage that arrived without one could never be given one. The
+     Responsibility dropdown is that way in — and because the field holds one
+     person, naming a lead is also un-naming one. */
+  test('names a stage lead from the team, and stands the old one down', async ({ page }) => {
+    await openTeam(page);
+    /* the row opens with the avatar's initials, so the name is the first
+       wrapping cell, not the first line */
+    const outgoing = (
+      await page.locator('[data-person="leader"] .wrapcell').first().innerText()
+    ).trim();
+
+    await page.getByRole('button', { name: /Add someone/ }).click();
+    await page.getByLabel('Name').fill('Hana Seo');
+    /* exact, or it also matches the typed field's "Responsibility, typed" */
+    await page.getByLabel('Responsibility', { exact: true }).selectOption('Stage leader');
+    await page.getByLabel('Email').fill('hana.seo@example.com');
+    /* it says whose job it is taking, before it is taken */
+    await expect(page.locator('[data-standing-down]')).toContainText(outgoing);
+    await page.getByRole('button', { name: 'Save' }).click();
+
+    await expect(page.locator('[data-person="leader"]')).toContainText('Hana Seo');
+    /* the outgoing lead is still on the stage, and no longer the lead */
+    await expect(
+      page.locator('[data-person]:not([data-person="leader"])').filter({ hasText: outgoing }),
+    ).toHaveCount(1);
+    await expect(page.locator('[data-person="leader"]')).not.toContainText(outgoing);
+    await writesSettled(page);
+
+    await page.reload();
+    await expect(page.locator('[data-person="leader"]')).toContainText('Hana Seo');
+    await expect(
+      page.locator('[data-person]:not([data-person="leader"])').filter({ hasText: outgoing }),
+    ).toHaveCount(1);
+
+    /* and the properties rail, which is where a stage says who runs it */
+    await page.goto(`${SHELL_PATH}/stage/physicalDesign/activity`);
+    await expect(rail(page)).toContainText('Hana Seo');
+  });
+
+  /* The other half of the promotion: somebody already in the list becomes the
+     lead, which is the only path that deletes a contact row. The unit tests
+     hold the arithmetic; this holds the wiring. */
+  test('promotes a member already on the stage, and takes them out of the list', async ({
+    page,
+  }) => {
+    await openTeam(page);
+    const outgoing = (
+      await page.locator('[data-person="leader"] .wrapcell').first().innerText()
+    ).trim();
+    const row = page.locator('[data-person]:not([data-person="leader"])').first();
+    const id = await row.getAttribute('data-person');
+    const promoted = (await row.locator('.wrapcell').first().innerText()).trim();
+
+    await row.getByRole('button', { name: 'Edit' }).click();
+    await page.getByLabel('Responsibility', { exact: true }).selectOption('Stage leader');
+    await expect(page.locator('[data-standing-down]')).toContainText(outgoing);
+    await page.getByRole('button', { name: 'Save' }).click();
+
+    await expect(page.locator('[data-person="leader"]')).toContainText(promoted);
+    /* out of the list: shown twice, they would read as two people */
+    await expect(page.locator(`[data-person="${id}"]`)).toHaveCount(0);
+    await expect(
+      page.locator('[data-person]:not([data-person="leader"])').filter({ hasText: outgoing }),
+    ).toHaveCount(1);
+    await writesSettled(page);
+
+    /* the delete is a server write of its own, so the reload is the assertion
+       that matters: an optimistic row can vanish without the row behind it */
+    await page.reload();
+    await expect(page.locator('[data-person="leader"]')).toContainText(promoted);
+    await expect(page.locator(`[data-person="${id}"]`)).toHaveCount(0);
+    await expect(
+      page.locator('[data-person]:not([data-person="leader"])').filter({ hasText: outgoing }),
+    ).toHaveCount(1);
+  });
+
+  /* Standing down is the same dropdown the other way, and the only way a stage
+     loses its lead — it must not lose the person too. */
+  test('stands the lead down into an ordinary member', async ({ page }) => {
+    await openTeam(page);
+    const lead = (
+      await page.locator('[data-person="leader"] .wrapcell').first().innerText()
+    ).trim();
+
+    await page.locator('[data-person="leader"]').getByRole('button', { name: 'Edit' }).click();
+    await page.getByLabel('Responsibility', { exact: true }).selectOption('Input manually…');
+    await page.getByLabel('Responsibility, typed').fill('Mask data prep');
+    await page.getByRole('button', { name: 'Save' }).click();
+
+    await expect(page.locator('[data-person="leader"]')).toHaveCount(0);
+    await expect(page.locator('[data-person]').filter({ hasText: lead })).toContainText(
+      'Mask data prep',
+    );
+    await writesSettled(page);
+
+    await page.reload();
+    await expect(page.locator('[data-person="leader"]')).toHaveCount(0);
+    await expect(page.locator('[data-person]').filter({ hasText: lead })).toContainText(
+      'Mask data prep',
+    );
+    /* the stage now says nobody runs it, rather than saying nothing */
+    await page.goto(`${SHELL_PATH}/stage/physicalDesign/activity`);
+    await expect(rail(page)).toContainText('Unassigned');
+  });
+
+  test('the properties rail names the stage lead', async ({ page }) => {
+    await page.goto(`${SHELL_PATH}/stage/physicalDesign/activity`);
+    await expect(rail(page)).toContainText('Grace Park');
   });
 
   test('a person is removed, and stays removed', async ({ page }) => {
