@@ -178,6 +178,103 @@ test.describe('templates', () => {
 
   /* Renaming and re-staging are one act of editing this template, so they share
      a form and a save button rather than being two screens. */
+  /* The prefix is what DEF-01 is made of, so it is typed rather than derived
+     from a title nobody chose it for. */
+  test('gives an added stage a prefix nobody else holds, and lets it be typed', async ({
+    page,
+  }) => {
+    await duplicate(page);
+    await page
+      .locator('[data-template]')
+      .filter({ hasText: NAME })
+      .locator('[data-edit-template]')
+      .click();
+
+    await page.locator('[data-add-stage]').click();
+    const added = page.locator('[data-stage-row="new-1"]');
+    await expect(added.locator('[data-stage-prefix]')).toHaveValue('NEW');
+
+    await page.locator('[data-add-stage]').click();
+    await expect(
+      page.locator('[data-stage-row="new-2"] [data-stage-prefix]'),
+    ).toHaveValue('NEW2');
+
+    /* Typed the way a reference carries it: lower case and punctuation do not
+       survive the field. */
+    await added.locator('[data-stage-prefix]').fill('cus-t');
+    await expect(added.locator('[data-stage-prefix]')).toHaveValue('CUST');
+
+    await page.locator('[data-stage-dialog] [data-tpl-save]').click();
+    await expect(page.locator('[data-stage-dialog]')).toHaveCount(0);
+
+    await open(page);
+    await page
+      .locator('[data-template]')
+      .filter({ hasText: NAME })
+      .locator('[data-edit-template]')
+      .click();
+    await expect(
+      page.locator('[data-stage-row="new-1"] [data-stage-prefix]'),
+    ).toHaveValue('CUST');
+  });
+
+  test('refuses two stages that would share a prefix', async ({ page }) => {
+    await duplicate(page);
+    await page
+      .locator('[data-template]')
+      .filter({ hasText: NAME })
+      .locator('[data-edit-template]')
+      .click();
+
+    const first = page.locator('[data-stage-row]').first();
+    const taken = await first.locator('[data-stage-prefix]').inputValue();
+    await page.locator('[data-stage-row]').nth(1).locator('[data-stage-prefix]').fill(taken);
+
+    await expect(page.locator('[data-stage-dialog] .err')).toContainText(taken);
+    await expect(page.locator('[data-stage-dialog] [data-tpl-save]')).toBeDisabled();
+
+    /* And a stage left with no prefix at all is refused for its own reason. */
+    await page.locator('[data-stage-row]').nth(1).locator('[data-stage-prefix]').fill('');
+    await expect(page.locator('[data-stage-dialog] .err')).toContainText(/prefix/i);
+    await expect(page.locator('[data-stage-dialog] [data-tpl-save]')).toBeDisabled();
+  });
+
+  /* The prefix is the stage's identity and the number is the activity's.
+     Moving the first must leave the second exactly where it was. */
+  test('carries the activity references when a prefix changes, numbers intact', async ({
+    page,
+  }) => {
+    await duplicate(page);
+    await page
+      .locator('[data-template]')
+      .filter({ hasText: NAME })
+      .locator('[data-edit-template]')
+      .click();
+
+    await page.locator('[data-stage-row="productDefinition"] [data-edit-activities]').click();
+    await expect(page.locator('[data-activity-row="DEF-01"]')).toBeVisible();
+    const refs = await page.locator('[data-activity-row]').count();
+    await page.locator('[data-act-dialog] [data-tpl-save]').click();
+    await expect(page.locator('[data-act-dialog]')).toHaveCount(0);
+
+    await page
+      .locator('[data-stage-row="productDefinition"] [data-stage-prefix]')
+      .fill('CUS');
+    await page.locator('[data-stage-dialog] [data-tpl-save]').click();
+    await expect(page.locator('[data-stage-dialog]')).toHaveCount(0);
+
+    await open(page);
+    await page
+      .locator('[data-template]')
+      .filter({ hasText: NAME })
+      .locator('[data-edit-template]')
+      .click();
+    await page.locator('[data-stage-row="productDefinition"] [data-edit-activities]').click();
+    await expect(page.locator('[data-activity-row="CUS-01"]')).toBeVisible();
+    await expect(page.locator('[data-activity-row="DEF-01"]')).toHaveCount(0);
+    await expect(page.locator('[data-activity-row]')).toHaveCount(refs);
+  });
+
   test('renames the copy, and the new name survives a reload', async ({ page }) => {
     await duplicate(page);
     await page

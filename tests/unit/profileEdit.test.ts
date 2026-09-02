@@ -1,9 +1,14 @@
 import { describe, expect, it } from 'vitest';
 import {
   addStage,
+  assertPrefixes,
+  duplicatePrefixes,
   moveStage,
+  normalizePrefix,
+  refRenames,
   removeStage,
   retimeStage,
+  setStagePrefix,
   StageEditError,
 } from '@/lib/profileEdit';
 import type { ProfileStageDef } from '@/data/types';
@@ -116,5 +121,106 @@ describe('re-timing a stage', () => {
 
   it('refuses a negative offset', () => {
     expect(() => retimeStage(BASE, 'b', { startOffsetWeeks: -1 })).toThrow(StageEditError);
+  });
+});
+
+describe('a stage prefix', () => {
+  /* The prefix is what every reference in the stage is built from — DEF-01 is
+     the first activity of the stage whose prefix is DEF — so it is stored the
+     way it is printed and there is no second form to keep in step. */
+  it('is normalised to the shape a reference can carry', () => {
+    expect(normalizePrefix('  cus ')).toBe('CUS');
+    expect(normalizePrefix('pkg-d')).toBe('PKGD');
+    expect(normalizePrefix('a b c')).toBe('ABC');
+    expect(normalizePrefix('verylongprefix')).toBe('VERYLO');
+    expect(normalizePrefix('!!')).toBe('');
+  });
+
+  it('is set on the one stage named, and normalised on the way in', () => {
+    const out = setStagePrefix(BASE, 'b', ' cus ');
+    expect(out.map((s) => s.shortTitle)).toEqual(['A', 'CUS', 'C']);
+  });
+
+  it('refuses a stage that is not there', () => {
+    expect(() => setStagePrefix(BASE, 'zz', 'X')).toThrow(StageEditError);
+  });
+
+  /* Setting does not throw on a clash: a prefix is typed a letter at a time,
+     and rejecting a keystroke because the half-typed value collides would make
+     the field impossible to edit. The clash is reported, and refused on save. */
+  it('accepts a clash while it is being typed, and names it', () => {
+    const clashing = setStagePrefix(BASE, 'b', 'A');
+    expect(clashing[1].shortTitle).toBe('A');
+    expect(duplicatePrefixes(clashing)).toEqual(['A']);
+    expect(() => assertPrefixes(clashing)).toThrow(/A/);
+  });
+
+  it('sees no duplicate in a list where every prefix stands alone', () => {
+    expect(duplicatePrefixes(BASE)).toEqual([]);
+    expect(() => assertPrefixes(BASE)).not.toThrow();
+  });
+
+  it('refuses a stage left with no prefix at all', () => {
+    expect(() => assertPrefixes(setStagePrefix(BASE, 'b', ''))).toThrow(StageEditError);
+  });
+
+  /* Two blanks are one problem, not two: the empty message says it first. */
+  it('reports the blank rather than counting blanks as a duplicate', () => {
+    const blanks = setStagePrefix(setStagePrefix(BASE, 'a', ''), 'b', '');
+    expect(duplicatePrefixes(blanks)).toEqual([]);
+    expect(() => assertPrefixes(blanks)).toThrow(/prefix/i);
+  });
+
+  /* An added stage cannot arrive already clashing, or the dialog would open on
+     an error nobody caused. */
+  it('is unique on a stage that was just added', () => {
+    const one = addStage(BASE, 3);
+    expect(one[3].shortTitle).toBe('NEW');
+    const two = addStage(one, 4);
+    expect(two[4].shortTitle).toBe('NEW2');
+    expect(duplicatePrefixes(two)).toEqual([]);
+  });
+});
+
+describe('renaming the references a prefix owns', () => {
+  const acts = [
+    { ref: 'NEW-01', stageKey: 'b' },
+    { ref: 'NEW-04', stageKey: 'b' },
+    { ref: 'A-01', stageKey: 'a' },
+  ];
+
+  /* The number is the activity's identity within its stage; the prefix is the
+     stage's. Changing one must not disturb the other. */
+  it('carries the number across unchanged', () => {
+    expect(refRenames(acts, [{ stageKey: 'b', from: 'NEW', to: 'CUS' }])).toEqual([
+      { from: 'NEW-01', to: 'CUS-01' },
+      { from: 'NEW-04', to: 'CUS-04' },
+    ]);
+  });
+
+  it('leaves the other stages alone', () => {
+    const out = refRenames(acts, [{ stageKey: 'b', from: 'NEW', to: 'CUS' }]);
+    expect(out.some((r) => r.from === 'A-01')).toBe(false);
+  });
+
+  it('has nothing to do when the prefix did not move', () => {
+    expect(refRenames(acts, [{ stageKey: 'b', from: 'NEW', to: 'NEW' }])).toEqual([]);
+    expect(refRenames(acts, [])).toEqual([]);
+  });
+
+  /* A row whose ref does not start with the old prefix was named by hand or by
+     an older prefix; renaming it would be a guess. */
+  it('ignores a reference the old prefix does not own', () => {
+    const odd = [{ ref: 'ZZ-09', stageKey: 'b' }];
+    expect(refRenames(odd, [{ stageKey: 'b', from: 'NEW', to: 'CUS' }])).toEqual([]);
+  });
+
+  /* profileId+ref is unique, so a rename onto a live ref would fail in the
+     database. It fails here instead, where the message can say which. */
+  it('refuses to rename onto a reference that already exists', () => {
+    const clash = [...acts, { ref: 'CUS-01', stageKey: 'c' }];
+    expect(() => refRenames(clash, [{ stageKey: 'b', from: 'NEW', to: 'CUS' }])).toThrow(
+      /CUS-01/,
+    );
   });
 });

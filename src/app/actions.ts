@@ -5,6 +5,7 @@ import { stageMilestone } from '@/data/scheduleProfiles';
 import type { ItemKind, ScheduleProfile, StageBaseline, StageId } from '@/data/types';
 import { pickStages } from '@/lib/customProfile';
 import { prisma } from '@/lib/db';
+import { assertPrefixes, normalizePrefix, refRenames } from '@/lib/profileEdit';
 import { DB_KIND } from '@/lib/projectState';
 import { resolveStages } from '@/lib/stages';
 import {
@@ -843,29 +844,66 @@ export async function saveProfileStages(input: {
   }
   if (!input.stages.length) throw new Error('A template needs at least one stage.');
 
+  /* The prefix is stored in the shape a reference carries it, so the rule is
+     applied once, here, rather than at each place one is read. */
+  const stages = input.stages.map((st) => ({
+    ...st,
+    shortTitle: normalizePrefix(st.shortTitle),
+  }));
+
   const keys = new Set<string>();
-  for (const st of input.stages) {
+  for (const st of stages) {
     if (!st.title.trim()) throw new Error('Every stage needs a title.');
     if (keys.has(st.key)) throw new Error(`Duplicate stage: ${st.key}`);
     keys.add(st.key);
   }
+  assertPrefixes(stages);
 
   const name = input.name?.trim();
   if (name && name !== profile.name) await assertProfileNameFree(name);
 
+  /* A stage's prefix and an activity's number are two identities. Moving the
+     first takes the references with it and leaves the second alone, so DEF-04
+     becomes CUS-04 and the gap where 03 was deleted stays a gap. */
+  const before = await prisma.profileStage.findMany({
+    where: { profileId: profile.id },
+    select: { key: true, shortTitle: true },
+  });
+  const was = new Map(before.map((st) => [st.key, normalizePrefix(st.shortTitle)]));
+  const changes = stages
+    .filter((st) => was.has(st.key) && was.get(st.key) !== st.shortTitle)
+    .map((st) => ({ stageKey: st.key, from: was.get(st.key) as string, to: st.shortTitle }));
+
+  const acts = changes.length
+    ? await prisma.profileActivity.findMany({
+        where: { profileId: profile.id },
+        select: { id: true, ref: true, stageKey: true },
+      })
+    : [];
+  const idOf = new Map(acts.map((a) => [a.ref, a.id]));
+  /* Two passes through a name nothing else can hold: profileId+ref is unique,
+     and swapping two stages' prefixes would collide halfway through one pass.
+     `~` survives no prefix — normalizePrefix drops it — so `~0` is free. */
+  const renames = refRenames(acts, changes)
+    .map((r, i) => ({ id: idOf.get(r.from), parked: `~${i}`, to: r.to }))
+    .filter((r): r is { id: string; parked: string; to: string } => !!r.id);
+
   await prisma.$transaction([
+    ...renames.map((r) =>
+      prisma.profileActivity.update({ where: { id: r.id }, data: { ref: r.parked } }),
+    ),
     prisma.profileStage.deleteMany({ where: { profileId: profile.id } }),
     prisma.profile.update({
       where: { id: profile.id },
       data: {
         ...(name ? { name } : {}),
         stages: {
-          create: input.stages.map((st, order) => ({
+          create: stages.map((st, order) => ({
             id: `${profile.id}:${st.key}`,
             key: st.key,
             order,
             title: st.title.trim(),
-            shortTitle: st.shortTitle.trim() || st.title.trim().slice(0, 4).toUpperCase(),
+            shortTitle: st.shortTitle,
             phaseId: st.phaseId,
             baseKey: st.baseKey,
             startOffsetWeeks: st.startOffsetWeeks,
@@ -874,6 +912,9 @@ export async function saveProfileStages(input: {
         },
       },
     }),
+    ...renames.map((r) =>
+      prisma.profileActivity.update({ where: { id: r.id }, data: { ref: r.to } }),
+    ),
   ]);
   revalidatePath('/');
   revalidatePath('/templates');

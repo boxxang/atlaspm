@@ -13,7 +13,16 @@ import { activitySteps as activityLibrary } from '@/data/activitySteps';
 import { lifecyclePhases } from '@/data/scheduleProfiles';
 import type { ProfileStageDef } from '@/data/types';
 import { uid } from '@/store/useAppStore';
-import { addStage, moveStage, removeStage, retimeStage } from '@/lib/profileEdit';
+import {
+  addStage,
+  assertPrefixes,
+  duplicatePrefixes,
+  moveStage,
+  normalizePrefix,
+  removeStage,
+  retimeStage,
+  setStagePrefix,
+} from '@/lib/profileEdit';
 import { ctVar, CTHead, type Col } from './ctable';
 import { IconPlus } from './icons';
 
@@ -271,6 +280,7 @@ function NameDialog({
 
 const STAGE_COLS: Col[] = [
   ['title', null, 'STAGE'],
+  ['prefix', 92, 'PREFIX'],
   ['phase', 140, 'BAND'],
   ['start', 84, 'STARTS wk'],
   ['dur', 76, 'WEEKS'],
@@ -320,6 +330,18 @@ function StageDialog({
     };
   }, [profileId]);
 
+  /* Derived, not stored: the message a save would refuse with, computed on
+     every keystroke so the field says so before the button is reached. */
+  let prefixErr = '';
+  if (stages) {
+    try {
+      assertPrefixes(stages);
+    } catch (e) {
+      prefixErr = message(e);
+    }
+  }
+  const clashing = new Set(stages ? duplicatePrefixes(stages) : []);
+
   const edit = (fn: (s: readonly ProfileStageDef[]) => ProfileStageDef[]) => {
     setErr('');
     setStages((cur) => {
@@ -335,6 +357,10 @@ function StageDialog({
 
   const submit = async () => {
     if (!stages) return;
+    if (prefixErr) {
+      setErr(prefixErr);
+      return;
+    }
     setErr('');
     setPending(true);
     try {
@@ -400,6 +426,23 @@ function StageDialog({
                     edit((cur) =>
                       cur.map((x) => (x.key === st.key ? { ...x, title: e.target.value } : x)),
                     )
+                  }
+                />
+                <input
+                  className="lnkin"
+                  data-stage-prefix
+                  aria-label={`Prefix of ${st.title}`}
+                  autoComplete="off"
+                  spellCheck={false}
+                  maxLength={6}
+                  value={st.shortTitle}
+                  onChange={(e) =>
+                    edit((cur) => setStagePrefix(cur, st.key, e.target.value))
+                  }
+                  style={
+                    clashing.has(normalizePrefix(st.shortTitle)) || !st.shortTitle
+                      ? { color: 'var(--risk)', borderColor: 'var(--risk)' }
+                      : undefined
                   }
                 />
                 <select
@@ -498,14 +541,15 @@ function StageDialog({
               <span />
               <span />
               <span />
+              <span />
             </div>
           </div>
         )}
       </div>
       <div className="dlg-foot">
-        {err && (
+        {(err || prefixErr) && (
           <span className="err" style={{ fontSize: 12, color: 'var(--risk)' }}>
-            {err}
+            {err || prefixErr}
           </span>
         )}
         <span style={{ flexGrow: 1 }} />
@@ -516,7 +560,7 @@ function StageDialog({
           type="button"
           className="btn pri sm"
           data-tpl-save
-          disabled={pending || !stages || !name.trim()}
+          disabled={pending || !stages || !name.trim() || !!prefixErr}
           onClick={submit}
         >
           {pending ? 'Saving…' : 'Save template'}
