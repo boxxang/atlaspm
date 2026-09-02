@@ -12,7 +12,6 @@ import { useAppStore } from '@/store/useAppStore';
 import { useRailStore } from '@/store/railStore';
 import { CommsTab } from './CommsTab';
 import { DeliverablesTab } from './DeliverablesTab';
-import { IconPlus } from './icons';
 import { KeyInfoTab } from './KeyInfoTab';
 import { StageActivityTab } from './StageActivity';
 import { StageRisksTab } from './StageRisksTab';
@@ -162,10 +161,6 @@ export function StagePage({
             ›
           </Link>
         </div>
-        <button className="btn pri sm" type="button">
-          <IconPlus light />
-          New
-        </button>
       </div>
 
       <div style={{ padding: '18px 20px 0' }}>

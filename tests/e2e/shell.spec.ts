@@ -40,6 +40,13 @@ test.describe('the nav', () => {
     }
   });
 
+  /* The template is edited from Templates, which is where templates live. */
+  test('the timeline no longer offers to edit the template', async ({ page }) => {
+    await page.goto(`${SHELL_PATH}/timeline`);
+    await expect(page.getByRole('heading', { name: 'Timeline', level: 1 })).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Edit template' })).toHaveCount(0);
+  });
+
   test('carries the counts, including the two that mean steps', async ({ page }) => {
     const nav = page.getByRole('navigation', { name: 'Program' });
     await expect(nav.getByRole('link', { name: /^Stages/ })).toContainText('23');
@@ -183,6 +190,14 @@ test.describe('a stage', () => {
       'aria-current',
       'page',
     );
+  });
+
+  /* Its header carried a New that did nothing. A control that names an action
+     it cannot perform is worse than no control. */
+  test('offers no New button in its header', async ({ page }) => {
+    await page.goto(`${SHELL_PATH}/stage/physicalDesign`);
+    await expect(page.getByRole('heading', { name: 'Physical Design', level: 1 })).toBeVisible();
+    await expect(page.locator('.hd').getByRole('button', { name: 'New' })).toHaveCount(0);
   });
 
   test('a deep link into a tab restores it', async ({ page }) => {

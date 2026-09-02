@@ -7,7 +7,7 @@ import { formatManMonths } from '@/lib/effort';
 import { fmtDate } from '@/lib/schedule';
 import { useAppStore } from '@/store/useAppStore';
 import { Chevron } from './ctable';
-import { IconFilter, IconPlus } from './icons';
+import { IconFilter } from './icons';
 import { useProgramWork } from './useProgramWork';
 import { useStageSteps } from './useStageSteps';
 
@@ -53,7 +53,6 @@ export function TimelinePage({ projectId }: { projectId: string }) {
   const edited = useAppStore((s) => s.edited);
   const resetSchedule = useAppStore((s) => s.resetSchedule);
   const { risks } = useProgramWork();
-  const router = useRouter();
   const [size, setSize] = useState<RowSize>('normal');
   const [open, setOpen] = useState<string | null>(null);
   const chart = useRef<HTMLDivElement>(null);
@@ -136,10 +135,6 @@ export function TimelinePage({ projectId }: { projectId: string }) {
             </button>
           ))}
         </div>
-        <button className="btn pri sm" type="button" onClick={() => router.push(`/p/${projectId}/stages`)}>
-          <IconPlus light />
-          Edit template
-        </button>
       </div>
 
       <div className="ptl-scroll">
