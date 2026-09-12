@@ -2963,6 +2963,13 @@ kbd{font:inherit;font-size:10.5px;border:1px solid var(--line);border-bottom-wid
    into a pile. */
 .ovfeed{display:flex;gap:11px;padding:10px 16px;border-bottom:1px solid var(--line-soft)}
 .ovfeed:last-child{border-bottom:none}
+/* A board update's own subject, on the name's line. Clamped rather than left to
+   wrap: some entries are a sentence long, and a pill that takes the whole line
+   pushes the date off it. The full text is on the title attribute. */
+.pill.subject{max-width:260px;overflow:hidden;text-overflow:ellipsis;display:inline-block;vertical-align:bottom}
+/* The pills that go somewhere say so on hover; they are links inside a line of
+   text, so nothing else marks them. */
+a.pill:hover,a.ref:hover{filter:brightness(0.94)}
 /* two lines of a post, then an ellipsis — the feed is a prompt, not the thread */
 .ell2{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 

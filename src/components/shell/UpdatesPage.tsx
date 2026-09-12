@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import { useProgramActivities } from './useProgramActivities';
 import { detailActivityTitles } from '@/data/activityIndex';
 import { fmtDT } from '@/lib/schedule';
@@ -14,19 +15,30 @@ import { Avatar } from './icons';
  * tables — the second is the older board's — and this is the one screen that
  * has to show them together, because "what has been said lately" does not care
  * which.
+ *
+ * The name's line carries what the post is about and the body carries what was
+ * said, and nothing sits between them. A post on a step already names its
+ * activity and its step in the pills, so printing the activity's title
+ * underneath was the same sentence twice; a board update names neither, so its
+ * own subject moves up onto that line rather than being dropped. Every pill
+ * that can name somewhere is a link to it — the reference to the write-up, the
+ * step to the step itself, the stage to the stage — because the reason to read
+ * a post in a feed is usually to go to what it is about.
  */
 export function UpdatesPage({
   stageId,
+  projectId,
 }: {
   /** Given, this is the stage's own Updates tab rather than the programme's. */
   stageId?: string;
+  projectId: string;
 }) {
   const posts = useAppStore((s) => s.posts);
   const content = useAppStore((s) => s.content);
   const stages = useAppStore((s) => s.stages);
 
   const activitySteps = useProgramActivities();
-    const stageOfAct = (ref: string | null) => (ref ? (activitySteps[ref]?.st ?? null) : null);
+  const stageOfAct = (ref: string | null) => (ref ? (activitySteps[ref]?.st ?? null) : null);
 
   const fromPosts = posts.map((p) => ({
     id: p.id,
@@ -36,9 +48,9 @@ export function UpdatesPage({
     stageId: p.stageId ?? stageOfAct(p.activityRef),
     act: p.activityRef,
     stepN: p.stepN,
-    /* What the update is about, which is the line the mockup puts under the
-       name: a feed of texts with no subject reads as a chat log. */
-    title: p.activityRef ? (detailActivityTitles[p.activityRef] ?? p.activityRef) : null,
+    /* Only a board update carries one: what a post on a step is about is the
+       activity and the step its pills already name. */
+    subject: null as string | null,
     risk: p.kind === 'risk',
     edited: !!p.editedAt,
   }));
@@ -53,7 +65,7 @@ export function UpdatesPage({
           stageId: id,
           act: null as string | null,
           stepN: null as number | null,
-          title: it.title as string | null,
+          subject: it.title as string | null,
           risk: k === 'risks',
           edited: false,
         })),
@@ -79,15 +91,52 @@ export function UpdatesPage({
           <div style={{ flexGrow: 1, minWidth: 0 }}>
             <div style={{ display: 'flex', alignItems: 'baseline', gap: 7, flexWrap: 'wrap' }}>
               <b style={{ fontSize: 13 }}>{p.who || '—'}</b>
-              {shortOf(p.stageId) && (
-                <span className="pill" style={{ fontSize: 10.5 }}>
+              {/* On a stage's own tab every row is that stage's, so the pill
+                  would be a label that never varies. */}
+              {!stageId && p.stageId && shortOf(p.stageId) && (
+                <Link
+                  className="pill"
+                  style={{ fontSize: 10.5 }}
+                  href={`/p/${projectId}/stage/${p.stageId}/activity`}
+                  data-stage-pill={p.stageId}
+                >
                   {shortOf(p.stageId)}
-                </span>
+                </Link>
               )}
-              {p.act && <span className="ref">{p.act}</span>}
-              {p.stepN != null && (
-                <span className="pill acc" style={{ fontSize: 10.5 }}>
-                  STEP {p.stepN}
+              {p.act && (
+                <Link
+                  className="ref"
+                  href={`/p/${projectId}/activity/${p.act}`}
+                  /* the name the row no longer prints, for whoever wants it
+                     without leaving the feed */
+                  title={detailActivityTitles[p.act] ?? p.act}
+                  data-ref={p.act}
+                >
+                  {p.act}
+                </Link>
+              )}
+              {p.stepN != null &&
+                (p.act && p.stageId ? (
+                  <Link
+                    className="pill acc"
+                    style={{ fontSize: 10.5 }}
+                    /* the step itself, where its state and this thread are —
+                       not the write-up, which is about the template */
+                    href={`/p/${projectId}/stage/${p.stageId}/activity?step=${p.act}:${p.stepN}`}
+                    data-step-link={`${p.act}:${p.stepN}`}
+                  >
+                    STEP {p.stepN}
+                  </Link>
+                ) : (
+                  <span className="pill acc" style={{ fontSize: 10.5 }}>
+                    STEP {p.stepN}
+                  </span>
+                ))}
+              {/* Not a link: an entry on a board has no address of its own to
+                  send anybody to. */}
+              {p.subject && (
+                <span className="pill subject" title={p.subject} data-subject={p.id}>
+                  {p.subject}
                 </span>
               )}
               <span className="num" style={{ fontSize: 11.5, color: 'var(--ink-3)' }}>
@@ -96,9 +145,6 @@ export function UpdatesPage({
               {p.risk && <span className="dot" style={{ background: 'var(--risk)' }} />}
               {p.edited && <span className="edited">edited</span>}
             </div>
-            {p.title && (
-              <div style={{ fontSize: 13, fontWeight: 500, marginTop: 2 }}>{p.title}</div>
-            )}
             <div
               /* the whole body, as it was typed — this row is not a preview */
               style={{
