@@ -11683,7 +11683,9 @@ table.tens .tx{color:var(--ink-2);line-height:1.4}
       <section><p class="cap">Why it exists</p><p class="lede">Finish the die as a <b>manufacturable object</b>—seal ring, metal fill, dummy, alignment marks, identification—and verify that none of it broke what was closed.</p><p class="lede">Chip finishing is mechanical and it is not free. Metal fill changes coupling capacitance and therefore timing; the seal ring consumes die edge; and dummy fill interacts with the analog matching that <code>AMS-11</code> spent weeks building. Every one has to be applied and then re-verified.</p></section>
 
       <section><p class="cap">What it delivers</p>
-        <p class="none">No key deliverable is owned here — this activity contributes to the ones below.</p>
+        <div class="deliv">
+          <p class="deliv-h"><span class="did">PD-D9</span>Signoff-ready database handoff</p>
+          <p class="deliv-w">The assembled top level is not signoff-ready until it is finished: density and fill are DRC rules, and a database that has not met them fails the first check signoff runs.</p></div>
       </section>
 
       <section><p class="cap">Needs first</p><ul><li>Routed database from PD-08 and PD-15</li><li>Seal ring and frame rules from PDK-02</li><li>Fill and density rules from the DRM</li><li>Analog macro fill exclusions from AMS-11</li><li>Die identification requirements from MP-12</li></ul></section>
@@ -13247,7 +13249,9 @@ table.tens .tx{color:var(--ink-2);line-height:1.4}
       <section><p class="cap">Why it exists</p><p class="lede">Confirm the <b>FEOL mask order</b> and get a mask shop schedule the program can plan wafer start against.</p><p class="lede">One man-month of administration that fixes a date the whole downstream schedule hangs on. Mask writing takes weeks, and knowing when the FEOL set will be ready is what tells <code>FAB-05</code> when wafers can start.</p></section>
 
       <section><p class="cap">What it delivers</p>
-        <p class="none">No key deliverable is owned here — this activity contributes to the ones below.</p>
+        <div class="deliv">
+          <p class="deliv-h"><span class="did">TO-D5</span>FEOL MTO release package and mask order confirmation</p>
+          <p class="deliv-w">The order confirmation half of the release record, and the half the deliverable is not complete without — the mask shop is not building anything until this activity has scheduled it.</p></div>
       </section>
 
       <section><p class="cap">Needs first</p><ul><li>FEOL submission record from TO-06</li><li>Mask cost sheet from TECH-06</li><li>Capacity and slot commitment from TECH-07</li><li>Purchase authorization</li><li>Mask shop schedule</li></ul></section>
@@ -17562,7 +17566,9 @@ table.tens .tx{color:var(--ink-2);line-height:1.4}
       <section><p class="cap">Why it exists</p><p class="lede">Attach the interposer to the substrate and <b>underfill and mold</b> the assembly—the steps that make it mechanically robust and that lock in whatever went before.</p><p class="lede">Underfill is irreversible. Once it has flowed and cured, a bonding defect underneath is permanent and invisible to everything except acoustic imaging. The step's quality—void-free flow, complete fillet, correct cure—determines whether the mechanical stress the package will see is distributed or concentrated.</p></section>
 
       <section><p class="cap">What it delivers</p>
-        <p class="none">No key deliverable is owned here — this activity contributes to the ones below.</p>
+        <div class="deliv">
+          <p class="deliv-h"><span class="did">ASSY-D1</span>Assembly travelers and process data</p>
+          <p class="deliv-w">Underfill and mold conditions are recorded on the same traveler the bond step opened, and it closes here — a unit is not documented until it is encapsulated.</p></div>
       </section>
 
       <section><p class="cap">Needs first</p><ul><li>Bonded assemblies from ASSY-05</li><li>Substrates from PKGD-07 supply</li><li>Underfill and mold compound specifications</li><li>Frozen process window from PTV-12</li><li>Warpage data from PTV-09</li></ul></section>
