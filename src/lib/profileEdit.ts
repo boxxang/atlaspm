@@ -1,4 +1,5 @@
 import type { ProfileStageDef } from '@/data/types';
+import { addWeeks, DAY, startOfDay } from '@/lib/schedule';
 
 /**
  * The four edits a stage list takes, as pure functions.
@@ -230,4 +231,75 @@ export function retimeStage(
     throw new StageEditError('A stage needs a length.');
   }
   return stages.map((s) => (s.key === key ? { ...s, ...patch } : s));
+}
+
+/* ---------- reading and editing a stage as dates ---------- */
+
+/**
+ * A template still stores weeks and nothing else.
+ *
+ * The editor shows dates because weeks are hard to sanity-check — "mask
+ * fabrication starts in week 80" does not read as wrong, and "03/15/2027,
+ * before the MTO release on 03/29" does. The kickoff that turns one into the
+ * other is supplied by whoever is reading; it is not stored, and it is not the
+ * template's. That is the whole point: a template that held a date would be a
+ * programme, and the promise that editing one reschedules nobody rests on it
+ * holding none.
+ *
+ * So the conversion lives here, outside the stored shape, and every edit still
+ * lands on `startOffsetWeeks` and `durationWeeks` through `retimeStage`.
+ */
+export function stageWindow(
+  kickoff: Date,
+  stage: Pick<ProfileStageDef, 'startOffsetWeeks' | 'durationWeeks'>,
+): { start: Date; end: Date } {
+  return {
+    start: addWeeks(kickoff, stage.startOffsetWeeks),
+    end: addWeeks(kickoff, stage.startOffsetWeeks + stage.durationWeeks),
+  };
+}
+
+/**
+ * Whole weeks from the kickoff, rounded to the nearest.
+ *
+ * A stage's offsets have only ever been whole weeks and a date picker hands
+ * back any day of any of them. Rounding is the honest reading of "this stage
+ * starts that week", and it stops a half-week entering a template that has
+ * never carried one. Negative before the kickoff, so the caller can say so.
+ */
+export const weeksFromKickoff = (kickoff: Date, date: Date): number =>
+  Math.round((startOfDay(date).getTime() - startOfDay(kickoff).getTime()) / (7 * DAY));
+
+/**
+ * Retiming a stage from either end.
+ *
+ * Moving the start moves the whole stage and keeps its length — the same rule
+ * the week fields follow, and the reason a start dragged past the old end does
+ * not produce a negative one. Moving the end changes the length alone, which is
+ * why the end-date column and the TAT column are the same edit: `{ end }` and
+ * the `durationWeeks` it implies are interchangeable, and a test pins that.
+ */
+export function retimeStageByDate(
+  stages: readonly ProfileStageDef[],
+  key: string,
+  kickoff: Date,
+  patch: { start?: Date; end?: Date; durationWeeks?: number },
+): ProfileStageDef[] {
+  const stage = find(stages, key);
+  const ok = (d: Date) => {
+    if (Number.isNaN(d.getTime())) throw new StageEditError('That is not a date.');
+    return d;
+  };
+
+  if (patch.start) {
+    const weeks = weeksFromKickoff(kickoff, ok(patch.start));
+    if (weeks < 0) throw new StageEditError('A stage cannot start before the programme does.');
+    return retimeStage(stages, key, { startOffsetWeeks: weeks });
+  }
+  if (patch.end) {
+    const weeks = weeksFromKickoff(kickoff, ok(patch.end)) - stage.startOffsetWeeks;
+    if (weeks <= 0) throw new StageEditError('A stage has to end after it starts.');
+    return retimeStage(stages, key, { durationWeeks: weeks });
+  }
+  return retimeStage(stages, key, { durationWeeks: patch.durationWeeks });
 }

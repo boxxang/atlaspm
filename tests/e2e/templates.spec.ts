@@ -81,14 +81,106 @@ test.describe('templates', () => {
     await page.locator('[data-add-stage]').click();
     await expect(page.locator('[data-stage-row]')).toHaveCount(23);
 
-    await page.locator('[data-stage-row="productDefinition"] [data-stage-dur]').fill('10');
+    await page.locator('[data-stage-row="productDefinition"] [data-stage-tat]').fill('10');
     await page.locator('[data-stage-dialog] [data-tpl-save]').click();
     await expect(page.locator('[data-stage-dialog]')).toHaveCount(0);
 
     await open(page);
     await page.locator('[data-template]').filter({ hasText: NAME }).locator('[data-edit-template]').click();
     await expect(page.locator('[data-stage-row="tapeout"]')).toHaveCount(0);
-    await expect(page.locator('[data-stage-row="productDefinition"] [data-stage-dur]')).toHaveValue('10');
+    await expect(page.locator('[data-stage-row="productDefinition"] [data-stage-tat]')).toHaveValue('10');
+  });
+
+  /**
+   * The stage rows read as dates against a kickoff the reader supplies.
+   *
+   * Nothing about that reaches the database: what is saved is still
+   * `startOffsetWeeks` and `durationWeeks`, which is what lets a template be
+   * edited without rescheduling the programmes running on it. So these check
+   * the arithmetic on screen, and that the kickoff is the only thing moving
+   * the dates when the weeks have not changed.
+   */
+  test.describe('reading the stages as dates', () => {
+    const iso = (base: string, addDays: number) => {
+      const d = new Date(`${base}T00:00:00`);
+      d.setDate(d.getDate() + addDays);
+      return d.toISOString().slice(0, 10);
+    };
+
+    test('the kickoff sets where the first stage starts', async ({ page }) => {
+      await duplicate(page);
+      await page.locator('[data-template]').filter({ hasText: NAME }).locator('[data-edit-template]').click();
+
+      await page.locator('[data-tpl-kickoff]').fill('2026-01-05');
+      const first = page.locator('[data-stage-row="productDefinition"]');
+      /* Product Definition opens the programme, so it starts on the kickoff */
+      await expect(first.locator('[data-stage-start]')).toHaveValue('2026-01-05');
+      const tat = Number(await first.locator('[data-stage-tat]').inputValue());
+      await expect(first.locator('[data-stage-end]')).toHaveValue(iso('2026-01-05', tat * 7));
+    });
+
+    test('moving the kickoff moves every date and no week', async ({ page }) => {
+      await duplicate(page);
+      await page.locator('[data-template]').filter({ hasText: NAME }).locator('[data-edit-template]').click();
+      const row = page.locator('[data-stage-row="signoff"]');
+
+      await page.locator('[data-tpl-kickoff]').fill('2026-01-05');
+      const before = await row.locator('[data-stage-start]').inputValue();
+      const tat = await row.locator('[data-stage-tat]').inputValue();
+
+      await page.locator('[data-tpl-kickoff]').fill('2026-01-12');
+      await expect(row.locator('[data-stage-start]')).toHaveValue(iso(before, 7));
+      await expect(row.locator('[data-stage-tat]')).toHaveValue(tat);
+    });
+
+    /* The two columns are the same edit from either end. */
+    test('TAT moves the end date, and the end date moves TAT', async ({ page }) => {
+      await duplicate(page);
+      await page.locator('[data-template]').filter({ hasText: NAME }).locator('[data-edit-template]').click();
+      await page.locator('[data-tpl-kickoff]').fill('2026-01-05');
+      const row = page.locator('[data-stage-row="productDefinition"]');
+
+      await row.locator('[data-stage-tat]').fill('10');
+      await expect(row.locator('[data-stage-end]')).toHaveValue(iso('2026-01-05', 70));
+      await expect(row.locator('[data-stage-start]')).toHaveValue('2026-01-05');
+
+      await row.locator('[data-stage-end]').fill(iso('2026-01-05', 84));
+      await expect(row.locator('[data-stage-tat]')).toHaveValue('12');
+      await expect(row.locator('[data-stage-start]')).toHaveValue('2026-01-05');
+    });
+
+    /* Moving a stage moves it whole; it does not stretch it. */
+    test('a new start date carries the length with it', async ({ page }) => {
+      await duplicate(page);
+      await page.locator('[data-template]').filter({ hasText: NAME }).locator('[data-edit-template]').click();
+      await page.locator('[data-tpl-kickoff]').fill('2026-01-05');
+      const row = page.locator('[data-stage-row="productDefinition"]');
+      const tat = await row.locator('[data-stage-tat]').inputValue();
+
+      await row.locator('[data-stage-start]').fill(iso('2026-01-05', 28));
+      await expect(row.locator('[data-stage-tat]')).toHaveValue(tat);
+      await expect(row.locator('[data-stage-end]')).toHaveValue(iso('2026-01-05', 28 + Number(tat) * 7));
+    });
+
+    /* What is stored is weeks, so the dates have to survive a different
+       kickoff being set on the way back in. */
+    test('what a date edit saves is weeks, not the date', async ({ page }) => {
+      await duplicate(page);
+      await page.locator('[data-template]').filter({ hasText: NAME }).locator('[data-edit-template]').click();
+      await page.locator('[data-tpl-kickoff]').fill('2026-01-05');
+      const row = page.locator('[data-stage-row="productDefinition"]');
+      await row.locator('[data-stage-end]').fill(iso('2026-01-05', 84));
+      await page.locator('[data-stage-dialog] [data-tpl-save]').click();
+      await expect(page.locator('[data-stage-dialog]')).toHaveCount(0);
+
+      await open(page);
+      await page.locator('[data-template]').filter({ hasText: NAME }).locator('[data-edit-template]').click();
+      await page.locator('[data-tpl-kickoff]').fill('2027-03-01');
+      const again = page.locator('[data-stage-row="productDefinition"]');
+      await expect(again.locator('[data-stage-tat]')).toHaveValue('12');
+      await expect(again.locator('[data-stage-start]')).toHaveValue('2027-03-01');
+      await expect(again.locator('[data-stage-end]')).toHaveValue(iso('2027-03-01', 84));
+    });
   });
 
   /* Moving a row is the y-axis, not the calendar: the dates must not follow. */

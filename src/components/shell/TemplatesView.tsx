@@ -21,9 +21,11 @@ import {
   normalizePrefix,
   prefixCharsOk,
   removeStage,
-  retimeStage,
+  retimeStageByDate,
   setStagePrefix,
+  stageWindow,
 } from '@/lib/profileEdit';
+import { fromISO, startOfDay, toISO } from '@/lib/schedule';
 import { ctVar, CTHead, type Col } from './ctable';
 import { IconPlus } from './icons';
 
@@ -281,12 +283,49 @@ function NameDialog({
 
 const STAGE_COLS: Col[] = [
   ['title', null, 'STAGE'],
-  ['prefix', 92, 'PREFIX'],
-  ['phase', 140, 'BAND'],
-  ['start', 84, 'STARTS wk'],
-  ['dur', 76, 'WEEKS'],
-  ['acts', 250, ''],
+  ['prefix', 84, 'PREFIX'],
+  ['phase', 132, 'BAND'],
+  ['start', 122, 'STARTS'],
+  ['end', 122, 'ENDS'],
+  ['tat', 62, 'TAT (W)'],
+  ['acts', 232, ''],
 ];
+
+/**
+ * The kickoff the editor reads the stages against.
+ *
+ * Not the template's — a template has no dates, and that is what makes editing
+ * one safe for every programme already running on it. This is a reading aid:
+ * weeks are hard to check by eye ("mask fabrication starts in week 80" does not
+ * look wrong) and dates are not ("03/15/2027, a fortnight before the data that
+ * feeds it is released" does).
+ *
+ * Remembered per browser rather than stored, which is where the display
+ * settings already live. A browser that refuses storage falls back to today
+ * rather than to no dates at all.
+ */
+const KICKOFF_KEY = 'atlaspm:template-kickoff';
+
+const readKickoff = (): Date => {
+  try {
+    const saved = localStorage.getItem(KICKOFF_KEY);
+    if (saved) {
+      const d = fromISO(saved);
+      if (!Number.isNaN(d.getTime())) return d;
+    }
+  } catch {
+    /* private window, or site data blocked */
+  }
+  return startOfDay();
+};
+
+const rememberKickoff = (d: Date) => {
+  try {
+    localStorage.setItem(KICKOFF_KEY, toISO(d));
+  } catch {
+    /* the dates still work for this session */
+  }
+};
 
 /**
  * Editing a template's stages.
@@ -311,6 +350,8 @@ function StageDialog({
   /* Renaming and re-staging are one act of editing this template, so they share
      a form and a save rather than being two screens with two buttons. */
   const [name, setName] = useState(label);
+  /* Lazily, because localStorage is not there while this renders on the server. */
+  const [kickoff, setKickoff] = useState<Date>(() => readKickoff());
   const [acts, setActs] = useState<{ stageKey: string; shortTitle: string } | null>(null);
   const [err, setErr] = useState('');
   const [pending, setPending] = useState(false);
@@ -388,7 +429,11 @@ function StageDialog({
   return (
     <dialog
       className="dlg"
-      style={{ width: 'min(980px, calc(100vw - 32px))' }}
+      /* Wide enough for the date columns: the action column is justified to
+         the end, so a grid that cannot fit it does not clip it — it slides
+         left over the column before it, which is how the TAT field went
+         missing while being present in the DOM. */
+      style={{ width: 'min(1160px, calc(100vw - 32px))' }}
       ref={box}
       data-stage-dialog
       aria-label={`Stages of ${label}`}
@@ -406,6 +451,31 @@ function StageDialog({
             setName(e.target.value);
           }}
         />
+        <label
+          style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, color: 'var(--ink-3)' }}
+        >
+          Kickoff
+          <input
+            className="lnkin num"
+            type="date"
+            aria-label="Kickoff the dates are read against"
+            data-tpl-kickoff
+            value={toISO(kickoff)}
+            onChange={(e) => {
+              const d = fromISO(e.target.value);
+              if (Number.isNaN(d.getTime())) return;
+              setKickoff(d);
+              rememberKickoff(d);
+            }}
+          />
+        </label>
+        <span
+          className="mono-note"
+          style={{ fontSize: 11, color: 'var(--ink-3)' }}
+          title="A template stores weeks, not dates. This one is yours, for reading them."
+        >
+          not saved with the template
+        </span>
         <span style={{ flexGrow: 1 }} />
         <button type="button" className="btn sm" onClick={onClose}>
           Close
@@ -468,29 +538,47 @@ function StageDialog({
                     </option>
                   ))}
                 </select>
+                {/* Dates on the way out, weeks on the way in: what is stored is
+                    still startOffsetWeeks and durationWeeks, and the conversion
+                    lives in /lib/profileEdit with its own tests. */}
                 <input
                   className="lnkin num"
-                  type="number"
-                  min={0}
-                  step={1}
+                  type="date"
+                  aria-label={`${st.title} starts`}
                   data-stage-start
-                  value={st.startOffsetWeeks}
+                  value={toISO(stageWindow(kickoff, st).start)}
                   onChange={(e) =>
                     edit((cur) =>
-                      retimeStage(cur, st.key, { startOffsetWeeks: Number(e.target.value) }),
+                      retimeStageByDate(cur, st.key, kickoff, { start: fromISO(e.target.value) }),
                     )
                   }
                 />
                 <input
                   className="lnkin num"
+                  type="date"
+                  aria-label={`${st.title} ends`}
+                  data-stage-end
+                  value={toISO(stageWindow(kickoff, st).end)}
+                  onChange={(e) =>
+                    edit((cur) =>
+                      retimeStageByDate(cur, st.key, kickoff, { end: fromISO(e.target.value) }),
+                    )
+                  }
+                />
+                {/* The same edit as the end date, from the other side. */}
+                <input
+                  className="lnkin num"
                   type="number"
                   min={1}
                   step={1}
-                  data-stage-dur
+                  aria-label={`${st.title} TAT in weeks`}
+                  data-stage-tat
                   value={st.durationWeeks}
                   onChange={(e) =>
                     edit((cur) =>
-                      retimeStage(cur, st.key, { durationWeeks: Number(e.target.value) }),
+                      retimeStageByDate(cur, st.key, kickoff, {
+                        durationWeeks: Number(e.target.value),
+                      }),
                     )
                   }
                 />
