@@ -59,15 +59,15 @@ test.describe('the communication board', () => {
   /* What it is about is the post's own claim, not a guess: it is chosen when
      the post is written and it survives the round trip. */
   test('a post names the step it is about, and who raised it', async ({ page }) => {
-    await post(page, { about: 'ASSY-10', step: '7' });
+    await post(page, { about: 'ASSY-02', step: '7' });
     const row = page.locator('[data-item]').filter({ hasText: SUBJECT });
-    await expect(row.locator('[data-about]')).toHaveAttribute('data-about', 'ASSY-10 · step 7');
+    await expect(row.locator('[data-about]')).toHaveAttribute('data-about', 'ASSY-02 · step 7');
     await expect(row.locator('[data-poster]')).toHaveAttribute('data-poster', /\S/);
 
     await open(page);
     await expect(
       page.locator('[data-item]').filter({ hasText: SUBJECT }).locator('[data-about]'),
-    ).toHaveAttribute('data-about', 'ASSY-10 · step 7');
+    ).toHaveAttribute('data-about', 'ASSY-02 · step 7');
   });
 
   /* A post that belongs to the stage rather than to one piece of work says so

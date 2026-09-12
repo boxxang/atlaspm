@@ -16,11 +16,11 @@ module.exports = {
   ],
   flowNote:'Step 3 sizes the signoff campaign. Signoff runtime on a die this size is measured in days per corner, and knowing the number before the final turn is what lets the schedule be built rather than discovered.',
   consumes:[
-    'Turn 2 database from PD-06',
-    'Decks and runsets from PDK-10',
-    'Corner definition from PDK-11',
-    'Tool matrix from PDK-08',
-    'Compute and license capacity from PDK-12',
+    'Turn 2 database from PD-11',
+    'Decks and runsets from PDK-04',
+    'Corner definition from PDK-12',
+    'Tool matrix from PDK-07',
+    'Compute and license capacity from PDK-10',
   ],
   produces:[
     'Assembled signoff flow with integrated decks',
@@ -32,7 +32,7 @@ module.exports = {
   producedBy:[1,2,3,4,5],
   rel:[
     {id:'SO-D7', rel:'feeds', text:'<b>Signoff summary and Design Freeze package.</b> The rehearsal is what makes the real campaign\'s schedule credible.'},
-    {id:'SO-D1', rel:'feeds', text:'<b>STA signoff reports.</b> The flow that produces them is built and debugged here.'},
+    {id:'SO-D4', rel:'feeds', text:'<b>STA signoff reports.</b> The flow that produces them is built and debugged here.'},
   ],
   risks:[
     '<b>Dry run skipped for schedule.</b> The flow\'s first full-chip run then happens on the critical path, and every problem it finds costs tapeout days.',
@@ -50,18 +50,18 @@ module.exports = {
   ],
   effort:[['Flow assembly and deck integration',4.5], ['Dry run execution',3.5], ['Issue resolution',3], ['Triage process and tooling',1.5], ['Runtime measurement',1.5]],
   entry:[
-    'Turn 2 database available from PD-06',
-    'Decks validated and versioned by PDK-10',
-    'Corner definition final from PDK-11',
+    'Turn 2 database available from PD-11',
+    'Decks validated and versioned by PDK-04',
+    'Corner definition final from PDK-12',
   ],
   exit:[
     'Flow runs end to end at full chip before the final turn',
     'Runtime measured and the campaign scheduled against it',
     'Rehearsal findings fixed, not only listed',
   ],
-  dependsOn:['PD-06','PDK-08','PDK-10','PDK-11','PDK-12'],
+  dependsOn:['PD-11','PDK-07','PDK-04','PDK-12','PDK-10'],
   dependsNote:null,
-  feedsInto:['SO-02','SO-03','SO-04','PD-09'],
+  feedsInto:['SO-03','SO-04','SO-05','PD-06'],
   measuredBy:[
     'Flow issues found in rehearsal against in the real campaign',
     'Runtime per corner against the campaign plan',
@@ -70,10 +70,77 @@ module.exports = {
 },
 
 'SO-02': {
+  stage:'signoff', window:[2,7], criticalPath:false,
+  purpose:[
+    'Correlate the <b>signoff flow against the foundry\'s own decks and the implementation tool</b>, so that a number produced here means the same thing everywhere it is read.',
+    'Three parties analyze this design: the implementation tool, the signoff tool and the foundry. If they disagree, the design can be closed in one and rejected by another. Establishing the correlation early is what lets physical design close with the right margin instead of re-closing after signoff reports.',
+  ],
+  steps:[
+    {n:1, text:'Correlation methodology and reference case selection', tat:1, lane:'main'},
+    {n:2, text:'Implementation to signoff tool correlation', tat:1.5, lane:'main'},
+    {n:3, text:'Foundry deck and derate correlation', tat:1, lane:'par'},
+    {n:4, text:'Extraction and parasitic correlation', tat:1, lane:'par'},
+    {n:5, text:'Correlation findings and margin guidance', tat:2.5, lane:'main'},
+  ],
+  flowNote:'Step 5 is the output physical design actually uses. Knowing that signoff reads 40 ps more pessimistic than implementation on long paths lets <code>PD-06</code> close with that margin built in, rather than closing to zero and discovering the gap at <code>SO-03</code>.',
+  consumes:[
+    'Implementation timing results from PD-06',
+    'Signoff flow from SO-01',
+    'Foundry decks and derates from PDK-12',
+    'Extraction decks from PDK-04',
+    'Library models from PDK-03',
+  ],
+  produces:[
+    'Correlation methodology and reference cases',
+    'Implementation to signoff correlation results',
+    'Foundry deck and derate correlation',
+    'Extraction and parasitic correlation',
+    'Margin guidance for physical design',
+  ],
+  producedBy:[1,2,3,4,5],
+  rel:[
+    {id:'SO-D4', rel:'feeds', text:'<b>STA signoff reports.</b> Correlation is what makes the signoff numbers comparable to the ones physical design closed against.'},
+    {id:'SO-D7', rel:'feeds', text:'<b>Signoff summary and Design Freeze package.</b> A stated correlation is part of what makes the signoff result defensible to the foundry.'},
+  ],
+  risks:[
+    '<b>Correlation established after signoff starts.</b> The gap is then discovered on the final database, when closing it means re-opening closure.',
+    '<b>Correlation on unrepresentative paths.</b> Tool differences concentrate on long, heavily coupled paths, and correlating on short clean ones shows agreement that does not generalize.',
+    '<b>Extraction differences overlooked.</b> Parasitic differences between flows can exceed timing tool differences and are less often checked.',
+    '<b>Margin guidance not adopted.</b> Correlation that physical design does not close against has produced information nobody used.',
+    '<b>Foundry decks assumed identical to internal ones.</b> Derates and corner definitions can differ in detail, and the foundry\'s version is the one that decides acceptance.',
+  ],
+  roles:[
+    {r:'Signoff methodology engineer', d:'Owns correlation and margin guidance'},
+    {r:'STA engineers', d:'Reference case analysis in both flows'},
+    {r:'Extraction engineer', d:'Parasitic correlation'},
+    {r:'Physical design liaison', d:'Adopts margin guidance into closure'},
+    {r:'Foundry liaison', d:'Deck and derate alignment'},
+  ],
+  effort:[['Correlation findings and guidance',2], ['Implementation to signoff correlation',1.5], ['Extraction correlation',1], ['Foundry deck correlation',1], ['Methodology and reference cases',0.5]],
+  entry:[
+    'Implementation timing available from PD-06',
+    'Signoff flow assembled in SO-01',
+    'Foundry decks and derates available from PDK-12',
+  ],
+  exit:[
+    'Correlation established on representative, difficult paths',
+    'Margin guidance published and adopted by physical design',
+    'Foundry deck differences understood, not assumed away',
+  ],
+  dependsOn:['SO-01','PD-06','PDK-03','PDK-04','PDK-12'],
+  dependsNote:null,
+  feedsInto:['SO-03','PD-06','TO-02'],
+  measuredBy:[
+    'Correlation gap on representative paths',
+    'Margin guidance adopted in closure',
+    'Surprises at first signoff run',
+  ],
+},
+'SO-03': {
   stage:'signoff', window:[5,15], criticalPath:true,
   purpose:[
     'Prove the final database meets timing <b>at every corner and every mode, in the signoff tool</b>, and dispose of every remaining violation as a fix or a signed waiver.',
-    'This is the largest activity in the stage and the one Design Freeze most depends on. It differs from <code>PD-09</code> in that it is judgment rather than optimization: the signoff tool, the foundry-agreed derates and the full corner set, with no ECO loop to fall back on.',
+    'This is the largest activity in the stage and the one Design Freeze most depends on. It differs from <code>PD-06</code> in that it is judgment rather than optimization: the signoff tool, the foundry-agreed derates and the full corner set, with no ECO loop to fall back on.',
   ],
   steps:[
     {n:1, text:'Signoff STA setup on the final database', tat:1.5, lane:'main'},
@@ -86,11 +153,11 @@ module.exports = {
   ],
   flowNote:'Step 6 covers the modes that are easy to forget and expensive to miss. Scan shift, at-speed capture and any low-power mode each have their own timing, and a design signed off functionally and not in test mode produces parts that fail at ATE.',
   consumes:[
-    'Final database from PD-13 and PD-16',
+    'Final database from PD-15 and PD-12',
     'Constraints from SYN-01',
-    'Corner and derate definition from PDK-11',
-    'Correlation findings from SO-12',
-    'Timing closure status from PD-09',
+    'Corner and derate definition from PDK-12',
+    'Correlation findings from SO-02',
+    'Timing closure status from PD-06',
   ],
   produces:[
     'Signoff STA setup',
@@ -103,14 +170,14 @@ module.exports = {
   ],
   producedBy:[1,2,3,4,5,6,7],
   rel:[
-    {id:'SO-D1', rel:'produces', text:'<b>STA signoff reports across all corners and modes, with waiver list.</b> This activity is the deliverable, and the waiver list is the part that carries risk into silicon.'},
+    {id:'SO-D4', rel:'produces', text:'<b>STA signoff reports across all corners and modes, with waiver list.</b> This activity is the deliverable, and the waiver list is the part that carries risk into silicon.'},
     {id:'SO-D7', rel:'feeds', text:'<b>Signoff summary and Design Freeze package.</b> Timing signoff is the largest single input to the freeze decision.'},
   ],
   risks:[
     '<b>Corners deferred to fit the schedule.</b> The deferred corner is the one that fails, and it fails in silicon where there is no fix.',
     '<b>Waivers granted without root cause.</b> A waived violation with no understood cause is a silicon risk being accepted blind.',
     '<b>Test modes not signed off.</b> Scan shift and at-speed timing failures produce parts that work functionally and fail at ATE.',
-    '<b>Signoff and implementation disagreeing late.</b> If <code>SO-12</code> has not correlated the two, the first signoff run can show a design weeks from closure.',
+    '<b>Signoff and implementation disagreeing late.</b> If <code>SO-02</code> has not correlated the two, the first signoff run can show a design weeks from closure.',
     '<b>ECO loop reopening after signoff starts.</b> Each ECO invalidates the analysis it was based on, and uncontrolled iteration never converges.',
   ],
   roles:[
@@ -122,18 +189,18 @@ module.exports = {
   ],
   effort:[['Setup timing analysis',10], ['Hold timing analysis',7], ['Violation triage and root cause',6], ['Closure and waiver disposition',5], ['Test-mode signoff',3.5], ['ECO iteration',2.5]],
   entry:[
-    'Final database frozen and handed over by PD-13',
-    'Corner and derate set agreed in PDK-11',
-    'Correlation established in SO-12',
+    'Final database frozen and handed over by PD-15',
+    'Corner and derate set agreed in PDK-12',
+    'Correlation established in SO-02',
   ],
   exit:[
     'Every corner and mode analyzed, none deferred',
     'Every waiver carries a root cause and a signature',
     'Test modes signed off alongside functional',
   ],
-  dependsOn:['SO-01','SO-12','PD-13','PD-16','PDK-11'],
+  dependsOn:['SO-01','SO-02','PD-15','PD-12','PDK-12'],
   dependsNote:null,
-  feedsInto:['SO-10','SO-11','TO-02','TO-03'],
+  feedsInto:['SO-11','SO-10','TO-02','TO-03'],
   measuredBy:[
     'Corners and modes signed off against total',
     'Waivers with a root cause',
@@ -141,7 +208,7 @@ module.exports = {
   ],
 },
 
-'SO-03': {
+'SO-04': {
   stage:'signoff', window:[6,15], criticalPath:true,
   purpose:[
     'Run <b>full-chip physical verification</b>—DRC, LVS, antenna, density—to clean, on the database that will become masks.',
@@ -157,10 +224,10 @@ module.exports = {
   ],
   flowNote:'Step 4 is where the hardest problems hide. An LVS mismatch on a full chip can take days to localize, and the causes are usually elsewhere—a macro abstract that disagrees with its layout, or an ECO applied to one view and not the other.',
   consumes:[
-    'Final database from PD-13 and PD-16',
-    'Verification decks from PDK-10',
-    'Macro layouts and abstracts from AMS-12 and AMS-15',
-    'Chip finishing from PD-15',
+    'Final database from PD-15 and PD-12',
+    'Verification decks from PDK-04',
+    'Macro layouts and abstracts from AMS-11 and AMS-16',
+    'Chip finishing from PD-16',
     'Foundry rule set from PDK-02',
   ],
   produces:[
@@ -173,7 +240,7 @@ module.exports = {
   ],
   producedBy:[1,2,3,4,5,6],
   rel:[
-    {id:'SO-D2', rel:'produces', text:'<b>Clean DRC / LVS / antenna / density reports.</b> This activity is the deliverable, and it is a precondition for mask release rather than an opinion.'},
+    {id:'SO-D5', rel:'produces', text:'<b>Clean DRC / LVS / antenna / density reports.</b> This activity is the deliverable, and it is a precondition for mask release rather than an opinion.'},
     {id:'SO-D7', rel:'feeds', text:'<b>Signoff summary and Design Freeze package.</b> A design with open physical violations cannot be frozen.'},
   ],
   risks:[
@@ -192,18 +259,18 @@ module.exports = {
   ],
   effort:[['DRC execution and triage',8], ['LVS and mismatch debug',7], ['Antenna verification and fixing',4.5], ['Closure and waiver preparation',3.5], ['Density and fill verification',3]],
   entry:[
-    'Final database available from PD-13',
-    'Decks validated and versioned in PDK-10',
-    'Chip finishing complete from PD-15',
+    'Final database available from PD-15',
+    'Decks validated and versioned in PDK-04',
+    'Chip finishing complete from PD-16',
   ],
   exit:[
     'DRC, LVS, antenna and density all clean or formally waived',
     'LVS mismatches resolved, not waived',
     'No database change after the last clean run',
   ],
-  dependsOn:['SO-01','PD-13','PD-15','PD-16','PDK-10'],
+  dependsOn:['SO-01','PD-15','PD-16','PD-12','PDK-04'],
   dependsNote:null,
-  feedsInto:['SO-10','TO-01','TO-02','TO-09'],
+  feedsInto:['SO-11','TO-01','TO-02','TO-09'],
   measuredBy:[
     'Violations remaining at freeze',
     'Full-chip run iterations required',
@@ -211,7 +278,7 @@ module.exports = {
   ],
 },
 
-'SO-04': {
+'SO-05': {
   stage:'signoff', window:[7,15], criticalPath:true,
   purpose:[
     'Sign off <b>electromigration and IR drop</b>—static and dynamic, with real switching—because a design that meets timing and fails EM will not survive its warranty.',
@@ -227,10 +294,10 @@ module.exports = {
   ],
   flowNote:'Step 5 closes a loop that is often left open. IR drop lowers the local supply and slows the logic, and unless that is back-annotated into timing the STA has been run at a voltage the die does not actually see.',
   consumes:[
-    'Final database from PD-13',
+    'Final database from PD-15',
     'PDN from PD-03',
-    'Switching activity from DV-04 and SYN-06',
-    'Chip power model and co-analysis from SIPI-04',
+    'Switching activity from DV-08 and SYN-09',
+    'Chip power model and co-analysis from SIPI-05',
     'EM rules from PDK-02',
   ],
   produces:[
@@ -243,13 +310,13 @@ module.exports = {
   ],
   producedBy:[1,2,3,4,5,6],
   rel:[
-    {id:'SO-D3', rel:'produces', text:'<b>EM/IR and SI/PI signoff reports.</b> The EM and IR half of the deliverable; <code>SO-05</code> supplies the SI/PI half.'},
-    {id:'SO-D1', rel:'feeds', text:'<b>STA signoff reports.</b> IR-aware timing is timing, and the two signoffs have to be reconciled rather than reported separately.'},
+    {id:'SO-D1', rel:'produces', text:'<b>EM/IR and SI/PI signoff reports.</b> The EM and IR half of the deliverable; <code>SO-08</code> supplies the SI/PI half.'},
+    {id:'SO-D4', rel:'feeds', text:'<b>STA signoff reports.</b> IR-aware timing is timing, and the two signoffs have to be reconciled rather than reported separately.'},
   ],
   risks:[
     '<b>IR not back-annotated into timing.</b> The design is then signed off at a supply voltage it never sees, and the margin was never real.',
     '<b>Dynamic IR analyzed with uniform activity.</b> Real switching is bursty and local, and uniform assumptions understate the worst case.',
-    '<b>Package effects excluded.</b> Die-only IR is optimistic; the number that matters includes the package inductance <code>SIPI-04</code> models.',
+    '<b>Package effects excluded.</b> Die-only IR is optimistic; the number that matters includes the package inductance <code>SIPI-05</code> models.',
     '<b>Signal EM overlooked.</b> High-toggle nets on advanced nodes carry real EM exposure, and checking only power misses them.',
     '<b>EM fixes reopening timing.</b> Widening wires changes delay, and a fix applied after timing signoff invalidates it.',
   ],
@@ -262,18 +329,18 @@ module.exports = {
   ],
   effort:[['Static and dynamic IR analysis',7], ['EM analysis',5], ['Closure and waiver disposition',4], ['IR-aware timing assessment',2.5], ['Setup and scenarios',1.5]],
   entry:[
-    'Final database available from PD-13',
-    'Realistic switching activity available from DV-04',
-    'Package co-analysis results available from SIPI-04',
+    'Final database available from PD-15',
+    'Realistic switching activity available from DV-08',
+    'Package co-analysis results available from SIPI-05',
   ],
   exit:[
     'IR back-annotated into timing signoff',
     'Dynamic IR analyzed with realistic localized activity',
     'EM checked on signal nets as well as power',
   ],
-  dependsOn:['SO-01','PD-03','PD-10','PD-13','SIPI-04'],
+  dependsOn:['SO-01','PD-03','PD-14','PD-15','SIPI-05'],
   dependsNote:null,
-  feedsInto:['SO-02','SO-10','TO-02','MP-02'],
+  feedsInto:['SO-03','SO-11','TO-02','MP-03'],
   measuredBy:[
     'IR drop against budget with realistic activity',
     'Timing margin consumed by IR',
@@ -281,145 +348,7 @@ module.exports = {
   ],
 },
 
-'SO-05': {
-  stage:'signoff', window:[9,15], criticalPath:false,
-  purpose:[
-    'Sign off <b>signal integrity</b>—crosstalk delay, noise, glitch—on the final database, and confirm the numbers the timing signoff assumed.',
-    'Crosstalk is timing. Coupling between adjacent nets changes delay in both directions and can inject glitches that propagate as functional failures. The analysis is separate from STA and its results feed straight back into it, which makes the two inseparable at signoff.',
-  ],
-  steps:[
-    {n:1, text:'SI signoff setup and coupling extraction', tat:1, lane:'main'},
-    {n:2, text:'Crosstalk delay analysis and timing impact', tat:1.5, lane:'main'},
-    {n:3, text:'Noise and glitch analysis', tat:1.5, lane:'par'},
-    {n:4, text:'Victim-aggressor analysis on critical nets', tat:1.5, lane:'main'},
-    {n:5, text:'Power integrity signoff reconciliation', tat:1, lane:'par'},
-    {n:6, text:'SI signoff closure and reporting', tat:2, lane:'main'},
-  ],
-  flowNote:'Step 4 is where the analysis becomes actionable. A global crosstalk number tells nobody what to fix; a victim-aggressor list on the critical paths tells routing exactly which nets to space or shield.',
-  consumes:[
-    'Final database and extraction from PD-13',
-    'Crosstalk fixes from PD-10',
-    'Timing analysis from SO-02',
-    'Noise rules and thresholds from PDK-02',
-    'PI results from SO-04',
-  ],
-  produces:[
-    'SI signoff setup and coupling extraction',
-    'Crosstalk delay analysis and timing impact',
-    'Noise and glitch analysis results',
-    'Victim-aggressor findings on critical nets',
-    'Power integrity signoff reconciliation',
-    'SI signoff report',
-  ],
-  producedBy:[1,2,3,4,5,6],
-  rel:[
-    {id:'SO-D3', rel:'produces', text:'<b>EM/IR and SI/PI signoff reports.</b> The signal integrity half of the deliverable.'},
-    {id:'SO-D1', rel:'feeds', text:'<b>STA signoff reports.</b> Crosstalk delay is part of the timing number, not a separate finding.'},
-  ],
-  risks:[
-    '<b>Crosstalk reported and not reconciled with timing.</b> Two separate reports means the design is signed off against timing that excludes coupling.',
-    '<b>Glitch analysis omitted.</b> Noise on a static net can propagate as a functional failure that no timing analysis would show.',
-    '<b>Analysis on a subset of nets.</b> Coupling is a property of adjacency, and the critical net set is not the same as the coupled net set.',
-    '<b>Fixes applied after timing signoff.</b> Spacing and shielding change delay, and a late fix invalidates the timing it was meant to protect.',
-    '<b>Thresholds set by tool default.</b> Noise thresholds are a library and technology property, and defaults are either optimistic or unnecessarily punitive.',
-  ],
-  roles:[
-    {r:'SI signoff engineer', d:'Owns crosstalk and noise signoff'},
-    {r:'STA engineer', d:'Timing reconciliation with crosstalk delay'},
-    {r:'Routing engineers', d:'Spacing and shielding fixes'},
-    {r:'Library engineer', d:'Noise thresholds and cell characterization'},
-    {r:'Signoff lead', d:'Closure and reporting'},
-  ],
-  effort:[['Crosstalk delay analysis',3.5], ['Victim-aggressor analysis',2.5], ['Noise and glitch analysis',2.5], ['Closure and reporting',2], ['Setup and extraction',1.5]],
-  entry:[
-    'Final database and extraction available from PD-13',
-    'Crosstalk fixes applied in PD-10',
-    'Timing analysis running in SO-02',
-  ],
-  exit:[
-    'Crosstalk delay included in the timing signoff numbers',
-    'Glitch analysis run, not only delay analysis',
-    'Noise thresholds set from library data, not defaults',
-  ],
-  dependsOn:['SO-01','SO-04','PD-10','PD-13'],
-  dependsNote:null,
-  feedsInto:['SO-02','SO-10','TO-02'],
-  measuredBy:[
-    'Crosstalk delay against the timing budget',
-    'Glitch violations at freeze',
-    'Nets analyzed against nets coupled',
-  ],
-},
-
 'SO-06': {
-  stage:'signoff', window:[11,15], criticalPath:false,
-  purpose:[
-    'Review the <b>chip-package-system co-verification result</b> as a signoff item in its own right, rather than assuming the die-only analysis covers it.',
-    '<code>SIPI</code> analyzed the die, package and board as one electrical system. This activity brings that result into the signoff record and reconciles it against the die-only numbers—because where they disagree, the system-level answer is the one silicon will produce.',
-  ],
-  steps:[
-    {n:1, text:'SIPI result intake and scope confirmation', tat:0.75, lane:'main'},
-    {n:2, text:'Die-only against system-level IR reconciliation', tat:1.25, lane:'main'},
-    {n:3, text:'Channel compliance review against the interface budgets', tat:1, lane:'par'},
-    {n:4, text:'Power-aware timing correlation review', tat:1, lane:'par'},
-    {n:5, text:'Co-verification signoff review and disposition', tat:2, lane:'main'},
-  ],
-  flowNote:'Step 2 is the reconciliation that matters. Die-only IR analysis excludes package inductance, and the difference between the two numbers is margin the design either has or does not—a discrepancy that has to be resolved before mask release rather than explained afterwards.',
-  consumes:[
-    'Co-verification results from SIPI-11',
-    'Die-only IR from SO-04',
-    'Channel budgets from ARCH-04 and AMS-03',
-    'Chip power model from PD-11',
-    'Timing signoff from SO-02',
-  ],
-  produces:[
-    'SIPI result intake record',
-    'Die-only against system-level reconciliation',
-    'Channel compliance review findings',
-    'Power-aware timing correlation review',
-    'Co-verification signoff disposition',
-  ],
-  producedBy:[1,2,3,4,5],
-  rel:[
-    {id:'SO-D3', rel:'feeds', text:'<b>EM/IR and SI/PI signoff reports.</b> The system-level results belong in the same report as the die-only ones, reconciled rather than filed separately.'},
-    {id:'SO-D7', rel:'feeds', text:'<b>Signoff summary and Design Freeze package.</b> Co-verification signoff is a freeze precondition, since mask release follows it.'},
-  ],
-  risks:[
-    '<b>Co-verification treated as a package deliverable.</b> It constrains the die\'s signoff, and excluding it from the signoff record means freezing without it.',
-    '<b>Discrepancies explained rather than resolved.</b> Where die-only and system-level disagree, one is wrong, and the difference is real margin.',
-    '<b>Channel compliance reviewed against internal assumptions.</b> The interface specification\'s mask is what compliance means, and internal budgets can be more generous.',
-    '<b>Review scheduled after Design Freeze.</b> The freeze is what gates mask release, and a co-verification finding afterwards has nowhere to go.',
-    '<b>Power-aware timing not reviewed.</b> STA at nominal voltage and IR analysis showing droop are two views of the same design, and only the reconciliation is the truth.',
-  ],
-  roles:[
-    {r:'Signoff lead', d:'Owns the review and its disposition'},
-    {r:'SIPI lead', d:'Presents the co-verification results'},
-    {r:'Power integrity engineer', d:'IR reconciliation between die and system'},
-    {r:'Interface architect', d:'Channel compliance interpretation'},
-    {r:'Timing engineer', d:'Power-aware timing correlation'},
-  ],
-  effort:[['Co-verification review and disposition',2], ['IR reconciliation',1.5], ['Channel compliance review',0.75], ['Timing correlation review',0.75]],
-  entry:[
-    'Co-verification signed off in SIPI-11',
-    'Die-only IR results available from SO-04',
-    'Timing signoff progressing in SO-02',
-  ],
-  exit:[
-    'Die-only and system-level results reconciled, not merely compared',
-    'Channel compliance reviewed against the specification mask',
-    'Review completed before Design Freeze, not after',
-  ],
-  dependsOn:['SO-02','SO-04','SIPI-11','PD-11'],
-  dependsNote:null,
-  feedsInto:['SO-10','TO-04','TO-06'],
-  measuredBy:[
-    'Discrepancies resolved against identified',
-    'Channel margin against the compliance mask',
-    'Review completion against the freeze date',
-  ],
-},
-
-'SO-07': {
   stage:'signoff', window:[8,14], criticalPath:false,
   purpose:[
     'Verify the <b>reliability requirements</b> the product will be qualified against—ESD paths, latch-up structures, soft error rate—on the final database rather than in the qualification lab.',
@@ -434,11 +363,11 @@ module.exports = {
   ],
   flowNote:'Step 2 traces the discharge path through the actual layout rather than confirming the strategy. A clamp that exists and a path that reaches it are different claims, and only the full-chip trace establishes the second.',
   consumes:[
-    'Final database from PD-13',
-    'ESD strategy and clamps from PDK-07',
+    'Final database from PD-15',
+    'ESD strategy and clamps from PDK-06',
     'Latch-up rules from PDK-02',
     'Soft error requirements from the qualification plan',
-    'AMS reliability results from AMS-14',
+    'AMS reliability results from AMS-15',
   ],
   produces:[
     'Reliability requirements and rule setup',
@@ -449,7 +378,7 @@ module.exports = {
   ],
   producedBy:[1,2,3,4,5],
   rel:[
-    {id:'SO-D4', rel:'produces', text:'<b>Reliability reports—ESD, latch-up, FIT.</b> This activity is the deliverable, and it is what <code>MP-03</code> will be measured against.'},
+    {id:'SO-D2', rel:'produces', text:'<b>Reliability reports—ESD, latch-up, FIT.</b> This activity is the deliverable, and it is what <code>MP-04</code> will be measured against.'},
     {id:'SO-D7', rel:'feeds', text:'<b>Signoff summary and Design Freeze package.</b> Reliability findings are part of the risk the freeze decision accepts.'},
   ],
   risks:[
@@ -468,8 +397,8 @@ module.exports = {
   ],
   effort:[['ESD path verification',3], ['Latch-up verification',2], ['Closure and waiver disposition',2], ['Soft error and FIT estimation',1.5], ['Requirement setup',1.5]],
   entry:[
-    'Final database available from PD-13',
-    'ESD strategy fixed by PDK-07',
+    'Final database available from PD-15',
+    'ESD strategy fixed by PDK-06',
     'Qualification reliability requirements known',
   ],
   exit:[
@@ -477,9 +406,9 @@ module.exports = {
     'Latch-up checked internally as well as at the ring',
     'FIT estimated against the product requirement',
   ],
-  dependsOn:['PD-13','PDK-02','PDK-07','AMS-14'],
+  dependsOn:['PD-15','PDK-02','PDK-06','AMS-15'],
   dependsNote:null,
-  feedsInto:['SO-10','TO-02','MP-03','MP-02'],
+  feedsInto:['SO-11','TO-02','MP-04','MP-03'],
   measuredBy:[
     'ESD paths verified against IO count',
     'Latch-up violations at freeze',
@@ -487,7 +416,7 @@ module.exports = {
   ],
 },
 
-'SO-08': {
+'SO-07': {
   stage:'signoff', window:[8,14], criticalPath:false,
   purpose:[
     'Check the design against <b>manufacturability</b>—lithography hotspots, CMP density, DFM recommended rules—so the foundry can print it at yield.',
@@ -502,11 +431,11 @@ module.exports = {
   ],
   flowNote:'Step 4 quantifies what <code>PDK-02</code> decided. Recommended-rule compliance is a score rather than a pass, and it correlates with yield—a design that scored 60% on the rules it chose to ignore is a design whose yield learning curve starts lower.',
   consumes:[
-    'Final database from PD-13',
+    'Final database from PD-15',
     'DFM decks and litho models from the foundry',
     'Rule dispositions from PDK-02',
-    'Fill and density from PD-15',
-    'Defect density model from TECH-07',
+    'Fill and density from PD-16',
+    'Defect density model from TECH-02',
   ],
   produces:[
     'DFM deck setup and model versions',
@@ -517,8 +446,8 @@ module.exports = {
   ],
   producedBy:[1,2,3,4,5],
   rel:[
-    {id:'SO-D5', rel:'produces', text:'<b>DFM and lithography hotspot report.</b> This activity is the deliverable, and its compliance score is a yield predictor.'},
-    {id:'SO-D2', rel:'feeds', text:'<b>Clean DRC / LVS / antenna / density reports.</b> DFM fixes are layout changes and close alongside physical verification.'},
+    {id:'SO-D3', rel:'produces', text:'<b>DFM and lithography hotspot report.</b> This activity is the deliverable, and its compliance score is a yield predictor.'},
+    {id:'SO-D5', rel:'feeds', text:'<b>Clean DRC / LVS / antenna / density reports.</b> DFM fixes are layout changes and close alongside physical verification.'},
   ],
   risks:[
     '<b>DFM checked after routing is frozen.</b> Hotspot fixes are layout changes, and a frozen database has no room for them.',
@@ -536,22 +465,92 @@ module.exports = {
   ],
   effort:[['Hotspot fixing and closure',3.5], ['Litho hotspot analysis',2.5], ['CMP and density simulation',2], ['Rule compliance scoring',1], ['Deck setup',1]],
   entry:[
-    'Final database available from PD-13',
+    'Final database available from PD-15',
     'DFM decks and current litho models available',
-    'Fill applied in PD-15',
+    'Fill applied in PD-16',
   ],
   exit:[
     'Hotspots fixed or accepted with a yield impact estimate',
     'Compliance scored rather than assumed',
     'Fixes re-verified against DRC and timing',
   ],
-  dependsOn:['PD-13','PD-15','PDK-02','TECH-07'],
+  dependsOn:['PD-15','PD-16','PDK-02','TECH-02'],
   dependsNote:null,
-  feedsInto:['SO-10','TO-02','FAB-06','MP-05'],
+  feedsInto:['SO-11','TO-02','FAB-04','MP-02'],
   measuredBy:[
     'Hotspots remaining at freeze',
     'Recommended rule compliance score',
     'Yield impact of accepted hotspots',
+  ],
+},
+
+'SO-08': {
+  stage:'signoff', window:[9,15], criticalPath:false,
+  purpose:[
+    'Sign off <b>signal integrity</b>—crosstalk delay, noise, glitch—on the final database, and confirm the numbers the timing signoff assumed.',
+    'Crosstalk is timing. Coupling between adjacent nets changes delay in both directions and can inject glitches that propagate as functional failures. The analysis is separate from STA and its results feed straight back into it, which makes the two inseparable at signoff.',
+  ],
+  steps:[
+    {n:1, text:'SI signoff setup and coupling extraction', tat:1, lane:'main'},
+    {n:2, text:'Crosstalk delay analysis and timing impact', tat:1.5, lane:'main'},
+    {n:3, text:'Noise and glitch analysis', tat:1.5, lane:'par'},
+    {n:4, text:'Victim-aggressor analysis on critical nets', tat:1.5, lane:'main'},
+    {n:5, text:'Power integrity signoff reconciliation', tat:1, lane:'par'},
+    {n:6, text:'SI signoff closure and reporting', tat:2, lane:'main'},
+  ],
+  flowNote:'Step 4 is where the analysis becomes actionable. A global crosstalk number tells nobody what to fix; a victim-aggressor list on the critical paths tells routing exactly which nets to space or shield.',
+  consumes:[
+    'Final database and extraction from PD-15',
+    'Crosstalk fixes from PD-14',
+    'Timing analysis from SO-03',
+    'Noise rules and thresholds from PDK-02',
+    'PI results from SO-05',
+  ],
+  produces:[
+    'SI signoff setup and coupling extraction',
+    'Crosstalk delay analysis and timing impact',
+    'Noise and glitch analysis results',
+    'Victim-aggressor findings on critical nets',
+    'Power integrity signoff reconciliation',
+    'SI signoff report',
+  ],
+  producedBy:[1,2,3,4,5,6],
+  rel:[
+    {id:'SO-D1', rel:'produces', text:'<b>EM/IR and SI/PI signoff reports.</b> The signal integrity half of the deliverable.'},
+    {id:'SO-D4', rel:'feeds', text:'<b>STA signoff reports.</b> Crosstalk delay is part of the timing number, not a separate finding.'},
+  ],
+  risks:[
+    '<b>Crosstalk reported and not reconciled with timing.</b> Two separate reports means the design is signed off against timing that excludes coupling.',
+    '<b>Glitch analysis omitted.</b> Noise on a static net can propagate as a functional failure that no timing analysis would show.',
+    '<b>Analysis on a subset of nets.</b> Coupling is a property of adjacency, and the critical net set is not the same as the coupled net set.',
+    '<b>Fixes applied after timing signoff.</b> Spacing and shielding change delay, and a late fix invalidates the timing it was meant to protect.',
+    '<b>Thresholds set by tool default.</b> Noise thresholds are a library and technology property, and defaults are either optimistic or unnecessarily punitive.',
+  ],
+  roles:[
+    {r:'SI signoff engineer', d:'Owns crosstalk and noise signoff'},
+    {r:'STA engineer', d:'Timing reconciliation with crosstalk delay'},
+    {r:'Routing engineers', d:'Spacing and shielding fixes'},
+    {r:'Library engineer', d:'Noise thresholds and cell characterization'},
+    {r:'Signoff lead', d:'Closure and reporting'},
+  ],
+  effort:[['Crosstalk delay analysis',3.5], ['Victim-aggressor analysis',2.5], ['Noise and glitch analysis',2.5], ['Closure and reporting',2], ['Setup and extraction',1.5]],
+  entry:[
+    'Final database and extraction available from PD-15',
+    'Crosstalk fixes applied in PD-14',
+    'Timing analysis running in SO-03',
+  ],
+  exit:[
+    'Crosstalk delay included in the timing signoff numbers',
+    'Glitch analysis run, not only delay analysis',
+    'Noise thresholds set from library data, not defaults',
+  ],
+  dependsOn:['SO-01','SO-05','PD-14','PD-15'],
+  dependsNote:null,
+  feedsInto:['SO-03','SO-11','TO-02'],
+  measuredBy:[
+    'Crosstalk delay against the timing budget',
+    'Glitch violations at freeze',
+    'Nets analyzed against nets coupled',
   ],
 },
 
@@ -568,13 +567,13 @@ module.exports = {
     {n:4, text:'Netlist to layout consistency confirmation', tat:1, lane:'par'},
     {n:5, text:'Non-equivalence resolution and final report', tat:2.5, lane:'main'},
   ],
-  flowNote:'Step 3 pairs the formal result with the ECO log from <code>PD-14</code>. Equivalence proves the netlists match; reconciliation proves that every difference between them was an ECO somebody approved rather than a change nobody noticed.',
+  flowNote:'Step 3 pairs the formal result with the ECO log from <code>PD-09</code>. Equivalence proves the netlists match; reconciliation proves that every difference between them was an ECO somebody approved rather than a change nobody noticed.',
   consumes:[
-    'Final database and netlist from PD-13',
-    'FFN from SYN-09',
-    'ECO log from PD-14',
-    'LVS results from SO-03',
-    'Equivalence methodology from SYN-10',
+    'Final database and netlist from PD-15',
+    'FFN from SYN-12',
+    'ECO log from PD-09',
+    'LVS results from SO-04',
+    'Equivalence methodology from SYN-06',
   ],
   produces:[
     'Final equivalence setup',
@@ -604,18 +603,18 @@ module.exports = {
   ],
   effort:[['Non-equivalence resolution and report',3], ['RTL to netlist equivalence',2], ['ECO reconciliation',1.5], ['Setup',1], ['Layout consistency',0.5]],
   entry:[
-    'Final database frozen by PD-13',
-    'ECO log complete from PD-14',
-    'LVS clean from SO-03',
+    'Final database frozen by PD-15',
+    'ECO log complete from PD-09',
+    'LVS clean from SO-04',
   ],
   exit:[
     'Equivalence proved against the verified RTL, not only the FFN',
     'Every netlist difference traced to an approved ECO',
     'Run performed after the last database change',
   ],
-  dependsOn:['SO-03','PD-13','PD-14','SYN-09','SYN-10'],
+  dependsOn:['SO-04','PD-15','PD-09','SYN-12','SYN-06'],
   dependsNote:null,
-  feedsInto:['SO-10','TO-02','TO-03'],
+  feedsInto:['SO-11','TO-02','TO-03'],
   measuredBy:[
     'Non-equivalences at the final check',
     'Netlist differences traced to approved ECOs',
@@ -624,6 +623,74 @@ module.exports = {
 },
 
 'SO-10': {
+  stage:'signoff', window:[10,15], criticalPath:false,
+  purpose:[
+    'Run <b>gate-level simulation with the final SDF</b>—the last dynamic check that the design behaves correctly with real timing on the database being taped out.',
+    'Static timing analysis proves paths meet constraints; it does not prove the design works. Simulating with final timing catches what STA structurally cannot—race conditions, reset behavior under real delays, and any place where the constraints described a design different from the one built.',
+  ],
+  steps:[
+    {n:1, text:'Final SDF generation and simulation setup', tat:1, lane:'main'},
+    {n:2, text:'Timing-annotated functional simulation', tat:1.5, lane:'main'},
+    {n:3, text:'Reset and initialization sequence simulation', tat:1, lane:'par'},
+    {n:4, text:'Test mode simulation with final timing', tat:1, lane:'par'},
+    {n:5, text:'Failure debug and signoff reporting', tat:2.5, lane:'main'},
+  ],
+  flowNote:'Step 3 is the check most likely to find something. Reset behavior depends on relative delays across the die, and a sequence that works with estimated timing can fail with the real numbers—a failure that would otherwise appear at first power-on.',
+  consumes:[
+    'Final database and SDF from PD-15 and PD-06',
+    'Gate-level environment from DV-12',
+    'Test patterns and modes from DFT-11',
+    'Timing signoff results from SO-03',
+    'Power intent from SYN-10',
+  ],
+  produces:[
+    'Final SDF and simulation setup',
+    'Timing-annotated functional simulation results',
+    'Reset and initialization results',
+    'Test mode simulation results',
+    'Gate-level signoff report',
+  ],
+  producedBy:[1,2,3,4,5],
+  rel:[
+    {id:'SO-D7', rel:'feeds', text:'<b>Signoff summary and Design Freeze package.</b> Dynamic evidence on the final database belongs in the freeze package alongside the static analysis.'},
+    {id:'SO-D4', rel:'feeds', text:'<b>STA signoff reports.</b> A gate-level failure with clean STA means the constraints described a different design, which is a timing finding.'},
+  ],
+  risks:[
+    '<b>Skipped because STA is clean.</b> They answer different questions, and the failures gate-level simulation finds are invisible to static analysis.',
+    '<b>Run on an earlier database.</b> A simulation against pre-final timing says nothing about the database being taped out.',
+    '<b>Reset simulation omitted.</b> Reset ordering under real delays is a common silicon failure and one of the cheapest to catch here.',
+    '<b>X failures forced away.</b> Initializing signals to make the simulation run hides exactly the uninitialized state that will fail at power-on.',
+    '<b>Runtime prohibiting meaningful scenarios.</b> Full-timing simulation is slow, and a scenario set trimmed to fit may exclude the case that matters.',
+  ],
+  roles:[
+    {r:'Gate-level simulation engineer', d:'Owns the runs and the report'},
+    {r:'Timing engineer', d:'SDF generation and timing interpretation'},
+    {r:'Verification engineers', d:'Failure debug'},
+    {r:'DFT engineer', d:'Test mode simulation'},
+    {r:'Signoff lead', d:'Accepts the dynamic evidence into the package'},
+  ],
+  effort:[['Failure debug and reporting',3], ['Timing-annotated simulation',2], ['Reset and initialization simulation',1.5], ['Test mode simulation',1], ['SDF and setup',0.5]],
+  entry:[
+    'Final database and SDF available from PD-15 and PD-06',
+    'Gate-level environment available from DV-12',
+    'Test patterns available from DFT-11',
+  ],
+  exit:[
+    'Simulated against the final SDF, not an earlier one',
+    'Reset and initialization simulated with real delays',
+    'X failures fixed rather than forced',
+  ],
+  dependsOn:['PD-06','PD-15','DV-12','DFT-11'],
+  dependsNote:null,
+  feedsInto:['SO-11','TO-02','BU-02'],
+  measuredBy:[
+    'Scenarios simulated with final timing',
+    'Failures found that STA could not show',
+    'X issues fixed against forced',
+  ],
+},
+
+'SO-11': {
   stage:'signoff', window:[10,16], criticalPath:true,
   purpose:[
     'Run the <b>waiver review board</b>—every violation that survives signoff, examined, owned and either fixed or accepted—and assemble the Design Freeze package.',
@@ -640,10 +707,10 @@ module.exports = {
   flowNote:'Step 3 has a duration outside the program\'s control. Foundry waivers are reviewed on the foundry\'s schedule, and a design that assumes approval and does not receive it cannot release masks—which makes early submission worth more than a complete submission.',
   consumes:[
     'Waivers from every signoff activity',
-    'Timing waivers from SO-02',
-    'Physical verification waivers from SO-03',
-    'Reliability and DFM waivers from SO-07 and SO-08',
-    'Foundry waiver process from TECH-06',
+    'Timing waivers from SO-03',
+    'Physical verification waivers from SO-04',
+    'Reliability and DFM waivers from SO-06 and SO-07',
+    'Foundry waiver process from TECH-03',
   ],
   produces:[
     'Classified waiver intake across signoff domains',
@@ -657,7 +724,7 @@ module.exports = {
   producedBy:[1,2,3,3,4,5,6],
   rel:[
     {id:'SO-D7', rel:'produces', text:'<b>Signoff summary and Design Freeze package.</b> This activity is the deliverable, and it is what the tapeout decision is taken on.'},
-    {id:'SO-D1', rel:'feeds', text:'<b>STA signoff reports with waiver list.</b> The timing waiver list is dispositioned here rather than inside the STA activity.'},
+    {id:'SO-D4', rel:'feeds', text:'<b>STA signoff reports with waiver list.</b> The timing waiver list is dispositioned here rather than inside the STA activity.'},
   ],
   risks:[
     '<b>Waivers accumulated rather than reviewed.</b> A register nobody dispositioned is a set of accepted risks nobody accepted.',
@@ -676,7 +743,7 @@ module.exports = {
   effort:[['Package assembly',1.5], ['Root cause and quantification',1.5], ['Board review and disposition',1.5], ['Foundry alignment',1], ['Residual risk statement',0.5]],
   entry:[
     'Signoff activities producing waiver candidates',
-    'Foundry waiver process understood from TECH-06',
+    'Foundry waiver process understood from TECH-03',
     'Board membership named with authority to refuse',
   ],
   exit:[
@@ -684,9 +751,9 @@ module.exports = {
     'Foundry waivers submitted and answered before freeze',
     'Residual risk summarized in one statement for the gate',
   ],
-  dependsOn:['SO-02','SO-03','SO-04','SO-05','SO-07','SO-08','SO-09'],
+  dependsOn:['SO-03','SO-04','SO-05','SO-08','SO-06','SO-07','SO-09'],
   dependsNote:null,
-  feedsInto:['TO-03','TO-04','TO-05','MP-09'],
+  feedsInto:['TO-03','TO-04','TO-05','MP-12'],
   measuredBy:[
     'Waivers dispositioned against raised',
     'Foundry waivers answered before freeze',
@@ -694,140 +761,73 @@ module.exports = {
   ],
 },
 
-'SO-11': {
-  stage:'signoff', window:[10,15], criticalPath:false,
+'SO-12': {
+  stage:'signoff', window:[11,15], criticalPath:false,
   purpose:[
-    'Run <b>gate-level simulation with the final SDF</b>—the last dynamic check that the design behaves correctly with real timing on the database being taped out.',
-    'Static timing analysis proves paths meet constraints; it does not prove the design works. Simulating with final timing catches what STA structurally cannot—race conditions, reset behavior under real delays, and any place where the constraints described a design different from the one built.',
+    'Review the <b>chip-package-system co-verification result</b> as a signoff item in its own right, rather than assuming the die-only analysis covers it.',
+    '<code>SIPI</code> analyzed the die, package and board as one electrical system. This activity brings that result into the signoff record and reconciles it against the die-only numbers—because where they disagree, the system-level answer is the one silicon will produce.',
   ],
   steps:[
-    {n:1, text:'Final SDF generation and simulation setup', tat:1, lane:'main'},
-    {n:2, text:'Timing-annotated functional simulation', tat:1.5, lane:'main'},
-    {n:3, text:'Reset and initialization sequence simulation', tat:1, lane:'par'},
-    {n:4, text:'Test mode simulation with final timing', tat:1, lane:'par'},
-    {n:5, text:'Failure debug and signoff reporting', tat:2.5, lane:'main'},
+    {n:1, text:'SIPI result intake and scope confirmation', tat:0.75, lane:'main'},
+    {n:2, text:'Die-only against system-level IR reconciliation', tat:1.25, lane:'main'},
+    {n:3, text:'Channel compliance review against the interface budgets', tat:1, lane:'par'},
+    {n:4, text:'Power-aware timing correlation review', tat:1, lane:'par'},
+    {n:5, text:'Co-verification signoff review and disposition', tat:2, lane:'main'},
   ],
-  flowNote:'Step 3 is the check most likely to find something. Reset behavior depends on relative delays across the die, and a sequence that works with estimated timing can fail with the real numbers—a failure that would otherwise appear at first power-on.',
+  flowNote:'Step 2 is the reconciliation that matters. Die-only IR analysis excludes package inductance, and the difference between the two numbers is margin the design either has or does not—a discrepancy that has to be resolved before mask release rather than explained afterwards.',
   consumes:[
-    'Final database and SDF from PD-13 and PD-09',
-    'Gate-level environment from DV-11',
-    'Test patterns and modes from DFT-08',
-    'Timing signoff results from SO-02',
-    'Power intent from SYN-07',
+    'Co-verification results from SIPI-11',
+    'Die-only IR from SO-05',
+    'Channel budgets from ARCH-03 and AMS-04',
+    'Chip power model from PD-10',
+    'Timing signoff from SO-03',
   ],
   produces:[
-    'Final SDF and simulation setup',
-    'Timing-annotated functional simulation results',
-    'Reset and initialization results',
-    'Test mode simulation results',
-    'Gate-level signoff report',
+    'SIPI result intake record',
+    'Die-only against system-level reconciliation',
+    'Channel compliance review findings',
+    'Power-aware timing correlation review',
+    'Co-verification signoff disposition',
   ],
   producedBy:[1,2,3,4,5],
   rel:[
-    {id:'SO-D7', rel:'feeds', text:'<b>Signoff summary and Design Freeze package.</b> Dynamic evidence on the final database belongs in the freeze package alongside the static analysis.'},
-    {id:'SO-D1', rel:'feeds', text:'<b>STA signoff reports.</b> A gate-level failure with clean STA means the constraints described a different design, which is a timing finding.'},
+    {id:'SO-D1', rel:'feeds', text:'<b>EM/IR and SI/PI signoff reports.</b> The system-level results belong in the same report as the die-only ones, reconciled rather than filed separately.'},
+    {id:'SO-D7', rel:'feeds', text:'<b>Signoff summary and Design Freeze package.</b> Co-verification signoff is a freeze precondition, since mask release follows it.'},
   ],
   risks:[
-    '<b>Skipped because STA is clean.</b> They answer different questions, and the failures gate-level simulation finds are invisible to static analysis.',
-    '<b>Run on an earlier database.</b> A simulation against pre-final timing says nothing about the database being taped out.',
-    '<b>Reset simulation omitted.</b> Reset ordering under real delays is a common silicon failure and one of the cheapest to catch here.',
-    '<b>X failures forced away.</b> Initializing signals to make the simulation run hides exactly the uninitialized state that will fail at power-on.',
-    '<b>Runtime prohibiting meaningful scenarios.</b> Full-timing simulation is slow, and a scenario set trimmed to fit may exclude the case that matters.',
+    '<b>Co-verification treated as a package deliverable.</b> It constrains the die\'s signoff, and excluding it from the signoff record means freezing without it.',
+    '<b>Discrepancies explained rather than resolved.</b> Where die-only and system-level disagree, one is wrong, and the difference is real margin.',
+    '<b>Channel compliance reviewed against internal assumptions.</b> The interface specification\'s mask is what compliance means, and internal budgets can be more generous.',
+    '<b>Review scheduled after Design Freeze.</b> The freeze is what gates mask release, and a co-verification finding afterwards has nowhere to go.',
+    '<b>Power-aware timing not reviewed.</b> STA at nominal voltage and IR analysis showing droop are two views of the same design, and only the reconciliation is the truth.',
   ],
   roles:[
-    {r:'Gate-level simulation engineer', d:'Owns the runs and the report'},
-    {r:'Timing engineer', d:'SDF generation and timing interpretation'},
-    {r:'Verification engineers', d:'Failure debug'},
-    {r:'DFT engineer', d:'Test mode simulation'},
-    {r:'Signoff lead', d:'Accepts the dynamic evidence into the package'},
+    {r:'Signoff lead', d:'Owns the review and its disposition'},
+    {r:'SIPI lead', d:'Presents the co-verification results'},
+    {r:'Power integrity engineer', d:'IR reconciliation between die and system'},
+    {r:'Interface architect', d:'Channel compliance interpretation'},
+    {r:'Timing engineer', d:'Power-aware timing correlation'},
   ],
-  effort:[['Failure debug and reporting',3], ['Timing-annotated simulation',2], ['Reset and initialization simulation',1.5], ['Test mode simulation',1], ['SDF and setup',0.5]],
+  effort:[['Co-verification review and disposition',2], ['IR reconciliation',1.5], ['Channel compliance review',0.75], ['Timing correlation review',0.75]],
   entry:[
-    'Final database and SDF available from PD-13 and PD-09',
-    'Gate-level environment available from DV-11',
-    'Test patterns available from DFT-08',
+    'Co-verification signed off in SIPI-11',
+    'Die-only IR results available from SO-05',
+    'Timing signoff progressing in SO-03',
   ],
   exit:[
-    'Simulated against the final SDF, not an earlier one',
-    'Reset and initialization simulated with real delays',
-    'X failures fixed rather than forced',
+    'Die-only and system-level results reconciled, not merely compared',
+    'Channel compliance reviewed against the specification mask',
+    'Review completed before Design Freeze, not after',
   ],
-  dependsOn:['PD-09','PD-13','DV-11','DFT-08'],
+  dependsOn:['SO-03','SO-05','SIPI-11','PD-10'],
   dependsNote:null,
-  feedsInto:['SO-10','TO-02','BU-02'],
+  feedsInto:['SO-11','TO-04','TO-06'],
   measuredBy:[
-    'Scenarios simulated with final timing',
-    'Failures found that STA could not show',
-    'X issues fixed against forced',
+    'Discrepancies resolved against identified',
+    'Channel margin against the compliance mask',
+    'Review completion against the freeze date',
   ],
 },
 
-'SO-12': {
-  stage:'signoff', window:[2,7], criticalPath:false,
-  purpose:[
-    'Correlate the <b>signoff flow against the foundry\'s own decks and the implementation tool</b>, so that a number produced here means the same thing everywhere it is read.',
-    'Three parties analyze this design: the implementation tool, the signoff tool and the foundry. If they disagree, the design can be closed in one and rejected by another. Establishing the correlation early is what lets physical design close with the right margin instead of re-closing after signoff reports.',
-  ],
-  steps:[
-    {n:1, text:'Correlation methodology and reference case selection', tat:1, lane:'main'},
-    {n:2, text:'Implementation to signoff tool correlation', tat:1.5, lane:'main'},
-    {n:3, text:'Foundry deck and derate correlation', tat:1, lane:'par'},
-    {n:4, text:'Extraction and parasitic correlation', tat:1, lane:'par'},
-    {n:5, text:'Correlation findings and margin guidance', tat:2.5, lane:'main'},
-  ],
-  flowNote:'Step 5 is the output physical design actually uses. Knowing that signoff reads 40 ps more pessimistic than implementation on long paths lets <code>PD-09</code> close with that margin built in, rather than closing to zero and discovering the gap at <code>SO-02</code>.',
-  consumes:[
-    'Implementation timing results from PD-09',
-    'Signoff flow from SO-01',
-    'Foundry decks and derates from PDK-11',
-    'Extraction decks from PDK-10',
-    'Library models from PDK-03',
-  ],
-  produces:[
-    'Correlation methodology and reference cases',
-    'Implementation to signoff correlation results',
-    'Foundry deck and derate correlation',
-    'Extraction and parasitic correlation',
-    'Margin guidance for physical design',
-  ],
-  producedBy:[1,2,3,4,5],
-  rel:[
-    {id:'SO-D1', rel:'feeds', text:'<b>STA signoff reports.</b> Correlation is what makes the signoff numbers comparable to the ones physical design closed against.'},
-    {id:'SO-D7', rel:'feeds', text:'<b>Signoff summary and Design Freeze package.</b> A stated correlation is part of what makes the signoff result defensible to the foundry.'},
-  ],
-  risks:[
-    '<b>Correlation established after signoff starts.</b> The gap is then discovered on the final database, when closing it means re-opening closure.',
-    '<b>Correlation on unrepresentative paths.</b> Tool differences concentrate on long, heavily coupled paths, and correlating on short clean ones shows agreement that does not generalize.',
-    '<b>Extraction differences overlooked.</b> Parasitic differences between flows can exceed timing tool differences and are less often checked.',
-    '<b>Margin guidance not adopted.</b> Correlation that physical design does not close against has produced information nobody used.',
-    '<b>Foundry decks assumed identical to internal ones.</b> Derates and corner definitions can differ in detail, and the foundry\'s version is the one that decides acceptance.',
-  ],
-  roles:[
-    {r:'Signoff methodology engineer', d:'Owns correlation and margin guidance'},
-    {r:'STA engineers', d:'Reference case analysis in both flows'},
-    {r:'Extraction engineer', d:'Parasitic correlation'},
-    {r:'Physical design liaison', d:'Adopts margin guidance into closure'},
-    {r:'Foundry liaison', d:'Deck and derate alignment'},
-  ],
-  effort:[['Correlation findings and guidance',2], ['Implementation to signoff correlation',1.5], ['Extraction correlation',1], ['Foundry deck correlation',1], ['Methodology and reference cases',0.5]],
-  entry:[
-    'Implementation timing available from PD-09',
-    'Signoff flow assembled in SO-01',
-    'Foundry decks and derates available from PDK-11',
-  ],
-  exit:[
-    'Correlation established on representative, difficult paths',
-    'Margin guidance published and adopted by physical design',
-    'Foundry deck differences understood, not assumed away',
-  ],
-  dependsOn:['SO-01','PD-09','PDK-03','PDK-10','PDK-11'],
-  dependsNote:null,
-  feedsInto:['SO-02','PD-09','TO-02'],
-  measuredBy:[
-    'Correlation gap on representative paths',
-    'Margin guidance adopted in closure',
-    'Surprises at first signoff run',
-  ],
-},
 
 };

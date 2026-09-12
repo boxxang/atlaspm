@@ -7,7 +7,7 @@
     "exist, or the generator stops.",
     "Run `node tools/check-step-outputs.mjs` to see what else might belong here."
   ],
-  "EVB-07": {
+  "EVB-10": {
     "why": "The outputs of steps 3 to 6 sat one step late, with step 3's landing on step 6: telemetry validation was credited to the interface loopback step, and the thermal fit check to the step that validates clocking. Each moves onto the step whose name it repeats.",
     "producedBy": {
       "Telemetry and protection validation": 3,

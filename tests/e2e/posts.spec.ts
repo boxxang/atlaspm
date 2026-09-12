@@ -100,14 +100,14 @@ test.describe('key info', () => {
 
 test.describe('posting on a step', () => {
   test('an update lands on that step and nowhere else', async ({ page }) => {
-    await openStep(page, 'PD-10', 2);
+    await openStep(page, 'PD-14', 2);
     await rail(page).getByLabel('What happened on step 2…').fill('Waiting on the spacing study.');
     await rail(page).getByRole('button', { name: 'Post' }).click();
     await expect(rail(page).locator('.txt')).toHaveText('Waiting on the spacing study.');
     await writesSettled(page);
 
     /* the step next door has its own thread */
-    await page.locator('[data-step="PD-10:3"]').click();
+    await page.locator('[data-step="PD-14:3"]').click();
     await expect(rail(page)).toContainText('No updates on this step yet.');
   });
 
@@ -115,7 +115,7 @@ test.describe('posting on a step', () => {
      quotes a log line. Collapsing both is the browser's default, not a
      decision anybody made. */
   test('a post keeps the line breaks and spacing it was written with', async ({ page }) => {
-    await openStep(page, 'PD-10', 4);
+    await openStep(page, 'PD-14', 4);
     const typed = 'First line.\n\nSecond paragraph.\n    indented   with   gaps';
     await rail(page).getByLabel('What happened on step 4…').fill(typed);
     await rail(page).getByRole('button', { name: 'Post' }).click();
@@ -135,7 +135,7 @@ test.describe('posting on a step', () => {
     await writesSettled(page);
 
     await page.reload();
-    await openStep(page, 'PD-10', 4);
+    await openStep(page, 'PD-14', 4);
     await expect(rail(page).locator('.post .txt').first()).toHaveText(typed);
   });
 
@@ -159,7 +159,7 @@ test.describe('posting on a step', () => {
   });
 
   test('a reply sits under the post it answers, and goes with it', async ({ page }) => {
-    await openStep(page, 'PD-10', 2);
+    await openStep(page, 'PD-14', 2);
     await rail(page).getByLabel('What happened on step 2…').fill('The parent.');
     await rail(page).getByRole('button', { name: 'Post' }).click();
     await rail(page).getByRole('button', { name: 'Reply' }).click();
@@ -169,7 +169,7 @@ test.describe('posting on a step', () => {
     await expect(rail(page).locator('.replies .txt')).toHaveText('The answer.');
     await writesSettled(page);
     await page.reload();
-    await openStep(page, 'PD-10', 2);
+    await openStep(page, 'PD-14', 2);
     await expect(rail(page).locator('.replies .txt')).toHaveText('The answer.');
 
     /* deleting the parent takes the thread — a reply to nothing is not a post */
@@ -182,7 +182,7 @@ test.describe('posting on a step', () => {
     await expect(rail(page).locator('.post')).toHaveCount(0);
     await writesSettled(page);
     await page.reload();
-    await openStep(page, 'PD-10', 2);
+    await openStep(page, 'PD-14', 2);
     await expect(rail(page).locator('.post')).toHaveCount(0);
   });
 

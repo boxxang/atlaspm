@@ -12,7 +12,7 @@ module.exports = {
     {n:2, text:'Architecture option definition — interposer, bridge, organic', tat:2, lane:'main'},
     {n:3, text:'Capability and capacity screen per option', tat:1.5, lane:'par'},
     {n:4, text:'Substrate construction and layer count study', tat:2, lane:'main'},
-    {n:5, text:'Cost comparison per option with the DEF-04 model', tat:1.5, lane:'par'},
+    {n:5, text:'Cost comparison per option with the DEF-06 model', tat:1.5, lane:'par'},
     {n:6, text:'Architecture selection and specification', tat:2.5, lane:'main'},
   ],
   flowNote:'Step 3 can eliminate an option outright. Advanced interposer capacity is allocated quarters ahead to a small number of customers, and an architecture the program cannot get capacity for is not an option however good it looks technically.',
@@ -20,8 +20,8 @@ module.exports = {
     'Package architecture assumption from DEF-01',
     'Partitioning and die count from ARCH-02',
     'Backend supply chain findings from TECH-09',
-    'Bandwidth and HBM requirements from DEF-05',
-    'Cost model from DEF-04',
+    'Bandwidth and HBM requirements from DEF-04',
+    'Cost model from DEF-06',
   ],
   produces:[
     'Package requirement consolidation',
@@ -35,7 +35,7 @@ module.exports = {
   producedBy:[1,2,3,3,4,5,6],
   rel:[
     {id:'PKGD-D1', rel:'produces', text:'<b>Package architecture specification.</b> This activity is the deliverable, and it is a supply chain commitment as much as a technical one.'},
-    {id:'PKGD-D7', rel:'feeds', text:'<b>Substrate and interposer PO with committed lead time.</b> The architecture decides which supplier queue the program is standing in.'},
+    {id:'PKGD-D4', rel:'feeds', text:'<b>Substrate and interposer PO with committed lead time.</b> The architecture decides which supplier queue the program is standing in.'},
   ],
   risks:[
     '<b>Architecture chosen without capacity.</b> Advanced packaging capacity is scarce and allocated far ahead; a technically ideal option with no allocation is not an option.',
@@ -55,16 +55,16 @@ module.exports = {
   entry:[
     'Partitioning and die count known from ARCH-02',
     'Backend supply chain findings available from TECH-09',
-    'Bandwidth and HBM requirements from DEF-05',
+    'Bandwidth and HBM requirements from DEF-04',
   ],
   exit:[
     'Architecture selected with capacity indicated, not assumed',
     'At least two options evaluated and costed end to end',
     'Specification issued before bump planning starts',
   ],
-  dependsOn:['DEF-01','DEF-05','ARCH-02','TECH-09','DEF-04'],
+  dependsOn:['DEF-01','DEF-04','ARCH-02','TECH-09','DEF-06'],
   dependsNote:null,
-  feedsInto:['PKGD-02','PKGD-04','PKGD-07','PKGD-09','PD-04','PTV-01'],
+  feedsInto:['PKGD-02','PKGD-05','PKGD-06','PKGD-07','PD-04','PTV-01'],
   measuredBy:[
     'Options evaluated against the one chosen',
     'Capacity indicated for the selected architecture',
@@ -91,8 +91,8 @@ module.exports = {
     'Package architecture from PKGD-01',
     'Bump budget and intent from ARCH-08',
     'Power envelope and delivery requirement from PD-03',
-    'Interface lane counts from ARCH-04',
-    'Substrate layer count from PKGD-04',
+    'Interface lane counts from ARCH-03',
+    'Substrate layer count from PKGD-05',
   ],
   produces:[
     'Bump pitch and field definition',
@@ -104,12 +104,12 @@ module.exports = {
   ],
   producedBy:[1,2,3,4,5,6],
   rel:[
-    {id:'PKGD-D2', rel:'produces', text:'<b>Bump map and interposer / RDL database.</b> The bump map half of the deliverable; <code>PKGD-03</code> supplies the interposer routing.'},
-    {id:'PKGD-D4', rel:'feeds', text:'<b>Package electrical design intent.</b> Bump assignment determines channel quality before any routing is drawn.'},
+    {id:'PKGD-D3', rel:'produces', text:'<b>Bump map and interposer / RDL database.</b> The bump map half of the deliverable; <code>PKGD-04</code> supplies the interposer routing.'},
+    {id:'PKGD-D6', rel:'feeds', text:'<b>Package electrical design intent.</b> Bump assignment determines channel quality before any routing is drawn.'},
   ],
   risks:[
     '<b>Bump map converged on the die side only.</b> A map that cannot escape on the substrate has to be redone, and by then the die may be placed around it.',
-    '<b>Power bumps reduced to fit signals.</b> The interfaces then work and the die cannot be fed, which <code>SIPI-04</code> finds much later.',
+    '<b>Power bumps reduced to fit signals.</b> The interfaces then work and the die cannot be fed, which <code>SIPI-05</code> finds much later.',
     '<b>Pitch chosen from the previous program.</b> Pitch depends on the interposer technology and the assembly process, both of which may have changed.',
     '<b>Signal assignment ignoring channel quality.</b> Which bump a high-speed signal uses affects its escape path and its crosstalk exposure.',
     '<b>Iteration continuing past the freeze date.</b> <code>PD-04</code> and the substrate order both depend on this closing on time.',
@@ -132,9 +132,9 @@ module.exports = {
     'Power-to-signal ratio meets the delivery requirement',
     'Map converged before the PD-04 freeze date',
   ],
-  dependsOn:['PKGD-01','ARCH-04','ARCH-08','PD-03'],
+  dependsOn:['PKGD-01','ARCH-03','ARCH-08','PD-03'],
   dependsNote:null,
-  feedsInto:['PKGD-03','PKGD-05','PD-04','SIPI-02'],
+  feedsInto:['PKGD-04','PKGD-09','PD-04','SIPI-02'],
   measuredBy:[
     'Iterations to convergence',
     'Escape feasibility at first check',
@@ -143,6 +143,72 @@ module.exports = {
 },
 
 'PKGD-03': {
+  stage:'packageDesign', window:[10,14], criticalPath:false,
+  purpose:[
+    'Tell <b>PTV what the vehicles have to measure</b>—which risks, which structures, which conditions—early enough that the vehicles can be designed, built and stressed before wafer-out.',
+    'The test vehicle program has a fifty-two week window and a hard gate at product wafer-out. Its requirements have to arrive while there is time to act on them, which is why this activity sits at week ten of a fifty-two week stage rather than after the package design is finished.',
+  ],
+  steps:[
+    {n:1, text:'Package risk identification for vehicle coverage', tat:1, lane:'main'},
+    {n:2, text:'Vehicle type requirements — mechanical, thermal, electrical', tat:1.5, lane:'par'},
+    {n:3, text:'Measurement condition and structure specification', tat:1.5, lane:'main'},
+    {n:4, text:'Requirement handoff and PTV plan review', tat:1.5, lane:'main'},
+  ],
+  flowNote:'Step 1 has to be done on an incomplete package design, which is uncomfortable and necessary. The architecture is known, the materials are known and the assembly process is broadly known—enough to say what will be risky, which is all the vehicle plan needs.',
+  consumes:[
+    'Package architecture from PKGD-01',
+    'Thermal and warpage predictions from PKGD-06',
+    'Assembly process direction from PKGD-08',
+    'CPI and ULK risk from TECH-04',
+    'Previous-program package failures',
+  ],
+  produces:[
+    'Package risk list for vehicle coverage',
+    'Vehicle type requirements',
+    'Measurement conditions and structure specification',
+    'Requirement handoff to PTV',
+  ],
+  producedBy:[1,2,3,4],
+  rel:[
+    {id:'PKGD-D2', rel:'produces', text:'<b>Test vehicle requirement specification for PTV.</b> This activity is the deliverable, and its timing matters as much as its content.'},
+    {id:'PKGD-D8', rel:'feeds', text:'<b>Thermal and mechanical simulation reports.</b> The vehicles measure what the simulations predicted, so the two are specified together.'},
+  ],
+  risks:[
+    '<b>Requirements issued after the package design completes.</b> The vehicle program then cannot finish before wafer-out, and the gate is missed.',
+    '<b>Risks identified from the design rather than from experience.</b> The failures that matter are the ones previous programs hit, and they are rarely visible in a design review.',
+    '<b>Electrical vehicle omitted.</b> Daisy-chain continuity and assembly yield are as important as thermal and mechanical, and they need their own vehicle.',
+    '<b>Conditions unspecified.</b> A vehicle measured at the wrong temperature or reflow profile answers a question nobody asked.',
+    '<b>No feedback loop defined.</b> The vehicle results have to change something, and the mechanism for that has to be agreed up front.',
+  ],
+  roles:[
+    {r:'Package architect', d:'Owns the risk list and the requirements'},
+    {r:'Thermal and mechanical engineers', d:'Vehicle requirements from the simulations'},
+    {r:'Reliability engineer', d:'Failure modes worth measuring'},
+    {r:'PTV lead', d:'Receives the requirements and confirms feasibility'},
+    {r:'OSAT liaison', d:'Assembly process realism in the vehicle plan'},
+  ],
+  effort:[['Risk identification',1], ['Measurement specification',0.75], ['Vehicle type requirements',0.75], ['Handoff and review',0.5]],
+  entry:[
+    'Package architecture selected in PKGD-01',
+    'First thermal and warpage predictions available',
+    'Assembly process direction known from PKGD-08',
+  ],
+  exit:[
+    'Requirements issued with time for the vehicle program to finish before wafer-out',
+    'Risks drawn from experience as well as from the design',
+    'Feedback mechanism into package design agreed',
+  ],
+  dependsOn:['PKGD-01','PKGD-06','TECH-04'],
+  dependsNote:null,
+  feedsInto:['PTV-01','PTV-02','PTV-03','PTV-04'],
+  measuredBy:[
+    'Weeks between requirement issue and the wafer-out gate',
+    'Risks covered by vehicles against risks identified',
+    'Vehicle findings that changed the package design',
+  ],
+},
+
+'PKGD-04': {
   stage:'packageDesign', window:[16,30], criticalPath:true,
   purpose:[
     'Route the <b>interposer and its redistribution layers</b>—the silicon layer that carries the die-to-HBM channels and everything else the substrate cannot.',
@@ -160,10 +226,10 @@ module.exports = {
   flowNote:'Step 2 dominates because HBM channels are numerous, fine-pitch and length-sensitive at once. Getting them routed with matched lengths and clean references is most of the interposer\'s difficulty and most of its schedule.',
   consumes:[
     'Bump map from PKGD-02',
-    'HBM channel requirements from ARCH-03 and ARCH-04',
+    'HBM channel requirements from ARCH-04 and ARCH-03',
     'Interposer technology rules from the supplier',
     'Power delivery requirement from PD-03',
-    'SI requirements from SIPI-07',
+    'SI requirements from SIPI-04',
   ],
   produces:[
     'Interposer layer stack and routing plan',
@@ -176,8 +242,8 @@ module.exports = {
   ],
   producedBy:[1,2,3,4,5,6,7],
   rel:[
-    {id:'PKGD-D2', rel:'produces', text:'<b>Bump map and interposer / RDL database.</b> The interposer half of the deliverable—the routed silicon layer itself.'},
-    {id:'PKGD-D4', rel:'feeds', text:'<b>Package electrical design intent.</b> Interposer routing is the highest-performance part of the package\'s electrical behavior.'},
+    {id:'PKGD-D3', rel:'produces', text:'<b>Bump map and interposer / RDL database.</b> The interposer half of the deliverable—the routed silicon layer itself.'},
+    {id:'PKGD-D6', rel:'feeds', text:'<b>Package electrical design intent.</b> Interposer routing is the highest-performance part of the package\'s electrical behavior.'},
   ],
   risks:[
     '<b>HBM channel lengths unmatched.</b> Skew across a wide parallel interface eats the training margin, and the failure appears at bring-up as a memory that will not train at speed.',
@@ -197,16 +263,16 @@ module.exports = {
   entry:[
     'Bump map converged in PKGD-02',
     'Interposer technology rules available from the supplier',
-    'Channel requirements known from SIPI-07',
+    'Channel requirements known from SIPI-04',
   ],
   exit:[
     'HBM channel lengths matched within the training budget',
     'Reference planes continuous under high-speed channels',
     'Interposer DRC clean against supplier rules',
   ],
-  dependsOn:['PKGD-02','ARCH-03','ARCH-04','PD-03'],
+  dependsOn:['PKGD-02','ARCH-04','ARCH-03','PD-03'],
   dependsNote:null,
-  feedsInto:['PKGD-05','PKGD-11','SIPI-02','SIPI-07','PTV-05'],
+  feedsInto:['PKGD-09','PKGD-11','SIPI-02','SIPI-04','PTV-05'],
   measuredBy:[
     'Channel length skew against the training budget',
     'Reference plane violations',
@@ -214,7 +280,7 @@ module.exports = {
   ],
 },
 
-'PKGD-04': {
+'PKGD-05': {
   stage:'packageDesign', window:[18,32], criticalPath:true,
   purpose:[
     'Design the <b>substrate</b>—stack-up, escape routing, power planes, package DRC—the organic carrier that connects the interposer to the board.',
@@ -232,10 +298,10 @@ module.exports = {
   flowNote:'Step 1 is the cost decision. Every substrate layer adds cost across the product\'s lifetime, and the layer count is set by whether the escape routing fits—which is not known until step 2 is attempted. The two steps iterate.',
   consumes:[
     'Package architecture from PKGD-01',
-    'Interposer footprint from PKGD-03',
+    'Interposer footprint from PKGD-04',
     'Board requirements and ball map from EVB-02',
-    'Supplier design rules from PKGD-09',
-    'Power delivery requirement from SIPI-05',
+    'Supplier design rules from PKGD-07',
+    'Power delivery requirement from SIPI-06',
   ],
   produces:[
     'Substrate stack-up and layer count',
@@ -248,8 +314,8 @@ module.exports = {
   ],
   producedBy:[1,2,3,4,5,6,7],
   rel:[
-    {id:'PKGD-D3', rel:'produces', text:'<b>Substrate design files (Gerber / ODB++) and stack-up.</b> This activity is the deliverable, and it is what the supplier manufactures from.'},
-    {id:'PKGD-D7', rel:'feeds', text:'<b>Substrate and interposer PO with committed lead time.</b> The order cannot be placed against a design that is not finished.'},
+    {id:'PKGD-D5', rel:'produces', text:'<b>Substrate design files (Gerber / ODB++) and stack-up.</b> This activity is the deliverable, and it is what the supplier manufactures from.'},
+    {id:'PKGD-D4', rel:'feeds', text:'<b>Substrate and interposer PO with committed lead time.</b> The order cannot be placed against a design that is not finished.'},
   ],
   risks:[
     '<b>Layer count set before escape is attempted.</b> A stack-up chosen for cost that cannot carry the escape has to be increased, and the cost model was built on the smaller number.',
@@ -268,17 +334,17 @@ module.exports = {
   effort:[['Escape routing',5], ['Ball assignment and breakout',3.5], ['Power and ground planes',3], ['Stack-up definition',2.5], ['Via and drill planning',2], ['DRC and release',2]],
   entry:[
     'Package architecture selected in PKGD-01',
-    'Interposer footprint available from PKGD-03',
-    'Supplier design rules obtained via PKGD-09',
+    'Interposer footprint available from PKGD-04',
+    'Supplier design rules obtained via PKGD-07',
   ],
   exit:[
     'Layer count justified by an attempted escape, not assumed',
     'Package DRC clean against the actual supplier\'s rules',
     'Ball map agreed with the board design',
   ],
-  dependsOn:['PKGD-01','PKGD-03','PKGD-09'],
+  dependsOn:['PKGD-01','PKGD-04','PKGD-07'],
   dependsNote:null,
-  feedsInto:['PKGD-05','PKGD-06','PKGD-11','SIPI-02','PTV-05'],
+  feedsInto:['PKGD-09','PKGD-10','PKGD-11','SIPI-02','PTV-05'],
   measuredBy:[
     'Layer count against the cost model assumption',
     'DRC violations at supplier review',
@@ -286,147 +352,7 @@ module.exports = {
   ],
 },
 
-'PKGD-05': {
-  stage:'packageDesign', window:[26,36], criticalPath:false,
-  purpose:[
-    'Route the package for <b>signal integrity</b>—length matching, reference continuity, via design, crosstalk separation—so the channels can carry what the interfaces need.',
-    'Package routing is where high-speed channels are made or ruined. A via with a long stub, a trace crossing a plane split, or a differential pair routed without its partner all cost margin that the PHY then has to make up. <code>SIPI-07</code> will measure the result; this activity is what determines it.',
-  ],
-  steps:[
-    {n:1, text:'Channel budget allocation to the package', tat:1.5, lane:'main'},
-    {n:2, text:'Length matching and skew control per interface', tat:2.5, lane:'main'},
-    {n:3, text:'Reference plane continuity and return path design', tat:2, lane:'par'},
-    {n:4, text:'Via structure design and stub management', tat:2, lane:'main'},
-    {n:5, text:'Crosstalk separation and shielding', tat:2, lane:'par'},
-    {n:6, text:'Routing review against the SI requirements', tat:4, lane:'main'},
-  ],
-  flowNote:'Step 4 is the one most often underestimated. Via stubs resonate at frequencies that matter for the fastest interfaces, and back-drilling or blind via structures are decisions with cost implications that belong to the substrate design rather than to routing.',
-  consumes:[
-    'Interposer and substrate routing from PKGD-03 and PKGD-04',
-    'Channel budgets from AMS-03 and ARCH-04',
-    'SI requirements and targets from SIPI-07',
-    'Interface compliance requirements',
-    'Supplier via and drill capability',
-  ],
-  produces:[
-    'Channel budget allocation to the package',
-    'Length-matched routing per interface',
-    'Reference plane continuity design',
-    'Via structures with managed stubs',
-    'Crosstalk separation plan',
-    'SI routing review record',
-  ],
-  producedBy:[1,2,3,4,5,6],
-  rel:[
-    {id:'PKGD-D4', rel:'produces', text:'<b>Package electrical design intent and model handoff to co-verification.</b> The signal half of the deliverable—the design intent <code>SIPI</code> then verifies.'},
-    {id:'PKGD-D3', rel:'feeds', text:'<b>Substrate design files and stack-up.</b> SI-driven routing is part of what the substrate files contain.'},
-  ],
-  risks:[
-    '<b>Via stubs unmanaged.</b> They resonate in band for the fastest interfaces, and the remedy—back-drilling or blind vias—is a substrate cost decision made too late.',
-    '<b>Length matching without reference continuity.</b> Matched traces over a split plane have matched delay and mismatched impedance.',
-    '<b>Channel budget not allocated.</b> Die, package and board each consume part of the loss budget, and without allocation each assumes the others left room.',
-    '<b>Crosstalk managed by spacing alone.</b> On a dense substrate there is no spare space, and the answer is usually reference and via design instead.',
-    '<b>Review after the substrate is released.</b> SI findings then have nowhere to go except into the PHY\'s margin.',
-  ],
-  roles:[
-    {r:'SI engineer', d:'Owns channel budgets and routing requirements'},
-    {r:'Package designer', d:'Implements length, reference and via design'},
-    {r:'Interposer designer', d:'Interposer-side channel routing'},
-    {r:'PHY liaison', d:'Channel budget from the die side'},
-    {r:'Supplier liaison', d:'Via and drill capability'},
-  ],
-  effort:[['Length matching and skew',3], ['Via structure design',2.5], ['Reference and return path',2], ['Crosstalk separation',2], ['Budget allocation',1.5], ['Review',1]],
-  entry:[
-    'Interposer and substrate routing progressing',
-    'Channel budgets available from AMS-03',
-    'SI targets defined by SIPI-07',
-  ],
-  exit:[
-    'Channel budget explicitly allocated between die, package and board',
-    'Via stubs managed rather than accepted',
-    'Routing reviewed against SI requirements before substrate release',
-  ],
-  dependsOn:['PKGD-03','PKGD-04','ARCH-04','AMS-03'],
-  dependsNote:null,
-  feedsInto:['PKGD-11','SIPI-07','SIPI-08','SO-06'],
-  measuredBy:[
-    'Channel loss against the package\'s allocated budget',
-    'Via stub length on critical interfaces',
-    'Length skew per interface',
-  ],
-},
-
 'PKGD-06': {
-  stage:'packageDesign', window:[28,37], criticalPath:false,
-  purpose:[
-    'Design the <b>package power delivery</b>—plane structure, via arrays, decoupling footprints—knowing that its electrical closure belongs to <code>SIPI</code> rather than to this activity.',
-    'The package sits between the die\'s instantaneous current demand and the board\'s slower supply. Its planes, vias and decoupling determine the impedance in the mid-frequency band where neither the die\'s on-chip decap nor the board\'s bulk capacitors help. Designing it is here; proving it works is co-verification.',
-  ],
-  steps:[
-    {n:1, text:'Package PDN topology and plane allocation', tat:2, lane:'main'},
-    {n:2, text:'Power via array design and current capability', tat:2, lane:'main'},
-    {n:3, text:'Decoupling capacitor footprint placement', tat:1.5, lane:'par'},
-    {n:4, text:'Plane perforation and current path management', tat:2, lane:'main'},
-    {n:5, text:'Interposer to substrate power transition', tat:1.5, lane:'par'},
-    {n:6, text:'PDN design intent handoff to co-verification', tat:3, lane:'main'},
-  ],
-  flowNote:'Step 3 places footprints rather than choosing values. Which capacitors go where is decided by <code>SIPI-05</code> against the impedance target; the package\'s job is to provide mounting positions close enough to the current draw for those choices to be available.',
-  consumes:[
-    'Substrate stack-up from PKGD-04',
-    'Power delivery requirement from PD-03',
-    'Bump and ball power assignment from PKGD-02',
-    'Impedance targets from SIPI-03',
-    'Supplier capability for via arrays and mounting',
-  ],
-  produces:[
-    'Package PDN topology and plane allocation',
-    'Power via array design',
-    'Decoupling footprint placement',
-    'Plane perforation and current path analysis',
-    'Interposer to substrate power transition design',
-    'PDN design intent handoff',
-  ],
-  producedBy:[1,2,3,4,5,6],
-  rel:[
-    {id:'PKGD-D4', rel:'produces', text:'<b>Package electrical design intent and model handoff to co-verification.</b> The power half of the deliverable, handed to <code>SIPI</code> for closure.'},
-    {id:'PKGD-D3', rel:'feeds', text:'<b>Substrate design files and stack-up.</b> Plane allocation and via arrays are substrate content.'},
-  ],
-  risks:[
-    '<b>Decoupling footprints too far from the current draw.</b> Mounting position determines the loop inductance, and a capacitor mounted far away is a capacitor that does not help.',
-    '<b>Plane perforation ignored.</b> Escape vias perforate power planes, and the remaining current path can be far worse than the plane suggests.',
-    '<b>Via array sized for DC only.</b> Transient current is what the package has to supply, and DC sizing understates the requirement.',
-    '<b>Closure assumed to be someone else\'s problem.</b> If the design intent is not analysable, <code>SIPI</code> cannot close it and the iteration comes back here.',
-    '<b>Interposer to substrate transition overlooked.</b> The power path crosses two interfaces, and the transition is where its resistance concentrates.',
-  ],
-  roles:[
-    {r:'Package power integrity engineer', d:'Owns package PDN design'},
-    {r:'Substrate designer', d:'Plane and via implementation'},
-    {r:'SIPI liaison', d:'Impedance targets and closure feedback'},
-    {r:'Die power delivery engineer', d:'Die-side current profile'},
-    {r:'Supplier liaison', d:'Via array and mounting capability'},
-  ],
-  effort:[['PDN topology and planes',2.5], ['Power via arrays',2], ['Plane perforation management',2], ['Decoupling footprints',1.5], ['Power transition design',1], ['Handoff',1]],
-  entry:[
-    'Substrate stack-up defined in PKGD-04',
-    'Power delivery requirement known from PD-03',
-    'Impedance targets available from SIPI-03',
-  ],
-  exit:[
-    'Decoupling footprints placed for loop inductance, not convenience',
-    'Plane perforation analyzed rather than assumed away',
-    'Design intent handed over in a form SIPI can analyze',
-  ],
-  dependsOn:['PKGD-02','PKGD-04','PD-03','SIPI-03'],
-  dependsNote:null,
-  feedsInto:['PKGD-11','SIPI-03','SIPI-05','SO-06'],
-  measuredBy:[
-    'Package PDN impedance against target',
-    'Decoupling loop inductance',
-    'Current path resistance through perforated planes',
-  ],
-},
-
-'PKGD-07': {
   stage:'packageDesign', window:[20,32], criticalPath:false,
   purpose:[
     'Simulate the <b>thermal and mechanical behavior</b> of the package—heat path, warpage, co-planarity, TIM and lid—before any of it is built.',
@@ -441,13 +367,13 @@ module.exports = {
     {n:6, text:'Mechanical stress and co-planarity analysis', tat:2, lane:'par'},
     {n:7, text:'Thermal and mechanical design recommendations', tat:4.5, lane:'main'},
   ],
-  flowNote:'Step 5 predicts what <code>PTV-07</code> will measure. Warpage across the reflow profile is the mechanism behind most 2.5D assembly failures, and simulating it before the vehicles are built is what makes the vehicle results interpretable rather than merely surprising.',
+  flowNote:'Step 5 predicts what <code>PTV-09</code> will measure. Warpage across the reflow profile is the mechanism behind most 2.5D assembly failures, and simulating it before the vehicles are built is what makes the vehicle results interpretable rather than merely surprising.',
   consumes:[
     'Package architecture from PKGD-01',
-    'Power map and hotspot data from PD-03 and SYN-06',
+    'Power map and hotspot data from PD-03 and SYN-09',
     'Material properties from the supplier',
-    'Assembly reflow profile from PKGD-10',
-    'Thermal requirements from DEF-03',
+    'Assembly reflow profile from PKGD-08',
+    'Thermal requirements from DEF-05',
   ],
   produces:[
     'Thermal model of the package stack',
@@ -460,8 +386,8 @@ module.exports = {
   ],
   producedBy:[1,2,3,4,5,6,7],
   rel:[
-    {id:'PKGD-D5', rel:'produces', text:'<b>Thermal and mechanical (warpage) simulation reports.</b> This activity is the deliverable, and <code>PTV</code> is what validates it.'},
-    {id:'PKGD-D6', rel:'feeds', text:'<b>Test vehicle requirement specification for PTV.</b> The simulations decide which mechanical and thermal risks the vehicles must measure.'},
+    {id:'PKGD-D8', rel:'produces', text:'<b>Thermal and mechanical (warpage) simulation reports.</b> This activity is the deliverable, and <code>PTV</code> is what validates it.'},
+    {id:'PKGD-D2', rel:'feeds', text:'<b>Test vehicle requirement specification for PTV.</b> The simulations decide which mechanical and thermal risks the vehicles must measure.'},
   ],
   risks:[
     '<b>Thermal simulated at uniform power.</b> An accelerator\'s power is concentrated in the compute clusters, and uniform assumptions understate the hotspot badly.',
@@ -488,9 +414,9 @@ module.exports = {
     'Warpage simulated across the full reflow profile',
     'Findings handed to PTV as vehicle requirements',
   ],
-  dependsOn:['PKGD-01','PD-03','DEF-03'],
+  dependsOn:['PKGD-01','PD-03','DEF-05'],
   dependsNote:null,
-  feedsInto:['PKGD-08','PKGD-10','PTV-03','PTV-07','SIPI-10'],
+  feedsInto:['PKGD-03','PKGD-08','PTV-03','PTV-09','SIPI-10'],
   measuredBy:[
     'Predicted Rjc against the PTV measurement',
     'Predicted warpage against measured',
@@ -498,73 +424,7 @@ module.exports = {
   ],
 },
 
-'PKGD-08': {
-  stage:'packageDesign', window:[10,14], criticalPath:false,
-  purpose:[
-    'Tell <b>PTV what the vehicles have to measure</b>—which risks, which structures, which conditions—early enough that the vehicles can be designed, built and stressed before wafer-out.',
-    'The test vehicle program has a fifty-two week window and a hard gate at product wafer-out. Its requirements have to arrive while there is time to act on them, which is why this activity sits at week ten of a fifty-two week stage rather than after the package design is finished.',
-  ],
-  steps:[
-    {n:1, text:'Package risk identification for vehicle coverage', tat:1, lane:'main'},
-    {n:2, text:'Vehicle type requirements — mechanical, thermal, electrical', tat:1.5, lane:'par'},
-    {n:3, text:'Measurement condition and structure specification', tat:1.5, lane:'main'},
-    {n:4, text:'Requirement handoff and PTV plan review', tat:1.5, lane:'main'},
-  ],
-  flowNote:'Step 1 has to be done on an incomplete package design, which is uncomfortable and necessary. The architecture is known, the materials are known and the assembly process is broadly known—enough to say what will be risky, which is all the vehicle plan needs.',
-  consumes:[
-    'Package architecture from PKGD-01',
-    'Thermal and warpage predictions from PKGD-07',
-    'Assembly process direction from PKGD-10',
-    'CPI and ULK risk from TECH-03',
-    'Previous-program package failures',
-  ],
-  produces:[
-    'Package risk list for vehicle coverage',
-    'Vehicle type requirements',
-    'Measurement conditions and structure specification',
-    'Requirement handoff to PTV',
-  ],
-  producedBy:[1,2,3,4],
-  rel:[
-    {id:'PKGD-D6', rel:'produces', text:'<b>Test vehicle requirement specification for PTV.</b> This activity is the deliverable, and its timing matters as much as its content.'},
-    {id:'PKGD-D5', rel:'feeds', text:'<b>Thermal and mechanical simulation reports.</b> The vehicles measure what the simulations predicted, so the two are specified together.'},
-  ],
-  risks:[
-    '<b>Requirements issued after the package design completes.</b> The vehicle program then cannot finish before wafer-out, and the gate is missed.',
-    '<b>Risks identified from the design rather than from experience.</b> The failures that matter are the ones previous programs hit, and they are rarely visible in a design review.',
-    '<b>Electrical vehicle omitted.</b> Daisy-chain continuity and assembly yield are as important as thermal and mechanical, and they need their own vehicle.',
-    '<b>Conditions unspecified.</b> A vehicle measured at the wrong temperature or reflow profile answers a question nobody asked.',
-    '<b>No feedback loop defined.</b> The vehicle results have to change something, and the mechanism for that has to be agreed up front.',
-  ],
-  roles:[
-    {r:'Package architect', d:'Owns the risk list and the requirements'},
-    {r:'Thermal and mechanical engineers', d:'Vehicle requirements from the simulations'},
-    {r:'Reliability engineer', d:'Failure modes worth measuring'},
-    {r:'PTV lead', d:'Receives the requirements and confirms feasibility'},
-    {r:'OSAT liaison', d:'Assembly process realism in the vehicle plan'},
-  ],
-  effort:[['Risk identification',1], ['Measurement specification',0.75], ['Vehicle type requirements',0.75], ['Handoff and review',0.5]],
-  entry:[
-    'Package architecture selected in PKGD-01',
-    'First thermal and warpage predictions available',
-    'Assembly process direction known from PKGD-10',
-  ],
-  exit:[
-    'Requirements issued with time for the vehicle program to finish before wafer-out',
-    'Risks drawn from experience as well as from the design',
-    'Feedback mechanism into package design agreed',
-  ],
-  dependsOn:['PKGD-01','PKGD-07','TECH-03'],
-  dependsNote:null,
-  feedsInto:['PTV-01','PTV-02','PTV-03','PTV-04'],
-  measuredBy:[
-    'Weeks between requirement issue and the wafer-out gate',
-    'Risks covered by vehicles against risks identified',
-    'Vehicle findings that changed the package design',
-  ],
-},
-
-'PKGD-09': {
+'PKGD-07': {
   stage:'packageDesign', window:[22,32], criticalPath:true,
   purpose:[
     'Select the <b>substrate and interposer suppliers and book their lead time</b>—a twenty-week commitment that sets the date the package can be built.',
@@ -581,10 +441,10 @@ module.exports = {
   flowNote:'Step 6 takes four weeks because the order cannot be placed until the design is frozen, and the freeze is in <code>PKGD-11</code>. Everything before it exists so that the order can be placed the same week the design is released rather than a month later.',
   consumes:[
     'Package architecture from PKGD-01',
-    'Substrate design requirements from PKGD-04',
+    'Substrate design requirements from PKGD-05',
     'Backend supply chain landscape from TECH-09',
     'Volume forecast and ramp from DEF-08',
-    'Cost targets from DEF-04',
+    'Cost targets from DEF-06',
   ],
   produces:[
     'Supplier capability screen',
@@ -596,8 +456,8 @@ module.exports = {
   ],
   producedBy:[1,2,3,4,5,6],
   rel:[
-    {id:'PKGD-D7', rel:'produces', text:'<b>Substrate and interposer PO with committed lead time.</b> This activity is the deliverable, and the committed date is what wafer-out has to be planned against.'},
-    {id:'PKGD-D3', rel:'feeds', text:'<b>Substrate design files and stack-up.</b> Supplier rules determine what the substrate design can contain.'},
+    {id:'PKGD-D4', rel:'produces', text:'<b>Substrate and interposer PO with committed lead time.</b> This activity is the deliverable, and the committed date is what wafer-out has to be planned against.'},
+    {id:'PKGD-D5', rel:'feeds', text:'<b>Substrate design files and stack-up.</b> Supplier rules determine what the substrate design can contain.'},
   ],
   risks:[
     '<b>Order placed after wafer-out is committed.</b> A twenty-week substrate against a fixed wafer-out date means wafers waiting for a package.',
@@ -616,7 +476,7 @@ module.exports = {
   effort:[['Supplier selection and qualification',1], ['Design rule assessment',0.75], ['Capacity and lead time',0.75], ['Purchase order',0.75], ['Commercial negotiation',0.5], ['Capability screen',0.25]],
   entry:[
     'Package architecture selected in PKGD-01',
-    'Substrate requirements known from PKGD-04',
+    'Substrate requirements known from PKGD-05',
     'Volume and ramp forecast available',
   ],
   exit:[
@@ -626,7 +486,7 @@ module.exports = {
   ],
   dependsOn:['PKGD-01','TECH-09','DEF-08'],
   dependsNote:null,
-  feedsInto:['PKGD-04','PKGD-11','PTV-05','ASSY-04'],
+  feedsInto:['PKGD-05','PKGD-11','PTV-05','ASSY-07'],
   measuredBy:[
     'Committed lead time against the wafer-out date',
     'Weeks between design freeze and order placement',
@@ -634,7 +494,7 @@ module.exports = {
   ],
 },
 
-'PKGD-10': {
+'PKGD-08': {
   stage:'packageDesign', window:[24,33], criticalPath:false,
   purpose:[
     'Select the <b>OSAT and define the assembly process</b>—bonding, underfill, molding, lid attach—because the process determines what the package design has to accommodate.',
@@ -652,7 +512,7 @@ module.exports = {
   consumes:[
     'Package architecture from PKGD-01',
     'Backend supply chain findings from TECH-09',
-    'Thermal and mechanical requirements from PKGD-07',
+    'Thermal and mechanical requirements from PKGD-06',
     'Volume and ramp forecast from DEF-08',
     'Known-good-die strategy from TEST-01',
   ],
@@ -666,8 +526,8 @@ module.exports = {
   ],
   producedBy:[1,2,3,4,5,6],
   rel:[
-    {id:'PKGD-D8', rel:'produces', text:'<b>OSAT assembly process flow and agreement.</b> This activity is the deliverable, and the agreement includes the responsibility model.'},
-    {id:'PKGD-D5', rel:'feeds', text:'<b>Thermal and mechanical simulation reports.</b> The reflow profile the simulations use comes from the assembly process defined here.'},
+    {id:'PKGD-D7', rel:'produces', text:'<b>OSAT assembly process flow and agreement.</b> This activity is the deliverable, and the agreement includes the responsibility model.'},
+    {id:'PKGD-D8', rel:'feeds', text:'<b>Thermal and mechanical simulation reports.</b> The reflow profile the simulations use comes from the assembly process defined here.'},
   ],
   risks:[
     '<b>OSAT selected after the package is designed.</b> The design then has to be adapted to the assembler\'s process rather than developed with it.',
@@ -694,13 +554,153 @@ module.exports = {
     'Process parameters known to the package design, not assumed',
     'Known-good-die responsibility agreed in writing',
   ],
-  dependsOn:['PKGD-01','PKGD-07','TECH-09'],
+  dependsOn:['PKGD-01','PKGD-06','TECH-09'],
   dependsNote:null,
-  feedsInto:['PKGD-07','PKGD-11','PTV-06','ASSY-01','ASSY-03'],
+  feedsInto:['PKGD-06','PKGD-11','PTV-06','ASSY-03','ASSY-05'],
   measuredBy:[
     'Assembly capacity committed against the ramp requirement',
     'Process parameters specified against those assumed',
     'Responsibility model agreed before first build',
+  ],
+},
+
+'PKGD-09': {
+  stage:'packageDesign', window:[26,36], criticalPath:false,
+  purpose:[
+    'Route the package for <b>signal integrity</b>—length matching, reference continuity, via design, crosstalk separation—so the channels can carry what the interfaces need.',
+    'Package routing is where high-speed channels are made or ruined. A via with a long stub, a trace crossing a plane split, or a differential pair routed without its partner all cost margin that the PHY then has to make up. <code>SIPI-04</code> will measure the result; this activity is what determines it.',
+  ],
+  steps:[
+    {n:1, text:'Channel budget allocation to the package', tat:1.5, lane:'main'},
+    {n:2, text:'Length matching and skew control per interface', tat:2.5, lane:'main'},
+    {n:3, text:'Reference plane continuity and return path design', tat:2, lane:'par'},
+    {n:4, text:'Via structure design and stub management', tat:2, lane:'main'},
+    {n:5, text:'Crosstalk separation and shielding', tat:2, lane:'par'},
+    {n:6, text:'Routing review against the SI requirements', tat:4, lane:'main'},
+  ],
+  flowNote:'Step 4 is the one most often underestimated. Via stubs resonate at frequencies that matter for the fastest interfaces, and back-drilling or blind via structures are decisions with cost implications that belong to the substrate design rather than to routing.',
+  consumes:[
+    'Interposer and substrate routing from PKGD-04 and PKGD-05',
+    'Channel budgets from AMS-04 and ARCH-03',
+    'SI requirements and targets from SIPI-04',
+    'Interface compliance requirements',
+    'Supplier via and drill capability',
+  ],
+  produces:[
+    'Channel budget allocation to the package',
+    'Length-matched routing per interface',
+    'Reference plane continuity design',
+    'Via structures with managed stubs',
+    'Crosstalk separation plan',
+    'SI routing review record',
+  ],
+  producedBy:[1,2,3,4,5,6],
+  rel:[
+    {id:'PKGD-D6', rel:'produces', text:'<b>Package electrical design intent and model handoff to co-verification.</b> The signal half of the deliverable—the design intent <code>SIPI</code> then verifies.'},
+    {id:'PKGD-D5', rel:'feeds', text:'<b>Substrate design files and stack-up.</b> SI-driven routing is part of what the substrate files contain.'},
+  ],
+  risks:[
+    '<b>Via stubs unmanaged.</b> They resonate in band for the fastest interfaces, and the remedy—back-drilling or blind vias—is a substrate cost decision made too late.',
+    '<b>Length matching without reference continuity.</b> Matched traces over a split plane have matched delay and mismatched impedance.',
+    '<b>Channel budget not allocated.</b> Die, package and board each consume part of the loss budget, and without allocation each assumes the others left room.',
+    '<b>Crosstalk managed by spacing alone.</b> On a dense substrate there is no spare space, and the answer is usually reference and via design instead.',
+    '<b>Review after the substrate is released.</b> SI findings then have nowhere to go except into the PHY\'s margin.',
+  ],
+  roles:[
+    {r:'SI engineer', d:'Owns channel budgets and routing requirements'},
+    {r:'Package designer', d:'Implements length, reference and via design'},
+    {r:'Interposer designer', d:'Interposer-side channel routing'},
+    {r:'PHY liaison', d:'Channel budget from the die side'},
+    {r:'Supplier liaison', d:'Via and drill capability'},
+  ],
+  effort:[['Length matching and skew',3], ['Via structure design',2.5], ['Reference and return path',2], ['Crosstalk separation',2], ['Budget allocation',1.5], ['Review',1]],
+  entry:[
+    'Interposer and substrate routing progressing',
+    'Channel budgets available from AMS-04',
+    'SI targets defined by SIPI-04',
+  ],
+  exit:[
+    'Channel budget explicitly allocated between die, package and board',
+    'Via stubs managed rather than accepted',
+    'Routing reviewed against SI requirements before substrate release',
+  ],
+  dependsOn:['PKGD-04','PKGD-05','ARCH-03','AMS-04'],
+  dependsNote:null,
+  feedsInto:['PKGD-11','SIPI-04','SIPI-08','SO-12'],
+  measuredBy:[
+    'Channel loss against the package\'s allocated budget',
+    'Via stub length on critical interfaces',
+    'Length skew per interface',
+  ],
+},
+
+'PKGD-10': {
+  stage:'packageDesign', window:[28,37], criticalPath:false,
+  purpose:[
+    'Design the <b>package power delivery</b>—plane structure, via arrays, decoupling footprints—knowing that its electrical closure belongs to <code>SIPI</code> rather than to this activity.',
+    'The package sits between the die\'s instantaneous current demand and the board\'s slower supply. Its planes, vias and decoupling determine the impedance in the mid-frequency band where neither the die\'s on-chip decap nor the board\'s bulk capacitors help. Designing it is here; proving it works is co-verification.',
+  ],
+  steps:[
+    {n:1, text:'Package PDN topology and plane allocation', tat:2, lane:'main'},
+    {n:2, text:'Power via array design and current capability', tat:2, lane:'main'},
+    {n:3, text:'Decoupling capacitor footprint placement', tat:1.5, lane:'par'},
+    {n:4, text:'Plane perforation and current path management', tat:2, lane:'main'},
+    {n:5, text:'Interposer to substrate power transition', tat:1.5, lane:'par'},
+    {n:6, text:'PDN design intent handoff to co-verification', tat:3, lane:'main'},
+  ],
+  flowNote:'Step 3 places footprints rather than choosing values. Which capacitors go where is decided by <code>SIPI-06</code> against the impedance target; the package\'s job is to provide mounting positions close enough to the current draw for those choices to be available.',
+  consumes:[
+    'Substrate stack-up from PKGD-05',
+    'Power delivery requirement from PD-03',
+    'Bump and ball power assignment from PKGD-02',
+    'Impedance targets from SIPI-03',
+    'Supplier capability for via arrays and mounting',
+  ],
+  produces:[
+    'Package PDN topology and plane allocation',
+    'Power via array design',
+    'Decoupling footprint placement',
+    'Plane perforation and current path analysis',
+    'Interposer to substrate power transition design',
+    'PDN design intent handoff',
+  ],
+  producedBy:[1,2,3,4,5,6],
+  rel:[
+    {id:'PKGD-D6', rel:'produces', text:'<b>Package electrical design intent and model handoff to co-verification.</b> The power half of the deliverable, handed to <code>SIPI</code> for closure.'},
+    {id:'PKGD-D5', rel:'feeds', text:'<b>Substrate design files and stack-up.</b> Plane allocation and via arrays are substrate content.'},
+  ],
+  risks:[
+    '<b>Decoupling footprints too far from the current draw.</b> Mounting position determines the loop inductance, and a capacitor mounted far away is a capacitor that does not help.',
+    '<b>Plane perforation ignored.</b> Escape vias perforate power planes, and the remaining current path can be far worse than the plane suggests.',
+    '<b>Via array sized for DC only.</b> Transient current is what the package has to supply, and DC sizing understates the requirement.',
+    '<b>Closure assumed to be someone else\'s problem.</b> If the design intent is not analysable, <code>SIPI</code> cannot close it and the iteration comes back here.',
+    '<b>Interposer to substrate transition overlooked.</b> The power path crosses two interfaces, and the transition is where its resistance concentrates.',
+  ],
+  roles:[
+    {r:'Package power integrity engineer', d:'Owns package PDN design'},
+    {r:'Substrate designer', d:'Plane and via implementation'},
+    {r:'SIPI liaison', d:'Impedance targets and closure feedback'},
+    {r:'Die power delivery engineer', d:'Die-side current profile'},
+    {r:'Supplier liaison', d:'Via array and mounting capability'},
+  ],
+  effort:[['PDN topology and planes',2.5], ['Power via arrays',2], ['Plane perforation management',2], ['Decoupling footprints',1.5], ['Power transition design',1], ['Handoff',1]],
+  entry:[
+    'Substrate stack-up defined in PKGD-05',
+    'Power delivery requirement known from PD-03',
+    'Impedance targets available from SIPI-03',
+  ],
+  exit:[
+    'Decoupling footprints placed for loop inductance, not convenience',
+    'Plane perforation analyzed rather than assumed away',
+    'Design intent handed over in a form SIPI can analyze',
+  ],
+  dependsOn:['PKGD-02','PKGD-05','PD-03','SIPI-03'],
+  dependsNote:null,
+  feedsInto:['PKGD-11','SIPI-03','SIPI-06','SO-12'],
+  measuredBy:[
+    'Package PDN impedance against target',
+    'Decoupling loop inductance',
+    'Current path resistance through perforated planes',
   ],
 },
 
@@ -720,11 +720,11 @@ module.exports = {
   ],
   flowNote:'Step 5 runs in parallel and can send the design back. Suppliers review for manufacturability against their own process, and their acceptance is what makes the order placeable—a design frozen internally and rejected by the supplier has not frozen anything.',
   consumes:[
-    'Interposer database from PKGD-03',
-    'Substrate database from PKGD-04',
-    'SI and PDN design from PKGD-05 and PKGD-06',
+    'Interposer database from PKGD-04',
+    'Substrate database from PKGD-05',
+    'SI and PDN design from PKGD-09 and PKGD-10',
     'Co-verification findings from SIPI-11',
-    'Supplier PO framework from PKGD-09',
+    'Supplier PO framework from PKGD-07',
   ],
   produces:[
     'Design completeness review record',
@@ -737,7 +737,7 @@ module.exports = {
   producedBy:[1,2,3,4,5,6],
   rel:[
     {id:'PKGD-D9', rel:'produces', text:'<b>Package Design Freeze package.</b> This activity is the deliverable, and it carries the stage\'s milestone.'},
-    {id:'PKGD-D7', rel:'gates', text:'<b>Substrate and interposer PO with committed lead time.</b> The order is released on this freeze; nothing before it starts the lead time.'},
+    {id:'PKGD-D4', rel:'gates', text:'<b>Substrate and interposer PO with committed lead time.</b> The order is released on this freeze; nothing before it starts the lead time.'},
   ],
   risks:[
     '<b>Freeze slipping.</b> Twenty weeks of substrate lead time follow it, and the delay lands after wafer-out where nothing can absorb it.',
@@ -764,9 +764,9 @@ module.exports = {
     'Order released the same week as the freeze',
     'Co-verification findings incorporated before freeze, not after',
   ],
-  dependsOn:['PKGD-03','PKGD-04','PKGD-05','PKGD-06','PKGD-09','PKGD-10','PD-04','SIPI-11'],
+  dependsOn:['PKGD-04','PKGD-05','PKGD-09','PKGD-10','PKGD-07','PKGD-08','PD-04','SIPI-11'],
   dependsNote:null,
-  feedsInto:['ASSY-04','PTV-12','MP-10'],
+  feedsInto:['ASSY-07','PTV-12','MP-08'],
   measuredBy:[
     'Freeze date against the substrate lead time requirement',
     'Supplier acceptance at first review',

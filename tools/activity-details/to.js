@@ -16,11 +16,11 @@ module.exports = {
   ],
   flowNote:'Step 4 is checked against the foundry\'s layer map rather than the internal one. The two are usually identical and occasionally are not, and the difference is only visible at the mask shop—by which point the masks exist.',
   consumes:[
-    'Frozen signoff database from PD-13 and PD-16',
-    'Hard macro GDS from AMS-15',
+    'Frozen signoff database from PD-15 and PD-12',
+    'Hard macro GDS from AMS-16',
     'Foundry layer map and stream-out rules',
-    'Chip finishing from PD-15',
-    'Signoff clean status from SO-03',
+    'Chip finishing from PD-16',
+    'Signoff clean status from SO-04',
   ],
   produces:[
     'Database checksum and provenance record',
@@ -50,8 +50,8 @@ module.exports = {
   ],
   effort:[['Stream-out',2.5], ['Layer map verification',1.5], ['Macro merge',1], ['Intake and provenance',1]],
   entry:[
-    'Signoff database frozen by PD-13',
-    'Physical verification clean from SO-03',
+    'Signoff database frozen by PD-15',
+    'Physical verification clean from SO-04',
     'Foundry layer map and format confirmed',
   ],
   exit:[
@@ -59,9 +59,9 @@ module.exports = {
     'Every macro GDS traced to its released version',
     'Database checksummed and recorded',
   ],
-  dependsOn:['PD-13','PD-15','PD-16','SO-03','AMS-15'],
+  dependsOn:['PD-15','PD-16','PD-12','SO-04','AMS-16'],
   dependsNote:null,
-  feedsInto:['TO-02','TO-03','TO-06','TO-08'],
+  feedsInto:['TO-02','TO-03','TO-06','TO-07'],
   measuredBy:[
     'Layer map discrepancies found',
     'Macro versions traced to release',
@@ -85,9 +85,9 @@ module.exports = {
   flowNote:'Step 5 sounds pedantic and prevents the worst class of error. Verifying one database and releasing another has happened on real programs, and the only defense is confirming the checksum of what was verified against the checksum of what was sent.',
   consumes:[
     'Released database from TO-01',
-    'Verification decks from PDK-10',
-    'Signoff results from SO-03',
-    'Waiver list from SO-10',
+    'Verification decks from PDK-04',
+    'Signoff results from SO-04',
+    'Waiver list from SO-11',
     'Compute capacity for full-chip runs',
   ],
   produces:[
@@ -106,7 +106,7 @@ module.exports = {
     '<b>Skipped because signoff was clean.</b> Signoff checked a different database, and the difference between them is exactly what this run exists to catch.',
     '<b>Run on the signoff database rather than the released one.</b> That repeats the earlier check and proves nothing new.',
     '<b>Compute capacity unavailable.</b> A full-chip run takes days and needs to be scheduled, not requested.',
-    '<b>New violations discovered with no time to fix.</b> Which is why <code>SO-03</code> has to close cleanly rather than nearly.',
+    '<b>New violations discovered with no time to fix.</b> Which is why <code>SO-04</code> has to close cleanly rather than nearly.',
     '<b>Checksums not compared.</b> Verifying one file and releasing another is a documented failure mode with a trivial defense.',
   ],
   roles:[
@@ -127,7 +127,7 @@ module.exports = {
     'Checksums confirmed identical between verified and released',
     'No violations outstanding that were not already waived',
   ],
-  dependsOn:['TO-01','SO-03','SO-09','PDK-10'],
+  dependsOn:['TO-01','SO-04','SO-09','PDK-04'],
   dependsNote:null,
   feedsInto:['TO-03','TO-05','TO-06'],
   measuredBy:[
@@ -151,11 +151,11 @@ module.exports = {
   ],
   flowNote:'Step 3 runs in parallel because it is where the time goes. Chasing an owner who has not signed, or an entry whose evidence does not exist, is the real work—the checklist itself takes an afternoon.',
   consumes:[
-    'Signoff results from SO-02 through SO-11',
-    'DFT signoff from DFT-08',
-    'DV closure from DV-12',
+    'Signoff results from SO-03 through SO-10',
+    'DFT signoff from DFT-11',
+    'DV closure from DV-04',
     'Verification results from TO-02',
-    'Waiver dispositions from SO-10',
+    'Waiver dispositions from SO-11',
   ],
   produces:[
     'Assembled tapeout checklist',
@@ -193,7 +193,7 @@ module.exports = {
     'Signatures from accountable owners, not proxies',
     'Gaps escalated with time to close them',
   ],
-  dependsOn:['TO-01','TO-02','SO-10','DFT-08','DV-12'],
+  dependsOn:['TO-01','TO-02','SO-11','DFT-11','DV-04'],
   dependsNote:null,
   feedsInto:['TO-04','TO-05'],
   measuredBy:[
@@ -217,9 +217,9 @@ module.exports = {
   ],
   flowNote:'Step 3 is what gives the Go / No-Go meeting something to decide. An item with a mitigation—a test screen, a software workaround, a bin split—is a different decision from one without, and identifying which is which is this activity\'s contribution.',
   consumes:[
-    'Open bug list and risk statement from DV-12',
-    'Waiver register from SO-10',
-    'Test coverage gaps from DFT-07',
+    'Open bug list and risk statement from DV-04',
+    'Waiver register from SO-11',
+    'Test coverage gaps from DFT-10',
     'Package and assembly open items from PKGD-11',
     'Program risk register',
   ],
@@ -250,7 +250,7 @@ module.exports = {
   ],
   effort:[['Risk classification',1.25], ['Acceptance and ownership',0.75], ['Consolidation',0.5], ['Mitigation options',0.5]],
   entry:[
-    'Bug and waiver lists available from DV-12 and SO-10',
+    'Bug and waiver lists available from DV-04 and SO-11',
     'Test and package open items collected',
     'Risk classification scheme agreed',
   ],
@@ -259,9 +259,9 @@ module.exports = {
     'Mitigation options identified where they exist',
     'Each accepted risk has a named owner',
   ],
-  dependsOn:['DV-12','SO-10','DFT-07'],
+  dependsOn:['DV-04','SO-11','DFT-10'],
   dependsNote:null,
-  feedsInto:['TO-05','BU-10','MP-09'],
+  feedsInto:['TO-05','BU-09','MP-12'],
   measuredBy:[
     'Items with a quantified consequence',
     'Accepted risks with a named owner',
@@ -285,7 +285,7 @@ module.exports = {
     'Tapeout checklist from TO-03',
     'Risk acceptance record from TO-04',
     'Verification results from TO-02',
-    'Foundry readiness from TECH-05',
+    'Foundry readiness from TECH-07',
     'Program schedule position from DEF-08',
   ],
   produces:[
@@ -326,7 +326,7 @@ module.exports = {
   ],
   dependsOn:['TO-02','TO-03','TO-04'],
   dependsNote:null,
-  feedsInto:['TO-06','TO-08','MP-09'],
+  feedsInto:['TO-06','TO-07','MP-12'],
   measuredBy:[
     'Conditions attached and assigned',
     'Dissent recorded',
@@ -350,8 +350,8 @@ module.exports = {
     'Released database from TO-01',
     'Go / No-Go decision from TO-05',
     'Foundry submission format and MDP requirements',
-    'Layer split definition from TECH-02',
-    'Mask order and slot from TECH-05',
+    'Layer split definition from TECH-05',
+    'Mask order and slot from TECH-07',
   ],
   produces:[
     'FEOL layer data set',
@@ -381,16 +381,16 @@ module.exports = {
   entry:[
     'Go / No-Go decision taken in TO-05',
     'Database verified in TO-02',
-    'Mask slot confirmed by TECH-05',
+    'Mask slot confirmed by TECH-07',
   ],
   exit:[
     'Layer split matches the FEOL/BEOL plan exactly',
     'Submission acknowledged by the foundry in writing',
     'Released layers traceable to the database checksum',
   ],
-  dependsOn:['TO-01','TO-05','TECH-05'],
+  dependsOn:['TO-01','TO-05','TECH-07'],
   dependsNote:null,
-  feedsInto:['TO-07','FAB-01','TO-08'],
+  feedsInto:['TO-08','FAB-01','TO-07'],
   measuredBy:[
     'Submission accepted at first attempt',
     'Release date against the plan',
@@ -399,10 +399,80 @@ module.exports = {
 },
 
 'TO-07': {
+  stage:'tapeout', window:[2,6], criticalPath:true,
+  purpose:[
+    'Use the <b>four weeks between the two mask releases</b> to make metal-layer fixes—the last window in which a design change is possible without a new front-end mask set.',
+    'This window is the reason the releases are split. FEOL masks are being cut and cannot change; BEOL is still open, and any fix implementable in metal can still be made. It is a genuine and finite opportunity, and it closes on a date.',
+  ],
+  steps:[
+    {n:1, text:'Fix window scope and admission rules', tat:0.5, lane:'main'},
+    {n:2, text:'Metal-layer ECO implementation', tat:1.5, lane:'main'},
+    {n:3, text:'Fix prioritization and risk assessment', tat:1, lane:'par'},
+    {n:4, text:'ECO verification per fix', tat:1, lane:'main'},
+    {n:5, text:'Equivalence and consistency check per fix', tat:1, lane:'par'},
+    {n:6, text:'Window close and BEOL database freeze', tat:1, lane:'main'},
+  ],
+  flowNote:'Step 1 has to be strict. Every late fix carries risk, and a window with no admission rules fills with changes that individually look safe and collectively make the BEOL database something nobody has verified as a whole.',
+  consumes:[
+    'Released database from TO-01',
+    'Late findings from bring-up preparation, verification and signoff',
+    'Spare cell and metal-only strategy from PD-09',
+    'Go / No-Go conditions from TO-05',
+    'Equivalence methodology from SO-09',
+  ],
+  produces:[
+    'Fix window scope and admission rules',
+    'Implemented metal-layer ECOs',
+    'Fix prioritization and risk record',
+    'Per-fix verification results',
+    'Per-fix equivalence and consistency results',
+    'Frozen BEOL database',
+  ],
+  producedBy:[1,2,3,4,5,6],
+  rel:[
+    {id:'TO-D6', rel:'produces', text:'<b>BEOL ECO log covering the fix window.</b> This activity is the deliverable, and the log is what makes the BEOL database traceable.'},
+    {id:'TO-D7', rel:'feeds', text:'<b>BEOL MTO release package.</b> The database released to BEOL is the FEOL database plus this window\'s fixes.'},
+  ],
+  risks:[
+    '<b>Window used as general contingency.</b> Fixes admitted without rules accumulate into a database that differs from the verified one in ways nobody assessed as a whole.',
+    '<b>Fix requiring base layers.</b> If <code>PD-09</code>\'s spare cell strategy was not put in place, the fix cannot be made in metal and the window is useless.',
+    '<b>Verification per fix but not in combination.</b> Individually correct changes can interact, and the combined database needs a check of its own.',
+    '<b>Window extended.</b> BEOL mask release has a date; extending the window pushes the whole mask set and with it wafer start.',
+    '<b>Equivalence skipped for speed.</b> A metal ECO can change function, and the only detector is an equivalence run.',
+  ],
+  roles:[
+    {r:'Physical design lead', d:'Owns implementation and the window'},
+    {r:'Program manager', d:'Admission rules and prioritization'},
+    {r:'Verification lead', d:'Per-fix and combined verification'},
+    {r:'Equivalence engineer', d:'Equivalence per fix and at window close'},
+    {r:'Signoff lead', d:'Re-verification scope for changed layers'},
+  ],
+  effort:[['ECO implementation',4], ['ECO verification',2.5], ['Prioritization and risk',1.5], ['Equivalence checks',1.5], ['Window close',0.5]],
+  entry:[
+    'FEOL released in TO-06',
+    'Admission rules agreed before the window opens',
+    'Spare cell capacity available from PD-09',
+  ],
+  exit:[
+    'Every fix implementable in metal, none requiring base layers',
+    'Combined database verified, not only individual fixes',
+    'Window closed on its date, not extended',
+  ],
+  dependsOn:['TO-01','TO-05','TO-06','PD-09'],
+  dependsNote:null,
+  feedsInto:['TO-09','TO-10','BU-11'],
+  measuredBy:[
+    'Fixes admitted against fixes requested',
+    'Fixes implementable in metal',
+    'Window closed on the planned date',
+  ],
+},
+
+'TO-08': {
   stage:'tapeout', window:[3,4], criticalPath:false,
   purpose:[
     'Confirm the <b>FEOL mask order</b> and get a mask shop schedule the program can plan wafer start against.',
-    'One man-month of administration that fixes a date the whole downstream schedule hangs on. Mask writing takes weeks, and knowing when the FEOL set will be ready is what tells <code>FAB-02</code> when wafers can start.',
+    'One man-month of administration that fixes a date the whole downstream schedule hangs on. Mask writing takes weeks, and knowing when the FEOL set will be ready is what tells <code>FAB-05</code> when wafers can start.',
   ],
   steps:[
     {n:1, text:'Mask order confirmation and purchase authorization', tat:0.4, lane:'main'},
@@ -412,8 +482,8 @@ module.exports = {
   flowNote:'Step 3 sounds trivial and is where schedules break. A mask completion date known only to the person who confirmed it is a date the rest of the program plans without.',
   consumes:[
     'FEOL submission record from TO-06',
-    'Mask cost sheet from TECH-04',
-    'Capacity and slot commitment from TECH-05',
+    'Mask cost sheet from TECH-06',
+    'Capacity and slot commitment from TECH-07',
     'Purchase authorization',
     'Mask shop schedule',
   ],
@@ -444,7 +514,7 @@ module.exports = {
   effort:[['Order confirmation',0.5], ['Schedule confirmation',0.3], ['Communication',0.2]],
   entry:[
     'FEOL data submitted and accepted in TO-06',
-    'Mask pricing confirmed in TECH-04',
+    'Mask pricing confirmed in TECH-06',
     'Purchase authority available',
   ],
   exit:[
@@ -452,83 +522,13 @@ module.exports = {
     'Mask completion date received and communicated',
     'Escalation contact identified',
   ],
-  dependsOn:['TO-06','TECH-04','TECH-05'],
+  dependsOn:['TO-06','TECH-06','TECH-07'],
   dependsNote:null,
-  feedsInto:['FAB-01','FAB-02','TO-11'],
+  feedsInto:['FAB-01','FAB-05','TO-11'],
   measuredBy:[
     'Days from submission to order confirmation',
     'Mask completion date against plan',
     'Cost against the mask budget',
-  ],
-},
-
-'TO-08': {
-  stage:'tapeout', window:[2,6], criticalPath:true,
-  purpose:[
-    'Use the <b>four weeks between the two mask releases</b> to make metal-layer fixes—the last window in which a design change is possible without a new front-end mask set.',
-    'This window is the reason the releases are split. FEOL masks are being cut and cannot change; BEOL is still open, and any fix implementable in metal can still be made. It is a genuine and finite opportunity, and it closes on a date.',
-  ],
-  steps:[
-    {n:1, text:'Fix window scope and admission rules', tat:0.5, lane:'main'},
-    {n:2, text:'Metal-layer ECO implementation', tat:1.5, lane:'main'},
-    {n:3, text:'Fix prioritization and risk assessment', tat:1, lane:'par'},
-    {n:4, text:'ECO verification per fix', tat:1, lane:'main'},
-    {n:5, text:'Equivalence and consistency check per fix', tat:1, lane:'par'},
-    {n:6, text:'Window close and BEOL database freeze', tat:1, lane:'main'},
-  ],
-  flowNote:'Step 1 has to be strict. Every late fix carries risk, and a window with no admission rules fills with changes that individually look safe and collectively make the BEOL database something nobody has verified as a whole.',
-  consumes:[
-    'Released database from TO-01',
-    'Late findings from bring-up preparation, verification and signoff',
-    'Spare cell and metal-only strategy from PD-14',
-    'Go / No-Go conditions from TO-05',
-    'Equivalence methodology from SO-09',
-  ],
-  produces:[
-    'Fix window scope and admission rules',
-    'Implemented metal-layer ECOs',
-    'Fix prioritization and risk record',
-    'Per-fix verification results',
-    'Per-fix equivalence and consistency results',
-    'Frozen BEOL database',
-  ],
-  producedBy:[1,2,3,4,5,6],
-  rel:[
-    {id:'TO-D6', rel:'produces', text:'<b>BEOL ECO log covering the fix window.</b> This activity is the deliverable, and the log is what makes the BEOL database traceable.'},
-    {id:'TO-D7', rel:'feeds', text:'<b>BEOL MTO release package.</b> The database released to BEOL is the FEOL database plus this window\'s fixes.'},
-  ],
-  risks:[
-    '<b>Window used as general contingency.</b> Fixes admitted without rules accumulate into a database that differs from the verified one in ways nobody assessed as a whole.',
-    '<b>Fix requiring base layers.</b> If <code>PD-14</code>\'s spare cell strategy was not put in place, the fix cannot be made in metal and the window is useless.',
-    '<b>Verification per fix but not in combination.</b> Individually correct changes can interact, and the combined database needs a check of its own.',
-    '<b>Window extended.</b> BEOL mask release has a date; extending the window pushes the whole mask set and with it wafer start.',
-    '<b>Equivalence skipped for speed.</b> A metal ECO can change function, and the only detector is an equivalence run.',
-  ],
-  roles:[
-    {r:'Physical design lead', d:'Owns implementation and the window'},
-    {r:'Program manager', d:'Admission rules and prioritization'},
-    {r:'Verification lead', d:'Per-fix and combined verification'},
-    {r:'Equivalence engineer', d:'Equivalence per fix and at window close'},
-    {r:'Signoff lead', d:'Re-verification scope for changed layers'},
-  ],
-  effort:[['ECO implementation',4], ['ECO verification',2.5], ['Prioritization and risk',1.5], ['Equivalence checks',1.5], ['Window close',0.5]],
-  entry:[
-    'FEOL released in TO-06',
-    'Admission rules agreed before the window opens',
-    'Spare cell capacity available from PD-14',
-  ],
-  exit:[
-    'Every fix implementable in metal, none requiring base layers',
-    'Combined database verified, not only individual fixes',
-    'Window closed on its date, not extended',
-  ],
-  dependsOn:['TO-01','TO-05','TO-06','PD-14'],
-  dependsNote:null,
-  feedsInto:['TO-09','TO-10','BU-11'],
-  measuredBy:[
-    'Fixes admitted against fixes requested',
-    'Fixes implementable in metal',
-    'Window closed on the planned date',
   ],
 },
 
@@ -546,11 +546,11 @@ module.exports = {
   ],
   flowNote:'Step 1 decides between a targeted re-run and a full one. Targeted is faster and risks missing an interaction; full is safe and may not fit the window. The scope decision has to be made on what the fixes actually touched.',
   consumes:[
-    'Frozen BEOL database from TO-08',
-    'ECO log from TO-08',
-    'Verification decks from PDK-10',
-    'Timing analysis capability from SO-02',
-    'Signoff baseline from SO-03',
+    'Frozen BEOL database from TO-07',
+    'ECO log from TO-07',
+    'Verification decks from PDK-04',
+    'Timing analysis capability from SO-03',
+    'Signoff baseline from SO-04',
   ],
   produces:[
     'Re-verification scope decision',
@@ -579,7 +579,7 @@ module.exports = {
   ],
   effort:[['DRC and antenna verification',2.5], ['LVS and density re-check',2], ['Scope definition',0.75], ['Timing confirmation',0.75]],
   entry:[
-    'BEOL database frozen by TO-08',
+    'BEOL database frozen by TO-07',
     'ECO log complete',
     'Verification decks and capacity available',
   ],
@@ -588,7 +588,7 @@ module.exports = {
     'Timing re-confirmed for every applied fix',
     'Results complete before BEOL data is released',
   ],
-  dependsOn:['TO-08','PDK-10','SO-02'],
+  dependsOn:['TO-07','PDK-04','SO-03'],
   dependsNote:null,
   feedsInto:['TO-10'],
   measuredBy:[
@@ -614,8 +614,8 @@ module.exports = {
     'Re-verified BEOL database from TO-09',
     'FEOL layer split from TO-06',
     'Foundry submission requirements',
-    'Mask order framework from TO-07',
-    'ECO log from TO-08',
+    'Mask order framework from TO-08',
+    'ECO log from TO-07',
   ],
   produces:[
     'BEOL layer data set',
@@ -652,7 +652,7 @@ module.exports = {
     'Submission acknowledged in writing',
     'Database difference from the original traced to the ECO log',
   ],
-  dependsOn:['TO-08','TO-09','TO-06'],
+  dependsOn:['TO-07','TO-09','TO-06'],
   dependsNote:null,
   feedsInto:['TO-11','FAB-03'],
   measuredBy:[
@@ -665,7 +665,7 @@ module.exports = {
 'TO-11': {
   stage:'tapeout', window:[7,8], criticalPath:false,
   purpose:[
-    'Confirm the <b>BEOL order and track the mask set to completion</b>, so that <code>FAB-05</code> knows when back-end layers will be available and the line does not stall mid-lot.',
+    'Confirm the <b>BEOL order and track the mask set to completion</b>, so that <code>FAB-07</code> knows when back-end layers will be available and the line does not stall mid-lot.',
     'The BEOL masks are needed several weeks into wafer processing, not at wafer start. Tracking them to completion is what confirms that the parallel schedule the FEOL/BEOL split assumed actually holds.',
   ],
   steps:[
@@ -676,10 +676,10 @@ module.exports = {
   flowNote:'Step 2 tracks the whole set rather than the second half. A mask set is only usable when every layer is complete, and the last layer to finish is the one that decides.',
   consumes:[
     'BEOL submission record from TO-10',
-    'Mask order framework from TO-07',
+    'Mask order framework from TO-08',
     'Mask shop schedules',
-    'Wafer processing plan from FAB-04',
-    'Cost sheet from TECH-04',
+    'Wafer processing plan from FAB-06',
+    'Cost sheet from TECH-06',
   ],
   produces:[
     'Confirmed BEOL mask order',
@@ -708,17 +708,17 @@ module.exports = {
   effort:[['Order confirmation',0.4], ['Set completion tracking',0.4], ['Communication',0.2]],
   entry:[
     'BEOL data submitted and accepted in TO-10',
-    'Mask order framework established in TO-07',
-    'Wafer processing plan available from FAB-04',
+    'Mask order framework established in TO-08',
+    'Wafer processing plan available from FAB-06',
   ],
   exit:[
     'Order confirmed against the submitted layer set',
     'Set completion tracked to the last layer',
     'Availability communicated to fabrication against the line schedule',
   ],
-  dependsOn:['TO-07','TO-10'],
+  dependsOn:['TO-08','TO-10'],
   dependsNote:null,
-  feedsInto:['FAB-03','FAB-05','FAB-09'],
+  feedsInto:['FAB-03','FAB-07','FAB-02'],
   measuredBy:[
     'Mask set completion against the wafer schedule',
     'Layers remaining at each status check',

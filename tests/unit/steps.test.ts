@@ -246,7 +246,7 @@ describe('doneStepKeys', () => {
 
 describe('fromStepIndex', () => {
   it('reads the generated tuples back into named fields', () => {
-    const a = fromStepIndex('PD-10', {
+    const a = fromStepIndex('PD-14', {
       st: 'physicalDesign',
       w: [0, 6],
       s: [
@@ -255,7 +255,7 @@ describe('fromStepIndex', () => {
       ],
       ro: 'SI/PI engineer',
     });
-    expect(a.ref).toBe('PD-10');
+    expect(a.ref).toBe('PD-14');
     expect(a.stageId).toBe('physicalDesign');
     expect(a.role).toBe('SI/PI engineer');
     expect(a.steps[0]).toEqual({ n: 1, text: 'Set up SI and run the crosstalk analysis', tat: 2, lane: 'main' });
@@ -289,6 +289,6 @@ describe('fromStepIndex', () => {
         .filter((s) => s.tat === 0)
         .map((s) => `${ref}:${s.n}`),
     );
-    expect(zero).toEqual(['TECH-07:6', 'TECH-08:6']);
+    expect(zero).toEqual(['TECH-02:6', 'TECH-08:6']);
   });
 });

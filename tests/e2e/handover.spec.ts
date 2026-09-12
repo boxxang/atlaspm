@@ -268,8 +268,8 @@ test.describe('the team', () => {
        without a reload */
     await page.goto(`${SHELL_PATH}/stage/physicalDesign/activity`);
     await expect(page.locator('[data-act]').first()).toBeVisible();
-    await page.locator('[data-act="PD-10"]').click();
-    await page.locator('[data-step="PD-10:2"]').click();
+    await page.locator('[data-act="PD-14"]').click();
+    await page.locator('[data-step="PD-14:2"]').click();
     await rail(page).locator('[data-edit-facts]').click();
     await rail(page).getByLabel('Owner').selectOption('Yuna Cho');
     await rail(page).getByRole('button', { name: 'Save' }).click();

@@ -5,7 +5,7 @@ const CATALOGUE = {
   'TECH-D2': 'Process option / flavor sheet agreed with foundry',
   'TECH-D3': 'Wafer, mask and NRE cost sheet',
   'DEF-D5': 'Program charter, staffing and budget plan',
-  'PD-D6': 'Interim physical DRC / LVS clean',
+  'PD-D5': 'Interim physical DRC / LVS clean',
 };
 /* which stage a reference's prefix belongs to */
 const STAGE_OF = { TECH: 'tech', DEF: 'define', PD: 'physicalDesign' };

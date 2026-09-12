@@ -17,9 +17,9 @@ module.exports = {
   ],
   flowNote:'Step 3 can cancel the activity, and should be allowed to. A test chip whose results land after the production design has committed is an expense with no decision attached, and finding that out in week three is far better than in week forty.',
   consumes:[
-    'Node risk assessment from TECH-07',
+    'Node risk assessment from TECH-02',
     'IP readiness gaps from IPR-05',
-    'Custom memory decision from PDK-06',
+    'Custom memory decision from PDK-11',
     'AMS block risk list from AMS-01',
     'Production design schedule from DEF-08',
   ],
@@ -52,8 +52,8 @@ module.exports = {
   ],
   effort:[['Risk item selection',1.25], ['Structure selection',1], ['Specification and coverage matrix',1], ['Objective definition',0.75]],
   entry:[
-    'Node risk assessment available from TECH-07',
-    'IP and memory gaps known from IPR-05 and PDK-06',
+    'Node risk assessment available from TECH-02',
+    'IP and memory gaps known from IPR-05 and PDK-11',
     'Production design schedule dated by DEF-08',
   ],
   exit:[
@@ -61,7 +61,7 @@ module.exports = {
     'Schedule feasibility confirmed against the decision dates',
     'Area and cost budget fixed before structures are finalized',
   ],
-  dependsOn:['TECH-07','IPR-05','PDK-06','AMS-01'],
+  dependsOn:['TECH-02','IPR-05','PDK-11','AMS-01'],
   dependsNote:null,
   feedsInto:['TC-02','TC-03','TC-04','TC-07'],
   measuredBy:[
@@ -162,7 +162,7 @@ module.exports = {
   consumes:[
     'Test chip objective and schedule feasibility from TC-01',
     'Shuttle calendars from the foundry or broker',
-    'Capacity and pricing terms from TECH-05',
+    'Capacity and pricing terms from TECH-07',
     'Production decision dates from DEF-08',
     'Submission format requirements',
   ],
@@ -203,7 +203,7 @@ module.exports = {
     'Submission requirements collected and understood',
     'Backward schedule agreed with physical design',
   ],
-  dependsOn:['TC-01','TECH-05','TECH-06'],
+  dependsOn:['TC-01','TECH-07','TECH-03'],
   dependsNote:null,
   feedsInto:['TC-02','TC-04','TC-05'],
   measuredBy:[
@@ -493,7 +493,7 @@ module.exports = {
   ],
   dependsOn:['TC-01','TC-02','TC-04','TC-05','TC-06'],
   dependsNote:null,
-  feedsInto:['TC-08','AMS-13','PDK-03','SO-10'],
+  feedsInto:['TC-08','AMS-12','PDK-03','SO-11'],
   measuredBy:[
     'Parameters correlated against parameters measured',
     'Measurement uncertainty against effect size',
@@ -520,8 +520,8 @@ module.exports = {
     'Correlation results from TC-07',
     'Production design status and open margins',
     'Model and library data from PDK-03',
-    'AMS post-layout results from AMS-13',
-    'Production design change control process from RTL-10',
+    'AMS post-layout results from AMS-12',
+    'Production design change control process from RTL-03',
   ],
   produces:[
     'Correlation gap analysis',
@@ -554,7 +554,7 @@ module.exports = {
   entry:[
     'Correlation results available from TC-07',
     'Production design status known well enough to act on',
-    'Change control process available from RTL-10',
+    'Change control process available from RTL-03',
   ],
   exit:[
     'Every finding converted into a specific, owned action',
@@ -563,7 +563,7 @@ module.exports = {
   ],
   dependsOn:['TC-07'],
   dependsNote:null,
-  feedsInto:['PDK-03','AMS-13','PD-09','SO-10','DEF-04'],
+  feedsInto:['PDK-03','AMS-12','PD-06','SO-11','DEF-06'],
   measuredBy:[
     'Findings converted into owned actions',
     'Actions adopted against actions raised',

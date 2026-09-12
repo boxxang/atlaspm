@@ -38,64 +38,81 @@ test.describe('the activity table', () => {
   test('lists the stage’s activities with what each hands over', async ({ page }) => {
     const rows = page.locator('[data-act]');
     await expect(rows).toHaveCount(16);
-    const pd10 = page.locator('[data-act="PD-10"]');
+    const pd10 = page.locator('[data-act="PD-14"]');
     await expect(pd10).toContainText('Signal and Power Integrity Iteration');
     await expect(pd10).toContainText('SI/PI engineer');
     /* the deliverables it stands against, by reference — the titles drift
        between the two seed lists, the references cannot */
-    await expect(pd10).toContainText('PD-D6');
+    await expect(pd10).toContainText('PD-D5');
   });
 
   test('opens an activity in place, and dims the rest of the stage', async ({ page }) => {
     await expect(page.locator('[data-stepblock]')).toHaveCount(0);
-    await openActivity(page, 'PD-10');
+    await openActivity(page, 'PD-14');
     await expect(page.locator('[data-acts]')).toHaveAttribute('data-focused', '');
-    await expect(page.locator('[data-act="PD-10"]')).toHaveClass(/open/);
+    await expect(page.locator('[data-act="PD-14"]')).toHaveClass(/open/);
     /* six steps, and the two parallel ones are marked as such */
     await expect(page.locator('[data-stepblock] [data-step]')).toHaveCount(6);
     /* the STEP column's own header says whose steps these are and how many —
        the mockup puts it there rather than in a caption row above the table */
     await expect(page.locator('[data-stepblock] .chead')).toContainText(
-      'PD-10 — 6 steps, 2 run in parallel',
+      'PD-14 — 6 steps, 2 run in parallel',
     );
   });
 
   test('a second click closes it again', async ({ page }) => {
-    await openActivity(page, 'PD-10');
-    await page.locator('[data-act="PD-10"]').click();
+    await openActivity(page, 'PD-14');
+    await page.locator('[data-act="PD-14"]').click();
     await expect(page.locator('[data-stepblock]')).toHaveCount(0);
   });
 
+  /**
+   * Which activity is carrying the overdue work is the seed's business, not
+   * this test's. It stalls one activity per stage in flight and takes it from
+   * the middle of the candidates, so the stall moves whenever the list is
+   * reordered — as renumbering the activities by schedule reordered it. This
+   * used to name PD-10, which held the stall until then and stopped holding it
+   * for a reason that has nothing to do with what is being checked here.
+   *
+   * What is being checked is the rule: a step past its date with nothing handed
+   * over says Overdue, and the date it is late against is in the past.
+   */
   test('a step past its date with nothing handed over says Overdue', async ({ page }) => {
-    await openActivity(page, 'PD-10');
-    const step1 = page.locator('[data-step="PD-10:1"]');
-    await expect(step1).toContainText('Overdue');
-    /* and the date it is late against is drawn as late, and is in the past */
-    const late = step1.locator('[data-due]');
-    await expect(late).toBeVisible();
-    expect(asDate(await late.innerText()).getTime()).toBeLessThan(Date.now());
+    const stalled = page.locator('[data-act].rk').first();
+    await expect(stalled).toBeVisible();
+    await stalled.click();
+    await expect(page.locator('[data-stepblock]')).toBeVisible();
+
+    const late = page.locator('[data-stepblock] [data-step]').filter({ hasText: 'Overdue' });
+    await expect(late.first()).toBeVisible();
+
+    const due = late.first().locator('[data-due]');
+    await expect(due).toBeVisible();
+    expect(asDate(await due.innerText()).getTime()).toBeLessThan(Date.now());
+    /* and it is overdue because nothing was handed over, not because it is done */
+    await expect(late.first()).not.toContainText('Completed');
   });
 });
 
 test.describe('picking a step', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto(STAGE);
-    await openActivity(page, 'PD-10');
+    await openActivity(page, 'PD-14');
   });
 
   test('selects it and only it', async ({ page }) => {
-    await page.locator('[data-step="PD-10:2"]').click();
-    await expect(page.locator('[data-step="PD-10:2"]')).toHaveClass(/sel/);
+    await page.locator('[data-step="PD-14:2"]').click();
+    await expect(page.locator('[data-step="PD-14:2"]')).toHaveClass(/sel/);
     await expect(page.locator('.steprow.sel')).toHaveCount(1);
   });
 
   test('does not close the block it is in', async ({ page }) => {
-    await page.locator('[data-step="PD-10:2"]').click();
+    await page.locator('[data-step="PD-14:2"]').click();
     await expect(page.locator('[data-stepblock]')).toBeVisible();
   });
 
   test('fills the rail with everything about it', async ({ page }) => {
-    await page.locator('[data-step="PD-10:2"]').click();
+    await page.locator('[data-step="PD-14:2"]').click();
     const rail = page.getByRole('complementary', { name: 'Details' });
     await expect(rail).toContainText('Step 2 of 6');
     await expect(rail).toContainText('Fix crosstalk');
@@ -106,25 +123,25 @@ test.describe('picking a step', () => {
     await expect(rail.getByLabel('Owner')).toHaveCount(0);
     await expect(rail.getByLabel('Due')).toHaveCount(0);
     /* the rail and the row are held to the same date */
-    await expect(rail).toContainText(await dueOf(page, 'PD-10:2'));
+    await expect(rail).toContainText(await dueOf(page, 'PD-14:2'));
   });
 
   test('the release step carries the activity’s key deliverables', async ({ page }) => {
     const rail = page.getByRole('complementary', { name: 'Details' });
-    await page.locator('[data-step="PD-10:6"]').click();
+    await page.locator('[data-step="PD-14:6"]').click();
     await expect(rail).toContainText('Key deliverables');
-    await expect(rail).toContainText('PD-D6');
+    await expect(rail).toContainText('PD-D5');
     /* and the steps before it do not: they produce outputs, not deliverables */
-    await page.locator('[data-step="PD-10:2"]').click();
-    await expect(rail).not.toContainText('PD-D6');
+    await page.locator('[data-step="PD-14:2"]').click();
+    await expect(rail).not.toContainText('PD-D5');
   });
 });
 
 test.describe('changing a step', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto(STAGE);
-    await openActivity(page, 'PD-10');
-    await page.locator('[data-step="PD-10:2"]').click();
+    await openActivity(page, 'PD-14');
+    await page.locator('[data-step="PD-14:2"]').click();
   });
 
   const rail = (page: import('./fixtures').Page) =>
@@ -141,13 +158,13 @@ test.describe('changing a step', () => {
 
   test('marking it complete stamps the date and survives a reload', async ({ page }) => {
     await rail(page).getByRole('button', { name: 'Mark complete' }).click();
-    await expect(page.locator('[data-step="PD-10:2"]')).toContainText('Completed');
+    await expect(page.locator('[data-step="PD-14:2"]')).toContainText('Completed');
     await writesSettled(page);
 
     await page.reload();
-    await openActivity(page, 'PD-10');
-    await expect(page.locator('[data-step="PD-10:2"]')).toContainText('Completed');
-    await expect(page.locator('[data-step="PD-10:2"]').getByRole('checkbox')).toBeChecked();
+    await openActivity(page, 'PD-14');
+    await expect(page.locator('[data-step="PD-14:2"]')).toContainText('Completed');
+    await expect(page.locator('[data-step="PD-14:2"]').getByRole('checkbox')).toBeChecked();
   });
 
   test('the completion date is editable afterwards', async ({ page }) => {
@@ -157,8 +174,8 @@ test.describe('changing a step', () => {
     await saveFacts(page);
     await writesSettled(page);
     await page.reload();
-    await openActivity(page, 'PD-10');
-    await expect(page.locator('[data-step="PD-10:2"]')).toContainText('07/01/2026');
+    await openActivity(page, 'PD-14');
+    await expect(page.locator('[data-step="PD-14:2"]')).toContainText('07/01/2026');
   });
 
   test('clearing the completion date reopens the step', async ({ page }) => {
@@ -166,35 +183,35 @@ test.describe('changing a step', () => {
     await editFacts(page);
     await rail(page).getByLabel('Completed').fill('');
     await saveFacts(page);
-    await expect(page.locator('[data-step="PD-10:2"]').getByRole('checkbox')).not.toBeChecked();
+    await expect(page.locator('[data-step="PD-14:2"]').getByRole('checkbox')).not.toBeChecked();
   });
 
   test('the checkbox in the table does the same thing', async ({ page }) => {
-    await page.locator('[data-step="PD-10:3"]').getByRole('checkbox').check();
-    await expect(page.locator('[data-step="PD-10:3"]')).toContainText('Completed');
+    await page.locator('[data-step="PD-14:3"]').getByRole('checkbox').check();
+    await expect(page.locator('[data-step="PD-14:3"]')).toContainText('Completed');
     /* and ticking a row does not select it — the box is about the step, the
        row is about what the rail shows */
-    await expect(page.locator('[data-step="PD-10:2"]')).toHaveClass(/sel/);
+    await expect(page.locator('[data-step="PD-14:2"]')).toHaveClass(/sel/);
   });
 
   test('a moved due date is flagged as edited, and clearing it restores the plan', async ({
     page,
   }) => {
-    const planned = await dueOf(page, 'PD-10:2');
+    const planned = await dueOf(page, 'PD-14:2');
 
     await editFacts(page);
     await rail(page).getByLabel('Due').fill('2027-12-01');
     await saveFacts(page);
-    await expect(page.locator('[data-step="PD-10:2"]')).toContainText('12/01/2027');
+    await expect(page.locator('[data-step="PD-14:2"]')).toContainText('12/01/2027');
     /* and it is not late against a date that far out */
-    await expect(page.locator('[data-step="PD-10:2"]')).not.toContainText('Overdue');
+    await expect(page.locator('[data-step="PD-14:2"]')).not.toContainText('Overdue');
 
     /* a moved date offers the way back to the baseline, which is how the mockup
        says the date was moved at all */
     await editFacts(page);
     await rail(page).getByRole('button', { name: 'reset' }).click();
     await saveFacts(page);
-    await expect(page.locator('[data-step="PD-10:2"]')).toContainText(planned);
+    await expect(page.locator('[data-step="PD-14:2"]')).toContainText(planned);
   });
 
   test('an owner comes from the stage’s own people', async ({ page }) => {
@@ -207,8 +224,8 @@ test.describe('changing a step', () => {
     await writesSettled(page);
 
     await page.reload();
-    await openActivity(page, 'PD-10');
-    await page.locator('[data-step="PD-10:2"]').click();
+    await openActivity(page, 'PD-14');
+    await page.locator('[data-step="PD-14:2"]').click();
     await expect(rail(page)).toContainText('Grace Park');
   });
 
@@ -216,16 +233,16 @@ test.describe('changing a step', () => {
      there. A panel whose fields write straight through has no Cancel to mean
      anything, which is why they are drafts now. */
   test('nothing changes until Save, and Cancel puts it back', async ({ page }) => {
-    const planned = await dueOf(page, 'PD-10:2');
+    const planned = await dueOf(page, 'PD-14:2');
 
     await editFacts(page);
     await rail(page).getByLabel('Due').fill('2027-12-01');
     await rail(page).getByLabel('Owner').selectOption('Grace Park');
     /* still the old date on the row behind it */
-    await expect(page.locator('[data-step="PD-10:2"]')).toContainText(planned);
+    await expect(page.locator('[data-step="PD-14:2"]')).toContainText(planned);
 
     await rail(page).getByRole('button', { name: 'Cancel' }).click();
-    await expect(page.locator('[data-step="PD-10:2"]')).toContainText(planned);
+    await expect(page.locator('[data-step="PD-14:2"]')).toContainText(planned);
     await expect(rail(page)).toContainText('Unassigned');
     await expect(rail(page).getByLabel('Due')).toHaveCount(0);
   });
@@ -234,7 +251,7 @@ test.describe('changing a step', () => {
   test('moving to another step closes the editor', async ({ page }) => {
     await editFacts(page);
     await rail(page).getByLabel('Owner').selectOption('Grace Park');
-    await page.locator('[data-step="PD-10:3"]').click();
+    await page.locator('[data-step="PD-14:3"]').click();
 
     await expect(rail(page)).toContainText('Step 3 of 6');
     await expect(rail(page).getByLabel('Owner')).toHaveCount(0);
@@ -255,8 +272,8 @@ test.describe('handing an output over', () => {
 
   test.beforeEach(async ({ page }) => {
     await page.goto(STAGE);
-    await openActivity(page, 'PD-10');
-    await page.locator('[data-step="PD-10:2"]').click();
+    await openActivity(page, 'PD-14');
+    await page.locator('[data-step="PD-14:2"]').click();
   });
 
   test('completes the step and stamps the day it arrived', async ({ page }) => {
@@ -266,11 +283,11 @@ test.describe('handing an output over', () => {
       .setInputFiles({ name: 'crosstalk-fixes.pdf', mimeType: 'application/pdf', buffer: Buffer.from('%PDF-1.4 fixes') });
 
     await expect(rail(page)).toContainText('crosstalk-fixes.pdf');
-    await expect(page.locator('[data-step="PD-10:2"]')).toContainText('Completed');
+    await expect(page.locator('[data-step="PD-14:2"]')).toContainText('Completed');
     /* stamped today, and the row says so */
     const today = new Date();
     const stamp = `${String(today.getMonth() + 1).padStart(2, '0')}/${String(today.getDate()).padStart(2, '0')}/${today.getFullYear()}`;
-    await expect(page.locator('[data-step="PD-10:2"]')).toContainText(stamp);
+    await expect(page.locator('[data-step="PD-14:2"]')).toContainText(stamp);
   });
 
   test('the file is there to open, and survives a reload', async ({ page }) => {
@@ -287,22 +304,22 @@ test.describe('handing an output over', () => {
     expect(await res.text()).toBe('closed');
 
     await page.reload();
-    await openActivity(page, 'PD-10');
-    await page.locator('[data-step="PD-10:2"]').click();
+    await openActivity(page, 'PD-14');
+    await page.locator('[data-step="PD-14:2"]').click();
     await expect(rail(page)).toContainText('si-report.txt');
-    await expect(page.locator('[data-step="PD-10:2"]')).toContainText('Completed');
+    await expect(page.locator('[data-step="PD-14:2"]')).toContainText('Completed');
   });
 
   test('taking the last one back reopens the step', async ({ page }) => {
     await rail(page)
       .getByLabel('Attach an output')
       .setInputFiles({ name: 'draft.txt', mimeType: 'text/plain', buffer: Buffer.from('draft') });
-    await expect(page.locator('[data-step="PD-10:2"]')).toContainText('Completed');
+    await expect(page.locator('[data-step="PD-14:2"]')).toContainText('Completed');
 
     await rail(page).getByRole('button', { name: 'Remove draft.txt' }).click();
     await expect(rail(page)).toContainText('Nothing attached yet');
-    await expect(page.locator('[data-step="PD-10:2"]')).not.toContainText('Completed');
-    await expect(page.locator('[data-step="PD-10:2"]').getByRole('checkbox')).not.toBeChecked();
+    await expect(page.locator('[data-step="PD-14:2"]')).not.toContainText('Completed');
+    await expect(page.locator('[data-step="PD-14:2"]').getByRole('checkbox')).not.toBeChecked();
   });
 
   test('an output belongs to one program, not to every program with that step', async ({
@@ -314,7 +331,7 @@ test.describe('handing an output over', () => {
     await expect(rail(page)).toContainText('mine.txt');
     await writesSettled(page);
 
-    /* PD-10 step 2 names a step of every program on this profile. The other
+    /* PD-14 step 2 names a step of every program on this profile. The other
        one must not be showing this program's evidence. */
     await page.goto('/');
     await page.locator('[data-new-project]').click();
@@ -325,8 +342,8 @@ test.describe('handing an output over', () => {
     const other = new URL(page.url()).pathname.replace(/\/overview$/, '');
 
     await page.goto(`${other}/stage/physicalDesign/activity`);
-    await openActivity(page, 'PD-10');
-    await page.locator('[data-step="PD-10:2"]').click();
+    await openActivity(page, 'PD-14');
+    await page.locator('[data-step="PD-14:2"]').click();
     await expect(rail(page)).toContainText('Nothing attached yet');
   });
 });

@@ -122,9 +122,34 @@ Deliberately **not** touched: `PORTING_PLAN.md`, `PORTING_PLAN_V2.md`,
 file. They record what was done at the time, and the numbers they quote were
 correct then. Rewriting history to match the present makes both harder to read.
 
-`prisma/schema.prisma` is untouched. A reference is a `String`; nothing about
-its shape changes, so there is no migration and `npm run build`'s `prisma db
-push` is a no-op for this work.
+### The one schema change, found during the work
+
+This was written expecting `prisma/schema.prisma` to be untouched: a reference
+is a `String` and nothing about its shape changes. That was wrong, and the
+reason is worth keeping.
+
+`ensureBuiltinProfile()` decides whether the stored built-in profile still says
+what the code says, on every render, and it decided it by **counting**: 259 rows
+stored against 259 rows in the code meant up to date. The comment said why —
+comparing 259 rows on every page render is the wrong place to be thorough, and
+nothing but that function writes them.
+
+Renumbering is invisible to a count. The stages do not change, the number of
+activities does not change, and most references keep their spelling — `PD-14`
+existed before and exists after. What changed is what `PD-14` *means*. So the
+check passed on a database holding one numbering's titles and windows under
+another numbering's references, and `prisma db seed` could not fix it either,
+because the seed calls the same function and takes the same early return.
+
+The fix is a digest instead of a count: `Profile.activityRevision`, a nullable
+`String`, holding an FNV-1a hash of the rows the profile was written from. It is
+O(1) on the read path, which is what the count was protecting, and it catches
+any future content change rather than only this one. A profile stored before the
+column existed has `null` and is rewritten once, which is exactly the behaviour
+wanted on the deploy that carries this.
+
+The column is nullable and additive, so `npm run build`'s `prisma db push`
+carries it with no data loss and no hand-run migration.
 
 ## The rewriting tool
 
@@ -172,6 +197,27 @@ needs its *assertions* changed, rather than only its reference strings, is a
 signal that something beyond a rename happened, and is to be investigated rather
 than updated.
 
+Three did, and the investigations are the most useful thing this work produced.
+
+One was the count in `ensureBuiltinProfile()` above — a real defect, fixed at
+the source. The other two were assertions pinned to a coincidence:
+
+`stepSeed.test.ts` capped the late steps at `STALL_DEPTH * 6`. That bounds the
+steps the seed deliberately leaves open on a stalled activity, and silently
+assumed the other population — steps whose window closed while a step before
+them is still running — was empty. It was four. The sum fitted under twelve only
+for as long as the stalls fell where they did, and `pickStalls()` takes the
+middle of each stage's candidate list, so reordering the list moved them. The
+test now states both populations and asserts every late step belongs to one.
+
+`steps.spec.ts` asserted that a named activity's first step says Overdue. It did,
+because it happened to be the stalled one. Which activity carries the stall is
+the seed's business, so the test now finds the stalled row on the page and
+checks the rule.
+
+Neither was a renaming error, and neither was fixed by moving the number until
+it passed. A test that is measuring a coincidence is worth finding.
+
 Then the screens, against the served prototype: the Activities board, a stage's
 Activity tab, the key deliverables table and a write-up page, checking that each
 stage's rows now read `01, 02, 03 …` and `D1, D2, D3 …` down the page.
@@ -191,5 +237,11 @@ library has lost — so nothing breaks, but nothing recovers either. If such a
 programme exists when this ships, delete it or accept that it is stale.
 
 Order of operations: deploy the code, then reseed. The reseed is what makes the
-data agree with the code, and running it first would leave the old code reading
-new references for as long as the build takes.
+programme's own rows agree with the code, and running it first would leave the
+old code reading new references for as long as the build takes.
+
+The built-in profile's rows do not wait for the reseed: `activityRevision` is
+null or stale on the deployed database, so the first render after the deploy
+rewrites all 259 of them. That is the mechanism, and it is why the reseed on its
+own would not have been enough — a point that only came out because three tests
+refused to pass.

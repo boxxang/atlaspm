@@ -296,7 +296,7 @@ test.describe('Timeline', () => {
   test('a bar opens its activities under it, on the same axis', async ({ page }) => {
     await page.locator('[data-tl="physicalDesign"]').click();
     await expect(page.locator('.tl-head')).toContainText('16 activities');
-    await expect(page.locator('[data-tl-act="PD-10"]')).toBeVisible();
+    await expect(page.locator('[data-tl-act="PD-14"]')).toBeVisible();
     await page.getByRole('button', { name: 'Open stage' }).click();
     await expect(page).toHaveURL(/\/stage\/physicalDesign\/activity$/);
   });
@@ -306,17 +306,17 @@ test.describe('Timeline', () => {
      page of prose is a different question from the one the chart asked. */
   test('an activity row opens that activity where the work is', async ({ page }) => {
     await page.locator('[data-tl="physicalDesign"]').click();
-    await page.locator('[data-tl-act="PD-10"]').click();
-    await expect(page).toHaveURL(/\/stage\/physicalDesign\/activity\?act=PD-10$/);
+    await page.locator('[data-tl-act="PD-14"]').click();
+    await expect(page).toHaveURL(/\/stage\/physicalDesign\/activity\?act=PD-14$/);
 
     /* open, without a second click */
-    await expect(page.locator('[data-act="PD-10"]')).toHaveClass(/open/);
-    await expect(page.locator('[data-stepblock] .chead')).toContainText('PD-10');
+    await expect(page.locator('[data-act="PD-14"]')).toHaveClass(/open/);
+    await expect(page.locator('[data-stepblock] .chead')).toContainText('PD-14');
     const rail = page.getByRole('complementary', { name: 'Details' });
     await expect(rail).toContainText('Signal and Power Integrity');
 
     /* and it still closes on a click, rather than being pinned open by the URL */
-    await page.locator('[data-act="PD-10"]').click();
+    await page.locator('[data-act="PD-14"]').click();
     await expect(page.locator('[data-stepblock]')).toHaveCount(0);
   });
 });

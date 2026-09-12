@@ -13,12 +13,12 @@ module.exports = {
     {n:3, text:'Unit tracking register and allocation record', tat:0.5, lane:'par'},
     {n:4, text:'Pre-power checklist against the board\'s known issues', tat:0.5, lane:'main'},
   ],
-  flowNote:'Step 4 is the reason board bring-up happened first. The checklist is only meaningful because <code>EVB-07</code> already established which board behaviors are normal and which are faults.',
+  flowNote:'Step 4 is the reason board bring-up happened first. The checklist is only meaningful because <code>EVB-10</code> already established which board behaviors are normal and which are faults.',
   consumes:[
-    'Allocated units from ASSY-09',
-    'Screened unit record from ASSY-08',
-    'Brought-up boards from EVB-07',
-    'Board known-issue list from EVB-07',
+    'Allocated units from ASSY-10',
+    'Screened unit record from ASSY-11',
+    'Brought-up boards from EVB-10',
+    'Board known-issue list from EVB-10',
     'ESD and handling procedures',
   ],
   produces:[
@@ -30,11 +30,11 @@ module.exports = {
   producedBy:[1,2,3,4],
   rel:[
     {id:'BU-D1', rel:'feeds', text:'<b>Bring-up report with per-milestone health status.</b> Receipt and mounting are the report\'s first entries.'},
-    {id:'BU-D5', rel:'informs', text:'<b>Failure analysis reports.</b> A unit\'s history starts here, and an FA needs to know how it was handled.'},
+    {id:'BU-D2', rel:'informs', text:'<b>Failure analysis reports.</b> A unit\'s history starts here, and an FA needs to know how it was handled.'},
   ],
   risks:[
     '<b>Handling damage on an irreplaceable unit.</b> ESD or mechanical damage at mounting costs a unit the program cannot replace.',
-    '<b>Mounting onto an unvalidated board.</b> A board fault then destroys the part, and <code>EVB-07</code> exists to prevent exactly this.',
+    '<b>Mounting onto an unvalidated board.</b> A board fault then destroys the part, and <code>EVB-10</code> exists to prevent exactly this.',
     '<b>No unit tracking.</b> Every subsequent result has to be attributable to a specific unit and its history.',
     '<b>Incoming inspection skipped in the rush.</b> Shipping damage is real and is much cheaper to find before power than after.',
     '<b>All units mounted at once.</b> A systematic board or handling fault then takes the whole fleet rather than one unit.',
@@ -48,8 +48,8 @@ module.exports = {
   ],
   effort:[['Board mounting',0.75], ['Incoming inspection',0.5], ['Pre-power checklist',0.5], ['Unit tracking',0.25]],
   entry:[
-    'Units allocated and screened from ASSY-08 and ASSY-09',
-    'Boards brought up and accepted from EVB-07',
+    'Units allocated and screened from ASSY-11 and ASSY-10',
+    'Boards brought up and accepted from EVB-10',
     'ESD-controlled bench available',
   ],
   exit:[
@@ -57,7 +57,7 @@ module.exports = {
     'Units mounted only on validated boards',
     'Unit register started and maintained',
   ],
-  dependsOn:['ASSY-08','ASSY-09','EVB-07'],
+  dependsOn:['ASSY-11','ASSY-10','EVB-10'],
   dependsNote:null,
   feedsInto:['BU-02'],
   measuredBy:[
@@ -83,10 +83,10 @@ module.exports = {
   flowNote:'Step 2\'s current limits are what turn a fatal event into a diagnostic one. A rail that draws far more than expected trips the limit and the part survives to be investigated; without the limit it is destroyed and the information goes with it.',
   consumes:[
     'Mounted units from BU-01',
-    'Power subsystem and protection from EVB-05',
+    'Power subsystem and protection from EVB-03',
     'Power sequencing specification from ARCH-08',
     'Expected rail currents from PD-08',
-    'Telemetry from EVB-05',
+    'Telemetry from EVB-03',
   ],
   produces:[
     'Power sequencing verification',
@@ -98,7 +98,7 @@ module.exports = {
   producedBy:[1,2,3,4,5],
   rel:[
     {id:'BU-D1', rel:'feeds', text:'<b>Bring-up report with per-milestone health status.</b> Power-on is the first milestone and its result sets the program\'s tone.'},
-    {id:'BU-D2', rel:'feeds', text:'<b>Characterization data set.</b> The first rail current measurements are the earliest real power data the program has.'},
+    {id:'BU-D5', rel:'feeds', text:'<b>Characterization data set.</b> The first rail current measurements are the earliest real power data the program has.'},
   ],
   risks:[
     '<b>Power applied without current limits.</b> A short then destroys the unit instead of revealing itself.',
@@ -117,7 +117,7 @@ module.exports = {
   effort:[['First power application',2.5], ['Rail profiling',2], ['Sequencing verification',1.5], ['Anomaly triage',1.25], ['Health check',0.75]],
   entry:[
     'Units mounted from BU-01',
-    'Power subsystem validated in EVB-05',
+    'Power subsystem validated in EVB-03',
     'Expected rail currents from PD-08',
   ],
   exit:[
@@ -125,9 +125,9 @@ module.exports = {
     'Rail currents profiled against expectation',
     'No unexplained anomaly carried into the next milestone',
   ],
-  dependsOn:['BU-01','EVB-05','ARCH-08','PD-08'],
+  dependsOn:['BU-01','EVB-03','ARCH-08','PD-08'],
   dependsNote:null,
-  feedsInto:['BU-03','BU-09','MP-05'],
+  feedsInto:['BU-03','BU-05','MP-02'],
   measuredBy:[
     'Units surviving first power-on',
     'Rail currents against prediction',
@@ -151,10 +151,10 @@ module.exports = {
   flowNote:'Step 5\'s jitter measurement is easy to skip because the part appears to work without it. It matters because interface training margin depends on clock quality, and a jitter problem found here explains a class of failures that would otherwise be chased in the SerDes.',
   consumes:[
     'Powered units from BU-02',
-    'PLL specifications from AMS-04',
-    'Clock architecture from ARCH-05',
-    'Reset architecture from RTL-04',
-    'Clock instrumentation from EVB-09',
+    'PLL specifications from AMS-06',
+    'Clock architecture from ARCH-06',
+    'Reset architecture from RTL-10',
+    'Clock instrumentation from EVB-08',
   ],
   produces:[
     'Reference clock validation',
@@ -166,7 +166,7 @@ module.exports = {
   producedBy:[1,2,3,4,5],
   rel:[
     {id:'BU-D1', rel:'feeds', text:'<b>Bring-up report with per-milestone health status.</b> Clocking and reset form the second milestone.'},
-    {id:'BU-D2', rel:'feeds', text:'<b>Characterization data set.</b> PLL lock range and jitter are datasheet-relevant measurements.'},
+    {id:'BU-D5', rel:'feeds', text:'<b>Characterization data set.</b> PLL lock range and jitter are datasheet-relevant measurements.'},
   ],
   risks:[
     '<b>PLL lock validated only at nominal.</b> The lock range matters because shmoo and characterization will operate outside nominal.',
@@ -185,17 +185,17 @@ module.exports = {
   effort:[['PLL lock validation',2.5], ['Clock tree verification',2], ['Reset sequence verification',1.5], ['Jitter measurement',1.25], ['Reference validation',0.75]],
   entry:[
     'Units powered and healthy from BU-02',
-    'PLL specification from AMS-04',
-    'Clock instrumentation available from EVB-09',
+    'PLL specification from AMS-06',
+    'Clock instrumentation available from EVB-08',
   ],
   exit:[
     'PLL lock verified across the full operating range',
     'Reset domain release order confirmed against the architecture',
     'Jitter measured with the board\'s contribution separated',
   ],
-  dependsOn:['BU-02','AMS-04','ARCH-05','RTL-04'],
+  dependsOn:['BU-02','AMS-06','ARCH-06','RTL-10'],
   dependsNote:null,
-  feedsInto:['BU-04','BU-05','BU-09'],
+  feedsInto:['BU-04','BU-06','BU-05'],
   measuredBy:[
     'PLL lock range achieved against specification',
     'Jitter against the interface budget',
@@ -220,10 +220,10 @@ module.exports = {
   flowNote:'Step 4\'s first successful register read is the moment the program knows the silicon is fundamentally sound. Everything before it is infrastructure and everything after it is degrees of correctness.',
   consumes:[
     'Clocking-validated units from BU-03',
-    'Host enablement from EVB-10',
+    'Host enablement from EVB-09',
     'Boot ROM and firmware from the firmware team',
-    'Register map from RTL-06',
-    'Debug access from EVB-06',
+    'Register map from RTL-09',
+    'Debug access from EVB-04',
   ],
   produces:[
     'Boot ROM execution record',
@@ -239,7 +239,7 @@ module.exports = {
     {id:'BU-D4', rel:'feeds', text:'<b>Errata list with workarounds.</b> Boot-time deviations are the earliest errata the program records.'},
   ],
   risks:[
-    '<b>Boot failure with no state visible.</b> Without debug access the failure is a symptom with no information, and debug access comes from <code>EVB-06</code>.',
+    '<b>Boot failure with no state visible.</b> Without debug access the failure is a symptom with no information, and debug access comes from <code>EVB-04</code>.',
     '<b>Firmware and hardware assumptions differing.</b> The handoff is where two teams\' expectations meet, and nobody wrote them down.',
     '<b>Register map drift.</b> The tool reads addresses the silicon does not implement and reports plausible garbage.',
     '<b>Smoke test too shallow.</b> A part that boots and does nothing else has passed a milestone without demonstrating much.',
@@ -255,7 +255,7 @@ module.exports = {
   effort:[['Firmware load and handoff',3.5], ['Register access',3], ['Boot sequence execution',2.5], ['Failure triage',1.75], ['Smoke test',1.25]],
   entry:[
     'Clocking and reset validated in BU-03',
-    'Host enablement validated in EVB-10',
+    'Host enablement validated in EVB-09',
     'Firmware and boot ROM available',
   ],
   exit:[
@@ -263,9 +263,9 @@ module.exports = {
     'Boot-time deviations captured as errata candidates',
     'Status broadcast to the program',
   ],
-  dependsOn:['BU-03','EVB-06','EVB-10','RTL-06'],
+  dependsOn:['BU-03','EVB-04','EVB-09','RTL-09'],
   dependsNote:null,
-  feedsInto:['BU-05','BU-06','BU-09','BU-10'],
+  feedsInto:['BU-06','BU-07','BU-05','BU-09'],
   measuredBy:[
     'Time from power-on to first register read',
     'Boot failures with usable state captured',
@@ -274,6 +274,80 @@ module.exports = {
 },
 
 'BU-05': {
+  stage:'bringup', window:[4,14], criticalPath:true,
+  purpose:[
+    '<b>Debug what is wrong</b>—reproduce it, isolate it, extract the internal state, find the root cause, and get failure analysis where physical evidence is needed.',
+    'This is the activity the whole DFT and debug infrastructure investment exists to serve. It runs alongside every other bring-up activity because anomalies arrive from all of them, and its throughput largely determines how long bring-up takes.',
+  ],
+  steps:[
+    {n:1, text:'Anomaly intake and triage process', tat:1, lane:'main'},
+    {n:2, text:'Reproduction and isolation', tat:2, lane:'main'},
+    {n:3, text:'Simulation and emulation cross-check', tat:2, lane:'par'},
+    {n:4, text:'Internal state extraction via DFT and trace', tat:2.5, lane:'main'},
+    {n:5, text:'Design-team escalation and analysis', tat:2, lane:'par'},
+    {n:6, text:'Hypothesis test and root cause', tat:2.5, lane:'main'},
+    {n:7, text:'Debug knowledge capture', tat:1.5, lane:'par'},
+    {n:8, text:'Failure analysis request and disposition', tat:2, lane:'main'},
+  ],
+  flowNote:'Step 3 is the highest-leverage step in the activity. An anomaly reproduced in simulation can be examined with full visibility and unlimited retries, which is an environment no amount of silicon debug can match.',
+  consumes:[
+    'Anomalies from every bring-up activity',
+    'DFT and trace access from DFT-11 and EVB-04',
+    'Simulation and emulation environments from DV-03 and DV-12',
+    'Design database and RTL from RTL-02',
+    'FA laboratory capability',
+  ],
+  produces:[
+    'Anomaly intake and triage records',
+    'Reproduction and isolation results',
+    'Simulation and emulation cross-check findings',
+    'Extracted internal state',
+    'Design-team analysis',
+    'Root cause determinations',
+    'Debug knowledge base',
+    'Failure analysis reports and dispositions',
+  ],
+  producedBy:[1,2,3,4,5,6,7,8],
+  rel:[
+    {id:'BU-D2', rel:'produces', text:'<b>Failure analysis reports.</b> This activity is the deliverable, and physical FA is its most conclusive form.'},
+    {id:'BU-D4', rel:'feeds', text:'<b>Errata list with workarounds.</b> Every root cause found here becomes an errata entry or a fix.'},
+  ],
+  risks:[
+    '<b>Symptoms treated instead of causes.</b> A workaround without a root cause hides a mechanism that resurfaces in the field.',
+    '<b>No path back to simulation.</b> Debug then happens only on silicon, with limited visibility and long turnaround per hypothesis.',
+    '<b>Design team engaged late.</b> The people who wrote the logic can often recognize a symptom in minutes, and validation debugs alone for days first.',
+    '<b>Units consumed by destructive FA too readily.</b> Physical analysis destroys the unit, and there are very few.',
+    '<b>Findings not captured.</b> The same anomaly is then debugged twice by different engineers.',
+  ],
+  roles:[
+    {r:'Silicon debug engineer', d:'Owns anomaly resolution'},
+    {r:'Design engineer', d:'Logic analysis and hypothesis generation'},
+    {r:'DFT engineer', d:'State extraction and trace'},
+    {r:'DV engineer', d:'Simulation and emulation reproduction'},
+    {r:'Failure analysis engineer', d:'Physical analysis and disposition'},
+  ],
+  effort:[['Root cause determination',7], ['Internal state extraction',6], ['Reproduction and isolation',5], ['Simulation cross-check',4], ['FA and disposition',3.5], ['Knowledge capture',2.5]],
+  entry:[
+    'Anomalies arriving from bring-up activities',
+    'DFT and trace access working from EVB-04',
+    'Simulation and emulation environments available',
+  ],
+  exit:[
+    'Root cause established rather than symptom suppressed',
+    'Anomalies reproduced in simulation where possible',
+    'Findings captured so they are debugged once',
+  ],
+  dependsOn:['BU-02','BU-03','BU-04','BU-06','DFT-11','EVB-04','DV-03','DV-12'],
+  dependsNote:'Anomalies arrive from every bring-up activity; the dependencies listed are the ones that supply the debug capability rather than the problems.',
+  feedsInto:['BU-09','BU-11','MP-02'],
+  measuredBy:[
+    'Anomalies root-caused against opened',
+    'Median time from anomaly to root cause',
+    'Anomalies reproduced outside silicon',
+  ],
+},
+
+'BU-06': {
   stage:'bringup', window:[6,14], criticalPath:true,
   purpose:[
     'Bring up the <b>interfaces</b>—PCIe/CXL link training, HBM training, die-to-die—which on this part is the largest single body of bring-up work and the most likely to produce a respin decision.',
@@ -292,10 +366,10 @@ module.exports = {
   flowNote:'Step 3 is not optional even when training succeeds. A link that trains with no margin trains today and fails at temperature or on a different host, and only the eye measurement distinguishes the two.',
   consumes:[
     'Booted units from BU-04',
-    'SIPI channel budget and predictions from SIPI-04 and SIPI-05',
-    'Debug and trace access from EVB-06',
-    'Lab instrumentation from EVB-09',
-    'Interface specifications from ARCH-03',
+    'SIPI channel budget and predictions from SIPI-05 and SIPI-06',
+    'Debug and trace access from EVB-04',
+    'Lab instrumentation from EVB-08',
+    'Interface specifications from ARCH-04',
   ],
   produces:[
     'Interface bring-up order and plan',
@@ -330,17 +404,17 @@ module.exports = {
   effort:[['HBM training',7], ['PCIe/CXL training',6], ['Margin and eye measurement',4.5], ['Training failure debug',4], ['Die-to-die bring-up',2.5], ['Compliance and interoperability',2]],
   entry:[
     'Units booted from BU-04',
-    'SIPI predictions available from SIPI-04 and SIPI-05',
-    'High-speed instrumentation available from EVB-09',
+    'SIPI predictions available from SIPI-05 and SIPI-06',
+    'High-speed instrumentation available from EVB-08',
   ],
   exit:[
     'Every interface\'s margin measured, not only its training result',
     'Failures attributed to a layer against the SIPI prediction',
     'Interoperability confirmed on more than the lab\'s host',
   ],
-  dependsOn:['BU-04','SIPI-04','SIPI-05','EVB-06','EVB-09'],
+  dependsOn:['BU-04','SIPI-05','SIPI-06','EVB-04','EVB-08'],
   dependsNote:null,
-  feedsInto:['BU-06','BU-08','BU-10','TEST-10','MP-11'],
+  feedsInto:['BU-07','BU-10','BU-09','TEST-11','MP-09'],
   measuredBy:[
     'Training margin against the SIPI prediction',
     'Interfaces trained against interfaces designed',
@@ -348,7 +422,7 @@ module.exports = {
   ],
 },
 
-'BU-06': {
+'BU-07': {
   stage:'bringup', window:[8,14], criticalPath:false,
   purpose:[
     'Validate the <b>memory subsystem</b>—controller, address map, bandwidth, latency, ECC—because on an AI accelerator the memory system is most of the performance.',
@@ -364,11 +438,11 @@ module.exports = {
   ],
   flowNote:'Step 3 has to be done deliberately by injecting errors. ECC that has never corrected anything is ECC that has never been shown to work, and a broken correction path is silent until it matters.',
   consumes:[
-    'Trained HBM interfaces from BU-05',
-    'Memory subsystem model from ARCH-04',
-    'Address map from RTL-05',
-    'Memory test content from TEST-06',
-    'Thermal capability from EVB-08',
+    'Trained HBM interfaces from BU-06',
+    'Memory subsystem model from ARCH-03',
+    'Address map from RTL-06',
+    'Memory test content from TEST-07',
+    'Thermal capability from EVB-06',
   ],
   produces:[
     'Controller initialization and configuration',
@@ -380,7 +454,7 @@ module.exports = {
   ],
   producedBy:[1,2,3,4,5,6],
   rel:[
-    {id:'BU-D2', rel:'feeds', text:'<b>Characterization data set.</b> Memory bandwidth, latency and efficiency are core characterization results.'},
+    {id:'BU-D5', rel:'feeds', text:'<b>Characterization data set.</b> Memory bandwidth, latency and efficiency are core characterization results.'},
     {id:'BU-D3', rel:'feeds', text:'<b>Interface compliance results with training margins.</b> Sustained memory operation is what proves the trained interfaces hold.'},
   ],
   risks:[
@@ -399,18 +473,18 @@ module.exports = {
   ],
   effort:[['Bandwidth measurement',4.5], ['Latency characterization',3.5], ['Address map validation',3], ['ECC validation',2.5], ['Controller initialization',1.5], ['Refresh behavior',1]],
   entry:[
-    'HBM interfaces trained in BU-05',
-    'Architecture memory model available from ARCH-04',
-    'Thermal control available from EVB-08',
+    'HBM interfaces trained in BU-06',
+    'Architecture memory model available from ARCH-03',
+    'Thermal control available from EVB-06',
   ],
   exit:[
     'ECC validated by injected errors, not by absence of failures',
     'Bandwidth and latency compared against the architecture model',
     'Efficiency characterized, not only peak',
   ],
-  dependsOn:['BU-05','ARCH-04','RTL-05','EVB-08'],
+  dependsOn:['BU-06','ARCH-03','RTL-06','EVB-06'],
   dependsNote:null,
-  feedsInto:['BU-08','BU-10','MP-12'],
+  feedsInto:['BU-10','BU-09','MP-11'],
   measuredBy:[
     'Achieved bandwidth against the model',
     'Latency against the architectural target',
@@ -418,7 +492,7 @@ module.exports = {
   ],
 },
 
-'BU-07': {
+'BU-08': {
   stage:'bringup', window:[9,16], criticalPath:false,
   purpose:[
     '<b>Shmoo the part</b> across voltage, frequency and temperature—the measurement that establishes how much margin the design actually has.',
@@ -434,11 +508,11 @@ module.exports = {
   ],
   flowNote:'Step 5 is what separates a characteristic from an anecdote. One unit\'s shmoo is that unit; the fleet\'s spread is what the population looks like, and the specification has to be set against the population.',
   consumes:[
-    'Booted and interface-trained units from BU-04 and BU-05',
-    'Sweep automation from EVB-09',
-    'Thermal control from EVB-08',
-    'Rail sweep capability from EVB-05',
-    'Characterization content from TEST-07',
+    'Booted and interface-trained units from BU-04 and BU-06',
+    'Sweep automation from EVB-08',
+    'Thermal control from EVB-06',
+    'Rail sweep capability from EVB-03',
+    'Characterization content from TEST-09',
   ],
   produces:[
     'Shmoo plan and automation',
@@ -450,7 +524,7 @@ module.exports = {
   ],
   producedBy:[1,2,3,4,5,6],
   rel:[
-    {id:'BU-D2', rel:'produces', text:'<b>Characterization data set—V/F/T shmoo and power measurements.</b> This activity is the deliverable.'},
+    {id:'BU-D5', rel:'produces', text:'<b>Characterization data set—V/F/T shmoo and power measurements.</b> This activity is the deliverable.'},
     {id:'BU-D1', rel:'feeds', text:'<b>Bring-up report with per-milestone health status.</b> Margin is the strongest single indicator of whether the silicon is healthy.'},
   ],
   risks:[
@@ -469,18 +543,18 @@ module.exports = {
   ],
   effort:[['Temperature-extended shmoo',4], ['Voltage-frequency shmoo',3.5], ['Margin extraction',3], ['Power measurement',2.5], ['Unit-to-unit variation',2], ['Automation setup',1]],
   entry:[
-    'Units functional from BU-04 and BU-05',
-    'Sweep automation working from EVB-09',
-    'Thermal control available from EVB-08',
+    'Units functional from BU-04 and BU-06',
+    'Sweep automation working from EVB-08',
+    'Thermal control available from EVB-06',
   ],
   exit:[
     'Shmoo across a fleet, not a single unit',
     'Temperature corners included, not only room',
     'No throttling inside the measured region',
   ],
-  dependsOn:['BU-04','BU-05','EVB-05','EVB-08','EVB-09','TEST-07'],
+  dependsOn:['BU-04','BU-06','EVB-03','EVB-06','EVB-08','TEST-09'],
   dependsNote:null,
-  feedsInto:['BU-08','BU-11','MP-06','MP-08','TEST-10'],
+  feedsInto:['BU-10','BU-11','MP-07','MP-05','TEST-11'],
   measuredBy:[
     'Margin at the worst corner',
     'Units in the shmoo sample',
@@ -488,151 +562,7 @@ module.exports = {
   ],
 },
 
-'BU-08': {
-  stage:'bringup', window:[11,17], criticalPath:false,
-  purpose:[
-    'Measure <b>real performance against the architecture model</b>—the check on whether the product does what it was sold as doing.',
-    'The whole program was justified by a performance projection. This is where that projection meets a physical part running real workloads, and any gap has to be attributed: to the model, to the design, to the memory system, or to the software driving it.',
-  ],
-  steps:[
-    {n:1, text:'Benchmark and workload setup', tat:1, lane:'main'},
-    {n:2, text:'Performance measurement across workloads', tat:1.5, lane:'main'},
-    {n:3, text:'Power efficiency measurement', tat:1.5, lane:'par'},
-    {n:4, text:'Comparison against the architecture model', tat:1.5, lane:'main'},
-    {n:5, text:'Bottleneck profiling', tat:1.5, lane:'par'},
-    {n:6, text:'Gap analysis and attribution', tat:2, lane:'main'},
-  ],
-  flowNote:'Step 6 is where the program learns something durable. A gap attributed to the model improves the next program\'s projections; a gap attributed to the design becomes an errata or a respin input; an unattributed gap teaches nothing.',
-  consumes:[
-    'Functional units from BU-04 through BU-06',
-    'Architecture performance model from ARCH-02',
-    'Workload definitions from DEF-03',
-    'Power measurement from BU-07',
-    'Lab instrumentation from EVB-09',
-  ],
-  produces:[
-    'Benchmark and workload setup',
-    'Performance measurements across workloads',
-    'Power efficiency measurements',
-    'Comparison against the architecture model',
-    'Bottleneck profiling results',
-    'Gap analysis and attribution',
-  ],
-  producedBy:[1,2,3,4,5,6],
-  rel:[
-    {id:'BU-D2', rel:'feeds', text:'<b>Characterization data set.</b> Performance and efficiency measurements are part of the product\'s characterization.'},
-    {id:'BU-D1', rel:'feeds', text:'<b>Bring-up report with per-milestone health status.</b> Performance against target is the milestone the business cares about most.'},
-  ],
-  risks:[
-    '<b>Performance measured on unrepresentative workloads.</b> A benchmark that is not what customers run produces a number that does not predict their experience.',
-    '<b>Gap reported without attribution.</b> Nobody can act on it, and the next program repeats the modeling error.',
-    '<b>Software limiting the measurement.</b> An immature stack understates the silicon, and the difference has to be established rather than assumed.',
-    '<b>Efficiency ignored.</b> Performance per watt is the metric this product class is bought on, and raw throughput alone misleads.',
-    '<b>Measured at a single operating point.</b> Real deployment spans conditions, and performance at nominal is not the whole picture.',
-  ],
-  roles:[
-    {r:'Performance engineer', d:'Owns measurement and attribution'},
-    {r:'Architect', d:'Model comparison and gap interpretation'},
-    {r:'Validation software engineer', d:'Workload execution and software effects'},
-    {r:'Design engineer', d:'Bottleneck root cause'},
-    {r:'Product marketing', d:'Workload representativeness'},
-  ],
-  effort:[['Performance measurement',4], ['Model comparison',3.5], ['Gap analysis',3], ['Bottleneck profiling',2.5], ['Efficiency measurement',2], ['Benchmark setup',1]],
-  entry:[
-    'Memory subsystem validated in BU-06',
-    'Architecture model available from ARCH-02',
-    'Workloads defined in DEF-03',
-  ],
-  exit:[
-    'Every material gap attributed to a cause',
-    'Efficiency measured alongside throughput',
-    'Software\'s contribution to the measurement established',
-  ],
-  dependsOn:['BU-05','BU-06','BU-07','ARCH-02','DEF-03'],
-  dependsNote:null,
-  feedsInto:['BU-11','MP-12','TEST-10'],
-  measuredBy:[
-    'Performance against the architecture projection',
-    'Efficiency against the target',
-    'Gaps attributed against gaps found',
-  ],
-},
-
 'BU-09': {
-  stage:'bringup', window:[4,14], criticalPath:true,
-  purpose:[
-    '<b>Debug what is wrong</b>—reproduce it, isolate it, extract the internal state, find the root cause, and get failure analysis where physical evidence is needed.',
-    'This is the activity the whole DFT and debug infrastructure investment exists to serve. It runs alongside every other bring-up activity because anomalies arrive from all of them, and its throughput largely determines how long bring-up takes.',
-  ],
-  steps:[
-    {n:1, text:'Anomaly intake and triage process', tat:1, lane:'main'},
-    {n:2, text:'Reproduction and isolation', tat:2, lane:'main'},
-    {n:3, text:'Simulation and emulation cross-check', tat:2, lane:'par'},
-    {n:4, text:'Internal state extraction via DFT and trace', tat:2.5, lane:'main'},
-    {n:5, text:'Design-team escalation and analysis', tat:2, lane:'par'},
-    {n:6, text:'Hypothesis test and root cause', tat:2.5, lane:'main'},
-    {n:7, text:'Debug knowledge capture', tat:1.5, lane:'par'},
-    {n:8, text:'Failure analysis request and disposition', tat:2, lane:'main'},
-  ],
-  flowNote:'Step 3 is the highest-leverage step in the activity. An anomaly reproduced in simulation can be examined with full visibility and unlimited retries, which is an environment no amount of silicon debug can match.',
-  consumes:[
-    'Anomalies from every bring-up activity',
-    'DFT and trace access from DFT-08 and EVB-06',
-    'Simulation and emulation environments from DV-08 and DV-11',
-    'Design database and RTL from RTL-09',
-    'FA laboratory capability',
-  ],
-  produces:[
-    'Anomaly intake and triage records',
-    'Reproduction and isolation results',
-    'Simulation and emulation cross-check findings',
-    'Extracted internal state',
-    'Design-team analysis',
-    'Root cause determinations',
-    'Debug knowledge base',
-    'Failure analysis reports and dispositions',
-  ],
-  producedBy:[1,2,3,4,5,6,7,8],
-  rel:[
-    {id:'BU-D5', rel:'produces', text:'<b>Failure analysis reports.</b> This activity is the deliverable, and physical FA is its most conclusive form.'},
-    {id:'BU-D4', rel:'feeds', text:'<b>Errata list with workarounds.</b> Every root cause found here becomes an errata entry or a fix.'},
-  ],
-  risks:[
-    '<b>Symptoms treated instead of causes.</b> A workaround without a root cause hides a mechanism that resurfaces in the field.',
-    '<b>No path back to simulation.</b> Debug then happens only on silicon, with limited visibility and long turnaround per hypothesis.',
-    '<b>Design team engaged late.</b> The people who wrote the logic can often recognize a symptom in minutes, and validation debugs alone for days first.',
-    '<b>Units consumed by destructive FA too readily.</b> Physical analysis destroys the unit, and there are very few.',
-    '<b>Findings not captured.</b> The same anomaly is then debugged twice by different engineers.',
-  ],
-  roles:[
-    {r:'Silicon debug engineer', d:'Owns anomaly resolution'},
-    {r:'Design engineer', d:'Logic analysis and hypothesis generation'},
-    {r:'DFT engineer', d:'State extraction and trace'},
-    {r:'DV engineer', d:'Simulation and emulation reproduction'},
-    {r:'Failure analysis engineer', d:'Physical analysis and disposition'},
-  ],
-  effort:[['Root cause determination',7], ['Internal state extraction',6], ['Reproduction and isolation',5], ['Simulation cross-check',4], ['FA and disposition',3.5], ['Knowledge capture',2.5]],
-  entry:[
-    'Anomalies arriving from bring-up activities',
-    'DFT and trace access working from EVB-06',
-    'Simulation and emulation environments available',
-  ],
-  exit:[
-    'Root cause established rather than symptom suppressed',
-    'Anomalies reproduced in simulation where possible',
-    'Findings captured so they are debugged once',
-  ],
-  dependsOn:['BU-02','BU-03','BU-04','BU-05','DFT-08','EVB-06','DV-08','DV-11'],
-  dependsNote:'Anomalies arrive from every bring-up activity; the dependencies listed are the ones that supply the debug capability rather than the problems.',
-  feedsInto:['BU-10','BU-11','MP-05'],
-  measuredBy:[
-    'Anomalies root-caused against opened',
-    'Median time from anomaly to root cause',
-    'Anomalies reproduced outside silicon',
-  ],
-},
-
-'BU-10': {
   stage:'bringup', window:[10,17], criticalPath:false,
   purpose:[
     'Turn what is wrong into a <b>documented errata list with workarounds</b>—the honest account of the silicon\'s behavior that customers and the next revision both need.',
@@ -648,11 +578,11 @@ module.exports = {
   ],
   flowNote:'Step 4\'s validation is the part that gets skipped. A workaround that has been described but never run is a hypothesis, and shipping it as a mitigation is how a known issue becomes a field failure anyway.',
   consumes:[
-    'Root causes from BU-09',
-    'Failure analysis results from BU-09',
-    'Design impact assessment from RTL-09',
-    'Customer use models from DEF-03',
-    'Documentation standards from MP-12',
+    'Root causes from BU-05',
+    'Failure analysis results from BU-05',
+    'Design impact assessment from RTL-02',
+    'Customer use models from DEF-05',
+    'Documentation standards from MP-11',
   ],
   produces:[
     'Errata intake and classification',
@@ -683,22 +613,92 @@ module.exports = {
   ],
   effort:[['Workaround definition and validation',3], ['Errata documentation',2.5], ['Impact assessment',2], ['Visibility determination',1.5], ['Fix decision input',1]],
   entry:[
-    'Root causes available from BU-09',
-    'Customer use models from DEF-03',
-    'Documentation standard from MP-12',
+    'Root causes available from BU-05',
+    'Customer use models from DEF-05',
+    'Documentation standard from MP-11',
   ],
   exit:[
     'Every workaround validated on silicon, not only described',
     'Severity assessed with customer use models in view',
     'Errata versioned against silicon revision',
   ],
-  dependsOn:['BU-04','BU-05','BU-06','BU-09'],
+  dependsOn:['BU-04','BU-06','BU-07','BU-05'],
   dependsNote:null,
-  feedsInto:['BU-11','BU-12','MP-12'],
+  feedsInto:['BU-11','BU-12','MP-11'],
   measuredBy:[
     'Workarounds validated against documented',
     'Errata found by customers after release',
     'Time from root cause to documented errata',
+  ],
+},
+
+'BU-10': {
+  stage:'bringup', window:[11,17], criticalPath:false,
+  purpose:[
+    'Measure <b>real performance against the architecture model</b>—the check on whether the product does what it was sold as doing.',
+    'The whole program was justified by a performance projection. This is where that projection meets a physical part running real workloads, and any gap has to be attributed: to the model, to the design, to the memory system, or to the software driving it.',
+  ],
+  steps:[
+    {n:1, text:'Benchmark and workload setup', tat:1, lane:'main'},
+    {n:2, text:'Performance measurement across workloads', tat:1.5, lane:'main'},
+    {n:3, text:'Power efficiency measurement', tat:1.5, lane:'par'},
+    {n:4, text:'Comparison against the architecture model', tat:1.5, lane:'main'},
+    {n:5, text:'Bottleneck profiling', tat:1.5, lane:'par'},
+    {n:6, text:'Gap analysis and attribution', tat:2, lane:'main'},
+  ],
+  flowNote:'Step 6 is where the program learns something durable. A gap attributed to the model improves the next program\'s projections; a gap attributed to the design becomes an errata or a respin input; an unattributed gap teaches nothing.',
+  consumes:[
+    'Functional units from BU-04 through BU-07',
+    'Architecture performance model from ARCH-02',
+    'Workload definitions from DEF-05',
+    'Power measurement from BU-08',
+    'Lab instrumentation from EVB-08',
+  ],
+  produces:[
+    'Benchmark and workload setup',
+    'Performance measurements across workloads',
+    'Power efficiency measurements',
+    'Comparison against the architecture model',
+    'Bottleneck profiling results',
+    'Gap analysis and attribution',
+  ],
+  producedBy:[1,2,3,4,5,6],
+  rel:[
+    {id:'BU-D5', rel:'feeds', text:'<b>Characterization data set.</b> Performance and efficiency measurements are part of the product\'s characterization.'},
+    {id:'BU-D1', rel:'feeds', text:'<b>Bring-up report with per-milestone health status.</b> Performance against target is the milestone the business cares about most.'},
+  ],
+  risks:[
+    '<b>Performance measured on unrepresentative workloads.</b> A benchmark that is not what customers run produces a number that does not predict their experience.',
+    '<b>Gap reported without attribution.</b> Nobody can act on it, and the next program repeats the modeling error.',
+    '<b>Software limiting the measurement.</b> An immature stack understates the silicon, and the difference has to be established rather than assumed.',
+    '<b>Efficiency ignored.</b> Performance per watt is the metric this product class is bought on, and raw throughput alone misleads.',
+    '<b>Measured at a single operating point.</b> Real deployment spans conditions, and performance at nominal is not the whole picture.',
+  ],
+  roles:[
+    {r:'Performance engineer', d:'Owns measurement and attribution'},
+    {r:'Architect', d:'Model comparison and gap interpretation'},
+    {r:'Validation software engineer', d:'Workload execution and software effects'},
+    {r:'Design engineer', d:'Bottleneck root cause'},
+    {r:'Product marketing', d:'Workload representativeness'},
+  ],
+  effort:[['Performance measurement',4], ['Model comparison',3.5], ['Gap analysis',3], ['Bottleneck profiling',2.5], ['Efficiency measurement',2], ['Benchmark setup',1]],
+  entry:[
+    'Memory subsystem validated in BU-07',
+    'Architecture model available from ARCH-02',
+    'Workloads defined in DEF-05',
+  ],
+  exit:[
+    'Every material gap attributed to a cause',
+    'Efficiency measured alongside throughput',
+    'Software\'s contribution to the measurement established',
+  ],
+  dependsOn:['BU-06','BU-07','BU-08','ARCH-02','DEF-05'],
+  dependsNote:null,
+  feedsInto:['BU-11','MP-11','TEST-11'],
+  measuredBy:[
+    'Performance against the architecture projection',
+    'Efficiency against the target',
+    'Gaps attributed against gaps found',
   ],
 },
 
@@ -718,10 +718,10 @@ module.exports = {
   ],
   flowNote:'Step 2 is bounded by physics rather than by will. A metal fix can only change routing layers, and whether the required change fits inside them is a question with a factual answer that has to be established before the decision is framed.',
   consumes:[
-    'Errata list and severity from BU-10',
-    'Root causes from BU-09',
-    'Margin data from BU-07',
-    'Performance gaps from BU-08',
+    'Errata list and severity from BU-09',
+    'Root causes from BU-05',
+    'Margin data from BU-08',
+    'Performance gaps from BU-10',
     'Mask and fab cost from TECH-08',
   ],
   produces:[
@@ -753,8 +753,8 @@ module.exports = {
   ],
   effort:[['Cost, schedule and risk comparison',1.5], ['Metal-fix feasibility',1.25], ['Respin scoping',1], ['Decision record',0.75], ['Market impact input',0.5]],
   entry:[
-    'Errata list and severities available from BU-10',
-    'Margin and performance data from BU-07 and BU-08',
+    'Errata list and severities available from BU-09',
+    'Margin and performance data from BU-08 and BU-10',
     'Mask and fab costs available',
   ],
   exit:[
@@ -762,9 +762,9 @@ module.exports = {
     'Margin evidence weighed alongside functional defects',
     'Decision recorded with what was known at the time',
   ],
-  dependsOn:['BU-07','BU-08','BU-09','BU-10','TECH-08'],
+  dependsOn:['BU-08','BU-10','BU-05','BU-09','TECH-08'],
   dependsNote:null,
-  feedsInto:['BU-12','MP-09','MP-10'],
+  feedsInto:['BU-12','MP-12','MP-08'],
   measuredBy:[
     'Decision made against the planned date',
     'Feasibility claims that held',
@@ -788,10 +788,10 @@ module.exports = {
   ],
   flowNote:'Step 5 is the one that pays back most. A customer who finds something and has an obvious route to report it gives the program early field data; one who does not gives it a design loss with no explanation.',
   consumes:[
-    'Allocated sample units from ASSY-09',
-    'Errata list from BU-10',
+    'Allocated sample units from ASSY-10',
+    'Errata list from BU-09',
     'Decision record from BU-11',
-    'Preliminary datasheet from MP-12',
+    'Preliminary datasheet from MP-11',
     'Customer commitments from DEF-01',
   ],
   produces:[
@@ -823,8 +823,8 @@ module.exports = {
   ],
   effort:[['Release package assembly',1.75], ['Unit selection and screening',1.25], ['Documentation pack',1.25], ['Shipment and support',1], ['Feedback channel',0.75]],
   entry:[
-    'Sample units allocated from ASSY-09',
-    'Errata list released from BU-10',
+    'Sample units allocated from ASSY-10',
+    'Errata list released from BU-09',
     'Respin decision recorded in BU-11',
   ],
   exit:[
@@ -832,9 +832,9 @@ module.exports = {
     'Units screened before shipment',
     'Feedback channel established and staffed',
   ],
-  dependsOn:['ASSY-09','BU-10','BU-11'],
+  dependsOn:['ASSY-10','BU-09','BU-11'],
   dependsNote:null,
-  feedsInto:['MP-10','MP-12'],
+  feedsInto:['MP-08','MP-11'],
   measuredBy:[
     'Samples shipped against commitment',
     'Customer issues that were already documented',

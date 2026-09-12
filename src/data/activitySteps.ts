@@ -113,11 +113,11 @@ export const activitySteps: Record<string, ActivityStepEntry> = {
     "feeds"
    ],
    [
-    "DEF-D3",
+    "DEF-D4",
     "informs"
    ],
    [
-    "DEF-D4",
+    "DEF-D3",
     "feeds"
    ],
    [
@@ -128,6 +128,73 @@ export const activitySteps: Record<string, ActivityStepEntry> = {
   "ro": "Requirements lead"
  },
  "DEF-02": {
+  "st": "productDefinition",
+  "w": [
+   0,
+   4
+  ],
+  "s": [
+   [
+    1,
+    "Identify target competitor and expected launch timing",
+    0.5
+   ],
+   [
+    2,
+    "Collect public benchmarks, specifications, and public product information",
+    1
+   ],
+   [
+    3,
+    "Normalize benchmark data and comparison conditions",
+    1,
+    1
+   ],
+   [
+    4,
+    "Project competitor capabilities to our target launch window",
+    1
+   ],
+   [
+    5,
+    "Compare our product targets against expected competitors",
+    1
+   ],
+   [
+    6,
+    "Review gaps with product and sales teams",
+    0.5
+   ]
+  ],
+  "o": [
+   "Target competitor list with expected launch timing",
+   "Competitor benchmark and specification data",
+   "Comparable benchmark data with clearly defined conditions",
+   "Expected competitor performance and capabilities at launch",
+   "Prioritized performance and capability gaps",
+   "Competitive gaps to feed into DEF-01 product requirements"
+  ],
+  "ob": [
+   1,
+   2,
+   3,
+   4,
+   5,
+   6
+  ],
+  "r": [
+   [
+    "DEF-D1",
+    "feeds"
+   ],
+   [
+    "DEF-D4",
+    "informs"
+   ]
+  ],
+  "ro": "Product marketing lead"
+ },
+ "DEF-03": {
   "st": "productDefinition",
   "w": [
    1,
@@ -200,13 +267,81 @@ export const activitySteps: Record<string, ActivityStepEntry> = {
     "feeds"
    ],
    [
-    "DEF-D4",
+    "DEF-D3",
     "feeds"
    ]
   ],
   "ro": "Workload architect"
  },
- "DEF-03": {
+ "DEF-04": {
+  "st": "productDefinition",
+  "w": [
+   2,
+   5
+  ],
+  "s": [
+   [
+    1,
+    "Determine bandwidth demand from DEF-03 workloads",
+    0.75
+   ],
+   [
+    2,
+    "Size the memory hierarchy - on-die SRAM, HBM capacity, stacks, and channels.",
+    1
+   ],
+   [
+    3,
+    "Size the host interface - PCIe/CXL generation and lane count",
+    0.5,
+    1
+   ],
+   [
+    4,
+    "Define Die-to-die interface requirement for chiplet option",
+    0.5,
+    1
+   ],
+   [
+    5,
+    "Translate interface requirements into pin and bump budgets",
+    0.75
+   ],
+   [
+    6,
+    "Review requirements with architecture and package teams",
+    0.5
+   ]
+  ],
+  "o": [
+   "Bandwidth requirements by workload and memory hierarchy level",
+   "Memory configuration — capacity, stacks, and channels",
+   "Host interface configuration — generation and lane count",
+   "Die-to-die interface requirement",
+   "Pin and bump budget",
+   "Approved memory, interface and bump requirements"
+  ],
+  "ob": [
+   1,
+   2,
+   3,
+   4,
+   5,
+   6
+  ],
+  "r": [
+   [
+    "DEF-D1",
+    "feeds"
+   ],
+   [
+    "DEF-D2",
+    "feeds"
+   ]
+  ],
+  "ro": "Memory systems architect"
+ },
+ "DEF-05": {
   "st": "productDefinition",
   "w": [
    3,
@@ -275,17 +410,17 @@ export const activitySteps: Record<string, ActivityStepEntry> = {
     "produces"
    ],
    [
-    "DEF-D4",
+    "DEF-D3",
     "feeds"
    ],
    [
-    "DEF-D3",
+    "DEF-D4",
     "informs"
    ]
   ],
   "ro": "PPA lead"
  },
- "DEF-04": {
+ "DEF-06": {
   "st": "productDefinition",
   "w": [
    3,
@@ -354,11 +489,11 @@ export const activitySteps: Record<string, ActivityStepEntry> = {
   ],
   "r": [
    [
-    "DEF-D3",
+    "DEF-D4",
     "produces"
    ],
    [
-    "DEF-D4",
+    "DEF-D3",
     "feeds"
    ],
    [
@@ -367,141 +502,6 @@ export const activitySteps: Record<string, ActivityStepEntry> = {
    ]
   ],
   "ro": "Product cost analyst"
- },
- "DEF-05": {
-  "st": "productDefinition",
-  "w": [
-   2,
-   5
-  ],
-  "s": [
-   [
-    1,
-    "Determine bandwidth demand from DEF-02 workloads",
-    0.75
-   ],
-   [
-    2,
-    "Size the memory hierarchy - on-die SRAM, HBM capacity, stacks, and channels.",
-    1
-   ],
-   [
-    3,
-    "Size the host interface - PCIe/CXL generation and lane count",
-    0.5,
-    1
-   ],
-   [
-    4,
-    "Define Die-to-die interface requirement for chiplet option",
-    0.5,
-    1
-   ],
-   [
-    5,
-    "Translate interface requirements into pin and bump budgets",
-    0.75
-   ],
-   [
-    6,
-    "Review requirements with architecture and package teams",
-    0.5
-   ]
-  ],
-  "o": [
-   "Bandwidth requirements by workload and memory hierarchy level",
-   "Memory configuration — capacity, stacks, and channels",
-   "Host interface configuration — generation and lane count",
-   "Die-to-die interface requirement",
-   "Pin and bump budget",
-   "Approved memory, interface and bump requirements"
-  ],
-  "ob": [
-   1,
-   2,
-   3,
-   4,
-   5,
-   6
-  ],
-  "r": [
-   [
-    "DEF-D1",
-    "feeds"
-   ],
-   [
-    "DEF-D2",
-    "feeds"
-   ]
-  ],
-  "ro": "Memory systems architect"
- },
- "DEF-06": {
-  "st": "productDefinition",
-  "w": [
-   0,
-   4
-  ],
-  "s": [
-   [
-    1,
-    "Identify target competitor and expected launch timing",
-    0.5
-   ],
-   [
-    2,
-    "Collect public benchmarks, specifications, and public product information",
-    1
-   ],
-   [
-    3,
-    "Normalize benchmark data and comparison conditions",
-    1,
-    1
-   ],
-   [
-    4,
-    "Project competitor capabilities to our target launch window",
-    1
-   ],
-   [
-    5,
-    "Compare our product targets against expected competitors",
-    1
-   ],
-   [
-    6,
-    "Review gaps with product and sales teams",
-    0.5
-   ]
-  ],
-  "o": [
-   "Target competitor list with expected launch timing",
-   "Competitor benchmark and specification data",
-   "Comparable benchmark data with clearly defined conditions",
-   "Expected competitor performance and capabilities at launch",
-   "Prioritized performance and capability gaps",
-   "Competitive gaps to feed into DEF-01 product requirements"
-  ],
-  "ob": [
-   1,
-   2,
-   3,
-   4,
-   5,
-   6
-  ],
-  "r": [
-   [
-    "DEF-D1",
-    "feeds"
-   ],
-   [
-    "DEF-D3",
-    "informs"
-   ]
-  ],
-  "ro": "Product marketing lead"
  },
  "DEF-07": {
   "st": "productDefinition",
@@ -568,7 +568,7 @@ export const activitySteps: Record<string, ActivityStepEntry> = {
   ],
   "r": [
    [
-    "DEF-D4",
+    "DEF-D3",
     "produces"
    ],
    [
@@ -739,7 +739,7 @@ export const activitySteps: Record<string, ActivityStepEntry> = {
    ],
    [
     3,
-    "Integrate the DEF-02 workload suite",
+    "Integrate the DEF-03 workload suite",
     1,
     1
    ],
@@ -807,15 +807,15 @@ export const activitySteps: Record<string, ActivityStepEntry> = {
   ],
   "r": [
    [
-    "ARCH-D2",
+    "ARCH-D3",
     "produces"
    ],
    [
-    "ARCH-D1",
+    "ARCH-D6",
     "feeds"
    ],
    [
-    "ARCH-D3",
+    "ARCH-D4",
     "feeds"
    ]
   ],
@@ -845,7 +845,7 @@ export const activitySteps: Record<string, ActivityStepEntry> = {
    ],
    [
     4,
-    "Compare yield and cost across architecture options using DEF-04 model",
+    "Compare yield and cost across architecture options using DEF-06 model",
     1.5,
     1
    ],
@@ -894,21 +894,108 @@ export const activitySteps: Record<string, ActivityStepEntry> = {
   ],
   "r": [
    [
-    "ARCH-D3",
+    "ARCH-D4",
     "produces"
    ],
    [
-    "ARCH-D1",
+    "ARCH-D6",
     "feeds"
    ],
    [
-    "ARCH-D6",
+    "ARCH-D5",
     "feeds"
    ]
   ],
   "ro": "Chief architect"
  },
  "ARCH-03": {
+  "st": "architecture",
+  "w": [
+   3,
+   9
+  ],
+  "s": [
+   [
+    1,
+    "Consolidate interface requirements from DEF-04",
+    0.5
+   ],
+   [
+    2,
+    "Review protocol version maturity and expected finalization timing",
+    1
+   ],
+   [
+    3,
+    "Select host interfaces — PCIe generation and CXL profile",
+    1.5
+   ],
+   [
+    4,
+    "Select HBM generation and define controller requirements",
+    1,
+    1
+   ],
+   [
+    5,
+    "Select the die-to-die interface for chiplet architectures (if the chipset option is survived.)",
+    1,
+    1
+   ],
+   [
+    6,
+    "Define compliance and interoperability requirements",
+    1,
+    1
+   ],
+   [
+    7,
+    "Define controller and PHY requirements for IP selection and sourcing",
+    1
+   ],
+   [
+    8,
+    "Finalize and review the interface definition",
+    2
+   ]
+  ],
+  "o": [
+   "Interface requirements for selection",
+   "Protocol maturity and timing assessment",
+   "Host interface selection and protocol versions",
+   "HBM selection and controller requirements",
+   "Die-to-die interface selection and requirements",
+   "Compliance and interoperability requirements",
+   "Controller and PHY requirements",
+   "ARCH-D1 Interface and Protocol Definition Document"
+  ],
+  "ob": [
+   1,
+   2,
+   3,
+   4,
+   5,
+   6,
+   7,
+   8
+  ],
+  "r": [
+   [
+    "ARCH-D1",
+    "produces"
+   ],
+   [
+    "ARCH-D6",
+    "feeds"
+   ],
+   [
+    "ARCH-D5",
+    "feeds"
+   ]
+  ],
+  "ro": "Interface architect"
+ },
+ "ARCH-04": {
   "st": "architecture",
   "w": [
    4,
@@ -967,7 +1054,7 @@ export const activitySteps: Record<string, ActivityStepEntry> = {
    "Cache and scratchpad policy",
    "Prefetch and data-movement engine requirements",
    "Memory hierarchy performance and bottleneck analysis",
-   "Memory hierarchy section of ARCH-D1 and memory requirements for downstream teams"
+   "Memory hierarchy section of ARCH-D6 and memory requirements for downstream teams"
   ],
   "ob": [
    1,
@@ -981,108 +1068,97 @@ export const activitySteps: Record<string, ActivityStepEntry> = {
   ],
   "r": [
    [
-    "ARCH-D1",
+    "ARCH-D6",
     "produces"
+   ],
+   [
+    "ARCH-D4",
+    "feeds"
    ],
    [
     "ARCH-D3",
     "feeds"
+   ]
+  ],
+  "ro": "Memory systems architect"
+ },
+ "ARCH-05": {
+  "st": "architecture",
+  "w": [
+   6,
+   12
+  ],
+  "s": [
+   [
+    1,
+    "Define and document threat model and asset inventory",
+    1
+   ],
+   [
+    2,
+    "Define secure boot chain and immutable ROM",
+    1.5
+   ],
+   [
+    3,
+    "Select root of trust and key storage",
+    1,
+    1
+   ],
+   [
+    4,
+    "Define fuse map, chip identity and lifecycle state",
+    1
+   ],
+   [
+    5,
+    "Debug and test access lockdown policy, with DFT",
+    1,
+    1
+   ],
+   [
+    6,
+    "Define and document cryptographic accelerator requirement",
+    0.75,
+    1
+   ],
+   [
+    7,
+    "Review and approve the security architecture",
+    2.5
+   ]
+  ],
+  "o": [
+   "Threat model and asset inventory",
+   "Secure boot chain specification",
+   "Root of trust and key storage architecture",
+   "Fuse map and lifecycle state definition",
+   "Debug lockdown policy",
+   "Cryptographic accelerator requirement",
+   "Security architecture note and review record"
+  ],
+  "ob": [
+   1,
+   2,
+   3,
+   4,
+   5,
+   6,
+   7
+  ],
+  "r": [
+   [
+    "ARCH-D6",
+    "produces"
    ],
    [
     "ARCH-D2",
     "feeds"
    ]
   ],
-  "ro": "Memory systems architect"
+  "ro": "Security architect"
  },
- "ARCH-04": {
-  "st": "architecture",
-  "w": [
-   3,
-   9
-  ],
-  "s": [
-   [
-    1,
-    "Consolidate interface requirements from DEF-05",
-    0.5
-   ],
-   [
-    2,
-    "Review protocol version maturity and expected finalization timing",
-    1
-   ],
-   [
-    3,
-    "Select host interfaces — PCIe generation and CXL profile",
-    1.5
-   ],
-   [
-    4,
-    "Select HBM generation and define controller requirements",
-    1,
-    1
-   ],
-   [
-    5,
-    "Select the die-to-die interface for chiplet architectures (if the chipset option is survived.)",
-    1,
-    1
-   ],
-   [
-    6,
-    "Define compliance and interoperability requirements",
-    1,
-    1
-   ],
-   [
-    7,
-    "Define controller and PHY requirements for IP selection and sourcing",
-    1
-   ],
-   [
-    8,
-    "Finalize and review the interface definition",
-    2
-   ]
-  ],
-  "o": [
-   "Interface requirements for selection",
-   "Protocol maturity and timing assessment",
-   "Host interface selection and protocol versions",
-   "HBM selection and controller requirements",
-   "Die-to-die interface selection and requirements",
-   "Compliance and interoperability requirements",
-   "Controller and PHY requirements",
-   "ARCH-D4 Interface and Protocol Definition Document"
-  ],
-  "ob": [
-   1,
-   2,
-   3,
-   4,
-   5,
-   6,
-   7,
-   8
-  ],
-  "r": [
-   [
-    "ARCH-D4",
-    "produces"
-   ],
-   [
-    "ARCH-D1",
-    "feeds"
-   ],
-   [
-    "ARCH-D6",
-    "feeds"
-   ]
-  ],
-  "ro": "Interface architect"
- },
- "ARCH-05": {
+ "ARCH-06": {
   "st": "architecture",
   "w": [
    7,
@@ -1155,256 +1231,21 @@ export const activitySteps: Record<string, ActivityStepEntry> = {
   ],
   "r": [
    [
-    "ARCH-D5",
+    "ARCH-D2",
     "produces"
    ],
    [
-    "ARCH-D1",
+    "ARCH-D6",
     "feeds"
    ],
    [
-    "ARCH-D3",
+    "ARCH-D4",
     "feeds"
    ]
   ],
   "ro": "Power architect"
  },
- "ARCH-06": {
-  "st": "architecture",
-  "w": [
-   12,
-   16
-  ],
-  "s": [
-   [
-    1,
-    "Reconcile DEF-03 PPA targets with the finalized ARCH-02 block list",
-    0.75
-   ],
-   [
-    2,
-    "Allocate die area to each block using the floorplan intent",
-    1
-   ],
-   [
-    3,
-    "Allocate power by block and power domain",
-    1
-   ],
-   [
-    4,
-    "Define frequency and timing budgets by block and clock domain",
-    0.75,
-    1
-   ],
-   [
-    5,
-    "Reserve margin for implementation growth and ECOs",
-    0.5,
-    1
-   ],
-   [
-    6,
-    "Assign owners and obtain budget acceptance",
-    0.75
-   ],
-   [
-    7,
-    "Publish the PPA budgets and change-control rules",
-    0.5
-   ]
-  ],
-  "o": [
-   "Reconciliation note against the DEF-03 targets",
-   "Per-block area allocation",
-   "Per-block and per-domain power allocation",
-   "Per-block area, power and timing budget",
-   "Margin reservation record",
-   "Owner acceptance sheet per block",
-   "Change-control rule for budget movement"
-  ],
-  "ob": [
-   1,
-   2,
-   3,
-   4,
-   5,
-   6,
-   7
-  ],
-  "r": [
-   [
-    "ARCH-D3",
-    "produces"
-   ],
-   [
-    "ARCH-D1",
-    "feeds"
-   ],
-   [
-    "ARCH-D7",
-    "gates"
-   ]
-  ],
-  "ro": "PPA lead"
- },
  "ARCH-07": {
-  "st": "architecture",
-  "w": [
-   6,
-   12
-  ],
-  "s": [
-   [
-    1,
-    "Define and document threat model and asset inventory",
-    1
-   ],
-   [
-    2,
-    "Define secure boot chain and immutable ROM",
-    1.5
-   ],
-   [
-    3,
-    "Select root of trust and key storage",
-    1,
-    1
-   ],
-   [
-    4,
-    "Define fuse map, chip identity and lifecycle state",
-    1
-   ],
-   [
-    5,
-    "Debug and test access lockdown policy, with DFT",
-    1,
-    1
-   ],
-   [
-    6,
-    "Define and document cryptographic accelerator requirement",
-    0.75,
-    1
-   ],
-   [
-    7,
-    "Review and approve the security architecture",
-    2.5
-   ]
-  ],
-  "o": [
-   "Threat model and asset inventory",
-   "Secure boot chain specification",
-   "Root of trust and key storage architecture",
-   "Fuse map and lifecycle state definition",
-   "Debug lockdown policy",
-   "Cryptographic accelerator requirement",
-   "Security architecture note and review record"
-  ],
-  "ob": [
-   1,
-   2,
-   3,
-   4,
-   5,
-   6,
-   7
-  ],
-  "r": [
-   [
-    "ARCH-D1",
-    "produces"
-   ],
-   [
-    "ARCH-D5",
-    "feeds"
-   ]
-  ],
-  "ro": "Security architect"
- },
- "ARCH-08": {
-  "st": "architecture",
-  "w": [
-   10,
-   15
-  ],
-  "s": [
-   [
-    1,
-    "Place block intent from the partitioning and the hierarchy",
-    1
-   ],
-   [
-    2,
-    "Place iO ring and PHY plan",
-    1
-   ],
-   [
-    3,
-    "Define bump field — pitch, count, power-to-signal ratio",
-    1.5
-   ],
-   [
-    4,
-    "Allocate signal bump per interface",
-    0.75,
-    1
-   ],
-   [
-    5,
-    "Define and document power delivery bump budget against the power envelope",
-    1,
-    1
-   ],
-   [
-    6,
-    "Define package feasibility check with package design",
-    0.75,
-    1
-   ],
-   [
-    7,
-    "Define and document block diagram and bump budget publication",
-    1.5
-   ]
-  ],
-  "o": [
-   "Chip-level block diagram with placement intent",
-   "IO ring and PHY placement plan",
-   "Bump field definition and map",
-   "Signal and power bump allocation",
-   "Power delivery bump budget",
-   "Package feasibility assessment result",
-   "Published block diagram and bump budget"
-  ],
-  "ob": [
-   1,
-   2,
-   3,
-   4,
-   5,
-   6,
-   7
-  ],
-  "r": [
-   [
-    "ARCH-D6",
-    "produces"
-   ],
-   [
-    "ARCH-D1",
-    "feeds"
-   ],
-   [
-    "ARCH-D3",
-    "feeds"
-   ]
-  ],
-  "ro": "Physical architect"
- },
- "ARCH-09": {
   "st": "architecture",
   "w": [
    9,
@@ -1477,7 +1318,7 @@ export const activitySteps: Record<string, ActivityStepEntry> = {
   ],
   "r": [
    [
-    "ARCH-D1",
+    "ARCH-D6",
     "produces"
    ],
    [
@@ -1485,11 +1326,170 @@ export const activitySteps: Record<string, ActivityStepEntry> = {
     "produces"
    ],
    [
-    "ARCH-D2",
+    "ARCH-D3",
     "feeds"
    ]
   ],
   "ro": "Chief architect"
+ },
+ "ARCH-08": {
+  "st": "architecture",
+  "w": [
+   10,
+   15
+  ],
+  "s": [
+   [
+    1,
+    "Place block intent from the partitioning and the hierarchy",
+    1
+   ],
+   [
+    2,
+    "Place iO ring and PHY plan",
+    1
+   ],
+   [
+    3,
+    "Define bump field — pitch, count, power-to-signal ratio",
+    1.5
+   ],
+   [
+    4,
+    "Allocate signal bump per interface",
+    0.75,
+    1
+   ],
+   [
+    5,
+    "Define and document power delivery bump budget against the power envelope",
+    1,
+    1
+   ],
+   [
+    6,
+    "Define package feasibility check with package design",
+    0.75,
+    1
+   ],
+   [
+    7,
+    "Define and document block diagram and bump budget publication",
+    1.5
+   ]
+  ],
+  "o": [
+   "Chip-level block diagram with placement intent",
+   "IO ring and PHY placement plan",
+   "Bump field definition and map",
+   "Signal and power bump allocation",
+   "Power delivery bump budget",
+   "Package feasibility assessment result",
+   "Published block diagram and bump budget"
+  ],
+  "ob": [
+   1,
+   2,
+   3,
+   4,
+   5,
+   6,
+   7
+  ],
+  "r": [
+   [
+    "ARCH-D5",
+    "produces"
+   ],
+   [
+    "ARCH-D6",
+    "feeds"
+   ],
+   [
+    "ARCH-D4",
+    "feeds"
+   ]
+  ],
+  "ro": "Physical architect"
+ },
+ "ARCH-09": {
+  "st": "architecture",
+  "w": [
+   12,
+   16
+  ],
+  "s": [
+   [
+    1,
+    "Reconcile DEF-05 PPA targets with the finalized ARCH-02 block list",
+    0.75
+   ],
+   [
+    2,
+    "Allocate die area to each block using the floorplan intent",
+    1
+   ],
+   [
+    3,
+    "Allocate power by block and power domain",
+    1
+   ],
+   [
+    4,
+    "Define frequency and timing budgets by block and clock domain",
+    0.75,
+    1
+   ],
+   [
+    5,
+    "Reserve margin for implementation growth and ECOs",
+    0.5,
+    1
+   ],
+   [
+    6,
+    "Assign owners and obtain budget acceptance",
+    0.75
+   ],
+   [
+    7,
+    "Publish the PPA budgets and change-control rules",
+    0.5
+   ]
+  ],
+  "o": [
+   "Reconciliation note against the DEF-05 targets",
+   "Per-block area allocation",
+   "Per-block and per-domain power allocation",
+   "Per-block area, power and timing budget",
+   "Margin reservation record",
+   "Owner acceptance sheet per block",
+   "Change-control rule for budget movement"
+  ],
+  "ob": [
+   1,
+   2,
+   3,
+   4,
+   5,
+   6,
+   7
+  ],
+  "r": [
+   [
+    "ARCH-D4",
+    "produces"
+   ],
+   [
+    "ARCH-D6",
+    "feeds"
+   ],
+   [
+    "ARCH-D7",
+    "gates"
+   ]
+  ],
+  "ro": "PPA lead"
  },
  "ARCH-10": {
   "st": "architecture",
@@ -1564,11 +1564,11 @@ export const activitySteps: Record<string, ActivityStepEntry> = {
   ],
   "r": [
    [
-    "ARCH-D1",
+    "ARCH-D6",
     "feeds"
    ],
    [
-    "ARCH-D3",
+    "ARCH-D4",
     "feeds"
    ],
    [
@@ -1647,13 +1647,230 @@ export const activitySteps: Record<string, ActivityStepEntry> = {
     "produces"
    ],
    [
-    "TECH-D6",
+    "TECH-D4",
     "feeds"
    ]
   ],
   "ro": "Technology strategist"
  },
  "TECH-02": {
+  "st": "technology",
+  "w": [
+   1,
+   5
+  ],
+  "s": [
+   [
+    1,
+    "Map program milestones to foundry roadmap milestones",
+    1
+   ],
+   [
+    2,
+    "Review process maturity, model readiness, and risk-production timing",
+    1
+   ],
+   [
+    3,
+    "Assess yield-learning and manufacturing-readiness risk",
+    1,
+    1
+   ],
+   [
+    4,
+    "Identify schedule dependencies on future foundry releases",
+    0.75,
+    1
+   ],
+   [
+    5,
+    "Define mitigation for readiness gaps",
+    2
+   ],
+   [
+    6,
+    "Align the program schedule with confirmed foundry milestones",
+    0
+   ]
+  ],
+  "o": [
+   "Program-to-foundry milestone map",
+   "Technology maturity assessment",
+   "Production-readiness risk assessment",
+   "Foundry-dependent schedule items",
+   "Technology-readiness mitigation plan",
+   "Updated roadmap and schedule alignment"
+  ],
+  "ob": [
+   1,
+   2,
+   3,
+   4,
+   5,
+   6
+  ],
+  "r": [
+   [
+    "TECH-D4",
+    "produces"
+   ],
+   [
+    "TECH-D1",
+    "feeds"
+   ]
+  ],
+  "ro": "Technology strategist"
+ },
+ "TECH-03": {
+  "st": "technology",
+  "w": [
+   2,
+   10
+  ],
+  "s": [
+   [
+    1,
+    "Identify required legal and commercial agreements",
+    1
+   ],
+   [
+    2,
+    "Execute the NDA required for technical data exchange",
+    1
+   ],
+   [
+    3,
+    "Review foundry design-agreement terms and design-data rights",
+    1.5,
+    1
+   ],
+   [
+    4,
+    "Align IP licensing and third-party usage terms",
+    2.5
+   ],
+   [
+    5,
+    "Resolve commercial and legal exceptions",
+    1.5,
+    1
+   ],
+   [
+    6,
+    "Execute the required foundry agreements",
+    1,
+    1
+   ]
+  ],
+  "o": [
+   "Agreement and access checklist",
+   "Executed NDA",
+   "Design agreement issues and required changes",
+   "IP licensing framework",
+   "Closed legal and commercial issue list",
+   "Executed design agreement and legal package"
+  ],
+  "ob": [
+   1,
+   2,
+   3,
+   4,
+   5,
+   6
+  ],
+  "r": [
+   [
+    "TECH-D5",
+    "produces"
+   ],
+   [
+    "TECH-D6",
+    "feeds"
+   ]
+  ],
+  "ro": "Legal counsel"
+ },
+ "TECH-04": {
+  "st": "technology",
+  "w": [
+   3,
+   10
+  ],
+  "s": [
+   [
+    1,
+    "Define representative blocks and benchmark conditions",
+    0.75
+   ],
+   [
+    2,
+    "Collect process, library, and interconnect characterization inputs",
+    1.5
+   ],
+   [
+    3,
+    "Estimate or implement baseline PPA for each candidate configuration",
+    1.5
+   ],
+   [
+    4,
+    "Compare density, frequency, leakage, and power against product targets",
+    1.25,
+    1
+   ],
+   [
+    5,
+    "Run DTCO studies on the largest PPA gaps",
+    1.25,
+    1
+   ],
+   [
+    6,
+    "Evaluate sensitivity to key design and process assumptions",
+    1,
+    1
+   ],
+   [
+    7,
+    "Summarize expected PPA capability and remaining risks",
+    1.5
+   ]
+  ],
+  "o": [
+   "Benchmark scope and common assumptions",
+   "Qualified benchmark inputs",
+   "Baseline PPA results by configuration",
+   "PPA gap assessment",
+   "DTCO improvement opportunities",
+   "PPA sensitivity assessment",
+   "Process PPA and DTCO assessment"
+  ],
+  "ob": [
+   1,
+   2,
+   3,
+   4,
+   5,
+   6,
+   7
+  ],
+  "r": [
+   [
+    "TECH-D1",
+    "feeds"
+   ],
+   [
+    "TECH-D4",
+    "feeds"
+   ],
+   [
+    "TECH-D2",
+    "feeds"
+   ]
+  ],
+  "ro": "DTCO lead"
+ },
+ "TECH-05": {
   "st": "technology",
   "w": [
    4,
@@ -1726,87 +1943,7 @@ export const activitySteps: Record<string, ActivityStepEntry> = {
   ],
   "ro": "Technology strategist"
  },
- "TECH-03": {
-  "st": "technology",
-  "w": [
-   3,
-   10
-  ],
-  "s": [
-   [
-    1,
-    "Define representative blocks and benchmark conditions",
-    0.75
-   ],
-   [
-    2,
-    "Collect process, library, and interconnect characterization inputs",
-    1.5
-   ],
-   [
-    3,
-    "Estimate or implement baseline PPA for each candidate configuration",
-    1.5
-   ],
-   [
-    4,
-    "Compare density, frequency, leakage, and power against product targets",
-    1.25,
-    1
-   ],
-   [
-    5,
-    "Run DTCO studies on the largest PPA gaps",
-    1.25,
-    1
-   ],
-   [
-    6,
-    "Evaluate sensitivity to key design and process assumptions",
-    1,
-    1
-   ],
-   [
-    7,
-    "Summarize expected PPA capability and remaining risks",
-    1.5
-   ]
-  ],
-  "o": [
-   "Benchmark scope and common assumptions",
-   "Qualified benchmark inputs",
-   "Baseline PPA results by configuration",
-   "PPA gap assessment",
-   "DTCO improvement opportunities",
-   "PPA sensitivity assessment",
-   "Process PPA and DTCO assessment"
-  ],
-  "ob": [
-   1,
-   2,
-   3,
-   4,
-   5,
-   6,
-   7
-  ],
-  "r": [
-   [
-    "TECH-D1",
-    "feeds"
-   ],
-   [
-    "TECH-D6",
-    "feeds"
-   ],
-   [
-    "TECH-D2",
-    "feeds"
-   ]
-  ],
-  "ro": "DTCO lead"
- },
- "TECH-04": {
+ "TECH-06": {
   "st": "technology",
   "w": [
    5,
@@ -1875,7 +2012,7 @@ export const activitySteps: Record<string, ActivityStepEntry> = {
   ],
   "ro": "Procurement lead"
  },
- "TECH-05": {
+ "TECH-07": {
   "st": "technology",
   "w": [
    8,
@@ -1933,7 +2070,7 @@ export const activitySteps: Record<string, ActivityStepEntry> = {
   ],
   "r": [
    [
-    "TECH-D5",
+    "TECH-D6",
     "produces"
    ],
    [
@@ -1942,143 +2079,6 @@ export const activitySteps: Record<string, ActivityStepEntry> = {
    ]
   ],
   "ro": "Foundry relationship manager"
- },
- "TECH-06": {
-  "st": "technology",
-  "w": [
-   2,
-   10
-  ],
-  "s": [
-   [
-    1,
-    "Identify required legal and commercial agreements",
-    1
-   ],
-   [
-    2,
-    "Execute the NDA required for technical data exchange",
-    1
-   ],
-   [
-    3,
-    "Review foundry design-agreement terms and design-data rights",
-    1.5,
-    1
-   ],
-   [
-    4,
-    "Align IP licensing and third-party usage terms",
-    2.5
-   ],
-   [
-    5,
-    "Resolve commercial and legal exceptions",
-    1.5,
-    1
-   ],
-   [
-    6,
-    "Execute the required foundry agreements",
-    1,
-    1
-   ]
-  ],
-  "o": [
-   "Agreement and access checklist",
-   "Executed NDA",
-   "Design agreement issues and required changes",
-   "IP licensing framework",
-   "Closed legal and commercial issue list",
-   "Executed design agreement and legal package"
-  ],
-  "ob": [
-   1,
-   2,
-   3,
-   4,
-   5,
-   6
-  ],
-  "r": [
-   [
-    "TECH-D4",
-    "produces"
-   ],
-   [
-    "TECH-D5",
-    "feeds"
-   ]
-  ],
-  "ro": "Legal counsel"
- },
- "TECH-07": {
-  "st": "technology",
-  "w": [
-   1,
-   5
-  ],
-  "s": [
-   [
-    1,
-    "Map program milestones to foundry roadmap milestones",
-    1
-   ],
-   [
-    2,
-    "Review process maturity, model readiness, and risk-production timing",
-    1
-   ],
-   [
-    3,
-    "Assess yield-learning and manufacturing-readiness risk",
-    1,
-    1
-   ],
-   [
-    4,
-    "Identify schedule dependencies on future foundry releases",
-    0.75,
-    1
-   ],
-   [
-    5,
-    "Define mitigation for readiness gaps",
-    2
-   ],
-   [
-    6,
-    "Align the program schedule with confirmed foundry milestones",
-    0
-   ]
-  ],
-  "o": [
-   "Program-to-foundry milestone map",
-   "Technology maturity assessment",
-   "Production-readiness risk assessment",
-   "Foundry-dependent schedule items",
-   "Technology-readiness mitigation plan",
-   "Updated roadmap and schedule alignment"
-  ],
-  "ob": [
-   1,
-   2,
-   3,
-   4,
-   5,
-   6
-  ],
-  "r": [
-   [
-    "TECH-D6",
-    "produces"
-   ],
-   [
-    "TECH-D1",
-    "feeds"
-   ]
-  ],
-  "ro": "Technology strategist"
  },
  "TECH-08": {
   "st": "technology",
@@ -2142,7 +2142,7 @@ export const activitySteps: Record<string, ActivityStepEntry> = {
     "feeds"
    ],
    [
-    "TECH-D6",
+    "TECH-D4",
     "feeds"
    ]
   ],
@@ -2214,7 +2214,7 @@ export const activitySteps: Record<string, ActivityStepEntry> = {
   ],
   "r": [
    [
-    "TECH-D5",
+    "TECH-D6",
     "feeds"
    ],
    [
@@ -2446,6 +2446,78 @@ export const activitySteps: Record<string, ActivityStepEntry> = {
   "st": "pdk",
   "w": [
    6,
+   12
+  ],
+  "s": [
+   [
+    1,
+    "Inventory required signoff decks and technology files",
+    1
+   ],
+   [
+    2,
+    "Map each deck to its PDK and tool compatibility requirements",
+    1
+   ],
+   [
+    3,
+    "Baseline the approved DRC, LVS, extraction, and QRC versions",
+    1.5,
+    1
+   ],
+   [
+    4,
+    "Regression-test major deck updates on representative designs",
+    1.5
+   ],
+   [
+    5,
+    "Assess the impact of rule or extraction changes on active designs",
+    1,
+    1
+   ],
+   [
+    6,
+    "Release approved updates with version history and usage notes",
+    2.5
+   ]
+  ],
+  "o": [
+   "Signoff-deck inventory",
+   "Deck compatibility matrix",
+   "Controlled signoff-deck baseline",
+   "Deck-update regression results",
+   "Deck delta impact assessment",
+   "Signoff-deck release history"
+  ],
+  "ob": [
+   1,
+   2,
+   3,
+   4,
+   5,
+   6
+  ],
+  "r": [
+   [
+    "PDK-D5",
+    "feeds"
+   ],
+   [
+    "PDK-D8",
+    "feeds"
+   ],
+   [
+    "PDK-D1",
+    "feeds"
+   ]
+  ],
+  "ro": "CAD methodology engineer"
+ },
+ "PDK-05": {
+  "st": "pdk",
+  "w": [
+   6,
    15
   ],
   "s": [
@@ -2511,7 +2583,7 @@ export const activitySteps: Record<string, ActivityStepEntry> = {
     "produces"
    ],
    [
-    "PDK-D3",
+    "PDK-D7",
     "feeds"
    ],
    [
@@ -2521,143 +2593,7 @@ export const activitySteps: Record<string, ActivityStepEntry> = {
   ],
   "ro": "Memory library engineer"
  },
- "PDK-05": {
-  "st": "pdk",
-  "w": [
-   14,
-   20
-  ],
-  "s": [
-   [
-    1,
-    "Select representative and critical compiled memory instances",
-    0.5
-   ],
-   [
-    2,
-    "Collect timing, power, leakage, area, and Vmin data",
-    1.5
-   ],
-   [
-    3,
-    "Compare each instance against block-level budgets",
-    1.5
-   ],
-   [
-    4,
-    "Evaluate sensitivity to size, aspect ratio, Vt, and operating conditions",
-    1,
-    1
-   ],
-   [
-    5,
-    "Identify instances that cannot meet the required budget",
-    1,
-    1
-   ],
-   [
-    6,
-    "Review results with architecture, PDK, and AMS teams",
-    2.5
-   ]
-  ],
-  "o": [
-   "Memory characterization scope",
-   "Memory PPA data set",
-   "Memory PPA gap analysis",
-   "Memory configuration sensitivity",
-   "Custom-memory candidate list",
-   "Memory PPA disposition"
-  ],
-  "ob": [
-   1,
-   2,
-   3,
-   4,
-   5,
-   6
-  ],
-  "r": [
-   [
-    "PDK-D3",
-    "produces"
-   ],
-   [
-    "PDK-D2",
-    "feeds"
-   ]
-  ],
-  "ro": "Memory characterization engineer"
- },
  "PDK-06": {
-  "st": "pdk",
-  "w": [
-   19,
-   23
-  ],
-  "s": [
-   [
-    1,
-    "Review memory gaps that cannot be closed with standard compiler options",
-    0.5
-   ],
-   [
-    2,
-    "Estimate achievable PPA benefit from custom or pushed-rule development",
-    1
-   ],
-   [
-    3,
-    "Assess design, verification, foundry, and schedule effort",
-    1
-   ],
-   [
-    4,
-    "Confirm pushed-rule feasibility and approval path with the foundry",
-    0.75,
-    1
-   ],
-   [
-    5,
-    "Select standard, custom, or pushed-rule disposition for each instance",
-    0.75,
-    1
-   ],
-   [
-    6,
-    "Integrate approved custom-memory work into AMS and program schedules",
-    1.5
-   ]
-  ],
-  "o": [
-   "Custom-memory candidate list",
-   "Expected custom-memory benefit",
-   "Custom-memory development impact",
-   "Foundry feasibility and approval plan",
-   "Memory implementation decision",
-   "Custom-memory scope and schedule"
-  ],
-  "ob": [
-   1,
-   2,
-   3,
-   4,
-   5,
-   6
-  ],
-  "r": [
-   [
-    "PDK-D3",
-    "produces"
-   ],
-   [
-    "PDK-D1",
-    "gates"
-   ]
-  ],
-  "ro": "PDK owner"
- },
- "PDK-07": {
   "st": "pdk",
   "w": [
    8,
@@ -2725,7 +2661,7 @@ export const activitySteps: Record<string, ActivityStepEntry> = {
   ],
   "ro": "IO library engineer"
  },
- "PDK-08": {
+ "PDK-07": {
   "st": "pdk",
   "w": [
    10,
@@ -2792,13 +2728,13 @@ export const activitySteps: Record<string, ActivityStepEntry> = {
     "feeds"
    ],
    [
-    "PDK-D7",
+    "PDK-D3",
     "feeds"
    ]
   ],
   "ro": "CAD tools lead"
  },
- "PDK-09": {
+ "PDK-08": {
   "st": "pdk",
   "w": [
    12,
@@ -2878,53 +2814,53 @@ export const activitySteps: Record<string, ActivityStepEntry> = {
   ],
   "ro": "Methodology lead"
  },
- "PDK-10": {
+ "PDK-09": {
   "st": "pdk",
   "w": [
-   6,
-   12
+   14,
+   20
   ],
   "s": [
    [
     1,
-    "Inventory required signoff decks and technology files",
-    1
+    "Select representative and critical compiled memory instances",
+    0.5
    ],
    [
     2,
-    "Map each deck to its PDK and tool compatibility requirements",
-    1
-   ],
-   [
-    3,
-    "Baseline the approved DRC, LVS, extraction, and QRC versions",
-    1.5,
-    1
-   ],
-   [
-    4,
-    "Regression-test major deck updates on representative designs",
+    "Collect timing, power, leakage, area, and Vmin data",
     1.5
    ],
    [
+    3,
+    "Compare each instance against block-level budgets",
+    1.5
+   ],
+   [
+    4,
+    "Evaluate sensitivity to size, aspect ratio, Vt, and operating conditions",
+    1,
+    1
+   ],
+   [
     5,
-    "Assess the impact of rule or extraction changes on active designs",
+    "Identify instances that cannot meet the required budget",
     1,
     1
    ],
    [
     6,
-    "Release approved updates with version history and usage notes",
+    "Review results with architecture, PDK, and AMS teams",
     2.5
    ]
   ],
   "o": [
-   "Signoff-deck inventory",
-   "Deck compatibility matrix",
-   "Controlled signoff-deck baseline",
-   "Deck-update regression results",
-   "Deck delta impact assessment",
-   "Signoff-deck release history"
+   "Memory characterization scope",
+   "Memory PPA data set",
+   "Memory PPA gap analysis",
+   "Memory configuration sensitivity",
+   "Custom-memory candidate list",
+   "Memory PPA disposition"
   ],
   "ob": [
    1,
@@ -2936,21 +2872,153 @@ export const activitySteps: Record<string, ActivityStepEntry> = {
   ],
   "r": [
    [
-    "PDK-D5",
-    "feeds"
+    "PDK-D7",
+    "produces"
    ],
    [
-    "PDK-D8",
-    "feeds"
-   ],
-   [
-    "PDK-D1",
+    "PDK-D2",
     "feeds"
    ]
   ],
-  "ro": "CAD methodology engineer"
+  "ro": "Memory characterization engineer"
+ },
+ "PDK-10": {
+  "st": "pdk",
+  "w": [
+   16,
+   22
+  ],
+  "s": [
+   [
+    1,
+    "Estimate compute demand by tool, stage, and program phase",
+    1.5
+   ],
+   [
+    2,
+    "Estimate EDA license demand during peak concurrent usage",
+    1.5
+   ],
+   [
+    3,
+    "Estimate working, checkpoint, regression, and archive storage needs",
+    0.75,
+    1
+   ],
+   [
+    4,
+    "Compare demand against available infrastructure",
+    1.5
+   ],
+   [
+    5,
+    "Define procurement, reservation, or scheduling actions for gaps",
+    1,
+    1
+   ],
+   [
+    6,
+    "Align infrastructure readiness with the program schedule",
+    1.5
+   ]
+  ],
+  "o": [
+   "Compute demand forecast",
+   "License demand forecast",
+   "Storage demand forecast",
+   "Infrastructure capacity gap analysis",
+   "Capacity mitigation plan",
+   "Compute, license, and storage capacity plan"
+  ],
+  "ob": [
+   1,
+   2,
+   3,
+   4,
+   5,
+   6
+  ],
+  "r": [
+   [
+    "PDK-D3",
+    "produces"
+   ],
+   [
+    "PDK-D4",
+    "feeds"
+   ]
+  ],
+  "ro": "CAD infrastructure lead"
  },
  "PDK-11": {
+  "st": "pdk",
+  "w": [
+   19,
+   23
+  ],
+  "s": [
+   [
+    1,
+    "Review memory gaps that cannot be closed with standard compiler options",
+    0.5
+   ],
+   [
+    2,
+    "Estimate achievable PPA benefit from custom or pushed-rule development",
+    1
+   ],
+   [
+    3,
+    "Assess design, verification, foundry, and schedule effort",
+    1
+   ],
+   [
+    4,
+    "Confirm pushed-rule feasibility and approval path with the foundry",
+    0.75,
+    1
+   ],
+   [
+    5,
+    "Select standard, custom, or pushed-rule disposition for each instance",
+    0.75,
+    1
+   ],
+   [
+    6,
+    "Integrate approved custom-memory work into AMS and program schedules",
+    1.5
+   ]
+  ],
+  "o": [
+   "Custom-memory candidate list",
+   "Expected custom-memory benefit",
+   "Custom-memory development impact",
+   "Foundry feasibility and approval plan",
+   "Memory implementation decision",
+   "Custom-memory scope and schedule"
+  ],
+  "ob": [
+   1,
+   2,
+   3,
+   4,
+   5,
+   6
+  ],
+  "r": [
+   [
+    "PDK-D7",
+    "produces"
+   ],
+   [
+    "PDK-D1",
+    "gates"
+   ]
+  ],
+  "ro": "PDK owner"
+ },
+ "PDK-12": {
   "st": "pdk",
   "w": [
    20,
@@ -3012,79 +3080,11 @@ export const activitySteps: Record<string, ActivityStepEntry> = {
     "produces"
    ],
    [
-    "PDK-D7",
+    "PDK-D3",
     "feeds"
    ]
   ],
   "ro": "Signoff methodology lead"
- },
- "PDK-12": {
-  "st": "pdk",
-  "w": [
-   16,
-   22
-  ],
-  "s": [
-   [
-    1,
-    "Estimate compute demand by tool, stage, and program phase",
-    1.5
-   ],
-   [
-    2,
-    "Estimate EDA license demand during peak concurrent usage",
-    1.5
-   ],
-   [
-    3,
-    "Estimate working, checkpoint, regression, and archive storage needs",
-    0.75,
-    1
-   ],
-   [
-    4,
-    "Compare demand against available infrastructure",
-    1.5
-   ],
-   [
-    5,
-    "Define procurement, reservation, or scheduling actions for gaps",
-    1,
-    1
-   ],
-   [
-    6,
-    "Align infrastructure readiness with the program schedule",
-    1.5
-   ]
-  ],
-  "o": [
-   "Compute demand forecast",
-   "License demand forecast",
-   "Storage demand forecast",
-   "Infrastructure capacity gap analysis",
-   "Capacity mitigation plan",
-   "Compute, license, and storage capacity plan"
-  ],
-  "ob": [
-   1,
-   2,
-   3,
-   4,
-   5,
-   6
-  ],
-  "r": [
-   [
-    "PDK-D7",
-    "produces"
-   ],
-   [
-    "PDK-D4",
-    "feeds"
-   ]
-  ],
-  "ro": "CAD infrastructure lead"
  },
  "PDK-13": {
   "st": "pdk",
@@ -3357,7 +3357,7 @@ export const activitySteps: Record<string, ActivityStepEntry> = {
     "produces"
    ],
    [
-    "IPR-D7",
+    "IPR-D6",
     "feeds"
    ]
   ],
@@ -3512,93 +3512,17 @@ export const activitySteps: Record<string, ActivityStepEntry> = {
     "produces"
    ],
    [
-    "IPR-D7",
+    "IPR-D6",
     "feeds"
    ],
    [
-    "IPR-D6",
+    "IPR-D7",
     "feeds"
    ]
   ],
   "ro": "IP strategist"
  },
  "IPR-06": {
-  "st": "ipReadiness",
-  "w": [
-   11,
-   18
-  ],
-  "s": [
-   [
-    1,
-    "Define the required deliverables by IP type and integration flow",
-    1
-   ],
-   [
-    2,
-    "Map each deliverable to its downstream consumer and required date",
-    1.5
-   ],
-   [
-    3,
-    "Review vendor or internal delivery manifests against the checklist",
-    1,
-    1
-   ],
-   [
-    4,
-    "Validate format, version, and tool compatibility for critical views",
-    1,
-    1
-   ],
-   [
-    5,
-    "Identify missing collateral and required corrective actions",
-    1.5
-   ],
-   [
-    6,
-    "Agree delivery content and dates with the IP owner or vendor",
-    2,
-    1
-   ],
-   [
-    7,
-    "Track integration readiness through delivery",
-    3
-   ]
-  ],
-  "o": [
-   "IP deliverable checklist template",
-   "Deliverable-to-integration mapping",
-   "IP deliverable gap assessment",
-   "Deliverable compatibility results",
-   "IP deliverable action list",
-   "Committed IP deliverable plan",
-   "IP integration-readiness status"
-  ],
-  "ob": [
-   1,
-   2,
-   3,
-   4,
-   5,
-   6,
-   7
-  ],
-  "r": [
-   [
-    "IPR-D4",
-    "produces"
-   ],
-   [
-    "IPR-D5",
-    "feeds"
-   ]
-  ],
-  "ro": "IP integration lead"
- },
- "IPR-07": {
   "st": "ipReadiness",
   "w": [
    10,
@@ -3675,7 +3599,7 @@ export const activitySteps: Record<string, ActivityStepEntry> = {
     "produces"
    ],
    [
-    "IPR-D6",
+    "IPR-D7",
     "feeds"
    ],
    [
@@ -3684,6 +3608,82 @@ export const activitySteps: Record<string, ActivityStepEntry> = {
    ]
   ],
   "ro": "Procurement lead"
+ },
+ "IPR-07": {
+  "st": "ipReadiness",
+  "w": [
+   11,
+   18
+  ],
+  "s": [
+   [
+    1,
+    "Define the required deliverables by IP type and integration flow",
+    1
+   ],
+   [
+    2,
+    "Map each deliverable to its downstream consumer and required date",
+    1.5
+   ],
+   [
+    3,
+    "Review vendor or internal delivery manifests against the checklist",
+    1,
+    1
+   ],
+   [
+    4,
+    "Validate format, version, and tool compatibility for critical views",
+    1,
+    1
+   ],
+   [
+    5,
+    "Identify missing collateral and required corrective actions",
+    1.5
+   ],
+   [
+    6,
+    "Agree delivery content and dates with the IP owner or vendor",
+    2,
+    1
+   ],
+   [
+    7,
+    "Track integration readiness through delivery",
+    3
+   ]
+  ],
+  "o": [
+   "IP deliverable checklist template",
+   "Deliverable-to-integration mapping",
+   "IP deliverable gap assessment",
+   "Deliverable compatibility results",
+   "IP deliverable action list",
+   "Committed IP deliverable plan",
+   "IP integration-readiness status"
+  ],
+  "ob": [
+   1,
+   2,
+   3,
+   4,
+   5,
+   6,
+   7
+  ],
+  "r": [
+   [
+    "IPR-D4",
+    "produces"
+   ],
+   [
+    "IPR-D5",
+    "feeds"
+   ]
+  ],
+  "ro": "IP integration lead"
  },
  "IPR-08": {
   "st": "ipReadiness",
@@ -3747,7 +3747,7 @@ export const activitySteps: Record<string, ActivityStepEntry> = {
     "feeds"
    ],
    [
-    "IPR-D6",
+    "IPR-D7",
     "feeds"
    ]
   ],
@@ -3811,11 +3811,11 @@ export const activitySteps: Record<string, ActivityStepEntry> = {
   ],
   "r": [
    [
-    "IPR-D6",
+    "IPR-D7",
     "produces"
    ],
    [
-    "IPR-D7",
+    "IPR-D6",
     "feeds"
    ]
   ],
@@ -3872,7 +3872,7 @@ export const activitySteps: Record<string, ActivityStepEntry> = {
   ],
   "r": [
    [
-    "IPR-D7",
+    "IPR-D6",
     "produces"
    ],
    [
@@ -3951,6 +3951,89 @@ export const activitySteps: Record<string, ActivityStepEntry> = {
   "ro": "AMS architect"
  },
  "AMS-02": {
+  "st": "amsIp",
+  "w": [
+   2,
+   12
+  ],
+  "s": [
+   [
+    1,
+    "Define capacity, width, ports, bandwidth, Vmin, and PPA targets",
+    0.75
+   ],
+   [
+    2,
+    "Evaluate available bitcell and pushed-rule options",
+    1.75
+   ],
+   [
+    3,
+    "Define row, column, banking, and mux organization",
+    2
+   ],
+   [
+    4,
+    "Define wordline, bitline, precharge, sensing, and write architecture",
+    2
+   ],
+   [
+    5,
+    "Define replica, tracking, and internal timing strategy",
+    1.75,
+    1
+   ],
+   [
+    6,
+    "Estimate area, delay, power, and margin for candidate organizations",
+    1.5,
+    1
+   ],
+   [
+    7,
+    "Select the preferred custom SRAM architecture",
+    3.5
+   ],
+   [
+    8,
+    "Hand off architecture constraints to circuit and layout design",
+    1.5,
+    1
+   ]
+  ],
+  "o": [
+   "Custom SRAM requirement baseline",
+   "Bitcell option assessment",
+   "Array organization",
+   "Memory periphery architecture",
+   "SRAM timing architecture",
+   "SRAM architecture tradeoff results",
+   "Custom SRAM architecture decision",
+   "Custom SRAM design requirements"
+  ],
+  "ob": [
+   1,
+   2,
+   3,
+   4,
+   5,
+   6,
+   7,
+   8
+  ],
+  "r": [
+   [
+    "AMS-D2",
+    "produces"
+   ],
+   [
+    "AMS-D1",
+    "feeds"
+   ]
+  ],
+  "ro": "Memory circuit architect"
+ },
+ "AMS-03": {
   "st": "amsIp",
   "w": [
    4,
@@ -4041,17 +4124,17 @@ export const activitySteps: Record<string, ActivityStepEntry> = {
     "feeds"
    ],
    [
-    "AMS-D2",
+    "AMS-D5",
     "feeds"
    ],
    [
-    "AMS-D5",
+    "AMS-D7",
     "feeds"
    ]
   ],
   "ro": "PLL circuit designer"
  },
- "AMS-03": {
+ "AMS-04": {
   "st": "amsIp",
   "w": [
    4,
@@ -4138,11 +4221,11 @@ export const activitySteps: Record<string, ActivityStepEntry> = {
   ],
   "r": [
    [
-    "AMS-D2",
+    "AMS-D5",
     "produces"
    ],
    [
-    "AMS-D5",
+    "AMS-D7",
     "feeds"
    ],
    [
@@ -4152,7 +4235,82 @@ export const activitySteps: Record<string, ActivityStepEntry> = {
   ],
   "ro": "SerDes and PHY lead"
  },
- "AMS-04": {
+ "AMS-05": {
+  "st": "amsIp",
+  "w": [
+   6,
+   22
+  ],
+  "s": [
+   [
+    1,
+    "Select the circuit topology and device operating points",
+    1.5
+   ],
+   [
+    2,
+    "Implement the transistor-level schematic",
+    3
+   ],
+   [
+    3,
+    "Verify nominal DC, AC, transient, noise, and functional behavior",
+    3.5
+   ],
+   [
+    4,
+    "Run required PVT corner simulations",
+    3
+   ],
+   [
+    5,
+    "Run Monte Carlo and mismatch analysis on critical metrics",
+    2.5,
+    1
+   ],
+   [
+    6,
+    "Verify startup, calibration, trim, and fault behavior where applicable",
+    2.5,
+    1
+   ],
+   [
+    7,
+    "Release layout constraints and the pre-layout design baseline",
+    5
+   ]
+  ],
+  "o": [
+   "AMS circuit architecture",
+   "AMS schematic design",
+   "Baseline pre-layout results",
+   "PVT verification results",
+   "Variation and mismatch results",
+   "Control and robustness results",
+   "Layout-ready AMS schematic"
+  ],
+  "ob": [
+   1,
+   2,
+   3,
+   4,
+   5,
+   6,
+   7
+  ],
+  "r": [
+   [
+    "AMS-D1",
+    "feeds"
+   ],
+   [
+    "AMS-D5",
+    "feeds"
+   ]
+  ],
+  "ro": "Analog design leads"
+ },
+ "AMS-06": {
   "st": "amsIp",
   "w": [
    6,
@@ -4224,104 +4382,21 @@ export const activitySteps: Record<string, ActivityStepEntry> = {
   ],
   "r": [
    [
-    "AMS-D2",
-    "feeds"
-   ],
-   [
     "AMS-D5",
     "feeds"
    ],
    [
     "AMS-D7",
     "feeds"
+   ],
+   [
+    "AMS-D4",
+    "feeds"
    ]
   ],
   "ro": "Power management circuit designer"
  },
- "AMS-05": {
-  "st": "amsIp",
-  "w": [
-   2,
-   12
-  ],
-  "s": [
-   [
-    1,
-    "Define capacity, width, ports, bandwidth, Vmin, and PPA targets",
-    0.75
-   ],
-   [
-    2,
-    "Evaluate available bitcell and pushed-rule options",
-    1.75
-   ],
-   [
-    3,
-    "Define row, column, banking, and mux organization",
-    2
-   ],
-   [
-    4,
-    "Define wordline, bitline, precharge, sensing, and write architecture",
-    2
-   ],
-   [
-    5,
-    "Define replica, tracking, and internal timing strategy",
-    1.75,
-    1
-   ],
-   [
-    6,
-    "Estimate area, delay, power, and margin for candidate organizations",
-    1.5,
-    1
-   ],
-   [
-    7,
-    "Select the preferred custom SRAM architecture",
-    3.5
-   ],
-   [
-    8,
-    "Hand off architecture constraints to circuit and layout design",
-    1.5,
-    1
-   ]
-  ],
-  "o": [
-   "Custom SRAM requirement baseline",
-   "Bitcell option assessment",
-   "Array organization",
-   "Memory periphery architecture",
-   "SRAM timing architecture",
-   "SRAM architecture tradeoff results",
-   "Custom SRAM architecture decision",
-   "Custom SRAM design requirements"
-  ],
-  "ob": [
-   1,
-   2,
-   3,
-   4,
-   5,
-   6,
-   7,
-   8
-  ],
-  "r": [
-   [
-    "AMS-D3",
-    "produces"
-   ],
-   [
-    "AMS-D1",
-    "feeds"
-   ]
-  ],
-  "ro": "Memory circuit architect"
- },
- "AMS-06": {
+ "AMS-07": {
   "st": "amsIp",
   "w": [
    10,
@@ -4386,17 +4461,85 @@ export const activitySteps: Record<string, ActivityStepEntry> = {
   ],
   "r": [
    [
-    "AMS-D3",
+    "AMS-D2",
     "feeds"
    ],
    [
-    "AMS-D2",
+    "AMS-D5",
     "feeds"
    ]
   ],
   "ro": "Memory circuit designer"
  },
- "AMS-07": {
+ "AMS-08": {
+  "st": "amsIp",
+  "w": [
+   16,
+   22
+  ],
+  "s": [
+   [
+    1,
+    "Define repair coverage and spare-resource targets",
+    1
+   ],
+   [
+    2,
+    "Select row, column, or hybrid redundancy architecture",
+    1.5
+   ],
+   [
+    3,
+    "Define repair address encoding and storage format",
+    1.25
+   ],
+   [
+    4,
+    "Integrate memory repair controls with MBIST / BISR",
+    1,
+    1
+   ],
+   [
+    5,
+    "Verify repair loading, application, and boot sequencing",
+    1,
+    1
+   ],
+   [
+    6,
+    "Run fault-injection scenarios through detection and repair",
+    2.25
+   ]
+  ],
+  "o": [
+   "Memory redundancy requirements",
+   "Redundancy architecture",
+   "Repair encoding specification",
+   "BISR integration interface",
+   "Repair-sequence verification",
+   "Memory repair verification results"
+  ],
+  "ob": [
+   1,
+   2,
+   3,
+   4,
+   5,
+   6
+  ],
+  "r": [
+   [
+    "AMS-D2",
+    "feeds"
+   ],
+   [
+    "AMS-D8",
+    "feeds"
+   ]
+  ],
+  "ro": "Memory circuit designer"
+ },
+ "AMS-09": {
   "st": "amsIp",
   "w": [
    18,
@@ -4468,17 +4611,17 @@ export const activitySteps: Record<string, ActivityStepEntry> = {
   ],
   "r": [
    [
-    "AMS-D6",
+    "AMS-D3",
     "produces"
    ],
    [
-    "AMS-D3",
+    "AMS-D2",
     "feeds"
    ]
   ],
   "ro": "Memory layout lead"
  },
- "AMS-08": {
+ "AMS-10": {
   "st": "amsIp",
   "w": [
    20,
@@ -4543,151 +4686,7 @@ export const activitySteps: Record<string, ActivityStepEntry> = {
   ],
   "r": [
    [
-    "AMS-D3",
-    "produces"
-   ],
-   [
     "AMS-D2",
-    "feeds"
-   ]
-  ],
-  "ro": "Statistical analysis engineer"
- },
- "AMS-09": {
-  "st": "amsIp",
-  "w": [
-   16,
-   22
-  ],
-  "s": [
-   [
-    1,
-    "Define repair coverage and spare-resource targets",
-    1
-   ],
-   [
-    2,
-    "Select row, column, or hybrid redundancy architecture",
-    1.5
-   ],
-   [
-    3,
-    "Define repair address encoding and storage format",
-    1.25
-   ],
-   [
-    4,
-    "Integrate memory repair controls with MBIST / BISR",
-    1,
-    1
-   ],
-   [
-    5,
-    "Verify repair loading, application, and boot sequencing",
-    1,
-    1
-   ],
-   [
-    6,
-    "Run fault-injection scenarios through detection and repair",
-    2.25
-   ]
-  ],
-  "o": [
-   "Memory redundancy requirements",
-   "Redundancy architecture",
-   "Repair encoding specification",
-   "BISR integration interface",
-   "Repair-sequence verification",
-   "Memory repair verification results"
-  ],
-  "ob": [
-   1,
-   2,
-   3,
-   4,
-   5,
-   6
-  ],
-  "r": [
-   [
-    "AMS-D3",
-    "feeds"
-   ],
-   [
-    "AMS-D8",
-    "feeds"
-   ]
-  ],
-  "ro": "Memory circuit designer"
- },
- "AMS-10": {
-  "st": "amsIp",
-  "w": [
-   28,
-   38
-  ],
-  "s": [
-   [
-    1,
-    "Define the required characterization corners, arcs, and view set",
-    1
-   ],
-   [
-    2,
-    "Run extracted timing and power characterization",
-    3
-   ],
-   [
-    3,
-    "Generate Liberty and functional simulation models",
-    2,
-    1
-   ],
-   [
-    4,
-    "Generate LEF, GDS, CDL / SPICE, and required physical views",
-    1.5,
-    1
-   ],
-   [
-    5,
-    "Generate test, DFT, and integration collateral",
-    1.5,
-    1
-   ],
-   [
-    6,
-    "Run cross-view consistency and downstream tool checks",
-    2
-   ],
-   [
-    7,
-    "Release the compiler-equivalent memory package",
-    4
-   ]
-  ],
-  "o": [
-   "Custom-memory characterization plan",
-   "Memory timing and power data",
-   "Timing and functional views",
-   "Physical and circuit views",
-   "Memory integration collateral",
-   "Custom-memory view qualification results",
-   "Qualified custom-memory release"
-  ],
-  "ob": [
-   1,
-   2,
-   3,
-   4,
-   5,
-   6,
-   7
-  ],
-  "r": [
-   [
-    "AMS-D4",
     "produces"
    ],
    [
@@ -4695,84 +4694,9 @@ export const activitySteps: Record<string, ActivityStepEntry> = {
     "feeds"
    ]
   ],
-  "ro": "Memory characterization engineer"
+  "ro": "Statistical analysis engineer"
  },
  "AMS-11": {
-  "st": "amsIp",
-  "w": [
-   6,
-   22
-  ],
-  "s": [
-   [
-    1,
-    "Select the circuit topology and device operating points",
-    1.5
-   ],
-   [
-    2,
-    "Implement the transistor-level schematic",
-    3
-   ],
-   [
-    3,
-    "Verify nominal DC, AC, transient, noise, and functional behavior",
-    3.5
-   ],
-   [
-    4,
-    "Run required PVT corner simulations",
-    3
-   ],
-   [
-    5,
-    "Run Monte Carlo and mismatch analysis on critical metrics",
-    2.5,
-    1
-   ],
-   [
-    6,
-    "Verify startup, calibration, trim, and fault behavior where applicable",
-    2.5,
-    1
-   ],
-   [
-    7,
-    "Release layout constraints and the pre-layout design baseline",
-    5
-   ]
-  ],
-  "o": [
-   "AMS circuit architecture",
-   "AMS schematic design",
-   "Baseline pre-layout results",
-   "PVT verification results",
-   "Variation and mismatch results",
-   "Control and robustness results",
-   "Layout-ready AMS schematic"
-  ],
-  "ob": [
-   1,
-   2,
-   3,
-   4,
-   5,
-   6,
-   7
-  ],
-  "r": [
-   [
-    "AMS-D1",
-    "feeds"
-   ],
-   [
-    "AMS-D2",
-    "feeds"
-   ]
-  ],
-  "ro": "Analog design leads"
- },
- "AMS-12": {
   "st": "amsIp",
   "w": [
    20,
@@ -4844,17 +4768,17 @@ export const activitySteps: Record<string, ActivityStepEntry> = {
   ],
   "r": [
    [
-    "AMS-D6",
+    "AMS-D3",
     "produces"
    ],
    [
-    "AMS-D5",
+    "AMS-D7",
     "feeds"
    ]
   ],
   "ro": "Analog layout lead"
  },
- "AMS-13": {
+ "AMS-12": {
   "st": "amsIp",
   "w": [
    22,
@@ -4919,7 +4843,7 @@ export const activitySteps: Record<string, ActivityStepEntry> = {
   ],
   "r": [
    [
-    "AMS-D2",
+    "AMS-D5",
     "produces"
    ],
    [
@@ -4929,170 +4853,7 @@ export const activitySteps: Record<string, ActivityStepEntry> = {
   ],
   "ro": "Analog design leads"
  },
- "AMS-14": {
-  "st": "amsIp",
-  "w": [
-   28,
-   38
-  ],
-  "s": [
-   [
-    1,
-    "Define the applicable reliability checks and mission profile",
-    1
-   ],
-   [
-    2,
-    "Check device voltage, current, and operating-area limits",
-    2.5
-   ],
-   [
-    3,
-    "Run EM / IR analysis on critical supply and high-current paths",
-    1.5,
-    1
-   ],
-   [
-    4,
-    "Evaluate aging and lifetime degradation on sensitive circuits",
-    2.5
-   ],
-   [
-    5,
-    "Verify ESD protection paths and clamp assumptions",
-    2,
-    1
-   ],
-   [
-    6,
-    "Review latch-up spacing, taps, guard rings, and injection risks",
-    1.5,
-    1
-   ],
-   [
-    7,
-    "Close reliability violations and release the assessment",
-    4
-   ]
-  ],
-  "o": [
-   "AMS reliability verification plan",
-   "Device stress results",
-   "AMS EM / IR results",
-   "Aging assessment",
-   "ESD verification results",
-   "Latch-up assessment",
-   "AMS reliability closure record"
-  ],
-  "ob": [
-   1,
-   2,
-   3,
-   4,
-   5,
-   6,
-   7
-  ],
-  "r": [
-   [
-    "AMS-D7",
-    "produces"
-   ],
-   [
-    "AMS-D8",
-    "feeds"
-   ]
-  ],
-  "ro": "Reliability engineer"
- },
- "AMS-15": {
-  "st": "amsIp",
-  "w": [
-   32,
-   40
-  ],
-  "s": [
-   [
-    1,
-    "Define the required hard-macro view set and release manifest",
-    1
-   ],
-   [
-    2,
-    "Generate LEF and physical abstracts",
-    1.5
-   ],
-   [
-    3,
-    "Generate timing and power models",
-    1.5
-   ],
-   [
-    4,
-    "Generate GDS, CDL / SPICE, and LVS collateral",
-    2,
-    1
-   ],
-   [
-    5,
-    "Generate behavioral or functional models where required",
-    1.5,
-    1
-   ],
-   [
-    6,
-    "Document placement, supply, clock, pin, and usage constraints",
-    1.5,
-    1
-   ],
-   [
-    7,
-    "Run cross-view and downstream tool consistency checks",
-    2
-   ],
-   [
-    8,
-    "Release the version-controlled hard-macro package",
-    2
-   ]
-  ],
-  "o": [
-   "AMS macro release requirements",
-   "AMS physical abstract",
-   "AMS timing and power views",
-   "AMS circuit and signoff views",
-   "AMS simulation models",
-   "AMS integration guide",
-   "AMS macro qualification results",
-   "Qualified AMS hard-macro release"
-  ],
-  "ob": [
-   1,
-   2,
-   3,
-   4,
-   5,
-   6,
-   7,
-   8
-  ],
-  "r": [
-   [
-    "AMS-D5",
-    "produces"
-   ],
-   [
-    "AMS-D4",
-    "feeds"
-   ],
-   [
-    "AMS-D2",
-    "feeds"
-   ]
-  ],
-  "ro": "AMS integration lead"
- },
- "AMS-16": {
+ "AMS-13": {
   "st": "amsIp",
   "w": [
    26,
@@ -5166,6 +4927,245 @@ export const activitySteps: Record<string, ActivityStepEntry> = {
    ]
   ],
   "ro": "AMS verification engineer"
+ },
+ "AMS-14": {
+  "st": "amsIp",
+  "w": [
+   28,
+   38
+  ],
+  "s": [
+   [
+    1,
+    "Define the required characterization corners, arcs, and view set",
+    1
+   ],
+   [
+    2,
+    "Run extracted timing and power characterization",
+    3
+   ],
+   [
+    3,
+    "Generate Liberty and functional simulation models",
+    2,
+    1
+   ],
+   [
+    4,
+    "Generate LEF, GDS, CDL / SPICE, and required physical views",
+    1.5,
+    1
+   ],
+   [
+    5,
+    "Generate test, DFT, and integration collateral",
+    1.5,
+    1
+   ],
+   [
+    6,
+    "Run cross-view consistency and downstream tool checks",
+    2
+   ],
+   [
+    7,
+    "Release the compiler-equivalent memory package",
+    4
+   ]
+  ],
+  "o": [
+   "Custom-memory characterization plan",
+   "Memory timing and power data",
+   "Timing and functional views",
+   "Physical and circuit views",
+   "Memory integration collateral",
+   "Custom-memory view qualification results",
+   "Qualified custom-memory release"
+  ],
+  "ob": [
+   1,
+   2,
+   3,
+   4,
+   5,
+   6,
+   7
+  ],
+  "r": [
+   [
+    "AMS-D6",
+    "produces"
+   ],
+   [
+    "AMS-D7",
+    "feeds"
+   ]
+  ],
+  "ro": "Memory characterization engineer"
+ },
+ "AMS-15": {
+  "st": "amsIp",
+  "w": [
+   28,
+   38
+  ],
+  "s": [
+   [
+    1,
+    "Define the applicable reliability checks and mission profile",
+    1
+   ],
+   [
+    2,
+    "Check device voltage, current, and operating-area limits",
+    2.5
+   ],
+   [
+    3,
+    "Run EM / IR analysis on critical supply and high-current paths",
+    1.5,
+    1
+   ],
+   [
+    4,
+    "Evaluate aging and lifetime degradation on sensitive circuits",
+    2.5
+   ],
+   [
+    5,
+    "Verify ESD protection paths and clamp assumptions",
+    2,
+    1
+   ],
+   [
+    6,
+    "Review latch-up spacing, taps, guard rings, and injection risks",
+    1.5,
+    1
+   ],
+   [
+    7,
+    "Close reliability violations and release the assessment",
+    4
+   ]
+  ],
+  "o": [
+   "AMS reliability verification plan",
+   "Device stress results",
+   "AMS EM / IR results",
+   "Aging assessment",
+   "ESD verification results",
+   "Latch-up assessment",
+   "AMS reliability closure record"
+  ],
+  "ob": [
+   1,
+   2,
+   3,
+   4,
+   5,
+   6,
+   7
+  ],
+  "r": [
+   [
+    "AMS-D4",
+    "produces"
+   ],
+   [
+    "AMS-D8",
+    "feeds"
+   ]
+  ],
+  "ro": "Reliability engineer"
+ },
+ "AMS-16": {
+  "st": "amsIp",
+  "w": [
+   32,
+   40
+  ],
+  "s": [
+   [
+    1,
+    "Define the required hard-macro view set and release manifest",
+    1
+   ],
+   [
+    2,
+    "Generate LEF and physical abstracts",
+    1.5
+   ],
+   [
+    3,
+    "Generate timing and power models",
+    1.5
+   ],
+   [
+    4,
+    "Generate GDS, CDL / SPICE, and LVS collateral",
+    2,
+    1
+   ],
+   [
+    5,
+    "Generate behavioral or functional models where required",
+    1.5,
+    1
+   ],
+   [
+    6,
+    "Document placement, supply, clock, pin, and usage constraints",
+    1.5,
+    1
+   ],
+   [
+    7,
+    "Run cross-view and downstream tool consistency checks",
+    2
+   ],
+   [
+    8,
+    "Release the version-controlled hard-macro package",
+    2
+   ]
+  ],
+  "o": [
+   "AMS macro release requirements",
+   "AMS physical abstract",
+   "AMS timing and power views",
+   "AMS circuit and signoff views",
+   "AMS simulation models",
+   "AMS integration guide",
+   "AMS macro qualification results",
+   "Qualified AMS hard-macro release"
+  ],
+  "ob": [
+   1,
+   2,
+   3,
+   4,
+   5,
+   6,
+   7,
+   8
+  ],
+  "r": [
+   [
+    "AMS-D7",
+    "produces"
+   ],
+   [
+    "AMS-D6",
+    "feeds"
+   ],
+   [
+    "AMS-D5",
+    "feeds"
+   ]
+  ],
+  "ro": "AMS integration lead"
  },
  "TC-01": {
   "st": "testChip",
@@ -5803,7 +5803,7 @@ export const activitySteps: Record<string, ActivityStepEntry> = {
   ],
   "r": [
    [
-    "RTL-D1",
+    "RTL-D5",
     "feeds"
    ],
    [
@@ -5814,6 +5814,233 @@ export const activitySteps: Record<string, ActivityStepEntry> = {
   "ro": "Block owners"
  },
  "RTL-02": {
+  "st": "rtl",
+  "w": [
+   2,
+   32
+  ],
+  "s": [
+   [
+    1,
+    "Set up the build system and dependency management",
+    2.5
+   ],
+   [
+    2,
+    "Stand up continuous integration with per-commit checks",
+    3
+   ],
+   [
+    3,
+    "Define and schedule the nightly regression",
+    2.5,
+    1
+   ],
+   [
+    4,
+    "Establish release tagging and the version manifest process",
+    2
+   ],
+   [
+    5,
+    "Manage compute and license capacity for regressions",
+    2,
+    1
+   ],
+   [
+    6,
+    "Build the failure triage and notification workflow",
+    2.5,
+    1
+   ],
+   [
+    7,
+    "Operate and maintain the machinery across the stage",
+    22.5
+   ]
+  ],
+  "o": [
+   "Build system and dependency management",
+   "Continuous integration with per-commit checks",
+   "Nightly regression suite and schedule",
+   "Release tagging and version manifests",
+   "Compute and license capacity management record",
+   "Failure triage and notification workflow",
+   "Regression operation and maintenance log"
+  ],
+  "ob": [
+   1,
+   2,
+   3,
+   4,
+   5,
+   6,
+   7
+  ],
+  "r": [
+   [
+    "RTL-D1",
+    "produces"
+   ],
+   [
+    "RTL-D5",
+    "feeds"
+   ]
+  ],
+  "ro": "Configuration and release manager"
+ },
+ "RTL-03": {
+  "st": "rtl",
+  "w": [
+   2,
+   32
+  ],
+  "s": [
+   [
+    1,
+    "Define the change control process and ECO board charter",
+    1.5
+   ],
+   [
+    2,
+    "Build the change request intake and impact assessment workflow",
+    2
+   ],
+   [
+    3,
+    "Operate the ECO board and record decisions",
+    20
+   ],
+   [
+    4,
+    "Track approved changes across blocks, verification and synthesis",
+    3,
+    1
+   ],
+   [
+    5,
+    "Define freeze criteria and track readiness against them",
+    2.5,
+    1
+   ],
+   [
+    6,
+    "Assemble the RTL Freeze package",
+    3
+   ],
+   [
+    7,
+    "Declare freeze and publish the post-freeze exception policy",
+    3.5
+   ]
+  ],
+  "o": [
+   "Change control process and ECO board charter",
+   "Change request log with impact assessments",
+   "ECO board decision records",
+   "Change tracking record across blocks, verification and synthesis",
+   "Freeze criteria and readiness tracking",
+   "RTL Freeze package and declaration",
+   "Freeze declaration with its exception policy"
+  ],
+  "ob": [
+   1,
+   2,
+   3,
+   4,
+   5,
+   6,
+   7
+  ],
+  "r": [
+   [
+    "RTL-D7",
+    "produces"
+   ],
+   [
+    "RTL-D5",
+    "gates"
+   ]
+  ],
+  "ro": "Program manager"
+ },
+ "RTL-04": {
+  "st": "rtl",
+  "w": [
+   4,
+   12
+  ],
+  "s": [
+   [
+    1,
+    "Select the register description language and generation tooling",
+    1
+   ],
+   [
+    2,
+    "Allocate the address map across blocks",
+    1.5
+   ],
+   [
+    3,
+    "Define registers per block",
+    2.5
+   ],
+   [
+    4,
+    "Specify access policies, reset values and side effects",
+    1.5,
+    1
+   ],
+   [
+    5,
+    "Build the generation flow for RTL, headers, documentation and the UVM model",
+    2,
+    1
+   ],
+   [
+    6,
+    "Run the software review of the map",
+    1.5,
+    1
+   ],
+   [
+    7,
+    "Release the map under change control",
+    3
+   ]
+  ],
+  "o": [
+   "Register description source",
+   "Address map allocation",
+   "Per-block register definitions",
+   "Access policy and side-effect specification",
+   "Generated RTL, headers, documentation and UVM model",
+   "Software review record",
+   "Released register map with change control"
+  ],
+  "ob": [
+   1,
+   2,
+   3,
+   4,
+   5,
+   6,
+   7
+  ],
+  "r": [
+   [
+    "RTL-D2",
+    "produces"
+   ],
+   [
+    "RTL-D5",
+    "feeds"
+   ]
+  ],
+  "ro": "Register map owner"
+ },
+ "RTL-05": {
   "st": "rtl",
   "w": [
    4,
@@ -5892,17 +6119,95 @@ export const activitySteps: Record<string, ActivityStepEntry> = {
   ],
   "r": [
    [
-    "RTL-D1",
+    "RTL-D5",
     "produces"
    ],
    [
-    "RTL-D4",
+    "RTL-D6",
     "feeds"
    ]
   ],
   "ro": "Block designers"
  },
- "RTL-03": {
+ "RTL-06": {
+  "st": "rtl",
+  "w": [
+   6,
+   16
+  ],
+  "s": [
+   [
+    1,
+    "Implement power domain boundaries against the ARCH-06 definition",
+    2
+   ],
+   [
+    2,
+    "Implement the isolation, level-shifter and retention strategy",
+    2.5
+   ],
+   [
+    3,
+    "Implement CDC synchronisers against the crossing inventory",
+    2,
+    1
+   ],
+   [
+    4,
+    "Implement reset sequencing and synchronization",
+    1.5,
+    1
+   ],
+   [
+    5,
+    "Author the UPF and check tool acceptance in synthesis",
+    2.5
+   ],
+   [
+    6,
+    "Implement the power management controller RTL",
+    2,
+    1
+   ],
+   [
+    7,
+    "Review the intent with synthesis, verification and physical design",
+    3
+   ]
+  ],
+  "o": [
+   "Implemented power domain boundaries",
+   "Implemented isolation, level shifters and retention",
+   "Synchroniser coverage against the crossing inventory",
+   "Implemented CDC synchronisers",
+   "Reset sequencing logic",
+   "UPF power intent file, tool-accepted",
+   "Power management controller RTL",
+   "Power intent review record"
+  ],
+  "ob": [
+   1,
+   2,
+   3,
+   3,
+   4,
+   5,
+   6,
+   7
+  ],
+  "r": [
+   [
+    "RTL-D3",
+    "produces"
+   ],
+   [
+    "RTL-D6",
+    "feeds"
+   ]
+  ],
+  "ro": "Low-power implementation lead"
+ },
+ "RTL-07": {
   "st": "rtl",
   "w": [
    8,
@@ -5975,17 +6280,170 @@ export const activitySteps: Record<string, ActivityStepEntry> = {
   ],
   "r": [
    [
-    "RTL-D6",
+    "RTL-D4",
     "produces"
    ],
    [
-    "RTL-D1",
+    "RTL-D5",
     "feeds"
    ]
   ],
   "ro": "IP integration lead"
  },
- "RTL-04": {
+ "RTL-08": {
+  "st": "rtl",
+  "w": [
+   10,
+   22
+  ],
+  "s": [
+   [
+    1,
+    "Set up the trial synthesis flow and bootstrap constraints",
+    1.5
+   ],
+   [
+    2,
+    "Run per-block trial synthesis and establish QoR baselines",
+    3
+   ],
+   [
+    3,
+    "Deliver timing feedback to block owners",
+    2.5,
+    1
+   ],
+   [
+    4,
+    "Track area against the ARCH-09 budgets",
+    2
+   ],
+   [
+    5,
+    "Feed back power and clock-gating effectiveness to block owners",
+    2,
+    1
+   ],
+   [
+    6,
+    "Flag congestion and routability early indications",
+    2,
+    1
+   ],
+   [
+    7,
+    "Operate the recurring trial synthesis cadence and reporting",
+    5.5
+   ]
+  ],
+  "o": [
+   "Trial synthesis flow and constraints",
+   "Per-block QoR baselines",
+   "Timing feedback reports to block owners",
+   "Area tracking against the ARCH-09 budgets",
+   "Power and clock-gating effectiveness reports",
+   "Congestion and routability indications",
+   "Trial synthesis cadence and reporting record"
+  ],
+  "ob": [
+   1,
+   2,
+   3,
+   4,
+   5,
+   6,
+   7
+  ],
+  "r": [
+   [
+    "RTL-D5",
+    "feeds"
+   ],
+   [
+    "RTL-D7",
+    "feeds"
+   ]
+  ],
+  "ro": "Synthesis engineer"
+ },
+ "RTL-09": {
+  "st": "rtl",
+  "w": [
+   12,
+   28
+  ],
+  "s": [
+   [
+    1,
+    "Define the lint, CDC and RDC methodology and rule sets",
+    1.5
+   ],
+   [
+    2,
+    "Close lint at block level",
+    3.5
+   ],
+   [
+    3,
+    "Close CDC at block level",
+    3.5,
+    1
+   ],
+   [
+    4,
+    "Close CDC at chip level against the crossing inventory",
+    4
+   ],
+   [
+    5,
+    "Close RDC and analyze reset domains",
+    3,
+    1
+   ],
+   [
+    6,
+    "Review and disposition every waiver",
+    3
+   ],
+   [
+    7,
+    "Report closure and set up the closure regression",
+    4
+   ]
+  ],
+  "o": [
+   "Lint, CDC and RDC rule sets",
+   "Block-level lint closure record",
+   "Block-level CDC closure record",
+   "Chip-level CDC closure results",
+   "Crossing inventory reconciliation",
+   "RDC closure record and reset domain analysis",
+   "Waiver list with dispositions and signatures",
+   "Closure regression in the CI flow"
+  ],
+  "ob": [
+   1,
+   2,
+   3,
+   4,
+   4,
+   5,
+   6,
+   7
+  ],
+  "r": [
+   [
+    "RTL-D6",
+    "produces"
+   ],
+   [
+    "RTL-D7",
+    "gates"
+   ]
+  ],
+  "ro": "RTL quality lead"
+ },
+ "RTL-10": {
   "st": "rtl",
   "w": [
    16,
@@ -6058,7 +6516,7 @@ export const activitySteps: Record<string, ActivityStepEntry> = {
   ],
   "r": [
    [
-    "RTL-D1",
+    "RTL-D5",
     "produces"
    ],
    [
@@ -6067,464 +6525,6 @@ export const activitySteps: Record<string, ActivityStepEntry> = {
    ]
   ],
   "ro": "Chip integration lead"
- },
- "RTL-05": {
-  "st": "rtl",
-  "w": [
-   6,
-   16
-  ],
-  "s": [
-   [
-    1,
-    "Implement power domain boundaries against the ARCH-05 definition",
-    2
-   ],
-   [
-    2,
-    "Implement the isolation, level-shifter and retention strategy",
-    2.5
-   ],
-   [
-    3,
-    "Implement CDC synchronisers against the crossing inventory",
-    2,
-    1
-   ],
-   [
-    4,
-    "Implement reset sequencing and synchronization",
-    1.5,
-    1
-   ],
-   [
-    5,
-    "Author the UPF and check tool acceptance in synthesis",
-    2.5
-   ],
-   [
-    6,
-    "Implement the power management controller RTL",
-    2,
-    1
-   ],
-   [
-    7,
-    "Review the intent with synthesis, verification and physical design",
-    3
-   ]
-  ],
-  "o": [
-   "Implemented power domain boundaries",
-   "Implemented isolation, level shifters and retention",
-   "Synchroniser coverage against the crossing inventory",
-   "Implemented CDC synchronisers",
-   "Reset sequencing logic",
-   "UPF power intent file, tool-accepted",
-   "Power management controller RTL",
-   "Power intent review record"
-  ],
-  "ob": [
-   1,
-   2,
-   3,
-   3,
-   4,
-   5,
-   6,
-   7
-  ],
-  "r": [
-   [
-    "RTL-D5",
-    "produces"
-   ],
-   [
-    "RTL-D4",
-    "feeds"
-   ]
-  ],
-  "ro": "Low-power implementation lead"
- },
- "RTL-06": {
-  "st": "rtl",
-  "w": [
-   12,
-   28
-  ],
-  "s": [
-   [
-    1,
-    "Define the lint, CDC and RDC methodology and rule sets",
-    1.5
-   ],
-   [
-    2,
-    "Close lint at block level",
-    3.5
-   ],
-   [
-    3,
-    "Close CDC at block level",
-    3.5,
-    1
-   ],
-   [
-    4,
-    "Close CDC at chip level against the crossing inventory",
-    4
-   ],
-   [
-    5,
-    "Close RDC and analyze reset domains",
-    3,
-    1
-   ],
-   [
-    6,
-    "Review and disposition every waiver",
-    3
-   ],
-   [
-    7,
-    "Report closure and set up the closure regression",
-    4
-   ]
-  ],
-  "o": [
-   "Lint, CDC and RDC rule sets",
-   "Block-level lint closure record",
-   "Block-level CDC closure record",
-   "Chip-level CDC closure results",
-   "Crossing inventory reconciliation",
-   "RDC closure record and reset domain analysis",
-   "Waiver list with dispositions and signatures",
-   "Closure regression in the CI flow"
-  ],
-  "ob": [
-   1,
-   2,
-   3,
-   4,
-   4,
-   5,
-   6,
-   7
-  ],
-  "r": [
-   [
-    "RTL-D4",
-    "produces"
-   ],
-   [
-    "RTL-D7",
-    "gates"
-   ]
-  ],
-  "ro": "RTL quality lead"
- },
- "RTL-07": {
-  "st": "rtl",
-  "w": [
-   4,
-   12
-  ],
-  "s": [
-   [
-    1,
-    "Select the register description language and generation tooling",
-    1
-   ],
-   [
-    2,
-    "Allocate the address map across blocks",
-    1.5
-   ],
-   [
-    3,
-    "Define registers per block",
-    2.5
-   ],
-   [
-    4,
-    "Specify access policies, reset values and side effects",
-    1.5,
-    1
-   ],
-   [
-    5,
-    "Build the generation flow for RTL, headers, documentation and the UVM model",
-    2,
-    1
-   ],
-   [
-    6,
-    "Run the software review of the map",
-    1.5,
-    1
-   ],
-   [
-    7,
-    "Release the map under change control",
-    3
-   ]
-  ],
-  "o": [
-   "Register description source",
-   "Address map allocation",
-   "Per-block register definitions",
-   "Access policy and side-effect specification",
-   "Generated RTL, headers, documentation and UVM model",
-   "Software review record",
-   "Released register map with change control"
-  ],
-  "ob": [
-   1,
-   2,
-   3,
-   4,
-   5,
-   6,
-   7
-  ],
-  "r": [
-   [
-    "RTL-D2",
-    "produces"
-   ],
-   [
-    "RTL-D1",
-    "feeds"
-   ]
-  ],
-  "ro": "Register map owner"
- },
- "RTL-08": {
-  "st": "rtl",
-  "w": [
-   10,
-   22
-  ],
-  "s": [
-   [
-    1,
-    "Set up the trial synthesis flow and bootstrap constraints",
-    1.5
-   ],
-   [
-    2,
-    "Run per-block trial synthesis and establish QoR baselines",
-    3
-   ],
-   [
-    3,
-    "Deliver timing feedback to block owners",
-    2.5,
-    1
-   ],
-   [
-    4,
-    "Track area against the ARCH-06 budgets",
-    2
-   ],
-   [
-    5,
-    "Feed back power and clock-gating effectiveness to block owners",
-    2,
-    1
-   ],
-   [
-    6,
-    "Flag congestion and routability early indications",
-    2,
-    1
-   ],
-   [
-    7,
-    "Operate the recurring trial synthesis cadence and reporting",
-    5.5
-   ]
-  ],
-  "o": [
-   "Trial synthesis flow and constraints",
-   "Per-block QoR baselines",
-   "Timing feedback reports to block owners",
-   "Area tracking against the ARCH-06 budgets",
-   "Power and clock-gating effectiveness reports",
-   "Congestion and routability indications",
-   "Trial synthesis cadence and reporting record"
-  ],
-  "ob": [
-   1,
-   2,
-   3,
-   4,
-   5,
-   6,
-   7
-  ],
-  "r": [
-   [
-    "RTL-D1",
-    "feeds"
-   ],
-   [
-    "RTL-D7",
-    "feeds"
-   ]
-  ],
-  "ro": "Synthesis engineer"
- },
- "RTL-09": {
-  "st": "rtl",
-  "w": [
-   2,
-   32
-  ],
-  "s": [
-   [
-    1,
-    "Set up the build system and dependency management",
-    2.5
-   ],
-   [
-    2,
-    "Stand up continuous integration with per-commit checks",
-    3
-   ],
-   [
-    3,
-    "Define and schedule the nightly regression",
-    2.5,
-    1
-   ],
-   [
-    4,
-    "Establish release tagging and the version manifest process",
-    2
-   ],
-   [
-    5,
-    "Manage compute and license capacity for regressions",
-    2,
-    1
-   ],
-   [
-    6,
-    "Build the failure triage and notification workflow",
-    2.5,
-    1
-   ],
-   [
-    7,
-    "Operate and maintain the machinery across the stage",
-    22.5
-   ]
-  ],
-  "o": [
-   "Build system and dependency management",
-   "Continuous integration with per-commit checks",
-   "Nightly regression suite and schedule",
-   "Release tagging and version manifests",
-   "Compute and license capacity management record",
-   "Failure triage and notification workflow",
-   "Regression operation and maintenance log"
-  ],
-  "ob": [
-   1,
-   2,
-   3,
-   4,
-   5,
-   6,
-   7
-  ],
-  "r": [
-   [
-    "RTL-D3",
-    "produces"
-   ],
-   [
-    "RTL-D1",
-    "feeds"
-   ]
-  ],
-  "ro": "Configuration and release manager"
- },
- "RTL-10": {
-  "st": "rtl",
-  "w": [
-   2,
-   32
-  ],
-  "s": [
-   [
-    1,
-    "Define the change control process and ECO board charter",
-    1.5
-   ],
-   [
-    2,
-    "Build the change request intake and impact assessment workflow",
-    2
-   ],
-   [
-    3,
-    "Operate the ECO board and record decisions",
-    20
-   ],
-   [
-    4,
-    "Track approved changes across blocks, verification and synthesis",
-    3,
-    1
-   ],
-   [
-    5,
-    "Define freeze criteria and track readiness against them",
-    2.5,
-    1
-   ],
-   [
-    6,
-    "Assemble the RTL Freeze package",
-    3
-   ],
-   [
-    7,
-    "Declare freeze and publish the post-freeze exception policy",
-    3.5
-   ]
-  ],
-  "o": [
-   "Change control process and ECO board charter",
-   "Change request log with impact assessments",
-   "ECO board decision records",
-   "Change tracking record across blocks, verification and synthesis",
-   "Freeze criteria and readiness tracking",
-   "RTL Freeze package and declaration",
-   "Freeze declaration with its exception policy"
-  ],
-  "ob": [
-   1,
-   2,
-   3,
-   4,
-   5,
-   6,
-   7
-  ],
-  "r": [
-   [
-    "RTL-D7",
-    "produces"
-   ],
-   [
-    "RTL-D1",
-    "gates"
-   ]
-  ],
-  "ro": "Program manager"
  },
  "DV-01": {
   "st": "verification",
@@ -6680,404 +6680,6 @@ export const activitySteps: Record<string, ActivityStepEntry> = {
  "DV-03": {
   "st": "verification",
   "w": [
-   8,
-   38
-  ],
-  "s": [
-   [
-    1,
-    "Instantiate per-block testbenches from the shared environment",
-    2.5
-   ],
-   [
-    2,
-    "Develop directed tests for specified behavior",
-    5
-   ],
-   [
-    3,
-    "Develop constrained-random stimulus and tune the constraints",
-    6
-   ],
-   [
-    4,
-    "Write and bind assertions",
-    4,
-    1
-   ],
-   [
-    5,
-    "Run corner-case and error-injection testing",
-    5
-   ],
-   [
-    6,
-    "Analyze coverage and close holes per block",
-    6
-   ],
-   [
-    7,
-    "Run the debug and bug reporting loop with block owners",
-    8,
-    1
-   ],
-   [
-    8,
-    "Close each block against the DV-01 criteria and sign off",
-    5.5
-   ]
-  ],
-  "o": [
-   "Per-block testbenches and test suites",
-   "Directed test suite for specified behavior",
-   "Constrained-random test suite with tuned constraints",
-   "Bound assertion set",
-   "Corner-case and error-injection results",
-   "Coverage analysis and hole closure records",
-   "Bug reports and debug log with block owners",
-   "Assertions bound to block interfaces",
-   "Per-block closure evidence package"
-  ],
-  "ob": [
-   1,
-   2,
-   3,
-   4,
-   5,
-   6,
-   7,
-   8,
-   8
-  ],
-  "r": [
-   [
-    "DV-D2",
-    "feeds"
-   ],
-   [
-    "DV-D3",
-    "feeds"
-   ],
-   [
-    "DV-D8",
-    "feeds"
-   ]
-  ],
-  "ro": "Block verification owners"
- },
- "DV-04": {
-  "st": "verification",
-  "w": [
-   14,
-   36
-  ],
-  "s": [
-   [
-    1,
-    "Assemble the chip-level verification environment",
-    2.5
-   ],
-   [
-    2,
-    "Develop boot and configuration scenarios",
-    3
-   ],
-   [
-    3,
-    "Test end-to-end data paths and data integrity",
-    4
-   ],
-   [
-    4,
-    "Stress the interconnect for arbitration and deadlock under contention",
-    3.5,
-    1
-   ],
-   [
-    5,
-    "Test power state transitions and DVFS scenarios",
-    3,
-    1
-   ],
-   [
-    6,
-    "Inject errors and verify recovery at system level",
-    3.5
-   ],
-   [
-    7,
-    "Run realistic workload scenarios from the DEF-02 suite",
-    3.5,
-    1
-   ],
-   [
-    8,
-    "Close chip-level coverage and sign off",
-    9
-   ]
-  ],
-  "o": [
-   "Chip-level verification environment",
-   "Boot and configuration scenarios",
-   "End-to-end data integrity results",
-   "Interconnect stress and deadlock findings",
-   "Power transition scenario results",
-   "System-level error injection and recovery results",
-   "Realistic workload scenarios in the testbench",
-   "Chip-level coverage closure and signoff record"
-  ],
-  "ob": [
-   1,
-   2,
-   3,
-   4,
-   5,
-   6,
-   7,
-   8
-  ],
-  "r": [
-   [
-    "DV-D8",
-    "feeds"
-   ],
-   [
-    "DV-D3",
-    "feeds"
-   ]
-  ],
-  "ro": "Chip verification lead"
- },
- "DV-05": {
-  "st": "verification",
-  "w": [
-   10,
-   26
-  ],
-  "s": [
-   [
-    1,
-    "Select formal targets where proof beats simulation",
-    1.5
-   ],
-   [
-    2,
-    "Write property specifications per target",
-    3
-   ],
-   [
-    3,
-    "Prove connectivity and structural properties at chip level",
-    2.5,
-    1
-   ],
-   [
-    4,
-    "Prove control logic and arbiter properties",
-    3.5
-   ],
-   [
-    5,
-    "Prove security and isolation properties",
-    2.5,
-    1
-   ],
-   [
-    6,
-    "Review assumptions and check for over-constraint",
-    2.5
-   ],
-   [
-    7,
-    "Close proofs, state bounded results and report",
-    5.5
-   ]
-  ],
-  "o": [
-   "Formal target list with rationale",
-   "Property specifications per target",
-   "Connectivity and structural proof results",
-   "Control and arbiter proof results",
-   "Security property proof results",
-   "Assumption review and over-constraint findings",
-   "Assumption list and proof closure report"
-  ],
-  "ob": [
-   1,
-   2,
-   3,
-   4,
-   5,
-   6,
-   7
-  ],
-  "r": [
-   [
-    "DV-D4",
-    "produces"
-   ],
-   [
-    "DV-D8",
-    "feeds"
-   ]
-  ],
-  "ro": "Formal verification lead"
- },
- "DV-06": {
-  "st": "verification",
-  "w": [
-   18,
-   28
-  ],
-  "s": [
-   [
-    1,
-    "Set up the UPF-aware simulation environment",
-    1.5
-   ],
-   [
-    2,
-    "Run static UPF structural checks",
-    1.5
-   ],
-   [
-    3,
-    "Verify isolation and level shifters",
-    2
-   ],
-   [
-    4,
-    "Verify retention and state restoration through real power-down cycles",
-    2,
-    1
-   ],
-   [
-    5,
-    "Verify power sequencing and the power management controller",
-    2,
-    1
-   ],
-   [
-    6,
-    "Integrate power-aware tests into the standing regression",
-    1.5,
-    1
-   ],
-   [
-    7,
-    "Close low-power coverage and report",
-    5
-   ]
-  ],
-  "o": [
-   "UPF-aware simulation environment",
-   "Static UPF structural check results",
-   "Isolation and level shifter verification results",
-   "Retention verification results",
-   "Power sequencing verification results",
-   "Power-aware tests in the standing regression",
-   "Low-power coverage report"
-  ],
-  "ob": [
-   1,
-   2,
-   3,
-   4,
-   5,
-   6,
-   7
-  ],
-  "r": [
-   [
-    "DV-D5",
-    "produces"
-   ],
-   [
-    "DV-D3",
-    "feeds"
-   ]
-  ],
-  "ro": "Low-power verification engineer"
- },
- "DV-07": {
-  "st": "verification",
-  "w": [
-   16,
-   28
-  ],
-  "s": [
-   [
-    1,
-    "Build the co-simulation environment and integrate the models",
-    2
-   ],
-   [
-    2,
-    "Review model fidelity against the AMS characterization results",
-    2
-   ],
-   [
-    3,
-    "Verify the control and configuration interfaces",
-    2.5
-   ],
-   [
-    4,
-    "Verify calibration and training sequences from the digital side",
-    2.5,
-    1
-   ],
-   [
-    5,
-    "Verify startup, lock and ready signaling",
-    2,
-    1
-   ],
-   [
-    6,
-    "Verify analog fault and degraded-mode behavior",
-    1.5,
-    1
-   ],
-   [
-    7,
-    "Close co-simulation and report the findings",
-    5.5
-   ]
-  ],
-  "o": [
-   "AMS co-simulation environment",
-   "Model fidelity review findings",
-   "Control and configuration interface results",
-   "Calibration and training sequence results",
-   "Startup and ready-signaling results",
-   "Analog fault and degraded-mode results",
-   "Co-simulation findings report"
-  ],
-  "ob": [
-   1,
-   2,
-   3,
-   4,
-   5,
-   6,
-   7
-  ],
-  "r": [
-   [
-    "DV-D2",
-    "feeds"
-   ],
-   [
-    "DV-D8",
-    "feeds"
-   ]
-  ],
-  "ro": "AMS verification engineer"
- },
- "DV-08": {
-  "st": "verification",
-  "w": [
    6,
    26
   ],
@@ -7148,253 +6750,17 @@ export const activitySteps: Record<string, ActivityStepEntry> = {
   ],
   "r": [
    [
-    "DV-D6",
+    "DV-D3",
     "produces"
    ],
    [
-    "DV-D3",
+    "DV-D6",
     "feeds"
    ]
   ],
   "ro": "Emulation lead"
  },
- "DV-09": {
-  "st": "verification",
-  "w": [
-   22,
-   34
-  ],
-  "s": [
-   [
-    1,
-    "Build performance measurement infrastructure into the testbench",
-    1.5
-   ],
-   [
-    2,
-    "Execute the workloads on emulation and simulation",
-    3
-   ],
-   [
-    3,
-    "Measure bandwidth and utilization against the model predictions",
-    2.5
-   ],
-   [
-    4,
-    "Analyze latency and queueing behavior",
-    2,
-    1
-   ],
-   [
-    5,
-    "Identify bottlenecks and establish root causes",
-    2.5,
-    1
-   ],
-   [
-    6,
-    "Correlate results against the ARCH-01 performance model",
-    2.5
-   ],
-   [
-    7,
-    "Report findings, recommendations and model reconciliation",
-    2.5
-   ]
-  ],
-  "o": [
-   "Performance measurement infrastructure",
-   "Workload execution results",
-   "Bandwidth, utilization and latency measurements",
-   "Latency and queueing analysis results",
-   "Bottleneck analysis with root causes",
-   "Model correlation results",
-   "Findings and recommendations"
-  ],
-  "ob": [
-   1,
-   2,
-   3,
-   4,
-   5,
-   6,
-   7
-  ],
-  "r": [
-   [
-    "DV-D8",
-    "feeds"
-   ],
-   [
-    "DV-D6",
-    "feeds"
-   ]
-  ],
-  "ro": "Performance verification lead"
- },
- "DV-10": {
-  "st": "verification",
-  "w": [
-   12,
-   38
-  ],
-  "s": [
-   [
-    1,
-    "Define and tier the regression suites",
-    2
-   ],
-   [
-    2,
-    "Build the regression infrastructure and manage capacity",
-    2.5
-   ],
-   [
-    3,
-    "Establish the failure triage process with ownership",
-    2.5,
-    1
-   ],
-   [
-    4,
-    "Collect, merge and report coverage",
-    3
-   ],
-   [
-    5,
-    "Analyze coverage holes and target tests at them",
-    5
-   ],
-   [
-    6,
-    "Stabilize the regression and eliminate flaky tests",
-    4,
-    1
-   ],
-   [
-    7,
-    "Publish the dashboard and track closure",
-    4,
-    1
-   ],
-   [
-    8,
-    "Drive coverage to closure and assemble the signoff",
-    13.5
-   ]
-  ],
-  "o": [
-   "Tiered regression suites",
-   "Regression infrastructure and capacity plan",
-   "Failure triage process with ownership",
-   "Merged coverage reporting",
-   "Hole analysis and targeted test list",
-   "Regression stability and flake elimination record",
-   "Published coverage dashboard",
-   "Assembled DV closure signoff package"
-  ],
-  "ob": [
-   1,
-   2,
-   3,
-   4,
-   5,
-   6,
-   7,
-   8
-  ],
-  "r": [
-   [
-    "DV-D3",
-    "produces"
-   ],
-   [
-    "DV-D8",
-    "produces"
-   ]
-  ],
-  "ro": "Regression owner"
- },
- "DV-11": {
-  "st": "verification",
-  "w": [
-   28,
-   38
-  ],
-  "s": [
-   [
-    1,
-    "Build the gate-level environment and bring the netlist up",
-    1.5
-   ],
-   [
-    2,
-    "Run zero-delay functional gate-level simulation",
-    2
-   ],
-   [
-    3,
-    "Analyze X-propagation and reset initialization",
-    2
-   ],
-   [
-    4,
-    "Run SDF back-annotated timing simulation",
-    2.5,
-    1
-   ],
-   [
-    5,
-    "Simulate DFT and scan modes",
-    2,
-    1
-   ],
-   [
-    6,
-    "Run power-aware gate-level simulation",
-    1.5,
-    1
-   ],
-   [
-    7,
-    "Debug failures and close the findings",
-    4.5
-   ]
-  ],
-  "o": [
-   "Gate-level environment with the netlist brought up",
-   "Functional gate-level results",
-   "X-propagation and reset initialization findings",
-   "SDF timing-annotated simulation results",
-   "Scan and DFT mode simulation results",
-   "Power-aware gate-level simulation results",
-   "Gate-level simulation report",
-   "Failure debug and closure record"
-  ],
-  "ob": [
-   1,
-   2,
-   3,
-   4,
-   5,
-   6,
-   7,
-   7
-  ],
-  "r": [
-   [
-    "DV-D7",
-    "produces"
-   ],
-   [
-    "DV-D8",
-    "feeds"
-   ]
-  ],
-  "ro": "Gate-level simulation lead"
- },
- "DV-12": {
+ "DV-04": {
   "st": "verification",
   "w": [
    6,
@@ -7471,11 +6837,645 @@ export const activitySteps: Record<string, ActivityStepEntry> = {
     "feeds"
    ],
    [
-    "DV-D3",
+    "DV-D6",
     "feeds"
    ]
   ],
   "ro": "Verification lead"
+ },
+ "DV-05": {
+  "st": "verification",
+  "w": [
+   8,
+   38
+  ],
+  "s": [
+   [
+    1,
+    "Instantiate per-block testbenches from the shared environment",
+    2.5
+   ],
+   [
+    2,
+    "Develop directed tests for specified behavior",
+    5
+   ],
+   [
+    3,
+    "Develop constrained-random stimulus and tune the constraints",
+    6
+   ],
+   [
+    4,
+    "Write and bind assertions",
+    4,
+    1
+   ],
+   [
+    5,
+    "Run corner-case and error-injection testing",
+    5
+   ],
+   [
+    6,
+    "Analyze coverage and close holes per block",
+    6
+   ],
+   [
+    7,
+    "Run the debug and bug reporting loop with block owners",
+    8,
+    1
+   ],
+   [
+    8,
+    "Close each block against the DV-01 criteria and sign off",
+    5.5
+   ]
+  ],
+  "o": [
+   "Per-block testbenches and test suites",
+   "Directed test suite for specified behavior",
+   "Constrained-random test suite with tuned constraints",
+   "Bound assertion set",
+   "Corner-case and error-injection results",
+   "Coverage analysis and hole closure records",
+   "Bug reports and debug log with block owners",
+   "Assertions bound to block interfaces",
+   "Per-block closure evidence package"
+  ],
+  "ob": [
+   1,
+   2,
+   3,
+   4,
+   5,
+   6,
+   7,
+   8,
+   8
+  ],
+  "r": [
+   [
+    "DV-D2",
+    "feeds"
+   ],
+   [
+    "DV-D6",
+    "feeds"
+   ],
+   [
+    "DV-D8",
+    "feeds"
+   ]
+  ],
+  "ro": "Block verification owners"
+ },
+ "DV-06": {
+  "st": "verification",
+  "w": [
+   10,
+   26
+  ],
+  "s": [
+   [
+    1,
+    "Select formal targets where proof beats simulation",
+    1.5
+   ],
+   [
+    2,
+    "Write property specifications per target",
+    3
+   ],
+   [
+    3,
+    "Prove connectivity and structural properties at chip level",
+    2.5,
+    1
+   ],
+   [
+    4,
+    "Prove control logic and arbiter properties",
+    3.5
+   ],
+   [
+    5,
+    "Prove security and isolation properties",
+    2.5,
+    1
+   ],
+   [
+    6,
+    "Review assumptions and check for over-constraint",
+    2.5
+   ],
+   [
+    7,
+    "Close proofs, state bounded results and report",
+    5.5
+   ]
+  ],
+  "o": [
+   "Formal target list with rationale",
+   "Property specifications per target",
+   "Connectivity and structural proof results",
+   "Control and arbiter proof results",
+   "Security property proof results",
+   "Assumption review and over-constraint findings",
+   "Assumption list and proof closure report"
+  ],
+  "ob": [
+   1,
+   2,
+   3,
+   4,
+   5,
+   6,
+   7
+  ],
+  "r": [
+   [
+    "DV-D4",
+    "produces"
+   ],
+   [
+    "DV-D8",
+    "feeds"
+   ]
+  ],
+  "ro": "Formal verification lead"
+ },
+ "DV-07": {
+  "st": "verification",
+  "w": [
+   12,
+   38
+  ],
+  "s": [
+   [
+    1,
+    "Define and tier the regression suites",
+    2
+   ],
+   [
+    2,
+    "Build the regression infrastructure and manage capacity",
+    2.5
+   ],
+   [
+    3,
+    "Establish the failure triage process with ownership",
+    2.5,
+    1
+   ],
+   [
+    4,
+    "Collect, merge and report coverage",
+    3
+   ],
+   [
+    5,
+    "Analyze coverage holes and target tests at them",
+    5
+   ],
+   [
+    6,
+    "Stabilize the regression and eliminate flaky tests",
+    4,
+    1
+   ],
+   [
+    7,
+    "Publish the dashboard and track closure",
+    4,
+    1
+   ],
+   [
+    8,
+    "Drive coverage to closure and assemble the signoff",
+    13.5
+   ]
+  ],
+  "o": [
+   "Tiered regression suites",
+   "Regression infrastructure and capacity plan",
+   "Failure triage process with ownership",
+   "Merged coverage reporting",
+   "Hole analysis and targeted test list",
+   "Regression stability and flake elimination record",
+   "Published coverage dashboard",
+   "Assembled DV closure signoff package"
+  ],
+  "ob": [
+   1,
+   2,
+   3,
+   4,
+   5,
+   6,
+   7,
+   8
+  ],
+  "r": [
+   [
+    "DV-D6",
+    "produces"
+   ],
+   [
+    "DV-D8",
+    "produces"
+   ]
+  ],
+  "ro": "Regression owner"
+ },
+ "DV-08": {
+  "st": "verification",
+  "w": [
+   14,
+   36
+  ],
+  "s": [
+   [
+    1,
+    "Assemble the chip-level verification environment",
+    2.5
+   ],
+   [
+    2,
+    "Develop boot and configuration scenarios",
+    3
+   ],
+   [
+    3,
+    "Test end-to-end data paths and data integrity",
+    4
+   ],
+   [
+    4,
+    "Stress the interconnect for arbitration and deadlock under contention",
+    3.5,
+    1
+   ],
+   [
+    5,
+    "Test power state transitions and DVFS scenarios",
+    3,
+    1
+   ],
+   [
+    6,
+    "Inject errors and verify recovery at system level",
+    3.5
+   ],
+   [
+    7,
+    "Run realistic workload scenarios from the DEF-03 suite",
+    3.5,
+    1
+   ],
+   [
+    8,
+    "Close chip-level coverage and sign off",
+    9
+   ]
+  ],
+  "o": [
+   "Chip-level verification environment",
+   "Boot and configuration scenarios",
+   "End-to-end data integrity results",
+   "Interconnect stress and deadlock findings",
+   "Power transition scenario results",
+   "System-level error injection and recovery results",
+   "Realistic workload scenarios in the testbench",
+   "Chip-level coverage closure and signoff record"
+  ],
+  "ob": [
+   1,
+   2,
+   3,
+   4,
+   5,
+   6,
+   7,
+   8
+  ],
+  "r": [
+   [
+    "DV-D8",
+    "feeds"
+   ],
+   [
+    "DV-D6",
+    "feeds"
+   ]
+  ],
+  "ro": "Chip verification lead"
+ },
+ "DV-09": {
+  "st": "verification",
+  "w": [
+   16,
+   28
+  ],
+  "s": [
+   [
+    1,
+    "Build the co-simulation environment and integrate the models",
+    2
+   ],
+   [
+    2,
+    "Review model fidelity against the AMS characterization results",
+    2
+   ],
+   [
+    3,
+    "Verify the control and configuration interfaces",
+    2.5
+   ],
+   [
+    4,
+    "Verify calibration and training sequences from the digital side",
+    2.5,
+    1
+   ],
+   [
+    5,
+    "Verify startup, lock and ready signaling",
+    2,
+    1
+   ],
+   [
+    6,
+    "Verify analog fault and degraded-mode behavior",
+    1.5,
+    1
+   ],
+   [
+    7,
+    "Close co-simulation and report the findings",
+    5.5
+   ]
+  ],
+  "o": [
+   "AMS co-simulation environment",
+   "Model fidelity review findings",
+   "Control and configuration interface results",
+   "Calibration and training sequence results",
+   "Startup and ready-signaling results",
+   "Analog fault and degraded-mode results",
+   "Co-simulation findings report"
+  ],
+  "ob": [
+   1,
+   2,
+   3,
+   4,
+   5,
+   6,
+   7
+  ],
+  "r": [
+   [
+    "DV-D2",
+    "feeds"
+   ],
+   [
+    "DV-D8",
+    "feeds"
+   ]
+  ],
+  "ro": "AMS verification engineer"
+ },
+ "DV-10": {
+  "st": "verification",
+  "w": [
+   18,
+   28
+  ],
+  "s": [
+   [
+    1,
+    "Set up the UPF-aware simulation environment",
+    1.5
+   ],
+   [
+    2,
+    "Run static UPF structural checks",
+    1.5
+   ],
+   [
+    3,
+    "Verify isolation and level shifters",
+    2
+   ],
+   [
+    4,
+    "Verify retention and state restoration through real power-down cycles",
+    2,
+    1
+   ],
+   [
+    5,
+    "Verify power sequencing and the power management controller",
+    2,
+    1
+   ],
+   [
+    6,
+    "Integrate power-aware tests into the standing regression",
+    1.5,
+    1
+   ],
+   [
+    7,
+    "Close low-power coverage and report",
+    5
+   ]
+  ],
+  "o": [
+   "UPF-aware simulation environment",
+   "Static UPF structural check results",
+   "Isolation and level shifter verification results",
+   "Retention verification results",
+   "Power sequencing verification results",
+   "Power-aware tests in the standing regression",
+   "Low-power coverage report"
+  ],
+  "ob": [
+   1,
+   2,
+   3,
+   4,
+   5,
+   6,
+   7
+  ],
+  "r": [
+   [
+    "DV-D5",
+    "produces"
+   ],
+   [
+    "DV-D6",
+    "feeds"
+   ]
+  ],
+  "ro": "Low-power verification engineer"
+ },
+ "DV-11": {
+  "st": "verification",
+  "w": [
+   22,
+   34
+  ],
+  "s": [
+   [
+    1,
+    "Build performance measurement infrastructure into the testbench",
+    1.5
+   ],
+   [
+    2,
+    "Execute the workloads on emulation and simulation",
+    3
+   ],
+   [
+    3,
+    "Measure bandwidth and utilization against the model predictions",
+    2.5
+   ],
+   [
+    4,
+    "Analyze latency and queueing behavior",
+    2,
+    1
+   ],
+   [
+    5,
+    "Identify bottlenecks and establish root causes",
+    2.5,
+    1
+   ],
+   [
+    6,
+    "Correlate results against the ARCH-01 performance model",
+    2.5
+   ],
+   [
+    7,
+    "Report findings, recommendations and model reconciliation",
+    2.5
+   ]
+  ],
+  "o": [
+   "Performance measurement infrastructure",
+   "Workload execution results",
+   "Bandwidth, utilization and latency measurements",
+   "Latency and queueing analysis results",
+   "Bottleneck analysis with root causes",
+   "Model correlation results",
+   "Findings and recommendations"
+  ],
+  "ob": [
+   1,
+   2,
+   3,
+   4,
+   5,
+   6,
+   7
+  ],
+  "r": [
+   [
+    "DV-D8",
+    "feeds"
+   ],
+   [
+    "DV-D3",
+    "feeds"
+   ]
+  ],
+  "ro": "Performance verification lead"
+ },
+ "DV-12": {
+  "st": "verification",
+  "w": [
+   28,
+   38
+  ],
+  "s": [
+   [
+    1,
+    "Build the gate-level environment and bring the netlist up",
+    1.5
+   ],
+   [
+    2,
+    "Run zero-delay functional gate-level simulation",
+    2
+   ],
+   [
+    3,
+    "Analyze X-propagation and reset initialization",
+    2
+   ],
+   [
+    4,
+    "Run SDF back-annotated timing simulation",
+    2.5,
+    1
+   ],
+   [
+    5,
+    "Simulate DFT and scan modes",
+    2,
+    1
+   ],
+   [
+    6,
+    "Run power-aware gate-level simulation",
+    1.5,
+    1
+   ],
+   [
+    7,
+    "Debug failures and close the findings",
+    4.5
+   ]
+  ],
+  "o": [
+   "Gate-level environment with the netlist brought up",
+   "Functional gate-level results",
+   "X-propagation and reset initialization findings",
+   "SDF timing-annotated simulation results",
+   "Scan and DFT mode simulation results",
+   "Power-aware gate-level simulation results",
+   "Gate-level simulation report",
+   "Failure debug and closure record"
+  ],
+  "ob": [
+   1,
+   2,
+   3,
+   4,
+   5,
+   6,
+   7,
+   7
+  ],
+  "r": [
+   [
+    "DV-D7",
+    "produces"
+   ],
+   [
+    "DV-D8",
+    "feeds"
+   ]
+  ],
+  "ro": "Gate-level simulation lead"
  },
  "DFT-01": {
   "st": "dft",
@@ -7600,96 +7600,13 @@ export const activitySteps: Record<string, ActivityStepEntry> = {
     "feeds"
    ],
    [
-    "DFT-D4",
+    "DFT-D5",
     "feeds"
    ]
   ],
   "ro": "DFT architect"
  },
  "DFT-03": {
-  "st": "dft",
-  "w": [
-   6,
-   16
-  ],
-  "s": [
-   [
-    1,
-    "Inventory the memories and set a test requirement per instance",
-    1.5
-   ],
-   [
-    2,
-    "Architect MBIST and allocate the engines",
-    2.5
-   ],
-   [
-    3,
-    "Select test algorithms per memory type",
-    1.5,
-    1
-   ],
-   [
-    4,
-    "Architect the BIRA and repair analysis",
-    2
-   ],
-   [
-    5,
-    "Integrate BISR and the fuse path with ARCH-07",
-    2,
-    1
-   ],
-   [
-    6,
-    "Agree the repair interface jointly with the memory designers",
-    1.5,
-    1
-   ],
-   [
-    7,
-    "Insert and integrate the MBIST logic",
-    2.5
-   ],
-   [
-    8,
-    "Verify the architecture and release its specification",
-    1.5
-   ]
-  ],
-  "o": [
-   "Memory inventory with test requirements",
-   "MBIST architecture and engine allocation",
-   "Algorithm selection per memory type",
-   "BIRA and BISR architecture",
-   "Fuse path integration",
-   "Repair interface agreement with the memory designers",
-   "MBIST insertion and verification results",
-   "Verified MBIST architecture specification"
-  ],
-  "ob": [
-   1,
-   2,
-   3,
-   4,
-   5,
-   6,
-   7,
-   8
-  ],
-  "r": [
-   [
-    "DFT-D2",
-    "produces"
-   ],
-   [
-    "DFT-D1",
-    "feeds"
-   ]
-  ],
-  "ro": "DFT memory lead"
- },
- "DFT-04": {
   "st": "dft",
   "w": [
    4,
@@ -7759,7 +7676,158 @@ export const activitySteps: Record<string, ActivityStepEntry> = {
   ],
   "ro": "DFT access lead"
  },
+ "DFT-04": {
+  "st": "dft",
+  "w": [
+   6,
+   14
+  ],
+  "s": [
+   [
+    1,
+    "Collect debug requirements from validation and design",
+    1
+   ],
+   [
+    2,
+    "Architect the observability — trace, triggers, snapshot",
+    2
+   ],
+   [
+    3,
+    "Budget the trace ports and bandwidth",
+    1,
+    1
+   ],
+   [
+    4,
+    "Design the trigger and cross-trigger network",
+    1.5,
+    1
+   ],
+   [
+    5,
+    "Implement internal state snapshot and scan dump capability",
+    1.5
+   ],
+   [
+    6,
+    "Verify the debug infrastructure and document it for the lab",
+    3.5
+   ]
+  ],
+  "o": [
+   "Debug requirement list",
+   "Observability architecture",
+   "Trace port and bandwidth budget",
+   "Trigger and cross-trigger network",
+   "Scan dump and snapshot capability",
+   "Debug infrastructure documentation"
+  ],
+  "ob": [
+   1,
+   2,
+   3,
+   4,
+   5,
+   6
+  ],
+  "r": [
+   [
+    "DFT-D3",
+    "feeds"
+   ],
+   [
+    "DFT-D1",
+    "feeds"
+   ]
+  ],
+  "ro": "DFT debug lead"
+ },
  "DFT-05": {
+  "st": "dft",
+  "w": [
+   6,
+   16
+  ],
+  "s": [
+   [
+    1,
+    "Inventory the memories and set a test requirement per instance",
+    1.5
+   ],
+   [
+    2,
+    "Architect MBIST and allocate the engines",
+    2.5
+   ],
+   [
+    3,
+    "Select test algorithms per memory type",
+    1.5,
+    1
+   ],
+   [
+    4,
+    "Architect the BIRA and repair analysis",
+    2
+   ],
+   [
+    5,
+    "Integrate BISR and the fuse path with ARCH-05",
+    2,
+    1
+   ],
+   [
+    6,
+    "Agree the repair interface jointly with the memory designers",
+    1.5,
+    1
+   ],
+   [
+    7,
+    "Insert and integrate the MBIST logic",
+    2.5
+   ],
+   [
+    8,
+    "Verify the architecture and release its specification",
+    1.5
+   ]
+  ],
+  "o": [
+   "Memory inventory with test requirements",
+   "MBIST architecture and engine allocation",
+   "Algorithm selection per memory type",
+   "BIRA and BISR architecture",
+   "Fuse path integration",
+   "Repair interface agreement with the memory designers",
+   "MBIST insertion and verification results",
+   "Verified MBIST architecture specification"
+  ],
+  "ob": [
+   1,
+   2,
+   3,
+   4,
+   5,
+   6,
+   7,
+   8
+  ],
+  "r": [
+   [
+    "DFT-D2",
+    "produces"
+   ],
+   [
+    "DFT-D1",
+    "feeds"
+   ]
+  ],
+  "ro": "DFT memory lead"
+ },
+ "DFT-06": {
   "st": "dft",
   "w": [
    8,
@@ -7821,13 +7889,89 @@ export const activitySteps: Record<string, ActivityStepEntry> = {
     "feeds"
    ],
    [
-    "DFT-D4",
+    "DFT-D5",
     "feeds"
    ]
   ],
   "ro": "DFT engineer, at-speed"
  },
- "DFT-06": {
+ "DFT-07": {
+  "st": "dft",
+  "w": [
+   12,
+   18
+  ],
+  "s": [
+   [
+    1,
+    "Inventory the fuse consumers — repair, trim, ID, lifecycle, security",
+    1
+   ],
+   [
+    2,
+    "Allocate capacity against the worst-case need",
+    1
+   ],
+   [
+    3,
+    "Integrate the eFuse array and its programming path",
+    1.5,
+    1
+   ],
+   [
+    4,
+    "Design the fuse read, shadow register and distribution logic",
+    1.5
+   ],
+   [
+    5,
+    "Define the chip identity and traceability scheme",
+    1,
+    1
+   ],
+   [
+    6,
+    "Agree the lifecycle state encoding with ARCH-05",
+    1,
+    1
+   ],
+   [
+    7,
+    "Verify the fuse infrastructure end to end",
+    2.5
+   ]
+  ],
+  "o": [
+   "Fuse consumer inventory",
+   "Capacity allocation with worst-case margin",
+   "eFuse array integration and programming path",
+   "Fuse read and distribution logic",
+   "Chip identity scheme",
+   "Lifecycle state encoding agreed with the security architecture",
+   "Verified fuse infrastructure"
+  ],
+  "ob": [
+   1,
+   2,
+   3,
+   4,
+   5,
+   6,
+   7
+  ],
+  "r": [
+   [
+    "DFT-D2",
+    "feeds"
+   ],
+   [
+    "DFT-D3",
+    "feeds"
+   ]
+  ],
+  "ro": "Fuse and infrastructure engineer"
+ },
+ "DFT-08": {
   "st": "dft",
   "w": [
    14,
@@ -7893,17 +8037,86 @@ export const activitySteps: Record<string, ActivityStepEntry> = {
   ],
   "r": [
    [
-    "DFT-D5",
+    "DFT-D4",
     "produces"
+   ],
+   [
+    "DFT-D5",
+    "feeds"
+   ]
+  ],
+  "ro": "DFT implementation engineer"
+ },
+ "DFT-09": {
+  "st": "dft",
+  "w": [
+   16,
+   26
+  ],
+  "s": [
+   [
+    1,
+    "Analyze chain routing feasibility against the floorplan",
+    1.5
+   ],
+   [
+    2,
+    "Align the compression network topology to the physical partitions",
+    2
+   ],
+   [
+    3,
+    "Define the chain ordering and reordering strategy",
+    1.5,
+    1
+   ],
+   [
+    4,
+    "Assess the congestion impact of the test network",
+    1.5,
+    1
+   ],
+   [
+    5,
+    "Confirm test clock distribution feasibility",
+    1.5,
+    1
+   ],
+   [
+    6,
+    "Agree the physical DFT plan with physical design",
+    6.5
+   ]
+  ],
+  "o": [
+   "Chain routing feasibility findings",
+   "Compression topology aligned to physical partitions",
+   "Chain ordering and reordering strategy",
+   "Congestion impact assessment",
+   "Test clock distribution plan",
+   "Agreed physical DFT plan"
+  ],
+  "ob": [
+   1,
+   2,
+   3,
+   4,
+   5,
+   6
+  ],
+  "r": [
+   [
+    "DFT-D1",
+    "feeds"
    ],
    [
     "DFT-D4",
     "feeds"
    ]
   ],
-  "ro": "DFT implementation engineer"
+  "ro": "DFT physical lead"
  },
- "DFT-07": {
+ "DFT-10": {
   "st": "dft",
   "w": [
    22,
@@ -7976,7 +8189,7 @@ export const activitySteps: Record<string, ActivityStepEntry> = {
   ],
   "r": [
    [
-    "DFT-D4",
+    "DFT-D5",
     "produces"
    ],
    [
@@ -7986,7 +8199,7 @@ export const activitySteps: Record<string, ActivityStepEntry> = {
   ],
   "ro": "ATPG engineer"
  },
- "DFT-08": {
+ "DFT-11": {
   "st": "dft",
   "w": [
    28,
@@ -8062,219 +8275,6 @@ export const activitySteps: Record<string, ActivityStepEntry> = {
   ],
   "ro": "DFT validation engineer"
  },
- "DFT-09": {
-  "st": "dft",
-  "w": [
-   16,
-   26
-  ],
-  "s": [
-   [
-    1,
-    "Analyze chain routing feasibility against the floorplan",
-    1.5
-   ],
-   [
-    2,
-    "Align the compression network topology to the physical partitions",
-    2
-   ],
-   [
-    3,
-    "Define the chain ordering and reordering strategy",
-    1.5,
-    1
-   ],
-   [
-    4,
-    "Assess the congestion impact of the test network",
-    1.5,
-    1
-   ],
-   [
-    5,
-    "Confirm test clock distribution feasibility",
-    1.5,
-    1
-   ],
-   [
-    6,
-    "Agree the physical DFT plan with physical design",
-    6.5
-   ]
-  ],
-  "o": [
-   "Chain routing feasibility findings",
-   "Compression topology aligned to physical partitions",
-   "Chain ordering and reordering strategy",
-   "Congestion impact assessment",
-   "Test clock distribution plan",
-   "Agreed physical DFT plan"
-  ],
-  "ob": [
-   1,
-   2,
-   3,
-   4,
-   5,
-   6
-  ],
-  "r": [
-   [
-    "DFT-D1",
-    "feeds"
-   ],
-   [
-    "DFT-D5",
-    "feeds"
-   ]
-  ],
-  "ro": "DFT physical lead"
- },
- "DFT-10": {
-  "st": "dft",
-  "w": [
-   12,
-   18
-  ],
-  "s": [
-   [
-    1,
-    "Inventory the fuse consumers — repair, trim, ID, lifecycle, security",
-    1
-   ],
-   [
-    2,
-    "Allocate capacity against the worst-case need",
-    1
-   ],
-   [
-    3,
-    "Integrate the eFuse array and its programming path",
-    1.5,
-    1
-   ],
-   [
-    4,
-    "Design the fuse read, shadow register and distribution logic",
-    1.5
-   ],
-   [
-    5,
-    "Define the chip identity and traceability scheme",
-    1,
-    1
-   ],
-   [
-    6,
-    "Agree the lifecycle state encoding with ARCH-07",
-    1,
-    1
-   ],
-   [
-    7,
-    "Verify the fuse infrastructure end to end",
-    2.5
-   ]
-  ],
-  "o": [
-   "Fuse consumer inventory",
-   "Capacity allocation with worst-case margin",
-   "eFuse array integration and programming path",
-   "Fuse read and distribution logic",
-   "Chip identity scheme",
-   "Lifecycle state encoding agreed with the security architecture",
-   "Verified fuse infrastructure"
-  ],
-  "ob": [
-   1,
-   2,
-   3,
-   4,
-   5,
-   6,
-   7
-  ],
-  "r": [
-   [
-    "DFT-D2",
-    "feeds"
-   ],
-   [
-    "DFT-D3",
-    "feeds"
-   ]
-  ],
-  "ro": "Fuse and infrastructure engineer"
- },
- "DFT-11": {
-  "st": "dft",
-  "w": [
-   6,
-   14
-  ],
-  "s": [
-   [
-    1,
-    "Collect debug requirements from validation and design",
-    1
-   ],
-   [
-    2,
-    "Architect the observability — trace, triggers, snapshot",
-    2
-   ],
-   [
-    3,
-    "Budget the trace ports and bandwidth",
-    1,
-    1
-   ],
-   [
-    4,
-    "Design the trigger and cross-trigger network",
-    1.5,
-    1
-   ],
-   [
-    5,
-    "Implement internal state snapshot and scan dump capability",
-    1.5
-   ],
-   [
-    6,
-    "Verify the debug infrastructure and document it for the lab",
-    3.5
-   ]
-  ],
-  "o": [
-   "Debug requirement list",
-   "Observability architecture",
-   "Trace port and bandwidth budget",
-   "Trigger and cross-trigger network",
-   "Scan dump and snapshot capability",
-   "Debug infrastructure documentation"
-  ],
-  "ob": [
-   1,
-   2,
-   3,
-   4,
-   5,
-   6
-  ],
-  "r": [
-   [
-    "DFT-D3",
-    "feeds"
-   ],
-   [
-    "DFT-D1",
-    "feeds"
-   ]
-  ],
-  "ro": "DFT debug lead"
- },
  "SYN-01": {
   "st": "synthesis",
   "w": [
@@ -8333,7 +8333,7 @@ export const activitySteps: Record<string, ActivityStepEntry> = {
   ],
   "r": [
    [
-    "SYN-D4",
+    "SYN-D2",
     "produces"
    ],
    [
@@ -8405,13 +8405,151 @@ export const activitySteps: Record<string, ActivityStepEntry> = {
     "feeds"
    ],
    [
-    "SYN-D2",
+    "SYN-D4",
     "feeds"
    ]
   ],
   "ro": "Synthesis lead"
  },
  "SYN-03": {
+  "st": "synthesis",
+  "w": [
+   2,
+   24
+  ],
+  "s": [
+   [
+    1,
+    "Build the reporting framework and ingest the budgets",
+    1.5
+   ],
+   [
+    2,
+    "Report and analyze timing per drop",
+    2
+   ],
+   [
+    3,
+    "Compare against budget and apply the escalation rules",
+    2,
+    1
+   ],
+   [
+    4,
+    "Report area and power per drop",
+    2
+   ],
+   [
+    5,
+    "Analyze trends across the drop sequence",
+    2,
+    1
+   ],
+   [
+    6,
+    "Run continuous reporting across the stage",
+    16.5
+   ]
+  ],
+  "o": [
+   "Reporting framework with budget ingestion",
+   "Per-drop timing reports",
+   "Budget comparison per block",
+   "Escalation records",
+   "Per-drop area and power reports",
+   "Trend analysis across drops",
+   "Reporting log across the stage"
+  ],
+  "ob": [
+   1,
+   2,
+   3,
+   3,
+   4,
+   5,
+   6
+  ],
+  "r": [
+   [
+    "SYN-D5",
+    "produces"
+   ],
+   [
+    "SYN-D4",
+    "feeds"
+   ]
+  ],
+  "ro": "PPA reporting engineer"
+ },
+ "SYN-04": {
+  "st": "synthesis",
+  "w": [
+   2,
+   24
+  ],
+  "s": [
+   [
+    1,
+    "Define the handoff package contents and format",
+    1
+   ],
+   [
+    2,
+    "Assemble the package for each drop",
+    1.5
+   ],
+   [
+    3,
+    "Agree acceptance criteria with physical design",
+    1.5,
+    1
+   ],
+   [
+    4,
+    "Review the QoR delta with physical design per drop",
+    1.5
+   ],
+   [
+    5,
+    "Track issues between drops",
+    1.5,
+    1
+   ],
+   [
+    6,
+    "Run the continuous handoff across the drop sequence",
+    18
+   ]
+  ],
+  "o": [
+   "Handoff package definition and format",
+   "Per-drop handoff package",
+   "Acceptance criteria agreed with PD",
+   "QoR delta review records",
+   "Issue tracking between drops",
+   "Handoff log across the drop sequence"
+  ],
+  "ob": [
+   1,
+   2,
+   3,
+   4,
+   5,
+   6
+  ],
+  "r": [
+   [
+    "SYN-D7",
+    "produces"
+   ],
+   [
+    "SYN-D4",
+    "feeds"
+   ]
+  ],
+  "ro": "Synthesis lead"
+ },
+ "SYN-05": {
   "st": "synthesis",
   "w": [
    3,
@@ -8467,427 +8605,13 @@ export const activitySteps: Record<string, ActivityStepEntry> = {
     "produces"
    ],
    [
-    "SYN-D8",
-    "feeds"
-   ]
-  ],
-  "ro": "Synthesis lead"
- },
- "SYN-04": {
-  "st": "synthesis",
-  "w": [
-   6,
-   13
-  ],
-  "s": [
-   [
-    1,
-    "Set up the physical-aware flow with the floorplan",
-    1.5
-   ],
-   [
-    2,
-    "Run floorplan-aware mapping and optimization",
-    2
-   ],
-   [
-    3,
-    "Model macros and blockages in placement",
-    1.5,
-    1
-   ],
-   [
-    4,
-    "Run the congestion feedback loop with physical design",
-    2
-   ],
-   [
-    5,
-    "Restructure logic in the congested regions",
-    1.5,
-    1
-   ],
-   [
-    6,
-    "Compare QoR against the non-physical synthesis result",
-    1.5
-   ]
-  ],
-  "o": [
-   "Physical-aware synthesis flow",
-   "Floorplan-aware mapped netlist",
-   "Macro and blockage aware placement",
-   "Congestion feedback findings",
-   "Restructured logic in congested regions",
-   "QoR comparison against non-physical synthesis"
-  ],
-  "ob": [
-   1,
-   2,
-   3,
-   4,
-   5,
-   6
-  ],
-  "r": [
-   [
-    "SYN-D5",
-    "feeds"
-   ],
-   [
-    "SYN-D8",
-    "feeds"
-   ]
-  ],
-  "ro": "Synthesis engineers"
- },
- "SYN-05": {
-  "st": "synthesis",
-  "w": [
-   8,
-   13
-  ],
-  "s": [
-   [
-    1,
-    "Take in the RTL drop and review the delta against N0",
-    1
-   ],
-   [
-    2,
-    "Run synthesis and close at block level",
-    1.5
-   ],
-   [
-    3,
-    "Incorporate the physical design feedback",
-    1,
-    1
-   ],
-   [
-    4,
-    "Analyze the QoR delta against the N0 baseline",
-    1.5
-   ],
-   [
-    5,
-    "Compile the issue list for the next drop",
-    1,
-    1
-   ],
-   [
-    6,
-    "Release N1 and hand it off to physical design",
-    1
-   ]
-  ],
-  "o": [
-   "RTL drop intake and delta review",
-   "Block-level synthesis closure",
-   "Physical design feedback incorporation record",
-   "QoR delta analysis against N0",
-   "Issue list carried to N2",
-   "N1 netlist",
-   "Handoff package for PD turn 1"
-  ],
-  "ob": [
-   1,
-   2,
-   3,
-   4,
-   5,
-   6,
-   6
-  ],
-  "r": [
-   [
-    "SYN-D2",
-    "produces"
-   ],
-   [
-    "SYN-D5",
+    "SYN-D7",
     "feeds"
    ]
   ],
   "ro": "Synthesis lead"
  },
  "SYN-06": {
-  "st": "synthesis",
-  "w": [
-   9,
-   16
-  ],
-  "s": [
-   [
-    1,
-    "Establish the power analysis baseline and identify hot spots",
-    1.5
-   ],
-   [
-    2,
-    "Insert clock gating and analyze its efficiency",
-    2
-   ],
-   [
-    3,
-    "Optimize the Vt mix for leakage",
-    1.5,
-    1
-   ],
-   [
-    4,
-    "Implement operand isolation and datapath gating",
-    2
-   ],
-   [
-    5,
-    "Re-optimize with real switching activity data",
-    1.5,
-    1
-   ],
-   [
-    6,
-    "Report power QoR against the budget",
-    1.5
-   ]
-  ],
-  "o": [
-   "Power analysis baseline and hot spots",
-   "Clock gating insertion and efficiency report",
-   "Vt mix optimization results",
-   "Operand isolation implementation",
-   "Activity-driven optimization results",
-   "Power QoR against budget"
-  ],
-  "ob": [
-   1,
-   2,
-   3,
-   4,
-   5,
-   6
-  ],
-  "r": [
-   [
-    "SYN-D5",
-    "feeds"
-   ],
-   [
-    "SYN-D7",
-    "feeds"
-   ]
-  ],
-  "ro": "Power optimization engineer"
- },
- "SYN-07": {
-  "st": "synthesis",
-  "w": [
-   10,
-   15
-  ],
-  "s": [
-   [
-    1,
-    "Ingest and elaborate the UPF in the synthesis flow",
-    1
-   ],
-   [
-    2,
-    "Infer and insert isolation cells and level shifters",
-    1.5
-   ],
-   [
-    3,
-    "Handle always-on and feed-through paths",
-    1,
-    1
-   ],
-   [
-    4,
-    "Insert retention cells and their control",
-    1.5
-   ],
-   [
-    5,
-    "Check UPF-to-netlist consistency",
-    1,
-    1
-   ],
-   [
-    6,
-    "Write the power intent implementation report",
-    1
-   ]
-  ],
-  "o": [
-   "Elaborated UPF in the synthesis flow",
-   "Inserted isolation and level shifter cells",
-   "Always-on path implementation",
-   "Retention cell insertion and control logic",
-   "UPF-netlist consistency results",
-   "Power intent implementation report"
-  ],
-  "ob": [
-   1,
-   2,
-   3,
-   4,
-   5,
-   6
-  ],
-  "r": [
-   [
-    "SYN-D7",
-    "produces"
-   ],
-   [
-    "SYN-D6",
-    "feeds"
-   ]
-  ],
-  "ro": "Low-power synthesis engineer"
- },
- "SYN-08": {
-  "st": "synthesis",
-  "w": [
-   14,
-   19
-  ],
-  "s": [
-   [
-    1,
-    "Take in the RTL and ECO changes since N1",
-    1
-   ],
-   [
-    2,
-    "Run full synthesis with all optimizations enabled",
-    1.5
-   ],
-   [
-    3,
-    "Assess the impact of late RTL changes",
-    1,
-    1
-   ],
-   [
-    4,
-    "Check congestion and timing convergence",
-    1.5
-   ],
-   [
-    5,
-    "Incorporate the turn-1 feedback from physical design",
-    1,
-    1
-   ],
-   [
-    6,
-    "Release N2 with a closure risk statement",
-    1
-   ]
-  ],
-  "o": [
-   "RTL and ECO intake record since N1",
-   "N2 netlist with full optimization",
-   "Late change impact assessment",
-   "Congestion and timing convergence analysis",
-   "Turn-1 feedback incorporation record",
-   "Closure risk statement"
-  ],
-  "ob": [
-   1,
-   2,
-   3,
-   4,
-   5,
-   6
-  ],
-  "r": [
-   [
-    "SYN-D2",
-    "produces"
-   ],
-   [
-    "SYN-D5",
-    "feeds"
-   ]
-  ],
-  "ro": "Synthesis lead"
- },
- "SYN-09": {
-  "st": "synthesis",
-  "w": [
-   19,
-   23
-  ],
-  "s": [
-   [
-    1,
-    "Confirm RTL freeze and take the final intake",
-    0.75
-   ],
-   [
-    2,
-    "Run the final synthesis",
-    1.25
-   ],
-   [
-    3,
-    "Freeze the constraint set",
-    1,
-    1
-   ],
-   [
-    4,
-    "Verify final equivalence and UPF consistency",
-    1
-   ],
-   [
-    5,
-    "Assemble the handoff package for the final turn",
-    0.75,
-    1
-   ],
-   [
-    6,
-    "Release the FFN and declare functional freeze",
-    1
-   ]
-  ],
-  "o": [
-   "RTL freeze confirmation",
-   "Final synthesis run and netlist",
-   "Frozen constraint set",
-   "Final equivalence and UPF consistency results",
-   "Handoff package for the final turn",
-   "FFN release with functional freeze declaration"
-  ],
-  "ob": [
-   1,
-   2,
-   3,
-   4,
-   5,
-   6
-  ],
-  "r": [
-   [
-    "SYN-D3",
-    "produces"
-   ],
-   [
-    "SYN-D4",
-    "gates"
-   ],
-   [
-    "SYN-D8",
-    "feeds"
-   ]
-  ],
-  "ro": "Synthesis lead"
- },
- "SYN-10": {
   "st": "synthesis",
   "w": [
    4,
@@ -8964,65 +8688,63 @@ export const activitySteps: Record<string, ActivityStepEntry> = {
     "produces"
    ],
    [
-    "SYN-D3",
+    "SYN-D8",
     "gates"
    ]
   ],
   "ro": "Equivalence engineer"
  },
- "SYN-11": {
+ "SYN-07": {
   "st": "synthesis",
   "w": [
-   2,
-   24
+   6,
+   13
   ],
   "s": [
    [
     1,
-    "Build the reporting framework and ingest the budgets",
+    "Set up the physical-aware flow with the floorplan",
     1.5
    ],
    [
     2,
-    "Report and analyze timing per drop",
+    "Run floorplan-aware mapping and optimization",
     2
    ],
    [
     3,
-    "Compare against budget and apply the escalation rules",
-    2,
+    "Model macros and blockages in placement",
+    1.5,
     1
    ],
    [
     4,
-    "Report area and power per drop",
+    "Run the congestion feedback loop with physical design",
     2
    ],
    [
     5,
-    "Analyze trends across the drop sequence",
-    2,
+    "Restructure logic in the congested regions",
+    1.5,
     1
    ],
    [
     6,
-    "Run continuous reporting across the stage",
-    16.5
+    "Compare QoR against the non-physical synthesis result",
+    1.5
    ]
   ],
   "o": [
-   "Reporting framework with budget ingestion",
-   "Per-drop timing reports",
-   "Budget comparison per block",
-   "Escalation records",
-   "Per-drop area and power reports",
-   "Trend analysis across drops",
-   "Reporting log across the stage"
+   "Physical-aware synthesis flow",
+   "Floorplan-aware mapped netlist",
+   "Macro and blockage aware placement",
+   "Congestion feedback findings",
+   "Restructured logic in congested regions",
+   "QoR comparison against non-physical synthesis"
   ],
   "ob": [
    1,
    2,
-   3,
    3,
    4,
    5,
@@ -9031,62 +8753,336 @@ export const activitySteps: Record<string, ActivityStepEntry> = {
   "r": [
    [
     "SYN-D5",
-    "produces"
+    "feeds"
    ],
    [
-    "SYN-D2",
+    "SYN-D7",
     "feeds"
    ]
   ],
-  "ro": "PPA reporting engineer"
+  "ro": "Synthesis engineers"
  },
- "SYN-12": {
+ "SYN-08": {
   "st": "synthesis",
   "w": [
-   2,
-   24
+   8,
+   13
   ],
   "s": [
    [
     1,
-    "Define the handoff package contents and format",
+    "Take in the RTL drop and review the delta against N0",
     1
    ],
    [
     2,
-    "Assemble the package for each drop",
+    "Run synthesis and close at block level",
     1.5
    ],
    [
     3,
-    "Agree acceptance criteria with physical design",
+    "Incorporate the physical design feedback",
+    1,
+    1
+   ],
+   [
+    4,
+    "Analyze the QoR delta against the N0 baseline",
+    1.5
+   ],
+   [
+    5,
+    "Compile the issue list for the next drop",
+    1,
+    1
+   ],
+   [
+    6,
+    "Release N1 and hand it off to physical design",
+    1
+   ]
+  ],
+  "o": [
+   "RTL drop intake and delta review",
+   "Block-level synthesis closure",
+   "Physical design feedback incorporation record",
+   "QoR delta analysis against N0",
+   "Issue list carried to N2",
+   "N1 netlist",
+   "Handoff package for PD turn 1"
+  ],
+  "ob": [
+   1,
+   2,
+   3,
+   4,
+   5,
+   6,
+   6
+  ],
+  "r": [
+   [
+    "SYN-D4",
+    "produces"
+   ],
+   [
+    "SYN-D5",
+    "feeds"
+   ]
+  ],
+  "ro": "Synthesis lead"
+ },
+ "SYN-09": {
+  "st": "synthesis",
+  "w": [
+   9,
+   16
+  ],
+  "s": [
+   [
+    1,
+    "Establish the power analysis baseline and identify hot spots",
+    1.5
+   ],
+   [
+    2,
+    "Insert clock gating and analyze its efficiency",
+    2
+   ],
+   [
+    3,
+    "Optimize the Vt mix for leakage",
     1.5,
     1
    ],
    [
     4,
-    "Review the QoR delta with physical design per drop",
-    1.5
+    "Implement operand isolation and datapath gating",
+    2
    ],
    [
     5,
-    "Track issues between drops",
+    "Re-optimize with real switching activity data",
     1.5,
     1
    ],
    [
     6,
-    "Run the continuous handoff across the drop sequence",
-    18
+    "Report power QoR against the budget",
+    1.5
    ]
   ],
   "o": [
-   "Handoff package definition and format",
-   "Per-drop handoff package",
-   "Acceptance criteria agreed with PD",
-   "QoR delta review records",
-   "Issue tracking between drops",
-   "Handoff log across the drop sequence"
+   "Power analysis baseline and hot spots",
+   "Clock gating insertion and efficiency report",
+   "Vt mix optimization results",
+   "Operand isolation implementation",
+   "Activity-driven optimization results",
+   "Power QoR against budget"
+  ],
+  "ob": [
+   1,
+   2,
+   3,
+   4,
+   5,
+   6
+  ],
+  "r": [
+   [
+    "SYN-D5",
+    "feeds"
+   ],
+   [
+    "SYN-D3",
+    "feeds"
+   ]
+  ],
+  "ro": "Power optimization engineer"
+ },
+ "SYN-10": {
+  "st": "synthesis",
+  "w": [
+   10,
+   15
+  ],
+  "s": [
+   [
+    1,
+    "Ingest and elaborate the UPF in the synthesis flow",
+    1
+   ],
+   [
+    2,
+    "Infer and insert isolation cells and level shifters",
+    1.5
+   ],
+   [
+    3,
+    "Handle always-on and feed-through paths",
+    1,
+    1
+   ],
+   [
+    4,
+    "Insert retention cells and their control",
+    1.5
+   ],
+   [
+    5,
+    "Check UPF-to-netlist consistency",
+    1,
+    1
+   ],
+   [
+    6,
+    "Write the power intent implementation report",
+    1
+   ]
+  ],
+  "o": [
+   "Elaborated UPF in the synthesis flow",
+   "Inserted isolation and level shifter cells",
+   "Always-on path implementation",
+   "Retention cell insertion and control logic",
+   "UPF-netlist consistency results",
+   "Power intent implementation report"
+  ],
+  "ob": [
+   1,
+   2,
+   3,
+   4,
+   5,
+   6
+  ],
+  "r": [
+   [
+    "SYN-D3",
+    "produces"
+   ],
+   [
+    "SYN-D6",
+    "feeds"
+   ]
+  ],
+  "ro": "Low-power synthesis engineer"
+ },
+ "SYN-11": {
+  "st": "synthesis",
+  "w": [
+   14,
+   19
+  ],
+  "s": [
+   [
+    1,
+    "Take in the RTL and ECO changes since N1",
+    1
+   ],
+   [
+    2,
+    "Run full synthesis with all optimizations enabled",
+    1.5
+   ],
+   [
+    3,
+    "Assess the impact of late RTL changes",
+    1,
+    1
+   ],
+   [
+    4,
+    "Check congestion and timing convergence",
+    1.5
+   ],
+   [
+    5,
+    "Incorporate the turn-1 feedback from physical design",
+    1,
+    1
+   ],
+   [
+    6,
+    "Release N2 with a closure risk statement",
+    1
+   ]
+  ],
+  "o": [
+   "RTL and ECO intake record since N1",
+   "N2 netlist with full optimization",
+   "Late change impact assessment",
+   "Congestion and timing convergence analysis",
+   "Turn-1 feedback incorporation record",
+   "Closure risk statement"
+  ],
+  "ob": [
+   1,
+   2,
+   3,
+   4,
+   5,
+   6
+  ],
+  "r": [
+   [
+    "SYN-D4",
+    "produces"
+   ],
+   [
+    "SYN-D5",
+    "feeds"
+   ]
+  ],
+  "ro": "Synthesis lead"
+ },
+ "SYN-12": {
+  "st": "synthesis",
+  "w": [
+   19,
+   23
+  ],
+  "s": [
+   [
+    1,
+    "Confirm RTL freeze and take the final intake",
+    0.75
+   ],
+   [
+    2,
+    "Run the final synthesis",
+    1.25
+   ],
+   [
+    3,
+    "Freeze the constraint set",
+    1,
+    1
+   ],
+   [
+    4,
+    "Verify final equivalence and UPF consistency",
+    1
+   ],
+   [
+    5,
+    "Assemble the handoff package for the final turn",
+    0.75,
+    1
+   ],
+   [
+    6,
+    "Release the FFN and declare functional freeze",
+    1
+   ]
+  ],
+  "o": [
+   "RTL freeze confirmation",
+   "Final synthesis run and netlist",
+   "Frozen constraint set",
+   "Final equivalence and UPF consistency results",
+   "Handoff package for the final turn",
+   "FFN release with functional freeze declaration"
   ],
   "ob": [
    1,
@@ -9103,6 +9099,10 @@ export const activitySteps: Record<string, ActivityStepEntry> = {
    ],
    [
     "SYN-D2",
+    "gates"
+   ],
+   [
+    "SYN-D7",
     "feeds"
    ]
   ],
@@ -9170,7 +9170,7 @@ export const activitySteps: Record<string, ActivityStepEntry> = {
     "produces"
    ],
    [
-    "PD-D5",
+    "PD-D6",
     "feeds"
    ]
   ],
@@ -9234,11 +9234,11 @@ export const activitySteps: Record<string, ActivityStepEntry> = {
   ],
   "r": [
    [
-    "PD-D4",
+    "PD-D2",
     "produces"
    ],
    [
-    "PD-D2",
+    "PD-D4",
     "feeds"
    ]
   ],
@@ -9302,11 +9302,11 @@ export const activitySteps: Record<string, ActivityStepEntry> = {
   ],
   "r": [
    [
-    "PD-D4",
+    "PD-D2",
     "produces"
    ],
    [
-    "PD-D5",
+    "PD-D6",
     "feeds"
    ]
   ],
@@ -9372,11 +9372,11 @@ export const activitySteps: Record<string, ActivityStepEntry> = {
   ],
   "r": [
    [
-    "PD-D7",
+    "PD-D3",
     "produces"
    ],
    [
-    "PD-D4",
+    "PD-D2",
     "feeds"
    ]
   ],
@@ -9459,11 +9459,11 @@ export const activitySteps: Record<string, ActivityStepEntry> = {
   ],
   "r": [
    [
-    "PD-D2",
+    "PD-D4",
     "produces"
    ],
    [
-    "PD-D5",
+    "PD-D6",
     "feeds"
    ]
   ],
@@ -9472,64 +9472,63 @@ export const activitySteps: Record<string, ActivityStepEntry> = {
  "PD-06": {
   "st": "physicalDesign",
   "w": [
-   14,
-   22
+   8,
+   30
   ],
   "s": [
    [
     1,
-    "Take in N2 and assess the delta against turn 1",
-    1
+    "Set up timing and define the MMMC scenarios",
+    1.5
    ],
    [
     2,
-    "Place with congestion mitigation",
-    2
+    "Close setup timing",
+    3
    ],
    [
     3,
-    "Restructure congestion hot spots with synthesis",
-    1.5,
+    "Track and report the violation burn-down",
+    3,
     1
    ],
    [
     4,
-    "Refine the clock trees",
-    2
+    "Close hold timing",
+    3
    ],
    [
     5,
-    "Converge timing through ECO rounds",
-    1.5,
+    "Generate and apply timing ECOs",
+    3,
     1
    ],
    [
     6,
-    "Converge the route",
-    2
+    "Converge across corners and modes",
+    3.5
    ],
    [
     7,
-    "Converge power and IR",
-    1.5,
+    "Correlate against the signoff timing flow",
+    3,
     1
    ],
    [
     8,
-    "Quantify the closure risk for the final turn",
-    1
+    "Run continuous closure across turns",
+    11
    ]
   ],
   "o": [
-   "N2 intake and delta assessment",
-   "Placement with congestion mitigation",
-   "Congestion mitigation and restructuring results",
-   "Refined clock trees",
-   "Timing convergence and ECO record",
-   "Converged route",
-   "Power and IR convergence results",
-   "Turn 2 placed and routed database",
-   "Closure risk quantification"
+   "MMMC timing scenarios",
+   "Setup timing closure results",
+   "Violation burn-down tracking",
+   "Hold timing closure results",
+   "Timing ECOs",
+   "Cross-corner convergence results",
+   "Signoff correlation findings",
+   "Closure record across turns"
   ],
   "ob": [
    1,
@@ -9539,20 +9538,19 @@ export const activitySteps: Record<string, ActivityStepEntry> = {
    5,
    6,
    7,
-   8,
    8
   ],
   "r": [
    [
-    "PD-D2",
+    "PD-D6",
     "produces"
    ],
    [
-    "PD-D5",
+    "PD-D8",
     "feeds"
    ]
   ],
-  "ro": "Physical design turn lead"
+  "ro": "Timing closure lead"
  },
  "PD-07": {
   "st": "physicalDesign",
@@ -9629,11 +9627,11 @@ export const activitySteps: Record<string, ActivityStepEntry> = {
   ],
   "r": [
    [
-    "PD-D5",
+    "PD-D6",
     "feeds"
    ],
    [
-    "PD-D2",
+    "PD-D4",
     "feeds"
    ]
   ],
@@ -9712,11 +9710,11 @@ export const activitySteps: Record<string, ActivityStepEntry> = {
   ],
   "r": [
    [
-    "PD-D6",
+    "PD-D5",
     "produces"
    ],
    [
-    "PD-D3",
+    "PD-D8",
     "feeds"
    ]
   ],
@@ -9725,63 +9723,276 @@ export const activitySteps: Record<string, ActivityStepEntry> = {
  "PD-09": {
   "st": "physicalDesign",
   "w": [
-   8,
+   12,
    30
   ],
   "s": [
    [
     1,
-    "Set up timing and define the MMMC scenarios",
+    "Set up the ECO flow and methodology",
     1.5
    ],
    [
     2,
-    "Close setup timing",
-    3
+    "Build the functional ECO implementation capability",
+    2.5
    ],
    [
     3,
-    "Track and report the violation burn-down",
-    3,
+    "Assess and track the impact of each ECO",
+    2,
     1
    ],
    [
     4,
-    "Close hold timing",
-    3
+    "Implement the timing ECOs",
+    2.5
    ],
    [
     5,
-    "Generate and apply timing ECOs",
-    3,
+    "Establish the spare cell and metal-only ECO strategy",
+    2,
     1
    ],
    [
     6,
-    "Converge across corners and modes",
-    3.5
+    "Operate the ECO machinery continuously across turns",
+    11.5
+   ]
+  ],
+  "o": [
+   "ECO flow and methodology",
+   "Functional ECO implementation capability",
+   "Impact assessment and tracking records",
+   "Timing ECO implementation",
+   "Spare cell and metal-only strategy",
+   "ECO log across turns"
+  ],
+  "ob": [
+   1,
+   2,
+   3,
+   4,
+   5,
+   6
+  ],
+  "r": [
+   [
+    "PD-D7",
+    "produces"
+   ],
+   [
+    "PD-D8",
+    "feeds"
+   ]
+  ],
+  "ro": "ECO lead"
+ },
+ "PD-10": {
+  "st": "physicalDesign",
+  "w": [
+   14,
+   19
+  ],
+  "s": [
+   [
+    1,
+    "Define the power model requirements with SIPI",
+    1
+   ],
+   [
+    2,
+    "Extract the CPM per domain and operating mode",
+    1.5
+   ],
+   [
+    3,
+    "Select the switching scenarios for the extraction",
+    1,
+    1
+   ],
+   [
+    4,
+    "Validate the model against internal IR analysis",
+    1.5
+   ],
+   [
+    5,
+    "Hand the model off under version control",
+    1
+   ]
+  ],
+  "o": [
+   "Power model requirement definition",
+   "Chip power model per domain and mode",
+   "Switching scenario selection record",
+   "Model validation against internal IR",
+   "Versioned model handoff"
+  ],
+  "ob": [
+   1,
+   2,
+   3,
+   4,
+   5
+  ],
+  "r": [
+   [
+    "PD-D2",
+    "feeds"
+   ],
+   [
+    "PD-D3",
+    "feeds"
+   ]
+  ],
+  "ro": "Power modeling engineer"
+ },
+ "PD-11": {
+  "st": "physicalDesign",
+  "w": [
+   14,
+   22
+  ],
+  "s": [
+   [
+    1,
+    "Take in N2 and assess the delta against turn 1",
+    1
+   ],
+   [
+    2,
+    "Place with congestion mitigation",
+    2
+   ],
+   [
+    3,
+    "Restructure congestion hot spots with synthesis",
+    1.5,
+    1
+   ],
+   [
+    4,
+    "Refine the clock trees",
+    2
+   ],
+   [
+    5,
+    "Converge timing through ECO rounds",
+    1.5,
+    1
+   ],
+   [
+    6,
+    "Converge the route",
+    2
    ],
    [
     7,
-    "Correlate against the signoff timing flow",
-    3,
+    "Converge power and IR",
+    1.5,
     1
    ],
    [
     8,
-    "Run continuous closure across turns",
-    11
+    "Quantify the closure risk for the final turn",
+    1
    ]
   ],
   "o": [
-   "MMMC timing scenarios",
-   "Setup timing closure results",
-   "Violation burn-down tracking",
-   "Hold timing closure results",
-   "Timing ECOs",
-   "Cross-corner convergence results",
-   "Signoff correlation findings",
-   "Closure record across turns"
+   "N2 intake and delta assessment",
+   "Placement with congestion mitigation",
+   "Congestion mitigation and restructuring results",
+   "Refined clock trees",
+   "Timing convergence and ECO record",
+   "Converged route",
+   "Power and IR convergence results",
+   "Turn 2 placed and routed database",
+   "Closure risk quantification"
+  ],
+  "ob": [
+   1,
+   2,
+   3,
+   4,
+   5,
+   6,
+   7,
+   8,
+   8
+  ],
+  "r": [
+   [
+    "PD-D4",
+    "produces"
+   ],
+   [
+    "PD-D6",
+    "feeds"
+   ]
+  ],
+  "ro": "Physical design turn lead"
+ },
+ "PD-12": {
+  "st": "physicalDesign",
+  "w": [
+   14,
+   28
+  ],
+  "s": [
+   [
+    1,
+    "Define the block closure criteria and handoff",
+    1.5
+   ],
+   [
+    2,
+    "Close the blocks at block level",
+    3
+   ],
+   [
+    3,
+    "Set inter-block timing budgets and close the interfaces",
+    2.5,
+    1
+   ],
+   [
+    4,
+    "Generate the block abstracts and timing models",
+    3
+   ],
+   [
+    5,
+    "Manage top-level routing and feedthroughs",
+    2.5,
+    1
+   ],
+   [
+    6,
+    "Assemble the top level",
+    3
+   ],
+   [
+    7,
+    "Correlate hierarchical timing — block model against flat",
+    2,
+    1
+   ],
+   [
+    8,
+    "Verify the top-level integration",
+    3.5
+   ]
+  ],
+  "o": [
+   "Block closure criteria",
+   "Block-level closure results",
+   "Inter-block timing budgets",
+   "Block abstracts and timing models",
+   "Top-level routing and feedthroughs",
+   "Assembled top level",
+   "Hierarchical timing correlation results",
+   "Assembled and verified top level"
   ],
   "ob": [
    1,
@@ -9795,17 +10006,85 @@ export const activitySteps: Record<string, ActivityStepEntry> = {
   ],
   "r": [
    [
-    "PD-D5",
+    "PD-D9",
     "produces"
    ],
    [
-    "PD-D3",
+    "PD-D8",
     "feeds"
    ]
   ],
-  "ro": "Timing closure lead"
+  "ro": "Hierarchical closure lead"
  },
- "PD-10": {
+ "PD-13": {
+  "st": "physicalDesign",
+  "w": [
+   16,
+   22
+  ],
+  "s": [
+   [
+    1,
+    "Analyze the physical scan chains and their routing cost",
+    1
+   ],
+   [
+    2,
+    "Reorder the chains for routing efficiency",
+    1.5
+   ],
+   [
+    3,
+    "Preserve the diagnosis mapping through the reorder",
+    1,
+    1
+   ],
+   [
+    4,
+    "Route and shield the test paths DFT-aware",
+    1.5
+   ],
+   [
+    5,
+    "Route the test clocks and manage their skew",
+    1,
+    1
+   ],
+   [
+    6,
+    "Verify the chains after the reorder",
+    2
+   ]
+  ],
+  "o": [
+   "Chain routing cost analysis",
+   "Reordered scan chains",
+   "Diagnosis mapping record",
+   "DFT-aware routing and shielding",
+   "Test clock routing",
+   "Post-reorder chain verification results"
+  ],
+  "ob": [
+   1,
+   2,
+   3,
+   4,
+   5,
+   6
+  ],
+  "r": [
+   [
+    "PD-D5",
+    "feeds"
+   ],
+   [
+    "PD-D8",
+    "feeds"
+   ]
+  ],
+  "ro": "DFT physical engineer"
+ },
+ "PD-14": {
   "st": "physicalDesign",
   "w": [
    16,
@@ -9865,145 +10144,17 @@ export const activitySteps: Record<string, ActivityStepEntry> = {
   ],
   "r": [
    [
-    "PD-D6",
+    "PD-D5",
     "feeds"
    ],
    [
-    "PD-D5",
+    "PD-D6",
     "feeds"
    ]
   ],
   "ro": "SI/PI engineer"
  },
- "PD-11": {
-  "st": "physicalDesign",
-  "w": [
-   14,
-   19
-  ],
-  "s": [
-   [
-    1,
-    "Define the power model requirements with SIPI",
-    1
-   ],
-   [
-    2,
-    "Extract the CPM per domain and operating mode",
-    1.5
-   ],
-   [
-    3,
-    "Select the switching scenarios for the extraction",
-    1,
-    1
-   ],
-   [
-    4,
-    "Validate the model against internal IR analysis",
-    1.5
-   ],
-   [
-    5,
-    "Hand the model off under version control",
-    1
-   ]
-  ],
-  "o": [
-   "Power model requirement definition",
-   "Chip power model per domain and mode",
-   "Switching scenario selection record",
-   "Model validation against internal IR",
-   "Versioned model handoff"
-  ],
-  "ob": [
-   1,
-   2,
-   3,
-   4,
-   5
-  ],
-  "r": [
-   [
-    "PD-D4",
-    "feeds"
-   ],
-   [
-    "PD-D7",
-    "feeds"
-   ]
-  ],
-  "ro": "Power modeling engineer"
- },
- "PD-12": {
-  "st": "physicalDesign",
-  "w": [
-   16,
-   22
-  ],
-  "s": [
-   [
-    1,
-    "Analyze the physical scan chains and their routing cost",
-    1
-   ],
-   [
-    2,
-    "Reorder the chains for routing efficiency",
-    1.5
-   ],
-   [
-    3,
-    "Preserve the diagnosis mapping through the reorder",
-    1,
-    1
-   ],
-   [
-    4,
-    "Route and shield the test paths DFT-aware",
-    1.5
-   ],
-   [
-    5,
-    "Route the test clocks and manage their skew",
-    1,
-    1
-   ],
-   [
-    6,
-    "Verify the chains after the reorder",
-    2
-   ]
-  ],
-  "o": [
-   "Chain routing cost analysis",
-   "Reordered scan chains",
-   "Diagnosis mapping record",
-   "DFT-aware routing and shielding",
-   "Test clock routing",
-   "Post-reorder chain verification results"
-  ],
-  "ob": [
-   1,
-   2,
-   3,
-   4,
-   5,
-   6
-  ],
-  "r": [
-   [
-    "PD-D6",
-    "feeds"
-   ],
-   [
-    "PD-D3",
-    "feeds"
-   ]
-  ],
-  "ro": "DFT physical engineer"
- },
- "PD-13": {
+ "PD-15": {
   "st": "physicalDesign",
   "w": [
    19,
@@ -10091,85 +10242,17 @@ export const activitySteps: Record<string, ActivityStepEntry> = {
   ],
   "r": [
    [
-    "PD-D3",
+    "PD-D8",
     "produces"
    ],
    [
-    "PD-D5",
+    "PD-D6",
     "feeds"
    ]
   ],
   "ro": "Physical design lead"
  },
- "PD-14": {
-  "st": "physicalDesign",
-  "w": [
-   12,
-   30
-  ],
-  "s": [
-   [
-    1,
-    "Set up the ECO flow and methodology",
-    1.5
-   ],
-   [
-    2,
-    "Build the functional ECO implementation capability",
-    2.5
-   ],
-   [
-    3,
-    "Assess and track the impact of each ECO",
-    2,
-    1
-   ],
-   [
-    4,
-    "Implement the timing ECOs",
-    2.5
-   ],
-   [
-    5,
-    "Establish the spare cell and metal-only ECO strategy",
-    2,
-    1
-   ],
-   [
-    6,
-    "Operate the ECO machinery continuously across turns",
-    11.5
-   ]
-  ],
-  "o": [
-   "ECO flow and methodology",
-   "Functional ECO implementation capability",
-   "Impact assessment and tracking records",
-   "Timing ECO implementation",
-   "Spare cell and metal-only strategy",
-   "ECO log across turns"
-  ],
-  "ob": [
-   1,
-   2,
-   3,
-   4,
-   5,
-   6
-  ],
-  "r": [
-   [
-    "PD-D8",
-    "produces"
-   ],
-   [
-    "PD-D3",
-    "feeds"
-   ]
-  ],
-  "ro": "ECO lead"
- },
- "PD-15": {
+ "PD-16": {
   "st": "physicalDesign",
   "w": [
    24,
@@ -10227,98 +10310,15 @@ export const activitySteps: Record<string, ActivityStepEntry> = {
   ],
   "r": [
    [
-    "PD-D3",
+    "PD-D8",
     "feeds"
    ],
    [
-    "PD-D6",
+    "PD-D5",
     "feeds"
    ]
   ],
   "ro": "Chip finishing engineer"
- },
- "PD-16": {
-  "st": "physicalDesign",
-  "w": [
-   14,
-   28
-  ],
-  "s": [
-   [
-    1,
-    "Define the block closure criteria and handoff",
-    1.5
-   ],
-   [
-    2,
-    "Close the blocks at block level",
-    3
-   ],
-   [
-    3,
-    "Set inter-block timing budgets and close the interfaces",
-    2.5,
-    1
-   ],
-   [
-    4,
-    "Generate the block abstracts and timing models",
-    3
-   ],
-   [
-    5,
-    "Manage top-level routing and feedthroughs",
-    2.5,
-    1
-   ],
-   [
-    6,
-    "Assemble the top level",
-    3
-   ],
-   [
-    7,
-    "Correlate hierarchical timing — block model against flat",
-    2,
-    1
-   ],
-   [
-    8,
-    "Verify the top-level integration",
-    3.5
-   ]
-  ],
-  "o": [
-   "Block closure criteria",
-   "Block-level closure results",
-   "Inter-block timing budgets",
-   "Block abstracts and timing models",
-   "Top-level routing and feedthroughs",
-   "Assembled top level",
-   "Hierarchical timing correlation results",
-   "Assembled and verified top level"
-  ],
-  "ob": [
-   1,
-   2,
-   3,
-   4,
-   5,
-   6,
-   7,
-   8
-  ],
-  "r": [
-   [
-    "PD-D9",
-    "produces"
-   ],
-   [
-    "PD-D3",
-    "feeds"
-   ]
-  ],
-  "ro": "Hierarchical closure lead"
  },
  "SO-01": {
   "st": "signoff",
@@ -10375,13 +10375,74 @@ export const activitySteps: Record<string, ActivityStepEntry> = {
     "feeds"
    ],
    [
-    "SO-D1",
+    "SO-D4",
     "feeds"
    ]
   ],
   "ro": "Signoff lead"
  },
  "SO-02": {
+  "st": "signoff",
+  "w": [
+   2,
+   7
+  ],
+  "s": [
+   [
+    1,
+    "Define the correlation methodology and select reference cases",
+    1
+   ],
+   [
+    2,
+    "Correlate the implementation tool against the signoff tool",
+    1.5
+   ],
+   [
+    3,
+    "Correlate against the foundry decks and derates",
+    1,
+    1
+   ],
+   [
+    4,
+    "Correlate extraction and parasitics",
+    1,
+    1
+   ],
+   [
+    5,
+    "Publish the correlation findings and margin guidance",
+    2.5
+   ]
+  ],
+  "o": [
+   "Correlation methodology and reference cases",
+   "Implementation to signoff correlation results",
+   "Foundry deck and derate correlation",
+   "Extraction and parasitic correlation",
+   "Margin guidance for physical design"
+  ],
+  "ob": [
+   1,
+   2,
+   3,
+   4,
+   5
+  ],
+  "r": [
+   [
+    "SO-D4",
+    "feeds"
+   ],
+   [
+    "SO-D7",
+    "feeds"
+   ]
+  ],
+  "ro": "Signoff methodology engineer"
+ },
+ "SO-03": {
   "st": "signoff",
   "w": [
    5,
@@ -10447,7 +10508,7 @@ export const activitySteps: Record<string, ActivityStepEntry> = {
   ],
   "r": [
    [
-    "SO-D1",
+    "SO-D4",
     "produces"
    ],
    [
@@ -10457,7 +10518,7 @@ export const activitySteps: Record<string, ActivityStepEntry> = {
   ],
   "ro": "STA signoff lead"
  },
- "SO-03": {
+ "SO-04": {
   "st": "signoff",
   "w": [
    6,
@@ -10515,7 +10576,7 @@ export const activitySteps: Record<string, ActivityStepEntry> = {
   ],
   "r": [
    [
-    "SO-D2",
+    "SO-D5",
     "produces"
    ],
    [
@@ -10525,7 +10586,7 @@ export const activitySteps: Record<string, ActivityStepEntry> = {
   ],
   "ro": "Physical verification lead"
  },
- "SO-04": {
+ "SO-05": {
   "st": "signoff",
   "w": [
    7,
@@ -10583,17 +10644,139 @@ export const activitySteps: Record<string, ActivityStepEntry> = {
   ],
   "r": [
    [
-    "SO-D3",
+    "SO-D1",
     "produces"
    ],
    [
-    "SO-D1",
+    "SO-D4",
     "feeds"
    ]
   ],
   "ro": "EM/IR signoff lead"
  },
- "SO-05": {
+ "SO-06": {
+  "st": "signoff",
+  "w": [
+   8,
+   14
+  ],
+  "s": [
+   [
+    1,
+    "Collect the reliability requirements and set up the rules",
+    1
+   ],
+   [
+    2,
+    "Verify ESD paths through the full chip",
+    1.5
+   ],
+   [
+    3,
+    "Verify latch-up structures and guard rings",
+    1.5,
+    1
+   ],
+   [
+    4,
+    "Estimate the soft error rate and FIT",
+    1.5,
+    1
+   ],
+   [
+    5,
+    "Close reliability and disposition the waivers",
+    3.5
+   ]
+  ],
+  "o": [
+   "Reliability requirements and rule setup",
+   "Full-chip ESD path verification results",
+   "Latch-up and guard ring verification",
+   "Soft error rate and FIT estimate",
+   "Reliability signoff report and waivers"
+  ],
+  "ob": [
+   1,
+   2,
+   3,
+   4,
+   5
+  ],
+  "r": [
+   [
+    "SO-D2",
+    "produces"
+   ],
+   [
+    "SO-D7",
+    "feeds"
+   ]
+  ],
+  "ro": "Reliability signoff engineer"
+ },
+ "SO-07": {
+  "st": "signoff",
+  "w": [
+   8,
+   14
+  ],
+  "s": [
+   [
+    1,
+    "Set up the DFM decks and confirm the model versions",
+    1
+   ],
+   [
+    2,
+    "Detect and analyze lithography hotspots",
+    1.5
+   ],
+   [
+    3,
+    "Simulate CMP and density",
+    1.5,
+    1
+   ],
+   [
+    4,
+    "Score recommended rule compliance",
+    1.5,
+    1
+   ],
+   [
+    5,
+    "Fix the hotspots and close DFM",
+    3.5
+   ]
+  ],
+  "o": [
+   "DFM deck setup and model versions",
+   "Litho hotspot analysis results",
+   "CMP and density simulation results",
+   "Recommended rule compliance score",
+   "Hotspot fixes and DFM closure report"
+  ],
+  "ob": [
+   1,
+   2,
+   3,
+   4,
+   5
+  ],
+  "r": [
+   [
+    "SO-D3",
+    "produces"
+   ],
+   [
+    "SO-D5",
+    "feeds"
+   ]
+  ],
+  "ro": "DFM engineer"
+ },
+ "SO-08": {
   "st": "signoff",
   "w": [
    9,
@@ -10651,198 +10834,15 @@ export const activitySteps: Record<string, ActivityStepEntry> = {
   ],
   "r": [
    [
-    "SO-D3",
+    "SO-D1",
     "produces"
    ],
    [
-    "SO-D1",
+    "SO-D4",
     "feeds"
    ]
   ],
   "ro": "SI signoff engineer"
- },
- "SO-06": {
-  "st": "signoff",
-  "w": [
-   11,
-   15
-  ],
-  "s": [
-   [
-    1,
-    "Take in the SIPI results and confirm the scope",
-    0.75
-   ],
-   [
-    2,
-    "Reconcile die-only against system-level IR",
-    1.25
-   ],
-   [
-    3,
-    "Review channel compliance against the interface budgets",
-    1,
-    1
-   ],
-   [
-    4,
-    "Review the power-aware timing correlation",
-    1,
-    1
-   ],
-   [
-    5,
-    "Review the co-verification signoff and disposition the criteria",
-    2
-   ]
-  ],
-  "o": [
-   "SIPI result intake record",
-   "Die-only against system-level reconciliation",
-   "Channel compliance review findings",
-   "Power-aware timing correlation review",
-   "Co-verification signoff disposition"
-  ],
-  "ob": [
-   1,
-   2,
-   3,
-   4,
-   5
-  ],
-  "r": [
-   [
-    "SO-D3",
-    "feeds"
-   ],
-   [
-    "SO-D7",
-    "feeds"
-   ]
-  ],
-  "ro": "Signoff lead"
- },
- "SO-07": {
-  "st": "signoff",
-  "w": [
-   8,
-   14
-  ],
-  "s": [
-   [
-    1,
-    "Collect the reliability requirements and set up the rules",
-    1
-   ],
-   [
-    2,
-    "Verify ESD paths through the full chip",
-    1.5
-   ],
-   [
-    3,
-    "Verify latch-up structures and guard rings",
-    1.5,
-    1
-   ],
-   [
-    4,
-    "Estimate the soft error rate and FIT",
-    1.5,
-    1
-   ],
-   [
-    5,
-    "Close reliability and disposition the waivers",
-    3.5
-   ]
-  ],
-  "o": [
-   "Reliability requirements and rule setup",
-   "Full-chip ESD path verification results",
-   "Latch-up and guard ring verification",
-   "Soft error rate and FIT estimate",
-   "Reliability signoff report and waivers"
-  ],
-  "ob": [
-   1,
-   2,
-   3,
-   4,
-   5
-  ],
-  "r": [
-   [
-    "SO-D4",
-    "produces"
-   ],
-   [
-    "SO-D7",
-    "feeds"
-   ]
-  ],
-  "ro": "Reliability signoff engineer"
- },
- "SO-08": {
-  "st": "signoff",
-  "w": [
-   8,
-   14
-  ],
-  "s": [
-   [
-    1,
-    "Set up the DFM decks and confirm the model versions",
-    1
-   ],
-   [
-    2,
-    "Detect and analyze lithography hotspots",
-    1.5
-   ],
-   [
-    3,
-    "Simulate CMP and density",
-    1.5,
-    1
-   ],
-   [
-    4,
-    "Score recommended rule compliance",
-    1.5,
-    1
-   ],
-   [
-    5,
-    "Fix the hotspots and close DFM",
-    3.5
-   ]
-  ],
-  "o": [
-   "DFM deck setup and model versions",
-   "Litho hotspot analysis results",
-   "CMP and density simulation results",
-   "Recommended rule compliance score",
-   "Hotspot fixes and DFM closure report"
-  ],
-  "ob": [
-   1,
-   2,
-   3,
-   4,
-   5
-  ],
-  "r": [
-   [
-    "SO-D5",
-    "produces"
-   ],
-   [
-    "SO-D2",
-    "feeds"
-   ]
-  ],
-  "ro": "DFM engineer"
  },
  "SO-09": {
   "st": "signoff",
@@ -10909,6 +10909,67 @@ export const activitySteps: Record<string, ActivityStepEntry> = {
   "st": "signoff",
   "w": [
    10,
+   15
+  ],
+  "s": [
+   [
+    1,
+    "Generate the final SDF and set up the simulation",
+    1
+   ],
+   [
+    2,
+    "Run timing-annotated functional simulation",
+    1.5
+   ],
+   [
+    3,
+    "Simulate the reset and initialization sequences",
+    1,
+    1
+   ],
+   [
+    4,
+    "Simulate the test modes with final timing",
+    1,
+    1
+   ],
+   [
+    5,
+    "Debug the failures and report the signoff",
+    2.5
+   ]
+  ],
+  "o": [
+   "Final SDF and simulation setup",
+   "Timing-annotated functional simulation results",
+   "Reset and initialization results",
+   "Test mode simulation results",
+   "Gate-level signoff report"
+  ],
+  "ob": [
+   1,
+   2,
+   3,
+   4,
+   5
+  ],
+  "r": [
+   [
+    "SO-D7",
+    "feeds"
+   ],
+   [
+    "SO-D4",
+    "feeds"
+   ]
+  ],
+  "ro": "Gate-level simulation engineer"
+ },
+ "SO-11": {
+  "st": "signoff",
+  "w": [
+   10,
    16
   ],
   "s": [
@@ -10969,114 +11030,53 @@ export const activitySteps: Record<string, ActivityStepEntry> = {
     "produces"
    ],
    [
-    "SO-D1",
+    "SO-D4",
     "feeds"
    ]
   ],
   "ro": "Signoff lead"
  },
- "SO-11": {
+ "SO-12": {
   "st": "signoff",
   "w": [
-   10,
+   11,
    15
   ],
   "s": [
    [
     1,
-    "Generate the final SDF and set up the simulation",
-    1
+    "Take in the SIPI results and confirm the scope",
+    0.75
    ],
    [
     2,
-    "Run timing-annotated functional simulation",
-    1.5
+    "Reconcile die-only against system-level IR",
+    1.25
    ],
    [
     3,
-    "Simulate the reset and initialization sequences",
+    "Review channel compliance against the interface budgets",
     1,
     1
    ],
    [
     4,
-    "Simulate the test modes with final timing",
+    "Review the power-aware timing correlation",
     1,
     1
    ],
    [
     5,
-    "Debug the failures and report the signoff",
-    2.5
+    "Review the co-verification signoff and disposition the criteria",
+    2
    ]
   ],
   "o": [
-   "Final SDF and simulation setup",
-   "Timing-annotated functional simulation results",
-   "Reset and initialization results",
-   "Test mode simulation results",
-   "Gate-level signoff report"
-  ],
-  "ob": [
-   1,
-   2,
-   3,
-   4,
-   5
-  ],
-  "r": [
-   [
-    "SO-D7",
-    "feeds"
-   ],
-   [
-    "SO-D1",
-    "feeds"
-   ]
-  ],
-  "ro": "Gate-level simulation engineer"
- },
- "SO-12": {
-  "st": "signoff",
-  "w": [
-   2,
-   7
-  ],
-  "s": [
-   [
-    1,
-    "Define the correlation methodology and select reference cases",
-    1
-   ],
-   [
-    2,
-    "Correlate the implementation tool against the signoff tool",
-    1.5
-   ],
-   [
-    3,
-    "Correlate against the foundry decks and derates",
-    1,
-    1
-   ],
-   [
-    4,
-    "Correlate extraction and parasitics",
-    1,
-    1
-   ],
-   [
-    5,
-    "Publish the correlation findings and margin guidance",
-    2.5
-   ]
-  ],
-  "o": [
-   "Correlation methodology and reference cases",
-   "Implementation to signoff correlation results",
-   "Foundry deck and derate correlation",
-   "Extraction and parasitic correlation",
-   "Margin guidance for physical design"
+   "SIPI result intake record",
+   "Die-only against system-level reconciliation",
+   "Channel compliance review findings",
+   "Power-aware timing correlation review",
+   "Co-verification signoff disposition"
   ],
   "ob": [
    1,
@@ -11095,7 +11095,7 @@ export const activitySteps: Record<string, ActivityStepEntry> = {
     "feeds"
    ]
   ],
-  "ro": "Signoff methodology engineer"
+  "ro": "Signoff lead"
  },
  "TO-01": {
   "st": "tapeout",
@@ -11414,51 +11414,6 @@ export const activitySteps: Record<string, ActivityStepEntry> = {
  "TO-07": {
   "st": "tapeout",
   "w": [
-   3,
-   4
-  ],
-  "s": [
-   [
-    1,
-    "Confirm the mask order and purchase authorization",
-    0.4
-   ],
-   [
-    2,
-    "Confirm the mask shop schedule",
-    0.3
-   ],
-   [
-    3,
-    "Communicate the delivery date to the program",
-    0.3
-   ]
-  ],
-  "o": [
-   "Confirmed mask order",
-   "Mask shop schedule with completion date",
-   "Delivery date communication to the program"
-  ],
-  "ob": [
-   1,
-   2,
-   3
-  ],
-  "r": [
-   [
-    "TO-D5",
-    "feeds"
-   ],
-   [
-    "TO-D8",
-    "feeds"
-   ]
-  ],
-  "ro": "Procurement"
- },
- "TO-08": {
-  "st": "tapeout",
-  "w": [
    2,
    6
   ],
@@ -11523,6 +11478,51 @@ export const activitySteps: Record<string, ActivityStepEntry> = {
    ]
   ],
   "ro": "Physical design lead"
+ },
+ "TO-08": {
+  "st": "tapeout",
+  "w": [
+   3,
+   4
+  ],
+  "s": [
+   [
+    1,
+    "Confirm the mask order and purchase authorization",
+    0.4
+   ],
+   [
+    2,
+    "Confirm the mask shop schedule",
+    0.3
+   ],
+   [
+    3,
+    "Communicate the delivery date to the program",
+    0.3
+   ]
+  ],
+  "o": [
+   "Confirmed mask order",
+   "Mask shop schedule with completion date",
+   "Delivery date communication to the program"
+  ],
+  "ob": [
+   1,
+   2,
+   3
+  ],
+  "r": [
+   [
+    "TO-D5",
+    "feeds"
+   ],
+   [
+    "TO-D8",
+    "feeds"
+   ]
+  ],
+  "ro": "Procurement"
  },
  "TO-09": {
   "st": "tapeout",
@@ -11729,7 +11729,7 @@ export const activitySteps: Record<string, ActivityStepEntry> = {
     "produces"
    ],
    [
-    "FAB-D5",
+    "FAB-D2",
     "feeds"
    ]
   ],
@@ -11738,47 +11738,70 @@ export const activitySteps: Record<string, ActivityStepEntry> = {
  "FAB-02": {
   "st": "fabrication",
   "w": [
-   7,
-   8
+   1,
+   19
   ],
   "s": [
    [
     1,
-    "Authorize wafer start and define the lots",
-    0.4
+    "Set up WIP tracking and the reporting cadence",
+    1
    ],
    [
     2,
-    "Decide the starting material and lot split strategy",
-    0.3
+    "Manage the hot-lot priority",
+    2
    ],
    [
     3,
-    "Confirm the start and communicate the schedule",
-    0.3
+    "Escalate schedule deviations",
+    2,
+    1
+   ],
+   [
+    4,
+    "Maintain the wafer-out forecast",
+    2
+   ],
+   [
+    5,
+    "Communicate the forecast to downstream stages",
+    2,
+    1
+   ],
+   [
+    6,
+    "Track continuously across the run",
+    13
    ]
   ],
   "o": [
-   "Wafer start authorization",
-   "Lot definition with split strategy",
-   "Start confirmation and schedule communication"
+   "WIP tracking and reporting cadence",
+   "Hot-lot priority management record",
+   "Schedule deviation escalations",
+   "Wafer-out forecast, maintained",
+   "Forecast communications to downstream stages",
+   "WIP tracking log across the run"
   ],
   "ob": [
    1,
    2,
-   3
+   3,
+   4,
+   5,
+   6
   ],
   "r": [
    [
     "FAB-D2",
-    "feeds"
+    "produces"
    ],
    [
-    "FAB-D5",
+    "FAB-D6",
     "feeds"
    ]
   ],
-  "ro": "Operations planner"
+  "ro": "Program manager"
  },
  "FAB-03": {
   "st": "fabrication",
@@ -11836,147 +11859,13 @@ export const activitySteps: Record<string, ActivityStepEntry> = {
     "produces"
    ],
    [
-    "FAB-D5",
+    "FAB-D2",
     "feeds"
    ]
   ],
   "ro": "Foundry liaison"
  },
  "FAB-04": {
-  "st": "fabrication",
-  "w": [
-   7,
-   15
-  ],
-  "s": [
-   [
-    1,
-    "Confirm lot release and front-end entry",
-    1
-   ],
-   [
-    2,
-    "Track the wafers through transistor formation",
-    3
-   ],
-   [
-    3,
-    "Monitor inline data at the front-end critical steps",
-    2,
-    1
-   ],
-   [
-    4,
-    "Track the wafers through contact and local interconnect",
-    3
-   ],
-   [
-    5,
-    "Respond to excursions and disposition the lots",
-    1.5,
-    1
-   ],
-   [
-    6,
-    "Confirm front-end exit and hand off to the back end",
-    1
-   ]
-  ],
-  "o": [
-   "Lot release and front-end entry confirmation",
-   "Wafers through transistor formation",
-   "Inline monitoring findings at critical steps",
-   "Wafers through contact and local interconnect",
-   "Excursion responses and lot dispositions",
-   "Front-end-complete wafers",
-   "Front-end exit confirmation"
-  ],
-  "ob": [
-   1,
-   2,
-   3,
-   4,
-   5,
-   6,
-   6
-  ],
-  "r": [
-   [
-    "FAB-D2",
-    "feeds"
-   ],
-   [
-    "FAB-D3",
-    "feeds"
-   ]
-  ],
-  "ro": "Foundry liaison"
- },
- "FAB-05": {
-  "st": "fabrication",
-  "w": [
-   14,
-   19
-  ],
-  "s": [
-   [
-    1,
-    "Confirm back-end entry and BEOL mask availability",
-    0.5
-   ],
-   [
-    2,
-    "Track the wafers through metallization and via formation",
-    2
-   ],
-   [
-    3,
-    "Monitor back-end inline data",
-    1.5,
-    1
-   ],
-   [
-    4,
-    "Track the wafers through top metal and passivation",
-    1.5
-   ],
-   [
-    5,
-    "Confirm wafer completion and lot exit",
-    1
-   ]
-  ],
-  "o": [
-   "Back-end entry and mask availability confirmation",
-   "Wafers through metallization and via formation",
-   "Back-end inline monitoring findings",
-   "Wafers through top metal and passivation",
-   "Completed engineering-lot wafers",
-   "Wafer count confirmation against the downstream requirement",
-   "Lot exit confirmation"
-  ],
-  "ob": [
-   1,
-   2,
-   3,
-   4,
-   5,
-   5,
-   5
-  ],
-  "r": [
-   [
-    "FAB-D2",
-    "produces"
-   ],
-   [
-    "FAB-D3",
-    "feeds"
-   ]
-  ],
-  "ro": "Foundry liaison"
- },
- "FAB-06": {
   "st": "fabrication",
   "w": [
    5,
@@ -12036,6 +11925,185 @@ export const activitySteps: Record<string, ActivityStepEntry> = {
   ],
   "r": [
    [
+    "FAB-D4",
+    "produces"
+   ],
+   [
+    "FAB-D5",
+    "feeds"
+   ]
+  ],
+  "ro": "Yield engineer"
+ },
+ "FAB-05": {
+  "st": "fabrication",
+  "w": [
+   7,
+   8
+  ],
+  "s": [
+   [
+    1,
+    "Authorize wafer start and define the lots",
+    0.4
+   ],
+   [
+    2,
+    "Decide the starting material and lot split strategy",
+    0.3
+   ],
+   [
+    3,
+    "Confirm the start and communicate the schedule",
+    0.3
+   ]
+  ],
+  "o": [
+   "Wafer start authorization",
+   "Lot definition with split strategy",
+   "Start confirmation and schedule communication"
+  ],
+  "ob": [
+   1,
+   2,
+   3
+  ],
+  "r": [
+   [
+    "FAB-D3",
+    "feeds"
+   ],
+   [
+    "FAB-D2",
+    "feeds"
+   ]
+  ],
+  "ro": "Operations planner"
+ },
+ "FAB-06": {
+  "st": "fabrication",
+  "w": [
+   7,
+   15
+  ],
+  "s": [
+   [
+    1,
+    "Confirm lot release and front-end entry",
+    1
+   ],
+   [
+    2,
+    "Track the wafers through transistor formation",
+    3
+   ],
+   [
+    3,
+    "Monitor inline data at the front-end critical steps",
+    2,
+    1
+   ],
+   [
+    4,
+    "Track the wafers through contact and local interconnect",
+    3
+   ],
+   [
+    5,
+    "Respond to excursions and disposition the lots",
+    1.5,
+    1
+   ],
+   [
+    6,
+    "Confirm front-end exit and hand off to the back end",
+    1
+   ]
+  ],
+  "o": [
+   "Lot release and front-end entry confirmation",
+   "Wafers through transistor formation",
+   "Inline monitoring findings at critical steps",
+   "Wafers through contact and local interconnect",
+   "Excursion responses and lot dispositions",
+   "Front-end-complete wafers",
+   "Front-end exit confirmation"
+  ],
+  "ob": [
+   1,
+   2,
+   3,
+   4,
+   5,
+   6,
+   6
+  ],
+  "r": [
+   [
+    "FAB-D3",
+    "feeds"
+   ],
+   [
+    "FAB-D4",
+    "feeds"
+   ]
+  ],
+  "ro": "Foundry liaison"
+ },
+ "FAB-07": {
+  "st": "fabrication",
+  "w": [
+   14,
+   19
+  ],
+  "s": [
+   [
+    1,
+    "Confirm back-end entry and BEOL mask availability",
+    0.5
+   ],
+   [
+    2,
+    "Track the wafers through metallization and via formation",
+    2
+   ],
+   [
+    3,
+    "Monitor back-end inline data",
+    1.5,
+    1
+   ],
+   [
+    4,
+    "Track the wafers through top metal and passivation",
+    1.5
+   ],
+   [
+    5,
+    "Confirm wafer completion and lot exit",
+    1
+   ]
+  ],
+  "o": [
+   "Back-end entry and mask availability confirmation",
+   "Wafers through metallization and via formation",
+   "Back-end inline monitoring findings",
+   "Wafers through top metal and passivation",
+   "Completed engineering-lot wafers",
+   "Wafer count confirmation against the downstream requirement",
+   "Lot exit confirmation"
+  ],
+  "ob": [
+   1,
+   2,
+   3,
+   4,
+   5,
+   5,
+   5
+  ],
+  "r": [
+   [
     "FAB-D3",
     "produces"
    ],
@@ -12044,9 +12112,9 @@ export const activitySteps: Record<string, ActivityStepEntry> = {
     "feeds"
    ]
   ],
-  "ro": "Yield engineer"
+  "ro": "Foundry liaison"
  },
- "FAB-07": {
+ "FAB-08": {
   "st": "fabrication",
   "w": [
    15,
@@ -12089,17 +12157,17 @@ export const activitySteps: Record<string, ActivityStepEntry> = {
   ],
   "r": [
    [
-    "FAB-D3",
+    "FAB-D4",
     "produces"
    ],
    [
-    "FAB-D4",
+    "FAB-D5",
     "feeds"
    ]
   ],
   "ro": "Device engineer"
  },
- "FAB-08": {
+ "FAB-09": {
   "st": "fabrication",
   "w": [
    16,
@@ -12142,83 +12210,15 @@ export const activitySteps: Record<string, ActivityStepEntry> = {
   ],
   "r": [
    [
-    "FAB-D4",
-    "produces"
-   ],
-   [
-    "FAB-D2",
-    "gates"
-   ]
-  ],
-  "ro": "Product engineering"
- },
- "FAB-09": {
-  "st": "fabrication",
-  "w": [
-   1,
-   19
-  ],
-  "s": [
-   [
-    1,
-    "Set up WIP tracking and the reporting cadence",
-    1
-   ],
-   [
-    2,
-    "Manage the hot-lot priority",
-    2
-   ],
-   [
-    3,
-    "Escalate schedule deviations",
-    2,
-    1
-   ],
-   [
-    4,
-    "Maintain the wafer-out forecast",
-    2
-   ],
-   [
-    5,
-    "Communicate the forecast to downstream stages",
-    2,
-    1
-   ],
-   [
-    6,
-    "Track continuously across the run",
-    13
-   ]
-  ],
-  "o": [
-   "WIP tracking and reporting cadence",
-   "Hot-lot priority management record",
-   "Schedule deviation escalations",
-   "Wafer-out forecast, maintained",
-   "Forecast communications to downstream stages",
-   "WIP tracking log across the run"
-  ],
-  "ob": [
-   1,
-   2,
-   3,
-   4,
-   5,
-   6
-  ],
-  "r": [
-   [
     "FAB-D5",
     "produces"
    ],
    [
-    "FAB-D6",
-    "feeds"
+    "FAB-D3",
+    "gates"
    ]
   ],
-  "ro": "Program manager"
+  "ro": "Product engineering"
  },
  "FAB-10": {
   "st": "fabrication",
@@ -12261,7 +12261,7 @@ export const activitySteps: Record<string, ActivityStepEntry> = {
     "produces"
    ],
    [
-    "FAB-D2",
+    "FAB-D3",
     "feeds"
    ]
   ],
@@ -12297,7 +12297,7 @@ export const activitySteps: Record<string, ActivityStepEntry> = {
    ],
    [
     5,
-    "Compare cost per option with the DEF-04 model",
+    "Compare cost per option with the DEF-06 model",
     1.5,
     1
    ],
@@ -12331,7 +12331,7 @@ export const activitySteps: Record<string, ActivityStepEntry> = {
     "produces"
    ],
    [
-    "PKGD-D7",
+    "PKGD-D4",
     "feeds"
    ]
   ],
@@ -12395,17 +12395,70 @@ export const activitySteps: Record<string, ActivityStepEntry> = {
   ],
   "r": [
    [
-    "PKGD-D2",
+    "PKGD-D3",
     "produces"
    ],
    [
-    "PKGD-D4",
+    "PKGD-D6",
     "feeds"
    ]
   ],
   "ro": "Package designer"
  },
  "PKGD-03": {
+  "st": "packageDesign",
+  "w": [
+   10,
+   14
+  ],
+  "s": [
+   [
+    1,
+    "Identify the package risks the vehicles must cover",
+    1
+   ],
+   [
+    2,
+    "Define the vehicle type requirements — mechanical, thermal, electrical",
+    1.5,
+    1
+   ],
+   [
+    3,
+    "Specify the measurement conditions and structures",
+    1.5
+   ],
+   [
+    4,
+    "Hand off the requirements and review the PTV plan",
+    1.5
+   ]
+  ],
+  "o": [
+   "Package risk list for vehicle coverage",
+   "Vehicle type requirements",
+   "Measurement conditions and structure specification",
+   "Requirement handoff to PTV"
+  ],
+  "ob": [
+   1,
+   2,
+   3,
+   4
+  ],
+  "r": [
+   [
+    "PKGD-D2",
+    "produces"
+   ],
+   [
+    "PKGD-D8",
+    "feeds"
+   ]
+  ],
+  "ro": "Package architect"
+ },
+ "PKGD-04": {
   "st": "packageDesign",
   "w": [
    16,
@@ -12471,17 +12524,17 @@ export const activitySteps: Record<string, ActivityStepEntry> = {
   ],
   "r": [
    [
-    "PKGD-D2",
+    "PKGD-D3",
     "produces"
    ],
    [
-    "PKGD-D4",
+    "PKGD-D6",
     "feeds"
    ]
   ],
   "ro": "Interposer designer"
  },
- "PKGD-04": {
+ "PKGD-05": {
   "st": "packageDesign",
   "w": [
    18,
@@ -12547,153 +12600,17 @@ export const activitySteps: Record<string, ActivityStepEntry> = {
   ],
   "r": [
    [
-    "PKGD-D3",
+    "PKGD-D5",
     "produces"
    ],
    [
-    "PKGD-D7",
+    "PKGD-D4",
     "feeds"
    ]
   ],
   "ro": "Substrate designer"
  },
- "PKGD-05": {
-  "st": "packageDesign",
-  "w": [
-   26,
-   36
-  ],
-  "s": [
-   [
-    1,
-    "Allocate the channel budget to the package",
-    1.5
-   ],
-   [
-    2,
-    "Match lengths and control skew per interface",
-    2.5
-   ],
-   [
-    3,
-    "Design reference plane continuity and return paths",
-    2,
-    1
-   ],
-   [
-    4,
-    "Design the via structures and manage the stubs",
-    2
-   ],
-   [
-    5,
-    "Separate and shield against crosstalk",
-    2,
-    1
-   ],
-   [
-    6,
-    "Review the routing against the SI requirements",
-    4
-   ]
-  ],
-  "o": [
-   "Channel budget allocation to the package",
-   "Length-matched routing per interface",
-   "Reference plane continuity design",
-   "Via structures with managed stubs",
-   "Crosstalk separation plan",
-   "SI routing review record"
-  ],
-  "ob": [
-   1,
-   2,
-   3,
-   4,
-   5,
-   6
-  ],
-  "r": [
-   [
-    "PKGD-D4",
-    "produces"
-   ],
-   [
-    "PKGD-D3",
-    "feeds"
-   ]
-  ],
-  "ro": "SI engineer"
- },
  "PKGD-06": {
-  "st": "packageDesign",
-  "w": [
-   28,
-   37
-  ],
-  "s": [
-   [
-    1,
-    "Define the package PDN topology and plane allocation",
-    2
-   ],
-   [
-    2,
-    "Design the power via arrays and current capability",
-    2
-   ],
-   [
-    3,
-    "Place the decoupling capacitor footprints",
-    1.5,
-    1
-   ],
-   [
-    4,
-    "Analyze plane perforation and manage the current paths",
-    2
-   ],
-   [
-    5,
-    "Design the interposer-to-substrate power transition",
-    1.5,
-    1
-   ],
-   [
-    6,
-    "Hand the PDN design intent to co-verification",
-    3
-   ]
-  ],
-  "o": [
-   "Package PDN topology and plane allocation",
-   "Power via array design",
-   "Decoupling footprint placement",
-   "Plane perforation and current path analysis",
-   "Interposer to substrate power transition design",
-   "PDN design intent handoff"
-  ],
-  "ob": [
-   1,
-   2,
-   3,
-   4,
-   5,
-   6
-  ],
-  "r": [
-   [
-    "PKGD-D4",
-    "produces"
-   ],
-   [
-    "PKGD-D3",
-    "feeds"
-   ]
-  ],
-  "ro": "Package power integrity engineer"
- },
- "PKGD-07": {
   "st": "packageDesign",
   "w": [
    20,
@@ -12759,70 +12676,17 @@ export const activitySteps: Record<string, ActivityStepEntry> = {
   ],
   "r": [
    [
-    "PKGD-D5",
+    "PKGD-D8",
     "produces"
    ],
    [
-    "PKGD-D6",
+    "PKGD-D2",
     "feeds"
    ]
   ],
   "ro": "Thermal engineer"
  },
- "PKGD-08": {
-  "st": "packageDesign",
-  "w": [
-   10,
-   14
-  ],
-  "s": [
-   [
-    1,
-    "Identify the package risks the vehicles must cover",
-    1
-   ],
-   [
-    2,
-    "Define the vehicle type requirements — mechanical, thermal, electrical",
-    1.5,
-    1
-   ],
-   [
-    3,
-    "Specify the measurement conditions and structures",
-    1.5
-   ],
-   [
-    4,
-    "Hand off the requirements and review the PTV plan",
-    1.5
-   ]
-  ],
-  "o": [
-   "Package risk list for vehicle coverage",
-   "Vehicle type requirements",
-   "Measurement conditions and structure specification",
-   "Requirement handoff to PTV"
-  ],
-  "ob": [
-   1,
-   2,
-   3,
-   4
-  ],
-  "r": [
-   [
-    "PKGD-D6",
-    "produces"
-   ],
-   [
-    "PKGD-D5",
-    "feeds"
-   ]
-  ],
-  "ro": "Package architect"
- },
- "PKGD-09": {
+ "PKGD-07": {
   "st": "packageDesign",
   "w": [
    22,
@@ -12880,17 +12744,17 @@ export const activitySteps: Record<string, ActivityStepEntry> = {
   ],
   "r": [
    [
-    "PKGD-D7",
+    "PKGD-D4",
     "produces"
    ],
    [
-    "PKGD-D3",
+    "PKGD-D5",
     "feeds"
    ]
   ],
   "ro": "Backend supply chain lead"
  },
- "PKGD-10": {
+ "PKGD-08": {
   "st": "packageDesign",
   "w": [
    24,
@@ -12948,7 +12812,75 @@ export const activitySteps: Record<string, ActivityStepEntry> = {
   ],
   "r": [
    [
+    "PKGD-D7",
+    "produces"
+   ],
+   [
     "PKGD-D8",
+    "feeds"
+   ]
+  ],
+  "ro": "Backend supply chain lead"
+ },
+ "PKGD-09": {
+  "st": "packageDesign",
+  "w": [
+   26,
+   36
+  ],
+  "s": [
+   [
+    1,
+    "Allocate the channel budget to the package",
+    1.5
+   ],
+   [
+    2,
+    "Match lengths and control skew per interface",
+    2.5
+   ],
+   [
+    3,
+    "Design reference plane continuity and return paths",
+    2,
+    1
+   ],
+   [
+    4,
+    "Design the via structures and manage the stubs",
+    2
+   ],
+   [
+    5,
+    "Separate and shield against crosstalk",
+    2,
+    1
+   ],
+   [
+    6,
+    "Review the routing against the SI requirements",
+    4
+   ]
+  ],
+  "o": [
+   "Channel budget allocation to the package",
+   "Length-matched routing per interface",
+   "Reference plane continuity design",
+   "Via structures with managed stubs",
+   "Crosstalk separation plan",
+   "SI routing review record"
+  ],
+  "ob": [
+   1,
+   2,
+   3,
+   4,
+   5,
+   6
+  ],
+  "r": [
+   [
+    "PKGD-D6",
     "produces"
    ],
    [
@@ -12956,7 +12888,75 @@ export const activitySteps: Record<string, ActivityStepEntry> = {
     "feeds"
    ]
   ],
-  "ro": "Backend supply chain lead"
+  "ro": "SI engineer"
+ },
+ "PKGD-10": {
+  "st": "packageDesign",
+  "w": [
+   28,
+   37
+  ],
+  "s": [
+   [
+    1,
+    "Define the package PDN topology and plane allocation",
+    2
+   ],
+   [
+    2,
+    "Design the power via arrays and current capability",
+    2
+   ],
+   [
+    3,
+    "Place the decoupling capacitor footprints",
+    1.5,
+    1
+   ],
+   [
+    4,
+    "Analyze plane perforation and manage the current paths",
+    2
+   ],
+   [
+    5,
+    "Design the interposer-to-substrate power transition",
+    1.5,
+    1
+   ],
+   [
+    6,
+    "Hand the PDN design intent to co-verification",
+    3
+   ]
+  ],
+  "o": [
+   "Package PDN topology and plane allocation",
+   "Power via array design",
+   "Decoupling footprint placement",
+   "Plane perforation and current path analysis",
+   "Interposer to substrate power transition design",
+   "PDN design intent handoff"
+  ],
+  "ob": [
+   1,
+   2,
+   3,
+   4,
+   5,
+   6
+  ],
+  "r": [
+   [
+    "PKGD-D6",
+    "produces"
+   ],
+   [
+    "PKGD-D5",
+    "feeds"
+   ]
+  ],
+  "ro": "Package power integrity engineer"
  },
  "PKGD-11": {
   "st": "packageDesign",
@@ -13020,7 +13020,7 @@ export const activitySteps: Record<string, ActivityStepEntry> = {
     "produces"
    ],
    [
-    "PKGD-D7",
+    "PKGD-D4",
     "gates"
    ]
   ],
@@ -13449,50 +13449,50 @@ export const activitySteps: Record<string, ActivityStepEntry> = {
  "PTV-07": {
   "st": "packageTestVehicle",
   "w": [
-   38,
-   45
+   36,
+   50
   ],
   "s": [
    [
     1,
-    "Set up the measurement — shadow moiré or equivalent",
-    1
-   ],
-   [
-    2,
-    "Measure the room-temperature baseline across units",
-    1.5
-   ],
-   [
-    3,
-    "Measure warpage across the reflow profile",
+    "Plan the board-level tests and design the coupon boards",
     2
    ],
    [
+    2,
+    "Fabricate the coupon boards and mount the vehicles",
+    2.5
+   ],
+   [
+    3,
+    "Run temperature cycling to failure",
+    4
+   ],
+   [
     4,
-    "Measure co-planarity and ball flatness",
-    1.5,
+    "Run drop and shock testing",
+    2.5,
     1
    ],
    [
     5,
-    "Correlate condition to warpage from the DOE",
-    1.5,
+    "Run bend and flex testing",
+    2,
     1
    ],
    [
     6,
-    "Compare the results against the PKGD-07 simulation",
-    2.5
+    "Analyze the failure modes and establish characteristic life",
+    5.5
    ]
   ],
   "o": [
-   "Measurement setup and method",
-   "Room-temperature warpage baseline",
-   "Warpage across the reflow profile",
-   "Co-planarity and ball flatness results",
-   "Condition correlation from the DOE",
-   "Simulation comparison"
+   "Board-level test plan and coupon boards",
+   "Mounted vehicle assemblies",
+   "Temperature cycling results to failure",
+   "Drop and shock results",
+   "Bend and flex results",
+   "Failure mode analysis and characteristic life"
   ],
   "ob": [
    1,
@@ -13504,15 +13504,15 @@ export const activitySteps: Record<string, ActivityStepEntry> = {
   ],
   "r": [
    [
-    "PTV-D4",
+    "PTV-D7",
     "produces"
    ],
    [
-    "PTV-D8",
+    "PTV-D9",
     "feeds"
    ]
   ],
-  "ro": "Mechanical engineer"
+  "ro": "Reliability engineer"
  },
  "PTV-08": {
   "st": "packageTestVehicle",
@@ -13586,6 +13586,74 @@ export const activitySteps: Record<string, ActivityStepEntry> = {
   "st": "packageTestVehicle",
   "w": [
    38,
+   45
+  ],
+  "s": [
+   [
+    1,
+    "Set up the measurement — shadow moiré or equivalent",
+    1
+   ],
+   [
+    2,
+    "Measure the room-temperature baseline across units",
+    1.5
+   ],
+   [
+    3,
+    "Measure warpage across the reflow profile",
+    2
+   ],
+   [
+    4,
+    "Measure co-planarity and ball flatness",
+    1.5,
+    1
+   ],
+   [
+    5,
+    "Correlate condition to warpage from the DOE",
+    1.5,
+    1
+   ],
+   [
+    6,
+    "Compare the results against the PKGD-06 simulation",
+    2.5
+   ]
+  ],
+  "o": [
+   "Measurement setup and method",
+   "Room-temperature warpage baseline",
+   "Warpage across the reflow profile",
+   "Co-planarity and ball flatness results",
+   "Condition correlation from the DOE",
+   "Simulation comparison"
+  ],
+  "ob": [
+   1,
+   2,
+   3,
+   4,
+   5,
+   6
+  ],
+  "r": [
+   [
+    "PTV-D4",
+    "produces"
+   ],
+   [
+    "PTV-D8",
+    "feeds"
+   ]
+  ],
+  "ro": "Mechanical engineer"
+ },
+ "PTV-10": {
+  "st": "packageTestVehicle",
+  "w": [
+   38,
    47
   ],
   "s": [
@@ -13618,7 +13686,7 @@ export const activitySteps: Record<string, ActivityStepEntry> = {
    ],
    [
     6,
-    "Correlate the results against the PKGD-07 thermal model",
+    "Correlate the results against the PKGD-06 thermal model",
     3.5
    ]
   ],
@@ -13649,74 +13717,6 @@ export const activitySteps: Record<string, ActivityStepEntry> = {
    ]
   ],
   "ro": "Thermal engineer"
- },
- "PTV-10": {
-  "st": "packageTestVehicle",
-  "w": [
-   36,
-   50
-  ],
-  "s": [
-   [
-    1,
-    "Plan the board-level tests and design the coupon boards",
-    2
-   ],
-   [
-    2,
-    "Fabricate the coupon boards and mount the vehicles",
-    2.5
-   ],
-   [
-    3,
-    "Run temperature cycling to failure",
-    4
-   ],
-   [
-    4,
-    "Run drop and shock testing",
-    2.5,
-    1
-   ],
-   [
-    5,
-    "Run bend and flex testing",
-    2,
-    1
-   ],
-   [
-    6,
-    "Analyze the failure modes and establish characteristic life",
-    5.5
-   ]
-  ],
-  "o": [
-   "Board-level test plan and coupon boards",
-   "Mounted vehicle assemblies",
-   "Temperature cycling results to failure",
-   "Drop and shock results",
-   "Bend and flex results",
-   "Failure mode analysis and characteristic life"
-  ],
-  "ob": [
-   1,
-   2,
-   3,
-   4,
-   5,
-   6
-  ],
-  "r": [
-   [
-    "PTV-D7",
-    "produces"
-   ],
-   [
-    "PTV-D9",
-    "feeds"
-   ]
-  ],
-  "ro": "Reliability engineer"
  },
  "PTV-11": {
   "st": "packageTestVehicle",
@@ -13918,7 +13918,7 @@ export const activitySteps: Record<string, ActivityStepEntry> = {
     "produces"
    ],
    [
-    "SIPI-D3",
+    "SIPI-D4",
     "feeds"
    ]
   ],
@@ -13986,7 +13986,7 @@ export const activitySteps: Record<string, ActivityStepEntry> = {
     "produces"
    ],
    [
-    "SIPI-D5",
+    "SIPI-D3",
     "feeds"
    ]
   ],
@@ -14050,221 +14050,17 @@ export const activitySteps: Record<string, ActivityStepEntry> = {
   ],
   "r": [
    [
-    "SIPI-D3",
+    "SIPI-D4",
     "produces"
    ],
    [
-    "SIPI-D4",
+    "SIPI-D5",
     "feeds"
    ]
   ],
   "ro": "Power integrity engineer"
  },
  "SIPI-04": {
-  "st": "chipPackageCoVerification",
-  "w": [
-   12,
-   20
-  ],
-  "s": [
-   [
-    1,
-    "Select the transient scenarios from the workload profiles",
-    1.5
-   ],
-   [
-    2,
-    "Run the combined transient simulation with package inductance",
-    2.5
-   ],
-   [
-    3,
-    "Analyze droop magnitude and duration per domain",
-    2
-   ],
-   [
-    4,
-    "Compare against the die-only IR results",
-    1.5,
-    1
-   ],
-   [
-    5,
-    "Explore the worst-case scenarios",
-    1.5,
-    1
-   ],
-   [
-    6,
-    "Assess the dynamic IR margin and report the findings",
-    2
-   ]
-  ],
-  "o": [
-   "Transient scenario selection",
-   "Combined transient simulation results",
-   "Droop magnitude and duration per domain",
-   "Die-only comparison",
-   "Worst-case scenario findings",
-   "Dynamic IR margin assessment"
-  ],
-  "ob": [
-   1,
-   2,
-   3,
-   4,
-   5,
-   6
-  ],
-  "r": [
-   [
-    "SIPI-D3",
-    "produces"
-   ],
-   [
-    "SIPI-D7",
-    "feeds"
-   ]
-  ],
-  "ro": "Power integrity engineer"
- },
- "SIPI-05": {
-  "st": "chipPackageCoVerification",
-  "w": [
-   14,
-   21
-  ],
-  "s": [
-   [
-    1,
-    "Allocate the frequency bands across the three levels",
-    1.5
-   ],
-   [
-    2,
-    "Set the on-die decap requirement and cost its area",
-    1.5
-   ],
-   [
-    3,
-    "Select the package capacitors and their mounting positions",
-    1.5,
-    1
-   ],
-   [
-    4,
-    "Set the board bulk capacitance requirement",
-    1,
-    1
-   ],
-   [
-    5,
-    "Verify the combined impedance with the allocation",
-    1.5
-   ],
-   [
-    6,
-    "Issue the decap specification and hand it to each level",
-    2.5
-   ]
-  ],
-  "o": [
-   "Frequency band allocation",
-   "On-die decap requirement with area cost",
-   "Package capacitor selection and placement",
-   "Board bulk capacitance requirement",
-   "Combined impedance verification",
-   "Decap specification per level"
-  ],
-  "ob": [
-   1,
-   2,
-   3,
-   4,
-   5,
-   6
-  ],
-  "r": [
-   [
-    "SIPI-D4",
-    "produces"
-   ],
-   [
-    "SIPI-D3",
-    "feeds"
-   ]
-  ],
-  "ro": "Power integrity engineer"
- },
- "SIPI-06": {
-  "st": "chipPackageCoVerification",
-  "w": [
-   15,
-   20
-  ],
-  "s": [
-   [
-    1,
-    "Scope the SSN analysis — which interfaces switch together",
-    1
-   ],
-   [
-    2,
-    "Model the IO ring power and ground network",
-    1.5
-   ],
-   [
-    3,
-    "Simulate simultaneous switching per interface",
-    1.5,
-    1
-   ],
-   [
-    4,
-    "Analyze ground bounce and reference shift",
-    1.5
-   ],
-   [
-    5,
-    "Assess mitigations — bump assignment, decoupling",
-    1,
-    1
-   ],
-   [
-    6,
-    "Report the SSN findings and interface impact",
-    1
-   ]
-  ],
-  "o": [
-   "SSN analysis scope",
-   "IO ring power and ground models",
-   "Simultaneous switching simulation results",
-   "Ground bounce and reference shift analysis",
-   "Mitigation assessment",
-   "SSN findings per interface"
-  ],
-  "ob": [
-   1,
-   2,
-   3,
-   4,
-   5,
-   6
-  ],
-  "r": [
-   [
-    "SIPI-D5",
-    "feeds"
-   ],
-   [
-    "SIPI-D3",
-    "feeds"
-   ]
-  ],
-  "ro": "SI/PI engineer"
- },
- "SIPI-07": {
   "st": "chipPackageCoVerification",
   "w": [
    8,
@@ -14322,7 +14118,7 @@ export const activitySteps: Record<string, ActivityStepEntry> = {
   ],
   "r": [
    [
-    "SIPI-D5",
+    "SIPI-D3",
     "produces"
    ],
    [
@@ -14331,6 +14127,210 @@ export const activitySteps: Record<string, ActivityStepEntry> = {
    ]
   ],
   "ro": "SI engineer"
+ },
+ "SIPI-05": {
+  "st": "chipPackageCoVerification",
+  "w": [
+   12,
+   20
+  ],
+  "s": [
+   [
+    1,
+    "Select the transient scenarios from the workload profiles",
+    1.5
+   ],
+   [
+    2,
+    "Run the combined transient simulation with package inductance",
+    2.5
+   ],
+   [
+    3,
+    "Analyze droop magnitude and duration per domain",
+    2
+   ],
+   [
+    4,
+    "Compare against the die-only IR results",
+    1.5,
+    1
+   ],
+   [
+    5,
+    "Explore the worst-case scenarios",
+    1.5,
+    1
+   ],
+   [
+    6,
+    "Assess the dynamic IR margin and report the findings",
+    2
+   ]
+  ],
+  "o": [
+   "Transient scenario selection",
+   "Combined transient simulation results",
+   "Droop magnitude and duration per domain",
+   "Die-only comparison",
+   "Worst-case scenario findings",
+   "Dynamic IR margin assessment"
+  ],
+  "ob": [
+   1,
+   2,
+   3,
+   4,
+   5,
+   6
+  ],
+  "r": [
+   [
+    "SIPI-D4",
+    "produces"
+   ],
+   [
+    "SIPI-D6",
+    "feeds"
+   ]
+  ],
+  "ro": "Power integrity engineer"
+ },
+ "SIPI-06": {
+  "st": "chipPackageCoVerification",
+  "w": [
+   14,
+   21
+  ],
+  "s": [
+   [
+    1,
+    "Allocate the frequency bands across the three levels",
+    1.5
+   ],
+   [
+    2,
+    "Set the on-die decap requirement and cost its area",
+    1.5
+   ],
+   [
+    3,
+    "Select the package capacitors and their mounting positions",
+    1.5,
+    1
+   ],
+   [
+    4,
+    "Set the board bulk capacitance requirement",
+    1,
+    1
+   ],
+   [
+    5,
+    "Verify the combined impedance with the allocation",
+    1.5
+   ],
+   [
+    6,
+    "Issue the decap specification and hand it to each level",
+    2.5
+   ]
+  ],
+  "o": [
+   "Frequency band allocation",
+   "On-die decap requirement with area cost",
+   "Package capacitor selection and placement",
+   "Board bulk capacitance requirement",
+   "Combined impedance verification",
+   "Decap specification per level"
+  ],
+  "ob": [
+   1,
+   2,
+   3,
+   4,
+   5,
+   6
+  ],
+  "r": [
+   [
+    "SIPI-D5",
+    "produces"
+   ],
+   [
+    "SIPI-D4",
+    "feeds"
+   ]
+  ],
+  "ro": "Power integrity engineer"
+ },
+ "SIPI-07": {
+  "st": "chipPackageCoVerification",
+  "w": [
+   15,
+   20
+  ],
+  "s": [
+   [
+    1,
+    "Scope the SSN analysis — which interfaces switch together",
+    1
+   ],
+   [
+    2,
+    "Model the IO ring power and ground network",
+    1.5
+   ],
+   [
+    3,
+    "Simulate simultaneous switching per interface",
+    1.5,
+    1
+   ],
+   [
+    4,
+    "Analyze ground bounce and reference shift",
+    1.5
+   ],
+   [
+    5,
+    "Assess mitigations — bump assignment, decoupling",
+    1,
+    1
+   ],
+   [
+    6,
+    "Report the SSN findings and interface impact",
+    1
+   ]
+  ],
+  "o": [
+   "SSN analysis scope",
+   "IO ring power and ground models",
+   "Simultaneous switching simulation results",
+   "Ground bounce and reference shift analysis",
+   "Mitigation assessment",
+   "SSN findings per interface"
+  ],
+  "ob": [
+   1,
+   2,
+   3,
+   4,
+   5,
+   6
+  ],
+  "r": [
+   [
+    "SIPI-D3",
+    "feeds"
+   ],
+   [
+    "SIPI-D4",
+    "feeds"
+   ]
+  ],
+  "ro": "SI/PI engineer"
  },
  "SIPI-08": {
   "st": "chipPackageCoVerification",
@@ -14392,11 +14392,11 @@ export const activitySteps: Record<string, ActivityStepEntry> = {
   ],
   "r": [
    [
-    "SIPI-D6",
+    "SIPI-D7",
     "produces"
    ],
    [
-    "SIPI-D5",
+    "SIPI-D3",
     "feeds"
    ]
   ],
@@ -14432,7 +14432,7 @@ export const activitySteps: Record<string, ActivityStepEntry> = {
    ],
    [
     5,
-    "Reconcile with the SO-02 signoff margin",
+    "Reconcile with the SO-03 signoff margin",
     1.5,
     1
    ],
@@ -14460,11 +14460,11 @@ export const activitySteps: Record<string, ActivityStepEntry> = {
   ],
   "r": [
    [
-    "SIPI-D7",
+    "SIPI-D6",
     "produces"
    ],
    [
-    "SIPI-D3",
+    "SIPI-D4",
     "feeds"
    ]
   ],
@@ -14528,11 +14528,11 @@ export const activitySteps: Record<string, ActivityStepEntry> = {
   ],
   "r": [
    [
-    "SIPI-D3",
+    "SIPI-D4",
     "feeds"
    ],
    [
-    "SIPI-D7",
+    "SIPI-D6",
     "feeds"
    ]
   ],
@@ -14602,7 +14602,7 @@ export const activitySteps: Record<string, ActivityStepEntry> = {
     "produces"
    ],
    [
-    "SIPI-D6",
+    "SIPI-D7",
     "gates"
    ]
   ],
@@ -14611,402 +14611,55 @@ export const activitySteps: Record<string, ActivityStepEntry> = {
  "ASSY-01": {
   "st": "packaging",
   "w": [
-   23,
-   26
+   0,
+   16
   ],
   "s": [
    [
     1,
-    "Receive the wafers and set up sort on the probe station",
-    0.5
-   ],
-   [
-    2,
-    "Execute wafer sort against the KGD criteria",
-    1
-   ],
-   [
-    3,
-    "Disposition the marginal die",
-    0.75,
-    1
-   ],
-   [
-    4,
-    "Select the known-good die and build the wafer maps",
-    1
-   ],
-   [
-    5,
-    "Release the die to assembly with traceability",
-    0.5
-   ]
-  ],
-  "o": [
-   "Wafers received with sort setup complete",
-   "Sort execution results",
-   "Marginal die disposition record",
-   "Known-good-die map per wafer",
-   "Die released to assembly with traceability"
-  ],
-  "ob": [
-   1,
-   2,
-   3,
-   4,
-   5
-  ],
-  "r": [
-   [
-    "ASSY-D1",
-    "feeds"
-   ],
-   [
-    "ASSY-D3",
-    "feeds"
-   ]
-  ],
-  "ro": "Product engineering"
- },
- "ASSY-02": {
-  "st": "packaging",
-  "w": [
-   23,
-   26
-  ],
-  "s": [
-   [
-    1,
-    "Confirm HBM procurement and take delivery",
-    0.5
-   ],
-   [
-    2,
-    "Run incoming inspection against the specification",
-    1
-   ],
-   [
-    3,
-    "Review the supplier test data",
-    0.75,
-    1
-   ],
-   [
-    4,
-    "Qualify the stacks and release them to assembly",
-    1
-   ],
-   [
-    5,
-    "Maintain inventory and lot traceability",
-    0.5
-   ]
-  ],
-  "o": [
-   "Delivered HBM stacks",
-   "Incoming inspection results",
-   "Supplier test data review",
-   "Qualified stacks released to assembly",
-   "Inventory and lot traceability record"
-  ],
-  "ob": [
-   1,
-   2,
-   3,
-   4,
-   5
-  ],
-  "r": [
-   [
-    "ASSY-D1",
-    "feeds"
-   ],
-   [
-    "ASSY-D4",
-    "feeds"
-   ]
-  ],
-  "ro": "Procurement"
- },
- "ASSY-03": {
-  "st": "packaging",
-  "w": [
-   25,
-   28
-  ],
-  "s": [
-   [
-    1,
-    "Set up the process to the frozen window",
-    0.5
-   ],
-   [
-    2,
-    "Prepare the micro-bumps and apply flux",
-    1
-   ],
-   [
-    3,
-    "Monitor the bond parameters during the run",
-    0.75,
-    1
-   ],
-   [
-    4,
-    "Bond the die and stacks by thermo-compression",
-    1
-   ],
-   [
-    5,
-    "Inspect post-bond and record the travelers",
-    0.5
-   ]
-  ],
-  "o": [
-   "Process setup record against the frozen window",
-   "Prepared micro-bumps",
-   "Bond parameter monitoring data",
-   "Bonded die and stack assemblies",
-   "Post-bond inspection results",
-   "Assembly travelers with actual conditions"
-  ],
-  "ob": [
-   1,
-   2,
-   3,
-   4,
-   5,
-   5
-  ],
-  "r": [
-   [
-    "ASSY-D2",
-    "produces"
-   ],
-   [
-    "ASSY-D1",
-    "feeds"
-   ]
-  ],
-  "ro": "OSAT process engineer"
- },
- "ASSY-04": {
-  "st": "packaging",
-  "w": [
-   26,
-   29
-  ],
-  "s": [
-   [
-    1,
-    "Attach the interposer to the substrate",
-    0.5
-   ],
-   [
-    2,
-    "Dispense and flow the underfill",
-    1
-   ],
-   [
-    3,
-    "Inspect voids and fillet before cure",
-    0.75,
-    1
-   ],
-   [
-    4,
-    "Cure the underfill and mold the assembly",
-    1
-   ],
-   [
-    5,
-    "Inspect post-mold",
-    0.5
-   ]
-  ],
-  "o": [
-   "Interposer-to-substrate attached assemblies",
-   "Dispensed and flowed underfill",
-   "Void and fillet inspection results",
-   "Cured and molded assemblies",
-   "Inspected post-mold units",
-   "Post-mold inspection results"
-  ],
-  "ob": [
-   1,
-   2,
-   3,
-   4,
-   5,
-   5
-  ],
-  "r": [
-   [
-    "ASSY-D1",
-    "feeds"
-   ],
-   [
-    "ASSY-D4",
-    "feeds"
-   ]
-  ],
-  "ro": "OSAT process engineer"
- },
- "ASSY-05": {
-  "st": "packaging",
-  "w": [
-   28,
-   30
-  ],
-  "s": [
-   [
-    1,
-    "Apply the TIM and attach the lid",
-    0.5
-   ],
-   [
-    2,
-    "Attach the balls and reflow",
-    0.75
-   ],
-   [
-    3,
-    "Check lid flatness and co-planarity",
-    0.5,
-    1
-   ],
-   [
-    4,
-    "Run final visual and dimensional inspection",
-    0.75
-   ]
-  ],
-  "o": [
-   "Lidded units with applied TIM",
-   "Ball-attached packages",
-   "Lid flatness and co-planarity results",
-   "Final inspection results",
-   "Completed assembled units"
-  ],
-  "ob": [
-   1,
-   2,
-   3,
-   4,
-   4
-  ],
-  "r": [
-   [
-    "ASSY-D1",
-    "produces"
-   ],
-   [
-    "ASSY-D4",
-    "feeds"
-   ]
-  ],
-  "ro": "OSAT process engineer"
- },
- "ASSY-06": {
-  "st": "packaging",
-  "w": [
-   26,
-   28
-  ],
-  "s": [
-   [
-    1,
-    "Set the inspection plan and sampling strategy",
-    0.5
-   ],
-   [
-    2,
-    "X-ray the joints and voids",
-    0.75
-   ],
-   [
-    3,
-    "Classify and disposition the defects",
-    0.5,
-    1
-   ],
-   [
-    4,
-    "Run acoustic imaging and warpage metrology",
-    0.75
-   ]
-  ],
-  "o": [
-   "Inspection plan and sampling strategy",
-   "X-ray inspection results",
-   "Defect classification and disposition",
-   "Acoustic imaging and warpage results"
-  ],
-  "ob": [
-   1,
-   2,
-   3,
-   4
-  ],
-  "r": [
-   [
-    "ASSY-D4",
-    "produces"
-   ],
-   [
-    "ASSY-D3",
-    "feeds"
-   ]
-  ],
-  "ro": "Quality engineer"
- },
- "ASSY-07": {
-  "st": "packaging",
-  "w": [
-   26,
-   31
-  ],
-  "s": [
-   [
-    1,
-    "Collect the yield data across process steps",
-    0.75
-   ],
-   [
-    2,
-    "Build the failure pareto by mode and process step",
-    1.25
-   ],
-   [
-    3,
-    "Compare against the PTV yield prediction",
-    1,
-    1
-   ],
-   [
-    4,
-    "Run root cause analysis with the OSAT",
+    "Release the frozen substrate stack-up and tooling to the supplier",
     1.5
    ],
    [
-    5,
-    "Track the corrective actions",
-    1,
+    2,
+    "Laminate material allocation and lot commitment",
+    3
+   ],
+   [
+    3,
+    "Substrate core, build-up layers and fine-line escape routing",
+    5
+   ],
+   [
+    4,
+    "Supplier line monitoring and lot-to-lot variability review",
+    7,
     1
+   ],
+   [
+    5,
+    "Surface finish, solder resist and stiffener processing",
+    2.5
    ],
    [
     6,
-    "Tune the process inside the frozen window",
-    1.5
+    "Substrate electrical test, coplanarity and warpage screening",
+    2
+   ],
+   [
+    7,
+    "Incoming inspection and release of substrate lots to the OSAT",
+    2
    ]
   ],
   "o": [
-   "Yield data by process step",
-   "Failure pareto by mode",
-   "Comparison against vehicle prediction",
-   "Root cause findings",
-   "Corrective actions and their tracking",
-   "Process tuning record"
+   "Substrate stack-up and tooling released to the supplier",
+   "Laminate allocation and material lot commitment",
+   "Substrate build complete through escape routing",
+   "Supplier line monitoring and variability record",
+   "Surface finish and stiffener processing complete",
+   "Substrate electrical test, coplanarity and warpage data",
+   "Substrate lots released to assembly with traceability"
   ],
   "ob": [
    1,
@@ -15014,134 +14667,22 @@ export const activitySteps: Record<string, ActivityStepEntry> = {
    3,
    4,
    5,
-   6
+   6,
+   7
   ],
   "r": [
-   [
-    "ASSY-D3",
-    "produces"
-   ],
    [
     "ASSY-D2",
     "feeds"
-   ]
-  ],
-  "ro": "Yield engineer"
- },
- "ASSY-08": {
-  "st": "packaging",
-  "w": [
-   29,
-   31
-  ],
-  "s": [
-   [
-    1,
-    "Set up the test and continuity criteria",
-    0.5
-   ],
-   [
-    2,
-    "Execute the open and short tests",
-    0.75
-   ],
-   [
-    3,
-    "Screen for marginal resistance",
-    0.5,
-    1
-   ],
-   [
-    4,
-    "Disposition the failures and release the units",
-    0.75
-   ]
-  ],
-  "o": [
-   "Test setup and criteria",
-   "Open and short results per unit",
-   "Marginal resistance screening results",
-   "Failure disposition and released units"
-  ],
-  "ob": [
-   1,
-   2,
-   3,
-   4
-  ],
-  "r": [
-   [
-    "ASSY-D4",
-    "produces"
    ],
    [
     "ASSY-D1",
-    "gates"
+    "feeds"
    ]
   ],
-  "ro": "Package test engineer"
+  "ro": "Package engineer"
  },
- "ASSY-09": {
-  "st": "packaging",
-  "w": [
-   28,
-   31
-  ],
-  "s": [
-   [
-    1,
-    "Collect the allocation requirements from each consumer",
-    0.5
-   ],
-   [
-    2,
-    "Allocate and reserve the units",
-    1
-   ],
-   [
-    3,
-    "Resolve contention and escalate where needed",
-    0.5,
-    1
-   ],
-   [
-    4,
-    "Build to the allocation across lots",
-    1
-   ],
-   [
-    5,
-    "Release with traceability per allocation",
-    0.5
-   ]
-  ],
-  "o": [
-   "Allocation requirements per consumer",
-   "Unit allocation and reservation record",
-   "Contention resolution decisions",
-   "Units built to allocation",
-   "Release and traceability per allocation"
-  ],
-  "ob": [
-   1,
-   2,
-   3,
-   4,
-   5
-  ],
-  "r": [
-   [
-    "ASSY-D5",
-    "produces"
-   ],
-   [
-    "ASSY-D1",
-    "produces"
-   ]
-  ],
-  "ro": "Program manager"
- },
- "ASSY-10": {
+ "ASSY-02": {
   "st": "packaging",
   "w": [
    0,
@@ -15212,68 +14753,177 @@ export const activitySteps: Record<string, ActivityStepEntry> = {
   ],
   "r": [
    [
-    "ASSY-D1",
+    "ASSY-D2",
     "feeds"
    ],
    [
-    "ASSY-D2",
+    "ASSY-D1",
     "feeds"
    ]
   ],
   "ro": "Package engineer"
  },
- "ASSY-11": {
+ "ASSY-03": {
   "st": "packaging",
   "w": [
-   0,
-   16
+   23,
+   26
   ],
   "s": [
    [
     1,
-    "Release the frozen substrate stack-up and tooling to the supplier",
-    1.5
+    "Receive the wafers and set up sort on the probe station",
+    0.5
    ],
    [
     2,
-    "Laminate material allocation and lot commitment",
-    3
+    "Execute wafer sort against the KGD criteria",
+    1
    ],
    [
     3,
-    "Substrate core, build-up layers and fine-line escape routing",
-    5
+    "Disposition the marginal die",
+    0.75,
+    1
    ],
    [
     4,
-    "Supplier line monitoring and lot-to-lot variability review",
-    7,
+    "Select the known-good die and build the wafer maps",
     1
    ],
    [
     5,
-    "Surface finish, solder resist and stiffener processing",
-    2.5
-   ],
-   [
-    6,
-    "Substrate electrical test, coplanarity and warpage screening",
-    2
-   ],
-   [
-    7,
-    "Incoming inspection and release of substrate lots to the OSAT",
-    2
+    "Release the die to assembly with traceability",
+    0.5
    ]
   ],
   "o": [
-   "Substrate stack-up and tooling released to the supplier",
-   "Laminate allocation and material lot commitment",
-   "Substrate build complete through escape routing",
-   "Supplier line monitoring and variability record",
-   "Surface finish and stiffener processing complete",
-   "Substrate electrical test, coplanarity and warpage data",
-   "Substrate lots released to assembly with traceability"
+   "Wafers received with sort setup complete",
+   "Sort execution results",
+   "Marginal die disposition record",
+   "Known-good-die map per wafer",
+   "Die released to assembly with traceability"
+  ],
+  "ob": [
+   1,
+   2,
+   3,
+   4,
+   5
+  ],
+  "r": [
+   [
+    "ASSY-D2",
+    "feeds"
+   ],
+   [
+    "ASSY-D4",
+    "feeds"
+   ]
+  ],
+  "ro": "Product engineering"
+ },
+ "ASSY-04": {
+  "st": "packaging",
+  "w": [
+   23,
+   26
+  ],
+  "s": [
+   [
+    1,
+    "Confirm HBM procurement and take delivery",
+    0.5
+   ],
+   [
+    2,
+    "Run incoming inspection against the specification",
+    1
+   ],
+   [
+    3,
+    "Review the supplier test data",
+    0.75,
+    1
+   ],
+   [
+    4,
+    "Qualify the stacks and release them to assembly",
+    1
+   ],
+   [
+    5,
+    "Maintain inventory and lot traceability",
+    0.5
+   ]
+  ],
+  "o": [
+   "Delivered HBM stacks",
+   "Incoming inspection results",
+   "Supplier test data review",
+   "Qualified stacks released to assembly",
+   "Inventory and lot traceability record"
+  ],
+  "ob": [
+   1,
+   2,
+   3,
+   4,
+   5
+  ],
+  "r": [
+   [
+    "ASSY-D2",
+    "feeds"
+   ],
+   [
+    "ASSY-D3",
+    "feeds"
+   ]
+  ],
+  "ro": "Procurement"
+ },
+ "ASSY-05": {
+  "st": "packaging",
+  "w": [
+   25,
+   28
+  ],
+  "s": [
+   [
+    1,
+    "Set up the process to the frozen window",
+    0.5
+   ],
+   [
+    2,
+    "Prepare the micro-bumps and apply flux",
+    1
+   ],
+   [
+    3,
+    "Monitor the bond parameters during the run",
+    0.75,
+    1
+   ],
+   [
+    4,
+    "Bond the die and stacks by thermo-compression",
+    1
+   ],
+   [
+    5,
+    "Inspect post-bond and record the travelers",
+    0.5
+   ]
+  ],
+  "o": [
+   "Process setup record against the frozen window",
+   "Prepared micro-bumps",
+   "Bond parameter monitoring data",
+   "Bonded die and stack assemblies",
+   "Post-bond inspection results",
+   "Assembly travelers with actual conditions"
   ],
   "ob": [
    1,
@@ -15281,20 +14931,370 @@ export const activitySteps: Record<string, ActivityStepEntry> = {
    3,
    4,
    5,
-   6,
-   7
+   5
   ],
   "r": [
    [
     "ASSY-D1",
-    "feeds"
+    "produces"
    ],
    [
     "ASSY-D2",
     "feeds"
    ]
   ],
-  "ro": "Package engineer"
+  "ro": "OSAT process engineer"
+ },
+ "ASSY-06": {
+  "st": "packaging",
+  "w": [
+   26,
+   28
+  ],
+  "s": [
+   [
+    1,
+    "Set the inspection plan and sampling strategy",
+    0.5
+   ],
+   [
+    2,
+    "X-ray the joints and voids",
+    0.75
+   ],
+   [
+    3,
+    "Classify and disposition the defects",
+    0.5,
+    1
+   ],
+   [
+    4,
+    "Run acoustic imaging and warpage metrology",
+    0.75
+   ]
+  ],
+  "o": [
+   "Inspection plan and sampling strategy",
+   "X-ray inspection results",
+   "Defect classification and disposition",
+   "Acoustic imaging and warpage results"
+  ],
+  "ob": [
+   1,
+   2,
+   3,
+   4
+  ],
+  "r": [
+   [
+    "ASSY-D3",
+    "produces"
+   ],
+   [
+    "ASSY-D4",
+    "feeds"
+   ]
+  ],
+  "ro": "Quality engineer"
+ },
+ "ASSY-07": {
+  "st": "packaging",
+  "w": [
+   26,
+   29
+  ],
+  "s": [
+   [
+    1,
+    "Attach the interposer to the substrate",
+    0.5
+   ],
+   [
+    2,
+    "Dispense and flow the underfill",
+    1
+   ],
+   [
+    3,
+    "Inspect voids and fillet before cure",
+    0.75,
+    1
+   ],
+   [
+    4,
+    "Cure the underfill and mold the assembly",
+    1
+   ],
+   [
+    5,
+    "Inspect post-mold",
+    0.5
+   ]
+  ],
+  "o": [
+   "Interposer-to-substrate attached assemblies",
+   "Dispensed and flowed underfill",
+   "Void and fillet inspection results",
+   "Cured and molded assemblies",
+   "Inspected post-mold units",
+   "Post-mold inspection results"
+  ],
+  "ob": [
+   1,
+   2,
+   3,
+   4,
+   5,
+   5
+  ],
+  "r": [
+   [
+    "ASSY-D2",
+    "feeds"
+   ],
+   [
+    "ASSY-D3",
+    "feeds"
+   ]
+  ],
+  "ro": "OSAT process engineer"
+ },
+ "ASSY-08": {
+  "st": "packaging",
+  "w": [
+   26,
+   31
+  ],
+  "s": [
+   [
+    1,
+    "Collect the yield data across process steps",
+    0.75
+   ],
+   [
+    2,
+    "Build the failure pareto by mode and process step",
+    1.25
+   ],
+   [
+    3,
+    "Compare against the PTV yield prediction",
+    1,
+    1
+   ],
+   [
+    4,
+    "Run root cause analysis with the OSAT",
+    1.5
+   ],
+   [
+    5,
+    "Track the corrective actions",
+    1,
+    1
+   ],
+   [
+    6,
+    "Tune the process inside the frozen window",
+    1.5
+   ]
+  ],
+  "o": [
+   "Yield data by process step",
+   "Failure pareto by mode",
+   "Comparison against vehicle prediction",
+   "Root cause findings",
+   "Corrective actions and their tracking",
+   "Process tuning record"
+  ],
+  "ob": [
+   1,
+   2,
+   3,
+   4,
+   5,
+   6
+  ],
+  "r": [
+   [
+    "ASSY-D4",
+    "produces"
+   ],
+   [
+    "ASSY-D1",
+    "feeds"
+   ]
+  ],
+  "ro": "Yield engineer"
+ },
+ "ASSY-09": {
+  "st": "packaging",
+  "w": [
+   28,
+   30
+  ],
+  "s": [
+   [
+    1,
+    "Apply the TIM and attach the lid",
+    0.5
+   ],
+   [
+    2,
+    "Attach the balls and reflow",
+    0.75
+   ],
+   [
+    3,
+    "Check lid flatness and co-planarity",
+    0.5,
+    1
+   ],
+   [
+    4,
+    "Run final visual and dimensional inspection",
+    0.75
+   ]
+  ],
+  "o": [
+   "Lidded units with applied TIM",
+   "Ball-attached packages",
+   "Lid flatness and co-planarity results",
+   "Final inspection results",
+   "Completed assembled units"
+  ],
+  "ob": [
+   1,
+   2,
+   3,
+   4,
+   4
+  ],
+  "r": [
+   [
+    "ASSY-D2",
+    "produces"
+   ],
+   [
+    "ASSY-D3",
+    "feeds"
+   ]
+  ],
+  "ro": "OSAT process engineer"
+ },
+ "ASSY-10": {
+  "st": "packaging",
+  "w": [
+   28,
+   31
+  ],
+  "s": [
+   [
+    1,
+    "Collect the allocation requirements from each consumer",
+    0.5
+   ],
+   [
+    2,
+    "Allocate and reserve the units",
+    1
+   ],
+   [
+    3,
+    "Resolve contention and escalate where needed",
+    0.5,
+    1
+   ],
+   [
+    4,
+    "Build to the allocation across lots",
+    1
+   ],
+   [
+    5,
+    "Release with traceability per allocation",
+    0.5
+   ]
+  ],
+  "o": [
+   "Allocation requirements per consumer",
+   "Unit allocation and reservation record",
+   "Contention resolution decisions",
+   "Units built to allocation",
+   "Release and traceability per allocation"
+  ],
+  "ob": [
+   1,
+   2,
+   3,
+   4,
+   5
+  ],
+  "r": [
+   [
+    "ASSY-D5",
+    "produces"
+   ],
+   [
+    "ASSY-D2",
+    "produces"
+   ]
+  ],
+  "ro": "Program manager"
+ },
+ "ASSY-11": {
+  "st": "packaging",
+  "w": [
+   29,
+   31
+  ],
+  "s": [
+   [
+    1,
+    "Set up the test and continuity criteria",
+    0.5
+   ],
+   [
+    2,
+    "Execute the open and short tests",
+    0.75
+   ],
+   [
+    3,
+    "Screen for marginal resistance",
+    0.5,
+    1
+   ],
+   [
+    4,
+    "Disposition the failures and release the units",
+    0.75
+   ]
+  ],
+  "o": [
+   "Test setup and criteria",
+   "Open and short results per unit",
+   "Marginal resistance screening results",
+   "Failure disposition and released units"
+  ],
+  "ob": [
+   1,
+   2,
+   3,
+   4
+  ],
+  "r": [
+   [
+    "ASSY-D3",
+    "produces"
+   ],
+   [
+    "ASSY-D2",
+    "gates"
+   ]
+  ],
+  "ro": "Package test engineer"
  },
  "EVB-01": {
   "st": "validationHardware",
@@ -15358,7 +15358,7 @@ export const activitySteps: Record<string, ActivityStepEntry> = {
     "produces"
    ],
    [
-    "EVB-D3",
+    "EVB-D5",
     "informs"
    ]
   ],
@@ -15437,7 +15437,7 @@ export const activitySteps: Record<string, ActivityStepEntry> = {
   ],
   "r": [
    [
-    "EVB-D2",
+    "EVB-D4",
     "produces"
    ],
    [
@@ -15448,6 +15448,144 @@ export const activitySteps: Record<string, ActivityStepEntry> = {
   "ro": "Hardware engineer"
  },
  "EVB-03": {
+  "st": "validationHardware",
+  "w": [
+   8,
+   15
+  ],
+  "s": [
+   [
+    1,
+    "Derive the power tree requirement from the die and package",
+    1
+   ],
+   [
+    2,
+    "Select and design the VRMs",
+    1.5
+   ],
+   [
+    3,
+    "Design the transient response against the SIPI budget",
+    1.5,
+    1
+   ],
+   [
+    4,
+    "Design the telemetry and monitoring",
+    1.5
+   ],
+   [
+    5,
+    "Design the protection and sequencing",
+    1.5,
+    1
+   ],
+   [
+    6,
+    "Bring up and validate the power subsystem on the board",
+    3
+   ]
+  ],
+  "o": [
+   "Power tree requirement",
+   "VRM design",
+   "Transient response design",
+   "Telemetry and monitoring capability",
+   "Protection and sequencing design",
+   "Power bring-up and validation results"
+  ],
+  "ob": [
+   1,
+   2,
+   3,
+   4,
+   5,
+   6
+  ],
+  "r": [
+   [
+    "EVB-D4",
+    "feeds"
+   ],
+   [
+    "EVB-D6",
+    "feeds"
+   ]
+  ],
+  "ro": "Power engineer"
+ },
+ "EVB-04": {
+  "st": "validationHardware",
+  "w": [
+   10,
+   17
+  ],
+  "s": [
+   [
+    1,
+    "Collect the debug requirements from validation and DFT",
+    1
+   ],
+   [
+    2,
+    "Design the JTAG and trace pod interfaces",
+    1.5
+   ],
+   [
+    3,
+    "Design the logic analyser and scope access",
+    1.5,
+    1
+   ],
+   [
+    4,
+    "Design the interposers and probe access",
+    1.5
+   ],
+   [
+    5,
+    "Integrate the software debug tooling",
+    1,
+    1
+   ],
+   [
+    6,
+    "Validate the debug infrastructure and document it",
+    3
+   ]
+  ],
+  "o": [
+   "Debug requirements",
+   "JTAG and trace pod interface",
+   "Logic analyser and scope access",
+   "Interposer and probe access design",
+   "Software debug tool integration",
+   "Debug infrastructure validation results",
+   "Debug and trace access documentation"
+  ],
+  "ob": [
+   1,
+   2,
+   3,
+   4,
+   5,
+   6,
+   6
+  ],
+  "r": [
+   [
+    "EVB-D2",
+    "produces"
+   ],
+   [
+    "EVB-D4",
+    "feeds"
+   ]
+  ],
+  "ro": "Validation engineer"
+ },
+ "EVB-05": {
   "st": "validationHardware",
   "w": [
    12,
@@ -15520,293 +15658,17 @@ export const activitySteps: Record<string, ActivityStepEntry> = {
   ],
   "r": [
    [
-    "EVB-D2",
+    "EVB-D4",
     "produces"
    ],
    [
-    "EVB-D3",
+    "EVB-D5",
     "feeds"
    ]
   ],
   "ro": "PCB layout engineer"
  },
- "EVB-04": {
-  "st": "validationHardware",
-  "w": [
-   23,
-   31
-  ],
-  "s": [
-   [
-    1,
-    "Select the fabrication vendor and release the data",
-    1
-   ],
-   [
-    2,
-    "Track PCB fabrication",
-    3
-   ],
-   [
-    3,
-    "Procure the components against their lead times",
-    1.5,
-    1
-   ],
-   [
-    4,
-    "Assemble the boards",
-    2.5
-   ],
-   [
-    5,
-    "Run first article inspection",
-    1,
-    1
-   ],
-   [
-    6,
-    "Run incoming inspection and accept the boards",
-    1.5
-   ]
-  ],
-  "o": [
-   "Vendor selection and released fabrication data",
-   "Fabricated bare boards",
-   "Procured components",
-   "Assembled boards",
-   "First article inspection result",
-   "Incoming inspection and acceptance record"
-  ],
-  "ob": [
-   1,
-   2,
-   3,
-   4,
-   5,
-   6
-  ],
-  "r": [
-   [
-    "EVB-D3",
-    "produces"
-   ],
-   [
-    "EVB-D2",
-    "informs"
-   ]
-  ],
-  "ro": "Hardware engineer"
- },
- "EVB-05": {
-  "st": "validationHardware",
-  "w": [
-   8,
-   15
-  ],
-  "s": [
-   [
-    1,
-    "Derive the power tree requirement from the die and package",
-    1
-   ],
-   [
-    2,
-    "Select and design the VRMs",
-    1.5
-   ],
-   [
-    3,
-    "Design the transient response against the SIPI budget",
-    1.5,
-    1
-   ],
-   [
-    4,
-    "Design the telemetry and monitoring",
-    1.5
-   ],
-   [
-    5,
-    "Design the protection and sequencing",
-    1.5,
-    1
-   ],
-   [
-    6,
-    "Bring up and validate the power subsystem on the board",
-    3
-   ]
-  ],
-  "o": [
-   "Power tree requirement",
-   "VRM design",
-   "Transient response design",
-   "Telemetry and monitoring capability",
-   "Protection and sequencing design",
-   "Power bring-up and validation results"
-  ],
-  "ob": [
-   1,
-   2,
-   3,
-   4,
-   5,
-   6
-  ],
-  "r": [
-   [
-    "EVB-D2",
-    "feeds"
-   ],
-   [
-    "EVB-D4",
-    "feeds"
-   ]
-  ],
-  "ro": "Power engineer"
- },
  "EVB-06": {
-  "st": "validationHardware",
-  "w": [
-   10,
-   17
-  ],
-  "s": [
-   [
-    1,
-    "Collect the debug requirements from validation and DFT",
-    1
-   ],
-   [
-    2,
-    "Design the JTAG and trace pod interfaces",
-    1.5
-   ],
-   [
-    3,
-    "Design the logic analyser and scope access",
-    1.5,
-    1
-   ],
-   [
-    4,
-    "Design the interposers and probe access",
-    1.5
-   ],
-   [
-    5,
-    "Integrate the software debug tooling",
-    1,
-    1
-   ],
-   [
-    6,
-    "Validate the debug infrastructure and document it",
-    3
-   ]
-  ],
-  "o": [
-   "Debug requirements",
-   "JTAG and trace pod interface",
-   "Logic analyser and scope access",
-   "Interposer and probe access design",
-   "Software debug tool integration",
-   "Debug infrastructure validation results",
-   "Debug and trace access documentation"
-  ],
-  "ob": [
-   1,
-   2,
-   3,
-   4,
-   5,
-   6,
-   6
-  ],
-  "r": [
-   [
-    "EVB-D5",
-    "produces"
-   ],
-   [
-    "EVB-D2",
-    "feeds"
-   ]
-  ],
-  "ro": "Validation engineer"
- },
- "EVB-07": {
-  "st": "validationHardware",
-  "w": [
-   30,
-   37
-  ],
-  "s": [
-   [
-    1,
-    "Plan the bring-up and fit the dummy parts",
-    1
-   ],
-   [
-    2,
-    "Bring up the power tree and verify the rails",
-    1.5
-   ],
-   [
-    3,
-    "Validate the telemetry and protection",
-    1.5,
-    1
-   ],
-   [
-    4,
-    "Validate the clocking and references",
-    1.5
-   ],
-   [
-    5,
-    "Check the thermal solution fit",
-    1.5,
-    1
-   ],
-   [
-    6,
-    "Validate the interface loopbacks and signals",
-    3
-   ]
-  ],
-  "o": [
-   "Bring-up plan and fitted dummy parts",
-   "Power tree bring-up results",
-   "Telemetry and protection validation",
-   "Clocking and reference validation",
-   "Thermal fit check",
-   "Interface loopback and signal validation results",
-   "Board bring-up report and known issues"
-  ],
-  "ob": [
-   1,
-   2,
-   3,
-   4,
-   5,
-   6,
-   6
-  ],
-  "r": [
-   [
-    "EVB-D4",
-    "produces"
-   ],
-   [
-    "EVB-D3",
-    "gates"
-   ]
-  ],
-  "ro": "Hardware engineer"
- },
- "EVB-08": {
   "st": "validationHardware",
   "w": [
    16,
@@ -15868,13 +15730,81 @@ export const activitySteps: Record<string, ActivityStepEntry> = {
     "feeds"
    ],
    [
-    "EVB-D4",
+    "EVB-D6",
     "feeds"
    ]
   ],
   "ro": "Thermal engineer"
  },
- "EVB-09": {
+ "EVB-07": {
+  "st": "validationHardware",
+  "w": [
+   23,
+   31
+  ],
+  "s": [
+   [
+    1,
+    "Select the fabrication vendor and release the data",
+    1
+   ],
+   [
+    2,
+    "Track PCB fabrication",
+    3
+   ],
+   [
+    3,
+    "Procure the components against their lead times",
+    1.5,
+    1
+   ],
+   [
+    4,
+    "Assemble the boards",
+    2.5
+   ],
+   [
+    5,
+    "Run first article inspection",
+    1,
+    1
+   ],
+   [
+    6,
+    "Run incoming inspection and accept the boards",
+    1.5
+   ]
+  ],
+  "o": [
+   "Vendor selection and released fabrication data",
+   "Fabricated bare boards",
+   "Procured components",
+   "Assembled boards",
+   "First article inspection result",
+   "Incoming inspection and acceptance record"
+  ],
+  "ob": [
+   1,
+   2,
+   3,
+   4,
+   5,
+   6
+  ],
+  "r": [
+   [
+    "EVB-D5",
+    "produces"
+   ],
+   [
+    "EVB-D4",
+    "informs"
+   ]
+  ],
+  "ro": "Hardware engineer"
+ },
+ "EVB-08": {
   "st": "validationHardware",
   "w": [
    24,
@@ -15934,17 +15864,17 @@ export const activitySteps: Record<string, ActivityStepEntry> = {
   ],
   "r": [
    [
-    "EVB-D6",
+    "EVB-D3",
     "produces"
    ],
    [
-    "EVB-D4",
+    "EVB-D6",
     "informs"
    ]
   ],
   "ro": "Lab manager"
  },
- "EVB-10": {
+ "EVB-09": {
   "st": "validationHardware",
   "w": [
    26,
@@ -16002,15 +15932,85 @@ export const activitySteps: Record<string, ActivityStepEntry> = {
   ],
   "r": [
    [
-    "EVB-D4",
+    "EVB-D6",
     "feeds"
    ],
    [
-    "EVB-D5",
+    "EVB-D2",
     "feeds"
    ]
   ],
   "ro": "Validation software engineer"
+ },
+ "EVB-10": {
+  "st": "validationHardware",
+  "w": [
+   30,
+   37
+  ],
+  "s": [
+   [
+    1,
+    "Plan the bring-up and fit the dummy parts",
+    1
+   ],
+   [
+    2,
+    "Bring up the power tree and verify the rails",
+    1.5
+   ],
+   [
+    3,
+    "Validate the telemetry and protection",
+    1.5,
+    1
+   ],
+   [
+    4,
+    "Validate the clocking and references",
+    1.5
+   ],
+   [
+    5,
+    "Check the thermal solution fit",
+    1.5,
+    1
+   ],
+   [
+    6,
+    "Validate the interface loopbacks and signals",
+    3
+   ]
+  ],
+  "o": [
+   "Bring-up plan and fitted dummy parts",
+   "Power tree bring-up results",
+   "Telemetry and protection validation",
+   "Clocking and reference validation",
+   "Thermal fit check",
+   "Interface loopback and signal validation results",
+   "Board bring-up report and known issues"
+  ],
+  "ob": [
+   1,
+   2,
+   3,
+   4,
+   5,
+   6,
+   6
+  ],
+  "r": [
+   [
+    "EVB-D6",
+    "produces"
+   ],
+   [
+    "EVB-D5",
+    "gates"
+   ]
+  ],
+  "ro": "Hardware engineer"
  },
  "TEST-01": {
   "st": "testDevelopment",
@@ -16159,513 +16159,13 @@ export const activitySteps: Record<string, ActivityStepEntry> = {
     "feeds"
    ],
    [
-    "TEST-D3",
+    "TEST-D7",
     "informs"
    ]
   ],
   "ro": "Test engineering manager"
  },
  "TEST-03": {
-  "st": "testDevelopment",
-  "w": [
-   10,
-   30
-  ],
-  "s": [
-   [
-    1,
-    "Extract the probe card requirement and bump map",
-    2
-   ],
-   [
-    2,
-    "Design the probe card",
-    3
-   ],
-   [
-    3,
-    "Analyze contact resistance and planarity",
-    3,
-    1
-   ],
-   [
-    4,
-    "Track probe card fabrication",
-    8
-   ],
-   [
-    5,
-    "Define the touchdown life and cleaning strategy",
-    3,
-    1
-   ],
-   [
-    6,
-    "Qualify the card on the tester",
-    4
-   ],
-   [
-    7,
-    "Set the spare card and repair plan",
-    2.5,
-    1
-   ],
-   [
-    8,
-    "Release the card to wafer sort",
-    3
-   ]
-  ],
-  "o": [
-   "Probe card requirement and bump map",
-   "Probe card design",
-   "Contact resistance and planarity analysis",
-   "Fabricated probe card",
-   "Touchdown life and cleaning strategy",
-   "Tester qualification results",
-   "Spare card and repair plan",
-   "Probe card released to sort"
-  ],
-  "ob": [
-   1,
-   2,
-   3,
-   4,
-   5,
-   6,
-   7,
-   8
-  ],
-  "r": [
-   [
-    "TEST-D2",
-    "produces"
-   ],
-   [
-    "TEST-D3",
-    "gates"
-   ]
-  ],
-  "ro": "Probe engineer"
- },
- "TEST-04": {
-  "st": "testDevelopment",
-  "w": [
-   12,
-   29
-  ],
-  "s": [
-   [
-    1,
-    "Define the load board requirement and select the socket",
-    2
-   ],
-   [
-    2,
-    "Design the load board with signal integrity",
-    3.5
-   ],
-   [
-    3,
-    "Analyze socket contact and insertion life",
-    2.5,
-    1
-   ],
-   [
-    4,
-    "Track fabrication and assembly",
-    5
-   ],
-   [
-    5,
-    "Design the power delivery on the load board",
-    2.5,
-    1
-   ],
-   [
-    6,
-    "Bring the board up on the tester",
-    3.5
-   ],
-   [
-    7,
-    "Design the correlation fixture",
-    2,
-    1
-   ],
-   [
-    8,
-    "Release the board to final test",
-    3
-   ]
-  ],
-  "o": [
-   "Load board requirement and socket selection",
-   "Load board design with SI results",
-   "Socket contact and life analysis",
-   "Fabricated and assembled load board",
-   "Load board power delivery analysis",
-   "Load board power delivery design",
-   "Tester bring-up results",
-   "Correlation fixture",
-   "Load board released to final test"
-  ],
-  "ob": [
-   1,
-   2,
-   3,
-   4,
-   5,
-   5,
-   6,
-   7,
-   8
-  ],
-  "r": [
-   [
-    "TEST-D2",
-    "produces"
-   ],
-   [
-    "TEST-D3",
-    "gates"
-   ]
-  ],
-  "ro": "Test hardware engineer"
- },
- "TEST-05": {
-  "st": "testDevelopment",
-  "w": [
-   16,
-   32
-  ],
-  "s": [
-   [
-    1,
-    "Define the sort flow and test list",
-    2
-   ],
-   [
-    2,
-    "Develop the DC and continuity tests",
-    3.5
-   ],
-   [
-    3,
-    "Develop the parametric and process monitor tests",
-    2.5,
-    1
-   ],
-   [
-    4,
-    "Integrate the scan and structural content",
-    3.5
-   ],
-   [
-    5,
-    "Build the binning and wafer map output",
-    2.5,
-    1
-   ],
-   [
-    6,
-    "Develop the functional and memory BIST content",
-    3.5
-   ],
-   [
-    7,
-    "Set the test limits and guard bands",
-    2.5,
-    1
-   ],
-   [
-    8,
-    "Integrate and debug the program on the tester",
-    3.5
-   ]
-  ],
-  "o": [
-   "Sort flow and test list",
-   "DC and continuity tests",
-   "Parametric and monitor tests",
-   "Integrated scan and structural content",
-   "Binning and wafer map output",
-   "Functional and BIST content",
-   "Test limits and guard bands",
-   "Debugged sort program"
-  ],
-  "ob": [
-   1,
-   2,
-   3,
-   4,
-   5,
-   6,
-   7,
-   8
-  ],
-  "r": [
-   [
-    "TEST-D3",
-    "produces"
-   ],
-   [
-    "TEST-D1",
-    "feeds"
-   ]
-  ],
-  "ro": "Test engineer"
- },
- "TEST-06": {
-  "st": "testDevelopment",
-  "w": [
-   20,
-   36
-  ],
-  "s": [
-   [
-    1,
-    "Define the final test flow",
-    2
-   ],
-   [
-    2,
-    "Develop the package-level DC and continuity content",
-    3.5
-   ],
-   [
-    3,
-    "Develop the power and thermal test content",
-    2.5,
-    1
-   ],
-   [
-    4,
-    "Develop the at-speed functional content",
-    3.5
-   ],
-   [
-    5,
-    "Develop the binning and grading content",
-    2.5,
-    1
-   ],
-   [
-    6,
-    "Develop the interface and HBM test content",
-    3.5
-   ],
-   [
-    7,
-    "Set the final test limits and guard bands",
-    2.5,
-    1
-   ],
-   [
-    8,
-    "Integrate and debug the program",
-    3.5
-   ]
-  ],
-  "o": [
-   "Final test flow",
-   "Package-level DC and continuity content",
-   "Power and thermal test content",
-   "At-speed functional content",
-   "Binning and grading content",
-   "Interface and HBM test content",
-   "Final test limits and guard bands",
-   "Debugged final test program"
-  ],
-  "ob": [
-   1,
-   2,
-   3,
-   4,
-   5,
-   6,
-   7,
-   8
-  ],
-  "r": [
-   [
-    "TEST-D3",
-    "produces"
-   ],
-   [
-    "TEST-D6",
-    "feeds"
-   ]
-  ],
-  "ro": "Test engineer"
- },
- "TEST-07": {
-  "st": "testDevelopment",
-  "w": [
-   24,
-   36
-  ],
-  "s": [
-   [
-    1,
-    "Collect the characterization requirement from qualification and marketing",
-    1.5
-   ],
-   [
-    2,
-    "Build the shmoo and corner content",
-    2.5
-   ],
-   [
-    3,
-    "Automate the temperature and voltage sweeps",
-    2,
-    1
-   ],
-   [
-    4,
-    "Build the parametric characterization content",
-    2.5
-   ],
-   [
-    5,
-    "Design the statistical sample plan",
-    2,
-    1
-   ],
-   [
-    6,
-    "Build the datasheet parameter test content",
-    2.5
-   ],
-   [
-    7,
-    "Build the data analysis and reporting pipeline",
-    1.5,
-    1
-   ],
-   [
-    8,
-    "Integrate the content and set up correlation",
-    3
-   ]
-  ],
-  "o": [
-   "Characterization requirement",
-   "Shmoo and corner content",
-   "Sweep automation",
-   "Parametric characterization content",
-   "Statistical sample plan",
-   "Datasheet parameter content",
-   "Data analysis and reporting pipeline",
-   "Integrated characterization suite"
-  ],
-  "ob": [
-   1,
-   2,
-   3,
-   4,
-   5,
-   6,
-   7,
-   8
-  ],
-  "r": [
-   [
-    "TEST-D4",
-    "produces"
-   ],
-   [
-    "TEST-D6",
-    "informs"
-   ]
-  ],
-  "ro": "Characterization engineer"
- },
- "TEST-08": {
-  "st": "testDevelopment",
-  "w": [
-   22,
-   32
-  ],
-  "s": [
-   [
-    1,
-    "Take the ATPG pattern handoff from DFT",
-    1.5
-   ],
-   [
-    2,
-    "Translate the patterns to the tester format",
-    2
-   ],
-   [
-    3,
-    "Reduce pattern volume against the memory depth",
-    1.5,
-    1
-   ],
-   [
-    4,
-    "Map the timing and protocols",
-    2.5
-   ],
-   [
-    5,
-    "Set up compression and streaming",
-    1.5,
-    1
-   ],
-   [
-    6,
-    "Simulate the patterns against the tester model",
-    2
-   ],
-   [
-    7,
-    "Put the patterns under regression and version control",
-    1.5,
-    1
-   ],
-   [
-    8,
-    "Debug the patterns on silicon or emulation",
-    2
-   ]
-  ],
-  "o": [
-   "Pattern handoff record",
-   "Translated tester-format patterns",
-   "Volume and memory reduction",
-   "Timing and protocol mapping",
-   "Compression and streaming setup",
-   "Tester-model simulation results",
-   "Pattern regression under version control",
-   "Debugged ATE-ready pattern set"
-  ],
-  "ob": [
-   1,
-   2,
-   3,
-   4,
-   5,
-   6,
-   7,
-   8
-  ],
-  "r": [
-   [
-    "TEST-D5",
-    "produces"
-   ],
-   [
-    "TEST-D3",
-    "feeds"
-   ]
-  ],
-  "ro": "Test engineer"
- },
- "TEST-09": {
   "st": "testDevelopment",
   "w": [
    8,
@@ -16748,66 +16248,66 @@ export const activitySteps: Record<string, ActivityStepEntry> = {
   ],
   "ro": "Test engineer"
  },
- "TEST-10": {
+ "TEST-04": {
   "st": "testDevelopment",
   "w": [
-   32,
-   40
+   10,
+   30
   ],
   "s": [
    [
     1,
-    "Plan the correlation and select the units",
-    1
-   ],
-   [
-    2,
-    "Correlate ATE against bench",
+    "Extract the probe card requirement and bump map",
     2
    ],
    [
+    2,
+    "Design the probe card",
+    3
+   ],
+   [
     3,
-    "Build the measurement uncertainty budget",
-    1.5,
+    "Analyze contact resistance and planarity",
+    3,
     1
    ],
    [
     4,
-    "Correlate ATE against system",
-    2
+    "Track probe card fabrication",
+    8
    ],
    [
     5,
-    "Designate and retain the golden units",
-    1.5,
+    "Define the touchdown life and cleaning strategy",
+    3,
     1
    ],
    [
     6,
-    "Analyze the discrepancies and establish root causes",
-    1.5
+    "Qualify the card on the tester",
+    4
    ],
    [
     7,
-    "Set up the correlation regression",
-    1,
+    "Set the spare card and repair plan",
+    2.5,
     1
    ],
    [
     8,
-    "Adjust the guard bands and release",
-    1.5
+    "Release the card to wafer sort",
+    3
    ]
   ],
   "o": [
-   "Correlation plan and unit selection",
-   "ATE-to-bench correlation results",
-   "Measurement uncertainty budget",
-   "ATE-to-system correlation results",
-   "Designated golden units",
-   "Discrepancy analysis and root causes",
-   "Correlation regression",
-   "Adjusted guard bands"
+   "Probe card requirement and bump map",
+   "Probe card design",
+   "Contact resistance and planarity analysis",
+   "Fabricated probe card",
+   "Touchdown life and cleaning strategy",
+   "Tester qualification results",
+   "Spare card and repair plan",
+   "Probe card released to sort"
   ],
   "ob": [
    1,
@@ -16822,16 +16322,433 @@ export const activitySteps: Record<string, ActivityStepEntry> = {
   "r": [
    [
     "TEST-D4",
-    "feeds"
+    "produces"
    ],
    [
-    "TEST-D3",
+    "TEST-D7",
+    "gates"
+   ]
+  ],
+  "ro": "Probe engineer"
+ },
+ "TEST-05": {
+  "st": "testDevelopment",
+  "w": [
+   12,
+   29
+  ],
+  "s": [
+   [
+    1,
+    "Define the load board requirement and select the socket",
+    2
+   ],
+   [
+    2,
+    "Design the load board with signal integrity",
+    3.5
+   ],
+   [
+    3,
+    "Analyze socket contact and insertion life",
+    2.5,
+    1
+   ],
+   [
+    4,
+    "Track fabrication and assembly",
+    5
+   ],
+   [
+    5,
+    "Design the power delivery on the load board",
+    2.5,
+    1
+   ],
+   [
+    6,
+    "Bring the board up on the tester",
+    3.5
+   ],
+   [
+    7,
+    "Design the correlation fixture",
+    2,
+    1
+   ],
+   [
+    8,
+    "Release the board to final test",
+    3
+   ]
+  ],
+  "o": [
+   "Load board requirement and socket selection",
+   "Load board design with SI results",
+   "Socket contact and life analysis",
+   "Fabricated and assembled load board",
+   "Load board power delivery analysis",
+   "Load board power delivery design",
+   "Tester bring-up results",
+   "Correlation fixture",
+   "Load board released to final test"
+  ],
+  "ob": [
+   1,
+   2,
+   3,
+   4,
+   5,
+   5,
+   6,
+   7,
+   8
+  ],
+  "r": [
+   [
+    "TEST-D4",
+    "produces"
+   ],
+   [
+    "TEST-D7",
+    "gates"
+   ]
+  ],
+  "ro": "Test hardware engineer"
+ },
+ "TEST-06": {
+  "st": "testDevelopment",
+  "w": [
+   16,
+   32
+  ],
+  "s": [
+   [
+    1,
+    "Define the sort flow and test list",
+    2
+   ],
+   [
+    2,
+    "Develop the DC and continuity tests",
+    3.5
+   ],
+   [
+    3,
+    "Develop the parametric and process monitor tests",
+    2.5,
+    1
+   ],
+   [
+    4,
+    "Integrate the scan and structural content",
+    3.5
+   ],
+   [
+    5,
+    "Build the binning and wafer map output",
+    2.5,
+    1
+   ],
+   [
+    6,
+    "Develop the functional and memory BIST content",
+    3.5
+   ],
+   [
+    7,
+    "Set the test limits and guard bands",
+    2.5,
+    1
+   ],
+   [
+    8,
+    "Integrate and debug the program on the tester",
+    3.5
+   ]
+  ],
+  "o": [
+   "Sort flow and test list",
+   "DC and continuity tests",
+   "Parametric and monitor tests",
+   "Integrated scan and structural content",
+   "Binning and wafer map output",
+   "Functional and BIST content",
+   "Test limits and guard bands",
+   "Debugged sort program"
+  ],
+  "ob": [
+   1,
+   2,
+   3,
+   4,
+   5,
+   6,
+   7,
+   8
+  ],
+  "r": [
+   [
+    "TEST-D7",
+    "produces"
+   ],
+   [
+    "TEST-D1",
     "feeds"
    ]
   ],
-  "ro": "Product engineering"
+  "ro": "Test engineer"
  },
- "TEST-11": {
+ "TEST-07": {
+  "st": "testDevelopment",
+  "w": [
+   20,
+   36
+  ],
+  "s": [
+   [
+    1,
+    "Define the final test flow",
+    2
+   ],
+   [
+    2,
+    "Develop the package-level DC and continuity content",
+    3.5
+   ],
+   [
+    3,
+    "Develop the power and thermal test content",
+    2.5,
+    1
+   ],
+   [
+    4,
+    "Develop the at-speed functional content",
+    3.5
+   ],
+   [
+    5,
+    "Develop the binning and grading content",
+    2.5,
+    1
+   ],
+   [
+    6,
+    "Develop the interface and HBM test content",
+    3.5
+   ],
+   [
+    7,
+    "Set the final test limits and guard bands",
+    2.5,
+    1
+   ],
+   [
+    8,
+    "Integrate and debug the program",
+    3.5
+   ]
+  ],
+  "o": [
+   "Final test flow",
+   "Package-level DC and continuity content",
+   "Power and thermal test content",
+   "At-speed functional content",
+   "Binning and grading content",
+   "Interface and HBM test content",
+   "Final test limits and guard bands",
+   "Debugged final test program"
+  ],
+  "ob": [
+   1,
+   2,
+   3,
+   4,
+   5,
+   6,
+   7,
+   8
+  ],
+  "r": [
+   [
+    "TEST-D7",
+    "produces"
+   ],
+   [
+    "TEST-D6",
+    "feeds"
+   ]
+  ],
+  "ro": "Test engineer"
+ },
+ "TEST-08": {
+  "st": "testDevelopment",
+  "w": [
+   22,
+   32
+  ],
+  "s": [
+   [
+    1,
+    "Take the ATPG pattern handoff from DFT",
+    1.5
+   ],
+   [
+    2,
+    "Translate the patterns to the tester format",
+    2
+   ],
+   [
+    3,
+    "Reduce pattern volume against the memory depth",
+    1.5,
+    1
+   ],
+   [
+    4,
+    "Map the timing and protocols",
+    2.5
+   ],
+   [
+    5,
+    "Set up compression and streaming",
+    1.5,
+    1
+   ],
+   [
+    6,
+    "Simulate the patterns against the tester model",
+    2
+   ],
+   [
+    7,
+    "Put the patterns under regression and version control",
+    1.5,
+    1
+   ],
+   [
+    8,
+    "Debug the patterns on silicon or emulation",
+    2
+   ]
+  ],
+  "o": [
+   "Pattern handoff record",
+   "Translated tester-format patterns",
+   "Volume and memory reduction",
+   "Timing and protocol mapping",
+   "Compression and streaming setup",
+   "Tester-model simulation results",
+   "Pattern regression under version control",
+   "Debugged ATE-ready pattern set"
+  ],
+  "ob": [
+   1,
+   2,
+   3,
+   4,
+   5,
+   6,
+   7,
+   8
+  ],
+  "r": [
+   [
+    "TEST-D2",
+    "produces"
+   ],
+   [
+    "TEST-D7",
+    "feeds"
+   ]
+  ],
+  "ro": "Test engineer"
+ },
+ "TEST-09": {
+  "st": "testDevelopment",
+  "w": [
+   24,
+   36
+  ],
+  "s": [
+   [
+    1,
+    "Collect the characterization requirement from qualification and marketing",
+    1.5
+   ],
+   [
+    2,
+    "Build the shmoo and corner content",
+    2.5
+   ],
+   [
+    3,
+    "Automate the temperature and voltage sweeps",
+    2,
+    1
+   ],
+   [
+    4,
+    "Build the parametric characterization content",
+    2.5
+   ],
+   [
+    5,
+    "Design the statistical sample plan",
+    2,
+    1
+   ],
+   [
+    6,
+    "Build the datasheet parameter test content",
+    2.5
+   ],
+   [
+    7,
+    "Build the data analysis and reporting pipeline",
+    1.5,
+    1
+   ],
+   [
+    8,
+    "Integrate the content and set up correlation",
+    3
+   ]
+  ],
+  "o": [
+   "Characterization requirement",
+   "Shmoo and corner content",
+   "Sweep automation",
+   "Parametric characterization content",
+   "Statistical sample plan",
+   "Datasheet parameter content",
+   "Data analysis and reporting pipeline",
+   "Integrated characterization suite"
+  ],
+  "ob": [
+   1,
+   2,
+   3,
+   4,
+   5,
+   6,
+   7,
+   8
+  ],
+  "r": [
+   [
+    "TEST-D5",
+    "produces"
+   ],
+   [
+    "TEST-D6",
+    "informs"
+   ]
+  ],
+  "ro": "Characterization engineer"
+ },
+ "TEST-10": {
   "st": "testDevelopment",
   "w": [
    26,
@@ -16904,7 +16821,7 @@ export const activitySteps: Record<string, ActivityStepEntry> = {
   ],
   "r": [
    [
-    "TEST-D7",
+    "TEST-D3",
     "produces"
    ],
    [
@@ -16913,6 +16830,89 @@ export const activitySteps: Record<string, ActivityStepEntry> = {
    ]
   ],
   "ro": "Test data engineer"
+ },
+ "TEST-11": {
+  "st": "testDevelopment",
+  "w": [
+   32,
+   40
+  ],
+  "s": [
+   [
+    1,
+    "Plan the correlation and select the units",
+    1
+   ],
+   [
+    2,
+    "Correlate ATE against bench",
+    2
+   ],
+   [
+    3,
+    "Build the measurement uncertainty budget",
+    1.5,
+    1
+   ],
+   [
+    4,
+    "Correlate ATE against system",
+    2
+   ],
+   [
+    5,
+    "Designate and retain the golden units",
+    1.5,
+    1
+   ],
+   [
+    6,
+    "Analyze the discrepancies and establish root causes",
+    1.5
+   ],
+   [
+    7,
+    "Set up the correlation regression",
+    1,
+    1
+   ],
+   [
+    8,
+    "Adjust the guard bands and release",
+    1.5
+   ]
+  ],
+  "o": [
+   "Correlation plan and unit selection",
+   "ATE-to-bench correlation results",
+   "Measurement uncertainty budget",
+   "ATE-to-system correlation results",
+   "Designated golden units",
+   "Discrepancy analysis and root causes",
+   "Correlation regression",
+   "Adjusted guard bands"
+  ],
+  "ob": [
+   1,
+   2,
+   3,
+   4,
+   5,
+   6,
+   7,
+   8
+  ],
+  "r": [
+   [
+    "TEST-D5",
+    "feeds"
+   ],
+   [
+    "TEST-D7",
+    "feeds"
+   ]
+  ],
+  "ro": "Product engineering"
  },
  "BU-01": {
   "st": "bringup",
@@ -16961,7 +16961,7 @@ export const activitySteps: Record<string, ActivityStepEntry> = {
     "feeds"
    ],
    [
-    "BU-D5",
+    "BU-D2",
     "informs"
    ]
   ],
@@ -17021,7 +17021,7 @@ export const activitySteps: Record<string, ActivityStepEntry> = {
     "feeds"
    ],
    [
-    "BU-D2",
+    "BU-D5",
     "feeds"
    ]
   ],
@@ -17081,7 +17081,7 @@ export const activitySteps: Record<string, ActivityStepEntry> = {
     "feeds"
    ],
    [
-    "BU-D2",
+    "BU-D5",
     "feeds"
    ]
   ],
@@ -17156,6 +17156,89 @@ export const activitySteps: Record<string, ActivityStepEntry> = {
   "ro": "Bring-up lead"
  },
  "BU-05": {
+  "st": "bringup",
+  "w": [
+   4,
+   14
+  ],
+  "s": [
+   [
+    1,
+    "Run the anomaly intake and triage process",
+    1
+   ],
+   [
+    2,
+    "Reproduce and isolate each anomaly",
+    2
+   ],
+   [
+    3,
+    "Cross-check against simulation and emulation",
+    2,
+    1
+   ],
+   [
+    4,
+    "Extract internal state via DFT and trace",
+    2.5
+   ],
+   [
+    5,
+    "Escalate to the design team for analysis",
+    2,
+    1
+   ],
+   [
+    6,
+    "Test hypotheses and establish root causes",
+    2.5
+   ],
+   [
+    7,
+    "Capture the debug knowledge",
+    1.5,
+    1
+   ],
+   [
+    8,
+    "Request failure analysis and disposition the findings",
+    2
+   ]
+  ],
+  "o": [
+   "Anomaly intake and triage records",
+   "Reproduction and isolation results",
+   "Simulation and emulation cross-check findings",
+   "Extracted internal state",
+   "Design-team analysis",
+   "Root cause determinations",
+   "Debug knowledge base",
+   "Failure analysis reports and dispositions"
+  ],
+  "ob": [
+   1,
+   2,
+   3,
+   4,
+   5,
+   6,
+   7,
+   8
+  ],
+  "r": [
+   [
+    "BU-D2",
+    "produces"
+   ],
+   [
+    "BU-D4",
+    "feeds"
+   ]
+  ],
+  "ro": "Silicon debug engineer"
+ },
+ "BU-06": {
   "st": "bringup",
   "w": [
    6,
@@ -17240,7 +17323,7 @@ export const activitySteps: Record<string, ActivityStepEntry> = {
   ],
   "ro": "Interface engineer"
  },
- "BU-06": {
+ "BU-07": {
   "st": "bringup",
   "w": [
    8,
@@ -17298,7 +17381,7 @@ export const activitySteps: Record<string, ActivityStepEntry> = {
   ],
   "r": [
    [
-    "BU-D2",
+    "BU-D5",
     "feeds"
    ],
    [
@@ -17308,7 +17391,7 @@ export const activitySteps: Record<string, ActivityStepEntry> = {
   ],
   "ro": "Memory engineer"
  },
- "BU-07": {
+ "BU-08": {
   "st": "bringup",
   "w": [
    9,
@@ -17366,7 +17449,7 @@ export const activitySteps: Record<string, ActivityStepEntry> = {
   ],
   "r": [
    [
-    "BU-D2",
+    "BU-D5",
     "produces"
    ],
    [
@@ -17376,158 +17459,7 @@ export const activitySteps: Record<string, ActivityStepEntry> = {
   ],
   "ro": "Characterization engineer"
  },
- "BU-08": {
-  "st": "bringup",
-  "w": [
-   11,
-   17
-  ],
-  "s": [
-   [
-    1,
-    "Set up the benchmarks and workloads",
-    1
-   ],
-   [
-    2,
-    "Measure performance across the workloads",
-    1.5
-   ],
-   [
-    3,
-    "Measure power efficiency",
-    1.5,
-    1
-   ],
-   [
-    4,
-    "Compare against the architecture model",
-    1.5
-   ],
-   [
-    5,
-    "Profile the bottlenecks",
-    1.5,
-    1
-   ],
-   [
-    6,
-    "Analyze the gaps and attribute their causes",
-    2
-   ]
-  ],
-  "o": [
-   "Benchmark and workload setup",
-   "Performance measurements across workloads",
-   "Power efficiency measurements",
-   "Comparison against the architecture model",
-   "Bottleneck profiling results",
-   "Gap analysis and attribution"
-  ],
-  "ob": [
-   1,
-   2,
-   3,
-   4,
-   5,
-   6
-  ],
-  "r": [
-   [
-    "BU-D2",
-    "feeds"
-   ],
-   [
-    "BU-D1",
-    "feeds"
-   ]
-  ],
-  "ro": "Performance engineer"
- },
  "BU-09": {
-  "st": "bringup",
-  "w": [
-   4,
-   14
-  ],
-  "s": [
-   [
-    1,
-    "Run the anomaly intake and triage process",
-    1
-   ],
-   [
-    2,
-    "Reproduce and isolate each anomaly",
-    2
-   ],
-   [
-    3,
-    "Cross-check against simulation and emulation",
-    2,
-    1
-   ],
-   [
-    4,
-    "Extract internal state via DFT and trace",
-    2.5
-   ],
-   [
-    5,
-    "Escalate to the design team for analysis",
-    2,
-    1
-   ],
-   [
-    6,
-    "Test hypotheses and establish root causes",
-    2.5
-   ],
-   [
-    7,
-    "Capture the debug knowledge",
-    1.5,
-    1
-   ],
-   [
-    8,
-    "Request failure analysis and disposition the findings",
-    2
-   ]
-  ],
-  "o": [
-   "Anomaly intake and triage records",
-   "Reproduction and isolation results",
-   "Simulation and emulation cross-check findings",
-   "Extracted internal state",
-   "Design-team analysis",
-   "Root cause determinations",
-   "Debug knowledge base",
-   "Failure analysis reports and dispositions"
-  ],
-  "ob": [
-   1,
-   2,
-   3,
-   4,
-   5,
-   6,
-   7,
-   8
-  ],
-  "r": [
-   [
-    "BU-D5",
-    "produces"
-   ],
-   [
-    "BU-D4",
-    "feeds"
-   ]
-  ],
-  "ro": "Silicon debug engineer"
- },
- "BU-10": {
   "st": "bringup",
   "w": [
    10,
@@ -17594,6 +17526,74 @@ export const activitySteps: Record<string, ActivityStepEntry> = {
    ]
   ],
   "ro": "Product engineering"
+ },
+ "BU-10": {
+  "st": "bringup",
+  "w": [
+   11,
+   17
+  ],
+  "s": [
+   [
+    1,
+    "Set up the benchmarks and workloads",
+    1
+   ],
+   [
+    2,
+    "Measure performance across the workloads",
+    1.5
+   ],
+   [
+    3,
+    "Measure power efficiency",
+    1.5,
+    1
+   ],
+   [
+    4,
+    "Compare against the architecture model",
+    1.5
+   ],
+   [
+    5,
+    "Profile the bottlenecks",
+    1.5,
+    1
+   ],
+   [
+    6,
+    "Analyze the gaps and attribute their causes",
+    2
+   ]
+  ],
+  "o": [
+   "Benchmark and workload setup",
+   "Performance measurements across workloads",
+   "Power efficiency measurements",
+   "Comparison against the architecture model",
+   "Bottleneck profiling results",
+   "Gap analysis and attribution"
+  ],
+  "ob": [
+   1,
+   2,
+   3,
+   4,
+   5,
+   6
+  ],
+  "r": [
+   [
+    "BU-D5",
+    "feeds"
+   ],
+   [
+    "BU-D1",
+    "feeds"
+   ]
+  ],
+  "ro": "Performance engineer"
  },
  "BU-11": {
   "st": "bringup",
@@ -17795,247 +17795,13 @@ export const activitySteps: Record<string, ActivityStepEntry> = {
     "produces"
    ],
    [
-    "MP-D5",
+    "MP-D8",
     "informs"
    ]
   ],
   "ro": "Reliability engineer"
  },
  "MP-02": {
-  "st": "qualification",
-  "w": [
-   5,
-   23
-  ],
-  "s": [
-   [
-    1,
-    "Prepare the samples and run pre-stress characterization",
-    1.5
-   ],
-   [
-    2,
-    "Load the stress chambers and start the campaign",
-    2
-   ],
-   [
-    3,
-    "Execute uHAST and THB",
-    3,
-    1
-   ],
-   [
-    4,
-    "Execute HTOL",
-    6
-   ],
-   [
-    5,
-    "Take interim readouts at the defined intervals",
-    3,
-    1
-   ],
-   [
-    6,
-    "Execute temperature cycle and HTS",
-    4.5
-   ],
-   [
-    7,
-    "Analyze the stress failures",
-    2.5,
-    1
-   ],
-   [
-    8,
-    "Take the final readout, analyze and report",
-    4
-   ]
-  ],
-  "o": [
-   "Pre-stress characterization baseline",
-   "Loaded stress campaign",
-   "uHAST and THB results",
-   "HTOL results",
-   "Interim readout data",
-   "Temperature cycle and HTS results",
-   "Stress failure analyses",
-   "Reliability data package"
-  ],
-  "ob": [
-   1,
-   2,
-   3,
-   4,
-   5,
-   6,
-   7,
-   8
-  ],
-  "r": [
-   [
-    "MP-D2",
-    "produces"
-   ],
-   [
-    "MP-D1",
-    "feeds"
-   ]
-  ],
-  "ro": "Reliability engineer"
- },
- "MP-03": {
-  "st": "qualification",
-  "w": [
-   6,
-   12
-  ],
-  "s": [
-   [
-    1,
-    "Write the ESD and latch-up test plan and classify the pins",
-    1
-   ],
-   [
-    2,
-    "Characterize HBM ESD",
-    1.5
-   ],
-   [
-    3,
-    "Review the pin classification and protection",
-    1,
-    1
-   ],
-   [
-    4,
-    "Characterize CDM ESD",
-    1.5
-   ],
-   [
-    5,
-    "Analyze the ESD failures",
-    1,
-    1
-   ],
-   [
-    6,
-    "Run the latch-up test and report",
-    2
-   ]
-  ],
-  "o": [
-   "ESD and latch-up test plan",
-   "HBM ESD classification",
-   "Pin classification and protection review",
-   "CDM ESD classification",
-   "ESD failure analyses",
-   "Latch-up test results and report"
-  ],
-  "ob": [
-   1,
-   2,
-   3,
-   4,
-   5,
-   6
-  ],
-  "r": [
-   [
-    "MP-D2",
-    "feeds"
-   ],
-   [
-    "MP-D8",
-    "feeds"
-   ]
-  ],
-  "ro": "ESD engineer"
- },
- "MP-04": {
-  "st": "qualification",
-  "w": [
-   8,
-   20
-  ],
-  "s": [
-   [
-    1,
-    "Run MSL preconditioning and moisture classification",
-    1.5
-   ],
-   [
-    2,
-    "Run board-level reliability — temperature cycling on board",
-    2.5
-   ],
-   [
-    3,
-    "Correlate the solder joint reliability model",
-    2,
-    1
-   ],
-   [
-    4,
-    "Run drop and bend testing",
-    3
-   ],
-   [
-    5,
-    "Track warpage and co-planarity through stress",
-    2,
-    1
-   ],
-   [
-    6,
-    "Run package-level readout and acoustic imaging",
-    2.5
-   ],
-   [
-    7,
-    "Analyze the package failures",
-    1.5,
-    1
-   ],
-   [
-    8,
-    "Analyze the results and write the qualification report",
-    2.5
-   ]
-  ],
-  "o": [
-   "MSL classification",
-   "Board-level reliability results",
-   "Solder joint reliability model correlation",
-   "Drop and bend results",
-   "Warpage and co-planarity through stress",
-   "Package readout and acoustic imaging",
-   "Package failure analyses",
-   "Package qualification report"
-  ],
-  "ob": [
-   1,
-   2,
-   3,
-   4,
-   5,
-   6,
-   7,
-   8
-  ],
-  "r": [
-   [
-    "MP-D2",
-    "produces"
-   ],
-   [
-    "MP-D1",
-    "feeds"
-   ]
-  ],
-  "ro": "Package reliability engineer"
- },
- "MP-05": {
   "st": "qualification",
   "w": [
    2,
@@ -18108,17 +17874,334 @@ export const activitySteps: Record<string, ActivityStepEntry> = {
   ],
   "r": [
    [
-    "MP-D4",
+    "MP-D2",
     "produces"
    ],
    [
-    "MP-D5",
+    "MP-D8",
     "feeds"
    ]
   ],
   "ro": "Yield engineer"
  },
+ "MP-03": {
+  "st": "qualification",
+  "w": [
+   5,
+   23
+  ],
+  "s": [
+   [
+    1,
+    "Prepare the samples and run pre-stress characterization",
+    1.5
+   ],
+   [
+    2,
+    "Load the stress chambers and start the campaign",
+    2
+   ],
+   [
+    3,
+    "Execute uHAST and THB",
+    3,
+    1
+   ],
+   [
+    4,
+    "Execute HTOL",
+    6
+   ],
+   [
+    5,
+    "Take interim readouts at the defined intervals",
+    3,
+    1
+   ],
+   [
+    6,
+    "Execute temperature cycle and HTS",
+    4.5
+   ],
+   [
+    7,
+    "Analyze the stress failures",
+    2.5,
+    1
+   ],
+   [
+    8,
+    "Take the final readout, analyze and report",
+    4
+   ]
+  ],
+  "o": [
+   "Pre-stress characterization baseline",
+   "Loaded stress campaign",
+   "uHAST and THB results",
+   "HTOL results",
+   "Interim readout data",
+   "Temperature cycle and HTS results",
+   "Stress failure analyses",
+   "Reliability data package"
+  ],
+  "ob": [
+   1,
+   2,
+   3,
+   4,
+   5,
+   6,
+   7,
+   8
+  ],
+  "r": [
+   [
+    "MP-D5",
+    "produces"
+   ],
+   [
+    "MP-D1",
+    "feeds"
+   ]
+  ],
+  "ro": "Reliability engineer"
+ },
+ "MP-04": {
+  "st": "qualification",
+  "w": [
+   6,
+   12
+  ],
+  "s": [
+   [
+    1,
+    "Write the ESD and latch-up test plan and classify the pins",
+    1
+   ],
+   [
+    2,
+    "Characterize HBM ESD",
+    1.5
+   ],
+   [
+    3,
+    "Review the pin classification and protection",
+    1,
+    1
+   ],
+   [
+    4,
+    "Characterize CDM ESD",
+    1.5
+   ],
+   [
+    5,
+    "Analyze the ESD failures",
+    1,
+    1
+   ],
+   [
+    6,
+    "Run the latch-up test and report",
+    2
+   ]
+  ],
+  "o": [
+   "ESD and latch-up test plan",
+   "HBM ESD classification",
+   "Pin classification and protection review",
+   "CDM ESD classification",
+   "ESD failure analyses",
+   "Latch-up test results and report"
+  ],
+  "ob": [
+   1,
+   2,
+   3,
+   4,
+   5,
+   6
+  ],
+  "r": [
+   [
+    "MP-D5",
+    "feeds"
+   ],
+   [
+    "MP-D7",
+    "feeds"
+   ]
+  ],
+  "ro": "ESD engineer"
+ },
+ "MP-05": {
+  "st": "qualification",
+  "w": [
+   8,
+   17
+  ],
+  "s": [
+   [
+    1,
+    "Design the split lots across the process corners",
+    1
+   ],
+   [
+    2,
+    "Fabricate and track the split lots",
+    2
+   ],
+   [
+    3,
+    "Analyze parametric spread and Cpk",
+    1.5,
+    1
+   ],
+   [
+    4,
+    "Characterize the corners on the split material",
+    2
+   ],
+   [
+    5,
+    "Assess the design margin at the corners",
+    1.5,
+    1
+   ],
+   [
+    6,
+    "Correlate the corners against the models",
+    2
+   ],
+   [
+    7,
+    "Recommend the process window",
+    1.25,
+    1
+   ],
+   [
+    8,
+    "Sign off the corners and report",
+    2
+   ]
+  ],
+  "o": [
+   "Split-lot design",
+   "Fabricated and tracked split lots",
+   "Parametric spread and Cpk analysis",
+   "Corner characterization results",
+   "Design margin at the corners",
+   "Corner-to-model correlation",
+   "Process window recommendation",
+   "Corner signoff report"
+  ],
+  "ob": [
+   1,
+   2,
+   3,
+   4,
+   5,
+   6,
+   7,
+   8
+  ],
+  "r": [
+   [
+    "MP-D2",
+    "feeds"
+   ],
+   [
+    "MP-D1",
+    "feeds"
+   ]
+  ],
+  "ro": "Product engineering"
+ },
  "MP-06": {
+  "st": "qualification",
+  "w": [
+   8,
+   20
+  ],
+  "s": [
+   [
+    1,
+    "Run MSL preconditioning and moisture classification",
+    1.5
+   ],
+   [
+    2,
+    "Run board-level reliability — temperature cycling on board",
+    2.5
+   ],
+   [
+    3,
+    "Correlate the solder joint reliability model",
+    2,
+    1
+   ],
+   [
+    4,
+    "Run drop and bend testing",
+    3
+   ],
+   [
+    5,
+    "Track warpage and co-planarity through stress",
+    2,
+    1
+   ],
+   [
+    6,
+    "Run package-level readout and acoustic imaging",
+    2.5
+   ],
+   [
+    7,
+    "Analyze the package failures",
+    1.5,
+    1
+   ],
+   [
+    8,
+    "Analyze the results and write the qualification report",
+    2.5
+   ]
+  ],
+  "o": [
+   "MSL classification",
+   "Board-level reliability results",
+   "Solder joint reliability model correlation",
+   "Drop and bend results",
+   "Warpage and co-planarity through stress",
+   "Package readout and acoustic imaging",
+   "Package failure analyses",
+   "Package qualification report"
+  ],
+  "ob": [
+   1,
+   2,
+   3,
+   4,
+   5,
+   6,
+   7,
+   8
+  ],
+  "r": [
+   [
+    "MP-D5",
+    "produces"
+   ],
+   [
+    "MP-D1",
+    "feeds"
+   ]
+  ],
+  "ro": "Package reliability engineer"
+ },
+ "MP-07": {
   "st": "qualification",
   "w": [
    10,
@@ -18195,13 +18278,179 @@ export const activitySteps: Record<string, ActivityStepEntry> = {
     "produces"
    ],
    [
-    "MP-D5",
+    "MP-D8",
     "feeds"
    ]
   ],
   "ro": "Product engineering"
  },
- "MP-07": {
+ "MP-08": {
+  "st": "qualification",
+  "w": [
+   10,
+   22
+  ],
+  "s": [
+   [
+    1,
+    "Confirm the demand forecast and volume commitment",
+    1.5
+   ],
+   [
+    2,
+    "Commit the wafer, substrate and HBM supply",
+    2.5
+   ],
+   [
+    3,
+    "Analyze lead times and buffers",
+    2,
+    1
+   ],
+   [
+    4,
+    "Commit the assembly and test capacity",
+    2.5
+   ],
+   [
+    5,
+    "Compute the cost per unit at volume",
+    2,
+    1
+   ],
+   [
+    6,
+    "Build the ramp plan and build schedule",
+    2.5
+   ],
+   [
+    7,
+    "Set up logistics and distribution",
+    1.5,
+    1
+   ],
+   [
+    8,
+    "Assess supply chain risk and set the second-source plan",
+    3
+   ]
+  ],
+  "o": [
+   "Demand forecast and volume commitment",
+   "Wafer, substrate and HBM supply commitments",
+   "Lead time and buffer analysis",
+   "Assembly and test capacity commitments",
+   "Cost per unit at volume",
+   "Ramp plan and build schedule",
+   "Logistics and distribution setup",
+   "Supply chain risk and second-source plan"
+  ],
+  "ob": [
+   1,
+   2,
+   3,
+   4,
+   5,
+   6,
+   7,
+   8
+  ],
+  "r": [
+   [
+    "MP-D6",
+    "produces"
+   ],
+   [
+    "MP-D2",
+    "feeds"
+   ]
+  ],
+  "ro": "Operations manager"
+ },
+ "MP-09": {
+  "st": "qualification",
+  "w": [
+   10,
+   22
+  ],
+  "s": [
+   [
+    1,
+    "Scope the applicable standards and certifications",
+    1.5
+   ],
+   [
+    2,
+    "Run PCIe/CXL compliance testing at a plugfest",
+    2.5
+   ],
+   [
+    3,
+    "Remediate the compliance failures",
+    2,
+    1
+   ],
+   [
+    4,
+    "Run EMC and safety testing",
+    2.5
+   ],
+   [
+    5,
+    "Prepare the documentation and declarations",
+    2,
+    1
+   ],
+   [
+    6,
+    "Close materials compliance — RoHS, REACH, conflict minerals",
+    2.5
+   ],
+   [
+    7,
+    "Complete the export classification",
+    1.5,
+    1
+   ],
+   [
+    8,
+    "Obtain the certificates and registrations",
+    3
+   ]
+  ],
+  "o": [
+   "Applicable standards and scope",
+   "PCIe/CXL compliance test results",
+   "Remediation record",
+   "EMC and safety test results",
+   "Compliance documentation and declarations",
+   "Materials compliance declarations",
+   "Export classification",
+   "Issued certificates and registrations"
+  ],
+  "ob": [
+   1,
+   2,
+   3,
+   4,
+   5,
+   6,
+   7,
+   8
+  ],
+  "r": [
+   [
+    "MP-D4",
+    "produces"
+   ],
+   [
+    "MP-D7",
+    "feeds"
+   ]
+  ],
+  "ro": "Compliance engineer"
+ },
+ "MP-10": {
   "st": "qualification",
   "w": [
    14,
@@ -18286,326 +18535,7 @@ export const activitySteps: Record<string, ActivityStepEntry> = {
   ],
   "ro": "Test engineer"
  },
- "MP-08": {
-  "st": "qualification",
-  "w": [
-   8,
-   17
-  ],
-  "s": [
-   [
-    1,
-    "Design the split lots across the process corners",
-    1
-   ],
-   [
-    2,
-    "Fabricate and track the split lots",
-    2
-   ],
-   [
-    3,
-    "Analyze parametric spread and Cpk",
-    1.5,
-    1
-   ],
-   [
-    4,
-    "Characterize the corners on the split material",
-    2
-   ],
-   [
-    5,
-    "Assess the design margin at the corners",
-    1.5,
-    1
-   ],
-   [
-    6,
-    "Correlate the corners against the models",
-    2
-   ],
-   [
-    7,
-    "Recommend the process window",
-    1.25,
-    1
-   ],
-   [
-    8,
-    "Sign off the corners and report",
-    2
-   ]
-  ],
-  "o": [
-   "Split-lot design",
-   "Fabricated and tracked split lots",
-   "Parametric spread and Cpk analysis",
-   "Corner characterization results",
-   "Design margin at the corners",
-   "Corner-to-model correlation",
-   "Process window recommendation",
-   "Corner signoff report"
-  ],
-  "ob": [
-   1,
-   2,
-   3,
-   4,
-   5,
-   6,
-   7,
-   8
-  ],
-  "r": [
-   [
-    "MP-D4",
-    "feeds"
-   ],
-   [
-    "MP-D1",
-    "feeds"
-   ]
-  ],
-  "ro": "Product engineering"
- },
- "MP-09": {
-  "st": "qualification",
-  "w": [
-   18,
-   24
-  ],
-  "s": [
-   [
-    1,
-    "Set the readiness criteria and collect the evidence",
-    1
-   ],
-   [
-    2,
-    "Hold the cross-functional readiness review",
-    1.5
-   ],
-   [
-    3,
-    "Establish change control and the document baseline",
-    1,
-    1
-   ],
-   [
-    4,
-    "Close the gaps and track the conditional items",
-    1.5
-   ],
-   [
-    5,
-    "Escalate the unresolved items",
-    1,
-    1
-   ],
-   [
-    6,
-    "Sign off and establish the PCN process",
-    2
-   ]
-  ],
-  "o": [
-   "Readiness criteria and collected evidence",
-   "Cross-functional review record",
-   "Change control and document baseline",
-   "Gap closure and conditional item tracking",
-   "Escalation record",
-   "Signed-off readiness and established PCN process",
-   "Mass production release record"
-  ],
-  "ob": [
-   1,
-   2,
-   3,
-   4,
-   5,
-   6,
-   6
-  ],
-  "r": [
-   [
-    "MP-D5",
-    "produces"
-   ],
-   [
-    "MP-D9",
-    "produces"
-   ]
-  ],
-  "ro": "Program manager"
- },
- "MP-10": {
-  "st": "qualification",
-  "w": [
-   10,
-   22
-  ],
-  "s": [
-   [
-    1,
-    "Confirm the demand forecast and volume commitment",
-    1.5
-   ],
-   [
-    2,
-    "Commit the wafer, substrate and HBM supply",
-    2.5
-   ],
-   [
-    3,
-    "Analyze lead times and buffers",
-    2,
-    1
-   ],
-   [
-    4,
-    "Commit the assembly and test capacity",
-    2.5
-   ],
-   [
-    5,
-    "Compute the cost per unit at volume",
-    2,
-    1
-   ],
-   [
-    6,
-    "Build the ramp plan and build schedule",
-    2.5
-   ],
-   [
-    7,
-    "Set up logistics and distribution",
-    1.5,
-    1
-   ],
-   [
-    8,
-    "Assess supply chain risk and set the second-source plan",
-    3
-   ]
-  ],
-  "o": [
-   "Demand forecast and volume commitment",
-   "Wafer, substrate and HBM supply commitments",
-   "Lead time and buffer analysis",
-   "Assembly and test capacity commitments",
-   "Cost per unit at volume",
-   "Ramp plan and build schedule",
-   "Logistics and distribution setup",
-   "Supply chain risk and second-source plan"
-  ],
-  "ob": [
-   1,
-   2,
-   3,
-   4,
-   5,
-   6,
-   7,
-   8
-  ],
-  "r": [
-   [
-    "MP-D6",
-    "produces"
-   ],
-   [
-    "MP-D4",
-    "feeds"
-   ]
-  ],
-  "ro": "Operations manager"
- },
  "MP-11": {
-  "st": "qualification",
-  "w": [
-   10,
-   22
-  ],
-  "s": [
-   [
-    1,
-    "Scope the applicable standards and certifications",
-    1.5
-   ],
-   [
-    2,
-    "Run PCIe/CXL compliance testing at a plugfest",
-    2.5
-   ],
-   [
-    3,
-    "Remediate the compliance failures",
-    2,
-    1
-   ],
-   [
-    4,
-    "Run EMC and safety testing",
-    2.5
-   ],
-   [
-    5,
-    "Prepare the documentation and declarations",
-    2,
-    1
-   ],
-   [
-    6,
-    "Close materials compliance — RoHS, REACH, conflict minerals",
-    2.5
-   ],
-   [
-    7,
-    "Complete the export classification",
-    1.5,
-    1
-   ],
-   [
-    8,
-    "Obtain the certificates and registrations",
-    3
-   ]
-  ],
-  "o": [
-   "Applicable standards and scope",
-   "PCIe/CXL compliance test results",
-   "Remediation record",
-   "EMC and safety test results",
-   "Compliance documentation and declarations",
-   "Materials compliance declarations",
-   "Export classification",
-   "Issued certificates and registrations"
-  ],
-  "ob": [
-   1,
-   2,
-   3,
-   4,
-   5,
-   6,
-   7,
-   8
-  ],
-  "r": [
-   [
-    "MP-D7",
-    "produces"
-   ],
-   [
-    "MP-D8",
-    "feeds"
-   ]
-  ],
-  "ro": "Compliance engineer"
- },
- "MP-12": {
   "st": "qualification",
   "w": [
    14,
@@ -18680,7 +18610,7 @@ export const activitySteps: Record<string, ActivityStepEntry> = {
   ],
   "r": [
    [
-    "MP-D8",
+    "MP-D7",
     "produces"
    ],
    [
@@ -18689,6 +18619,76 @@ export const activitySteps: Record<string, ActivityStepEntry> = {
    ]
   ],
   "ro": "Technical writer"
+ },
+ "MP-12": {
+  "st": "qualification",
+  "w": [
+   18,
+   24
+  ],
+  "s": [
+   [
+    1,
+    "Set the readiness criteria and collect the evidence",
+    1
+   ],
+   [
+    2,
+    "Hold the cross-functional readiness review",
+    1.5
+   ],
+   [
+    3,
+    "Establish change control and the document baseline",
+    1,
+    1
+   ],
+   [
+    4,
+    "Close the gaps and track the conditional items",
+    1.5
+   ],
+   [
+    5,
+    "Escalate the unresolved items",
+    1,
+    1
+   ],
+   [
+    6,
+    "Sign off and establish the PCN process",
+    2
+   ]
+  ],
+  "o": [
+   "Readiness criteria and collected evidence",
+   "Cross-functional review record",
+   "Change control and document baseline",
+   "Gap closure and conditional item tracking",
+   "Escalation record",
+   "Signed-off readiness and established PCN process",
+   "Mass production release record"
+  ],
+  "ob": [
+   1,
+   2,
+   3,
+   4,
+   5,
+   6,
+   6
+  ],
+  "r": [
+   [
+    "MP-D8",
+    "produces"
+   ],
+   [
+    "MP-D9",
+    "produces"
+   ]
+  ],
+  "ro": "Program manager"
  }
 };
 

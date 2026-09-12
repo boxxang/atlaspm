@@ -17,11 +17,11 @@ module.exports = {
   ],
   flowNote:'Step 3 is where a schedule can be bought. An existing platform that carries 70% of the requirement, adapted, beats a new design by a quarter—and the assessment costs a week.',
   consumes:[
-    'Bring-up requirements from BU-02 through BU-08 planning',
-    'Characterization plan from TEST-07',
-    'Package pin map from PKGD-04',
+    'Bring-up requirements from BU-02 through BU-10 planning',
+    'Characterization plan from TEST-09',
+    'Package pin map from PKGD-05',
     'Power envelope from ARCH-08',
-    'Interface list from ARCH-03',
+    'Interface list from ARCH-04',
   ],
   produces:[
     'Consolidated validation requirements',
@@ -34,7 +34,7 @@ module.exports = {
   producedBy:[1,2,3,4,5,6],
   rel:[
     {id:'EVB-D1', rel:'produces', text:'<b>Validation platform specification.</b> This activity is the deliverable, and everything the board team builds derives from it.'},
-    {id:'EVB-D3', rel:'informs', text:'<b>Fabricated and assembled boards.</b> The quantity and revision plan decides how many boards exist and when.'},
+    {id:'EVB-D5', rel:'informs', text:'<b>Fabricated and assembled boards.</b> The quantity and revision plan decides how many boards exist and when.'},
   ],
   risks:[
     '<b>Requirements collected from bring-up only.</b> Characterization and qualification also live on this platform, and their needs—soak capability, instrumented rails—differ.',
@@ -61,9 +61,9 @@ module.exports = {
     'Socket-versus-solder decided and its consequences accepted',
     'Quantity plan sized against parallel debug needs',
   ],
-  dependsOn:['ARCH-03','ARCH-08','PKGD-04','TEST-07'],
+  dependsOn:['ARCH-04','ARCH-08','PKGD-05','TEST-09'],
   dependsNote:null,
-  feedsInto:['EVB-02','EVB-05','EVB-06','EVB-08','EVB-09'],
+  feedsInto:['EVB-02','EVB-03','EVB-04','EVB-06','EVB-08'],
   measuredBy:[
     'Requirements traceable into the specification',
     'Reuse opportunities identified',
@@ -90,10 +90,10 @@ module.exports = {
   flowNote:'Step 7 runs alongside deliberately. Component lead times are discovered during sourcing, and a part found to be 40 weeks out while the schematic is still editable can be substituted; found after layout it cannot.',
   consumes:[
     'Platform specification from EVB-01',
-    'Package pin map from PKGD-04',
+    'Package pin map from PKGD-05',
     'Power rail requirements from PD-08',
-    'Interface specifications from ARCH-03',
-    'Debug requirements from EVB-06',
+    'Interface specifications from ARCH-04',
+    'Debug requirements from EVB-04',
   ],
   produces:[
     'Block diagram and interface partition',
@@ -107,7 +107,7 @@ module.exports = {
   ],
   producedBy:[1,2,3,4,5,6,7,8],
   rel:[
-    {id:'EVB-D2', rel:'produces', text:'<b>EVB schematics, BOM and layout database.</b> The schematic half of the deliverable.'},
+    {id:'EVB-D4', rel:'produces', text:'<b>EVB schematics, BOM and layout database.</b> The schematic half of the deliverable.'},
     {id:'EVB-D1', rel:'informs', text:'<b>Validation platform specification.</b> Schematic decisions feed back into what the specification can promise.'},
   ],
   risks:[
@@ -127,7 +127,7 @@ module.exports = {
   effort:[['Power tree design',3.5], ['Host interface',3], ['Socket interface',2.5], ['Clocking',2], ['Review and release',1.5], ['BOM and sourcing',1.5]],
   entry:[
     'Platform specification approved from EVB-01',
-    'Package pin map frozen from PKGD-04',
+    'Package pin map frozen from PKGD-05',
     'Power rail requirements available from PD-08',
   ],
   exit:[
@@ -135,9 +135,9 @@ module.exports = {
     'BOM sourced with lead times confirmed against the schedule',
     'Schematic reviewed by validation, not only by hardware',
   ],
-  dependsOn:['EVB-01','PKGD-04','PD-08','ARCH-03'],
+  dependsOn:['EVB-01','PKGD-05','PD-08','ARCH-04'],
   dependsNote:null,
-  feedsInto:['EVB-03','EVB-04','EVB-05'],
+  feedsInto:['EVB-05','EVB-07','EVB-03'],
   measuredBy:[
     'Rails with sense points against total rails',
     'Long-lead components identified before layout',
@@ -146,6 +146,147 @@ module.exports = {
 },
 
 'EVB-03': {
+  stage:'validationHardware', window:[8,15], criticalPath:false,
+  purpose:[
+    'Design and bring up the <b>power delivery, VRM and telemetry</b> on the platform—the rails the silicon runs on and the instrumentation that measures them.',
+    'Characterization is mostly a power measurement. Shmoo needs rails that can be swept, power validation needs rails that can be measured accurately, and both need protection that trips before an expensive part is destroyed rather than after.',
+  ],
+  steps:[
+    {n:1, text:'Power tree requirement from the die and package', tat:1, lane:'main'},
+    {n:2, text:'VRM selection and design', tat:1.5, lane:'main'},
+    {n:3, text:'Transient response design against the SIPI budget', tat:1.5, lane:'par'},
+    {n:4, text:'Telemetry and monitoring design', tat:1.5, lane:'main'},
+    {n:5, text:'Protection and sequencing design', tat:1.5, lane:'par'},
+    {n:6, text:'Power bring-up and validation on the board', tat:3, lane:'main'},
+  ],
+  flowNote:'Step 5 is what protects the units. A sequencing error or an overcurrent event on a first-silicon part costs a package worth many thousands, and the protection has to be validated before a real part is ever inserted.',
+  consumes:[
+    'Power rail requirements from PD-08',
+    'Board PDN design from EVB-05',
+    'Transient budget from SIPI-07',
+    'Shmoo range from BU-08 planning',
+    'Package power delivery from PKGD-09',
+  ],
+  produces:[
+    'Power tree requirement',
+    'VRM design',
+    'Transient response design',
+    'Telemetry and monitoring capability',
+    'Protection and sequencing design',
+    'Power bring-up and validation results',
+  ],
+  producedBy:[1,2,3,4,5,6],
+  rel:[
+    {id:'EVB-D4', rel:'feeds', text:'<b>EVB schematics, BOM and layout database.</b> The power subsystem design is part of the schematic package.'},
+    {id:'EVB-D6', rel:'feeds', text:'<b>Board bring-up report and known issues.</b> Power bring-up results are the first part of the board\'s own bring-up record.'},
+  ],
+  risks:[
+    '<b>Rails not sweepable across the shmoo range.</b> Characterization then cannot reach the corners the qualification plan requires.',
+    '<b>Protection untested before a real part goes in.</b> A sequencing fault destroys a first-silicon unit, and there are very few of them.',
+    '<b>Telemetry accuracy insufficient.</b> Power measurements at the resolution characterization needs demand real instrumentation, not a rough monitor.',
+    '<b>Transient response inadequate.</b> The die\'s di/dt is known from SIPI; a VRM that cannot follow it produces droop that looks like a silicon failure.',
+    '<b>Sequencing not matching the silicon\'s requirement.</b> The power-up order comes from the design, and getting it wrong is a common first-board fault.',
+  ],
+  roles:[
+    {r:'Power engineer', d:'Owns the power subsystem'},
+    {r:'Hardware engineer', d:'Board integration and bring-up'},
+    {r:'SI/PI engineer', d:'Transient and PDN requirements'},
+    {r:'Validation engineer', d:'Shmoo and telemetry requirements'},
+    {r:'Test engineer', d:'Measurement accuracy needs'},
+  ],
+  effort:[['VRM design',2.5], ['Power bring-up',2], ['Telemetry design',1.5], ['Transient response',1.25], ['Protection and sequencing',0.75]],
+  entry:[
+    'Power rail requirements from PD-08',
+    'Transient budget from SIPI-07',
+    'Shmoo range defined by validation',
+  ],
+  exit:[
+    'Rails sweepable across the full shmoo range',
+    'Protection validated before any real part is inserted',
+    'Telemetry accurate enough for characterization',
+  ],
+  dependsOn:['EVB-01','PD-08','SIPI-07','PKGD-09'],
+  dependsNote:null,
+  feedsInto:['EVB-10','BU-02','BU-08'],
+  measuredBy:[
+    'Rail sweep range against the shmoo requirement',
+    'Protection trip validated before first insertion',
+    'Telemetry accuracy against characterization need',
+  ],
+},
+
+'EVB-04': {
+  stage:'validationHardware', window:[10,17], criticalPath:false,
+  purpose:[
+    'Build the <b>debug access</b>—JTAG and trace pods, interposers, probe points—because silicon debug is bounded by what can be observed.',
+    'When first silicon does something unexpected, the difference between a day and a month is whether the state that explains it can be read out. The DFT infrastructure provides the internal access; this activity provides the physical path to it.',
+  ],
+  steps:[
+    {n:1, text:'Debug requirements from validation and DFT', tat:1, lane:'main'},
+    {n:2, text:'JTAG and trace pod interface design', tat:1.5, lane:'main'},
+    {n:3, text:'Logic analyser and scope access design', tat:1.5, lane:'par'},
+    {n:4, text:'Interposer and probe access design', tat:1.5, lane:'main'},
+    {n:5, text:'Software debug tool integration', tat:1, lane:'par'},
+    {n:6, text:'Debug infrastructure validation', tat:3, lane:'main'},
+  ],
+  flowNote:'Step 6 validates the debug path before it is needed. A trace pod that does not work is discovered during the crisis it was meant to resolve, which is the worst possible moment.',
+  consumes:[
+    'Debug and trace architecture from DFT-11',
+    'Silicon debug requirements from BU-05 planning',
+    'Platform specification from EVB-01',
+    'Package pin map from PKGD-05',
+    'Debug tooling from the DFT flow',
+  ],
+  produces:[
+    'Debug requirements',
+    'JTAG and trace pod interface',
+    'Logic analyser and scope access',
+    'Interposer and probe access design',
+    'Software debug tool integration',
+    'Debug infrastructure validation results',
+    'Debug and trace access documentation',
+  ],
+  producedBy:[1,2,3,4,5,6,6],
+  rel:[
+    {id:'EVB-D2', rel:'produces', text:'<b>Debug and trace access documentation.</b> This activity is the deliverable, and it is what the bring-up team reads at 2am.'},
+    {id:'EVB-D4', rel:'feeds', text:'<b>EVB schematics, BOM and layout database.</b> Debug headers and access points are schematic and layout content.'},
+  ],
+  risks:[
+    '<b>Debug access designed without DFT.</b> The internal observability comes from <code>DFT-11</code>, and the board access has to match what it exposes.',
+    '<b>Trace bandwidth insufficient.</b> Trace is only useful if it can keep up with the events being traced, and the bandwidth is a board design parameter.',
+    '<b>Probe points unreachable once the cooling solution is mounted.</b> The thermal solution and the probe access compete for the same physical space.',
+    '<b>Debug path unvalidated before silicon.</b> It is then debugged during the emergency it exists to resolve.',
+    '<b>Software tooling not integrated.</b> A hardware debug path with no software to drive it is not a debug path.',
+  ],
+  roles:[
+    {r:'Validation engineer', d:'Owns debug requirements'},
+    {r:'DFT engineer', d:'Internal observability and access protocol'},
+    {r:'Hardware engineer', d:'Board debug interface design'},
+    {r:'Software engineer', d:'Debug tooling integration'},
+    {r:'Mechanical engineer', d:'Probe access against the thermal solution'},
+  ],
+  effort:[['Pod interface design',2.5], ['Infrastructure validation',2], ['Probe access design',1.5], ['Analyser access',1.25], ['Tool integration',0.75]],
+  entry:[
+    'DFT debug architecture available from DFT-11',
+    'Silicon debug requirements understood',
+    'Platform specification from EVB-01',
+  ],
+  exit:[
+    'Debug access matching what DFT actually exposes',
+    'Trace bandwidth sufficient for the events being traced',
+    'Debug path validated before silicon, not during a crisis',
+  ],
+  dependsOn:['EVB-01','DFT-11','PKGD-05'],
+  dependsNote:null,
+  feedsInto:['EVB-02','EVB-10','BU-05'],
+  measuredBy:[
+    'Debug access coverage against DFT observability',
+    'Trace bandwidth against event rate',
+    'Debug path validated before silicon arrival',
+  ],
+},
+
+'EVB-05': {
   stage:'validationHardware', window:[12,24], criticalPath:true,
   purpose:[
     'Lay out the PCB with <b>signal and power integrity simulated on the critical channels</b>, because a validation board carrying PCIe Gen6 or CXL is itself a high-speed design.',
@@ -165,9 +306,9 @@ module.exports = {
   consumes:[
     'Released schematic and BOM from EVB-02',
     'Package model from SIPI-02',
-    'Channel budget from SIPI-04',
-    'Board PDN target from SIPI-06',
-    'Mechanical constraints from EVB-08',
+    'Channel budget from SIPI-05',
+    'Board PDN target from SIPI-07',
+    'Mechanical constraints from EVB-06',
   ],
   produces:[
     'Stack-up and impedance plan',
@@ -181,8 +322,8 @@ module.exports = {
   ],
   producedBy:[1,2,3,4,5,6,7,8],
   rel:[
-    {id:'EVB-D2', rel:'produces', text:'<b>EVB schematics, BOM and layout database.</b> The layout half of the deliverable—what fabrication is built from.'},
-    {id:'EVB-D3', rel:'feeds', text:'<b>Fabricated and assembled boards.</b> Fabrication takes the released layout database directly.'},
+    {id:'EVB-D4', rel:'produces', text:'<b>EVB schematics, BOM and layout database.</b> The layout half of the deliverable—what fabrication is built from.'},
+    {id:'EVB-D5', rel:'feeds', text:'<b>Fabricated and assembled boards.</b> Fabrication takes the released layout database directly.'},
   ],
   risks:[
     '<b>Board channel contribution not budgeted.</b> The SIPI channel budget covers package and board together, and a board that consumes more than its share leaves the silicon nothing.',
@@ -202,16 +343,16 @@ module.exports = {
   entry:[
     'Schematic released from EVB-02',
     'Package model available from SIPI-02',
-    'Channel and PDN budgets from SIPI-04 and SIPI-06',
+    'Channel and PDN budgets from SIPI-05 and SIPI-07',
   ],
   exit:[
     'Board channel contribution inside its share of the SIPI budget',
     'SI and PI simulated during routing, not after',
     'Mechanical and thermal constraints met without a revision',
   ],
-  dependsOn:['EVB-02','SIPI-02','SIPI-04','SIPI-06','EVB-08'],
+  dependsOn:['EVB-02','SIPI-02','SIPI-05','SIPI-07','EVB-06'],
   dependsNote:null,
-  feedsInto:['EVB-04','EVB-07'],
+  feedsInto:['EVB-07','EVB-10'],
   measuredBy:[
     'Board channel loss against its budget share',
     'Simulation findings resolved in layout',
@@ -219,289 +360,7 @@ module.exports = {
   ],
 },
 
-'EVB-04': {
-  stage:'validationHardware', window:[23,31], criticalPath:true,
-  purpose:[
-    'Get the boards <b>fabricated, assembled and inspected</b>—an eight-week vendor cycle that is mostly waiting and entirely on the critical path to bring-up.',
-    'This is procurement work with an engineering tail. The board has to arrive before silicon does, its quantity has to match the parallel-debug plan, and every board that arrives faulty is a debug station that does not exist.',
-  ],
-  steps:[
-    {n:1, text:'Fabrication vendor selection and data release', tat:1, lane:'main'},
-    {n:2, text:'PCB fabrication', tat:3, lane:'main'},
-    {n:3, text:'Component procurement against lead times', tat:1.5, lane:'par'},
-    {n:4, text:'Board assembly', tat:2.5, lane:'main'},
-    {n:5, text:'First article inspection', tat:1, lane:'par'},
-    {n:6, text:'Incoming inspection and acceptance', tat:1.5, lane:'main'},
-  ],
-  flowNote:'Step 5 catches assembly problems on one board before they are replicated across the whole run. It costs a day and it is routinely skipped in the interest of speed, which is how twenty identically-wrong boards get built.',
-  consumes:[
-    'Released layout database from EVB-03',
-    'BOM with sourcing from EVB-02',
-    'Quantity plan from EVB-01',
-    'Fabrication and assembly vendor capacity',
-    'Inspection criteria',
-  ],
-  produces:[
-    'Vendor selection and released fabrication data',
-    'Fabricated bare boards',
-    'Procured components',
-    'Assembled boards',
-    'First article inspection result',
-    'Incoming inspection and acceptance record',
-  ],
-  producedBy:[1,2,3,4,5,6],
-  rel:[
-    {id:'EVB-D3', rel:'produces', text:'<b>Fabricated and assembled boards, rev A/B with quantity plan.</b> This activity is the deliverable.'},
-    {id:'EVB-D2', rel:'informs', text:'<b>EVB schematics, BOM and layout database.</b> Fabrication findings—DFM issues, substitutions—feed back into the database.'},
-  ],
-  risks:[
-    '<b>Long-lead components blocking assembly.</b> The board is fabricated and waiting on one part, which is the most common way this activity slips.',
-    '<b>First article skipped.</b> An assembly error is then replicated across the entire run and discovered at bring-up.',
-    '<b>Quantity cut for cost.</b> Boards are the constraint on parallel debug, and the saving is repaid in serialized lab time.',
-    '<b>Boards arriving after silicon.</b> Silicon waiting on a board is the worst schedule outcome the program can produce.',
-    '<b>Controlled impedance not verified.</b> The stack-up was designed for it; the fabricated board has to be coupon-tested to confirm it.',
-  ],
-  roles:[
-    {r:'Hardware engineer', d:'Fabrication data release and acceptance'},
-    {r:'Component engineer', d:'Procurement and lead-time management'},
-    {r:'Quality engineer', d:'First article and incoming inspection'},
-    {r:'Program manager', d:'Quantity and schedule against silicon arrival'},
-    {r:'Vendor liaison', d:'Fabrication and assembly execution'},
-  ],
-  effort:[['Assembly oversight',1.25], ['Fabrication oversight',1], ['Procurement',1], ['Inspection',0.75]],
-  entry:[
-    'Layout database released from EVB-03',
-    'Components ordered against confirmed lead times',
-    'Vendor capacity booked',
-  ],
-  exit:[
-    'Boards delivered before silicon arrives',
-    'First article inspected before the run completes',
-    'Controlled impedance verified by coupon',
-  ],
-  dependsOn:['EVB-03','EVB-02','EVB-01'],
-  dependsNote:null,
-  feedsInto:['EVB-07','BU-01'],
-  measuredBy:[
-    'Board delivery against silicon arrival',
-    'Boards accepted against boards built',
-    'First article findings caught before the run',
-  ],
-},
-
-'EVB-05': {
-  stage:'validationHardware', window:[8,15], criticalPath:false,
-  purpose:[
-    'Design and bring up the <b>power delivery, VRM and telemetry</b> on the platform—the rails the silicon runs on and the instrumentation that measures them.',
-    'Characterization is mostly a power measurement. Shmoo needs rails that can be swept, power validation needs rails that can be measured accurately, and both need protection that trips before an expensive part is destroyed rather than after.',
-  ],
-  steps:[
-    {n:1, text:'Power tree requirement from the die and package', tat:1, lane:'main'},
-    {n:2, text:'VRM selection and design', tat:1.5, lane:'main'},
-    {n:3, text:'Transient response design against the SIPI budget', tat:1.5, lane:'par'},
-    {n:4, text:'Telemetry and monitoring design', tat:1.5, lane:'main'},
-    {n:5, text:'Protection and sequencing design', tat:1.5, lane:'par'},
-    {n:6, text:'Power bring-up and validation on the board', tat:3, lane:'main'},
-  ],
-  flowNote:'Step 5 is what protects the units. A sequencing error or an overcurrent event on a first-silicon part costs a package worth many thousands, and the protection has to be validated before a real part is ever inserted.',
-  consumes:[
-    'Power rail requirements from PD-08',
-    'Board PDN design from EVB-03',
-    'Transient budget from SIPI-06',
-    'Shmoo range from BU-07 planning',
-    'Package power delivery from PKGD-05',
-  ],
-  produces:[
-    'Power tree requirement',
-    'VRM design',
-    'Transient response design',
-    'Telemetry and monitoring capability',
-    'Protection and sequencing design',
-    'Power bring-up and validation results',
-  ],
-  producedBy:[1,2,3,4,5,6],
-  rel:[
-    {id:'EVB-D2', rel:'feeds', text:'<b>EVB schematics, BOM and layout database.</b> The power subsystem design is part of the schematic package.'},
-    {id:'EVB-D4', rel:'feeds', text:'<b>Board bring-up report and known issues.</b> Power bring-up results are the first part of the board\'s own bring-up record.'},
-  ],
-  risks:[
-    '<b>Rails not sweepable across the shmoo range.</b> Characterization then cannot reach the corners the qualification plan requires.',
-    '<b>Protection untested before a real part goes in.</b> A sequencing fault destroys a first-silicon unit, and there are very few of them.',
-    '<b>Telemetry accuracy insufficient.</b> Power measurements at the resolution characterization needs demand real instrumentation, not a rough monitor.',
-    '<b>Transient response inadequate.</b> The die\'s di/dt is known from SIPI; a VRM that cannot follow it produces droop that looks like a silicon failure.',
-    '<b>Sequencing not matching the silicon\'s requirement.</b> The power-up order comes from the design, and getting it wrong is a common first-board fault.',
-  ],
-  roles:[
-    {r:'Power engineer', d:'Owns the power subsystem'},
-    {r:'Hardware engineer', d:'Board integration and bring-up'},
-    {r:'SI/PI engineer', d:'Transient and PDN requirements'},
-    {r:'Validation engineer', d:'Shmoo and telemetry requirements'},
-    {r:'Test engineer', d:'Measurement accuracy needs'},
-  ],
-  effort:[['VRM design',2.5], ['Power bring-up',2], ['Telemetry design',1.5], ['Transient response',1.25], ['Protection and sequencing',0.75]],
-  entry:[
-    'Power rail requirements from PD-08',
-    'Transient budget from SIPI-06',
-    'Shmoo range defined by validation',
-  ],
-  exit:[
-    'Rails sweepable across the full shmoo range',
-    'Protection validated before any real part is inserted',
-    'Telemetry accurate enough for characterization',
-  ],
-  dependsOn:['EVB-01','PD-08','SIPI-06','PKGD-05'],
-  dependsNote:null,
-  feedsInto:['EVB-07','BU-02','BU-07'],
-  measuredBy:[
-    'Rail sweep range against the shmoo requirement',
-    'Protection trip validated before first insertion',
-    'Telemetry accuracy against characterization need',
-  ],
-},
-
 'EVB-06': {
-  stage:'validationHardware', window:[10,17], criticalPath:false,
-  purpose:[
-    'Build the <b>debug access</b>—JTAG and trace pods, interposers, probe points—because silicon debug is bounded by what can be observed.',
-    'When first silicon does something unexpected, the difference between a day and a month is whether the state that explains it can be read out. The DFT infrastructure provides the internal access; this activity provides the physical path to it.',
-  ],
-  steps:[
-    {n:1, text:'Debug requirements from validation and DFT', tat:1, lane:'main'},
-    {n:2, text:'JTAG and trace pod interface design', tat:1.5, lane:'main'},
-    {n:3, text:'Logic analyser and scope access design', tat:1.5, lane:'par'},
-    {n:4, text:'Interposer and probe access design', tat:1.5, lane:'main'},
-    {n:5, text:'Software debug tool integration', tat:1, lane:'par'},
-    {n:6, text:'Debug infrastructure validation', tat:3, lane:'main'},
-  ],
-  flowNote:'Step 6 validates the debug path before it is needed. A trace pod that does not work is discovered during the crisis it was meant to resolve, which is the worst possible moment.',
-  consumes:[
-    'Debug and trace architecture from DFT-08',
-    'Silicon debug requirements from BU-09 planning',
-    'Platform specification from EVB-01',
-    'Package pin map from PKGD-04',
-    'Debug tooling from the DFT flow',
-  ],
-  produces:[
-    'Debug requirements',
-    'JTAG and trace pod interface',
-    'Logic analyser and scope access',
-    'Interposer and probe access design',
-    'Software debug tool integration',
-    'Debug infrastructure validation results',
-    'Debug and trace access documentation',
-  ],
-  producedBy:[1,2,3,4,5,6,6],
-  rel:[
-    {id:'EVB-D5', rel:'produces', text:'<b>Debug and trace access documentation.</b> This activity is the deliverable, and it is what the bring-up team reads at 2am.'},
-    {id:'EVB-D2', rel:'feeds', text:'<b>EVB schematics, BOM and layout database.</b> Debug headers and access points are schematic and layout content.'},
-  ],
-  risks:[
-    '<b>Debug access designed without DFT.</b> The internal observability comes from <code>DFT-08</code>, and the board access has to match what it exposes.',
-    '<b>Trace bandwidth insufficient.</b> Trace is only useful if it can keep up with the events being traced, and the bandwidth is a board design parameter.',
-    '<b>Probe points unreachable once the cooling solution is mounted.</b> The thermal solution and the probe access compete for the same physical space.',
-    '<b>Debug path unvalidated before silicon.</b> It is then debugged during the emergency it exists to resolve.',
-    '<b>Software tooling not integrated.</b> A hardware debug path with no software to drive it is not a debug path.',
-  ],
-  roles:[
-    {r:'Validation engineer', d:'Owns debug requirements'},
-    {r:'DFT engineer', d:'Internal observability and access protocol'},
-    {r:'Hardware engineer', d:'Board debug interface design'},
-    {r:'Software engineer', d:'Debug tooling integration'},
-    {r:'Mechanical engineer', d:'Probe access against the thermal solution'},
-  ],
-  effort:[['Pod interface design',2.5], ['Infrastructure validation',2], ['Probe access design',1.5], ['Analyser access',1.25], ['Tool integration',0.75]],
-  entry:[
-    'DFT debug architecture available from DFT-08',
-    'Silicon debug requirements understood',
-    'Platform specification from EVB-01',
-  ],
-  exit:[
-    'Debug access matching what DFT actually exposes',
-    'Trace bandwidth sufficient for the events being traced',
-    'Debug path validated before silicon, not during a crisis',
-  ],
-  dependsOn:['EVB-01','DFT-08','PKGD-04'],
-  dependsNote:null,
-  feedsInto:['EVB-02','EVB-07','BU-09'],
-  measuredBy:[
-    'Debug access coverage against DFT observability',
-    'Trace bandwidth against event rate',
-    'Debug path validated before silicon arrival',
-  ],
-},
-
-'EVB-07': {
-  stage:'validationHardware', window:[30,37], criticalPath:true,
-  purpose:[
-    'Bring the <b>board itself up</b>—with dummy parts or a socketed loopback—so that when silicon arrives, every failure is the silicon\'s.',
-    'This is the single highest-leverage activity in the stage. A board debugged before first silicon means bring-up starts on a known-good platform; a board debugged alongside first silicon means every anomaly has two possible causes and each takes days to separate.',
-  ],
-  steps:[
-    {n:1, text:'Bring-up plan and dummy part fitting', tat:1, lane:'main'},
-    {n:2, text:'Power tree bring-up and rail verification', tat:1.5, lane:'main'},
-    {n:3, text:'Telemetry and protection validation', tat:1.5, lane:'par'},
-    {n:4, text:'Clocking and reference validation', tat:1.5, lane:'main'},
-    {n:5, text:'Thermal solution fit check', tat:1.5, lane:'par'},
-    {n:6, text:'Interface loopback and signal validation', tat:3, lane:'main'},
-  ],
-  flowNote:'The whole activity is scheduled to complete before silicon arrives. Every hour spent here is an hour not spent, at ten times the cost, debugging a board while first silicon waits on the bench.',
-  consumes:[
-    'Assembled boards from EVB-04',
-    'Power subsystem from EVB-05',
-    'Debug infrastructure from EVB-06',
-    'Thermal solution from EVB-08',
-    'Host enablement from EVB-10',
-  ],
-  produces:[
-    'Bring-up plan and fitted dummy parts',
-    'Power tree bring-up results',
-    'Telemetry and protection validation',
-    'Clocking and reference validation',
-    'Thermal fit check',
-    'Interface loopback and signal validation results',
-    'Board bring-up report and known issues',
-  ],
-  producedBy:[1,2,3,4,5,6,2],
-  rel:[
-    {id:'EVB-D4', rel:'produces', text:'<b>Board bring-up report and known issues.</b> This activity is the deliverable, and the known-issues list is what stops board faults being mistaken for silicon faults.'},
-    {id:'EVB-D3', rel:'gates', text:'<b>Fabricated and assembled boards.</b> A board is not released to silicon bring-up until it has passed this.'},
-  ],
-  risks:[
-    '<b>Board bring-up deferred until silicon arrives.</b> Every anomaly then has two candidate causes, and separating them costs days each.',
-    '<b>Known issues not documented.</b> The bring-up team then rediscovers each board quirk independently, once per engineer.',
-    '<b>Dummy parts not representative.</b> A loopback that does not load the rails or exercise the channels validates less than it appears to.',
-    '<b>Only one board brought up.</b> Board-to-board variation is real, and a fleet where only one is characterized is a fleet with unknown members.',
-    '<b>Thermal fit checked after silicon insertion.</b> A cooling solution that does not fit is discovered with an irreplaceable part underneath it.',
-  ],
-  roles:[
-    {r:'Hardware engineer', d:'Owns board bring-up'},
-    {r:'Power engineer', d:'Rail and protection verification'},
-    {r:'Validation engineer', d:'Known-issue capture for the bring-up team'},
-    {r:'SI engineer', d:'Loopback and signal validation'},
-    {r:'Mechanical engineer', d:'Thermal fit'},
-  ],
-  effort:[['Interface validation',3], ['Power bring-up',2.5], ['Clocking validation',2], ['Telemetry validation',1.5], ['Thermal fit',1]],
-  entry:[
-    'Assembled boards accepted from EVB-04',
-    'Power and debug subsystems designed',
-    'Dummy parts or loopback fixtures available',
-  ],
-  exit:[
-    'Board bring-up complete before silicon arrives',
-    'Known issues documented for the bring-up team',
-    'Every board in the fleet brought up, not just one',
-  ],
-  dependsOn:['EVB-04','EVB-05','EVB-06','EVB-08','EVB-10'],
-  dependsNote:null,
-  feedsInto:['BU-01','BU-02'],
-  measuredBy:[
-    'Board bring-up completion against silicon arrival',
-    'Boards brought up against boards built',
-    'Silicon-bring-up issues later traced to the board',
-  ],
-},
-
-'EVB-08': {
   stage:'validationHardware', window:[16,23], criticalPath:false,
   purpose:[
     'Design and validate the <b>cooling for the lab platform</b>—which is not the product\'s thermal solution, but has to remove the same power.',
@@ -517,11 +376,11 @@ module.exports = {
   ],
   flowNote:'Step 5 is what makes qualification-adjacent measurement possible. Characterization needs the part held at a temperature, not merely kept cool, and a solution that only cools cannot produce a hot-corner shmoo.',
   consumes:[
-    'Package thermal envelope from PKGD-08',
+    'Package thermal envelope from PKGD-03',
     'Power envelope from ARCH-08',
     'Platform specification from EVB-01',
-    'Characterization temperature range from TEST-07',
-    'Mechanical constraints from EVB-03',
+    'Characterization temperature range from TEST-09',
+    'Mechanical constraints from EVB-05',
   ],
   produces:[
     'Thermal requirement',
@@ -534,7 +393,7 @@ module.exports = {
   producedBy:[1,2,3,4,5,6],
   rel:[
     {id:'EVB-D1', rel:'feeds', text:'<b>Validation platform specification.</b> Thermal capability is part of what the platform can promise.'},
-    {id:'EVB-D4', rel:'feeds', text:'<b>Board bring-up report and known issues.</b> Thermal validation results belong in the platform\'s own record.'},
+    {id:'EVB-D6', rel:'feeds', text:'<b>Board bring-up report and known issues.</b> Thermal validation results belong in the platform\'s own record.'},
   ],
   risks:[
     '<b>Cooling sized to the product\'s solution rather than to the lab\'s need.</b> The lab platform can be oversized, and measurement validity is worth more than realism.',
@@ -552,8 +411,8 @@ module.exports = {
   ],
   effort:[['Cooling selection',2], ['Thermal validation',2], ['Mounting design',1.5], ['Airflow design',1], ['Temperature control',0.5]],
   entry:[
-    'Package thermal envelope from PKGD-08',
-    'Characterization temperature range from TEST-07',
+    'Package thermal envelope from PKGD-03',
+    'Characterization temperature range from TEST-09',
     'Platform specification from EVB-01',
   ],
   exit:[
@@ -561,9 +420,9 @@ module.exports = {
     'Temperature held at set point, including the hot corner',
     'Mounting compatible with debug probe access',
   ],
-  dependsOn:['EVB-01','PKGD-08','ARCH-08','TEST-07'],
+  dependsOn:['EVB-01','PKGD-03','ARCH-08','TEST-09'],
   dependsNote:null,
-  feedsInto:['EVB-03','EVB-07','BU-07'],
+  feedsInto:['EVB-05','EVB-10','BU-08'],
   measuredBy:[
     'Throttling events during characterization',
     'Temperature set-point range achieved',
@@ -571,7 +430,77 @@ module.exports = {
   ],
 },
 
-'EVB-09': {
+'EVB-07': {
+  stage:'validationHardware', window:[23,31], criticalPath:true,
+  purpose:[
+    'Get the boards <b>fabricated, assembled and inspected</b>—an eight-week vendor cycle that is mostly waiting and entirely on the critical path to bring-up.',
+    'This is procurement work with an engineering tail. The board has to arrive before silicon does, its quantity has to match the parallel-debug plan, and every board that arrives faulty is a debug station that does not exist.',
+  ],
+  steps:[
+    {n:1, text:'Fabrication vendor selection and data release', tat:1, lane:'main'},
+    {n:2, text:'PCB fabrication', tat:3, lane:'main'},
+    {n:3, text:'Component procurement against lead times', tat:1.5, lane:'par'},
+    {n:4, text:'Board assembly', tat:2.5, lane:'main'},
+    {n:5, text:'First article inspection', tat:1, lane:'par'},
+    {n:6, text:'Incoming inspection and acceptance', tat:1.5, lane:'main'},
+  ],
+  flowNote:'Step 5 catches assembly problems on one board before they are replicated across the whole run. It costs a day and it is routinely skipped in the interest of speed, which is how twenty identically-wrong boards get built.',
+  consumes:[
+    'Released layout database from EVB-05',
+    'BOM with sourcing from EVB-02',
+    'Quantity plan from EVB-01',
+    'Fabrication and assembly vendor capacity',
+    'Inspection criteria',
+  ],
+  produces:[
+    'Vendor selection and released fabrication data',
+    'Fabricated bare boards',
+    'Procured components',
+    'Assembled boards',
+    'First article inspection result',
+    'Incoming inspection and acceptance record',
+  ],
+  producedBy:[1,2,3,4,5,6],
+  rel:[
+    {id:'EVB-D5', rel:'produces', text:'<b>Fabricated and assembled boards, rev A/B with quantity plan.</b> This activity is the deliverable.'},
+    {id:'EVB-D4', rel:'informs', text:'<b>EVB schematics, BOM and layout database.</b> Fabrication findings—DFM issues, substitutions—feed back into the database.'},
+  ],
+  risks:[
+    '<b>Long-lead components blocking assembly.</b> The board is fabricated and waiting on one part, which is the most common way this activity slips.',
+    '<b>First article skipped.</b> An assembly error is then replicated across the entire run and discovered at bring-up.',
+    '<b>Quantity cut for cost.</b> Boards are the constraint on parallel debug, and the saving is repaid in serialized lab time.',
+    '<b>Boards arriving after silicon.</b> Silicon waiting on a board is the worst schedule outcome the program can produce.',
+    '<b>Controlled impedance not verified.</b> The stack-up was designed for it; the fabricated board has to be coupon-tested to confirm it.',
+  ],
+  roles:[
+    {r:'Hardware engineer', d:'Fabrication data release and acceptance'},
+    {r:'Component engineer', d:'Procurement and lead-time management'},
+    {r:'Quality engineer', d:'First article and incoming inspection'},
+    {r:'Program manager', d:'Quantity and schedule against silicon arrival'},
+    {r:'Vendor liaison', d:'Fabrication and assembly execution'},
+  ],
+  effort:[['Assembly oversight',1.25], ['Fabrication oversight',1], ['Procurement',1], ['Inspection',0.75]],
+  entry:[
+    'Layout database released from EVB-05',
+    'Components ordered against confirmed lead times',
+    'Vendor capacity booked',
+  ],
+  exit:[
+    'Boards delivered before silicon arrives',
+    'First article inspected before the run completes',
+    'Controlled impedance verified by coupon',
+  ],
+  dependsOn:['EVB-05','EVB-02','EVB-01'],
+  dependsNote:null,
+  feedsInto:['EVB-10','BU-01'],
+  measuredBy:[
+    'Board delivery against silicon arrival',
+    'Boards accepted against boards built',
+    'First article findings caught before the run',
+  ],
+},
+
+'EVB-08': {
   stage:'validationHardware', window:[24,31], criticalPath:false,
   purpose:[
     'Reserve the instruments and <b>build the lab racks</b>—because characterization needs equipment that is expensive, shared and booked months ahead.',
@@ -587,8 +516,8 @@ module.exports = {
   ],
   flowNote:'Step 3 decides whether characterization is manual or automatic. A shmoo run by hand takes days per corner; the same shmoo automated runs overnight, and the automation is written here rather than improvised during bring-up.',
   consumes:[
-    'Characterization plan from TEST-07',
-    'Bring-up plan from BU-02 through BU-08',
+    'Characterization plan from TEST-09',
+    'Bring-up plan from BU-02 through BU-10',
     'Platform specification from EVB-01',
     'Instrument pool and capital budget',
     'Lab space and infrastructure',
@@ -604,8 +533,8 @@ module.exports = {
   ],
   producedBy:[1,2,3,4,5,6,2],
   rel:[
-    {id:'EVB-D6', rel:'produces', text:'<b>Lab setup and instrument reservation plan.</b> This activity is the deliverable, and it is what stops bring-up queueing for a scope.'},
-    {id:'EVB-D4', rel:'informs', text:'<b>Board bring-up report and known issues.</b> The lab setup is the context every bring-up measurement is made in.'},
+    {id:'EVB-D3', rel:'produces', text:'<b>Lab setup and instrument reservation plan.</b> This activity is the deliverable, and it is what stops bring-up queueing for a scope.'},
+    {id:'EVB-D6', rel:'informs', text:'<b>Board bring-up report and known issues.</b> The lab setup is the context every bring-up measurement is made in.'},
   ],
   risks:[
     '<b>Instruments booked too late.</b> High-bandwidth equipment is shared and queued, and a six-week wait delays everything downstream.',
@@ -623,7 +552,7 @@ module.exports = {
   ],
   effort:[['Rack build and cabling',2], ['Integration and calibration',2], ['Instrument reservation',1.75], ['Automation infrastructure',1.5], ['Space provisioning',0.75]],
   entry:[
-    'Characterization plan available from TEST-07',
+    'Characterization plan available from TEST-09',
     'Bring-up measurement needs understood',
     'Capital budget approved',
   ],
@@ -632,9 +561,9 @@ module.exports = {
     'Automation working before bring-up starts',
     'Racks calibrated and their calibration current',
   ],
-  dependsOn:['EVB-01','TEST-07'],
+  dependsOn:['EVB-01','TEST-09'],
   dependsNote:null,
-  feedsInto:['BU-05','BU-07','BU-08'],
+  feedsInto:['BU-06','BU-08','BU-10'],
   measuredBy:[
     'Instrument availability against the bring-up window',
     'Measurements automated against manual',
@@ -642,7 +571,7 @@ module.exports = {
   ],
 },
 
-'EVB-10': {
+'EVB-09': {
   stage:'validationHardware', window:[26,33], criticalPath:false,
   purpose:[
     'Provide the <b>minimum host-side software</b> needed to power on and talk to the part—boot, register access, enumeration, logging—without taking on the product\'s software stack.',
@@ -658,9 +587,9 @@ module.exports = {
   ],
   flowNote:'Step 1 is the activity\'s most valuable hour. Without an explicit boundary, hardware validation writes software the firmware team is also writing, and each assumes the other is doing it.',
   consumes:[
-    'Register map from RTL-06',
-    'Boot sequence from ARCH-06',
-    'Debug tooling from EVB-06',
+    'Register map from RTL-09',
+    'Boot sequence from ARCH-09',
+    'Debug tooling from EVB-04',
     'Firmware team\'s scope and schedule',
     'Platform specification from EVB-01',
   ],
@@ -674,8 +603,8 @@ module.exports = {
   ],
   producedBy:[1,2,3,4,5,6],
   rel:[
-    {id:'EVB-D4', rel:'feeds', text:'<b>Board bring-up report and known issues.</b> Host enablement is validated as part of the platform and reported with it.'},
-    {id:'EVB-D5', rel:'feeds', text:'<b>Debug and trace access documentation.</b> The diagnostic tooling is how debug access is actually used.'},
+    {id:'EVB-D6', rel:'feeds', text:'<b>Board bring-up report and known issues.</b> Host enablement is validated as part of the platform and reported with it.'},
+    {id:'EVB-D2', rel:'feeds', text:'<b>Debug and trace access documentation.</b> The diagnostic tooling is how debug access is actually used.'},
   ],
   risks:[
     '<b>Boundary with firmware left implicit.</b> Either the work is duplicated or nobody does it, and both are discovered at power-on.',
@@ -693,8 +622,8 @@ module.exports = {
   ],
   effort:[['Boot software',3], ['Enablement validation',2.5], ['Diagnostic tooling',2], ['Driver stub',1.5], ['Logging',1]],
   entry:[
-    'Register map available from RTL-06',
-    'Boot sequence defined in ARCH-06',
+    'Register map available from RTL-09',
+    'Boot sequence defined in ARCH-09',
     'Firmware team\'s scope known',
   ],
   exit:[
@@ -702,14 +631,85 @@ module.exports = {
     'Register access validated against the current map',
     'Enablement validated on the platform before silicon',
   ],
-  dependsOn:['EVB-01','EVB-06','RTL-06','ARCH-06'],
+  dependsOn:['EVB-01','EVB-04','RTL-09','ARCH-09'],
   dependsNote:null,
-  feedsInto:['EVB-07','BU-04','BU-02'],
+  feedsInto:['EVB-10','BU-04','BU-02'],
   measuredBy:[
     'Boundary disputes with firmware during bring-up',
     'Register map currency against RTL',
     'Bring-up issues later traced to host software',
   ],
 },
+'EVB-10': {
+  stage:'validationHardware', window:[30,37], criticalPath:true,
+  purpose:[
+    'Bring the <b>board itself up</b>—with dummy parts or a socketed loopback—so that when silicon arrives, every failure is the silicon\'s.',
+    'This is the single highest-leverage activity in the stage. A board debugged before first silicon means bring-up starts on a known-good platform; a board debugged alongside first silicon means every anomaly has two possible causes and each takes days to separate.',
+  ],
+  steps:[
+    {n:1, text:'Bring-up plan and dummy part fitting', tat:1, lane:'main'},
+    {n:2, text:'Power tree bring-up and rail verification', tat:1.5, lane:'main'},
+    {n:3, text:'Telemetry and protection validation', tat:1.5, lane:'par'},
+    {n:4, text:'Clocking and reference validation', tat:1.5, lane:'main'},
+    {n:5, text:'Thermal solution fit check', tat:1.5, lane:'par'},
+    {n:6, text:'Interface loopback and signal validation', tat:3, lane:'main'},
+  ],
+  flowNote:'The whole activity is scheduled to complete before silicon arrives. Every hour spent here is an hour not spent, at ten times the cost, debugging a board while first silicon waits on the bench.',
+  consumes:[
+    'Assembled boards from EVB-07',
+    'Power subsystem from EVB-03',
+    'Debug infrastructure from EVB-04',
+    'Thermal solution from EVB-06',
+    'Host enablement from EVB-09',
+  ],
+  produces:[
+    'Bring-up plan and fitted dummy parts',
+    'Power tree bring-up results',
+    'Telemetry and protection validation',
+    'Clocking and reference validation',
+    'Thermal fit check',
+    'Interface loopback and signal validation results',
+    'Board bring-up report and known issues',
+  ],
+  producedBy:[1,2,3,4,5,6,2],
+  rel:[
+    {id:'EVB-D6', rel:'produces', text:'<b>Board bring-up report and known issues.</b> This activity is the deliverable, and the known-issues list is what stops board faults being mistaken for silicon faults.'},
+    {id:'EVB-D5', rel:'gates', text:'<b>Fabricated and assembled boards.</b> A board is not released to silicon bring-up until it has passed this.'},
+  ],
+  risks:[
+    '<b>Board bring-up deferred until silicon arrives.</b> Every anomaly then has two candidate causes, and separating them costs days each.',
+    '<b>Known issues not documented.</b> The bring-up team then rediscovers each board quirk independently, once per engineer.',
+    '<b>Dummy parts not representative.</b> A loopback that does not load the rails or exercise the channels validates less than it appears to.',
+    '<b>Only one board brought up.</b> Board-to-board variation is real, and a fleet where only one is characterized is a fleet with unknown members.',
+    '<b>Thermal fit checked after silicon insertion.</b> A cooling solution that does not fit is discovered with an irreplaceable part underneath it.',
+  ],
+  roles:[
+    {r:'Hardware engineer', d:'Owns board bring-up'},
+    {r:'Power engineer', d:'Rail and protection verification'},
+    {r:'Validation engineer', d:'Known-issue capture for the bring-up team'},
+    {r:'SI engineer', d:'Loopback and signal validation'},
+    {r:'Mechanical engineer', d:'Thermal fit'},
+  ],
+  effort:[['Interface validation',3], ['Power bring-up',2.5], ['Clocking validation',2], ['Telemetry validation',1.5], ['Thermal fit',1]],
+  entry:[
+    'Assembled boards accepted from EVB-07',
+    'Power and debug subsystems designed',
+    'Dummy parts or loopback fixtures available',
+  ],
+  exit:[
+    'Board bring-up complete before silicon arrives',
+    'Known issues documented for the bring-up team',
+    'Every board in the fleet brought up, not just one',
+  ],
+  dependsOn:['EVB-07','EVB-03','EVB-04','EVB-06','EVB-09'],
+  dependsNote:null,
+  feedsInto:['BU-01','BU-02'],
+  measuredBy:[
+    'Board bring-up completion against silicon arrival',
+    'Boards brought up against boards built',
+    'Silicon-bring-up issues later traced to the board',
+  ],
+},
+
 
 };

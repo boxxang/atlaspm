@@ -132,9 +132,9 @@ test.describe('the rail', () => {
     const rail = page.getByRole('complementary', { name: 'Details' });
     await expect(page.locator('[data-act]').first()).toBeVisible();
 
-    await page.locator('[data-act="PD-10"]').click();
+    await page.locator('[data-act="PD-14"]').click();
     await expect(rail).toContainText('Signal and Power Integrity');
-    await page.locator('[data-act="PD-10"]').click();
+    await page.locator('[data-act="PD-14"]').click();
     await expect(rail).toContainText('Properties');
     await expect(rail).toContainText('Grace Park');
   });
@@ -157,8 +157,8 @@ test.describe('the rail', () => {
   test('closing a step hands the rail back to the stage', async ({ page }) => {
     await page.goto(`${SHELL_PATH}/stage/physicalDesign/activity`);
     await expect(page.locator('[data-act]').first()).toBeVisible();
-    await page.locator('[data-act="PD-10"]').click();
-    await page.locator('[data-step="PD-10:2"]').click();
+    await page.locator('[data-act="PD-14"]').click();
+    await page.locator('[data-step="PD-14:2"]').click();
 
     const rail = page.getByRole('complementary', { name: 'Details' });
     await expect(rail).toContainText('Step 2 of');
@@ -295,7 +295,7 @@ test.describe('at a laptop width', () => {
      on screen, the rows are simply taller. */
   test('a stage’s tables wrap rather than cutting the text off', async ({ page }) => {
     await page.setViewportSize({ width: 1180, height: 800 });
-    await page.goto(`${SHELL_PATH}/stage/physicalDesign/activity?act=PD-10`);
+    await page.goto(`${SHELL_PATH}/stage/physicalDesign/activity?act=PD-14`);
     await expect(page.locator('[data-stepblock]')).toBeVisible();
 
     /* nothing is ellipsised away: every cell wraps and shows its whole text */
@@ -333,7 +333,7 @@ test.describe('at a laptop width', () => {
 
   test('the same holds with the rail open beside it', async ({ page }) => {
     await page.setViewportSize({ width: 1400, height: 800 });
-    await page.goto(`${SHELL_PATH}/stage/physicalDesign/activity?step=PD-10:2`);
+    await page.goto(`${SHELL_PATH}/stage/physicalDesign/activity?step=PD-14:2`);
     await expect(page.locator('[data-stepblock]')).toBeVisible();
     await expect(page.getByRole('complementary', { name: 'Details' })).toBeVisible();
 

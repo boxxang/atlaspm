@@ -5,7 +5,7 @@ module.exports = {
   stage:'synthesis', window:[0,8], criticalPath:true,
   purpose:[
     'Write the <b>constraints the whole implementation is optimized and signed off against</b>—clocks, generated clocks, IO timing, exceptions, test modes—and validate them rather than assume them.',
-    'Constraints are the specification synthesis and physical design actually read. A missing clock definition produces a design optimized for a path nobody cares about; a wrong false path produces one that closes in the tool and fails in silicon. Every hour spent validating them here saves days at <code>PD-09</code>.',
+    'Constraints are the specification synthesis and physical design actually read. A missing clock definition produces a design optimized for a path nobody cares about; a wrong false path produces one that closes in the tool and fails in silicon. Every hour spent validating them here saves days at <code>PD-06</code>.',
   ],
   steps:[
     {n:1, text:'Mode and corner enumeration against the operating conditions', tat:1.5, lane:'main'},
@@ -17,11 +17,11 @@ module.exports = {
   ],
   flowNote:'Step 6 is not review, it is tooling. Constraint quality checkers find unconstrained paths, conflicting exceptions and clocks that reach nothing, and they find them in minutes—which is why every drop should be re-checked rather than checked once.',
   consumes:[
-    'Clock architecture and DVFS points from ARCH-05',
-    'Interface timing requirements from ARCH-04',
-    'Corner and mode definition from PDK-11',
+    'Clock architecture and DVFS points from ARCH-06',
+    'Interface timing requirements from ARCH-03',
+    'Corner and mode definition from PDK-12',
     'DFT test modes from DFT-01',
-    'RTL hierarchy from RTL-04',
+    'RTL hierarchy from RTL-10',
   ],
   produces:[
     'Mode and corner enumeration',
@@ -33,7 +33,7 @@ module.exports = {
   ],
   producedBy:[1,2,3,4,5,6],
   rel:[
-    {id:'SYN-D4', rel:'produces', text:'<b>Validated SDC constraint set per mode and corner.</b> This activity is the deliverable, and "validated" is what distinguishes it from a file of assertions.'},
+    {id:'SYN-D2', rel:'produces', text:'<b>Validated SDC constraint set per mode and corner.</b> This activity is the deliverable, and "validated" is what distinguishes it from a file of assertions.'},
     {id:'SYN-D5', rel:'feeds', text:'<b>Synthesis QoR report per drop.</b> QoR is only meaningful against constraints; an unconstrained path reports as passing.'},
   ],
   risks:[
@@ -41,7 +41,7 @@ module.exports = {
     '<b>Exceptions written to close timing.</b> A false path added because the path would not close is a silicon failure being converted into a green report.',
     '<b>Constraints diverging between synthesis and signoff.</b> Two constraint sets means optimizing against one and being judged against the other.',
     '<b>Test mode constraints written late.</b> Scan shift and at-speed modes have their own timing, and a design closed only in functional mode fails at ATE.',
-    '<b>IO constraints assumed from the interface specification.</b> Actual budgets come from the package and channel analysis in <code>SIPI-07</code>, not from the protocol document.',
+    '<b>IO constraints assumed from the interface specification.</b> Actual budgets come from the package and channel analysis in <code>SIPI-04</code>, not from the protocol document.',
   ],
   roles:[
     {r:'Constraints lead', d:'Owns the SDC set and its validation'},
@@ -52,8 +52,8 @@ module.exports = {
   ],
   effort:[['Clock and generated clock definitions',5], ['Constraint validation',4.5], ['IO and interface constraints',3.5], ['Exception specification',3], ['Test mode constraints',2]],
   entry:[
-    'Clock architecture fixed by ARCH-05',
-    'Corner and mode definition available from PDK-11',
+    'Clock architecture fixed by ARCH-06',
+    'Corner and mode definition available from PDK-12',
     'RTL hierarchy stable enough to constrain',
   ],
   exit:[
@@ -61,9 +61,9 @@ module.exports = {
     'Every exception justified by a design reason, not by a violation',
     'One constraint set used by both synthesis and signoff',
   ],
-  dependsOn:['ARCH-05','PDK-11','DFT-01','RTL-04'],
+  dependsOn:['ARCH-06','PDK-12','DFT-01','RTL-10'],
   dependsNote:null,
-  feedsInto:['SYN-02','SYN-03','SYN-11','PD-01','SO-02'],
+  feedsInto:['SYN-02','SYN-05','SYN-03','PD-01','SO-03'],
   measuredBy:[
     'Unconstrained paths at each drop',
     'Exceptions with a documented design reason',
@@ -89,9 +89,9 @@ module.exports = {
   consumes:[
     'Qualified libraries from PDK-03',
     'Constraints from SYN-01',
-    'RTL from RTL-02 and RTL-04',
-    'PPA budgets from ARCH-06',
-    'Flow and methodology from PDK-09',
+    'RTL from RTL-05 and RTL-10',
+    'PPA budgets from ARCH-09',
+    'Flow and methodology from PDK-08',
   ],
   produces:[
     'Mapping strategy and library configuration',
@@ -104,7 +104,7 @@ module.exports = {
   producedBy:[1,2,3,4,5,6],
   rel:[
     {id:'SYN-D5', rel:'feeds', text:'<b>Synthesis QoR report per drop.</b> This activity produces the QoR the report describes, drop after drop.'},
-    {id:'SYN-D2', rel:'feeds', text:'<b>N1 and N2 netlist drops.</b> Each drop is this activity\'s output at a point in time, with whatever optimization was enabled.'},
+    {id:'SYN-D4', rel:'feeds', text:'<b>N1 and N2 netlist drops.</b> Each drop is this activity\'s output at a point in time, with whatever optimization was enabled.'},
   ],
   risks:[
     '<b>Everything optimized for speed.</b> Area and leakage on non-critical paths are given away for performance nobody asked for, and the die grows.',
@@ -118,30 +118,170 @@ module.exports = {
     {r:'Synthesis engineers', d:'Flow configuration and optimization'},
     {r:'Library engineer', d:'Vt menu and special cell usage'},
     {r:'Block owners', d:'RTL restructuring where synthesis cannot close'},
-    {r:'PPA lead', d:'QoR against the ARCH-06 budgets'},
+    {r:'PPA lead', d:'QoR against the ARCH-09 budgets'},
   ],
   effort:[['Baseline mapping and optimization',5], ['QoR analysis and iteration',4], ['Multi-bit and useful skew',3], ['Datapath optimization',2], ['Area recovery',2]],
   entry:[
     'Libraries qualified and frozen by PDK-03',
     'Constraints available from SYN-01',
-    'Flow available from PDK-09',
+    'Flow available from PDK-08',
   ],
   exit:[
     'Area recovered on non-critical paths, not only speed optimized',
     'Vt menu used across its range, not defaulted',
     'QoR reported normalized so drops are comparable',
   ],
-  dependsOn:['SYN-01','PDK-03','PDK-09','RTL-02'],
+  dependsOn:['SYN-01','PDK-03','PDK-08','RTL-05'],
   dependsNote:null,
-  feedsInto:['SYN-04','SYN-05','SYN-06','SYN-11','PD-05'],
+  feedsInto:['SYN-07','SYN-08','SYN-09','SYN-03','PD-05'],
   measuredBy:[
-    'Area and leakage against the ARCH-06 budget',
+    'Area and leakage against the ARCH-09 budget',
     'Clock power against the multi-bit projection',
     'QoR trend across drops',
   ],
 },
 
 'SYN-03': {
+  stage:'synthesis', window:[2,24], criticalPath:false,
+  purpose:[
+    'Report <b>timing, area and power against the budget after every drop</b>, and escalate when a block is diverging rather than when it has already blown its allocation.',
+    'QoR reported in absolute terms tells nobody anything. Reported against the <code>ARCH-09</code> allocation and trended across drops, it says which blocks are converging, which are not, and how much of the gap is still recoverable—which is the only version a program manager can act on.',
+  ],
+  steps:[
+    {n:1, text:'Reporting framework and budget ingestion', tat:1.5, lane:'main'},
+    {n:2, text:'Per-drop timing report and analysis', tat:2, lane:'main'},
+    {n:3, text:'Budget comparison and escalation rules', tat:2, lane:'par'},
+    {n:4, text:'Per-drop area and power report', tat:2, lane:'main'},
+    {n:5, text:'Trend analysis across the drop sequence', tat:2, lane:'par'},
+    {n:6, text:'Continuous reporting across the stage', tat:16.5, lane:'main'},
+  ],
+  flowNote:'Step 5 is the part that predicts. A block 10% over budget and improving is a different problem from one 5% over and flat, and only a trend across drops distinguishes them.',
+  consumes:[
+    'Synthesis results from every drop',
+    'PPA budgets from ARCH-09',
+    'Constraints from SYN-01',
+    'Power results from SYN-09',
+    'Physical-aware results from SYN-07',
+  ],
+  produces:[
+    'Reporting framework with budget ingestion',
+    'Per-drop timing, area and power report',
+    'Budget comparison per block',
+    'Escalation records',
+    'Per-drop timing, area and power reports',
+    'Trend analysis across drops',
+    'Reporting log across the stage',
+  ],
+  producedBy:[1,2,3,3,4,5,6],
+  rel:[
+    {id:'SYN-D5', rel:'produces', text:'<b>Synthesis QoR report per drop against PPA targets.</b> This activity is the deliverable, and "against targets" is what makes it usable.'},
+    {id:'SYN-D4', rel:'feeds', text:'<b>N1 and N2 netlist drops with QoR delta reports.</b> The delta report accompanying each drop comes from here.'},
+  ],
+  risks:[
+    '<b>QoR reported in absolute terms.</b> Numbers with no budget reference cannot be acted on, and everyone forms their own opinion of whether they are acceptable.',
+    '<b>No escalation rule.</b> Divergence noticed and not escalated becomes a surprise at the final turn, when there is nothing left to do about it.',
+    '<b>Reports not normalized across drops.</b> More RTL in a later drop makes the trend meaningless unless the comparison accounts for it.',
+    '<b>Power reported at nominal only.</b> The number that matters is at the product\'s operating point, and reporting at nominal understates it consistently.',
+    '<b>Reporting stopping between drops.</b> The interesting question is whether a block is improving, and that needs data between releases as well as at them.',
+  ],
+  roles:[
+    {r:'PPA reporting engineer', d:'Owns the framework and the reports'},
+    {r:'Synthesis engineers', d:'Data generation per drop'},
+    {r:'PPA lead', d:'Budget comparison and escalation decisions'},
+    {r:'Block owners', d:'Act on their block\'s divergence'},
+    {r:'Program manager', d:'Consumes trends for schedule decisions'},
+  ],
+  effort:[['Continuous reporting',4], ['Per-drop reports',2.5], ['Budget comparison',2], ['Trend analysis',1.5]],
+  entry:[
+    'PPA budgets available from ARCH-09',
+    'First synthesis results available',
+    'Reporting framework agreed with the PPA lead',
+  ],
+  exit:[
+    'Every report references the budget, not only the absolute number',
+    'Divergence escalated on a rule, not on judgment',
+    'Trends normalized so drops are comparable',
+  ],
+  dependsOn:['SYN-01','SYN-02','ARCH-09','PDK-10'],
+  dependsNote:null,
+  feedsInto:['SYN-08','SYN-11','PD-06','ARCH-09'],
+  measuredBy:[
+    'Blocks reported against budget',
+    'Escalations raised before the final turn',
+    'Trend accuracy in predicting final-turn QoR',
+  ],
+},
+
+'SYN-04': {
+  stage:'synthesis', window:[2,24], criticalPath:false,
+  purpose:[
+    'Hand each netlist to physical design as a <b>complete, accepted package</b>—netlist, constraints, UPF, DFT collateral, abstracts—and review the QoR delta together rather than throwing results over a wall.',
+    'The handoff is where two teams either share a picture of the design or maintain two. Six man-months across the stage buys a structured package and a joint review per drop, and it prevents the pattern where physical design spends a week discovering what synthesis already knew.',
+  ],
+  steps:[
+    {n:1, text:'Handoff package definition — contents and format', tat:1, lane:'main'},
+    {n:2, text:'Per-drop package assembly', tat:1.5, lane:'main'},
+    {n:3, text:'Acceptance criteria agreed with physical design', tat:1.5, lane:'par'},
+    {n:4, text:'QoR delta review with physical design per drop', tat:1.5, lane:'main'},
+    {n:5, text:'Issue tracking between drops', tat:1.5, lane:'par'},
+    {n:6, text:'Continuous handoff across the drop sequence', tat:18, lane:'main'},
+  ],
+  flowNote:'Step 3 is what makes a handoff a transaction rather than a delivery. Acceptance criteria mean physical design can reject a package that is incomplete, and rejection at handoff is far cheaper than discovering the gap three days into a turn.',
+  consumes:[
+    'Netlists from every drop',
+    'Constraints from SYN-01',
+    'UPF and low-power implementation from SYN-10',
+    'DFT collateral from DFT-08',
+    'QoR reports from SYN-03',
+  ],
+  produces:[
+    'Handoff package definition and format',
+    'Per-drop handoff package',
+    'Acceptance criteria agreed with PD',
+    'QoR delta review records',
+    'Issue tracking between drops',
+    'Assembled packages per drop',
+  ],
+  producedBy:[1,2,3,4,5,6],
+  rel:[
+    {id:'SYN-D7', rel:'produces', text:'<b>Physical design handoff package per drop.</b> This activity is the deliverable, and acceptance rather than delivery is its standard.'},
+    {id:'SYN-D4', rel:'feeds', text:'<b>N1 and N2 netlist drops with QoR delta reports.</b> The delta review is where the drop is actually transferred.'},
+  ],
+  risks:[
+    '<b>Packages delivered without acceptance.</b> Physical design discovers the gap mid-turn, and the turn absorbs the delay.',
+    '<b>QoR reviewed asynchronously.</b> A report read separately produces two interpretations, and the disagreement surfaces at the next escalation.',
+    '<b>Issues not tracked between drops.</b> Each handoff then starts fresh, and the same problems are raised at every drop.',
+    '<b>Package contents changing between drops.</b> Physical design automates against the format, and an inconsistent package breaks their flow.',
+    '<b>Handoff treated as a synthesis milestone.</b> It is a shared event; a handoff that PD has not accepted has not happened.',
+  ],
+  roles:[
+    {r:'Synthesis lead', d:'Owns the handoff and the delta review'},
+    {r:'Physical design lead', d:'Acceptance and feedback'},
+    {r:'Configuration manager', d:'Package assembly and version control'},
+    {r:'DFT engineer', d:'DFT collateral in the package'},
+    {r:'PPA lead', d:'Joint QoR interpretation'},
+  ],
+  effort:[['Continuous handoff',2.5], ['QoR delta review',1.5], ['Package assembly',1], ['Acceptance criteria',1]],
+  entry:[
+    'First netlist drop ready in SYN-05',
+    'Acceptance criteria negotiable with physical design',
+    'Package format agreed',
+  ],
+  exit:[
+    'Every package accepted rather than merely delivered',
+    'QoR reviewed jointly per drop',
+    'Issues tracked across drops rather than re-raised',
+  ],
+  dependsOn:['SYN-05','SYN-08','SYN-03'],
+  dependsNote:null,
+  feedsInto:['PD-01','PD-05','PD-11','PD-15'],
+  measuredBy:[
+    'Packages accepted at first presentation',
+    'Issues carried between drops against re-raised',
+    'Days lost to incomplete handoffs',
+  ],
+},
+'SYN-05': {
   stage:'synthesis', window:[3,7], criticalPath:true,
   purpose:[
     'Release the <b>N0 flow-flush netlist</b>—functionally incomplete, structurally representative—so physical design can build and debug its flow against a real database months before the design is ready.',
@@ -156,8 +296,8 @@ module.exports = {
   ],
   flowNote:'Step 1 is the whole activity. N0 has to be representative in the dimensions PD\'s flow cares about—hierarchy, macro count, instance count, pin count—and can be arbitrarily wrong in everything else. Getting that distinction right is what makes it cheap.',
   consumes:[
-    'RTL in whatever state exists from RTL-02',
-    'Macro list and abstracts from AMS-15',
+    'RTL in whatever state exists from RTL-05',
+    'Macro list and abstracts from AMS-16',
     'Constraints from SYN-01',
     'Flow setup requirements from PD-01',
     'Hierarchy from ARCH-02',
@@ -173,7 +313,7 @@ module.exports = {
   producedBy:[1,2,2,3,4,5],
   rel:[
     {id:'SYN-D1', rel:'produces', text:'<b>N0 flow-flush netlist for PD flow setup.</b> This activity is the deliverable, and its value is entirely in arriving early rather than in being correct.'},
-    {id:'SYN-D8', rel:'feeds', text:'<b>Physical design handoff package per drop.</b> N0 is the first handoff, and it sets the format every later one follows.'},
+    {id:'SYN-D7', rel:'feeds', text:'<b>Physical design handoff package per drop.</b> N0 is the first handoff, and it sets the format every later one follows.'},
   ],
   risks:[
     '<b>N0 delayed until it is good.</b> The point is to be early; a correct N0 delivered late has become N1 and left PD\'s flow undebugged.',
@@ -192,7 +332,7 @@ module.exports = {
   effort:[['Scope definition and stubs',2], ['Elaboration and structural checks',1.5], ['Release and handover',1.5], ['Bootstrap constraints',1]],
   entry:[
     'Enough RTL exists to elaborate a representative hierarchy',
-    'Macro abstracts available from AMS-15',
+    'Macro abstracts available from AMS-16',
     'PD flow setup ready to receive a netlist',
   ],
   exit:[
@@ -200,9 +340,9 @@ module.exports = {
     'Limitations stated explicitly with the release',
     'Delivered on the date PD\'s flow setup needs it, not when it is good',
   ],
-  dependsOn:['SYN-01','SYN-02','AMS-15','RTL-02'],
+  dependsOn:['SYN-01','SYN-02','AMS-16','RTL-05'],
   dependsNote:null,
-  feedsInto:['PD-01','PD-02','SYN-12'],
+  feedsInto:['PD-01','PD-02','SYN-04'],
   measuredBy:[
     'Days from PD flow setup start to N0 availability',
     'Representativeness against the dimensions PD named',
@@ -210,11 +350,85 @@ module.exports = {
   ],
 },
 
-'SYN-04': {
+'SYN-06': {
+  stage:'synthesis', window:[4,24], criticalPath:false,
+  purpose:[
+    'Prove that <b>every netlist still means what the RTL meant</b>—formal equivalence per drop, including through DFT insertion, clock gating and low-power transformations.',
+    'Synthesis rewrites the design, and the tools that do it are not infallible. Equivalence checking is the only evidence that the netlist implements the RTL that verification actually verified; without it, a transformation error is discovered in silicon as behavior nobody can trace to a bug.',
+  ],
+  steps:[
+    {n:1, text:'Equivalence methodology and tool setup', tat:1.5, lane:'main'},
+    {n:2, text:'Block-level equivalence per drop', tat:2, lane:'main'},
+    {n:3, text:'Black-box and constraint handling for incomplete drops', tat:2, lane:'par'},
+    {n:4, text:'Chip-level equivalence per drop', tat:3, lane:'main'},
+    {n:5, text:'DFT and clock gating equivalence handling', tat:2, lane:'par'},
+    {n:6, text:'Non-equivalence debug and resolution', tat:2.5, lane:'main'},
+    {n:7, text:'Per-drop equivalence reporting', tat:2, lane:'par'},
+    {n:8, text:'Continuous checking across the drop sequence', tat:11, lane:'main'},
+  ],
+  flowNote:'Step 5 is where most of the difficulty lives. Scan insertion and clock gating change the netlist in ways that are correct and not structurally equivalent, and setting up the checker to accept those and reject everything else is the skilled part of the activity.',
+  consumes:[
+    'RTL from RTL-05 and RTL-10',
+    'Netlists from every synthesis drop',
+    'Scan-inserted netlist from DFT-08',
+    'UPF and low-power implementation from SYN-10',
+    'Equivalence tools from PDK-07',
+  ],
+  produces:[
+    'Equivalence methodology and setup',
+    'Per-drop block-level equivalence results',
+    'Black-box and constraint handling record',
+    'Block and chip-level equivalence results per drop',
+    'DFT and clock gating handling configuration',
+    'Non-equivalence debug records',
+    'Per-drop equivalence reports',
+    'Equivalence checking log across the drop sequence',
+  ],
+  producedBy:[1,2,3,4,5,6,7,8],
+  rel:[
+    {id:'SYN-D6', rel:'produces', text:'<b>Formal equivalence clean report per drop.</b> This activity is the deliverable, and "per drop" is what makes it a control rather than a final check.'},
+    {id:'SYN-D8', rel:'gates', text:'<b>FFN—final full netlist.</b> An FFN that has not been proved equivalent is a netlist nobody can claim was verified.'},
+  ],
+  risks:[
+    '<b>Equivalence run only on the final netlist.</b> A transformation error introduced at N1 is then found at the FFN, when the debug competes with tapeout.',
+    '<b>Non-equivalences waived to make progress.</b> Each waiver is a place where the netlist may not implement the verified RTL, and they accumulate quietly.',
+    '<b>DFT transformations not modelled.</b> The checker reports thousands of differences and everyone stops reading the report.',
+    '<b>Black-box handling too permissive.</b> Boxing out a block to get a clean result excludes exactly the logic that was not checked.',
+    '<b>Debug capacity underestimated.</b> A single real non-equivalence on a design this size can take a week to localize, and there is rarely a week available.',
+  ],
+  roles:[
+    {r:'Equivalence engineer', d:'Owns methodology, runs and debug'},
+    {r:'Synthesis engineers', d:'Transformation explanations and fixes'},
+    {r:'DFT engineer', d:'Scan transformation handling'},
+    {r:'Low-power engineer', d:'UPF-related transformation handling'},
+    {r:'Synthesis lead', d:'Waiver decisions and reporting'},
+  ],
+  effort:[['Continuous checking',4], ['Non-equivalence debug',3], ['Chip-level equivalence',2], ['Methodology and setup',1.5], ['DFT and low-power handling',1.5]],
+  entry:[
+    'RTL and first netlists available',
+    'Equivalence tools qualified by PDK-07',
+    'DFT insertion methodology known from DFT-08',
+  ],
+  exit:[
+    'Every drop checked, not only the final one',
+    'Non-equivalences resolved rather than waived',
+    'Chip-level equivalence clean on the FFN',
+  ],
+  dependsOn:['SYN-02','SYN-10','DFT-08','PDK-07'],
+  dependsNote:null,
+  feedsInto:['SYN-12','SO-09','TO-02'],
+  measuredBy:[
+    'Drops with a clean equivalence result',
+    'Non-equivalences waived against resolved',
+    'Debug time per non-equivalence',
+  ],
+},
+
+'SYN-07': {
   stage:'synthesis', window:[6,13], criticalPath:false,
   purpose:[
     'Synthesize <b>with the floorplan in the loop</b>—physical-aware mapping, congestion feedback, placement-driven restructuring—so the netlist that reaches physical design is already routable.',
-    'Logic synthesis without physical information optimizes for a wire model that does not exist. On a large die the difference between estimated and actual wire delay is large enough to invalidate the optimization, and the correction happens either here or as weeks of congestion work at <code>PD-06</code>.',
+    'Logic synthesis without physical information optimizes for a wire model that does not exist. On a large die the difference between estimated and actual wire delay is large enough to invalidate the optimization, and the correction happens either here or as weeks of congestion work at <code>PD-11</code>.',
   ],
   steps:[
     {n:1, text:'Physical-aware flow setup with the floorplan', tat:1.5, lane:'main'},
@@ -228,7 +442,7 @@ module.exports = {
   consumes:[
     'Floorplan from PD-02',
     'Mapped netlist from SYN-02',
-    'Congestion analysis from PD-06',
+    'Congestion analysis from PD-11',
     'Macro placement and blockages from PD-02',
     'Constraints from SYN-01',
   ],
@@ -243,7 +457,7 @@ module.exports = {
   producedBy:[1,2,3,4,5,6],
   rel:[
     {id:'SYN-D5', rel:'feeds', text:'<b>Synthesis QoR report per drop.</b> Physical-aware results are the ones that predict what physical design will actually achieve.'},
-    {id:'SYN-D8', rel:'feeds', text:'<b>Physical design handoff package per drop.</b> A netlist synthesized against the floorplan is a materially better handoff than one synthesized against a wire model.'},
+    {id:'SYN-D7', rel:'feeds', text:'<b>Physical design handoff package per drop.</b> A netlist synthesized against the floorplan is a materially better handoff than one synthesized against a wire model.'},
   ],
   risks:[
     '<b>Floorplan too immature to synthesize against.</b> Physical-aware synthesis against a floorplan that then changes produces optimization for a layout that never exists.',
@@ -263,7 +477,7 @@ module.exports = {
   entry:[
     'Floorplan available and stable from PD-02',
     'Mapped netlist available from SYN-02',
-    'Congestion analysis capability in PD-06',
+    'Congestion analysis capability in PD-11',
   ],
   exit:[
     'Netlist synthesized against a floorplan PD is actually using',
@@ -272,7 +486,7 @@ module.exports = {
   ],
   dependsOn:['SYN-02','PD-02'],
   dependsNote:null,
-  feedsInto:['SYN-05','SYN-08','PD-05','PD-06'],
+  feedsInto:['SYN-08','SYN-11','PD-05','PD-11'],
   measuredBy:[
     'QoR improvement against non-physical synthesis',
     'Congestion at PD-05 against prediction',
@@ -280,7 +494,7 @@ module.exports = {
   ],
 },
 
-'SYN-05': {
+'SYN-08': {
   stage:'synthesis', window:[8,13], criticalPath:true,
   purpose:[
     'Release the <b>N1 drop—the first netlist meant to be closed</b>—against PD\'s feedback from its flow setup, and establish the QoR baseline every later drop is measured against.',
@@ -296,11 +510,11 @@ module.exports = {
   ],
   flowNote:'Step 5 is what makes the drop cadence a process rather than a sequence of releases. Each drop should hand forward a named list of what it could not fix and why, so the next one starts from a position rather than from scratch.',
   consumes:[
-    'RTL release from RTL-02',
-    'Physical-aware results from SYN-04',
+    'RTL release from RTL-05',
+    'Physical-aware results from SYN-07',
     'PD flow setup feedback from PD-01',
     'Constraints from SYN-01',
-    'PPA budgets from ARCH-06',
+    'PPA budgets from ARCH-09',
   ],
   produces:[
     'RTL drop intake and delta review',
@@ -313,7 +527,7 @@ module.exports = {
   ],
   producedBy:[1,2,3,4,5,6,6],
   rel:[
-    {id:'SYN-D2', rel:'produces', text:'<b>N1 and N2 netlist drops with QoR delta reports.</b> The first of the two quality drops, with the baseline it establishes.'},
+    {id:'SYN-D4', rel:'produces', text:'<b>N1 and N2 netlist drops with QoR delta reports.</b> The first of the two quality drops, with the baseline it establishes.'},
     {id:'SYN-D5', rel:'feeds', text:'<b>Synthesis QoR report per drop.</b> N1 sets the baseline the QoR trend is measured from.'},
   ],
   risks:[
@@ -328,7 +542,7 @@ module.exports = {
     {r:'Synthesis engineers', d:'Run, closure and delta analysis'},
     {r:'Physical design lead', d:'Feedback into the drop and acceptance out of it'},
     {r:'RTL lead', d:'Confirms RTL readiness for the drop'},
-    {r:'PPA lead', d:'Baseline against the ARCH-06 budgets'},
+    {r:'PPA lead', d:'Baseline against the ARCH-09 budgets'},
   ],
   effort:[['Synthesis run and closure',4], ['QoR delta analysis',3], ['Feedback incorporation',2.5], ['Intake and release',2.5]],
   entry:[
@@ -341,17 +555,17 @@ module.exports = {
     'Delta against N0 explained, not only reported',
     'Issue list handed forward to N2',
   ],
-  dependsOn:['SYN-01','SYN-02','SYN-04','PD-01','RTL-02'],
+  dependsOn:['SYN-01','SYN-02','SYN-07','PD-01','RTL-05'],
   dependsNote:null,
-  feedsInto:['SYN-08','SYN-11','SYN-12','PD-05'],
+  feedsInto:['SYN-11','SYN-03','SYN-04','PD-05'],
   measuredBy:[
-    'QoR at N1 against the ARCH-06 budget',
+    'QoR at N1 against the ARCH-09 budget',
     'Design completeness at the baseline',
     'Issues carried forward against issues found',
   ],
 },
 
-'SYN-06': {
+'SYN-09': {
   stage:'synthesis', window:[9,16], criticalPath:false,
   purpose:[
     'Reduce power where it is actually spent—<b>clock gating, operand isolation, Vt mix</b>—driven by real switching activity rather than by defaults.',
@@ -365,13 +579,13 @@ module.exports = {
     {n:5, text:'Activity-driven optimization with real switching data', tat:1.5, lane:'par'},
     {n:6, text:'Power QoR and comparison against the budget', tat:1.5, lane:'main'},
   ],
-  flowNote:'Step 5 is what separates power optimization from power decoration. Switching activity from the <code>DV-04</code> workload simulations tells the tool which logic is actually idle; without it, gating is inserted by structural heuristic and saves a fraction of what it could.',
+  flowNote:'Step 5 is what separates power optimization from power decoration. Switching activity from the <code>DV-08</code> workload simulations tells the tool which logic is actually idle; without it, gating is inserted by structural heuristic and saves a fraction of what it could.',
   consumes:[
-    'Switching activity from DV-04 workload simulations',
-    'Power budgets from ARCH-06',
+    'Switching activity from DV-08 workload simulations',
+    'Power budgets from ARCH-09',
     'Mapped netlist from SYN-02',
     'Library Vt menu from PDK-03',
-    'Clock architecture from ARCH-05',
+    'Clock architecture from ARCH-06',
   ],
   produces:[
     'Power analysis baseline and hot spots',
@@ -384,7 +598,7 @@ module.exports = {
   producedBy:[1,2,3,4,5,6],
   rel:[
     {id:'SYN-D5', rel:'feeds', text:'<b>Synthesis QoR report per drop.</b> Power is one of the three QoR axes, and the only one that needs external activity data to measure honestly.'},
-    {id:'SYN-D7', rel:'feeds', text:'<b>Power intent implementation report.</b> Dynamic power optimization sits alongside the UPF implementation from <code>SYN-07</code> in the same report.'},
+    {id:'SYN-D3', rel:'feeds', text:'<b>Power intent implementation report.</b> Dynamic power optimization sits alongside the UPF implementation from <code>SYN-10</code> in the same report.'},
   ],
   risks:[
     '<b>Optimization driven by default activity.</b> Uniform switching assumptions produce gating where it saves nothing and none where it would.',
@@ -397,13 +611,13 @@ module.exports = {
     {r:'Power optimization engineer', d:'Owns dynamic and leakage optimization'},
     {r:'Synthesis engineers', d:'Flow configuration and insertion'},
     {r:'Verification liaison', d:'Switching activity from real workloads'},
-    {r:'PPA lead', d:'Power against the ARCH-06 budget'},
+    {r:'PPA lead', d:'Power against the ARCH-09 budget'},
     {r:'Library engineer', d:'Vt menu usage and leakage characterization'},
   ],
   effort:[['Clock gating',3.5], ['Vt mix optimization',2.5], ['Operand isolation',2.5], ['Power analysis',2], ['QoR comparison',1.5]],
   entry:[
-    'Switching activity available from DV-04',
-    'Power budgets published by ARCH-06',
+    'Switching activity available from DV-08',
+    'Power budgets published by ARCH-09',
     'Mapped netlist available from SYN-02',
   ],
   exit:[
@@ -411,9 +625,9 @@ module.exports = {
     'Clock gating efficiency measured, not assumed',
     'Power reported at the operating point the product uses',
   ],
-  dependsOn:['SYN-02','ARCH-06','DV-04','PDK-03'],
+  dependsOn:['SYN-02','ARCH-09','DV-08','PDK-03'],
   dependsNote:null,
-  feedsInto:['SYN-08','SYN-11','PD-09','SO-04'],
+  feedsInto:['SYN-11','SYN-03','PD-06','SO-05'],
   measuredBy:[
     'Dynamic power against budget',
     'Clock gating efficiency',
@@ -421,7 +635,7 @@ module.exports = {
   ],
 },
 
-'SYN-07': {
+'SYN-10': {
   stage:'synthesis', window:[10,15], criticalPath:false,
   purpose:[
     'Implement the <b>power intent in the netlist</b>—isolation cells, level shifters, retention flops, always-on paths—from the UPF, and prove the netlist and the intent still agree.',
@@ -437,11 +651,11 @@ module.exports = {
   ],
   flowNote:'Step 5 runs in parallel and is the one that must not be skipped. The netlist and the UPF are two descriptions of the same intent, and any divergence between them propagates into physical design and verification as a defect nobody can attribute.',
   consumes:[
-    'UPF from RTL-05',
+    'UPF from RTL-06',
     'Low-power cells from PDK-03',
-    'Power domain definition from ARCH-05',
+    'Power domain definition from ARCH-06',
     'Mapped netlist from SYN-02',
-    'Low-power flow from PDK-09',
+    'Low-power flow from PDK-08',
   ],
   produces:[
     'Elaborated UPF in the synthesis flow',
@@ -453,7 +667,7 @@ module.exports = {
   ],
   producedBy:[1,2,3,4,5,6],
   rel:[
-    {id:'SYN-D7', rel:'produces', text:'<b>Power intent implementation report.</b> This activity is the deliverable—what was inferred, what was inserted, and where intent and netlist agree.'},
+    {id:'SYN-D3', rel:'produces', text:'<b>Power intent implementation report.</b> This activity is the deliverable—what was inferred, what was inserted, and where intent and netlist agree.'},
     {id:'SYN-D6', rel:'feeds', text:'<b>Formal equivalence clean report per drop.</b> Low-power cells complicate equivalence checking, and the two activities have to agree on how they are handled.'},
   ],
   risks:[
@@ -472,18 +686,18 @@ module.exports = {
   ],
   effort:[['Isolation and level shifter insertion',2.5], ['Retention cell insertion',2], ['UPF elaboration',1.5], ['Consistency checking',1], ['Implementation report',1]],
   entry:[
-    'UPF available and tool-accepted from RTL-05',
+    'UPF available and tool-accepted from RTL-06',
     'Low-power cells qualified in PDK-03',
-    'Low-power flow available from PDK-09',
+    'Low-power flow available from PDK-08',
   ],
   exit:[
     'Every domain boundary has verified isolation',
     'UPF and netlist consistent, checked rather than assumed',
     'Retention and always-on requirements handed to physical design',
   ],
-  dependsOn:['RTL-05','SYN-02','PDK-03','PDK-09'],
+  dependsOn:['RTL-06','SYN-02','PDK-03','PDK-08'],
   dependsNote:null,
-  feedsInto:['SYN-10','DV-06','PD-03','SO-09'],
+  feedsInto:['SYN-06','DV-10','PD-03','SO-09'],
   measuredBy:[
     'Domain boundaries with verified isolation',
     'UPF-netlist consistency violations',
@@ -491,7 +705,7 @@ module.exports = {
   ],
 },
 
-'SYN-08': {
+'SYN-11': {
   stage:'synthesis', window:[14,19], criticalPath:true,
   purpose:[
     'Release the <b>N2 drop with everything enabled</b>—full optimization, power, low-power intent, physical awareness—and state honestly how much closure risk remains.',
@@ -509,9 +723,9 @@ module.exports = {
   consumes:[
     'RTL updates and ECOs since N1',
     'Turn 1 results and feedback from PD-05',
-    'Power optimization from SYN-06',
-    'Low-power implementation from SYN-07',
-    'Physical-aware results from SYN-04',
+    'Power optimization from SYN-09',
+    'Low-power implementation from SYN-10',
+    'Physical-aware results from SYN-07',
   ],
   produces:[
     'RTL and ECO intake record since N1',
@@ -523,7 +737,7 @@ module.exports = {
   ],
   producedBy:[1,2,3,4,5,6],
   rel:[
-    {id:'SYN-D2', rel:'produces', text:'<b>N1 and N2 netlist drops with QoR delta reports.</b> The second quality drop, and the last structurally changeable one.'},
+    {id:'SYN-D4', rel:'produces', text:'<b>N1 and N2 netlist drops with QoR delta reports.</b> The second quality drop, and the last structurally changeable one.'},
     {id:'SYN-D5', rel:'feeds', text:'<b>Synthesis QoR report per drop.</b> The N2 QoR is the best available prediction of what the final turn will reach.'},
   ],
   risks:[
@@ -531,7 +745,7 @@ module.exports = {
     '<b>Late RTL changes absorbed without assessment.</b> A functional change arriving between N1 and N2 can invalidate the turn-1 closure work entirely.',
     '<b>All optimizations enabled for the first time at N2.</b> Enabling power, low-power and physical awareness together for the first time produces a QoR nobody can attribute.',
     '<b>Turn-1 feedback not incorporated.</b> N2 then repeats N1\'s physical problems, and turn 2 spends its time on the same issues.',
-    '<b>Treated as the final netlist.</b> N2 is not the FFN, and freezing behavior around it removes the RTL freeze discipline that <code>SYN-09</code> depends on.',
+    '<b>Treated as the final netlist.</b> N2 is not the FFN, and freezing behavior around it removes the RTL freeze discipline that <code>SYN-12</code> depends on.',
   ],
   roles:[
     {r:'Synthesis lead', d:'Owns the drop and the closure risk statement'},
@@ -543,17 +757,17 @@ module.exports = {
   effort:[['Full synthesis run',4], ['Convergence check',3], ['Change impact assessment',2.5], ['Release and risk statement',2.5]],
   entry:[
     'Turn 1 complete with feedback from PD-05',
-    'Power and low-power optimization available from SYN-06 and SYN-07',
-    'RTL changes since N1 controlled through RTL-10',
+    'Power and low-power optimization available from SYN-09 and SYN-10',
+    'RTL changes since N1 controlled through RTL-03',
   ],
   exit:[
     'Closure risk stated specifically, with paths, blocks and options',
     'Turn-1 feedback incorporated rather than deferred',
     'Late changes assessed before inclusion',
   ],
-  dependsOn:['SYN-04','SYN-05','SYN-06','SYN-07','PD-05'],
+  dependsOn:['SYN-07','SYN-08','SYN-09','SYN-10','PD-05'],
   dependsNote:null,
-  feedsInto:['SYN-09','SYN-11','PD-06','SO-01'],
+  feedsInto:['SYN-12','SYN-03','PD-11','SO-01'],
   measuredBy:[
     'Closure risk at N2 against outcome at the final turn',
     'Late changes assessed against absorbed',
@@ -561,11 +775,11 @@ module.exports = {
   ],
 },
 
-'SYN-09': {
+'SYN-12': {
   stage:'synthesis', window:[19,23], criticalPath:true,
   purpose:[
     'Release the <b>FFN—the final full netlist</b>—against frozen RTL, with constraints frozen and equivalence proved, and declare that nothing functional changes after it.',
-    'The FFN is a commitment more than a deliverable. Everything after it is physical: <code>PD-13</code> closes on this netlist and <code>SO-02</code> signs off on what PD produces. A functional change after the FFN restarts both, which is why the freeze around it has to be real.',
+    'The FFN is a commitment more than a deliverable. Everything after it is physical: <code>PD-15</code> closes on this netlist and <code>SO-03</code> signs off on what PD produces. A functional change after the FFN restarts both, which is why the freeze around it has to be real.',
   ],
   steps:[
     {n:1, text:'RTL freeze confirmation and final intake', tat:0.75, lane:'main'},
@@ -575,13 +789,13 @@ module.exports = {
     {n:5, text:'Handoff package assembly', tat:0.75, lane:'par'},
     {n:6, text:'FFN release and functional freeze declaration', tat:1, lane:'main'},
   ],
-  flowNote:'Step 1 is a confirmation rather than a formality. If <code>RTL-10</code> has not actually declared freeze, the FFN is a snapshot of a moving design, and the final turn in <code>PD-13</code> will be closing against something that changes underneath it.',
+  flowNote:'Step 1 is a confirmation rather than a formality. If <code>RTL-03</code> has not actually declared freeze, the FFN is a snapshot of a moving design, and the final turn in <code>PD-15</code> will be closing against something that changes underneath it.',
   consumes:[
-    'Frozen RTL from RTL-10',
+    'Frozen RTL from RTL-03',
     'Constraints from SYN-01',
-    'Optimization configuration from SYN-06 and SYN-07',
-    'N2 results and closure risk from SYN-08',
-    'Equivalence methodology from SYN-10',
+    'Optimization configuration from SYN-09 and SYN-10',
+    'N2 results and closure risk from SYN-11',
+    'Equivalence methodology from SYN-06',
   ],
   produces:[
     'RTL freeze confirmation',
@@ -593,9 +807,9 @@ module.exports = {
   ],
   producedBy:[1,2,3,4,5,6],
   rel:[
-    {id:'SYN-D3', rel:'produces', text:'<b>FFN—final full netlist, release-tagged.</b> This activity is the deliverable, and the milestone the stage ends on.'},
-    {id:'SYN-D4', rel:'gates', text:'<b>Validated SDC constraint set.</b> Constraints freeze with the FFN—closing against moving constraints is closing against nothing.'},
-    {id:'SYN-D8', rel:'feeds', text:'<b>Physical design handoff package per drop.</b> The final handoff, and the one <code>PD-13</code> closes against.'},
+    {id:'SYN-D8', rel:'produces', text:'<b>FFN—final full netlist, release-tagged.</b> This activity is the deliverable, and the milestone the stage ends on.'},
+    {id:'SYN-D2', rel:'gates', text:'<b>Validated SDC constraint set.</b> Constraints freeze with the FFN—closing against moving constraints is closing against nothing.'},
+    {id:'SYN-D7', rel:'feeds', text:'<b>Physical design handoff package per drop.</b> The final handoff, and the one <code>PD-15</code> closes against.'},
   ],
   risks:[
     '<b>FFN released against RTL that is not actually frozen.</b> The final turn then closes against a moving netlist, and every change restarts it.',
@@ -613,8 +827,8 @@ module.exports = {
   ],
   effort:[['Final synthesis run',3.5], ['Equivalence and consistency',2.5], ['Release and freeze declaration',2], ['Constraint freeze',1], ['Handoff package',1]],
   entry:[
-    'RTL freeze declared by RTL-10',
-    'N2 closure risk understood from SYN-08',
+    'RTL freeze declared by RTL-03',
+    'N2 closure risk understood from SYN-11',
     'Equivalence methodology proven across earlier drops',
   ],
   exit:[
@@ -622,9 +836,9 @@ module.exports = {
     'Constraints frozen with the netlist',
     'Functional freeze declared and its exception process published',
   ],
-  dependsOn:['SYN-08','SYN-10','RTL-10'],
+  dependsOn:['SYN-11','SYN-06','RTL-03'],
   dependsNote:null,
-  feedsInto:['PD-13','SO-02','SO-09','TO-01'],
+  feedsInto:['PD-15','SO-03','SO-09','TO-01'],
   measuredBy:[
     'Functional changes after the FFN',
     'Equivalence result on the final netlist',
@@ -632,219 +846,5 @@ module.exports = {
   ],
 },
 
-'SYN-10': {
-  stage:'synthesis', window:[4,24], criticalPath:false,
-  purpose:[
-    'Prove that <b>every netlist still means what the RTL meant</b>—formal equivalence per drop, including through DFT insertion, clock gating and low-power transformations.',
-    'Synthesis rewrites the design, and the tools that do it are not infallible. Equivalence checking is the only evidence that the netlist implements the RTL that verification actually verified; without it, a transformation error is discovered in silicon as behavior nobody can trace to a bug.',
-  ],
-  steps:[
-    {n:1, text:'Equivalence methodology and tool setup', tat:1.5, lane:'main'},
-    {n:2, text:'Block-level equivalence per drop', tat:2, lane:'main'},
-    {n:3, text:'Black-box and constraint handling for incomplete drops', tat:2, lane:'par'},
-    {n:4, text:'Chip-level equivalence per drop', tat:3, lane:'main'},
-    {n:5, text:'DFT and clock gating equivalence handling', tat:2, lane:'par'},
-    {n:6, text:'Non-equivalence debug and resolution', tat:2.5, lane:'main'},
-    {n:7, text:'Per-drop equivalence reporting', tat:2, lane:'par'},
-    {n:8, text:'Continuous checking across the drop sequence', tat:11, lane:'main'},
-  ],
-  flowNote:'Step 5 is where most of the difficulty lives. Scan insertion and clock gating change the netlist in ways that are correct and not structurally equivalent, and setting up the checker to accept those and reject everything else is the skilled part of the activity.',
-  consumes:[
-    'RTL from RTL-02 and RTL-04',
-    'Netlists from every synthesis drop',
-    'Scan-inserted netlist from DFT-06',
-    'UPF and low-power implementation from SYN-07',
-    'Equivalence tools from PDK-08',
-  ],
-  produces:[
-    'Equivalence methodology and setup',
-    'Per-drop block-level equivalence results',
-    'Black-box and constraint handling record',
-    'Block and chip-level equivalence results per drop',
-    'DFT and clock gating handling configuration',
-    'Non-equivalence debug records',
-    'Per-drop equivalence reports',
-    'Equivalence checking log across the drop sequence',
-  ],
-  producedBy:[1,2,3,4,5,6,7,8],
-  rel:[
-    {id:'SYN-D6', rel:'produces', text:'<b>Formal equivalence clean report per drop.</b> This activity is the deliverable, and "per drop" is what makes it a control rather than a final check.'},
-    {id:'SYN-D3', rel:'gates', text:'<b>FFN—final full netlist.</b> An FFN that has not been proved equivalent is a netlist nobody can claim was verified.'},
-  ],
-  risks:[
-    '<b>Equivalence run only on the final netlist.</b> A transformation error introduced at N1 is then found at the FFN, when the debug competes with tapeout.',
-    '<b>Non-equivalences waived to make progress.</b> Each waiver is a place where the netlist may not implement the verified RTL, and they accumulate quietly.',
-    '<b>DFT transformations not modelled.</b> The checker reports thousands of differences and everyone stops reading the report.',
-    '<b>Black-box handling too permissive.</b> Boxing out a block to get a clean result excludes exactly the logic that was not checked.',
-    '<b>Debug capacity underestimated.</b> A single real non-equivalence on a design this size can take a week to localize, and there is rarely a week available.',
-  ],
-  roles:[
-    {r:'Equivalence engineer', d:'Owns methodology, runs and debug'},
-    {r:'Synthesis engineers', d:'Transformation explanations and fixes'},
-    {r:'DFT engineer', d:'Scan transformation handling'},
-    {r:'Low-power engineer', d:'UPF-related transformation handling'},
-    {r:'Synthesis lead', d:'Waiver decisions and reporting'},
-  ],
-  effort:[['Continuous checking',4], ['Non-equivalence debug',3], ['Chip-level equivalence',2], ['Methodology and setup',1.5], ['DFT and low-power handling',1.5]],
-  entry:[
-    'RTL and first netlists available',
-    'Equivalence tools qualified by PDK-08',
-    'DFT insertion methodology known from DFT-06',
-  ],
-  exit:[
-    'Every drop checked, not only the final one',
-    'Non-equivalences resolved rather than waived',
-    'Chip-level equivalence clean on the FFN',
-  ],
-  dependsOn:['SYN-02','SYN-07','DFT-06','PDK-08'],
-  dependsNote:null,
-  feedsInto:['SYN-09','SO-09','TO-02'],
-  measuredBy:[
-    'Drops with a clean equivalence result',
-    'Non-equivalences waived against resolved',
-    'Debug time per non-equivalence',
-  ],
-},
-
-'SYN-11': {
-  stage:'synthesis', window:[2,24], criticalPath:false,
-  purpose:[
-    'Report <b>timing, area and power against the budget after every drop</b>, and escalate when a block is diverging rather than when it has already blown its allocation.',
-    'QoR reported in absolute terms tells nobody anything. Reported against the <code>ARCH-06</code> allocation and trended across drops, it says which blocks are converging, which are not, and how much of the gap is still recoverable—which is the only version a program manager can act on.',
-  ],
-  steps:[
-    {n:1, text:'Reporting framework and budget ingestion', tat:1.5, lane:'main'},
-    {n:2, text:'Per-drop timing report and analysis', tat:2, lane:'main'},
-    {n:3, text:'Budget comparison and escalation rules', tat:2, lane:'par'},
-    {n:4, text:'Per-drop area and power report', tat:2, lane:'main'},
-    {n:5, text:'Trend analysis across the drop sequence', tat:2, lane:'par'},
-    {n:6, text:'Continuous reporting across the stage', tat:16.5, lane:'main'},
-  ],
-  flowNote:'Step 5 is the part that predicts. A block 10% over budget and improving is a different problem from one 5% over and flat, and only a trend across drops distinguishes them.',
-  consumes:[
-    'Synthesis results from every drop',
-    'PPA budgets from ARCH-06',
-    'Constraints from SYN-01',
-    'Power results from SYN-06',
-    'Physical-aware results from SYN-04',
-  ],
-  produces:[
-    'Reporting framework with budget ingestion',
-    'Per-drop timing, area and power report',
-    'Budget comparison per block',
-    'Escalation records',
-    'Per-drop timing, area and power reports',
-    'Trend analysis across drops',
-    'Reporting log across the stage',
-  ],
-  producedBy:[1,2,3,3,4,5,6],
-  rel:[
-    {id:'SYN-D5', rel:'produces', text:'<b>Synthesis QoR report per drop against PPA targets.</b> This activity is the deliverable, and "against targets" is what makes it usable.'},
-    {id:'SYN-D2', rel:'feeds', text:'<b>N1 and N2 netlist drops with QoR delta reports.</b> The delta report accompanying each drop comes from here.'},
-  ],
-  risks:[
-    '<b>QoR reported in absolute terms.</b> Numbers with no budget reference cannot be acted on, and everyone forms their own opinion of whether they are acceptable.',
-    '<b>No escalation rule.</b> Divergence noticed and not escalated becomes a surprise at the final turn, when there is nothing left to do about it.',
-    '<b>Reports not normalized across drops.</b> More RTL in a later drop makes the trend meaningless unless the comparison accounts for it.',
-    '<b>Power reported at nominal only.</b> The number that matters is at the product\'s operating point, and reporting at nominal understates it consistently.',
-    '<b>Reporting stopping between drops.</b> The interesting question is whether a block is improving, and that needs data between releases as well as at them.',
-  ],
-  roles:[
-    {r:'PPA reporting engineer', d:'Owns the framework and the reports'},
-    {r:'Synthesis engineers', d:'Data generation per drop'},
-    {r:'PPA lead', d:'Budget comparison and escalation decisions'},
-    {r:'Block owners', d:'Act on their block\'s divergence'},
-    {r:'Program manager', d:'Consumes trends for schedule decisions'},
-  ],
-  effort:[['Continuous reporting',4], ['Per-drop reports',2.5], ['Budget comparison',2], ['Trend analysis',1.5]],
-  entry:[
-    'PPA budgets available from ARCH-06',
-    'First synthesis results available',
-    'Reporting framework agreed with the PPA lead',
-  ],
-  exit:[
-    'Every report references the budget, not only the absolute number',
-    'Divergence escalated on a rule, not on judgment',
-    'Trends normalized so drops are comparable',
-  ],
-  dependsOn:['SYN-01','SYN-02','ARCH-06','PDK-12'],
-  dependsNote:null,
-  feedsInto:['SYN-05','SYN-08','PD-09','ARCH-06'],
-  measuredBy:[
-    'Blocks reported against budget',
-    'Escalations raised before the final turn',
-    'Trend accuracy in predicting final-turn QoR',
-  ],
-},
-
-'SYN-12': {
-  stage:'synthesis', window:[2,24], criticalPath:false,
-  purpose:[
-    'Hand each netlist to physical design as a <b>complete, accepted package</b>—netlist, constraints, UPF, DFT collateral, abstracts—and review the QoR delta together rather than throwing results over a wall.',
-    'The handoff is where two teams either share a picture of the design or maintain two. Six man-months across the stage buys a structured package and a joint review per drop, and it prevents the pattern where physical design spends a week discovering what synthesis already knew.',
-  ],
-  steps:[
-    {n:1, text:'Handoff package definition — contents and format', tat:1, lane:'main'},
-    {n:2, text:'Per-drop package assembly', tat:1.5, lane:'main'},
-    {n:3, text:'Acceptance criteria agreed with physical design', tat:1.5, lane:'par'},
-    {n:4, text:'QoR delta review with physical design per drop', tat:1.5, lane:'main'},
-    {n:5, text:'Issue tracking between drops', tat:1.5, lane:'par'},
-    {n:6, text:'Continuous handoff across the drop sequence', tat:18, lane:'main'},
-  ],
-  flowNote:'Step 3 is what makes a handoff a transaction rather than a delivery. Acceptance criteria mean physical design can reject a package that is incomplete, and rejection at handoff is far cheaper than discovering the gap three days into a turn.',
-  consumes:[
-    'Netlists from every drop',
-    'Constraints from SYN-01',
-    'UPF and low-power implementation from SYN-07',
-    'DFT collateral from DFT-06',
-    'QoR reports from SYN-11',
-  ],
-  produces:[
-    'Handoff package definition and format',
-    'Per-drop handoff package',
-    'Acceptance criteria agreed with PD',
-    'QoR delta review records',
-    'Issue tracking between drops',
-    'Assembled packages per drop',
-  ],
-  producedBy:[1,2,3,4,5,6],
-  rel:[
-    {id:'SYN-D8', rel:'produces', text:'<b>Physical design handoff package per drop.</b> This activity is the deliverable, and acceptance rather than delivery is its standard.'},
-    {id:'SYN-D2', rel:'feeds', text:'<b>N1 and N2 netlist drops with QoR delta reports.</b> The delta review is where the drop is actually transferred.'},
-  ],
-  risks:[
-    '<b>Packages delivered without acceptance.</b> Physical design discovers the gap mid-turn, and the turn absorbs the delay.',
-    '<b>QoR reviewed asynchronously.</b> A report read separately produces two interpretations, and the disagreement surfaces at the next escalation.',
-    '<b>Issues not tracked between drops.</b> Each handoff then starts fresh, and the same problems are raised at every drop.',
-    '<b>Package contents changing between drops.</b> Physical design automates against the format, and an inconsistent package breaks their flow.',
-    '<b>Handoff treated as a synthesis milestone.</b> It is a shared event; a handoff that PD has not accepted has not happened.',
-  ],
-  roles:[
-    {r:'Synthesis lead', d:'Owns the handoff and the delta review'},
-    {r:'Physical design lead', d:'Acceptance and feedback'},
-    {r:'Configuration manager', d:'Package assembly and version control'},
-    {r:'DFT engineer', d:'DFT collateral in the package'},
-    {r:'PPA lead', d:'Joint QoR interpretation'},
-  ],
-  effort:[['Continuous handoff',2.5], ['QoR delta review',1.5], ['Package assembly',1], ['Acceptance criteria',1]],
-  entry:[
-    'First netlist drop ready in SYN-03',
-    'Acceptance criteria negotiable with physical design',
-    'Package format agreed',
-  ],
-  exit:[
-    'Every package accepted rather than merely delivered',
-    'QoR reviewed jointly per drop',
-    'Issues tracked across drops rather than re-raised',
-  ],
-  dependsOn:['SYN-03','SYN-05','SYN-11'],
-  dependsNote:null,
-  feedsInto:['PD-01','PD-05','PD-06','PD-13'],
-  measuredBy:[
-    'Packages accepted at first presentation',
-    'Issues carried between drops against re-raised',
-    'Days lost to incomplete handoffs',
-  ],
-},
 
 };

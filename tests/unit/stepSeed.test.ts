@@ -3,7 +3,7 @@ import { activitySteps } from '@/data/activitySteps';
 import { BUILTIN_PROFILE, STAGE_ORDER } from '@/data/scheduleProfiles';
 import { addWeeks, computeSchedule, startOfDay } from '@/lib/schedule';
 import { fromStepIndex, plannedSteps, type ActivitySteps } from '@/lib/steps';
-import { pickStalls, seedRisks, seedStepStates, STALL_DEPTH } from '@/lib/stepSeed';
+import { finishedPrefix, pickStalls, seedRisks, seedStepStates, STALL_DEPTH } from '@/lib/stepSeed';
 import { riskSeeds } from '@/data/riskSeeds';
 import type { DetailStep } from '@/data/activityDetailTypes';
 
@@ -191,10 +191,54 @@ describe('the seeded programme, on its real schedule', () => {
       : [];
   });
 
-  it('leaves a handful of steps late, not hundreds and not none', () => {
+  /**
+   * A late step is late for one of exactly two reasons, and this says which.
+   *
+   * Either it is one of a stalled activity's last few finished steps — the ones
+   * the seed deliberately leaves open, at most `STALL_DEPTH` per stall — or its
+   * own window closed while a step before it in the same activity is still
+   * running, so it never entered the finished prefix at all. The second kind is
+   * a property of how an activity's steps overlap and the seed's knobs do not
+   * bound it.
+   *
+   * This used to be `late.length <= STALL_DEPTH * 6`, which bounded the first
+   * population and silently assumed the second was empty. It was not — it was
+   * four — and the sum fitted under twelve only for as long as the stalls
+   * happened to fall where they did. Renumbering moved which activity sits in
+   * the middle of each stage's candidate list, the stalls moved with it, and
+   * the sum came out at thirteen. Nothing about the seed changed; the old
+   * assertion was measuring a coincidence.
+   */
+  it('leaves a handful of steps late, and each for a reason', () => {
     const late = closed.filter((k) => !doneKeys.has(k));
     expect(late.length).toBeGreaterThan(0);
-    expect(late.length).toBeLessThanOrEqual(STALL_DEPTH * 6);
+
+    const stalls = pickStalls({ stages, activities, today });
+    const heldOpen = new Set(
+      stalls.flatMap((ref) => {
+        const a = activities.find((x) => x.ref === ref)!;
+        const span = schedule.stages[a.stageId];
+        return finishedPrefix(plannedSteps(span.start, a), today)
+          .slice(-STALL_DEPTH)
+          .map((s) => `${ref}:${s.n}`);
+      }),
+    );
+    expect(heldOpen.size).toBeLessThanOrEqual(STALL_DEPTH * stalls.length);
+
+    /* a step the seed stranded: closed, but sitting behind one still running */
+    const stranded = new Set(
+      activities.flatMap((a) => {
+        const span = schedule.stages[a.stageId];
+        if (!span) return [];
+        const dates = plannedSteps(span.start, a);
+        const ran = new Set(finishedPrefix(dates, today).map((s) => s.n));
+        return dates.filter((s) => s.end < today && !ran.has(s.n)).map((s) => `${a.ref}:${s.n}`);
+      }),
+    );
+
+    expect(late.filter((k) => !heldOpen.has(k) && !stranded.has(k))).toEqual([]);
+    /* and it is still a handful: a programme with a few things stuck */
+    expect(late.length).toBeLessThan(40);
   });
 
   it('spreads them across stages rather than sinking one', () => {

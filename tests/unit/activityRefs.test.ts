@@ -10,31 +10,31 @@ import { journeyData } from '@/data/journey';
 import { activityRowId } from '@/lib/rowIds';
 
 /**
- * A write-up names other activities in its prose — "PPA targets from DEF-03".
+ * A write-up names other activities in its prose — "PPA targets from DEF-05".
  * The reader wants to follow that, so the ID has to come out of the string as
  * something the page can turn into a link. The strings also carry a little
  * markup (<b>, <code>), and an ID sits inside it as often as beside it.
  */
 describe('activity references in a write-up', () => {
   it('splits an ID out of plain prose', () => {
-    expect(parseRich('PPA targets from DEF-03')).toEqual([
+    expect(parseRich('PPA targets from DEF-05')).toEqual([
       { kind: 'text', text: 'PPA targets from ' },
-      { kind: 'ref', id: 'DEF-03' },
+      { kind: 'ref', id: 'DEF-05' },
     ]);
   });
 
   it('finds every ID, not just the first', () => {
-    const nodes = parseRich('DEF-02 and ARCH-01 both feed it');
+    const nodes = parseRich('DEF-03 and ARCH-01 both feed it');
     expect(nodes.filter((n) => n.kind === 'ref')).toEqual([
-      { kind: 'ref', id: 'DEF-02' },
+      { kind: 'ref', id: 'DEF-03' },
       { kind: 'ref', id: 'ARCH-01' },
     ]);
   });
 
   it('keeps the markup and reaches the ID inside it', () => {
-    expect(parseRich('This activity defines <code>DEF-02</code>.')).toEqual([
+    expect(parseRich('This activity defines <code>DEF-03</code>.')).toEqual([
       { kind: 'text', text: 'This activity defines ' },
-      { kind: 'tag', tag: 'code', children: [{ kind: 'ref', id: 'DEF-02' }] },
+      { kind: 'tag', tag: 'code', children: [{ kind: 'ref', id: 'DEF-03' }] },
       { kind: 'text', text: '.' },
     ]);
   });
@@ -91,7 +91,7 @@ describe('which activities open a page', () => {
   it('knows the written ones and refuses everything else', () => {
     expect(writtenActivities).toHaveLength(259);
     expect(hasActivityDetail('DEF-01')).toBe(true);
-    expect(hasActivityDetail('MP-12')).toBe(true);
+    expect(hasActivityDetail('MP-11')).toBe(true);
     /* the shape of a row ID, but no row has it */
     expect(hasActivityDetail('DEF-99')).toBe(false);
     expect(hasActivityDetail('ZZZ-01')).toBe(false);
@@ -99,6 +99,10 @@ describe('which activities open a page', () => {
     expect(hasActivityDetail('DEF-D1')).toBe(false);
   });
 
+  /* Positional, not a reference: the first activity of the first stage and the
+     last of the last. Qualification runs twelve, so the tail is MP-12 whichever
+     activity currently holds that number — which is why the renumbering left
+     these two literals alone. */
   it('lists them in the order the programme runs them', () => {
     expect(writtenActivities[0]).toBe('DEF-01');
     expect(writtenActivities[writtenActivities.length - 1]).toBe('MP-12');

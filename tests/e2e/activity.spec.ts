@@ -30,11 +30,11 @@ test.describe('an activity write-up', () => {
   test('the rail links to it from the activity it is about', async ({ page }) => {
     await page.goto(`${SHELL_PATH}/stage/physicalDesign/activity`);
     await expect(page.locator('[data-act]').first()).toBeVisible();
-    await page.locator('[data-act="PD-10"]').click();
+    await page.locator('[data-act="PD-14"]').click();
 
     const rail = page.getByRole('complementary', { name: 'Details' });
-    await rail.getByRole('link', { name: /Read PD-10/ }).click();
-    await expect(page).toHaveURL(/\/activity\/PD-10$/);
+    await rail.getByRole('link', { name: /Read PD-14/ }).click();
+    await expect(page).toHaveURL(/\/activity\/PD-14$/);
     await expect(page.locator('.ad-title')).toContainText('Signal and Power Integrity');
   });
 

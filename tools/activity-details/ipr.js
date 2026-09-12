@@ -19,7 +19,7 @@ module.exports = {
   consumes:[
     'Requirement register from DEF-01',
     'Architecture sketch and block list direction from ARCH-02',
-    'Interface selections from ARCH-04',
+    'Interface selections from ARCH-03',
     'Previous-program IP list as a starting reference',
     'Foundry IP catalogue for the selected node',
   ],
@@ -63,9 +63,9 @@ module.exports = {
     'Foundry IP included alongside third-party and internal blocks',
     'Specification stubs detailed enough to evaluate a vendor against',
   ],
-  dependsOn:['DEF-01','ARCH-02','ARCH-04'],
+  dependsOn:['DEF-01','ARCH-02','ARCH-03'],
   dependsNote:null,
-  feedsInto:['IPR-02','IPR-03','IPR-04','TECH-08','PDK-04'],
+  feedsInto:['IPR-02','IPR-03','IPR-04','TECH-08','PDK-05'],
   measuredBy:[
     'IP lines traceable to a requirement',
     'Requirements with no IP against them',
@@ -133,7 +133,7 @@ module.exports = {
   ],
   dependsOn:['IPR-01','TECH-01'],
   dependsNote:null,
-  feedsInto:['IPR-03','IPR-08','ARCH-06'],
+  feedsInto:['IPR-03','IPR-08','ARCH-09'],
   measuredBy:[
     'Blocks classified as direct reuse against those later ported',
     'Collateral gaps found here against those found at integration',
@@ -145,7 +145,7 @@ module.exports = {
   stage:'ipReadiness', window:[5,10], criticalPath:true,
   purpose:[
     'Take each line of the bill and decide, with a reason, whether it is <b>made, bought or reused</b>—and record what the rejected options would have cost.',
-    'Make/buy is a schedule decision more than a cost one. Building a PHY internally is cheaper on paper and costs nine months in <code>AMS-03</code>; buying it costs a license and a vendor dependency. Neither is wrong, and the program only gets to argue about it once.',
+    'Make/buy is a schedule decision more than a cost one. Building a PHY internally is cheaper on paper and costs nine months in <code>AMS-04</code>; buying it costs a license and a vendor dependency. Neither is wrong, and the program only gets to argue about it once.',
   ],
   steps:[
     {n:1, text:'Decision criteria definition — cost, schedule, differentiation, risk', tat:0.75, lane:'main'},
@@ -161,7 +161,7 @@ module.exports = {
     'Reuse classification from IPR-02',
     'AMS capacity and schedule from the program plan',
     'Sourcing strategy direction from TECH-08',
-    'Cost model assumptions from DEF-04',
+    'Cost model assumptions from DEF-06',
   ],
   produces:[
     'Decision criteria and their weighting',
@@ -175,7 +175,7 @@ module.exports = {
   producedBy:[1,2,3,4,5,6,6],
   rel:[
     {id:'IPR-D1', rel:'produces', text:'<b>IP bill of materials with make / buy / reuse decision per block.</b> The decision half of the deliverable, with the rejected options priced rather than forgotten.'},
-    {id:'IPR-D7', rel:'feeds', text:'<b>IP risk register.</b> Every buy decision creates a vendor dependency and every make decision creates a capacity dependency; both belong on the register.'},
+    {id:'IPR-D6', rel:'feeds', text:'<b>IP risk register.</b> Every buy decision creates a vendor dependency and every make decision creates a capacity dependency; both belong on the register.'},
   ],
   risks:[
     '<b>Make decided on capability rather than capacity.</b> The team can build it; whether it can build it alongside everything else it is already committed to is the real question.',
@@ -204,7 +204,7 @@ module.exports = {
   ],
   dependsOn:['IPR-01','IPR-02','TECH-08'],
   dependsNote:null,
-  feedsInto:['IPR-04','IPR-07','IPR-08','AMS-01','AMS-03'],
+  feedsInto:['IPR-04','IPR-06','IPR-08','AMS-01','AMS-04'],
   measuredBy:[
     'Lines decided against lines in the bill',
     'Make decisions with a capacity commitment behind them',
@@ -231,8 +231,8 @@ module.exports = {
   consumes:[
     'Buy decisions from IPR-03',
     'Specification stubs from IPR-01',
-    'Node and process option from TECH-02',
-    'Interface requirements from ARCH-04',
+    'Node and process option from TECH-05',
+    'Interface requirements from ARCH-03',
     'Vendor landscape and previous-program experience',
   ],
   produces:[
@@ -247,7 +247,7 @@ module.exports = {
   producedBy:[1,2,3,4,5,6,7],
   rel:[
     {id:'IPR-D2', rel:'produces', text:'<b>Vendor evaluation matrix and selection record.</b> This activity is the deliverable, and the matrix is what a later dispute is settled against.'},
-    {id:'IPR-D5', rel:'feeds', text:'<b>Executed licences and POs.</b> Selection precedes negotiation; <code>IPR-07</code> contracts with whoever this activity chose.'},
+    {id:'IPR-D5', rel:'feeds', text:'<b>Executed licences and POs.</b> Selection precedes negotiation; <code>IPR-06</code> contracts with whoever this activity chose.'},
     {id:'IPR-D3', rel:'feeds', text:'<b>IP readiness report.</b> Vendor track record is part of an IP\'s maturity rating, not separate from it.'},
   ],
   risks:[
@@ -275,9 +275,9 @@ module.exports = {
     'Reference customers contacted for the critical blocks',
     'Selection recorded against the matrix, with support model assessed',
   ],
-  dependsOn:['IPR-01','IPR-03','ARCH-04'],
+  dependsOn:['IPR-01','IPR-03','ARCH-03'],
   dependsNote:null,
-  feedsInto:['IPR-05','IPR-06','IPR-07','AMS-03'],
+  feedsInto:['IPR-05','IPR-07','IPR-06','AMS-04'],
   measuredBy:[
     'Candidates evaluated per line',
     'Reference checks completed on critical blocks',
@@ -304,7 +304,7 @@ module.exports = {
   consumes:[
     'Vendor selections from IPR-04',
     'Reuse classification from IPR-02',
-    'Node and process option from TECH-02',
+    'Node and process option from TECH-05',
     'Vendor silicon evidence and characterization data',
     'Errata from previous programs and vendor disclosures',
   ],
@@ -320,8 +320,8 @@ module.exports = {
   producedBy:[1,2,3,4,5,6,7],
   rel:[
     {id:'IPR-D3', rel:'produces', text:'<b>IP readiness report—silicon-proven status and maturity level per IP.</b> This activity is the deliverable, and it is the one that replaces a claim with a fact.'},
-    {id:'IPR-D7', rel:'feeds', text:'<b>IP risk register.</b> Every block below the maturity bar is a risk with a name, an owner and a mitigation.'},
-    {id:'IPR-D6', rel:'feeds', text:'<b>IP delivery schedule.</b> An unproven block needs a hardening window, and the window has to be in the schedule.'},
+    {id:'IPR-D6', rel:'feeds', text:'<b>IP risk register.</b> Every block below the maturity bar is a risk with a name, an owner and a mitigation.'},
+    {id:'IPR-D7', rel:'feeds', text:'<b>IP delivery schedule.</b> An unproven block needs a hardening window, and the window has to be in the schedule.'},
   ],
   risks:[
     '<b>Vendor claim accepted at the vendor\'s definition.</b> Without an evidence standard, "silicon-proven" means whatever is most convenient.',
@@ -340,17 +340,17 @@ module.exports = {
   effort:[['Evidence assessment',2.5], ['Node and option verification',1.5], ['Errata review',1], ['Maturity assignment and report',1]],
   entry:[
     'Vendor selections available from IPR-04',
-    'Node and process option fixed by TECH-02',
+    'Node and process option fixed by TECH-05',
     'Vendor NDAs allow access to characterization data',
   ],
   exit:[
     'Every block carries a maturity level backed by evidence, not by claim',
     'Node and process option match verified per block',
-    'Findings available before licences are signed in IPR-07',
+    'Findings available before licences are signed in IPR-06',
   ],
-  dependsOn:['IPR-02','IPR-04','TECH-02'],
+  dependsOn:['IPR-02','IPR-04','TECH-05'],
   dependsNote:null,
-  feedsInto:['IPR-06','IPR-07','IPR-08','IPR-10','TC-02','RTL-03'],
+  feedsInto:['IPR-07','IPR-06','IPR-08','IPR-10','TC-02','RTL-07'],
   measuredBy:[
     'Blocks with evidence against blocks with a claim',
     'Node and option mismatches found',
@@ -359,82 +359,10 @@ module.exports = {
 },
 
 'IPR-06': {
-  stage:'ipReadiness', window:[11,18], criticalPath:false,
-  purpose:[
-    'Define <b>exactly what a complete IP delivery contains</b>—every view, model, testbench and document—and get that list agreed before it becomes a contractual obligation.',
-    'Most IP delivery disputes are not about whether the block works; they are about whether a delivery counted as a delivery. A block that arrives without multi-corner timing views or without its verification collateral has arrived in a form the program cannot integrate, and the argument that follows is unwinnable if the checklist was never agreed.',
-  ],
-  steps:[
-    {n:1, text:'Deliverable checklist definition per IP class', tat:1, lane:'main'},
-    {n:2, text:'View and model requirements against the tool matrix', tat:1.5, lane:'main'},
-    {n:3, text:'Verification collateral requirements with DV', tat:1, lane:'par'},
-    {n:4, text:'Documentation, errata and integration guide requirements', tat:1, lane:'par'},
-    {n:5, text:'Acceptance criteria and incoming inspection procedure', tat:1.5, lane:'main'},
-    {n:6, text:'Checklist agreement with each vendor', tat:2, lane:'par'},
-    {n:7, text:'Checklist publication and handoff to procurement', tat:3, lane:'main'},
-  ],
-  flowNote:'Step 5 turns the checklist into something enforceable. A list of expected files is a wish; an acceptance procedure that says what is checked, by whom, and what happens when it fails is a term.',
-  consumes:[
-    'Vendor selections from IPR-04',
-    'Tool matrix and view requirements from PDK-08',
-    'Verification methodology needs from DV-01',
-    'Integration requirements from RTL-03',
-    'Previous-program IP delivery disputes',
-  ],
-  produces:[
-    'Deliverable checklist per IP class',
-    'View and model requirement list',
-    'Verification collateral requirements',
-    'Documentation, errata and integration guide requirements',
-    'Acceptance criteria and incoming inspection procedure',
-    'Vendor-agreed checklists',
-    'Published checklist with procurement handoff',
-  ],
-  producedBy:[1,2,3,4,5,6,7],
-  rel:[
-    {id:'IPR-D4', rel:'produces', text:'<b>IP deliverable acceptance checklist.</b> This activity is the deliverable, and its value is entirely in being agreed before the PO rather than after the delivery.'},
-    {id:'IPR-D5', rel:'feeds', text:'<b>Executed licences and POs.</b> The checklist becomes a contractual schedule, which is the only form in which it is enforceable.'},
-  ],
-  risks:[
-    '<b>Checklist agreed after the PO.</b> Once the commercial terms are closed, a missing view is a favor rather than an obligation.',
-    '<b>Views specified without the tool matrix.</b> A .lib set that does not cover the signoff corners in <code>PDK-11</code> is incomplete in a way nobody notices until closure.',
-    '<b>Verification collateral omitted.</b> A block delivered without its testbench has to be verified from scratch, and that effort was never in the DV plan.',
-    '<b>No incoming inspection.</b> Deliverables accepted without a check are found incomplete weeks later, when the vendor\'s engineer has moved on.',
-    '<b>One checklist for all IP classes.</b> A memory compiler, a PHY and a controller have genuinely different deliverable sets, and a single list serves none of them.',
-  ],
-  roles:[
-    {r:'IP integration lead', d:'Owns the checklist and the acceptance procedure'},
-    {r:'CAD methodology engineer', d:'View and model requirements against the tools'},
-    {r:'Verification lead', d:'Collateral requirements and what DV will need'},
-    {r:'Procurement lead', d:'Makes the checklist a contractual schedule'},
-    {r:'Vendor technical contacts', d:'Agree the list is deliverable as written'},
-  ],
-  effort:[['Checklist and view requirements',2], ['Acceptance criteria and inspection',1.5], ['Verification collateral requirements',1], ['Vendor agreement and publication',1.5]],
-  entry:[
-    'Vendor selections made in IPR-04',
-    'Tool matrix available from PDK-08',
-    'Signoff corner intent known from PDK-11',
-  ],
-  exit:[
-    'Checklist agreed with each vendor before the PO is placed',
-    'Acceptance procedure names who checks what, and when',
-    'Views cover the signoff corners the program will actually run',
-  ],
-  dependsOn:['IPR-04','PDK-08','DV-01'],
-  dependsNote:null,
-  feedsInto:['IPR-07','IPR-09','RTL-03','PD-02'],
-  measuredBy:[
-    'Vendors with an agreed checklist before PO',
-    'Deliveries rejected at incoming inspection',
-    'Missing views discovered after acceptance',
-  ],
-},
-
-'IPR-07': {
   stage:'ipReadiness', window:[10,22], criticalPath:true,
   purpose:[
     'Turn selections into <b>executed licences and purchase orders with committed delivery dates</b>, including the deliverable checklist as a contractual schedule.',
-    'Twelve weeks for 5 M/M—this is the stage\'s longest activity and among its smallest in effort, because the elapsed time belongs to two legal departments and a procurement process. It is on the critical path regardless: nothing arrives until it executes, and <code>RTL-03</code> has integration windows that assume it did.',
+    'Twelve weeks for 5 M/M—this is the stage\'s longest activity and among its smallest in effort, because the elapsed time belongs to two legal departments and a procurement process. It is on the critical path regardless: nothing arrives until it executes, and <code>RTL-07</code> has integration windows that assume it did.',
   ],
   steps:[
     {n:1, text:'Commercial terms definition per IP line', tat:1.5, lane:'main'},
@@ -450,7 +378,7 @@ module.exports = {
   consumes:[
     'Vendor selections from IPR-04',
     'Readiness findings from IPR-05 as negotiating position',
-    'Deliverable checklists from IPR-06',
+    'Deliverable checklists from IPR-07',
     'Integration window requirements from the program schedule',
     'Corporate legal templates and positions',
   ],
@@ -468,7 +396,7 @@ module.exports = {
   producedBy:[1,2,3,4,5,6,7,8,8],
   rel:[
     {id:'IPR-D5', rel:'produces', text:'<b>Executed licences and POs with committed delivery dates.</b> This activity is the deliverable, and the committed date is the part the schedule depends on.'},
-    {id:'IPR-D6', rel:'feeds', text:'<b>IP delivery schedule.</b> Committed dates are what <code>IPR-09</code> aligns against the integration windows.'},
+    {id:'IPR-D7', rel:'feeds', text:'<b>IP delivery schedule.</b> Committed dates are what <code>IPR-09</code> aligns against the integration windows.'},
     {id:'IPR-D4', rel:'gates', text:'<b>IP deliverable acceptance checklist.</b> The checklist only has force once it is attached to an executed agreement.'},
   ],
   risks:[
@@ -489,20 +417,92 @@ module.exports = {
   entry:[
     'Vendor selections final from IPR-04',
     'Readiness findings available from IPR-05',
-    'Deliverable checklists agreed in IPR-06',
+    'Deliverable checklists agreed in IPR-07',
   ],
   exit:[
     'Every license carries a committed delivery date, not an intention',
     'Deliverable checklist attached as a contractual schedule',
     'Access distributed and tracked to the teams that need it',
   ],
-  dependsOn:['IPR-04','IPR-05','IPR-06','TECH-06'],
+  dependsOn:['IPR-04','IPR-05','IPR-07','TECH-03'],
   dependsNote:null,
-  feedsInto:['IPR-09','RTL-03','AMS-03','PD-02'],
+  feedsInto:['IPR-09','RTL-07','AMS-04','PD-02'],
   measuredBy:[
     'Licences with a committed delivery date',
     'Weeks from selection to execution',
     'Deliveries received against the committed date',
+  ],
+},
+
+'IPR-07': {
+  stage:'ipReadiness', window:[11,18], criticalPath:false,
+  purpose:[
+    'Define <b>exactly what a complete IP delivery contains</b>—every view, model, testbench and document—and get that list agreed before it becomes a contractual obligation.',
+    'Most IP delivery disputes are not about whether the block works; they are about whether a delivery counted as a delivery. A block that arrives without multi-corner timing views or without its verification collateral has arrived in a form the program cannot integrate, and the argument that follows is unwinnable if the checklist was never agreed.',
+  ],
+  steps:[
+    {n:1, text:'Deliverable checklist definition per IP class', tat:1, lane:'main'},
+    {n:2, text:'View and model requirements against the tool matrix', tat:1.5, lane:'main'},
+    {n:3, text:'Verification collateral requirements with DV', tat:1, lane:'par'},
+    {n:4, text:'Documentation, errata and integration guide requirements', tat:1, lane:'par'},
+    {n:5, text:'Acceptance criteria and incoming inspection procedure', tat:1.5, lane:'main'},
+    {n:6, text:'Checklist agreement with each vendor', tat:2, lane:'par'},
+    {n:7, text:'Checklist publication and handoff to procurement', tat:3, lane:'main'},
+  ],
+  flowNote:'Step 5 turns the checklist into something enforceable. A list of expected files is a wish; an acceptance procedure that says what is checked, by whom, and what happens when it fails is a term.',
+  consumes:[
+    'Vendor selections from IPR-04',
+    'Tool matrix and view requirements from PDK-07',
+    'Verification methodology needs from DV-01',
+    'Integration requirements from RTL-07',
+    'Previous-program IP delivery disputes',
+  ],
+  produces:[
+    'Deliverable checklist per IP class',
+    'View and model requirement list',
+    'Verification collateral requirements',
+    'Documentation, errata and integration guide requirements',
+    'Acceptance criteria and incoming inspection procedure',
+    'Vendor-agreed checklists',
+    'Published checklist with procurement handoff',
+  ],
+  producedBy:[1,2,3,4,5,6,7],
+  rel:[
+    {id:'IPR-D4', rel:'produces', text:'<b>IP deliverable acceptance checklist.</b> This activity is the deliverable, and its value is entirely in being agreed before the PO rather than after the delivery.'},
+    {id:'IPR-D5', rel:'feeds', text:'<b>Executed licences and POs.</b> The checklist becomes a contractual schedule, which is the only form in which it is enforceable.'},
+  ],
+  risks:[
+    '<b>Checklist agreed after the PO.</b> Once the commercial terms are closed, a missing view is a favor rather than an obligation.',
+    '<b>Views specified without the tool matrix.</b> A .lib set that does not cover the signoff corners in <code>PDK-12</code> is incomplete in a way nobody notices until closure.',
+    '<b>Verification collateral omitted.</b> A block delivered without its testbench has to be verified from scratch, and that effort was never in the DV plan.',
+    '<b>No incoming inspection.</b> Deliverables accepted without a check are found incomplete weeks later, when the vendor\'s engineer has moved on.',
+    '<b>One checklist for all IP classes.</b> A memory compiler, a PHY and a controller have genuinely different deliverable sets, and a single list serves none of them.',
+  ],
+  roles:[
+    {r:'IP integration lead', d:'Owns the checklist and the acceptance procedure'},
+    {r:'CAD methodology engineer', d:'View and model requirements against the tools'},
+    {r:'Verification lead', d:'Collateral requirements and what DV will need'},
+    {r:'Procurement lead', d:'Makes the checklist a contractual schedule'},
+    {r:'Vendor technical contacts', d:'Agree the list is deliverable as written'},
+  ],
+  effort:[['Checklist and view requirements',2], ['Acceptance criteria and inspection',1.5], ['Verification collateral requirements',1], ['Vendor agreement and publication',1.5]],
+  entry:[
+    'Vendor selections made in IPR-04',
+    'Tool matrix available from PDK-07',
+    'Signoff corner intent known from PDK-12',
+  ],
+  exit:[
+    'Checklist agreed with each vendor before the PO is placed',
+    'Acceptance procedure names who checks what, and when',
+    'Views cover the signoff corners the program will actually run',
+  ],
+  dependsOn:['IPR-04','PDK-07','DV-01'],
+  dependsNote:null,
+  feedsInto:['IPR-06','IPR-09','RTL-07','PD-02'],
+  measuredBy:[
+    'Vendors with an agreed checklist before PO',
+    'Deliveries rejected at incoming inspection',
+    'Missing views discovered after acceptance',
   ],
 },
 
@@ -520,7 +520,7 @@ module.exports = {
     {n:5, text:'Dependency mapping against the integration windows', tat:0.75, lane:'par'},
     {n:6, text:'Hardening plan with owners and dates', tat:1.75, lane:'main'},
   ],
-  flowNote:'Step 3 decides who absorbs the risk. Vendor-executed hardening is on a schedule the program cannot influence; internally executed hardening competes with <code>AMS-03</code> for the same analog engineers. Both are real answers and neither is free.',
+  flowNote:'Step 3 decides who absorbs the risk. Vendor-executed hardening is on a schedule the program cannot influence; internally executed hardening competes with <code>AMS-04</code> for the same analog engineers. Both are real answers and neither is free.',
   consumes:[
     'Readiness report and gap list from IPR-05',
     'Reuse classification from IPR-02',
@@ -539,7 +539,7 @@ module.exports = {
   producedBy:[1,2,3,4,5,6],
   rel:[
     {id:'IPR-D3', rel:'feeds', text:'<b>IP readiness report.</b> A block\'s maturity level is only actionable alongside the plan that raises it, and this activity supplies the plan.'},
-    {id:'IPR-D6', rel:'feeds', text:'<b>IP delivery schedule.</b> A hardening window is part of the delivery date, and omitting it produces a schedule that cannot hold.'},
+    {id:'IPR-D7', rel:'feeds', text:'<b>IP delivery schedule.</b> A hardening window is part of the delivery date, and omitting it produces a schedule that cannot hold.'},
   ],
   risks:[
     '<b>Hardening treated as vendor overhead.</b> It is a project with a duration; leaving it off the plan means the block arrives on a date nobody derived.',
@@ -568,7 +568,7 @@ module.exports = {
   ],
   dependsOn:['IPR-02','IPR-03','IPR-05'],
   dependsNote:null,
-  feedsInto:['IPR-09','IPR-10','AMS-03','DV-02'],
+  feedsInto:['IPR-09','IPR-10','AMS-04','DV-02'],
   measuredBy:[
     'Unproven blocks with a dated plan',
     'Internal hardening committed against AMS capacity',
@@ -580,7 +580,7 @@ module.exports = {
   stage:'ipReadiness', window:[17,21], criticalPath:true,
   purpose:[
     'Line up <b>every IP delivery date against the window that actually needs it</b>—RTL integration, synthesis, floorplan—and surface the mismatches while they can still be fixed.',
-    'An IP schedule is only meaningful against the design schedule. A PHY delivered in week 40 is early for RTL and late for the floorplan, because <code>PD-02</code> needs the abstract long before <code>RTL-03</code> needs the model. Alignment means matching each deliverable to the window that consumes it, not the block to a date.',
+    'An IP schedule is only meaningful against the design schedule. A PHY delivered in week 40 is early for RTL and late for the floorplan, because <code>PD-02</code> needs the abstract long before <code>RTL-07</code> needs the model. Alignment means matching each deliverable to the window that consumes it, not the block to a date.',
   ],
   steps:[
     {n:1, text:'Integration window extraction — what each stage needs and when', tat:0.75, lane:'main'},
@@ -592,11 +592,11 @@ module.exports = {
   ],
   flowNote:'Step 3 is where the useful detail lives. Vendors quote one date for a block; the design needs the LEF abstract for floorplan months before it needs the multi-corner .lib for signoff, and asking for the abstract early is often free.',
   consumes:[
-    'Committed delivery dates from IPR-07',
+    'Committed delivery dates from IPR-06',
     'Hardening plan from IPR-08',
     'RTL integration windows from the program schedule',
     'Floorplan and macro placement needs from PD planning',
-    'Deliverable checklist from IPR-06',
+    'Deliverable checklist from IPR-07',
   ],
   produces:[
     'Integration window map per consuming stage',
@@ -608,8 +608,8 @@ module.exports = {
   ],
   producedBy:[1,2,3,4,5,6],
   rel:[
-    {id:'IPR-D6', rel:'produces', text:'<b>IP delivery schedule folded into the program plan.</b> This activity is the deliverable, and "folded in" is the operative part—a separate IP schedule is one nobody tracks.'},
-    {id:'IPR-D7', rel:'feeds', text:'<b>IP risk register.</b> Every mismatch that cannot be closed becomes a tracked risk with a mitigation.'},
+    {id:'IPR-D7', rel:'produces', text:'<b>IP delivery schedule folded into the program plan.</b> This activity is the deliverable, and "folded in" is the operative part—a separate IP schedule is one nobody tracks.'},
+    {id:'IPR-D6', rel:'feeds', text:'<b>IP risk register.</b> Every mismatch that cannot be closed becomes a tracked risk with a mitigation.'},
   ],
   risks:[
     '<b>Block-level dates instead of deliverable-level.</b> One date per block hides that the abstract is needed months before the model, and the earlier need is the binding one.',
@@ -627,7 +627,7 @@ module.exports = {
   ],
   effort:[['Deliverable-level alignment',0.75], ['Window extraction and date collection',0.5], ['Mismatch identification',0.5], ['Schedule integration',0.25]],
   entry:[
-    'Committed dates available from IPR-07',
+    'Committed dates available from IPR-06',
     'Hardening plan available from IPR-08',
     'Integration windows known from the program schedule',
   ],
@@ -636,9 +636,9 @@ module.exports = {
     'Every mismatch has an owner and an escalation path',
     'IP schedule visible inside the program plan, not beside it',
   ],
-  dependsOn:['IPR-06','IPR-07','IPR-08','DEF-08'],
+  dependsOn:['IPR-07','IPR-06','IPR-08','DEF-08'],
   dependsNote:null,
-  feedsInto:['RTL-03','RTL-09','PD-02','PD-04'],
+  feedsInto:['RTL-07','RTL-02','PD-02','PD-04'],
   measuredBy:[
     'Deliverables aligned to a consuming window',
     'Mismatches closed against those raised',
@@ -676,7 +676,7 @@ module.exports = {
   ],
   producedBy:[1,2,3,4,5],
   rel:[
-    {id:'IPR-D7', rel:'produces', text:'<b>IP risk register and contingency plan.</b> This activity is the deliverable, and the triggers are what make it a plan rather than a list.'},
+    {id:'IPR-D6', rel:'produces', text:'<b>IP risk register and contingency plan.</b> This activity is the deliverable, and the triggers are what make it a plan rather than a list.'},
     {id:'IPR-D3', rel:'feeds', text:'<b>IP readiness report.</b> Maturity and risk are read together—a mature block from a fragile vendor is not a low-risk line.'},
   ],
   risks:[
@@ -706,7 +706,7 @@ module.exports = {
   ],
   dependsOn:['IPR-05','IPR-08','IPR-09','TECH-08'],
   dependsNote:null,
-  feedsInto:['RTL-10','DEF-09','AMS-01'],
+  feedsInto:['RTL-03','DEF-09','AMS-01'],
   measuredBy:[
     'Critical dependencies with a triggered contingency',
     'Register reviews held against those planned',
