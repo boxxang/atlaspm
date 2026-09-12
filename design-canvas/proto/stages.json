@@ -226,7 +226,7 @@
  },
  "fabrication": {
   "tagline": "Hundreds of steps, weeks of patience.",
-  "description": "Masks are cut and wafers are processed. The program has almost no levers here — only hot-lot priority, WIP visibility and an honest wafer-out forecast. Eighteen weeks from FEOL MTO to wafer out: seven for an EUV mask set, eleven for a hot-lot cycle.",
+  "description": "Masks are cut and wafers are processed. The program has almost no levers here — only hot-lot priority, WIP visibility and an honest wafer-out forecast. Twenty weeks from FEOL MTO to wafer out: seven for an EUV mask set, twelve for a hot-lot cycle.",
   "tools": [
    "Foundry WIP tracking",
    "Process monitoring",

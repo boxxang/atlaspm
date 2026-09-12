@@ -22858,8 +22858,8 @@
     "DFT-08": {
       "stage": "dft",
       "window": [
-        14,
-        24
+        26,
+        36
       ],
       "criticalPath": true,
       "purpose": [
@@ -22872,56 +22872,56 @@
           "text": "Scan insertion setup and configuration",
           "tat": 1.5,
           "lane": "main",
-          "startWeek": 14,
-          "endWeek": 15.5
+          "startWeek": 26,
+          "endWeek": 27.5
         },
         {
           "n": 2,
           "text": "Scan chain insertion and stitching",
           "tat": 2,
           "lane": "main",
-          "startWeek": 15.5,
-          "endWeek": 17.5
+          "startWeek": 27.5,
+          "endWeek": 29.5
         },
         {
           "n": 3,
           "text": "Compression logic insertion",
           "tat": 1.5,
           "lane": "par",
-          "startWeek": 15.5,
-          "endWeek": 17
+          "startWeek": 27.5,
+          "endWeek": 29
         },
         {
           "n": 4,
           "text": "Test point insertion for coverage improvement",
           "tat": 1.5,
           "lane": "par",
-          "startWeek": 17,
-          "endWeek": 18.5
+          "startWeek": 29,
+          "endWeek": 30.5
         },
         {
           "n": 5,
           "text": "DFT DRC analysis and violation closure",
           "tat": 3,
           "lane": "main",
-          "startWeek": 17.5,
-          "endWeek": 20.5
+          "startWeek": 29.5,
+          "endWeek": 32.5
         },
         {
           "n": 6,
           "text": "Scan chain integrity verification",
           "tat": 1.5,
           "lane": "par",
-          "startWeek": 17.5,
-          "endWeek": 19
+          "startWeek": 29.5,
+          "endWeek": 31
         },
         {
           "n": 7,
           "text": "Insertion signoff and netlist handoff",
           "tat": 3.5,
           "lane": "main",
-          "startWeek": 20.5,
-          "endWeek": 24
+          "startWeek": 32.5,
+          "endWeek": 36
         }
       ],
       "flowNote": "Step 5 is the substance. Every DFT DRC violation is a region of logic ATPG cannot control or observe, and the coverage loss is silent—the tool simply reports a lower number without saying which violation caused it.",
@@ -23048,8 +23048,8 @@
         "Chain length imbalance against budget"
       ],
       "absWindow": [
-        32,
-        42
+        44,
+        54
       ],
       "links": {
         "dependsOn": [
@@ -23058,7 +23058,8 @@
           "RTL-10",
           "DFT-01",
           "DFT-05",
-          "DFT-06"
+          "DFT-06",
+          "SYN-01"
         ],
         "feedsInto": [
           "DV-12",
@@ -23070,9 +23071,7 @@
           "TEST-06"
         ],
         "runsWith": [],
-        "revisedBy": [
-          "SYN-01"
-        ],
+        "revisedBy": [],
         "feedsBackInto": []
       },
       "terms": [
@@ -23087,8 +23086,8 @@
     "DFT-09": {
       "stage": "dft",
       "window": [
-        16,
-        26
+        34,
+        44
       ],
       "criticalPath": false,
       "purpose": [
@@ -23101,48 +23100,48 @@
           "text": "Chain routing feasibility analysis with the floorplan",
           "tat": 1.5,
           "lane": "main",
-          "startWeek": 16,
-          "endWeek": 17.5
+          "startWeek": 34,
+          "endWeek": 35.5
         },
         {
           "n": 2,
           "text": "Compression network topology against physical partitioning",
           "tat": 2,
           "lane": "main",
-          "startWeek": 17.5,
-          "endWeek": 19.5
+          "startWeek": 35.5,
+          "endWeek": 37.5
         },
         {
           "n": 3,
           "text": "Chain ordering and reordering strategy",
           "tat": 1.5,
           "lane": "par",
-          "startWeek": 17.5,
-          "endWeek": 19
+          "startWeek": 35.5,
+          "endWeek": 37
         },
         {
           "n": 4,
           "text": "Congestion impact assessment",
           "tat": 1.5,
           "lane": "par",
-          "startWeek": 19,
-          "endWeek": 20.5
+          "startWeek": 37,
+          "endWeek": 38.5
         },
         {
           "n": 5,
           "text": "Test clock distribution feasibility",
           "tat": 1.5,
           "lane": "par",
-          "startWeek": 20.5,
-          "endWeek": 22
+          "startWeek": 38.5,
+          "endWeek": 40
         },
         {
           "n": 6,
           "text": "Physical DFT plan agreement with physical design",
           "tat": 6.5,
           "lane": "main",
-          "startWeek": 19.5,
-          "endWeek": 26
+          "startWeek": 37.5,
+          "endWeek": 44
         }
       ],
       "flowNote": "Step 3 is where the two disciplines usually collide. DFT wants chains ordered for balance and diagnosis; physical design wants them ordered for routing. Reordering after placement is the standard compromise, and agreeing it here avoids arguing about it during closure.",
@@ -23259,13 +23258,15 @@
         "Feasibility findings raised before routing starts"
       ],
       "absWindow": [
-        34,
-        44
+        52,
+        62
       ],
       "links": {
         "dependsOn": [
           "DFT-01",
-          "DFT-08"
+          "DFT-08",
+          "PD-01",
+          "PD-02"
         ],
         "feedsInto": [
           "DFT-10",
@@ -23273,10 +23274,7 @@
           "PD-13"
         ],
         "runsWith": [],
-        "revisedBy": [
-          "PD-01",
-          "PD-02"
-        ],
+        "revisedBy": [],
         "feedsBackInto": []
       },
       "terms": [
@@ -23287,8 +23285,8 @@
     "DFT-10": {
       "stage": "dft",
       "window": [
-        22,
-        38
+        38,
+        54
       ],
       "criticalPath": true,
       "purpose": [
@@ -23301,64 +23299,64 @@
           "text": "ATPG setup, constraints and test mode configuration",
           "tat": 2,
           "lane": "main",
-          "startWeek": 22,
-          "endWeek": 24
+          "startWeek": 38,
+          "endWeek": 40
         },
         {
           "n": 2,
           "text": "Stuck-at pattern generation and coverage analysis",
           "tat": 3,
           "lane": "main",
-          "startWeek": 24,
-          "endWeek": 27
+          "startWeek": 40,
+          "endWeek": 43
         },
         {
           "n": 3,
           "text": "Transition and at-speed pattern generation",
           "tat": 3.5,
           "lane": "main",
-          "startWeek": 27,
-          "endWeek": 30.5
+          "startWeek": 43,
+          "endWeek": 46.5
         },
         {
           "n": 4,
           "text": "Cell-aware pattern generation",
           "tat": 2.5,
           "lane": "par",
-          "startWeek": 27,
-          "endWeek": 29.5
+          "startWeek": 43,
+          "endWeek": 45.5
         },
         {
           "n": 5,
           "text": "Untestable fault analysis and coverage justification",
           "tat": 2.5,
           "lane": "par",
-          "startWeek": 29.5,
-          "endWeek": 32
+          "startWeek": 45.5,
+          "endWeek": 48
         },
         {
           "n": 6,
           "text": "Pattern volume reduction and compaction",
           "tat": 3,
           "lane": "main",
-          "startWeek": 30.5,
-          "endWeek": 33.5
+          "startWeek": 46.5,
+          "endWeek": 49.5
         },
         {
           "n": 7,
           "text": "Coverage closure against the DFT-02 targets",
           "tat": 2,
           "lane": "par",
-          "startWeek": 30.5,
-          "endWeek": 32.5
+          "startWeek": 46.5,
+          "endWeek": 48.5
         },
         {
           "n": 8,
           "text": "Pattern set assembly and release",
           "tat": 4.5,
           "lane": "main",
-          "startWeek": 33.5,
-          "endWeek": 38
+          "startWeek": 49.5,
+          "endWeek": 54
         }
       ],
       "flowNote": "Step 5 is what makes a coverage number honest. Faults reported as untestable are either genuinely untestable—tied off, redundant—or untestable because of a DRC violation, and only analysis distinguishes a real limit from a fixable one.",
@@ -23481,15 +23479,17 @@
         "Untestable faults analyzed against accepted"
       ],
       "absWindow": [
-        40,
-        56
+        56,
+        72
       ],
       "links": {
         "dependsOn": [
           "DFT-02",
           "DFT-06",
           "DFT-08",
-          "DFT-09"
+          "DFT-09",
+          "PD-13",
+          "TEST-03"
         ],
         "feedsInto": [
           "DFT-11",
@@ -23499,10 +23499,7 @@
           "MP-07"
         ],
         "runsWith": [],
-        "revisedBy": [
-          "PD-13",
-          "TEST-03"
-        ],
+        "revisedBy": [],
         "feedsBackInto": []
       },
       "terms": [
@@ -23516,8 +23513,8 @@
     "DFT-11": {
       "stage": "dft",
       "window": [
-        28,
-        38
+        50,
+        60
       ],
       "criticalPath": true,
       "purpose": [
@@ -23530,56 +23527,56 @@
           "text": "Pattern simulation environment setup",
           "tat": 1.5,
           "lane": "main",
-          "startWeek": 28,
-          "endWeek": 29.5
+          "startWeek": 50,
+          "endWeek": 51.5
         },
         {
           "n": 2,
           "text": "Zero-delay pattern validation by gate-level simulation",
           "tat": 2,
           "lane": "main",
-          "startWeek": 29.5,
-          "endWeek": 31.5
+          "startWeek": 51.5,
+          "endWeek": 53.5
         },
         {
           "n": 3,
           "text": "Timing-annotated pattern simulation",
           "tat": 2,
           "lane": "par",
-          "startWeek": 29.5,
-          "endWeek": 31.5
+          "startWeek": 51.5,
+          "endWeek": 53.5
         },
         {
           "n": 4,
           "text": "Pattern failure debug and regeneration",
           "tat": 2.5,
           "lane": "main",
-          "startWeek": 31.5,
-          "endWeek": 34
+          "startWeek": 53.5,
+          "endWeek": 56
         },
         {
           "n": 5,
           "text": "STIL and WGL format conversion",
           "tat": 1.5,
           "lane": "par",
-          "startWeek": 31.5,
-          "endWeek": 33
+          "startWeek": 53.5,
+          "endWeek": 55
         },
         {
           "n": 6,
           "text": "Tester format and timing set validation",
           "tat": 1.5,
           "lane": "par",
-          "startWeek": 33,
-          "endWeek": 34.5
+          "startWeek": 55,
+          "endWeek": 56.5
         },
         {
           "n": 7,
           "text": "Pattern release and DFT tapeout signoff",
           "tat": 4,
           "lane": "main",
-          "startWeek": 34,
-          "endWeek": 38
+          "startWeek": 56,
+          "endWeek": 60
         }
       ],
       "flowNote": "Step 3 catches what zero-delay cannot: patterns that violate timing at the capture edge. On an at-speed pattern set this is not a formality—a launch-capture sequence that closes in ATPG and fails in timing simulation would have produced yield loss on good die.",
@@ -23700,8 +23697,8 @@
         "Regeneration cycles required"
       ],
       "absWindow": [
-        46,
-        56
+        68,
+        78
       ],
       "links": {
         "dependsOn": [
@@ -23931,6 +23928,7 @@
         ],
         "feedsInto": [
           "DV-12",
+          "DFT-08",
           "SYN-02",
           "SYN-03",
           "SYN-05",
@@ -23941,9 +23939,7 @@
         ],
         "runsWith": [],
         "revisedBy": [],
-        "feedsBackInto": [
-          "DFT-08"
-        ]
+        "feedsBackInto": []
       },
       "terms": [
         "RTL",
@@ -26413,6 +26409,7 @@
           "SYN-05"
         ],
         "feedsInto": [
+          "DFT-09",
           "SYN-08",
           "PD-02",
           "PD-05"
@@ -26420,8 +26417,7 @@
         "runsWith": [],
         "revisedBy": [],
         "feedsBackInto": [
-          "PDK-10",
-          "DFT-09"
+          "PDK-10"
         ]
       },
       "terms": [
@@ -26637,6 +26633,7 @@
           "PD-01"
         ],
         "feedsInto": [
+          "DFT-09",
           "SYN-07",
           "PD-03",
           "PD-04",
@@ -26647,9 +26644,7 @@
         ],
         "runsWith": [],
         "revisedBy": [],
-        "feedsBackInto": [
-          "DFT-09"
-        ]
+        "feedsBackInto": []
       },
       "terms": [
         "PDN"
@@ -29096,14 +29091,13 @@
           "PD-08"
         ],
         "feedsInto": [
+          "DFT-10",
           "PD-15",
           "SO-04"
         ],
         "runsWith": [],
         "revisedBy": [],
-        "feedsBackInto": [
-          "DFT-10"
-        ]
+        "feedsBackInto": []
       },
       "terms": [
         "DRC",
@@ -34354,8 +34348,8 @@
         "Days between defect detection and disposition"
       ],
       "absWindow": [
-        80,
-        87
+        82,
+        89
       ],
       "links": {
         "dependsOn": [
@@ -34551,8 +34545,8 @@
         "Cycle time against the hot-lot plan"
       ],
       "absWindow": [
-        81,
-        99
+        83,
+        101
       ],
       "links": {
         "dependsOn": [
@@ -34742,8 +34736,8 @@
         "Layers requiring remake"
       ],
       "absWindow": [
-        84,
-        90
+        86,
+        92
       ],
       "links": {
         "dependsOn": [
@@ -34939,8 +34933,8 @@
         "Critical steps monitored against those selected"
       ],
       "absWindow": [
-        85,
-        99
+        87,
+        101
       ],
       "links": {
         "dependsOn": [
@@ -35101,8 +35095,8 @@
         "Splits included against those planned"
       ],
       "absWindow": [
-        87,
-        88
+        89,
+        90
       ],
       "links": {
         "dependsOn": [
@@ -35296,8 +35290,8 @@
         "Wafers surviving front-end processing"
       ],
       "absWindow": [
-        87,
-        95
+        89,
+        97
       ],
       "links": {
         "dependsOn": [
@@ -35485,8 +35479,8 @@
         "Back-end defect density"
       ],
       "absWindow": [
-        94,
-        99
+        96,
+        101
       ],
       "links": {
         "dependsOn": [
@@ -35658,8 +35652,8 @@
         "Days before part delivery that findings were available"
       ],
       "absWindow": [
-        95,
-        98
+        97,
+        100
       ],
       "links": {
         "dependsOn": [
@@ -35835,8 +35829,8 @@
         "Wafers accepted against wafers completed"
       ],
       "absWindow": [
-        96,
-        99
+        98,
+        101
       ],
       "links": {
         "dependsOn": [
@@ -36000,8 +35994,8 @@
         "Destination readiness at arrival"
       ],
       "absWindow": [
-        97,
-        99
+        99,
+        101
       ],
       "links": {
         "dependsOn": [
@@ -47929,6 +47923,7 @@
           "TEST-06"
         ],
         "feedsInto": [
+          "DFT-10",
           "MP-07",
           "MP-10"
         ],
@@ -47937,8 +47932,7 @@
           "TEST-07"
         ],
         "feedsBackInto": [
-          "DEF-02",
-          "DFT-10"
+          "DEF-02"
         ]
       },
       "terms": [
@@ -56066,11 +56060,11 @@
     {
       "from": "FAB-10",
       "to": "TEST-06",
-      "uS": 97,
-      "uE": 99,
+      "uS": 99,
+      "uE": 101,
       "vS": 70,
       "vE": 86,
-      "gap": 11
+      "gap": 13
     },
     {
       "from": "PD-04",
@@ -56091,39 +56085,12 @@
       "gap": 10
     },
     {
-      "from": "PD-02",
-      "to": "DFT-09",
-      "uS": 51,
-      "uE": 60,
-      "vS": 34,
-      "vE": 44,
-      "gap": 7
-    },
-    {
       "from": "AMS-16",
       "to": "RTL-07",
       "uS": 50,
       "uE": 58,
       "vS": 28,
       "vE": 44,
-      "gap": 6
-    },
-    {
-      "from": "TEST-03",
-      "to": "DFT-10",
-      "uS": 62,
-      "uE": 71,
-      "vS": 40,
-      "vE": 56,
-      "gap": 6
-    },
-    {
-      "from": "PD-13",
-      "to": "DFT-10",
-      "uS": 62,
-      "uE": 68,
-      "vS": 40,
-      "vE": 56,
       "gap": 6
     },
     {
@@ -56215,15 +56182,6 @@
       "vS": 62,
       "vE": 71,
       "gap": 3
-    },
-    {
-      "from": "PD-01",
-      "to": "DFT-09",
-      "uS": 46,
-      "uE": 53,
-      "vS": 34,
-      "vE": 44,
-      "gap": 2
     },
     {
       "from": "PKGD-06",
@@ -56322,15 +56280,6 @@
       "uE": 62,
       "vS": 40,
       "vE": 56,
-      "gap": 0
-    },
-    {
-      "from": "SYN-01",
-      "to": "DFT-08",
-      "uS": 42,
-      "uE": 50,
-      "vS": 32,
-      "vE": 42,
       "gap": 0
     },
     {

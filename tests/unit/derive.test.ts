@@ -114,11 +114,14 @@ describe('project seed', () => {
 });
 
 describe('(e) progress derivation', () => {
+  /* Three fewer than before: the DFT pattern deliverables moved out to the
+     weeks the activities that produce them actually close, which is past the
+     point the seed counts as settled. */
   it('is done deliverables over total, program-wide', () => {
     const all = Object.values(seed.deliverables).flat();
     expect(all).toHaveLength(167);
-    expect(all.filter((d) => d.done)).toHaveLength(87);
-    expect(progressPct(seed.deliverables)).toBe(52);
+    expect(all.filter((d) => d.done)).toHaveLength(84);
+    expect(progressPct(seed.deliverables)).toBe(50);
   });
 
   it('reports per-stage counters', () => {
@@ -184,13 +187,17 @@ describe('open risks', () => {
 });
 
 describe('schedule position', () => {
-  it('has nine stages in flight today, physical design among them', () => {
+  /* DFT joined this list when its stage stopped ending at week 58. ATPG now
+     closes against the final netlist rather than nine weeks before it, so the
+     stage runs to 78 and is genuinely still in flight here. */
+  it('has ten stages in flight today, physical design among them', () => {
     const live = inFlightStageIds(schedule, TODAY);
     expect(live).toContain('physicalDesign');
     /* stages overlap by design, and the enablement and package workstreams run
        alongside implementation — a single "current stage" is not a thing */
     expect(live).toEqual([
       'verification',
+      'dft',
       'synthesis',
       'physicalDesign',
       'signoff',
@@ -220,6 +227,9 @@ describe('schedule position', () => {
       'pdDatabaseHandoff',
       'packageDesignFreeze',
       'coVerificationSignoff',
+      /* between the co-verification signoff and the design freeze now: the
+         patterns close on the netlist they will actually run against */
+      'dftSignoff',
       'designFreeze',
       'tapeoutBeolMto',
       'assemblyWindowFreeze',

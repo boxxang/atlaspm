@@ -569,7 +569,7 @@ export const journeyData = [
     engineeringStart: [0, 2, 6, 8, 10, 18, 24, 30, 16, 12, 14],
     /* Which activity produces each deliverable, and the week it is due. */
     deliverableFrom: [0, 2, 3, 5, 6, 7, 7],
-    deliverableWeek: [8, 16, 16, 28, 40, 40, 40],
+    deliverableWeek: [8, 16, 16, 36, 54, 60, 60],
     risks: ["Coverage target miss", "Pattern volume", "Debug access gaps"],
     potentialRisks: [
       "Coverage and test-time targets never agreed with product engineering",
@@ -829,7 +829,7 @@ export const journeyData = [
   {
     id: "fabrication", stage: 15, title: "Fabrication", shortTitle: "FAB",
     tagline: "Hundreds of steps, weeks of patience.",
-    description: "Masks are cut and wafers are processed. The program has almost no levers here — only hot-lot priority, WIP visibility and an honest wafer-out forecast. Eighteen weeks from FEOL MTO to wafer out: seven for an EUV mask set, eleven for a hot-lot cycle.",
+    description: "Masks are cut and wafers are processed. The program has almost no levers here — only hot-lot priority, WIP visibility and an honest wafer-out forecast. Twenty weeks from FEOL MTO to wafer out: seven for an EUV mask set, twelve for a hot-lot cycle.",
     activities: ["Mask fabrication", "Wafer processing", "Process monitoring", "Wafer acceptance"],
     /* Listed in the order this stage's plan produces them. */
     deliverables: [

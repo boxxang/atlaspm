@@ -5,7 +5,7 @@
   {
    "week": 76,
    "name": "package material gate",
-   "rule": "package design frozen and tooling released before interposer and substrate lots are started — they take longer than the die"
+   "rule": "package design frozen and tooling released before interposer and substrate lots are started \u2014 they take longer than the die"
   },
   {
    "week": 78,
@@ -13,7 +13,7 @@
    "rule": "signoff closed + SIPI co-verification signed off before any mask data is released"
   },
   {
-   "week": 99,
+   "week": 101,
    "name": "wafer-out gate",
    "rule": "PTV package validation complete before product wafers leave the fab"
   }
@@ -27,7 +27,7 @@
   {
    "id": "enable",
    "label": "Technology & IP Enablement",
-   "note": "Everything that must exist before design can start — the layer the current template is missing"
+   "note": "Everything that must exist before design can start \u2014 the layer the current template is missing"
   },
   {
    "id": "design",
@@ -60,63 +60,63 @@
    "label": "Architecture freeze",
    "week": 24,
    "months": 5.5,
-   "reportedRange": "mo 4 – 7",
-   "basis": "Workload modeling and partitioning for a new accelerator architecture. Was month 2.5 — that is a derivative’s schedule, not a new one’s."
+   "reportedRange": "mo 4 \u2013 7",
+   "basis": "Workload modeling and partitioning for a new accelerator architecture. Was month 2.5 \u2014 that is a derivative\u2019s schedule, not a new one\u2019s."
   },
   {
    "label": "RTL freeze",
    "week": 52,
    "months": 12,
-   "reportedRange": "mo 10 – 15",
-   "basis": "Large accelerator RTL runs 8 – 10 months of block work plus integration. Was 15 weeks."
+   "reportedRange": "mo 10 \u2013 15",
+   "basis": "Large accelerator RTL runs 8 \u2013 10 months of block work plus integration. Was 15 weeks."
   },
   {
    "label": "DV closure",
    "week": 66,
    "months": 15.2,
-   "reportedRange": "mo 13 – 18",
-   "basis": "Verification is the longest pre-silicon activity and closes 2 – 3 months before tapeout. Was 18 weeks."
+   "reportedRange": "mo 13 \u2013 18",
+   "basis": "Verification is the longest pre-silicon activity and closes 2 \u2013 3 months before tapeout. Was 18 weeks."
   },
   {
    "label": "Design freeze / signoff complete",
    "week": 78,
    "months": 18,
-   "reportedRange": "mo 16 – 22",
+   "reportedRange": "mo 16 \u2013 22",
    "basis": "Three PD turns plus a final FFN turn, then multi-corner signoff with a rehearsed dry run."
   },
   {
    "label": "FEOL mask tapeout",
    "week": 80,
    "months": 18.4,
-   "reportedRange": "—",
+   "reportedRange": "\u2014",
    "basis": "Front-end data out first; the BEOL fix window opens here."
   },
   {
-   "label": "First silicon — wafer out",
+   "label": "First silicon \u2014 wafer out",
    "week": 99,
    "months": 22.8,
-   "reportedRange": "mo 20 – 26",
-   "basis": "FEOL MTO to wafer out is 19 weeks: 7 weeks for an EUV mask set plus a 12-week hot-lot fab cycle at 4 nm, against a 14 – 16 week standard cycle. Was week 98 — the stage began in week 79, one week before TO-06 releases the FEOL data to the mask shop."
+   "reportedRange": "mo 20 \u2013 26",
+   "basis": "FEOL MTO to wafer out is 19 weeks: 7 weeks for an EUV mask set plus a 12-week hot-lot fab cycle at 4 nm, against a 14 \u2013 16 week standard cycle. Was week 98 \u2014 the stage began in week 79, one week before TO-06 releases the FEOL data to the mask shop."
   },
   {
    "label": "Assembled units available",
    "week": 105,
    "months": 24.2,
-   "reportedRange": "mo 23 – 28",
-   "basis": "Sort, known-good-die selection and 2.5D assembly. Interposer supply, not the die, sets this date — which is why the interposer and substrate build now starts at the design freeze in week 76 rather than appearing at die attach. Lid and ball attach close in week 106, which is where bring-up starts."
+   "reportedRange": "mo 23 \u2013 28",
+   "basis": "Sort, known-good-die selection and 2.5D assembly. Interposer supply, not the die, sets this date \u2014 which is why the interposer and substrate build now starts at the design freeze in week 76 rather than appearing at die attach. Lid and ball attach close in week 106, which is where bring-up starts."
   },
   {
    "label": "Bring-up complete",
    "week": 124,
    "months": 28.5,
-   "reportedRange": "mo 25 – 31",
-   "basis": "Power-on to characterized silicon with an errata list and a respin decision on the record. Was week 120 — bring-up began in week 102, receiving samples three weeks before die attach finished."
+   "reportedRange": "mo 25 \u2013 31",
+   "basis": "Power-on to characterized silicon with an errata list and a respin decision on the record. Was week 120 \u2014 bring-up began in week 102, receiving samples three weeks before die attach finished."
   },
   {
    "label": "Mass production release",
    "week": 136,
    "months": 31.3,
-   "reportedRange": "mo 28 – 36",
+   "reportedRange": "mo 28 \u2013 36",
    "basis": "Reliability qualification alone is 1000 hours of HTOL plus package qual; yield learning runs alongside."
   }
  ],
@@ -132,7 +132,7 @@
    "isNew": false,
    "description": "Fix what the product must achieve and the technical, cost and schedule boundaries the program will be held to. Nothing downstream is negotiable if this is vague.",
    "note": null,
-   "revisionNote": "IP strategy and technology node selection move out to IPR and TECH — this stage keeps requirements, PPA and the business case. Window 0–4 → 0–8: two months is the floor for a new product, not four weeks.",
+   "revisionNote": "IP strategy and technology node selection move out to IPR and TECH \u2014 this stage keeps requirements, PPA and the business case. Window 0\u20134 \u2192 0\u20138: two months is the floor for a new product, not four weeks.",
    "milestone": null,
    "marks": [],
    "manMonths": 28,
@@ -167,7 +167,7 @@
     },
     {
      "id": "DEF-05",
-     "text": "PPA target definition — max frequency, power, die area",
+     "text": "PPA target definition \u2014 max frequency, power, die area",
      "tatWeeks": 4,
      "manMonths": 3,
      "continuous": false
@@ -208,7 +208,7 @@
     },
     {
      "id": "DEF-D2",
-     "title": "Target specification — PPA and KPI table"
+     "title": "Target specification \u2014 PPA and KPI table"
     },
     {
      "id": "DEF-D3",
@@ -237,9 +237,9 @@
    "endWeek": 24,
    "durationWeeks": 18,
    "isNew": false,
-   "description": "Turn requirements into a system architecture and make the decisions — partitioning, memory hierarchy, interfaces, power — that every downstream team inherits.",
+   "description": "Turn requirements into a system architecture and make the decisions \u2014 partitioning, memory hierarchy, interfaces, power \u2014 that every downstream team inherits.",
    "note": null,
-   "revisionNote": "Window 3–11 → 6–24. Architecture freeze at month 5.5 rather than month 2.5: workload modeling for a new accelerator architecture is a four-to-five month activity on its own. IP make/buy leaves for IPR; safety/security architecture and DVFS strategy added.",
+   "revisionNote": "Window 3\u201311 \u2192 6\u201324. Architecture freeze at month 5.5 rather than month 2.5: workload modeling for a new accelerator architecture is a four-to-five month activity on its own. IP make/buy leaves for IPR; safety/security architecture and DVFS strategy added.",
    "milestone": "Arch Freeze",
    "marks": [],
    "manMonths": 111,
@@ -274,7 +274,7 @@
     },
     {
      "id": "ARCH-05",
-     "text": "Security and safety architecture — secure boot, root of trust, fusing",
+     "text": "Security and safety architecture \u2014 secure boot, root of trust, fusing",
      "tatWeeks": 6,
      "manMonths": 7,
      "continuous": false
@@ -356,7 +356,7 @@
    "durationWeeks": 14,
    "isNew": true,
    "description": "Choose the foundry, the node and the process flavor, and convert that choice into signed commercial and capacity commitments. Everything in IP, PDK and library land is downstream of this decision.",
-   "note": "<b>New.</b> Today this exists as one activity line inside Product Definition — \"technology node selection\" — with no schedule, no deliverable and no capacity commitment behind it. Low effort, long TAT: most of the elapsed time is the foundry’s, not yours.",
+   "note": "<b>New.</b> Today this exists as one activity line inside Product Definition \u2014 \"technology node selection\" \u2014 with no schedule, no deliverable and no capacity commitment behind it. Low effort, long TAT: most of the elapsed time is the foundry\u2019s, not yours.",
    "revisionNote": null,
    "milestone": null,
    "marks": [],
@@ -378,7 +378,7 @@
     },
     {
      "id": "TECH-03",
-     "text": "Foundry legal engagement — NDA, design agreement, IP licensing frame",
+     "text": "Foundry legal engagement \u2014 NDA, design agreement, IP licensing frame",
      "tatWeeks": 8,
      "manMonths": 2,
      "continuous": false
@@ -441,7 +441,7 @@
     },
     {
      "id": "TECH-D4",
-     "title": "Node risk assessment — maturity, defect density, yield learning curve"
+     "title": "Node risk assessment \u2014 maturity, defect density, yield learning curve"
     },
     {
      "id": "TECH-D5",
@@ -462,8 +462,8 @@
    "endWeek": 44,
    "durationWeeks": 36,
    "isNew": true,
-   "description": "Get the design kit, the libraries, the tools and the signoff conditions to a state the program can actually build on — and keep tracking them as the foundry releases new versions underneath you.",
-   "note": "<b>New.</b> Today this appears only as a risk line in Logic Synthesis: \"library / PDK version mismatches across teams\". A 0.5-to-1.0 PDK delta that reopens timing is a schedule event, not a warning. This stage also owns the <b>memory instance decision gate</b> — if compiler instances miss the block PPA budget, the custom-array path opens here and executes in AMS.",
+   "description": "Get the design kit, the libraries, the tools and the signoff conditions to a state the program can actually build on \u2014 and keep tracking them as the foundry releases new versions underneath you.",
+   "note": "<b>New.</b> Today this appears only as a risk line in Logic Synthesis: \"library / PDK version mismatches across teams\". A 0.5-to-1.0 PDK delta that reopens timing is a schedule event, not a warning. This stage also owns the <b>memory instance decision gate</b> \u2014 if compiler instances miss the block PPA budget, the custom-array path opens here and executes in AMS.",
    "revisionNote": null,
    "milestone": "PDK 1.0 Release",
    "marks": [],
@@ -471,7 +471,7 @@
    "activities": [
     {
      "id": "PDK-01",
-     "text": "PDK version roadmap tracking (0.1 → 0.5 → 1.0 → production) and delta impact analysis",
+     "text": "PDK version roadmap tracking (0.1 \u2192 0.5 \u2192 1.0 \u2192 production) and delta impact analysis",
      "tatWeeks": 34,
      "manMonths": 14,
      "continuous": true
@@ -513,7 +513,7 @@
     },
     {
      "id": "PDK-07",
-     "text": "EDA tool version qualification for the node — synthesis, P&R, STA, PV, EM/IR",
+     "text": "EDA tool version qualification for the node \u2014 synthesis, P&R, STA, PV, EM/IR",
      "tatWeeks": 10,
      "manMonths": 12,
      "continuous": false
@@ -527,7 +527,7 @@
     },
     {
      "id": "PDK-09",
-     "text": "Compiler instance PPA characterization against block budgets — density, Vmin, access time, leakage",
+     "text": "Compiler instance PPA characterization against block budgets \u2014 density, Vmin, access time, leakage",
      "tatWeeks": 6,
      "manMonths": 7,
      "continuous": false
@@ -564,7 +564,7 @@
    "deliverables": [
     {
      "id": "PDK-D1",
-     "title": "PDK readiness dashboard — version, release date, open gap list"
+     "title": "PDK readiness dashboard \u2014 version, release date, open gap list"
     },
     {
      "id": "PDK-D2",
@@ -605,7 +605,7 @@
    "endWeek": 26,
    "durationWeeks": 22,
    "isNew": true,
-   "description": "Decompose the product into the IP it needs, decide make / buy / reuse for each, and prove that every bought or reused block is actually available and silicon-proven on the selected process option — before anyone schedules integration around it.",
+   "description": "Decompose the product into the IP it needs, decide make / buy / reuse for each, and prove that every bought or reused block is actually available and silicon-proven on the selected process option \u2014 before anyone schedules integration around it.",
    "note": "<b>New.</b> Today this is a risk line in RTL Development: \"third-party IP delivery dates unconfirmed\". IP acquisition is a workstream with lead times, not a risk to watch. Licence negotiation dominates the TAT and almost none of the effort.",
    "revisionNote": null,
    "milestone": "IP Plan Freeze",
@@ -614,14 +614,14 @@
    "activities": [
     {
      "id": "IPR-01",
-     "text": "Product requirement → IP requirement decomposition (IP bill of materials)",
+     "text": "Product requirement \u2192 IP requirement decomposition (IP bill of materials)",
      "tatWeeks": 5,
      "manMonths": 5,
      "continuous": false
     },
     {
      "id": "IPR-02",
-     "text": "Reuse inventory audit — internal IP already available on the target node",
+     "text": "Reuse inventory audit \u2014 internal IP already available on the target node",
      "tatWeeks": 4,
      "manMonths": 3,
      "continuous": false
@@ -694,7 +694,7 @@
     },
     {
      "id": "IPR-D3",
-     "title": "IP readiness report — silicon-proven status and maturity level per IP"
+     "title": "IP readiness report \u2014 silicon-proven status and maturity level per IP"
     },
     {
      "id": "IPR-D4",
@@ -723,8 +723,8 @@
    "endWeek": 60,
    "durationWeeks": 42,
    "isNew": true,
-   "description": "Build the analog, custom and memory blocks that no vendor and no compiler is delivering — PLLs, SerDes and PHYs, regulators, custom SRAM arrays — through schematic, layout, post-layout characterization and hardening into usable macros.",
-   "note": "<b>New.</b> Analog appears today only as a collaborator name. When an IP has to be developed rather than bought, it is a multi-quarter mini-program on the tapeout critical path. The <b>custom SRAM path</b> opens only when PDK-11 shows compiler instances missing the block PPA budget — its abstract views must land before PD floorplan at week 53, even if final characterization trails to week 60.",
+   "description": "Build the analog, custom and memory blocks that no vendor and no compiler is delivering \u2014 PLLs, SerDes and PHYs, regulators, custom SRAM arrays \u2014 through schematic, layout, post-layout characterization and hardening into usable macros.",
+   "note": "<b>New.</b> Analog appears today only as a collaborator name. When an IP has to be developed rather than bought, it is a multi-quarter mini-program on the tapeout critical path. The <b>custom SRAM path</b> opens only when PDK-11 shows compiler instances missing the block PPA budget \u2014 its abstract views must land before PD floorplan at week 53, even if final characterization trails to week 60.",
    "revisionNote": null,
    "milestone": "AMS Macro Handoff",
    "marks": [],
@@ -739,7 +739,7 @@
     },
     {
      "id": "AMS-02",
-     "text": "Custom SRAM instance architecture — bitcell selection, array organization, sense amp and replica timing",
+     "text": "Custom SRAM instance architecture \u2014 bitcell selection, array organization, sense amp and replica timing",
      "tatWeeks": 10,
      "manMonths": 14,
      "continuous": false
@@ -774,7 +774,7 @@
     },
     {
      "id": "AMS-07",
-     "text": "Read / write assist circuit design for Vmin — WL boost, negative bitline, VDD collapse",
+     "text": "Read / write assist circuit design for Vmin \u2014 WL boost, negative bitline, VDD collapse",
      "tatWeeks": 10,
      "manMonths": 12,
      "continuous": false
@@ -795,7 +795,7 @@
     },
     {
      "id": "AMS-10",
-     "text": "Statistical margin and yield analysis — importance sampling, sigma-Vmin, bitcell variation",
+     "text": "Statistical margin and yield analysis \u2014 importance sampling, sigma-Vmin, bitcell variation",
      "tatWeeks": 10,
      "manMonths": 12,
      "continuous": false
@@ -816,7 +816,7 @@
     },
     {
      "id": "AMS-13",
-     "text": "AMS–digital co-simulation and integration support",
+     "text": "AMS\u2013digital co-simulation and integration support",
      "tatWeeks": 16,
      "manMonths": 12,
      "continuous": true
@@ -830,7 +830,7 @@
     },
     {
      "id": "AMS-15",
-     "text": "Reliability checks — EM/IR, aging, ESD, latch-up",
+     "text": "Reliability checks \u2014 EM/IR, aging, ESD, latch-up",
      "tatWeeks": 10,
      "manMonths": 10,
      "continuous": false
@@ -858,7 +858,7 @@
     },
     {
      "id": "AMS-D4",
-     "title": "Reliability report — EM/IR, ESD, latch-up, aging"
+     "title": "Reliability report \u2014 EM/IR, ESD, latch-up, aging"
     },
     {
      "id": "AMS-D5",
@@ -887,7 +887,7 @@
    "endWeek": 62,
    "durationWeeks": 40,
    "isNew": true,
-   "description": "De-risk the parts of the design that cannot be trusted to simulation — new IP, new process, marginal circuits — on a small shuttle vehicle whose silicon comes back in time to change the production design.",
+   "description": "De-risk the parts of the design that cannot be trusted to simulation \u2014 new IP, new process, marginal circuits \u2014 on a small shuttle vehicle whose silicon comes back in time to change the production design.",
    "note": "<b>New, optional.</b> Programs on a mature node with proven IP can drop this stage. Programs with new SerDes or a new node generally cannot. The shuttle fab window is sixteen weeks of waiting and almost no effort.",
    "revisionNote": null,
    "milestone": "Test Chip Silicon",
@@ -945,7 +945,7 @@
     },
     {
      "id": "TC-08",
-     "text": "Feedback into the production design — model correction and margin decisions",
+     "text": "Feedback into the production design \u2014 model correction and margin decisions",
      "tatWeeks": 6,
      "manMonths": 8,
      "continuous": false
@@ -985,7 +985,7 @@
    "isNew": false,
    "description": "Implement the architecture in synthesisable logic, integrate the IP that IPR and AMS deliver, and hold the design under change control until freeze.",
    "note": null,
-   "revisionNote": "Window 9–24 → 20–52. Fifteen weeks of RTL for a large accelerator was not a schedule; block work alone is 8 – 10 months. Renamed from \"IP & RTL Development\" — IP acquisition moves to IPR. Register map generation and spec change control made explicit.",
+   "revisionNote": "Window 9\u201324 \u2192 20\u201352. Fifteen weeks of RTL for a large accelerator was not a schedule; block work alone is 8 \u2013 10 months. Renamed from \"IP & RTL Development\" \u2014 IP acquisition moves to IPR. Register map generation and spec change control made explicit.",
    "milestone": "RTL Freeze",
    "marks": [],
    "manMonths": 410,
@@ -1034,7 +1034,7 @@
     },
     {
      "id": "RTL-07",
-     "text": "Third-party and internal IP integration — wrappers, glue, configuration",
+     "text": "Third-party and internal IP integration \u2014 wrappers, glue, configuration",
      "tatWeeks": 16,
      "manMonths": 45,
      "continuous": false
@@ -1101,9 +1101,9 @@
    "endWeek": 66,
    "durationWeeks": 40,
    "isNew": false,
-   "description": "Build the evidence that the design does what the specification says, across block, chip and system level — the longest and most schedule-critical pre-silicon activity, and the largest single line of effort in the program.",
+   "description": "Build the evidence that the design does what the specification says, across block, chip and system level \u2014 the longest and most schedule-critical pre-silicon activity, and the largest single line of effort in the program.",
    "note": null,
-   "revisionNote": "Window 12–30 → 26–66. Verification closing eighteen weeks after it started was the least credible number in the previous draft; it closes 2 – 3 months before tapeout, not before RTL is written. Emulation and FPGA prototyping made an explicit activity; low-power and performance validation added.",
+   "revisionNote": "Window 12\u201330 \u2192 26\u201366. Verification closing eighteen weeks after it started was the least credible number in the previous draft; it closes 2 \u2013 3 months before tapeout, not before RTL is written. Emulation and FPGA prototyping made an explicit activity; low-power and performance validation added.",
    "milestone": "DV Closure",
    "marks": [],
    "manMonths": 650,
@@ -1124,7 +1124,7 @@
     },
     {
      "id": "DV-03",
-     "text": "Emulation and FPGA prototype bring-up — capacity, partitioning, speed",
+     "text": "Emulation and FPGA prototype bring-up \u2014 capacity, partitioning, speed",
      "tatWeeks": 20,
      "manMonths": 55,
      "continuous": false
@@ -1145,7 +1145,7 @@
     },
     {
      "id": "DV-06",
-     "text": "Formal property verification — control logic, connectivity, security",
+     "text": "Formal property verification \u2014 control logic, connectivity, security",
      "tatWeeks": 16,
      "manMonths": 40,
      "continuous": false
@@ -1234,19 +1234,19 @@
    "name": "DFT Architecture",
    "band": "design",
    "startOffsetWeeks": 18,
-   "endWeek": 58,
-   "durationWeeks": 40,
+   "endWeek": 78,
+   "durationWeeks": 60,
    "isNew": true,
-   "description": "Decide how the chip will be tested before it can be built to be testable — scan and compression, memory BIST and repair, JTAG and debug access — then produce and validate the patterns the tester will run.",
+   "description": "Decide how the chip will be tested before it can be built to be testable \u2014 scan and compression, memory BIST and repair, JTAG and debug access \u2014 then produce and validate the patterns the tester will run.",
    "note": "<b>New.</b> Today DFT is one activity line inside Logic Synthesis (\"DFT insertion\"). The architecture is decided at ARCH time and the pattern work runs past synthesis; missing coverage targets is found far too late when it lives inside SYN.",
    "revisionNote": null,
-   "milestone": "DFT Architecture Freeze",
+   "milestone": "DFT Signoff",
    "marks": [],
    "manMonths": 130,
    "activities": [
     {
      "id": "DFT-01",
-     "text": "DFT architecture definition — scan style, compression ratio, hierarchical DFT",
+     "text": "DFT architecture definition \u2014 scan style, compression ratio, hierarchical DFT",
      "tatWeeks": 8,
      "manMonths": 12,
      "continuous": false
@@ -1267,7 +1267,7 @@
     },
     {
      "id": "DFT-04",
-     "text": "Silicon debug hooks — trace, observability, design-for-debug",
+     "text": "Silicon debug hooks \u2014 trace, observability, design-for-debug",
      "tatWeeks": 8,
      "manMonths": 10,
      "continuous": false
@@ -1309,7 +1309,7 @@
     },
     {
      "id": "DFT-10",
-     "text": "ATPG pattern generation — stuck-at, transition, cell-aware — and coverage closure",
+     "text": "ATPG pattern generation \u2014 stuck-at, transition, cell-aware \u2014 and coverage closure",
      "tatWeeks": 16,
      "manMonths": 28,
      "continuous": false
@@ -1362,9 +1362,9 @@
    "endWeek": 66,
    "durationWeeks": 24,
    "isNew": false,
-   "description": "Map verified RTL onto the qualified library under real constraints — and issue it as a sequence of netlists rather than one handover. The first drop exists so physical design can build its flow; the last one, the FFN, is the only netlist the final turn is allowed to see.",
+   "description": "Map verified RTL onto the qualified library under real constraints \u2014 and issue it as a sequence of netlists rather than one handover. The first drop exists so physical design can build its flow; the last one, the FFN, is the only netlist the final turn is allowed to see.",
    "note": null,
-   "revisionNote": "Restructured around how netlists actually arrive, and moved 22–28 → 42–66. Synthesis does not hand over once: N0 is a flow-flush netlist released for PD flow setup, N1 and N2 are quality turns against PD feedback, and the FFN is the final release. DFT insertion moved to the DFT stage.",
+   "revisionNote": "Restructured around how netlists actually arrive, and moved 22\u201328 \u2192 42\u201366. Synthesis does not hand over once: N0 is a flow-flush netlist released for PD flow setup, N1 and N2 are quality turns against PD feedback, and the FFN is the final release. DFT insertion moved to the DFT stage.",
    "milestone": "FFN Release",
    "marks": [],
    "manMonths": 136,
@@ -1378,7 +1378,7 @@
     },
     {
      "id": "SYN-02",
-     "text": "Technology mapping and optimization — multi-Vt, multi-bit, useful skew",
+     "text": "Technology mapping and optimization \u2014 multi-Vt, multi-bit, useful skew",
      "tatWeeks": 8,
      "manMonths": 16,
      "continuous": false
@@ -1399,7 +1399,7 @@
     },
     {
      "id": "SYN-05",
-     "text": "N0 flow-flush netlist release — functionally incomplete, structurally representative, issued so PD can build the flow",
+     "text": "N0 flow-flush netlist release \u2014 functionally incomplete, structurally representative, issued so PD can build the flow",
      "tatWeeks": 4,
      "manMonths": 6,
      "continuous": false
@@ -1420,35 +1420,35 @@
     },
     {
      "id": "SYN-08",
-     "text": "N1 netlist drop — first quality turn against PD placement and congestion feedback",
+     "text": "N1 netlist drop \u2014 first quality turn against PD placement and congestion feedback",
      "tatWeeks": 5,
      "manMonths": 12,
      "continuous": false
     },
     {
      "id": "SYN-09",
-     "text": "Power optimization — clock gating, operand isolation, Vt mix",
+     "text": "Power optimization \u2014 clock gating, operand isolation, Vt mix",
      "tatWeeks": 7,
      "manMonths": 12,
      "continuous": false
     },
     {
      "id": "SYN-10",
-     "text": "Low-power synthesis — isolation and level-shifter insertion against UPF",
+     "text": "Low-power synthesis \u2014 isolation and level-shifter insertion against UPF",
      "tatWeeks": 5,
      "manMonths": 8,
      "continuous": false
     },
     {
      "id": "SYN-11",
-     "text": "N2 netlist drop — timing and congestion converged, late RTL changes absorbed",
+     "text": "N2 netlist drop \u2014 timing and congestion converged, late RTL changes absorbed",
      "tatWeeks": 5,
      "manMonths": 12,
      "continuous": false
     },
     {
      "id": "SYN-12",
-     "text": "FFN (final full netlist) release — RTL frozen, ECOs closed, no functional change beyond this point",
+     "text": "FFN (final full netlist) release \u2014 RTL frozen, ECOs closed, no functional change beyond this point",
      "tatWeeks": 4,
      "manMonths": 10,
      "continuous": false
@@ -1485,7 +1485,7 @@
     },
     {
      "id": "SYN-D8",
-     "title": "FFN — final full netlist, release-tagged"
+     "title": "FFN \u2014 final full netlist, release-tagged"
     }
    ]
   },
@@ -1498,16 +1498,16 @@
    "endWeek": 76,
    "durationWeeks": 30,
    "isNew": false,
-   "description": "Make the netlist physically real — floorplan, power grid, placement, clock trees, routing — across a sequence of turns whose quality climbs with each netlist drop, then close the design on the final turn against the FFN.",
+   "description": "Make the netlist physically real \u2014 floorplan, power grid, placement, clock trees, routing \u2014 across a sequence of turns whose quality climbs with each netlist drop, then close the design on the final turn against the FFN.",
    "note": null,
-   "revisionNote": "Restructured around the netlist drop cadence and moved 26–40 → 46–76: flow setup on the N0 flow-flush netlist, two quality turns on N1 and N2, then the final turn on the FFN. Bump / RDL planning and chip power model extraction added as explicit handoffs.",
+   "revisionNote": "Restructured around the netlist drop cadence and moved 26\u201340 \u2192 46\u201376: flow setup on the N0 flow-flush netlist, two quality turns on N1 and N2, then the final turn on the FFN. Bump / RDL planning and chip power model extraction added as explicit handoffs.",
    "milestone": null,
    "marks": [],
    "manMonths": 449,
    "activities": [
     {
      "id": "PD-01",
-     "text": "Flow setup and MMMC environment build on the N0 flow-flush netlist — scripts, decks, runtimes, capacity",
+     "text": "Flow setup and MMMC environment build on the N0 flow-flush netlist \u2014 scripts, decks, runtimes, capacity",
      "tatWeeks": 7,
      "manMonths": 22,
      "continuous": false
@@ -1535,7 +1535,7 @@
     },
     {
      "id": "PD-05",
-     "text": "Turn 1 on the N1 drop — placement, CTS and first full route; QoR baseline established",
+     "text": "Turn 1 on the N1 drop \u2014 placement, CTS and first full route; QoR baseline established",
      "tatWeeks": 8,
      "manMonths": 45,
      "continuous": false
@@ -1577,7 +1577,7 @@
     },
     {
      "id": "PD-11",
-     "text": "Turn 2 on the N2 drop — congestion, timing and power convergence; closure risk quantified",
+     "text": "Turn 2 on the N2 drop \u2014 congestion, timing and power convergence; closure risk quantified",
      "tatWeeks": 8,
      "manMonths": 45,
      "continuous": false
@@ -1598,21 +1598,21 @@
     },
     {
      "id": "PD-14",
-     "text": "Signal and power integrity iteration — crosstalk, EM",
+     "text": "Signal and power integrity iteration \u2014 crosstalk, EM",
      "tatWeeks": 10,
      "manMonths": 18,
      "continuous": false
     },
     {
      "id": "PD-15",
-     "text": "Final turn on the FFN — full closure, no functional change admitted",
+     "text": "Final turn on the FFN \u2014 full closure, no functional change admitted",
      "tatWeeks": 11,
      "manMonths": 55,
      "continuous": false
     },
     {
      "id": "PD-16",
-     "text": "Chip finishing — seal ring, dummy and metal fill, alignment marks",
+     "text": "Chip finishing \u2014 seal ring, dummy and metal fill, alignment marks",
      "tatWeeks": 5,
      "manMonths": 6,
      "continuous": false
@@ -1621,7 +1621,7 @@
    "deliverables": [
     {
      "id": "PD-D1",
-     "title": "Flow setup release — MMMC environment, scripts and runtime baseline"
+     "title": "Flow setup release \u2014 MMMC environment, scripts and runtime baseline"
     },
     {
      "id": "PD-D2",
@@ -1668,14 +1668,14 @@
    "isNew": false,
    "description": "Prove the final implementation holds across every electrical, timing, reliability and manufacturing check the foundry and the product demand, and dispose of every waiver on the record. The decks are rehearsed on an intermediate turn so the final turn is not the first time the flow runs at full chip.",
    "note": null,
-   "revisionNote": "Window 37–44 → 62–78. Signoff dry runs on the Turn 2 database added — decks, runtimes and violation triage are rehearsed before the FFN turn arrives. DFM / lithography and reliability (ESD, latch-up, FIT) added; the chip-package co-verification result (SIPI) now enters signoff as its own review.",
+   "revisionNote": "Window 37\u201344 \u2192 62\u201378. Signoff dry runs on the Turn 2 database added \u2014 decks, runtimes and violation triage are rehearsed before the FFN turn arrives. DFM / lithography and reliability (ESD, latch-up, FIT) added; the chip-package co-verification result (SIPI) now enters signoff as its own review.",
    "milestone": "Design Freeze",
    "marks": [],
    "manMonths": 159,
    "activities": [
     {
      "id": "SO-01",
-     "text": "Signoff flow dry run on the Turn 2 database — decks, runtimes, capacity and violation triage rehearsed",
+     "text": "Signoff flow dry run on the Turn 2 database \u2014 decks, runtimes, capacity and violation triage rehearsed",
      "tatWeeks": 6,
      "manMonths": 14,
      "continuous": false
@@ -1710,7 +1710,7 @@
     },
     {
      "id": "SO-06",
-     "text": "Reliability verification — ESD, latch-up, soft error / FIT",
+     "text": "Reliability verification \u2014 ESD, latch-up, soft error / FIT",
      "tatWeeks": 6,
      "manMonths": 10,
      "continuous": false
@@ -1724,7 +1724,7 @@
     },
     {
      "id": "SO-08",
-     "text": "Power and signal integrity signoff — crosstalk, noise",
+     "text": "Power and signal integrity signoff \u2014 crosstalk, noise",
      "tatWeeks": 6,
      "manMonths": 12,
      "continuous": false
@@ -1765,7 +1765,7 @@
     },
     {
      "id": "SO-D2",
-     "title": "Reliability reports — ESD, latch-up, FIT"
+     "title": "Reliability reports \u2014 ESD, latch-up, FIT"
     },
     {
      "id": "SO-D3",
@@ -1798,7 +1798,7 @@
    "endWeek": 86,
    "durationWeeks": 8,
    "isNew": false,
-   "description": "Release the design to mask in two steps. Front-end layers go out first and the mask shop starts cutting them; back-end layers follow about a month later. That gap is not slack — it is the last window in which a metal-layer fix can still be made without touching the front-end mask set.",
+   "description": "Release the design to mask in two steps. Front-end layers go out first and the mask shop starts cutting them; back-end layers follow about a month later. That gap is not slack \u2014 it is the last window in which a metal-layer fix can still be made without touching the front-end mask set.",
    "note": null,
    "revisionNote": "Split into FEOL and BEOL mask tapeout. Previously a single one-week moment; now an eight-week release sequence with a deliberate four-week BEOL design fix window between the two MTOs.",
    "milestone": "Tapeout (BEOL MTO)",
@@ -1858,7 +1858,7 @@
     },
     {
      "id": "TO-07",
-     "text": "BEOL design fix window — metal-layer ECOs and late fixes while FEOL masks are being cut",
+     "text": "BEOL design fix window \u2014 metal-layer ECOs and late fixes while FEOL masks are being cut",
      "tatWeeks": 4,
      "manMonths": 10,
      "continuous": false
@@ -1872,7 +1872,7 @@
     },
     {
      "id": "TO-09",
-     "text": "BEOL layer re-verification — DRC, LVS, antenna and density on the fixed metal stack",
+     "text": "BEOL layer re-verification \u2014 DRC, LVS, antenna and density on the fixed metal stack",
      "tatWeeks": 2.5,
      "manMonths": 6,
      "continuous": false
@@ -1932,13 +1932,13 @@
    "code": "FAB",
    "name": "Fabrication",
    "band": "manufacture",
-   "startOffsetWeeks": 80,
-   "endWeek": 99,
+   "startOffsetWeeks": 82,
+   "endWeek": 101,
    "durationWeeks": 19,
    "isNew": false,
-   "description": "Masks are cut and wafers are processed. The program has almost no levers here — only hot-lot priority, WIP visibility and an honest wafer-out forecast. Eighteen weeks from FEOL MTO to wafer out: seven for an EUV mask set, eleven for a hot-lot cycle.",
+   "description": "Masks are cut and wafers are processed. The program has almost no levers here \u2014 only hot-lot priority, WIP visibility and an honest wafer-out forecast. Twenty weeks from FEOL MTO to wafer out: seven for an EUV mask set, twelve for a hot-lot cycle.",
    "note": null,
-   "revisionNote": "Split to follow the two mask releases: wafer start is gated on FEOL mask availability, and the BEOL masks are cut while front-end processing is already running. Wafer-out is gated on PTV closing package validation — wafers must not arrive at an unqualified assembly process.",
+   "revisionNote": "Split to follow the two mask releases: wafer start is gated on FEOL mask availability, and the BEOL masks are cut while front-end processing is already running. Wafer-out is gated on PTV closing package validation \u2014 wafers must not arrive at an unqualified assembly process.",
    "milestone": "First Silicon",
    "marks": [],
    "manMonths": 30,
@@ -2050,8 +2050,8 @@
    "endWeek": 76,
    "durationWeeks": 52,
    "isNew": true,
-   "description": "Design the package the die will live in — interposer, substrate, bump map, thermal and mechanical solution — on a schedule driven by substrate lead time rather than by the die.",
-   "note": "<b>New, split out of Advanced Packaging.</b> Package design runs in parallel with physical design and feeds the bump map into it. Leaving it beside assembly is what makes substrate lead time a surprise. Electrical closure is owned by SIPI and physical validation by PTV — this stage designs, those two verify.",
+   "description": "Design the package the die will live in \u2014 interposer, substrate, bump map, thermal and mechanical solution \u2014 on a schedule driven by substrate lead time rather than by the die.",
+   "note": "<b>New, split out of Advanced Packaging.</b> Package design runs in parallel with physical design and feeds the bump map into it. Leaving it beside assembly is what makes substrate lead time a surprise. Electrical closure is owned by SIPI and physical validation by PTV \u2014 this stage designs, those two verify.",
    "revisionNote": null,
    "milestone": "Package Design Freeze",
    "marks": [],
@@ -2059,7 +2059,7 @@
    "activities": [
     {
      "id": "PKGD-01",
-     "text": "Package architecture selection — 2.5D interposer type, organic substrate, layer count",
+     "text": "Package architecture selection \u2014 2.5D interposer type, organic substrate, layer count",
      "tatWeeks": 8,
      "manMonths": 10,
      "continuous": false
@@ -2094,7 +2094,7 @@
     },
     {
      "id": "PKGD-06",
-     "text": "Thermal and mechanical simulation — warpage, co-planarity, TIM, lid",
+     "text": "Thermal and mechanical simulation \u2014 warpage, co-planarity, TIM, lid",
      "tatWeeks": 12,
      "manMonths": 12,
      "continuous": false
@@ -2115,7 +2115,7 @@
     },
     {
      "id": "PKGD-09",
-     "text": "Package routing for signal integrity — length matching, reference plane and via design",
+     "text": "Package routing for signal integrity \u2014 length matching, reference plane and via design",
      "tatWeeks": 10,
      "manMonths": 12,
      "continuous": false
@@ -2184,7 +2184,7 @@
    "durationWeeks": 52,
    "isNew": true,
    "description": "Prove the package before the product die exists. Mechanical, thermal and daisy-chain vehicles carry the chip-package interaction, warpage and thermal risk, so the first real assembly is not the first experiment.",
-   "note": "<b>New.</b> Package validation must close <b>before product wafer-out</b> — the vehicles have to be designed, built and stressed while the die is still in the fab. This stage closes at week 88, ten weeks ahead of wafer-out at week 98. Today none of this exists in the template.",
+   "note": "<b>New.</b> Package validation must close <b>before product wafer-out</b> \u2014 the vehicles have to be designed, built and stressed while the die is still in the fab. This stage closes at week 88, ten weeks ahead of wafer-out at week 98. Today none of this exists in the template.",
    "revisionNote": null,
    "milestone": "Package Validation Complete",
    "marks": [],
@@ -2192,28 +2192,28 @@
    "activities": [
     {
      "id": "PTV-01",
-     "text": "Test vehicle strategy and risk item definition — CPI, warpage, thermal, ULK/BEOL stress",
+     "text": "Test vehicle strategy and risk item definition \u2014 CPI, warpage, thermal, ULK/BEOL stress",
      "tatWeeks": 6,
      "manMonths": 5,
      "continuous": false
     },
     {
      "id": "PTV-02",
-     "text": "Mechanical test vehicle (MTV) design — bump array, dummy die stack, substrate coupon",
+     "text": "Mechanical test vehicle (MTV) design \u2014 bump array, dummy die stack, substrate coupon",
      "tatWeeks": 9,
      "manMonths": 8,
      "continuous": false
     },
     {
      "id": "PTV-03",
-     "text": "Thermal test vehicle (TTV) design — embedded heater array and RTD sensor placement",
+     "text": "Thermal test vehicle (TTV) design \u2014 embedded heater array and RTD sensor placement",
      "tatWeeks": 9,
      "manMonths": 8,
      "continuous": false
     },
     {
      "id": "PTV-04",
-     "text": "Daisy-chain electrical vehicle design — interconnect continuity and bump yield structures",
+     "text": "Daisy-chain electrical vehicle design \u2014 interconnect continuity and bump yield structures",
      "tatWeeks": 8,
      "manMonths": 6,
      "continuous": false
@@ -2234,28 +2234,28 @@
     },
     {
      "id": "PTV-07",
-     "text": "Board-level reliability on vehicles — temperature cycle, drop, bend",
+     "text": "Board-level reliability on vehicles \u2014 temperature cycle, drop, bend",
      "tatWeeks": 14,
      "manMonths": 8,
      "continuous": false
     },
     {
      "id": "PTV-08",
-     "text": "Chip-package interaction stress evaluation — low-k / ULK crack, bump and BEOL integrity",
+     "text": "Chip-package interaction stress evaluation \u2014 low-k / ULK crack, bump and BEOL integrity",
      "tatWeeks": 11,
      "manMonths": 14,
      "continuous": false
     },
     {
      "id": "PTV-09",
-     "text": "Warpage and co-planarity measurement across the reflow profile (shadow moiré)",
+     "text": "Warpage and co-planarity measurement across the reflow profile (shadow moir\u00e9)",
      "tatWeeks": 7,
      "manMonths": 8,
      "continuous": false
     },
     {
      "id": "PTV-10",
-     "text": "Thermal characterization — Rjc / Rja, TIM performance, hotspot mapping against the thermal model",
+     "text": "Thermal characterization \u2014 Rjc / Rja, TIM performance, hotspot mapping against the thermal model",
      "tatWeeks": 9,
      "manMonths": 10,
      "continuous": false
@@ -2294,7 +2294,7 @@
     },
     {
      "id": "PTV-D5",
-     "title": "CPI stress assessment report — ULK, bump and BEOL integrity"
+     "title": "CPI stress assessment report \u2014 ULK, bump and BEOL integrity"
     },
     {
      "id": "PTV-D6",
@@ -2310,7 +2310,7 @@
     },
     {
      "id": "PTV-D9",
-     "title": "Package validation complete record — gate for product wafer-out"
+     "title": "Package validation complete record \u2014 gate for product wafer-out"
     }
    ]
   },
@@ -2323,8 +2323,8 @@
    "endWeek": 76,
    "durationWeeks": 26,
    "isNew": true,
-   "description": "Verify the die, the package and the board as one electrical system — one power delivery network, one channel — and close it as a signoff with named exit criteria, not as three separate simulations that never met.",
-   "note": "<b>New.</b> Today SI/PI appears three times as isolated activities inside physical design, signoff and package design, each assuming a model of the other two. The co-analysis that catches package-induced voltage droop and channel loss has no owner, no procedure and no exit criteria. This stage closes at week 76 — before signoff completes at week 78 and the FEOL mask release goes out at week 80.",
+   "description": "Verify the die, the package and the board as one electrical system \u2014 one power delivery network, one channel \u2014 and close it as a signoff with named exit criteria, not as three separate simulations that never met.",
+   "note": "<b>New.</b> Today SI/PI appears three times as isolated activities inside physical design, signoff and package design, each assuming a model of the other two. The co-analysis that catches package-induced voltage droop and channel loss has no owner, no procedure and no exit criteria. This stage closes at week 76 \u2014 before signoff completes at week 78 and the FEOL mask release goes out at week 80.",
    "revisionNote": null,
    "milestone": "Co-Verification Signoff",
    "marks": [],
@@ -2339,21 +2339,21 @@
     },
     {
      "id": "SIPI-02",
-     "text": "Package and board model extraction — 3D EM, S-parameter and RLC network",
+     "text": "Package and board model extraction \u2014 3D EM, S-parameter and RLC network",
      "tatWeeks": 8,
      "manMonths": 10,
      "continuous": false
     },
     {
      "id": "SIPI-03",
-     "text": "Die-package-board PDN co-simulation — DC and AC impedance versus target",
+     "text": "Die-package-board PDN co-simulation \u2014 DC and AC impedance versus target",
      "tatWeeks": 9,
      "manMonths": 12,
      "continuous": false
     },
     {
      "id": "SIPI-04",
-     "text": "High-speed channel simulation with extracted package models — insertion loss, crosstalk, return path",
+     "text": "High-speed channel simulation with extracted package models \u2014 insertion loss, crosstalk, return path",
      "tatWeeks": 9,
      "manMonths": 11,
      "continuous": false
@@ -2388,7 +2388,7 @@
     },
     {
      "id": "SIPI-09",
-     "text": "Power-aware timing correlation — voltage drop back-annotated into STA",
+     "text": "Power-aware timing correlation \u2014 voltage drop back-annotated into STA",
      "tatWeeks": 5,
      "manMonths": 5,
      "continuous": false
@@ -2439,7 +2439,7 @@
     },
     {
      "id": "SIPI-D8",
-     "title": "Chip-package-system co-verification signoff — tapeout gate"
+     "title": "Chip-package-system co-verification signoff \u2014 tapeout gate"
     }
    ]
   },
@@ -2452,7 +2452,7 @@
    "endWeek": 107,
    "durationWeeks": 31,
    "isNew": false,
-   "description": "Stack, bond and build the units — known-good die, HBM stacks, underfill, lid — and learn the assembly yield on the parts bring-up and qualification will consume.",
+   "description": "Stack, bond and build the units \u2014 known-good die, HBM stacks, underfill, lid \u2014 and learn the assembly yield on the parts bring-up and qualification will consume.",
    "note": null,
    "revisionNote": "Renamed from \"Advanced Packaging\" and reduced to the build. Design content moves to PKGD, electrical verification to SIPI, and the process window this stage runs to is the one PTV froze.",
    "milestone": null,
@@ -2461,14 +2461,14 @@
    "activities": [
     {
      "id": "ASSY-01",
-     "text": "Production package substrate build — laminate allocation, build-up, escape routing, incoming screening",
+     "text": "Production package substrate build \u2014 laminate allocation, build-up, escape routing, incoming screening",
      "tatWeeks": 16,
      "manMonths": 6,
      "continuous": false
     },
     {
      "id": "ASSY-02",
-     "text": "Production silicon interposer fabrication — mask tooling, TSV and RDL build, micro-bump, acceptance",
+     "text": "Production silicon interposer fabrication \u2014 mask tooling, TSV and RDL build, micro-bump, acceptance",
      "tatWeeks": 20,
      "manMonths": 8,
      "continuous": false
@@ -2496,7 +2496,7 @@
     },
     {
      "id": "ASSY-06",
-     "text": "Assembly inline inspection — X-ray, CSAM, warpage metrology",
+     "text": "Assembly inline inspection \u2014 X-ray, CSAM, warpage metrology",
      "tatWeeks": 2,
      "manMonths": 3,
      "continuous": false
@@ -2544,7 +2544,7 @@
     },
     {
      "id": "ASSY-D2",
-     "title": "Assembled units — bring-up, qualification and sample lots"
+     "title": "Assembled units \u2014 bring-up, qualification and sample lots"
     },
     {
      "id": "ASSY-D3",
@@ -2569,7 +2569,7 @@
    "endWeek": 90,
    "durationWeeks": 38,
    "isNew": true,
-   "description": "Design, build and debug the boards and lab infrastructure that first silicon will be plugged into — finished and shaken out before the parts arrive, not after.",
+   "description": "Design, build and debug the boards and lab infrastructure that first silicon will be plugged into \u2014 finished and shaken out before the parts arrive, not after.",
    "note": "<b>New, optional.</b> Today this is a risk line in Silicon Bring-up: \"evaluation boards not ready when silicon arrives\". Programs that reuse an existing platform can fold it into BU.",
    "revisionNote": null,
    "milestone": "EVB Ready",
@@ -2585,7 +2585,7 @@
     },
     {
      "id": "EVB-02",
-     "text": "EVB schematic design — power tree, clocking, host interface, connectors",
+     "text": "EVB schematic design \u2014 power tree, clocking, host interface, connectors",
      "tatWeeks": 10,
      "manMonths": 14,
      "continuous": false
@@ -2599,7 +2599,7 @@
     },
     {
      "id": "EVB-04",
-     "text": "Debug infrastructure — JTAG and trace pods, interposers, instrumentation headers",
+     "text": "Debug infrastructure \u2014 JTAG and trace pods, interposers, instrumentation headers",
      "tatWeeks": 7,
      "manMonths": 8,
      "continuous": false
@@ -2683,7 +2683,7 @@
    "endWeek": 96,
    "durationWeeks": 42,
    "isNew": true,
-   "description": "Build the ability to test the product — tester platform, probe card and load board, sort and final programs — on a critical path set by probe card lead time, not by wafer-out.",
+   "description": "Build the ability to test the product \u2014 tester platform, probe card and load board, sort and final programs \u2014 on a critical path set by probe card lead time, not by wafer-out.",
    "note": "<b>New.</b> Today test work appears only inside Qualification & Production, after wafer-out. A probe card ordered then arrives twenty weeks after the wafers.",
    "revisionNote": null,
    "milestone": "Probe Card Ready",
@@ -2692,7 +2692,7 @@
    "activities": [
     {
      "id": "TEST-01",
-     "text": "Test plan and coverage strategy — wafer sort, final test, system-level test",
+     "text": "Test plan and coverage strategy \u2014 wafer sort, final test, system-level test",
      "tatWeeks": 8,
      "manMonths": 12,
      "continuous": false
@@ -2706,7 +2706,7 @@
     },
     {
      "id": "TEST-03",
-     "text": "Test time and cost optimization — parallelism, site count",
+     "text": "Test time and cost optimization \u2014 parallelism, site count",
      "tatWeeks": 9,
      "manMonths": 12,
      "continuous": false
@@ -2748,14 +2748,14 @@
     },
     {
      "id": "TEST-09",
-     "text": "Characterization test content — shmoo, Vmin/Fmax, PVT sweeps",
+     "text": "Characterization test content \u2014 shmoo, Vmin/Fmax, PVT sweeps",
      "tatWeeks": 12,
      "manMonths": 20,
      "continuous": false
     },
     {
      "id": "TEST-10",
-     "text": "Test data infrastructure — STDF collection and yield database",
+     "text": "Test data infrastructure \u2014 STDF collection and yield database",
      "tatWeeks": 8,
      "manMonths": 10,
      "continuous": false
@@ -2810,7 +2810,7 @@
    "isNew": false,
    "description": "Find out what the silicon actually does. Power on, train the interfaces, characterize the margins, debug what does not match, and decide whether the program respins.",
    "note": null,
-   "revisionNote": "Window 56–64 → 102–120. Interface training, memory subsystem validation and the respin decision analysis broken out as their own activities; ten weeks was too short for a first-silicon accelerator with HBM and high-speed links.",
+   "revisionNote": "Window 56\u201364 \u2192 102\u2013120. Interface training, memory subsystem validation and the respin decision analysis broken out as their own activities; ten weeks was too short for a first-silicon accelerator with HBM and high-speed links.",
    "milestone": null,
    "marks": [],
    "manMonths": 153,
@@ -2852,7 +2852,7 @@
     },
     {
      "id": "BU-06",
-     "text": "Interface bring-up — PCIe/CXL link training, HBM training, die-to-die",
+     "text": "Interface bring-up \u2014 PCIe/CXL link training, HBM training, die-to-die",
      "tatWeeks": 8,
      "manMonths": 26,
      "continuous": false
@@ -2887,7 +2887,7 @@
     },
     {
      "id": "BU-11",
-     "text": "Respin versus metal-fix decision analysis — ECO scope, cost, schedule",
+     "text": "Respin versus metal-fix decision analysis \u2014 ECO scope, cost, schedule",
      "tatWeeks": 4,
      "manMonths": 5,
      "continuous": false
@@ -2919,7 +2919,7 @@
     },
     {
      "id": "BU-D5",
-     "title": "Characterization data set — V/F/T shmoo and power measurements"
+     "title": "Characterization data set \u2014 V/F/T shmoo and power measurements"
     },
     {
      "id": "BU-D6",
@@ -2942,7 +2942,7 @@
    "isNew": false,
    "description": "Prove reliability to standard, drive yield to the cost model, release the production test program, and commit to a ramp the supply chain can actually hold.",
    "note": null,
-   "revisionNote": "Window 62–78 → 106–132. Sixteen weeks did not cover 1000 hours of HTOL plus package qualification plus yield learning. Compliance and certification, documentation release and supply chain ramp commitment added; test program work now inherits from TEST rather than starting here.",
+   "revisionNote": "Window 62\u201378 \u2192 106\u2013132. Sixteen weeks did not cover 1000 hours of HTOL plus package qualification plus yield learning. Compliance and certification, documentation release and supply chain ramp commitment added; test program work now inherits from TEST rather than starting here.",
    "milestone": "Mass Production",
    "marks": [],
    "manMonths": 208,
@@ -2963,7 +2963,7 @@
     },
     {
      "id": "MP-03",
-     "text": "Reliability stress — HTOL, HTS, temperature cycle, uHAST, THB",
+     "text": "Reliability stress \u2014 HTOL, HTS, temperature cycle, uHAST, THB",
      "tatWeeks": 18,
      "manMonths": 30,
      "continuous": false
@@ -2984,7 +2984,7 @@
     },
     {
      "id": "MP-06",
-     "text": "Package qualification — MSL, drop, bend, board-level reliability",
+     "text": "Package qualification \u2014 MSL, drop, bend, board-level reliability",
      "tatWeeks": 12,
      "manMonths": 18,
      "continuous": false
@@ -2998,14 +2998,14 @@
     },
     {
      "id": "MP-08",
-     "text": "Capacity, supply chain and ramp commitment — wafer starts, substrate, HBM",
+     "text": "Capacity, supply chain and ramp commitment \u2014 wafer starts, substrate, HBM",
      "tatWeeks": 12,
      "manMonths": 12,
      "continuous": false
     },
     {
      "id": "MP-09",
-     "text": "Compliance and certification — PCIe/CXL compliance, RoHS/REACH, safety",
+     "text": "Compliance and certification \u2014 PCIe/CXL compliance, RoHS/REACH, safety",
      "tatWeeks": 12,
      "manMonths": 18,
      "continuous": false
@@ -3019,7 +3019,7 @@
     },
     {
      "id": "MP-11",
-     "text": "Documentation release — datasheet, user guide, errata, application notes",
+     "text": "Documentation release \u2014 datasheet, user guide, errata, application notes",
      "tatWeeks": 10,
      "manMonths": 16,
      "continuous": false

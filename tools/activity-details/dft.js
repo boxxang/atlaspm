@@ -496,7 +496,7 @@ module.exports = {
 },
 
 'DFT-08': {
-  stage:'dft', window:[14,24], criticalPath:true,
+  stage:'dft', window:[26,36], criticalPath:true,
   purpose:[
     'Insert the <b>scan chains, compression and test logic</b> into the design during synthesis, and drive DFT design-rule checking to clean.',
     'This is where the architecture becomes logic. DFT DRC violations—uncontrollable clocks, unresettable flops, blocked scan paths—reduce coverage silently, and each one is a set of faults ATPG will never be able to target.',
@@ -568,7 +568,7 @@ module.exports = {
 },
 
 'DFT-09': {
-  stage:'dft', window:[16,26], criticalPath:false,
+  stage:'dft', window:[34,44], criticalPath:false,
   purpose:[
     'Work with physical design on whether the <b>scan chains and compression network can actually be routed</b>—and fix the plan before routing rather than after.',
     'Compression networks connect every chain to a shared decompressor and compactor, which produces long routes across the die competing with functional signals for the same resource. A compression ratio that is optimal on paper and unroutable in practice is discovered at <code>PD-11</code>, when the remedies are expensive.',
@@ -638,7 +638,7 @@ module.exports = {
 },
 
 'DFT-10': {
-  stage:'dft', window:[22,38], criticalPath:true,
+  stage:'dft', window:[38,54], criticalPath:true,
   purpose:[
     'Generate the <b>ATPG patterns</b>—stuck-at, transition and cell-aware—and drive coverage to the targets <code>DFT-02</code> agreed, inside the pattern volume the tester can hold.',
     'Two constraints pull against each other here: coverage has to reach the quality target and pattern volume has to fit tester memory and test time. Every technique that raises one raises the other, and closing both is the work.',
@@ -712,7 +712,7 @@ module.exports = {
 },
 
 'DFT-11': {
-  stage:'dft', window:[28,38], criticalPath:true,
+  stage:'dft', window:[50,60], criticalPath:true,
   purpose:[
     'Prove the patterns <b>actually run</b>—simulate them against the netlist with timing, convert them to tester format, and hand ATE a set that works.',
     'A pattern set that passes in ATPG and fails in gate-level simulation is a pattern set that would have failed on silicon. This activity is the last place a pattern problem is cheap, and it is also where the format conversion for the tester is proved rather than assumed.',

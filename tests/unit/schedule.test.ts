@@ -48,12 +48,12 @@ describe('(a) baseline schedule for kickoff 05/12/2027', () => {
       testChip: ['10/13/2027', '07/19/2028'],
       rtl: ['09/29/2027', '05/10/2028'],
       verification: ['11/10/2027', '08/16/2028'],
-      dft: ['09/15/2027', '06/21/2028'],
+      dft: ['09/15/2027', '11/08/2028'],
       synthesis: ['03/01/2028', '08/16/2028'],
       physicalDesign: ['03/29/2028', '10/25/2028'],
       signoff: ['07/19/2028', '11/08/2028'],
       tapeout: ['11/08/2028', '01/03/2029'],
-      fabrication: ['11/22/2028', '04/04/2029'],
+      fabrication: ['12/06/2028', '04/18/2029'],
       packageDesign: ['10/27/2027', '10/25/2028'],
       packageTestVehicle: ['01/19/2028', '01/17/2029'],
       chipPackageCoVerification: ['04/26/2028', '10/25/2028'],
@@ -67,7 +67,7 @@ describe('(a) baseline schedule for kickoff 05/12/2027', () => {
 
   it('exposes the three toolbar dates and the program length', () => {
     expect(fmtDate(s.tapeout!)).toBe('01/03/2029');
-    expect(fmtDate(s.firstSilicon!)).toBe('04/04/2029');
+    expect(fmtDate(s.firstSilicon!)).toBe('04/18/2029');
     expect(fmtDate(s.production!)).toBe('12/19/2029');
     expect(s.totalWeeks).toBe(136);
   });

@@ -7974,8 +7974,8 @@ export const activitySteps: Record<string, ActivityStepEntry> = {
  "DFT-08": {
   "st": "dft",
   "w": [
-   14,
-   24
+   26,
+   36
   ],
   "s": [
    [
@@ -8050,8 +8050,8 @@ export const activitySteps: Record<string, ActivityStepEntry> = {
  "DFT-09": {
   "st": "dft",
   "w": [
-   16,
-   26
+   34,
+   44
   ],
   "s": [
    [
@@ -8119,8 +8119,8 @@ export const activitySteps: Record<string, ActivityStepEntry> = {
  "DFT-10": {
   "st": "dft",
   "w": [
-   22,
-   38
+   38,
+   54
   ],
   "s": [
    [
@@ -8202,8 +8202,8 @@ export const activitySteps: Record<string, ActivityStepEntry> = {
  "DFT-11": {
   "st": "dft",
   "w": [
-   28,
-   38
+   50,
+   60
   ],
   "s": [
    [

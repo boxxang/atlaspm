@@ -20902,8 +20902,8 @@ export const activityDetails: Record<string, ActivityDetail> = {
  "DFT-08": {
   "stage": "dft",
   "window": [
-   14,
-   24
+   26,
+   36
   ],
   "criticalPath": true,
   "purpose": [
@@ -21113,8 +21113,8 @@ export const activityDetails: Record<string, ActivityDetail> = {
  "DFT-09": {
   "stage": "dft",
   "window": [
-   16,
-   26
+   34,
+   44
   ],
   "criticalPath": false,
   "purpose": [
@@ -21297,8 +21297,8 @@ export const activityDetails: Record<string, ActivityDetail> = {
  "DFT-10": {
   "stage": "dft",
   "window": [
-   22,
-   38
+   38,
+   54
   ],
   "criticalPath": true,
   "purpose": [
@@ -21506,8 +21506,8 @@ export const activityDetails: Record<string, ActivityDetail> = {
  "DFT-11": {
   "stage": "dft",
   "window": [
-   28,
-   38
+   50,
+   60
   ],
   "criticalPath": true,
   "purpose": [
