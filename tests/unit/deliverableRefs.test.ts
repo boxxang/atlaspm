@@ -3,7 +3,7 @@ import { deliverableRefs } from '@/lib/deliverableRefs';
 
 const CATALOGUE = {
   'TECH-D2': 'Process option / flavor sheet agreed with foundry',
-  'TECH-D3': 'Wafer, mask and NRE cost sheet',
+  'TECH-D5': 'Wafer, mask and NRE cost sheet',
   'DEF-D5': 'Program charter, staffing and budget plan',
   'PD-D5': 'Interim physical DRC / LVS clean',
 };
@@ -17,7 +17,7 @@ describe('tagging a key deliverable with its reference', () => {
       CATALOGUE,
       STAGE_OF,
     );
-    expect(refs.get('a')).toBe('TECH-D3');
+    expect(refs.get('a')).toBe('TECH-D5');
   });
 
   /* The two seed lists spell this differently. Folding the orthography is what
@@ -60,7 +60,7 @@ describe('tagging a key deliverable with its reference', () => {
       CATALOGUE,
       STAGE_OF,
     );
-    expect(refs.get('a')).toBe('TECH-D3');
+    expect(refs.get('a')).toBe('TECH-D5');
     expect(refs.has('b')).toBe(false);
   });
 

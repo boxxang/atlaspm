@@ -65,7 +65,7 @@ describe('producerStarted', () => {
 describe('deliverableStep', () => {
   const acts = [
     { ref: 'DEF-01', produces: ['DEF-D1', 'DEF-D2'], stepCount: 6 },
-    { ref: 'DEF-03', produces: ['DEF-D4'], stepCount: 4 },
+    { ref: 'DEF-03', produces: ['DEF-D3'], stepCount: 4 },
   ];
 
   it('is the release step — the last one — of the activity that produces it', () => {

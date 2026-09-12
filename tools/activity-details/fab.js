@@ -244,7 +244,7 @@ module.exports = {
   ],
   producedBy:[1,2,3,4,5,5,6],
   rel:[
-    {id:'FAB-D4', rel:'produces', text:'<b>Inline, PCM and WAT data package.</b> The inline half of the deliverable, and the earliest signal the program gets.'},
+    {id:'FAB-D3', rel:'produces', text:'<b>Inline, PCM and WAT data package.</b> The inline half of the deliverable, and the earliest signal the program gets.'},
     {id:'FAB-D5', rel:'feeds', text:'<b>Wafer acceptance disposition record.</b> Inline findings inform the acceptance decision rather than being separate from it.'},
   ],
   risks:[
@@ -308,7 +308,7 @@ module.exports = {
   ],
   producedBy:[1,2,3],
   rel:[
-    {id:'FAB-D3', rel:'feeds', text:'<b>Processed engineering-lot wafers.</b> The lot definition here determines what comes out at the end.'},
+    {id:'FAB-D4', rel:'feeds', text:'<b>Processed engineering-lot wafers.</b> The lot definition here determines what comes out at the end.'},
     {id:'FAB-D2', rel:'feeds', text:'<b>Wafer-out forecast versus actual log.</b> Wafer start is the point from which the forecast is measured.'},
   ],
   risks:[
@@ -379,8 +379,8 @@ module.exports = {
   ],
   producedBy:[1,2,3,4,5,6,6],
   rel:[
-    {id:'FAB-D3', rel:'feeds', text:'<b>Processed engineering-lot wafers.</b> Front-end processing is where the transistors are actually made.'},
-    {id:'FAB-D4', rel:'feeds', text:'<b>Inline, PCM and WAT data package.</b> Front-end inline data is the earliest indication of how the lot is running.'},
+    {id:'FAB-D4', rel:'feeds', text:'<b>Processed engineering-lot wafers.</b> Front-end processing is where the transistors are actually made.'},
+    {id:'FAB-D3', rel:'feeds', text:'<b>Inline, PCM and WAT data package.</b> Front-end inline data is the earliest indication of how the lot is running.'},
   ],
   risks:[
     '<b>Excursion response improvised.</b> Without a framework the decision defaults to whatever is least disruptive rather than what is best for the lot.',
@@ -449,8 +449,8 @@ module.exports = {
   ],
   producedBy:[1,2,3,4,5,5,5],
   rel:[
-    {id:'FAB-D3', rel:'produces', text:'<b>Processed engineering-lot wafers.</b> This activity is where the wafers are finished—the deliverable the whole stage exists to produce.'},
-    {id:'FAB-D4', rel:'feeds', text:'<b>Inline, PCM and WAT data package.</b> Back-end inline data completes the process record for the lot.'},
+    {id:'FAB-D4', rel:'produces', text:'<b>Processed engineering-lot wafers.</b> This activity is where the wafers are finished—the deliverable the whole stage exists to produce.'},
+    {id:'FAB-D3', rel:'feeds', text:'<b>Inline, PCM and WAT data package.</b> Back-end inline data completes the process record for the lot.'},
   ],
   risks:[
     '<b>BEOL masks not ready at back-end entry.</b> Lots stall mid-process, consuming fab capacity and adding cycle time nobody planned.',
@@ -515,7 +515,7 @@ module.exports = {
   ],
   producedBy:[1,2,3,4],
   rel:[
-    {id:'FAB-D4', rel:'produces', text:'<b>Inline, PCM and WAT data package.</b> The PCM half of the deliverable, and the earliest device-level data available.'},
+    {id:'FAB-D3', rel:'produces', text:'<b>Inline, PCM and WAT data package.</b> The PCM half of the deliverable, and the earliest device-level data available.'},
     {id:'FAB-D5', rel:'feeds', text:'<b>Wafer acceptance disposition record.</b> Parameter deviations are part of what acceptance is decided on.'},
   ],
   risks:[
@@ -582,7 +582,7 @@ module.exports = {
   producedBy:[1,2,3,4],
   rel:[
     {id:'FAB-D5', rel:'produces', text:'<b>Wafer acceptance disposition record.</b> This activity is the deliverable, and the record is what a later yield discussion refers back to.'},
-    {id:'FAB-D3', rel:'gates', text:'<b>Processed engineering-lot wafers.</b> Wafers are not released downstream until this decision is taken.'},
+    {id:'FAB-D4', rel:'gates', text:'<b>Processed engineering-lot wafers.</b> Wafers are not released downstream until this decision is taken.'},
   ],
   risks:[
     '<b>Acceptance by default.</b> A lot released without a decision has been accepted by nobody, and the deviation is discovered later with no record.',
@@ -647,7 +647,7 @@ module.exports = {
   producedBy:[1,2,3,3],
   rel:[
     {id:'FAB-D6', rel:'produces', text:'<b>First Silicon availability notice.</b> This activity is the deliverable, and it carries the stage\'s milestone.'},
-    {id:'FAB-D3', rel:'feeds', text:'<b>Processed engineering-lot wafers.</b> Wafers become useful when they arrive, not when they are finished.'},
+    {id:'FAB-D4', rel:'feeds', text:'<b>Processed engineering-lot wafers.</b> Wafers become useful when they arrive, not when they are finished.'},
   ],
   risks:[
     '<b>Customs paperwork started at wafer-out.</b> It can be prepared during processing and takes a week if it is not.',

@@ -109,7 +109,7 @@ module.exports = {
   producedBy:[1,2,3,4,5,6],
   rel:[
     {id:'PDK-D1', rel:'feeds', text:'<b>PDK readiness dashboard.</b> An outstanding exception request is a readiness gap, and it belongs on the dashboard with a date.'},
-    {id:'PDK-D5', rel:'feeds', text:'<b>Internal reference flow and methodology guide.</b> Rule dispositions become flow settings—what the tools are told to enforce and what they are told to allow.'},
+    {id:'PDK-D6', rel:'feeds', text:'<b>Internal reference flow and methodology guide.</b> Rule dispositions become flow settings—what the tools are told to enforce and what they are told to allow.'},
   ],
   risks:[
     '<b>Recommended rules adopted wholesale.</b> Safe, and it costs density the product was sized against; the trade should be made per rule, not once.',
@@ -182,7 +182,7 @@ module.exports = {
   rel:[
     {id:'PDK-D2', rel:'produces', text:'<b>Qualified library list with .lib / LEF / GDS views.</b> The standard cell half of the deliverable; <code>PDK-05</code> adds memory and <code>PDK-06</code> adds IO.'},
     {id:'PDK-D1', rel:'feeds', text:'<b>PDK readiness dashboard.</b> An unqualified library is a readiness gap that blocks synthesis, and it shows on the dashboard as one.'},
-    {id:'PDK-D6', rel:'feeds', text:'<b>Signoff corner definition.</b> The corners a library is characterized at bound the corners signoff can be run at.'},
+    {id:'PDK-D7', rel:'feeds', text:'<b>Signoff corner definition.</b> The corners a library is characterized at bound the corners signoff can be run at.'},
   ],
   risks:[
     '<b>Timing models trusted without a quality check.</b> A model error at one corner produces a design that closes in the tool and fails on silicon—the most expensive class of library defect.',
@@ -251,7 +251,7 @@ module.exports = {
   ],
   producedBy:[1,2,3,4,5,6],
   rel:[
-    {id:'PDK-D5', rel:'feeds', text:'<b>Internal reference flow and methodology guide.</b> A flow is only reproducible if the decks it calls are versioned; the guide names the versions.'},
+    {id:'PDK-D6', rel:'feeds', text:'<b>Internal reference flow and methodology guide.</b> A flow is only reproducible if the decks it calls are versioned; the guide names the versions.'},
     {id:'PDK-D8', rel:'feeds', text:'<b>Golden environment release notes.</b> The environment pins deck versions, and this activity is what makes pinning possible.'},
     {id:'PDK-D1', rel:'feeds', text:'<b>PDK readiness dashboard.</b> Deck currency and validation status are readiness items on the dashboard.'},
   ],
@@ -325,7 +325,7 @@ module.exports = {
   producedBy:[1,2,3,4,5,6,7],
   rel:[
     {id:'PDK-D2', rel:'produces', text:'<b>Qualified library list.</b> The memory half of the deliverable—instances with every view a downstream tool consumes.'},
-    {id:'PDK-D7', rel:'feeds', text:'<b>Memory PPA gap analysis and custom-instance decision record.</b> The capability screen is where the gap first appears; <code>PDK-09</code> quantifies it.'},
+    {id:'PDK-D4', rel:'feeds', text:'<b>Memory PPA gap analysis and custom-instance decision record.</b> The capability screen is where the gap first appears; <code>PDK-09</code> quantifies it.'},
     {id:'PDK-D1', rel:'feeds', text:'<b>PDK readiness dashboard.</b> Compiler access and instance availability are tracked readiness items in their own right.'},
   ],
   risks:[
@@ -396,7 +396,7 @@ module.exports = {
   producedBy:[1,2,3,4,5,6],
   rel:[
     {id:'PDK-D2', rel:'produces', text:'<b>Qualified library list.</b> The IO and ESD half of the deliverable—the cells at the die edge, qualified rather than assumed.'},
-    {id:'PDK-D6', rel:'feeds', text:'<b>Signoff corner definition.</b> ESD and latch-up verification conditions are part of what signoff has to run, and they are defined here.'},
+    {id:'PDK-D7', rel:'feeds', text:'<b>Signoff corner definition.</b> ESD and latch-up verification conditions are part of what signoff has to run, and they are defined here.'},
   ],
   risks:[
     '<b>ESD strategy chosen after the pad ring.</b> Clamp placement and rail topology constrain the ring; retrofitting means redoing the ring and the bump map with it.',
@@ -469,9 +469,9 @@ module.exports = {
   ],
   producedBy:[1,2,3,4,5,6,7,8],
   rel:[
-    {id:'PDK-D4', rel:'produces', text:'<b>EDA tool and version matrix (qualified and frozen).</b> This activity is the deliverable, and the freeze is the part that matters.'},
-    {id:'PDK-D5', rel:'feeds', text:'<b>Internal reference flow and methodology guide.</b> The flow is written against specific tool versions; the guide and the matrix are read together.'},
-    {id:'PDK-D3', rel:'feeds', text:'<b>Compute and license capacity plan.</b> Which tools and how many concurrent seats is what the license plan is built from.'},
+    {id:'PDK-D3', rel:'produces', text:'<b>EDA tool and version matrix (qualified and frozen).</b> This activity is the deliverable, and the freeze is the part that matters.'},
+    {id:'PDK-D6', rel:'feeds', text:'<b>Internal reference flow and methodology guide.</b> The flow is written against specific tool versions; the guide and the matrix are read together.'},
+    {id:'PDK-D5', rel:'feeds', text:'<b>Compute and license capacity plan.</b> Which tools and how many concurrent seats is what the license plan is built from.'},
   ],
   risks:[
     '<b>Teams on different versions.</b> Two teams with different STA versions will disagree about timing, and the disagreement is diagnosed as a design problem for weeks first.',
@@ -544,7 +544,7 @@ module.exports = {
   ],
   producedBy:[1,2,3,4,5,6,7,8],
   rel:[
-    {id:'PDK-D5', rel:'produces', text:'<b>Internal reference flow and methodology guide.</b> This activity is the deliverable, and the pilot is what makes it credible.'},
+    {id:'PDK-D6', rel:'produces', text:'<b>Internal reference flow and methodology guide.</b> This activity is the deliverable, and the pilot is what makes it credible.'},
     {id:'PDK-D8', rel:'feeds', text:'<b>Golden environment release notes.</b> The environment in <code>PDK-13</code> packages this flow; the two are released together.'},
     {id:'PDK-D1', rel:'feeds', text:'<b>PDK readiness dashboard.</b> Flow readiness is tracked alongside library and deck readiness—a design cannot start on any one of them alone.'},
   ],
@@ -615,7 +615,7 @@ module.exports = {
   ],
   producedBy:[1,2,3,4,5,6],
   rel:[
-    {id:'PDK-D7', rel:'produces', text:'<b>Memory PPA gap analysis and custom-instance decision record.</b> The gap analysis half—<code>PDK-11</code> adds the decision that follows from it.'},
+    {id:'PDK-D4', rel:'produces', text:'<b>Memory PPA gap analysis and custom-instance decision record.</b> The gap analysis half—<code>PDK-11</code> adds the decision that follows from it.'},
     {id:'PDK-D2', rel:'feeds', text:'<b>Qualified library list.</b> An instance that fails characterization does not belong on the qualified list, whatever the compiler says.'},
   ],
   risks:[
@@ -685,8 +685,8 @@ module.exports = {
   ],
   producedBy:[1,2,3,4,5,6],
   rel:[
-    {id:'PDK-D3', rel:'produces', text:'<b>Compute and license capacity plan.</b> This activity is the deliverable, and its value is that it is dated against lead times.'},
-    {id:'PDK-D4', rel:'feeds', text:'<b>EDA tool and version matrix.</b> Which tools are pooled and at what seat count is decided against the matrix.'},
+    {id:'PDK-D5', rel:'produces', text:'<b>Compute and license capacity plan.</b> This activity is the deliverable, and its value is that it is dated against lead times.'},
+    {id:'PDK-D3', rel:'feeds', text:'<b>EDA tool and version matrix.</b> Which tools are pooled and at what seat count is decided against the matrix.'},
   ],
   risks:[
     '<b>Demand modelled per team rather than per flow step.</b> Contention happens when several teams hit the same tool at the same time, which an org-chart model cannot see.',
@@ -756,7 +756,7 @@ module.exports = {
   ],
   producedBy:[1,2,3,4,5,6,6],
   rel:[
-    {id:'PDK-D7', rel:'produces', text:'<b>Memory PPA gap analysis and custom-instance decision record.</b> The decision half of the deliverable, and the record downstream stages will point at.'},
+    {id:'PDK-D4', rel:'produces', text:'<b>Memory PPA gap analysis and custom-instance decision record.</b> The decision half of the deliverable, and the record downstream stages will point at.'},
     {id:'PDK-D1', rel:'gates', text:'<b>PDK readiness dashboard.</b> An undecided memory gap is the most consequential open item the dashboard can carry—it holds both library closure and the AMS plan.'},
   ],
   risks:[
@@ -826,8 +826,8 @@ module.exports = {
   ],
   producedBy:[1,2,3,4,5,6],
   rel:[
-    {id:'PDK-D6', rel:'produces', text:'<b>Signoff corner definition agreed with foundry.</b> This activity is the deliverable, and "agreed" is the operative word—an internal corner set has no standing.'},
-    {id:'PDK-D3', rel:'feeds', text:'<b>Compute and license capacity plan.</b> Corner count multiplied by modes is the single largest driver of signoff compute demand.'},
+    {id:'PDK-D7', rel:'produces', text:'<b>Signoff corner definition agreed with foundry.</b> This activity is the deliverable, and "agreed" is the operative word—an internal corner set has no standing.'},
+    {id:'PDK-D5', rel:'feeds', text:'<b>Compute and license capacity plan.</b> Corner count multiplied by modes is the single largest driver of signoff compute demand.'},
   ],
   risks:[
     '<b>Corner set agreed after closure starts.</b> Adding a corner mid-closure invalidates the work done, and the addition usually comes from the foundry.',
@@ -900,7 +900,7 @@ module.exports = {
   rel:[
     {id:'PDK-D8', rel:'produces', text:'<b>Golden environment release notes.</b> This activity is the deliverable—the environment itself, with what is in it and what is known to be wrong with it.'},
     {id:'PDK-D1', rel:'gates', text:'<b>PDK readiness dashboard.</b> The dashboard closes when the environment releases; until then every readiness item is still individually tracked.'},
-    {id:'PDK-D5', rel:'feeds', text:'<b>Internal reference flow and methodology guide.</b> The guide describes the flow; this environment is the flow, packaged and versioned.'},
+    {id:'PDK-D6', rel:'feeds', text:'<b>Internal reference flow and methodology guide.</b> The guide describes the flow; this environment is the flow, packaged and versioned.'},
   ],
   risks:[
     '<b>Environment released without a regression.</b> An untested package is a package whose first regression is run by whoever is closest to a deadline.',

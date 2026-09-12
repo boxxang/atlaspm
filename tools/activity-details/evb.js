@@ -107,7 +107,7 @@ module.exports = {
   ],
   producedBy:[1,2,3,4,5,6,7,8],
   rel:[
-    {id:'EVB-D4', rel:'produces', text:'<b>EVB schematics, BOM and layout database.</b> The schematic half of the deliverable.'},
+    {id:'EVB-D3', rel:'produces', text:'<b>EVB schematics, BOM and layout database.</b> The schematic half of the deliverable.'},
     {id:'EVB-D1', rel:'informs', text:'<b>Validation platform specification.</b> Schematic decisions feed back into what the specification can promise.'},
   ],
   risks:[
@@ -177,7 +177,7 @@ module.exports = {
   ],
   producedBy:[1,2,3,4,5,6],
   rel:[
-    {id:'EVB-D4', rel:'feeds', text:'<b>EVB schematics, BOM and layout database.</b> The power subsystem design is part of the schematic package.'},
+    {id:'EVB-D3', rel:'feeds', text:'<b>EVB schematics, BOM and layout database.</b> The power subsystem design is part of the schematic package.'},
     {id:'EVB-D6', rel:'feeds', text:'<b>Board bring-up report and known issues.</b> Power bring-up results are the first part of the board\'s own bring-up record.'},
   ],
   risks:[
@@ -249,7 +249,7 @@ module.exports = {
   producedBy:[1,2,3,4,5,6,6],
   rel:[
     {id:'EVB-D2', rel:'produces', text:'<b>Debug and trace access documentation.</b> This activity is the deliverable, and it is what the bring-up team reads at 2am.'},
-    {id:'EVB-D4', rel:'feeds', text:'<b>EVB schematics, BOM and layout database.</b> Debug headers and access points are schematic and layout content.'},
+    {id:'EVB-D3', rel:'feeds', text:'<b>EVB schematics, BOM and layout database.</b> Debug headers and access points are schematic and layout content.'},
   ],
   risks:[
     '<b>Debug access designed without DFT.</b> The internal observability comes from <code>DFT-11</code>, and the board access has to match what it exposes.',
@@ -322,7 +322,7 @@ module.exports = {
   ],
   producedBy:[1,2,3,4,5,6,7,8],
   rel:[
-    {id:'EVB-D4', rel:'produces', text:'<b>EVB schematics, BOM and layout database.</b> The layout half of the deliverable—what fabrication is built from.'},
+    {id:'EVB-D3', rel:'produces', text:'<b>EVB schematics, BOM and layout database.</b> The layout half of the deliverable—what fabrication is built from.'},
     {id:'EVB-D5', rel:'feeds', text:'<b>Fabricated and assembled boards.</b> Fabrication takes the released layout database directly.'},
   ],
   risks:[
@@ -463,7 +463,7 @@ module.exports = {
   producedBy:[1,2,3,4,5,6],
   rel:[
     {id:'EVB-D5', rel:'produces', text:'<b>Fabricated and assembled boards, rev A/B with quantity plan.</b> This activity is the deliverable.'},
-    {id:'EVB-D4', rel:'informs', text:'<b>EVB schematics, BOM and layout database.</b> Fabrication findings—DFM issues, substitutions—feed back into the database.'},
+    {id:'EVB-D3', rel:'informs', text:'<b>EVB schematics, BOM and layout database.</b> Fabrication findings—DFM issues, substitutions—feed back into the database.'},
   ],
   risks:[
     '<b>Long-lead components blocking assembly.</b> The board is fabricated and waiting on one part, which is the most common way this activity slips.',
@@ -533,7 +533,7 @@ module.exports = {
   ],
   producedBy:[1,2,3,4,5,6,2],
   rel:[
-    {id:'EVB-D3', rel:'produces', text:'<b>Lab setup and instrument reservation plan.</b> This activity is the deliverable, and it is what stops bring-up queueing for a scope.'},
+    {id:'EVB-D4', rel:'produces', text:'<b>Lab setup and instrument reservation plan.</b> This activity is the deliverable, and it is what stops bring-up queueing for a scope.'},
     {id:'EVB-D6', rel:'informs', text:'<b>Board bring-up report and known issues.</b> The lab setup is the context every bring-up measurement is made in.'},
   ],
   risks:[

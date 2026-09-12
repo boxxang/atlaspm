@@ -256,7 +256,7 @@ module.exports = {
   ],
   producedBy:[1,2,3,4,5,6,7,8],
   rel:[
-    {id:'TEST-D4', rel:'produces', text:'<b>Qualified probe card and load board.</b> The probe card half of the deliverable.'},
+    {id:'TEST-D2', rel:'produces', text:'<b>Qualified probe card and load board.</b> The probe card half of the deliverable.'},
     {id:'TEST-D7', rel:'gates', text:'<b>Wafer sort and final test programs.</b> A sort program cannot be debugged on silicon without a qualified card.'},
   ],
   risks:[
@@ -331,7 +331,7 @@ module.exports = {
   ],
   producedBy:[1,2,3,4,5,5,6,7,8],
   rel:[
-    {id:'TEST-D4', rel:'produces', text:'<b>Qualified probe card and load board.</b> The load board half of the deliverable.'},
+    {id:'TEST-D2', rel:'produces', text:'<b>Qualified probe card and load board.</b> The load board half of the deliverable.'},
     {id:'TEST-D7', rel:'gates', text:'<b>Wafer sort and final test programs.</b> The final test program is debugged on this hardware.'},
   ],
   risks:[
@@ -553,7 +553,7 @@ module.exports = {
   ],
   producedBy:[1,2,3,4,5,6,7,8],
   rel:[
-    {id:'TEST-D2', rel:'produces', text:'<b>ATE-ready pattern set with debug log.</b> This activity is the deliverable.'},
+    {id:'TEST-D3', rel:'produces', text:'<b>ATE-ready pattern set with debug log.</b> This activity is the deliverable.'},
     {id:'TEST-D7', rel:'feeds', text:'<b>Wafer sort and final test programs.</b> Both programs run these patterns as their structural content.'},
   ],
   risks:[
@@ -701,7 +701,7 @@ module.exports = {
   ],
   producedBy:[1,2,3,4,5,6,7,8],
   rel:[
-    {id:'TEST-D3', rel:'produces', text:'<b>Test data infrastructure and yield database.</b> This activity is the deliverable.'},
+    {id:'TEST-D4', rel:'produces', text:'<b>Test data infrastructure and yield database.</b> This activity is the deliverable.'},
     {id:'TEST-D1', rel:'informs', text:'<b>Test plan and test coverage matrix.</b> What the data shows about actual failure modes updates the plan\'s assumptions.'},
   ],
   risks:[

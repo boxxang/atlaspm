@@ -120,12 +120,12 @@ export const activityDetails: Record<string, ActivityDetail> = {
     "text": "<b>Target specification—PPA and KPI table.</b> Each ranked requirement becomes a KPI line that <code>DEF-05</code> converts into a number. A target that cannot be traced back to a requirement is a target no customer asked for."
    },
    {
-    "id": "DEF-D4",
+    "id": "DEF-D3",
     "rel": "informs",
     "text": "<b>Product cost and margin model.</b> Provides the volume, segment and ASP assumptions the cost model is built on."
    },
    {
-    "id": "DEF-D3",
+    "id": "DEF-D4",
     "rel": "feeds",
     "text": "<b>Feasibility report.</b> <code>DEF-07</code> assesses feasibility against this specific requirement set. A feasibility study run against a different or older set does not tell the program anything useful."
    },
@@ -321,7 +321,7 @@ export const activityDetails: Record<string, ActivityDetail> = {
     "text": "<b>Product requirements document.</b> The capability gaps identified here become requirements. A gap that is not written into the requirement set is not addressed by the design."
    },
    {
-    "id": "DEF-D4",
+    "id": "DEF-D3",
     "rel": "informs",
     "text": "<b>Product cost and margin model.</b> Competitive position is the basis on which the ASP assumption is defended."
    }
@@ -509,7 +509,7 @@ export const activityDetails: Record<string, ActivityDetail> = {
     "text": "<b>Product requirements document.</b> The use-case list and the deployment mix are written back into the PRD as the context the requirements are based on."
    },
    {
-    "id": "DEF-D3",
+    "id": "DEF-D4",
     "rel": "feeds",
     "text": "<b>Feasibility report.</b> Feasibility is assessed against these KPI numbers rather than against the requirement text."
    }
@@ -897,12 +897,12 @@ export const activityDetails: Record<string, ActivityDetail> = {
     "text": "<b>Target specification—PPA and KPI table.</b> This activity defines the PPA target. <code>DEF-03</code> defines the KPI targets, and both are combined into a single target specification."
    },
    {
-    "id": "DEF-D3",
+    "id": "DEF-D4",
     "rel": "feeds",
     "text": "<b>Feasibility report.</b> These are the numbers <code>DEF-07</code> asks each candidate process node to support."
    },
    {
-    "id": "DEF-D4",
+    "id": "DEF-D3",
     "rel": "informs",
     "text": "<b>Product cost and margin model.</b> The die area budget is the single largest input to the cost model."
    }
@@ -1106,12 +1106,12 @@ export const activityDetails: Record<string, ActivityDetail> = {
   ],
   "rel": [
    {
-    "id": "DEF-D4",
+    "id": "DEF-D3",
     "rel": "produces",
     "text": "<b>Product cost and margin model.</b> This activity produces the product cost and margin model with all key assumptions, allowing downstream teams to update and re-run the model as inputs change."
    },
    {
-    "id": "DEF-D3",
+    "id": "DEF-D4",
     "rel": "feeds",
     "text": "<b>Feasibility report.</b> A process node that meets the PPA targets but breaks the cost ceiling is recorded as infeasible, and this model is the basis for that finding."
    },
@@ -1316,7 +1316,7 @@ export const activityDetails: Record<string, ActivityDetail> = {
   ],
   "rel": [
    {
-    "id": "DEF-D3",
+    "id": "DEF-D4",
     "rel": "produces",
     "text": "The feasibility report includes the feasibility decision, assessment matrix, and required tradeoffs, providing the basis for the Go / No-Go decision."
    },
@@ -1924,7 +1924,7 @@ export const activityDetails: Record<string, ActivityDetail> = {
     "text": "<b>Architecture specification.</b> Every quantitative claim in the specification traces back to a sweep in this model, or it does not belong in the specification."
    },
    {
-    "id": "ARCH-D4",
+    "id": "ARCH-D5",
     "rel": "feeds",
     "text": "<b>Block partitioning and PPA budget table.</b> The sweeps are what decide cluster count and SRAM capacity before <code>ARCH-02</code> draws the boundaries."
    }
@@ -2143,7 +2143,7 @@ export const activityDetails: Record<string, ActivityDetail> = {
   ],
   "rel": [
    {
-    "id": "ARCH-D4",
+    "id": "ARCH-D5",
     "rel": "produces",
     "text": "<b>Block partitioning and PPA budget table.</b> The deliverable defines the block boundaries and die assignments. <code>ARCH-09</code> adds the PPA budgets for each block."
    },
@@ -2153,7 +2153,7 @@ export const activityDetails: Record<string, ActivityDetail> = {
     "text": "<b>Architecture specification.</b> The partition and its boundaries are the specification's structural spine—every other section is written against them."
    },
    {
-    "id": "ARCH-D5",
+    "id": "ARCH-D4",
     "rel": "feeds",
     "text": "<b>Chip-level block diagram with pin and bump budget.</b> <code>ARCH-08</code> draws what this activity decides."
    }
@@ -2372,7 +2372,7 @@ export const activityDetails: Record<string, ActivityDetail> = {
     "text": "<b>Architecture specification.</b> The interface chapter is imported from the definition document rather than restated, so the two cannot drift."
    },
    {
-    "id": "ARCH-D5",
+    "id": "ARCH-D4",
     "rel": "feeds",
     "text": "<b>Chip-level block diagram with pin and bump budget.</b> Lane counts and PHY footprints are what <code>ARCH-08</code> allocates bumps against."
    }
@@ -2590,7 +2590,7 @@ export const activityDetails: Record<string, ActivityDetail> = {
     "text": "<b>Architecture specification.</b> This activity defines the dataflow and memory hierarchy section of <code>ARCH-D6</code>, including SRAM organization and HBM configuration. <code>ARCH-07</code> integrates it into the final architecture specification."
    },
    {
-    "id": "ARCH-D4",
+    "id": "ARCH-D5",
     "rel": "feeds",
     "text": "<b>Block partitioning and PPA budget table.</b> SRAM capacity is the largest single area line in the budget, and it is decided here."
    },
@@ -3029,7 +3029,7 @@ export const activityDetails: Record<string, ActivityDetail> = {
     "text": "<b>Architecture specification.</b> The power and clock chapter, and the constraint every block owner designs against."
    },
    {
-    "id": "ARCH-D4",
+    "id": "ARCH-D5",
     "rel": "feeds",
     "text": "<b>Block partitioning and PPA budget table.</b> Power domains are the unit the power budget is allocated in."
    }
@@ -3461,7 +3461,7 @@ export const activityDetails: Record<string, ActivityDetail> = {
   ],
   "rel": [
    {
-    "id": "ARCH-D5",
+    "id": "ARCH-D4",
     "rel": "produces",
     "text": "The deliverable defines the chip-level block placement intent and pin/bump budget used by physical design and package teams."
    },
@@ -3471,7 +3471,7 @@ export const activityDetails: Record<string, ActivityDetail> = {
     "text": "Architecture specification. The physical view chapter—the first place the specification stops being a block diagram and becomes a die."
    },
    {
-    "id": "ARCH-D4",
+    "id": "ARCH-D5",
     "rel": "feeds",
     "text": "Block partitioning and PPA budget table. Placement intent is what <code>ARCH-09</code> allocates die area against."
    }
@@ -3676,9 +3676,9 @@ export const activityDetails: Record<string, ActivityDetail> = {
   ],
   "rel": [
    {
-    "id": "ARCH-D4",
+    "id": "ARCH-D5",
     "rel": "produces",
-    "text": "This activity defines the PPA budget portion of ARCH-D4 against the blocks established in ARCH-02."
+    "text": "This activity defines the PPA budget portion of ARCH-D5 against the blocks established in ARCH-02."
    },
    {
     "id": "ARCH-D6",
@@ -3908,7 +3908,7 @@ export const activityDetails: Record<string, ActivityDetail> = {
     "text": "Block microarchitecture specifications refine the block definitions in ARCH-D6 and must remain consistent with the frozen architecture."
    },
    {
-    "id": "ARCH-D4",
+    "id": "ARCH-D5",
     "rel": "feeds",
     "text": "Block partitioning and PPA budget table. Microarchitecture is where a block owner first tests whether the allocated budget is achievable."
    },
@@ -4116,7 +4116,7 @@ export const activityDetails: Record<string, ActivityDetail> = {
     "text": "Technology selection report and decision record. This activity defines the deliverable; <code>TECH-04</code> supplies the technical evidence it rests on."
    },
    {
-    "id": "TECH-D4",
+    "id": "TECH-D3",
     "rel": "feeds",
     "text": "Node risk assessment. The supply-continuity and geopolitical screen is one of the risk assessment's inputs, and it is gathered here."
    }
@@ -4304,7 +4304,7 @@ export const activityDetails: Record<string, ActivityDetail> = {
   ],
   "rel": [
    {
-    "id": "TECH-D4",
+    "id": "TECH-D3",
     "rel": "produces",
     "text": "Node risk assessment—maturity, defect density, yield learning curve. The deliverable it is what the yield assumption in the cost model should be built on."
    },
@@ -4485,7 +4485,7 @@ export const activityDetails: Record<string, ActivityDetail> = {
   ],
   "rel": [
    {
-    "id": "TECH-D5",
+    "id": "TECH-D4",
     "rel": "produces",
     "text": "Executed foundry design agreement (DA) and NDA. The deliverable until it executes the enablement band cannot legally start."
    },
@@ -4684,7 +4684,7 @@ export const activityDetails: Record<string, ActivityDetail> = {
     "text": "Technology selection report and decision record. The evidence half of the report—<code>TECH-01</code> records the decision, this activity is why the decision is defensible."
    },
    {
-    "id": "TECH-D4",
+    "id": "TECH-D3",
     "rel": "feeds",
     "text": "Node risk assessment. Where a target is only just met, this study is what says so, and that margin is a node risk."
    },
@@ -4883,7 +4883,7 @@ export const activityDetails: Record<string, ActivityDetail> = {
     "text": "Process option / flavor sheet agreed with foundry. The deliverable it is contractual rather than advisory."
    },
    {
-    "id": "TECH-D3",
+    "id": "TECH-D5",
     "rel": "feeds",
     "text": "Wafer, mask and NRE cost sheet. Every option on the sheet carries a price adder, so the flavor decides a meaningful part of the wafer cost."
    },
@@ -5079,7 +5079,7 @@ export const activityDetails: Record<string, ActivityDetail> = {
   ],
   "rel": [
    {
-    "id": "TECH-D3",
+    "id": "TECH-D5",
     "rel": "produces",
     "text": "Wafer, mask and NRE cost sheet. The deliverable its value is that the numbers are quoted rather than estimated."
    },
@@ -5269,7 +5269,7 @@ export const activityDetails: Record<string, ActivityDetail> = {
     "text": "Capacity and tapeout slot commitment. The deliverable it is worth only as much as the escalation path written into it."
    },
    {
-    "id": "TECH-D3",
+    "id": "TECH-D5",
     "rel": "informs",
     "text": "Wafer, mask and NRE cost sheet. Committed volume is what the price tier is granted against, so the two documents have to agree."
    }
@@ -5452,7 +5452,7 @@ export const activityDetails: Record<string, ActivityDetail> = {
     "text": "Technology selection report and decision record. Single-source acceptance belongs in the selection record, priced, rather than being implied by its absence."
    },
    {
-    "id": "TECH-D4",
+    "id": "TECH-D3",
     "rel": "feeds",
     "text": "Node risk assessment. Supply concentration is a node risk, and its mitigation is either a second source or an accepted exposure."
    }
@@ -5643,7 +5643,7 @@ export const activityDetails: Record<string, ActivityDetail> = {
     "text": "Capacity and tapeout slot commitment. Front-end capacity without matching backend capacity delivers wafers that cannot be assembled."
    },
    {
-    "id": "TECH-D3",
+    "id": "TECH-D5",
     "rel": "informs",
     "text": "Wafer, mask and NRE cost sheet. Interposer and assembly pricing is the backend half of the technology cost, and the cost model needs both."
    },
@@ -6029,7 +6029,7 @@ export const activityDetails: Record<string, ActivityDetail> = {
     "text": "PDK readiness dashboard. An outstanding exception request is a readiness gap, and it belongs on the dashboard with a date."
    },
    {
-    "id": "PDK-D5",
+    "id": "PDK-D6",
     "rel": "feeds",
     "text": "Internal reference flow and methodology guide. Rule dispositions become flow settings—what the tools are told to enforce and what they are told to allow."
    }
@@ -6222,7 +6222,7 @@ export const activityDetails: Record<string, ActivityDetail> = {
     "text": "PDK readiness dashboard. An unqualified library is a readiness gap that blocks synthesis, and it shows on the dashboard as one."
    },
    {
-    "id": "PDK-D6",
+    "id": "PDK-D7",
     "rel": "feeds",
     "text": "Signoff corner definition. The corners a library is characterized at bound the corners signoff can be run at."
    }
@@ -6418,7 +6418,7 @@ export const activityDetails: Record<string, ActivityDetail> = {
   ],
   "rel": [
    {
-    "id": "PDK-D5",
+    "id": "PDK-D6",
     "rel": "feeds",
     "text": "Internal reference flow and methodology guide. A flow is only reproducible if the decks it calls are versioned; the guide names the versions."
    },
@@ -6626,7 +6626,7 @@ export const activityDetails: Record<string, ActivityDetail> = {
     "text": "Qualified library list. The memory half of the deliverable—instances with every view a downstream tool consumes."
    },
    {
-    "id": "PDK-D7",
+    "id": "PDK-D4",
     "rel": "feeds",
     "text": "Memory PPA gap analysis and custom-instance decision record. The capability screen is where the gap first appears; <code>PDK-09</code> quantifies it."
    },
@@ -6828,7 +6828,7 @@ export const activityDetails: Record<string, ActivityDetail> = {
     "text": "Qualified library list. The IO and ESD half of the deliverable—the cells at the die edge, qualified rather than assumed."
    },
    {
-    "id": "PDK-D6",
+    "id": "PDK-D7",
     "rel": "feeds",
     "text": "Signoff corner definition. ESD and latch-up verification conditions are part of what signoff has to run, and they are defined here."
    }
@@ -7011,17 +7011,17 @@ export const activityDetails: Record<string, ActivityDetail> = {
   ],
   "rel": [
    {
-    "id": "PDK-D4",
+    "id": "PDK-D3",
     "rel": "produces",
     "text": "EDA tool and version matrix (qualified and frozen). The deliverable the freeze is the part that matters."
    },
    {
-    "id": "PDK-D5",
+    "id": "PDK-D6",
     "rel": "feeds",
     "text": "Internal reference flow and methodology guide. The flow is written against specific tool versions; the guide and the matrix are read together."
    },
    {
-    "id": "PDK-D3",
+    "id": "PDK-D5",
     "rel": "feeds",
     "text": "Compute and license capacity plan. Which tools and how many concurrent seats is what the license plan is built from."
    }
@@ -7218,7 +7218,7 @@ export const activityDetails: Record<string, ActivityDetail> = {
   ],
   "rel": [
    {
-    "id": "PDK-D5",
+    "id": "PDK-D6",
     "rel": "produces",
     "text": "Internal reference flow and methodology guide. The deliverable the pilot is what makes it credible."
    },
@@ -7415,7 +7415,7 @@ export const activityDetails: Record<string, ActivityDetail> = {
   ],
   "rel": [
    {
-    "id": "PDK-D7",
+    "id": "PDK-D4",
     "rel": "produces",
     "text": "Memory PPA gap analysis and custom-instance decision record. The gap analysis half—<code>PDK-11</code> adds the decision that follows from it."
    },
@@ -7601,12 +7601,12 @@ export const activityDetails: Record<string, ActivityDetail> = {
   ],
   "rel": [
    {
-    "id": "PDK-D3",
+    "id": "PDK-D5",
     "rel": "produces",
     "text": "Compute and license capacity plan. The deliverable its value is that it is dated against lead times."
    },
    {
-    "id": "PDK-D4",
+    "id": "PDK-D3",
     "rel": "feeds",
     "text": "EDA tool and version matrix. Which tools are pooled and at what seat count is decided against the matrix."
    }
@@ -7787,7 +7787,7 @@ export const activityDetails: Record<string, ActivityDetail> = {
   ],
   "rel": [
    {
-    "id": "PDK-D7",
+    "id": "PDK-D4",
     "rel": "produces",
     "text": "Memory PPA gap analysis and custom-instance decision record. The decision half of the deliverable, and the record downstream stages will point at."
    },
@@ -7974,12 +7974,12 @@ export const activityDetails: Record<string, ActivityDetail> = {
   ],
   "rel": [
    {
-    "id": "PDK-D6",
+    "id": "PDK-D7",
     "rel": "produces",
     "text": "Signoff corner definition agreed with foundry. The deliverable \"agreed\" is the operative word—an internal corner set has no standing."
    },
    {
-    "id": "PDK-D3",
+    "id": "PDK-D5",
     "rel": "feeds",
     "text": "Compute and license capacity plan. Corner count multiplied by modes is the single largest driver of signoff compute demand."
    }
@@ -8185,7 +8185,7 @@ export const activityDetails: Record<string, ActivityDetail> = {
     "text": "PDK readiness dashboard. The dashboard closes when the environment releases; until then every readiness item is still individually tracked."
    },
    {
-    "id": "PDK-D5",
+    "id": "PDK-D6",
     "rel": "feeds",
     "text": "Internal reference flow and methodology guide. The guide describes the flow; this environment is the flow, packaged and versioned."
    }
@@ -28146,7 +28146,7 @@ export const activityDetails: Record<string, ActivityDetail> = {
   ],
   "rel": [
    {
-    "id": "SO-D1",
+    "id": "SO-D3",
     "rel": "produces",
     "text": "<b>EM/IR and SI/PI signoff reports.</b> The EM and IR half of the deliverable; <code>SO-08</code> supplies the SI/PI half."
    },
@@ -28334,7 +28334,7 @@ export const activityDetails: Record<string, ActivityDetail> = {
   ],
   "rel": [
    {
-    "id": "SO-D2",
+    "id": "SO-D1",
     "rel": "produces",
     "text": "<b>Reliability reports—ESD, latch-up, FIT.</b> The reliability reports are produced here, and they are what <code>MP-04</code> will be measured against."
    },
@@ -28514,7 +28514,7 @@ export const activityDetails: Record<string, ActivityDetail> = {
   ],
   "rel": [
    {
-    "id": "SO-D3",
+    "id": "SO-D2",
     "rel": "produces",
     "text": "<b>DFM and lithography hotspot report.</b> The DFM and hotspot report is produced here, and its compliance score is a yield predictor."
    },
@@ -28703,7 +28703,7 @@ export const activityDetails: Record<string, ActivityDetail> = {
   ],
   "rel": [
    {
-    "id": "SO-D1",
+    "id": "SO-D3",
     "rel": "produces",
     "text": "<b>EM/IR and SI/PI signoff reports.</b> The signal integrity half of the deliverable—crosstalk delay, noise and glitch results reconciled into the timing signoff numbers."
    },
@@ -29450,7 +29450,7 @@ export const activityDetails: Record<string, ActivityDetail> = {
   ],
   "rel": [
    {
-    "id": "SO-D1",
+    "id": "SO-D3",
     "rel": "feeds",
     "text": "<b>EM/IR and SI/PI signoff reports.</b> The system-level results belong in the same report as the die-only ones, reconciled rather than filed separately."
    },
@@ -31984,7 +31984,7 @@ export const activityDetails: Record<string, ActivityDetail> = {
   ],
   "rel": [
    {
-    "id": "FAB-D4",
+    "id": "FAB-D3",
     "rel": "produces",
     "text": "<b>Inline, PCM and WAT data package.</b> The inline half of the deliverable, and the earliest signal the program gets."
    },
@@ -32144,7 +32144,7 @@ export const activityDetails: Record<string, ActivityDetail> = {
   ],
   "rel": [
    {
-    "id": "FAB-D3",
+    "id": "FAB-D4",
     "rel": "feeds",
     "text": "<b>Processed engineering-lot wafers.</b> The lot definition here determines what comes out at the end."
    },
@@ -32317,12 +32317,12 @@ export const activityDetails: Record<string, ActivityDetail> = {
   ],
   "rel": [
    {
-    "id": "FAB-D3",
+    "id": "FAB-D4",
     "rel": "feeds",
     "text": "<b>Processed engineering-lot wafers.</b> Front-end processing is where the transistors are actually made."
    },
    {
-    "id": "FAB-D4",
+    "id": "FAB-D3",
     "rel": "feeds",
     "text": "<b>Inline, PCM and WAT data package.</b> Front-end inline data is the earliest indication of how the lot is running."
    }
@@ -32492,12 +32492,12 @@ export const activityDetails: Record<string, ActivityDetail> = {
   ],
   "rel": [
    {
-    "id": "FAB-D3",
+    "id": "FAB-D4",
     "rel": "produces",
     "text": "<b>Processed engineering-lot wafers.</b> The wafers are finished here—the deliverable the whole stage exists to produce."
    },
    {
-    "id": "FAB-D4",
+    "id": "FAB-D3",
     "rel": "feeds",
     "text": "<b>Inline, PCM and WAT data package.</b> Back-end inline data completes the process record for the lot."
    }
@@ -32656,7 +32656,7 @@ export const activityDetails: Record<string, ActivityDetail> = {
   ],
   "rel": [
    {
-    "id": "FAB-D4",
+    "id": "FAB-D3",
     "rel": "produces",
     "text": "<b>Inline, PCM and WAT data package.</b> The PCM half of the deliverable, and the earliest device-level data available."
    },
@@ -32822,7 +32822,7 @@ export const activityDetails: Record<string, ActivityDetail> = {
     "text": "<b>Wafer acceptance disposition record.</b> The disposition record is produced here, and it is what a later yield discussion refers back to."
    },
    {
-    "id": "FAB-D3",
+    "id": "FAB-D4",
     "rel": "gates",
     "text": "<b>Processed engineering-lot wafers.</b> Wafers are not released downstream until this decision is taken."
    }
@@ -32982,7 +32982,7 @@ export const activityDetails: Record<string, ActivityDetail> = {
     "text": "<b>First Silicon availability notice.</b> The availability notice is issued here, and it carries the stage's milestone—First Silicon."
    },
    {
-    "id": "FAB-D3",
+    "id": "FAB-D4",
     "rel": "feeds",
     "text": "<b>Processed engineering-lot wafers.</b> Wafers become useful when they arrive, not when they are finished."
    }
@@ -41827,7 +41827,7 @@ export const activityDetails: Record<string, ActivityDetail> = {
   ],
   "rel": [
    {
-    "id": "EVB-D4",
+    "id": "EVB-D3",
     "rel": "produces",
     "text": "<b>EVB schematics, BOM and layout database.</b> The schematic half of the deliverable—the reviewed schematic and sourced BOM that layout is built from."
    },
@@ -42018,7 +42018,7 @@ export const activityDetails: Record<string, ActivityDetail> = {
   ],
   "rel": [
    {
-    "id": "EVB-D4",
+    "id": "EVB-D3",
     "rel": "feeds",
     "text": "<b>EVB schematics, BOM and layout database.</b> The power subsystem design is part of the schematic package."
    },
@@ -42216,7 +42216,7 @@ export const activityDetails: Record<string, ActivityDetail> = {
     "text": "<b>Debug and trace access documentation.</b> The access documentation is produced here, and it is what the bring-up team reads at 2am."
    },
    {
-    "id": "EVB-D4",
+    "id": "EVB-D3",
     "rel": "feeds",
     "text": "<b>EVB schematics, BOM and layout database.</b> Debug headers and access points are schematic and layout content."
    }
@@ -42414,7 +42414,7 @@ export const activityDetails: Record<string, ActivityDetail> = {
   ],
   "rel": [
    {
-    "id": "EVB-D4",
+    "id": "EVB-D3",
     "rel": "produces",
     "text": "<b>EVB schematics, BOM and layout database.</b> The layout half of the deliverable—what fabrication is built from."
    },
@@ -42802,7 +42802,7 @@ export const activityDetails: Record<string, ActivityDetail> = {
     "text": "<b>Fabricated and assembled boards, rev A/B with quantity plan.</b> The board fleet is fabricated, assembled and inspected here, delivered at the quantity the parallel-debug plan needs."
    },
    {
-    "id": "EVB-D4",
+    "id": "EVB-D3",
     "rel": "informs",
     "text": "<b>EVB schematics, BOM and layout database.</b> Fabrication findings—DFM issues, substitutions—feed back into the database."
    }
@@ -42977,7 +42977,7 @@ export const activityDetails: Record<string, ActivityDetail> = {
   ],
   "rel": [
    {
-    "id": "EVB-D3",
+    "id": "EVB-D4",
     "rel": "produces",
     "text": "<b>Lab setup and instrument reservation plan.</b> The reservation plan and rack build come from here, and they are what stop bring-up queueing for a scope."
    },
@@ -44154,7 +44154,7 @@ export const activityDetails: Record<string, ActivityDetail> = {
   ],
   "rel": [
    {
-    "id": "TEST-D4",
+    "id": "TEST-D2",
     "rel": "produces",
     "text": "<b>Qualified probe card and load board.</b> The probe card half of the deliverable—designed, fabricated and qualified on the tester before wafers arrive, with its spare and repair plan."
    },
@@ -44361,7 +44361,7 @@ export const activityDetails: Record<string, ActivityDetail> = {
   ],
   "rel": [
    {
-    "id": "TEST-D4",
+    "id": "TEST-D2",
     "rel": "produces",
     "text": "<b>Qualified probe card and load board.</b> The load board half of the deliverable—the socketed, SI-validated board brought up on the tester with its correlation fixture."
    },
@@ -44996,7 +44996,7 @@ export const activityDetails: Record<string, ActivityDetail> = {
   ],
   "rel": [
    {
-    "id": "TEST-D2",
+    "id": "TEST-D3",
     "rel": "produces",
     "text": "<b>ATE-ready pattern set with debug log.</b> The ATE-ready pattern set and its debug log are produced here—patterns translated, fitted to tester memory, simulated against the tester model and debugged to run."
    },
@@ -45420,7 +45420,7 @@ export const activityDetails: Record<string, ActivityDetail> = {
   ],
   "rel": [
    {
-    "id": "TEST-D3",
+    "id": "TEST-D4",
     "rel": "produces",
     "text": "<b>Test data infrastructure and yield database.</b> The data infrastructure is built here—the STDF pipeline, traceability keys and yield database every later yield decision is made from."
    },
@@ -45976,7 +45976,7 @@ export const activityDetails: Record<string, ActivityDetail> = {
     "text": "<b>Bring-up report with per-milestone health status.</b> Power-on is the first milestone and its result sets the program's tone."
    },
    {
-    "id": "BU-D5",
+    "id": "BU-D4",
     "rel": "feeds",
     "text": "<b>Characterization data set.</b> The first rail current measurements are the earliest real power data the program has."
    }
@@ -46155,7 +46155,7 @@ export const activityDetails: Record<string, ActivityDetail> = {
     "text": "<b>Bring-up report with per-milestone health status.</b> Clocking and reset form the second milestone; clearing this layer is what makes every later failure attributable to something real."
    },
    {
-    "id": "BU-D5",
+    "id": "BU-D4",
     "rel": "feeds",
     "text": "<b>Characterization data set.</b> PLL lock range and jitter are datasheet-relevant measurements."
    }
@@ -46344,7 +46344,7 @@ export const activityDetails: Record<string, ActivityDetail> = {
     "text": "<b>Bring-up report with per-milestone health status.</b> First boot is the report's central milestone and where it starts being published widely."
    },
    {
-    "id": "BU-D4",
+    "id": "BU-D6",
     "rel": "feeds",
     "text": "<b>Errata list with workarounds.</b> Boot-time deviations are the earliest errata the program records."
    }
@@ -46549,7 +46549,7 @@ export const activityDetails: Record<string, ActivityDetail> = {
     "text": "<b>Failure analysis reports.</b> The failure analysis reports come from here, and physical FA is their most conclusive form."
    },
    {
-    "id": "BU-D4",
+    "id": "BU-D6",
     "rel": "feeds",
     "text": "<b>Errata list with workarounds.</b> Every root cause found here becomes an errata entry or a fix."
    }
@@ -46969,7 +46969,7 @@ export const activityDetails: Record<string, ActivityDetail> = {
   ],
   "rel": [
    {
-    "id": "BU-D5",
+    "id": "BU-D4",
     "rel": "feeds",
     "text": "<b>Characterization data set.</b> Memory bandwidth, latency and efficiency are core characterization results."
    },
@@ -47160,7 +47160,7 @@ export const activityDetails: Record<string, ActivityDetail> = {
   ],
   "rel": [
    {
-    "id": "BU-D5",
+    "id": "BU-D4",
     "rel": "produces",
     "text": "<b>Characterization data set—V/F/T shmoo and power measurements.</b> The characterization data set is produced here—the V/F/T shmoo surfaces, power measurements and fleet variation data the specification is set against."
    },
@@ -47359,12 +47359,12 @@ export const activityDetails: Record<string, ActivityDetail> = {
   ],
   "rel": [
    {
-    "id": "BU-D4",
+    "id": "BU-D6",
     "rel": "produces",
     "text": "<b>Errata list with workarounds.</b> The errata list with its workarounds is produced here, and it is what ships alongside the product."
    },
    {
-    "id": "BU-D6",
+    "id": "BU-D5",
     "rel": "feeds",
     "text": "<b>Respin versus metal-fix decision record.</b> Which errata are tolerable with a workaround is the decision's main input."
    }
@@ -47542,7 +47542,7 @@ export const activityDetails: Record<string, ActivityDetail> = {
   ],
   "rel": [
    {
-    "id": "BU-D5",
+    "id": "BU-D4",
     "rel": "feeds",
     "text": "<b>Characterization data set.</b> Performance and efficiency measurements are part of the product's characterization."
    },
@@ -47733,12 +47733,12 @@ export const activityDetails: Record<string, ActivityDetail> = {
   ],
   "rel": [
    {
-    "id": "BU-D6",
+    "id": "BU-D5",
     "rel": "produces",
     "text": "<b>Respin versus metal-fix decision record.</b> The decision record is produced here, and the record is what the program is held to."
    },
    {
-    "id": "BU-D4",
+    "id": "BU-D6",
     "rel": "feeds",
     "text": "<b>Errata list with workarounds.</b> Errata not fixed by the decision become permanent, documented behavior."
    }
@@ -47922,7 +47922,7 @@ export const activityDetails: Record<string, ActivityDetail> = {
     "text": "<b>Customer sample release package.</b> The release package is assembled here—units plus everything needed to use them."
    },
    {
-    "id": "BU-D4",
+    "id": "BU-D6",
     "rel": "feeds",
     "text": "<b>Errata list with workarounds.</b> The errata pack that ships with samples is the errata list's first external use."
    }
@@ -48522,7 +48522,7 @@ export const activityDetails: Record<string, ActivityDetail> = {
   ],
   "rel": [
    {
-    "id": "MP-D5",
+    "id": "MP-D6",
     "rel": "produces",
     "text": "<b>Reliability and package qualification data packages.</b> The silicon-reliability half of the deliverable—stress results, interim readouts and failure mechanisms compiled into the reliability data package."
    },
@@ -48715,7 +48715,7 @@ export const activityDetails: Record<string, ActivityDetail> = {
   ],
   "rel": [
    {
-    "id": "MP-D5",
+    "id": "MP-D6",
     "rel": "feeds",
     "text": "<b>Reliability and package qualification data packages.</b> ESD and latch-up classification are part of the qualification package."
    },
@@ -49131,7 +49131,7 @@ export const activityDetails: Record<string, ActivityDetail> = {
   ],
   "rel": [
    {
-    "id": "MP-D5",
+    "id": "MP-D6",
     "rel": "produces",
     "text": "<b>Reliability and package qualification data packages.</b> The package half of the deliverable—MSL classification, board-level life, drop and bend results with their failure analyses."
    },
@@ -49555,7 +49555,7 @@ export const activityDetails: Record<string, ActivityDetail> = {
   ],
   "rel": [
    {
-    "id": "MP-D6",
+    "id": "MP-D5",
     "rel": "produces",
     "text": "<b>Ramp plan and supply commitment.</b> The ramp plan and supply commitment are produced here—with every long-lead commitment, buffer and second-source position behind them."
    },
@@ -49982,7 +49982,7 @@ export const activityDetails: Record<string, ActivityDetail> = {
     "text": "<b>Production test program release.</b> The multi-site flow is a controlled revision of the released program."
    },
    {
-    "id": "MP-D6",
+    "id": "MP-D5",
     "rel": "feeds",
     "text": "<b>Ramp plan and supply commitment.</b> Throughput per tester is what the capacity commitment is built from."
    }

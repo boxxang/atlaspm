@@ -44,7 +44,7 @@ module.exports = {
   rel:[
     {id:'ARCH-D3', rel:'produces', text:'<b>Performance model and workload analysis report.</b> The model, its correlation and its confidence statement are the deliverable—the report without the model is an assertion.'},
     {id:'ARCH-D6', rel:'feeds', text:'<b>Architecture specification.</b> Every quantitative claim in the specification traces back to a sweep in this model, or it does not belong in the specification.'},
-    {id:'ARCH-D4', rel:'feeds', text:'<b>Block partitioning and PPA budget table.</b> The sweeps are what decide cluster count and SRAM capacity before <code>ARCH-02</code> draws the boundaries.'},
+    {id:'ARCH-D5', rel:'feeds', text:'<b>Block partitioning and PPA budget table.</b> The sweeps are what decide cluster count and SRAM capacity before <code>ARCH-02</code> draws the boundaries.'},
   ],
   risks:[
     '<b>Model never correlated against silicon.</b> An uncorrelated model has an unknown error bar, and every decision taken on it inherits that error silently.',
@@ -117,9 +117,9 @@ module.exports = {
   ],
   producedBy:[1,2,3,4,5,6,7,8],
   rel:[
-    {id:'ARCH-D4', rel:'produces', text:'<b>Block partitioning and PPA budget table.</b> The partitioning half of the deliverable; <code>ARCH-09</code> supplies the budget half against these blocks.'},
+    {id:'ARCH-D5', rel:'produces', text:'<b>Block partitioning and PPA budget table.</b> The partitioning half of the deliverable; <code>ARCH-09</code> supplies the budget half against these blocks.'},
     {id:'ARCH-D6', rel:'feeds', text:'<b>Architecture specification.</b> The partition and its boundaries are the specification\'s structural spine—every other section is written against them.'},
-    {id:'ARCH-D5', rel:'feeds', text:'<b>Chip-level block diagram with pin and bump budget.</b> <code>ARCH-08</code> draws what this activity decides.'},
+    {id:'ARCH-D4', rel:'feeds', text:'<b>Chip-level block diagram with pin and bump budget.</b> <code>ARCH-08</code> draws what this activity decides.'},
   ],
   risks:[
     '<b>Chiplet chosen for the roadmap rather than for this product.</b> A die-to-die interface costs area, power and a test strategy; taking it on to be ready for the next program charges this one.',
@@ -195,7 +195,7 @@ module.exports = {
   rel:[
     {id:'ARCH-D1', rel:'produces', text:'<b>Interface and protocol definition document.</b> This activity is the deliverable—the selections, their revisions and the requirements derived from them.'},
     {id:'ARCH-D6', rel:'feeds', text:'<b>Architecture specification.</b> The interface chapter is imported from the definition document rather than restated, so the two cannot drift.'},
-    {id:'ARCH-D5', rel:'feeds', text:'<b>Chip-level block diagram with pin and bump budget.</b> Lane counts and PHY footprints are what <code>ARCH-08</code> allocates bumps against.'},
+    {id:'ARCH-D4', rel:'feeds', text:'<b>Chip-level block diagram with pin and bump budget.</b> Lane counts and PHY footprints are what <code>ARCH-08</code> allocates bumps against.'},
   ],
   risks:[
     '<b>Specification not ratified at selection.</b> Designing to a draft revision transfers a standards-body schedule into the program, and the transfer is invisible until compliance testing.',
@@ -269,7 +269,7 @@ module.exports = {
   producedBy:[1,2,3,4,5,6,7,8],
   rel:[
     {id:'ARCH-D6', rel:'produces', text:'<b>Architecture specification.</b> The memory hierarchy chapter is authored here and lands in the specification whole; <code>ARCH-07</code> assembles rather than rewrites it.'},
-    {id:'ARCH-D4', rel:'feeds', text:'<b>Block partitioning and PPA budget table.</b> SRAM capacity is the largest single area line in the budget, and it is decided here.'},
+    {id:'ARCH-D5', rel:'feeds', text:'<b>Block partitioning and PPA budget table.</b> SRAM capacity is the largest single area line in the budget, and it is decided here.'},
     {id:'ARCH-D3', rel:'feeds', text:'<b>Performance model and workload analysis report.</b> The hierarchy sweeps are run in the ARCH-01 model and reported with it.'},
   ],
   risks:[
@@ -417,7 +417,7 @@ module.exports = {
   rel:[
     {id:'ARCH-D2', rel:'produces', text:'<b>Power / clock / reset architecture and UPF intent.</b> This activity is the deliverable, and the UPF file is the part of it tools consume directly.'},
     {id:'ARCH-D6', rel:'feeds', text:'<b>Architecture specification.</b> The power and clock chapter, and the constraint every block owner designs against.'},
-    {id:'ARCH-D4', rel:'feeds', text:'<b>Block partitioning and PPA budget table.</b> Power domains are the unit the power budget is allocated in.'},
+    {id:'ARCH-D5', rel:'feeds', text:'<b>Block partitioning and PPA budget table.</b> Power domains are the unit the power budget is allocated in.'},
   ],
   risks:[
     '<b>Domains drawn for elegance rather than for control.</b> Every domain boundary costs isolation cells, level shifters and verification states; a domain that is never independently gated is pure overhead.',
@@ -563,9 +563,9 @@ module.exports = {
   ],
   producedBy:[1,2,3,4,5,6,7],
   rel:[
-    {id:'ARCH-D5', rel:'produces', text:'<b>Chip-level block diagram with pin and bump budget.</b> This activity is the deliverable, and the bump map is the half of it the package team consumes directly.'},
+    {id:'ARCH-D4', rel:'produces', text:'<b>Chip-level block diagram with pin and bump budget.</b> This activity is the deliverable, and the bump map is the half of it the package team consumes directly.'},
     {id:'ARCH-D6', rel:'feeds', text:'<b>Architecture specification.</b> The physical view chapter—the first place the specification stops being a block diagram and becomes a die.'},
-    {id:'ARCH-D4', rel:'feeds', text:'<b>Block partitioning and PPA budget table.</b> Placement intent is what <code>ARCH-09</code> allocates die area against.'},
+    {id:'ARCH-D5', rel:'feeds', text:'<b>Block partitioning and PPA budget table.</b> Placement intent is what <code>ARCH-09</code> allocates die area against.'},
   ],
   risks:[
     '<b>Bump budget derived after interfaces are fixed.</b> Lane counts set without a bump budget produce a floorplan that cannot be built and an interface that has to be cut late.',
@@ -636,7 +636,7 @@ module.exports = {
   ],
   producedBy:[1,2,3,4,5,6,7],
   rel:[
-    {id:'ARCH-D4', rel:'produces', text:'<b>Block partitioning and PPA budget table.</b> The budget half of the deliverable, published against the blocks <code>ARCH-02</code> defined.'},
+    {id:'ARCH-D5', rel:'produces', text:'<b>Block partitioning and PPA budget table.</b> The budget half of the deliverable, published against the blocks <code>ARCH-02</code> defined.'},
     {id:'ARCH-D6', rel:'feeds', text:'<b>Architecture specification.</b> The budget table is referenced by the specification rather than copied, so a budget change does not need a specification revision.'},
     {id:'ARCH-D7', rel:'gates', text:'<b>Architecture Freeze review package.</b> A block without an accepted budget is an open item at the freeze gate.'},
   ],
@@ -712,7 +712,7 @@ module.exports = {
   producedBy:[1,2,3,4,5,6,7,8],
   rel:[
     {id:'ARCH-D6', rel:'feeds', text:'<b>Architecture specification.</b> Block specifications are children of it—they refine rather than restate, and any conflict is resolved in favor of the architecture specification.'},
-    {id:'ARCH-D4', rel:'feeds', text:'<b>Block partitioning and PPA budget table.</b> Microarchitecture is where a block owner first tests whether the allocated budget is achievable.'},
+    {id:'ARCH-D5', rel:'feeds', text:'<b>Block partitioning and PPA budget table.</b> Microarchitecture is where a block owner first tests whether the allocated budget is achievable.'},
     {id:'ARCH-D7', rel:'gates', text:'<b>Architecture Freeze review package.</b> A block with no microarchitecture owner is an open item at the gate—the specification cannot be implemented by nobody.'},
   ],
   risks:[

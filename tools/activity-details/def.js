@@ -38,8 +38,8 @@ module.exports = {
   rel:[
     {id:'DEF-D1', rel:'produces', text:'<b>Product requirements document (PRD).</b> The requirements list built here becomes the body of the PRD. This activity does not contribute to the PRD—it produces its content.'},
     {id:'DEF-D2', rel:'feeds', text:'<b>Target specification—PPA and KPI table.</b> Each ranked requirement becomes a KPI line that <code>DEF-05</code> converts into a number. A target that cannot be traced back to a requirement is a target no customer asked for.'},
-    {id:'DEF-D4', rel:'informs', text:'<b>Product cost and margin model.</b> Provides the volume, segment and ASP assumptions the cost model is built on.'},
-    {id:'DEF-D3', rel:'feeds', text:'<b>Feasibility report.</b> <code>DEF-07</code> assesses feasibility against this specific requirement set. A feasibility study run against a different or older set does not tell the program anything useful.'},
+    {id:'DEF-D3', rel:'informs', text:'<b>Product cost and margin model.</b> Provides the volume, segment and ASP assumptions the cost model is built on.'},
+    {id:'DEF-D4', rel:'feeds', text:'<b>Feasibility report.</b> <code>DEF-07</code> assesses feasibility against this specific requirement set. A feasibility study run against a different or older set does not tell the program anything useful.'},
     {id:'DEF-D6', rel:'gates', text:'<b>Kickoff Go / No-Go decision record.</b> The gate review checks the signoff sheet. If the requirements are not signed, the program does not pass the gate.'},
   ],
   risks:[
@@ -111,7 +111,7 @@ module.exports = {
   producedBy:[1,2,3,4,5,5,6],
   rel:[
     {id:'DEF-D1', rel:'feeds', text:'<b>Product requirements document.</b> The capability gaps identified here become requirements. A gap that is not written into the requirement set is not addressed by the design.'},
-    {id:'DEF-D4', rel:'informs', text:'<b>Product cost and margin model.</b> Competitive position is the basis on which the ASP assumption is defended.'},
+    {id:'DEF-D3', rel:'informs', text:'<b>Product cost and margin model.</b> Competitive position is the basis on which the ASP assumption is defended.'},
   ],
   risks:[
     '<b>Benchmarking against currently shipping parts.</b> The comparison that determines the product\'s position is against parts launching thirty months out, and those numbers have to be projected rather than measured.',
@@ -184,7 +184,7 @@ module.exports = {
   rel:[
     {id:'DEF-D2', rel:'produces', text:'<b>Target specification—PPA and KPI table.</b> This activity derives the KPI half of the deliverable; <code>DEF-05</code> derives the PPA half. The two are published as a single table.'},
     {id:'DEF-D1', rel:'feeds', text:'<b>Product requirements document.</b> The use-case list and the deployment mix are written back into the PRD as the context the requirements are based on.'},
-    {id:'DEF-D3', rel:'feeds', text:'<b>Feasibility report.</b> Feasibility is assessed against these KPI numbers rather than against the requirement text.'},
+    {id:'DEF-D4', rel:'feeds', text:'<b>Feasibility report.</b> Feasibility is assessed against these KPI numbers rather than against the requirement text.'},
   ],
   risks:[
     '<b>Workload traces that flatter the design.</b> A workload suite assembled from benchmarks that already run well on the previous generation will not expose the cases that break the new architecture.',
@@ -326,8 +326,8 @@ module.exports = {
   producedBy:[1,2,3,4,5,6,7],
   rel:[
     {id:'DEF-D2', rel:'produces', text:'<b>Target specification—PPA and KPI table.</b> This activity produces the PPA half of the deliverable. <code>DEF-03</code> produces the KPI half, and the two are published as a single table.'},
-    {id:'DEF-D3', rel:'feeds', text:'<b>Feasibility report.</b> These are the numbers <code>DEF-07</code> asks each candidate process node to support.'},
-    {id:'DEF-D4', rel:'informs', text:'<b>Product cost and margin model.</b> The die area budget is the single largest input to the cost model.'},
+    {id:'DEF-D4', rel:'feeds', text:'<b>Feasibility report.</b> These are the numbers <code>DEF-07</code> asks each candidate process node to support.'},
+    {id:'DEF-D3', rel:'informs', text:'<b>Product cost and margin model.</b> The die area budget is the single largest input to the cost model.'},
   ],
   risks:[
     '<b>Targets set from ambition rather than from process capability.</b> A max frequency target the standard cell library cannot reach leads to an extended timing closure effort that ends in either a respin or a reduced speed bin.',
@@ -400,8 +400,8 @@ module.exports = {
   ],
   producedBy:[1,2,3,4,5,6,6,6,7],
   rel:[
-    {id:'DEF-D4', rel:'produces', text:'<b>Product cost and margin model.</b> This activity produces the deliverable. The workbook and its assumptions are handed over in full rather than summarized, because downstream teams need to re-run the model when inputs change.'},
-    {id:'DEF-D3', rel:'feeds', text:'<b>Feasibility report.</b> A process node that meets the PPA targets but breaks the cost ceiling is recorded as infeasible, and this model is the basis for that finding.'},
+    {id:'DEF-D3', rel:'produces', text:'<b>Product cost and margin model.</b> This activity produces the deliverable. The workbook and its assumptions are handed over in full rather than summarized, because downstream teams need to re-run the model when inputs change.'},
+    {id:'DEF-D4', rel:'feeds', text:'<b>Feasibility report.</b> A process node that meets the PPA targets but breaks the cost ceiling is recorded as infeasible, and this model is the basis for that finding.'},
     {id:'DEF-D6', rel:'gates', text:'<b>Kickoff Go / No-Go decision record.</b> The funding decision is a margin decision. If the cost model does not close, the program does not pass the gate.'},
   ],
   risks:[
@@ -473,7 +473,7 @@ module.exports = {
   ],
   producedBy:[1,2,3,4,5,6,7],
   rel:[
-    {id:'DEF-D3', rel:'produces', text:'<b>Feasibility report.</b> This activity produces the deliverable. The verdict, the assessment matrix and the concession list are published together, because the verdict on its own cannot be acted on.'},
+    {id:'DEF-D4', rel:'produces', text:'<b>Feasibility report.</b> This activity produces the deliverable. The verdict, the assessment matrix and the concession list are published together, because the verdict on its own cannot be acted on.'},
     {id:'DEF-D6', rel:'gates', text:'<b>Kickoff Go / No-Go decision record.</b> A No-Go recommendation from this activity is the only mechanism in the stage that can stop the program, and it has to reach the decision review without being edited.'},
   ],
   risks:[

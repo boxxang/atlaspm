@@ -113,12 +113,12 @@
           "text": "<b>Target specification—PPA and KPI table.</b> Each ranked requirement becomes a KPI line that <code>DEF-05</code> converts into a number. A target that cannot be traced back to a requirement is a target no customer asked for."
         },
         {
-          "id": "DEF-D4",
+          "id": "DEF-D3",
           "rel": "informs",
           "text": "<b>Product cost and margin model.</b> Provides the volume, segment and ASP assumptions the cost model is built on."
         },
         {
-          "id": "DEF-D3",
+          "id": "DEF-D4",
           "rel": "feeds",
           "text": "<b>Feasibility report.</b> <code>DEF-07</code> assesses feasibility against this specific requirement set. A feasibility study run against a different or older set does not tell the program anything useful."
         },
@@ -332,7 +332,7 @@
           "text": "<b>Product requirements document.</b> The capability gaps identified here become requirements. A gap that is not written into the requirement set is not addressed by the design."
         },
         {
-          "id": "DEF-D4",
+          "id": "DEF-D3",
           "rel": "informs",
           "text": "<b>Product cost and margin model.</b> Competitive position is the basis on which the ASP assumption is defended."
         }
@@ -538,7 +538,7 @@
           "text": "<b>Product requirements document.</b> The use-case list and the deployment mix are written back into the PRD as the context the requirements are based on."
         },
         {
-          "id": "DEF-D3",
+          "id": "DEF-D4",
           "rel": "feeds",
           "text": "<b>Feasibility report.</b> Feasibility is assessed against these KPI numbers rather than against the requirement text."
         }
@@ -960,12 +960,12 @@
           "text": "<b>Target specification—PPA and KPI table.</b> This activity produces the PPA half of the deliverable. <code>DEF-03</code> produces the KPI half, and the two are published as a single table."
         },
         {
-          "id": "DEF-D3",
+          "id": "DEF-D4",
           "rel": "feeds",
           "text": "<b>Feasibility report.</b> These are the numbers <code>DEF-07</code> asks each candidate process node to support."
         },
         {
-          "id": "DEF-D4",
+          "id": "DEF-D3",
           "rel": "informs",
           "text": "<b>Product cost and margin model.</b> The die area budget is the single largest input to the cost model."
         }
@@ -1187,12 +1187,12 @@
       ],
       "rel": [
         {
-          "id": "DEF-D4",
+          "id": "DEF-D3",
           "rel": "produces",
           "text": "<b>Product cost and margin model.</b> This activity produces the deliverable. The workbook and its assumptions are handed over in full rather than summarized, because downstream teams need to re-run the model when inputs change."
         },
         {
-          "id": "DEF-D3",
+          "id": "DEF-D4",
           "rel": "feeds",
           "text": "<b>Feasibility report.</b> A process node that meets the PPA targets but breaks the cost ceiling is recorded as infeasible, and this model is the basis for that finding."
         },
@@ -1415,7 +1415,7 @@
       ],
       "rel": [
         {
-          "id": "DEF-D3",
+          "id": "DEF-D4",
           "rel": "produces",
           "text": "<b>Feasibility report.</b> This activity produces the deliverable. The verdict, the assessment matrix and the concession list are published together, because the verdict on its own cannot be acted on."
         },
@@ -2083,7 +2083,7 @@
           "text": "<b>Architecture specification.</b> Every quantitative claim in the specification traces back to a sweep in this model, or it does not belong in the specification."
         },
         {
-          "id": "ARCH-D4",
+          "id": "ARCH-D5",
           "rel": "feeds",
           "text": "<b>Block partitioning and PPA budget table.</b> The sweeps are what decide cluster count and SRAM capacity before <code>ARCH-02</code> draws the boundaries."
         }
@@ -2322,7 +2322,7 @@
       ],
       "rel": [
         {
-          "id": "ARCH-D4",
+          "id": "ARCH-D5",
           "rel": "produces",
           "text": "<b>Block partitioning and PPA budget table.</b> The partitioning half of the deliverable; <code>ARCH-09</code> supplies the budget half against these blocks."
         },
@@ -2332,7 +2332,7 @@
           "text": "<b>Architecture specification.</b> The partition and its boundaries are the specification's structural spine—every other section is written against them."
         },
         {
-          "id": "ARCH-D5",
+          "id": "ARCH-D4",
           "rel": "feeds",
           "text": "<b>Chip-level block diagram with pin and bump budget.</b> <code>ARCH-08</code> draws what this activity decides."
         }
@@ -2573,7 +2573,7 @@
           "text": "<b>Architecture specification.</b> The interface chapter is imported from the definition document rather than restated, so the two cannot drift."
         },
         {
-          "id": "ARCH-D5",
+          "id": "ARCH-D4",
           "rel": "feeds",
           "text": "<b>Chip-level block diagram with pin and bump budget.</b> Lane counts and PHY footprints are what <code>ARCH-08</code> allocates bumps against."
         }
@@ -2811,7 +2811,7 @@
           "text": "<b>Architecture specification.</b> The memory hierarchy chapter is authored here and lands in the specification whole; <code>ARCH-07</code> assembles rather than rewrites it."
         },
         {
-          "id": "ARCH-D4",
+          "id": "ARCH-D5",
           "rel": "feeds",
           "text": "<b>Block partitioning and PPA budget table.</b> SRAM capacity is the largest single area line in the budget, and it is decided here."
         },
@@ -3288,7 +3288,7 @@
           "text": "<b>Architecture specification.</b> The power and clock chapter, and the constraint every block owner designs against."
         },
         {
-          "id": "ARCH-D4",
+          "id": "ARCH-D5",
           "rel": "feeds",
           "text": "<b>Block partitioning and PPA budget table.</b> Power domains are the unit the power budget is allocated in."
         }
@@ -3758,7 +3758,7 @@
       ],
       "rel": [
         {
-          "id": "ARCH-D5",
+          "id": "ARCH-D4",
           "rel": "produces",
           "text": "<b>Chip-level block diagram with pin and bump budget.</b> This activity is the deliverable, and the bump map is the half of it the package team consumes directly."
         },
@@ -3768,7 +3768,7 @@
           "text": "<b>Architecture specification.</b> The physical view chapter—the first place the specification stops being a block diagram and becomes a die."
         },
         {
-          "id": "ARCH-D4",
+          "id": "ARCH-D5",
           "rel": "feeds",
           "text": "<b>Block partitioning and PPA budget table.</b> Placement intent is what <code>ARCH-09</code> allocates die area against."
         }
@@ -3991,7 +3991,7 @@
       ],
       "rel": [
         {
-          "id": "ARCH-D4",
+          "id": "ARCH-D5",
           "rel": "produces",
           "text": "<b>Block partitioning and PPA budget table.</b> The budget half of the deliverable, published against the blocks <code>ARCH-02</code> defined."
         },
@@ -4243,7 +4243,7 @@
           "text": "<b>Architecture specification.</b> Block specifications are children of it—they refine rather than restate, and any conflict is resolved in favor of the architecture specification."
         },
         {
-          "id": "ARCH-D4",
+          "id": "ARCH-D5",
           "rel": "feeds",
           "text": "<b>Block partitioning and PPA budget table.</b> Microarchitecture is where a block owner first tests whether the allocated budget is achievable."
         },
@@ -4469,7 +4469,7 @@
           "text": "<b>Technology selection report and decision record.</b> This activity owns the deliverable; <code>TECH-04</code> supplies the technical evidence it rests on."
         },
         {
-          "id": "TECH-D4",
+          "id": "TECH-D3",
           "rel": "feeds",
           "text": "<b>Node risk assessment.</b> The supply-continuity and geopolitical screen is one of the risk assessment's inputs, and it is gathered here."
         }
@@ -4665,7 +4665,7 @@
       ],
       "rel": [
         {
-          "id": "TECH-D4",
+          "id": "TECH-D3",
           "rel": "produces",
           "text": "<b>Node risk assessment—maturity, defect density, yield learning curve.</b> This activity is the deliverable, and it is what the yield assumption in the cost model should be built on."
         },
@@ -4882,7 +4882,7 @@
       ],
       "rel": [
         {
-          "id": "TECH-D5",
+          "id": "TECH-D4",
           "rel": "produces",
           "text": "<b>Executed foundry design agreement (DA) and NDA.</b> This activity is the deliverable, and until it executes the enablement band cannot legally start."
         },
@@ -5109,7 +5109,7 @@
           "text": "<b>Technology selection report and decision record.</b> The evidence half of the report—<code>TECH-01</code> records the decision, this activity is why the decision is defensible."
         },
         {
-          "id": "TECH-D4",
+          "id": "TECH-D3",
           "rel": "feeds",
           "text": "<b>Node risk assessment.</b> Where a target is only just met, this study is what says so, and that margin is a node risk."
         },
@@ -5334,7 +5334,7 @@
           "text": "<b>Process option / flavor sheet agreed with foundry.</b> This activity is the deliverable, and it is contractual rather than advisory."
         },
         {
-          "id": "TECH-D3",
+          "id": "TECH-D5",
           "rel": "feeds",
           "text": "<b>Wafer, mask and NRE cost sheet.</b> Every option on the sheet carries a price adder, so the flavor decides a meaningful part of the wafer cost."
         },
@@ -5556,7 +5556,7 @@
       ],
       "rel": [
         {
-          "id": "TECH-D3",
+          "id": "TECH-D5",
           "rel": "produces",
           "text": "<b>Wafer, mask and NRE cost sheet.</b> This activity is the deliverable, and its value is that the numbers are quoted rather than estimated."
         },
@@ -5762,7 +5762,7 @@
           "text": "<b>Capacity and tapeout slot commitment.</b> This activity is the deliverable, and it is worth only as much as the escalation path written into it."
         },
         {
-          "id": "TECH-D3",
+          "id": "TECH-D5",
           "rel": "informs",
           "text": "<b>Wafer, mask and NRE cost sheet.</b> Committed volume is what the price tier is granted against, so the two documents have to agree."
         }
@@ -5951,7 +5951,7 @@
           "text": "<b>Technology selection report and decision record.</b> Single-source acceptance belongs in the selection record, priced, rather than being implied by its absence."
         },
         {
-          "id": "TECH-D4",
+          "id": "TECH-D3",
           "rel": "feeds",
           "text": "<b>Node risk assessment.</b> Supply concentration is a node risk, and its mitigation is either a second source or an accepted exposure."
         }
@@ -6160,7 +6160,7 @@
           "text": "<b>Capacity and tapeout slot commitment.</b> Front-end capacity without matching backend capacity delivers wafers that cannot be assembled."
         },
         {
-          "id": "TECH-D3",
+          "id": "TECH-D5",
           "rel": "informs",
           "text": "<b>Wafer, mask and NRE cost sheet.</b> Interposer and assembly pricing is the backend half of the technology cost, and the cost model needs both."
         },
@@ -6598,7 +6598,7 @@
           "text": "<b>PDK readiness dashboard.</b> An outstanding exception request is a readiness gap, and it belongs on the dashboard with a date."
         },
         {
-          "id": "PDK-D5",
+          "id": "PDK-D6",
           "rel": "feeds",
           "text": "<b>Internal reference flow and methodology guide.</b> Rule dispositions become flow settings—what the tools are told to enforce and what they are told to allow."
         }
@@ -6817,7 +6817,7 @@
           "text": "<b>PDK readiness dashboard.</b> An unqualified library is a readiness gap that blocks synthesis, and it shows on the dashboard as one."
         },
         {
-          "id": "PDK-D6",
+          "id": "PDK-D7",
           "rel": "feeds",
           "text": "<b>Signoff corner definition.</b> The corners a library is characterized at bound the corners signoff can be run at."
         }
@@ -7029,7 +7029,7 @@
       ],
       "rel": [
         {
-          "id": "PDK-D5",
+          "id": "PDK-D6",
           "rel": "feeds",
           "text": "<b>Internal reference flow and methodology guide.</b> A flow is only reproducible if the decks it calls are versioned; the guide names the versions."
         },
@@ -7255,7 +7255,7 @@
           "text": "<b>Qualified library list.</b> The memory half of the deliverable—instances with every view a downstream tool consumes."
         },
         {
-          "id": "PDK-D7",
+          "id": "PDK-D4",
           "rel": "feeds",
           "text": "<b>Memory PPA gap analysis and custom-instance decision record.</b> The capability screen is where the gap first appears; <code>PDK-09</code> quantifies it."
         },
@@ -7473,7 +7473,7 @@
           "text": "<b>Qualified library list.</b> The IO and ESD half of the deliverable—the cells at the die edge, qualified rather than assumed."
         },
         {
-          "id": "PDK-D6",
+          "id": "PDK-D7",
           "rel": "feeds",
           "text": "<b>Signoff corner definition.</b> ESD and latch-up verification conditions are part of what signoff has to run, and they are defined here."
         }
@@ -7692,17 +7692,17 @@
       ],
       "rel": [
         {
-          "id": "PDK-D4",
+          "id": "PDK-D3",
           "rel": "produces",
           "text": "<b>EDA tool and version matrix (qualified and frozen).</b> This activity is the deliverable, and the freeze is the part that matters."
         },
         {
-          "id": "PDK-D5",
+          "id": "PDK-D6",
           "rel": "feeds",
           "text": "<b>Internal reference flow and methodology guide.</b> The flow is written against specific tool versions; the guide and the matrix are read together."
         },
         {
-          "id": "PDK-D3",
+          "id": "PDK-D5",
           "rel": "feeds",
           "text": "<b>Compute and license capacity plan.</b> Which tools and how many concurrent seats is what the license plan is built from."
         }
@@ -7927,7 +7927,7 @@
       ],
       "rel": [
         {
-          "id": "PDK-D5",
+          "id": "PDK-D6",
           "rel": "produces",
           "text": "<b>Internal reference flow and methodology guide.</b> This activity is the deliverable, and the pilot is what makes it credible."
         },
@@ -8140,7 +8140,7 @@
       ],
       "rel": [
         {
-          "id": "PDK-D7",
+          "id": "PDK-D4",
           "rel": "produces",
           "text": "<b>Memory PPA gap analysis and custom-instance decision record.</b> The gap analysis half—<code>PDK-11</code> adds the decision that follows from it."
         },
@@ -8342,12 +8342,12 @@
       ],
       "rel": [
         {
-          "id": "PDK-D3",
+          "id": "PDK-D5",
           "rel": "produces",
           "text": "<b>Compute and license capacity plan.</b> This activity is the deliverable, and its value is that it is dated against lead times."
         },
         {
-          "id": "PDK-D4",
+          "id": "PDK-D3",
           "rel": "feeds",
           "text": "<b>EDA tool and version matrix.</b> Which tools are pooled and at what seat count is decided against the matrix."
         }
@@ -8546,7 +8546,7 @@
       ],
       "rel": [
         {
-          "id": "PDK-D7",
+          "id": "PDK-D4",
           "rel": "produces",
           "text": "<b>Memory PPA gap analysis and custom-instance decision record.</b> The decision half of the deliverable, and the record downstream stages will point at."
         },
@@ -8749,12 +8749,12 @@
       ],
       "rel": [
         {
-          "id": "PDK-D6",
+          "id": "PDK-D7",
           "rel": "produces",
           "text": "<b>Signoff corner definition agreed with foundry.</b> This activity is the deliverable, and \"agreed\" is the operative word—an internal corner set has no standing."
         },
         {
-          "id": "PDK-D3",
+          "id": "PDK-D5",
           "rel": "feeds",
           "text": "<b>Compute and license capacity plan.</b> Corner count multiplied by modes is the single largest driver of signoff compute demand."
         }
@@ -8978,7 +8978,7 @@
           "text": "<b>PDK readiness dashboard.</b> The dashboard closes when the environment releases; until then every readiness item is still individually tracked."
         },
         {
-          "id": "PDK-D5",
+          "id": "PDK-D6",
           "rel": "feeds",
           "text": "<b>Internal reference flow and methodology guide.</b> The guide describes the flow; this environment is the flow, packaged and versioned."
         }
@@ -30722,7 +30722,7 @@
       ],
       "rel": [
         {
-          "id": "SO-D1",
+          "id": "SO-D3",
           "rel": "produces",
           "text": "<b>EM/IR and SI/PI signoff reports.</b> The EM and IR half of the deliverable; <code>SO-08</code> supplies the SI/PI half."
         },
@@ -30924,7 +30924,7 @@
       ],
       "rel": [
         {
-          "id": "SO-D2",
+          "id": "SO-D1",
           "rel": "produces",
           "text": "<b>Reliability reports—ESD, latch-up, FIT.</b> This activity is the deliverable, and it is what <code>MP-04</code> will be measured against."
         },
@@ -31118,7 +31118,7 @@
       ],
       "rel": [
         {
-          "id": "SO-D3",
+          "id": "SO-D2",
           "rel": "produces",
           "text": "<b>DFM and lithography hotspot report.</b> This activity is the deliverable, and its compliance score is a yield predictor."
         },
@@ -31323,7 +31323,7 @@
       ],
       "rel": [
         {
-          "id": "SO-D1",
+          "id": "SO-D3",
           "rel": "produces",
           "text": "<b>EM/IR and SI/PI signoff reports.</b> The signal integrity half of the deliverable."
         },
@@ -32128,7 +32128,7 @@
       ],
       "rel": [
         {
-          "id": "SO-D1",
+          "id": "SO-D3",
           "rel": "feeds",
           "text": "<b>EM/IR and SI/PI signoff reports.</b> The system-level results belong in the same report as the die-only ones, reconciled rather than filed separately."
         },
@@ -34852,7 +34852,7 @@
       ],
       "rel": [
         {
-          "id": "FAB-D4",
+          "id": "FAB-D3",
           "rel": "produces",
           "text": "<b>Inline, PCM and WAT data package.</b> The inline half of the deliverable, and the earliest signal the program gets."
         },
@@ -35022,7 +35022,7 @@
       ],
       "rel": [
         {
-          "id": "FAB-D3",
+          "id": "FAB-D4",
           "rel": "feeds",
           "text": "<b>Processed engineering-lot wafers.</b> The lot definition here determines what comes out at the end."
         },
@@ -35211,12 +35211,12 @@
       ],
       "rel": [
         {
-          "id": "FAB-D3",
+          "id": "FAB-D4",
           "rel": "feeds",
           "text": "<b>Processed engineering-lot wafers.</b> Front-end processing is where the transistors are actually made."
         },
         {
-          "id": "FAB-D4",
+          "id": "FAB-D3",
           "rel": "feeds",
           "text": "<b>Inline, PCM and WAT data package.</b> Front-end inline data is the earliest indication of how the lot is running."
         }
@@ -35400,12 +35400,12 @@
       ],
       "rel": [
         {
-          "id": "FAB-D3",
+          "id": "FAB-D4",
           "rel": "produces",
           "text": "<b>Processed engineering-lot wafers.</b> This activity is where the wafers are finished—the deliverable the whole stage exists to produce."
         },
         {
-          "id": "FAB-D4",
+          "id": "FAB-D3",
           "rel": "feeds",
           "text": "<b>Inline, PCM and WAT data package.</b> Back-end inline data completes the process record for the lot."
         }
@@ -35576,7 +35576,7 @@
       ],
       "rel": [
         {
-          "id": "FAB-D4",
+          "id": "FAB-D3",
           "rel": "produces",
           "text": "<b>Inline, PCM and WAT data package.</b> The PCM half of the deliverable, and the earliest device-level data available."
         },
@@ -35754,7 +35754,7 @@
           "text": "<b>Wafer acceptance disposition record.</b> This activity is the deliverable, and the record is what a later yield discussion refers back to."
         },
         {
-          "id": "FAB-D3",
+          "id": "FAB-D4",
           "rel": "gates",
           "text": "<b>Processed engineering-lot wafers.</b> Wafers are not released downstream until this decision is taken."
         }
@@ -35924,7 +35924,7 @@
           "text": "<b>First Silicon availability notice.</b> This activity is the deliverable, and it carries the stage's milestone."
         },
         {
-          "id": "FAB-D3",
+          "id": "FAB-D4",
           "rel": "feeds",
           "text": "<b>Processed engineering-lot wafers.</b> Wafers become useful when they arrive, not when they are finished."
         }
@@ -45521,7 +45521,7 @@
       ],
       "rel": [
         {
-          "id": "EVB-D4",
+          "id": "EVB-D3",
           "rel": "produces",
           "text": "<b>EVB schematics, BOM and layout database.</b> The schematic half of the deliverable."
         },
@@ -45728,7 +45728,7 @@
       ],
       "rel": [
         {
-          "id": "EVB-D4",
+          "id": "EVB-D3",
           "rel": "feeds",
           "text": "<b>EVB schematics, BOM and layout database.</b> The power subsystem design is part of the schematic package."
         },
@@ -45942,7 +45942,7 @@
           "text": "<b>Debug and trace access documentation.</b> This activity is the deliverable, and it is what the bring-up team reads at 2am."
         },
         {
-          "id": "EVB-D4",
+          "id": "EVB-D3",
           "rel": "feeds",
           "text": "<b>EVB schematics, BOM and layout database.</b> Debug headers and access points are schematic and layout content."
         }
@@ -46160,7 +46160,7 @@
       ],
       "rel": [
         {
-          "id": "EVB-D4",
+          "id": "EVB-D3",
           "rel": "produces",
           "text": "<b>EVB schematics, BOM and layout database.</b> The layout half of the deliverable—what fabrication is built from."
         },
@@ -46580,7 +46580,7 @@
           "text": "<b>Fabricated and assembled boards, rev A/B with quantity plan.</b> This activity is the deliverable."
         },
         {
-          "id": "EVB-D4",
+          "id": "EVB-D3",
           "rel": "informs",
           "text": "<b>EVB schematics, BOM and layout database.</b> Fabrication findings—DFM issues, substitutions—feed back into the database."
         }
@@ -46771,7 +46771,7 @@
       ],
       "rel": [
         {
-          "id": "EVB-D3",
+          "id": "EVB-D4",
           "rel": "produces",
           "text": "<b>Lab setup and instrument reservation plan.</b> This activity is the deliverable, and it is what stops bring-up queueing for a scope."
         },
@@ -48056,7 +48056,7 @@
       ],
       "rel": [
         {
-          "id": "TEST-D4",
+          "id": "TEST-D2",
           "rel": "produces",
           "text": "<b>Qualified probe card and load board.</b> The probe card half of the deliverable."
         },
@@ -48283,7 +48283,7 @@
       ],
       "rel": [
         {
-          "id": "TEST-D4",
+          "id": "TEST-D2",
           "rel": "produces",
           "text": "<b>Qualified probe card and load board.</b> The load board half of the deliverable."
         },
@@ -48982,7 +48982,7 @@
       ],
       "rel": [
         {
-          "id": "TEST-D2",
+          "id": "TEST-D3",
           "rel": "produces",
           "text": "<b>ATE-ready pattern set with debug log.</b> This activity is the deliverable."
         },
@@ -49446,7 +49446,7 @@
       ],
       "rel": [
         {
-          "id": "TEST-D3",
+          "id": "TEST-D4",
           "rel": "produces",
           "text": "<b>Test data infrastructure and yield database.</b> This activity is the deliverable."
         },
@@ -50047,7 +50047,7 @@
           "text": "<b>Bring-up report with per-milestone health status.</b> Power-on is the first milestone and its result sets the program's tone."
         },
         {
-          "id": "BU-D5",
+          "id": "BU-D4",
           "rel": "feeds",
           "text": "<b>Characterization data set.</b> The first rail current measurements are the earliest real power data the program has."
         }
@@ -50240,7 +50240,7 @@
           "text": "<b>Bring-up report with per-milestone health status.</b> Clocking and reset form the second milestone."
         },
         {
-          "id": "BU-D5",
+          "id": "BU-D4",
           "rel": "feeds",
           "text": "<b>Characterization data set.</b> PLL lock range and jitter are datasheet-relevant measurements."
         }
@@ -50445,7 +50445,7 @@
           "text": "<b>Bring-up report with per-milestone health status.</b> First boot is the report's central milestone and where it starts being published widely."
         },
         {
-          "id": "BU-D4",
+          "id": "BU-D6",
           "rel": "feeds",
           "text": "<b>Errata list with workarounds.</b> Boot-time deviations are the earliest errata the program records."
         }
@@ -50670,7 +50670,7 @@
           "text": "<b>Failure analysis reports.</b> This activity is the deliverable, and physical FA is its most conclusive form."
         },
         {
-          "id": "BU-D4",
+          "id": "BU-D6",
           "rel": "feeds",
           "text": "<b>Errata list with workarounds.</b> Every root cause found here becomes an errata entry or a fix."
         }
@@ -51126,7 +51126,7 @@
       ],
       "rel": [
         {
-          "id": "BU-D5",
+          "id": "BU-D4",
           "rel": "feeds",
           "text": "<b>Characterization data set.</b> Memory bandwidth, latency and efficiency are core characterization results."
         },
@@ -51333,7 +51333,7 @@
       ],
       "rel": [
         {
-          "id": "BU-D5",
+          "id": "BU-D4",
           "rel": "produces",
           "text": "<b>Characterization data set—V/F/T shmoo and power measurements.</b> This activity is the deliverable."
         },
@@ -51548,12 +51548,12 @@
       ],
       "rel": [
         {
-          "id": "BU-D4",
+          "id": "BU-D6",
           "rel": "produces",
           "text": "<b>Errata list with workarounds.</b> This activity is the deliverable, and it is what ships alongside the product."
         },
         {
-          "id": "BU-D6",
+          "id": "BU-D5",
           "rel": "feeds",
           "text": "<b>Respin versus metal-fix decision record.</b> Which errata are tolerable with a workaround is the decision's main input."
         }
@@ -51747,7 +51747,7 @@
       ],
       "rel": [
         {
-          "id": "BU-D5",
+          "id": "BU-D4",
           "rel": "feeds",
           "text": "<b>Characterization data set.</b> Performance and efficiency measurements are part of the product's characterization."
         },
@@ -51954,12 +51954,12 @@
       ],
       "rel": [
         {
-          "id": "BU-D6",
+          "id": "BU-D5",
           "rel": "produces",
           "text": "<b>Respin versus metal-fix decision record.</b> This activity is the deliverable, and the record is what the program is held to."
         },
         {
-          "id": "BU-D4",
+          "id": "BU-D6",
           "rel": "feeds",
           "text": "<b>Errata list with workarounds.</b> Errata not fixed by the decision become permanent, documented behavior."
         }
@@ -52159,7 +52159,7 @@
           "text": "<b>Customer sample release package.</b> This activity is the deliverable—units plus everything needed to use them."
         },
         {
-          "id": "BU-D4",
+          "id": "BU-D6",
           "rel": "feeds",
           "text": "<b>Errata list with workarounds.</b> The errata pack that ships with samples is the errata list's first external use."
         }
@@ -52817,7 +52817,7 @@
       ],
       "rel": [
         {
-          "id": "MP-D5",
+          "id": "MP-D6",
           "rel": "produces",
           "text": "<b>Reliability and package qualification data packages.</b> The silicon-reliability half of the deliverable."
         },
@@ -53026,7 +53026,7 @@
       ],
       "rel": [
         {
-          "id": "MP-D5",
+          "id": "MP-D6",
           "rel": "feeds",
           "text": "<b>Reliability and package qualification data packages.</b> ESD and latch-up classification are part of the qualification package."
         },
@@ -53482,7 +53482,7 @@
       ],
       "rel": [
         {
-          "id": "MP-D5",
+          "id": "MP-D6",
           "rel": "produces",
           "text": "<b>Reliability and package qualification data packages.</b> The package half of the deliverable."
         },
@@ -53946,7 +53946,7 @@
       ],
       "rel": [
         {
-          "id": "MP-D6",
+          "id": "MP-D5",
           "rel": "produces",
           "text": "<b>Ramp plan and supply commitment.</b> This activity is the deliverable."
         },
@@ -54413,7 +54413,7 @@
           "text": "<b>Production test program release.</b> The multi-site flow is a controlled revision of the released program."
         },
         {
-          "id": "MP-D6",
+          "id": "MP-D5",
           "rel": "feeds",
           "text": "<b>Ramp plan and supply commitment.</b> Throughput per tester is what the capacity commitment is built from."
         }

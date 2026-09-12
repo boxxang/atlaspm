@@ -182,7 +182,7 @@ module.exports = {
   ],
   producedBy:[1,2,3,4,5,6,7,8],
   rel:[
-    {id:'MP-D5', rel:'produces', text:'<b>Reliability and package qualification data packages.</b> The silicon-reliability half of the deliverable.'},
+    {id:'MP-D6', rel:'produces', text:'<b>Reliability and package qualification data packages.</b> The silicon-reliability half of the deliverable.'},
     {id:'MP-D1', rel:'feeds', text:'<b>Qualification plan and JEDEC-compliant qualification report.</b> These are the results the report is written from.'},
   ],
   risks:[
@@ -252,7 +252,7 @@ module.exports = {
   ],
   producedBy:[1,2,3,4,5,6],
   rel:[
-    {id:'MP-D5', rel:'feeds', text:'<b>Reliability and package qualification data packages.</b> ESD and latch-up classification are part of the qualification package.'},
+    {id:'MP-D6', rel:'feeds', text:'<b>Reliability and package qualification data packages.</b> ESD and latch-up classification are part of the qualification package.'},
     {id:'MP-D7', rel:'feeds', text:'<b>Datasheet and product documentation set.</b> ESD classification is a datasheet parameter every handler reads.'},
   ],
   risks:[
@@ -400,7 +400,7 @@ module.exports = {
   ],
   producedBy:[1,2,3,4,5,6,7,8],
   rel:[
-    {id:'MP-D5', rel:'produces', text:'<b>Reliability and package qualification data packages.</b> The package half of the deliverable.'},
+    {id:'MP-D6', rel:'produces', text:'<b>Reliability and package qualification data packages.</b> The package half of the deliverable.'},
     {id:'MP-D1', rel:'feeds', text:'<b>Qualification plan and JEDEC-compliant qualification report.</b> Package qualification is a required section of the report.'},
   ],
   risks:[
@@ -548,7 +548,7 @@ module.exports = {
   ],
   producedBy:[1,2,3,4,5,6,7,8],
   rel:[
-    {id:'MP-D6', rel:'produces', text:'<b>Ramp plan and supply commitment.</b> This activity is the deliverable.'},
+    {id:'MP-D5', rel:'produces', text:'<b>Ramp plan and supply commitment.</b> This activity is the deliverable.'},
     {id:'MP-D2', rel:'feeds', text:'<b>Yield model versus cost target report.</b> Cost per unit at volume is where the yield model meets the actual supply cost.'},
   ],
   risks:[
@@ -698,7 +698,7 @@ module.exports = {
   producedBy:[1,1,2,3,4,5,6,7,8],
   rel:[
     {id:'MP-D3', rel:'feeds', text:'<b>Production test program release.</b> The multi-site flow is a controlled revision of the released program.'},
-    {id:'MP-D6', rel:'feeds', text:'<b>Ramp plan and supply commitment.</b> Throughput per tester is what the capacity commitment is built from.'},
+    {id:'MP-D5', rel:'feeds', text:'<b>Ramp plan and supply commitment.</b> Throughput per tester is what the capacity commitment is built from.'},
   ],
   risks:[
     '<b>Site-to-site bias undetected.</b> It appears as a yield difference and is investigated as a process problem for weeks.',

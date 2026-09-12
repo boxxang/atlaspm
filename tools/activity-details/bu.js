@@ -98,7 +98,7 @@ module.exports = {
   producedBy:[1,2,3,4,5],
   rel:[
     {id:'BU-D1', rel:'feeds', text:'<b>Bring-up report with per-milestone health status.</b> Power-on is the first milestone and its result sets the program\'s tone.'},
-    {id:'BU-D5', rel:'feeds', text:'<b>Characterization data set.</b> The first rail current measurements are the earliest real power data the program has.'},
+    {id:'BU-D4', rel:'feeds', text:'<b>Characterization data set.</b> The first rail current measurements are the earliest real power data the program has.'},
   ],
   risks:[
     '<b>Power applied without current limits.</b> A short then destroys the unit instead of revealing itself.',
@@ -166,7 +166,7 @@ module.exports = {
   producedBy:[1,2,3,4,5],
   rel:[
     {id:'BU-D1', rel:'feeds', text:'<b>Bring-up report with per-milestone health status.</b> Clocking and reset form the second milestone.'},
-    {id:'BU-D5', rel:'feeds', text:'<b>Characterization data set.</b> PLL lock range and jitter are datasheet-relevant measurements.'},
+    {id:'BU-D4', rel:'feeds', text:'<b>Characterization data set.</b> PLL lock range and jitter are datasheet-relevant measurements.'},
   ],
   risks:[
     '<b>PLL lock validated only at nominal.</b> The lock range matters because shmoo and characterization will operate outside nominal.',
@@ -236,7 +236,7 @@ module.exports = {
   producedBy:[1,2,3,4,5,6],
   rel:[
     {id:'BU-D1', rel:'produces', text:'<b>Bring-up report with per-milestone health status.</b> First boot is the report\'s central milestone and where it starts being published widely.'},
-    {id:'BU-D4', rel:'feeds', text:'<b>Errata list with workarounds.</b> Boot-time deviations are the earliest errata the program records.'},
+    {id:'BU-D6', rel:'feeds', text:'<b>Errata list with workarounds.</b> Boot-time deviations are the earliest errata the program records.'},
   ],
   risks:[
     '<b>Boot failure with no state visible.</b> Without debug access the failure is a symptom with no information, and debug access comes from <code>EVB-04</code>.',
@@ -310,7 +310,7 @@ module.exports = {
   producedBy:[1,2,3,4,5,6,7,8],
   rel:[
     {id:'BU-D2', rel:'produces', text:'<b>Failure analysis reports.</b> This activity is the deliverable, and physical FA is its most conclusive form.'},
-    {id:'BU-D4', rel:'feeds', text:'<b>Errata list with workarounds.</b> Every root cause found here becomes an errata entry or a fix.'},
+    {id:'BU-D6', rel:'feeds', text:'<b>Errata list with workarounds.</b> Every root cause found here becomes an errata entry or a fix.'},
   ],
   risks:[
     '<b>Symptoms treated instead of causes.</b> A workaround without a root cause hides a mechanism that resurfaces in the field.',
@@ -454,7 +454,7 @@ module.exports = {
   ],
   producedBy:[1,2,3,4,5,6],
   rel:[
-    {id:'BU-D5', rel:'feeds', text:'<b>Characterization data set.</b> Memory bandwidth, latency and efficiency are core characterization results.'},
+    {id:'BU-D4', rel:'feeds', text:'<b>Characterization data set.</b> Memory bandwidth, latency and efficiency are core characterization results.'},
     {id:'BU-D3', rel:'feeds', text:'<b>Interface compliance results with training margins.</b> Sustained memory operation is what proves the trained interfaces hold.'},
   ],
   risks:[
@@ -524,7 +524,7 @@ module.exports = {
   ],
   producedBy:[1,2,3,4,5,6],
   rel:[
-    {id:'BU-D5', rel:'produces', text:'<b>Characterization data set—V/F/T shmoo and power measurements.</b> This activity is the deliverable.'},
+    {id:'BU-D4', rel:'produces', text:'<b>Characterization data set—V/F/T shmoo and power measurements.</b> This activity is the deliverable.'},
     {id:'BU-D1', rel:'feeds', text:'<b>Bring-up report with per-milestone health status.</b> Margin is the strongest single indicator of whether the silicon is healthy.'},
   ],
   risks:[
@@ -594,8 +594,8 @@ module.exports = {
   ],
   producedBy:[1,2,3,4,5,6],
   rel:[
-    {id:'BU-D4', rel:'produces', text:'<b>Errata list with workarounds.</b> This activity is the deliverable, and it is what ships alongside the product.'},
-    {id:'BU-D6', rel:'feeds', text:'<b>Respin versus metal-fix decision record.</b> Which errata are tolerable with a workaround is the decision\'s main input.'},
+    {id:'BU-D6', rel:'produces', text:'<b>Errata list with workarounds.</b> This activity is the deliverable, and it is what ships alongside the product.'},
+    {id:'BU-D5', rel:'feeds', text:'<b>Respin versus metal-fix decision record.</b> Which errata are tolerable with a workaround is the decision\'s main input.'},
   ],
   risks:[
     '<b>Workarounds documented but never validated.</b> The mitigation then fails in the field and the errata gave false comfort.',
@@ -664,7 +664,7 @@ module.exports = {
   ],
   producedBy:[1,2,3,4,5,6],
   rel:[
-    {id:'BU-D5', rel:'feeds', text:'<b>Characterization data set.</b> Performance and efficiency measurements are part of the product\'s characterization.'},
+    {id:'BU-D4', rel:'feeds', text:'<b>Characterization data set.</b> Performance and efficiency measurements are part of the product\'s characterization.'},
     {id:'BU-D1', rel:'feeds', text:'<b>Bring-up report with per-milestone health status.</b> Performance against target is the milestone the business cares about most.'},
   ],
   risks:[
@@ -734,8 +734,8 @@ module.exports = {
   ],
   producedBy:[1,2,3,4,5,6],
   rel:[
-    {id:'BU-D6', rel:'produces', text:'<b>Respin versus metal-fix decision record.</b> This activity is the deliverable, and the record is what the program is held to.'},
-    {id:'BU-D4', rel:'feeds', text:'<b>Errata list with workarounds.</b> Errata not fixed by the decision become permanent, documented behavior.'},
+    {id:'BU-D5', rel:'produces', text:'<b>Respin versus metal-fix decision record.</b> This activity is the deliverable, and the record is what the program is held to.'},
+    {id:'BU-D6', rel:'feeds', text:'<b>Errata list with workarounds.</b> Errata not fixed by the decision become permanent, documented behavior.'},
   ],
   risks:[
     '<b>Decision made on schedule pressure alone.</b> Shipping a part with a real defect to protect a date routinely costs more than the delay would have.',
@@ -805,7 +805,7 @@ module.exports = {
   producedBy:[1,2,3,4,5,6],
   rel:[
     {id:'BU-D7', rel:'produces', text:'<b>Customer sample release package.</b> This activity is the deliverable—units plus everything needed to use them.'},
-    {id:'BU-D4', rel:'feeds', text:'<b>Errata list with workarounds.</b> The errata pack that ships with samples is the errata list\'s first external use.'},
+    {id:'BU-D6', rel:'feeds', text:'<b>Errata list with workarounds.</b> The errata pack that ships with samples is the errata list\'s first external use.'},
   ],
   risks:[
     '<b>Samples shipped without errata.</b> The customer spends their first week rediscovering known issues and loses confidence in the part.',

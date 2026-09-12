@@ -310,7 +310,7 @@ module.exports = {
   ],
   producedBy:[1,2,3,4,5,6],
   rel:[
-    {id:'SO-D1', rel:'produces', text:'<b>EM/IR and SI/PI signoff reports.</b> The EM and IR half of the deliverable; <code>SO-08</code> supplies the SI/PI half.'},
+    {id:'SO-D3', rel:'produces', text:'<b>EM/IR and SI/PI signoff reports.</b> The EM and IR half of the deliverable; <code>SO-08</code> supplies the SI/PI half.'},
     {id:'SO-D4', rel:'feeds', text:'<b>STA signoff reports.</b> IR-aware timing is timing, and the two signoffs have to be reconciled rather than reported separately.'},
   ],
   risks:[
@@ -378,7 +378,7 @@ module.exports = {
   ],
   producedBy:[1,2,3,4,5],
   rel:[
-    {id:'SO-D2', rel:'produces', text:'<b>Reliability reports—ESD, latch-up, FIT.</b> This activity is the deliverable, and it is what <code>MP-04</code> will be measured against.'},
+    {id:'SO-D1', rel:'produces', text:'<b>Reliability reports—ESD, latch-up, FIT.</b> This activity is the deliverable, and it is what <code>MP-04</code> will be measured against.'},
     {id:'SO-D7', rel:'feeds', text:'<b>Signoff summary and Design Freeze package.</b> Reliability findings are part of the risk the freeze decision accepts.'},
   ],
   risks:[
@@ -446,7 +446,7 @@ module.exports = {
   ],
   producedBy:[1,2,3,4,5],
   rel:[
-    {id:'SO-D3', rel:'produces', text:'<b>DFM and lithography hotspot report.</b> This activity is the deliverable, and its compliance score is a yield predictor.'},
+    {id:'SO-D2', rel:'produces', text:'<b>DFM and lithography hotspot report.</b> This activity is the deliverable, and its compliance score is a yield predictor.'},
     {id:'SO-D5', rel:'feeds', text:'<b>Clean DRC / LVS / antenna / density reports.</b> DFM fixes are layout changes and close alongside physical verification.'},
   ],
   risks:[
@@ -516,7 +516,7 @@ module.exports = {
   ],
   producedBy:[1,2,3,4,5,6],
   rel:[
-    {id:'SO-D1', rel:'produces', text:'<b>EM/IR and SI/PI signoff reports.</b> The signal integrity half of the deliverable.'},
+    {id:'SO-D3', rel:'produces', text:'<b>EM/IR and SI/PI signoff reports.</b> The signal integrity half of the deliverable.'},
     {id:'SO-D4', rel:'feeds', text:'<b>STA signoff reports.</b> Crosstalk delay is part of the timing number, not a separate finding.'},
   ],
   risks:[
@@ -791,7 +791,7 @@ module.exports = {
   ],
   producedBy:[1,2,3,4,5],
   rel:[
-    {id:'SO-D1', rel:'feeds', text:'<b>EM/IR and SI/PI signoff reports.</b> The system-level results belong in the same report as the die-only ones, reconciled rather than filed separately.'},
+    {id:'SO-D3', rel:'feeds', text:'<b>EM/IR and SI/PI signoff reports.</b> The system-level results belong in the same report as the die-only ones, reconciled rather than filed separately.'},
     {id:'SO-D7', rel:'feeds', text:'<b>Signoff summary and Design Freeze package.</b> Co-verification signoff is a freeze precondition, since mask release follows it.'},
   ],
   risks:[

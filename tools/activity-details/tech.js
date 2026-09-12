@@ -37,7 +37,7 @@ module.exports = {
   producedBy:[1,2,3,4,5,6,7],
   rel:[
     {id:'TECH-D1', rel:'produces', text:'<b>Technology selection report and decision record.</b> This activity owns the deliverable; <code>TECH-04</code> supplies the technical evidence it rests on.'},
-    {id:'TECH-D4', rel:'feeds', text:'<b>Node risk assessment.</b> The supply-continuity and geopolitical screen is one of the risk assessment\'s inputs, and it is gathered here.'},
+    {id:'TECH-D3', rel:'feeds', text:'<b>Node risk assessment.</b> The supply-continuity and geopolitical screen is one of the risk assessment\'s inputs, and it is gathered here.'},
   ],
   risks:[
     '<b>Short-list of one.</b> A screen that arrives at a single candidate has no negotiating position on price, capacity or terms, and the foundry knows it.',
@@ -105,7 +105,7 @@ module.exports = {
   ],
   producedBy:[1,2,3,4,5,5],
   rel:[
-    {id:'TECH-D4', rel:'produces', text:'<b>Node risk assessment—maturity, defect density, yield learning curve.</b> This activity is the deliverable, and it is what the yield assumption in the cost model should be built on.'},
+    {id:'TECH-D3', rel:'produces', text:'<b>Node risk assessment—maturity, defect density, yield learning curve.</b> This activity is the deliverable, and it is what the yield assumption in the cost model should be built on.'},
     {id:'TECH-D1', rel:'feeds', text:'<b>Technology selection report.</b> Maturity is a selection criterion in its own right, separate from the PPA the node can deliver.'},
   ],
   risks:[
@@ -179,7 +179,7 @@ module.exports = {
   ],
   producedBy:[1,2,3,4,5,6,7,8],
   rel:[
-    {id:'TECH-D5', rel:'produces', text:'<b>Executed foundry design agreement (DA) and NDA.</b> This activity is the deliverable, and until it executes the enablement band cannot legally start.'},
+    {id:'TECH-D4', rel:'produces', text:'<b>Executed foundry design agreement (DA) and NDA.</b> This activity is the deliverable, and until it executes the enablement band cannot legally start.'},
     {id:'TECH-D6', rel:'feeds', text:'<b>Capacity and tapeout slot commitment.</b> Capacity is committed under the design agreement; the commitment has no standing without it.'},
   ],
   risks:[
@@ -254,7 +254,7 @@ module.exports = {
   producedBy:[1,2,3,4,5,6,7,8],
   rel:[
     {id:'TECH-D1', rel:'feeds', text:'<b>Technology selection report and decision record.</b> The evidence half of the report—<code>TECH-01</code> records the decision, this activity is why the decision is defensible.'},
-    {id:'TECH-D4', rel:'feeds', text:'<b>Node risk assessment.</b> Where a target is only just met, this study is what says so, and that margin is a node risk.'},
+    {id:'TECH-D3', rel:'feeds', text:'<b>Node risk assessment.</b> Where a target is only just met, this study is what says so, and that margin is a node risk.'},
     {id:'TECH-D2', rel:'feeds', text:'<b>Process option / flavor sheet.</b> The Vt menu and metal stack on the sheet are chosen from these results.'},
   ],
   risks:[
@@ -327,7 +327,7 @@ module.exports = {
   producedBy:[1,2,3,4,5,6,7],
   rel:[
     {id:'TECH-D2', rel:'produces', text:'<b>Process option / flavor sheet agreed with foundry.</b> This activity is the deliverable, and it is contractual rather than advisory.'},
-    {id:'TECH-D3', rel:'feeds', text:'<b>Wafer, mask and NRE cost sheet.</b> Every option on the sheet carries a price adder, so the flavor decides a meaningful part of the wafer cost.'},
+    {id:'TECH-D5', rel:'feeds', text:'<b>Wafer, mask and NRE cost sheet.</b> Every option on the sheet carries a price adder, so the flavor decides a meaningful part of the wafer cost.'},
     {id:'TECH-D1', rel:'feeds', text:'<b>Technology selection report.</b> The selection is only complete when the flavor is named—a node without a flavor sheet is not a selection anyone can build on.'},
   ],
   risks:[
@@ -399,7 +399,7 @@ module.exports = {
   ],
   producedBy:[1,2,3,4,5,6,7],
   rel:[
-    {id:'TECH-D3', rel:'produces', text:'<b>Wafer, mask and NRE cost sheet.</b> This activity is the deliverable, and its value is that the numbers are quoted rather than estimated.'},
+    {id:'TECH-D5', rel:'produces', text:'<b>Wafer, mask and NRE cost sheet.</b> This activity is the deliverable, and its value is that the numbers are quoted rather than estimated.'},
     {id:'TECH-D1', rel:'feeds', text:'<b>Technology selection report.</b> Cost is a selection criterion; a node that wins on PPA and loses on price is a decision, not a formality.'},
   ],
   risks:[
@@ -470,7 +470,7 @@ module.exports = {
   producedBy:[1,2,3,4,5,6],
   rel:[
     {id:'TECH-D6', rel:'produces', text:'<b>Capacity and tapeout slot commitment.</b> This activity is the deliverable, and it is worth only as much as the escalation path written into it.'},
-    {id:'TECH-D3', rel:'informs', text:'<b>Wafer, mask and NRE cost sheet.</b> Committed volume is what the price tier is granted against, so the two documents have to agree.'},
+    {id:'TECH-D5', rel:'informs', text:'<b>Wafer, mask and NRE cost sheet.</b> Committed volume is what the price tier is granted against, so the two documents have to agree.'},
   ],
   risks:[
     '<b>Slot reserved against a date that has not been committed.</b> A tapeout slot booked against an optimistic schedule is a slot that will be missed and re-queued behind whoever is ready.',
@@ -538,7 +538,7 @@ module.exports = {
   producedBy:[1,2,3,4,5],
   rel:[
     {id:'TECH-D1', rel:'feeds', text:'<b>Technology selection report and decision record.</b> Single-source acceptance belongs in the selection record, priced, rather than being implied by its absence.'},
-    {id:'TECH-D4', rel:'feeds', text:'<b>Node risk assessment.</b> Supply concentration is a node risk, and its mitigation is either a second source or an accepted exposure.'},
+    {id:'TECH-D3', rel:'feeds', text:'<b>Node risk assessment.</b> Supply concentration is a node risk, and its mitigation is either a second source or an accepted exposure.'},
   ],
   risks:[
     '<b>Single-source accepted by default.</b> A decision nobody made is a decision nobody owns, and it surfaces during a supply disruption as a surprise.',
@@ -610,7 +610,7 @@ module.exports = {
   producedBy:[1,2,3,4,5,6,7],
   rel:[
     {id:'TECH-D6', rel:'feeds', text:'<b>Capacity and tapeout slot commitment.</b> Front-end capacity without matching backend capacity delivers wafers that cannot be assembled.'},
-    {id:'TECH-D3', rel:'informs', text:'<b>Wafer, mask and NRE cost sheet.</b> Interposer and assembly pricing is the backend half of the technology cost, and the cost model needs both.'},
+    {id:'TECH-D5', rel:'informs', text:'<b>Wafer, mask and NRE cost sheet.</b> Interposer and assembly pricing is the backend half of the technology cost, and the cost model needs both.'},
     {id:'TECH-D1', rel:'feeds', text:'<b>Technology selection report.</b> On a 2.5D part the choice of foundry constrains the interposer options, so backend capability belongs in the selection record.'},
   ],
   risks:[
