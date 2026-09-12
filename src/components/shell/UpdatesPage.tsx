@@ -106,7 +106,15 @@ export function UpdatesPage({
               {p.act && (
                 <Link
                   className="ref"
-                  href={`/p/${projectId}/activity/${p.act}`}
+                  /* The stage, with the activity open — not the write-up. The
+                     write-up describes the template; a post is about this
+                     programme's run of it, and the row it belongs to is where
+                     the steps, the dates and the state are. */
+                  href={
+                    p.stageId
+                      ? `/p/${projectId}/stage/${p.stageId}/activity?act=${p.act}`
+                      : `/p/${projectId}/activity/${p.act}`
+                  }
                   /* the name the row no longer prints, for whoever wants it
                      without leaving the feed */
                   title={detailActivityTitles[p.act] ?? p.act}

@@ -39,13 +39,17 @@ test.describe('the updates feed', () => {
     await expect(row).not.toContainText(name);
   });
 
-  test('the reference opens the write-up', async ({ page }) => {
+  /* The stage's Activity tab, with the row open — not the write-up. The
+     write-up is about the template; the work is on the stage. */
+  test('the reference opens the activity on its stage', async ({ page }) => {
     const row = stepRow(page);
     const ref = await row.locator('[data-ref]').innerText();
 
     await row.locator('[data-ref]').click();
-    await expect(page).toHaveURL(new RegExp(`/activity/${ref}$`));
-    await expect(page.getByRole('heading', { level: 1 })).toHaveText(detailActivityTitles[ref]);
+    await expect(page).toHaveURL(new RegExp(`/stage/[^/]+/activity\\?act=${ref}$`));
+    /* open, not merely present: its steps are showing */
+    await expect(page.locator(`[data-step^="${ref}:"]`).first()).toBeVisible();
+    await expect(page.locator(`[data-act="${ref}"]`)).toHaveAttribute('aria-expanded', 'true');
   });
 
   /* Not the write-up: the step's own state and thread live on the stage's
@@ -61,6 +65,29 @@ test.describe('the updates feed', () => {
     await row.locator('[data-step-link]').click();
     await expect(page.locator(`[data-step="${target}"]`)).toBeVisible();
     await expect(rail(page)).toContainText(`Step ${target!.split(':')[1]} of`);
+  });
+
+  /* Opening the rail is not arriving. The step row is most of the way down a
+     stage page, so a link that only selects it leaves the reader looking at the
+     stage header wondering what happened. */
+  test('the step pill scrolls the step into view, not just the stage', async ({ page }) => {
+    const row = page
+      .locator('[data-update]')
+      .filter({ has: page.locator('[data-step-link]') })
+      .first();
+    const target = await row.locator('[data-step-link]').getAttribute('data-step-link');
+
+    await row.locator('[data-step-link]').click();
+    const step = page.locator(`[data-step="${target}"]`);
+    await expect(step).toBeVisible();
+
+    /* inside the viewport on arrival, with nobody having scrolled */
+    const where = await step.evaluate((el) => {
+      const r = el.getBoundingClientRect();
+      return { top: r.top, bottom: r.bottom, h: window.innerHeight };
+    });
+    expect(where.top).toBeGreaterThanOrEqual(0);
+    expect(where.bottom).toBeLessThanOrEqual(where.h);
   });
 
   test('the stage pill opens the stage', async ({ page }) => {

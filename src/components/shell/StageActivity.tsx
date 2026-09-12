@@ -1,7 +1,7 @@
 'use client';
 
 import { useSearchParams } from 'next/navigation';
-import { Fragment, useState } from 'react';
+import { Fragment, useEffect, useState } from 'react';
 import { fmtDate } from '@/lib/schedule';
 import { isStepLate, type ResolvedStep } from '@/lib/steps';
 import { useAppStore } from '@/store/useAppStore';
@@ -66,6 +66,35 @@ export function StageActivityTab({ stageId }: { stageId: string }) {
   }
   const shown = expanded;
   const toggle = (ref: string) => setExpanded(expanded === ref ? null : ref);
+
+  /**
+   * A link that named a row brings you to it, not to the top of the page.
+   *
+   * Opening the rail is not arriving: an activity sits anywhere in a list of up
+   * to sixteen and its steps are further down again, so selecting one and
+   * leaving the scroll alone lands the reader on the stage header with a panel
+   * open about something they cannot see. The Updates feed's pills are the case
+   * that made this obvious, but every link with `?step=` or `?act=` on it has
+   * always had the problem.
+   *
+   * After paint rather than during: the row exists only once the block above
+   * has expanded it, and that happens in the same render. Keyed on the URL, so
+   * it runs on arrival and on a second link to a different row, and never when
+   * somebody scrolls away from a row they opened by hand.
+   */
+  const wantStep = useSearchParams().get('step');
+  useEffect(() => {
+    const target = wantStep ?? wantAct;
+    if (!target) return;
+    const sel = wantStep
+      ? `[data-step="${CSS.escape(wantStep)}"]`
+      : `[data-act="${CSS.escape(target)}"]`;
+    /* `center`, not `nearest`: a row flush against the top edge of the viewport
+       reads as the top of the page rather than as the thing you were sent to.
+       `inline: nearest` because the table scrolls sideways too, and nothing
+       asked for a horizontal jump. */
+    document.querySelector(sel)?.scrollIntoView({ block: 'center', inline: 'nearest' });
+  }, [wantStep, wantAct, shown]);
 
   if (!activities.length) {
     return <div className="empty">No activities are written up for this stage.</div>;
