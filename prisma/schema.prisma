@@ -37,6 +37,13 @@ model Profile {
   /// stages gets a private profile (template = false) so the edit lands on that
   /// program alone; "Save as template" is what publishes one.
   template  Boolean  @default(false)
+  /// A digest of the activity rows this profile was written from, for the
+  /// built-in one only. It answers "are the stored rows still what the code
+  /// says" without reading 259 rows on every render. It replaced a count, which
+  /// could not see the renumbering: every reference kept its spelling and
+  /// changed its meaning, so 259 still equalled 259. Null on a profile stored
+  /// before the column existed, which rewrites it once.
+  activityRevision String?
   createdAt DateTime @default(now())
 
   stages     ProfileStage[]
