@@ -462,6 +462,7 @@ module.exports = {
   ],
   producedBy:[1,2,3,4,5,5],
   rel:[
+    {id:'ASSY-D1', rel:'produces', text:'<b>Assembly travelers and process data.</b> Underfill and mold conditions are recorded on the same traveler the bond step opened, and it closes here — a unit is not documented until it is encapsulated.'},
     {id:'ASSY-D2', rel:'feeds', text:'<b>Assembled units.</b> After molding the unit is mechanically complete.'},
     {id:'ASSY-D3', rel:'feeds', text:'<b>Package-level inspection and test data.</b> Void and fillet inspection results are part of the unit\'s quality record.'},
   ],

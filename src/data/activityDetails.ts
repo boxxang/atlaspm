@@ -27179,6 +27179,11 @@ export const activityDetails: Record<string, ActivityDetail> = {
   ],
   "rel": [
    {
+    "id": "PD-D9",
+    "rel": "produces",
+    "text": "<b>Signoff-ready database handoff.</b> The assembled top level is not signoff-ready until it is finished."
+   },
+   {
     "id": "PD-D8",
     "rel": "feeds",
     "text": "<b>Final-turn routed database.</b> The database handed to tapeout is the finished one, and the finishing is part of it."
@@ -30807,7 +30812,7 @@ export const activityDetails: Record<string, ActivityDetail> = {
   "rel": [
    {
     "id": "TO-D5",
-    "rel": "feeds",
+    "rel": "produces",
     "text": "<b>FEOL MTO release package and mask order confirmation.</b> The order confirmation half of the release record—the confirmed order, schedule and delivery date that make the FEOL release actionable."
    },
    {
@@ -40742,6 +40747,11 @@ export const activityDetails: Record<string, ActivityDetail> = {
    5
   ],
   "rel": [
+   {
+    "id": "ASSY-D1",
+    "rel": "produces",
+    "text": "<b>Assembly travelers and process data.</b> Underfill and mold conditions close the traveler the bond step opened."
+   },
    {
     "id": "ASSY-D2",
     "rel": "feeds",

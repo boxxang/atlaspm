@@ -29677,6 +29677,11 @@
       ],
       "rel": [
         {
+          "id": "PD-D9",
+          "rel": "produces",
+          "text": "<b>Signoff-ready database handoff.</b> The assembled top level is not signoff-ready until it is finished: density and fill are DRC rules, and a database that has not met them fails the first check signoff runs."
+        },
+        {
           "id": "PD-D8",
           "rel": "feeds",
           "text": "<b>Final-turn routed database.</b> The database handed to tapeout is the finished one, and the finishing is part of it."
@@ -33581,8 +33586,8 @@
       "rel": [
         {
           "id": "TO-D5",
-          "rel": "feeds",
-          "text": "<b>FEOL MTO release package and mask order confirmation.</b> The order confirmation half of the release record."
+          "rel": "produces",
+          "text": "<b>FEOL MTO release package and mask order confirmation.</b> The order confirmation half of the release record, and the half the deliverable is not complete without — the mask shop is not building anything until this activity has scheduled it."
         },
         {
           "id": "TO-D8",
@@ -44342,6 +44347,11 @@
         5
       ],
       "rel": [
+        {
+          "id": "ASSY-D1",
+          "rel": "produces",
+          "text": "<b>Assembly travelers and process data.</b> Underfill and mold conditions are recorded on the same traveler the bond step opened, and it closes here — a unit is not documented until it is encapsulated."
+        },
         {
           "id": "ASSY-D2",
           "rel": "feeds",

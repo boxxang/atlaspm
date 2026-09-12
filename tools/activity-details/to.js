@@ -494,7 +494,7 @@ module.exports = {
   ],
   producedBy:[1,2,3],
   rel:[
-    {id:'TO-D5', rel:'feeds', text:'<b>FEOL MTO release package and mask order confirmation.</b> The order confirmation half of the release record.'},
+    {id:'TO-D5', rel:'produces', text:'<b>FEOL MTO release package and mask order confirmation.</b> The order confirmation half of the release record, and the half the deliverable is not complete without — the mask shop is not building anything until this activity has scheduled it.'},
     {id:'TO-D8', rel:'feeds', text:'<b>Full mask set completion record.</b> FEOL completion is the first half of the set.'},
   ],
   risks:[

@@ -1118,6 +1118,7 @@ module.exports = {
   ],
   producedBy:[1,2,3,4,5,6],
   rel:[
+    {id:'PD-D9', rel:'produces', text:'<b>Signoff-ready database handoff.</b> The assembled top level is not signoff-ready until it is finished: density and fill are DRC rules, and a database that has not met them fails the first check signoff runs.'},
     {id:'PD-D8', rel:'feeds', text:'<b>Final-turn routed database.</b> The database handed to tapeout is the finished one, and the finishing is part of it.'},
     {id:'PD-D5', rel:'feeds', text:'<b>Interim physical DRC / LVS clean.</b> Density and fill rules are DRC rules, and finishing is where they are met.'},
   ],

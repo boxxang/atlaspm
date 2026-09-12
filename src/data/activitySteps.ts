@@ -10310,6 +10310,10 @@ export const activitySteps: Record<string, ActivityStepEntry> = {
   ],
   "r": [
    [
+    "PD-D9",
+    "produces"
+   ],
+   [
     "PD-D8",
     "feeds"
    ],
@@ -11515,7 +11519,7 @@ export const activitySteps: Record<string, ActivityStepEntry> = {
   "r": [
    [
     "TO-D5",
-    "feeds"
+    "produces"
    ],
    [
     "TO-D8",
@@ -15049,6 +15053,10 @@ export const activitySteps: Record<string, ActivityStepEntry> = {
    5
   ],
   "r": [
+   [
+    "ASSY-D1",
+    "produces"
+   ],
    [
     "ASSY-D2",
     "feeds"

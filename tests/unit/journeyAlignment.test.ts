@@ -81,10 +81,10 @@ describe('deliverableFrom points at the activity that makes the deliverable', ()
   );
   const refOf = deliverableRefs(rows, detailDeliverables, prefixOf);
 
-  /** The authoring corpus's own claim about who produces what. */
-  const produces: Record<string, string> = {};
+  /** Every activity the corpus says produces each deliverable — often several. */
+  const produces: Record<string, string[]> = {};
   for (const [ref, a] of Object.entries(activitySteps)) {
-    for (const [dref, rel] of a.r) if (rel === 'produces') produces[dref] = ref;
+    for (const [dref, rel] of a.r) if (rel === 'produces') (produces[dref] ??= []).push(ref);
   }
 
   it('indexes an activity the stage actually runs', () => {
@@ -99,30 +99,50 @@ describe('deliverableFrom points at the activity that makes the deliverable', ()
   });
 
   /**
-   * Two sources say who produces a deliverable: this array, and the `produces`
-   * edge in the authoring corpus. They agree on 153 of 167 and have disagreed
-   * on these fourteen since before any of this work — a separate inconsistency
-   * that has not been reviewed and is not being papered over here.
+   * `deliverableFrom` is derived from the corpus now, not written by hand —
+   * see tools/derive-deliverable-from.mjs. Two sources used to answer this and
+   * disagreed on fourteen of the hundred and sixty-seven; six of those were not
+   * disagreements at all, because a deliverable may have several producers
+   * (twenty-seven do) and the array can only name one.
    *
-   * The number is what matters: when the renumbering shuffled the array, it
-   * went from fourteen to a hundred and twelve.
+   * What is left is one rule, and these are its two halves: the activity named
+   * must actually claim to produce the deliverable, and among those that do it
+   * must be the one a reader would be sent to — the last discrete contributor,
+   * since a continuous activity runs throughout and gates nothing.
    */
-  const KNOWN_DISAGREEMENTS = [
-    'ARCH-D7', 'TECH-D1', 'PDK-D2', 'AMS-D2', 'TC-D3', 'RTL-D7', 'DV-D8',
-    'PD-D9', 'TO-D5', 'PKGD-D3', 'ASSY-D1', 'ASSY-D2', 'TEST-D4', 'MP-D5',
-  ];
+  it('names an activity that claims to produce it', () => {
+    for (const s of journeyData) {
+      const refs = refsOf(s.id);
+      s.deliverables.forEach((title, i) => {
+        const dref = refOf.get(`${s.id}:${i}`);
+        expect(dref, `${s.id} deliverable ${i + 1} ("${title}") resolves to no reference`).toBeTruthy();
+        const named = refs[s.deliverableFrom[i]];
+        expect(produces[dref!], `${dref} has no producer`).toContain(named);
+      });
+    }
+  });
 
-  it('agrees with the corpus everywhere but the fourteen known rows', () => {
-    const differ: string[] = [];
+  it('names the last discrete producer of the ones that do', () => {
+    /* the flag for an activity that runs throughout rather than for a length */
+    const continuous = new Set<string>();
+    for (const s of journeyData) {
+      refsOf(s.id).forEach((ref, i) => {
+        if (s.engineeringTat[i] < 0) continuous.add(ref);
+      });
+    }
+    const later = (a: string, b: string) =>
+      Number(continuous.has(a)) - Number(continuous.has(b)) ||
+      activitySteps[b].w[1] - activitySteps[a].w[1] ||
+      activitySteps[b].w[0] - activitySteps[a].w[0] ||
+      a.localeCompare(b);
+
     for (const s of journeyData) {
       const refs = refsOf(s.id);
       s.deliverables.forEach((_, i) => {
-        const dref = refOf.get(`${s.id}:${i}`);
-        const made = dref && produces[dref];
-        const named = refs[s.deliverableFrom[i]];
-        if (dref && made && named && made !== named) differ.push(dref);
+        const dref = refOf.get(`${s.id}:${i}`)!;
+        const best = [...produces[dref]].sort(later)[0];
+        expect(refs[s.deliverableFrom[i]], `${dref} should name ${best}`).toBe(best);
       });
     }
-    expect(differ.sort()).toEqual([...KNOWN_DISAGREEMENTS].sort());
   });
 });

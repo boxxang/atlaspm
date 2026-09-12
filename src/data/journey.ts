@@ -101,7 +101,7 @@ export const journeyData = [
     /* The plan this stage runs to, in weeks from its start. Modelling runs almost the whole stage because everything else is argued against it; interfaces settle early, partitioning and budgets fall out of the model, and the specification is written across the back half. */
     engineeringStart: [0, 2, 0, 3, 4, 6, 9, 10, 10, 12],
     /* Which activity produces each deliverable, and the week it is due. */
-    deliverableFrom: [2, 5, 0, 8, 7, 6, 9],
+    deliverableFrom: [2, 5, 0, 8, 7, 6, 6],
     deliverableWeek: [6, 13, 14, 14, 15, 18, 18],
     risks: ["Late architecture changes", "Workload model gaps", "Underestimated complexity"],
     potentialRisks: [
@@ -155,7 +155,7 @@ export const journeyData = [
     /* The plan this stage runs to, in weeks from its start. The benchmarking decides the node, the commercial work runs alongside it, and the capacity commitment closes the stage because it is what cannot be signed until everything else is. */
     engineeringStart: [0, 6, 4, 2, 4, 4, 9, 8, 9],
     /* Which activity produces each deliverable, and the week it is due. */
-    deliverableFrom: [3, 4, 5, 1, 2, 6],
+    deliverableFrom: [0, 4, 5, 1, 2, 6],
     deliverableWeek: [9, 9, 10, 10, 12, 14],
     risks: ["Node maturity", "Capacity commitment", "Wafer cost volatility"],
     potentialRisks: [
@@ -215,7 +215,7 @@ export const journeyData = [
     /* The plan this stage runs to, in weeks from its start. Libraries and tools qualify first because the flow is built on them; the flow follows, corners are agreed against it, and the golden environment is released once there is something to freeze. */
     engineeringStart: [0, 0, 2, 0, 4, 8, 4, 10, 13, 6, 19, 16, 28],
     /* Which activity produces each deliverable, and the week it is due. */
-    deliverableFrom: [0, 2, 9, 6, 7, 11, 10, 12],
+    deliverableFrom: [0, 4, 9, 6, 7, 11, 10, 12],
     deliverableWeek: [8, 10, 12, 14, 20, 22, 23, 36],
     risks: ["PDK version churn", "Library gaps", "Tool qualification lag"],
     potentialRisks: [
@@ -334,7 +334,7 @@ export const journeyData = [
     /* The plan this stage runs to, in weeks from its start. The long analogue blocks — SerDes, PLL, LDO — run most of the stage; layout and post-layout simulation trail them, and the macro views that the digital side integrates come out at the end. */
     engineeringStart: [0, 4, 6, 4, 8, 6, 12, 22, 18, 24, 20, 24, 0, 30, 28, 34],
     /* Which activity produces each deliverable, and the week it is due. */
-    deliverableFrom: [0, 1, 10, 14, 11, 13, 15, 12],
+    deliverableFrom: [0, 9, 10, 14, 11, 13, 15, 12],
     deliverableWeek: [6, 14, 38, 38, 40, 40, 42, 42],
     risks: ["Analog schedule slip", "Vmin margin shortfall", "Macro late to floorplan"],
     potentialRisks: [
@@ -386,7 +386,7 @@ export const journeyData = [
     /* The plan this stage runs to, in weeks from its start. Design, implement, submit, wait for the shuttle — and then characterise against the clock, which is why the correlation and the guidance are cut at the gate. */
     engineeringStart: [0, 4, 3, 14, 20, 26, 34, 36],
     /* Which activity produces each deliverable, and the week it is due. */
-    deliverableFrom: [0, 3, 4, 6, 7],
+    deliverableFrom: [0, 3, 6, 6, 7],
     deliverableWeek: [5, 26, 36, 40, 40],
     risks: ["Shuttle slot availability", "Correlation gap", "Feedback arrives too late"],
     potentialRisks: [
@@ -449,7 +449,7 @@ export const journeyData = [
     engineeringStart: [0, 0, 0, 2, 4, 12, 8, 20, 14, 16],
     /* Which activity produces each deliverable, so the artefact is drawn on
        the work that makes it rather than on a row of its own. */
-    deliverableFrom: [1, 3, 5, 6, 9, 8, 7],
+    deliverableFrom: [1, 3, 5, 6, 9, 8, 2],
     /* And when each is due: the week its producing activity finishes, except
        the build system, which lands early and is then maintained. The last
        falls on the gate, as every stage's last does. */
@@ -511,7 +511,7 @@ export const journeyData = [
     /* The plan this stage runs to, in weeks from its start. The plan, then the environment, then thirty weeks of block-level testing under it; emulation starts early because its bring-up is long, and gate-level simulation closes the stage. */
     engineeringStart: [0, 4, 6, 0, 8, 12, 0, 16, 18, 22, 24, 30],
     /* Which activity produces each deliverable, and the week it is due. */
-    deliverableFrom: [0, 1, 2, 5, 9, 6, 11, 3],
+    deliverableFrom: [0, 1, 2, 5, 9, 6, 11, 6],
     deliverableWeek: [8, 18, 26, 28, 32, 34, 40, 40],
     risks: ["Coverage closure", "Late bug discovery", "Spec changes"],
     potentialRisks: [
@@ -916,7 +916,7 @@ export const journeyData = [
     /* The plan this stage runs to, in weeks from its start. The architecture and the test vehicle requirements go out early because PTV is waiting on them; routing and analysis fill the middle, and the freeze closes a stage that ran a year. */
     engineeringStart: [0, 8, 6, 18, 16, 30, 10, 32, 24, 28, 46],
     /* Which activity produces each deliverable, and the week it is due. */
-    deliverableFrom: [0, 2, 1, 6, 4, 9, 7, 5, 10],
+    deliverableFrom: [0, 2, 3, 6, 4, 9, 7, 5, 10],
     deliverableWeek: [8, 10, 18, 20, 30, 37, 41, 42, 52],
     risks: ["Substrate lead time", "Interposer supply", "Design freeze slip"],
     potentialRisks: [
@@ -1091,7 +1091,7 @@ export const journeyData = [
        run at the end, on top of parts that now exist. */
     engineeringStart: [0, 0, 23, 23, 25, 26, 26, 26, 28, 28, 29],
     /* Which activity produces each deliverable, and the week it is due. */
-    deliverableFrom: [6, 8, 10, 7, 9],
+    deliverableFrom: [6, 9, 10, 7, 9],
     deliverableWeek: [29, 30, 31, 31, 31],
     risks: ["Assembly yield", "Material availability", "Inspection escapes"],
     potentialRisks: [
