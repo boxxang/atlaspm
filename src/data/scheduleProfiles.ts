@@ -45,9 +45,15 @@ export const STAGE_ORDER = [
  * hold, and both were a stage starting before the thing it consumes exists:
  *
  * Fabrication began at week 79, but FEOL mask data does not reach the mask
- * shop until TO-06 releases it in week 80 — which is the week the template's
- * own "FEOL mask tapeout" anchor names. Mask fabrication cannot precede the
- * mask order, so the stage starts at 80.
+ * shop until TO-06 releases it. That moved the stage to 80, the week TO-06
+ * starts — and the mask shop cannot start on data still being prepared. TO-06
+ * finishes releasing in 81.5 and TO-08 confirms the order in 82, and BEOL runs
+ * the same two weeks late against TO-10 and TO-11. So the stage starts at 82,
+ * which is the same argument as before carried to the end of it.
+ *
+ * Every activity inside keeps its window relative to the stage, so the chain
+ * from mask set to wafer shipment moves whole and no width changes. First
+ * Silicon lands two weeks later, inside the slack before bring-up.
  *
  * Bring-up began at week 102 and its first step is receiving samples, but die
  * attach does not finish until 103 and lid/ball attach until 106. There was
