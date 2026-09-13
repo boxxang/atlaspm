@@ -10,6 +10,7 @@ import { detailActivityTitles } from '@/data/activityIndex';
 import { RISK_AUTHOR } from '@/data/riskSeeds';
 import { useAppStore } from '@/store/useAppStore';
 import { useRailStore } from '@/store/railStore';
+import { RelatedMeetings } from '../meetings/RelatedMeetings';
 import { DeliverableLines } from './DeliverableLines';
 import { Avatar, IconFile, IconPlus, IconTick } from './icons';
 import { PostThread } from './PostThread';
@@ -460,6 +461,8 @@ export function StepPanel({ act, n, projectId }: { act: string; n: number; proje
             </div>
           )}
         </div>
+
+        <RelatedMeetings projectId={projectId} act={act} n={n} />
 
         {/* the thread, filtered to this step */}
         <div style={{ borderTop: '1px solid var(--line-soft)', marginTop: 15, paddingTop: 13 }}>

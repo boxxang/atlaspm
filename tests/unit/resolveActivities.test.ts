@@ -59,6 +59,32 @@ describe('an inherited activity', () => {
     expect(out['DEF-01'].w).toEqual([2, 9]);
   });
 
+  /* A step added to one programme's copy — an action item converted into new
+     work — goes after the steps it inherits. Materialising the whole activity
+     instead would throw away its outputs, deliverable relations and role, which
+     is too much to lose for adding a line. */
+  it('appends steps added to it after its own, and keeps what it inherits', () => {
+    const out = resolveActivities(
+      [
+        row({
+          ref: 'DEF-01',
+          baseRef: 'DEF-01',
+          steps: [{ n: 3, text: 'Re-confirm the KPI list with the second customer', tat: 0.5, lane: 'main' }],
+        }),
+      ],
+      LIB,
+    );
+    expect(out['DEF-01'].s).toEqual([
+      [1, 'Interview the customers', 1.5],
+      [2, 'Write it down', 0.5, 1],
+      [3, 'Re-confirm the KPI list with the second customer', 0.5],
+    ]);
+    expect(out['DEF-01'].o).toEqual(LIB['DEF-01'].o);
+    expect(out['DEF-01'].ob).toEqual(LIB['DEF-01'].ob);
+    expect(out['DEF-01'].r).toEqual(LIB['DEF-01'].r);
+    expect(out['DEF-01'].ro).toBe('Product manager');
+  });
+
   /* A baseRef pointing at nothing is a template that outlived its library. It
      resolves to an activity with no steps rather than throwing, because one
      stale row must not take a whole programme down. */

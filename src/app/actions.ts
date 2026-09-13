@@ -4,6 +4,7 @@ import { revalidatePath } from 'next/cache';
 import { stageMilestone } from '@/data/scheduleProfiles';
 import type { ItemKind, ScheduleProfile, StageBaseline, StageId } from '@/data/types';
 import { pickStages } from '@/lib/customProfile';
+import { copyActivities as copyProfileActivities } from '@/lib/profileCopy';
 import { prisma } from '@/lib/db';
 import { assertPrefixes, normalizePrefix, refRenames } from '@/lib/profileEdit';
 import { DB_KIND } from '@/lib/projectState';
@@ -233,9 +234,19 @@ export async function savePost(input: {
   itemId?: string | null;
   parentId?: string | null;
   doneAt?: Date | null;
+  /** The meeting a risk was raised in — a source, never where the post lives. */
+  meetingId?: string | null;
 }) {
   const { projectId, id, ...post } = input;
   await assertProject(projectId);
+  /* A meeting from another programme is not a source this post can name. */
+  if (post.meetingId) {
+    const m = await prisma.meeting.findFirst({
+      where: { id: post.meetingId, projectId },
+      select: { id: true },
+    });
+    if (!m) throw new Error('That meeting is not on this program.');
+  }
   await prisma.post.upsert({
     where: { id },
     /* An edit changes what was said and when it was said again — never who said
@@ -736,40 +747,8 @@ export async function deleteProject(projectId: string) {
  * write-ups, and a programme made from it records work against the same
  * references its template names.
  */
-async function copyActivities(fromProfileId: string, toProfileId: string) {
-  const rows = await prisma.profileActivity.findMany({
-    where: { profileId: fromProfileId },
-    orderBy: { order: 'asc' },
-    include: { steps: { orderBy: { n: 'asc' } } },
-  });
-  if (!rows.length) return;
-
-  await prisma.profileActivity.createMany({
-    data: rows.map((a) => ({
-      id: `${toProfileId}:act:${a.ref}`,
-      profileId: toProfileId,
-      stageKey: a.stageKey,
-      ref: a.ref,
-      order: a.order,
-      title: a.title,
-      windowFrom: a.windowFrom,
-      windowTo: a.windowTo,
-      baseRef: a.baseRef,
-    })),
-  });
-
-  const steps = rows.flatMap((a) =>
-    a.steps.map((s) => ({
-      id: `${toProfileId}:act:${a.ref}:${s.n}`,
-      activityId: `${toProfileId}:act:${a.ref}`,
-      n: s.n,
-      text: s.text,
-      tat: s.tat,
-      lane: s.lane,
-    })),
-  );
-  if (steps.length) await prisma.profileStep.createMany({ data: steps });
-}
+const copyActivities = (fromProfileId: string, toProfileId: string) =>
+  copyProfileActivities(prisma, fromProfileId, toProfileId);
 
 /**
  * Copy a template so it can be edited.
@@ -1069,9 +1048,19 @@ export async function uploadAttachments(form: FormData): Promise<AttachmentMeta[
   const activityRef = String(form.get('activityRef') ?? '') || null;
   const rawStep = form.get('stepN');
   const stepN = rawStep == null || rawStep === '' ? null : Number(rawStep);
-  if (!itemId && !postId && !deliverableId && !(activityRef && stepN !== null))
-    throw new Error('An attachment needs an item, a post, a deliverable or a step.');
+  /* A file on a meeting, a decision or an action item — the MeetingFile row
+     says which, and it has to be this programme's. */
+  const meetingFileId = String(form.get('meetingFileId') ?? '') || null;
+  if (!itemId && !postId && !deliverableId && !meetingFileId && !(activityRef && stepN !== null))
+    throw new Error('An attachment needs an item, a post, a deliverable, a meeting file or a step.');
   await assertProject(projectId);
+  if (meetingFileId) {
+    const owner = await prisma.meetingFile.findFirst({
+      where: { id: meetingFileId, projectId },
+      select: { id: true },
+    });
+    if (!owner) throw new Error('That meeting file is not on this program.');
+  }
 
   const ids = form.getAll('ids').map(String);
   const files = form.getAll('files').filter((f): f is File => f instanceof File);
@@ -1094,6 +1083,7 @@ export async function uploadAttachments(form: FormData): Promise<AttachmentMeta[
         itemId,
         postId,
         deliverableId,
+        meetingFileId,
         activityRef,
         stepN,
         data: Buffer.from(await file.arrayBuffer()),

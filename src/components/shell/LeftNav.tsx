@@ -9,6 +9,7 @@ import {
   IconActivities,
   IconDeliverables,
   IconLate,
+  IconMeetings,
   IconOverview,
   IconProfile,
   IconRisk,
@@ -20,6 +21,7 @@ import {
   IconUpdates,
 } from './icons';
 import { useProgramWork } from './useProgramWork';
+import { UpcomingMeetingsCount } from '../meetings/NavCount';
 
 /**
  * The left nav, as the prototype draws it.
@@ -171,6 +173,16 @@ export function LeftNav({ projectId }: { projectId: string }) {
            a write-up for: a program running three stages does not have 257. */
         extra={<span className="c">{new Set(work.steps.map((s) => s.act)).size}</span>}
       />
+      {/* Right under the work it is about: a meeting is where activities get
+          reviewed and their follow-up decided. Its own objects, not a kind of
+          activity — see /lib/meetings/types. */}
+      <NavItem
+        here={pathname}
+        href={`${base}/meetings`}
+        label="Meetings"
+        icon={<IconMeetings />}
+        extra={<UpcomingMeetingsCount />}
+      />
       <NavItem
         here={pathname}
         href={`${base}/deliverables`}
@@ -254,5 +266,7 @@ function NavItem({
 function isCurrent(pathname: string, href: string): boolean {
   if (pathname === href) return true;
   if (href.endsWith('/stages')) return pathname.startsWith(href.replace(/\/stages$/, '/stage/'));
+  /* a meeting, the action list and every other page under Meetings is still Meetings */
+  if (href.endsWith('/meetings')) return pathname.startsWith(`${href}/`);
   return false;
 }

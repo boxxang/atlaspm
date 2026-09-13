@@ -3075,3 +3075,116 @@ a.pill:hover,a.ref:hover{filter:brightness(0.94)}
   border-radius:var(--r);padding:2px 6px;margin:-2px -6px}
 .coststat:hover{background:var(--hover)}
 .coststat[aria-expanded="true"]{background:var(--accent-wash)}
+
+/* ────────────────────────────── meetings ──────────────────────────────
+   Built from the shell's own parts — cards, pills, ctable rows, chips, the
+   dlg dialog — with only what those do not already cover: a calendar grid,
+   a meeting row, an agenda card, the link chips and the picker. Tokens only;
+   no colour here that the rest of the app does not already use. */
+.mt-page{padding:18px 20px 40px}
+.mt-banner{display:flex;align-items:center;gap:8px;margin:12px 20px 0;padding:8px 12px;
+  border:1px solid var(--risk-line);background:var(--risk-soft);color:var(--risk-ink);border-radius:var(--r);font-size:12.5px}
+.mt-sum{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+@media (max-width:1000px){.mt-sum{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:560px){.mt-sum{grid-template-columns:minmax(0,1fr)}}
+.mt-stat{display:flex;flex-direction:column;align-items:flex-start;text-align:left;padding:12px 14px;color:inherit}
+.mt-stat:hover{background:var(--hover);color:inherit}
+.mt-stat[aria-current="true"]{box-shadow:inset 0 0 0 1.5px var(--accent)}
+.mt-cols{display:grid;grid-template-columns:minmax(0,1fr) 360px;gap:16px;margin-top:16px;align-items:start}
+@media (max-width:1120px){.mt-cols{grid-template-columns:minmax(0,1fr)}}
+.mt-stack{display:flex;flex-direction:column;gap:16px;min-width:0}
+.mt-row{display:grid;grid-template-columns:118px minmax(0,1fr) auto;gap:12px;align-items:start;padding:11px 16px;
+  border-bottom:1px solid var(--line-soft);color:inherit;width:100%;text-align:left}
+.mt-row:last-child{border-bottom:none}
+.mt-row:hover{background:var(--hover);color:inherit}
+@media (max-width:640px){.mt-row{grid-template-columns:minmax(0,1fr)}}
+.mt-meta{display:flex;align-items:center;gap:6px;flex-wrap:wrap;font-size:11.5px;color:var(--ink-3);margin-top:3px}
+.mt-links{display:flex;flex-wrap:wrap;gap:5px;min-width:0}
+.mt-link{display:inline-flex;align-items:center;gap:5px;max-width:340px;min-width:0;font-size:11.5px;padding:2px 7px;
+  border-radius:var(--r-sm);background:var(--accent-wash);border:1px solid var(--accent-line);color:var(--ink-2)}
+.mt-link b{color:var(--accent);font-weight:600;white-space:nowrap}
+a.mt-link:hover{border-color:var(--accent);color:var(--ink)}
+.mt-link.gone{background:var(--muted);border-color:var(--line);color:var(--ink-3)}
+.mt-link.gone b{color:var(--ink-3)}
+.mt-link .x{font-size:11px;color:var(--ink-4);padding:0 1px;line-height:1}
+.mt-link .x:hover{color:var(--risk)}
+.mt-picker{display:flex;flex-direction:column;gap:8px;width:100%}
+.mt-picker .chips{height:auto;padding:0;border:none;flex-wrap:wrap;gap:4px}
+.mt-picker .stagepick{margin:0;width:100%;max-height:240px;overflow-y:auto}
+.mt-people{display:flex;flex-direction:column;gap:7px;width:100%}
+.mt-people-list{display:flex;flex-wrap:wrap;gap:6px}
+.mt-person{display:inline-flex;align-items:center;gap:6px;padding:2px 4px 2px 3px;border:1px solid var(--line);
+  border-radius:12px;font-size:12px;background:var(--bg)}
+.mt-person .chip{padding:0 6px;font-size:10.5px}
+.mt-person .x{font-size:11px;color:var(--ink-4);padding:0 3px}
+.mt-person .x:hover{color:var(--risk)}
+.mt-grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 18px}
+@media (max-width:640px){.mt-grid2{grid-template-columns:minmax(0,1fr)}}
+.mt-text{width:100%;border:1px solid var(--line);border-radius:var(--r-sm);padding:7px 9px;font-size:13px;line-height:1.5;
+  min-height:72px;resize:vertical;background:var(--bg)}
+.mt-text:focus{outline:none;border-color:var(--accent)}
+.dlg.wide{width:min(840px,calc(100vw - 32px))}
+.mt-props{display:grid;grid-template-columns:150px minmax(0,1fr);gap:9px 14px;font-size:13px;align-items:start}
+.mt-props > dt{color:var(--ink-3);font-size:12.5px;padding-top:1px}
+.mt-props > dd{margin:0;min-width:0}
+@media (max-width:560px){.mt-props{grid-template-columns:minmax(0,1fr)}.mt-props > dd{margin-bottom:6px}}
+.mt-agenda{border:1px solid var(--line);border-radius:var(--r-lg);background:var(--bg);margin-bottom:10px;overflow:hidden}
+.mt-agenda.discussed{background:var(--sunken)}
+.mt-agenda-hd{display:flex;align-items:center;gap:8px;padding:9px 12px;flex-wrap:wrap}
+.mt-agenda-body{padding:12px;border-top:1px solid var(--line-soft);display:grid;gap:12px}
+.mt-agenda-num{width:22px;height:22px;border-radius:var(--r-sm);background:var(--muted);display:inline-flex;align-items:center;
+  justify-content:center;font-size:11.5px;font-weight:600;color:var(--ink-2);flex-shrink:0}
+.mt-minutes{white-space:pre-wrap;overflow-wrap:break-word;font-size:13.5px;line-height:1.6;color:var(--ink-body)}
+.mt-cal{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));border-top:1px solid var(--line);border-left:1px solid var(--line)}
+.mt-cal-hd{font-size:11px;font-weight:600;color:var(--ink-3);padding:6px 8px;border-right:1px solid var(--line);
+  border-bottom:1px solid var(--line);background:var(--sunken)}
+.mt-day{min-height:112px;border-right:1px solid var(--line);border-bottom:1px solid var(--line);padding:5px;
+  display:flex;flex-direction:column;gap:4px;min-width:0;background:var(--bg)}
+.mt-day.out{background:var(--sunken)}
+.mt-day.out .mt-daynum{color:var(--ink-4)}
+.mt-daynum{align-self:flex-start;font-size:11.5px;font-weight:600;color:var(--ink-2);min-width:20px;height:20px;padding:0 5px;
+  border-radius:10px;display:inline-flex;align-items:center;justify-content:center}
+.mt-day.today .mt-daynum{background:var(--accent);color:#fff}
+.mt-week .mt-day{min-height:340px}
+.mt-ev{display:block;width:100%;text-align:left;font-size:11.5px;line-height:1.32;padding:3px 5px 3px 6px;border-radius:var(--r-sm);
+  background:var(--accent-wash);border-left:3px solid var(--accent);color:var(--ink);min-width:0}
+.mt-ev:hover{background:var(--accent-soft);color:var(--ink)}
+.mt-ev .t{display:block;font-weight:550;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.mt-ev .s{display:block;color:var(--ink-3);font-size:10.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.mt-ev.st-draft{background:var(--bg);border-left-style:dashed;border-left-color:var(--ink-3)}
+.mt-ev.st-in_progress{background:var(--warn-soft);border-left-color:var(--warn)}
+.mt-ev.st-completed{background:var(--ok-soft);border-left-color:var(--ok)}
+.mt-ev.st-cancelled{background:var(--muted);border-left-color:var(--ink-4);color:var(--ink-3)}
+.mt-ev.st-cancelled .t{text-decoration:line-through}
+@media (max-width:760px){
+  .mt-cal{grid-template-columns:minmax(0,1fr)}
+  .mt-cal-hd{display:none}
+  .mt-day.out{display:none}
+  .mt-day,.mt-week .mt-day{min-height:0}
+  .mt-day:not(:has(.mt-ev)){display:none}
+}
+.mt-checks{display:flex;flex-direction:column;gap:6px;margin:4px 0}
+.mt-check{display:flex;align-items:flex-start;gap:8px;font-size:12.5px;line-height:1.45}
+.mt-check .mk{width:16px;height:16px;border-radius:50%;flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;
+  font-size:10px;font-weight:700;margin-top:1px}
+.mt-check.ok .mk{background:var(--ok-soft);color:var(--ok)}
+.mt-check.bad .mk{background:var(--risk-soft);color:var(--risk-ink)}
+.mt-warn{display:flex;gap:6px;flex-wrap:wrap}
+.mt-section{border-top:1px solid var(--line-soft);margin-top:14px;padding-top:13px}
+.mt-section > .cap{display:flex;align-items:center;gap:8px;margin-bottom:9px}
+.mt-mini{display:flex;flex-direction:column;gap:2px;padding:6px 0;border-bottom:1px solid var(--line-soft);font-size:12.5px;color:inherit}
+.mt-mini:last-child{border-bottom:none}
+a.mt-mini:hover{color:inherit;background:var(--hover)}
+/* A header with more than a title and a button wraps rather than pushing its
+   buttons off the edge. */
+.hd.mt-hd{height:auto;min-height:48px;flex-wrap:wrap;padding-top:6px;padding-bottom:6px}
+.chips.mt-chips{height:auto;min-height:38px;flex-wrap:wrap;padding-top:6px;padding-bottom:6px}
+/* Narrow, a meeting, decision or action table stops being a row of columns:
+   the columns would be squeezed until their text ran into each other. Each
+   row becomes a short stack instead, and the header row it no longer matches
+   goes. */
+@media (max-width:760px){
+  .ctable[data-board-stack] > .trow{grid-template-columns:minmax(0,1fr) !important;row-gap:4px;
+    padding-top:10px;padding-bottom:10px}
+  .ctable[data-board-stack] > .chead{display:none}
+}

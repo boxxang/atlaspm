@@ -77,6 +77,8 @@ export interface ProgramPost {
   parentId: string | null;
   /** Set on a handover: the day the deliverable was accepted. */
   doneAt: Date | null;
+  /** The meeting a risk was raised in — its source, not where it lives. */
+  meetingId: string | null;
   attachments: AttachmentRef[];
 }
 
@@ -207,6 +209,7 @@ interface ProgramPostRow {
   deliverableId: string | null;
   parentId: string | null;
   doneAt: Date | null;
+  meetingId?: string | null;
   attachments?: AttachmentRow[];
 }
 interface StepStateRow {
@@ -410,6 +413,7 @@ export function buildProjectState(project: {
     deliverableId: p.deliverableId,
     parentId: p.parentId,
     doneAt: p.doneAt,
+    meetingId: p.meetingId ?? null,
     attachments: p.attachments ?? [],
   }));
 

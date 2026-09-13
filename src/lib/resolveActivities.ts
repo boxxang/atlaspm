@@ -34,14 +34,18 @@ const NO_OUTPUTS: string[] = [];
 const NO_PRODUCERS: number[] = [];
 const NO_RELATIONS: [string, DeliverableRelation][] = [];
 
-/** Renumbered 1..n on the way out: a gap in step numbers is not a step. */
-const ownSteps = (rows: ActivityRow['steps']): StepTuple[] =>
+/**
+ * Renumbered on the way out: a gap in step numbers is not a step. `after` is
+ * how many steps come before these — the inherited ones, for a step added to
+ * an inherited activity.
+ */
+const ownSteps = (rows: ActivityRow['steps'], after = 0): StepTuple[] =>
   [...rows]
     .sort((a, b) => a.n - b.n)
     .map((s, i) =>
       s.lane === 'par'
-        ? ([i + 1, s.text, s.tat, 1] as StepTuple)
-        : ([i + 1, s.text, s.tat] as StepTuple),
+        ? ([after + i + 1, s.text, s.tat, 1] as StepTuple)
+        : ([after + i + 1, s.text, s.tat] as StepTuple),
     );
 
 /**
@@ -89,7 +93,14 @@ export function resolveActivities(
     out[row.ref] = {
       st: row.stageKey,
       w: [row.windowFrom, row.windowTo],
-      s: base ? base.s : ownSteps(row.steps),
+      /* An inherited activity can carry steps of its own too: ones added to
+         this programme's copy after the fact, such as an action item a meeting
+         converted into new work. They follow the inherited steps, and the
+         activity keeps inheriting everything else — materialising the whole
+         activity to add one line would throw away its outputs, deliverable
+         relations and role. Still resolved here and only here, so nothing
+         downstream consults two sources. */
+      s: base ? (row.steps.length ? [...base.s, ...ownSteps(row.steps, base.s.length)] : base.s) : ownSteps(row.steps),
       o: base ? base.o : NO_OUTPUTS,
       ob: base ? base.ob : NO_PRODUCERS,
       r: base ? base.r : NO_RELATIONS,

@@ -134,6 +134,8 @@ export interface AppState {
     deliverableId?: string | null;
     parentId?: string | null;
     doneAt?: Date | null;
+    /** The meeting a risk was raised in, if one. */
+    meetingId?: string | null;
   }) => void;
   /** Change what a post says. Only the text and, on a handover, its date. */
   editPost: (id: string, text: string, doneAt?: Date | null) => void;
@@ -281,7 +283,9 @@ const UNTOUCHED_STEP: StepStateRecord = {
 const sameDay = (a: Date | null, b: Date | null) =>
   a === b || (!!a && !!b && a.getTime() === b.getTime());
 
-const sync = (p: Promise<unknown>) => {
+/* Exported so the meetings store's writes are tracked by the same set, and
+   flushWrites waits for them too. */
+export const sync = (p: Promise<unknown>) => {
   inFlight.add(p);
   void p
     .catch((e) => console.error('[atlaspm] server action failed', e))
@@ -533,6 +537,7 @@ export const useAppStore = create<AppState>()((set, get) => ({
           deliverableId: null,
           parentId: null,
           doneAt: null,
+          meetingId: null,
           ...post,
           createdAt: now,
           editedAt: null,

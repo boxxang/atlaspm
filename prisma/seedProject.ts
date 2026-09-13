@@ -5,8 +5,10 @@
  */
 import { journeyData } from '../src/data/journey';
 import { SEED_COST_PER_MAN_MONTH, createProjectSeed } from '../src/data/projectSeed';
-import { BUILTIN_PROFILE, STAGE_ORDER } from '../src/data/scheduleProfiles';
+import { RISK_AUTHOR } from '../src/data/riskSeeds';
+import { BUILTIN_PROFILE, milestoneDefs, STAGE_ORDER } from '../src/data/scheduleProfiles';
 import { ensureBuiltinProfile } from '../src/lib/builtinProfile';
+import { buildMeetingSeed } from '../src/lib/meetingSeed';
 import { DB_KIND } from '../src/lib/projectState';
 import { addWeeks, computeSchedule, startOfDay } from '../src/lib/schedule';
 import { fromStepIndex, plannedSteps } from '../src/lib/steps';
@@ -164,6 +166,44 @@ export async function seedProject(prisma: PrismaClient, now = new Date()): Promi
       stepN: r.stepN,
     })),
   });
+  /* The programme's meetings: five series and their recent sittings, placed
+     relative to today and to what is actually in flight — see
+     /lib/meetingSeed.ts. Scoped to this project like everything above, and
+     removed with it by the delete at the top. */
+  const meetings = buildMeetingSeed({
+    projectId: PROJECT_ID,
+    now,
+    today,
+    timeZone: 'America/Los_Angeles',
+    stages,
+    activities,
+    risks: risks.map((r) => ({
+      postId: `${PROJECT_ID}:risk:${r.activityRef}:${r.stepN}`,
+      activityRef: r.activityRef,
+      stepN: r.stepN,
+    })),
+    deliverables: STAGE_ORDER.flatMap((stageId) =>
+      seed.deliverables[stageId].map((d) => ({ id: d.id, stageId, title: d.title, done: d.done })),
+    ),
+    milestones: milestoneDefs.map((m) => ({ id: m.id, stageId: m.anchor.stage })),
+    people: Object.fromEntries(
+      STAGE_ORDER.map((stageId) => [
+        stageId,
+        { lead: seed.leaders[stageId].name, team: seed.contacts[stageId].map((c) => c.name) },
+      ]),
+    ),
+    me: RISK_AUTHOR,
+  });
+  await prisma.meetingSeries.createMany({
+    data: meetings.series.map(({ primaryStage: _stage, ...row }) => row),
+  });
+  await prisma.meeting.createMany({ data: meetings.meetings });
+  await prisma.meetingAttendee.createMany({ data: meetings.attendees });
+  await prisma.meetingAgendaItem.createMany({ data: meetings.agenda });
+  await prisma.meetingDecision.createMany({ data: meetings.decisions });
+  await prisma.actionItem.createMany({ data: meetings.actions });
+  await prisma.meetingLink.createMany({ data: meetings.links });
+
   await prisma.stepState.createMany({
     data: done.map((d) => ({
       id: `${PROJECT_ID}:step:${d.activityRef}:${d.stepN}`,

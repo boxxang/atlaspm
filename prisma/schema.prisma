@@ -136,6 +136,10 @@ model Project {
   /// which shows the effort without pretending to know what it costs.
   costPerManMonth Float  @default(0)
   currency        String @default("USD")
+  /// What completing a meeting does when its checks fail: warn | block. A
+  /// programme that wants minutes and owned actions before a meeting can close
+  /// says so here; the default only warns.
+  meetingCompletionMode String @default("warn")
 
   profile      Profile @relation(fields: [profileId], references: [id])
 
@@ -148,6 +152,15 @@ model Project {
   posts        Post[]
   stepStates   StepState[]
   attachments  Attachment[]
+
+  meetingSeries    MeetingSeries[]
+  meetings         Meeting[]
+  meetingAttendees MeetingAttendee[]
+  meetingAgenda    MeetingAgendaItem[]
+  meetingDecisions MeetingDecision[]
+  actionItems      ActionItem[]
+  meetingLinks     MeetingLink[]
+  meetingFiles     MeetingFile[]
 }
 
 /// The ONLY schedule mutation surface — baseline profiles are immutable code.
@@ -242,11 +255,17 @@ model Post {
   /// one is a record of what was sent, not a claim that it is finished.
   doneAt DateTime?
 
+  /// The meeting a risk was raised in, when it was raised in one. A source,
+  /// not a target: the risk still lives on its step and closes with it, and
+  /// cancelling or completing the meeting does nothing to it.
+  meetingId String?
+
   project     Project      @relation(fields: [projectId], references: [id], onDelete: Cascade)
   item        Item?        @relation(fields: [itemId], references: [id], onDelete: Cascade)
   deliverable Deliverable? @relation(fields: [deliverableId], references: [id], onDelete: Cascade)
   parent      Post?        @relation("PostReplies", fields: [parentId], references: [id], onDelete: Cascade)
   replies     Post[]       @relation("PostReplies")
+  meeting     Meeting?     @relation(fields: [meetingId], references: [id], onDelete: SetNull)
   attachments Attachment[]
 
   @@index([itemId])
@@ -255,6 +274,7 @@ model Post {
   @@index([projectId, kind])
   @@index([projectId, activityRef, stepN])
   @@index([projectId, stageId])
+  @@index([meetingId])
 }
 
 /// What has happened to one step of one activity.
@@ -317,6 +337,10 @@ model Attachment {
   /// this is evidence rather than decoration.
   activityRef String?
   stepN       Int?
+  /// A file on a meeting's Files tab, a decision's evidence, or the evidence
+  /// that closed an action item. The MeetingFile row says which; the bytes
+  /// stay here, served by the same route as every other attachment.
+  meetingFileId String?
   filename       String
   mimeType       String
   size           Int
@@ -327,11 +351,13 @@ model Attachment {
   item        Item?        @relation(fields: [itemId], references: [id], onDelete: Cascade)
   post        Post?        @relation(fields: [postId], references: [id], onDelete: Cascade)
   deliverable Deliverable? @relation(fields: [deliverableId], references: [id], onDelete: Cascade)
+  meetingFile MeetingFile? @relation(fields: [meetingFileId], references: [id], onDelete: Cascade)
 
   @@index([itemId])
   @@index([postId])
   @@index([deliverableId])
   @@index([projectId, activityRef, stepN])
+  @@index([meetingFileId])
 }
 
 model Deliverable {
@@ -411,4 +437,290 @@ model Contact {
   project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
 
   @@index([projectId, stageId])
+}
+
+// ─────────────────────────────── meetings ───────────────────────────────
+//
+// A meeting is its own object, not a kind of activity or step. A series is how
+// a meeting recurs; a Meeting row is one sitting of it, and everything said at
+// that sitting — agenda, minutes, decisions, action items — hangs off the
+// sitting, never the series. Decisions and actions are stored once and every
+// screen reads the same row.
+//
+// Every row carries projectId, and every read and write is scoped by it. People
+// are names, as they are everywhere else in this schema: there is no Person
+// table to reference, and inventing one for meetings would be a second directory.
+
+/// How a meeting recurs, and what each sitting starts with.
+model MeetingSeries {
+  id              String   @id
+  projectId       String
+  title           String
+  purpose         String   @default("")
+  /// program_review | working_group | war_room | supplier_review | readiness_review | design_review | bringup | ad_hoc
+  type            String   @default("working_group")
+  owner           String   @default("")
+  /// Default attendees, newline-separated.
+  attendees       String   @default("")
+  /// The RecurrenceRule as JSON — see /lib/meetings/recurrence.ts.
+  recurrence      String   @default("{}")
+  durationMinutes Int      @default(60)
+  /// Agenda titles each new sitting starts with, newline-separated.
+  agendaTemplate  String   @default("")
+  timeZone        String   @default("UTC")
+  location        String   @default("")
+  /// program | stage_team | invitees
+  accessScope     String   @default("program")
+  /// active | inactive
+  status          String   @default("active")
+  createdAt       DateTime
+  updatedAt       DateTime
+  createdBy       String   @default("")
+  updatedBy       String   @default("")
+
+  project  Project       @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  meetings Meeting[]
+  links    MeetingLink[]
+
+  @@index([projectId])
+}
+
+/// One sitting.
+model Meeting {
+  id           String    @id
+  projectId    String
+  seriesId     String?
+  title        String
+  type         String    @default("working_group")
+  /// draft | scheduled | in_progress | completed | cancelled
+  status       String    @default("scheduled")
+  startsAt     DateTime
+  endsAt       DateTime
+  /// The zone the times were set in; the instant is stored, the zone says how to read it.
+  timeZone     String    @default("UTC")
+  owner        String    @default("")
+  facilitator  String    @default("")
+  /// A room or a meeting link.
+  location     String    @default("")
+  purpose      String    @default("")
+  /// Free-form minutes. Each agenda item carries its own discussion notes too.
+  minutes      String    @default("")
+  completedAt  DateTime?
+  cancelReason String    @default("")
+  createdAt    DateTime
+  updatedAt    DateTime
+  createdBy    String    @default("")
+  updatedBy    String    @default("")
+
+  project   Project             @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  /// SetNull: retiring a series must not delete the record of what its sittings decided.
+  series    MeetingSeries?      @relation(fields: [seriesId], references: [id], onDelete: SetNull)
+  attendees MeetingAttendee[]
+  agenda    MeetingAgendaItem[]
+  decisions MeetingDecision[]
+  actions   ActionItem[]        @relation("ActionSource")
+  carriedIn ActionItem[]        @relation("ActionCarriedTo")
+  links     MeetingLink[]
+  files     MeetingFile[]
+  risks     Post[]
+
+  @@index([projectId, startsAt])
+  @@index([seriesId])
+}
+
+model MeetingAttendee {
+  id        String  @id
+  projectId String
+  meetingId String
+  name      String
+  optional  Boolean @default(false)
+  position  Int     @default(0)
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  meeting Meeting @relation(fields: [meetingId], references: [id], onDelete: Cascade)
+
+  @@index([meetingId])
+}
+
+model MeetingAgendaItem {
+  id            String   @id
+  projectId     String
+  meetingId     String
+  position      Int
+  title         String
+  description   String   @default("")
+  presenter     String   @default("")
+  /// Allocated minutes.
+  minutes       Int      @default(0)
+  /// What was said — the structured half of the minutes.
+  notes         String   @default("")
+  /// info | decision | action | risk | escalation | deferred; empty until discussed
+  outcome       String   @default("")
+  /// pending | discussed
+  status        String   @default("pending")
+  /// next_meeting | offline | dropped — what happens to a deferred item
+  deferral      String   @default("")
+  deferNote     String   @default("")
+  /// The item this was carried in from, at an earlier sitting.
+  carriedFromId String?
+  createdAt     DateTime
+  updatedAt     DateTime
+  createdBy     String   @default("")
+  updatedBy     String   @default("")
+
+  project     Project             @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  meeting     Meeting             @relation(fields: [meetingId], references: [id], onDelete: Cascade)
+  carriedFrom MeetingAgendaItem?  @relation("AgendaCarry", fields: [carriedFromId], references: [id], onDelete: SetNull)
+  carriedTo   MeetingAgendaItem[] @relation("AgendaCarry")
+  decisions   MeetingDecision[]
+  actions     ActionItem[]
+  links       MeetingLink[]
+
+  @@index([meetingId])
+}
+
+model MeetingDecision {
+  id           String    @id
+  projectId    String
+  meetingId    String
+  /// The agenda item it came out of, if one.
+  agendaItemId String?
+  title        String
+  description  String    @default("")
+  owner        String    @default("")
+  approvedBy   String    @default("")
+  decidedOn    DateTime?
+  rationale    String    @default("")
+  /// What it applies to, in words.
+  scope        String    @default("")
+  /// proposed | approved | superseded | rejected
+  status       String    @default("proposed")
+  supersedesId String?
+  createdAt    DateTime
+  updatedAt    DateTime
+  createdBy    String    @default("")
+  updatedBy    String    @default("")
+
+  project      Project            @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  meeting      Meeting            @relation(fields: [meetingId], references: [id], onDelete: Cascade)
+  agendaItem   MeetingAgendaItem? @relation(fields: [agendaItemId], references: [id], onDelete: SetNull)
+  supersedes   MeetingDecision?   @relation("DecisionSupersedes", fields: [supersedesId], references: [id], onDelete: SetNull)
+  supersededBy MeetingDecision[]  @relation("DecisionSupersedes")
+  links        MeetingLink[]
+  files        MeetingFile[]
+
+  @@index([meetingId])
+  @@index([projectId, status])
+}
+
+/// A promise with one name and one date on it.
+///
+/// Its source meeting is nullable so an action can later be raised from a risk
+/// or a step directly with the same shape. Completing one changes no step and
+/// no activity; converting one to a step is a separate, explicit act that
+/// records the step it became.
+model ActionItem {
+  id                   String    @id
+  projectId            String
+  meetingId            String?
+  agendaItemId         String?
+  description          String
+  /// Accountable owner — one name.
+  owner                String    @default("")
+  /// Newline-separated.
+  contributors         String    @default("")
+  dueDate              DateTime?
+  /// critical | high | normal | low
+  priority             String    @default("normal")
+  /// open | in_progress | blocked | done | cancelled
+  status               String    @default("open")
+  /// support | new_step | standalone
+  actionType           String    @default("support")
+  evidence             String    @default("")
+  blocker              String    @default("")
+  escalationDate       DateTime?
+  verifiedBy           String    @default("")
+  completedAt          DateTime?
+  /// none | step_at_risk | activity_end | milestone | not_assessed — a judgement, never a date change
+  scheduleImpact       String    @default("")
+  impactNote           String    @default("")
+  /// The later sitting it was carried into. It still belongs to its source.
+  carriedToMeetingId   String?
+  /// The step it became, once converted.
+  convertedActivityRef String?
+  convertedStepN       Int?
+  createdAt            DateTime
+  updatedAt            DateTime
+  createdBy            String    @default("")
+  updatedBy            String    @default("")
+
+  project    Project            @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  meeting    Meeting?           @relation("ActionSource", fields: [meetingId], references: [id], onDelete: Cascade)
+  agendaItem MeetingAgendaItem? @relation(fields: [agendaItemId], references: [id], onDelete: SetNull)
+  carriedTo  Meeting?           @relation("ActionCarriedTo", fields: [carriedToMeetingId], references: [id], onDelete: SetNull)
+  links      MeetingLink[]
+  files      MeetingFile[]
+
+  @@index([projectId, status])
+  @@index([meetingId])
+  @@index([carriedToMeetingId])
+}
+
+/// What a meeting row is about. Exactly one owner column is set; the target is
+/// addressed the way the rest of the app addresses it, because steps have no
+/// rows: `stage` a stage key, `activity` a ref, `step` `ref:n`, `risk` the post
+/// id, `deliverable` its id, `milestone` its id.
+model MeetingLink {
+  id           String   @id
+  projectId    String
+  seriesId     String?
+  meetingId    String?
+  agendaItemId String?
+  decisionId   String?
+  actionItemId String?
+  /// stage | activity | step | risk | deliverable | milestone
+  targetType   String
+  targetRef    String
+  createdAt    DateTime
+  createdBy    String   @default("")
+
+  project    Project            @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  series     MeetingSeries?     @relation(fields: [seriesId], references: [id], onDelete: Cascade)
+  meeting    Meeting?           @relation(fields: [meetingId], references: [id], onDelete: Cascade)
+  agendaItem MeetingAgendaItem? @relation(fields: [agendaItemId], references: [id], onDelete: Cascade)
+  decision   MeetingDecision?   @relation(fields: [decisionId], references: [id], onDelete: Cascade)
+  actionItem ActionItem?        @relation(fields: [actionItemId], references: [id], onDelete: Cascade)
+
+  @@index([projectId, targetType, targetRef])
+  @@index([meetingId])
+  @@index([agendaItemId])
+  @@index([decisionId])
+  @@index([actionItemId])
+  @@index([seriesId])
+}
+
+/// A file or a link on a meeting, a decision's supporting evidence, or the
+/// evidence that closed an action. Uploaded bytes live in Attachment.
+model MeetingFile {
+  id           String   @id
+  projectId    String
+  meetingId    String?
+  decisionId   String?
+  actionItemId String?
+  /// presentation | report | analysis | attachment | link | evidence
+  category     String   @default("attachment")
+  title        String
+  url          String   @default("")
+  createdAt    DateTime
+  createdBy    String   @default("")
+
+  project     Project          @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  meeting     Meeting?         @relation(fields: [meetingId], references: [id], onDelete: Cascade)
+  decision    MeetingDecision? @relation(fields: [decisionId], references: [id], onDelete: Cascade)
+  actionItem  ActionItem?      @relation(fields: [actionItemId], references: [id], onDelete: Cascade)
+  attachments Attachment[]
+
+  @@index([meetingId])
+  @@index([decisionId])
+  @@index([actionItemId])
 }

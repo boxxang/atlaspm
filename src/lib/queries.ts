@@ -2,6 +2,8 @@ import 'server-only';
 import { ensureBuiltinProfile } from './builtinProfile';
 import { prisma } from './db';
 import { buildProjectState, type ProjectState } from './projectState';
+import { buildMeetingsState } from './meetings/state';
+import type { MeetingsState } from './meetings/types';
 import { resolveStageDetail } from './stageDetail';
 import { resolveStages } from './stages';
 import { activitySteps } from '@/data/activitySteps';
@@ -321,6 +323,45 @@ function openStepEndsFor(
     }
   }
   return ends.sort((x, y) => x - y);
+}
+
+/**
+ * A programme's meetings: series, sittings, and everything said at them.
+ *
+ * Every read is scoped by the programme, so a meeting id from another one is
+ * simply not in the payload — the detail page answers "no such meeting" rather
+ * than rendering somebody else's minutes.
+ */
+export async function getMeetingsState(projectId: string): Promise<MeetingsState> {
+  const scope = { where: { projectId } };
+  const [project, series, meetings, agenda, decisions, actions, links, files] = await Promise.all([
+    prisma.project.findUnique({ where: { id: projectId }, select: { meetingCompletionMode: true } }),
+    prisma.meetingSeries.findMany({ ...scope, orderBy: { createdAt: 'asc' } }),
+    prisma.meeting.findMany({
+      ...scope,
+      orderBy: { startsAt: 'asc' },
+      include: { attendees: { orderBy: { position: 'asc' } } },
+    }),
+    prisma.meetingAgendaItem.findMany({ ...scope, orderBy: [{ meetingId: 'asc' }, { position: 'asc' }] }),
+    prisma.meetingDecision.findMany({ ...scope, orderBy: { createdAt: 'asc' } }),
+    prisma.actionItem.findMany({ ...scope, orderBy: { createdAt: 'asc' } }),
+    prisma.meetingLink.findMany({ ...scope, orderBy: [{ createdAt: 'asc' }, { id: 'asc' }] }),
+    prisma.meetingFile.findMany({
+      ...scope,
+      orderBy: { createdAt: 'asc' },
+      include: { attachments: { select: ATTACHMENT_META } },
+    }),
+  ]);
+  return buildMeetingsState({
+    completionMode: project?.meetingCompletionMode ?? 'warn',
+    series,
+    meetings,
+    agenda,
+    decisions,
+    actions,
+    links,
+    files,
+  });
 }
 
 /** Every profile a program can run on, oldest first, built-in leading. */

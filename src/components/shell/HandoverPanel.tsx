@@ -10,6 +10,7 @@ import { deliverableStep, handoverComplete } from '@/lib/deliverableStatus';
 import type { ProgramPost } from '@/lib/projectState';
 import { fmtDate, fmtDT, fromISO, toISO } from '@/lib/schedule';
 import { uid, useAppStore } from '@/store/useAppStore';
+import { DeliverableDecisions } from '../meetings/MeetingSource';
 import { Avatar, IconFile, IconPlus } from './icons';
 import { useDeliverableRefs } from './useDeliverableRefs';
 
@@ -161,6 +162,7 @@ export function HandoverPanel({
         </div>
 
         <div className="notecard-body">
+          <DeliverableDecisions deliverableId={deliverableId} projectId={projectId} />
           {mode === 'delete' ? (
             <div className="delconf">
               <svg

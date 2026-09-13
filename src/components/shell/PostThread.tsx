@@ -6,6 +6,7 @@ import { attachmentUrl, formatBytes } from '@/lib/attachments';
 import { fmtDT } from '@/lib/schedule';
 import type { ProgramPost } from '@/lib/projectState';
 import { uid, useAppStore } from '@/store/useAppStore';
+import { MeetingSource } from '../meetings/MeetingSource';
 import { Avatar, IconClip } from './icons';
 import { useProgramWork } from './useProgramWork';
 
@@ -244,6 +245,7 @@ function WhoLine({
         {fmtDT(post.createdAt)}
       </span>
       {post.editedAt && <span className="edited">edited</span>}
+      {post.meetingId && <MeetingSource meetingId={post.meetingId} />}
     </div>
   );
 }

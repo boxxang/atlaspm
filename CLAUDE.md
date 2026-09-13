@@ -123,6 +123,21 @@ and where the two disagree about anything else it still wins. If it ever grows
 a programmes-and-templates model, port the screens then — the editors, the
 read-only built-in, and the copy at creation — and this note comes out.
 
+**Meetings** are the second app-only feature, asked for directly the same way:
+series and sittings, agenda and minutes, decisions, action items and their
+follow-up, linked to stages, activities, steps, risks, deliverables and
+milestones (`/lib/meetings/*`, `/store/meetingStore.ts`,
+`/app/meetingActions.ts`, `/components/meetings/*`, and the `Meeting*` and
+`ActionItem` tables). Do not delete them as a divergence either. Their rules:
+a meeting is its own object, never a kind of activity or step; decisions and
+actions belong to one sitting and every other screen reads the same row;
+finishing an action completes no step and a late one moves no date; only
+"Convert to New Step", confirmed in its dialog, touches the plan. That
+conversion appends a step to an *inherited* activity on the programme's own
+copy of the plan — `resolveActivities` puts such steps after the inherited
+ones — rather than materialising the whole activity, which would drop its
+outputs and deliverable relations.
+
 ## Derived values (never stored)
 
 Stage dates (kickoff + offsets), milestones (anchored to stage ends), progress %

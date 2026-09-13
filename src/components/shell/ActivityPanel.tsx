@@ -5,6 +5,7 @@ import { detailActivityTitles } from '@/data/activityIndex';
 import { fmtDate } from '@/lib/schedule';
 import { useAppStore } from '@/store/useAppStore';
 import { useRailStore } from '@/store/railStore';
+import { RelatedMeetings } from '../meetings/RelatedMeetings';
 import { DeliverableLines } from './DeliverableLines';
 import { PostThread } from './PostThread';
 import { Segments } from './StageActivity';
@@ -106,6 +107,8 @@ export function ActivityPanel({ act, projectId }: { act: string; projectId: stri
           projectId={projectId}
           empty="This activity does not release a key deliverable of its own."
         />
+
+        <RelatedMeetings projectId={projectId} act={a.ref} />
 
         <div style={{ borderTop: '1px solid var(--line-soft)', marginTop: 14, paddingTop: 13 }}>
           <div style={{ display: 'flex', alignItems: 'baseline', gap: 8, marginBottom: 13 }}>
