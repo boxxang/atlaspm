@@ -38,10 +38,15 @@ export function ProgramShell({
 
   /* The rail clears on navigation. A step picked on one screen has nothing to
      say on the next, and a rail still showing it would be claiming a selection
-     that is no longer on the page. A view that wants one sets it from the URL. */
-  useEffect(() => {
-    useRailStore.getState().clear();
-  }, [pathname]);
+     that is no longer on the page. A view that wants one sets it from the URL.
+
+     In the cleanup, not the body. React runs a commit's effects child first, so
+     a clear in the body ran after the arriving page had set its selection from
+     the URL and wiped it: every `?step=` link reached by clicking landed on the
+     stage's properties. Cleanups all run before any effect body, so clearing
+     on the way out of a route always comes first. `next dev` hid it — Strict
+     Mode runs the page's effect a second time, after the clear. */
+  useEffect(() => () => useRailStore.getState().clear(), [pathname]);
 
   if (!hydrated) return null;
 
