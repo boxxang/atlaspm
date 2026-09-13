@@ -44,6 +44,8 @@ export function PostThread({
   squareBar = false,
   /** Show which step each post is about — an activity's thread does, a step's does not. */
   showStep = false,
+  /** The post a link brought the reader to, marked so they can see which. */
+  arrived = null,
   emptyText,
 }: {
   posts: ProgramPost[];
@@ -61,6 +63,7 @@ export function PostThread({
   fixedStep?: number | null;
   squareBar?: boolean;
   showStep?: boolean;
+  arrived?: string | null;
   emptyText: string;
 }) {
   const savePost = useAppStore((s) => s.savePost);
@@ -94,6 +97,7 @@ export function PostThread({
             key={p.id}
             post={p}
             showStep={showStep}
+            arrived={p.id === arrived}
             live={live.has(p.id)}
             mode={mode}
             setMode={setMode}
@@ -134,6 +138,7 @@ function Post({
   post,
   replies,
   showStep,
+  arrived,
   live,
   mode,
   setMode,
@@ -144,6 +149,7 @@ function Post({
   post: ProgramPost;
   replies: ProgramPost[];
   showStep: boolean;
+  arrived: boolean;
   live: boolean;
   mode: Mode;
   setMode: (m: Mode) => void;
@@ -154,7 +160,7 @@ function Post({
   const savePost = useAppStore((s) => s.savePost);
 
   return (
-    <div className="post" data-post={post.id}>
+    <div className="post" data-post={post.id} data-arrived={arrived ? '' : undefined}>
       <Avatar name={post.author} />
       <div style={{ flexGrow: 1, minWidth: 0 }}>
         <WhoLine post={post} showStep={showStep} live={live} />

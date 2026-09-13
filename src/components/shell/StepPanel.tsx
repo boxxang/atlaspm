@@ -1,7 +1,8 @@
 'use client';
 
 import Link from 'next/link';
-import { useRef, useState } from 'react';
+import { useSearchParams } from 'next/navigation';
+import { useEffect, useRef, useState } from 'react';
 import { attachmentUrl, formatBytes } from '@/lib/attachments';
 import { fmtDate, fmtDT, fromISO, toISO } from '@/lib/schedule';
 import { isStepLate, stepKey } from '@/lib/steps';
@@ -52,6 +53,19 @@ export function StepPanel({ act, n, projectId }: { act: string; n: number; proje
      open so Cancel means something. Keyed on the step below, so moving to
      another step closes the editor rather than carrying the draft to it. */
   const [draft, setDraft] = useState<Facts | null>(null);
+
+  /* The post a link named — the step pills in the Updates feed and on the
+     Overview carry it. The thread sits under Progress, Outputs and Details, so
+     on a laptop screen it is below the rail's fold, and the rail is its own
+     scroller: the page scrolling to the step's row does nothing for it. After
+     paint, because the post is rendered by the thread in the same commit. */
+  const arrived = useSearchParams().get('post');
+  useEffect(() => {
+    if (!arrived) return;
+    document
+      .querySelector(`#peek [data-post="${CSS.escape(arrived)}"]`)
+      ?.scrollIntoView({ block: 'center', inline: 'nearest' });
+  }, [arrived, act, n]);
 
   const step = a?.steps.find((s) => s.n === n);
   if (!a || !step) return null;
@@ -462,6 +476,7 @@ export function StepPanel({ act, n, projectId }: { act: string; n: number; proje
             fixedStep={n}
             squareBar
             allowRisk
+            arrived={arrived}
             emptyText="No updates on this step yet."
           />
         </div>

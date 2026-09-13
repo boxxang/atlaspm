@@ -818,6 +818,7 @@ function RecentUpdates({ projectId }: { projectId: string }) {
     who: p.author,
     text: p.text,
     stageId: p.stageId ?? stageOfAct(p.activityRef),
+    act: p.activityRef,
     stepN: p.stepN,
     risk: p.kind === 'risk',
   }));
@@ -830,6 +831,7 @@ function RecentUpdates({ projectId }: { projectId: string }) {
           who: it.owner,
           text: u.text,
           stageId: id,
+          act: null as string | null,
           stepN: null as number | null,
           risk: k === 'risks',
         })),
@@ -860,11 +862,23 @@ function RecentUpdates({ projectId }: { projectId: string }) {
                   {shortOf(p.stageId)}
                 </span>
               )}
-              {p.stepN != null && (
-                <span className="pill acc" style={{ fontSize: 10.5 }}>
-                  STEP {p.stepN}
-                </span>
-              )}
+              {/* the post, in its step's thread — the same place the Updates
+                  feed's pill goes */}
+              {p.stepN != null &&
+                (p.act && p.stageId ? (
+                  <Link
+                    className="pill acc"
+                    style={{ fontSize: 10.5 }}
+                    href={`/p/${projectId}/stage/${p.stageId}/activity?step=${p.act}:${p.stepN}&post=${p.id}`}
+                    data-step-link={`${p.act}:${p.stepN}`}
+                  >
+                    STEP {p.stepN}
+                  </Link>
+                ) : (
+                  <span className="pill acc" style={{ fontSize: 10.5 }}>
+                    STEP {p.stepN}
+                  </span>
+                ))}
               <span className="num" style={{ fontSize: 11.5, color: 'var(--ink-3)' }}>
                 {fmtDT(p.at)}
               </span>

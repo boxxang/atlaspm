@@ -129,8 +129,9 @@ export function UpdatesPage({
                     className="pill acc"
                     style={{ fontSize: 10.5 }}
                     /* the step itself, where its state and this thread are —
-                       not the write-up, which is about the template */
-                    href={`/p/${projectId}/stage/${p.stageId}/activity?step=${p.act}:${p.stepN}`}
+                       not the write-up, which is about the template — and the
+                       post in that thread, which is what was clicked */
+                    href={`/p/${projectId}/stage/${p.stageId}/activity?step=${p.act}:${p.stepN}&post=${p.id}`}
                     data-step-link={`${p.act}:${p.stepN}`}
                   >
                     STEP {p.stepN}

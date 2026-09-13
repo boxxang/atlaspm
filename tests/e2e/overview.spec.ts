@@ -214,6 +214,32 @@ test.describe('the estimated cost', () => {
   });
 });
 
+/* The Overview's recent updates say which step a post is on, and that is a
+   link to the post the same as it is in the Updates feed — a label naming
+   somewhere you cannot go from it is a dead end on the one card people read
+   first. */
+test('a recent update on a step opens that post', async ({ page }) => {
+  /* somewhere a post can be written on a step, whichever the seed's schedule
+     put first in the feed */
+  await page.goto(`${SHELL_PATH}/updates`);
+  const href = await page.locator('[data-step-link]').first().getAttribute('href');
+  await page.goto(href!.replace(/&post=[^&]*/, ''));
+
+  const rail = page.getByRole('complementary', { name: 'Details' });
+  const text = `Probe card back from the vendor ${Date.now()}`;
+  await rail.getByPlaceholder(/^What happened on step/).fill(text);
+  await rail.getByRole('button', { name: 'Post', exact: true }).click();
+  await writesSettled(page);
+
+  await open(page, `${SHELL_PATH}/overview`, '[data-attn]');
+  await page.locator('.ovfeed').filter({ hasText: text }).locator('[data-step-link]').click();
+
+  await expect(rail.locator('[data-post]').filter({ hasText: text })).toHaveAttribute(
+    'data-arrived',
+    '',
+  );
+});
+
 test.describe('Timeline', () => {
   test.beforeEach(async ({ page }) => {
     await open(page, `${SHELL_PATH}/timeline`, '[data-timeline]');

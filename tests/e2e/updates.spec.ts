@@ -90,6 +90,31 @@ test.describe('the updates feed', () => {
     expect(where.bottom).toBeLessThanOrEqual(where.h);
   });
 
+  /* Arriving at the step is still not arriving at what was said. The step's
+     panel runs to Progress, Outputs and Details before its thread, so on a
+     laptop screen the post you clicked is below the panel's fold with nothing
+     saying which one it was. The rail is its own scroller, so the page being
+     scrolled says nothing about it. */
+  test('the step pill brings you to the post itself', async ({ page }) => {
+    await page.setViewportSize({ width: 1440, height: 700 });
+    const row = page
+      .locator('[data-update]')
+      .filter({ has: page.locator('[data-step-link]') })
+      .first();
+    const postId = await row.getAttribute('data-update');
+
+    await row.locator('[data-step-link]').click();
+    const post = rail(page).locator(`[data-post="${postId}"]`);
+    await expect(post).toHaveAttribute('data-arrived', '');
+
+    const inside = await post.evaluate((el) => {
+      const r = el.getBoundingClientRect();
+      const b = el.closest('.peek-body')!.getBoundingClientRect();
+      return r.top >= b.top && r.bottom <= b.bottom;
+    });
+    expect(inside, 'the post should be inside the rail’s visible area').toBe(true);
+  });
+
   test('the stage pill opens the stage', async ({ page }) => {
     const pill = page.locator('[data-update] [data-stage-pill]').first();
     const stageId = await pill.getAttribute('data-stage-pill');

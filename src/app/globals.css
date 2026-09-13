@@ -2465,6 +2465,12 @@ button.clip:hover{background:var(--accent-line)}
    are not sitting between them. */
 .post > div > .txt,.reply > div > .txt{border:1px solid var(--line-soft);border-radius:var(--r);
   padding:7px 10px;background:var(--sunken)}
+/* The post a link brought you to. The outline stays, so it can be found again
+   after reading the panel above it; the tint fades, so it marks the post
+   without shouting for as long as the panel is open. */
+.post[data-arrived] > div > .txt{border-color:var(--accent);animation:arrived 2.4s ease-out both}
+@keyframes arrived{from{background:var(--accent-soft)}to{background:var(--sunken)}}
+@media (prefers-reduced-motion:reduce){.post[data-arrived] > div > .txt{animation:none}}
 .acts button{font-size:11.5px;color:var(--ink-3);padding:1px 5px;border-radius:4px}
 .acts button:hover{color:var(--accent);background:var(--accent-soft)}
 .acts button.del:hover{color:var(--risk-ink);background:var(--risk-soft)}
