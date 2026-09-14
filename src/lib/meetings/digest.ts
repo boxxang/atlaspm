@@ -20,9 +20,22 @@ const ACTIVE: ReadonlySet<MeetingStatus> = new Set(['draft', 'scheduled', 'in_pr
 
 const stillToHappen = (m: Meeting, today: Date) => ACTIVE.has(m.status) && m.startsAt.getTime() >= today.getTime();
 
-/** Sittings from today on that are still to happen — what the nav counts. */
-export const countUpcoming = (meetings: readonly Meeting[], today: Date): number =>
-  meetings.filter((m) => stillToHappen(m, today)).length;
+/**
+ * Sittings still to happen from today to `days` out — what the Upcoming tab
+ * lists, so its count and the nav's say the same as the list under them.
+ */
+export const countUpcoming = (meetings: readonly Meeting[], today: Date, days = UPCOMING_DAYS): number => {
+  const end = today.getTime() + (days + 1) * DAY;
+  return meetings.filter((m) => stillToHappen(m, today) && m.startsAt.getTime() < end).length;
+};
+
+/** Today's meetings in the order they start, held or still to come — not the cancelled. */
+export const meetingsToday = (meetings: readonly Meeting[], today: Date): Meeting[] => {
+  const t0 = today.getTime();
+  return meetings
+    .filter((m) => m.status !== 'cancelled' && m.startsAt.getTime() >= t0 && m.startsAt.getTime() < t0 + DAY)
+    .sort((a, b) => a.startsAt.getTime() - b.startsAt.getTime());
+};
 
 /** A series' next sitting that has not happened yet. */
 export const nextSittingOf = (seriesId: string, meetings: readonly Meeting[], today: Date): Meeting | null =>
@@ -68,9 +81,7 @@ export function upcomingDigest(input: {
   const horizonEnd = t0 + ((input.horizonDays ?? UPCOMING_DAYS) + 1) * DAY;
   const byStart = (a: Meeting, b: Meeting) => a.startsAt.getTime() - b.startsAt.getTime();
 
-  const today = input.meetings
-    .filter((m) => m.status !== 'cancelled' && m.startsAt.getTime() >= t0 && m.startsAt.getTime() < dayEnd)
-    .sort(byStart);
+  const today = meetingsToday(input.meetings, input.today);
   const upcoming = input.meetings
     .filter(
       (m) =>

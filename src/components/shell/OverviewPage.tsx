@@ -12,12 +12,13 @@ import { Avatar, IconMail } from './icons';
 import { useAttention } from './useAttention';
 import { useRowLimit } from './useRowLimit';
 import { useProgramWork } from './useProgramWork';
+import { TodayMeetings } from '../meetings/TodayMeetings';
 
 /**
  * Where the programme is, on one screen.
  *
- * Four things in the order a TPM reads them: the figures, what needs answering
- * today, when the checkpoints land, and who is doing what right now. The
+ * In the order a TPM reads them: the figures, what needs answering today, the
+ * meetings on today, when the checkpoints land, and who is doing what right now. The
  * schedule sits beside the smaller cards rather than under them, because it is
  * the one that rewards a wide look.
  */
@@ -77,6 +78,8 @@ export function OverviewPage({ projectId }: { projectId: string }) {
         </div>
 
         <NeedsYouToday projectId={projectId} />
+
+        <TodayMeetings projectId={projectId} />
 
         <div className="ov-cols">
           <ScheduleCard projectId={projectId} first={first} last={last} />
@@ -506,7 +509,7 @@ function ScheduleCard({
   }
 
   return (
-    <div className="card" style={{ padding: '14px 18px 16px', minWidth: 0 }}>
+    <div className="card" style={{ padding: '14px 18px 16px', minWidth: 0 }} data-schedule-card>
       <div style={{ display: 'flex', alignItems: 'center', gap: 9, marginBottom: 14, flexWrap: 'wrap' }}>
         <b style={{ fontSize: 14 }}>Schedule</b>
         <span className="pill">{rows.length} checkpoints</span>

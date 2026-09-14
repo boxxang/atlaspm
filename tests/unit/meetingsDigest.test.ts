@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { countUpcoming, nextSittingOf, upcomingDigest } from '@/lib/meetings/digest';
+import { countUpcoming, meetingsToday, nextSittingOf, upcomingDigest } from '@/lib/meetings/digest';
 import { action, agendaItem, decision, meeting } from './meetingFixtures';
 
 const ME = 'Sangwook Park';
@@ -27,10 +27,21 @@ const meetings = [
 ];
 
 describe('counting what is coming', () => {
-  it('counts meetings from today on that are still to happen', () => {
-    /* today, tomorrow, the draft and the one outside the horizon — not the
-       completed one yesterday, nor the cancellation */
-    expect(countUpcoming(meetings, TODAY)).toBe(4);
+  it('counts what the Upcoming tab lists: still to happen, from today to a week out', () => {
+    /* today, tomorrow and the draft a week out — not the completed one
+       yesterday, the cancellation, or the one past the week */
+    expect(countUpcoming(meetings, TODAY)).toBe(3);
+    expect(countUpcoming(meetings, TODAY, 30)).toBe(4);
+  });
+
+  it('lists today’s meetings in the order they start, held or not, without cancellations', () => {
+    const list = [
+      ...meetings,
+      meeting({ id: 'early', startsAt: at(13, 7), status: 'completed' }),
+      meeting({ id: 'dropped', startsAt: at(13, 11), status: 'cancelled' }),
+      meeting({ id: 'late-tonight', startsAt: at(13, 23) }),
+    ];
+    expect(meetingsToday(list, TODAY).map((m) => m.id)).toEqual(['early', 'today', 'late-tonight']);
   });
 
   it('finds a series’ next sitting that has not happened yet', () => {

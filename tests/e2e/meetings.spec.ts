@@ -356,6 +356,35 @@ test.describe('inside a meeting', () => {
 });
 
 test.describe('on the work itself', () => {
+  test('the overview lists today’s meetings between Needs you today and the schedule', async ({ page }) => {
+    await page.goto(MEETINGS);
+    await page.locator('[data-new-meeting]').click();
+    const dlg = page.locator('[data-meeting-dialog]');
+    await dlg.getByLabel('Title', { exact: true }).fill('Same-day ECO sync');
+    await dlg.getByLabel('Date').fill(dayFromToday(0));
+    await dlg.locator('[data-save-meeting]').click();
+    await expect(page.getByRole('heading', { level: 1, name: 'Same-day ECO sync' })).toBeVisible();
+    await writesSettled(page);
+
+    await page.goto(`${SHELL_PATH}/overview`);
+    const card = page.locator('[data-today-meetings]');
+    await expect(card).toContainText('Today’s meetings');
+    const row = card.locator('[data-meeting-row]').filter({ hasText: 'Same-day ECO sync' });
+    await expect(row).toBeVisible();
+
+    const order = await page.evaluate(() => {
+      const needs = document.querySelector('[data-attn-count]')!;
+      const today = document.querySelector('[data-today-meetings]')!;
+      const schedule = document.querySelector('[data-schedule-card]')!;
+      const after = (a: Element, b: Element) => !!(a.compareDocumentPosition(b) & Node.DOCUMENT_POSITION_FOLLOWING);
+      return [after(needs, today), after(today, schedule)];
+    });
+    expect(order).toEqual([true, true]);
+
+    await row.getByRole('link', { name: 'Same-day ECO sync' }).click();
+    await expect(page.getByRole('heading', { level: 1, name: 'Same-day ECO sync' })).toBeVisible();
+  });
+
   test('an activity panel lists the meetings, decisions and action items about it', async ({ page }) => {
     await openSeededSitting(page, 'DFT Weekly Review', 'Completed');
     const act = (await page.locator('[data-card="facts"] [data-link^="activity:"]').first().getAttribute('data-link'))!.split(':')[1];
