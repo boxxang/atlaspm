@@ -166,7 +166,8 @@ export async function seedProject(prisma: PrismaClient, now = new Date()): Promi
       stepN: r.stepN,
     })),
   });
-  /* The programme's meetings: five series and their recent sittings, placed
+  /* The programme's meetings: ten series, their recent sittings and a few
+     one-off meetings, placed
      relative to today and to what is actually in flight — see
      /lib/meetingSeed.ts. Scoped to this project like everything above, and
      removed with it by the delete at the top. */
@@ -197,7 +198,9 @@ export async function seedProject(prisma: PrismaClient, now = new Date()): Promi
   await prisma.meetingSeries.createMany({
     data: meetings.series.map(({ primaryStage: _stage, ...row }) => row),
   });
-  await prisma.meeting.createMany({ data: meetings.meetings });
+  await prisma.meeting.createMany({
+    data: meetings.meetings.map(({ primaryStage: _stage, ...row }) => row),
+  });
   await prisma.meetingAttendee.createMany({ data: meetings.attendees });
   await prisma.meetingAgendaItem.createMany({ data: meetings.agenda });
   await prisma.meetingDecision.createMany({ data: meetings.decisions });

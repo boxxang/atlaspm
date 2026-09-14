@@ -51,12 +51,17 @@ const seed = buildMeetingSeed({
 });
 
 describe('buildMeetingSeed', () => {
-  it('names the five series, one of them not running yet', () => {
+  it('names the series a programme in physical design runs, one of them not running yet', () => {
     expect(seed.series.map((s) => s.title)).toEqual([
+      'Weekly SoC Program Review',
       'DFT Weekly Review',
+      'DV Closure Sync',
+      'Netlist Drop Review',
+      'Physical Design Daily War-room',
       'Physical Design Closure Review',
       'Tapeout Readiness Review',
       'Package Supplier Review',
+      'Package Test Vehicle Review',
       'Silicon Bring-up Daily',
     ]);
     const bringup = seed.series.find((s) => s.title === 'Silicon Bring-up Daily')!;
@@ -64,8 +69,23 @@ describe('buildMeetingSeed', () => {
     expect(seed.meetings.filter((m) => m.seriesId === bringup.id)).toHaveLength(0);
   });
 
+  it('reads like a programme’s record, not a demo: a month of sittings, decisions and actions', () => {
+    expect(seed.meetings.length).toBeGreaterThanOrEqual(25);
+    expect(seed.decisions.length).toBeGreaterThanOrEqual(12);
+    expect(seed.actions.length).toBeGreaterThanOrEqual(20);
+  });
+
+  it('adds one-off meetings outside any series, held and ahead', () => {
+    const oneOffs = seed.meetings.filter((m) => m.seriesId === null);
+    expect(oneOffs.length).toBe(3);
+    expect(new Set(oneOffs.map((m) => m.status))).toEqual(new Set(['completed', 'scheduled', 'draft']));
+    for (const m of oneOffs) {
+      const weekday = m.startsAt.getDay();
+      expect(weekday === 0 || weekday === 6, `${m.title} lands on a weekend`).toBe(false);
+    }
+  });
+
   it('holds what is past as completed or cancelled, and schedules what is ahead', () => {
-    expect(seed.meetings.length).toBeGreaterThanOrEqual(8);
     for (const m of seed.meetings) {
       if (m.status === 'completed' || m.status === 'cancelled') expect(m.startsAt < NOW, m.title).toBe(true);
       else expect(m.startsAt > NOW, m.title).toBe(true);
@@ -74,11 +94,10 @@ describe('buildMeetingSeed', () => {
   });
 
   it('never meets about a stage before that stage has started', () => {
-    for (const s of seed.series.filter((x) => x.status === 'active')) {
-      const stage = stages.find((x) => x.id === s.primaryStage)!;
-      for (const m of seed.meetings.filter((x) => x.seriesId === s.id)) {
-        expect(m.startsAt >= stage.start, `${m.title} on ${m.startsAt.toISOString()}`).toBe(true);
-      }
+    for (const m of seed.meetings) {
+      const stage = stages.find((x) => x.id === m.primaryStage)!;
+      expect(stage, m.title).toBeTruthy();
+      expect(m.startsAt >= stage.start, `${m.title} on ${m.startsAt.toISOString()}`).toBe(true);
     }
   });
 
@@ -90,7 +109,7 @@ describe('buildMeetingSeed', () => {
     }
   });
 
-  it('records at least one decision for every series that has met, and leaves one awaiting approval', () => {
+  it('records at least one decision for every series that has met, and leaves some awaiting approval', () => {
     for (const s of seed.series.filter((x) => x.status === 'active')) {
       const ids = new Set(seed.meetings.filter((m) => m.seriesId === s.id).map((m) => m.id));
       expect(seed.decisions.some((d) => ids.has(d.meetingId)), s.title).toBe(true);
@@ -101,11 +120,12 @@ describe('buildMeetingSeed', () => {
   it('leaves action items open, in progress, blocked and done', () => {
     expect(new Set(seed.actions.map((a) => a.status))).toEqual(new Set(['open', 'in_progress', 'blocked', 'done']));
     for (const a of seed.actions.filter((x) => x.status === 'done')) expect(a.completedAt).not.toBeNull();
+    for (const a of seed.actions.filter((x) => x.status === 'blocked')) expect(a.blocker).not.toBe('');
   });
 
-  it('carries an unfinished action into a later sitting of the same series', () => {
+  it('carries unfinished actions into a later sitting of the same series', () => {
     const carried = seed.actions.filter((a) => a.carriedToMeetingId);
-    expect(carried.length).toBeGreaterThan(0);
+    expect(carried.length).toBeGreaterThan(1);
     for (const a of carried) {
       const from = seed.meetings.find((m) => m.id === a.meetingId)!;
       const into = seed.meetings.find((m) => m.id === a.carriedToMeetingId)!;
@@ -121,7 +141,7 @@ describe('buildMeetingSeed', () => {
     const dlv = new Set(deliverables.map((d) => d.id));
     const ms = new Set(milestoneDefs.map((m) => m.id));
     const stageIds = new Set<string>(STAGE_ORDER);
-    expect(seed.links.length).toBeGreaterThan(10);
+    expect(seed.links.length).toBeGreaterThan(40);
     for (const l of seed.links) {
       if (l.targetType === 'activity') expect(acts.has(l.targetRef), l.targetRef).toBe(true);
       if (l.targetType === 'step') {
@@ -134,10 +154,17 @@ describe('buildMeetingSeed', () => {
       if (l.targetType === 'milestone') expect(ms.has(l.targetRef), l.targetRef).toBe(true);
       if (l.targetType === 'stage') expect(stageIds.has(l.targetRef), l.targetRef).toBe(true);
     }
-    /* and to at least one activity, one step and one risk, which is what the
-       activity and step panels read */
     const kinds = new Set(seed.links.map((l) => l.targetType));
     for (const k of ['activity', 'step', 'risk', 'deliverable', 'milestone', 'stage']) expect(kinds.has(k), k).toBe(true);
+    /* every seeded risk is talked about somewhere */
+    for (const r of risks) expect(seed.links.some((l) => l.targetType === 'risk' && l.targetRef === r.postId), r.postId).toBe(true);
+  });
+
+  it('names people the programme has: its stage leads, its contacts and the TPM', () => {
+    const known = new Set([RISK_AUTHOR, ...Object.values(people).flatMap((p) => [p.lead, ...p.team])]);
+    for (const m of seed.meetings) expect(known.has(m.owner), m.owner).toBe(true);
+    for (const a of seed.attendees) expect(known.has(a.name), a.name).toBe(true);
+    for (const a of seed.actions) expect(known.has(a.owner), a.owner).toBe(true);
   });
 
   it('puts every row on the programme, with ids that do not collide', () => {
@@ -145,9 +172,14 @@ describe('buildMeetingSeed', () => {
     expect(rows.every((r) => r.projectId === 'atlasax1')).toBe(true);
     const ids = rows.map((r) => r.id);
     expect(new Set(ids).size).toBe(ids.length);
+    /* every seeded meeting is addressable as the seed's own, so a reseed can
+       replace it without touching meetings somebody created */
+    for (const m of seed.meetings) expect(m.id.startsWith('atlasax1:m:')).toBe(true);
+    for (const s of seed.series) expect(s.id.startsWith('atlasax1:ms:')).toBe(true);
   });
 
-  it('owns at least one coming meeting as the TPM, so Upcoming has something that is mine', () => {
+  it('owns coming meetings as the TPM, so Upcoming has something that is mine', () => {
     expect(seed.meetings.some((m) => m.owner === RISK_AUTHOR && m.startsAt > NOW)).toBe(true);
+    expect(seed.actions.some((a) => a.owner === RISK_AUTHOR && a.status !== 'done')).toBe(true);
   });
 });

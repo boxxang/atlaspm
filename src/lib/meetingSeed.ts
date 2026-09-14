@@ -5,7 +5,8 @@
  * lands. Each series meets on its own rule from the day its stage started, and
  * a sitting is named by its place around today — the last one before today,
  * the next one after — so the record reads the same whichever day the seed
- * runs. A series whose stage has not started holds no sittings.
+ * runs. A series whose stage has not started holds no sittings, and a one-off
+ * meeting about a stage that has not started is not held.
  *
  * What a meeting is about is chosen from what is actually happening: the
  * activity and step a risk was seeded on, or failing that an activity with a
@@ -14,10 +15,16 @@
  *
  * Pure: no DOM, no database, no clock of its own — now and today are passed in.
  */
-import { MEETING_SEEDS, type SeedLink, type SeedSeries } from '@/data/meetingSeeds';
+import {
+  MEETING_SEEDS,
+  ONE_OFF_MEETINGS,
+  type SeedLink,
+  type SeedSitting,
+} from '@/data/meetingSeeds';
 import { keyOfLocal } from './meetings/calendar';
 import { nextOccurrences } from './meetings/recurrence';
 import type { RecurrenceRule } from './meetings/types';
+import { zonedToUtc } from './meetings/zonedTime';
 import { DAY } from './schedule';
 import { plannedSteps, type ActivitySteps } from './steps';
 
@@ -78,6 +85,8 @@ export interface MeetingSeedRow extends Stamp {
   minutes: string;
   completedAt: Date | null;
   cancelReason: string;
+  /** Not a column: the stage the meeting is about, for the checks. */
+  primaryStage: string;
 }
 
 export interface AttendeeSeedRow {
@@ -173,6 +182,25 @@ export interface MeetingSeed {
 /** How far back to look for the sittings a series has already held. */
 const LOOKBACK_DAYS = 90;
 
+type Target = { type: string; ref: string };
+type LinkOwner = keyof Pick<LinkSeedRow, 'seriesId' | 'meetingId' | 'agendaItemId' | 'decisionId' | 'actionItemId'>;
+
+/** What a series or a one-off meeting is about, resolved against the programme. */
+interface About {
+  key: string;
+  title: string;
+  purpose: string;
+  type: string;
+  stage: string;
+  alsoStages?: string[];
+  milestone?: string;
+  deliverable?: string;
+  owner: string;
+  attendees: string[];
+  durationMinutes: number;
+  location: string;
+}
+
 const dayOf = (at: Date, days = 0) => {
   const d = new Date(at);
   d.setHours(0, 0, 0, 0);
@@ -180,21 +208,29 @@ const dayOf = (at: Date, days = 0) => {
   return d;
 };
 
+/** A day this many days from today, moved off a weekend in the same direction. */
+const workingDay = (today: Date, days: number) => {
+  const d = dayOf(today, days);
+  const step = days < 0 ? -1 : 1;
+  while (d.getDay() === 0 || d.getDay() === 6) d.setDate(d.getDate() + step);
+  return d;
+};
+
 export function buildMeetingSeed(input: MeetingSeedInput): MeetingSeed {
   const { projectId, now, timeZone, me } = input;
   const out: MeetingSeed = { series: [], meetings: [], attendees: [], agenda: [], decisions: [], actions: [], links: [] };
 
-  const link = (owner: { key: keyof Omit<LinkSeedRow, 'id' | 'projectId' | 'targetType' | 'targetRef' | 'createdAt' | 'createdBy'>; id: string }, targets: readonly { type: string; ref: string }[], at: Date, by: string) =>
+  const link = (key: LinkOwner, id: string, targets: readonly Target[], at: Date, by: string) =>
     targets.forEach((t, i) =>
       out.links.push({
-        id: `${owner.key}:${owner.id}:${String(i).padStart(3, '0')}`,
+        id: `${key}:${id}:${String(i).padStart(3, '0')}`,
         projectId,
         seriesId: null,
         meetingId: null,
         agendaItemId: null,
         decisionId: null,
         actionItemId: null,
-        [owner.key]: owner.id,
+        [key]: id,
         targetType: t.type,
         targetRef: t.ref,
         createdAt: at,
@@ -202,16 +238,20 @@ export function buildMeetingSeed(input: MeetingSeedInput): MeetingSeed {
       }),
     );
 
-  for (const s of MEETING_SEEDS) {
-    const stage = input.stages.find((x) => x.id === s.stage);
-    if (!stage) continue;
-    const lead = input.people[s.stage]?.lead || me;
-    const who = (name: string) => (name === '@me' ? me : name === '@lead' ? lead : name);
-    const owner = who(s.owner);
-    const work = workOf(s.stage, stage.start, input);
-    const deliverable = deliverableOf(s, input);
+  /** People as the seed names them: `@me`, `@lead`, `@lead:<stage>`, or a contact. */
+  const whoFor = (stage: string) => (name: string) => {
+    if (name === '@me') return me;
+    if (name === '@lead') return input.people[stage]?.lead || me;
+    if (name.startsWith('@lead:')) return input.people[name.slice('@lead:'.length)]?.lead || me;
+    return name;
+  };
 
-    const target = (kind: SeedLink | undefined): { type: string; ref: string } | null => {
+  /** The links, people and work a series or a one-off meeting resolves to. */
+  const resolve = (s: About) => {
+    const who = whoFor(s.stage);
+    const work = workOf(s.stage, input);
+    const deliverable = deliverableOf(s, input);
+    const target = (kind: SeedLink | undefined): Target | null => {
       switch (kind) {
         case 'stage':
           return { type: 'stage', ref: s.stage };
@@ -229,8 +269,143 @@ export function buildMeetingSeed(input: MeetingSeedInput): MeetingSeed {
           return null;
       }
     };
-    const targets = (kinds: readonly (SeedLink | undefined)[]) =>
-      kinds.map(target).filter((t): t is { type: string; ref: string } => !!t);
+    const targets = (kinds: readonly (SeedLink | undefined)[]) => kinds.map(target).filter((t): t is Target => !!t);
+    const links: Target[] = [
+      { type: 'stage', ref: s.stage },
+      ...(s.alsoStages ?? []).filter((id) => input.stages.some((x) => x.id === id)).map((ref) => ({ type: 'stage', ref })),
+      ...targets(['activity', 'milestone', s.deliverable ? 'deliverable' : undefined]),
+    ];
+    return { who, owner: who(s.owner), targets, links };
+  };
+
+  /** One sitting with its attendees, agenda, decisions and actions. */
+  const place = (
+    s: About,
+    r: ReturnType<typeof resolve>,
+    sitting: Omit<SeedSitting, 'when'>,
+    id: string,
+    seriesId: string | null,
+    startsAt: Date,
+    carryInto: string | null,
+  ) => {
+    const { who, owner, targets } = r;
+    const endsAt = new Date(startsAt.getTime() + s.durationMinutes * 60000);
+    const past = sitting.status === 'completed' || sitting.status === 'cancelled';
+    const held = sitting.status === 'completed';
+    const createdAt = past ? new Date(startsAt.getTime() - 7 * DAY) : new Date(Math.min(now.getTime() - DAY, startsAt.getTime()));
+    const updatedAt = held ? endsAt : createdAt;
+    const stamp = { createdAt, updatedAt, createdBy: owner, updatedBy: owner };
+
+    out.meetings.push({
+      id,
+      projectId,
+      seriesId,
+      title: s.title,
+      type: s.type,
+      status: sitting.status,
+      startsAt,
+      endsAt,
+      timeZone,
+      owner,
+      facilitator: '',
+      location: s.location,
+      purpose: s.purpose,
+      minutes: sitting.minutes ?? '',
+      completedAt: held ? endsAt : null,
+      cancelReason: sitting.cancelReason ?? '',
+      primaryStage: s.stage,
+      ...stamp,
+    });
+    [...new Set([owner, ...s.attendees.map(who)])].forEach((name, position) =>
+      out.attendees.push({ id: `${id}:att:${position}`, projectId, meetingId: id, name, optional: false, position }),
+    );
+    link('meetingId', id, r.links, createdAt, owner);
+
+    const agendaIds = sitting.agenda.map((_, i) => `${id}:a:${i}`);
+    sitting.agenda.forEach((a, i) => {
+      out.agenda.push({
+        id: agendaIds[i],
+        projectId,
+        meetingId: id,
+        position: i,
+        title: a.title,
+        description: '',
+        presenter: who(a.presenter),
+        minutes: a.minutes,
+        notes: held ? (a.notes ?? '') : '',
+        outcome: held ? (a.outcome ?? '') : '',
+        status: held ? 'discussed' : 'pending',
+        deferral: held ? (a.deferral ?? '') : '',
+        deferNote: '',
+        carriedFromId: null,
+        ...stamp,
+      });
+      link('agendaItemId', agendaIds[i], targets([a.link]), createdAt, owner);
+    });
+
+    (sitting.decisions ?? []).forEach((d, i) => {
+      const did = `${id}:d:${i}`;
+      out.decisions.push({
+        id: did,
+        projectId,
+        meetingId: id,
+        agendaItemId: d.agenda != null ? (agendaIds[d.agenda] ?? null) : null,
+        title: d.title,
+        description: d.description,
+        owner: who(d.owner),
+        approvedBy: d.approvedBy ? who(d.approvedBy) : '',
+        decidedOn: d.status === 'proposed' ? null : dayOf(startsAt),
+        rationale: d.rationale,
+        scope: d.scope,
+        status: d.status,
+        supersedesId: null,
+        createdAt: endsAt,
+        updatedAt: endsAt,
+        createdBy: owner,
+        updatedBy: owner,
+      });
+      link('decisionId', did, targets([d.link]), endsAt, owner);
+    });
+
+    (sitting.actions ?? []).forEach((a, i) => {
+      const aid = `${id}:x:${i}`;
+      const done = a.status === 'done';
+      out.actions.push({
+        id: aid,
+        projectId,
+        meetingId: id,
+        agendaItemId: a.agenda != null ? (agendaIds[a.agenda] ?? null) : null,
+        description: a.description,
+        owner: who(a.owner),
+        contributors: (a.contributors ?? []).map(who).join('\n'),
+        dueDate: dayOf(startsAt, a.dueAfter),
+        priority: a.priority,
+        status: a.status,
+        actionType: a.type,
+        evidence: a.evidence ?? '',
+        blocker: a.blocker ?? '',
+        escalationDate: a.escalateAfter != null ? dayOf(startsAt, a.escalateAfter) : null,
+        verifiedBy: a.verifiedBy ? who(a.verifiedBy) : '',
+        /* finished a day before it was due, and never after the seed ran */
+        completedAt: done ? new Date(Math.min(dayOf(startsAt, Math.max(1, a.dueAfter - 1)).getTime() + 16 * 3600000, now.getTime())) : null,
+        scheduleImpact: a.impact ?? '',
+        impactNote: a.impactNote ?? '',
+        carriedToMeetingId: a.carry && !done ? carryInto : null,
+        convertedActivityRef: null,
+        convertedStepN: null,
+        createdAt: endsAt,
+        updatedAt: endsAt,
+        createdBy: owner,
+        updatedBy: owner,
+      });
+      link('actionItemId', aid, targets([a.link]), endsAt, owner);
+    });
+  };
+
+  for (const s of MEETING_SEEDS) {
+    const stage = input.stages.find((x) => x.id === s.stage);
+    if (!stage) continue;
+    const r = resolve(s);
 
     const seriesId = `${projectId}:ms:${s.key}`;
     const rule: RecurrenceRule = {
@@ -242,11 +417,6 @@ export function buildMeetingSeed(input: MeetingSeedInput): MeetingSeed {
       time: s.time,
       until: null,
     };
-    const seriesLinks = [
-      { type: 'stage', ref: s.stage },
-      ...(s.alsoStages ?? []).filter((id) => input.stages.some((x) => x.id === id)).map((ref) => ({ type: 'stage', ref })),
-      ...targets(['activity', 'milestone', s.deliverable ? 'deliverable' : undefined]),
-    ];
 
     /* Where each sitting falls: counted back from now for the ones held, and
        forward for the ones to come — never before the stage started, because
@@ -259,7 +429,8 @@ export function buildMeetingSeed(input: MeetingSeedInput): MeetingSeed {
     const ahead = s.active ? nextOccurrences(rule, timeZone, now, 4) : [];
     const placed = s.sittings
       .map((sitting) => ({ sitting, startsAt: sitting.when < 0 ? held[-sitting.when - 1] : ahead[sitting.when - 1] }))
-      .filter((p): p is { sitting: (typeof s.sittings)[number]; startsAt: Date } => !!p.startsAt)
+      .filter((p): p is { sitting: SeedSitting; startsAt: Date } => !!p.startsAt)
+      .sort((a, b) => a.startsAt.getTime() - b.startsAt.getTime())
       .map((p) => ({ ...p, id: `${projectId}:m:${s.key}:${p.sitting.when}` }));
 
     const first = placed[0]?.startsAt;
@@ -270,8 +441,8 @@ export function buildMeetingSeed(input: MeetingSeedInput): MeetingSeed {
       title: s.title,
       purpose: s.purpose,
       type: s.type,
-      owner,
-      attendees: s.attendees.map(who).join('\n'),
+      owner: r.owner,
+      attendees: s.attendees.map(r.who).join('\n'),
       recurrence: JSON.stringify(rule),
       durationMinutes: s.durationMinutes,
       agendaTemplate: s.agendaTemplate.join('\n'),
@@ -285,122 +456,29 @@ export function buildMeetingSeed(input: MeetingSeedInput): MeetingSeed {
       updatedBy: me,
       primaryStage: s.stage,
     });
-    link({ key: 'seriesId', id: seriesId }, seriesLinks, madeAt, me);
+    link('seriesId', seriesId, r.links, madeAt, me);
 
     placed.forEach(({ sitting, startsAt, id }, k) => {
-      const endsAt = new Date(startsAt.getTime() + s.durationMinutes * 60000);
-      const past = sitting.status === 'completed' || sitting.status === 'cancelled';
-      const createdAt = past ? new Date(startsAt.getTime() - 7 * DAY) : new Date(Math.min(now.getTime() - DAY, startsAt.getTime()));
-      const updatedAt = sitting.status === 'completed' ? endsAt : createdAt;
-      const stamp = { createdAt, updatedAt, createdBy: owner, updatedBy: owner };
-      const next = placed.slice(k + 1).find((p) => p.sitting.status === 'scheduled' || p.sitting.status === 'draft');
-
-      out.meetings.push({
-        id,
-        projectId,
-        seriesId,
-        title: s.title,
-        type: s.type,
-        status: sitting.status,
-        startsAt,
-        endsAt,
-        timeZone,
-        owner,
-        facilitator: '',
-        location: s.location,
-        purpose: s.purpose,
-        minutes: sitting.minutes ?? '',
-        completedAt: sitting.status === 'completed' ? endsAt : null,
-        cancelReason: sitting.cancelReason ?? '',
-        ...stamp,
-      });
-      [...new Set(s.attendees.map(who))].forEach((name, position) =>
-        out.attendees.push({ id: `${id}:att:${position}`, projectId, meetingId: id, name, optional: false, position }),
-      );
-      link({ key: 'meetingId', id }, seriesLinks, createdAt, owner);
-
-      const agendaIds = sitting.agenda.map((_, i) => `${id}:a:${i}`);
-      sitting.agenda.forEach((a, i) => {
-        out.agenda.push({
-          id: agendaIds[i],
-          projectId,
-          meetingId: id,
-          position: i,
-          title: a.title,
-          description: '',
-          presenter: who(a.presenter),
-          minutes: a.minutes,
-          notes: sitting.status === 'completed' ? (a.notes ?? '') : '',
-          outcome: sitting.status === 'completed' ? (a.outcome ?? '') : '',
-          status: sitting.status === 'completed' ? 'discussed' : 'pending',
-          deferral: sitting.status === 'completed' ? (a.deferral ?? '') : '',
-          deferNote: '',
-          carriedFromId: null,
-          ...stamp,
-        });
-        link({ key: 'agendaItemId', id: agendaIds[i] }, targets([a.link]), createdAt, owner);
-      });
-
-      (sitting.decisions ?? []).forEach((d, i) => {
-        const did = `${id}:d:${i}`;
-        out.decisions.push({
-          id: did,
-          projectId,
-          meetingId: id,
-          agendaItemId: d.agenda != null ? (agendaIds[d.agenda] ?? null) : null,
-          title: d.title,
-          description: d.description,
-          owner: who(d.owner),
-          approvedBy: d.approvedBy ? who(d.approvedBy) : '',
-          decidedOn: d.status === 'proposed' ? null : dayOf(startsAt),
-          rationale: d.rationale,
-          scope: d.scope,
-          status: d.status,
-          supersedesId: null,
-          createdAt: endsAt,
-          updatedAt: endsAt,
-          createdBy: owner,
-          updatedBy: owner,
-        });
-        link({ key: 'decisionId', id: did }, targets([d.link]), endsAt, owner);
-      });
-
-      (sitting.actions ?? []).forEach((a, i) => {
-        const aid = `${id}:x:${i}`;
-        const due = dayOf(startsAt, a.dueAfter);
-        const done = a.status === 'done';
-        out.actions.push({
-          id: aid,
-          projectId,
-          meetingId: id,
-          agendaItemId: a.agenda != null ? (agendaIds[a.agenda] ?? null) : null,
-          description: a.description,
-          owner: who(a.owner),
-          contributors: (a.contributors ?? []).map(who).join('\n'),
-          dueDate: due,
-          priority: a.priority,
-          status: a.status,
-          actionType: a.type,
-          evidence: a.evidence ?? '',
-          blocker: a.blocker ?? '',
-          escalationDate: a.escalateAfter != null ? dayOf(startsAt, a.escalateAfter) : null,
-          verifiedBy: a.verifiedBy ? who(a.verifiedBy) : '',
-          /* finished a day before it was due, and never after the seed ran */
-          completedAt: done ? new Date(Math.min(dayOf(startsAt, Math.max(1, a.dueAfter - 1)).getTime() + 16 * 3600000, now.getTime())) : null,
-          scheduleImpact: a.impact ?? '',
-          impactNote: a.impactNote ?? '',
-          carriedToMeetingId: a.carry && next ? next.id : null,
-          convertedActivityRef: null,
-          convertedStepN: null,
-          createdAt: endsAt,
-          updatedAt: endsAt,
-          createdBy: owner,
-          updatedBy: owner,
-        });
-        link({ key: 'actionItemId', id: aid }, targets([a.link]), endsAt, owner);
-      });
+      /* an unfinished action is carried into the series' next sitting that has
+         not happened yet — never one already held */
+      const next = placed.slice(k + 1).find((p) => p.startsAt > now && (p.sitting.status === 'scheduled' || p.sitting.status === 'draft'));
+      place(s, r, sitting, id, seriesId, startsAt, next?.id ?? null);
     });
   }
+
+  for (const o of ONE_OFF_MEETINGS) {
+    const stage = input.stages.find((x) => x.id === o.stage);
+    if (!stage) continue;
+    const [hh, mm] = o.time.split(':').map(Number);
+    const day = workingDay(input.today, o.inDays);
+    const startsAt = zonedToUtc(keyOfLocal(day), `${String(hh).padStart(2, '0')}:${String(mm).padStart(2, '0')}`, timeZone);
+    const past = o.sitting.status === 'completed' || o.sitting.status === 'cancelled';
+    /* held only if it is behind us, scheduled only if it is ahead, and never
+       about a stage that had not started */
+    if (past !== startsAt < now || startsAt < stage.start) continue;
+    place(o, resolve(o), o.sitting, `${projectId}:m:${o.key}`, null, startsAt, null);
+  }
+
   return out;
 }
 
@@ -409,24 +487,23 @@ export function buildMeetingSeed(input: MeetingSeedInput): MeetingSeed {
  * stage has one — that is the work people are meeting about — otherwise an
  * activity with a step running today, otherwise the stage's first activity.
  */
-function workOf(
-  stageId: string,
-  stageStart: Date,
-  input: MeetingSeedInput,
-): { activity: string | null; step: string | null; risk: string | null } {
+function workOf(stageId: string, input: MeetingSeedInput): { activity: string | null; step: string | null; risk: string | null } {
   const mine = input.activities.filter((a) => a.stageId === stageId);
   const risk = input.risks.find((r) => mine.some((a) => a.ref === r.activityRef));
   if (risk) return { activity: risk.activityRef, step: `${risk.activityRef}:${risk.stepN}`, risk: risk.postId };
-  for (const a of mine) {
-    const running = plannedSteps(stageStart, a).find((st) => st.start <= input.today && input.today < st.end);
-    if (running) return { activity: a.ref, step: `${a.ref}:${running.n}`, risk: null };
+  const stageStart = input.stages.find((x) => x.id === stageId)?.start;
+  if (stageStart) {
+    for (const a of mine) {
+      const running = plannedSteps(stageStart, a).find((st) => st.start <= input.today && input.today < st.end);
+      if (running) return { activity: a.ref, step: `${a.ref}:${running.n}`, risk: null };
+    }
   }
   const first = mine[0];
   return first ? { activity: first.ref, step: `${first.ref}:1`, risk: null } : { activity: null, step: null, risk: null };
 }
 
-/** The deliverable a series reviews: by its words, in its stages, still open if possible. */
-function deliverableOf(s: SeedSeries, input: MeetingSeedInput): string | null {
+/** The deliverable a meeting reviews: by its words, in its stages, still open if possible. */
+function deliverableOf(s: About, input: MeetingSeedInput): string | null {
   const stages = new Set([s.stage, ...(s.alsoStages ?? [])]);
   const pool = input.deliverables.filter((d) => stages.has(d.stageId));
   const words = s.deliverable?.toLowerCase();

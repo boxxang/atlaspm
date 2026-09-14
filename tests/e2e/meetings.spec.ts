@@ -4,7 +4,8 @@ import { expect, test, SHELL_PATH, writesSettled, type Page } from './fixtures';
  * Meetings: series and sittings, agenda and minutes, decisions and action
  * items, and how they reach the work they are about.
  *
- * The seed gives the programme five series and their recent sittings, placed
+ * The seed gives the programme ten series, their recent sittings and a few
+ * one-off meetings, placed
  * relative to today, so some of these read what the seed wrote and the rest
  * build what they test through the screens.
  */
@@ -88,13 +89,13 @@ test.describe('Upcoming', () => {
     for (const hook of ['mine', 'overdue', 'blocked', 'awaiting']) {
       await expect(page.locator(`[data-summary="${hook}"]`)).toBeVisible();
     }
-    /* the seed leaves one action blocked on the foundry */
-    await expect(page.locator('[data-summary="blocked"]')).toContainText('1');
+    /* the seed leaves two actions blocked: one on the foundry, one on the emulator */
+    await expect(page.locator('[data-summary="blocked"]')).toContainText('2');
     await page.locator('[data-summary="blocked"]').click();
     await expect(page).toHaveURL(/\/meetings\/actions\?view=blocked$/);
-    await expect(page.locator('[data-action]')).toHaveCount(1);
-    await expect(page.locator('[data-action]')).toContainText('non-default routing rule');
-    await expect(page.locator('[data-action]')).toContainText('Blocked');
+    await expect(page.locator('[data-action]')).toHaveCount(2);
+    const foundry = page.locator('[data-action]').filter({ hasText: 'non-default routing rule' });
+    await expect(foundry).toContainText('Blocked');
   });
 
   test('lists coming meetings, what to prepare, what was carried over, and what is waiting for a decision', async ({ page }) => {
@@ -102,8 +103,8 @@ test.describe('Upcoming', () => {
     await expect(page.locator('[data-card="coming"] [data-meeting-row]').first()).toBeVisible();
     await expect(page.locator('[data-card="mine"]')).toContainText('Tapeout Readiness Review');
     await expect(page.locator('[data-prep]').first()).toBeVisible();
-    await expect(page.locator('[data-carried]')).toContainText('tester-time budget');
-    await expect(page.locator('[data-awaiting]')).toContainText('Move macro M3');
+    await expect(page.locator('[data-carried]').filter({ hasText: 'tester-time budget' })).toHaveCount(1);
+    await expect(page.locator('[data-awaiting]').filter({ hasText: 'Move macro M3' })).toHaveCount(1);
   });
 });
 
