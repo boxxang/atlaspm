@@ -89,7 +89,7 @@ export function UpcomingTab({ projectId, onNew }: { projectId: string; onNew: ()
         <Card
           title="Overdue actions"
           count={overdueActions.length}
-          sub="past their due date, the latest first"
+          sub="past their due date, most overdue first"
           hook="overdue-actions"
           action={
             <Link className="btn sm" href={`${base}/actions?view=overdue`}>
