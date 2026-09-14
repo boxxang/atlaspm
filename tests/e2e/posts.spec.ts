@@ -158,6 +158,28 @@ test.describe('posting on a step', () => {
     await expect(page.locator('[data-board]')).toContainText('Antenna fixes need another routing turn.');
   });
 
+  /* A risk on the step that ticks a deliverable puts two flags beside its
+     text, and with the rail open the column is narrow. The text used to give
+     way to the flags until it was one letter wide. */
+  test('a flagged step that ticks a deliverable keeps its text readable', async ({ page }) => {
+    await openStep(page, 'PD-14', 1);
+    const ticking = page.locator('[data-step^="PD-14:"]').filter({ hasText: 'TICKS' });
+    await expect(ticking).toHaveCount(1);
+    const ref = (await ticking.getAttribute('data-step'))!;
+    const n = Number(ref.split(':')[1]);
+    await ticking.click();
+    await rail(page).getByLabel(`What happened on step ${n}…`).fill('Congestion on the last turn.');
+    await rail(page).getByRole('checkbox', { name: 'risk' }).check();
+    await rail(page).getByRole('button', { name: 'Post' }).click();
+
+    const row = page.locator(`[data-step="${ref}"]`);
+    await expect(row.getByText('RISK FLAGGED')).toBeVisible();
+    await expect(rail(page)).toBeVisible();
+    const text = row.locator('[data-col="Step"] > span').first();
+    expect((await text.boundingBox())!.width).toBeGreaterThan(100);
+    expect((await row.boundingBox())!.height).toBeLessThan(160);
+  });
+
   test('a reply sits under the post it answers, and goes with it', async ({ page }) => {
     await openStep(page, 'PD-14', 2);
     await rail(page).getByLabel('What happened on step 2…').fill('The parent.');

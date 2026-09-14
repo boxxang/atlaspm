@@ -321,14 +321,18 @@ function StepBlock({ a }: { a: Activity }) {
               >
                 {s.n}
               </span>
+              {/* The flags wrap under the step's text rather than squeezing it:
+                  a risk on the step that ticks a deliverable carries two, and
+                  with the rail open the column is narrow enough that the text,
+                  which may shrink to nothing, was left one letter wide. */}
               <span
                 className="wrapcell"
                 data-col="Step"
-                style={{ display: 'flex', alignItems: 'center', gap: 8, minWidth: 0, lineHeight: 1.4 }}
+                style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '4px 8px', minWidth: 0, lineHeight: 1.4 }}
               >
                 <span
                   className={s.par ? 'par wrapcell' : 'wrapcell'}
-                  style={s.done ? { color: 'var(--ink-2)' } : undefined}
+                  style={{ flex: '1 1 14ch', ...(s.done ? { color: 'var(--ink-2)' } : {}) }}
                 >
                   {s.text}
                 </span>

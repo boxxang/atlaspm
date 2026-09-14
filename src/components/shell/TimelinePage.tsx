@@ -1,5 +1,7 @@
 'use client';
 
+import { isYearScale, scaleCells } from '@/lib/timelineScale';
+
 import { useRouter } from 'next/navigation';
 import { useLayoutEffect, useRef, useState } from 'react';
 import { lifecyclePhases } from '@/data/scheduleProfiles';
@@ -514,39 +516,13 @@ const Legend = ({ colour, label }: { colour: string; label: string }) => (
  * sitting in the same grey as everything else — they are the frame.
  */
 function Scale({ start, end, at }: { start: Date; end: Date; at: (d: Date) => number }) {
-  const months = (end.getTime() - start.getTime()) / 864e5 / 30.44;
-  const cells: { grow: number; label: string }[] = [];
-
-  if (months > 30) {
-    for (let y = start.getFullYear(); y <= end.getFullYear(); y++) {
-      const a = Math.max(0, at(new Date(y, 0, 1)));
-      const b = Math.min(100, at(new Date(y + 1, 0, 1)));
-      if (b <= 0 || a >= 100) continue;
-      cells.push({ grow: b - a, label: String(y) });
-    }
-  } else {
-    const MON = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-    let c = new Date(start.getFullYear(), start.getMonth(), 1);
-    while (c <= end) {
-      const next = new Date(c.getFullYear(), c.getMonth() + 1, 1);
-      const a = Math.max(0, at(c));
-      const b = Math.min(100, at(next));
-      if (b > 0 && a < 100) {
-        cells.push({
-          grow: b - a,
-          label: MON[c.getMonth()] + (c.getMonth() === 0 ? ` '${String(c.getFullYear()).slice(2)}` : ''),
-        });
-      }
-      c = next;
-    }
-  }
-
-  const big = months > 30;
+  const cells = scaleCells(start, end, at);
+  const big = isYearScale(start, end);
   return (
     <>
       {cells.map((c) => (
         <div
-          key={c.label}
+          key={c.key}
           style={{
             flexGrow: Math.max(1, c.grow),
             flexBasis: 0,
