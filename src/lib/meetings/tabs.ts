@@ -12,6 +12,7 @@
 export const MEETINGS_TABS = [
   { slug: 'calendar', label: 'Calendar' },
   { slug: 'upcoming', label: 'Upcoming' },
+  { slug: 'actions', label: 'Action Items' },
   { slug: 'all', label: 'All Meetings' },
   { slug: 'series', label: 'Series' },
 ] as const;
@@ -19,7 +20,18 @@ export type MeetingsTab = (typeof MEETINGS_TABS)[number]['slug'];
 export const isMeetingsTab = (s: unknown): s is MeetingsTab =>
   MEETINGS_TABS.some((t) => t.slug === s);
 /** The tab /meetings opens on, and the one its URL carries no `?tab=` for. */
-export const DEFAULT_MEETINGS_TAB: MeetingsTab = MEETINGS_TABS[0].slug;
+export const DEFAULT_MEETINGS_TAB = MEETINGS_TABS[0].slug;
+
+/**
+ * Where a tab goes. Action Items is its own screen — the follow-up lists the
+ * Upcoming summaries open — so its tab opens that screen on my open actions
+ * rather than drawing a second copy of it inside the Meetings page.
+ */
+export const meetingsTabHref = (projectId: string, tab: MeetingsTab): string => {
+  const base = `/p/${projectId}/meetings`;
+  if (tab === 'actions') return `${base}/actions?view=mine`;
+  return tab === DEFAULT_MEETINGS_TAB ? base : `${base}?tab=${tab}`;
+};
 
 export const MEETING_DETAIL_TABS = [
   { slug: 'overview', label: 'Overview' },

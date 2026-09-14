@@ -8,9 +8,11 @@ import { ME, useMeetingStore } from '@/store/meetingStore';
 import { useAppStore } from '@/store/useAppStore';
 import { SaveErrorBanner } from './atoms';
 import { ActionFilters, ActionItemsTable } from './ActionItems';
+import { MeetingsTabs } from './MeetingsTabs';
 
 /**
- * Every action item on the programme, opened from an Upcoming summary.
+ * Every action item on the programme, opened from the Action Items tab or an
+ * Upcoming summary.
  *
  * The rows are the meetings' own: editing one here edits it in the meeting it
  * came from, because it is the same row.
@@ -51,6 +53,7 @@ export function ActionsPage({ projectId, view }: { projectId: string; view: Acti
         </span>
       </div>
       <SaveErrorBanner />
+      <MeetingsTabs projectId={projectId} current="actions" />
       <div className="chips mt-chips" role="navigation" aria-label="Action item views">
         {ACTION_VIEWS.map((v) => (
           <Link key={v.slug} href={`${base}/actions?view=${v.slug}`} className={v.slug === view ? 'chip on' : 'chip'} aria-current={v.slug === view ? 'page' : undefined} data-action-view={v.slug}>

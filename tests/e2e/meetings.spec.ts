@@ -71,16 +71,30 @@ test.describe('getting there', () => {
     await expect(nav.getByRole('link', { name: /^Meetings/ })).toHaveAttribute('aria-current', 'page');
   });
 
-  test('the four tabs are Calendar, Upcoming, All Meetings and Series — nothing else', async ({ page }) => {
+  test('the five tabs are Calendar, Upcoming, Action Items, All Meetings and Series — nothing else', async ({ page }) => {
     await page.goto(MEETINGS);
     const tabs = page.getByRole('navigation', { name: 'Meetings' }).getByRole('link');
-    await expect(tabs).toHaveCount(4);
+    await expect(tabs).toHaveCount(5);
     expect((await tabs.allInnerTexts()).map((t) => t.replace(/\s*\d+$/, ''))).toEqual([
       'Calendar',
       'Upcoming',
+      'Action Items',
       'All Meetings',
       'Series',
     ]);
+  });
+
+  test('the Action Items tab opens my open actions, and stays lit there', async ({ page }) => {
+    await page.goto(MEETINGS);
+    await page.locator('[data-meetings-tab="actions"]').click();
+    await expect(page).toHaveURL(/\/meetings\/actions\?view=mine$/);
+    await expect(page.getByRole('heading', { level: 1, name: 'My open actions' })).toBeVisible();
+    await expect(page.locator('[data-meetings-tab="actions"]')).toHaveAttribute('aria-current', 'page');
+    await expect(page.locator('[data-action-view="mine"]')).toHaveAttribute('aria-current', 'page');
+
+    /* the other tabs still go where they went */
+    await page.locator('[data-meetings-tab="series"]').click();
+    await expect(page).toHaveURL(/\/meetings\?tab=series$/);
   });
 });
 
@@ -97,6 +111,26 @@ test.describe('Upcoming', () => {
     await expect(page.locator('[data-action]')).toHaveCount(2);
     const foundry = page.locator('[data-action]').filter({ hasText: 'non-default routing rule' });
     await expect(foundry).toContainText('Blocked');
+  });
+
+  test('lists the overdue actions between the summaries and today’s meetings', async ({ page }) => {
+    await page.goto(`${MEETINGS}?tab=upcoming`);
+    const card = page.locator('[data-card="overdue-actions"]');
+    const rows = card.locator('[data-action]');
+    await expect(rows.first()).toBeVisible();
+    const summary = (await page.locator('[data-summary="overdue"] .num').innerText()).trim();
+    await expect(rows).toHaveCount(Number(summary));
+    await expect(rows.first()).toContainText('Overdue');
+
+    const order = await page.evaluate(() => {
+      const after = (a: Element, b: Element) => !!(a.compareDocumentPosition(b) & Node.DOCUMENT_POSITION_FOLLOWING);
+      const q = (s: string) => document.querySelector(s)!;
+      return [after(q('[data-summary="overdue"]'), q('[data-card="overdue-actions"]')), after(q('[data-card="overdue-actions"]'), q('[data-card="today"]'))];
+    });
+    expect(order).toEqual([true, true]);
+
+    await card.getByRole('link', { name: 'All overdue actions' }).click();
+    await expect(page).toHaveURL(/\/meetings\/actions\?view=overdue$/);
   });
 
   test('lists coming meetings, what to prepare, what was carried over, and what is waiting for a decision', async ({ page }) => {

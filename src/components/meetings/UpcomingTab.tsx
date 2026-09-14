@@ -3,6 +3,8 @@
 import Link from 'next/link';
 import { useMemo } from 'react';
 import { upcomingDigest, UPCOMING_DAYS } from '@/lib/meetings/digest';
+import { filterActions } from '@/lib/meetings/followUp';
+import { ActionItemsTable } from './ActionItems';
 import { fmtDate } from '@/lib/schedule';
 import type { Meeting } from '@/lib/meetings/types';
 import { fmtZonedDate } from '@/lib/meetings/zonedTime';
@@ -46,6 +48,7 @@ export function UpcomingTab({ projectId, onNew }: { projectId: string; onNew: ()
   );
   const base = `/p/${projectId}/meetings`;
   const byId = new Map(meetings.map((m) => [m.id, m]));
+  const overdueActions = useMemo(() => filterActions(actions, { view: 'overdue' }, ME, today), [actions, today]);
 
   return (
     <div className="mt-page" data-upcoming>
@@ -80,6 +83,22 @@ export function UpcomingTab({ projectId, onNew }: { projectId: string; onNew: ()
           sub="still Proposed"
           hook="awaiting"
         />
+      </div>
+
+      <div style={{ marginTop: 16 }}>
+        <Card
+          title="Overdue actions"
+          count={overdueActions.length}
+          sub="past their due date, the latest first"
+          hook="overdue-actions"
+          action={
+            <Link className="btn sm" href={`${base}/actions?view=overdue`}>
+              All overdue actions
+            </Link>
+          }
+        >
+          <ActionItemsTable list={overdueActions} projectId={projectId} empty="No action item is past its due date." />
+        </Card>
       </div>
 
       <div className="mt-cols">
