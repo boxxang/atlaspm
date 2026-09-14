@@ -59,6 +59,18 @@ describe('upcomingDigest', () => {
     decisions: [decision({ status: 'proposed' }), decision({ id: 'd2' })],
   });
 
+  it('looks a week ahead unless told otherwise', () => {
+    const week = upcomingDigest({
+      ...base,
+      horizonDays: undefined,
+      meetings: [meeting({ id: 'day7', startsAt: at(20) }), meeting({ id: 'day8', startsAt: at(21) })],
+      agenda: [],
+      actions: [],
+      decisions: [],
+    });
+    expect(week.upcoming.map((m) => m.id)).toEqual(['day7']);
+  });
+
   it('separates today from what is coming, inside the horizon, without cancellations', () => {
     expect(got.today.map((m) => m.id)).toEqual(['today']);
     expect(got.upcoming.map((m) => m.id)).toEqual(['tomorrow', 'draft']);

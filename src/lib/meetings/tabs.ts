@@ -10,14 +10,16 @@
  * Pure: no DOM.
  */
 export const MEETINGS_TABS = [
-  { slug: 'upcoming', label: 'Upcoming' },
   { slug: 'calendar', label: 'Calendar' },
+  { slug: 'upcoming', label: 'Upcoming' },
   { slug: 'all', label: 'All Meetings' },
   { slug: 'series', label: 'Series' },
 ] as const;
 export type MeetingsTab = (typeof MEETINGS_TABS)[number]['slug'];
 export const isMeetingsTab = (s: unknown): s is MeetingsTab =>
   MEETINGS_TABS.some((t) => t.slug === s);
+/** The tab /meetings opens on, and the one its URL carries no `?tab=` for. */
+export const DEFAULT_MEETINGS_TAB: MeetingsTab = MEETINGS_TABS[0].slug;
 
 export const MEETING_DETAIL_TABS = [
   { slug: 'overview', label: 'Overview' },

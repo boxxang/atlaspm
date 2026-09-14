@@ -63,20 +63,21 @@ test.describe('getting there', () => {
     await expect(page).toHaveURL(/\/p\/atlasax1\/meetings$/);
     await expect(page.getByRole('heading', { level: 1, name: 'Meetings' })).toBeVisible();
     await expect(link).toHaveAttribute('aria-current', 'page');
-    await expect(page.locator('[data-meetings-tab="upcoming"]')).toHaveAttribute('aria-current', 'page');
+    await expect(page.locator('[data-meetings-tab="calendar"]')).toHaveAttribute('aria-current', 'page');
 
+    await page.locator('[data-meetings-tab="upcoming"]').click();
     await page.locator('[data-meeting-row]').first().getByRole('link').first().click();
     await expect(page).toHaveURL(/\/meetings\/[^/?]+/);
     await expect(nav.getByRole('link', { name: /^Meetings/ })).toHaveAttribute('aria-current', 'page');
   });
 
-  test('the four tabs are Upcoming, Calendar, All Meetings and Series — nothing else', async ({ page }) => {
+  test('the four tabs are Calendar, Upcoming, All Meetings and Series — nothing else', async ({ page }) => {
     await page.goto(MEETINGS);
     const tabs = page.getByRole('navigation', { name: 'Meetings' }).getByRole('link');
     await expect(tabs).toHaveCount(4);
     expect((await tabs.allInnerTexts()).map((t) => t.replace(/\s*\d+$/, ''))).toEqual([
-      'Upcoming',
       'Calendar',
+      'Upcoming',
       'All Meetings',
       'Series',
     ]);
@@ -85,7 +86,7 @@ test.describe('getting there', () => {
 
 test.describe('Upcoming', () => {
   test('sums up the follow-up, and each summary opens its list', async ({ page }) => {
-    await page.goto(MEETINGS);
+    await page.goto(`${MEETINGS}?tab=upcoming`);
     for (const hook of ['mine', 'overdue', 'blocked', 'awaiting']) {
       await expect(page.locator(`[data-summary="${hook}"]`)).toBeVisible();
     }
@@ -99,7 +100,7 @@ test.describe('Upcoming', () => {
   });
 
   test('lists coming meetings, what to prepare, what was carried over, and what is waiting for a decision', async ({ page }) => {
-    await page.goto(MEETINGS);
+    await page.goto(`${MEETINGS}?tab=upcoming`);
     await expect(page.locator('[data-card="coming"] [data-meeting-row]').first()).toBeVisible();
     await expect(page.locator('[data-card="mine"]')).toContainText('Tapeout Readiness Review');
     await expect(page.locator('[data-prep]').first()).toBeVisible();

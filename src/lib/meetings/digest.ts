@@ -14,7 +14,7 @@ import { parseStepRef, type RiskSteps } from './links';
 import type { ActionItem, AgendaItem, Decision, LinkRef, Meeting, MeetingStatus } from './types';
 
 /** How far ahead "upcoming" looks by default. */
-export const UPCOMING_DAYS = 14;
+export const UPCOMING_DAYS = 7;
 
 const ACTIVE: ReadonlySet<MeetingStatus> = new Set(['draft', 'scheduled', 'in_progress']);
 

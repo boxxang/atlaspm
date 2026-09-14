@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { useState } from 'react';
 import { countUpcoming } from '@/lib/meetings/digest';
-import { MEETINGS_TABS, type MeetingsTab } from '@/lib/meetings/tabs';
+import { DEFAULT_MEETINGS_TAB, MEETINGS_TABS, type MeetingsTab } from '@/lib/meetings/tabs';
 import type { CompletionMode } from '@/lib/meetings/types';
 import { useMeetingStore } from '@/store/meetingStore';
 import { useAppStore } from '@/store/useAppStore';
@@ -33,8 +33,8 @@ const MODES: readonly { key: CompletionMode; label: string; hint: string }[] = [
 /**
  * Meetings: four tabs, in the URL like a stage's.
  *
- * Upcoming is where it opens, because the question on arriving is what is on
- * and what is owed. History is not a tab: it is All Meetings filtered to what
+ * The calendar is where it opens, and Upcoming — what is on this week and what
+ * is owed — sits next to it. History is not a tab: it is All Meetings filtered to what
  * is past, which is the same list and should not be two.
  */
 export function MeetingsPage({ projectId, tab }: { projectId: string; tab: MeetingsTab }) {
@@ -81,7 +81,7 @@ export function MeetingsPage({ projectId, tab }: { projectId: string; tab: Meeti
           {MEETINGS_TABS.map((t) => (
             <Link
               key={t.slug}
-              href={`/p/${projectId}/meetings${t.slug === 'upcoming' ? '' : `?tab=${t.slug}`}`}
+              href={`/p/${projectId}/meetings${t.slug === DEFAULT_MEETINGS_TAB ? '' : `?tab=${t.slug}`}`}
               className={t.slug === tab ? 'tab on' : 'tab'}
               aria-current={t.slug === tab ? 'page' : undefined}
               data-meetings-tab={t.slug}
