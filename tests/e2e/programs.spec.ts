@@ -47,6 +47,28 @@ test.describe('the program list', () => {
     ).toContainText('0');
   });
 
+  /* Reference material every program needs is waiting on the stage it is
+     about, written by the PM, before anyone has typed a word. */
+  test('a new program starts with the netlist maturity criteria in physical design', async ({ page }) => {
+    await page.locator('[data-new-project]').click();
+    await page.locator('.pf-name').fill('AtlasNotes1');
+    await page.locator('.pf-kickoff').fill('2027-03-01');
+    await page.locator('[data-create]').click();
+    await page.waitForURL(/\/p\/atlasnotes1-[^/]*\/overview$/);
+    const id = page.url().split('/p/')[1].split('/')[0];
+
+    await page.goto(`/p/${id}/stage/physicalDesign/keyinfo`);
+    const note = page.locator('[data-note]').filter({ hasText: 'Netlist drop maturity criteria' });
+    await expect(note).toHaveCount(1);
+    await expect(page.getByRole('link', { name: /^Key info/ })).toContainText('1');
+    await note.click();
+    await expect(page.locator('.notecard')).toContainText('FFN — final full netlist');
+
+    /* only where it belongs */
+    await page.goto(`/p/${id}/stage/signoff/keyinfo`);
+    await expect(page.getByText('Nothing recorded yet.')).toBeVisible();
+  });
+
   /* Creating happens in a dialog, and every field says what it is for — the
      dates especially, since a bare date input on a form about a three-year
      program does not say which of its dates it is. */

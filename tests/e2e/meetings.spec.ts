@@ -136,7 +136,9 @@ test.describe('Upcoming', () => {
   test('lists coming meetings, what to prepare, what was carried over, and what is waiting for a decision', async ({ page }) => {
     await page.goto(`${MEETINGS}?tab=upcoming`);
     await expect(page.locator('[data-card="coming"] [data-meeting-row]').first()).toBeVisible();
-    await expect(page.locator('[data-card="mine"]')).toContainText('Tapeout Readiness Review');
+    /* the weekly series the PM runs always has a sitting inside the week;
+       the fortnightly readiness review is in it on only half the days */
+    await expect(page.locator('[data-card="mine"]')).toContainText('Weekly SoC Program Review');
     await expect(page.locator('[data-prep]').first()).toBeVisible();
     await expect(page.locator('[data-carried]').filter({ hasText: 'tester-time budget' })).toHaveCount(1);
     await expect(page.locator('[data-awaiting]').filter({ hasText: 'Move macro M3' })).toHaveCount(1);

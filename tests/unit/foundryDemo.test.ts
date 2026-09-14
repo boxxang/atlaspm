@@ -87,6 +87,14 @@ describe('where AtlasFX1 stands on 09/14', () => {
       .map((p) => `${a.ref}:${p.n}`),
   );
 
+  it('started with the netlist maturity criteria in physical design, like every new program', () => {
+    const notes = demo.posts.filter((p) => p.kind === 'note' && p.stageId === 'physicalDesign');
+    expect(notes).toHaveLength(1);
+    expect(notes[0].id).toBe('atlasfx1:note:netlist-maturity');
+    expect(notes[0].text.split('\n')[0]).toMatch(/^Netlist drop maturity criteria/);
+    expect(fmtDate(notes[0].createdAt)).toBe('02/09/2026');
+  });
+
   it('has physical design handed over, and its deliverables done', () => {
     const pd = demo.deliverables.filter((d) => d.stageId === 'physicalDesign');
     expect(pd.length).toBeGreaterThan(0);

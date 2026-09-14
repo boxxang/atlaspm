@@ -1,6 +1,7 @@
 'use server';
 
 import { revalidatePath } from 'next/cache';
+import { RISK_AUTHOR } from '@/data/riskSeeds';
 import { stageMilestone } from '@/data/scheduleProfiles';
 import type { ItemKind, ScheduleProfile, StageBaseline, StageId } from '@/data/types';
 import { pickStages } from '@/lib/customProfile';
@@ -8,6 +9,7 @@ import { copyActivities as copyProfileActivities } from '@/lib/profileCopy';
 import { prisma } from '@/lib/db';
 import { assertPrefixes, normalizePrefix, refRenames } from '@/lib/profileEdit';
 import { DB_KIND } from '@/lib/projectState';
+import { stageNotesFor } from '@/lib/stageNotes';
 import { resolveStages } from '@/lib/stages';
 import {
   MAX_ATTACHMENT_BYTES,
@@ -703,6 +705,11 @@ export async function createProject(input: {
       },
     },
   });
+  /* The reference notes every program starts with — the netlist maturity
+     criteria on physical design, and whatever /data/stageNotes adds — written
+     as the PM's, on the stages this program actually runs. */
+  const notes = stageNotesFor(stageDefs, input.id, RISK_AUTHOR, new Date());
+  if (notes.length) await prisma.post.createMany({ data: notes });
   revalidatePath('/');
   return input.id;
 }

@@ -41,6 +41,7 @@ import type { LinkSeedRow, MeetingSeed } from './meetingSeed';
 import { parseStepRef } from './meetings/links';
 import { zonedToUtc } from './meetings/zonedTime';
 import { addWeeks, computeSchedule, DAY, type Schedule } from './schedule';
+import { stageNotesFor } from './stageNotes';
 import { resolveStages } from './stages';
 import { fromStepIndex, plannedSteps, type ActivitySteps } from './steps';
 
@@ -235,8 +236,19 @@ export function buildFoundryDemo({ builtin, library }: FoundryDemoInput): Foundr
     if (!stepStates.some((x) => `${x.activityRef}:${x.stepN}` === key)) throw new Error(`No such step: ${key}`);
   }
 
-  /* ---- posts ---- */
-  const posts: DemoPostRow[] = FX1_POSTS.map((p) => {
+  /* ---- posts: the notes the program started with, then what the PM wrote ---- */
+  const startedWith: DemoPostRow[] = stageNotesFor(stages, PID, ME, at(`${FX1_KICKOFF} 09:00`)).map((n) => ({
+    ...n,
+    editedAt: null,
+    itemId: null,
+    activityRef: null,
+    stepN: null,
+    deliverableId: null,
+    parentId: null,
+    doneAt: null,
+    meetingId: null,
+  }));
+  const written: DemoPostRow[] = FX1_POSTS.map((p) => {
     const step = p.step ? parseStepRef(p.step) : null;
     if (p.step && !step) throw new Error(`Bad step reference: ${p.step}`);
     return {
@@ -257,6 +269,8 @@ export function buildFoundryDemo({ builtin, library }: FoundryDemoInput): Foundr
       meetingId: p.meeting ? meetingId(p.meeting) : null,
     };
   });
+
+  const posts: DemoPostRow[] = [...startedWith, ...written];
 
   /* ---- meetings ---- */
   const out: MeetingSeed = { series: [], meetings: [], attendees: [], agenda: [], decisions: [], actions: [], links: [] };
