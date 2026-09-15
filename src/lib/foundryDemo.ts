@@ -68,6 +68,7 @@ export interface DemoPostRow {
   parentId: string | null;
   doneAt: Date | null;
   meetingId: string | null;
+  doc: string | null;
 }
 
 export interface DemoStepStateRow {
@@ -267,6 +268,7 @@ export function buildFoundryDemo({ builtin, library }: FoundryDemoInput): Foundr
       parentId: p.parent ? postId(p.parent) : null,
       doneAt: null,
       meetingId: p.meeting ? meetingId(p.meeting) : null,
+      doc: null,
     };
   });
 

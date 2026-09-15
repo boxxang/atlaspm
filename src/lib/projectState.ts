@@ -79,6 +79,8 @@ export interface ProgramPost {
   doneAt: Date | null;
   /** The meeting a risk was raised in — its source, not where it lives. */
   meetingId: string | null;
+  /** A key-info note's body as a document (Tiptap JSON); null for plain text. */
+  doc: string | null;
   attachments: AttachmentRef[];
 }
 
@@ -210,6 +212,7 @@ interface ProgramPostRow {
   parentId: string | null;
   doneAt: Date | null;
   meetingId?: string | null;
+  doc?: string | null;
   attachments?: AttachmentRow[];
 }
 interface StepStateRow {
@@ -414,6 +417,7 @@ export function buildProjectState(project: {
     parentId: p.parentId,
     doneAt: p.doneAt,
     meetingId: p.meetingId ?? null,
+    doc: p.doc ?? null,
     attachments: p.attachments ?? [],
   }));
 

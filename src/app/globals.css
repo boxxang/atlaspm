@@ -2415,6 +2415,28 @@ button.clip:hover{background:var(--accent-line)}
   background:linear-gradient(to bottom,rgba(255,255,255,0),var(--bg) 78%);transition:opacity .12s}
 .noteprose-wrap.scrolls.at-end::after{opacity:0}
 .noteprose-text{font-size:14px;line-height:1.62;color:var(--ink-body);white-space:pre-wrap;word-break:break-word}
+/* A key-info note's document — read, and in its editor. Tables scroll inside
+   the note rather than widening the page. */
+.notedoc-scroll{overflow-x:auto;max-width:100%}
+.notedoc{font-size:14px;line-height:1.62;color:var(--ink-body);word-break:break-word}
+.notedoc > * + *{margin-top:10px}
+.notedoc p{margin:0}
+.notedoc h3{font-size:14.5px;font-weight:650;color:var(--ink);margin:18px 0 4px}
+.notedoc h4{font-size:13.5px;font-weight:650;color:var(--ink);margin:14px 0 2px}
+.notedoc ul,.notedoc ol{margin:0;padding-left:22px}
+.notedoc li + li{margin-top:3px}
+.notedoc .tableWrapper{overflow-x:auto}
+.notedoc table{border-collapse:collapse;width:100%;min-width:640px;font-size:12.5px;line-height:1.45}
+.notedoc th,.notedoc td{border:1px solid var(--line);padding:6px 9px;vertical-align:top;text-align:left;min-width:80px}
+.notedoc th{background:var(--accent-soft);color:var(--ink);font-weight:600}
+.notedoc th p,.notedoc td p{margin:0}
+.noterich{border:1px solid var(--line);border-radius:var(--r);padding:8px 12px 10px;background:var(--bg)}
+.noterich:focus-within{border-color:var(--accent)}
+.notedoc-edit{min-height:150px;outline:none;padding:2px}
+.notedoc-edit .selectedCell{background:var(--accent-soft)}
+.notetools{display:flex;flex-wrap:wrap;gap:5px;align-items:center;padding:0 0 9px;margin-bottom:10px;border-bottom:1px solid var(--line-soft)}
+.notetools .sep{width:1px;height:18px;background:var(--line);margin:0 3px}
+.notetools .btn.on{background:var(--accent-soft);border-color:var(--accent-line);color:var(--accent-hov)}
 .notebody{width:100%;min-height:150px;border:1px solid var(--line);border-radius:var(--r);padding:10px 12px;font-size:14px;line-height:1.6;resize:vertical;background:var(--bg);display:block}
 .notebody:focus{outline:none;border-color:var(--accent)}
 .noteatt{border-top:1px solid var(--line-soft);margin-top:15px;padding-top:12px}

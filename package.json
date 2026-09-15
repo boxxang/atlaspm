@@ -21,6 +21,12 @@
   "dependencies": {
     "@prisma/adapter-pg": "^7.9.1",
     "@prisma/client": "^7.9.1",
+    "@tiptap/core": "3.31.3",
+    "@tiptap/extension-table": "3.31.3",
+    "@tiptap/pm": "3.31.3",
+    "@tiptap/react": "3.31.3",
+    "@tiptap/starter-kit": "3.31.3",
+    "@tiptap/static-renderer": "3.31.3",
     "dotenv": "^17.4.2",
     "next": "16.3.1",
     "pg": "^8.23.0",

@@ -1,4 +1,4 @@
-import { expect, test, SHELL_PATH, writesSettled } from './fixtures';
+import { expect, test, SEED_PROJECT_ID, SHELL_PATH, testDb, writesSettled } from './fixtures';
 
 /**
  * Posting: on a step, on a stage's key-info board, and as a reply.
@@ -61,6 +61,84 @@ test.describe('key info', () => {
     await page.getByLabel('Filter these notes').fill('nothing says this');
     await expect(page.locator('[data-note]')).toHaveCount(0);
     await expect(page.getByText('No note here says that.')).toBeVisible();
+  });
+
+  /* A table is the reason notes have documents: typed cell by cell, grown a
+     row at a time, and still a table after a reload. */
+  test('a note carries a real table, typed cell by cell, and keeps it', async ({ page }) => {
+    await page.getByRole('button', { name: 'New note' }).click();
+    await page.getByLabel('Note title').fill('Mask slots');
+    const editor = page.getByLabel('Note', { exact: true });
+    await expect(editor).toBeVisible();
+    await page.locator('[data-notetool="table"]').click();
+    await expect(editor.locator('table tr')).toHaveCount(3);
+
+    await editor.locator('th').first().click();
+    await page.keyboard.type('Layer set');
+    await page.keyboard.press('Tab');
+    await page.keyboard.type('Slot');
+    await editor.locator('td').first().click();
+    await page.keyboard.type('FEOL');
+    await page.keyboard.press('Tab');
+    await page.keyboard.type('10/05');
+    await page.locator('[data-notetool="addRow"]').click();
+    await expect(editor.locator('table tr')).toHaveCount(4);
+    await page.getByRole('button', { name: 'Save note' }).click();
+
+    const shown = page.locator('.notecard [data-note-doc] table');
+    await expect(shown.locator('th').first()).toHaveText('Layer set');
+    await expect(shown.locator('tr')).toHaveCount(4);
+    await writesSettled(page);
+
+    await page.reload();
+    await page.locator('[data-note]').filter({ hasText: 'Mask slots' }).click();
+    await expect(page.locator('.notecard [data-note-doc] td').first()).toHaveText('FEOL');
+    /* the filter reads what the cells say */
+    await page.getByLabel('Filter these notes').fill('10/05');
+    await expect(page.locator('[data-note]')).toHaveCount(1);
+  });
+
+  test('a range pasted from a spreadsheet arrives as a table', async ({ page }) => {
+    await page.getByRole('button', { name: 'New note' }).click();
+    await page.getByLabel('Note title').fill('Corner list');
+    const editor = page.getByLabel('Note', { exact: true });
+    await editor.click();
+    await editor.evaluate((el) => {
+      const data = new DataTransfer();
+      data.setData('text/html', '<table><tr><td>Corner</td><td>WNS</td></tr><tr><td>SSGNP 0.72 V</td><td>-41 ps</td></tr></table>');
+      data.setData('text/plain', 'Corner\tWNS\nSSGNP 0.72 V\t-41 ps');
+      el.dispatchEvent(new ClipboardEvent('paste', { clipboardData: data, bubbles: true, cancelable: true }));
+    });
+    await expect(editor.locator('table tr')).toHaveCount(2);
+    await page.getByRole('button', { name: 'Save note' }).click();
+    await expect(page.locator('.notecard [data-note-doc] table')).toContainText('-41 ps');
+  });
+
+  /* Notes written before notes had documents are plain text, and there are
+     some on production. They read as they did, and editing one makes it a
+     document without losing a line. */
+  test('a note written before notes had documents reads as it did, and edits into one', async ({ page }) => {
+    await testDb().post.create({
+      data: {
+        id: 'legacy-note',
+        projectId: SEED_PROJECT_ID,
+        kind: 'note',
+        text: 'Split MTO\nFEOL 10/05\nBEOL 11/02',
+        author: 'Sangwook Park',
+        createdAt: new Date(),
+        stageId: 'physicalDesign',
+      },
+    });
+    await page.reload();
+    await page.locator('[data-note="legacy-note"]').click();
+    await expect(page.locator('.notecard .noteprose-text')).toContainText('BEOL 11/02');
+
+    await page.getByRole('button', { name: 'Edit' }).click();
+    const editor = page.getByLabel('Note', { exact: true });
+    await expect(editor.locator('p')).toHaveCount(2);
+    await page.getByRole('button', { name: 'Save note' }).click();
+    await expect(page.locator('.notecard [data-note-doc]')).toContainText('BEOL 11/02');
+    await expect(page.locator('[data-note="legacy-note"]')).toContainText('Split MTO');
   });
 
   test('a note is edited in place, and says it was edited', async ({ page }) => {

@@ -1,8 +1,10 @@
 'use client';
 
+import dynamic from 'next/dynamic';
 import { useRef, useState } from 'react';
 import { RISK_AUTHOR } from '@/data/riskSeeds';
 import { attachmentUrl, formatBytes } from '@/lib/attachments';
+import { docText, noteText, parseNoteDoc, textToDoc, type NoteDoc } from '@/lib/noteDoc';
 import { fmtDate, fmtDT } from '@/lib/schedule';
 import type { ProgramPost } from '@/lib/projectState';
 import { uid, useAppStore } from '@/store/useAppStore';
@@ -35,8 +37,20 @@ const COLS: Col[] = [
 
 const titleOf = (text: string) => text.split('\n')[0].trim();
 const bodyOf = (text: string) => text.split('\n').slice(1).join('\n').trim();
-const joinNote = (title: string, body: string) =>
-  body.trim() ? `${title.trim()}\n${body.trim()}` : title.trim();
+
+/* The editor and the renderer are loaded only when a note is written or
+   opened — the rest of the app never pays for them. */
+const NoteRichEditor = dynamic(() => import('./NoteRichEditor'), {
+  ssr: false,
+  loading: () => <p className="mono-note">Loading the editor…</p>,
+});
+const NoteDocView = dynamic(() => import('./NoteDocView'), { ssr: false });
+
+/** What a saved note stores: its text for the list and filter, and its document when it says anything. */
+const stored = (title: string, doc: NoteDoc) => ({
+  text: noteText(title, doc),
+  doc: docText(doc).trim() ? JSON.stringify(doc) : null,
+});
 
 export function KeyInfoTab({ stageId }: { stageId: string }) {
   const posts = useAppStore((s) => s.posts);
@@ -87,12 +101,12 @@ export function KeyInfoTab({ stageId }: { stageId: string }) {
           <NoteEditor
             note={null}
             onCancel={() => setEditing(null)}
-            onSave={(title, body) => {
+            onSave={(title, doc) => {
               const id = uid();
               useAppStore.getState().savePost({
                 id,
                 kind: 'note',
-                text: joinNote(title, body),
+                ...stored(title, doc),
                 author: RISK_AUTHOR,
                 stageId,
               });
@@ -176,8 +190,9 @@ export function KeyInfoTab({ stageId }: { stageId: string }) {
                       <NoteEditor
                         note={n}
                         onCancel={() => setEditing(null)}
-                        onSave={(title, body) => {
-                          useAppStore.getState().editPost(n.id, joinNote(title, body));
+                        onSave={(title, doc) => {
+                          const next = stored(title, doc);
+                          useAppStore.getState().editPost(n.id, next.text, undefined, next.doc);
                           setEditing(null);
                         }}
                       />
@@ -218,6 +233,8 @@ function NoteCard({
   const [asking, setAsking] = useState(false);
   const file = useRef<HTMLInputElement>(null);
   const body = bodyOf(note.text);
+  /* a note written before notes had documents has only its text */
+  const doc = parseNoteDoc(note.doc);
 
   return (
     <div className="notecard">
@@ -268,7 +285,9 @@ function NoteCard({
         ) : (
           <div className="noteprose-wrap">
             <div className="noteprose">
-              {body ? (
+              {doc ? (
+                <NoteDocView doc={doc} />
+              ) : body ? (
                 <div className="noteprose-text">{body}</div>
               ) : (
                 <p className="mono-note">
@@ -334,8 +353,11 @@ function NoteCard({
 
 /**
  * Writing one. The title is a field of its own because it is what the list
- * shows and the filter searches — burying it in the first line of a textarea
+ * shows and the filter searches — burying it in the first line of the body
  * would work and would not look like it mattered.
+ *
+ * The body is a document: text, headings, lists and tables. A note written
+ * before notes had documents opens as one paragraph a line.
  */
 function NoteEditor({
   note,
@@ -343,11 +365,17 @@ function NoteEditor({
   onCancel,
 }: {
   note: ProgramPost | null;
-  onSave: (title: string, body: string) => void;
+  onSave: (title: string, doc: NoteDoc) => void;
   onCancel: () => void;
 }) {
   const [title, setTitle] = useState(note ? titleOf(note.text) : '');
-  const [body, setBody] = useState(note ? bodyOf(note.text) : '');
+  const [initial] = useState<NoteDoc>(() =>
+    note ? (parseNoteDoc(note.doc) ?? textToDoc(bodyOf(note.text))) : textToDoc(''),
+  );
+  const [doc, setDoc] = useState<NoteDoc>(initial);
+  const save = () => {
+    if (title.trim()) onSave(title, doc);
+  };
 
   return (
     <div className="notecard">
@@ -364,17 +392,7 @@ function NoteEditor({
         />
       </div>
       <div className="notecard-body">
-        <textarea
-          className="notebody"
-          placeholder="What you learned, and where it came from. Numbers, decisions and the reason behind them — the things you will be asked for again."
-          aria-label="Note"
-          value={body}
-          onChange={(e) => setBody(e.target.value)}
-          onKeyDown={(e) => {
-            if (e.key === 'Enter' && (e.metaKey || e.ctrlKey) && title.trim()) onSave(title, body);
-            if (e.key === 'Escape') onCancel();
-          }}
-        />
+        <NoteRichEditor initial={initial} onChange={setDoc} onSubmit={save} onCancel={onCancel} />
         <div style={{ display: 'flex', gap: 7, marginTop: 11, alignItems: 'center' }}>
           <span style={{ fontSize: 11, color: 'var(--ink-4)' }}>⌘↵ saves · esc cancels</span>
           <span style={{ flexGrow: 1 }} />
@@ -386,7 +404,7 @@ function NoteEditor({
             className="btn pri sm"
             /* a note needs a title to be found by */
             disabled={!title.trim()}
-            onClick={() => onSave(title, body)}
+            onClick={save}
           >
             Save note
           </button>

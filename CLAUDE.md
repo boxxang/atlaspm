@@ -32,7 +32,11 @@ open it in a browser, serve the directory — Chrome refuses `file://` for this.
   because the prototype is the spec. The rest of the prototype's palette (white
   ground, its greys) is scoped to `.pshell` while `/p/:id/classic` still renders
   the reference's warm theme; it moves to `:root` when that route goes. Do not
-  introduce a component library.
+  introduce a component library. The one exception is Tiptap, the rich-text
+  editor behind key-info notes (`/components/shell/NoteRichEditor.tsx`): an
+  editor engine, asked for so a note can hold a real table. It stays confined
+  to key-info notes, loaded only when one is written or opened, and styled
+  with the app's own tokens.
 - All dates display as MM/DD/YYYY via one shared formatter. All user-facing text
   is English.
 

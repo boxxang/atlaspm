@@ -136,9 +136,11 @@ export interface AppState {
     doneAt?: Date | null;
     /** The meeting a risk was raised in, if one. */
     meetingId?: string | null;
+    /** A key-info note's body as a document (Tiptap JSON). */
+    doc?: string | null;
   }) => void;
   /** Change what a post says. Only the text and, on a handover, its date. */
-  editPost: (id: string, text: string, doneAt?: Date | null) => void;
+  editPost: (id: string, text: string, doneAt?: Date | null, doc?: string | null) => void;
   /**
    * Attach an artefact to a handover. The deliverable's own done flag follows —
    * it is stored, the progress figures read it, and V1 reads it too, so it has
@@ -538,6 +540,7 @@ export const useAppStore = create<AppState>()((set, get) => ({
           parentId: null,
           doneAt: null,
           meetingId: null,
+          doc: null,
           ...post,
           createdAt: now,
           editedAt: null,
@@ -555,13 +558,21 @@ export const useAppStore = create<AppState>()((set, get) => ({
    * the text travels, rather than the whole row. Spreading a stored post back
    * at the server sends it fields it has no columns for.
    */
-  editPost: (id, text, doneAt) => {
+  editPost: (id, text, doneAt, doc) => {
     const now = new Date();
     const existing = get().posts.find((p) => p.id === id);
     if (!existing) return;
     set((s) => ({
       posts: s.posts.map((p) =>
-        p.id === id ? { ...p, text, editedAt: now, doneAt: doneAt === undefined ? p.doneAt : doneAt } : p,
+        p.id === id
+          ? {
+              ...p,
+              text,
+              editedAt: now,
+              doneAt: doneAt === undefined ? p.doneAt : doneAt,
+              doc: doc === undefined ? p.doc : doc,
+            }
+          : p,
       ),
     }));
     sync(
@@ -572,6 +583,7 @@ export const useAppStore = create<AppState>()((set, get) => ({
         text,
         author: existing.author,
         doneAt: doneAt === undefined ? existing.doneAt : doneAt,
+        ...(doc === undefined ? {} : { doc }),
       }),
     );
   },

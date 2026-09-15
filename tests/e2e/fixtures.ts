@@ -84,6 +84,9 @@ export const test = base.extend<{ seeded: void }>({
  * The page counts what is in flight; this drains it before a navigation that
  * would otherwise cancel a pending action.
  */
+/** The test database, for a test that has to plant a row the screens cannot make. */
+export const testDb = () => prisma();
+
 export async function writesSettled(page: Page) {
   const count = inflight.get(page);
   if (count) await expect.poll(() => count.n, { timeout: 10_000 }).toBe(0);

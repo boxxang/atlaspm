@@ -260,6 +260,13 @@ model Post {
   /// cancelling or completing the meeting does nothing to it.
   meetingId String?
 
+  /// A key-info note's body as a rich-text document (Tiptap JSON): paragraphs,
+  /// headings, lists and tables. `text` still carries the title and the body
+  /// as plain text, which is what the list, the filter and the Updates feed
+  /// read. Null on every other kind of post, and on a note written before
+  /// notes had documents, which shows its text as it always did.
+  doc String?
+
   project     Project      @relation(fields: [projectId], references: [id], onDelete: Cascade)
   item        Item?        @relation(fields: [itemId], references: [id], onDelete: Cascade)
   deliverable Deliverable? @relation(fields: [deliverableId], references: [id], onDelete: Cascade)

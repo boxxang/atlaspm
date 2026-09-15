@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { RISK_AUTHOR } from '@/data/riskSeeds';
+import { parseNoteDoc } from '@/lib/noteDoc';
 import { stageNotesFor } from '@/lib/stageNotes';
 
 /**
@@ -18,7 +19,19 @@ describe('stageNotesFor', () => {
     expect(n.stageId).toBe('physicalDesign');
     expect(n.kind).toBe('note');
     expect(n.text.split('\n')[0]).toBe('Netlist drop maturity criteria — N0 → N1 → N2 → FFN');
-    for (const drop of ['N0 —', 'N1 —', 'N2 —', 'FFN —']) expect(n.text).toContain(`\n${drop}`);
+  });
+
+  it('carries the criteria as a real table — a row per criterion, a column per drop', () => {
+    const [n] = stageNotesFor([stage('physicalDesign')], 'p1', RISK_AUTHOR, NOW);
+    const doc = parseNoteDoc(n.doc)!;
+    const table = doc.content.find((b) => b.type === 'table')!;
+    expect(table.content).toHaveLength(13);
+    const header = table.content![0].content!;
+    expect(header.map((c) => c.type)).toEqual(['tableHeader', 'tableHeader', 'tableHeader', 'tableHeader', 'tableHeader']);
+    expect(doc.content.some((b) => b.type === 'bulletList')).toBe(true);
+    /* and says it as text, for the list, the filter and the Updates feed */
+    expect(n.text).toContain('Criterion | N0 — flow-flush netlist | N1 — first quality drop | N2 — last structural drop | FFN — final full netlist');
+    expect(n.text).toContain('RTL | Early; stubbed blocks allowed |');
   });
 
   it('is written by the PM, dated when the program was created, with an id of its own on each program', () => {

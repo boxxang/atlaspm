@@ -62,7 +62,17 @@ test.describe('the program list', () => {
     await expect(note).toHaveCount(1);
     await expect(page.getByRole('link', { name: /^Key info/ })).toContainText('1');
     await note.click();
-    await expect(page.locator('.notecard')).toContainText('FFN — final full netlist');
+    /* a real table: a header row and a row per criterion */
+    const table = page.locator('.notecard [data-note-doc] table');
+    await expect(table.locator('tr')).toHaveCount(13);
+    await expect(table.locator('th')).toHaveText([
+      'Criterion',
+      'N0 — flow-flush netlist',
+      'N1 — first quality drop',
+      'N2 — last structural drop',
+      'FFN — final full netlist',
+    ]);
+    await expect(page.locator('.notecard [data-note-doc]')).toContainText('Rules that decide it');
 
     /* only where it belongs */
     await page.goto(`/p/${id}/stage/signoff/keyinfo`);

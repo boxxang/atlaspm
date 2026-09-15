@@ -9,6 +9,7 @@ import { copyActivities as copyProfileActivities } from '@/lib/profileCopy';
 import { prisma } from '@/lib/db';
 import { assertPrefixes, normalizePrefix, refRenames } from '@/lib/profileEdit';
 import { DB_KIND } from '@/lib/projectState';
+import { parseNoteDoc } from '@/lib/noteDoc';
 import { stageNotesFor } from '@/lib/stageNotes';
 import { resolveStages } from '@/lib/stages';
 import {
@@ -238,8 +239,15 @@ export async function savePost(input: {
   doneAt?: Date | null;
   /** The meeting a risk was raised in — a source, never where the post lives. */
   meetingId?: string | null;
+  /**
+   * A key-info note's body as a document. Left out, an edit keeps the one
+   * stored; only a note carries one, and only one that reads back as a
+   * document is kept.
+   */
+  doc?: string | null;
 }) {
-  const { projectId, id, ...post } = input;
+  const { projectId, id, doc, ...post } = input;
+  const stored = doc === undefined ? undefined : post.kind === 'note' && parseNoteDoc(doc) ? doc : null;
   await assertProject(projectId);
   /* A meeting from another programme is not a source this post can name. */
   if (post.meetingId) {
@@ -253,8 +261,13 @@ export async function savePost(input: {
     where: { id },
     /* An edit changes what was said and when it was said again — never who said
        it, and never where it lives. */
-    update: { text: post.text, editedAt: new Date(), doneAt: post.doneAt ?? null },
-    create: { id, projectId, createdAt: new Date(), ...post },
+    update: {
+      text: post.text,
+      editedAt: new Date(),
+      doneAt: post.doneAt ?? null,
+      ...(stored !== undefined ? { doc: stored } : {}),
+    },
+    create: { id, projectId, createdAt: new Date(), ...post, doc: stored ?? null },
   });
   touch(projectId);
 }
