@@ -4,6 +4,7 @@ import { RISK_AUTHOR } from '@/data/riskSeeds';
 import { BUILTIN_PROFILE } from '@/data/scheduleProfiles';
 import { buildFoundryDemo } from '@/lib/foundryDemo';
 import { parseStepRef } from '@/lib/meetings/links';
+import { parseNoteDoc } from '@/lib/noteDoc';
 import { fmtDate } from '@/lib/schedule';
 import { plannedSteps } from '@/lib/steps';
 
@@ -93,6 +94,21 @@ describe('where AtlasFX1 stands on 09/14', () => {
     expect(notes[0].id).toBe('atlasfx1:note:netlist-maturity');
     expect(notes[0].text.split('\n')[0]).toMatch(/^Netlist drop maturity criteria/);
     expect(fmtDate(notes[0].createdAt)).toBe('02/09/2026');
+  });
+
+  it('keeps its timing closure status as tables: the burn-down, the 17 paths, the loop time', () => {
+    const note = demo.posts.find((p) => p.id === 'atlasfx1:post:note-signoff')!;
+    expect(note.stageId).toBe('signoff');
+    expect(note.text.split('\n')[0]).toBe('Timing closure status — 09/11');
+    const doc = parseNoteDoc(note.doc)!;
+    const tables = doc.content.filter((b) => b.type === 'table');
+    expect(tables).toHaveLength(3);
+    expect(tables[0].content).toHaveLength(6);
+    expect(tables[1].content).toHaveLength(4);
+    expect(doc.content.some((b) => b.type === 'bulletList')).toBe(true);
+    /* and says it as text, for the list and the filter */
+    expect(note.text).toContain('Round 6 | 09/11 | 17');
+    expect(note.text).toContain('CPU core ↔ L3 cache | 12 | Setup');
   });
 
   it('has physical design handed over, and its deliverables done', () => {

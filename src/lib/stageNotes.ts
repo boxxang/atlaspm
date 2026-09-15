@@ -26,7 +26,8 @@ export interface StageNoteRow {
   stageId: string;
 }
 
-const block = (b: NoteBlock): NoteNode =>
+/** A written block as a node of the note's document. */
+export const noteBlock = (b: NoteBlock): NoteNode =>
   'p' in b
     ? docParagraph(b.p)
     : 'h' in b
@@ -44,7 +45,7 @@ export function stageNotesFor(
   return STAGE_NOTES.flatMap((note) => {
     const stage = stages.find((s) => (s.baseKey ?? s.key) === note.baseKey);
     if (!stage) return [];
-    const doc: NoteDoc = { type: 'doc', content: note.blocks.map(block) };
+    const doc: NoteDoc = { type: 'doc', content: note.blocks.map(noteBlock) };
     return [
       {
         id: `${projectId}:note:${note.key}`,

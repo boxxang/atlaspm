@@ -41,7 +41,8 @@ import type { LinkSeedRow, MeetingSeed } from './meetingSeed';
 import { parseStepRef } from './meetings/links';
 import { zonedToUtc } from './meetings/zonedTime';
 import { addWeeks, computeSchedule, DAY, type Schedule } from './schedule';
-import { stageNotesFor } from './stageNotes';
+import { noteText, type NoteDoc } from './noteDoc';
+import { noteBlock, stageNotesFor } from './stageNotes';
 import { resolveStages } from './stages';
 import { fromStepIndex, plannedSteps, type ActivitySteps } from './steps';
 
@@ -252,11 +253,13 @@ export function buildFoundryDemo({ builtin, library }: FoundryDemoInput): Foundr
   const written: DemoPostRow[] = FX1_POSTS.map((p) => {
     const step = p.step ? parseStepRef(p.step) : null;
     if (p.step && !step) throw new Error(`Bad step reference: ${p.step}`);
+    /* a note written as blocks is stored the way the key-info editor stores one */
+    const doc: NoteDoc | null = p.blocks ? { type: 'doc', content: p.blocks.map(noteBlock) } : null;
     return {
       id: postId(p.key),
       projectId: PID,
       kind: p.kind,
-      text: p.text,
+      text: doc ? noteText(p.text, doc) : p.text,
       author: ME,
       createdAt: at(p.at),
       editedAt: null,
@@ -268,7 +271,7 @@ export function buildFoundryDemo({ builtin, library }: FoundryDemoInput): Foundr
       parentId: p.parent ? postId(p.parent) : null,
       doneAt: null,
       meetingId: p.meeting ? meetingId(p.meeting) : null,
-      doc: null,
+      doc: doc ? JSON.stringify(doc) : null,
     };
   });
 

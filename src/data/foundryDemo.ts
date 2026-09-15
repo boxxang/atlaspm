@@ -23,6 +23,8 @@
  * as owners, presenters and attendees — the people the PM is tracking.
  */
 
+import type { NoteBlock } from './stageNotes';
+
 export const FX1_ID = 'atlasfx1';
 export const FX1_NAME = 'AtlasFX1';
 /** Netlist hand-off: the day physical design started. */
@@ -169,7 +171,10 @@ export interface FxPost {
   kind: 'update' | 'risk' | 'note' | 'reply';
   /** Local date and time, YYYY-MM-DD HH:MM. */
   at: string;
+  /** The post's text — a note written as blocks gives only its title here. */
   text: string;
+  /** A key-info note's body as blocks: paragraphs, headings, lists and tables. */
+  blocks?: readonly NoteBlock[];
   /** A step, as ACT:n. */
   step?: string;
   stageId?: string;
@@ -257,15 +262,49 @@ export const FX1_POSTS: readonly FxPost[] = [
     kind: 'note',
     at: '2026-09-11 17:30',
     stageId: 'signoff',
-    text: [
-      'Timing closure status — 09/11',
-      'Signoff STA on the final database after ECO round 6, 24 MCMM corners.',
-      'Burn-down: 214 (08/21) → 131 (R2) → 58 (R4) → 38 (R5) → 17 (R6).',
-      'Remaining 17: 12 setup CPU core ↔ L3 cache · 3 setup PCIe Gen4 PIPE · 2 hold DDR PHY DFI.',
-      'Loop time: 5 working days (STA 1 · ECO P&R 1 · DRC/LVS 2.5 · EM/IR 0.5).',
-      'Forecast: clean timing 10/05, two weeks past Design Freeze on 09/21.',
-      'Plan: FEOL MTO 10/05 from R6, metal-only ECO to BEOL MTO 11/02 — pending path classification on 09/16.',
-    ].join('\n'),
+    text: 'Timing closure status — 09/11',
+    blocks: [
+      { p: 'Signoff STA on the final database after ECO round 6, 24 MCMM corners.' },
+      { h: 'Burn-down by ECO round' },
+      {
+        table: {
+          head: ['ECO round', 'Date', 'Critical paths', 'Reduction', 'Worst setup WNS'],
+          rows: [
+            ['Baseline — Turn 3 final database', '08/21', '214', '—', '−118 ps'],
+            ['Round 2', '08/28', '131', '−83', '—'],
+            ['Round 4', '09/04', '58', '−73', '—'],
+            ['Round 5', '09/08', '38', '−20', '−52 ps'],
+            ['Round 6', '09/11', '17', '−21', '−41 ps'],
+          ],
+        },
+      },
+      { h: 'The 17 paths still failing' },
+      {
+        table: {
+          head: ['Group', 'Paths', 'Type', 'Corner', 'Candidate fix'],
+          rows: [
+            ['CPU core ↔ L3 cache', '12', 'Setup', 'SSGNP 0.72 V / −40 °C', 'Detour, layer promotion, spare-cell buffering — 3 may need a Vt swap'],
+            ['PCIe Gen4 PIPE crossing', '3', 'Setup', 'SSGNP 0.72 V / −40 °C', 'Layer promotion'],
+            ['DDR PHY DFI', '2', 'Hold', 'FFGNP 0.88 V / 125 °C', 'Spare delay cells near the endpoints'],
+          ],
+        },
+      },
+      { h: 'One ECO loop, in working days' },
+      {
+        table: {
+          head: ['STA', 'ECO place and route', 'Full-chip DRC / LVS', 'EM/IR delta', 'Total'],
+          rows: [['1', '1', '2.5', '0.5', '5']],
+        },
+      },
+      { h: 'Forecast and plan' },
+      {
+        bullets: [
+          'Clean timing forecast 10/05 — two weeks past Design Freeze on 09/21.',
+          'FEOL MTO on 10/05 from the round 6 database; metal-only ECO through BEOL MTO on 11/02.',
+          'Held until each of the 17 paths is classified metal-only or base-layer — due 09/16.',
+        ],
+      },
+    ],
   },
   {
     key: 'note-tapeout',
