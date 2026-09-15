@@ -311,14 +311,50 @@ export const FX1_POSTS: readonly FxPost[] = [
     kind: 'note',
     at: '2026-09-11 17:50',
     stageId: 'tapeout',
-    text: [
-      'Split MTO — how it works on this program',
-      'FEOL: base layers through V0, released 10/05 from the ECO round 6 database with placement frozen.',
-      'BEOL: M1 to top metal and RDL, released 11/02 after the metal ECO window.',
-      'Admitted in the window: detours, layer promotion, and spare or gate-array ECO cells already placed in FEOL.',
-      'The foundry holds FEOL wafers before M1; the hold window is still to be confirmed (asked for 4 weeks).',
-      'Any base-layer change reopens FEOL and moves First Silicon by at least 3 weeks.',
-    ].join('\n'),
+    text: 'Split MTO — how it works on this program',
+    blocks: [
+      { p: 'The mask release is split so FEOL wafers keep moving while timing closes in metal.' },
+      { h: 'The two releases' },
+      {
+        table: {
+          head: ['Release', 'Layers', 'Database', 'MTO', 'Status'],
+          rows: [
+            ['FEOL', 'Base layers through V0', 'ECO round 6, placement frozen', '10/05', 'Proposed — held until the 17 paths are classified'],
+            ['BEOL', 'M1 to top metal and RDL', 'After the metal-only ECO window', '11/02', 'Planned'],
+          ],
+        },
+      },
+      { h: 'What the ECO window admits' },
+      {
+        table: {
+          head: ['Change', 'Admitted', 'Why'],
+          rows: [
+            ['Detours and re-routes', 'Yes', 'Metal only'],
+            ['Layer promotion', 'Yes', 'Metal only'],
+            ['Spare-cell and gate-array ECO cells already placed in FEOL', 'Yes', 'The cells are in FEOL; only metal connects them'],
+            ['New cells, resizing or Vt swaps outside the spare sites', 'No', 'Needs base layers — reopens FEOL'],
+          ],
+        },
+      },
+      { h: 'Constraints still open' },
+      {
+        table: {
+          head: ['Item', 'Status', 'Owner', 'Due'],
+          rows: [
+            ['FEOL wafer hold before M1', 'Asked for 4 weeks; the foundry has answered only for 3', 'Jaewon Lim', '09/15'],
+            ['Incremental PV on the changed metal windows', 'Asked; answer pending', 'Eric Moon', '09/16'],
+            ['All 17 paths fixable in metal', 'First pass: 12 look metal-only, not confirmed', 'Jisoo Han', '09/16'],
+          ],
+        },
+      },
+      { h: 'If it goes wrong' },
+      {
+        bullets: [
+          'Any base-layer change reopens FEOL and moves First Silicon by at least 3 weeks.',
+          'A hold shorter than 4 weeks forces BEOL MTO earlier than 11/02, with fewer ECO loops.',
+        ],
+      },
+    ],
   },
   {
     key: 'classify-0914',

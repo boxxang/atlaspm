@@ -111,6 +111,23 @@ describe('where AtlasFX1 stands on 09/14', () => {
     expect(note.text).toContain('CPU core ↔ L3 cache | 12 | Setup');
   });
 
+  it('keeps its split MTO plan as tables: the two releases, what the ECO window admits, and what is still open', () => {
+    const note = demo.posts.find((p) => p.id === 'atlasfx1:post:note-tapeout')!;
+    expect(note.stageId).toBe('tapeout');
+    expect(note.text.split('\n')[0]).toBe('Split MTO — how it works on this program');
+    const doc = parseNoteDoc(note.doc)!;
+    const tables = doc.content.filter((b) => b.type === 'table');
+    expect(tables).toHaveLength(3);
+    expect(tables[0].content).toHaveLength(3);
+    expect(tables[1].content).toHaveLength(5);
+    expect(tables[2].content).toHaveLength(4);
+    expect(note.text).toContain('FEOL | Base layers through V0');
+    expect(note.text).toContain('BEOL | M1 to top metal and RDL');
+    /* the open items name the owners and dates the meeting actions carry */
+    const hold = demo.meetings.actions.find((a) => /maximum FEOL hold/.test(a.description))!;
+    expect(note.text).toContain(`${hold.owner} | ${fmtDate(hold.dueDate!).slice(0, 5)}`);
+  });
+
   it('has physical design handed over, and its deliverables done', () => {
     const pd = demo.deliverables.filter((d) => d.stageId === 'physicalDesign');
     expect(pd.length).toBeGreaterThan(0);
