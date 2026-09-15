@@ -234,6 +234,9 @@ test.describe('handing one over', () => {
     await comment.getByRole('button', { name: 'Delete' }).click();
     await comment.locator('.delconf').getByRole('button', { name: 'Delete' }).click();
     await expect(card(page).locator('[data-comment]')).toHaveCount(0);
+    /* the delete is still on its way to the server; left there, the next
+       test's reseed can land first and the delete finds nothing */
+    await writesSettled(page);
   });
 });
 
