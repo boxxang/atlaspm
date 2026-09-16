@@ -4,7 +4,7 @@ import { useProgramActivities } from './useProgramActivities';
 import { useMemo } from 'react';
 import Link from 'next/link';
 import { attachmentUrl } from '@/lib/attachments';
-import { deliverableStatus, deliverableStep } from '@/lib/deliverableStatus';
+import { deliverableStatus, deliverableStep, producersOf } from '@/lib/deliverableStatus';
 import { fmtDate } from '@/lib/schedule';
 import type { Deliverable } from '@/data/types';
 import { useAppStore } from '@/store/useAppStore';
@@ -44,15 +44,7 @@ export function DeliverableLines({
   const activitySteps = useProgramActivities();
   /* Which activity hands over which deliverable, and how many steps it runs —
      the programme's own list, since a template can change it. */
-  const producers = useMemo(
-    () =>
-      Object.keys(activitySteps).map((ref) => ({
-        ref,
-        produces: activitySteps[ref].r.map(([id]) => id),
-        stepCount: activitySteps[ref].s.length,
-      })),
-    [activitySteps],
-  );
+  const producers = useMemo(() => producersOf(activitySteps), [activitySteps]);
 
   const span = schedule.stages[stageId];
   const refOf = useDeliverableRefs();

@@ -55,6 +55,23 @@ export function deliverableStatus(
 }
 
 /**
+ * Which activities produce which deliverables, as `deliverableStep` reads them.
+ *
+ * Only the `produces` relations count. An activity also lists the deliverables
+ * it feeds, informs or gates, and those usually come earlier in the plan than
+ * the one that makes it — so letting them in named a feeder as the producer:
+ * PKGD-D8 read "PKGD-03 step 4", when PKGD-06 is the activity that releases it.
+ */
+export const producersOf = (
+  activities: Readonly<Record<string, { r: readonly (readonly [string, string])[]; s: readonly unknown[] }>>,
+): { ref: string; produces: string[]; stepCount: number }[] =>
+  Object.keys(activities).map((ref) => ({
+    ref,
+    produces: activities[ref].r.filter(([, rel]) => rel === 'produces').map(([id]) => id),
+    stepCount: activities[ref].s.length,
+  }));
+
+/**
  * Which step hands a deliverable over: the release step — the last one — of the
  * activity that produces its ref. One resolver, so the label and the link
  * cannot point apart.

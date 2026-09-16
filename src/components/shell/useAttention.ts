@@ -4,7 +4,7 @@ import { useProgramActivities } from './useProgramActivities';
 import { useMemo } from 'react';
 import { detailDeliverables } from '@/data/activityIndex';
 import { attention, type AttentionRow } from '@/lib/attention';
-import { deliverableStep } from '@/lib/deliverableStatus';
+import { deliverableStep, producersOf } from '@/lib/deliverableStatus';
 import { useAppStore } from '@/store/useAppStore';
 import { useProgramWork } from './useProgramWork';
 
@@ -28,11 +28,7 @@ export function useAttention(limit: number): AttentionRow[] {
     const refOfTitle = new Map<string, string>();
     for (const [ref, title] of Object.entries(detailDeliverables)) refOfTitle.set(title, ref);
 
-    const producers = Object.keys(activitySteps).map((ref) => ({
-      ref,
-      produces: activitySteps[ref].r.map(([id]) => id),
-      stepCount: activitySteps[ref].s.length,
-    }));
+    const producers = producersOf(activitySteps);
 
     const rows = Object.entries(deliverables).flatMap(([stageId, list]) =>
       list.map((d) => {

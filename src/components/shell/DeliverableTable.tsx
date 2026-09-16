@@ -3,7 +3,7 @@
 import { useMemo } from 'react';
 import { useProgramActivities } from './useProgramActivities';
 import { attachmentUrl } from '@/lib/attachments';
-import { deliverableStatus, deliverableStep, producerStarted } from '@/lib/deliverableStatus';
+import { deliverableStatus, deliverableStep, producerStarted, producersOf } from '@/lib/deliverableStatus';
 import { fmtDate } from '@/lib/schedule';
 import type { Deliverable } from '@/data/types';
 import { useAppStore } from '@/store/useAppStore';
@@ -48,15 +48,7 @@ export function DeliverableTable({
   const activitySteps = useProgramActivities();
   /* Which activity hands over which deliverable — the programme's own list,
      since a template can change it. */
-  const producers = useMemo(
-    () =>
-      Object.keys(activitySteps).map((ref) => ({
-        ref,
-        produces: activitySteps[ref].r.map(([id]) => id),
-        stepCount: activitySteps[ref].s.length,
-      })),
-    [activitySteps],
-  );
+  const producers = useMemo(() => producersOf(activitySteps), [activitySteps]);
 
   const posts = useAppStore((s) => s.posts);
   const schedule = useAppStore((s) => s.schedule);
@@ -71,7 +63,9 @@ export function DeliverableTable({
      rather than merely that the stage has. */
   const producerOf = (ref: string | null) => {
     if (!ref) return null;
-    const owner = activities.find((a) => a.delivers.some(([id]) => id === ref));
+    const owner = activities.find((a) =>
+      a.delivers.some(([id, rel]) => id === ref && rel === 'produces'),
+    );
     return owner ? owner.state : null;
   };
 

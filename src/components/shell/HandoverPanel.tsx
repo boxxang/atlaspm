@@ -6,7 +6,7 @@ import Link from 'next/link';
 import { useRef, useState } from 'react';
 import { RISK_AUTHOR } from '@/data/riskSeeds';
 import { attachmentUrl, formatBytes } from '@/lib/attachments';
-import { deliverableStep, handoverComplete } from '@/lib/deliverableStatus';
+import { deliverableStep, handoverComplete, producersOf } from '@/lib/deliverableStatus';
 import type { ProgramPost } from '@/lib/projectState';
 import { fmtDate, fmtDT, fromISO, toISO } from '@/lib/schedule';
 import { uid, useAppStore } from '@/store/useAppStore';
@@ -48,15 +48,7 @@ export function HandoverPanel({
   const activitySteps = useProgramActivities();
   /* Which activity hands over which deliverable — the programme's own list,
      since a template can change it. */
-  const producers = useMemo(
-    () =>
-      Object.keys(activitySteps).map((ref) => ({
-        ref,
-        produces: activitySteps[ref].r.map(([id]) => id),
-        stepCount: activitySteps[ref].s.length,
-      })),
-    [activitySteps],
-  );
+  const producers = useMemo(() => producersOf(activitySteps), [activitySteps]);
 
   const deliverable = useAppStore((s) => s.deliverables)[stageId]?.find(
     (d) => d.id === deliverableId,

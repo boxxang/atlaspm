@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import {
   deliverableStatus,
   deliverableStep,
+  producersOf,
   handoverComplete,
   producerStarted,
 } from '@/lib/deliverableStatus';
@@ -79,6 +80,18 @@ describe('deliverableStep', () => {
 
   it('has no step for an activity with none written up', () => {
     expect(deliverableStep('X-D1', [{ ref: 'X-01', produces: ['X-D1'], stepCount: 0 }])).toBeNull();
+  });
+});
+
+describe('producersOf', () => {
+  it('counts only the activities that produce a deliverable, not the ones that feed it', () => {
+    const acts = {
+      'PKGD-03': { s: [1, 2, 3, 4], r: [['PKGD-D2', 'produces'], ['PKGD-D8', 'feeds']] as [string, string][] },
+      'PKGD-06': { s: [1, 2, 3, 4, 5, 6, 7], r: [['PKGD-D8', 'produces']] as [string, string][] },
+    };
+    const producers = producersOf(acts);
+    expect(deliverableStep('PKGD-D8', producers)).toEqual({ act: 'PKGD-06', n: 7 });
+    expect(deliverableStep('PKGD-D2', producers)).toEqual({ act: 'PKGD-03', n: 4 });
   });
 });
 
