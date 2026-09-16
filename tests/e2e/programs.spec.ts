@@ -441,7 +441,10 @@ test.describe('the program list', () => {
       const options = await page.locator('.pf-profile option').evaluateAll((os) =>
         os.map((o) => (o as HTMLOptionElement).value),
       );
-      expect(options).toEqual(['typicalSoC', 'custom:typicalSoC']);
+      /* the templates that ship, each offered whole and to be cut down — and
+         nothing else: the stage list this program was cut to describes that
+         program alone and is never offered to the next one */
+      expect(options).toEqual(['typicalSoC', 'custom:typicalSoC', 'threeDic', 'custom:threeDic']);
 
       await page.locator('.pf-profile').selectOption('typicalSoC');
       await expect(page.locator('[data-stage-picker]')).toHaveCount(0);

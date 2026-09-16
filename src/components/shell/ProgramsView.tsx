@@ -4,8 +4,8 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useEffect, useMemo, useRef, useState, useSyncExternalStore, useTransition } from 'react';
 import { createProject, deleteProject } from '@/app/actions';
-import { journeyData } from '@/data/journey';
 import { SEED_COST_PER_MAN_MONTH } from '@/data/projectSeed';
+import { BUILTIN_PROFILES, stageContent } from '@/data/builtins';
 import { BUILTIN_PROFILE, lifecyclePhases, stageMilestone } from '@/data/scheduleProfiles';
 import type { ProfileSummary } from '@/data/types';
 import { kickoffForAnchor, pickStages } from '@/lib/customProfile';
@@ -841,9 +841,24 @@ function NewProgramDialog({
   /* Which stages a customised program runs. Everything, until somebody says
      otherwise — a program that starts with nothing ticked would make the reader
      build it from scratch to answer a question they did not ask. */
+  /* The template being cut down — whichever built-in one was chosen, not
+     always the SoC flow now that a second ships. */
+  const source = useMemo(
+    () => BUILTIN_PROFILES.find((p) => p.id === baseId) ?? BUILTIN_PROFILE,
+    [baseId],
+  );
   const [keep, setKeep] = useState<Set<string>>(
     () => new Set(BUILTIN_PROFILE.stages.map((s) => s.key)),
   );
+  /* Choosing another template starts the ticks again on its own stages: the
+     keys of one template mean nothing in another. Adjusted while rendering
+     rather than in an effect — the ticks belong to the template that is
+     chosen, so they change with it rather than one render later. */
+  const [tickedFor, setTickedFor] = useState(source);
+  if (tickedFor !== source) {
+    setTickedFor(source);
+    setKeep(new Set(source.stages.map((s) => s.key)));
+  }
 
   /* The stages as this program would run them, and the one the date is pinned
      to. Anchoring on the first is the ordinary case and means the date is the
@@ -851,19 +866,19 @@ function NewProgramDialog({
      stage starts, and week zero is worked out from it. */
   const stages = useMemo(() => {
     try {
-      return customising ? pickStages(BUILTIN_PROFILE.stages, [...keep]) : [];
+      return customising ? pickStages(source.stages, [...keep]) : [];
     } catch {
       return [];
     }
-  }, [customising, keep]);
+  }, [customising, keep, source]);
   const [anchor, setAnchor] = useState<string>('');
   const anchorKey = stages.some((s) => s.key === anchor) ? anchor : (stages[0]?.key ?? '');
   const anchorStage = stages.find((s) => s.key === anchorKey);
   const anchored = !!anchorStage && anchorStage.startOffsetWeeks > 0;
   /* What the program's stages add up to, so the rate can be checked against a
      figure rather than typed into the dark. */
-  const effort = (customising ? stages : BUILTIN_PROFILE.stages).reduce((n, st) => {
-    const content = journeyData.find((j) => j.id === (st.baseKey ?? st.key));
+  const effort = (customising ? stages : source.stages).reduce((n, st) => {
+    const content = stageContent(st.baseKey ?? st.key);
     return n + (content?.engineeringEffort ?? []).reduce((a, e) => a + e, 0);
   }, 0);
 

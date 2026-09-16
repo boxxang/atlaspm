@@ -3,8 +3,7 @@
 import { create } from 'zustand';
 import * as api from '@/app/meetingActions';
 import { uploadAttachments } from '@/app/actions';
-import { detailActivityTitles } from '@/data/activityIndex';
-import { activitySteps } from '@/data/activitySteps';
+import { ALL_ACTIVITIES as activitySteps, ALL_ACTIVITY_TITLES as detailActivityTitles } from '@/data/builtins';
 import { RISK_AUTHOR } from '@/data/riskSeeds';
 import { rejectFile, rejectionMessage } from '@/lib/attachments';
 import { canComplete, completionChecks } from '@/lib/meetings/completion';

@@ -56,8 +56,14 @@ open it in a browser, serve the directory — Chrome refuses `file://` for this.
 
 - Profile { id, name, builtin, template } with ProfileStage { key, order, title,
   shortTitle, phaseId, baseKey, startOffsetWeeks, durationWeeks } — the stages a
-  program runs on. The built-in profile (`typicalSoC`) is seeded from
-  `/data/scheduleProfiles.ts` and stays immutable. Editing a program's stages
+  program runs on. Two built-in profiles ship and stay immutable: `typicalSoC`
+  from `/data/scheduleProfiles.ts`, and `threeDic` — a stacked-die programme,
+  the SoC stages plus chiplet partitioning, the die-to-die interface, bonding
+  process enablement, the daisy chain test vehicle (DCTV), 3D stack
+  integration, KGD sort and multi-die test — from `/data/threeDic.ts`, whose
+  content is authored by hand because the modules beside journey.ts are
+  generated. `/data/builtins.ts` composes both: the templates that ship, the
+  activity library every programme resolves against, and each stage's content. Editing a program's stages
   applies to THAT program: if it shares its profile, it moves onto a private
   copy (`template: false`, not offered in the pickers) so nobody else is
   rescheduled. `template: true` is a profile published to start programs from,

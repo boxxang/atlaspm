@@ -6,7 +6,7 @@ import { buildMeetingsState } from './meetings/state';
 import type { MeetingsState } from './meetings/types';
 import { resolveStageDetail } from './stageDetail';
 import { resolveStages } from './stages';
-import { activitySteps } from '@/data/activitySteps';
+import { ALL_ACTIVITIES as activitySteps } from '@/data/builtins';
 import { inheritedActivities, resolveActivities, type ActivityRow } from './resolveActivities';
 import { computeSchedule } from './schedule';
 import { fromStepIndex, plannedSteps } from './steps';

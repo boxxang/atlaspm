@@ -4,11 +4,13 @@ import Link from 'next/link';
 import { useMemo, useState } from 'react';
 import {
   activityGlossary,
-  detailActivityTitles,
   detailDeliverables,
   hasActivityDetail,
   writtenActivities,
 } from '@/data/activityIndex';
+/* Titles from both templates; the write-ups, glossary and deliverables above
+   are the SoC corpus, which is the only one that has them. */
+import { ALL_ACTIVITY_TITLES as detailActivityTitles } from '@/data/builtins';
 import type { ActivityDetail, DetailStep } from '@/data/activityDetailTypes';
 import type { ProjectState } from '@/lib/projectState';
 import { addWeeks, computeSchedule, fmtDate, fmtW } from '@/lib/schedule';

@@ -9,7 +9,7 @@ import {
   saveProfileStages,
   saveTemplateActivities,
 } from '@/app/actions';
-import { activitySteps as activityLibrary } from '@/data/activitySteps';
+import { ALL_ACTIVITIES as activityLibrary } from '@/data/builtins';
 import { lifecyclePhases } from '@/data/scheduleProfiles';
 import type { ProfileStageDef } from '@/data/types';
 import { uid } from '@/store/useAppStore';

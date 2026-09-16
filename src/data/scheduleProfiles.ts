@@ -70,7 +70,7 @@ export const STAGE_ORDER = [
  * and still runs weeks 99 to 107, so nothing downstream moved and the stage
  * still closes on Assembled Units.
  */
-const BASELINES: Record<string, { startOffsetWeeks: number; durationWeeks: number }> = {
+export const BASELINES: Record<string, { startOffsetWeeks: number; durationWeeks: number }> = {
   productDefinition: { startOffsetWeeks: 0, durationWeeks: 8 },
   architecture: { startOffsetWeeks: 6, durationWeeks: 18 },
   technology: { startOffsetWeeks: 0, durationWeeks: 14 },
@@ -153,7 +153,7 @@ export const lifecyclePhases = [
 ] satisfies readonly LifecyclePhase[];
 
 /** Which band each built-in stage sits under. */
-const PHASE_OF: Record<string, string> = {
+export const PHASE_OF: Record<string, string> = {
   productDefinition: 'define',
   architecture: 'define',
   technology: 'enable',

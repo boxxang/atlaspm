@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { detailActivityTitles } from '@/data/activityIndex';
+import { ALL_ACTIVITY_TITLES as detailActivityTitles } from '@/data/builtins';
 import { fmtDate } from '@/lib/schedule';
 import { useAppStore } from '@/store/useAppStore';
 import { useRailStore } from '@/store/railStore';

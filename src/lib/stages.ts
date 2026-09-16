@@ -8,7 +8,7 @@
  *
  * Pure: no DOM, no state, no UI imports.
  */
-import { journeyData } from '@/data/journey';
+import { stageContent } from '@/data/builtins';
 import { lifecyclePhases, phaseById } from '@/data/scheduleProfiles';
 import type { JourneyStage, ProfileStageDef, ScheduleProfile, Stage } from '@/data/types';
 
@@ -36,8 +36,9 @@ const BLANK: JourneyStage = {
   perspective: '',
 };
 
-const builtin = (key: string | null) =>
-  key ? journeyData.find((s) => s.id === key) : undefined;
+/* Both templates' stages: the SoC ones written in journey.ts, the stack ones
+   in threeDic.ts. A stage someone added points at neither and starts blank. */
+const builtin = (key: string | null) => stageContent(key);
 
 /** The profile's stages, in order, each with the content it inherits. */
 export function resolveStages(profile: ScheduleProfile): Stage[] {

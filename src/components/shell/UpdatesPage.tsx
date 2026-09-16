@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useProgramActivities } from './useProgramActivities';
-import { detailActivityTitles } from '@/data/activityIndex';
+import { ALL_ACTIVITY_TITLES as detailActivityTitles } from '@/data/builtins';
 import { fmtDT } from '@/lib/schedule';
 import { useAppStore } from '@/store/useAppStore';
 import { Avatar } from './icons';

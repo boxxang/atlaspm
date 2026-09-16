@@ -9,7 +9,7 @@ import type {
   StageId,
 } from '@/data/types';
 import { inheritedActivities, type ActivityRow } from '@/lib/resolveActivities';
-import { activitySteps } from '@/data/activitySteps';
+import { ALL_ACTIVITIES as activitySteps } from '@/data/builtins';
 import type { StageOverrides } from '@/lib/schedule';
 import type { StageDetailOverride } from '@/lib/stageDetail';
 import { stepKey, type StepStateRecord } from '@/lib/steps';

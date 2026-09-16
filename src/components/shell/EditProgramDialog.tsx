@@ -2,7 +2,7 @@
 
 import { Fragment, useEffect, useRef, useState } from 'react';
 import { renameProject, saveProjectActivities, saveProjectStages, setKickoff } from '@/app/actions';
-import { activitySteps as activityLibrary } from '@/data/activitySteps';
+import { ALL_ACTIVITIES as activityLibrary } from '@/data/builtins';
 import { lifecyclePhases, stageMilestone } from '@/data/scheduleProfiles';
 import type { ProfileStageDef } from '@/data/types';
 import {

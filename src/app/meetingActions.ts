@@ -1,7 +1,7 @@
 'use server';
 
 import { revalidatePath } from 'next/cache';
-import { activitySteps } from '@/data/activitySteps';
+import { ALL_ACTIVITIES as activitySteps } from '@/data/builtins';
 import { prisma } from '@/lib/db';
 import { canComplete, completionChecks } from '@/lib/meetings/completion';
 import { dedupeLinks } from '@/lib/meetings/links';
