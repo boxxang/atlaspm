@@ -2,7 +2,7 @@
 
 import { useProgramActivities } from './useProgramActivities';
 import { useMemo } from 'react';
-import { detailDeliverables } from '@/data/activityIndex';
+import { ALL_DELIVERABLE_TITLES as detailDeliverables } from '@/data/builtins';
 import { attention, type AttentionRow } from '@/lib/attention';
 import { deliverableStep, producersOf } from '@/lib/deliverableStatus';
 import { useAppStore } from '@/store/useAppStore';

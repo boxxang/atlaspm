@@ -13,12 +13,20 @@
  * sits beside them.
  */
 import { activitySteps, type ActivityStepEntry } from './activitySteps';
-import { detailActivityTitles } from './activityIndex';
+import {
+  activityGlossary,
+  detailActivityTitles,
+  detailDeliverables,
+  writtenActivities,
+  type GlossaryTerm,
+} from './activityIndex';
 import { journeyData } from './journey';
 import { BUILTIN_PROFILE, milestoneDefs } from './scheduleProfiles';
 import {
   THREE_DIC_ACTIVITIES,
   THREE_DIC_ACTIVITY_TITLES,
+  THREE_DIC_DELIVERABLES,
+  THREE_DIC_GLOSSARY,
   THREE_DIC_MILESTONES,
   THREE_DIC_PROFILE,
   THREE_DIC_STAGES,
@@ -55,3 +63,31 @@ export const ALL_MILESTONES: readonly MilestoneDef[] = [...milestoneDefs, ...THR
 /** The content a stage shows, or undefined for one nobody has written up. */
 export const stageContent = (key: string | null | undefined): JourneyStage | undefined =>
   key ? ALL_STAGE_CONTENT.find((s) => s.id === key) : undefined;
+
+/**
+ * Every key deliverable's reference tag and title, from both templates — the
+ * catalogue a programme's deliverable rows are matched against for their tag.
+ */
+export const ALL_DELIVERABLE_TITLES: Record<string, string> = {
+  ...detailDeliverables,
+  ...THREE_DIC_DELIVERABLES,
+};
+
+/** The terms a write-up may offer to explain, from both corpora. */
+export const ALL_GLOSSARY: Record<string, GlossaryTerm> = {
+  ...activityGlossary,
+  ...THREE_DIC_GLOSSARY,
+};
+
+/**
+ * Every activity with a write-up, SoC first and then the stack's, each in the
+ * order its template runs them. Every 3DIC activity is written up — a test
+ * holds that — so the list is its keys rather than a second copy of them.
+ */
+export const ALL_WRITTEN_ACTIVITIES: readonly string[] = [
+  ...writtenActivities,
+  ...Object.keys(THREE_DIC_ACTIVITIES),
+];
+
+const WRITTEN = new Set(ALL_WRITTEN_ACTIVITIES);
+export const hasWriteUp = (id: string): boolean => WRITTEN.has(id);

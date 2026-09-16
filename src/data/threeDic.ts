@@ -92,14 +92,19 @@ export const THREE_DIC_MILESTONES: readonly MilestoneDef[] = [
 
 /* ---------- activities ---------- */
 
+/**
+ * One output per step, as every SoC activity has: a step hands something over
+ * or it is not a step. So the outputs are listed in step order and the step
+ * each one comes from is its position.
+ */
 const act = (
   st: string,
   w: [number, number],
   ro: string,
   s: ActivityStepEntry['s'],
   o: string[],
-  ob: number[],
-): ActivityStepEntry => ({ st, w, s, o, ob, r: [], ro });
+  r: ActivityStepEntry['r'],
+): ActivityStepEntry => ({ st, w, s, o, ob: o.map((_, i) => i + 1), r, ro });
 
 /**
  * Keyed by reference, grouped by stage and in the order each stage runs them —
@@ -118,8 +123,14 @@ export const THREE_DIC_ACTIVITIES: Record<string, ActivityStepEntry> = {
       [4, 'Screen each split for thermal feasibility', 1],
       [5, 'Choose the stack topology and record what it was chosen over', 1.5],
     ],
-    ['Stack topology decision record'],
-    [5],
+    [
+      'Candidate die split options',
+      'Bandwidth and latency model per split',
+      'Cost comparison of the candidate splits',
+      'Thermal feasibility screen of each split',
+      'Stack topology decision record',
+    ],
+    [['PART-D1', 'produces'], ['PART-D5', 'feeds']],
   ),
   'PART-02': act(
     'chipletPartitioning',
@@ -131,8 +142,13 @@ export const THREE_DIC_ACTIVITIES: Record<string, ActivityStepEntry> = {
       [3, 'Estimate the interface power at the target bandwidth', 1, 1],
       [4, 'Reconcile the budget with the floorplan-level bump count', 2],
     ],
-    ['Die-to-die bandwidth and power budget'],
-    [4],
+    [
+      'Die-to-die traffic matrix',
+      'Per-link bandwidth, latency and coherency budget',
+      'Interface power estimate at target bandwidth',
+      'Die-to-die bandwidth and power budget',
+    ],
+    [['PART-D2', 'produces'], ['PART-D5', 'feeds']],
   ),
   'PART-03': act(
     'chipletPartitioning',
@@ -144,8 +160,13 @@ export const THREE_DIC_ACTIVITIES: Record<string, ActivityStepEntry> = {
       [3, 'Find the hotspots the stacking creates', 1.5, 1],
       [4, 'Set the per-die power ceiling and the cooling assumption', 2],
     ],
-    ['Stack thermal and power budget'],
-    [4],
+    [
+      'Stack thermal model',
+      'Per-die power maps placed in the stack',
+      'Stack hotspot list',
+      'Stack thermal and power budget',
+    ],
+    [['PART-D3', 'produces'], ['PART-D5', 'feeds']],
   ),
   'PART-04': act(
     'chipletPartitioning',
@@ -157,8 +178,13 @@ export const THREE_DIC_ACTIVITIES: Record<string, ActivityStepEntry> = {
       [3, 'Set the known-good-die criteria the programme will hold to', 1, 1],
       [4, 'Agree the repair and redundancy budget with design', 2],
     ],
-    ['Stack yield and KGD economics'],
-    [4],
+    [
+      'Compound stack yield model',
+      'Stack-a-bad-die versus sort cost trade-off',
+      'Draft known-good-die criteria',
+      'Stack yield and KGD economics',
+    ],
+    [['PART-D4', 'produces'], ['PART-D5', 'feeds']],
   ),
   'PART-05': act(
     'chipletPartitioning',
@@ -170,8 +196,13 @@ export const THREE_DIC_ACTIVITIES: Record<string, ActivityStepEntry> = {
       [3, 'Agree the contract with each die owner', 1, 1],
       [4, 'Release the partition to RTL and physical design', 2],
     ],
-    ['Partition freeze package', 'Inter-die interface contract'],
-    [1, 4],
+    [
+      'Frozen partition and die list',
+      'Inter-die interface contract',
+      'Die owner sign-off on the contract',
+      'Partition freeze package',
+    ],
+    [['PART-D5', 'produces']],
   ),
 
   /* --- TSV and hybrid bond process enablement --- */
@@ -185,8 +216,13 @@ export const THREE_DIC_ACTIVITIES: Record<string, ActivityStepEntry> = {
       [3, 'Check each option against the bandwidth and pitch the design needs', 1.5, 1],
       [4, 'Select the bonding scheme and record the constraints it brings', 3],
     ],
-    ['Bonding scheme selection record'],
-    [4],
+    [
+      'Foundry and OSAT bonding option list',
+      'Micro-bump versus hybrid bonding comparison',
+      'Pitch and bandwidth fit check per option',
+      'Bonding scheme selection record',
+    ],
+    [['BOND-D1', 'produces'], ['BOND-D3', 'feeds']],
   ),
   'BOND-02': act(
     'tsvHybridBond',
@@ -198,8 +234,13 @@ export const THREE_DIC_ACTIVITIES: Record<string, ActivityStepEntry> = {
       [3, 'Set the backside redistribution and pad rules', 2, 1],
       [4, 'Agree the process split points with the foundry', 4.5],
     ],
-    ['TSV and backside process rule set'],
-    [4],
+    [
+      'Foundry TSV and backside rules, received',
+      'TSV keep-out impact on the floorplan',
+      'Backside RDL and pad rules',
+      'TSV and backside process rule set',
+    ],
+    [['BOND-D2', 'produces'], ['BOND-D6', 'feeds']],
   ),
   'BOND-03': act(
     'tsvHybridBond',
@@ -211,8 +252,13 @@ export const THREE_DIC_ACTIVITIES: Record<string, ActivityStepEntry> = {
       [3, 'Check the capability against the bump map density', 2, 1],
       [4, 'Agree the bonding capability the design may assume', 4.5],
     ],
-    ['Bond pitch and alignment capability statement'],
-    [4],
+    [
+      'Bond pitch and overlay capability data',
+      'Alignment and placement accuracy budget',
+      'Capability check against bump map density',
+      'Bond pitch and alignment capability statement',
+    ],
+    [['BOND-D3', 'produces'], ['BOND-D6', 'feeds']],
   ),
   'BOND-04': act(
     'tsvHybridBond',
@@ -224,8 +270,13 @@ export const THREE_DIC_ACTIVITIES: Record<string, ActivityStepEntry> = {
       [3, 'Set the bow and warpage limits for handling', 2, 1],
       [4, 'Qualify the debond and clean steps on monitor wafers', 4],
     ],
-    ['Thinning and handling flow definition'],
-    [4],
+    [
+      'Thinning target and carrier flow',
+      'Thinned wafer handling risk assessment',
+      'Bow and warpage handling limits',
+      'Thinning and handling flow definition',
+    ],
+    [['BOND-D4', 'produces'], ['BOND-D5', 'informs']],
   ),
   'BOND-05': act(
     'tsvHybridBond',
@@ -237,8 +288,13 @@ export const THREE_DIC_ACTIVITIES: Record<string, ActivityStepEntry> = {
       [3, 'Set the thermal budget the stack may spend in assembly', 2, 1],
       [4, 'Review the reliability plan with the foundry and OSAT', 4.5],
     ],
-    ['Bond reliability and thermal budget plan'],
-    [4],
+    [
+      'Bond interface reliability requirements',
+      'Bond interface stress matrix',
+      'Assembly thermal budget',
+      'Bond reliability and thermal budget plan',
+    ],
+    [['BOND-D5', 'produces']],
   ),
   'BOND-06': act(
     'tsvHybridBond',
@@ -250,8 +306,13 @@ export const THREE_DIC_ACTIVITIES: Record<string, ActivityStepEntry> = {
       [3, 'Run the deck against the partitioning floorplan', 2, 1],
       [4, 'Release the 3D rule deck to the design teams', 4],
     ],
-    ['3D design rule deck, released'],
-    [4],
+    [
+      'Draft 3D design rule deck',
+      'Assembly and bonding checks in the deck',
+      'Deck run results on the partition floorplan',
+      '3D design rule deck, released',
+    ],
+    [['BOND-D6', 'produces']],
   ),
 
   /* --- die-to-die interface and IP readiness --- */
@@ -265,8 +326,13 @@ export const THREE_DIC_ACTIVITIES: Record<string, ActivityStepEntry> = {
       [3, 'Assess the ecosystem and interoperability cost of each', 1.5, 1],
       [4, 'Select the interface standard and the profile within it', 2.5],
     ],
-    ['Interface standard selection record'],
-    [4],
+    [
+      'Interface option comparison against the budget',
+      'Bonding pitch compatibility check',
+      'Ecosystem and interoperability cost assessment',
+      'Interface standard selection record',
+    ],
+    [['D2D-D1', 'produces'], ['D2D-D2', 'feeds']],
   ),
   'D2D-02': act(
     'd2dInterface',
@@ -278,8 +344,13 @@ export const THREE_DIC_ACTIVITIES: Record<string, ActivityStepEntry> = {
       [3, 'Check the deliverable set — models, views, test collateral', 2, 1],
       [4, 'Commit the vendor and place the IP schedule on the plan', 4],
     ],
-    ['D2D PHY IP commitment and schedule'],
-    [4],
+    [
+      'D2D PHY IP shortlist',
+      'Vendor silicon evidence review',
+      'IP deliverable set checklist',
+      'D2D PHY IP commitment and schedule',
+    ],
+    [['D2D-D2', 'produces'], ['D2D-D6', 'feeds']],
   ),
   'D2D-03': act(
     'd2dInterface',
@@ -291,8 +362,13 @@ export const THREE_DIC_ACTIVITIES: Record<string, ActivityStepEntry> = {
       [3, 'Model the latency the protocol adds under load', 2, 1],
       [4, 'Freeze the protocol and hand it to the die teams', 5],
     ],
-    ['Link layer and protocol specification'],
-    [4],
+    [
+      'Link layer framing and flow control definition',
+      'Retry, error detection and correction scheme',
+      'Protocol latency model under load',
+      'Link layer and protocol specification',
+    ],
+    [['D2D-D3', 'produces'], ['D2D-D6', 'feeds']],
   ),
   'D2D-04': act(
     'd2dInterface',
@@ -304,8 +380,13 @@ export const THREE_DIC_ACTIVITIES: Record<string, ActivityStepEntry> = {
       [3, 'Check the map against the bonding alignment budget', 2, 1],
       [4, 'Freeze the bump map across both dies', 5],
     ],
-    ['Frozen inter-die bump map'],
-    [4],
+    [
+      'Draft inter-die bump map',
+      'Redundant bump allocation',
+      'Bump map check against the alignment budget',
+      'Frozen inter-die bump map',
+    ],
+    [['D2D-D4', 'produces'], ['D2D-D5', 'feeds']],
   ),
   'D2D-05': act(
     'd2dInterface',
@@ -317,8 +398,13 @@ export const THREE_DIC_ACTIVITIES: Record<string, ActivityStepEntry> = {
       [3, 'Define the link repair and lane remap mechanism', 2, 1],
       [4, 'Review the test and repair architecture with test development', 5],
     ],
-    ['D2D test and repair architecture'],
-    [4],
+    [
+      'Die-level test access definition',
+      'IEEE 1838 wrapper and port structure',
+      'Lane repair and remap mechanism',
+      'D2D test and repair architecture',
+    ],
+    [['D2D-D5', 'produces']],
   ),
   'D2D-06': act(
     'd2dInterface',
@@ -330,8 +416,13 @@ export const THREE_DIC_ACTIVITIES: Record<string, ActivityStepEntry> = {
       [3, 'Run interoperability checks against the vendor model', 2, 1],
       [4, 'Report compliance and close the interface', 4],
     ],
-    ['Interface compliance and interop report'],
-    [4],
+    [
+      'Interface compliance test suite',
+      'Protocol verification results',
+      'Interoperability results against the vendor model',
+      'Interface compliance and interop report',
+    ],
+    [['D2D-D6', 'produces']],
   ),
 
   /* --- daisy chain test vehicle --- */
@@ -346,8 +437,14 @@ export const THREE_DIC_ACTIVITIES: Record<string, ActivityStepEntry> = {
       [4, 'Agree the sample plan and the build quantity with the OSAT', 1.5],
       [5, 'Review the vehicle scope and release it', 2],
     ],
-    ['DCTV scope and coverage matrix'],
-    [5],
+    [
+      'Vehicle objectives',
+      'Chain segmentation plan by bond level',
+      'Continuity and contact resistance limits',
+      'Sample plan and build quantity',
+      'DCTV scope and coverage matrix',
+    ],
+    [['DCTV-D1', 'produces'], ['DCTV-D2', 'feeds']],
   ),
   'DCTV-02': act(
     'dctv',
@@ -360,8 +457,14 @@ export const THREE_DIC_ACTIVITIES: Record<string, ActivityStepEntry> = {
       [4, 'Check the vehicle against the 3D design rule deck', 2],
       [5, 'Release the daisy chain design database', 2],
     ],
-    ['Daisy chain vehicle design database'],
-    [5],
+    [
+      'Daisy chain die layouts',
+      'Interposer and substrate chain layouts',
+      'Probe pad and measurement structure placement',
+      '3D rule deck check results on the vehicle',
+      'Daisy chain vehicle design database',
+    ],
+    [['DCTV-D2', 'produces'], ['DCTV-D3', 'feeds']],
   ),
   'DCTV-03': act(
     'dctv',
@@ -373,8 +476,13 @@ export const THREE_DIC_ACTIVITIES: Record<string, ActivityStepEntry> = {
       [3, 'Build the interposer and substrate lots in parallel', 4, 1],
       [4, 'Inspect and release the vehicle material to assembly', 3],
     ],
-    ['Built vehicle lots with travelers'],
-    [4],
+    [
+      'Vehicle mask tooling order',
+      'Vehicle wafers out of fab',
+      'Interposer and substrate lots',
+      'Built vehicle lots with travelers',
+    ],
+    [['DCTV-D3', 'produces'], ['DCTV-D4', 'feeds']],
   ),
   'DCTV-04': act(
     'dctv',
@@ -387,8 +495,14 @@ export const THREE_DIC_ACTIVITIES: Record<string, ActivityStepEntry> = {
       [4, 'Record the assembly yield of each split', 2],
       [5, 'Review the DOE result with the design and process teams', 3],
     ],
-    ['Assembly DOE result on the vehicle'],
-    [5],
+    [
+      'Assembly DOE matrix',
+      'Bonded vehicle stacks by split',
+      'X-ray and CSAM inspection results',
+      'Assembly yield by split',
+      'Assembly DOE result on the vehicle',
+    ],
+    [['DCTV-D4', 'produces'], ['DCTV-D7', 'feeds']],
   ),
   'DCTV-05': act(
     'dctv',
@@ -401,8 +515,14 @@ export const THREE_DIC_ACTIVITIES: Record<string, ActivityStepEntry> = {
       [4, 'Locate the opens and shorts to a bond level', 2],
       [5, 'Report continuity and resistance against the criteria', 2.5],
     ],
-    ['Continuity and contact resistance data'],
-    [5],
+    [
+      'Continuity measurement setup and correlation',
+      'Chain continuity map',
+      'Contact resistance distribution',
+      'Open and short locations by bond level',
+      'Continuity and contact resistance data',
+    ],
+    [['DCTV-D5', 'produces'], ['DCTV-D7', 'feeds']],
   ),
   'DCTV-06': act(
     'dctv',
@@ -415,8 +535,14 @@ export const THREE_DIC_ACTIVITIES: Record<string, ActivityStepEntry> = {
       [4, 'Analyse the failures by bond level and location', 2],
       [5, 'Report the reliability of the bond interface', 1.5],
     ],
-    ['Vehicle reliability report'],
-    [5],
+    [
+      'Preconditioned vehicle population',
+      'Temperature cycling readout log',
+      'Chain resistance drift by readout',
+      'Failure analysis by bond level and location',
+      'Vehicle reliability report',
+    ],
+    [['DCTV-D6', 'produces'], ['DCTV-D8', 'feeds']],
   ),
   'DCTV-07': act(
     'dctv',
@@ -429,8 +555,14 @@ export const THREE_DIC_ACTIVITIES: Record<string, ActivityStepEntry> = {
       [4, 'Freeze the 3D assembly process window', 1],
       [5, 'Sign the vehicle off as the gate for product assembly', 1.5],
     ],
-    ['Assembly yield learning report', 'Frozen 3D assembly process window'],
-    [1, 4],
+    [
+      'Assembly yield learning report',
+      'Chosen product process window',
+      'Bump map and rule deck change requests',
+      'Frozen 3D assembly process window',
+      'Vehicle signoff for product assembly',
+    ],
+    [['DCTV-D7', 'produces'], ['DCTV-D8', 'produces']],
   ),
 
   /* --- 3D stack integration and signoff --- */
@@ -444,8 +576,13 @@ export const THREE_DIC_ACTIVITIES: Record<string, ActivityStepEntry> = {
       [3, 'Reserve the keep-outs the bonding process requires', 2, 1],
       [4, 'Review the 3D floorplan with every die owner', 4],
     ],
-    ['3D floorplan with aligned bump and TSV fields'],
-    [4],
+    [
+      'TSV field placement per die',
+      'Cross-die bump alignment',
+      'Bonding keep-out reservations',
+      '3D floorplan with aligned bump and TSV fields',
+    ],
+    [['3DI-D1', 'produces'], ['3DI-D2', 'feeds']],
   ),
   '3DI-02': act(
     'threeDIntegration',
@@ -457,8 +594,13 @@ export const THREE_DIC_ACTIVITIES: Record<string, ActivityStepEntry> = {
       [3, 'Size the TSV count and strap width for the load', 2, 1],
       [4, 'Close the stack power delivery against the budget', 3.5],
     ],
-    ['Stack power delivery and IR report'],
-    [4],
+    [
+      'Stacked power delivery model through the TSVs',
+      'Stack IR drop analysis',
+      'TSV count and strap sizing',
+      'Stack power delivery and IR report',
+    ],
+    [['3DI-D2', 'produces'], ['3DI-D6', 'feeds']],
   ),
   '3DI-03': act(
     'threeDIntegration',
@@ -470,8 +612,13 @@ export const THREE_DIC_ACTIVITIES: Record<string, ActivityStepEntry> = {
       [3, 'Analyse timing across the stack corners', 2.5, 1],
       [4, 'Close the inter-die timing and publish the budget', 5],
     ],
-    ['Inter-die timing closure report'],
-    [4],
+    [
+      'Inter-die timing model',
+      'Die-to-die path budget',
+      'Stack corner timing analysis',
+      'Inter-die timing closure report',
+    ],
+    [['3DI-D3', 'produces'], ['3DI-D6', 'feeds']],
   ),
   '3DI-04': act(
     'threeDIntegration',
@@ -483,8 +630,13 @@ export const THREE_DIC_ACTIVITIES: Record<string, ActivityStepEntry> = {
       [3, 'Find the thermal limit each die imposes on the others', 2, 1],
       [4, 'Agree the thermal design point with the system team', 4.5],
     ],
-    ['Stack thermal simulation report'],
-    [4],
+    [
+      'Assembled stack thermal model',
+      'Workload thermal maps through the stack',
+      'Per-die thermal limits',
+      'Stack thermal simulation report',
+    ],
+    [['3DI-D4', 'produces'], ['3DI-D5', 'feeds']],
   ),
   '3DI-05': act(
     'threeDIntegration',
@@ -496,8 +648,13 @@ export const THREE_DIC_ACTIVITIES: Record<string, ActivityStepEntry> = {
       [3, 'Check the result against the vehicle measurements', 2, 1],
       [4, 'Close warpage and stress against the assembly window', 4],
     ],
-    ['Warpage and stress co-analysis report'],
-    [4],
+    [
+      'Reflow warpage model',
+      'Bond interface and TSV stress analysis',
+      'Correlation to the vehicle measurements',
+      'Warpage and stress co-analysis report',
+    ],
+    [['3DI-D5', 'produces'], ['3DI-D6', 'feeds']],
   ),
   '3DI-06': act(
     'threeDIntegration',
@@ -509,8 +666,13 @@ export const THREE_DIC_ACTIVITIES: Record<string, ActivityStepEntry> = {
       [3, 'Collect the stack signoff waivers and their reasons', 1.5, 1],
       [4, 'Sign the stack off for mask release', 3.5],
     ],
-    ['3D stack signoff package'],
-    [4],
+    [
+      'Multi-die static timing results',
+      'Assembly and 3D DRC results',
+      'Stack signoff waiver list',
+      '3D stack signoff package',
+    ],
+    [['3DI-D6', 'produces']],
   ),
 
   /* --- known-good-die and stack sort --- */
@@ -524,8 +686,13 @@ export const THREE_DIC_ACTIVITIES: Record<string, ActivityStepEntry> = {
       [3, 'Agree the criteria with the stacking partner', 1, 1],
       [4, 'Release the KGD definition to test development', 2],
     ],
-    ['Known-good-die criteria'],
-    [4],
+    [
+      'Draft KGD criteria from the yield economics',
+      'KGD sort flow',
+      'Stacking partner agreement on the criteria',
+      'Known-good-die criteria',
+    ],
+    [['KGD-D1', 'produces'], ['KGD-D2', 'feeds']],
   ),
   'KGD-02': act(
     'kgdSort',
@@ -537,8 +704,13 @@ export const THREE_DIC_ACTIVITIES: Record<string, ActivityStepEntry> = {
       [3, 'Set the limits and guard bands for stacking', 1.5, 1],
       [4, 'Release the sort program for the stacking lots', 2],
     ],
-    ['Wafer sort program for stacking'],
-    [4],
+    [
+      'Sort program extended to the KGD criteria',
+      'Pre-bond D2D link tests',
+      'Stacking limits and guard bands',
+      'Wafer sort program for stacking',
+    ],
+    [['KGD-D2', 'produces'], ['KGD-D3', 'feeds']],
   ),
   'KGD-03': act(
     'kgdSort',
@@ -550,8 +722,13 @@ export const THREE_DIC_ACTIVITIES: Record<string, ActivityStepEntry> = {
       [3, 'Model the compound yield of the pairing rules', 1.5, 1],
       [4, 'Release the pairing and binning plan to assembly', 2],
     ],
-    ['Die matching and binning plan'],
-    [4],
+    [
+      'Die-matching rules',
+      'Parametric die bins',
+      'Compound yield model of the pairing rules',
+      'Die matching and binning plan',
+    ],
+    [['KGD-D3', 'produces'], ['KGD-D4', 'feeds']],
   ),
   'KGD-04': act(
     'kgdSort',
@@ -563,8 +740,13 @@ export const THREE_DIC_ACTIVITIES: Record<string, ActivityStepEntry> = {
       [3, 'Agree the carrier logistics and storage limits', 1.5, 1],
       [4, 'Release the known-good dies to assembly', 3],
     ],
-    ['Known-good die release record'],
-    [4],
+    [
+      'Thinned wafer handling plan',
+      'Wafer-to-stack traceability map',
+      'Carrier logistics and storage limits',
+      'Known-good die release record',
+    ],
+    [['KGD-D4', 'produces']],
   ),
 
   /* --- multi-die test and repair --- */
@@ -578,8 +760,13 @@ export const THREE_DIC_ACTIVITIES: Record<string, ActivityStepEntry> = {
       [3, 'Set the coverage each insertion has to reach', 2, 1],
       [4, 'Review the post-bond test strategy and release it', 3.5],
     ],
-    ['Post-bond test strategy'],
-    [4],
+    [
+      'Pre-, mid- and post-bond test insertion plan',
+      'Buried-die test access plan',
+      'Coverage target per insertion',
+      'Post-bond test strategy',
+    ],
+    [['MDT-D1', 'produces'], ['MDT-D3', 'feeds']],
   ),
   'MDT-02': act(
     'multiDieTest',
@@ -591,8 +778,13 @@ export const THREE_DIC_ACTIVITIES: Record<string, ActivityStepEntry> = {
       [3, 'Measure the link margin across voltage and temperature', 2.5, 1],
       [4, 'Report the link BIST and repair readiness', 4.5],
     ],
-    ['D2D BIST and repair bring-up report'],
-    [4],
+    [
+      'Link BIST bring-up results',
+      'Lane repair and remap validation',
+      'Link margin across voltage and temperature',
+      'D2D BIST and repair bring-up report',
+    ],
+    [['MDT-D2', 'produces'], ['MDT-D5', 'feeds']],
   ),
   'MDT-03': act(
     'multiDieTest',
@@ -604,8 +796,13 @@ export const THREE_DIC_ACTIVITIES: Record<string, ActivityStepEntry> = {
       [3, 'Debug the patterns on the first assembled stacks', 3, 1],
       [4, 'Release the stack-level pattern set', 4.5],
     ],
-    ['Stack-level pattern set'],
-    [4],
+    [
+      'Stack-access ATPG patterns, ported',
+      'Pattern set within tester memory',
+      'Pattern debug log from the first stacks',
+      'Stack-level pattern set',
+    ],
+    [['MDT-D3', 'produces'], ['MDT-D4', 'feeds']],
   ),
   'MDT-04': act(
     'multiDieTest',
@@ -617,8 +814,13 @@ export const THREE_DIC_ACTIVITIES: Record<string, ActivityStepEntry> = {
       [3, 'Decide what is repaired and what is scrapped', 1.5, 1],
       [4, 'Release the known-good-stack criteria to production', 4],
     ],
-    ['Known-good-stack criteria'],
-    [4],
+    [
+      'Known-good-stack definition',
+      'Binning rules for the stacked part',
+      'Repair-or-scrap disposition rules',
+      'Known-good-stack criteria',
+    ],
+    [['MDT-D4', 'produces'], ['MDT-D5', 'feeds']],
   ),
   'MDT-05': act(
     'multiDieTest',
@@ -630,8 +832,13 @@ export const THREE_DIC_ACTIVITIES: Record<string, ActivityStepEntry> = {
       [3, 'Measure the repair yield against the redundancy budget', 2, 1],
       [4, 'Feed the analysis back into the test and assembly flows', 3.5],
     ],
-    ['Test escape and repair yield analysis'],
-    [4],
+    [
+      'Test escape analysis',
+      'Escape attribution by die, bond and flow',
+      'Repair yield against the redundancy budget',
+      'Test escape and repair yield analysis',
+    ],
+    [['MDT-D5', 'produces']],
   ),
 };
 
@@ -983,6 +1190,97 @@ export const THREE_DIC_STAGES: readonly ThreeDicStage[] = [
     perspective: 'A short engineering or program-management insight will appear here.',
   },
 ];
+
+/* ---------- deliverable references and terms ---------- */
+
+/**
+ * Each stack deliverable's reference tag, keyed the way /lib/rowIds numbers a
+ * row: PART-D1 is the first deliverable of the stage whose short title is PART.
+ *
+ * Derived from the stage lists rather than written out a second time, so the
+ * catalogue the tags are matched against is the list the rows are seeded from
+ * and the two cannot word a deliverable differently.
+ */
+export const THREE_DIC_DELIVERABLES: Record<string, string> = Object.fromEntries(
+  THREE_DIC_STAGES.flatMap((s) => s.deliverables.map((title, i) => [`${s.shortTitle}-D${i + 1}`, title])),
+);
+
+/**
+ * The terms the stack write-ups use that the SoC glossary does not explain.
+ * TSV, KGD, UCIe, D2D, CSAM and the rest are already there and are not repeated.
+ */
+export const THREE_DIC_GLOSSARY: Record<string, { full: string; group: string; note: string }> = {
+  '3DIC': {
+    full: 'Three-Dimensional Integrated Circuit',
+    group: 'pkg',
+    note: 'Dies stacked vertically and joined through bonds and TSVs, rather than placed side by side on an interposer.',
+  },
+  BoW: {
+    full: 'Bunch of Wires',
+    group: 'iface',
+    note: 'An open, parallel die-to-die interface from the OCP ODSA group. Simple and low power, with less ecosystem than UCIe.',
+  },
+  CTE: {
+    full: 'Coefficient of Thermal Expansion',
+    group: 'pkg',
+    note: 'How much a material grows with temperature. Mismatch between die, bond and substrate is what warps a stack and cracks its joints.',
+  },
+  D2W: {
+    full: 'Die-to-Wafer bonding',
+    group: 'process',
+    note: 'Singulated known-good dies bonded onto a wafer. Lets a bad die be kept out of the stack, at the cost of throughput and alignment.',
+  },
+  DCTV: {
+    full: 'Daisy Chain Test Vehicle',
+    group: 'pkg',
+    note: 'Dummy dies and interposer whose bumps and TSVs are wired in series, assembled through the real process so continuity and resistance prove the assembly before product silicon exists.',
+  },
+  F2B: {
+    full: 'Face-to-Back',
+    group: 'process',
+    note: 'A stacking orientation where the front of one die bonds to the thinned back of the other, so signals cross through TSVs.',
+  },
+  F2F: {
+    full: 'Face-to-Face',
+    group: 'process',
+    note: 'A stacking orientation where the two dies bond front to front. The shortest inter-die path, but only one die can reach the package without TSVs.',
+  },
+  HB: {
+    full: 'Hybrid Bonding',
+    group: 'process',
+    note: 'A direct copper-to-copper and oxide-to-oxide bond with no solder. Pitches under ten microns, and a surface that has to be nearly perfect.',
+  },
+  'IEEE 1838': {
+    full: 'IEEE Standard for Test Access Architecture for Three-Dimensional Stacked ICs',
+    group: 'test',
+    note: 'The die wrapper and serial and parallel ports that let a tester reach a die buried inside a stack.',
+  },
+  KGS: {
+    full: 'Known Good Stack',
+    group: 'test',
+    note: 'An assembled stack that has passed the tests proving its dies and the bonds between them. What ships, rather than dies that were good before bonding.',
+  },
+  KOZ: {
+    full: 'Keep-Out Zone',
+    group: 'design',
+    note: 'The area around a TSV or bond feature where devices may not be placed, because the stress it causes shifts their behaviour.',
+  },
+  TCB: {
+    full: 'Thermo-Compression Bonding',
+    group: 'process',
+    note: 'Bonding micro-bumps with heat and force applied through the die. Finer pitch than mass reflow, and slower.',
+  },
+  TCT: {
+    full: 'Temperature Cycling Test',
+    group: 'qual',
+    note: 'Repeated swings between temperature extremes. The stress that finds a weak bond, because every cycle works the CTE mismatch.',
+  },
+  W2W: {
+    full: 'Wafer-to-Wafer bonding',
+    group: 'process',
+    note: 'Whole wafers bonded before singulation. The best alignment and throughput, but a bad die on either wafer is stacked regardless.',
+  },
+};
 
 /* ---------- the profile ---------- */
 

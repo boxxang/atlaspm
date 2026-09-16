@@ -70,3 +70,18 @@ export interface ActivityDetail {
   links: DetailLinks;
   terms: string[];
 }
+
+/**
+ * A write-up authored beside a template's activities rather than generated
+ * with them: the prose only. Where the activity runs, its steps, what each step
+ * hands over and which deliverables it stands in relation to are already in the
+ * activity entry, so they are taken from there rather than written twice —
+ * `rel` supplies just the sentence for each relation the entry names.
+ */
+export type ActivityWriteUp = Omit<
+  ActivityDetail,
+  'stage' | 'window' | 'steps' | 'produces' | 'producedBy' | 'rel'
+> & {
+  /** Deliverable reference → the sentence explaining the relationship. */
+  rel: Record<string, string>;
+};

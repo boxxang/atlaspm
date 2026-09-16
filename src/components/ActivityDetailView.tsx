@@ -2,15 +2,15 @@
 
 import Link from 'next/link';
 import { useMemo, useState } from 'react';
+/* Titles, write-ups, terms and deliverables from both templates. */
 import {
-  activityGlossary,
-  detailDeliverables,
-  hasActivityDetail,
-  writtenActivities,
-} from '@/data/activityIndex';
-/* Titles from both templates; the write-ups, glossary and deliverables above
-   are the SoC corpus, which is the only one that has them. */
-import { ALL_ACTIVITY_TITLES as detailActivityTitles } from '@/data/builtins';
+  ALL_ACTIVITIES,
+  ALL_ACTIVITY_TITLES as detailActivityTitles,
+  ALL_DELIVERABLE_TITLES as detailDeliverables,
+  ALL_GLOSSARY as activityGlossary,
+  ALL_WRITTEN_ACTIVITIES,
+  hasWriteUp as hasActivityDetail,
+} from '@/data/builtins';
 import type { ActivityDetail, DetailStep } from '@/data/activityDetailTypes';
 import type { ProjectState } from '@/lib/projectState';
 import { addWeeks, computeSchedule, fmtDate, fmtW } from '@/lib/schedule';
@@ -165,8 +165,12 @@ export function ActivityDetailView({
   }, [detail.window]);
 
   /* The arrows walk the activities that have been written up, in ID order, and
-     wrap — the same set the stage's rows link into. */
-  const written = writtenActivities;
+     wrap — the same set the stage's rows link into, kept to the stages this
+     programme runs so an SoC programme is never walked into a stack stage. */
+  const written = useMemo(() => {
+    const runs = new Set(stages.map((s) => s.id));
+    return ALL_WRITTEN_ACTIVITIES.filter((id) => runs.has(ALL_ACTIVITIES[id]?.st));
+  }, [stages]);
   const at = written.indexOf(activityId);
   const prev = written[(at - 1 + written.length) % written.length];
   const next = written[(at + 1) % written.length];

@@ -16,6 +16,15 @@ import { activityRowId } from '@/lib/rowIds';
  * markup (<b>, <code>), and an ID sits inside it as often as beside it.
  */
 describe('activity references in a write-up', () => {
+  it('lifts a stack reference whose prefix carries a digit', () => {
+    expect(parseRich('the floorplan from 3DI-01 and the link from D2D-03')).toEqual([
+      { kind: 'text', text: 'the floorplan from ' },
+      { kind: 'ref', id: '3DI-01' },
+      { kind: 'text', text: ' and the link from ' },
+      { kind: 'ref', id: 'D2D-03' },
+    ]);
+  });
+
   it('splits an ID out of plain prose', () => {
     expect(parseRich('PPA targets from DEF-05')).toEqual([
       { kind: 'text', text: 'PPA targets from ' },

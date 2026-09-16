@@ -6,7 +6,7 @@ import { useEffect, useRef, useState } from 'react';
 import { attachmentUrl, formatBytes } from '@/lib/attachments';
 import { fmtDate, fmtDT, fromISO, toISO } from '@/lib/schedule';
 import { isStepLate, stepKey } from '@/lib/steps';
-import { detailActivityTitles } from '@/data/activityIndex';
+import { ALL_ACTIVITY_TITLES as detailActivityTitles } from '@/data/builtins';
 import { RISK_AUTHOR } from '@/data/riskSeeds';
 import { useAppStore } from '@/store/useAppStore';
 import { useRailStore } from '@/store/railStore';

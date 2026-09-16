@@ -68,6 +68,36 @@ test.describe('the 3DIC template', () => {
     await expect(steps.first()).toContainText('continuity measurement');
   });
 
+  /* The stack activities used to arrive with steps and nothing else: no output
+     beside a step, no tag on a deliverable, and a 404 behind every write-up
+     link. They show what every SoC activity shows. */
+  test('gives the stack activities outputs, deliverable tags and write-ups', async ({ page }) => {
+    const id = await newProgram(page, 'AtlasStack3', 'threeDic');
+
+    await page.goto(`/p/${id}/stage/dctv/activity`);
+    const doe = page.locator('[data-act="DCTV-04"]');
+    await expect(doe).toContainText('DCTV-D4');
+    await doe.click();
+    const outputs = page.locator('[data-step^="DCTV-04:"] [data-col="Output"]');
+    await expect(outputs).toHaveCount(5);
+    await expect(outputs.first()).toContainText('Assembly DOE matrix');
+    await expect(outputs.nth(2)).toContainText('X-ray and CSAM inspection results');
+
+    await page.goto(`/p/${id}/stage/dctv/deliverables`);
+    const rows = page.locator('[data-board] [data-deliverable]');
+    await expect(rows).toHaveCount(8);
+    await expect(rows.first()).toContainText('DCTV-D1');
+    await expect(rows.last()).toContainText('DCTV-D8');
+
+    await page.goto(`/p/${id}/activity/DCTV-04`);
+    await expect(page.locator('.ad-title')).toHaveText('OSAT Assembly DOE on the Daisy Chain Vehicle');
+    await expect(page.locator('.ad-steps li')).toHaveCount(5);
+
+    /* the stack stage whose prefix opens with a digit is written up as well */
+    await page.goto(`/p/${id}/activity/3DI-03`);
+    await expect(page.locator('.ad-title')).toHaveText('Inter-Die Timing Budget and Closure');
+  });
+
   test('leaves the SoC template able to start a programme of 23 stages', async ({ page }) => {
     await newProgram(page, 'AtlasSoc1', 'typicalSoC');
     await expect(stagesLink(page)).toContainText('23');

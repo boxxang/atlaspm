@@ -1,6 +1,7 @@
 import { notFound } from 'next/navigation';
 import { ActivityDetailView } from '@/components/ActivityDetailView';
 import { activityDetail } from '@/data/activityDetails';
+import { threeDicDetail } from '@/data/threeDicDetails';
 import { getProjectState } from '@/lib/queries';
 
 /**
@@ -18,7 +19,7 @@ export default async function ActivityPage({
 }: PageProps<'/p/[projectId]/activity/[activityId]'>) {
   const { projectId, activityId } = await params;
   const id = decodeURIComponent(activityId).toUpperCase();
-  const detail = activityDetail(id);
+  const detail = activityDetail(id) ?? threeDicDetail(id);
   if (!detail) notFound();
 
   const project = await getProjectState(projectId);

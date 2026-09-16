@@ -23,10 +23,12 @@ export type RichNode =
   | { kind: 'tag'; tag: RichTag; children: RichNode[] };
 
 /**
- * DEF-01, PKGD-11 — the row IDs of /lib/rowIds.ts. Two digits, all caps, so a
- * deliverable (DEF-D1) and a part number (PCIe-16) are both left alone.
+ * DEF-01, PKGD-11, 3DI-04, D2D-02 — the row IDs of /lib/rowIds.ts. Two digits,
+ * all caps, so a deliverable (DEF-D1) and a part number (PCIe-16) are both left
+ * alone. A prefix may carry digits after its first letter (D2D) or open with
+ * one (3DI), as the stack stages' do.
  */
-const REF = /\b[A-Z]{2,5}-\d{2}\b/g;
+const REF = /\b\d?[A-Z][A-Z0-9]{1,4}-\d{2}\b/g;
 
 const isTag = (name: string): name is RichTag => (TAGS as readonly string[]).includes(name);
 
