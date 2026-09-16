@@ -21,10 +21,12 @@ import type { ProjectSummary } from '@/lib/queries';
 import { computeSchedule, fmtDate, fromISO, startOfDay, toISO, type Schedule } from '@/lib/schedule';
 
 
+import { EditProgramDialog } from './EditProgramDialog';
 import {
   Avatar,
   IconEmptyList,
   IconFilter,
+  IconPencil,
   IconPlus,
   IconSearch,
   IconSort,
@@ -153,6 +155,9 @@ function ProgramTable({
   onSort: (k: SortKey) => void;
 }) {
   const [adding, setAdding] = useState(false);
+  /* The program whose name, kickoff and plan are being edited. */
+  const [editing, setEditing] = useState<ProjectSummary | null>(null);
+  const router = useRouter();
   const filterLabel = FILTERS.find((f) => f.key === filter)!.label;
   const sortLabel = SORTS.find((o) => o.key === sort)!.label;
 
@@ -215,12 +220,32 @@ function ProgramTable({
       </div>
 
       {projects.map((p) => (
-        <ProgramRow key={p.id} p={p} on={p.id === picked} onPick={() => onPick(p.id)} />
+        <ProgramRow
+          key={p.id}
+          p={p}
+          on={p.id === picked}
+          onPick={() => onPick(p.id)}
+          onEdit={() => setEditing(p)}
+        />
       ))}
 
       {/* The dialog is in the top layer, so the row it was launched from stays
           where it was rather than being replaced by it. */}
       {adding && <NewProgramDialog profiles={profiles} onClose={() => setAdding(false)} />}
+      {editing && (
+        <EditProgramDialog
+          key={editing.id}
+          projectId={editing.id}
+          profileId={editing.profile.id}
+          name={editing.name}
+          kickoff={editing.kickoff}
+          onClose={() => setEditing(null)}
+          onSaved={() => {
+            setEditing(null);
+            router.refresh();
+          }}
+        />
+      )}
       {
         <button
           type="button"
@@ -427,7 +452,17 @@ function useProgramFigures(p: ProjectSummary) {
   return { today, schedule, overdue, inFlight };
 }
 
-function ProgramRow({ p, on, onPick }: { p: ProjectSummary; on: boolean; onPick: () => void }) {
+function ProgramRow({
+  p,
+  on,
+  onPick,
+  onEdit,
+}: {
+  p: ProjectSummary;
+  on: boolean;
+  onPick: () => void;
+  onEdit: () => void;
+}) {
   const { today, schedule, overdue, inFlight } = useProgramFigures(p);
   const shortOf = (key: string) => p.profile.stages.find((s) => s.key === key)?.shortTitle ?? key;
   const risky = new Set(p.riskyStages);
@@ -453,6 +488,22 @@ function ProgramRow({ p, on, onPick }: { p: ProjectSummary; on: boolean; onPick:
       <span style={{ minWidth: 0 }}>
         <span style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
           <b style={{ fontSize: 14.5 }}>{p.name}</b>
+          {/* The row is a link, so the pencil has to say it is not part of it:
+              editing a program is not opening it. */}
+          <button
+            type="button"
+            className="rowpen"
+            data-edit-program={p.id}
+            aria-label={`Edit ${p.name}`}
+            title="Edit name, kickoff and stages"
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              onEdit();
+            }}
+          >
+            <IconPencil />
+          </button>
           {p.edited && (
             <span className="pill warn" style={{ fontSize: 10.5 }}>
               Edited
@@ -1024,7 +1075,7 @@ function NewProgramDialog({
  * three-year program does not say which of its dates it is, and the answer now
  * changes depending on what the program is aligned to.
  */
-function Field({
+export function Field({
   label,
   hint,
   count,

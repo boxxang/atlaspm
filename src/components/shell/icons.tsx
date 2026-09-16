@@ -116,6 +116,13 @@ export const IconPlus = ({ light = false, size = 12 }: { light?: boolean; size?:
   </S>
 );
 
+export const IconPencil = () => (
+  <S size={12} stroke="#62666d" width={2}>
+    <path d="M4 20h4L18.5 9.5l-4-4L4 16v4z" />
+    <path d="M13.5 6.5l4 4" />
+  </S>
+);
+
 export const IconFilter = () => (
   <S size={12} stroke="#62666d" width={2}>
     <path d="M3 6h18M7 12h10M11 18h2" />

@@ -920,6 +920,133 @@ export async function saveProfileStages(input: {
 }
 
 
+export interface ActivityInput {
+  ref: string;
+  title: string;
+  windowFrom: number;
+  windowTo: number;
+  baseRef: string | null;
+  steps: { n: number; text: string; tat: number; lane: string }[];
+}
+
+/** What a stage's activities have to be before either editor writes them. */
+function assertActivities(activities: readonly ActivityInput[]) {
+  const refs = new Set<string>();
+  for (const a of activities) {
+    if (!a.title.trim()) throw new Error('Every activity needs a title.');
+    if (refs.has(a.ref)) throw new Error(`Duplicate activity: ${a.ref}`);
+    refs.add(a.ref);
+    if (a.windowTo <= a.windowFrom) throw new Error(`${a.ref} has to end after it starts.`);
+    if (!a.baseRef && !a.steps.length) {
+      throw new Error(`${a.ref} needs at least one step.`);
+    }
+  }
+}
+
+/**
+ * Replace one stage's activities on a profile.
+ *
+ * Editing any step of an inherited activity materialises all of them: the row
+ * drops its baseRef and owns every step from then on. An activity is inherited
+ * or owned, never half of each, so nothing downstream has to consult two
+ * sources for one activity.
+ */
+const writeActivities = (profileId: string, stageKey: string, activities: readonly ActivityInput[]) =>
+  prisma.$transaction([
+    prisma.profileActivity.deleteMany({ where: { profileId, stageKey } }),
+    ...activities.map((a, order) =>
+      prisma.profileActivity.create({
+        data: {
+          id: `${profileId}:act:${a.ref}`,
+          profileId,
+          stageKey,
+          ref: a.ref,
+          order,
+          title: a.title.trim(),
+          windowFrom: a.windowFrom,
+          windowTo: a.windowTo,
+          baseRef: a.baseRef,
+          steps: a.baseRef
+            ? undefined
+            : {
+                create: a.steps.map((st, i) => ({
+                  id: `${profileId}:act:${a.ref}:${i + 1}`,
+                  n: i + 1,
+                  text: st.text.trim(),
+                  tat: st.tat,
+                  lane: st.lane === 'par' ? 'par' : 'main',
+                })),
+              },
+        },
+      }),
+    ),
+  ]);
+
+/**
+ * Rewrite one stage's activities on one program.
+ *
+ * The program half of `saveTemplateActivities`, and it exists for the same
+ * reason `saveProjectStages` is not `saveProfileStages`: editing what a
+ * program runs is about that program. A program sharing its profile — the
+ * built-in one, or a template two programs started from — gets a private copy
+ * first, stages and activities both, so nobody else's work is rewritten.
+ *
+ * The plan it edits is the program's own from then on; the template it came
+ * from is untouched, which is the blueprint rule.
+ */
+export async function saveProjectActivities(input: {
+  projectId: string;
+  /** Id to mint a profile under, when this edit needs one of its own. */
+  newProfileId: string;
+  stageKey: string;
+  activities: ActivityInput[];
+}): Promise<{ profileId: string }> {
+  const project = await prisma.project.findUnique({
+    where: { id: input.projectId },
+    select: { id: true, name: true, profileId: true },
+  });
+  if (!project) throw new Error(`No such program: ${input.projectId}`);
+  assertActivities(input.activities);
+
+  const current = await loadProfile(project.profileId);
+  const others = await prisma.project.count({
+    where: { profileId: current.id, id: { not: project.id } },
+  });
+  const isPrivate = !current.builtin && !current.template && others === 0;
+  const profileId = isPrivate ? current.id : input.newProfileId;
+
+  if (!isPrivate) {
+    await prisma.profile.create({
+      data: {
+        id: profileId,
+        name: `${project.name} stages`,
+        builtin: false,
+        template: false,
+        stages: {
+          create: current.stages.map((st) => ({
+            id: `${profileId}:${st.key}`,
+            key: st.key,
+            order: st.order,
+            title: st.title,
+            shortTitle: st.shortTitle,
+            phaseId: st.phaseId,
+            baseKey: st.baseKey,
+            startOffsetWeeks: st.startOffsetWeeks,
+            durationWeeks: st.durationWeeks,
+          })),
+        },
+      },
+    });
+    await copyActivities(current.id, profileId);
+    await prisma.project.update({ where: { id: project.id }, data: { profileId } });
+  }
+
+  await writeActivities(profileId, input.stageKey, input.activities);
+  touch(project.id);
+  revalidatePath('/');
+  return { profileId };
+}
+
 /**
  * Rewrite one stage's activities in a template.
  *
@@ -931,14 +1058,7 @@ export async function saveProfileStages(input: {
 export async function saveTemplateActivities(input: {
   profileId: string;
   stageKey: string;
-  activities: {
-    ref: string;
-    title: string;
-    windowFrom: number;
-    windowTo: number;
-    baseRef: string | null;
-    steps: { n: number; text: string; tat: number; lane: string }[];
-  }[];
+  activities: ActivityInput[];
 }): Promise<void> {
   const profile = await prisma.profile.findUnique({
     where: { id: input.profileId },
@@ -949,48 +1069,8 @@ export async function saveTemplateActivities(input: {
     throw new Error('The built-in template is read-only. Duplicate it to make changes.');
   }
 
-  const refs = new Set<string>();
-  for (const a of input.activities) {
-    if (!a.title.trim()) throw new Error('Every activity needs a title.');
-    if (refs.has(a.ref)) throw new Error(`Duplicate activity: ${a.ref}`);
-    refs.add(a.ref);
-    if (a.windowTo <= a.windowFrom) throw new Error(`${a.ref} has to end after it starts.`);
-    if (!a.baseRef && !a.steps.length) {
-      throw new Error(`${a.ref} needs at least one step.`);
-    }
-  }
-
-  await prisma.$transaction([
-    prisma.profileActivity.deleteMany({
-      where: { profileId: profile.id, stageKey: input.stageKey },
-    }),
-    ...input.activities.map((a, order) =>
-      prisma.profileActivity.create({
-        data: {
-          id: `${profile.id}:act:${a.ref}`,
-          profileId: profile.id,
-          stageKey: input.stageKey,
-          ref: a.ref,
-          order,
-          title: a.title.trim(),
-          windowFrom: a.windowFrom,
-          windowTo: a.windowTo,
-          baseRef: a.baseRef,
-          steps: a.baseRef
-            ? undefined
-            : {
-                create: a.steps.map((st, i) => ({
-                  id: `${profile.id}:act:${a.ref}:${i + 1}`,
-                  n: i + 1,
-                  text: st.text.trim(),
-                  tat: st.tat,
-                  lane: st.lane === 'par' ? 'par' : 'main',
-                })),
-              },
-        },
-      }),
-    ),
-  ]);
+  assertActivities(input.activities);
+  await writeActivities(profile.id, input.stageKey, input.activities);
   revalidatePath('/');
   revalidatePath('/templates');
 }
