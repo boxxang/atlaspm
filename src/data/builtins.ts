@@ -31,6 +31,12 @@ import {
   THREE_DIC_PROFILE,
   THREE_DIC_STAGES,
 } from './threeDic';
+import {
+  TOP_DIE_ACTIVITIES,
+  TOP_DIE_ACTIVITY_TITLES,
+  TOP_DIE_DELIVERABLES,
+  TOP_DIE_STAGES,
+} from './threeDicTopDie';
 import type { JourneyStage, MilestoneDef, ScheduleProfile } from './types';
 
 /** Every template the app ships, in the order the pickers list them. */
@@ -46,16 +52,22 @@ export const BUILTIN_PROFILES: readonly ScheduleProfile[] = [BUILTIN_PROFILE, TH
 export const ALL_ACTIVITIES: Record<string, ActivityStepEntry> = {
   ...activitySteps,
   ...THREE_DIC_ACTIVITIES,
+  ...TOP_DIE_ACTIVITIES,
 };
 
 /** Their titles, from the same two sources. */
 export const ALL_ACTIVITY_TITLES: Record<string, string> = {
   ...detailActivityTitles,
   ...THREE_DIC_ACTIVITY_TITLES,
+  ...TOP_DIE_ACTIVITY_TITLES,
 };
 
 /** Every stage's content, by the key a profile stage points at with `baseKey`. */
-export const ALL_STAGE_CONTENT: readonly JourneyStage[] = [...journeyData, ...THREE_DIC_STAGES];
+export const ALL_STAGE_CONTENT: readonly JourneyStage[] = [
+  ...journeyData,
+  ...THREE_DIC_STAGES,
+  ...TOP_DIE_STAGES,
+];
 
 /** The checkpoints of both templates; a profile keeps the ones it runs. */
 export const ALL_MILESTONES: readonly MilestoneDef[] = [...milestoneDefs, ...THREE_DIC_MILESTONES];
@@ -71,6 +83,7 @@ export const stageContent = (key: string | null | undefined): JourneyStage | und
 export const ALL_DELIVERABLE_TITLES: Record<string, string> = {
   ...detailDeliverables,
   ...THREE_DIC_DELIVERABLES,
+  ...TOP_DIE_DELIVERABLES,
 };
 
 /** The terms a write-up may offer to explain, from both corpora. */
@@ -80,13 +93,15 @@ export const ALL_GLOSSARY: Record<string, GlossaryTerm> = {
 };
 
 /**
- * Every activity with a write-up, SoC first and then the stack's, each in the
- * order its template runs them. Every 3DIC activity is written up — a test
- * holds that — so the list is its keys rather than a second copy of them.
+ * Every activity with a write-up: the SoC's, the stack's, then the top die's,
+ * each in the order its template runs them. Every 3DIC activity is written up
+ * and every top-die one derives its write-up from an SoC one — tests hold both
+ * — so the lists are their keys rather than second copies of them.
  */
 export const ALL_WRITTEN_ACTIVITIES: readonly string[] = [
   ...writtenActivities,
   ...Object.keys(THREE_DIC_ACTIVITIES),
+  ...Object.keys(TOP_DIE_ACTIVITIES),
 ];
 
 const WRITTEN = new Set(ALL_WRITTEN_ACTIVITIES);

@@ -11,6 +11,7 @@ import { activitySteps } from '@/data/activitySteps';
 import { journeyData } from '@/data/journey';
 import { BUILTIN_PROFILE, milestoneDefs } from '@/data/scheduleProfiles';
 import { THREE_DIC_ACTIVITIES, THREE_DIC_PROFILE, THREE_DIC_STAGE_KEYS } from '@/data/threeDic';
+import { TOP_DIE_ACTIVITIES, TOP_DIE_SPLIT } from '@/data/threeDicTopDie';
 
 /**
  * The templates the app ships and the content they resolve against.
@@ -46,7 +47,9 @@ describe('the templates that ship', () => {
 
   it('holds every activity of both, titled, with no reference claimed twice', () => {
     expect(Object.keys(ALL_ACTIVITIES)).toHaveLength(
-      Object.keys(activitySteps).length + Object.keys(THREE_DIC_ACTIVITIES).length,
+      Object.keys(activitySteps).length +
+        Object.keys(THREE_DIC_ACTIVITIES).length +
+        Object.keys(TOP_DIE_ACTIVITIES).length,
     );
     for (const ref of Object.keys(ALL_ACTIVITIES)) {
       expect(ALL_ACTIVITY_TITLES[ref], `${ref} has no title`).toBeTruthy();
@@ -65,6 +68,10 @@ describe('the templates that ship', () => {
     for (const [ref, a] of Object.entries(THREE_DIC_ACTIVITIES)) {
       expect(THREE_DIC_STAGE_KEYS, ref).toContain(a.st);
     }
+    /* and the top die's only in the top die's */
+    for (const [ref, a] of Object.entries(TOP_DIE_ACTIVITIES)) {
+      expect(TOP_DIE_SPLIT.map((t) => t.key), ref).toContain(a.st);
+    }
   });
 
   it('carries both templates’ checkpoints, each anchored to a stage that exists', () => {
@@ -75,7 +82,7 @@ describe('the templates that ship', () => {
   });
 
   it('keeps the stage content of both, without losing journey’s', () => {
-    expect(ALL_STAGE_CONTENT.length).toBe(journeyData.length + THREE_DIC_STAGE_KEYS.length);
+    expect(ALL_STAGE_CONTENT.length).toBe(journeyData.length + THREE_DIC_STAGE_KEYS.length + TOP_DIE_SPLIT.length);
     for (const s of journeyData) expect(stageContent(s.id)).toBe(s);
   });
 });

@@ -19,6 +19,7 @@
 import type { ActivityStepEntry } from './activitySteps';
 import { journeyData } from './journey';
 import { BASELINES, PHASE_OF, STAGE_ORDER } from './scheduleProfiles';
+import { TOP_DIE_SPLIT, TOP_DIE_STAGES } from './threeDicTopDie';
 import type { JourneyStage, MilestoneDef, ProfileStageDef, ScheduleProfile } from './types';
 
 /** The SoC stages a 3DIC programme still runs, unchanged. */
@@ -39,6 +40,8 @@ const PHASE_OF_3DIC: Record<string, string> = {
   threeDIntegration: 'implement',
   /* Sorting is a manufacturing step; testing the assembled stack is ramp. */
   kgdSort: 'manufacture',
+  /* Bonding the product is a manufacturing run, between sort and assembly. */
+  stackBonding: 'manufacture',
   multiDieTest: 'validateRamp',
 };
 
@@ -54,6 +57,7 @@ export const THREE_DIC_STAGE_KEYS = [
   'dctv',
   'threeDIntegration',
   'kgdSort',
+  'stackBonding',
   'multiDieTest',
 ] as const;
 
@@ -72,12 +76,49 @@ export const THREE_DIC_BASELINES: Record<string, { startOffsetWeeks: number; dur
      process window is what the first product build runs to. */
   dctv: { startOffsetWeeks: 30, durationWeeks: 34 },
   /* The stack's own floorplan, power, timing, thermal and warpage work, run
-     alongside each die's physical design. */
-  threeDIntegration: { startOffsetWeeks: 46, durationWeeks: 26 },
-  /* Dies are sorted before they are stacked. */
-  kgdSort: { startOffsetWeeks: 70, durationWeeks: 16 },
-  /* And tested once they are, through each other. */
-  multiDieTest: { startOffsetWeeks: 84, durationWeeks: 30 },
+     alongside each die's physical design — and its signoff, which waits for
+     both dies' signoff and gates both tapeouts. */
+  threeDIntegration: { startOffsetWeeks: 46, durationWeeks: 40 },
+  /* Dies are sorted before they are stacked: the criteria and the sort program
+     are written while the wafers are in the fab, the binning starts when the
+     bottom die's wafers ship, and the release follows the top die's. */
+  kgdSort: { startOffsetWeeks: 102, durationWeeks: 16 },
+  /* Known-good dies are bonded into stacks, and the bottom die's TSVs revealed
+     from the back, before the package takes the stack. */
+  stackBonding: { startOffsetWeeks: 116, durationWeeks: 8 },
+  /* And tested once they are, through each other: the strategy is set before
+     bonding, and the link is brought up on the first bonded stacks. */
+  multiDieTest: { startOffsetWeeks: 114, durationWeeks: 30 },
+};
+
+/**
+ * Where the SoC stages run in a 3DIC program. They are the bottom die, and a
+ * bottom die waits on the stack: its floorplan follows the 3D floorplan, its
+ * tapeout follows the stack signoff, and everything after fabrication waits on
+ * dies being sorted and bonded. Moved, never stretched — a stretched stage
+ * keeps its activities and ends in weeks of nothing.
+ */
+const SOC_IN_3DIC: Record<string, { startOffsetWeeks: number; durationWeeks: number }> = {
+  ...BASELINES,
+  physicalDesign: { startOffsetWeeks: 50, durationWeeks: 30 },
+  signoff: { startOffsetWeeks: 66, durationWeeks: 16 },
+  tapeout: { startOffsetWeeks: 86, durationWeeks: 8 },
+  fabrication: { startOffsetWeeks: 90, durationWeeks: 19 },
+  testDevelopment: { startOffsetWeeks: 62, durationWeeks: 42 },
+  packaging: { startOffsetWeeks: 99, durationWeeks: 31 },
+  bringup: { startOffsetWeeks: 129, durationWeeks: 18 },
+  qualification: { startOffsetWeeks: 133, durationWeeks: 26 },
+};
+
+/** The top die runs two weeks behind the bottom one, which carries the TSVs. */
+const TOP_DIE_BASELINES: Record<string, { startOffsetWeeks: number; durationWeeks: number }> = {
+  dftTop: { startOffsetWeeks: 20, durationWeeks: 60 },
+  synthesisTop: { startOffsetWeeks: 44, durationWeeks: 24 },
+  physicalDesignTop: { startOffsetWeeks: 52, durationWeeks: 30 },
+  signoffTop: { startOffsetWeeks: 68, durationWeeks: 16 },
+  tapeoutTop: { startOffsetWeeks: 88, durationWeeks: 8 },
+  fabricationTop: { startOffsetWeeks: 92, durationWeeks: 19 },
+  testDevelopmentTop: { startOffsetWeeks: 64, durationWeeks: 42 },
 };
 
 export const THREE_DIC_MILESTONES: readonly MilestoneDef[] = [
@@ -87,7 +128,15 @@ export const THREE_DIC_MILESTONES: readonly MilestoneDef[] = [
   { id: 'dctvAssemblySignoff', label: 'DCTV Assembly Signoff', anchor: { stage: 'dctv', at: 'end' }, major: true },
   { id: 'stackSignoff', label: '3D Stack Signoff', anchor: { stage: 'threeDIntegration', at: 'end' } },
   { id: 'kgdReady', label: 'KGD Ready', anchor: { stage: 'kgdSort', at: 'end' } },
+  { id: 'stackBonded', label: 'Stack Bonded', anchor: { stage: 'stackBonding', at: 'end' }, major: true },
   { id: 'knownGoodStack', label: 'Known Good Stack', anchor: { stage: 'multiDieTest', at: 'end' } },
+  { id: 'topDieTapeout', label: 'Top Die Tapeout', anchor: { stage: 'tapeoutTop', at: 'end' }, major: true },
+  {
+    id: 'topDieFirstSilicon',
+    label: 'Top Die First Silicon',
+    anchor: { stage: 'fabricationTop', at: 'end' },
+    major: true,
+  },
 ];
 
 /* ---------- activities ---------- */
@@ -658,7 +707,7 @@ export const THREE_DIC_ACTIVITIES: Record<string, ActivityStepEntry> = {
   ),
   '3DI-06': act(
     'threeDIntegration',
-    [18, 26],
+    [30, 40],
     'Signoff lead',
     [
       [1, 'Run multi-die static timing on the assembled netlists', 2.5],
@@ -747,6 +796,60 @@ export const THREE_DIC_ACTIVITIES: Record<string, ActivityStepEntry> = {
       'Known-good die release record',
     ],
     [['KGD-D4', 'produces']],
+  ),
+
+  /* --- product stack bonding --- */
+  'STK-01': act(
+    'stackBonding',
+    [0, 3],
+    'Stack integration engineer',
+    [
+      [1, 'Confirm the bond recipe against the frozen process window', 0.5],
+      [2, 'Plan the die pairing and bond sequence from the binning plan', 0.5, 1],
+      [3, 'Prepare and plasma-activate the bonding surfaces of both dies', 0.5],
+      [4, 'Bond the known-good dies and run the bond anneal', 1.5],
+    ],
+    ['Bond recipe checked against the process window', 'Die pairing and bond sequence', 'Activated bonding surfaces on both dies', 'Bonded stack lots'],
+    [['STK-D1', 'produces'], ['STK-D4', 'feeds']],
+  ),
+  'STK-02': act(
+    'stackBonding',
+    [2, 4],
+    'Stack quality engineer',
+    [
+      [1, 'Scan the bonded stacks by CSAM for voids and delamination', 0.75],
+      [2, 'Measure bond overlay and alignment by IR metrology', 0.5, 1],
+      [3, 'X-ray the stacks for bond and TSV defects', 0.5],
+      [4, 'Disposition the stacks against the inspection limits', 0.75],
+    ],
+    ['CSAM void and delamination map', 'Bond overlay measurements', 'X-ray defect results', 'Post-bond inspection disposition'],
+    [['STK-D2', 'produces']],
+  ),
+  'STK-03': act(
+    'stackBonding',
+    [3, 7],
+    'Backside process engineer',
+    [
+      [1, 'Thin the bottom die substrate to the TSV reveal target', 1],
+      [2, 'Reveal the TSVs and passivate the backside', 1],
+      [3, 'Form the backside RDL and the package bumps', 1.5],
+      [4, 'Measure TSV resistance and bump coplanarity', 0.5],
+    ],
+    ['Thinned bottom die at the reveal target', 'Revealed and passivated TSVs', 'Backside RDL and package bumps', 'TSV resistance and bump coplanarity data'],
+    [['STK-D3', 'produces'], ['STK-D4', 'feeds']],
+  ),
+  'STK-04': act(
+    'stackBonding',
+    [6, 8],
+    'Operations planner',
+    [
+      [1, 'Dice the bonded wafers into stacks', 0.5],
+      [2, 'Link each stack to its top and bottom die records', 0.5, 1],
+      [3, 'Sort the stacks for assembly on the post-bond results', 0.5],
+      [4, 'Release the known-good stacks to package assembly', 1],
+    ],
+    ['Singulated stacks', 'Stack-to-die traceability records', 'Stack sort for assembly', 'Released stacks for package assembly'],
+    [['STK-D4', 'produces']],
   ),
 
   /* --- multi-die test and repair --- */
@@ -877,6 +980,10 @@ export const THREE_DIC_ACTIVITY_TITLES: Record<string, string> = {
   'KGD-02': 'Wafer Sort Program for Stacking',
   'KGD-03': 'Die Matching and Binning for Stack Pairing',
   'KGD-04': 'Thinned Wafer Handling and Die Release',
+  'STK-01': 'Product Hybrid Bonding Run on Known-Good Dies',
+  'STK-02': 'Post-Bond Inspection and Overlay Verification',
+  'STK-03': 'Backside Thinning, TSV Reveal and Backside RDL',
+  'STK-04': 'Stack Singulation, Traceability and Release to Assembly',
   'MDT-01': 'Post-Bond Test Strategy and Access Plan',
   'MDT-02': 'D2D Link BIST and Repair Bring-Up',
   'MDT-03': 'Stack-Level ATPG and Pattern Porting',
@@ -1086,7 +1193,7 @@ export const THREE_DIC_STAGES: readonly ThreeDicStage[] = [
       '3D stack signoff package',
     ],
     deliverableFrom: [0, 1, 2, 3, 4, 5],
-    deliverableWeek: [8, 12, 18, 20, 22, 26],
+    deliverableWeek: [8, 12, 18, 20, 22, 40],
     engineeringView: [
       '3D Floorplan, TSV and Bump Alignment',
       'Stack Power Delivery and IR Closure',
@@ -1095,9 +1202,9 @@ export const THREE_DIC_STAGES: readonly ThreeDicStage[] = [
       'Warpage and Stress Co-Analysis',
       'Multi-Die Signoff and Assembly DRC',
     ],
-    engineeringTat: [8, 8, 10, 10, 10, 8],
+    engineeringTat: [8, 8, 10, 10, 10, 10],
     engineeringEffort: [9, 8, 10, 8, 7, 9],
-    engineeringStart: [0, 4, 8, 10, 12, 18],
+    engineeringStart: [0, 4, 8, 10, 12, 30],
     risks: ['Inter-die timing closed on one die’s assumptions', 'Thermal limit found after floorplan freeze'],
     potentialRisks: [
       'Each die signed off alone and the stack signed off by addition',
@@ -1150,8 +1257,47 @@ export const THREE_DIC_STAGES: readonly ThreeDicStage[] = [
     perspective: 'A short engineering or program-management insight will appear here.',
   },
   {
-    id: 'multiDieTest',
+    id: 'stackBonding',
     stage: 30,
+    title: 'Product Stack Bonding',
+    shortTitle: 'STK',
+    tagline: 'Join the dies that sorted good, and prove the joint before it is packaged.',
+    description:
+      'Bond the product: known-good top and bottom dies joined in the process window the vehicle froze, inspected for voids and overlay, thinned to reveal the bottom die’s TSVs, given their backside redistribution and bumps, and released to package assembly as stacks that can be traced back to both dies.',
+    activities: ['Bonding run', 'Post-bond inspection', 'Backside and TSV reveal', 'Release to assembly'],
+    deliverables: [
+      'Bonded product stack lots',
+      'Post-bond inspection report',
+      'Backside-processed stack wafers',
+      'Stack release record for package assembly',
+    ],
+    deliverableFrom: [0, 1, 2, 3],
+    deliverableWeek: [3, 4, 7, 8],
+    engineeringView: [
+      'Product Hybrid Bonding Run on Known-Good Dies',
+      'Post-Bond Inspection and Overlay Verification',
+      'Backside Thinning, TSV Reveal and Backside RDL',
+      'Stack Singulation, Traceability and Release to Assembly',
+    ],
+    engineeringTat: [3, 2, 4, 2],
+    engineeringEffort: [6, 3, 6, 3],
+    engineeringStart: [0, 2, 3, 6],
+    risks: ['Bond yield below the vehicle’s', 'TSV reveal damage found after RDL'],
+    potentialRisks: [
+      'Bonding run started before both dies’ KGD data is in',
+      'Surface contamination between activation and bond',
+      'Voids found by CSAM with no rule for what to scrap',
+      'Traceability from stack to die lost at dicing',
+    ],
+    leader: leaderOf('Ji-won Seo', 'J. Seo', '0519', 'jiwon.seo@example.com'),
+    collaboration: ['Foundry', 'OSAT', 'Product engineering', 'Quality'],
+    tools: ['Hybrid bonders', 'CSAM, X-ray and IR metrology', 'Backside grind and CMP'],
+    programView: ['Stack bonding yield', 'Stacks released to assembly', 'Post-bond inspection escapes'],
+    perspective: 'A short engineering or program-management insight will appear here.',
+  },
+  {
+    id: 'multiDieTest',
+    stage: 31,
     title: 'Multi-Die Test & Repair',
     shortTitle: 'MDT',
     tagline: 'Test a part whose dies can only be reached through each other.',
@@ -1297,22 +1443,40 @@ const stackStage = (key: string, order: number): ProfileStageDef => {
   };
 };
 
+const SPLIT_BASES = new Set<string>(TOP_DIE_SPLIT.map((s) => s.base));
+
 const socStage = (key: string, order: number): ProfileStageDef => {
   const content = journeyData.find((s) => s.id === key)!;
   return {
     key,
     order,
-    title: content.title,
+    title: SPLIT_BASES.has(key) ? `${content.title} — Bottom Die` : content.title,
     shortTitle: content.shortTitle,
     phaseId: PHASE_OF_3DIC[key],
     baseKey: key,
-    ...BASELINES[key],
+    ...SOC_IN_3DIC[key],
+  };
+};
+
+const topDieStage = (key: string, order: number): ProfileStageDef => {
+  const split = TOP_DIE_SPLIT.find((s) => s.key === key)!;
+  const content = TOP_DIE_STAGES.find((s) => s.id === key)!;
+  return {
+    key,
+    order,
+    title: content.title,
+    shortTitle: content.shortTitle,
+    phaseId: PHASE_OF[split.base],
+    baseKey: key,
+    ...TOP_DIE_BASELINES[key],
   };
 };
 
 /**
- * The SoC stages and the stack ones, ordered by when they start — the order is
- * the chart's y-axis, so a reader scanning down reads the programme forwards.
+ * The SoC stages as the bottom die, the top die's, and the stack's own, ordered
+ * by when they start — the order is the chart's y-axis, so a reader scanning
+ * down reads the program forwards. The seven stages done once per chip carry
+ * "— Bottom Die" here and nowhere else; an SoC program's titles are its own.
  */
 export const THREE_DIC_PROFILE: ScheduleProfile = {
   id: 'threeDic',
@@ -1320,13 +1484,12 @@ export const THREE_DIC_PROFILE: ScheduleProfile = {
   builtin: true,
   template: true,
   stages: [
-    ...SOC_STAGE_KEYS.map((key) => ({ key, ...BASELINES[key] })),
-    ...THREE_DIC_STAGE_KEYS.map((key) => ({ key, ...THREE_DIC_BASELINES[key] })),
+    ...SOC_STAGE_KEYS.map((key) => ({ key, kind: 'soc' as const, ...SOC_IN_3DIC[key] })),
+    ...TOP_DIE_SPLIT.map(({ key }) => ({ key, kind: 'top' as const, ...TOP_DIE_BASELINES[key] })),
+    ...THREE_DIC_STAGE_KEYS.map((key) => ({ key, kind: 'stack' as const, ...THREE_DIC_BASELINES[key] })),
   ]
     .sort((a, b) => a.startOffsetWeeks - b.startOffsetWeeks)
-    .map(({ key }, order) =>
-      (THREE_DIC_STAGE_KEYS as readonly string[]).includes(key)
-        ? stackStage(key, order)
-        : socStage(key, order),
+    .map(({ key, kind }, order) =>
+      kind === 'soc' ? socStage(key, order) : kind === 'top' ? topDieStage(key, order) : stackStage(key, order),
     ),
 };

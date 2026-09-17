@@ -18,6 +18,7 @@ import { KGD_WRITE_UPS } from './threeDicWriteUps/kgd';
 import { MDT_WRITE_UPS } from './threeDicWriteUps/mdt';
 import { PART_WRITE_UPS } from './threeDicWriteUps/part';
 import { STACK_WRITE_UPS } from './threeDicWriteUps/stack';
+import { STK_WRITE_UPS } from './threeDicWriteUps/stk';
 
 export const THREE_DIC_WRITE_UPS: Record<string, ActivityWriteUp> = {
   ...PART_WRITE_UPS,
@@ -26,6 +27,7 @@ export const THREE_DIC_WRITE_UPS: Record<string, ActivityWriteUp> = {
   ...DCTV_WRITE_UPS,
   ...STACK_WRITE_UPS,
   ...KGD_WRITE_UPS,
+  ...STK_WRITE_UPS,
   ...MDT_WRITE_UPS,
 };
 

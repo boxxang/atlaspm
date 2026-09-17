@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { activitySteps } from '@/data/activitySteps';
+import { ALL_ACTIVITIES, stageContent } from '@/data/builtins';
 import { detailActivityTitles } from '@/data/activityIndex';
 import { journeyData } from '@/data/journey';
 import { BUILTIN_PROFILE, milestoneDefs } from '@/data/scheduleProfiles';
@@ -11,6 +12,7 @@ import {
   THREE_DIC_STAGES,
   THREE_DIC_STAGE_KEYS,
 } from '@/data/threeDic';
+import { TOP_DIE_SPLIT, TOP_DIE_STAGES } from '@/data/threeDicTopDie';
 
 /**
  * The 3DIC template: a stacked-die programme.
@@ -45,7 +47,8 @@ describe('the 3DIC template', () => {
        all of it and more */
     for (const st of BUILTIN_PROFILE.stages) expect(keys, st.key).toContain(st.key);
     for (const key of THREE_DIC_STAGE_KEYS) expect(keys, key).toContain(key);
-    expect(keys.length).toBe(BUILTIN_PROFILE.stages.length + THREE_DIC_STAGE_KEYS.length);
+    for (const { key } of TOP_DIE_SPLIT) expect(keys, key).toContain(key);
+    expect(keys.length).toBe(BUILTIN_PROFILE.stages.length + TOP_DIE_SPLIT.length + THREE_DIC_STAGE_KEYS.length);
 
     const starts = THREE_DIC_PROFILE.stages.map((s) => s.startOffsetWeeks);
     expect([...starts].sort((a, b) => a - b)).toEqual(starts);
@@ -57,7 +60,7 @@ describe('the 3DIC template', () => {
 
   it('gives every stack stage its own content, and inherits the rest', () => {
     for (const st of THREE_DIC_PROFILE.stages) {
-      const own = THREE_DIC_STAGES.find((s) => s.id === st.key);
+      const own = [...THREE_DIC_STAGES, ...TOP_DIE_STAGES].find((s) => s.id === st.key);
       const inherited = journeyData.find((s) => s.id === st.baseKey);
       expect(own || inherited, `${st.key} shows nothing`).toBeTruthy();
       if (own) expect(st.baseKey, st.key).toBe(st.key);
@@ -135,26 +138,52 @@ describe('the 3DIC template', () => {
     const ids = new Set(milestoneDefs.map((m) => m.id));
     for (const m of THREE_DIC_MILESTONES) {
       expect(keys, m.id).toContain(m.anchor.stage);
-      expect(THREE_DIC_STAGE_KEYS, `${m.id} belongs to a stack stage`).toContain(m.anchor.stage);
+      expect(
+        [...THREE_DIC_STAGE_KEYS, ...TOP_DIE_SPLIT.map((t) => t.key)],
+        `${m.id} belongs to a stack or top-die stage`,
+      ).toContain(m.anchor.stage);
       expect(ids.has(m.id), `${m.id} collides with an SoC checkpoint`).toBe(false);
     }
     expect(THREE_DIC_MILESTONES.length).toBeGreaterThanOrEqual(4);
   });
 
-  it('starts every stack stage where the work it consumes exists', () => {
+  it('runs nothing before what it consumes exists', () => {
     const at = (key: string) => {
       const st = THREE_DIC_PROFILE.stages.find((s) => s.key === key)!;
       return { start: st.startOffsetWeeks, end: st.startOffsetWeeks + st.durationWeeks };
     };
-    /* partitioning is an architecture decision: it cannot follow the design it
-       decides the shape of */
+    const act = (ref: string) => {
+      const a = ALL_ACTIVITIES[ref];
+      const s = at(a.st);
+      return { start: s.start + a.w[0], end: s.start + a.w[1] };
+    };
     expect(at('chipletPartitioning').start).toBeLessThanOrEqual(at('rtl').start);
-    /* the bonding process has to be chosen before the stack is designed around it */
     expect(at('tsvHybridBond').start).toBeLessThanOrEqual(at('threeDIntegration').start);
-    /* the vehicle exists to be measured before the product is assembled */
-    expect(at('dctv').end).toBeLessThanOrEqual(at('packaging').end);
-    /* dies are sorted before they are stacked, and tested after */
-    expect(at('kgdSort').start).toBeLessThanOrEqual(at('packaging').start);
-    expect(at('multiDieTest').start).toBeGreaterThanOrEqual(at('kgdSort').start);
+    expect(at('dctv').end).toBeLessThanOrEqual(at('tapeout').start);
+    /* the stack is signed off once both dies are, and each die tapes out after */
+    expect(act('3DI-06').end).toBeGreaterThanOrEqual(Math.max(at('signoff').end, at('signoffTop').end));
+    expect(at('tapeout').start).toBeGreaterThanOrEqual(act('3DI-06').end);
+    expect(at('tapeoutTop').start).toBeGreaterThanOrEqual(act('3DI-06').end);
+    /* dies are binned once wafers ship, and released once both dies' have */
+    expect(act('KGD-03').start).toBeGreaterThanOrEqual(act('FAB-10').start);
+    expect(act('KGD-04').end).toBeGreaterThanOrEqual(act('FABT-10').end);
+    /* bonded from released dies, and bonded before the package takes the stack */
+    expect(act('STK-01').start).toBeGreaterThanOrEqual(act('KGD-04').start);
+    expect(at('stackBonding').end).toBeLessThanOrEqual(act('ASSY-05').start);
+    /* the link is brought up on a stack that exists */
+    expect(act('MDT-02').start).toBeGreaterThanOrEqual(act('STK-02').end);
+    /* and the program ends with qualification */
+    const end = Math.max(...THREE_DIC_PROFILE.stages.map((s) => s.startOffsetWeeks + s.durationWeeks));
+    expect(end).toBe(at('qualification').end);
+    expect(end).toBe(159);
+  });
+
+  it('costs about a third more than the SoC flow, not a few percent', () => {
+    const mm = (keys: readonly string[]) =>
+      keys.reduce((t, k) => t + stageContent(k)!.engineeringEffort.reduce((a, b) => a + b, 0), 0);
+    const soc = mm(BUILTIN_PROFILE.stages.map((s) => s.key));
+    const dic = mm(THREE_DIC_PROFILE.stages.map((s) => s.baseKey!));
+    expect(dic / soc).toBeGreaterThan(1.3);
+    expect(dic / soc).toBeLessThan(1.4);
   });
 });
