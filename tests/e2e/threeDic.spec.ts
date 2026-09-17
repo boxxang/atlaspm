@@ -29,8 +29,8 @@ test.describe('the 3DIC template', () => {
     await expect(dic).toBeVisible();
     await expect(dic).toContainText('Built-in');
     await expect(dic).toContainText('3DIC');
-    /* 23 SoC stages and the 7 a stack adds */
-    await expect(dic).toContainText('30');
+    /* 23 SoC stages, the 7 a top die repeats, and the 8 a stack adds */
+    await expect(dic).toContainText('38');
     await expect(dic.locator('[data-duplicate]')).toHaveCount(1);
     await expect(dic.locator('[data-edit-template]')).toHaveCount(0);
     await expect(dic.locator('[data-tpl-ask]')).toHaveCount(0);
@@ -41,7 +41,7 @@ test.describe('the 3DIC template', () => {
 
   test('starts a programme that runs the stack stages as well as the SoC ones', async ({ page }) => {
     const id = await newProgram(page, 'AtlasStack1', 'threeDic');
-    await expect(stagesLink(page)).toContainText('30');
+    await expect(stagesLink(page)).toContainText('38');
 
     await page.goto(`/p/${id}/stages`);
     for (const key of ['physicalDesign', 'signoff', 'tapeout']) {
@@ -96,6 +96,29 @@ test.describe('the 3DIC template', () => {
     /* the stack stage whose prefix opens with a digit is written up as well */
     await page.goto(`/p/${id}/activity/3DI-03`);
     await expect(page.locator('.ad-title')).toHaveText('Inter-Die Timing Budget and Closure');
+  });
+
+  /* A stack is two chips: the top die gets the per-chip stages of its own, and
+     the product is bonded in a stage between sort and assembly. */
+  test('builds a top die beside the bottom one, and bonds them', async ({ page }) => {
+    const id = await newProgram(page, 'AtlasStack4', 'threeDic');
+    await page.goto(`/p/${id}/stages`);
+    for (const key of ['physicalDesignTop', 'tapeoutTop', 'fabricationTop', 'stackBonding']) {
+      await expect(page.locator(`[data-stage="${key}"]`), key).toBeVisible();
+    }
+
+    await page.goto(`/p/${id}/stage/physicalDesignTop/activity`);
+    const fp = page.locator('[data-act="PDT-02"]');
+    await expect(fp).toContainText('(Top Die)');
+    await expect(fp).toContainText('PDT-D');
+
+    await page.goto(`/p/${id}/stage/stackBonding/deliverables`);
+    await expect(page.locator('[data-board] [data-deliverable]').first()).toContainText('STK-D1');
+
+    await page.goto(`/p/${id}/activity/PDT-06`);
+    await expect(page.locator('.ad-title')).toContainText('(Top Die)');
+    await page.goto(`/p/${id}/activity/STK-03`);
+    await expect(page.locator('.ad-title')).toHaveText('Backside Thinning, TSV Reveal and Backside RDL');
   });
 
   test('leaves the SoC template able to start a programme of 23 stages', async ({ page }) => {
