@@ -53,25 +53,6 @@ export const FOUNDRY_STAGES: readonly { key: string; startOffsetWeeks: number; d
   { key: 'qualification', startOffsetWeeks: 58, durationWeeks: 26 },
 ];
 
-/** A stage the built-in template does not have; it starts blank. */
-export const FOUNDRY_ADDED_STAGES: readonly {
-  key: string;
-  title: string;
-  shortTitle: string;
-  phaseId: string;
-  startOffsetWeeks: number;
-  durationWeeks: number;
-}[] = [
-  {
-    key: 'shipping',
-    title: 'Shipping & Customer Delivery',
-    shortTitle: 'SHIP',
-    phaseId: 'validateRamp',
-    startOffsetWeeks: 84,
-    durationWeeks: 8,
-  },
-];
-
 /**
  * Tapeout's activities re-timed into six weeks, [from, to] in weeks from the
  * stage start. A step's dates run from the window start by its TAT, so these

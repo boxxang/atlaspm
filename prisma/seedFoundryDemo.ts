@@ -4,7 +4,7 @@
  *
  * It does what the Templates and Programs screens do, in the same order and
  * with the same rules — duplicate the built-in template, keep the stages a
- * foundry programme runs and add Shipping, re-time Tapeout's activities, then
+ * foundry programme runs, re-time Tapeout's activities, then
  * start a programme on it, which takes its own copy of the stages — and then
  * writes what the PM has entered since. See /data/foundryDemo.ts.
  *

@@ -13,7 +13,6 @@
  */
 import type { ActivityStepEntry } from '@/data/activitySteps';
 import {
-  FOUNDRY_ADDED_STAGES,
   FOUNDRY_STAGES,
   FOUNDRY_TAPEOUT_WINDOWS,
   FOUNDRY_TEMPLATE_ID,
@@ -136,14 +135,17 @@ const seriesId = (key: string) => `${PID}:ms:${key}`;
 export function buildFoundryDemo({ builtin, library }: FoundryDemoInput): FoundryDemo {
   /* ---- the template's stages ---- */
   const base = new Map(builtin.stages.map((s) => [s.key, s]));
-  const stages: ProfileStageDef[] = [
-    ...FOUNDRY_STAGES.map((s) => {
-      const b = base.get(s.key);
-      if (!b) throw new Error(`The built-in template has no ${s.key} stage.`);
-      return { ...b, baseKey: b.baseKey ?? b.key, startOffsetWeeks: s.startOffsetWeeks, durationWeeks: s.durationWeeks };
-    }),
-    ...FOUNDRY_ADDED_STAGES.map((s) => ({ ...s, order: 0, baseKey: null })),
-  ].map((s, order) => ({ ...s, order }));
+  const stages: ProfileStageDef[] = FOUNDRY_STAGES.map((s, order) => {
+    const b = base.get(s.key);
+    if (!b) throw new Error(`The built-in template has no ${s.key} stage.`);
+    return {
+      ...b,
+      order,
+      baseKey: b.baseKey ?? b.key,
+      startOffsetWeeks: s.startOffsetWeeks,
+      durationWeeks: s.durationWeeks,
+    };
+  });
 
   const profile: ScheduleProfile = {
     id: `${PID}:stages`,

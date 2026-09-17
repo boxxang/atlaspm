@@ -28,7 +28,7 @@ const stepsOf = (ref: string) => {
 };
 
 describe('the Foundry Turnkey template', () => {
-  it('runs netlist hand-off to shipping, with shipping a stage of its own', () => {
+  it('runs netlist hand-off to qualification, on built-in stages only', () => {
     expect(demo.template.id).toBe('foundryTurnkey');
     expect(demo.template.name).toBe('Foundry Turnkey');
     expect(demo.template.stages.map((s) => s.key)).toEqual([
@@ -39,11 +39,9 @@ describe('the Foundry Turnkey template', () => {
       'testDevelopment',
       'packaging',
       'qualification',
-      'shipping',
     ]);
-    const ship = demo.template.stages.find((s) => s.key === 'shipping')!;
-    expect(ship.baseKey).toBeNull();
-    expect(ship.phaseId).toBe('validateRamp');
+    /* every stage shows the built-in content of the same key — none starts blank */
+    for (const st of demo.template.stages) expect(st.baseKey, st.key).toBe(st.key);
     const so = demo.template.stages.find((s) => s.key === 'signoff')!;
     expect(so.baseKey).toBe('signoff');
     expect(so.title).toBe('Signoff');
