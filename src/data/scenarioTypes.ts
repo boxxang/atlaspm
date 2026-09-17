@@ -63,6 +63,8 @@ export interface ScenarioSeries {
   freq: 'daily' | 'weekly';
   weekdays: readonly number[];
   startDate: string;
+  /** Last day it met, for a series that has ended; it is then inactive. */
+  until?: string;
   time: string;
   durationMinutes: number;
   agendaTemplate: readonly string[];

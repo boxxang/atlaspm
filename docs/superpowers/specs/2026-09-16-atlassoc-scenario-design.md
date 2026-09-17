@@ -60,10 +60,10 @@ program's record, not a slide.
 | PD | 0–38 | 0–45 | congestion recovery after the FFN, closure again on relaxed criteria |
 | TEST | 10–52 | 10–60 | TAP clock change and the 50 extra wafers |
 | SO | 24–40 | 24–47 | normal signoff abandoned 11/28; relaxed signoff through January |
-| ASSY | 37–68 | 42–73 | front end as planned, shifted; back end compressed 8 → 5 weeks by the customer's pull-in |
+| ASSY | 37–68 | 45–76 | moves with the wafers (+8); the customer's priority lot starts bring-up on its first units |
 | TO | 39–47 | 47–55 | tapeout 2024-01-29 → 2024-03-25 |
 | FAB | 43–62 | 51–70 | DPML at the minimum; no compression |
-| BU | 67–85 | 72–90 | |
+| BU | 67–85 | 72–90 | starts four weeks before assembly completes, not one: three weeks recovered |
 | MP | 71–97 | 76–102 | net slip at production: five weeks |
 
 Activity windows are re-timed piecewise, per stage:
@@ -72,10 +72,8 @@ Activity windows are re-timed piecewise, per stage:
   program week 29.5, the FFN date. Plan: [0,19]→[0,29.5], [19,30]→[29.5,38].
   Actual: [0,19]→[0,29.5], [19,30]→[29.5,45].
 - **SO** (actual [0,16]→[0,23]) and **TEST** (actual [0,42]→[0,50]) are linear.
-- **ASSY** actual: [0,20]→[0,20] and [20,31]→[24,31]. The substrate build is
-  unchanged; the back end starts two weeks before wafers ship and is five
-  weeks shorter than planned.
-- **TO, FAB, BU and MP** keep their template windows.
+- **ASSY, TO, FAB, BU and MP** keep their template windows. Compressing a window would
+  leave its inherited steps overrunning it, and no template activity does that.
 
 ## The record
 
@@ -172,7 +170,11 @@ No schema change.
   - Every decision is approved by someone.
   - Every link resolves: steps, risks, deliverables, milestones.
   - Die attach (ASSY-05) starts no earlier than two weeks before FAB ends in
-    the actual schedule.
+    the actual schedule, and bring-up overlaps assembly by four weeks against
+    the plan's one.
+  - Every activity's steps stay inside its window.
+  - Every deliverable is due inside its stage, no earlier than its producing
+    activity's last step.
 
 ## Out of scope
 
