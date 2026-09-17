@@ -142,6 +142,12 @@ export interface AppState {
   /** Change what a post says. Only the text and, on a handover, its date. */
   editPost: (id: string, text: string, doneAt?: Date | null, doc?: string | null) => void;
   /**
+   * Close a risk on the date given, or open it again with null. The reply that
+   * says how it was answered is posted separately — this only stops it
+   * counting.
+   */
+  setRiskClosed: (id: string, doneAt: Date | null) => void;
+  /**
    * Attach an artefact to a handover. The deliverable's own done flag follows —
    * it is stored, the progress figures read it, and V1 reads it too, so it has
    * to agree with what the handover actually says.
@@ -594,6 +600,11 @@ export const useAppStore = create<AppState>()((set, get) => ({
        showing replies to something that is gone. */
     set((s) => ({ posts: s.posts.filter((p) => p.id !== id && p.parentId !== id) }));
     sync(api.deletePost(get().projectId, id));
+  },
+
+  setRiskClosed: (id, doneAt) => {
+    set((s) => ({ posts: s.posts.map((p) => (p.id === id ? { ...p, doneAt } : p)) }));
+    sync(api.setRiskClosed(get().projectId, id, doneAt));
   },
 
   attachToPost: async (postId, files) => {

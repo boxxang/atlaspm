@@ -34,6 +34,8 @@ export interface ScenarioPerson {
 
 export interface ScenarioPost {
   key: string;
+  /** For a risk: the day it was closed. The reply under it says how. */
+  closed?: string;
   kind: 'update' | 'risk' | 'note' | 'reply';
   /** Local date and time, YYYY-MM-DD HH:MM. */
   at: string;

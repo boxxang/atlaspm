@@ -263,7 +263,8 @@ export function buildScenario(scenario: Scenario, { builtin, library }: Scenario
       stageId: p.stageId ?? null,
       deliverableId: null,
       parentId: p.parent ? postId(p.parent) : null,
-      doneAt: null,
+      /* a risk closed in the record: the reply under it says how */
+      doneAt: p.closed ? day(p.closed) : null,
       meetingId: p.meeting ? meetingId(p.meeting) : null,
       doc: doc ? JSON.stringify(doc) : null,
     };

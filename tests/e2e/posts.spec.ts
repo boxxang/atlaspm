@@ -286,23 +286,42 @@ test.describe('posting on a step', () => {
     await expect(rail(page).locator('.post')).toHaveCount(0);
   });
 
-  test('a risk raised here closes when its step is handed over', async ({ page }) => {
+  test('a risk raised here outlives its step, and closes when somebody says how', async ({
+    page,
+  }) => {
     await openStep(page, 'PD-08', 5);
     await rail(page).getByLabel('What happened on step 5…').fill('Blocked on the DRC deck.');
     await rail(page).getByRole('checkbox', { name: 'risk' }).check();
     await rail(page).getByRole('button', { name: 'Post' }).click();
     await writesSettled(page);
+    const risks = page.getByRole('navigation', { name: 'Program' }).getByRole('link', { name: /^Risks/ });
+    await expect(risks).toContainText('7');
 
+    /* handing the step over does not answer it */
     await page.locator('[data-step="PD-08:5"]').getByRole('checkbox').check();
     await writesSettled(page);
-    await expect(
-      page.getByRole('navigation', { name: 'Program' }).getByRole('link', { name: /^Risks/ }),
-    ).toContainText('6');
+    await expect(risks).toContainText('7');
 
-    /* it stopped counting; it did not vanish from the thread. The step is still
-       selected — clicking it again would toggle the selection off. */
-    await expect(rail(page).locator('.txt')).toHaveText('Blocked on the DRC deck.');
-    /* and it says so: the flag is kept and marked cleared, not deleted */
-    await expect(rail(page).locator('.post .pill')).toContainText('RISK · CLEARED');
+    /* closing it does, and it wants to be told how */
+    const post = rail(page).locator('.thread > .post').first();
+    await post.getByRole('button', { name: 'Close risk' }).click();
+    await expect(post.locator('[data-close-risk]')).toBeDisabled();
+    await post.getByLabel('How the risk was answered').fill('Deck updated by the foundry; DRC clean on the next run.');
+    await post.locator('[data-close-risk]').click();
+    await writesSettled(page);
+    await expect(risks).toContainText('6');
+
+    /* the flag is kept and marked closed, not deleted, and the answer is under it */
+    await expect(post.locator('.pill').first()).toContainText('RISK · CLOSED');
+    await expect(post.locator('.replies .txt')).toContainText('Deck updated by the foundry');
+
+    /* and it survives a reload, then reopens if it was closed too early */
+    await page.reload();
+    await openStep(page, 'PD-08', 5);
+    const again = rail(page).locator('.thread > .post').first();
+    await expect(again.locator('.pill').first()).toContainText('RISK · CLOSED');
+    await again.getByRole('button', { name: 'Reopen' }).click();
+    await writesSettled(page);
+    await expect(risks).toContainText('7');
   });
 });

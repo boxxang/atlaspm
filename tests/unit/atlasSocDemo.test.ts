@@ -124,6 +124,19 @@ describe('a finished program is finished', () => {
     for (const d of demo.deliverables) expect(d.done, d.id).toBe(true);
   });
 
+  it('has closed every risk, each with the word that answered it', () => {
+    const risks = demo.posts.filter((p) => p.kind === 'risk');
+    expect(risks.length).toBeGreaterThanOrEqual(4);
+    for (const r of risks) {
+      expect(r.doneAt, r.id).toBeTruthy();
+      const closing = demo.posts.filter((p) => p.parentId === r.id).sort(
+        (a, b) => a.createdAt.getTime() - b.createdAt.getTime(),
+      );
+      expect(closing.length, r.id).toBeGreaterThan(0);
+      expect(closing[closing.length - 1].text, r.id).toMatch(/^Closed/);
+    }
+  });
+
   it('has held every meeting, closed every action, and ended every series', () => {
     expect(demo.meetings.meetings.length).toBeGreaterThanOrEqual(12);
     for (const m of demo.meetings.meetings) expect(m.status, m.title).toBe('completed');

@@ -4,7 +4,6 @@ import { activitySteps } from '@/data/activitySteps';
 import {
   activityState,
   allOverdue,
-  doneStepKeys,
   fromStepIndex,
   isStepLate,
   plannedSteps,
@@ -229,18 +228,6 @@ describe('allOverdue', () => {
 
   it('is empty before anything has come due', () => {
     expect(allOverdue(build({}), d('2025-01-01'))).toEqual([]);
-  });
-});
-
-describe('doneStepKeys', () => {
-  it('names every step that has been handed over', () => {
-    const a = activity([step(1, 1), step(2, 1)]);
-    const keys = doneStepKeys(
-      resolveSteps(STAGE_START, a, {
-        'DEF-01:2': { done: true, doneAt: d('2025-01-20'), pct: 100, owner: '', dueOverride: null },
-      }),
-    );
-    expect([...keys]).toEqual(['DEF-01:2']);
   });
 });
 

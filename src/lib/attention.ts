@@ -32,7 +32,7 @@ import { DAY, startOfDay } from './schedule';
 import type { DerivedRisk } from './risks';
 import type { OverdueStep } from './steps';
 
-export const ATTN_BAND = { risk: 4000, overdue: 3000, soon: 2000, stale: 1000, next: 0 } as const;
+export const ATTN_BAND = { risk: 4000, overdue: 3000, soon: 2000, next: 0 } as const;
 /** How many rows the panel shows before it starts scrolling for the rest. */
 export const ATTN_LIMIT = 10;
 /** What the reader can set it to. */
@@ -42,10 +42,8 @@ export const ATTN_MTO = 300;
 
 /** How close a deliverable has to be before it is worth saying anything. */
 const SOON_DAYS = 21;
-/** How long a risk goes unanswered before the row says so. */
-const STALE_DAYS = 7;
 
-export type AttentionTag = 'Risk' | 'Overdue' | 'Due soon' | 'Stale risk' | 'Next up';
+export type AttentionTag = 'Risk' | 'Overdue' | 'Due soon' | 'Next up';
 export type AttentionType = 'Step' | 'Deliverable';
 
 export interface AttentionRow {
@@ -164,28 +162,32 @@ export function attention(input: AttentionInput): AttentionRow[] {
     );
   }
 
-  /* Every open risk, not only the ones that have gone quiet — a risk raised
-     this morning is the most useful thing on the screen, and waiting a week to
-     mention it is how the list came to have none on it at all.
+  /* Every open risk, and all of them under one tag. A risk used to turn into a
+     "Stale risk" after a week without an answer, which read as a second kind of
+     thing to deal with; it is the same risk, still open because nobody has
+     closed it. A risk is closed by saying how it was answered, so one that is
+     still here still wants an answer, whatever its age.
 
      Keyed on the step, not on the risk, so a step that is also overdue is one
      row rather than two saying the same thing. The higher score wins, and the
      risk band is above the overdue one, so it is filed as the risk.
 
      A risk carries no date of its own, so it is ordered on how long it has
-     gone unanswered: the one nobody has touched sits above the one somebody
-     answered an hour ago. */
+     gone unanswered — the one nobody has touched sits above the one somebody
+     answered an hour ago — and the row says when the last word in its thread
+     was, rather than when it was raised, because that is what the ordering is
+     measuring. */
   for (const r of input.risks) {
     const quiet = daysSince(r.updatedAt, today);
     const blocks = blocksTapeout(r.stageId);
     const late = input.overdue.find((o) => o.act === r.act && o.stepN === r.stepN);
     push({
       key: r.stepN == null ? `r:${r.id}` : `s:${r.act}:${r.stepN}`,
-      tag: quiet > STALE_DAYS ? 'Stale risk' : 'Risk',
+      tag: 'Risk',
       type: 'Step',
       title: r.title,
       why:
-        (quiet > STALE_DAYS ? `no update in ${quiet} days` : quiet === 0 ? 'raised today' : `raised ${plural(quiet, 'day')} ago`) +
+        `last word ${quiet === 0 ? 'today' : `${plural(quiet, 'day')} ago`}` +
         (late ? `, ${plural(daysSince(late.due, today), 'day')} past due` : ''),
       stageId: r.stageId,
       owner: r.owner,

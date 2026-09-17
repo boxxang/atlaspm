@@ -272,6 +272,22 @@ export async function savePost(input: {
   touch(projectId);
 }
 
+/**
+ * Close a risk, or open it again.
+ *
+ * Its own call rather than an edit, because closing one changes nothing about
+ * what was said: the post keeps its text and stays unedited, and the reply
+ * under it says how it was answered.
+ */
+export async function setRiskClosed(projectId: string, id: string, doneAt: Date | null) {
+  await assertProject(projectId);
+  const post = await prisma.post.findFirst({ where: { id, projectId }, select: { kind: true } });
+  if (!post) throw new Error('That post is not on this program.');
+  if (post.kind !== 'risk') throw new Error('Only a risk can be closed.');
+  await prisma.post.update({ where: { id }, data: { doneAt } });
+  touch(projectId);
+}
+
 /** Delete a post. Its replies and attachments go with it, by cascade. */
 export async function deletePost(projectId: string, id: string) {
   await assertProject(projectId);

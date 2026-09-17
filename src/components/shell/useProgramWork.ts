@@ -6,7 +6,6 @@ import { openRisks, type DerivedRisk } from '@/lib/risks';
 import {
   allOverdue,
   allUpcoming,
-  doneStepKeys,
   fromStepIndex,
   resolveSteps,
   type OverdueStep,
@@ -56,7 +55,7 @@ export function useProgramWork(): ProgramWork {
       steps,
       overdue: allOverdue(resolved, today),
       upcoming: allUpcoming(resolved, today),
-      risks: openRisks(posts, doneStepKeys(steps), stageOf),
+      risks: openRisks(posts, stageOf),
     };
   }, [activitySteps, schedule, stepStates, posts, today]);
 }

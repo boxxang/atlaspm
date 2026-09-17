@@ -69,7 +69,12 @@ test.describe('Risks', () => {
     ]);
   });
 
-  test('a risk drops off the moment its step is handed over', async ({ page }) => {
+  /* Handing the step over used to close the risk on it. It no longer does: a
+     step can be finished with its risk still live, and a risk is answered by
+     somebody saying how. */
+  test('a risk outlives its step being handed over, and drops off when it is closed', async ({
+    page,
+  }) => {
     const first = page.locator('[data-row]').first();
     const href = (await first.getAttribute('href'))!;
     const [, ref, step] = href.match(/step=([A-Z0-9-]+):(\d+)/)!;
@@ -82,8 +87,21 @@ test.describe('Risks', () => {
     await writesSettled(page);
 
     await openBoard(page, `${SHELL_PATH}/risks`);
+    await expect(page.locator('[data-row]')).toHaveCount(6);
+
+    /* closing it asks how it was answered, and will not close without one */
+    await page.goto(href);
+    const post = page.locator('[data-post]').filter({ hasText: 'RISK' }).first();
+    await post.getByRole('button', { name: 'Close risk' }).click();
+    await expect(post.locator('[data-close-risk]')).toBeDisabled();
+    await post.getByLabel('How the risk was answered').fill('Answered: the vendor shipped the fixed model and the block re-closed.');
+    await post.locator('[data-close-risk]').click();
+    await writesSettled(page);
+    await expect(post).toContainText('RISK · CLOSED');
+    await expect(post).toContainText('the vendor shipped the fixed model');
+
+    await openBoard(page, `${SHELL_PATH}/risks`);
     await expect(page.locator('[data-row]')).toHaveCount(5);
-    /* the post is still in the thread — it stopped counting, it did not vanish */
     await expect(
       page.getByRole('navigation', { name: 'Program' }).getByRole('link', { name: /^Risks/ }),
     ).toContainText('5');

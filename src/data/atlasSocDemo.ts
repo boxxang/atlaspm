@@ -219,6 +219,7 @@ export const SOC_POSTS: readonly ScenarioPost[] = [
   {
     key: 'risk-gate-count',
     kind: 'risk',
+    closed: '2024-03-28',
     at: '2023-10-04 15:30',
     step: 'PD-15:1',
     meeting: 'ffn-qor',
@@ -334,6 +335,7 @@ export const SOC_POSTS: readonly ScenarioPost[] = [
   {
     key: 'risk-signoff',
     kind: 'risk',
+    closed: '2024-01-29',
     at: '2023-11-28 16:40',
     step: 'SO-03:7',
     meeting: 'closure-assessment',
@@ -410,6 +412,7 @@ export const SOC_POSTS: readonly ScenarioPost[] = [
   {
     key: 'risk-samples',
     kind: 'risk',
+    closed: '2024-04-18',
     at: '2023-12-05 20:05',
     step: 'FAB-05:2',
     meeting: 'escalation',
@@ -434,6 +437,7 @@ export const SOC_POSTS: readonly ScenarioPost[] = [
   {
     key: 'risk-fab-cycle',
     kind: 'risk',
+    closed: '2024-01-12',
     at: '2023-12-14 17:30',
     step: 'FAB-05:3',
     meeting: 'fab-review',
@@ -494,6 +498,38 @@ export const SOC_POSTS: readonly ScenarioPost[] = [
     step: 'TO-10:3',
     text:
       'BEOL MTO submitted and accepted — EVT0 tapeout complete, full mask set on 03/25/2024, two months after the original plan. EVT1 root-cause plan kickoff scheduled for 04/15.',
+  },
+  {
+    key: 'risk-fab-cycle-closed',
+    kind: 'reply',
+    at: '2024-01-12 10:30',
+    parent: 'risk-fab-cycle',
+    text:
+      'Closed. The fab cycle cannot be recovered and the schedule now says so: First Silicon 07/08/2024 in the re-baseline published today. The customer’s priority lot takes three weeks back downstream, so bring-up, samples and production move five weeks rather than eight. Nothing further to chase here.',
+  },
+  {
+    key: 'risk-signoff-closed',
+    kind: 'reply',
+    at: '2024-01-29 17:30',
+    parent: 'risk-signoff',
+    text:
+      'Closed. EVT0 timing signoff completed on the agreed criteria on 01/26 with 212 residual HVQK violations, all waived with the foundry and accepted by the customer, and the Design Freeze package was released today. Closing at full criteria stays open as EVT1 work, tracked there rather than here.',
+  },
+  {
+    key: 'risk-samples-closed',
+    kind: 'reply',
+    at: '2024-04-18 11:00',
+    parent: 'risk-samples',
+    text:
+      'Closed. 75 wafers started on 04/15 against the amended PO, so the functional sample count no longer depends on parametric yield at the relaxed criteria. Sample sufficiency is reviewed again at sort, on the sort data rather than on a forecast.',
+  },
+  {
+    key: 'risk-gate-count-closed',
+    kind: 'reply',
+    at: '2024-03-28 18:30',
+    parent: 'risk-gate-count',
+    text:
+      'Closed at the retrospective. The congestion was contained for EVT0 by the relaxed criteria and EVT0 taped out on 03/25; the root cause — content added after N2 with no gate against the floorplan budget — is answered by the netlist drop gate adopted today and by the EVT1 re-partition of the NPU and ISP area. Neither is a live risk on this tapeout.',
   },
   {
     key: 'note-retro',

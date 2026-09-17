@@ -80,7 +80,7 @@ describe('the bands', () => {
     );
     /* the deliverable closes before tapeout and the risk does not, and the
        risk still comes first: the bonus orders inside a band, never across */
-    expect(rows.map((r) => r.tag)).toEqual(['Stale risk', 'Due soon']);
+    expect(rows.map((r) => r.tag)).toEqual(['Risk', 'Due soon']);
     expect(rows[1].blocks).toBe(true);
   });
 
@@ -153,9 +153,9 @@ describe('what each row says', () => {
   it('files a risk as a step, because it is answered on one', () => {
     const [row] = attention(input({ risks: [risk()] }));
     expect(row).toMatchObject({
-      tag: 'Stale risk',
+      tag: 'Risk',
       type: 'Step',
-      why: 'no update in 61 days',
+      why: 'last word 61 days ago',
       step: { act: 'DEF-01', n: 2 },
     });
   });
@@ -199,18 +199,19 @@ describe('what it leaves out', () => {
     expect(rows).toEqual([]);
   });
 
-  /* A risk answered this week is still open, and still the most useful thing
-     on the screen. Only the wording changes: Risk, not Stale risk. */
-  it('lists a risk answered this week, saying when it was raised', () => {
+  /* Every open risk reads the same way, however long it has been quiet: it is
+     open because nobody has closed it, and closing one means saying how it was
+     answered. Only the wording of "why" changes with the silence. */
+  it('lists a risk answered this week, saying when the last word was', () => {
     const rows = attention(input({ risks: [risk({ updatedAt: d('2025-05-28') })] }));
     expect(rows.map((r) => r.tag)).toEqual(['Risk']);
-    expect(rows[0].why).toBe('raised 4 days ago');
+    expect(rows[0].why).toBe('last word 4 days ago');
   });
 
-  it('says so when nobody has answered one in a week', () => {
+  it('says how long nobody has answered one, without making it a second kind of row', () => {
     const rows = attention(input({ risks: [risk({ updatedAt: d('2025-05-01') })] }));
-    expect(rows.map((r) => r.tag)).toEqual(['Stale risk']);
-    expect(rows[0].why).toBe('no update in 31 days');
+    expect(rows.map((r) => r.tag)).toEqual(['Risk']);
+    expect(rows[0].why).toBe('last word 31 days ago');
   });
 
   it('caps nothing that is wrong — every overdue step is on the list', () => {
@@ -233,7 +234,7 @@ describe('one row per thing', () => {
       }),
     );
     expect(rows).toHaveLength(1);
-    expect(rows[0].tag).toBe('Stale risk');
+    expect(rows[0].tag).toBe('Risk');
     expect(rows[0].why).toContain('10 days past due');
     expect(rows[0].step).toEqual({ act: 'DEF-01', n: 2 });
   });
@@ -243,7 +244,7 @@ describe('one row per thing', () => {
     const rows = attention(
       input({
         overdue: [overdue({ stepN: 9 })],
-        /* answered yesterday, so it reads Risk rather than Stale risk */
+        /* answered yesterday: the row says so, and still ranks above overdue */
         risks: [risk({ stepN: 2, updatedAt: d('2025-05-31') })],
       }),
     );

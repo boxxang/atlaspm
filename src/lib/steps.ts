@@ -237,10 +237,6 @@ export function allOverdue(
   return out.sort((a, b) => a.due.getTime() - b.due.getTime());
 }
 
-/** The keys of every step handed over — what risk liveness is judged against. */
-export const doneStepKeys = (steps: readonly ResolvedStep[]): Set<string> =>
-  new Set(steps.filter((s) => s.done).map((s) => stepKey(s.act, s.n)));
-
 /**
  * The generated index in /data/activitySteps.ts, in the shape these functions
  * read.

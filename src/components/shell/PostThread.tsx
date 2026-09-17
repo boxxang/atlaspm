@@ -1,9 +1,9 @@
 'use client';
 
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { RISK_AUTHOR } from '@/data/riskSeeds';
 import { attachmentUrl, formatBytes } from '@/lib/attachments';
-import { fmtDT } from '@/lib/schedule';
+import { fmtDate, fmtDT } from '@/lib/schedule';
 import type { ProgramPost } from '@/lib/projectState';
 import { uid, useAppStore } from '@/store/useAppStore';
 import { MeetingSource } from '../meetings/MeetingSource';
@@ -11,7 +11,7 @@ import { Avatar, IconClip } from './icons';
 import { useProgramWork } from './useProgramWork';
 
 /** Which post is open for editing or for the question asked before deleting. */
-type Mode = { id: string; kind: 'edit' | 'delete' } | null;
+type Mode = { id: string; kind: 'edit' | 'delete' | 'close' } | null;
 
 /**
  * A thread: posts, the replies under them, and a box to add another.
@@ -167,7 +167,17 @@ function Post({
         <WhoLine post={post} showStep={showStep} live={live} />
         <PostBody post={post} mode={mode} setMode={setMode} />
         {showStep && live && <RiskLine />}
-        <PostActions post={post} mode={mode} setMode={setMode} onReply={onReply} />
+        {mode?.id === post.id && mode.kind === 'close' ? (
+          <CloseRisk post={post} onDone={() => setMode(null)} />
+        ) : (
+          <PostActions
+            post={post}
+            mode={mode}
+            setMode={setMode}
+            onReply={onReply}
+            live={live}
+          />
+        )}
         {(replies.length > 0 || replying) && (
           <div className="replies">
             {replies.map((r) => (
@@ -236,9 +246,9 @@ function WhoLine({
           <span
             className="pill"
             style={{ fontSize: 10.5 }}
-            title="the step it was flagged on has been handed over"
+            title={post.doneAt ? `closed ${fmtDT(post.doneAt)}` : 'closed'}
           >
-            RISK · CLEARED
+            RISK · CLOSED{post.doneAt ? ` ${fmtDate(post.doneAt)}` : ''}
           </span>
         ))}
       <span className="num" style={{ fontSize: post.parentId ? 11 : 11.5, color: 'var(--ink-3)' }}>
@@ -263,12 +273,16 @@ function PostActions({
   mode,
   setMode,
   onReply,
+  live = false,
 }: {
   post: ProgramPost;
   mode: Mode;
   setMode: (m: Mode) => void;
   onReply?: () => void;
+  /** Whether this post is a risk still counting, which only a top-level one is. */
+  live?: boolean;
 }) {
+  const setRiskClosed = useAppStore((s) => s.setRiskClosed);
   if (mode?.id === post.id) return null;
   return (
     <div className="acts postacts">
@@ -277,6 +291,16 @@ function PostActions({
           Reply
         </button>
       )}
+      {post.kind === 'risk' &&
+        (live ? (
+          <button type="button" onClick={() => setMode({ id: post.id, kind: 'close' })}>
+            Close risk
+          </button>
+        ) : (
+          <button type="button" onClick={() => setRiskClosed(post.id, null)}>
+            Reopen
+          </button>
+        ))}
       <button type="button" onClick={() => setMode({ id: post.id, kind: 'edit' })}>
         Edit
       </button>
@@ -383,6 +407,93 @@ function PostBody({
         </div>
       )}
     </>
+  );
+}
+
+/**
+ * Closing a risk: what answered it, and the evidence if there is any.
+ *
+ * The outcome is required — a risk closed with no word on how reads, a year
+ * later, exactly like one nobody ever answered — and the file is not, because
+ * plenty of risks are answered by a decision rather than by an artefact.
+ */
+function CloseRisk({ post, onDone }: { post: ProgramPost; onDone: () => void }) {
+  const savePost = useAppStore((s) => s.savePost);
+  const setRiskClosed = useAppStore((s) => s.setRiskClosed);
+  const attachToPost = useAppStore((s) => s.attachToPost);
+  const [text, setText] = useState('');
+  const [picked, setPicked] = useState<File[]>([]);
+  const [problems, setProblems] = useState<string[]>([]);
+  const file = useRef<HTMLInputElement>(null);
+
+  const close = async () => {
+    const outcome = text.trim();
+    if (!outcome) return;
+    const id = uid();
+    savePost({ id, kind: 'reply', text: outcome, author: RISK_AUTHOR, parentId: post.id });
+    if (picked.length) {
+      const said = await attachToPost(id, picked);
+      if (said.length) {
+        setProblems(said);
+        return;
+      }
+    }
+    setRiskClosed(post.id, new Date());
+    onDone();
+  };
+
+  return (
+    <div className="composer" style={{ marginTop: 6 }}>
+      <textarea
+        value={text}
+        aria-label="How the risk was answered"
+        placeholder="How was it answered? What was decided, and what changed…"
+        onChange={(e) => setText(e.target.value)}
+        autoFocus
+      />
+      {picked.length > 0 && (
+        <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', padding: '0 10px 6px' }}>
+          {picked.map((f) => (
+            <span className="clip" key={f.name}>
+              <IconClip />
+              {f.name}
+            </span>
+          ))}
+        </div>
+      )}
+      {problems.length > 0 && (
+        <p className="mono-note" style={{ color: 'var(--risk-ink)', padding: '0 10px 6px' }}>
+          {problems.join(' ')}
+        </p>
+      )}
+      <div className="bar">
+        <input
+          ref={file}
+          type="file"
+          multiple
+          hidden
+          aria-label="Attach the evidence"
+          onChange={(e) => setPicked([...(e.target.files ?? [])])}
+        />
+        <button type="button" className="btn sm" onClick={() => file.current?.click()}>
+          + File
+        </button>
+        <span style={{ flexGrow: 1 }} />
+        <button type="button" className="btn sm" onClick={onDone}>
+          Cancel
+        </button>
+        <button
+          type="button"
+          className="btn pri sm"
+          data-close-risk
+          disabled={!text.trim()}
+          title={text.trim() ? 'Close this risk' : 'Say how it was answered first'}
+          onClick={close}
+        >
+          Close risk
+        </button>
+      </div>
+    </div>
   );
 }
 
