@@ -2,7 +2,7 @@
  * /lib/scheduleCalculator.ts — schedule math and the one date formatter set.
  * Pure: no DOM, no state, no UI imports. Ported 1:1 from the prototype.
  */
-import { milestoneDefs } from '@/data/scheduleProfiles';
+import { ALL_MILESTONES } from '@/data/builtins';
 import type {
   MilestoneDef,
   ScheduleProfile,
@@ -105,8 +105,10 @@ export function computeSchedule(
     totalWeeks = Math.max(totalWeeks, p.startOffsetWeeks + p.durationWeeks);
   }
   /* A milestone belongs to a stage; a profile that no longer carries that
-     stage no longer carries the milestone either. */
-  const milestones = milestoneDefs
+     stage no longer carries the milestone either. Both templates' checkpoints
+     are offered, so a 3DIC program keeps the stack's and an SoC program never
+     sees them. */
+  const milestones = ALL_MILESTONES
     .filter((m) => stages[m.anchor.stage])
     .map((m) => {
       const s = stages[m.anchor.stage];

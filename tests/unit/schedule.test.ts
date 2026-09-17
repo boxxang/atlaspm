@@ -6,6 +6,7 @@ import {
   scheduleProfiles,
 } from '@/data/scheduleProfiles';
 import { journeyData } from '@/data/journey';
+import { THREE_DIC_PROFILE } from '@/data/threeDic';
 import type { StageId } from '@/data/types';
 import {
   addWeeks,
@@ -346,5 +347,16 @@ describe('a checkpoint belongs to the stage it is anchored to', () => {
       'First Silicon',
       'Mass Production',
     ]);
+  });
+});
+
+describe('the 3DIC template’s checkpoints', () => {
+  /* The schedule read the SoC checkpoint list alone, so a 3DIC program never
+     showed Partition Freeze, DCTV Assembly Signoff or any stack checkpoint. */
+  it('reach the schedule of a program that runs their stages', () => {
+    const s = computeSchedule(new Date('2027-03-01T00:00:00'), THREE_DIC_PROFILE, {});
+    const ids = s.milestones.map((m) => m.id);
+    expect(ids).toContain('dctvAssemblySignoff');
+    expect(ids).toContain('tapeoutBeolMto');
   });
 });
