@@ -23,7 +23,15 @@
  * as owners, presenters and attendees — the people the PM is tracking.
  */
 
-import type { NoteBlock } from './stageNotes';
+import type { Scenario } from './scenario';
+import type {
+  ScenarioDeliverable,
+  ScenarioMeeting,
+  ScenarioPerson,
+  ScenarioPost,
+  ScenarioSeries,
+  ScenarioStep,
+} from './scenarioTypes';
 
 export const FX1_ID = 'atlasfx1';
 export const FX1_NAME = 'AtlasFX1';
@@ -76,19 +84,14 @@ export const FOUNDRY_TAPEOUT_WINDOWS: Readonly<Record<string, readonly [number, 
 /** Stages whose planned steps before today are simply done — no posts, no story. */
 export const FX1_DONE_BEFORE_TODAY: readonly string[] = ['physicalDesign', 'signoff', 'testDevelopment'];
 
-export interface FxPerson {
-  name: string;
-  role: string;
-}
-
-export const FX1_LEADERS: Readonly<Record<string, FxPerson>> = {
+export const FX1_LEADERS: Readonly<Record<string, ScenarioPerson>> = {
   physicalDesign: { name: 'Minjun Lee', role: 'Physical design lead' },
   signoff: { name: 'Hyunwoo Kang', role: 'Signoff lead' },
   tapeout: { name: 'Sujin Choi', role: 'Tapeout manager' },
   fabrication: { name: 'Jaewon Lim', role: 'Foundry program manager' },
 };
 
-export const FX1_CONTACTS: Readonly<Record<string, readonly FxPerson[]>> = {
+export const FX1_CONTACTS: Readonly<Record<string, readonly ScenarioPerson[]>> = {
   physicalDesign: [
     { name: 'Seoyeon Park', role: 'Timing ECO & place and route' },
     { name: 'Daniel Cho', role: 'Clock tree & CPU cluster' },
@@ -108,14 +111,7 @@ export const FX1_CONTACTS: Readonly<Record<string, readonly FxPerson[]>> = {
  * FX1_DONE_BEFORE_TODAY and its plan ended before today, and untouched
  * otherwise. `due` is a date moved by hand.
  */
-export const FX1_STEPS: readonly {
-  ref: string;
-  n: number;
-  pct?: number;
-  owner?: string;
-  due?: string;
-  doneAt?: string;
-}[] = [
+export const FX1_STEPS: readonly ScenarioStep[] = [
   /* still iterating a month after the plan said it would stop — the one
      overdue step, on purpose */
   { ref: 'SO-03', n: 5, pct: 75, owner: 'Seoyeon Park' },
@@ -133,7 +129,7 @@ export const FX1_STEPS: readonly {
 ];
 
 /** Deliverables by stage and position: finished, or re-dated by hand. */
-export const FX1_DELIVERABLES: readonly { stageId: string; position: number | 'all'; doneAt?: string; due?: string }[] = [
+export const FX1_DELIVERABLES: readonly ScenarioDeliverable[] = [
   { stageId: 'physicalDesign', position: 'all', doneAt: 'due' },
   { stageId: 'signoff', position: 0, doneAt: '2026-09-07' },
   { stageId: 'signoff', position: 1, doneAt: '2026-09-07' },
@@ -147,24 +143,7 @@ export const FX1_DELIVERABLES: readonly { stageId: string; position: number | 'a
   { stageId: 'tapeout', position: 6, due: '2026-11-02' },
 ];
 
-export interface FxPost {
-  key: string;
-  kind: 'update' | 'risk' | 'note' | 'reply';
-  /** Local date and time, YYYY-MM-DD HH:MM. */
-  at: string;
-  /** The post's text — a note written as blocks gives only its title here. */
-  text: string;
-  /** A key-info note's body as blocks: paragraphs, headings, lists and tables. */
-  blocks?: readonly NoteBlock[];
-  /** A step, as ACT:n. */
-  step?: string;
-  stageId?: string;
-  parent?: string;
-  /** The meeting a risk was raised in, by key. */
-  meeting?: string;
-}
-
-export const FX1_POSTS: readonly FxPost[] = [
+export const FX1_POSTS: readonly ScenarioPost[] = [
   {
     key: 'sta-baseline',
     kind: 'update',
@@ -361,92 +340,8 @@ export const FX1_POSTS: readonly FxPost[] = [
  * What a meeting links to. Steps are ACT:n; a risk is a post key above; a
  * deliverable is stage:position.
  */
-export interface FxLink {
-  type: 'stage' | 'activity' | 'step' | 'risk' | 'deliverable' | 'milestone';
-  ref: string;
-}
 
-export interface FxSeries {
-  key: string;
-  title: string;
-  purpose: string;
-  type: string;
-  attendees: readonly string[];
-  freq: 'daily' | 'weekly';
-  weekdays: readonly number[];
-  startDate: string;
-  time: string;
-  durationMinutes: number;
-  agendaTemplate: readonly string[];
-  location: string;
-  stage: string;
-  links: readonly FxLink[];
-}
-
-export interface FxAgenda {
-  title: string;
-  presenter: string;
-  minutes: number;
-  notes?: string;
-  outcome?: 'info' | 'decision' | 'action' | 'risk' | 'escalation' | 'deferred';
-  links?: readonly FxLink[];
-}
-
-export interface FxDecision {
-  title: string;
-  description: string;
-  rationale: string;
-  status: 'proposed' | 'approved' | 'superseded' | 'rejected';
-  owner: string;
-  approvedBy: string;
-  scope: string;
-  agenda?: number;
-  links?: readonly FxLink[];
-}
-
-export interface FxAction {
-  description: string;
-  owner: string;
-  contributors?: readonly string[];
-  due: string;
-  priority: 'critical' | 'high' | 'normal' | 'low';
-  status: 'open' | 'in_progress' | 'blocked' | 'done';
-  type: 'support' | 'new_step' | 'standalone';
-  agenda?: number;
-  blocker?: string;
-  escalation?: string;
-  impact?: 'none' | 'step_at_risk' | 'activity_end' | 'milestone' | 'not_assessed';
-  impactNote?: string;
-  evidence?: string;
-  verifiedBy?: string;
-  completed?: string;
-  /** The meeting it was carried into, by key. */
-  carriedTo?: string;
-  links?: readonly FxLink[];
-}
-
-export interface FxMeeting {
-  key: string;
-  series?: string;
-  /** A one-off meeting names itself; a sitting takes its series'. */
-  title?: string;
-  type?: string;
-  purpose?: string;
-  attendees?: readonly string[];
-  location?: string;
-  stage?: string;
-  links?: readonly FxLink[];
-  date: string;
-  time: string;
-  durationMinutes?: number;
-  status: 'draft' | 'scheduled' | 'completed' | 'cancelled';
-  minutes?: string;
-  agenda: readonly FxAgenda[];
-  decisions?: readonly FxDecision[];
-  actions?: readonly FxAction[];
-}
-
-export const FX1_SERIES: readonly FxSeries[] = [
+export const FX1_SERIES: readonly ScenarioSeries[] = [
   {
     key: 'warroom',
     title: 'Timing Closure War-room',
@@ -491,7 +386,7 @@ export const FX1_SERIES: readonly FxSeries[] = [
   },
 ];
 
-export const FX1_MEETINGS: readonly FxMeeting[] = [
+export const FX1_MEETINGS: readonly ScenarioMeeting[] = [
   {
     key: 'readiness-0901',
     series: 'readiness',
@@ -994,3 +889,32 @@ export const FX1_MEETINGS: readonly FxMeeting[] = [
     ],
   },
 ];
+
+/** AtlasFX1 as a scenario the builder and the seed read. */
+export const FX1_SCENARIO: Scenario = {
+  program: {
+    id: FX1_ID,
+    name: FX1_NAME,
+    kickoff: FX1_KICKOFF,
+    costPerManMonth: FX1_COST_PER_MAN_MONTH,
+    today: FX1_TODAY,
+    now: FX1_NOW,
+    timeZone: FX1_TIME_ZONE,
+    emailDomain: 'atlasfx1.example',
+    phoneStart: 140,
+  },
+  template: {
+    id: FOUNDRY_TEMPLATE_ID,
+    name: FOUNDRY_TEMPLATE_NAME,
+    stages: FOUNDRY_STAGES,
+    windows: FOUNDRY_TAPEOUT_WINDOWS,
+  },
+  doneStages: FX1_DONE_BEFORE_TODAY,
+  leaders: FX1_LEADERS,
+  contacts: FX1_CONTACTS,
+  steps: FX1_STEPS,
+  deliverables: FX1_DELIVERABLES,
+  posts: FX1_POSTS,
+  series: FX1_SERIES,
+  meetings: FX1_MEETINGS,
+};
