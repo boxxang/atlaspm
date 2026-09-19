@@ -106,3 +106,43 @@ export const ALL_WRITTEN_ACTIVITIES: readonly string[] = [
 
 const WRITTEN = new Set(ALL_WRITTEN_ACTIVITIES);
 export const hasWriteUp = (id: string): boolean => WRITTEN.has(id);
+
+/**
+ * Every stage the app ships, as a row a profile can take back.
+ *
+ * Editing a template or a programme's plan can drop a stage, and until now
+ * nothing could put it back: "add" made a blank stage with no content, no
+ * activities and no baseline. This is the catalogue the "add an existing one"
+ * picker reads — both templates' stages, each with the title, prefix, band and
+ * schedule the template gives it, keyed so a profile can tell which it already
+ * runs.
+ *
+ * A stage somebody wrote by hand is not in here, and deleting one is still
+ * final. Only what the app ships can be restored from the code.
+ */
+export interface BuiltinStage {
+  key: string;
+  title: string;
+  shortTitle: string;
+  phaseId: string;
+  startOffsetWeeks: number;
+  durationWeeks: number;
+}
+
+export const BUILTIN_STAGE_LIBRARY: readonly BuiltinStage[] = (() => {
+  const out = new Map<string, BuiltinStage>();
+  for (const profile of BUILTIN_PROFILES) {
+    for (const st of profile.stages) {
+      if (out.has(st.key)) continue;
+      out.set(st.key, {
+        key: st.key,
+        title: st.title,
+        shortTitle: st.shortTitle,
+        phaseId: st.phaseId,
+        startOffsetWeeks: st.startOffsetWeeks,
+        durationWeeks: st.durationWeeks,
+      });
+    }
+  }
+  return [...out.values()].sort((a, b) => a.startOffsetWeeks - b.startOffsetWeeks);
+})();

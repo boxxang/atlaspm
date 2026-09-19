@@ -75,7 +75,9 @@ test.describe('templates', () => {
     await page.locator('[data-template]').filter({ hasText: NAME }).locator('[data-edit-template]').click();
     await expect(page.locator('[data-stage-row]')).toHaveCount(23);
 
+    /* removing takes the stage's activities with it, so it asks first */
     await page.locator('[data-stage-row="tapeout"] [data-del-stage]').click();
+    await page.locator('[data-stage-remove] [data-confirm-del-stage]').click();
     await expect(page.locator('[data-stage-row]')).toHaveCount(22);
 
     await page.locator('[data-add-stage]').click();
@@ -89,6 +91,35 @@ test.describe('templates', () => {
     await page.locator('[data-template]').filter({ hasText: NAME }).locator('[data-edit-template]').click();
     await expect(page.locator('[data-stage-row="tapeout"]')).toHaveCount(0);
     await expect(page.locator('[data-stage-row="productDefinition"] [data-stage-tat]')).toHaveValue('10');
+  });
+
+  /* Remove the wrong row and there was no way back: add made a blank stage
+     with no content and no activities. The picker offers what the app ships. */
+  test('puts a removed stage back, with its content and its activities', async ({ page }) => {
+    await duplicate(page);
+    await page.locator('[data-template]').filter({ hasText: NAME }).locator('[data-edit-template]').click();
+
+    const tapeout = page.locator('[data-stage-row="tapeout"]');
+    const title = await tapeout.locator('[data-stage-title]').inputValue();
+    await tapeout.locator('[data-del-stage]').click();
+    await page.locator('[data-stage-remove] [data-confirm-del-stage]').click();
+    await expect(tapeout).toHaveCount(0);
+
+    await page.locator('[data-add-builtin]').selectOption('tapeout');
+    await expect(tapeout).toHaveCount(1);
+    await expect(tapeout.locator('[data-stage-title]')).toHaveValue(title);
+    /* and it is offered only while it is missing */
+    await expect(page.locator('[data-add-builtin] option[value="tapeout"]')).toHaveCount(0);
+
+    await page.locator('[data-stage-dialog] [data-tpl-save]').click();
+    await expect(page.locator('[data-stage-dialog]')).toHaveCount(0);
+
+    /* the activities it runs came back with it */
+    await open(page);
+    await page.locator('[data-template]').filter({ hasText: NAME }).locator('[data-edit-template]').click();
+    await page.locator('[data-stage-row="tapeout"] [data-edit-activities]').click();
+    await expect(page.locator('[data-activity-row]').first()).toBeVisible();
+    await expect(page.locator('[data-activity-row]')).toHaveCount(11);
   });
 
   /**
@@ -141,7 +172,9 @@ test.describe('templates', () => {
       await expect(ip.locator('[data-stage-start]')).toHaveValue('2026-02-02');
 
       await page.locator('[data-stage-row="productDefinition"] [data-del-stage]').click();
+      await page.locator('[data-stage-remove] [data-confirm-del-stage]').click();
       await page.locator('[data-stage-row="technology"] [data-del-stage]').click();
+      await page.locator('[data-stage-remove] [data-confirm-del-stage]').click();
 
       /* the earliest stage left now opens the programme, and nothing else moved
          relative to it — the gaps and the lengths are the template's claim */

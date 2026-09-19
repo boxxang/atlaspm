@@ -3,10 +3,13 @@
 import { Fragment, useEffect, useRef, useState } from 'react';
 import { renameProject, saveProjectActivities, saveProjectStages, setKickoff } from '@/app/actions';
 import { ALL_ACTIVITIES as activityLibrary } from '@/data/builtins';
+import { BUILTIN_STAGE_LIBRARY } from '@/data/builtins';
 import { lifecyclePhases, stageMilestone } from '@/data/scheduleProfiles';
 import type { ProfileStageDef } from '@/data/types';
 import {
+  addBuiltinStage,
   addStage,
+  addableStages,
   assertPrefixes,
   duplicatePrefixes,
   moveStage,
@@ -193,6 +196,8 @@ export function EditProgramDialog({
   };
 
   const gone = removing ? stages?.find((s) => s.key === removing) : null;
+  /* The stages the app ships that this programme does not run. */
+  const canAdd = addableStages(stages ?? [], BUILTIN_STAGE_LIBRARY);
 
   return (
     <dialog
@@ -409,15 +414,39 @@ export function EditProgramDialog({
               </div>
             ))}
             <div className="trow">
-              <button
-                type="button"
-                className="btn sm"
-                data-add-stage
-                onClick={() => edit((cur) => addStage(cur, cur.length))}
-              >
-                <IconPlus />
-                Add a stage
-              </button>
+              <span style={{ display: 'flex', gap: 6, alignItems: 'center', flexWrap: 'wrap' }}>
+                <button
+                  type="button"
+                  className="btn sm"
+                  data-add-stage
+                  onClick={() => edit((cur) => addStage(cur, cur.length))}
+                >
+                  <IconPlus />
+                  New stage
+                </button>
+                {/* and the ones the app ships: a stage removed by mistake comes
+                    back with its content, activities, deliverables and dates */}
+                <select
+                  className="lnkin"
+                  data-add-builtin
+                  aria-label="Add a stage the app ships"
+                  value=""
+                  disabled={!canAdd.length}
+                  onChange={(e) => {
+                    const pick = canAdd.find((x) => x.key === e.target.value);
+                    if (pick) edit((cur) => addBuiltinStage(cur, pick));
+                  }}
+                >
+                  <option value="">
+                    {canAdd.length ? 'Add an existing stage…' : 'Every stage is already here'}
+                  </option>
+                  {canAdd.map((x) => (
+                    <option key={x.key} value={x.key}>
+                      {x.shortTitle} · {x.title}
+                    </option>
+                  ))}
+                </select>
+              </span>
               <span />
               <span />
               <span />

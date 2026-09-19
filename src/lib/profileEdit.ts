@@ -196,6 +196,60 @@ export function addStage(stages: readonly ProfileStageDef[], at: number): Profil
   return renumber([...stages.slice(0, where), added, ...stages.slice(where)]);
 }
 
+/** A stage the app ships, as the picker offers it. */
+export interface AddableStage {
+  key: string;
+  title: string;
+  shortTitle: string;
+  phaseId: string;
+  startOffsetWeeks: number;
+  durationWeeks: number;
+}
+
+/** The ones from the catalogue this profile does not already run. */
+export const addableStages = (
+  stages: readonly ProfileStageDef[],
+  library: readonly AddableStage[],
+): AddableStage[] => {
+  const has = new Set(stages.map((s) => s.key));
+  return library.filter((s) => !has.has(s.key));
+};
+
+/**
+ * Put a stage the app ships back on a profile.
+ *
+ * The other add makes a blank stage; this one restores a stage that exists in
+ * the code — its title, prefix, band, schedule and the baseKey that carries its
+ * write-up, deliverables and activities. Deleting the wrong row is otherwise
+ * final, and a programme loses the work recorded on it.
+ *
+ * It lands where its dates say it belongs rather than at the end, because the
+ * order is the chart's y-axis and dropping Package Design after Qualification
+ * would be a second thing to fix by hand.
+ */
+export function addBuiltinStage(
+  stages: readonly ProfileStageDef[],
+  stage: AddableStage,
+): ProfileStageDef[] {
+  if (stages.some((s) => s.key === stage.key)) {
+    throw new StageEditError(`${stage.title} is already on this plan.`);
+  }
+  const at = stages.findIndex((s) => s.startOffsetWeeks > stage.startOffsetWeeks);
+  const where = at === -1 ? stages.length : at;
+  const added: ProfileStageDef = {
+    key: stage.key,
+    order: where,
+    title: stage.title,
+    shortTitle: stage.shortTitle,
+    phaseId: stage.phaseId,
+    /* the built-in stage of the same key is what it shows again */
+    baseKey: stage.key,
+    startOffsetWeeks: stage.startOffsetWeeks,
+    durationWeeks: stage.durationWeeks,
+  };
+  return renumber([...stages.slice(0, where), added, ...stages.slice(where)]);
+}
+
 export function removeStage(
   stages: readonly ProfileStageDef[],
   key: string,

@@ -94,6 +94,37 @@ test.describe('editing a program', () => {
     await expect(stagesOf(page)).toContainText('23');
   });
 
+  /* Add used to mean a blank stage with no content and no activities, so a
+     stage this programme does not run could not be brought in whole and one
+     removed by mistake could not come back. The picker offers what the app
+     ships — here a stack stage AtlasAX1 does not run. (A built-in stage of its
+     own cannot be removed at all: each carries a checkpoint.) */
+  test('adds a stage the app ships, with its activities and deliverables', async ({ page }) => {
+    const dlg = await open(page, 'AtlasAX1');
+    await expect(dlg.locator('[data-stage-row]')).toHaveCount(23);
+
+    await dlg.locator('[data-add-builtin]').selectOption('dctv');
+    const added = dlg.locator('[data-stage-row="dctv"]');
+    await expect(added).toHaveCount(1);
+    await expect(added.locator('[data-stage-title]')).toHaveValue('DCTV — Daisy Chain Test Vehicle');
+    /* and it is offered only while it is missing */
+    await expect(dlg.locator('[data-add-builtin] option[value="dctv"]')).toHaveCount(0);
+
+    await dlg.locator('[data-save-program]').click();
+    await expect(dlg).toHaveCount(0);
+
+    await page.goto(`/p/${SEED_PROJECT_ID}/stages`);
+    await expect(stagesOf(page)).toContainText('24');
+
+    /* it runs the activities the app ships for it, and its key deliverables
+       are on the board, dated by this programme's own schedule */
+    await page.goto(`/p/${SEED_PROJECT_ID}/stage/dctv/activity`);
+    await expect(page.locator('[data-act]').first()).toBeVisible();
+    await expect(page.locator('[data-act]')).toHaveCount(7);
+    await page.goto(`/p/${SEED_PROJECT_ID}/stage/dctv/deliverables`);
+    await expect(page.locator('[data-board] [data-deliverable]')).toHaveCount(8);
+  });
+
   test('adds an activity and a step to a stage of this program alone', async ({ page }) => {
     const dlg = await open(page, 'AtlasAX1');
     await dlg.locator('[data-stage-row="signoff"] [data-edit-activities]').click();

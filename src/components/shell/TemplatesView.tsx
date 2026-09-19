@@ -10,11 +10,14 @@ import {
   saveTemplateActivities,
 } from '@/app/actions';
 import { ALL_ACTIVITIES as activityLibrary } from '@/data/builtins';
+import { BUILTIN_STAGE_LIBRARY } from '@/data/builtins';
 import { lifecyclePhases } from '@/data/scheduleProfiles';
 import type { ProfileStageDef } from '@/data/types';
 import { uid } from '@/store/useAppStore';
 import {
+  addBuiltinStage,
   addStage,
+  addableStages,
   assertPrefixes,
   duplicatePrefixes,
   moveStage,
@@ -354,7 +357,14 @@ function StageDialog({
   /* Lazily, because localStorage is not there while this renders on the server. */
   const [kickoff, setKickoff] = useState<Date>(() => readKickoff());
   const [acts, setActs] = useState<{ stageKey: string; shortTitle: string } | null>(null);
+  /* Which stage the "are you sure" is open for. Removing one takes its
+     activities, and a stage written here cannot be added back. */
+  const [removing, setRemoving] = useState<string | null>(null);
   const [err, setErr] = useState('');
+  const gone = removing ? (stages?.find((x) => x.key === removing) ?? null) : null;
+  /* The stages the app ships that this template does not run — what the picker
+     offers, so a stage removed by mistake comes back whole. */
+  const canAdd = addableStages(stages ?? [], BUILTIN_STAGE_LIBRARY);
   const [pending, setPending] = useState(false);
   useModal(box, onClose);
 
@@ -483,6 +493,32 @@ function StageDialog({
         </button>
       </div>
       <div className="dlg-body">
+        {gone && (
+          <div className="delconf" style={{ marginBottom: 10 }} data-stage-remove>
+            <span style={{ flexGrow: 1 }}>
+              Remove {gone.title}? Its activities go with it. A stage the app ships can be added
+              back; one written here cannot.
+            </span>
+            <button type="button" className="btn sm" onClick={() => setRemoving(null)}>
+              Keep
+            </button>
+            <button
+              type="button"
+              className="btn sm dng"
+              data-confirm-del-stage
+              onClick={() => {
+                /* the template's weeks are counted from the kickoff, so dropping
+                   the stage at week 0 slides the rest back rather than leaving
+                   the plan starting late */
+                edit((cur) => rebaseToKickoff(removeStage(cur, gone.key)));
+                setRemoving(null);
+              }}
+            >
+              Remove
+            </button>
+          </div>
+        )}
+
         {!stages ? (
           <p className="mono-note">Reading the template…</p>
         ) : (
@@ -616,12 +652,10 @@ function StageDialog({
                     type="button"
                     className="btn sm dng"
                     data-del-stage
-                    onClick={() =>
-                      /* the template's weeks are counted from the kickoff, so
-                         dropping the stage that sits at week 0 slides the rest
-                         back rather than leaving the plan starting late */
-                      edit((cur) => rebaseToKickoff(removeStage(cur, st.key)))
-                    }
+                    onClick={() => {
+                      setErr('');
+                      setRemoving(st.key);
+                    }}
                   >
                     Remove
                   </button>
@@ -629,15 +663,39 @@ function StageDialog({
               </div>
             ))}
             <div className="trow">
-              <button
-                type="button"
-                className="btn sm"
-                data-add-stage
-                onClick={() => edit((cur) => addStage(cur, cur.length))}
-              >
-                <IconPlus />
-                Add a stage
-              </button>
+              <span style={{ display: 'flex', gap: 6, alignItems: 'center', flexWrap: 'wrap' }}>
+                <button
+                  type="button"
+                  className="btn sm"
+                  data-add-stage
+                  onClick={() => edit((cur) => addStage(cur, cur.length))}
+                >
+                  <IconPlus />
+                  New stage
+                </button>
+                {/* and the ones the app ships, so a stage removed by mistake can
+                    come back with its content, activities and schedule */}
+                <select
+                  className="lnkin"
+                  data-add-builtin
+                  aria-label="Add a stage the app ships"
+                  value=""
+                  disabled={!canAdd.length}
+                  onChange={(e) => {
+                    const pick = canAdd.find((x) => x.key === e.target.value);
+                    if (pick) edit((cur) => addBuiltinStage(cur, pick));
+                  }}
+                >
+                  <option value="">
+                    {canAdd.length ? 'Add an existing stage…' : 'Every stage is already here'}
+                  </option>
+                  {canAdd.map((x) => (
+                    <option key={x.key} value={x.key}>
+                      {x.shortTitle} · {x.title}
+                    </option>
+                  ))}
+                </select>
+              </span>
               <span />
               <span />
               <span />

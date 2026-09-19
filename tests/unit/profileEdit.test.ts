@@ -1,6 +1,8 @@
 import { describe, expect, it } from 'vitest';
 import {
   addStage,
+  addableStages,
+  addBuiltinStage,
   assertPrefixes,
   duplicatePrefixes,
   moveStage,
@@ -97,6 +99,53 @@ describe('removing a stage', () => {
  * its stage dates are commitments, so dropping a stage there must not pull the
  * rest of the plan earlier.
  */
+/**
+ * Putting a stage back.
+ *
+ * Add used to mean one thing: a blank stage with no content, no activities and
+ * no baseline. Delete the wrong row and there was no way back — which is what
+ * this is for. The catalogue is what the app ships; a stage written by hand is
+ * not in it, and deleting one of those is still final.
+ */
+describe('adding a stage the app ships', () => {
+  const LIB = [
+    { key: 'a', title: 'A', shortTitle: 'A', phaseId: 'define', startOffsetWeeks: 0, durationWeeks: 4 },
+    { key: 'b', title: 'B', shortTitle: 'B', phaseId: 'define', startOffsetWeeks: 4, durationWeeks: 6 },
+    { key: 'd', title: 'D', shortTitle: 'D', phaseId: 'implement', startOffsetWeeks: 6, durationWeeks: 5 },
+  ];
+
+  it('offers only what the profile does not already run', () => {
+    expect(addableStages(BASE, LIB).map((s) => s.key)).toEqual(['d']);
+    expect(addableStages([], LIB).map((s) => s.key)).toEqual(['a', 'b', 'd']);
+  });
+
+  it('brings the stage back with its title, prefix, band and schedule', () => {
+    const out = addBuiltinStage(removeStage(BASE, 'b'), LIB[1]);
+    const back = out.find((s) => s.key === 'b')!;
+    expect(back).toMatchObject({
+      key: 'b',
+      title: 'B',
+      shortTitle: 'B',
+      phaseId: 'define',
+      /* it points at the built-in content again, which is what carries its
+         write-up, deliverables and activities */
+      baseKey: 'b',
+      startOffsetWeeks: 4,
+      durationWeeks: 6,
+    });
+  });
+
+  it('puts it back where its dates say it belongs, and renumbers', () => {
+    const out = addBuiltinStage(removeStage(BASE, 'b'), LIB[1]);
+    expect(out.map((s) => s.key)).toEqual(['a', 'b', 'c']);
+    expect(out.map((s) => s.order)).toEqual([0, 1, 2]);
+  });
+
+  it('refuses one the profile already runs', () => {
+    expect(() => addBuiltinStage(BASE, LIB[0])).toThrow(StageEditError);
+  });
+});
+
 describe('rebasing a template onto its kickoff', () => {
   it('slides everything back when nothing starts at the kickoff any more', () => {
     const out = rebaseToKickoff(removeStage(BASE, 'a'));

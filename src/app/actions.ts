@@ -1,6 +1,7 @@
 'use server';
 
 import { revalidatePath } from 'next/cache';
+import { ALL_ACTIVITIES, ALL_ACTIVITY_TITLES } from '@/data/builtins';
 import { RISK_AUTHOR } from '@/data/riskSeeds';
 import { stageMilestone } from '@/data/scheduleProfiles';
 import type { ItemKind, ScheduleProfile, StageBaseline, StageId } from '@/data/types';
@@ -519,6 +520,10 @@ export async function saveProjectStages(input: SaveStagesInput) {
         template: !!templateName,
       },
     });
+    /* The activities come along with the stages. Without this the fork carried
+       none, and a programme with no rows is read straight from the SoC library
+       — which a 3DIC programme's stack stages are not in. */
+    await copyActivities(current.id, profileId);
   } else {
     await prisma.profile.update({
       where: { id: profileId },
@@ -583,6 +588,47 @@ export async function saveProjectStages(input: SaveStagesInput) {
     }),
     prisma.project.update({ where: { id: project.id }, data: { profileId } }),
   ]);
+
+  /* Stages the plan did not have a moment ago — the picker put them back, or
+     somebody added one. An added blank stage has neither activities nor
+     deliverables to restore; a stage the app ships has both, and they are what
+     make it a stage again rather than a bar on the chart. */
+  const added = input.stages
+    .map((st) => st.key)
+    .filter((key) => !current.stages.some((c) => c.key === key));
+  if (added.length) {
+    await restoreStageActivities(profileId, added, input.stages.map((st) => st.key));
+    const back = resolveStages({
+      ...current,
+      id: profileId,
+      stages: input.stages.map((st, order) => ({ ...st, order })),
+    }).filter((stage) => added.includes(stage.id));
+    const plan = computeSchedule(
+      (await prisma.project.findUnique({ where: { id: project.id }, select: { kickoff: true } }))!
+        .kickoff,
+      { ...current, id: profileId, stages: input.stages.map((st, order) => ({ ...st, order })) },
+      {},
+    );
+    const rows = back.flatMap((stage) => {
+      const span = plan.stages[stage.id];
+      return stage.deliverables.map((title, position) => ({
+        id: `${project.id}:dlv:${stage.id}:${position}`,
+        projectId: project.id,
+        stageId: stage.id,
+        title,
+        due: addWeeks(
+          span.start,
+          stage.deliverableWeek?.[position] ??
+            (span.durationWeeks * (position + 1)) / stage.deliverables.length,
+        ),
+        done: false,
+        completedAt: null,
+        position,
+      }));
+    });
+    /* skipDuplicates: a stage added and saved twice keeps the rows it has */
+    if (rows.length) await prisma.deliverable.createMany({ data: rows, skipDuplicates: true });
+  }
 
   /* A profile nobody is on any more is nobody's history — drop it, unless it
      is a template or the built-in one, which exist to be started from. */
@@ -787,6 +833,51 @@ const copyActivities = (fromProfileId: string, toProfileId: string) =>
   copyProfileActivities(prisma, fromProfileId, toProfileId);
 
 /**
+ * Give a stage back the activities the app ships for it.
+ *
+ * A stage put back on a plan — by the picker, after somebody removed it by
+ * mistake — arrives with its key and nothing else: the rows that said which
+ * activities it runs went when it did. They are inherited rows, so this writes
+ * the list and the schedule and leaves the steps and write-ups in the library.
+ *
+ * Only for stages that carry none: one edited down to two activities on purpose
+ * keeps its two. And a profile carrying no rows at all is read straight from
+ * the library, so filling in one stage would be the change that hides all the
+ * others — that one is materialised whole.
+ */
+async function restoreStageActivities(
+  profileId: string,
+  added: readonly string[],
+  allKeys: readonly string[],
+) {
+  if (!added.length) return;
+  const held = await prisma.profileActivity.findMany({
+    where: { profileId },
+    select: { stageKey: true },
+  });
+  const has = new Set(held.map((a) => a.stageKey));
+  const wanted = held.length ? added.filter((key) => !has.has(key)) : allKeys;
+  const rows = wanted
+    .flatMap((key) =>
+      Object.entries(ALL_ACTIVITIES)
+        .filter(([, a]) => a.st === key)
+        .map(([ref, a]) => ({
+          id: `${profileId}:act:${ref}`,
+          profileId,
+          stageKey: key,
+          ref,
+          title: ALL_ACTIVITY_TITLES[ref] ?? ref,
+          windowFrom: a.w[0],
+          windowTo: a.w[1],
+          baseRef: ref,
+        })),
+    )
+    .map((row, order) => ({ ...row, order }));
+  if (rows.length) await prisma.profileActivity.createMany({ data: rows, skipDuplicates: true });
+}
+
+
+/**
  * Copy a template so it can be edited.
  *
  * The built-in one is read-only, so this is the only way to change what it
@@ -931,6 +1022,13 @@ export async function saveProfileStages(input: {
       prisma.profileActivity.update({ where: { id: r.id }, data: { ref: r.to } }),
     ),
   ]);
+  /* A stage the picker put back arrives with its key and nothing else; the
+     activities the app ships for it are written again here. */
+  await restoreStageActivities(
+    profile.id,
+    stages.map((st) => st.key).filter((key) => !was.has(key)),
+    stages.map((st) => st.key),
+  );
   revalidatePath('/');
   revalidatePath('/templates');
 }
