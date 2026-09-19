@@ -205,6 +205,30 @@ export function removeStage(
   return renumber(stages.filter((s) => s.key !== key));
 }
 
+/**
+ * Slide a template's stages back so the earliest starts at the kickoff.
+ *
+ * A template's weeks are counted from the kickoff, so week 0 is the kickoff.
+ * Delete the stage sitting there — Product Definition, usually — and nothing
+ * does any more: every stage kept a number saying "six weeks in", and the
+ * template describes a programme that starts six weeks after it starts. The
+ * shift keeps every gap and every length; only the zero moves.
+ *
+ * Measured from the earliest stage rather than from the top row. The rows are
+ * ordered by hand and need not run in date order, and rebasing onto a row that
+ * is not the earliest would put a stage before the kickoff.
+ *
+ * The template editor calls this after removing a stage. A programme does not:
+ * its kickoff is a real date and its stage dates are commitments, so dropping
+ * a stage there leaves the rest where the programme said they would be.
+ */
+export function rebaseToKickoff(stages: readonly ProfileStageDef[]): ProfileStageDef[] {
+  if (!stages.length) return [];
+  const first = Math.min(...stages.map((s) => s.startOffsetWeeks));
+  if (first <= 0) return [...stages];
+  return stages.map((s) => ({ ...s, startOffsetWeeks: s.startOffsetWeeks - first }));
+}
+
 export function moveStage(
   stages: readonly ProfileStageDef[],
   key: string,

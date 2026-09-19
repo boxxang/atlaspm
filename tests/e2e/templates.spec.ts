@@ -119,6 +119,40 @@ test.describe('templates', () => {
       await expect(first.locator('[data-stage-end]')).toHaveValue(iso('2026-01-05', tat * 7));
     });
 
+    /* The weeks are counted from the kickoff, so deleting every stage that sits
+       on it would otherwise leave the whole template starting weeks late. Two
+       stages open this one — Product Definition and Technology both start at
+       week 0 — so both have to go before the rebase has anything to do. */
+    test('deleting the stages that open the programme slides the rest onto the kickoff', async ({
+      page,
+    }) => {
+      await duplicate(page);
+      await page.locator('[data-template]').filter({ hasText: NAME }).locator('[data-edit-template]').click();
+      await page.locator('[data-tpl-kickoff]').fill('2026-01-05');
+
+      const ip = page.locator('[data-stage-row="ipReadiness"]');
+      const arch = page.locator('[data-stage-row="architecture"]');
+      const day = (v: string) => Date.parse(v);
+      const gapBefore =
+        day(await arch.locator('[data-stage-start]').inputValue()) -
+        day(await ip.locator('[data-stage-start]').inputValue());
+      const ipTat = await ip.locator('[data-stage-tat]').inputValue();
+      /* IP Readiness starts four weeks in, so it is not on the kickoff yet */
+      await expect(ip.locator('[data-stage-start]')).toHaveValue('2026-02-02');
+
+      await page.locator('[data-stage-row="productDefinition"] [data-del-stage]').click();
+      await page.locator('[data-stage-row="technology"] [data-del-stage]').click();
+
+      /* the earliest stage left now opens the programme, and nothing else moved
+         relative to it — the gaps and the lengths are the template's claim */
+      await expect(ip.locator('[data-stage-start]')).toHaveValue('2026-01-05');
+      await expect(ip.locator('[data-stage-tat]')).toHaveValue(ipTat);
+      const gapAfter =
+        day(await arch.locator('[data-stage-start]').inputValue()) -
+        day(await ip.locator('[data-stage-start]').inputValue());
+      expect(gapAfter).toBe(gapBefore);
+    });
+
     test('moving the kickoff moves every date and no week', async ({ page }) => {
       await duplicate(page);
       await page.locator('[data-template]').filter({ hasText: NAME }).locator('[data-edit-template]').click();

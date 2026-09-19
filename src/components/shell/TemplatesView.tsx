@@ -20,6 +20,7 @@ import {
   moveStage,
   normalizePrefix,
   prefixCharsOk,
+  rebaseToKickoff,
   removeStage,
   retimeStageByDate,
   setStagePrefix,
@@ -615,7 +616,12 @@ function StageDialog({
                     type="button"
                     className="btn sm dng"
                     data-del-stage
-                    onClick={() => edit((cur) => removeStage(cur, st.key))}
+                    onClick={() =>
+                      /* the template's weeks are counted from the kickoff, so
+                         dropping the stage that sits at week 0 slides the rest
+                         back rather than leaving the plan starting late */
+                      edit((cur) => rebaseToKickoff(removeStage(cur, st.key)))
+                    }
                   >
                     Remove
                   </button>

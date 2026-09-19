@@ -7,6 +7,7 @@ import {
   normalizePrefix,
   prefixCharsOk,
   refRenames,
+  rebaseToKickoff,
   removeStage,
   retimeStage,
   setStagePrefix,
@@ -81,6 +82,44 @@ describe('removing a stage', () => {
 
   it('refuses a stage that is not there', () => {
     expect(() => removeStage(BASE, 'zz')).toThrow(/No such stage: zz/);
+  });
+});
+
+/**
+ * A template's weeks are counted from the kickoff, so week 0 is the kickoff
+ * itself. Delete the stage that sits there and nothing does: every remaining
+ * stage keeps a number that says "start six weeks in", and the template no
+ * longer describes a programme that begins when it begins. Rebasing slides the
+ * whole list back so the earliest stage starts at the kickoff again, keeping
+ * every gap and every length.
+ *
+ * Only the template editor calls it. A programme's kickoff is a real date and
+ * its stage dates are commitments, so dropping a stage there must not pull the
+ * rest of the plan earlier.
+ */
+describe('rebasing a template onto its kickoff', () => {
+  it('slides everything back when nothing starts at the kickoff any more', () => {
+    const out = rebaseToKickoff(removeStage(BASE, 'a'));
+    expect(out.map((s) => s.startOffsetWeeks)).toEqual([0, 6]);
+    expect(out.map((s) => s.durationWeeks)).toEqual([6, 8]);
+  });
+
+  it('leaves a list that already starts at the kickoff alone', () => {
+    expect(rebaseToKickoff(BASE)).toEqual(BASE);
+    expect(rebaseToKickoff(removeStage(BASE, 'b')).map((s) => s.startOffsetWeeks)).toEqual([0, 10]);
+  });
+
+  /* The rows are ordered by hand and need not run in date order, so the shift
+     is measured from the earliest stage rather than from the top row — the top
+     row is normally the earliest, and anything else would push a stage before
+     the kickoff. */
+  it('measures the shift from the earliest stage, not from the top row', () => {
+    const out = rebaseToKickoff([st('x', 0, 9, 4), st('y', 1, 5, 4)]);
+    expect(out.map((s) => s.startOffsetWeeks)).toEqual([4, 0]);
+  });
+
+  it('is unbothered by an empty list', () => {
+    expect(rebaseToKickoff([])).toEqual([]);
   });
 });
 
