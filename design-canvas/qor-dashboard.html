@@ -85,6 +85,15 @@ h1{font-size:23px;font-weight:600;letter-spacing:-.02em;margin-bottom:6px}
 .switch button[aria-selected="true"]{background:var(--ink);color:var(--bg);font-weight:600}
 .switch .n{margin-left:6px;font-size:10.5px;opacity:.7}
 .sets{display:inline-flex;gap:2px;padding:2px;border:1px solid var(--line);border-radius:999px}
+/* where the numbers came from, and how to change that */
+.srcbar{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.src{display:flex;align-items:center;gap:10px;margin-bottom:14px;font-size:12px;color:var(--ink-2)}
+.srcname{max-width:240px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding:3px 9px;border:1px solid var(--line);border-radius:999px;background:var(--sunken);color:var(--ink)}
+.lnk{font-size:12px;color:var(--accent);border-bottom:1px solid transparent}
+.lnk:hover{border-bottom-color:var(--accent)}
+.file{cursor:pointer}
+.loadmsg{display:flex;flex-direction:column;gap:2px;margin:-4px 0 14px;font-size:11.5px;color:var(--ink-3)}
+.loadmsg .err{color:var(--risk)}
 .sets button{padding:4px 11px;border-radius:999px;font-size:11.5px;color:var(--ink-2)}
 .sets button[aria-selected="true"]{background:var(--muted);color:var(--ink);font-weight:600}
 
@@ -188,10 +197,20 @@ h1{font-size:23px;font-weight:600;letter-spacing:-.02em;margin-bottom:6px}
   </div>
 
   <div class="drops" role="tablist" aria-label="Netlist drop" id="drops"></div>
-  <div class="switch" role="tablist" aria-label="What to read">
-    <button role="tab" aria-selected="true" data-view="chip">Full chip</button>
-    <button role="tab" aria-selected="false" data-view="block">By block <span class="n" id="blockN">60</span></button>
+  <div class="srcbar">
+    <div class="switch" role="tablist" aria-label="What to read">
+      <button role="tab" aria-selected="true" data-view="chip">Full chip</button>
+      <button role="tab" aria-selected="false" data-view="block">By block <span class="n" id="blockN">60</span></button>
+    </div>
+    <div class="src">
+      <span>Data</span>
+      <span class="srcname" id="srcName">Sample data</span>
+      <button class="lnk" id="dlTemplate">Download template</button>
+      <label class="lnk file">Load workbook…<input type="file" id="wbFile" accept=".xlsx" hidden /></label>
+      <button class="lnk" id="useSample" hidden>Back to sample</button>
+    </div>
   </div>
+  <p class="loadmsg" id="loadMsg" hidden></p>
 
   <div class="tiles" id="tiles"></div>
 
@@ -245,8 +264,8 @@ h1{font-size:23px;font-weight:600;letter-spacing:-.02em;margin-bottom:6px}
   </section>
 
   <p class="foot">
-    Mock-up for review. Every value comes from the QoR spreadsheet template — one row per block per netlist
-    drop — and the chip rows are rolled up from those against the signoff targets.
+    Mock-up for review. Every value comes from the QoR workbook — one sheet per netlist drop, one row per
+    block — and the chip rows are rolled up from those against the targets on its Targets sheet.
   </p>
 </div>
 
@@ -276,8 +295,9 @@ const BLOCKS = [
   ['efuse_ctrl','System',120],['thermal_mon','System',140],['adc_wrap','Analog',180],['pll_wrap0','Analog',150],
 ];
 
-/* The four drops, and what each one is. */
-const DROPS = [
+/* The four drops, and what each one is. Sample values until a workbook is
+   loaded, which replaces them — so these three are let, not const. */
+let DROPS = [
   { id:'N0', label:'N0', date:'04/14/2023' },
   { id:'N1', label:'N1', date:'06/23/2023' },
   { id:'N2', label:'N2', date:'08/18/2023' },
@@ -443,7 +463,7 @@ const LABEL = { clean:'Clean', watch:'Watching', fail:'Failing', none:'Not run' 
 /* Build every drop. A handful of blocks are not in the first netlist at all —
    they arrive with N1 — which is what "Not run" is for. */
 const LATE = new Set(['trace_top','perf_mon','thermal_mon','sdio_top','mailbox']);
-const DATA = DROPS.map((d, i) => {
+let DATA = DROPS.map((d, i) => {
   const rnd = rand(97 + i * 1013);
   return BLOCKS.map((b) => {
     if (i === 0 && LATE.has(b[0])) return { name:b[0], group:b[1], missing:true, stage:0 };
@@ -456,6 +476,9 @@ const DATA = DROPS.map((d, i) => {
 function roll(rows) {
   const live = rows.filter((r) => !r.missing);
   const by = { clean:0, watch:0, fail:0, none:rows.length - live.length };
+  /* a drop nobody has run yet: every measure zero rather than an average of
+     nothing, which prints NaN across the whole table */
+  if (!live.length) return { by, stages:STAGES.map(() => 0), ...Object.fromEntries(Object.keys(CHIP).map((k) => [k, 0])) };
   for (const r of live) by[statusOf(r)]++;
   return {
     by,
@@ -536,7 +559,7 @@ const CHIP = {
 };
 
 
-const ROLL = DATA.map(roll);
+let ROLL = DATA.map(roll);
 
 /* ── rendering ─────────────────────────────────────────────── */
 let drop = 3;              /* the FFN, because that is where the story is */
@@ -861,6 +884,300 @@ document.addEventListener('mousemove', (e) => {
   const r = tip.getBoundingClientRect();
   tip.style.left = Math.min(e.clientX + 14, window.innerWidth - r.width - 10) + 'px';
   tip.style.top = Math.max(10, e.clientY - r.height - 12) + 'px';
+});
+
+/* ── the workbook ─────────────────────────────────────────────
+   Everything on this page comes from one .xlsx: a Blocks sheet, a Drops
+   sheet, a Targets sheet, and one sheet per drop named after it. A block
+   left out of a drop's sheet reads "Not run" in that drop, which is how a
+   block that arrives late is said.
+
+   The file is read here rather than by a library, because this page is
+   opened from disk and a CDN it cannot reach is a page that cannot read
+   its own data. A .xlsx is a zip of XML; the browser inflates it. */
+
+const SHEET_COLS = [
+  { h:'Block', k:'name', t:'text' },
+  { h:'P&R stage', k:'stage', t:'stage' },
+  { h:'Instances (K)', k:'inst', t:'int' },
+  { h:'Utilization (%)', k:'util', t:'num' },
+  { h:'Setup WNS (ps)', k:'wns', t:'int' },
+  { h:'Setup TNS (ns)', k:'tns', t:'num' },
+  { h:'Setup failing endpoints', k:'feps', t:'int' },
+  { h:'Setup scenario', k:'setupScn', t:'text' },
+  { h:'Hold WNS (ps)', k:'holdW', t:'int' },
+  { h:'Hold TNS (ns)', k:'holdTns', t:'num' },
+  { h:'Hold failing endpoints', k:'holdV', t:'int' },
+  { h:'Hold scenario', k:'holdScn', t:'text' },
+  { h:'Clock skew (ps)', k:'skew', t:'int' },
+  { h:'Max transition violations', k:'maxTran', t:'int' },
+  { h:'Worst transition (ns)', k:'worstTran', t:'num' },
+  { h:'Max capacitance violations', k:'maxCap', t:'int' },
+  { h:'Max fanout violations', k:'maxFanout', t:'int' },
+  { h:'Min period violations', k:'minPeriod', t:'int' },
+  { h:'Min pulse width violations', k:'mpw', t:'int' },
+  { h:'Global route overflow (%)', k:'overflow', t:'num' },
+  { h:'DRC after route', k:'drc', t:'int' },
+  { h:'Dynamic power (mW)', k:'dyn', t:'int' },
+  { h:'Leakage power (mW)', k:'leak', t:'num' },
+  { h:'Power budget (mW)', k:'budget', t:'int' },
+  { h:'IR drop static (mV)', k:'irStatic', t:'num' },
+  { h:'IR drop dynamic (mV)', k:'irDynamic', t:'num' },
+  { h:'Turn runtime (h)', k:'runtime', t:'num' },
+  { h:'ECOs applied', k:'ecos', t:'int' },
+  { h:'ECO rounds', k:'ecoRounds', t:'int' },
+];
+
+/* ── zip, both directions ─────────────────────────────────── */
+
+const CRC = (() => {
+  const t = new Uint32Array(256);
+  for (let i = 0; i < 256; i++) { let c = i; for (let j = 0; j < 8; j++) c = c & 1 ? 0xedb88320 ^ (c >>> 1) : c >>> 1; t[i] = c >>> 0; }
+  return (u8) => { let c = 0xffffffff; for (let i = 0; i < u8.length; i++) c = t[(c ^ u8[i]) & 255] ^ (c >>> 8); return (c ^ 0xffffffff) >>> 0; };
+})();
+
+/* Written stored, not deflated: a template is a few hundred kilobytes and
+   Excel opens a stored zip like any other. */
+function zipWrite(files) {
+  const enc = new TextEncoder(), parts = [], dir = [];
+  let off = 0;
+  for (const [path, text] of files) {
+    const name = enc.encode(path), body = enc.encode(text), crc = CRC(body);
+    const lh = new DataView(new ArrayBuffer(30));
+    lh.setUint32(0, 0x04034b50, true); lh.setUint16(4, 20, true); lh.setUint16(6, 0x0800, true);
+    lh.setUint32(14, crc, true); lh.setUint32(18, body.length, true); lh.setUint32(22, body.length, true);
+    lh.setUint16(26, name.length, true);
+    parts.push(new Uint8Array(lh.buffer), name, body);
+    const ch = new DataView(new ArrayBuffer(46));
+    ch.setUint32(0, 0x02014b50, true); ch.setUint16(4, 20, true); ch.setUint16(6, 20, true);
+    ch.setUint16(8, 0x0800, true);
+    ch.setUint32(16, crc, true); ch.setUint32(20, body.length, true); ch.setUint32(24, body.length, true);
+    ch.setUint16(28, name.length, true); ch.setUint32(42, off, true);
+    dir.push(new Uint8Array(ch.buffer), name);
+    off += 30 + name.length + body.length;
+  }
+  const dirSize = dir.reduce((n, p) => n + p.length, 0);
+  const eo = new DataView(new ArrayBuffer(22));
+  eo.setUint32(0, 0x06054b50, true); eo.setUint16(8, files.length, true); eo.setUint16(10, files.length, true);
+  eo.setUint32(12, dirSize, true); eo.setUint32(16, off, true);
+  return new Blob([...parts, ...dir, new Uint8Array(eo.buffer)], { type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+}
+
+async function zipRead(buf) {
+  const dv = new DataView(buf), u8 = new Uint8Array(buf);
+  let eo = -1;
+  for (let i = buf.byteLength - 22; i >= 0 && i > buf.byteLength - 66000; i--)
+    if (dv.getUint32(i, true) === 0x06054b50) { eo = i; break; }
+  if (eo < 0) throw new Error('not a zip — is this really an .xlsx?');
+  const n = dv.getUint16(eo + 10, true);
+  let p = dv.getUint32(eo + 16, true);
+  const out = {}, dec = new TextDecoder();
+  for (let i = 0; i < n; i++) {
+    const nameLen = dv.getUint16(p + 28, true), extra = dv.getUint16(p + 30, true), cmt = dv.getUint16(p + 32, true);
+    const method = dv.getUint16(p + 10, true), size = dv.getUint32(p + 20, true);
+    const lo = dv.getUint32(p + 42, true);
+    const name = dec.decode(u8.subarray(p + 46, p + 46 + nameLen));
+    const ln = dv.getUint16(lo + 26, true), le = dv.getUint16(lo + 28, true);
+    const start = lo + 30 + ln + le, raw = u8.subarray(start, start + size);
+    out[name] = method === 0
+      ? dec.decode(raw)
+      : dec.decode(await new Response(new Blob([raw]).stream().pipeThrough(new DecompressionStream('deflate-raw'))).arrayBuffer());
+    p += 46 + nameLen + extra + cmt;
+  }
+  return out;
+}
+
+/* ── the template, written from the sample ────────────────── */
+
+const xe = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;' }[c]));
+const colName = (i) => { let s = ''; i++; while (i > 0) { const m = (i - 1) % 26; s = String.fromCharCode(65 + m) + s; i = (i - m - 1) / 26; } return s; };
+
+function sheetXml(rows) {
+  const body = rows.map((cells, r) => {
+    const cs = cells.map((v, c) => {
+      const ref = colName(c) + (r + 1);
+      if (v === null || v === undefined || v === '') return '';
+      return typeof v === 'number'
+        ? `<c r="${ref}"><v>${v}</v></c>`
+        : `<c r="${ref}" t="inlineStr" s="${r === 0 ? 1 : 0}"><is><t>${xe(v)}</t></is></c>`;
+    }).join('');
+    return `<row r="${r + 1}">${cs}</row>`;
+  }).join('');
+  return `<?xml version="1.0" encoding="UTF-8"?><worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"><sheetData>${body}</sheetData></worksheet>`;
+}
+
+function buildWorkbook() {
+  const sheets = [
+    ['Blocks', [['Block','Group'], ...BLOCKS.map((b) => [b[0], b[1]])]],
+    ['Drops', [['Drop','Label','Date'], ...DROPS.map((d) => [d.id, d.label, d.date])]],
+    ['Targets', [['Measure','Target','Unit','Good when'],
+      ...Object.entries(CHIP).map(([k, c]) => [c.label, c.target, c.unit || '', c.good === 'above' ? 'higher' : 'lower'])]],
+    ...DROPS.map((d, i) => [d.id, [
+      SHEET_COLS.map((c) => c.h),
+      ...DATA[i].filter((r) => !r.missing).map((r) => SHEET_COLS.map((c) => (c.t === 'stage' ? STAGES[r.stage] : r[c.k]))),
+    ]]),
+  ];
+  const files = [
+    ['[Content_Types].xml', `<?xml version="1.0" encoding="UTF-8"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/><Override PartName="/xl/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml"/>${sheets.map((_, i) => `<Override PartName="/xl/worksheets/sheet${i + 1}.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/>`).join('')}</Types>`],
+    ['_rels/.rels', `<?xml version="1.0" encoding="UTF-8"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="xl/workbook.xml"/></Relationships>`],
+    ['xl/workbook.xml', `<?xml version="1.0" encoding="UTF-8"?><workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"><sheets>${sheets.map(([n], i) => `<sheet name="${xe(n)}" sheetId="${i + 1}" r:id="rId${i + 1}"/>`).join('')}</sheets></workbook>`],
+    ['xl/_rels/workbook.xml.rels', `<?xml version="1.0" encoding="UTF-8"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">${sheets.map((_, i) => `<Relationship Id="rId${i + 1}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet${i + 1}.xml"/>`).join('')}<Relationship Id="rIdS" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/></Relationships>`],
+    ['xl/styles.xml', `<?xml version="1.0" encoding="UTF-8"?><styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"><fonts count="2"><font><sz val="11"/><name val="Calibri"/></font><font><b/><sz val="11"/><name val="Calibri"/></font></fonts><fills count="1"><fill><patternFill patternType="none"/></fill></fills><borders count="1"><border/></borders><cellStyleXfs count="1"><xf numFmtId="0" fontId="0" fillId="0" borderId="0"/></cellStyleXfs><cellXfs count="2"><xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0"/><xf numFmtId="0" fontId="1" fillId="0" borderId="0" xfId="0" applyFont="1"/></cellXfs><cellStyles count="1"><cellStyle name="Normal" xfId="0" builtinId="0"/></cellStyles></styleSheet>`],
+    ...sheets.map(([, rows], i) => [`xl/worksheets/sheet${i + 1}.xml`, sheetXml(rows)]),
+  ];
+  return zipWrite(files);
+}
+
+/* ── reading one back ─────────────────────────────────────── */
+
+function readSheets(parts) {
+  const dom = (s) => new DOMParser().parseFromString(s, 'application/xml');
+  const wb = dom(parts['xl/workbook.xml']);
+  const rels = {};
+  for (const r of dom(parts['xl/_rels/workbook.xml.rels']).getElementsByTagName('Relationship'))
+    rels[r.getAttribute('Id')] = r.getAttribute('Target').replace(/^\/?(xl\/)?/, 'xl/');
+  const shared = [];
+  if (parts['xl/sharedStrings.xml'])
+    for (const si of dom(parts['xl/sharedStrings.xml']).getElementsByTagName('si'))
+      shared.push([...si.getElementsByTagName('t')].map((t) => t.textContent).join(''));
+
+  const out = {};
+  for (const sh of wb.getElementsByTagName('sheet')) {
+    const id = sh.getAttributeNS('http://schemas.openxmlformats.org/officeDocument/2006/relationships', 'id')
+      || sh.getAttribute('r:id');
+    const xml = parts[rels[id]];
+    if (!xml) continue;
+    const rows = [];
+    for (const row of dom(xml).getElementsByTagName('row')) {
+      const cells = [];
+      for (const c of row.getElementsByTagName('c')) {
+        const ref = (c.getAttribute('r') || '').replace(/\d+/g, '');
+        let i = 0; for (const ch of ref) i = i * 26 + (ch.charCodeAt(0) - 64);
+        const t = c.getAttribute('t');
+        const v = c.getElementsByTagName('v')[0], is = c.getElementsByTagName('is')[0];
+        cells[i - 1] = t === 's' ? shared[+v.textContent]
+          : is ? [...is.getElementsByTagName('t')].map((x) => x.textContent).join('')
+          : v ? v.textContent : '';
+      }
+      rows.push(cells);
+    }
+    out[sh.getAttribute('name')] = rows;
+  }
+  return out;
+}
+
+const num = (v) => { const n = parseFloat(String(v ?? '').replace(/,/g, '')); return Number.isFinite(n) ? n : 0; };
+
+/* Turns sheets into the same shape the generator produces, and says what it
+   could not use. Nothing here throws on a column it does not know: a team
+   adds columns to a spreadsheet, and a dashboard that refuses the file over
+   one is a dashboard nobody loads twice. */
+function fromSheets(sheets) {
+  const warn = [], norm = (s) => String(s ?? '').trim().toLowerCase().replace(/\s+/g, ' ');
+  const head = (rows) => (rows[0] || []).map(norm);
+
+  const blocksRows = sheets.Blocks || sheets.blocks;
+  if (!blocksRows) throw new Error('no Blocks sheet');
+  const groupOf = {}, order = [];
+  for (const r of blocksRows.slice(1)) {
+    const name = String(r[0] ?? '').trim();
+    if (!name) continue;
+    groupOf[name] = String(r[1] ?? '—').trim() || '—';
+    order.push(name);
+  }
+  if (!order.length) throw new Error('the Blocks sheet has no blocks');
+
+  const dropRows = sheets.Drops || sheets.drops;
+  if (!dropRows) throw new Error('no Drops sheet');
+  const drops = dropRows.slice(1)
+    .filter((r) => String(r[0] ?? '').trim())
+    .map((r) => ({ id:String(r[0]).trim(), label:String(r[1] ?? r[0]).trim(), date:String(r[2] ?? '').trim() }));
+  if (!drops.length) throw new Error('the Drops sheet has no drops');
+
+  const targets = {};
+  const tRows = sheets.Targets || sheets.targets;
+  if (tRows) {
+    const byLabel = {};
+    for (const [k, c] of Object.entries(CHIP)) byLabel[norm(c.label)] = k;
+    for (const r of tRows.slice(1)) {
+      const k = byLabel[norm(r[0])];
+      if (k) targets[k] = num(r[1]);
+      else if (String(r[0] ?? '').trim()) warn.push(`Targets: "${String(r[0]).trim()}" is not a measure this page draws`);
+    }
+  }
+
+  const stageIndex = {};
+  STAGES.forEach((s, i) => { stageIndex[norm(s)] = i; });
+
+  const data = drops.map((d) => {
+    const rows = sheets[d.id];
+    if (!rows) { warn.push(`no sheet named "${d.id}" — that drop reads as not run`); return order.map((n) => ({ name:n, group:groupOf[n], missing:true, stage:0 })); }
+    const h = head(rows), map = {};
+    for (const c of SHEET_COLS) { const i = h.indexOf(norm(c.h)); if (i >= 0) map[c.k] = i; }
+    const missing = SHEET_COLS.filter((c) => map[c.k] === undefined).map((c) => c.h);
+    if (missing.length) warn.push(`${d.id}: no column for ${missing.join(', ')} — read as blank`);
+    const known = new Set(SHEET_COLS.map((c) => norm(c.h)));
+    const extra = h.filter((x) => x && !known.has(x));
+    if (extra.length) warn.push(`${d.id}: ignored ${extra.length} column${extra.length > 1 ? 's' : ''} (${extra.join(', ')})`);
+
+    const seen = {};
+    for (const r of rows.slice(1)) {
+      const name = String(r[map.name] ?? '').trim();
+      if (!name) continue;
+      if (!groupOf[name]) { groupOf[name] = '—'; order.push(name); warn.push(`${d.id}: "${name}" is not on the Blocks sheet`); }
+      const m = { name, group:groupOf[name] };
+      for (const c of SHEET_COLS) {
+        if (c.k === 'name') continue;
+        const v = map[c.k] === undefined ? '' : r[map[c.k]];
+        m[c.k] = c.t === 'stage' ? (stageIndex[norm(v)] ?? 0) : c.t === 'text' ? String(v ?? '').trim() : c.t === 'int' ? Math.round(num(v)) : num(v);
+      }
+      m.power = m.dyn + m.leak;
+      m.grew = false;
+      seen[name] = m;
+    }
+    return order.map((n) => seen[n] || { name:n, group:groupOf[n], missing:true, stage:0 });
+  });
+
+  return { drops, data, targets, warn, rows:data.reduce((t, rows) => t + rows.filter((r) => !r.missing).length, 0) };
+}
+
+/* ── the menu ─────────────────────────────────────────────── */
+
+const SAMPLE = { drops:DROPS, data:DATA, targets:Object.fromEntries(Object.entries(CHIP).map(([k, c]) => [k, c.target])) };
+
+function useData(src, name, warn = []) {
+  DROPS = src.drops; DATA = src.data;
+  for (const [k, v] of Object.entries(src.targets)) if (CHIP[k]) CHIP[k].target = v;
+  ROLL = DATA.map(roll);
+  drop = Math.min(drop, DROPS.length - 1);
+  $('srcName').textContent = name;
+  $('useSample').hidden = name === 'Sample data';
+  $('loadMsg').hidden = !warn.length;
+  $('loadMsg').innerHTML = warn.map((w) => `<span>${xe(w)}</span>`).join('');
+  renderAll();
+}
+
+$('dlTemplate').addEventListener('click', () => {
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(buildWorkbook());
+  a.download = 'qor-template.xlsx';
+  a.click();
+  setTimeout(() => URL.revokeObjectURL(a.href), 4000);
+});
+
+$('useSample').addEventListener('click', () => useData(SAMPLE, 'Sample data'));
+
+$('wbFile').addEventListener('change', async (e) => {
+  const f = e.target.files[0];
+  if (!f) return;
+  e.target.value = '';
+  try {
+    const src = fromSheets(readSheets(await zipRead(await f.arrayBuffer())));
+    useData(src, f.name, [`${src.rows.toLocaleString()} block rows across ${src.drops.length} drops`, ...src.warn]);
+  } catch (err) {
+    $('loadMsg').hidden = false;
+    $('loadMsg').innerHTML = `<span class="err">${xe(f.name)}: ${xe(err.message)}</span>`;
+  }
 });
 
 renderAll();
