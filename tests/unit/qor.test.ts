@@ -157,6 +157,29 @@ describe('parseSheets', () => {
     expect(r.unit).toBe('ns');
   });
 
+  /* The slip the Meta sheet cannot catch on its own: a file in nanoseconds
+     that still says ps rounds to whole picoseconds of zero, and a drop full of
+     zero slack reads as a design that closed. */
+  it('says so when every slack is under a picosecond', () => {
+    const tiny = (name: string, wns: number) => row(name, { 'Setup WNS (ps)': wns, 'Hold WNS (ps)': 0.012, 'Clock skew (ps)': 0.064 });
+    const r = parseSheets(book({ FFN: [HEAD, tiny('cpu_core0', -0.117), tiny('npu_core0', -0.05)] }));
+    expect(r.warn).toContain("FFN: every slack is under a picosecond — check the Meta sheet's slack unit, which says ps");
+    expect(r.warn.some((w) => w.startsWith('N0: every slack'))).toBe(false);
+  });
+
+  it('does not cry unit at a drop whose slack is genuinely whole picoseconds', () => {
+    const r = parseSheets(book());
+    expect(r.warn.some((w) => w.includes('under a picosecond'))).toBe(false);
+  });
+
+  it('does not cry unit at a file that declared nanoseconds', () => {
+    const r = parseSheets(book({
+      Meta: [['Key', 'Value'], ['Slack unit', 'ns']],
+      FFN: [HEAD, row('cpu_core0', { 'Setup WNS (ps)': -0.117 }), row('npu_core0', { 'Setup WNS (ps)': -0.05 })],
+    }));
+    expect(r.warn.some((w) => w.includes('under a picosecond'))).toBe(false);
+  });
+
   it('reads one flat table with a Drop column, which is what a script writes', () => {
     const flat = [
       ['Drop', 'Group', ...HEAD],

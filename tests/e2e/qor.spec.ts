@@ -11,7 +11,10 @@ import { SHELL_PATH, test, writesSettled } from './fixtures';
  * reload is what was loaded, and a number nobody reported never becomes a zero
  * on the way through.
  */
-const WORKBOOK = path.join(__dirname, '../../design-canvas/qor-template.xlsx');
+/* The sixty blocks across four drops the mock-up was drawn against, in the
+   shape the parser reads. Not the empty template the page writes — that has
+   the same columns and no rows, and is tested by downloading it. */
+const WORKBOOK = path.join(__dirname, '../../design-canvas/qor-sample.xlsx');
 const QOR = `${SHELL_PATH}/stage/physicalDesign/qor`;
 
 const load = async (page: import('@playwright/test').Page, file = WORKBOOK) => {
@@ -48,7 +51,7 @@ test('draws the chip and the blocks from a loaded workbook, and keeps it', async
   await page.goto(QOR);
   await load(page);
 
-  await expect(page.locator('.qor-srcname')).toHaveText('qor-template.xlsx');
+  await expect(page.locator('.qor-srcname')).toHaveText('qor-sample.xlsx');
   /* four netlist drops, opening on the newest — the one being argued about */
   await expect(page.locator('.qor-drop')).toHaveCount(4);
   await expect(page.locator('.qor-drop[aria-selected="true"] .k')).toHaveText('FFN');
@@ -62,7 +65,7 @@ test('draws the chip and the blocks from a loaded workbook, and keeps it', async
   /* the workbook is stored, not held in the page */
   await writesSettled(page);
   await page.reload();
-  await expect(page.locator('.qor-srcname')).toHaveText('qor-template.xlsx');
+  await expect(page.locator('.qor-srcname')).toHaveText('qor-sample.xlsx');
   await expect(page.locator('.qor-qtbl')).toContainText('Setup WNS');
 });
 

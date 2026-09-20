@@ -151,6 +151,10 @@ export function parseSheets(sheets: Sheets, fileName = ''): ParseResult {
   const known = new Set(SHEET_COLS.flatMap((c) => [norm(c.h), norm(c.a), norm(c.k)]).concat('drop', 'group'));
 
   const notReported: Record<string, number> = {};
+  /* the slack each drop reported, before it was rounded to whole picoseconds:
+     a file written in nanoseconds under a Meta sheet that says picoseconds
+     rounds to zero and reads as a closed design */
+  const rawSlack: Record<string, number[]> = {};
   const badStage: Record<string, Set<string>> = {};
   const dupes: Record<string, Set<string>> = {};
 
@@ -183,7 +187,10 @@ export function parseSheets(sheets: Sheets, fileName = ''): ParseResult {
       let v = num(raw);
       if (v === null) notReported[tag] = (notReported[tag] || 0) + 1;
       else {
-        if (SLACK_PS.includes(c.k as MeasureKey)) v *= scale || 1;
+        if (SLACK_PS.includes(c.k as MeasureKey)) {
+          v *= scale || 1;
+          (rawSlack[tag] ??= []).push(v);
+        }
         v = c.t === 'int' ? Math.round(v) : +v.toFixed(3);
       }
       set[c.k] = v;
@@ -242,6 +249,15 @@ export function parseSheets(sheets: Sheets, fileName = ''): ParseResult {
     warn.push(`${tag}: ${[...set].join(', ')} appear${set.size > 1 ? '' : 's'} more than once — the last row wins`);
   for (const [tag, set] of Object.entries(badStage))
     warn.push(`${tag}: P&R stage ${[...set].map((s) => `"${s}"`).join(', ')} not recognised — read as Not started`);
+  /* Slack under a picosecond, everywhere, is not a design that closed: it is a
+     file whose numbers are in some other unit. It is not converted, because
+     nanoseconds and seconds are both a thousand apart from something and the
+     file is the only thing that knows which — but it is not passed over either,
+     since rounding it to whole picoseconds turns it into a clean drop. */
+  for (const [tag, vals] of Object.entries(rawSlack)) {
+    if (vals.length < 5 || !vals.some((v) => v !== 0) || vals.some((v) => Math.abs(v) >= 1)) continue;
+    warn.push(`${tag}: every slack is under a picosecond — check the Meta sheet's slack unit, which says ${unit}`);
+  }
   for (const [tag, n] of Object.entries(notReported))
     warn.push(`${tag}: ${n} value${n > 1 ? 's' : ''} blank or unreadable — shown as not reported, left out of the roll-up`);
 

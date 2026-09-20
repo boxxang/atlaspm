@@ -1251,7 +1251,7 @@ function fromSheets(sheets, fallbackTargets) {
   };
   const known = new Set(SHEET_COLS.flatMap((c) => [norm(c.h), norm(c.a), norm(c.k)]).concat('drop', 'group'));
 
-  const notReported = {}, badStage = {}, dupes = {};
+  const notReported = {}, badStage = {}, dupes = {}, rawSlack = {};
   const readRow = (r, map, tag) => {
     const name = String(r[map.name] ?? '').trim();
     if (!name) return null;
@@ -1272,7 +1272,7 @@ function fromSheets(sheets, fallbackTargets) {
       let v = num(raw);
       if (v === null) notReported[tag] = (notReported[tag] || 0) + 1;
       else {
-        if (SLACK_PS.includes(c.k)) v *= scale || 1;
+        if (SLACK_PS.includes(c.k)) { v *= scale || 1; (rawSlack[tag] ??= []).push(v); }
         if (c.t === 'int') v = Math.round(v);
         else v = +v.toFixed(3);
       }
@@ -1324,6 +1324,14 @@ function fromSheets(sheets, fallbackTargets) {
     warn.push(`${tag}: ${[...set].join(', ')} appear${set.size > 1 ? '' : 's'} more than once — the last row wins`);
   for (const [tag, set] of Object.entries(badStage))
     warn.push(`${tag}: P&R stage ${[...set].map((s) => `"${s}"`).join(', ')} not recognised — read as Not started`);
+  /* Slack under a picosecond, everywhere, is not a design that closed: it is a
+     file whose numbers are in some other unit. It is not converted — ns and s
+     are both a thousand apart from something and only the file knows which —
+     but it is not passed over either, since rounding it to whole picoseconds
+     turns it into a clean drop. */
+  for (const [tag, vals] of Object.entries(rawSlack))
+    if (vals.length >= 5 && vals.some((v) => v !== 0) && !vals.some((v) => Math.abs(v) >= 1))
+      warn.push(`${tag}: every slack is under a picosecond — check the Meta sheet's slack unit, which says ${unit}`);
   for (const [tag, n] of Object.entries(notReported))
     warn.push(`${tag}: ${n} value${n > 1 ? 's' : ''} blank or unreadable — shown as not reported, left out of the roll-up`);
 
