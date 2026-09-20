@@ -30,13 +30,13 @@ generator client {
 /// its profile with anyone, it gets a private copy first, so no other program is
 /// ever rescheduled by someone else's edit.
 model Profile {
-  id        String   @id
-  name      String
-  builtin   Boolean  @default(false)
+  id               String   @id
+  name             String
+  builtin          Boolean  @default(false)
   /// Listed as a template others can start from. A program that edits its own
   /// stages gets a private profile (template = false) so the edit lands on that
   /// program alone; "Save as template" is what publishes one.
-  template  Boolean  @default(false)
+  template         Boolean  @default(false)
   /// A digest of the activity rows this profile was written from, for the
   /// built-in one only. It answers "are the stored rows still what the code
   /// says" without reading 259 rows on every render. It replaced a count, which
@@ -44,7 +44,7 @@ model Profile {
   /// changed its meaning, so 259 still equalled 259. Null on a profile stored
   /// before the column existed, which rewrites it once.
   activityRevision String?
-  createdAt DateTime @default(now())
+  createdAt        DateTime @default(now())
 
   stages     ProfileStage[]
   activities ProfileActivity[]
@@ -55,18 +55,18 @@ model Profile {
 /// deliverables, leaders, contacts, overrides, stage details) points at, and it
 /// survives a fork, so a forked program keeps its content.
 model ProfileStage {
-  id        String @id
-  profileId String
-  key       String
+  id         String  @id
+  profileId  String
+  key        String
   /// Position on the chart's y-axis, and the order the date ripple walks.
-  order     Int
-  title     String
+  order      Int
+  title      String
   shortTitle String
   /// Lifecycle band: define | designVerify | implement | manufacture | integrate | validateRamp
-  phaseId   String
+  phaseId    String
   /// The built-in stage whose text and drawing this stage shows; null for a
   /// stage someone added, which starts blank.
-  baseKey   String?
+  baseKey    String?
 
   startOffsetWeeks Float
   durationWeeks    Float
@@ -84,22 +84,22 @@ model ProfileStage {
 /// ProfileStage.baseKey names the stage whose text and drawing it shows; null
 /// means the activity was added or edited here and owns its steps in ProfileStep.
 model ProfileActivity {
-  id        String @id
-  profileId String
+  id         String  @id
+  profileId  String
   /// The stage it belongs to, by key rather than by row: stage keys survive a
   /// copy, which is what lets an activity travel with its stage.
-  stageKey  String
+  stageKey   String
   /// Stored, not derived from position. Deleting the third of eleven leaves a
   /// gap, and a gap is correct — the alternative is silently repointing
   /// somebody's recorded work at a different activity.
-  ref       String
-  order     Int
-  title     String
+  ref        String
+  order      Int
+  title      String
   /// Weeks from the stage's own start.
   windowFrom Float
   windowTo   Float
   /// The built-in activity this one shows; null for one added or edited here.
-  baseRef   String?
+  baseRef    String?
 
   profile Profile       @relation(fields: [profileId], references: [id], onDelete: Cascade)
   steps   ProfileStep[]
@@ -126,22 +126,22 @@ model ProfileStep {
 }
 
 model Project {
-  id        String   @id
-  name      String
-  kickoff   DateTime
-  profileId String
+  id                    String   @id
+  name                  String
+  kickoff               DateTime
+  profileId             String
   /// Orders the program list; ids are caller-supplied, so they sort by nothing.
-  createdAt DateTime @default(now())
+  createdAt             DateTime @default(now())
   /// Fully-loaded cost of one man-month, for the effort estimate. 0 = not set,
   /// which shows the effort without pretending to know what it costs.
-  costPerManMonth Float  @default(0)
-  currency        String @default("USD")
+  costPerManMonth       Float    @default(0)
+  currency              String   @default("USD")
   /// What completing a meeting does when its checks fail: warn | block. A
   /// programme that wants minutes and owned actions before a meeting can close
   /// says so here; the default only warns.
-  meetingCompletionMode String @default("warn")
+  meetingCompletionMode String   @default("warn")
 
-  profile      Profile @relation(fields: [profileId], references: [id])
+  profile Profile @relation(fields: [profileId], references: [id])
 
   overrides    StageOverride[]
   items        Item[]
@@ -149,6 +149,7 @@ model Project {
   leaders      Leader[]
   contacts     Contact[]
   stageDetails StageDetail[]
+  qorDatasets  QorDataset[]
   posts        Post[]
   stepStates   StepState[]
   attachments  Attachment[]
@@ -180,37 +181,37 @@ model StageOverride {
 }
 
 model Item {
-  id        String    @id
-  projectId String
-  stageId   String
+  id            String    @id
+  projectId     String
+  stageId       String
   /// keyinfo | activity | risk
-  kind      String
-  title     String
-  body      String    @default("")
-  owner     String
+  kind          String
+  title         String
+  body          String    @default("")
+  owner         String
   /// Who opened it. The communication board is a board people post on, so the
   /// person who started a thread is a different fact from the person carrying
   /// the work — `owner` answers who is on it, this answers who raised it.
   /// Defaulted rather than required: the other two boards have no posters.
-  author    String    @default("")
+  author        String    @default("")
   /// What the post is about, when it is about one piece of work. The stage is
   /// already known from stageId; this narrows it to an activity and, if the
   /// poster went that far, to a step of it. Steps are content addressed by
   /// reference, so they are named the way every other step reference is.
-  activityRef String?
-  stepN       Int?
-  due       DateTime?
-  done      Boolean   @default(false)
-  updatedAt DateTime
+  activityRef   String?
+  stepN         Int?
+  due           DateTime?
+  done          Boolean   @default(false)
+  updatedAt     DateTime
   /// The key deliverable this activity is work towards, if it is towards one.
   /// SetNull rather than Cascade: deleting a deliverable must not delete the
   /// record of the work that went into it.
   deliverableId String?
 
-  project     Project        @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  project     Project      @relation(fields: [projectId], references: [id], onDelete: Cascade)
   posts       Post[]
   attachments Attachment[]
-  deliverable Deliverable?   @relation(fields: [deliverableId], references: [id], onDelete: SetNull)
+  deliverable Deliverable? @relation(fields: [deliverableId], references: [id], onDelete: SetNull)
 
   @@index([projectId, stageId, kind])
   @@index([deliverableId])
@@ -227,7 +228,7 @@ model Item {
 /// Exactly one target is set. A reply sets `parentId` and nothing else: it belongs
 /// to its parent, and the parent knows where it is.
 model Post {
-  id        String   @id
+  id        String    @id
   projectId String
   /// update | risk | note | handover | reply
   kind      String
@@ -237,19 +238,19 @@ model Post {
   editedAt  DateTime?
 
   /// The V1 target: a post on a board item. Still how the boards work.
-  itemId String?
+  itemId        String?
   /// A post on one step of one activity. Steps are content, not rows, so they are
   /// addressed by the reference the write-up uses — "PD-10" — and the step number.
-  activityRef String?
-  stepN       Int?
+  activityRef   String?
+  stepN         Int?
   /// A note on a stage's key-info board: something the programme learned that is
   /// worth finding again. It belongs to the stage rather than to any one piece of
   /// work in it, which is why it needs a target of its own.
-  stageId String?
+  stageId       String?
   /// The handover that completes a deliverable.
   deliverableId String?
   /// A reply. Replies do not nest: a reply's parent is always a top-level post.
-  parentId String?
+  parentId      String?
 
   /// Set on a handover: the day the deliverable was accepted. A handover without
   /// one is a record of what was sent, not a claim that it is finished.
@@ -299,14 +300,14 @@ model StepState {
   activityRef String
   stepN       Int
 
-  done   Boolean   @default(false)
+  done        Boolean   @default(false)
   /// When it was handed over — stamped by the first output attached to it.
-  doneAt DateTime?
+  doneAt      DateTime?
   /// 0-100, typed by hand. A done step reads 100 whatever this says.
-  pct    Int       @default(0)
+  pct         Int       @default(0)
   /// Who is answerable. Empty means unassigned; the template's lead *role* is a
   /// different thing and does not belong here.
-  owner  String    @default("")
+  owner       String    @default("")
   /// Overrides the date the schedule computes for this step. Null keeps the
   /// baseline, so clearing an override is a delete rather than a recalculation.
   dueOverride DateTime?
@@ -325,7 +326,7 @@ model StepState {
 /// That caps the sensible file size (see MAX_ATTACHMENT_BYTES); moving to object
 /// storage later means replacing `data` with a URL and nothing else.
 model Attachment {
-  id     String  @id
+  id            String   @id
   /// Which programme it belongs to.
   ///
   /// The other three targets carry this implicitly — an attachment on an item,
@@ -335,24 +336,24 @@ model Attachment {
   /// the programme is stated here, and it is stated on all four rather than only
   /// where it is load-bearing — a column that is sometimes the answer and
   /// sometimes null is a column nobody trusts.
-  projectId String
-  itemId String?
-  postId String?
+  projectId     String
+  itemId        String?
+  postId        String?
   /// A deliverable's artefact — what makes it a delivered deliverable.
   deliverableId String?
   /// The output a step hands over. Attaching one is what completes the step, so
   /// this is evidence rather than decoration.
-  activityRef String?
-  stepN       Int?
+  activityRef   String?
+  stepN         Int?
   /// A file on a meeting's Files tab, a decision's evidence, or the evidence
   /// that closed an action item. The MeetingFile row says which; the bytes
   /// stay here, served by the same route as every other attachment.
   meetingFileId String?
-  filename       String
-  mimeType       String
-  size           Int
-  data           Bytes
-  createdAt      DateTime
+  filename      String
+  mimeType      String
+  size          Int
+  data          Bytes
+  createdAt     DateTime
 
   project     Project      @relation(fields: [projectId], references: [id], onDelete: Cascade)
   item        Item?        @relation(fields: [itemId], references: [id], onDelete: Cascade)
@@ -399,17 +400,41 @@ model StageDetail {
   projectId String
   stageId   String
 
-  description     String?
-  engineeringView String?
+  description       String?
+  engineeringView   String?
   /// Man-months per engineering line, newline-separated and index-aligned to
   /// engineeringView — including when that list is the shared default.
   engineeringEffort String?
   /// Elapsed weeks per engineering line, stored the same way. Negative marks an
   /// activity that runs continuously across the stage rather than closing once.
   engineeringTat    String?
-  programView     String?
-  tools           String?
-  collaboration   String?
+  programView       String?
+  tools             String?
+  collaboration     String?
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@unique([projectId, stageId])
+}
+
+/// A QoR workbook for one stage of one programme: per-block, per-netlist-drop
+/// physical-design numbers, parsed in the browser and stored whole.
+///
+/// One row, not a table of blocks and a table of drops. The dashboard reads
+/// every number at once and nothing else joins against them, so normalising
+/// would buy queries nobody makes and charge a migration for every measure the
+/// design team adds. `payload` is the parsed dataset as JSON, the way Post.doc
+/// holds a rich-text document.
+model QorDataset {
+  id        String @id
+  projectId String
+  stageId   String
+
+  /// the name of the file it was read from, shown beside the data
+  fileName   String
+  uploadedAt DateTime
+  /// QorDataset from /lib/qor/schema.ts, JSON.stringify'd
+  payload    String
 
   project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
 

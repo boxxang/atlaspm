@@ -42,6 +42,9 @@ export interface ProjectState {
   contacts: Record<StageId, Contact[]>;
   /** Per-program edits to the shared stage text, by stage. */
   stageDetails: Partial<Record<StageId, StageDetailOverride>>;
+  /* A QoR workbook per stage, as it was parsed. Only Physical Design has one
+     today; the shape does not care which stage it belongs to. */
+  qor: Partial<Record<StageId, QorDatasetRow>>;
   /**
    * What has happened to each step, keyed the way steps are addressed —
    * `activityRef:stepN`. Only steps somebody has touched are in here; the rest
@@ -194,6 +197,13 @@ interface OverrideRow {
 interface StageDetailRow extends StageDetailOverride {
   stageId: string;
 }
+/** A stage's QoR workbook as the row stands, payload still serialised. */
+export interface QorDatasetRow {
+  stageId: string;
+  fileName: string;
+  uploadedAt: Date;
+  payload: string;
+}
 interface StepAttachmentRow extends AttachmentRow {
   activityRef: string | null;
   stepN: number | null;
@@ -258,6 +268,7 @@ export function buildProjectState(project: {
   leaders: LeaderRow[];
   contacts: ContactRow[];
   stageDetails: StageDetailRow[];
+  qorDatasets: QorDatasetRow[];
   stepStates: StepStateRow[];
   attachments: StepAttachmentRow[];
   posts: ProgramPostRow[];
@@ -421,6 +432,9 @@ export function buildProjectState(project: {
     attachments: p.attachments ?? [],
   }));
 
+  const qor: Partial<Record<StageId, QorDatasetRow>> = {};
+  for (const d of project.qorDatasets) if (isStage(d.stageId)) qor[d.stageId] = d;
+
   const stageDetails: Partial<Record<StageId, StageDetailOverride>> = {};
   for (const d of project.stageDetails) {
     if (!isStage(d.stageId)) continue;
@@ -449,6 +463,7 @@ export function buildProjectState(project: {
     leaders,
     contacts,
     stageDetails,
+    qor,
     stepStates,
     stepOutputs,
     posts,

@@ -9,6 +9,10 @@
  */
 export const STAGE_TABS = [
   { slug: 'activity', label: 'Activity' },
+  /* Physical Design only, and hidden elsewhere — see qorTabApplies. It reads a
+     workbook of per-block, per-netlist-drop numbers, and no other stage has
+     one. It sits second because it is what a PD review opens on. */
+  { slug: 'qor', label: 'QoR Dashboard' },
   { slug: 'keyinfo', label: 'Key info' },
   { slug: 'risks', label: 'Risks' },
   { slug: 'deliverables', label: 'Key deliverables' },
@@ -30,3 +34,9 @@ export const isStageTab = (s: string): s is StageTab => STAGE_TABS.some((t) => t
 
 export const tabLabel = (slug: StageTab): string =>
   STAGE_TABS.find((t) => t.slug === slug)?.label ?? slug;
+
+/**
+ * Which stages show the QoR tab. The base key rather than the stage key, so a
+ * programme that renamed or copied its Physical Design stage keeps it.
+ */
+export const qorTabApplies = (vizKey: string | null | undefined) => vizKey === 'physicalDesign';

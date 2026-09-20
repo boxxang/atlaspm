@@ -2,6 +2,7 @@
 
 import { create } from 'zustand';
 import * as api from '@/app/actions';
+import type { QorDataset } from '@/lib/qor/schema';
 import { BUILTIN_PROFILE, STAGE_ORDER } from '@/data/scheduleProfiles';
 import { RISK_AUTHOR } from '@/data/riskSeeds';
 import type { ActivityStepEntry } from '@/data/activitySteps';
@@ -71,6 +72,8 @@ export interface AppState {
   leaders: Record<StageId, Leader>;
   contacts: Record<StageId, Contact[]>;
   stageDetails: Partial<Record<StageId, StageDetailOverride>>;
+  /** A stage's QoR workbook, as parsed. Physical Design is the only one today. */
+  qor: Partial<Record<StageId, { fileName: string; uploadedAt: Date; dataset: QorDataset }>>;
   inline: Partial<Record<StageId, InlineState | null>>;
   /**
    * What has happened to each step, keyed `activityRef:stepN`. Absent means
@@ -195,6 +198,8 @@ export interface AppState {
   deleteContact: (stageId: StageId, id: string) => void;
   saveLeader: (stageId: StageId, l: Omit<Leader, 'short'>) => void;
   saveStageDetail: (stageId: StageId, detail: StageDetailOverride) => void;
+  setQorDataset: (stageId: StageId, fileName: string, dataset: QorDataset) => void;
+  clearQorDataset: (stageId: StageId) => void;
   /** One man-month figure per engineering line of the stage. */
   setStageEffort: (stageId: StageId, effort: number[]) => void;
   /** Rewrites the stage's engineering list — titles and their man-months. */
@@ -326,6 +331,26 @@ const profileSignature = (p: ScheduleProfile) =>
 const BOOT_TODAY = new Date(0);
 const BOOT_KICKOFF = new Date(0);
 
+/**
+ * The stored payload back into a dataset. A row the current reader cannot make
+ * sense of is dropped rather than thrown: the rest of the programme should
+ * still open, and the tab says the workbook needs loading again.
+ */
+function readQor(rows: ProjectState['qor']): AppState['qor'] {
+  const out: AppState['qor'] = {};
+  for (const [stageId, row] of Object.entries(rows)) {
+    if (!row) continue;
+    try {
+      const dataset = JSON.parse(row.payload) as QorDataset;
+      if (dataset?.v !== 1) continue;
+      out[stageId as StageId] = { fileName: row.fileName, uploadedAt: row.uploadedAt, dataset };
+    } catch {
+      /* unreadable payload: the tab offers the upload again */
+    }
+  }
+  return out;
+}
+
 export const useAppStore = create<AppState>()((set, get) => ({
   /* Pre-hydration placeholders: the real values need a clock, and a clock read
      during SSR would not survive hydration. AppShell calls hydrate() on mount. */
@@ -349,6 +374,7 @@ export const useAppStore = create<AppState>()((set, get) => ({
   leaders: emptyMap<Leader>(() => ({ name: '', short: '', phone: '', email: '' })),
   contacts: emptyMap<Contact[]>(() => []),
   stageDetails: {},
+  qor: {},
   inline: {},
   stepStates: {},
   stepOutputs: {},
@@ -410,6 +436,7 @@ export const useAppStore = create<AppState>()((set, get) => ({
       leaders: initial.leaders,
       contacts: initial.contacts,
       stageDetails: initial.stageDetails,
+      qor: readQor(initial.qor),
       stepStates: initial.stepStates,
       stepOutputs: initial.stepOutputs,
       posts: initial.posts,
@@ -1075,6 +1102,20 @@ export const useAppStore = create<AppState>()((set, get) => ({
   setCostRate: (costPerManMonth, currency) => {
     set({ costPerManMonth, currency });
     sync(api.setCostRate(get().projectId, costPerManMonth, currency));
+  },
+
+  setQorDataset: (stageId, fileName, dataset) => {
+    set((st) => ({ qor: { ...st.qor, [stageId]: { fileName, uploadedAt: new Date(), dataset } } }));
+    void api.saveQorDataset(get().projectId, stageId, fileName, JSON.stringify(dataset));
+  },
+
+  clearQorDataset: (stageId) => {
+    set((st) => {
+      const qor = { ...st.qor };
+      delete qor[stageId];
+      return { qor };
+    });
+    void api.clearQorDataset(get().projectId, stageId);
   },
 
   saveStageDetail: (stageId, detail) => {

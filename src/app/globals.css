@@ -2242,7 +2242,7 @@ a.ad-ref:hover,a.ad-ref:focus-visible{border-color:var(--accent);background:var(
   --accent:#5b5bd6; --accent-hov:#4747b8; --accent-soft:#eeeefb; --accent-wash:#f7f7fe; --accent-line:#cdcdf5;
   --risk:#e5484d; --risk-ink:#c5303a; --risk-soft:#fdeced; --risk-wash:#fffafa; --risk-line:#f5cfd0;
   --warn:#f5a524; --warn-soft:#fef7e6; --warn-ink:#8a6a1f;
-  --ok:#30a46c; --ok-soft:#e6f6ed;
+  --ok:#30a46c; --ok-soft:#e6f6ed; --ok-ink:#218358;
   --st-done:#d8dade; --st-run:#a8adb6; --st-risk:#e5484d; --st-risk-fut:#f3b9bb; --st-future:#eceef0;
   --r-sm:5px; --r:6px; --r-lg:8px;
   --sh:0 1px 2px rgba(16,24,40,.04);
@@ -3219,3 +3219,114 @@ a.mt-mini:hover{color:inherit;background:var(--hover)}
     padding-top:10px;padding-bottom:10px}
   .ctable[data-board-stack] > .chead{display:none}
 }
+
+/* ── QoR dashboard ──────────────────────────────────────────
+   The Physical Design stage's workbook, drawn. Its own block because none of
+   it is shaped like the rest of the app: a drop is not a stage, a block is not
+   an activity, and the two column charts count the same sixty blocks against
+   the same total so a bar's height means the same thing in either. */
+.qor{font-size:13px}
+.qor .right{text-align:right;justify-self:end}
+.qor .num{font-variant-numeric:tabular-nums;font-family:var(--mono);font-size:12px}
+.qor .flat{color:var(--ink-3)}
+.qor .bad{color:var(--risk-ink)}
+.qor .warnv{color:var(--warn-ink)}
+
+/* the drops, as tabs */
+.qor-drops{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+.qor-drop{text-align:left;padding:9px 14px;border:1px solid var(--line);border-radius:var(--r-lg);background:var(--bg);min-width:190px}
+.qor-drop[aria-selected="true"]{border-color:var(--accent-line);background:var(--accent-wash);box-shadow:var(--sh)}
+.qor-drop .k{display:block;font-weight:600;font-size:13px}
+.qor-drop[aria-selected="true"] .k{color:var(--accent)}
+.qor-drop .d{display:block;font-size:11px;color:var(--ink-3);margin-top:2px}
+
+/* what to read, and where the numbers came from */
+.qor-srcbar{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.qor-switch{display:inline-flex;gap:2px;padding:3px;border:1px solid var(--line);border-radius:999px;margin:0 0 14px}
+.qor-switch button{padding:6px 14px;border-radius:999px;font-size:12.5px;color:var(--ink-2)}
+.qor-switch button[aria-selected="true"]{background:var(--ink);color:var(--bg);font-weight:600}
+.qor-switch .n{margin-left:6px;font-size:10.5px;opacity:.7}
+.qor-src{display:flex;align-items:center;gap:10px;margin-bottom:14px;font-size:12px;color:var(--ink-2);flex-wrap:wrap}
+.qor-srcname{max-width:260px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding:3px 9px;border:1px solid var(--line);border-radius:999px;background:var(--sunken);color:var(--ink)}
+.qor-lnk{font-size:12px;color:var(--accent);border-bottom:1px solid transparent}
+.qor-lnk:hover{border-bottom-color:var(--accent)}
+.qor-loadmsg{display:flex;flex-direction:column;gap:2px;margin:-4px 0 14px;font-size:11.5px;color:var(--ink-3)}
+.qor-loadmsg .err{color:var(--risk)}
+
+/* the six key numbers */
+/* auto-fit, not six: the stage page's main column narrows when the properties
+   panel is open, and a viewport media query cannot see that */
+.qor-tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:1px;background:var(--line);border:1px solid var(--line);border-radius:var(--r-lg);overflow:hidden;margin-bottom:16px}
+.qor-tile{background:var(--bg);padding:12px 14px}
+.qor-tile .cap{font-size:10.5px;letter-spacing:.05em;text-transform:uppercase;color:var(--ink-3)}
+.qor-tile .v{font-size:22px;font-weight:600;margin-top:5px;font-variant-numeric:tabular-nums}
+.qor-tile .v.bad{color:var(--risk-ink)}
+.qor-tile .v.good{color:var(--ink)}
+.qor-tile .sub{font-size:11.5px;color:var(--ink-3);margin-top:3px}
+.qor-delta{font-variant-numeric:tabular-nums;font-weight:600}
+.qor-delta.up{color:var(--ok)}
+.qor-delta.down{color:var(--risk-ink)}
+.qor-delta.flat{color:var(--ink-3);font-weight:400}
+
+/* the full-chip table */
+.qor-qtbl{border:1px solid var(--line);border-radius:var(--r);overflow:hidden;margin-top:10px}
+.qor-qrow{display:grid;grid-template-columns:1.5fr 90px 104px 116px 120px 104px 1.3fr;gap:10px;align-items:center;padding:9px 12px;border-bottom:1px solid var(--line-soft);font-size:12.5px}
+.qor-qrow:last-child{border-bottom:none}
+.qor-qrow.qhead{background:var(--sunken);font-size:10.5px;letter-spacing:.05em;text-transform:uppercase;color:var(--ink-3)}
+.qor-qrow .m{font-weight:600}
+.qor-qrow .unit{font-size:11px;color:var(--ink-3);font-weight:400;padding-left:6px}
+.qor-qrow .where{font-size:11.5px;color:var(--ink-2)}
+.qor-qrow .scnq{display:block;font-size:11px;color:var(--ink-3)}
+.qor-qrow:hover{background:var(--hover)}
+.qor-qgroup{padding:8px 12px 4px;font-size:11.5px;font-weight:600;color:var(--ink-2);background:var(--bg);border-bottom:1px solid var(--line-soft)}
+
+/* the two charts */
+.qor-cols{display:grid;grid-template-columns:repeat(auto-fit,minmax(330px,1fr));gap:14px;margin-bottom:16px}
+.qor-panel{border:1px solid var(--line);border-radius:var(--r-lg);background:var(--bg);padding:14px}
+.qor-panel h2{font-size:13px;font-weight:600;margin-bottom:2px}
+.qor-chart{display:grid;grid-auto-flow:column;grid-auto-columns:1fr;align-items:end;gap:10px;height:170px;margin-top:14px;border-bottom:1px solid var(--line)}
+.qor-col{display:flex;flex-direction:column;justify-content:flex-end;align-items:center;height:100%;gap:5px}
+.qor-col .v{font-size:12px;font-weight:600;font-variant-numeric:tabular-nums}
+.qor-col .v.zero{color:var(--ink-4);font-weight:400}
+.qor-col .bar{width:52px;max-width:100%;border-radius:4px 4px 0 0;min-height:2px}
+.qor-labels{display:grid;grid-auto-flow:column;grid-auto-columns:1fr;gap:10px;margin-top:7px;font-size:11px;color:var(--ink-2);text-align:center}
+
+/* the block table */
+.qor-toolbar{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:10px}
+.qor-chip{padding:5px 11px;border-radius:999px;border:1px solid var(--line);font-size:12px;color:var(--ink-2);background:var(--bg)}
+.qor-chip[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink);font-weight:600}
+.qor-chip .c{margin-left:5px;font-size:10.5px;opacity:.75}
+.qor-search{flex:1;min-width:180px;padding:6px 11px;border:1px solid var(--line);border-radius:var(--r);font-size:12.5px;background:var(--bg);color:var(--ink)}
+.qor-sets{display:inline-flex;gap:2px;padding:2px;border:1px solid var(--line);border-radius:999px}
+.qor-sets button{padding:4px 11px;border-radius:999px;font-size:11.5px;color:var(--ink-2)}
+.qor-sets button[aria-selected="true"]{background:var(--muted);color:var(--ink);font-weight:600}
+.qor-count{font-size:11.5px;color:var(--ink-3)}
+.qor-tbl{border:1px solid var(--line);border-radius:var(--r-lg);overflow:hidden}
+.qor-trow{display:grid;gap:8px;align-items:center;padding:8px 12px;border-bottom:1px solid var(--line-soft);font-size:12.5px}
+.qor-trow:last-child{border-bottom:none}
+.qor-tbody .qor-trow:hover{background:var(--hover)}
+.qor-thead{background:var(--sunken);padding:0}
+.qor-thead button{display:flex;align-items:baseline;gap:3px;justify-content:flex-end;width:100%;padding:8px 0;font-size:10.5px;letter-spacing:.04em;text-transform:uppercase;color:var(--ink-3)}
+.qor-thead button:first-child,.qor-thead button:nth-child(2),.qor-thead button:nth-child(3){justify-content:flex-start}
+.qor-thead button .u{font-size:9.5px;text-transform:none;letter-spacing:0;color:var(--ink-4)}
+.qor-thead button .ar{opacity:1;color:var(--accent);font-size:8px}
+.qor-trow .r-name{font-weight:600;font-size:12.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.qor-trow .r-group{font-weight:400;color:var(--ink-3);margin-left:6px;font-size:11px}
+.qor-stage{display:inline-block;padding:2px 8px;border-radius:999px;font-size:11px;background:var(--muted);color:var(--ink-2);white-space:nowrap}
+.qor-scn{font-size:11px;color:var(--ink-2);font-family:var(--mono);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.qor-empty{padding:22px 12px;text-align:center;color:var(--ink-3);font-size:12.5px}
+
+/* status: a colour, a shape and a word — never colour alone */
+.qor-st{display:inline-flex;align-items:center;gap:5px;padding:2px 8px;border-radius:999px;font-size:11px;font-weight:600;white-space:nowrap}
+.qor-st i{width:7px;height:7px;display:inline-block}
+.qor-st-clean{background:var(--ok-soft);color:var(--ok-ink)}
+.qor-st-clean i{background:var(--ok);border-radius:50%}
+.qor-st-watch{background:var(--warn-soft);color:var(--warn-ink)}
+.qor-st-watch i{background:var(--warn);clip-path:polygon(50% 0,100% 100%,0 100%)}
+.qor-st-fail{background:var(--risk-soft);color:var(--risk-ink)}
+.qor-st-fail i{background:var(--risk);border-radius:2px}
+/* hollow, because there is nothing in it: the shape says "no value", not "a bad value" */
+.qor-st-partial{background:var(--muted);color:var(--ink-2)}
+.qor-st-partial i{background:transparent;border:1.5px solid var(--ink-3);border-radius:2px}
+.qor-st-none{background:var(--muted);color:var(--ink-2)}
+.qor-st-none i{background:var(--ink-4);border-radius:50%;opacity:.6}

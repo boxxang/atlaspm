@@ -51,6 +51,7 @@ export async function getProjectState(projectId: string): Promise<ProjectState |
       },
       contacts: { orderBy: { position: 'asc' } },
       stageDetails: true,
+      qorDatasets: true,
       stepStates: true,
       /* every post that is not a V1 board item's: step updates and risks, stage
          notes, deliverable handovers, and the replies under them */

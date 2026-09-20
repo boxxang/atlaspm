@@ -7,7 +7,7 @@ import { phaseById } from '@/data/scheduleProfiles';
 import { estimateCost, formatManMonths } from '@/lib/effort';
 import { fmtDate } from '@/lib/schedule';
 import { stagePace } from '@/lib/stagePace';
-import { STAGE_TABS, type StageTab } from '@/lib/stageTabs';
+import { DEFAULT_TAB, STAGE_TABS, qorTabApplies, type StageTab } from '@/lib/stageTabs';
 import { useAppStore } from '@/store/useAppStore';
 import { useRailStore } from '@/store/railStore';
 import { CommsTab } from './CommsTab';
@@ -17,6 +17,7 @@ import { StageActivityTab } from './StageActivity';
 import { StageRisksTab } from './StageRisksTab';
 import { TeamTab } from './TeamTab';
 import { UpdatesPage } from './UpdatesPage';
+import { QorDashboardTab } from './qor/QorDashboardTab';
 import { useProgramWork } from './useProgramWork';
 import { useStageSteps } from './useStageSteps';
 
@@ -127,6 +128,12 @@ export function StagePage({
     updates: String(posts.filter((p) => p.activityRef && refs.has(p.activityRef)).length),
     team: String(contacts[stage.id]?.length ?? 0),
   };
+
+  /* The QoR tab belongs to Physical Design and nowhere else, so it is filtered
+     out rather than rendered empty — and a link to it on another stage falls
+     back to the default section instead of showing nothing. */
+  const tabs = STAGE_TABS.filter((t) => t.slug !== 'qor' || qorTabApplies(stage.vizKey));
+  const shown: StageTab = tabs.some((t) => t.slug === tab) ? tab : DEFAULT_TAB;
 
   const description = stageDetails[stage.id]?.description ?? stage.description;
 
@@ -241,12 +248,12 @@ export function StagePage({
         </div>
 
         <div className="tabs" style={{ marginTop: 15 }}>
-          {STAGE_TABS.map((t) => (
+          {tabs.map((t) => (
             <Link
               key={t.slug}
               href={`/p/${projectId}/stage/${stage.id}/${t.slug}`}
-              className={t.slug === tab ? 'tab on' : 'tab'}
-              aria-current={t.slug === tab ? 'page' : undefined}
+              className={t.slug === shown ? 'tab on' : 'tab'}
+              aria-current={t.slug === shown ? 'page' : undefined}
             >
               {t.label}
               <span
@@ -260,7 +267,9 @@ export function StagePage({
         </div>
       </div>
 
-      {tab === 'activity' && (
+      {shown === 'qor' && <QorDashboardTab stageId={stage.id} />}
+
+      {shown === 'activity' && (
         <div className="filterbar">
           <button className="btn sm" type="button">
             Status: All
@@ -275,13 +284,13 @@ export function StagePage({
         </div>
       )}
 
-      {tab === 'activity' && <StageActivityTab stageId={stage.id} />}
-      {tab === 'keyinfo' && <KeyInfoTab stageId={stage.id} />}
-      {tab === 'risks' && <StageRisksTab stageId={stage.id} projectId={projectId} />}
-      {tab === 'deliverables' && <DeliverablesTab stageId={stage.id} projectId={projectId} />}
-      {tab === 'team' && <TeamTab stageId={stage.id} />}
-      {tab === 'board' && <CommsTab stageId={stage.id} />}
-      {tab === 'updates' && <UpdatesPage stageId={stage.id} projectId={projectId} />}
+      {shown === 'activity' && <StageActivityTab stageId={stage.id} />}
+      {shown === 'keyinfo' && <KeyInfoTab stageId={stage.id} />}
+      {shown === 'risks' && <StageRisksTab stageId={stage.id} projectId={projectId} />}
+      {shown === 'deliverables' && <DeliverablesTab stageId={stage.id} projectId={projectId} />}
+      {shown === 'team' && <TeamTab stageId={stage.id} />}
+      {shown === 'board' && <CommsTab stageId={stage.id} />}
+      {shown === 'updates' && <UpdatesPage stageId={stage.id} projectId={projectId} />}
     </>
   );
 }

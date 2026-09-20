@@ -1242,6 +1242,46 @@ export async function saveStageDetail(
   touch(projectId);
 }
 
+/* ---------- QoR datasets ---------- */
+
+/**
+ * Stores one stage's QoR workbook, parsed.
+ *
+ * The parsing happened in the browser, where the file already is: a .xlsx is a
+ * zip of XML and the browser has both a zip inflater and an XML parser, so
+ * sending the bytes here to add a spreadsheet library on the server would buy
+ * nothing. What arrives is JSON, and what it must not be is unbounded, since a
+ * server action is reachable by direct POST.
+ */
+const MAX_QOR_BYTES = 8 * 1024 * 1024;
+
+export async function saveQorDataset(
+  projectId: string,
+  stageId: StageId,
+  fileName: string,
+  payload: string,
+) {
+  const pid = await assertProject(projectId);
+  if (payload.length > MAX_QOR_BYTES) throw new Error('That workbook is too large to store.');
+  /* parse it rather than trust it: a payload that is not the shape the
+     dashboard reads would fail on the next page load instead of here */
+  const parsed: unknown = JSON.parse(payload);
+  if (!parsed || typeof parsed !== 'object' || (parsed as { v?: number }).v !== 1)
+    throw new Error('That is not a QoR dataset this version can read.');
+  await prisma.qorDataset.upsert({
+    where: { projectId_stageId: { projectId: pid, stageId } },
+    create: { id: `${pid}:qor:${stageId}`, projectId: pid, stageId, fileName, uploadedAt: new Date(), payload },
+    update: { fileName, uploadedAt: new Date(), payload },
+  });
+  touch(projectId);
+}
+
+export async function clearQorDataset(projectId: string, stageId: StageId) {
+  const pid = await assertProject(projectId);
+  await prisma.qorDataset.deleteMany({ where: { projectId: pid, stageId } });
+  touch(projectId);
+}
+
 /* ---------- attachments ---------- */
 
 /**
