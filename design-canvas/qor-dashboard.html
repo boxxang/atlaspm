@@ -1,0 +1,862 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>QoR Dashboard — Physical Design (mock-up)</title>
+<!--
+  A mock-up of the QoR Dashboard tab for the Physical Design stage, for review
+  before anything is built in AtlasPM. Standalone: one file, no build, no
+  network — open it by double-clicking.
+
+  Everything here is a number or is derived from numbers, because every number
+  arrives from the QoR spreadsheet template: one row per sub-IP block per
+  netlist drop. Nothing on the screen describes a situation in prose.
+
+  What the sheet supplies per block, per drop: block, subsystem, P&R stage,
+  instances, utilization, setup WNS / TNS / failing endpoints, hold WNS and
+  violations, clock skew, global route overflow, DRC, power actual and budget,
+  IR drop static and dynamic, runtime, ECOs applied and ECO rounds.
+
+  Chip rows are rolled up from those against the signoff targets. The values
+  are invented for the mock-up. Tokens, type and tables are AtlasPM's.
+-->
+<style>
+:root{
+  --bg:#ffffff; --sunken:#fbfbfc; --hover:#f7f7f8; --muted:#f1f1f4; --shade:#eceef0;
+  --ink:#16181d; --ink-body:#3f434b; --ink-2:#62666d; --ink-3:#8b8f98; --ink-4:#b4b7bd;
+  --line-soft:#f0f0f2; --line:#e6e8eb; --line-strong:#d8dade;
+  --accent:#5b5bd6; --accent-hov:#4747b8; --accent-soft:#eeeefb; --accent-wash:#f7f7fe; --accent-line:#cdcdf5;
+  --risk:#e5484d; --risk-ink:#c5303a; --risk-soft:#fdeced; --risk-line:#f5cfd0;
+  --warn:#f5a524; --warn-soft:#fef7e6; --warn-ink:#8a6a1f;
+  --ok:#30a46c; --ok-soft:#e6f6ed; --ok-ink:#1b7a4b;
+  --r-sm:5px; --r:6px; --r-lg:8px;
+  --sh:0 1px 2px rgba(16,24,40,.04);
+  --sans:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:14px;letter-spacing:-.011em;-webkit-font-smoothing:antialiased}
+.num{font-variant-numeric:tabular-nums}
+button{font:inherit;color:inherit;background:none;border:none;cursor:pointer;letter-spacing:inherit}
+input,select{font:inherit;color:inherit;letter-spacing:inherit}
+[hidden]{display:none!important}
+
+.wrap{max-width:1480px;margin:0 auto;padding:26px 24px 60px}
+.crumbs{display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--ink-3);margin-bottom:10px}
+.crumbs b{color:var(--ink);font-weight:600}
+h1{font-size:23px;font-weight:600;letter-spacing:-.02em;margin-bottom:6px}
+.lede{color:var(--ink-2);font-size:13.5px;max-width:70ch;line-height:1.5}
+
+/* ── stage tabs, as the stage page draws them ─────────────── */
+.tabs{display:flex;gap:4px;flex-wrap:wrap;border-bottom:1px solid var(--line);margin:18px 0 0}
+.tabs button{padding:8px 12px;border-radius:var(--r) var(--r) 0 0;font-size:13px;color:var(--ink-2);border:1px solid transparent;border-bottom:none;position:relative;top:1px}
+.tabs button:hover{background:var(--hover)}
+.tabs button[aria-selected="true"]{background:var(--bg);border-color:var(--line);color:var(--ink);font-weight:600}
+.tabs .n{margin-left:6px;font-size:10.5px;color:var(--ink-3);background:var(--muted);border-radius:999px;padding:1px 6px}
+
+/* ── the drop tabs inside it ──────────────────────────────── */
+.drops{display:flex;gap:6px;flex-wrap:wrap;margin:16px 0 4px}
+.drop{padding:9px 14px;border:1px solid var(--line);border-radius:var(--r);background:var(--bg);text-align:left;min-width:132px}
+.drop:hover{background:var(--hover)}
+.drop[aria-selected="true"]{border-color:var(--accent-line);background:var(--accent-wash);box-shadow:var(--sh)}
+.drop .k{display:flex;align-items:center;gap:6px;font-weight:600;font-size:13px}
+.drop .d{font-size:11.5px;color:var(--ink-3);margin-top:2px}
+.drop[aria-selected="true"] .k{color:var(--accent)}
+
+
+/* ── stat tiles ───────────────────────────────────────────── */
+.tiles{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:1px;background:var(--line);border:1px solid var(--line);border-radius:var(--r-lg);overflow:hidden;margin-bottom:16px}
+@media (max-width:1180px){.tiles{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media (max-width:860px){.tiles{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.tile{background:var(--bg);padding:12px 14px}
+.tile .cap{font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-3)}
+.tile .v{font-size:21px;font-weight:600;letter-spacing:-.02em;margin-top:5px}
+.tile .v.bad{color:var(--risk-ink)}
+.tile .v.good{color:var(--ok-ink)}
+.tile .sub{font-size:11.5px;color:var(--ink-3);margin-top:3px}
+.delta{font-size:11.5px;font-weight:600}
+.delta.up{color:var(--ok-ink)}
+.delta.down{color:var(--risk-ink)}
+.delta.flat{color:var(--ink-3)}
+
+/* view switch, and the measure-set switch in the toolbar */
+.switch{display:inline-flex;gap:2px;padding:3px;border:1px solid var(--line);border-radius:999px;margin:0 0 14px}
+.switch button{padding:6px 14px;border-radius:999px;font-size:12.5px;color:var(--ink-2)}
+.switch button[aria-selected="true"]{background:var(--ink);color:var(--bg);font-weight:600}
+.switch .n{margin-left:6px;font-size:10.5px;opacity:.7}
+.sets{display:inline-flex;gap:2px;padding:2px;border:1px solid var(--line);border-radius:999px}
+.sets button{padding:4px 11px;border-radius:999px;font-size:11.5px;color:var(--ink-2)}
+.sets button[aria-selected="true"]{background:var(--muted);color:var(--ink);font-weight:600}
+
+/* full-chip table */
+.qtbl{border:1px solid var(--line);border-radius:var(--r);overflow:hidden}
+.qrow{display:grid;grid-template-columns:1.5fr 90px 104px 116px 120px 104px 1.3fr;gap:10px;align-items:center;padding:9px 12px;border-bottom:1px solid var(--line-soft);font-size:12.5px}
+.qrow:last-child{border-bottom:none}
+.qhead{background:var(--sunken);font-size:10.5px;letter-spacing:.05em;text-transform:uppercase;color:var(--ink-3)}
+.qrow .m{font-weight:600}
+.qrow .unit{font-size:11px;color:var(--ink-3);font-weight:400;padding-left:6px}
+.qrow .where{font-size:11.5px;color:var(--ink-2)}
+.qrow .scnq{display:block;font-size:11px;color:var(--ink-3)}
+.qrow:hover{background:var(--hover)}
+
+/* ── panels ───────────────────────────────────────────────── */
+.cols{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin-bottom:16px}
+@media (max-width:980px){.cols{grid-template-columns:minmax(0,1fr)}}
+.panel{border:1px solid var(--line);border-radius:var(--r-lg);background:var(--bg);padding:14px}
+.panel h2{font-size:13px;font-weight:600;margin-bottom:2px}
+.panel .hint{font-size:11.5px;color:var(--ink-3);margin-bottom:12px}
+
+/* status distribution: one stacked bar, every segment labelled */
+
+/* Column charts. Both count the same sixty blocks, so both are drawn against
+   sixty — a bar's height means the same thing in either panel. */
+.chart{display:grid;grid-auto-flow:column;grid-auto-columns:1fr;gap:10px;align-items:end;height:178px;border-bottom:1px solid var(--line)}
+.chart .col{display:flex;flex-direction:column;justify-content:flex-end;align-items:center;height:100%;cursor:default}
+.chart .v{font-size:11.5px;font-weight:600;margin-bottom:5px}
+.chart .v.zero{color:var(--ink-4);font-weight:400}
+.chart .bar{width:100%;max-width:48px;border-radius:4px 4px 0 0;min-height:2px}
+.labels{display:grid;grid-auto-flow:column;grid-auto-columns:1fr;gap:10px;margin-top:8px}
+.labels span{font-size:10.5px;color:var(--ink-2);text-align:center;line-height:1.3}
+.stage{display:inline-block;border-radius:999px;padding:2px 9px;font-size:11px;font-weight:600;white-space:nowrap;background:var(--muted);color:var(--ink-2)}
+
+/* ── the block table ──────────────────────────────────────── */
+.toolbar{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:4px 0 10px}
+.chip{border:1px solid var(--line);border-radius:999px;padding:5px 11px;font-size:12px;color:var(--ink-2);background:var(--bg)}
+.chip:hover{background:var(--hover)}
+.chip[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.chip .c{margin-left:6px;font-size:10.5px;opacity:.75}
+.search{border:1px solid var(--line);border-radius:var(--r);padding:6px 10px;min-width:210px;background:var(--bg)}
+.search::placeholder{color:var(--ink-4)}
+.count{margin-left:auto;font-size:12px;color:var(--ink-3)}
+
+.tbl{border:1px solid var(--line);border-radius:var(--r-lg);overflow:hidden}
+.trow{display:grid;grid-template-columns:174px 112px 94px var(--m,repeat(6,minmax(62px,1fr)));gap:8px;align-items:center;padding:8px 12px;border-bottom:1px solid var(--line-soft);font-size:12.5px}
+.trow:last-child{border-bottom:none}
+.thead{background:var(--sunken);border-bottom:1px solid var(--line);position:sticky;top:0;z-index:1}
+.thead button{font-size:10.5px;letter-spacing:.05em;text-transform:uppercase;color:var(--ink-3);display:flex;align-items:center;gap:4px;width:100%}
+.thead button:hover{color:var(--ink)}
+.thead button .u{font-size:10px;color:var(--ink-4);text-transform:none;letter-spacing:0}
+.thead button .ar{font-size:9px;opacity:0}
+.thead button[data-sorted] .ar{opacity:1;color:var(--accent)}
+.tbody{max-height:620px;overflow:auto}
+.trow:hover{background:var(--hover)}
+.r-name{font-weight:600}
+.r-group{font-size:11px;color:var(--ink-3);font-weight:400;margin-left:6px}
+.scn{font-size:11.5px;color:var(--ink-2);font-variant-numeric:tabular-nums}
+.right{text-align:right;justify-self:end}
+.bad{color:var(--risk-ink);font-weight:600}
+.warnv{color:var(--warn-ink)}
+.flat{color:var(--ink-3)}
+.empty{padding:26px;text-align:center;color:var(--ink-3);font-size:13px}
+
+/* status chip: colour, a shape and a word — never colour alone */
+.st{display:inline-flex;align-items:center;gap:5px;border-radius:999px;padding:2px 9px 2px 7px;font-size:11px;font-weight:600;white-space:nowrap}
+.st i{width:8px;height:8px;display:inline-block}
+.st-clean{background:var(--ok-soft);color:var(--ok-ink)}
+.st-clean i{background:var(--ok);border-radius:50%}
+.st-watch{background:var(--warn-soft);color:var(--warn-ink)}
+.st-watch i{background:var(--warn);clip-path:polygon(50% 0,100% 100%,0 100%)}
+.st-fail{background:var(--risk-soft);color:var(--risk-ink)}
+.st-fail i{background:var(--risk);border-radius:2px}
+.st-none{background:var(--muted);color:var(--ink-2)}
+.st-none i{background:var(--ink-4);border-radius:50%;opacity:.6}
+
+/* watch list */
+.watch{display:flex;flex-direction:column;gap:9px;max-height:280px;overflow:auto}
+.watch .w{display:grid;grid-template-columns:1fr auto;gap:4px 10px;padding-bottom:9px;border-bottom:1px solid var(--line-soft)}
+.watch .w:last-child{border-bottom:none;padding-bottom:0}
+.watch .n{font-weight:600;font-size:12.5px}
+.watch .why{grid-column:1/-1;font-size:11.5px;color:var(--ink-2);line-height:1.45}
+
+.tip{position:fixed;pointer-events:none;z-index:9;background:var(--ink);color:#fff;border-radius:var(--r-sm);padding:6px 9px;font-size:11.5px;line-height:1.45;box-shadow:0 8px 28px rgba(16,24,40,.22);max-width:260px}
+.tip b{color:#fff}
+.foot{margin-top:22px;font-size:11.5px;color:var(--ink-3);line-height:1.6}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="crumbs">Stages <span>/</span> Implement <span>/</span> <b>Physical Design</b> <span>PD</span></div>
+  <h1>Physical Design</h1>
+  <div class="tabs" role="tablist" aria-label="Stage">
+    <button role="tab" aria-selected="false">Activity <span class="n">16</span></button>
+    <button role="tab" aria-selected="true">QoR Dashboard <span class="n">4</span></button>
+    <button role="tab" aria-selected="false">Key info <span class="n">3</span></button>
+    <button role="tab" aria-selected="false">Risks <span class="n">2</span></button>
+    <button role="tab" aria-selected="false">Key deliverables <span class="n">9</span></button>
+    <button role="tab" aria-selected="false">Updates <span class="n">7</span></button>
+    <button role="tab" aria-selected="false">Team <span class="n">3</span></button>
+  </div>
+
+  <div class="drops" role="tablist" aria-label="Netlist drop" id="drops"></div>
+  <div class="switch" role="tablist" aria-label="What to read">
+    <button role="tab" aria-selected="true" data-view="chip">Full chip</button>
+    <button role="tab" aria-selected="false" data-view="block">By block <span class="n" id="blockN">60</span></button>
+  </div>
+
+  <div class="tiles" id="tiles"></div>
+
+  <section id="chipView">
+    <div class="panel" style="margin-bottom:16px">
+      <h2>Full-chip QoR</h2>
+      <div class="qtbl">
+        <div class="qrow qhead"><span>Measure</span><span class="right">Target</span><span class="right">Actual</span>
+          <span class="right">Against target</span><span class="right">Against last drop</span><span>Status</span><span>Worst block · scenario</span></div>
+        <div id="chipRows"></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="blockView" hidden>
+  <div class="cols">
+    <div class="panel">
+      <h2>Blocks by QoR status</h2>
+      <div class="chart" id="statusChart" role="img" aria-label="Blocks by QoR status"></div>
+      <div class="labels" id="statusLabels"></div>
+    </div>
+    <div class="panel">
+      <h2>Blocks by P&amp;R stage</h2>
+      <div class="chart" id="stageChart" role="img" aria-label="Blocks by P&R stage"></div>
+      <div class="labels" id="stageLabels"></div>
+    </div>
+  </div>
+
+  <div class="toolbar">
+    <button class="chip" data-filter="all" aria-pressed="true">All <span class="c" data-c="all"></span></button>
+    <button class="chip" data-filter="fail" aria-pressed="false">Failing <span class="c" data-c="fail"></span></button>
+    <button class="chip" data-filter="watch" aria-pressed="false">Watching <span class="c" data-c="watch"></span></button>
+    <button class="chip" data-filter="clean" aria-pressed="false">Clean <span class="c" data-c="clean"></span></button>
+    <button class="chip" data-filter="none" aria-pressed="false">Not run <span class="c" data-c="none"></span></button>
+    <input class="search" id="search" type="search" placeholder="Filter blocks — name or subsystem…" aria-label="Filter blocks" />
+    <span class="sets" role="tablist" aria-label="Measures">
+      <button role="tab" aria-selected="true" data-set="setup">Setup</button>
+      <button role="tab" aria-selected="false" data-set="hold">Hold</button>
+      <button role="tab" aria-selected="false" data-set="drv">DRV</button>
+      <button role="tab" aria-selected="false" data-set="physical">Physical</button>
+      <button role="tab" aria-selected="false" data-set="power">Power &amp; IR</button>
+      <button role="tab" aria-selected="false" data-set="flow">Flow</button>
+    </span>
+    <span class="count" id="rowCount"></span>
+  </div>
+
+  <div class="tbl">
+    <div class="trow thead" id="thead"></div>
+    <div class="tbody" id="tbody"></div>
+  </div>
+  </section>
+
+  <p class="foot">
+    Mock-up for review. Every value comes from the QoR spreadsheet template — one row per block per netlist
+    drop — and the chip rows are rolled up from those against the signoff targets.
+  </p>
+</div>
+
+<script>
+/* ────────────────────────────────────────────────────────────
+   The blocks. [name, subsystem, instances at N0 in thousands]
+   Sixty of them, which is what the programme's netlist carries.
+   ──────────────────────────────────────────────────────────── */
+const BLOCKS = [
+  ['cpu_core0','CPU',1180],['cpu_core1','CPU',1180],['cpu_core2','CPU',960],['cpu_core3','CPU',960],
+  ['cpu_l3','CPU',1420],['cpu_dsu','CPU',540],
+  ['npu_core0','NPU',4120],['npu_core1','NPU',4080],['npu_ctrl','NPU',620],['npu_sram_wrap','NPU',380],
+  ['gpu_shader','GPU',5200],['gpu_geom','GPU',1340],['gpu_l2','GPU',980],['gpu_ctrl','GPU',420],
+  ['isp_pipe','ISP',3350],['isp_stat','ISP',460],['isp_raw','ISP',720],
+  ['venc_top','Codec',2940],['vdec_top','Codec',2610],['jpeg_top','Codec',380],
+  ['ddr_ctrl','Memory',1180],['ddr_phy_wrap','Memory',640],['lpddr_sched','Memory',520],
+  ['sram_bank0','Memory',760],['sram_bank1','Memory',760],
+  ['pcie_ctrl','IO',1420],['pcie_phy_wrap','IO',480],['usb_top','IO',560],['ufs_ctrl','IO',640],
+  ['mipi_dphy_wrap','IO',340],['sdio_top','IO',280],
+  ['noc_main','Fabric',1860],['noc_cfg','Fabric',420],['noc_mem','Fabric',1240],
+  ['axi_bridge0','Fabric',360],['axi_bridge1','Fabric',360],
+  ['sec_crypto','Security',960],['sec_keystore','Security',280],['otp_ctrl','Security',180],['rom_boot','Security',120],
+  ['pmu_top','System',420],['clk_gen','System',260],['rst_ctrl','System',150],['dvfs_ctrl','System',320],
+  ['timer_top','System',140],['wdt_top','System',90],['gpio_top','System',170],['i2c_top','System',130],
+  ['spi_top','System',140],['uart_top','System',110],['dma0','System',540],['dma1','System',540],
+  ['mailbox','System',160],['debug_tap','Debug',210],['trace_top','Debug',480],['perf_mon','Debug',260],
+  ['efuse_ctrl','System',120],['thermal_mon','System',140],['adc_wrap','Analog',180],['pll_wrap0','Analog',150],
+];
+
+/* The four drops, and what each one is. */
+const DROPS = [
+  { id:'N0', label:'N0', date:'04/14/2023' },
+  { id:'N1', label:'N1', date:'06/23/2023' },
+  { id:'N2', label:'N2', date:'08/18/2023' },
+  { id:'FFN','label':'FFN', date:'09/29/2023' },
+];
+
+/* The nine that grew at the FFN, and by how much. The story this drop tells. */
+const FFN_GROWTH = {
+  npu_core0:0.143, npu_core1:0.127, isp_pipe:0.122, venc_top:0.116, vdec_top:0.107,
+  gpu_shader:0.102, pcie_ctrl:0.099, ddr_ctrl:0.093, sec_crypto:0.083,
+};
+/* Their neighbours, which gave up area and paid for it in routing. */
+const SQUEEZED = ['noc_main','noc_mem','sram_bank0','usb_top','dma0','isp_raw'];
+
+/* A small deterministic generator, so the mock-up reads the same every time. */
+/* The scenarios a worst number can come from. A slack with no scenario beside
+   it cannot be acted on: the same −117 ps means "too slow" in a slow corner and
+   something else entirely in a fast one. */
+const SETUP_SCN = [
+  'SS 0.72V/−40C · func',
+  'SS 0.72V/125C · func',
+  'SS 0.75V/−40C · dvfs_low',
+  'SS 0.72V/−40C · scan_cap',
+];
+const HOLD_SCN = [
+  'FF 0.88V/125C · func',
+  'FF 0.88V/−40C · func',
+  'FF 0.88V/125C · scan_shift',
+  'TT 0.80V/25C · func',
+];
+
+const rand = (seed) => { let s = seed >>> 0; return () => ((s = (s * 1664525 + 1013904223) >>> 0) / 4294967296); };
+
+/* How hard a block is to close, from its size and what it does. */
+const hardness = (b) => {
+  const big = Math.min(1, b[2] / 4200);
+  const kind = { CPU:.95, NPU:1, GPU:.9, ISP:.75, Codec:.7, Memory:.8, IO:.6, Fabric:.75, Security:.45, System:.3, Debug:.35, Analog:.25 }[b[1]] ?? .5;
+  return 0.35 * kind + 0.65 * big * kind;
+};
+
+/* One block's QoR in one drop. */
+function measure(b, dropIndex, rnd) {
+  const h = hardness(b);
+  const r = rnd();
+  /* quality climbs with every drop: N0 is rough, N2 is nearly there */
+  /* the flow matures turn by turn; the FFN is the same flow on a bigger
+     netlist, so it gains nothing by arriving — what it brings is its size */
+  const maturity = [0.15, 0.62, 0.95, 0.95][dropIndex];
+  const grew = dropIndex === 3 ? (FFN_GROWTH[b[0]] ?? 0) : 0;
+  const squeezed = dropIndex === 3 && SQUEEZED.includes(b[0]);
+
+  const inst = Math.round(b[2] * (1 + grew) * (1 + (dropIndex ? 0.01 * dropIndex : 0)));
+  const util = 58 + 14 * h + 8 * maturity + 100 * grew + (squeezed ? 3.5 : 0) + r * 3;
+
+  /* setup: a slack that improves with maturity and collapses where a block grew */
+  /* slack closes as the turns go by, and an easy block closes first; a block
+     that grew, or gave its whitespace to one that did, goes backwards */
+  const base = -(230 * h + 110 * r);
+  let wns = base * (1 - maturity) + maturity * maturity * 165 * (1 - 0.85 * h) - grew * 900 - (squeezed ? 34 : 0);
+  if (wns > 55) wns = 55 - r * 12;
+  const feps = wns >= 0 ? 0 : Math.max(1, Math.round((-wns) * (1.6 + 4.2 * h) * (0.6 + r)));
+  const tns = wns >= 0 ? 0 : -(feps * (0.004 + 0.009 * r));
+  const holdW = dropIndex === 0 ? -(30 + 60 * r) : -(14 * (1 - maturity) * (1 + r) + (squeezed ? 8 : 0) + grew * 60);
+  /* a negative hold slack is a violating endpoint by definition, so the two
+     never disagree: no violations means no negative slack to report */
+  let holdV = holdW >= -1 ? 0 : Math.max(1, Math.round((-holdW) * (1.2 + 2.6 * h) * r));
+  const holdTns = holdV ? -Math.abs(+(holdV * (-holdW) * 0.0008 * (0.6 + r)).toFixed(2)) : 0;
+
+  const overflow = Math.max(0, (3.2 * h + 1.5 * r) * (1 - maturity) - maturity * 0.35 + grew * 24 + (squeezed ? 0.85 : 0));
+  const drc = Math.round(overflow * (45 + 150 * h) * (0.5 + r * 0.8));
+  const leak = +(b[2] * (1 + grew) * (0.0009 + 0.0013 * r)).toFixed(1);
+  const dyn = +(b[2] * (1 + grew) * (0.011 + 0.006 * r)).toFixed(0);
+  /* what the block was budgeted, fixed at the architecture's split — the
+     actual moves against it and the gap is the number worth reading */
+  const budget = Math.round(b[2] * (0.0118 + 0.0055 * ((b[0].length % 7) / 7)));
+  /* IR drop on the block's own grid: denser placement and more switching
+     current pull it up, a matured grid pulls it down */
+  /* IR drop is two measurements signed off against two limits, not one */
+  const irStatic = +((8 + 22 * h + 7 * r) * (1 - 0.3 * maturity) * (1 + grew * 1.6) + (squeezed ? 1.5 : 0)).toFixed(1);
+  const irDynamic = +(irStatic * (1.5 + 0.5 * r) * (1 + grew * 0.8)).toFixed(1);
+  /* global skew inside the block, ps */
+  const skew = +((26 + 58 * h + 18 * r) * (1 - 0.45 * maturity) * (1 + grew * 1.4)).toFixed(0);
+
+  /* Design rule violations. Congestion shows here before it shows in the slack:
+     a net that had to detour is long, and a long net breaks max transition and
+     max capacitance first. */
+  const drvScale = (1 - maturity) * (1 + grew * 18) + (squeezed ? 0.12 : 0);
+  const maxTran = Math.round(drvScale * (120 + 380 * h) * (0.5 + r));
+  const maxCap = Math.round(drvScale * (70 + 240 * h) * (0.5 + r));
+  const maxFanout = Math.round(drvScale * (25 + 60 * h) * (0.4 + r));
+  /* worst transition against the 0.35 ns rule */
+  const worstTran = +(0.18 + drvScale * (0.5 + 0.9 * h) * (0.6 + r)).toFixed(2);
+  /* clock checks: minimum period and minimum pulse width */
+  const minPeriod = dropIndex === 0 ? Math.round((8 + 30 * h) * (0.5 + r)) : Math.round((1 - maturity) * (20 + 60 * h) * (0.4 + r) + grew * 14);
+  const mpw = dropIndex === 0 ? Math.round((6 + 22 * h) * (0.5 + r)) : Math.round((1 - maturity) * (14 + 44 * h) * (0.4 + r) + grew * 9);
+  /* one turn of place-and-route on this block, in hours */
+  const runtime = +((2.4 + 9.5 * (b[2] / 4200) + 3 * r) * (1 + grew * 1.6) * (1 + 0.25 * (1 - maturity))).toFixed(1);
+  /* ECOs applied in this drop — the count is what the change control record counts */
+  const ecos = Math.round((dropIndex === 0 ? 0 : 3 + 26 * h * (1 - maturity) * 6 + grew * 120) * (0.7 + r * 0.6));
+  /* rounds, not fixes: how many times the ECO loop was run on this block */
+  const ecoRounds = dropIndex === 0 ? 0 : Math.max(1, Math.round((1 + 15 * h * (1 - maturity) + grew * 16) * (0.8 + r * 0.4)));
+
+  /* which scenario produced the worst number, fixed per block so it does not
+     dance between drops; a block that grew is held by the slow corner */
+  let hash = 0;
+  for (let i = 0; i < b[0].length; i++) hash = (hash * 31 + b[0].charCodeAt(i)) % 9973;
+  const setupScn = grew ? SETUP_SCN[0] : SETUP_SCN[hash % SETUP_SCN.length];
+  const holdScn = HOLD_SCN[(hash >> 2) % HOLD_SCN.length];
+
+  return {
+    name:b[0], group:b[1], inst, util:+util.toFixed(1), setupScn, holdScn,
+    wns:Math.round(wns), tns:+tns.toFixed(2), feps,
+    holdW:holdV ? Math.round(holdW) : 0, holdV, holdTns,
+    maxTran, maxCap, maxFanout, worstTran, minPeriod, mpw,
+    overflow:+overflow.toFixed(2), drc,
+    leak, dyn, power:+(dyn + leak).toFixed(0), budget,
+    irStatic, irDynamic, skew, runtime, ecos, ecoRounds, grew,
+  };
+}
+
+/* The P&R pipeline, in order. A block sits in exactly one of these. */
+const STAGES = ['Not started','Floorplan','Place','CTS','Route','Post-route opt','Signoff','Complete'];
+/* One hue, light to dark, because the stages are ordered; not started is grey
+   and complete is the status green. */
+const STAGE_FILL = ['#d8dade','#dcdcf6','#c3c3ef','#a6a6e6','#8a8adc','#6f6fd2','#5b5bd6','#30a46c'];
+
+/* Where a block is in the pipeline. Each drop opens a band of stages, and a
+   block sits inside its band by how hard it is and how far its timing has
+   come: the easy ones lead, the ones that grew fall back to placement. */
+function stageOf(m, dropIndex) {
+  if (m.missing) return 0;
+  const h = hardness([m.name, m.group, m.inst]);
+  /* a stable 0..1 from the name, so the spread inside a band is not decided
+     by size alone */
+  let x = 0;
+  for (let i = 0; i < m.name.length; i++) x = (x * 31 + m.name.charCodeAt(i)) % 997;
+  const lead = 0.65 * (1 - h) + 0.35 * (x / 997);
+
+  /* N0 is floorplan and first placement; N1 gets through clocks and routing;
+     N2 optimises and signs off; the final turn closes what the netlist allows */
+  if (dropIndex === 0) return lead > 0.55 ? 2 : 1;
+  if (dropIndex === 1) return lead > 0.75 ? 4 : lead > 0.4 ? 3 : 2;
+  if (dropIndex === 2) return lead > 0.85 ? 7 : lead > 0.55 ? 6 : lead > 0.25 ? 5 : 4;
+  /* a block that grew is back in placement or routing, the ones it squeezed
+     are still optimising, and a block only counts complete once it is clean */
+  if (m.grew) return m.wns < -80 ? 2 : 4;
+  if (m.wns < -20) return 5;
+  if (m.wns < 0) return 6;
+  if (m.drc > 0 || m.holdV > 0) return 6;
+  return lead > 0.45 ? 7 : 6;
+}
+
+const statusOf = (m) => {
+  if (m == null) return 'none';
+  /* failing: a violation no ECO round will absorb, or routing that will not close */
+  if (m.wns < -40 || m.overflow > 2.5 || m.drc > 400) return 'fail';
+  /* watching: something is still open, but the turn can carry it */
+  if (m.wns < 0 || m.holdV > 0 || m.overflow > 1.2) return 'watch';
+  return 'clean';
+};
+const LABEL = { clean:'Clean', watch:'Watching', fail:'Failing', none:'Not run' };
+
+/* Build every drop. A handful of blocks are not in the first netlist at all —
+   they arrive with N1 — which is what "Not run" is for. */
+const LATE = new Set(['trace_top','perf_mon','thermal_mon','sdio_top','mailbox']);
+const DATA = DROPS.map((d, i) => {
+  const rnd = rand(97 + i * 1013);
+  return BLOCKS.map((b) => {
+    if (i === 0 && LATE.has(b[0])) return { name:b[0], group:b[1], missing:true, stage:0 };
+    const m = measure(b, i, rnd);
+    return { ...m, stage:stageOf(m, i) };
+  });
+});
+
+/* Chip-level roll-up for one drop. */
+function roll(rows) {
+  const live = rows.filter((r) => !r.missing);
+  const by = { clean:0, watch:0, fail:0, none:rows.length - live.length };
+  for (const r of live) by[statusOf(r)]++;
+  return {
+    by,
+    wns: Math.min(...live.map((r) => r.wns)),
+    tns: +live.reduce((t, r) => t + r.tns, 0).toFixed(1),
+    feps: live.reduce((t, r) => t + r.feps, 0),
+    holdV: live.reduce((t, r) => t + r.holdV, 0),
+    drc: live.reduce((t, r) => t + r.drc, 0),
+    inst: live.reduce((t, r) => t + r.inst, 0),
+    util: +(live.reduce((t, r) => t + r.util, 0) / live.length).toFixed(1),
+    power: Math.round(live.reduce((t, r) => t + r.dyn + r.leak, 0)),
+    leak: +live.reduce((t, r) => t + r.leak, 0).toFixed(0),
+    dyn: live.reduce((t, r) => t + r.dyn, 0),
+    budget: live.reduce((t, r) => t + r.budget, 0),
+    /* the chip's worst, not a sum: one block's grid is what browns out */
+    irStatic: +Math.max(...live.map((r) => r.irStatic)).toFixed(1),
+    irDynamic: +Math.max(...live.map((r) => r.irDynamic)).toFixed(1),
+    overflow: +Math.max(...live.map((r) => r.overflow)).toFixed(2),
+    holdW: Math.min(...live.map((r) => r.holdW)),
+    ecoRounds: Math.max(...live.map((r) => r.ecoRounds)),
+    holdTns: +live.reduce((t, r) => t + r.holdTns, 0).toFixed(2),
+    maxTran: live.reduce((t, r) => t + r.maxTran, 0),
+    maxCap: live.reduce((t, r) => t + r.maxCap, 0),
+    maxFanout: live.reduce((t, r) => t + r.maxFanout, 0),
+    worstTran: +Math.max(...live.map((r) => r.worstTran)).toFixed(2),
+    minPeriod: live.reduce((t, r) => t + r.minPeriod, 0),
+    mpw: live.reduce((t, r) => t + r.mpw, 0),
+    stages: STAGES.map((_, i) => rows.filter((x) => x.stage === i).length),
+    skew: Math.max(...live.map((r) => r.skew)),
+    /* the turn is as long as its longest block, plus top-level assembly */
+    runtime: +(Math.max(...live.map((r) => r.runtime)) + 6.5).toFixed(1),
+    ecos: live.reduce((t, r) => t + r.ecos, 0),
+    worst: [...live].sort((a, b) => a.wns - b.wns)[0],
+    worstIrS: [...live].sort((a, b) => b.irStatic - a.irStatic)[0],
+    worstIrD: [...live].sort((a, b) => b.irDynamic - a.irDynamic)[0],
+    worstOverflow: [...live].sort((a, b) => b.overflow - a.overflow)[0],
+    worstUtil: [...live].sort((a, b) => b.util - a.util)[0],
+    worstDrc: [...live].sort((a, b) => b.drc - a.drc)[0],
+    worstEco: [...live].sort((a, b) => b.ecoRounds - a.ecoRounds)[0],
+    worstTranBlk: [...live].sort((a, b) => b.worstTran - a.worstTran)[0],
+    worstMaxTran: [...live].sort((a, b) => b.maxTran - a.maxTran)[0],
+    worstMaxCap: [...live].sort((a, b) => b.maxCap - a.maxCap)[0],
+    worstMpw: [...live].sort((a, b) => b.mpw - a.mpw)[0],
+    worstFanout: [...live].sort((a, b) => b.maxFanout - a.maxFanout)[0],
+    worstPeriod: [...live].sort((a, b) => b.minPeriod - a.minPeriod)[0],
+    worstSkew: [...live].sort((a, b) => b.skew - a.skew)[0],
+    slowest: [...live].sort((a, b) => b.runtime - a.runtime)[0],
+  };
+}
+/* What the chip is signed off against. Targets, not wishes: each is a number
+   the programme committed to, and the full-chip view reads the actual against
+   it rather than on its own. */
+const CHIP = {
+  wns:{ target:0, unit:'ps', good:'above', label:'Setup WNS', group:'Timing', worst:'worst', scn:'setupScn' },
+  tns:{ target:0, unit:'ns', good:'above', label:'Setup TNS', group:'Timing', worst:'worst', scn:'setupScn' },
+  feps:{ target:0, unit:'', good:'below', label:'Failing endpoints', group:'Timing', worst:'worst', scn:'setupScn' },
+  holdW:{ target:0, unit:'ps', good:'above', label:'Hold WNS', group:'Timing', worst:'worst', scn:'holdScn' },
+  holdV:{ target:0, unit:'', good:'below', label:'Hold violations', group:'Timing', worst:'worst', scn:'holdScn' },
+  holdTns:{ target:0, unit:'ns', good:'above', label:'Hold TNS', group:'Timing', worst:'worst', scn:'holdScn' },
+  skew:{ target:60, unit:'ps', good:'below', label:'Clock skew', group:'Timing', worst:'worstSkew' },
+  maxTran:{ target:0, unit:'', good:'below', label:'Max transition violations', group:'Design rules', worst:'worstMaxTran' },
+  maxCap:{ target:0, unit:'', good:'below', label:'Max capacitance violations', group:'Design rules', worst:'worstMaxCap' },
+  maxFanout:{ target:0, unit:'', good:'below', label:'Max fanout violations', group:'Design rules', worst:'worstFanout' },
+  worstTran:{ target:0.35, unit:'ns', good:'below', label:'Worst transition', group:'Design rules', worst:'worstTranBlk' },
+  minPeriod:{ target:0, unit:'', good:'below', label:'Min period violations', group:'Design rules', worst:'worstPeriod' },
+  mpw:{ target:0, unit:'', good:'below', label:'Min pulse width violations', group:'Design rules', worst:'worstMpw' },
+  util:{ target:78, unit:'%', good:'below', label:'Utilization', group:'Physical', worst:'worstUtil' },
+  overflow:{ target:1, unit:'%', good:'below', label:'Global route overflow', group:'Physical', worst:'worstOverflow' },
+  drc:{ target:0, unit:'', good:'below', label:'DRC after route', group:'Physical', worst:'worstDrc' },
+  power:{ target:null, unit:'mW', good:'below', label:'Total power', group:'Power and IR', worst:null },
+  dyn:{ target:null, unit:'mW', good:'below', label:'Dynamic power', group:'Power and IR', worst:null },
+  leak:{ target:90, unit:'mW', good:'below', label:'Leakage power', group:'Power and IR', worst:null },
+  irStatic:{ target:25, unit:'mV', good:'below', label:'IR drop — static', group:'Power and IR', worst:'worstIrS' },
+  irDynamic:{ target:45, unit:'mV', good:'below', label:'IR drop — dynamic', group:'Power and IR', worst:'worstIrD' },
+  runtime:{ target:26, unit:'h', good:'below', label:'Turn runtime', group:'Flow', worst:'slowest' },
+  ecos:{ target:400, unit:'', good:'below', label:'ECOs applied', group:'Flow', worst:null },
+  ecoRounds:{ target:4, unit:'', good:'below', label:'ECO rounds', group:'Flow', worst:'worstEco' },
+};
+
+
+const ROLL = DATA.map(roll);
+
+/* ── rendering ─────────────────────────────────────────────── */
+let drop = 3;              /* the FFN, because that is where the story is */
+let filter = 'all';
+let query = '';
+let sort = { key:'wns', dir:1 };
+
+const $ = (id) => document.getElementById(id);
+const fmtK = (n) => (n >= 1000 ? (n / 1000).toFixed(2) + ' M' : n + ' K');
+const signed = (n, unit = '') => (n > 0 ? '+' : '') + n + unit;
+
+function deltaEl(now, before, { good = 'down', unit = '', digits = 0 } = {}) {
+  if (before == null) return '<span class="delta flat">—</span>';
+  const d = +(now - before).toFixed(digits);
+  if (Math.abs(d) < (digits ? 0.05 : 0.5)) return '<span class="delta flat">no change</span>';
+  const better = good === 'down' ? d < 0 : d > 0;
+  return `<span class="delta ${better ? 'up' : 'down'}">${signed(d, unit)}</span>`;
+}
+
+function renderDrops() {
+  $('drops').innerHTML = DROPS.map((d, i) => {
+    const r = ROLL[i];
+    return `<button class="drop" role="tab" aria-selected="${i === drop}" data-drop="${i}">
+      <span class="k">${d.label}</span>
+      <span class="d">${d.date} · ${r.by.fail} failing · ${r.stages[7]} complete</span>
+    </button>`;
+  }).join('');
+}
+
+/* The summary belongs to the full-chip view alone. In the block view the two
+   bar charts already count the blocks by stage and by status, and a row of
+   cards repeating those counts is the same fact twice. */
+function renderTiles() {
+  $('tiles').hidden = view !== 'chip';
+  if (view !== 'chip') return;
+  const r = ROLL[drop], p = drop ? ROLL[drop - 1] : null;
+  const against = (v, t, unit = '') => `${v > t ? '+' : ''}${+(v - t).toFixed(2)}${unit} against target`;
+  const tiles = [
+      { cap:'Setup WNS', v:`${r.wns} ps`, sub:deltaEl(r.wns, p && p.wns, { good:'up', unit:' ps' }) + ' vs last drop',
+        tone:r.wns < 0 ? 'bad' : 'good' },
+      { cap:'Setup TNS', v:`${r.tns} ns`, sub:deltaEl(r.tns, p && p.tns, { good:'up', unit:' ns', digits:1 }) + ' vs last drop',
+        tone:r.tns < 0 ? 'bad' : 'good' },
+      { cap:'Failing endpoints', v:r.feps.toLocaleString(), sub:deltaEl(r.feps, p && p.feps) + ' vs last drop',
+        tone:r.feps ? 'bad' : 'good' },
+      { cap:'Total power', v:`${(r.power / 1000).toFixed(2)} W`, sub:against(r.power, r.budget, ' mW'),
+        tone:r.power > r.budget ? 'bad' : 'good' },
+      { cap:'IR drop — dynamic', v:`${r.irDynamic} mV`, sub:against(r.irDynamic, CHIP.irDynamic.target, ' mV'),
+        tone:r.irDynamic > CHIP.irDynamic.target ? 'bad' : 'good' },
+      { cap:'DRC after route', v:r.drc.toLocaleString(), sub:deltaEl(r.drc, p && p.drc) + ' vs last drop',
+        tone:r.drc ? 'bad' : 'good' },
+    ];
+  $('tiles').innerHTML = tiles.map((t) => `<div class="tile">
+      <div class="cap">${t.cap}</div><div class="v ${t.tone || ''}">${t.v}</div><div class="sub">${t.sub}</div>
+    </div>`).join('');
+}
+
+/* Every chip measure against the target it was committed to. */
+function renderChip() {
+  const r = ROLL[drop], p = drop ? ROLL[drop - 1] : null;
+  /* power is measured against what the blocks were budgeted, so the chip row
+     and the block rows cannot say different things */
+  CHIP.power.target = r.budget;
+  CHIP.dyn.target = Math.round(r.budget * 0.9);
+  let out = '', group = '';
+  for (const key of Object.keys(CHIP)) {
+    const c = CHIP[key];
+    if (c.group !== group) { group = c.group; out += `<div class="qgroup">${group}</div>`; }
+    const now = r[key];
+    const before = p ? p[key] : null;
+    const pass = c.good === 'below' ? now <= c.target : now >= c.target;
+    const gap = +(now - c.target).toFixed(2);
+    const near = c.good === 'below' ? now <= c.target * 1.15 : now >= -5;
+    const w = c.worst ? r[c.worst] : null;
+    out += `<div class="qrow">
+      <span><span class="m">${c.label}</span>${c.unit ? `<span class="unit">${c.unit}</span>` : ''}</span>
+      <span class="right num flat">${c.target}</span>
+      <span class="right num ${pass ? '' : 'bad'}" style="font-weight:600">${now}</span>
+      <span class="right num ${pass ? '' : 'bad'}">${gap > 0 ? '+' : ''}${gap}</span>
+      <span class="right">${deltaEl(now, before, { good:c.good === 'below' ? 'down' : 'up', digits:2 })}</span>
+      <span>${chip(pass ? 'clean' : near ? 'watch' : 'fail')}</span>
+      <span class="where">${w ? `${w.name} · ${w[key]}${c.unit}${c.scn ? `<span class="scnq">${w[c.scn]}</span>` : ''}` : '—'}</span>
+    </div>`;
+  }
+  $('chipRows').innerHTML = out;
+}
+
+/* Both panels count the same sixty blocks, so both are drawn against sixty:
+   a bar's height means the same thing in either. Each column carries its own
+   number above it, so nothing has to be read off an axis. */
+function column(n, fill, tip) {
+  const total = BLOCKS.length;
+  return `<div class="col" data-tip="${tip}">
+      <span class="v ${n ? '' : 'zero'}">${n}</span>
+      <span class="bar" style="height:${(n / total) * 100}%;background:${n ? fill : 'var(--shade)'}"></span>
+    </div>`;
+}
+
+function renderStatusChart() {
+  const r = ROLL[drop];
+  const seg = [['clean','var(--ok)'],['watch','var(--warn)'],['fail','var(--risk)'],['none','var(--ink-4)']];
+  $('statusChart').innerHTML = seg
+    .map(([k, c]) => column(r.by[k], c, `${LABEL[k]}<br>${r.by[k]} of ${BLOCKS.length} blocks`)).join('');
+  $('statusLabels').innerHTML = seg.map(([k]) => `<span>${LABEL[k]}</span>`).join('');
+}
+
+function renderStageChart() {
+  const r = ROLL[drop];
+  $('stageChart').innerHTML = STAGES
+    .map((label, i) => column(r.stages[i], STAGE_FILL[i], `${label}<br>${r.stages[i]} of ${BLOCKS.length} blocks`)).join('');
+  $('stageLabels').innerHTML = STAGES.map((label) => `<span>${label}</span>`).join('');
+}
+
+const chip = (s) => `<span class="st st-${s}"><i></i>${LABEL[s]}</span>`;
+
+/* Three sets rather than twenty columns: a timing review, a physical one and
+   the flow's own numbers. Block and status stay in every set. */
+/* Four sets rather than twenty columns. Block, stage and status stay in each.
+   A unit rides with the column only where the number has one: a count of
+   endpoints or ECO rounds has none, and "Fail eps (#)" is noise. */
+/* Six sets rather than thirty columns. Block, stage and status stay in each.
+   Setup and hold are read apart because they are fixed differently — a setup
+   violation wants a faster path, a hold violation a slower one — and a design
+   rule violation is neither. A unit rides with a column only where the number
+   has one: a count of endpoints has none. */
+const SETS = {
+  setup:[
+    { key:'wns', label:'Setup WNS', unit:'ps' }, { key:'setupScn', label:'Setup scenario', wide:true },
+    { key:'tns', label:'Setup TNS', unit:'ns' }, { key:'feps', label:'Fail eps' },
+    { key:'skew', label:'Skew', unit:'ps' }, { key:'delta', label:'WNS Δ', unit:'ps' },
+  ],
+  hold:[
+    { key:'holdW', label:'Hold WNS', unit:'ps' }, { key:'holdScn', label:'Hold scenario', wide:true },
+    { key:'holdTns', label:'Hold TNS', unit:'ns' }, { key:'holdV', label:'Hold viol' },
+    { key:'skew', label:'Skew', unit:'ps' }, { key:'mpw', label:'MPW viol' },
+  ],
+  drv:[
+    { key:'maxTran', label:'Max tran viol' }, { key:'worstTran', label:'Worst tran', unit:'ns' },
+    { key:'maxCap', label:'Max cap viol' }, { key:'maxFanout', label:'Max fanout viol' },
+    { key:'minPeriod', label:'Min period viol' }, { key:'mpw', label:'MPW viol' },
+  ],
+  physical:[
+    { key:'util', label:'Util', unit:'%' }, { key:'inst', label:'Inst', unit:'M' },
+    { key:'overflow', label:'Overflow', unit:'%' }, { key:'drc', label:'DRC' },
+    { key:'skew', label:'Skew', unit:'ps' }, { key:'delta', label:'WNS Δ', unit:'ps' },
+  ],
+  power:[
+    { key:'power', label:'Power', unit:'mW' }, { key:'budget', label:'Budget', unit:'mW' },
+    { key:'pgap', label:'vs budget', unit:'mW' }, { key:'dyn', label:'Dynamic', unit:'mW' },
+    { key:'irStatic', label:'IR static', unit:'mV' }, { key:'irDynamic', label:'IR dynamic', unit:'mV' },
+  ],
+  flow:[
+    { key:'runtime', label:'Runtime', unit:'h' }, { key:'ecos', label:'ECOs' }, { key:'ecoRounds', label:'ECO rounds' },
+    { key:'feps', label:'Fail eps' }, { key:'drc', label:'DRC' }, { key:'delta', label:'WNS Δ', unit:'ps' },
+  ],
+};
+let set = 'setup';
+const colsNow = () => [
+  { key:'name', label:'Block' },
+  { key:'stage', label:'P&R stage' },
+  { key:'status', label:'QoR' },
+  ...SETS[set],
+];
+
+/* Every set has its own widths: a scenario name needs room, a number does not. */
+function applyCols() {
+  const t = SETS[set].map((c) => (c.wide ? 'minmax(152px,1.7fr)' : 'minmax(62px,1fr)')).join(' ');
+  document.querySelector('.tbl').style.setProperty('--m', t);
+}
+
+function renderHead() {
+  applyCols();
+  $('thead').innerHTML = colsNow().map((c, i) => `<button data-sort="${c.key}" ${sort.key === c.key ? 'data-sorted' : ''}
+      class="${i > 2 ? 'right' : ''}" style="${i > 2 ? 'justify-content:flex-end' : ''}">
+      ${c.label}${c.unit ? `<span class="u">${c.unit}</span>` : ''}<span class="ar">${sort.dir > 0 ? '▲' : '▼'}</span></button>`).join('');
+}
+
+function rowsNow() {
+  const before = drop ? DATA[drop - 1] : null;
+  let rows = DATA[drop].map((r, i) => ({ ...r, status:statusOf(r.missing ? null : r), was:before ? before[i] : null }));
+  if (filter !== 'all') rows = rows.filter((r) => r.status === filter);
+  if (query) {
+    const q = query.toLowerCase();
+    rows = rows.filter((r) => r.name.toLowerCase().includes(q) || r.group.toLowerCase().includes(q));
+  }
+  const k = sort.key;
+  const rank = { fail:0, watch:1, clean:2, none:3 };
+  rows.sort((a, b) => {
+    if (a.missing && !b.missing) return 1;
+    if (b.missing && !a.missing) return -1;
+    let d;
+    if (k === 'name') d = a.name.localeCompare(b.name);
+    else if (k === 'status') d = rank[a.status] - rank[b.status];
+    else if (k === 'delta') d = (a.wns - (a.was ? a.was.wns : 0)) - (b.wns - (b.was ? b.was.wns : 0));
+    else if (k === 'pgap') d = (a.power - a.budget) - (b.power - b.budget);
+    else if (k === 'stage') d = a.stage - b.stage;
+    else d = (a[k] ?? 0) - (b[k] ?? 0);
+    return d * sort.dir;
+  });
+  return rows;
+}
+
+function renderTable() {
+  const rows = rowsNow();
+  const counts = { all:BLOCKS.length, fail:0, watch:0, clean:0, none:0 };
+  for (const r of DATA[drop]) counts[statusOf(r.missing ? null : r)]++;
+  document.querySelectorAll('[data-c]').forEach((el) => { el.textContent = counts[el.dataset.c]; });
+  $('rowCount').textContent = `${rows.length} of ${BLOCKS.length} blocks`;
+
+  $('tbody').innerHTML = rows.length
+    ? rows.map((r) => {
+        if (r.missing) {
+          return `<div class="trow"><span class="r-name">${r.name}<span class="r-group">${r.group}</span></span>
+            <span><span class="stage">${STAGES[0]}</span></span><span>${chip('none')}</span>
+            <span class="flat" style="grid-column:4 / -1">not in this netlist</span></div>`;
+        }
+        const dw = r.was ? r.wns - r.was.wns : null;
+        const pgap = r.power - r.budget;
+        const cell = (c) => {
+          switch (c.key) {
+            case 'wns': return `<span class="right num ${r.wns < -40 ? 'bad' : r.wns < 0 ? 'warnv' : ''}">${r.wns}</span>`;
+            case 'tns': return `<span class="right num ${r.tns < -4 ? 'bad' : ''}">${r.tns}</span>`;
+            case 'feps': return `<span class="right num">${r.feps.toLocaleString()}</span>`;
+            case 'holdW': return `<span class="right num ${r.holdV ? 'warnv' : ''}">${r.holdW}</span>`;
+            case 'holdV': return `<span class="right num ${r.holdV ? 'warnv' : ''}">${r.holdV}</span>`;
+            case 'overflow': return `<span class="right num ${r.overflow > 2.5 ? 'bad' : r.overflow > 1.2 ? 'warnv' : ''}">${r.overflow}</span>`;
+            case 'drc': return `<span class="right num ${r.drc > 400 ? 'bad' : ''}">${r.drc.toLocaleString()}</span>`;
+            case 'util': return `<span class="right num ${r.util > 88 ? 'bad' : r.util > 82 ? 'warnv' : ''}">${r.util}</span>`;
+            case 'inst': return `<span class="right num">${(r.inst / 1000).toFixed(2)}M</span>`;
+            case 'irStatic': return `<span class="right num ${r.irStatic > CHIP.irStatic.target ? 'bad' : ''}">${r.irStatic}</span>`;
+            case 'irDynamic': return `<span class="right num ${r.irDynamic > CHIP.irDynamic.target ? 'bad' : ''}">${r.irDynamic}</span>`;
+            case 'dyn': return `<span class="right num">${r.dyn}</span>`;
+            case 'holdV': return `<span class="right num ${r.holdV ? 'warnv' : ''}">${r.holdV}</span>`;
+            case 'ecoRounds': return `<span class="right num ${r.ecoRounds > CHIP.ecoRounds.target ? 'warnv' : ''}">${r.ecoRounds}</span>`;
+            case 'holdTns': return `<span class="right num ${r.holdTns < -1 ? 'bad' : ''}">${r.holdTns}</span>`;
+      case 'maxTran': return `<span class="right num ${r.maxTran > 200 ? 'bad' : r.maxTran ? 'warnv' : ''}">${r.maxTran.toLocaleString()}</span>`;
+      case 'maxCap': return `<span class="right num ${r.maxCap > 120 ? 'bad' : r.maxCap ? 'warnv' : ''}">${r.maxCap.toLocaleString()}</span>`;
+      case 'maxFanout': return `<span class="right num ${r.maxFanout ? 'warnv' : ''}">${r.maxFanout.toLocaleString()}</span>`;
+      case 'worstTran': return `<span class="right num ${r.worstTran > CHIP.worstTran.target ? 'bad' : ''}">${r.worstTran}</span>`;
+      case 'minPeriod': return `<span class="right num ${r.minPeriod ? 'bad' : ''}">${r.minPeriod}</span>`;
+      case 'mpw': return `<span class="right num ${r.mpw ? 'bad' : ''}">${r.mpw}</span>`;
+      case 'setupScn': return `<span class="right scn">${r.setupScn}</span>`;
+      case 'holdScn': return `<span class="right scn">${r.holdV ? r.holdScn : '—'}</span>`;
+      case 'delta': return r.was
+              ? `<span class="right">${deltaEl(r.wns, r.was.wns, { good:'up' })}</span>`
+              : '<span class="right delta flat">—</span>';
+            case 'skew': return `<span class="right num ${r.skew > CHIP.skew.target ? 'bad' : ''}">${r.skew}</span>`;
+            case 'power': return `<span class="right num">${r.power}</span>`;
+            case 'budget': return `<span class="right num flat">${r.budget}</span>`;
+            case 'pgap': return `<span class="right num ${pgap > 0 ? 'bad' : ''}">${pgap > 0 ? '+' : ''}${pgap}</span>`;
+            case 'runtime': return `<span class="right num ${r.runtime > CHIP.runtime.target ? 'warnv' : ''}">${r.runtime}</span>`;
+            case 'ecos': return `<span class="right num">${r.ecos.toLocaleString()}</span>`;
+            default: return '<span></span>';
+          }
+        };
+        return `<div class="trow" data-tip="${r.name} · ${r.group} · ${STAGES[r.stage]}<br>Power ${r.power} / ${r.budget} mW · IR ${r.irStatic} static, ${r.irDynamic} dynamic<br>Skew ${r.skew} ps · runtime ${r.runtime} h · ${r.ecos} ECOs in ${r.ecoRounds} rounds">
+          <span class="r-name">${r.name}<span class="r-group">${r.group}</span></span>
+          <span><span class="stage" style="background:${STAGE_FILL[r.stage]}2e;color:${r.stage === 7 ? 'var(--ok-ink)' : 'var(--ink-2)'}">${STAGES[r.stage]}</span></span>
+          <span>${chip(r.status)}</span>
+          ${SETS[set].map(cell).join('')}
+        </div>`;
+      }).join('')
+    : '<p class="empty">No block matches that filter.</p>';
+}
+
+let view = 'chip';
+function renderAll() {
+  renderDrops(); renderTiles(); renderStatusChart(); renderStageChart(); renderChip(); renderHead(); renderTable();
+  $('chipView').hidden = view !== 'chip';
+  $('blockView').hidden = view !== 'block';
+}
+
+/* ── events ────────────────────────────────────────────────── */
+$('drops').addEventListener('click', (e) => {
+  const b = e.target.closest('[data-drop]');
+  if (!b) return;
+  drop = Number(b.dataset.drop);
+  renderAll();
+});
+document.querySelectorAll('[data-filter]').forEach((b) => b.addEventListener('click', () => {
+  filter = b.dataset.filter;
+  document.querySelectorAll('[data-filter]').forEach((x) => x.setAttribute('aria-pressed', String(x === b)));
+  renderTable();
+}));
+$('search').addEventListener('input', (e) => { query = e.target.value.trim(); renderTable(); });
+document.querySelectorAll('[data-view]').forEach((b) => b.addEventListener('click', () => {
+  view = b.dataset.view;
+  document.querySelectorAll('[data-view]').forEach((x) => x.setAttribute('aria-selected', String(x === b)));
+  renderAll();
+}));
+document.querySelectorAll('[data-set]').forEach((b) => b.addEventListener('click', () => {
+  set = b.dataset.set;
+  document.querySelectorAll('[data-set]').forEach((x) => x.setAttribute('aria-selected', String(x === b)));
+  /* a sort on a column the new set does not show falls back to the worst-first default */
+  if (!colsNow().some((c) => c.key === sort.key)) sort = { key:'wns', dir:1 };
+  renderHead(); renderTable();
+}));
+$('thead').addEventListener('click', (e) => {
+  const b = e.target.closest('[data-sort]');
+  if (!b) return;
+  const k = b.dataset.sort;
+  sort = { key:k, dir: sort.key === k ? -sort.dir : (k === 'name' || k === 'status' ? 1 : 1) };
+  renderHead(); renderTable();
+});
+
+/* one tooltip, shared by every mark that asks for one */
+const tip = document.createElement('div');
+tip.className = 'tip';
+tip.hidden = true;
+document.body.appendChild(tip);
+document.addEventListener('mousemove', (e) => {
+  const host = e.target.closest('[data-tip]');
+  if (!host) { tip.hidden = true; return; }
+  tip.innerHTML = host.dataset.tip;
+  tip.hidden = false;
+  const r = tip.getBoundingClientRect();
+  tip.style.left = Math.min(e.clientX + 14, window.innerWidth - r.width - 10) + 'px';
+  tip.style.top = Math.max(10, e.clientY - r.height - 12) + 'px';
+});
+
+renderAll();
+</script>
+</body>
+</html>
