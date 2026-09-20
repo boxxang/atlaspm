@@ -11,6 +11,7 @@ import { DeliverableLines } from './DeliverableLines';
 import { Avatar } from './icons';
 import { StepPanel } from './StepPanel';
 import { useStageSteps } from './useStageSteps';
+import { PaneGrip } from './PaneGrip';
 
 /**
  * The right rail. It shows whatever was last picked, and it is the same slot on
@@ -47,6 +48,9 @@ export function Rail({ projectId }: { projectId: string }) {
 
   return (
     <aside id="peek" aria-label="Details">
+      {/* Inside, because #peek does not scroll and because a rail that is not
+          shown should not leave a grip behind for a panel that is not there. */}
+      <PaneGrip pane="peek" />
       {selection.kind === 'stage' && (
         <StagePanel stageId={selection.stageId} projectId={projectId} />
       )}

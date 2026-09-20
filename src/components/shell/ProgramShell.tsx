@@ -7,6 +7,8 @@ import type { ProjectState } from '@/lib/projectState';
 import { useAppStore } from '@/store/useAppStore';
 import { useMeetingStore } from '@/store/meetingStore';
 import { useRailStore } from '@/store/railStore';
+import { PaneGrip } from './PaneGrip';
+import { usePaneWidths } from './usePaneWidths';
 import { LeftNav } from './LeftNav';
 import { Rail } from './Rail';
 
@@ -54,11 +56,18 @@ export function ProgramShell({
      Mode runs the page's effect a second time, after the clear. */
   useEffect(() => () => useRailStore.getState().clear(), [pathname]);
 
+  /* Paints --side-w and --peek-w, and keeps them inside the window as it
+     resizes. Called here so it runs for every route under the shell. */
+  usePaneWidths();
+
   if (!hydrated) return null;
 
   return (
     <div id="app">
       <LeftNav projectId={initial.projectId} />
+      {/* Outside the nav rather than inside it: #side scrolls, and a grip that
+          scrolls away with the content is a grip nobody finds twice. */}
+      <PaneGrip pane="side" />
       <div id="main">
         <div className="body">
           <div className="scroll" id="view">

@@ -22,6 +22,8 @@ import { computeSchedule, fmtDate, fromISO, startOfDay, toISO, type Schedule } f
 
 
 import { EditProgramDialog } from './EditProgramDialog';
+import { PaneGrip } from './PaneGrip';
+import { usePaneWidths } from './usePaneWidths';
 import {
   Avatar,
   IconEmptyList,
@@ -56,6 +58,9 @@ export function ProgramsView({
   const [filter, setFilter] = useState<FilterKey>('all');
   const [sort, setSort] = useState<SortKey>('tapeout');
   const today = useToday();
+  /* This shell is server-rendered with no hydration gate, so the widths come
+     through useSyncExternalStore and start at the defaults on both sides. */
+  usePaneWidths();
 
   /* The figures the toolbar sorts and narrows by are the ones the rows print,
      resolved here so a program's place in the list and the numbers on it cannot
@@ -605,6 +610,7 @@ function ProgramPeek({ project }: { project: ProjectSummary }) {
 
   return (
     <aside id="peek" aria-label="Program preview" style={{ background: 'var(--sunken)' }}>
+      <PaneGrip pane="peek" />
       <div className="prev-sec" style={{ paddingBottom: 16 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
           <span className="mark" style={{ width: 30, height: 30, borderRadius: 8, fontSize: 13 }}>

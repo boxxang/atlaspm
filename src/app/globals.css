@@ -2244,6 +2244,9 @@ a.ad-ref:hover,a.ad-ref:focus-visible{border-color:var(--accent);background:var(
   --warn:#f5a524; --warn-soft:#fef7e6; --warn-ink:#8a6a1f;
   --ok:#30a46c; --ok-soft:#e6f6ed; --ok-ink:#218358;
   --st-done:#d8dade; --st-run:#a8adb6; --st-risk:#e5484d; --st-risk-fut:#f3b9bb; --st-future:#eceef0;
+  /* The two side panels, dragged by their inner edge. A width somebody chose
+     is written onto the root element, where it beats every rule below. */
+  --side-w:232px; --peek-w:442px;
   --r-sm:5px; --r:6px; --r-lg:8px;
   --sh:0 1px 2px rgba(16,24,40,.04);
   --sh-pop:0 8px 28px rgba(16,24,40,.14);
@@ -2267,8 +2270,10 @@ a:hover{color:var(--accent-hov)}
 ::selection{background:var(--accent-soft)}
 
 /* ── shell ───────────────────────────────────────── */
-#app{display:flex;height:100vh;overflow:hidden}
-#side{width:232px;flex-shrink:0;background:var(--sunken);border-right:1px solid var(--line);display:flex;flex-direction:column;padding:10px 8px;overflow-y:auto}
+#app{display:flex;height:100vh;overflow:hidden;position:relative}
+/* min-width:0 so a collapsed panel is really zero wide: its padding would
+   otherwise hold a sliver open that reads as a rendering fault. */
+#side{width:var(--side-w);min-width:0;flex-shrink:0;background:var(--sunken);border-right:1px solid var(--line);display:flex;flex-direction:column;padding:10px 8px;overflow-y:auto}
 #main{flex-grow:1;display:flex;flex-direction:column;min-width:0}
 .hd{height:48px;flex-shrink:0;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:10px;padding:0 20px}
 .hd h1{font-size:15px;font-weight:600}
@@ -2469,7 +2474,7 @@ button.clip:hover{background:var(--accent-line)}
 .clip{display:inline-flex;align-items:center;gap:3px;font-size:10.5px;font-weight:600;color:var(--accent);background:var(--accent-soft);border-radius:4px;padding:0 5px;vertical-align:1px}
 
 /* ── peek panel ──────────────────────────────────── */
-#peek{width:442px;flex-shrink:0;border-left:1px solid var(--line);display:flex;flex-direction:column;background:var(--bg);min-height:0}
+#peek{width:var(--peek-w);min-width:0;flex-shrink:0;border-left:1px solid var(--line);display:flex;flex-direction:column;background:var(--bg);min-height:0;position:relative}
 .peek-hd{height:44px;flex-shrink:0;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:9px;padding:0 16px}
 .peek-body{flex-grow:1;overflow-y:auto;padding:15px 16px 20px}
 .peek-foot{border-top:1px solid var(--line);padding:11px 16px;display:flex;gap:8px;align-items:center;flex-shrink:0}
@@ -2687,7 +2692,7 @@ body.coldrag{cursor:col-resize;user-select:none}
 #pal .foot{border-top:1px solid var(--line);padding:8px 16px;display:flex;gap:14px;font-size:11.5px;color:var(--ink-3)}
 kbd{font:inherit;font-size:10.5px;border:1px solid var(--line);border-bottom-width:2px;border-radius:4px;padding:1px 5px;color:var(--ink-2)}
 .search{cursor:text}
-@media (max-width:1180px){ .stats{grid-template-columns:repeat(3,minmax(0,1fr))} #peek{width:340px} }
+@media (max-width:1180px){ .stats{grid-template-columns:repeat(3,minmax(0,1fr))} }
 @media (prefers-reduced-motion:reduce){ *{transition:none!important;animation:none!important} }
 
 /* ==========================================================================
@@ -2889,10 +2894,12 @@ kbd{font:inherit;font-size:10.5px;border:1px solid var(--line);border-bottom-wid
    sideways inside its own pane rather than crushing its content. A column you
    have to scroll to is legible; a column squeezed to 1ch is not.
    ========================================================================== */
-@media (max-width:1500px){ #peek{width:380px} }
-@media (max-width:1320px){ #peek{width:332px} }
+/* These set the default the panels start at, not their width: a width somebody
+   dragged is written onto the root element and beats all of them. */
+@media (max-width:1500px){ :root{--peek-w:380px} }
+@media (max-width:1320px){ :root{--peek-w:332px} }
 @media (max-width:1120px){ #peek{display:none} }
-@media (max-width:900px){ #side{width:188px} }
+@media (max-width:900px){ :root{--side-w:188px} }
 
 /* Narrow windows wrap rather than truncate or scroll.
 
@@ -3339,3 +3346,26 @@ a.mt-mini:hover{color:inherit;background:var(--hover)}
 .qor-st-partial i{background:transparent;border:1.5px solid var(--ink-3);border-radius:2px}
 .qor-st-none{background:var(--muted);color:var(--ink-2)}
 .qor-st-none i{background:var(--ink-4);border-radius:50%;opacity:.6}
+
+/* ── the panel grips ────────────────────────────────────────
+   Nine pixels of hit area over a one-pixel line, because a border is the right
+   thing to look at and the wrong thing to aim at. The line shows under the
+   pointer and stays lit through the drag, and the whole document takes the
+   resize cursor while one is running — so letting go anywhere still reads as
+   the same gesture. A collapsed panel leaves its grip at the screen edge,
+   which is how it comes back. */
+.panegrip{position:absolute;top:0;bottom:0;width:9px;z-index:30;cursor:col-resize;touch-action:none}
+.panegrip[data-pane="side"]{left:max(0px,calc(var(--side-w) - 4px))}
+.panegrip[data-pane="peek"]{left:-5px}
+.panegrip::after{content:"";position:absolute;top:0;bottom:0;left:4px;width:1px;background:transparent;transition:background .12s}
+.panegrip:hover::after,.panegrip.on::after{background:var(--accent)}
+.panegrip:focus-visible{outline:2px solid var(--accent);outline-offset:-2px}
+/* Collapsed: the contents go, the border stays as a one-pixel edge, and the
+   grip sits on it. Nothing here uses overflow:hidden — the rail's grip hangs
+   five pixels outside its own box, and clipping it would take away the only
+   way back. */
+:root[data-side-collapsed] #side{padding:0}
+:root[data-side-collapsed] #side > *{display:none}
+:root[data-peek-collapsed] #peek > *:not(.panegrip){display:none}
+body.panedrag{cursor:col-resize;user-select:none}
+body.panedrag *{cursor:col-resize !important}
