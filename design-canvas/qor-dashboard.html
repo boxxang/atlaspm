@@ -655,7 +655,7 @@ const chip = (s) => `<span class="st st-${s}"><i></i>${LABEL[s]}</span>`;
    the flow's own numbers. Block and status stay in every set. */
 /* Four sets rather than twenty columns. Block, stage and status stay in each.
    A unit rides with the column only where the number has one: a count of
-   endpoints or ECO rounds has none, and "Fail eps (#)" is noise. */
+   endpoints or ECO rounds has none, and "Failing endpoints (#)" is noise. */
 /* Six sets rather than thirty columns. Block, stage and status stay in each.
    Setup and hold are read apart because they are fixed differently — a setup
    violation wants a faster path, a hold violation a slower one — and a design
@@ -668,7 +668,7 @@ const chip = (s) => `<span class="st st-${s}"><i></i>${LABEL[s]}</span>`;
 const SETS = {
   setup:[
     { key:'wns', label:'Setup WNS', unit:'ps' }, { key:'setupScn', label:'Setup scenario', wide:true },
-    { key:'tns', label:'Setup TNS', unit:'ns' }, { key:'feps', label:'Fail eps' },
+    { key:'tns', label:'Setup TNS', unit:'ns' }, { key:'feps', label:'Failing endpoints' },
     { key:'delta', label:'WNS Δ', unit:'ps' },
   ],
   hold:[
