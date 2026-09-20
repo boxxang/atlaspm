@@ -167,6 +167,9 @@ h1{font-size:23px;font-weight:600;letter-spacing:-.02em;margin-bottom:6px}
 .st-watch i{background:var(--warn);clip-path:polygon(50% 0,100% 100%,0 100%)}
 .st-fail{background:var(--risk-soft);color:var(--risk-ink)}
 .st-fail i{background:var(--risk);border-radius:2px}
+.st-partial{background:var(--muted);color:var(--ink-2)}
+/* hollow, because there is nothing in it: the shape says "no value", not "a bad value" */
+.st-partial i{background:transparent;border:1.5px solid var(--ink-3);border-radius:2px}
 .st-none{background:var(--muted);color:var(--ink-2)}
 .st-none i{background:var(--ink-4);border-radius:50%;opacity:.6}
 
@@ -244,6 +247,7 @@ h1{font-size:23px;font-weight:600;letter-spacing:-.02em;margin-bottom:6px}
     <button class="chip" data-filter="fail" aria-pressed="false">Failing <span class="c" data-c="fail"></span></button>
     <button class="chip" data-filter="watch" aria-pressed="false">Watching <span class="c" data-c="watch"></span></button>
     <button class="chip" data-filter="clean" aria-pressed="false">Clean <span class="c" data-c="clean"></span></button>
+    <button class="chip" data-filter="partial" aria-pressed="false">Not reported <span class="c" data-c="partial"></span></button>
     <button class="chip" data-filter="none" aria-pressed="false">Not run <span class="c" data-c="none"></span></button>
     <input class="search" id="search" type="search" placeholder="Filter blocks — name or subsystem…" aria-label="Filter blocks" />
     <span class="sets" role="tablist" aria-label="Measures">
@@ -314,19 +318,22 @@ const SQUEEZED = ['noc_main','noc_mem','sram_bank0','usb_top','dma0','isp_raw'];
 
 /* A small deterministic generator, so the mock-up reads the same every time. */
 /* The scenarios a worst number can come from. A slack with no scenario beside
-   it cannot be acted on: the same −117 ps means "too slow" in a slow corner and
-   something else entirely in a fast one. */
+   it cannot be acted on: the same -117 ps means "too slow" in a slow corner and
+   something else entirely in a fast one.
+
+   Corner and mode are two fields, not one string. A script has them apart —
+   it never has them joined by a middot — and the joining is this page's job. */
 const SETUP_SCN = [
-  'SS 0.72V/−40C · func',
-  'SS 0.72V/125C · func',
-  'SS 0.75V/−40C · dvfs_low',
-  'SS 0.72V/−40C · scan_cap',
+  ['SS 0.72V/-40C', 'func'],
+  ['SS 0.72V/125C', 'func'],
+  ['SS 0.75V/-40C', 'dvfs_low'],
+  ['SS 0.72V/-40C', 'scan_cap'],
 ];
 const HOLD_SCN = [
-  'FF 0.88V/125C · func',
-  'FF 0.88V/−40C · func',
-  'FF 0.88V/125C · scan_shift',
-  'TT 0.80V/25C · func',
+  ['FF 0.88V/125C', 'func'],
+  ['FF 0.88V/-40C', 'func'],
+  ['FF 0.88V/125C', 'scan_shift'],
+  ['TT 0.80V/25C', 'func'],
 ];
 
 const rand = (seed) => { let s = seed >>> 0; return () => ((s = (s * 1664525 + 1013904223) >>> 0) / 4294967296); };
@@ -349,7 +356,9 @@ function measure(b, dropIndex, rnd) {
   const grew = dropIndex === 3 ? (FFN_GROWTH[b[0]] ?? 0) : 0;
   const squeezed = dropIndex === 3 && SQUEEZED.includes(b[0]);
 
-  const inst = Math.round(b[2] * (1 + grew) * (1 + (dropIndex ? 0.01 * dropIndex : 0)));
+  /* a raw instance count, the way a report gives it — asking a script to
+     divide by a thousand is asking it to be wrong once */
+  const inst = Math.round(b[2] * 1000 * (1 + grew) * (1 + (dropIndex ? 0.01 * dropIndex : 0)));
   const util = 58 + 14 * h + 8 * maturity + 100 * grew + (squeezed ? 3.5 : 0) + r * 3;
 
   /* setup: a slack that improves with maturity and collapses where a block grew */
@@ -408,7 +417,8 @@ function measure(b, dropIndex, rnd) {
   const holdScn = HOLD_SCN[(hash >> 2) % HOLD_SCN.length];
 
   return {
-    name:b[0], group:b[1], inst, util:+util.toFixed(1), setupScn, holdScn,
+    name:b[0], group:b[1], inst, util:+util.toFixed(1),
+    setupCorner:setupScn[0], setupMode:setupScn[1], holdCorner:holdScn[0], holdMode:holdScn[1],
     wns:Math.round(wns), tns:+tns.toFixed(2), feps,
     holdW:holdV ? Math.round(holdW) : 0, holdV, holdTns,
     maxTran, maxCap, maxFanout, worstTran, minPeriod, mpw,
@@ -429,7 +439,9 @@ const STAGE_FILL = ['#d8dade','#dcdcf6','#c3c3ef','#a6a6e6','#8a8adc','#6f6fd2',
    come: the easy ones lead, the ones that grew fall back to placement. */
 function stageOf(m, dropIndex) {
   if (m.missing) return 0;
-  const h = hardness([m.name, m.group, m.inst]);
+  /* hardness() reads instances in thousands, which is what BLOCKS carries;
+     m.inst is a raw count, as the sheet gives it */
+  const h = hardness([m.name, m.group, m.inst / 1000]);
   /* a stable 0..1 from the name, so the spread inside a band is not decided
      by size alone */
   let x = 0;
@@ -450,15 +462,25 @@ function stageOf(m, dropIndex) {
   return lead > 0.45 ? 7 : 6;
 }
 
+/* How a block reads, from the numbers that are in.
+
+   "Not reported" is its own answer. A blank cell is not a zero: a script that
+   has not run a check yet, or a tool that answers 1e30 for "no path", must not
+   land a block in the same column as one that came back clean. Everything
+   below treats a measure as either a number or null, never as a zero it was
+   not given. */
+const JUDGED = ['wns', 'overflow', 'drc', 'holdV'];
 const statusOf = (m) => {
-  if (m == null) return 'none';
+  if (m == null || m.missing) return 'none';
+  if (JUDGED.some((k) => m[k] === null || m[k] === undefined)) return 'partial';
   /* failing: a violation no ECO round will absorb, or routing that will not close */
   if (m.wns < -40 || m.overflow > 2.5 || m.drc > 400) return 'fail';
   /* watching: something is still open, but the turn can carry it */
   if (m.wns < 0 || m.holdV > 0 || m.overflow > 1.2) return 'watch';
   return 'clean';
 };
-const LABEL = { clean:'Clean', watch:'Watching', fail:'Failing', none:'Not run' };
+const STATUSES = ['clean', 'watch', 'fail', 'partial', 'none'];
+const LABEL = { clean:'Clean', watch:'Watching', fail:'Failing', partial:'Not reported', none:'Not run' };
 
 /* Build every drop. A handful of blocks are not in the first netlist at all —
    they arrive with N1 — which is what "Not run" is for. */
@@ -472,92 +494,73 @@ let DATA = DROPS.map((d, i) => {
   });
 });
 
-/* Chip-level roll-up for one drop. */
-function roll(rows) {
-  const live = rows.filter((r) => !r.missing);
-  const by = { clean:0, watch:0, fail:0, none:rows.length - live.length };
-  /* a drop nobody has run yet: every measure zero rather than an average of
-     nothing, which prints NaN across the whole table */
-  if (!live.length) return { by, stages:STAGES.map(() => 0), ...Object.fromEntries(Object.keys(CHIP).map((k) => [k, 0])) };
-  for (const r of live) by[statusOf(r)]++;
-  return {
-    by,
-    wns: Math.min(...live.map((r) => r.wns)),
-    tns: +live.reduce((t, r) => t + r.tns, 0).toFixed(1),
-    feps: live.reduce((t, r) => t + r.feps, 0),
-    holdV: live.reduce((t, r) => t + r.holdV, 0),
-    drc: live.reduce((t, r) => t + r.drc, 0),
-    inst: live.reduce((t, r) => t + r.inst, 0),
-    util: +(live.reduce((t, r) => t + r.util, 0) / live.length).toFixed(1),
-    power: Math.round(live.reduce((t, r) => t + r.dyn + r.leak, 0)),
-    leak: +live.reduce((t, r) => t + r.leak, 0).toFixed(0),
-    dyn: live.reduce((t, r) => t + r.dyn, 0),
-    budget: live.reduce((t, r) => t + r.budget, 0),
-    /* the chip's worst, not a sum: one block's grid is what browns out */
-    irStatic: +Math.max(...live.map((r) => r.irStatic)).toFixed(1),
-    irDynamic: +Math.max(...live.map((r) => r.irDynamic)).toFixed(1),
-    overflow: +Math.max(...live.map((r) => r.overflow)).toFixed(2),
-    holdW: Math.min(...live.map((r) => r.holdW)),
-    ecoRounds: Math.max(...live.map((r) => r.ecoRounds)),
-    holdTns: +live.reduce((t, r) => t + r.holdTns, 0).toFixed(2),
-    maxTran: live.reduce((t, r) => t + r.maxTran, 0),
-    maxCap: live.reduce((t, r) => t + r.maxCap, 0),
-    maxFanout: live.reduce((t, r) => t + r.maxFanout, 0),
-    worstTran: +Math.max(...live.map((r) => r.worstTran)).toFixed(2),
-    minPeriod: live.reduce((t, r) => t + r.minPeriod, 0),
-    mpw: live.reduce((t, r) => t + r.mpw, 0),
-    stages: STAGES.map((_, i) => rows.filter((x) => x.stage === i).length),
-    skew: Math.max(...live.map((r) => r.skew)),
-    /* the turn is as long as its longest block, plus top-level assembly */
-    runtime: +(Math.max(...live.map((r) => r.runtime)) + 6.5).toFixed(1),
-    ecos: live.reduce((t, r) => t + r.ecos, 0),
-    worst: [...live].sort((a, b) => a.wns - b.wns)[0],
-    worstIrS: [...live].sort((a, b) => b.irStatic - a.irStatic)[0],
-    worstIrD: [...live].sort((a, b) => b.irDynamic - a.irDynamic)[0],
-    worstOverflow: [...live].sort((a, b) => b.overflow - a.overflow)[0],
-    worstUtil: [...live].sort((a, b) => b.util - a.util)[0],
-    worstDrc: [...live].sort((a, b) => b.drc - a.drc)[0],
-    worstEco: [...live].sort((a, b) => b.ecoRounds - a.ecoRounds)[0],
-    worstTranBlk: [...live].sort((a, b) => b.worstTran - a.worstTran)[0],
-    worstMaxTran: [...live].sort((a, b) => b.maxTran - a.maxTran)[0],
-    worstMaxCap: [...live].sort((a, b) => b.maxCap - a.maxCap)[0],
-    worstMpw: [...live].sort((a, b) => b.mpw - a.mpw)[0],
-    worstFanout: [...live].sort((a, b) => b.maxFanout - a.maxFanout)[0],
-    worstPeriod: [...live].sort((a, b) => b.minPeriod - a.minPeriod)[0],
-    worstSkew: [...live].sort((a, b) => b.skew - a.skew)[0],
-    slowest: [...live].sort((a, b) => b.runtime - a.runtime)[0],
-  };
-}
-/* What the chip is signed off against. Targets, not wishes: each is a number
-   the programme committed to, and the full-chip view reads the actual against
-   it rather than on its own. */
-const CHIP = {
-  wns:{ target:0, unit:'ps', good:'above', label:'Setup WNS', group:'Timing', worst:'worst', scn:'setupScn' },
-  tns:{ target:0, unit:'ns', good:'above', label:'Setup TNS', group:'Timing', worst:'worst', scn:'setupScn' },
-  feps:{ target:0, unit:'', good:'below', label:'Setup failing endpoints', group:'Timing', worst:'worst', scn:'setupScn' },
-  holdW:{ target:0, unit:'ps', good:'above', label:'Hold WNS', group:'Timing', worst:'worst', scn:'holdScn' },
-  holdTns:{ target:0, unit:'ns', good:'above', label:'Hold TNS', group:'Timing', worst:'worst', scn:'holdScn' },
-  holdV:{ target:0, unit:'', good:'below', label:'Hold failing endpoints', group:'Timing', worst:'worst', scn:'holdScn' },
-  skew:{ target:60, unit:'ps', good:'below', label:'Clock skew', group:'Timing', worst:'worstSkew' },
-  maxTran:{ target:0, unit:'', good:'below', label:'Max transition violations', group:'Design rules', worst:'worstMaxTran' },
-  maxCap:{ target:0, unit:'', good:'below', label:'Max capacitance violations', group:'Design rules', worst:'worstMaxCap' },
-  maxFanout:{ target:0, unit:'', good:'below', label:'Max fanout violations', group:'Design rules', worst:'worstFanout' },
-  worstTran:{ target:0.35, unit:'ns', good:'below', label:'Worst transition', group:'Design rules', worst:'worstTranBlk' },
-  minPeriod:{ target:0, unit:'', good:'below', label:'Min period violations', group:'Design rules', worst:'worstPeriod' },
-  mpw:{ target:0, unit:'', good:'below', label:'Min pulse width violations', group:'Design rules', worst:'worstMpw' },
-  util:{ target:78, unit:'%', good:'below', label:'Utilization', group:'Physical', worst:'worstUtil' },
-  overflow:{ target:1, unit:'%', good:'below', label:'Global route overflow', group:'Physical', worst:'worstOverflow' },
-  drc:{ target:0, unit:'', good:'below', label:'DRC after route', group:'Physical', worst:'worstDrc' },
-  power:{ target:null, unit:'mW', good:'below', label:'Total power', group:'Power and IR', worst:null },
-  dyn:{ target:null, unit:'mW', good:'below', label:'Dynamic power', group:'Power and IR', worst:null },
-  leak:{ target:90, unit:'mW', good:'below', label:'Leakage power', group:'Power and IR', worst:null },
-  irStatic:{ target:25, unit:'mV', good:'below', label:'IR drop — static', group:'Power and IR', worst:'worstIrS' },
-  irDynamic:{ target:45, unit:'mV', good:'below', label:'IR drop — dynamic', group:'Power and IR', worst:'worstIrD' },
-  runtime:{ target:26, unit:'h', good:'below', label:'Turn runtime', group:'Flow', worst:'slowest' },
-  ecos:{ target:400, unit:'', good:'below', label:'ECOs applied', group:'Flow', worst:null },
-  ecoRounds:{ target:4, unit:'', good:'below', label:'ECO rounds', group:'Flow', worst:'worstEco' },
+/* Chip-level roll-up for one drop.
+
+   Every measure rolls up the way its own definition says — a slack is the
+   worst of the blocks, a violation count is their sum, utilisation their
+   average — so the rule rides on the measure in CHIP rather than being written
+   out once per row here. A measure no block reported rolls up to null, not to
+   zero, and the chip row says so. */
+const AGG = {
+  min: (v) => Math.min(...v),
+  max: (v) => Math.max(...v),
+  sum: (v) => v.reduce((t, x) => t + x, 0),
+  mean: (v) => v.reduce((t, x) => t + x, 0) / v.length,
 };
 
+function roll(rows) {
+  const live = rows.filter((r) => !r.missing);
+  const by = Object.fromEntries(STATUSES.map((s) => [s, 0]));
+  for (const r of rows) by[statusOf(r)]++;
+  const out = { by, total:rows.length, stages:STAGES.map((_, i) => rows.filter((x) => x.stage === i).length), worst:{} };
+  for (const [k, c] of Object.entries(CHIP)) {
+    const has = live.filter((r) => r[k] !== null && r[k] !== undefined);
+    out[k] = has.length ? +AGG[c.agg](has.map((r) => r[k])).toFixed(c.dp ?? 0) : null;
+    /* the block named beside the chip number is the worst one on THIS measure.
+       It used to be the worst-slack block for every timing row, which put the
+       wrong block's name beside the hold numbers. */
+    out.worst[k] = has.length
+      ? has.reduce((a, b) => ((c.good === 'above' ? b[k] < a[k] : b[k] > a[k]) ? b : a))
+      : null;
+  }
+  /* the turn is as long as its longest block, plus top-level assembly */
+  if (out.runtime !== null) out.runtime = +(out.runtime + 6.5).toFixed(1);
+  /* what the blocks were budgeted, which the power rows are measured against */
+  const budgets = live.map((r) => r.budget).filter((v) => v !== null && v !== undefined);
+  out.budget = budgets.length ? budgets.reduce((t, x) => t + x, 0) : null;
+  return out;
+}
+
+/* What the chip is signed off against. Targets, not wishes: each is a number
+   the programme committed to, and the full-chip view reads the actual against
+   it rather than on its own. `agg` is how the sixty blocks become one number,
+   and `dp` how many decimals that number is worth. */
+const CHIP = {
+  wns:{ target:0, unit:'ps', good:'above', label:'Setup WNS', group:'Timing', agg:'min', scn:'setup' },
+  tns:{ target:0, unit:'ns', good:'above', label:'Setup TNS', group:'Timing', agg:'sum', dp:1, scn:'setup' },
+  feps:{ target:0, unit:'', good:'below', label:'Setup failing endpoints', group:'Timing', agg:'sum', scn:'setup' },
+  holdW:{ target:0, unit:'ps', good:'above', label:'Hold WNS', group:'Timing', agg:'min', scn:'hold' },
+  holdTns:{ target:0, unit:'ns', good:'above', label:'Hold TNS', group:'Timing', agg:'sum', dp:2, scn:'hold' },
+  holdV:{ target:0, unit:'', good:'below', label:'Hold failing endpoints', group:'Timing', agg:'sum', scn:'hold' },
+  skew:{ target:60, unit:'ps', good:'below', label:'Clock skew', group:'Timing', agg:'max' },
+  maxTran:{ target:0, unit:'', good:'below', label:'Max transition violations', group:'Design rules', agg:'sum' },
+  maxCap:{ target:0, unit:'', good:'below', label:'Max capacitance violations', group:'Design rules', agg:'sum' },
+  maxFanout:{ target:0, unit:'', good:'below', label:'Max fanout violations', group:'Design rules', agg:'sum' },
+  worstTran:{ target:0.35, unit:'ns', good:'below', label:'Worst transition', group:'Design rules', agg:'max', dp:2 },
+  minPeriod:{ target:0, unit:'', good:'below', label:'Min period violations', group:'Design rules', agg:'sum' },
+  mpw:{ target:0, unit:'', good:'below', label:'Min pulse width violations', group:'Design rules', agg:'sum' },
+  util:{ target:78, unit:'%', good:'below', label:'Utilization', group:'Physical', agg:'mean', dp:1 },
+  overflow:{ target:1, unit:'%', good:'below', label:'Global route overflow', group:'Physical', agg:'max', dp:2 },
+  drc:{ target:0, unit:'', good:'below', label:'DRC after route', group:'Physical', agg:'sum' },
+  power:{ target:null, unit:'mW', good:'below', label:'Total power', group:'Power and IR', agg:'sum' },
+  dyn:{ target:null, unit:'mW', good:'below', label:'Dynamic power', group:'Power and IR', agg:'sum' },
+  leak:{ target:90, unit:'mW', good:'below', label:'Leakage power', group:'Power and IR', agg:'sum' },
+  irStatic:{ target:25, unit:'mV', good:'below', label:'IR drop — static', group:'Power and IR', agg:'max', dp:1 },
+  irDynamic:{ target:45, unit:'mV', good:'below', label:'IR drop — dynamic', group:'Power and IR', agg:'max', dp:1 },
+  runtime:{ target:26, unit:'h', good:'below', label:'Turn runtime', group:'Flow', agg:'max', dp:1 },
+  ecos:{ target:400, unit:'', good:'below', label:'ECOs applied', group:'Flow', agg:'sum' },
+  ecoRounds:{ target:4, unit:'', good:'below', label:'ECO rounds', group:'Flow', agg:'max' },
+};
 
 let ROLL = DATA.map(roll);
 
@@ -568,7 +571,7 @@ let query = '';
 let sort = { key:'wns', dir:1 };
 
 const $ = (id) => document.getElementById(id);
-const fmtK = (n) => (n >= 1000 ? (n / 1000).toFixed(2) + ' M' : n + ' K');
+const fmtM = (n) => (n >= 1e6 ? (n / 1e6).toFixed(2) + 'M' : (n / 1000).toFixed(0) + 'K');
 const signed = (n, unit = '') => (n > 0 ? '+' : '') + n + unit;
 
 function deltaEl(now, before, { good = 'down', unit = '', digits = 0 } = {}) {
@@ -589,6 +592,15 @@ function renderDrops() {
   }).join('');
 }
 
+/* A measure that was never reported prints as a dash, everywhere. */
+const DASH = '<span class="right num flat" title="not reported">—</span>';
+const nn = (v) => v !== null && v !== undefined;
+const tx = (v, u = '') => (nn(v) ? v + u : '—');
+const scnOf = (r, which) => {
+  const c = r[which + 'Corner'], m = r[which + 'Mode'];
+  return c || m ? [c, m].filter(Boolean).join(' · ') : '—';
+};
+
 /* The summary belongs to the full-chip view alone. In the block view the two
    bar charts already count the blocks by stage and by status, and a row of
    cards repeating those counts is the same fact twice. */
@@ -596,20 +608,18 @@ function renderTiles() {
   $('tiles').hidden = view !== 'chip';
   if (view !== 'chip') return;
   const r = ROLL[drop], p = drop ? ROLL[drop - 1] : null;
-  const against = (v, t, unit = '') => `${v > t ? '+' : ''}${+(v - t).toFixed(2)}${unit} against target`;
+  const against = (v, t, unit = '') => (nn(v) && nn(t) ? `${v > t ? '+' : ''}${+(v - t).toFixed(2)}${unit} against target` : 'no target to read against');
+  const vs = (k, o) => (nn(r[k]) ? deltaEl(r[k], p && p[k], o) + ' vs last drop' : 'not reported in this drop');
+  const tone = (k, bad) => (nn(r[k]) ? (bad ? 'bad' : 'good') : '');
   const tiles = [
-      { cap:'Setup WNS', v:`${r.wns} ps`, sub:deltaEl(r.wns, p && p.wns, { good:'up', unit:' ps' }) + ' vs last drop',
-        tone:r.wns < 0 ? 'bad' : 'good' },
-      { cap:'Setup TNS', v:`${r.tns} ns`, sub:deltaEl(r.tns, p && p.tns, { good:'up', unit:' ns', digits:1 }) + ' vs last drop',
-        tone:r.tns < 0 ? 'bad' : 'good' },
-      { cap:'Setup failing endpoints', v:r.feps.toLocaleString(), sub:deltaEl(r.feps, p && p.feps) + ' vs last drop',
-        tone:r.feps ? 'bad' : 'good' },
-      { cap:'Total power', v:`${(r.power / 1000).toFixed(2)} W`, sub:against(r.power, r.budget, ' mW'),
-        tone:r.power > r.budget ? 'bad' : 'good' },
-      { cap:'IR drop — dynamic', v:`${r.irDynamic} mV`, sub:against(r.irDynamic, CHIP.irDynamic.target, ' mV'),
-        tone:r.irDynamic > CHIP.irDynamic.target ? 'bad' : 'good' },
-      { cap:'DRC after route', v:r.drc.toLocaleString(), sub:deltaEl(r.drc, p && p.drc) + ' vs last drop',
-        tone:r.drc ? 'bad' : 'good' },
+      { cap:'Setup WNS', v:tx(r.wns, ' ps'), sub:vs('wns', { good:'up', unit:' ps' }), tone:tone('wns', r.wns < 0) },
+      { cap:'Setup TNS', v:tx(r.tns, ' ns'), sub:vs('tns', { good:'up', unit:' ns', digits:1 }), tone:tone('tns', r.tns < 0) },
+      { cap:'Setup failing endpoints', v:nn(r.feps) ? r.feps.toLocaleString() : '—', sub:vs('feps'), tone:tone('feps', r.feps) },
+      { cap:'Total power', v:nn(r.power) ? `${(r.power / 1000).toFixed(2)} W` : '—', sub:against(r.power, r.budget, ' mW'),
+        tone:tone('power', r.power > r.budget) },
+      { cap:'IR drop — dynamic', v:tx(r.irDynamic, ' mV'), sub:against(r.irDynamic, CHIP.irDynamic.target, ' mV'),
+        tone:tone('irDynamic', r.irDynamic > CHIP.irDynamic.target) },
+      { cap:'DRC after route', v:nn(r.drc) ? r.drc.toLocaleString() : '—', sub:vs('drc'), tone:tone('drc', r.drc) },
     ];
   $('tiles').innerHTML = tiles.map((t) => `<div class="tile">
       <div class="cap">${t.cap}</div><div class="v ${t.tone || ''}">${t.v}</div><div class="sub">${t.sub}</div>
@@ -622,53 +632,59 @@ function renderChip() {
   /* power is measured against what the blocks were budgeted, so the chip row
      and the block rows cannot say different things */
   CHIP.power.target = r.budget;
-  CHIP.dyn.target = Math.round(r.budget * 0.9);
+  CHIP.dyn.target = nn(r.budget) ? Math.round(r.budget * 0.9) : null;
   let out = '', group = '';
   for (const key of Object.keys(CHIP)) {
     const c = CHIP[key];
     if (c.group !== group) { group = c.group; out += `<div class="qgroup">${group}</div>`; }
-    const now = r[key];
-    const before = p ? p[key] : null;
-    const pass = c.good === 'below' ? now <= c.target : now >= c.target;
-    const gap = +(now - c.target).toFixed(2);
-    const near = c.good === 'below' ? now <= c.target * 1.15 : now >= -5;
-    const w = c.worst ? r[c.worst] : null;
+    const now = r[key], before = p ? p[key] : null, t = c.target;
+    const head = `<span><span class="m">${c.label}</span>${c.unit ? `<span class="unit">${c.unit}</span>` : ''}</span>`;
+    if (!nn(now)) {
+      out += `<div class="qrow">${head}<span class="right num flat">${tx(t)}</span>
+        <span class="right num flat">—</span><span class="right num flat">—</span><span class="right num flat">—</span>
+        <span>${chip('partial')}</span><span class="where">—</span></div>`;
+      continue;
+    }
+    const pass = !nn(t) || (c.good === 'below' ? now <= t : now >= t);
+    const gap = nn(t) ? +(now - t).toFixed(2) : null;
+    const near = !nn(t) || (c.good === 'below' ? now <= t * 1.15 : now >= -5);
+    const w = r.worst[key];
     out += `<div class="qrow">
-      <span><span class="m">${c.label}</span>${c.unit ? `<span class="unit">${c.unit}</span>` : ''}</span>
-      <span class="right num flat">${c.target}</span>
+      ${head}
+      <span class="right num flat">${tx(t)}</span>
       <span class="right num ${pass ? '' : 'bad'}" style="font-weight:600">${now}</span>
-      <span class="right num ${pass ? '' : 'bad'}">${gap > 0 ? '+' : ''}${gap}</span>
+      <span class="right num ${pass ? '' : 'bad'}">${nn(gap) ? (gap > 0 ? '+' : '') + gap : '—'}</span>
       <span class="right">${deltaEl(now, before, { good:c.good === 'below' ? 'down' : 'up', digits:2 })}</span>
       <span>${chip(pass ? 'clean' : near ? 'watch' : 'fail')}</span>
-      <span class="where">${w ? `${w.name} · ${w[key]}${c.unit}${c.scn ? `<span class="scnq">${w[c.scn]}</span>` : ''}` : '—'}</span>
+      <span class="where">${w ? `${w.name} · ${w[key]}${c.unit}${c.scn ? `<span class="scnq">${scnOf(w, c.scn)}</span>` : ''}` : '—'}</span>
     </div>`;
   }
   $('chipRows').innerHTML = out;
 }
 
-/* Both panels count the same sixty blocks, so both are drawn against sixty:
+/* Both panels count the same blocks, so both are drawn against that count:
    a bar's height means the same thing in either. Each column carries its own
    number above it, so nothing has to be read off an axis. */
-function column(n, fill, tip) {
-  const total = BLOCKS.length;
+function column(n, total, fill, tip) {
   return `<div class="col" data-tip="${tip}">
       <span class="v ${n ? '' : 'zero'}">${n}</span>
-      <span class="bar" style="height:${(n / total) * 100}%;background:${n ? fill : 'var(--shade)'}"></span>
+      <span class="bar" style="height:${total ? (n / total) * 100 : 0}%;background:${n ? fill : 'var(--shade)'}"></span>
     </div>`;
 }
 
+const STATUS_FILL = { clean:'var(--ok)', watch:'var(--warn)', fail:'var(--risk)', partial:'var(--ink-3)', none:'var(--ink-4)' };
+
 function renderStatusChart() {
   const r = ROLL[drop];
-  const seg = [['clean','var(--ok)'],['watch','var(--warn)'],['fail','var(--risk)'],['none','var(--ink-4)']];
-  $('statusChart').innerHTML = seg
-    .map(([k, c]) => column(r.by[k], c, `${LABEL[k]}<br>${r.by[k]} of ${BLOCKS.length} blocks`)).join('');
-  $('statusLabels').innerHTML = seg.map(([k]) => `<span>${LABEL[k]}</span>`).join('');
+  $('statusChart').innerHTML = STATUSES
+    .map((k) => column(r.by[k], r.total, STATUS_FILL[k], `${LABEL[k]}<br>${r.by[k]} of ${r.total} blocks`)).join('');
+  $('statusLabels').innerHTML = STATUSES.map((k) => `<span>${LABEL[k]}</span>`).join('');
 }
 
 function renderStageChart() {
   const r = ROLL[drop];
   $('stageChart').innerHTML = STAGES
-    .map((label, i) => column(r.stages[i], STAGE_FILL[i], `${label}<br>${r.stages[i]} of ${BLOCKS.length} blocks`)).join('');
+    .map((label, i) => column(r.stages[i], r.total, STAGE_FILL[i], `${label}<br>${r.stages[i]} of ${r.total} blocks`)).join('');
   $('stageLabels').innerHTML = STAGES.map((label) => `<span>${label}</span>`).join('');
 }
 
@@ -745,24 +761,33 @@ function renderHead() {
 
 function rowsNow() {
   const before = drop ? DATA[drop - 1] : null;
-  let rows = DATA[drop].map((r, i) => ({ ...r, status:statusOf(r.missing ? null : r), was:before ? before[i] : null }));
+  const wasOf = {};
+  if (before) for (const r of before) wasOf[r.name] = r;
+  let rows = DATA[drop].map((r) => ({ ...r, status:statusOf(r), was:wasOf[r.name] || null }));
   if (filter !== 'all') rows = rows.filter((r) => r.status === filter);
   if (query) {
     const q = query.toLowerCase();
     rows = rows.filter((r) => r.name.toLowerCase().includes(q) || r.group.toLowerCase().includes(q));
   }
   const k = sort.key;
-  const rank = { fail:0, watch:1, clean:2, none:3 };
+  const rank = { fail:0, watch:1, partial:2, clean:3, none:4 };
+  /* a value nobody reported sorts last whichever way the column is pointed:
+     it is not a large number and it is not a small one */
+  const val = (r, key) => (nn(r[key]) ? r[key] : null);
   rows.sort((a, b) => {
-    if (a.missing && !b.missing) return 1;
-    if (b.missing && !a.missing) return -1;
+    if (a.missing !== b.missing) return a.missing ? 1 : -1;
     let d;
     if (k === 'name') d = a.name.localeCompare(b.name);
     else if (k === 'status') d = rank[a.status] - rank[b.status];
-    else if (k === 'delta') d = (a.wns - (a.was ? a.was.wns : 0)) - (b.wns - (b.was ? b.was.wns : 0));
-    else if (k === 'pgap') d = (a.power - a.budget) - (b.power - b.budget);
     else if (k === 'stage') d = a.stage - b.stage;
-    else d = (a[k] ?? 0) - (b[k] ?? 0);
+    else {
+      const av = k === 'delta' ? (a.was && nn(a.wns) && nn(a.was.wns) ? a.wns - a.was.wns : null)
+        : k === 'pgap' ? (nn(a.power) && nn(a.budget) ? a.power - a.budget : null) : val(a, k);
+      const bv = k === 'delta' ? (b.was && nn(b.wns) && nn(b.was.wns) ? b.wns - b.was.wns : null)
+        : k === 'pgap' ? (nn(b.power) && nn(b.budget) ? b.power - b.budget : null) : val(b, k);
+      if (av === null || bv === null) return av === bv ? 0 : av === null ? 1 : -1;
+      d = av - bv;
+    }
     return d * sort.dir;
   });
   return rows;
@@ -770,10 +795,12 @@ function rowsNow() {
 
 function renderTable() {
   const rows = rowsNow();
-  const counts = { all:BLOCKS.length, fail:0, watch:0, clean:0, none:0 };
-  for (const r of DATA[drop]) counts[statusOf(r.missing ? null : r)]++;
+  const total = DATA[drop].length;
+  const counts = { all:total, clean:0, watch:0, fail:0, partial:0, none:0 };
+  for (const r of DATA[drop]) counts[statusOf(r)]++;
   document.querySelectorAll('[data-c]').forEach((el) => { el.textContent = counts[el.dataset.c]; });
-  $('rowCount').textContent = `${rows.length} of ${BLOCKS.length} blocks`;
+  $('rowCount').textContent = `${rows.length} of ${total} blocks`;
+  $('blockN').textContent = total;
 
   $('tbody').innerHTML = rows.length
     ? rows.map((r) => {
@@ -782,46 +809,48 @@ function renderTable() {
             <span><span class="stage">${STAGES[0]}</span></span><span>${chip('none')}</span>
             <span class="flat" style="grid-column:4 / -1">not in this netlist</span></div>`;
         }
-        const dw = r.was ? r.wns - r.was.wns : null;
-        const pgap = r.power - r.budget;
+        const pgap = nn(r.power) && nn(r.budget) ? r.power - r.budget : null;
+        const n = (v, cls = '') => `<span class="right num ${cls}">${v}</span>`;
         const cell = (c) => {
           switch (c.key) {
-            case 'wns': return `<span class="right num ${r.wns < -40 ? 'bad' : r.wns < 0 ? 'warnv' : ''}">${r.wns}</span>`;
-            case 'tns': return `<span class="right num ${r.tns < -4 ? 'bad' : ''}">${r.tns}</span>`;
-            case 'feps': return `<span class="right num">${r.feps.toLocaleString()}</span>`;
-            case 'holdW': return `<span class="right num ${r.holdV ? 'warnv' : ''}">${r.holdW}</span>`;
-            case 'holdV': return `<span class="right num ${r.holdV ? 'warnv' : ''}">${r.holdV}</span>`;
-            case 'overflow': return `<span class="right num ${r.overflow > 2.5 ? 'bad' : r.overflow > 1.2 ? 'warnv' : ''}">${r.overflow}</span>`;
-            case 'drc': return `<span class="right num ${r.drc > 400 ? 'bad' : ''}">${r.drc.toLocaleString()}</span>`;
-            case 'util': return `<span class="right num ${r.util > 88 ? 'bad' : r.util > 82 ? 'warnv' : ''}">${r.util}</span>`;
-            case 'inst': return `<span class="right num">${(r.inst / 1000).toFixed(2)}M</span>`;
-            case 'irStatic': return `<span class="right num ${r.irStatic > CHIP.irStatic.target ? 'bad' : ''}">${r.irStatic}</span>`;
-            case 'irDynamic': return `<span class="right num ${r.irDynamic > CHIP.irDynamic.target ? 'bad' : ''}">${r.irDynamic}</span>`;
-            case 'dyn': return `<span class="right num">${r.dyn}</span>`;
-            case 'holdV': return `<span class="right num ${r.holdV ? 'warnv' : ''}">${r.holdV}</span>`;
-            case 'ecoRounds': return `<span class="right num ${r.ecoRounds > CHIP.ecoRounds.target ? 'warnv' : ''}">${r.ecoRounds}</span>`;
-            case 'holdTns': return `<span class="right num ${r.holdTns < -1 ? 'bad' : ''}">${r.holdTns}</span>`;
-      case 'maxTran': return `<span class="right num ${r.maxTran > 200 ? 'bad' : r.maxTran ? 'warnv' : ''}">${r.maxTran.toLocaleString()}</span>`;
-      case 'maxCap': return `<span class="right num ${r.maxCap > 120 ? 'bad' : r.maxCap ? 'warnv' : ''}">${r.maxCap.toLocaleString()}</span>`;
-      case 'maxFanout': return `<span class="right num ${r.maxFanout ? 'warnv' : ''}">${r.maxFanout.toLocaleString()}</span>`;
-      case 'worstTran': return `<span class="right num ${r.worstTran > CHIP.worstTran.target ? 'bad' : ''}">${r.worstTran}</span>`;
-      case 'minPeriod': return `<span class="right num ${r.minPeriod ? 'bad' : ''}">${r.minPeriod}</span>`;
-      case 'mpw': return `<span class="right num ${r.mpw ? 'bad' : ''}">${r.mpw}</span>`;
-      case 'setupScn': return `<span class="right scn">${r.setupScn}</span>`;
-      case 'holdScn': return `<span class="right scn">${r.holdV ? r.holdScn : '—'}</span>`;
-      case 'delta': return r.was
+            case 'delta': return r.was && nn(r.wns) && nn(r.was.wns)
               ? `<span class="right">${deltaEl(r.wns, r.was.wns, { good:'up' })}</span>`
               : '<span class="right delta flat">—</span>';
-            case 'skew': return `<span class="right num ${r.skew > CHIP.skew.target ? 'bad' : ''}">${r.skew}</span>`;
-            case 'power': return `<span class="right num">${r.power}</span>`;
-            case 'budget': return `<span class="right num flat">${r.budget}</span>`;
-            case 'pgap': return `<span class="right num ${pgap > 0 ? 'bad' : ''}">${pgap > 0 ? '+' : ''}${pgap}</span>`;
-            case 'runtime': return `<span class="right num ${r.runtime > CHIP.runtime.target ? 'warnv' : ''}">${r.runtime}</span>`;
-            case 'ecos': return `<span class="right num">${r.ecos.toLocaleString()}</span>`;
+            case 'pgap': return pgap === null ? DASH : n(`${pgap > 0 ? '+' : ''}${pgap}`, pgap > 0 ? 'bad' : '');
+            case 'setupScn': return `<span class="right scn">${scnOf(r, 'setup')}</span>`;
+            case 'holdScn': return `<span class="right scn">${r.holdV ? scnOf(r, 'hold') : '—'}</span>`;
+          }
+          if (!nn(r[c.key])) return DASH;
+          switch (c.key) {
+            case 'wns': return n(r.wns, r.wns < -40 ? 'bad' : r.wns < 0 ? 'warnv' : '');
+            case 'tns': return n(r.tns, r.tns < -4 ? 'bad' : '');
+            case 'feps': return n(r.feps.toLocaleString());
+            case 'holdW': return n(r.holdW, r.holdV ? 'warnv' : '');
+            case 'holdV': return n(r.holdV, r.holdV ? 'warnv' : '');
+            case 'holdTns': return n(r.holdTns, r.holdTns < -1 ? 'bad' : '');
+            case 'overflow': return n(r.overflow, r.overflow > 2.5 ? 'bad' : r.overflow > 1.2 ? 'warnv' : '');
+            case 'drc': return n(r.drc.toLocaleString(), r.drc > 400 ? 'bad' : '');
+            case 'util': return n(r.util, r.util > 88 ? 'bad' : r.util > 82 ? 'warnv' : '');
+            case 'inst': return n(fmtM(r.inst));
+            case 'irStatic': return n(r.irStatic, r.irStatic > CHIP.irStatic.target ? 'bad' : '');
+            case 'irDynamic': return n(r.irDynamic, r.irDynamic > CHIP.irDynamic.target ? 'bad' : '');
+            case 'dyn': return n(r.dyn);
+            case 'ecoRounds': return n(r.ecoRounds, r.ecoRounds > CHIP.ecoRounds.target ? 'warnv' : '');
+            case 'maxTran': return n(r.maxTran.toLocaleString(), r.maxTran > 200 ? 'bad' : r.maxTran ? 'warnv' : '');
+            case 'maxCap': return n(r.maxCap.toLocaleString(), r.maxCap > 120 ? 'bad' : r.maxCap ? 'warnv' : '');
+            case 'maxFanout': return n(r.maxFanout.toLocaleString(), r.maxFanout ? 'warnv' : '');
+            case 'worstTran': return n(r.worstTran, r.worstTran > CHIP.worstTran.target ? 'bad' : '');
+            case 'minPeriod': return n(r.minPeriod, r.minPeriod ? 'bad' : '');
+            case 'mpw': return n(r.mpw, r.mpw ? 'bad' : '');
+            case 'skew': return n(r.skew, r.skew > CHIP.skew.target ? 'bad' : '');
+            case 'power': return n(r.power);
+            case 'budget': return n(r.budget, 'flat');
+            case 'runtime': return n(r.runtime, r.runtime > CHIP.runtime.target ? 'warnv' : '');
+            case 'ecos': return n(r.ecos.toLocaleString());
             default: return '<span></span>';
           }
         };
-        return `<div class="trow" data-tip="${r.name} · ${r.group} · ${STAGES[r.stage]}<br>Power ${r.power} / ${r.budget} mW · IR ${r.irStatic} static, ${r.irDynamic} dynamic<br>Skew ${r.skew} ps · runtime ${r.runtime} h · ${r.ecos} ECOs in ${r.ecoRounds} rounds">
+        return `<div class="trow" data-tip="${r.name} · ${r.group} · ${STAGES[r.stage]}<br>Power ${tx(r.power)} / ${tx(r.budget)} mW · IR ${tx(r.irStatic)} static, ${tx(r.irDynamic)} dynamic<br>Skew ${tx(r.skew, ' ps')} · runtime ${tx(r.runtime, ' h')} · ${tx(r.ecos)} ECOs in ${tx(r.ecoRounds)} rounds">
           <span class="r-name">${r.name}<span class="r-group">${r.group}</span></span>
           <span><span class="stage" style="background:${STAGE_FILL[r.stage]}2e;color:${r.stage === 7 ? 'var(--ok-ink)' : 'var(--ink-2)'}">${STAGES[r.stage]}</span></span>
           <span>${chip(r.status)}</span>
@@ -887,46 +916,82 @@ document.addEventListener('mousemove', (e) => {
 });
 
 /* ── the workbook ─────────────────────────────────────────────
-   Everything on this page comes from one .xlsx: a Blocks sheet, a Drops
-   sheet, a Targets sheet, and one sheet per drop named after it. A block
-   left out of a drop's sheet reads "Not run" in that drop, which is how a
-   block that arrives late is said.
+   Everything on this page comes from one file: a Blocks sheet, a Drops sheet,
+   a Targets sheet, a Meta sheet, and one sheet per drop named after it. A
+   single flat .csv with a Drop column works too, which is what a script in the
+   design environment can write after every run without touching a workbook.
 
-   The file is read here rather than by a library, because this page is
-   opened from disk and a CDN it cannot reach is a page that cannot read
-   its own data. A .xlsx is a zip of XML; the browser inflates it. */
+   Two rules the format is built around, because a script breaks both and a
+   person filling this in by hand does not:
 
+   1. A cell that is blank, or holds N/A, or holds a tool's 1e30 for "no path",
+      is NOT a zero. It reads as not reported, prints as a dash, and is left
+      out of the roll-up. A block whose numbers did not arrive must never sit
+      in the same colour as one that came back clean.
+   2. Anything the page cannot make sense of is said out loud in the load
+      message — a duplicate block row, a P&R stage it does not recognise, a
+      name that is not on the Blocks sheet, a column it ignored. Silence is
+      what turns a script's mistake into a decision.
+
+   The file is read here rather than by a library, because this page is opened
+   from disk and a CDN it cannot reach is a page that cannot read its own data.
+   A .xlsx is a zip of XML; the browser inflates it. */
+
+/* `h` is what a person reads, `a` what a script should write. Either is
+   accepted, and so is the bare key. Units live in the header for the reader
+   and in Meta for the machine. */
 const SHEET_COLS = [
-  { h:'Block', k:'name', t:'text' },
-  { h:'P&R stage', k:'stage', t:'stage' },
-  { h:'Instances (K)', k:'inst', t:'int' },
-  { h:'Utilization (%)', k:'util', t:'num' },
-  { h:'Setup WNS (ps)', k:'wns', t:'int' },
-  { h:'Setup TNS (ns)', k:'tns', t:'num' },
-  { h:'Setup failing endpoints', k:'feps', t:'int' },
-  { h:'Setup scenario', k:'setupScn', t:'text' },
-  { h:'Hold WNS (ps)', k:'holdW', t:'int' },
-  { h:'Hold TNS (ns)', k:'holdTns', t:'num' },
-  { h:'Hold failing endpoints', k:'holdV', t:'int' },
-  { h:'Hold scenario', k:'holdScn', t:'text' },
-  { h:'Clock skew (ps)', k:'skew', t:'int' },
-  { h:'Max transition violations', k:'maxTran', t:'int' },
-  { h:'Worst transition (ns)', k:'worstTran', t:'num' },
-  { h:'Max capacitance violations', k:'maxCap', t:'int' },
-  { h:'Max fanout violations', k:'maxFanout', t:'int' },
-  { h:'Min period violations', k:'minPeriod', t:'int' },
-  { h:'Min pulse width violations', k:'mpw', t:'int' },
-  { h:'Global route overflow (%)', k:'overflow', t:'num' },
-  { h:'DRC after route', k:'drc', t:'int' },
-  { h:'Dynamic power (mW)', k:'dyn', t:'int' },
-  { h:'Leakage power (mW)', k:'leak', t:'num' },
-  { h:'Power budget (mW)', k:'budget', t:'int' },
-  { h:'IR drop static (mV)', k:'irStatic', t:'num' },
-  { h:'IR drop dynamic (mV)', k:'irDynamic', t:'num' },
-  { h:'Turn runtime (h)', k:'runtime', t:'num' },
-  { h:'ECOs applied', k:'ecos', t:'int' },
-  { h:'ECO rounds', k:'ecoRounds', t:'int' },
+  { h:'Block', a:'block', k:'name', t:'text' },
+  { h:'P&R stage', a:'pnr_stage', k:'stage', t:'stage' },
+  { h:'Instances', a:'instances', k:'inst', t:'int' },
+  { h:'Utilization (%)', a:'utilization', k:'util', t:'num' },
+  { h:'Setup WNS (ps)', a:'setup_wns', k:'wns', t:'int' },
+  { h:'Setup TNS (ns)', a:'setup_tns', k:'tns', t:'num' },
+  { h:'Setup failing endpoints', a:'setup_failing_endpoints', k:'feps', t:'int' },
+  { h:'Setup corner', a:'setup_corner', k:'setupCorner', t:'text' },
+  { h:'Setup mode', a:'setup_mode', k:'setupMode', t:'text' },
+  { h:'Hold WNS (ps)', a:'hold_wns', k:'holdW', t:'int' },
+  { h:'Hold TNS (ns)', a:'hold_tns', k:'holdTns', t:'num' },
+  { h:'Hold failing endpoints', a:'hold_failing_endpoints', k:'holdV', t:'int' },
+  { h:'Hold corner', a:'hold_corner', k:'holdCorner', t:'text' },
+  { h:'Hold mode', a:'hold_mode', k:'holdMode', t:'text' },
+  { h:'Clock skew (ps)', a:'clock_skew', k:'skew', t:'int' },
+  { h:'Max transition violations', a:'max_transition_violations', k:'maxTran', t:'int' },
+  { h:'Worst transition (ns)', a:'worst_transition', k:'worstTran', t:'num' },
+  { h:'Max capacitance violations', a:'max_capacitance_violations', k:'maxCap', t:'int' },
+  { h:'Max fanout violations', a:'max_fanout_violations', k:'maxFanout', t:'int' },
+  { h:'Min period violations', a:'min_period_violations', k:'minPeriod', t:'int' },
+  { h:'Min pulse width violations', a:'min_pulse_width_violations', k:'mpw', t:'int' },
+  { h:'Global route overflow (%)', a:'global_route_overflow', k:'overflow', t:'num' },
+  { h:'DRC after route', a:'drc_after_route', k:'drc', t:'int' },
+  { h:'Dynamic power (mW)', a:'dynamic_power', k:'dyn', t:'int' },
+  { h:'Leakage power (mW)', a:'leakage_power', k:'leak', t:'num' },
+  { h:'Power budget (mW)', a:'power_budget', k:'budget', t:'int' },
+  { h:'IR drop static (mV)', a:'ir_drop_static', k:'irStatic', t:'num' },
+  { h:'IR drop dynamic (mV)', a:'ir_drop_dynamic', k:'irDynamic', t:'num' },
+  { h:'Turn runtime (h)', a:'turn_runtime', k:'runtime', t:'num' },
+  { h:'ECOs applied', a:'ecos_applied', k:'ecos', t:'int' },
+  { h:'ECO rounds', a:'eco_rounds', k:'ecoRounds', t:'int' },
 ];
+
+/* Slack the page shows in picoseconds. A tool reports seconds or nanoseconds,
+   so Meta says which unit the file is in and these three are converted. */
+const SLACK_PS = ['wns', 'holdW', 'skew'];
+const UNIT_SCALE = { ps:1, ns:1000, s:1e12 };
+
+/* What a tool calls a step, against what this page calls it. A script writes
+   its flow's own name; an unrecognised one is still reported rather than
+   quietly landing the block back at Not started. */
+const STAGE_ALIAS = {
+  'not started':0, 'none':0, 'na':0,
+  floorplan:1, fp:1, 'floor plan':1,
+  place:2, placement:2, placed:2, 'place opt':2,
+  cts:3, clock:3, 'clock tree':3,
+  route:4, routed:4, routing:4, 'detail route':4,
+  'post-route opt':5, 'post route opt':5, postroute:5, 'route opt':5, route_opt:5, 'post-route':5,
+  signoff:6, 'sign off':6, 'sign-off':6, sta:6,
+  complete:7, done:7, closed:7, 'tape ready':7,
+};
 
 /* ── zip, both directions ─────────────────────────────────── */
 
@@ -987,7 +1052,7 @@ async function zipRead(buf) {
   return out;
 }
 
-/* ── the template, written from the sample ────────────────── */
+/* ── the template, written from whatever is loaded ────────── */
 
 const xe = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;' }[c]));
 const colName = (i) => { let s = ''; i++; while (i > 0) { const m = (i - 1) % 26; s = String.fromCharCode(65 + m) + s; i = (i - m - 1) / 26; } return s; };
@@ -1008,13 +1073,24 @@ function sheetXml(rows) {
 
 function buildWorkbook() {
   const sheets = [
-    ['Blocks', [['Block','Group'], ...BLOCKS.map((b) => [b[0], b[1]])]],
+    ['Meta', [['Key','Value'],
+      ['Template version', 1],
+      ['Slack unit', 'ps'],
+      ['Generated at', new Date().toISOString().slice(0, 19).replace('T', ' ')],
+      ['Generated by', 'AtlasPM QoR dashboard'],
+      ['Run directory', ''],
+    ]],
+    ['Blocks', [['Block','Group'], ...BLOCKLIST.map((b) => [b.name, b.group])]],
     ['Drops', [['Drop','Label','Date'], ...DROPS.map((d) => [d.id, d.label, d.date])]],
-    ['Targets', [['Measure','Target','Unit','Good when'],
-      ...Object.entries(CHIP).map(([k, c]) => [c.label, c.target, c.unit || '', c.good === 'above' ? 'higher' : 'lower'])]],
+    ['Targets', [['Measure','Key','Target','Unit','Good when'],
+      ...Object.entries(CHIP).map(([k, c]) => [c.label, k, c.target, c.unit || '', c.good === 'above' ? 'higher' : 'lower'])]],
     ...DROPS.map((d, i) => [d.id, [
       SHEET_COLS.map((c) => c.h),
-      ...DATA[i].filter((r) => !r.missing).map((r) => SHEET_COLS.map((c) => (c.t === 'stage' ? STAGES[r.stage] : r[c.k]))),
+      ...DATA[i].filter((r) => !r.missing).map((r) => SHEET_COLS.map((c) => {
+        if (c.t === 'stage') return STAGES[r.stage];
+        const v = r[c.k];
+        return v === null || v === undefined ? '' : v;
+      })),
     ]]),
   ];
   const files = [
@@ -1066,94 +1142,230 @@ function readSheets(parts) {
   return out;
 }
 
-const num = (v) => { const n = parseFloat(String(v ?? '').replace(/,/g, '')); return Number.isFinite(n) ? n : 0; };
+/* A csv is one flat table with a Drop column: what a script writes after a run. */
+function readCsv(text) {
+  const rows = [];
+  let row = [], cell = '', q = false;
+  const s = text.replace(/^﻿/, '');
+  for (let i = 0; i < s.length; i++) {
+    const c = s[i];
+    if (q) {
+      if (c === '"') { if (s[i + 1] === '"') { cell += '"'; i++; } else q = false; }
+      else cell += c;
+    } else if (c === '"') q = true;
+    else if (c === ',') { row.push(cell); cell = ''; }
+    else if (c === '\n') { row.push(cell); rows.push(row); row = []; cell = ''; }
+    else if (c !== '\r') cell += c;
+  }
+  if (cell || row.length) { row.push(cell); rows.push(row); }
+  return rows.filter((r) => r.some((x) => String(x).trim() !== ''));
+}
 
-/* Turns sheets into the same shape the generator produces, and says what it
-   could not use. Nothing here throws on a column it does not know: a team
-   adds columns to a spreadsheet, and a dashboard that refuses the file over
-   one is a dashboard nobody loads twice. */
-function fromSheets(sheets) {
-  const warn = [], norm = (s) => String(s ?? '').trim().toLowerCase().replace(/\s+/g, ' ');
+/* ── sheets to rows ───────────────────────────────────────── */
+
+const norm = (s) => String(s ?? '').trim().toLowerCase().replace(/[\s_]+/g, ' ');
+const key = (s) => norm(s).replace(/ /g, '');
+
+/* A number, or null. Null is every way a cell can fail to be a measurement:
+   empty, a word, a tool's sentinel for "there was no path to report". */
+const HUGE = 1e20;
+function num(v) {
+  if (v === null || v === undefined) return null;
+  const s = String(v).trim().replace(/,/g, '');
+  if (!s) return null;
+  const n = parseFloat(s);
+  if (!Number.isFinite(n) || Math.abs(n) >= HUGE) return null;
+  return n;
+}
+
+function fromSheets(sheets, fallbackTargets) {
+  const warn = [];
+  const find = (name) => Object.keys(sheets).find((s) => norm(s) === name);
   const head = (rows) => (rows[0] || []).map(norm);
 
-  const blocksRows = sheets.Blocks || sheets.blocks;
-  if (!blocksRows) throw new Error('no Blocks sheet');
-  const groupOf = {}, order = [];
-  for (const r of blocksRows.slice(1)) {
-    const name = String(r[0] ?? '').trim();
-    if (!name) continue;
-    groupOf[name] = String(r[1] ?? '—').trim() || '—';
-    order.push(name);
+  /* Meta: version, the unit slack is in, and where the file came from */
+  const meta = {};
+  const metaSheet = sheets[find('meta')];
+  if (metaSheet) for (const r of metaSheet.slice(1)) if (String(r[0] ?? '').trim()) meta[key(r[0])] = String(r[1] ?? '').trim();
+  const unit = (meta.slackunit || 'ps').toLowerCase();
+  const scale = UNIT_SCALE[unit];
+  if (!scale) { warn.push(`Meta: slack unit "${meta.slackunit}" is not ps, ns or s — read as ps`); }
+
+  /* the flat shape a script writes: one sheet, every drop, a Drop column */
+  const flatName = Object.keys(sheets).find((s) => head(sheets[s]).includes('drop') && head(sheets[s]).includes('block'));
+
+  /* Blocks: the roster, and the spelling every other sheet is matched against */
+  const byKey = {}, order = [];
+  const addBlock = (name, group) => {
+    const k = key(name);
+    if (byKey[k]) return byKey[k];
+    const b = { name:String(name).trim(), group:String(group ?? '—').trim() || '—' };
+    byKey[k] = b; order.push(b);
+    return b;
+  };
+  const blocksSheet = sheets[find('blocks')];
+  if (blocksSheet) for (const r of blocksSheet.slice(1)) { if (String(r[0] ?? '').trim()) addBlock(r[0], r[1]); }
+
+  /* Drops: from the Drops sheet, or from the flat sheet's own Drop column */
+  let drops = [];
+  const dropSheet = sheets[find('drops')];
+  if (dropSheet) {
+    drops = dropSheet.slice(1).filter((r) => String(r[0] ?? '').trim())
+      .map((r) => ({ id:String(r[0]).trim(), label:String(r[1] ?? r[0]).trim() || String(r[0]).trim(), date:String(r[2] ?? '').trim() }));
+  } else if (flatName) {
+    const h = head(sheets[flatName]), di = h.indexOf('drop');
+    const seen = [];
+    for (const r of sheets[flatName].slice(1)) {
+      const d = String(r[di] ?? '').trim();
+      if (d && !seen.includes(d)) seen.push(d);
+    }
+    drops = seen.map((id) => ({ id, label:id, date:'' }));
   }
-  if (!order.length) throw new Error('the Blocks sheet has no blocks');
+  if (!drops.length) throw new Error('no Drops sheet, and no Drop column to take the drops from');
 
-  const dropRows = sheets.Drops || sheets.drops;
-  if (!dropRows) throw new Error('no Drops sheet');
-  const drops = dropRows.slice(1)
-    .filter((r) => String(r[0] ?? '').trim())
-    .map((r) => ({ id:String(r[0]).trim(), label:String(r[1] ?? r[0]).trim(), date:String(r[2] ?? '').trim() }));
-  if (!drops.length) throw new Error('the Drops sheet has no drops');
-
-  const targets = {};
-  const tRows = sheets.Targets || sheets.targets;
-  if (tRows) {
+  /* Targets: matched on the measure key if the sheet carries one, on the
+     label otherwise, so renaming a label does not break a file */
+  const targets = { ...fallbackTargets };
+  const tSheet = sheets[find('targets')];
+  if (tSheet) {
+    const h = head(tSheet);
+    const ki = h.indexOf('key'), li = h.indexOf('measure'), vi = h.indexOf('target');
     const byLabel = {};
     for (const [k, c] of Object.entries(CHIP)) byLabel[norm(c.label)] = k;
-    for (const r of tRows.slice(1)) {
-      const k = byLabel[norm(r[0])];
-      if (k) targets[k] = num(r[1]);
-      else if (String(r[0] ?? '').trim()) warn.push(`Targets: "${String(r[0]).trim()}" is not a measure this page draws`);
+    for (const r of tSheet.slice(1)) {
+      const k = (ki >= 0 && CHIP[String(r[ki] ?? '').trim()] && String(r[ki]).trim()) || byLabel[norm(r[li >= 0 ? li : 0])];
+      const v = num(r[vi >= 0 ? vi : 2]);
+      if (k && v !== null) targets[k] = v;
+      else if (String(r[0] ?? '').trim() && !k) warn.push(`Targets: "${String(r[0]).trim()}" is not a measure this page draws`);
     }
   }
 
-  const stageIndex = {};
-  STAGES.forEach((s, i) => { stageIndex[norm(s)] = i; });
+  /* one drop's rows, from its own sheet or from the flat sheet's slice */
+  const colsOf = (h) => {
+    const map = {};
+    for (const c of SHEET_COLS) {
+      const i = [norm(c.h), norm(c.a), norm(c.k)].map((n) => h.indexOf(n)).find((x) => x >= 0);
+      if (i !== undefined) map[c.k] = i;
+    }
+    return map;
+  };
+  const known = new Set(SHEET_COLS.flatMap((c) => [norm(c.h), norm(c.a), norm(c.k)]).concat('drop', 'group'));
+
+  const notReported = {}, badStage = {}, dupes = {};
+  const readRow = (r, map, tag) => {
+    const name = String(r[map.name] ?? '').trim();
+    if (!name) return null;
+    const b = byKey[key(name)] || (warn.push(`${tag}: "${name}" is not on the Blocks sheet`), addBlock(name, '—'));
+    const m = { name:b.name, group:b.group };
+    for (const c of SHEET_COLS) {
+      if (c.k === 'name') continue;
+      const raw = map[c.k] === undefined ? '' : r[map[c.k]];
+      if (c.t === 'stage') {
+        const s = norm(raw);
+        if (!s) { m.stage = 0; continue; }
+        const i = STAGE_ALIAS[s];
+        if (i === undefined) { badStage[tag] = (badStage[tag] || new Set()).add(String(raw).trim()); m.stage = 0; }
+        else m.stage = i;
+        continue;
+      }
+      if (c.t === 'text') { m[c.k] = String(raw ?? '').trim(); continue; }
+      let v = num(raw);
+      if (v === null) notReported[tag] = (notReported[tag] || 0) + 1;
+      else {
+        if (SLACK_PS.includes(c.k)) v *= scale || 1;
+        if (c.t === 'int') v = Math.round(v);
+        else v = +v.toFixed(3);
+      }
+      m[c.k] = v;
+    }
+    m.power = m.dyn === null || m.leak === null ? null : +(m.dyn + m.leak).toFixed(0);
+    return m;
+  };
+
+  const perDrop = {};
+  for (const d of drops) {
+    const own = sheets[find(norm(d.id))];
+    if (own) {
+      const h = head(own), map = colsOf(h);
+      if (map.name === undefined) { warn.push(`${d.id}: no Block column — that drop reads as not run`); perDrop[d.id] = {}; continue; }
+      const gone = SHEET_COLS.filter((c) => map[c.k] === undefined).map((c) => c.h);
+      if (gone.length) warn.push(`${d.id}: no column for ${gone.join(', ')}`);
+      const extra = h.filter((x) => x && !known.has(x));
+      if (extra.length) warn.push(`${d.id}: ignored ${extra.length} column${extra.length > 1 ? 's' : ''} (${extra.join(', ')})`);
+      const seen = {};
+      for (const r of own.slice(1)) {
+        const m = readRow(r, map, d.id);
+        if (!m) continue;
+        if (seen[key(m.name)]) dupes[d.id] = (dupes[d.id] || new Set()).add(m.name);
+        seen[key(m.name)] = m;
+      }
+      perDrop[d.id] = seen;
+    } else perDrop[d.id] = null;
+  }
+
+  if (flatName) {
+    const rows = sheets[flatName], h = head(rows), map = colsOf(h), di = h.indexOf('drop');
+    const extra = h.filter((x) => x && !known.has(x));
+    if (extra.length) warn.push(`${flatName}: ignored ${extra.length} column${extra.length > 1 ? 's' : ''} (${extra.join(', ')})`);
+    const gi = h.indexOf('group');
+    for (const r of rows.slice(1)) {
+      const id = String(r[di] ?? '').trim();
+      if (!id || !perDrop.hasOwnProperty(id)) continue;
+      if (perDrop[id] === null) perDrop[id] = {};
+      if (gi >= 0 && String(r[map.name] ?? '').trim()) addBlock(r[map.name], r[gi]);
+      const m = readRow(r, map, id);
+      if (!m) continue;
+      if (perDrop[id][key(m.name)]) dupes[id] = (dupes[id] || new Set()).add(m.name);
+      perDrop[id][key(m.name)] = m;
+    }
+  }
+
+  for (const [tag, set] of Object.entries(dupes))
+    warn.push(`${tag}: ${[...set].join(', ')} appear${set.size > 1 ? '' : 's'} more than once — the last row wins`);
+  for (const [tag, set] of Object.entries(badStage))
+    warn.push(`${tag}: P&R stage ${[...set].map((s) => `"${s}"`).join(', ')} not recognised — read as Not started`);
+  for (const [tag, n] of Object.entries(notReported))
+    warn.push(`${tag}: ${n} value${n > 1 ? 's' : ''} blank or unreadable — shown as not reported, left out of the roll-up`);
+
+  if (!order.length) throw new Error('no blocks — neither a Blocks sheet nor any block rows');
+
+  /* Utilisation as a fraction rather than a percent is the one unit slip a
+     script makes that every number still looks plausible after. */
+  for (const id of Object.keys(perDrop)) {
+    const ms = Object.values(perDrop[id] || {}).filter((m) => m.util !== null);
+    if (!ms.length || Math.max(...ms.map((m) => m.util)) > 1.5) continue;
+    for (const m of ms) m.util = +(m.util * 100).toFixed(1);
+    warn.push(`${id}: Utilization looked like a fraction, not a percent — every value was multiplied by 100`);
+  }
 
   const data = drops.map((d) => {
-    const rows = sheets[d.id];
-    if (!rows) { warn.push(`no sheet named "${d.id}" — that drop reads as not run`); return order.map((n) => ({ name:n, group:groupOf[n], missing:true, stage:0 })); }
-    const h = head(rows), map = {};
-    for (const c of SHEET_COLS) { const i = h.indexOf(norm(c.h)); if (i >= 0) map[c.k] = i; }
-    const missing = SHEET_COLS.filter((c) => map[c.k] === undefined).map((c) => c.h);
-    if (missing.length) warn.push(`${d.id}: no column for ${missing.join(', ')} — read as blank`);
-    const known = new Set(SHEET_COLS.map((c) => norm(c.h)));
-    const extra = h.filter((x) => x && !known.has(x));
-    if (extra.length) warn.push(`${d.id}: ignored ${extra.length} column${extra.length > 1 ? 's' : ''} (${extra.join(', ')})`);
-
-    const seen = {};
-    for (const r of rows.slice(1)) {
-      const name = String(r[map.name] ?? '').trim();
-      if (!name) continue;
-      if (!groupOf[name]) { groupOf[name] = '—'; order.push(name); warn.push(`${d.id}: "${name}" is not on the Blocks sheet`); }
-      const m = { name, group:groupOf[name] };
-      for (const c of SHEET_COLS) {
-        if (c.k === 'name') continue;
-        const v = map[c.k] === undefined ? '' : r[map[c.k]];
-        m[c.k] = c.t === 'stage' ? (stageIndex[norm(v)] ?? 0) : c.t === 'text' ? String(v ?? '').trim() : c.t === 'int' ? Math.round(num(v)) : num(v);
-      }
-      m.power = m.dyn + m.leak;
-      m.grew = false;
-      seen[name] = m;
-    }
-    return order.map((n) => seen[n] || { name:n, group:groupOf[n], missing:true, stage:0 });
+    const seen = perDrop[d.id];
+    if (seen === null) { warn.push(`no sheet named "${d.id}" — that drop reads as not run`); return order.map((b) => ({ ...b, missing:true, stage:0 })); }
+    return order.map((b) => seen[key(b.name)] || { ...b, missing:true, stage:0 });
   });
 
-  return { drops, data, targets, warn, rows:data.reduce((t, rows) => t + rows.filter((r) => !r.missing).length, 0) };
+  const rows = data.reduce((t, r) => t + r.filter((x) => !x.missing).length, 0);
+  if (!rows) throw new Error('no block rows in any drop');
+  return { drops, blocks:order, data, targets, meta, warn, rows, unit };
 }
 
 /* ── the menu ─────────────────────────────────────────────── */
 
-const SAMPLE = { drops:DROPS, data:DATA, targets:Object.fromEntries(Object.entries(CHIP).map(([k, c]) => [k, c.target])) };
+let BLOCKLIST = BLOCKS.map((b) => ({ name:b[0], group:b[1] }));
+const SAMPLE = {
+  drops:DROPS, data:DATA, blocks:BLOCKLIST,
+  targets:Object.fromEntries(Object.entries(CHIP).map(([k, c]) => [k, c.target])),
+};
 
-function useData(src, name, warn = []) {
-  DROPS = src.drops; DATA = src.data;
+function useData(src, name, notes = []) {
+  DROPS = src.drops; DATA = src.data; BLOCKLIST = src.blocks;
   for (const [k, v] of Object.entries(src.targets)) if (CHIP[k]) CHIP[k].target = v;
   ROLL = DATA.map(roll);
   drop = Math.min(drop, DROPS.length - 1);
   $('srcName').textContent = name;
   $('useSample').hidden = name === 'Sample data';
-  $('loadMsg').hidden = !warn.length;
-  $('loadMsg').innerHTML = warn.map((w) => `<span>${xe(w)}</span>`).join('');
+  $('loadMsg').hidden = !notes.length;
+  $('loadMsg').innerHTML = notes.map((w) => `<span>${xe(w)}</span>`).join('');
   renderAll();
 }
 
@@ -1172,8 +1384,15 @@ $('wbFile').addEventListener('change', async (e) => {
   if (!f) return;
   e.target.value = '';
   try {
-    const src = fromSheets(readSheets(await zipRead(await f.arrayBuffer())));
-    useData(src, f.name, [`${src.rows.toLocaleString()} block rows across ${src.drops.length} drops`, ...src.warn]);
+    const sheets = /\.csv$/i.test(f.name)
+      ? { QoR:readCsv(await f.text()) }
+      : readSheets(await zipRead(await f.arrayBuffer()));
+    const src = fromSheets(sheets, SAMPLE.targets);
+    const where = [src.meta.generatedby, src.meta.generatedat].filter(Boolean).join(' · ');
+    useData(src, f.name, [
+      `${src.rows.toLocaleString()} block rows across ${src.drops.length} drops${src.unit !== 'ps' ? `, slack read in ${src.unit}` : ''}${where ? ` — ${where}` : ''}`,
+      ...src.warn,
+    ]);
   } catch (err) {
     $('loadMsg').hidden = false;
     $('loadMsg').innerHTML = `<span class="err">${xe(f.name)}: ${xe(err.message)}</span>`;
