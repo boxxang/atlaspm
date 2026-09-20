@@ -15,6 +15,7 @@ import { parseSheets } from '@/lib/qor/parse';
 import { buildWorkbook, sheetsFromFile } from '@/lib/qor/xlsx';
 import { rollup } from '@/lib/qor/rollup';
 import type { StageId } from '@/data/types';
+import { IconDownload, IconTrash, IconUpload } from '../icons';
 import { QorChipTable, QorTiles } from './QorChipView';
 import { QorBlockView } from './QorBlockView';
 
@@ -66,16 +67,23 @@ export function QorDashboardTab({ stageId }: { stageId: StageId }) {
 
   const source = (
     <div className="qor-src">
-      <span>Data</span>
-      <span className="qor-srcname">{stored ? stored.fileName : 'No workbook loaded'}</span>
-      <button type="button" className="qor-lnk" onClick={download}>Download template</button>
-      <button type="button" className="qor-lnk" onClick={() => fileRef.current?.click()}>Load workbook…</button>
+      <span className="qor-srclbl">Data</span>
+      <span className="pill qor-srcname">{stored ? stored.fileName : 'No workbook loaded'}</span>
+      <button type="button" className="btn sm" onClick={download}>
+        <IconDownload />
+        Download template
+      </button>
+      <button type="button" className="btn sm" onClick={() => fileRef.current?.click()}>
+        <IconUpload />
+        {stored ? 'Replace workbook…' : 'Load workbook…'}
+      </button>
       {stored && (
         <button
           type="button"
-          className="qor-lnk"
+          className="btn sm"
           onClick={() => { clearQorDataset(stageId); setNotes([]); setError(''); }}
         >
+          <IconTrash />
           Remove
         </button>
       )}
@@ -122,10 +130,12 @@ export function QorDashboardTab({ stageId }: { stageId: StageId }) {
       </div>
 
       <div className="qor-srcbar">
-        <div className="qor-switch" role="tablist" aria-label="What to read">
-          <button type="button" role="tab" aria-selected={view === 'chip'} onClick={() => setView('chip')}>Full chip</button>
-          <button type="button" role="tab" aria-selected={view === 'block'} onClick={() => setView('block')}>
-            By block <span className="n">{rows.length}</span>
+        <div className="seg-ctl" role="tablist" aria-label="What to read">
+          <button type="button" role="tab" className={view === 'chip' ? 'on' : ''} aria-selected={view === 'chip'} onClick={() => setView('chip')}>
+            Full chip
+          </button>
+          <button type="button" role="tab" className={view === 'block' ? 'on' : ''} aria-selected={view === 'block'} onClick={() => setView('block')}>
+            By block <span className="pill" style={{ marginLeft: 6 }}>{rows.length}</span>
           </button>
         </div>
         {source}

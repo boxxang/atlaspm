@@ -164,7 +164,7 @@ export function QorBlockView({ rows, prevRows, roll, targets }: {
     });
   }, [rows, wasOf, filter, query, sort]);
 
-  const grid = ['174px', '112px', '94px', ...cols.map((c) => (c.wide ? 'minmax(152px,1.7fr)' : 'minmax(62px,1fr)'))].join(' ');
+  const grid = ['150px', '104px', '92px', ...cols.map((c) => (c.wide ? 'minmax(148px,1.7fr)' : 'minmax(64px,1fr)'))].join(' ');
   const head = (key: string, label: string, unit?: string) => (
     <button
       key={key}
@@ -192,12 +192,12 @@ export function QorBlockView({ rows, prevRows, roll, targets }: {
       </div>
 
       <div className="qor-toolbar">
-        <button type="button" className="qor-chip" aria-pressed={filter === 'all'} onClick={() => setFilter('all')}>
-          All <span className="c">{counts.all}</span>
+        <button type="button" className={`btn sm${filter === 'all' ? ' on' : ''}`} aria-pressed={filter === 'all'} onClick={() => setFilter('all')}>
+          All <span className="pill">{counts.all}</span>
         </button>
         {(['fail', 'watch', 'clean', 'partial', 'none'] as QorStatus[]).map((s) => (
-          <button key={s} type="button" className="qor-chip" aria-pressed={filter === s} onClick={() => setFilter(s)}>
-            {QOR_STATUS_LABEL[s]} <span className="c">{counts[s]}</span>
+          <button key={s} type="button" className={`btn sm${filter === s ? ' on' : ''}`} aria-pressed={filter === s} onClick={() => setFilter(s)}>
+            {QOR_STATUS_LABEL[s]} <span className="pill">{counts[s]}</span>
           </button>
         ))}
         <input
@@ -208,9 +208,9 @@ export function QorBlockView({ rows, prevRows, roll, targets }: {
           value={query}
           onChange={(e) => setQuery(e.target.value)}
         />
-        <span className="qor-sets" role="tablist" aria-label="Measures">
+        <span className="seg-ctl" role="tablist" aria-label="Measures">
           {SET_KEYS.map((k) => (
-            <button key={k} role="tab" type="button" aria-selected={set === k} onClick={() => setSet(k)}>
+            <button key={k} role="tab" type="button" className={set === k ? 'on' : ''} aria-selected={set === k} onClick={() => setSet(k)}>
               {SET_LABEL[k]}
             </button>
           ))}

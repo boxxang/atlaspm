@@ -149,6 +149,31 @@ export const IconClip = () => (
   </S>
 );
 
+/** Taking the workbook template away, and bringing one back. */
+export const IconDownload = ({ size = 12 }: { size?: number }) => (
+  <S size={size} width={2}>
+    <path d="M12 3v12" />
+    <path d="m7 11 5 5 5-5" />
+    <path d="M4 20h16" />
+  </S>
+);
+
+export const IconUpload = ({ size = 12 }: { size?: number }) => (
+  <S size={size} width={2}>
+    <path d="M12 17V5" />
+    <path d="m7 9 5-5 5 5" />
+    <path d="M4 20h16" />
+  </S>
+);
+
+export const IconTrash = ({ size = 12 }: { size?: number }) => (
+  <S size={size} width={2}>
+    <path d="M4 6h16" />
+    <path d="M9 6V4h6v2" />
+    <path d="M6 6v14a1 1 0 0 0 1 1h10a1 1 0 0 0 1-1V6" />
+  </S>
+);
+
 /** The sheet an attached file wears in an output row. */
 export const IconFile = () => (
   <S size={13} stroke="#5b5bd6">
