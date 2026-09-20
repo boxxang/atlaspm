@@ -660,17 +660,21 @@ const chip = (s) => `<span class="st st-${s}"><i></i>${LABEL[s]}</span>`;
    Setup and hold are read apart because they are fixed differently — a setup
    violation wants a faster path, a hold violation a slower one — and a design
    rule violation is neither. A unit rides with a column only where the number
-   has one: a count of endpoints has none. */
+   has one: a count of endpoints has none.
+
+   No measure appears in two sets. Block, P&R stage and QoR are the context
+   that survives a set change; anything else repeated was padding to a fixed
+   six columns, and a column that means nothing here reads as if it did. */
 const SETS = {
   setup:[
     { key:'wns', label:'Setup WNS', unit:'ps' }, { key:'setupScn', label:'Setup scenario', wide:true },
     { key:'tns', label:'Setup TNS', unit:'ns' }, { key:'feps', label:'Fail eps' },
-    { key:'skew', label:'Skew', unit:'ps' }, { key:'delta', label:'WNS Δ', unit:'ps' },
+    { key:'delta', label:'WNS Δ', unit:'ps' },
   ],
   hold:[
     { key:'holdW', label:'Hold WNS', unit:'ps' }, { key:'holdScn', label:'Hold scenario', wide:true },
     { key:'holdTns', label:'Hold TNS', unit:'ns' }, { key:'holdV', label:'Hold viol' },
-    { key:'skew', label:'Skew', unit:'ps' }, { key:'mpw', label:'MPW viol' },
+    { key:'skew', label:'Skew', unit:'ps' },
   ],
   drv:[
     { key:'maxTran', label:'Max tran viol' }, { key:'worstTran', label:'Worst tran', unit:'ns' },
@@ -680,7 +684,6 @@ const SETS = {
   physical:[
     { key:'util', label:'Util', unit:'%' }, { key:'inst', label:'Inst', unit:'M' },
     { key:'overflow', label:'Overflow', unit:'%' }, { key:'drc', label:'DRC' },
-    { key:'skew', label:'Skew', unit:'ps' }, { key:'delta', label:'WNS Δ', unit:'ps' },
   ],
   power:[
     { key:'power', label:'Power', unit:'mW' }, { key:'budget', label:'Budget', unit:'mW' },
@@ -689,7 +692,6 @@ const SETS = {
   ],
   flow:[
     { key:'runtime', label:'Runtime', unit:'h' }, { key:'ecos', label:'ECOs' }, { key:'ecoRounds', label:'ECO rounds' },
-    { key:'feps', label:'Fail eps' }, { key:'drc', label:'DRC' }, { key:'delta', label:'WNS Δ', unit:'ps' },
   ],
 };
 let set = 'setup';
