@@ -1,12 +1,14 @@
 'use client';
 
 import Link from 'next/link';
+import { useState } from 'react';
 import { useProgramActivities } from './useProgramActivities';
 import { ALL_ACTIVITY_TITLES as detailActivityTitles } from '@/data/builtins';
 import { fmtDT } from '@/lib/schedule';
 import { useAppStore } from '@/store/useAppStore';
 import { Avatar } from './icons';
-import { feedPosts, replyContext } from '@/lib/updateFeed';
+import { threads, whenSaid, type FeedThread } from '@/lib/updateFeed';
+import type { ProgramPost } from '@/lib/projectState';
 
 /**
  * Everything said on the programme, newest first.
@@ -16,6 +18,11 @@ import { feedPosts, replyContext } from '@/lib/updateFeed';
  * tables — the second is the older board's — and this is the one screen that
  * has to show them together, because "what has been said lately" does not care
  * which.
+ *
+ * A reply is not a row of its own. It belongs to the post it answers, so the
+ * feed lists threads: the post, the newest thing said back, and a click to
+ * open the rest. A thread rises to the top when anybody says anything in it —
+ * that is what "updates" means to somebody scanning for what moved.
  *
  * The name's line carries what the post is about and the body carries what was
  * said, and nothing sits between them. A post on a step already names its
@@ -41,30 +48,23 @@ export function UpdatesPage({
   const activitySteps = useProgramActivities();
   const stageOfAct = (ref: string | null) => (ref ? (activitySteps[ref]?.st ?? null) : null);
 
-  /* A key-info note is not an update: it is a page kept on a stage, looked up
-     by title, not a thing said about the work on a day. */
-  /* A reply holds no target of its own, so it borrows its parent's — both the
-     line that says what it is answering and the place that answer belongs. */
-  const answering = replyContext(posts);
-  const fromPosts = feedPosts(posts).map((p) => {
-    const re = answering[p.id];
-    const act = p.activityRef ?? re?.activityRef ?? null;
-    return {
-      id: p.id,
-      at: p.editedAt ?? p.createdAt,
-      who: p.author,
-      text: p.text,
-      stageId: p.stageId ?? re?.stageId ?? stageOfAct(act),
-      act,
-      stepN: p.stepN ?? re?.stepN ?? null,
-      /* A board update names the entry it is on; a reply names the post it
-         answers. A post on a step needs neither — the activity and step its
-         pills already name are what it is about. */
-      subject: re?.subject ?? null,
-      risk: p.kind === 'risk',
-      edited: !!p.editedAt,
-    };
-  });
+  /* One row per thread, ordered by when it was last spoken in — a key-info
+     note heads no thread, and a reply heads none either. */
+  const fromPosts = threads(posts).map((t) => ({
+    id: t.root.id,
+    at: t.at,
+    who: t.root.author,
+    text: t.root.text,
+    stageId: t.root.stageId ?? stageOfAct(t.root.activityRef),
+    act: t.root.activityRef,
+    stepN: t.root.stepN,
+    /* Only a board update carries one: what a post on a step is about is the
+       activity and the step its pills already name. */
+    subject: null as string | null,
+    risk: t.root.kind === 'risk',
+    edited: !!t.root.editedAt,
+    thread: t as FeedThread<ProgramPost>,
+  }));
   const fromItems = Object.entries(content).flatMap(([id, c]) =>
     (['keyinfo', 'activities', 'risks'] as const).flatMap((k) =>
       c[k].flatMap((it) =>
@@ -79,6 +79,7 @@ export function UpdatesPage({
           subject: it.title as string | null,
           risk: k === 'risks',
           edited: false,
+          thread: null as FeedThread<ProgramPost> | null,
         })),
       ),
     ),
@@ -89,6 +90,8 @@ export function UpdatesPage({
     .sort((a, b) => b.at.getTime() - a.at.getTime());
 
   const shortOf = (id: string | null) => stages.find((s) => s.id === id)?.shortTitle;
+  const [open, setOpen] = useState<Record<string, boolean>>({});
+  const toggle = (id: string) => setOpen((o) => ({ ...o, [id]: !o[id] }));
 
   const feed =
     rows.length === 0 ? (
@@ -97,7 +100,21 @@ export function UpdatesPage({
       </div>
     ) : (
       rows.map((p) => (
-        <div key={p.id} className="feedrow ovfeed" data-update={p.id}>
+        <div
+          key={p.id}
+          className={p.thread?.replies.length ? 'feedrow ovfeed thr-row' : 'feedrow ovfeed'}
+          data-update={p.id}
+          data-open={p.thread?.replies.length && open[p.id] ? '' : undefined}
+          /* The post opens its own thread, because that is what somebody
+             reaches for. Not a link, which has somewhere else to go, and not a
+             click that lands after selecting a line of it. */
+          onClick={(e) => {
+            if (!p.thread?.replies.length) return;
+            if ((e.target as HTMLElement).closest('a,button')) return;
+            if (window.getSelection()?.toString()) return;
+            toggle(p.id);
+          }}
+        >
           <Avatar name={p.who || '—'} />
           <div style={{ flexGrow: 1, minWidth: 0 }}>
             <div style={{ display: 'flex', alignItems: 'baseline', gap: 7, flexWrap: 'wrap' }}>
@@ -178,6 +195,9 @@ export function UpdatesPage({
             >
               {p.text}
             </div>
+            {p.thread && p.thread.replies.length > 0 && (
+              <Thread t={p.thread} open={!!open[p.id]} onToggle={() => toggle(p.id)} />
+            )}
           </div>
         </div>
       ))
@@ -193,5 +213,55 @@ export function UpdatesPage({
       </div>
       {feed}
     </>
+  );
+}
+
+/**
+ * What was said back.
+ *
+ * Collapsed it shows the newest reply, because that is what somebody scanning
+ * the feed is looking for — the answer, not the argument. Open it shows the
+ * whole thread in the order it was written, which is the order it makes sense
+ * in. The post itself is already above either way: the row prints it in full.
+ */
+function Thread({
+  t,
+  open,
+  onToggle,
+}: {
+  t: FeedThread<ProgramPost>;
+  open: boolean;
+  onToggle: () => void;
+}) {
+  const n = t.replies.length;
+  const shown = open ? t.replies : t.latest ? [t.latest] : [];
+  return (
+    <div className="thr">
+      <button
+        type="button"
+        className="thr-more"
+        aria-expanded={open}
+        data-thread-toggle={t.root.id}
+        onClick={onToggle}
+      >
+        {open ? 'Hide replies' : n === 1 ? '1 reply' : `${n} replies`}
+        {!open && n > 1 && <span className="thr-n">· showing the latest</span>}
+      </button>
+      {shown.map((r) => (
+        <div key={r.id} className="thr-reply" data-reply={r.id}>
+          <Avatar name={r.author || '—'} small />
+          <div style={{ minWidth: 0 }}>
+            <div style={{ display: 'flex', alignItems: 'baseline', gap: 7, flexWrap: 'wrap' }}>
+              <b style={{ fontSize: 12.5 }}>{r.author || '—'}</b>
+              <span className="num" style={{ fontSize: 11, color: 'var(--ink-3)' }}>
+                {fmtDT(whenSaid(r))}
+              </span>
+              {r.editedAt && <span className="edited">edited</span>}
+            </div>
+            <div className="thr-txt">{r.text}</div>
+          </div>
+        </div>
+      ))}
+    </div>
   );
 }

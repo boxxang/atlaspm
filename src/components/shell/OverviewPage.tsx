@@ -13,7 +13,7 @@ import { useAttention } from './useAttention';
 import { useRowLimit } from './useRowLimit';
 import { useProgramWork } from './useProgramWork';
 import { TodayMeetings } from '../meetings/TodayMeetings';
-import { feedPosts, replyContext } from '@/lib/updateFeed';
+import { threads, whenSaid } from '@/lib/updateFeed';
 
 /**
  * Where the programme is, on one screen.
@@ -816,23 +816,21 @@ function RecentUpdates({ projectId }: { projectId: string }) {
 
   const activitySteps = useProgramActivities();
     const stageOfAct = (ref: string | null) => (ref ? (activitySteps[ref]?.st ?? null) : null);
-  /* the same rules as the Updates page, so the two cannot disagree */
-  const answering = replyContext(posts);
-  const fromPosts = feedPosts(posts).map((p) => {
-    const re = answering[p.id];
-    const act = p.activityRef ?? re?.activityRef ?? null;
-    return {
-      id: p.id,
-      at: p.editedAt ?? p.createdAt,
-      who: p.author,
-      text: p.text,
-      stageId: p.stageId ?? re?.stageId ?? stageOfAct(act),
-      act,
-      stepN: p.stepN ?? re?.stepN ?? null,
-      subject: re?.subject ?? null,
-      risk: p.kind === 'risk',
-    };
-  });
+  /* the same rules as the Updates page, so the two cannot disagree: one row
+     per thread, newest activity first. This is a preview, so it shows what was
+     last said back and leaves the rest to the page it links to. */
+  const fromPosts = threads(posts).map((t) => ({
+    id: t.root.id,
+    at: t.at,
+    who: t.root.author,
+    text: t.root.text,
+    stageId: t.root.stageId ?? stageOfAct(t.root.activityRef),
+    act: t.root.activityRef,
+    stepN: t.root.stepN,
+    subject: null as string | null,
+    risk: t.root.kind === 'risk',
+    reply: t.latest ? { who: t.latest.author, at: whenSaid(t.latest), text: t.latest.text, n: t.replies.length } : null,
+  }));
   const fromItems = Object.entries(content).flatMap(([id, c]) =>
     (['keyinfo', 'activities', 'risks'] as const).flatMap((k) =>
       c[k].flatMap((it) =>
@@ -846,6 +844,7 @@ function RecentUpdates({ projectId }: { projectId: string }) {
           stepN: null as number | null,
           subject: it.title as string | null,
           risk: k === 'risks',
+          reply: null as { who: string; at: Date; text: string; n: number } | null,
         })),
       ),
     ),
@@ -904,6 +903,14 @@ function RecentUpdates({ projectId }: { projectId: string }) {
             <div className="ell2" style={{ fontSize: 13, color: 'var(--ink-2)', marginTop: 1, lineHeight: 1.45 }}>
               {p.text}
             </div>
+            {p.reply && (
+              <div className="thr-peek" data-latest-reply={p.id}>
+                <b>{p.reply.who || '—'}</b>
+                <span className="num">{fmtDT(p.reply.at)}</span>
+                {p.reply.n > 1 && <span className="thr-n">{p.reply.n} replies</span>}
+                <span className="ell2">{p.reply.text}</span>
+              </div>
+            )}
           </div>
         </div>
       ))}

@@ -22,7 +22,7 @@ import {
 } from './icons';
 import { useProgramWork } from './useProgramWork';
 import { UpcomingMeetingsCount } from '../meetings/NavCount';
-import { feedPosts } from '@/lib/updateFeed';
+import { threads } from '@/lib/updateFeed';
 
 /**
  * The left nav, as the prototype draws it.
@@ -58,10 +58,11 @@ export function LeftNav({ projectId }: { projectId: string }) {
   const base = `/p/${projectId}`;
   const allDeliv = Object.values(deliverables).flat();
   const done = allDeliv.filter((d) => d.done).length;
-  /* what the Updates page lists, which is not every post — a key-info note is
-     kept on its stage rather than said into the feed */
+  /* what the Updates page lists, which is neither every post nor one per post:
+     a key-info note is kept on its stage, and a reply is part of the thread it
+     answers rather than a row of its own */
   const updates =
-    feedPosts(posts).length +
+    threads(posts).length +
     Object.values(content).reduce(
       (n, c) =>
         n +

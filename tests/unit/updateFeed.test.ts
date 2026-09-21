@@ -1,9 +1,30 @@
 import { describe, expect, it } from 'vitest';
-import { feedPosts, firstLine, isFeedPost, replyContext } from '@/lib/updateFeed';
+import { isFeedPost, threads, whenSaid } from '@/lib/updateFeed';
 
-/* Everything written in the app is a post, which is the point — but the
-   Updates feed is a record of what has been said about the work, and a
-   key-info note is a page kept on a stage rather than a thing said on a day. */
+const d = (iso: string) => new Date(`${iso}T00:00:00`);
+
+interface P {
+  id: string;
+  kind: string;
+  parentId: string | null;
+  createdAt: Date;
+  editedAt: Date | null;
+}
+
+const post = (id: string, on: string, over: Partial<P> = {}): P => ({
+  id,
+  kind: 'update',
+  parentId: null,
+  createdAt: d(on),
+  editedAt: null,
+  ...over,
+});
+
+const reply = (id: string, parentId: string, on: string, over: Partial<P> = {}): P =>
+  post(id, on, { kind: 'reply', parentId, ...over });
+
+/* Everything written in the app is a post, which is the point — but a
+   key-info note is a page kept on a stage, not a thing said on a day. */
 describe('isFeedPost', () => {
   it('carries what was said about the work', () => {
     for (const kind of ['update', 'risk', 'handover', 'reply']) {
@@ -15,95 +36,96 @@ describe('isFeedPost', () => {
     expect(isFeedPost({ kind: 'note' })).toBe(false);
   });
 
-  /* A kind this predicate has never heard of is more likely a new way of
-     saying something than a new kind of page, so it is carried. */
+  /* A kind this has never heard of is more likely a new way of saying
+     something than a new kind of page, so it is carried. */
   it('carries a kind it does not know', () => {
     expect(isFeedPost({ kind: 'decision' })).toBe(true);
   });
 });
 
-describe('feedPosts', () => {
-  const posts = [
-    { id: 'a', kind: 'update' },
-    { id: 'b', kind: 'note' },
-    { id: 'c', kind: 'risk' },
-    { id: 'd', kind: 'note' },
-    { id: 'e', kind: 'reply' },
-  ];
-
-  it('keeps the order it was given, minus the notes', () => {
-    expect(feedPosts(posts).map((p) => p.id)).toEqual(['a', 'c', 'e']);
-  });
-
-  it('does not touch what it was given', () => {
-    feedPosts(posts);
-    expect(posts).toHaveLength(5);
+describe('whenSaid', () => {
+  it('is when it was written, or when it was last changed', () => {
+    expect(whenSaid(post('a', '2024-01-01'))).toEqual(d('2024-01-01'));
+    expect(whenSaid(post('a', '2024-01-01', { editedAt: d('2024-02-01') }))).toEqual(d('2024-02-01'));
   });
 });
 
-/* A reply carries no target of its own — its parent holds them — so in a flat
-   feed it arrives with nothing saying what it answers or where it belongs. */
-describe('replyContext', () => {
-  const risk = {
-    id: 'r1', kind: 'risk', parentId: null,
-    text: 'Gate count grew in 9 of 60 blocks at FFN, by 11% on average.\nOwner: Jaehyuk Yoon.',
-    stageId: 'physicalDesign', activityRef: 'PD-15', stepN: 1,
-  };
-  const reply = {
-    id: 'c1', kind: 'reply', parentId: 'r1', text: 'Closed at the retrospective.',
-    stageId: null, activityRef: null, stepN: null,
-  };
-
-  it('names the post a reply is answering, by its first line', () => {
-    const ctx = replyContext([risk, reply]);
-    expect(ctx.c1.subject).toBe('Gate count grew in 9 of 60 blocks at FFN, by 11% on average.');
+describe('threads', () => {
+  it('gives one row per post that started a thread', () => {
+    const rows = threads([post('a', '2024-01-01'), post('b', '2024-01-02')]);
+    expect(rows.map((t) => t.root.id)).toEqual(['b', 'a']);
+    expect(rows.every((t) => t.replies.length === 0)).toBe(true);
+    expect(rows[0].latest).toBeNull();
   });
 
-  it('borrows where the parent lives, so the reply can be got to', () => {
-    const { c1 } = replyContext([risk, reply]);
-    expect(c1.stageId).toBe('physicalDesign');
-    expect(c1.activityRef).toBe('PD-15');
-    expect(c1.stepN).toBe(1);
+  /* A reply alone says nothing you can place — "Closed." with no sign of what
+     was closed — so it belongs to the post it answers. */
+  it('folds a reply into the post it answers, rather than listing it', () => {
+    const rows = threads([post('a', '2024-01-01'), reply('c1', 'a', '2024-01-05')]);
+    expect(rows).toHaveLength(1);
+    expect(rows[0].root.id).toBe('a');
+    expect(rows[0].replies.map((r) => r.id)).toEqual(['c1']);
   });
 
-  /* A thread is named after the post that started it, so a reply to a reply
-     should not be labelled with somebody's answer. */
-  it('follows a chain up to the post that started the thread', () => {
-    const second = { ...reply, id: 'c2', parentId: 'c1', text: 'Agreed.' };
-    const ctx = replyContext([risk, reply, second]);
-    expect(ctx.c2.subject).toBe(ctx.c1.subject);
-    expect(ctx.c2.stepN).toBe(1);
+  /* What "updates" means to somebody scanning for what moved. */
+  it('raises a thread to when it was last spoken in', () => {
+    const rows = threads([
+      post('old', '2024-01-01'),
+      reply('c1', 'old', '2024-06-01'),
+      post('new', '2024-03-01'),
+    ]);
+    expect(rows.map((t) => t.root.id)).toEqual(['old', 'new']);
+    expect(rows[0].at).toEqual(d('2024-06-01'));
   });
 
-  it('says nothing about a post that is not a reply', () => {
-    expect(replyContext([risk, reply])).not.toHaveProperty('r1');
+  it('reads the replies in the order they were written, newest last', () => {
+    const rows = threads([
+      post('a', '2024-01-01'),
+      reply('c2', 'a', '2024-03-01'),
+      reply('c1', 'a', '2024-02-01'),
+    ]);
+    expect(rows[0].replies.map((r) => r.id)).toEqual(['c1', 'c2']);
+    expect(rows[0].latest?.id).toBe('c2');
+  });
+
+  it('hangs a reply to a reply off the post that started the thread', () => {
+    const rows = threads([
+      post('a', '2024-01-01'),
+      reply('c1', 'a', '2024-02-01'),
+      reply('c2', 'c1', '2024-03-01'),
+    ]);
+    expect(rows).toHaveLength(1);
+    expect(rows[0].replies.map((r) => r.id)).toEqual(['c1', 'c2']);
+  });
+
+  /* A note is a page; what was said on it belongs to the page, not the feed. */
+  it('leaves out a note and everything said on it', () => {
+    const rows = threads([
+      post('n', '2024-01-01', { kind: 'note' }),
+      reply('c1', 'n', '2024-02-01'),
+      post('a', '2024-01-02'),
+    ]);
+    expect(rows.map((t) => t.root.id)).toEqual(['a']);
   });
 
   it('leaves out a reply whose parent is not there', () => {
-    expect(replyContext([{ ...reply, parentId: 'gone' }])).toEqual({});
+    expect(threads([reply('c1', 'gone', '2024-01-01')])).toEqual([]);
   });
 
   it('does not hang on a parentId that loops', () => {
-    const a = { ...risk, id: 'a', kind: 'reply', parentId: 'b' };
-    const b = { ...risk, id: 'b', kind: 'reply', parentId: 'a' };
-    expect(() => replyContext([a, b])).not.toThrow();
-  });
-});
-
-describe('firstLine', () => {
-  it('is the first line that says anything', () => {
-    expect(firstLine('\n\n  The title  \nthe body')).toBe('The title');
+    const a = reply('a', 'b', '2024-01-01');
+    const b = reply('b', 'a', '2024-01-02');
+    expect(() => threads([a, b])).not.toThrow();
+    expect(threads([a, b])).toEqual([]);
   });
 
-  it('cuts a long one where it can still be recognised', () => {
-    const long = 'x'.repeat(200);
-    const cut = firstLine(long);
-    expect(cut).toHaveLength(64);
-    expect(cut.endsWith('…')).toBe(true);
-  });
-
-  it('is empty for a post that says nothing', () => {
-    expect(firstLine('')).toBe('');
-    expect(firstLine('   \n  ')).toBe('');
+  it('sorts a thread by its last word, edits included', () => {
+    const rows = threads([
+      post('a', '2024-01-01'),
+      post('b', '2024-01-02'),
+      reply('c1', 'a', '2024-01-03', { editedAt: d('2024-05-01') }),
+    ]);
+    expect(rows[0].root.id).toBe('a');
+    expect(rows[0].at).toEqual(d('2024-05-01'));
   });
 });

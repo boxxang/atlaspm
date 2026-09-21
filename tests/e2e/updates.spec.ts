@@ -1,4 +1,4 @@
-import { expect, test, SHELL_PATH, type Page } from './fixtures';
+import { expect, test, SHELL_PATH, writesSettled, type Page } from './fixtures';
 import { detailActivityTitles } from '../../src/data/activityIndex';
 
 /**
@@ -149,4 +149,74 @@ test('the stage tab drops the stage pill', async ({ page }) => {
   await page.goto(`${SHELL_PATH}/stage/${stageId}/updates`);
   await expect(page.locator('[data-update]').first()).toBeVisible();
   await expect(page.locator('[data-update] [data-stage-pill]')).toHaveCount(0);
+});
+
+/* A reply alone says nothing you can place, so the feed lists threads: the
+   post, the newest thing said back, and a click for the rest. */
+test.describe('a thread in the feed', () => {
+  const reply = async (page: Page, text: string) => {
+    await rail(page).getByRole('button', { name: 'Reply' }).last().click();
+    await rail(page).getByLabel('Reply — what moved, and what closed it…').fill(text);
+    await rail(page).locator('.reply .composer').getByRole('button', { name: 'Reply' }).click();
+  };
+
+  test('shows the newest reply, and opens to the whole thread', async ({ page }) => {
+    await page.goto(`${SHELL_PATH}/stage/physicalDesign/activity`);
+    await page.locator('[data-act="PD-14"]').click();
+    await page.locator('[data-step="PD-14:2"]').click();
+    await rail(page).getByLabel('What happened on step 2…').fill('The floorplan is frozen.');
+    await rail(page).getByRole('button', { name: 'Post' }).click();
+    await reply(page, 'First answer.');
+    await reply(page, 'Second answer.');
+    await writesSettled(page);
+
+    await page.goto(`${SHELL_PATH}/updates`);
+    const thread = page.locator('[data-update]').filter({ hasText: 'The floorplan is frozen.' });
+    await expect(thread).toHaveCount(1);
+
+    /* closed: the post in full, and only the last thing said back */
+    await expect(thread.locator('[data-reply]')).toHaveCount(1);
+    await expect(thread.locator('[data-reply]')).toContainText('Second answer.');
+    const toggle = thread.locator('[data-thread-toggle]');
+    await expect(toggle).toHaveText(/2 replies/);
+    await expect(toggle).toHaveAttribute('aria-expanded', 'false');
+
+    /* open: all of it, oldest first */
+    await toggle.click();
+    await expect(toggle).toHaveAttribute('aria-expanded', 'true');
+    await expect(thread.locator('[data-reply]')).toHaveCount(2);
+    await expect(thread.locator('[data-reply]').first()).toContainText('First answer.');
+    await expect(thread).toContainText('The floorplan is frozen.');
+
+    /* the post itself opens it too, and a pill on it still goes where it says */
+    await toggle.click();
+    await expect(thread.locator('[data-reply]')).toHaveCount(1);
+    await thread.locator('b').first().click();
+    await expect(thread.locator('[data-reply]')).toHaveCount(2);
+  });
+
+  /* What "updates" means to somebody scanning for what moved. */
+  test('a thread rises when somebody answers in it', async ({ page }) => {
+    await page.goto(`${SHELL_PATH}/stage/physicalDesign/activity`);
+    await page.locator('[data-act="PD-14"]').click();
+    await page.locator('[data-step="PD-14:2"]').click();
+    await rail(page).getByLabel('What happened on step 2…').fill('The older post.');
+    await rail(page).getByRole('button', { name: 'Post' }).click();
+    await page.locator('[data-step="PD-14:3"]').click();
+    await rail(page).getByLabel('What happened on step 3…').fill('The newer post.');
+    await rail(page).getByRole('button', { name: 'Post' }).click();
+    await writesSettled(page);
+
+    await page.goto(`${SHELL_PATH}/updates`);
+    await expect(page.locator('[data-update]').first()).toContainText('The newer post.');
+
+    await page.goto(`${SHELL_PATH}/stage/physicalDesign/activity`);
+    await page.locator('[data-act="PD-14"]').click();
+    await page.locator('[data-step="PD-14:2"]').click();
+    await reply(page, 'An answer on the older one.');
+    await writesSettled(page);
+
+    await page.goto(`${SHELL_PATH}/updates`);
+    await expect(page.locator('[data-update]').first()).toContainText('The older post.');
+  });
 });
