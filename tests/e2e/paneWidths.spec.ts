@@ -82,6 +82,35 @@ test('shuts a panel dragged past its minimum, and opens it again', async ({ page
   await expect(page.locator('#side .nav').first()).toBeVisible();
 });
 
+/* At the window's edge only five of the grip's nine pixels are reachable and
+   the rest is under the scrollbar, so a shut panel leaves a handle as well. */
+test('a shut panel leaves a handle that is on the screen and opens it', async ({ page }) => {
+  await fresh(page);
+  await drag(page, 'peek', 500);
+  await drag(page, 'side', -400);
+
+  for (const pane of ['side', 'peek'] as const) {
+    const handle = page.locator(`.panereopen[data-pane="${pane}"]`);
+    await expect(handle).toBeVisible();
+    const box = (await handle.boundingBox())!;
+    expect(box.x).toBeGreaterThanOrEqual(0);
+    expect(box.x + box.width).toBeLessThanOrEqual(1500);
+  }
+
+  await page.locator('.panereopen[data-pane="peek"]').click();
+  expect(await widthOf(page, '#peek')).toBe(442);
+  await expect(page.locator('.panereopen[data-pane="peek"]')).toHaveCount(0);
+
+  await page.locator('.panereopen[data-pane="side"]').click();
+  expect(await widthOf(page, '#side')).toBe(232);
+
+  /* and it stays open */
+  await page.reload();
+  await expect(page.locator('#side')).toBeVisible();
+  expect(await widthOf(page, '#side')).toBe(232);
+  expect(await widthOf(page, '#peek')).toBe(442);
+});
+
 test('a shut rail leaves the grip that reopens it, and remembers being shut', async ({ page }) => {
   await fresh(page);
   await drag(page, 'peek', 500);

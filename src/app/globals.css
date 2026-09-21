@@ -3366,6 +3366,21 @@ a.mt-mini:hover{color:inherit;background:var(--hover)}
    way back. */
 :root[data-side-collapsed] #side{padding:0}
 :root[data-side-collapsed] #side > *{display:none}
-:root[data-peek-collapsed] #peek > *:not(.panegrip){display:none}
+:root[data-peek-collapsed] #peek > *:not(.panegrip):not(.panereopen){display:none}
+/* Pulled fully inside: at the window's edge only five of the grip's nine
+   pixels are reachable, and the rest is under the scrollbar. */
+:root[data-peek-collapsed] .panegrip[data-pane="peek"]{left:-9px}
+
+/* What a collapsed panel leaves behind: a handle, pointing at the panel it
+   would open. The grip is still there for anyone who drags, but a border with
+   an invisible hit area is not something to ask someone to find twice. */
+.panereopen{
+  position:absolute;top:50%;transform:translateY(-50%);z-index:31;
+  width:17px;height:56px;display:flex;align-items:center;justify-content:center;
+  border:1px solid var(--line);background:var(--bg);box-shadow:var(--sh);color:var(--ink-3);
+}
+.panereopen:hover{background:var(--hover);color:var(--ink);border-color:var(--line-strong)}
+.panereopen[data-pane="side"]{left:0;border-left:none;border-radius:0 var(--r) var(--r) 0}
+.panereopen[data-pane="peek"]{right:0;border-right:none;border-radius:var(--r) 0 0 var(--r)}
 body.panedrag{cursor:col-resize;user-select:none}
 body.panedrag *{cursor:col-resize !important}

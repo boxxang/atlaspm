@@ -2,6 +2,7 @@
 
 import { useCallback, useRef } from 'react';
 import { PANE_DEFAULT, snapPane, type PaneKey } from '@/lib/paneWidths';
+import { IconChevron } from './icons';
 import { paintPane, usePaneWidths } from './usePaneWidths';
 
 /**
@@ -12,9 +13,11 @@ import { paintPane, usePaneWidths } from './usePaneWidths';
  * committed. A React state update per pointermove would re-render the whole
  * shell sixty times a second to move one border.
  *
- * Dragged past half its minimum a panel collapses, and the grip stays at the
- * edge of the screen to pull it back out. Double-click puts it back where it
- * shipped, which is the way out of a width somebody cannot undo by eye.
+ * Dragged past half its minimum a panel collapses. The grip stays, but at the
+ * very edge of the screen only five of its nine pixels are reachable — the
+ * rest is past the window, under the scrollbar — so a collapsed panel also
+ * leaves a handle that says what it opens. Double-click on the grip does the
+ * same thing for anyone who finds it first.
  */
 export function PaneGrip({ pane }: { pane: PaneKey }) {
   const { widths, commit } = usePaneWidths();
@@ -58,18 +61,35 @@ export function PaneGrip({ pane }: { pane: PaneKey }) {
     [pane, widths, commit],
   );
 
+  const name = pane === 'side' ? 'navigation' : 'properties';
+  const reopen = () => {
+    paintPane(pane, PANE_DEFAULT[pane]);
+    commit(pane, PANE_DEFAULT[pane]);
+  };
+
   return (
-    <div
-      className="panegrip"
-      data-pane={pane}
-      role="separator"
-      aria-orientation="vertical"
-      aria-label={`Resize the ${pane === 'side' ? 'navigation' : 'properties'} panel`}
-      onPointerDown={onPointerDown}
-      onDoubleClick={() => {
-        paintPane(pane, PANE_DEFAULT[pane]);
-        commit(pane, PANE_DEFAULT[pane]);
-      }}
-    />
+    <>
+      <div
+        className="panegrip"
+        data-pane={pane}
+        role="separator"
+        aria-orientation="vertical"
+        aria-label={`Resize the ${name} panel`}
+        onPointerDown={onPointerDown}
+        onDoubleClick={reopen}
+      />
+      {widths[pane] === 0 && (
+        <button
+          type="button"
+          className="panereopen"
+          data-pane={pane}
+          aria-label={`Show the ${name} panel`}
+          title={`Show the ${name} panel`}
+          onClick={reopen}
+        >
+          <IconChevron dir={pane === 'side' ? 'right' : 'left'} />
+        </button>
+      )}
+    </>
   );
 }

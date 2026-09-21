@@ -149,6 +149,13 @@ export const IconClip = () => (
   </S>
 );
 
+/** Points at the panel it would open, on the handle a collapsed one leaves. */
+export const IconChevron = ({ dir }: { dir: 'left' | 'right' }) => (
+  <S size={12} width={2.2}>
+    <path d={dir === 'right' ? 'm9 5 7 7-7 7' : 'm15 5-7 7 7 7'} />
+  </S>
+);
+
 /** Taking the workbook template away, and bringing one back. */
 export const IconDownload = ({ size = 12 }: { size?: number }) => (
   <S size={size} width={2}>
