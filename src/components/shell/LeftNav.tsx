@@ -22,6 +22,7 @@ import {
 } from './icons';
 import { useProgramWork } from './useProgramWork';
 import { UpcomingMeetingsCount } from '../meetings/NavCount';
+import { feedPosts } from '@/lib/updateFeed';
 
 /**
  * The left nav, as the prototype draws it.
@@ -57,8 +58,10 @@ export function LeftNav({ projectId }: { projectId: string }) {
   const base = `/p/${projectId}`;
   const allDeliv = Object.values(deliverables).flat();
   const done = allDeliv.filter((d) => d.done).length;
+  /* what the Updates page lists, which is not every post — a key-info note is
+     kept on its stage rather than said into the feed */
   const updates =
-    posts.length +
+    feedPosts(posts).length +
     Object.values(content).reduce(
       (n, c) =>
         n +

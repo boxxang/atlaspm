@@ -6,6 +6,7 @@ import { ALL_ACTIVITY_TITLES as detailActivityTitles } from '@/data/builtins';
 import { fmtDT } from '@/lib/schedule';
 import { useAppStore } from '@/store/useAppStore';
 import { Avatar } from './icons';
+import { feedPosts } from '@/lib/updateFeed';
 
 /**
  * Everything said on the programme, newest first.
@@ -40,7 +41,9 @@ export function UpdatesPage({
   const activitySteps = useProgramActivities();
   const stageOfAct = (ref: string | null) => (ref ? (activitySteps[ref]?.st ?? null) : null);
 
-  const fromPosts = posts.map((p) => ({
+  /* A key-info note is not an update: it is a page kept on a stage, looked up
+     by title, not a thing said about the work on a day. */
+  const fromPosts = feedPosts(posts).map((p) => ({
     id: p.id,
     at: p.editedAt ?? p.createdAt,
     who: p.author,

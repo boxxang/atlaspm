@@ -63,6 +63,33 @@ test.describe('key info', () => {
     await expect(page.getByText('No note here says that.')).toBeVisible();
   });
 
+  /* Everything written here is a post, which is the point — but a note is a
+     page kept on a stage, not a thing said about the work on a day, and a feed
+     of them drowns the updates it is mixed into. */
+  test('a note stays off the Updates feed, and out of its count', async ({ page }) => {
+    /* the programme's own Updates entry in the left nav, not the stage tab */
+    const nav = page.locator(`a[href="${SHELL_PATH}/updates"]`).first();
+    const before = Number((await nav.innerText()).replace(/\D+/g, '') || 0);
+
+    await write(page, 'Deep trench capacitor decision', 'The foundry will not qualify it before Q3.');
+    await expect(page.locator('[data-note]')).toContainText('Deep trench capacitor decision');
+    await writesSettled(page);
+
+    /* the badge does not move, and the page behind it does not either */
+    await expect(nav).toContainText(String(before));
+    await page.goto(`${SHELL_PATH}/updates`);
+    await expect(page.locator('[data-update]')).toHaveCount(before);
+    await expect(page.getByText('Deep trench capacitor decision')).toHaveCount(0);
+
+    /* nor the overview's recent list, which reads the same rule */
+    await page.goto(SHELL_PATH);
+    await expect(page.locator('.ovfeed').filter({ hasText: 'Deep trench' })).toHaveCount(0);
+
+    /* and the note is still on the stage that keeps it */
+    await page.goto(`${STAGE}/keyinfo`);
+    await expect(page.locator('[data-note]')).toContainText('Deep trench capacitor decision');
+  });
+
   /* A table is the reason notes have documents: typed cell by cell, grown a
      row at a time, and still a table after a reload. */
   test('a note carries a real table, typed cell by cell, and keeps it', async ({ page }) => {

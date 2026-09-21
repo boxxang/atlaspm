@@ -13,6 +13,7 @@ import { useAttention } from './useAttention';
 import { useRowLimit } from './useRowLimit';
 import { useProgramWork } from './useProgramWork';
 import { TodayMeetings } from '../meetings/TodayMeetings';
+import { feedPosts } from '@/lib/updateFeed';
 
 /**
  * Where the programme is, on one screen.
@@ -815,7 +816,8 @@ function RecentUpdates({ projectId }: { projectId: string }) {
 
   const activitySteps = useProgramActivities();
     const stageOfAct = (ref: string | null) => (ref ? (activitySteps[ref]?.st ?? null) : null);
-  const fromPosts = posts.map((p) => ({
+  /* the same rule as the Updates page, so the two cannot disagree */
+  const fromPosts = feedPosts(posts).map((p) => ({
     id: p.id,
     at: p.editedAt ?? p.createdAt,
     who: p.author,
