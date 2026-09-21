@@ -61,7 +61,9 @@ const message = (e: unknown) => (e instanceof Error ? e.message : String(e));
 export function TemplatesView({ profiles }: { profiles: TemplateRow[] }) {
   const router = useRouter();
   const [copying, setCopying] = useState<TemplateRow | null>(null);
-  const [editing, setEditing] = useState<{ id: string; label: string } | null>(null);
+  const [editing, setEditing] = useState<{ id: string; label: string; readOnly: boolean } | null>(
+    null,
+  );
   const [asking, setAsking] = useState<string | null>(null);
   const [err, setErr] = useState('');
 
@@ -125,19 +127,21 @@ export function TemplatesView({ profiles }: { profiles: TemplateRow[] }) {
               >
                 Duplicate
               </button>
-              {!p.builtin && (
-                <button
-                  type="button"
-                  className="btn sm"
-                  data-edit-template
-                  onClick={() => {
-                    setErr('');
-                    setEditing({ id: p.id, label: p.label });
-                  }}
-                >
-                  Edit
-                </button>
-              )}
+              {/* A built-in is read-only, but read-only is not the same as
+                  opaque: the stages, their weeks and their activities are the
+                  reason to start a programme from it, so they open. */}
+              <button
+                type="button"
+                className="btn sm"
+                data-edit-template={p.builtin ? undefined : ''}
+                data-view-template={p.builtin ? '' : undefined}
+                onClick={() => {
+                  setErr('');
+                  setEditing({ id: p.id, label: p.label, readOnly: p.builtin });
+                }}
+              >
+                {p.builtin ? 'View' : 'Edit'}
+              </button>
               {!p.builtin &&
                 (asking === p.id ? (
                   <>
@@ -182,7 +186,13 @@ export function TemplatesView({ profiles }: { profiles: TemplateRow[] }) {
         <StageDialog
           profileId={editing.id}
           label={editing.label}
+          readOnly={editing.readOnly}
           onClose={() => setEditing(null)}
+          onDuplicate={() => {
+            const p = profiles.find((x) => x.id === editing.id);
+            setEditing(null);
+            if (p) setCopying(p);
+          }}
           onDone={() => {
             setEditing(null);
             router.refresh();
@@ -341,12 +351,17 @@ const rememberKickoff = (d: Date) => {
 function StageDialog({
   profileId,
   label,
+  readOnly = false,
   onClose,
+  onDuplicate,
   onDone,
 }: {
   profileId: string;
   label: string;
+  /** A built-in: the same screen, with nothing on it that would write. */
+  readOnly?: boolean;
   onClose: () => void;
+  onDuplicate?: () => void;
   onDone: () => void;
 }) {
   const box = useRef<HTMLDialogElement>(null);
@@ -456,12 +471,18 @@ function StageDialog({
           aria-label="Template name"
           autoComplete="off"
           data-tpl-rename
+          readOnly={readOnly}
           value={name}
           onChange={(e) => {
             setErr('');
             setName(e.target.value);
           }}
         />
+        {readOnly && (
+          <span className="pill" style={{ fontSize: 10.5 }}>
+            Built-in
+          </span>
+        )}
         <label
           style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, color: 'var(--ink-3)' }}
         >
@@ -529,6 +550,7 @@ function StageDialog({
                 <input
                   className="lnkin"
                   data-stage-title
+                  readOnly={readOnly}
                   value={st.title}
                   onChange={(e) =>
                     edit((cur) =>
@@ -539,6 +561,7 @@ function StageDialog({
                 <input
                   className="lnkin"
                   data-stage-prefix
+                  readOnly={readOnly}
                   aria-label={`Prefix of ${st.title}`}
                   autoComplete="off"
                   spellCheck={false}
@@ -562,6 +585,7 @@ function StageDialog({
                 <select
                   className="lnkin"
                   data-stage-phase
+                  disabled={readOnly}
                   value={st.phaseId}
                   onChange={(e) =>
                     edit((cur) =>
@@ -583,6 +607,7 @@ function StageDialog({
                   type="date"
                   aria-label={`${st.title} starts`}
                   data-stage-start
+                  readOnly={readOnly}
                   value={toISO(stageWindow(kickoff, st).start)}
                   onChange={(e) =>
                     edit((cur) =>
@@ -595,6 +620,7 @@ function StageDialog({
                   type="date"
                   aria-label={`${st.title} ends`}
                   data-stage-end
+                  readOnly={readOnly}
                   value={toISO(stageWindow(kickoff, st).end)}
                   onChange={(e) =>
                     edit((cur) =>
@@ -610,6 +636,7 @@ function StageDialog({
                   step={1}
                   aria-label={`${st.title} TAT in weeks`}
                   data-stage-tat
+                  readOnly={readOnly}
                   value={st.durationWeeks}
                   onChange={(e) =>
                     edit((cur) =>
@@ -628,6 +655,8 @@ function StageDialog({
                   >
                     Activities
                   </button>
+                  {!readOnly && (
+                  <>
                   <button
                     type="button"
                     className="btn sm"
@@ -659,9 +688,12 @@ function StageDialog({
                   >
                     Remove
                   </button>
+                  </>
+                  )}
                 </span>
               </div>
             ))}
+            {!readOnly && (
             <div className="trow">
               <span style={{ display: 'flex', gap: 6, alignItems: 'center', flexWrap: 'wrap' }}>
                 <button
@@ -702,6 +734,7 @@ function StageDialog({
               <span />
               <span />
             </div>
+            )}
           </div>
         )}
       </div>
@@ -711,25 +744,39 @@ function StageDialog({
             {err || prefixErr}
           </span>
         )}
+        {readOnly && (
+          <span className="mono-note" style={{ fontSize: 11.5, color: 'var(--ink-3)' }}>
+            A built-in template is read-only. Duplicating it gives you a copy to change.
+          </span>
+        )}
         <span style={{ flexGrow: 1 }} />
         <button type="button" className="btn sm" onClick={onClose}>
-          Cancel
+          {readOnly ? 'Close' : 'Cancel'}
         </button>
-        <button
-          type="button"
-          className="btn pri sm"
-          data-tpl-save
-          disabled={pending || !stages || !name.trim() || !!prefixErr}
-          onClick={submit}
-        >
-          {pending ? 'Saving…' : 'Save template'}
-        </button>
+        {readOnly ? (
+          /* Wanting to change what you are reading is the ordinary next step,
+             so it is a button here rather than a rule to go and find. */
+          <button type="button" className="btn pri sm" data-tpl-dup-here onClick={onDuplicate}>
+            Duplicate to edit
+          </button>
+        ) : (
+          <button
+            type="button"
+            className="btn pri sm"
+            data-tpl-save
+            disabled={pending || !stages || !name.trim() || !!prefixErr}
+            onClick={submit}
+          >
+            {pending ? 'Saving…' : 'Save template'}
+          </button>
+        )}
       </div>
       {acts && (
         <ActivityDialog
           profileId={profileId}
           stageKey={acts.stageKey}
           shortTitle={acts.shortTitle}
+          readOnly={readOnly}
           onClose={() => setActs(null)}
         />
       )}
@@ -770,11 +817,14 @@ function ActivityDialog({
   profileId,
   stageKey,
   shortTitle,
+  readOnly = false,
   onClose,
 }: {
   profileId: string;
   stageKey: string;
   shortTitle: string;
+  /** Opened from a built-in: the activities and their steps, to read. */
+  readOnly?: boolean;
   onClose: () => void;
 }) {
   const box = useRef<HTMLDialogElement>(null);
@@ -879,6 +929,7 @@ function ActivityDialog({
                   <input
                     className="lnkin"
                     data-act-title
+                    readOnly={readOnly}
                     value={a.title}
                     onChange={(e) =>
                       edit((cur) =>
@@ -895,6 +946,7 @@ function ActivityDialog({
                     min={0}
                     step={1}
                     data-act-from
+                    readOnly={readOnly}
                     value={a.windowFrom}
                     onChange={(e) =>
                       edit((cur) =>
@@ -910,6 +962,7 @@ function ActivityDialog({
                     min={1}
                     step={1}
                     data-act-to
+                    readOnly={readOnly}
                     value={a.windowTo}
                     onChange={(e) =>
                       edit((cur) =>
@@ -935,6 +988,7 @@ function ActivityDialog({
                         a.baseRef ? libraryFor(a).length : a.steps.length
                       })`}
                     </button>
+                    {!readOnly && (
                     <button
                       type="button"
                       className="btn sm dng"
@@ -943,6 +997,7 @@ function ActivityDialog({
                     >
                       Remove
                     </button>
+                    )}
                   </span>
                 </div>
                 {openSteps === a.ref && (
@@ -955,6 +1010,7 @@ function ActivityDialog({
                         <input
                           className="lnkin"
                           data-step-text
+                          readOnly={readOnly}
                           value={st.text}
                           onChange={(e) =>
                             edit((cur) =>
@@ -977,6 +1033,7 @@ function ActivityDialog({
                           min={0}
                           step={0.5}
                           data-step-tat
+                          readOnly={readOnly}
                           value={st.tat}
                           onChange={(e) =>
                             edit((cur) =>
@@ -996,6 +1053,7 @@ function ActivityDialog({
                         <select
                           className="lnkin"
                           data-step-lane
+                          disabled={readOnly}
                           value={st.lane}
                           onChange={(e) =>
                             edit((cur) =>
@@ -1018,6 +1076,7 @@ function ActivityDialog({
                         <button
                           type="button"
                           className="btn sm dng"
+                          hidden={readOnly}
                           data-del-step
                           onClick={() =>
                             edit((cur) =>
@@ -1035,6 +1094,7 @@ function ActivityDialog({
                     ))}
                     <div className="steprow-edit">
                       <span />
+                      {!readOnly && (
                       <button
                         type="button"
                         className="btn sm"
@@ -1063,6 +1123,7 @@ function ActivityDialog({
                         <IconPlus />
                         Add a step
                       </button>
+                      )}
                       <span />
                       <span />
                       <span />
@@ -1071,6 +1132,7 @@ function ActivityDialog({
                 )}
               </Fragment>
             ))}
+            {!readOnly && (
             <div className="trow">
               <button
                 type="button"
@@ -1098,6 +1160,7 @@ function ActivityDialog({
               <span />
               <span />
             </div>
+            )}
           </div>
         )}
       </div>
@@ -1109,17 +1172,19 @@ function ActivityDialog({
         )}
         <span style={{ flexGrow: 1 }} />
         <button type="button" className="btn sm" onClick={onClose}>
-          Cancel
+          {readOnly ? 'Close' : 'Cancel'}
         </button>
-        <button
-          type="button"
-          className="btn pri sm"
-          data-tpl-save
-          disabled={pending || !rows}
-          onClick={submit}
-        >
-          {pending ? 'Saving…' : 'Save activities'}
-        </button>
+        {!readOnly && (
+          <button
+            type="button"
+            className="btn pri sm"
+            data-tpl-save
+            disabled={pending || !rows}
+            onClick={submit}
+          >
+            {pending ? 'Saving…' : 'Save activities'}
+          </button>
+        )}
       </div>
     </dialog>
   );

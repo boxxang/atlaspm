@@ -3376,6 +3376,16 @@ a.mt-mini:hover{color:inherit;background:var(--hover)}
 .thr-peek .thr-n{font-size:11px}
 .thr-peek .ell2{flex-basis:100%;color:var(--ink-2)}
 
+
+/* A field nobody can type in should not look like one. The value still reads
+   as the value — it is the box around it that was the lie. */
+.lnkin[readonly],.lnkin:disabled{
+  border-color:transparent;background:transparent;color:var(--ink-2);
+  cursor:default;box-shadow:none;
+}
+.lnkin[readonly]:hover,.lnkin:disabled:hover{background:transparent}
+.lnkin:disabled{opacity:1;appearance:none;-webkit-appearance:none}
+
 .panegrip{position:absolute;top:0;bottom:0;width:9px;z-index:30;cursor:col-resize;touch-action:none}
 .panegrip[data-pane="side"]{left:max(0px,calc(var(--side-w) - 4px))}
 .panegrip[data-pane="peek"]{left:-5px}
