@@ -13,7 +13,7 @@ import { useAttention } from './useAttention';
 import { useRowLimit } from './useRowLimit';
 import { useProgramWork } from './useProgramWork';
 import { TodayMeetings } from '../meetings/TodayMeetings';
-import { feedPosts } from '@/lib/updateFeed';
+import { feedPosts, replyContext } from '@/lib/updateFeed';
 
 /**
  * Where the programme is, on one screen.
@@ -816,17 +816,23 @@ function RecentUpdates({ projectId }: { projectId: string }) {
 
   const activitySteps = useProgramActivities();
     const stageOfAct = (ref: string | null) => (ref ? (activitySteps[ref]?.st ?? null) : null);
-  /* the same rule as the Updates page, so the two cannot disagree */
-  const fromPosts = feedPosts(posts).map((p) => ({
-    id: p.id,
-    at: p.editedAt ?? p.createdAt,
-    who: p.author,
-    text: p.text,
-    stageId: p.stageId ?? stageOfAct(p.activityRef),
-    act: p.activityRef,
-    stepN: p.stepN,
-    risk: p.kind === 'risk',
-  }));
+  /* the same rules as the Updates page, so the two cannot disagree */
+  const answering = replyContext(posts);
+  const fromPosts = feedPosts(posts).map((p) => {
+    const re = answering[p.id];
+    const act = p.activityRef ?? re?.activityRef ?? null;
+    return {
+      id: p.id,
+      at: p.editedAt ?? p.createdAt,
+      who: p.author,
+      text: p.text,
+      stageId: p.stageId ?? re?.stageId ?? stageOfAct(act),
+      act,
+      stepN: p.stepN ?? re?.stepN ?? null,
+      subject: re?.subject ?? null,
+      risk: p.kind === 'risk',
+    };
+  });
   const fromItems = Object.entries(content).flatMap(([id, c]) =>
     (['keyinfo', 'activities', 'risks'] as const).flatMap((k) =>
       c[k].flatMap((it) =>
@@ -838,6 +844,7 @@ function RecentUpdates({ projectId }: { projectId: string }) {
           stageId: id,
           act: null as string | null,
           stepN: null as number | null,
+          subject: it.title as string | null,
           risk: k === 'risks',
         })),
       ),
@@ -884,6 +891,11 @@ function RecentUpdates({ projectId }: { projectId: string }) {
                     STEP {p.stepN}
                   </span>
                 ))}
+              {p.subject && (
+                <span className="pill subject" title={p.subject} data-subject={p.id}>
+                  {p.subject}
+                </span>
+              )}
               <span className="num" style={{ fontSize: 11.5, color: 'var(--ink-3)' }}>
                 {fmtDT(p.at)}
               </span>

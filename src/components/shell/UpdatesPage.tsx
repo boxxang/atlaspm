@@ -6,7 +6,7 @@ import { ALL_ACTIVITY_TITLES as detailActivityTitles } from '@/data/builtins';
 import { fmtDT } from '@/lib/schedule';
 import { useAppStore } from '@/store/useAppStore';
 import { Avatar } from './icons';
-import { feedPosts } from '@/lib/updateFeed';
+import { feedPosts, replyContext } from '@/lib/updateFeed';
 
 /**
  * Everything said on the programme, newest first.
@@ -43,20 +43,28 @@ export function UpdatesPage({
 
   /* A key-info note is not an update: it is a page kept on a stage, looked up
      by title, not a thing said about the work on a day. */
-  const fromPosts = feedPosts(posts).map((p) => ({
-    id: p.id,
-    at: p.editedAt ?? p.createdAt,
-    who: p.author,
-    text: p.text,
-    stageId: p.stageId ?? stageOfAct(p.activityRef),
-    act: p.activityRef,
-    stepN: p.stepN,
-    /* Only a board update carries one: what a post on a step is about is the
-       activity and the step its pills already name. */
-    subject: null as string | null,
-    risk: p.kind === 'risk',
-    edited: !!p.editedAt,
-  }));
+  /* A reply holds no target of its own, so it borrows its parent's — both the
+     line that says what it is answering and the place that answer belongs. */
+  const answering = replyContext(posts);
+  const fromPosts = feedPosts(posts).map((p) => {
+    const re = answering[p.id];
+    const act = p.activityRef ?? re?.activityRef ?? null;
+    return {
+      id: p.id,
+      at: p.editedAt ?? p.createdAt,
+      who: p.author,
+      text: p.text,
+      stageId: p.stageId ?? re?.stageId ?? stageOfAct(act),
+      act,
+      stepN: p.stepN ?? re?.stepN ?? null,
+      /* A board update names the entry it is on; a reply names the post it
+         answers. A post on a step needs neither — the activity and step its
+         pills already name are what it is about. */
+      subject: re?.subject ?? null,
+      risk: p.kind === 'risk',
+      edited: !!p.editedAt,
+    };
+  });
   const fromItems = Object.entries(content).flatMap(([id, c]) =>
     (['keyinfo', 'activities', 'risks'] as const).flatMap((k) =>
       c[k].flatMap((it) =>

@@ -299,6 +299,19 @@ test.describe('posting on a step', () => {
     await openStep(page, 'PD-14', 2);
     await expect(rail(page).locator('.replies .txt')).toHaveText('The answer.');
 
+    /* In the feed the reply has no target of its own, so it borrows its
+       parent's: what it answers, and where that answer belongs. */
+    await page.goto(`${SHELL_PATH}/updates`);
+    const answer = page.locator('[data-update]').filter({ hasText: 'The answer.' });
+    await expect(answer.locator('[data-subject]')).toHaveText('The parent.');
+    await expect(answer.locator('[data-ref="PD-14"]')).toBeVisible();
+    await expect(answer.locator('[data-step-link="PD-14:2"]')).toBeVisible();
+    /* and the post it answers names nothing, because its own pills do */
+    await expect(
+      page.locator('[data-update]').filter({ hasText: 'The parent.' }).last().locator('[data-subject]'),
+    ).toHaveCount(0);
+
+    await openStep(page, 'PD-14', 2);
     /* deleting the parent takes the thread — a reply to nothing is not a post */
     await rail(page)
       /* the actions sit under the body now, not on the name's line */
