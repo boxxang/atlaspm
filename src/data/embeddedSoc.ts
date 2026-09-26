@@ -16,14 +16,14 @@
  * carries them as stages with checkpoints of their own rather than as a line
  * in bring-up.
  *
- * Three kinds of stage:
+ * Two kinds of stage:
  *
- *  - inherited unchanged from the SoC flow by key: IP readiness and tapeout;
  *  - derived from the SoC flow (/data/embeddedSocDerived), at embedded scale
  *    and with the steps that name the wrong product rewritten
- *    (/data/embeddedSocEdits): definition, architecture, foundry, PDK, RTL,
- *    verification, DFT, synthesis, physical design, signoff, the bring-up
- *    board, test development, bring-up, fabrication and qualification;
+ *    (/data/embeddedSocEdits): definition, architecture, foundry, IP, PDK,
+ *    RTL, verification, DFT, synthesis, physical design, signoff, tapeout,
+ *    the bring-up board, test development, bring-up, fabrication and
+ *    qualification;
  *  - authored here: the fabric and compiler co-design, eMRAM, the power
  *    manager, FPGA prototype verification, the package and its assembly, the
  *    compiler, the virtual platform and Playground, the SDK, the software
@@ -48,11 +48,11 @@ export type EmbeddedStage = JourneyStage &
   Required<Pick<JourneyStage, 'engineeringStart' | 'deliverableFrom' | 'deliverableWeek'>>;
 
 /**
- * The SoC stages an embedded programme runs exactly as the SoC one does: IP
- * readiness and tapeout say nothing an embedded programme would word
- * differently. Everything else it shares with the SoC flow is derived.
+ * The SoC stages an embedded programme would run exactly as the SoC one does.
+ * None, now: even the stages whose steps it words the same are derived, so
+ * that their write-ups point at the embedded programme's own work.
  */
-export const EMBEDDED_INHERITED_KEYS = ['ipReadiness', 'tapeout'] as const;
+export const EMBEDDED_INHERITED_KEYS: readonly string[] = [];
 
 /** The stages written for this template, in the order they start. */
 export const EMBEDDED_STAGE_KEYS = [
@@ -77,7 +77,7 @@ export const EMBEDDED_BASELINES: Record<string, { startOffsetWeeks: number; dura
      decisions, and the architecture, run as they do anywhere. */
   productDefinitionEmb: BASELINES.productDefinition,
   technologyEmb: BASELINES.technology,
-  ipReadiness: BASELINES.ipReadiness,
+  ipReadinessEmb: BASELINES.ipReadiness,
   architectureEmb: BASELINES.architecture,
   /* The fabric and the compiler are one design: what the hardware leaves out
      the compiler has to do, and the contract between them closes before RTL
@@ -122,7 +122,7 @@ export const EMBEDDED_BASELINES: Record<string, { startOffsetWeeks: number; dura
   evkDesign: { startOffsetWeeks: 56, durationWeeks: 44 },
   /* Tapeout and fabrication are the SoC's chain at its length, moved: the mask
      shop and the fab run to the node, not to the size of the design. */
-  tapeout: { startOffsetWeeks: 66, durationWeeks: BASELINES.tapeout.durationWeeks },
+  tapeoutEmb: { startOffsetWeeks: 66, durationWeeks: BASELINES.tapeout.durationWeeks },
   fabricationEmb: { startOffsetWeeks: 70, durationWeeks: BASELINES.fabrication.durationWeeks },
   /* Tooling is built while the wafers are in the fab; the line runs when they
      ship. */
@@ -1156,13 +1156,13 @@ export const EMBEDDED_ACTIVITIES: Record<string, ActivityStepEntry> = {
     'Package designer',
     [
       [1, 'Design the leadframe or substrate routing', 3],
-      [2, 'Draw the wire-bond diagram or bump map', 1.5],
+      [2, 'Draw the wire-bond diagram or ball map', 1.5],
       [3, 'Run package DRC against the supplier rules', 1],
       [4, 'Release the package design database', 0.5],
     ],
     [
       'Leadframe or substrate routing',
-      'Wire-bond diagram or bump map',
+      'Wire-bond diagram or ball map',
       'Package DRC report',
       'Leadframe or substrate design database',
     ],

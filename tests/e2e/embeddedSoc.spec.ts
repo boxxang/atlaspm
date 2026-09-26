@@ -47,11 +47,11 @@ test.describe('the Embedded SoC template', () => {
     for (const key of ['compiler', 'virtualPlatform', 'sdk', 'evkDesign', 'evkLaunch', 'softwareRelease', 'earlyAccess']) {
       await expect(page.locator(`[data-stage="${key}"]`), key).toBeVisible();
     }
-    for (const key of ['emram', 'pmu', 'fpgaVerification', 'rtlEmb', 'physicalDesignEmb', 'tapeout', 'fabricationEmb', 'qualificationEmb']) {
+    for (const key of ['emram', 'pmu', 'fpgaVerification', 'rtlEmb', 'physicalDesignEmb', 'tapeoutEmb', 'fabricationEmb', 'qualificationEmb']) {
       await expect(page.locator(`[data-stage="${key}"]`), key).toBeVisible();
     }
     /* and none of the leading-node stages it has no use for */
-    for (const key of ['packageTestVehicle', 'chipPackageCoVerification', 'amsIp', 'rtl', 'productDefinition', 'fabrication']) {
+    for (const key of ['packageTestVehicle', 'chipPackageCoVerification', 'amsIp', 'rtl', 'productDefinition', 'tapeout', 'fabrication']) {
       await expect(page.locator(`[data-stage="${key}"]`), key).toHaveCount(0);
     }
   });
@@ -114,6 +114,31 @@ test.describe('the Embedded SoC template', () => {
     await page.locator('[data-act="FPV-04"]').click();
     await expect(page.locator('[data-step^="FPV-04:"]')).toHaveCount(6);
     await expect(page.locator('[data-step^="FPV-04:"]').first()).toContainText('Arduino shields');
+  });
+
+  /* Every activity has a page, and the page is about this part: the authored
+     ones are written for it, and the derived ones are the SoC write-up with
+     what does not fit it rewritten and its links moved onto this programme. */
+  test('opens a write-up for an authored and a derived activity alike', async ({ page }) => {
+    const id = await newProgram(page, 'AtlasEdge6');
+
+    await page.goto(`/p/${id}/activity/CMP-04`);
+    await expect(page.locator('.ad-title')).toHaveText('Placement, Routing and Static Scheduling');
+    await expect(page.locator('.ad-steps li')).toHaveCount(6);
+    await expect(page.locator('body')).toContainText('FCD-03');
+
+    await page.goto(`/p/${id}/activity/EDEF-03`);
+    await expect(page.locator('.ad-title')).toHaveText('Workload Definition and KPI Targets');
+    const body = page.locator('body');
+    await expect(body).toContainText('duty cycle');
+    for (const word of ['LLM', 'TTFT', 'HBM', 'tokens/s']) await expect(body).not.toContainText(word);
+
+    /* the activity's panel links to it, as it does for every written activity */
+    await page.goto(`/p/${id}/stage/compiler/activity`);
+    await page.locator('[data-act="CMP-04"]').click();
+    await page.getByRole('link', { name: 'Read CMP-04 →' }).click();
+    await page.waitForURL(/\/activity\/CMP-04$/);
+    await expect(page.locator('.ad-title')).toHaveText('Placement, Routing and Static Scheduling');
   });
 
   test('cuts down its own stages, not the SoC flow’s', async ({ page }) => {

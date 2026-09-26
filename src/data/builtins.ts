@@ -35,6 +35,7 @@ import {
   EMBEDDED_DERIVED_DELIVERABLES,
   EMBEDDED_DERIVED_STAGES,
 } from './embeddedSocDerived';
+import { EMBEDDED_GLOSSARY } from './embeddedGlossary';
 import { journeyData } from './journey';
 import { BUILTIN_PROFILE, milestoneDefs } from './scheduleProfiles';
 import {
@@ -123,18 +124,23 @@ export const ALL_DELIVERABLE_TITLES: Record<string, string> = {
 export const ALL_GLOSSARY: Record<string, GlossaryTerm> = {
   ...activityGlossary,
   ...THREE_DIC_GLOSSARY,
+  ...EMBEDDED_GLOSSARY,
 };
 
 /**
- * Every activity with a write-up: the SoC's, the stack's, then the top die's,
- * each in the order its template runs them. Every 3DIC activity is written up
- * and every top-die one derives its write-up from an SoC one — tests hold both
- * — so the lists are their keys rather than second copies of them.
+ * Every activity with a write-up: the SoC's, the stack's, the top die's, then
+ * the Embedded SoC's derived and authored ones, each in the order its template
+ * runs them. Every 3DIC and Embedded SoC activity is written up, and every
+ * top-die and derived embedded one derives its write-up from an SoC one —
+ * tests hold all of it — so the lists are their keys rather than second
+ * copies of them.
  */
 export const ALL_WRITTEN_ACTIVITIES: readonly string[] = [
   ...writtenActivities,
   ...Object.keys(THREE_DIC_ACTIVITIES),
   ...Object.keys(TOP_DIE_ACTIVITIES),
+  ...Object.keys(EMBEDDED_DERIVED_ACTIVITIES),
+  ...Object.keys(EMBEDDED_ACTIVITIES),
 ];
 
 const WRITTEN = new Set(ALL_WRITTEN_ACTIVITIES);

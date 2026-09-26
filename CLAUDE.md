@@ -63,14 +63,16 @@ open it in a browser, serve the directory — Chrome refuses `file://` for this.
   integration, KGD sort and multi-die test — from `/data/threeDic.ts`; and
   `embeddedSoc` — an ultra-low-power embedded processor sold with its own
   compiler, SDK and EVK, modelled on the Electron E1 class — from
-  `/data/embeddedSoc.ts`. That one inherits two SoC stages by key (IP
-  readiness and tapeout, which say nothing an embedded programme would word
-  differently), derives fifteen under E-prefixes
-  (`/data/embeddedSocDerived.ts`, like the 3DIC top die) — at embedded scale,
-  with the steps that name the wrong product rewritten step by step in
-  `/data/embeddedSocEdits.ts` — and authors thirteen, including FPGA prototype verification (which owns the FPGA work
+  `/data/embeddedSoc.ts`. That one derives seventeen SoC stages under
+  E-prefixes (`/data/embeddedSocDerived.ts`, like the 3DIC top die) — at
+  embedded scale, with the steps that name the wrong product rewritten step
+  by step in `/data/embeddedSocEdits.ts` — and authors thirteen, including FPGA prototype verification (which owns the FPGA work
   the derived DV stage drops) and the compiler, Playground, SDK, EVK and early
-  access under the `platform` band. The authored content is written by hand because the modules
+  access under the `platform` band. Its write-ups are `/data/embeddedSocDetails.ts`:
+  the authored ones under `/data/embeddedWriteUps/`, the derived ones the SoC
+  write-up with fields rewritten in `/data/embeddedWriteUpEdits/` and every
+  reference moved onto the programme (`/data/embeddedWriteUpRefs.ts` maps the
+  SoC work it does not run). The authored content is written by hand because the modules
   beside journey.ts are generated. `/data/builtins.ts` composes all three: the
   templates that ship, the activity library every programme resolves against,
   and each stage's content. Derived stages keep the SoC wording, so a

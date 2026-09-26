@@ -98,15 +98,16 @@ describe('the Embedded SoC template', () => {
      qualification. The embedded programme runs its own fabrication and
      qualification, and the countdowns read those. */
   it('gives the countdowns their dates, from its own fabrication and qualification', () => {
+    expect(COUNTDOWN_STAGES.tapeout).toContain('tapeoutEmb');
     expect(COUNTDOWN_STAGES.firstSilicon).toContain('fabricationEmb');
     expect(COUNTDOWN_STAGES.production).toContain('qualificationEmb');
-    for (const key of ['tapeout', 'fabricationEmb', 'qualificationEmb']) {
+    for (const key of ['tapeoutEmb', 'fabricationEmb', 'qualificationEmb']) {
       const st = EMBEDDED_PROFILE.stages.find((s) => s.key === key)!;
       expect(st, key).toBeTruthy();
     }
     const kickoff = new Date('2027-01-04T00:00:00Z');
     const plan = computeSchedule(kickoff, EMBEDDED_PROFILE);
-    expect(plan.tapeout).toEqual(plan.stages.tapeout.end);
+    expect(plan.tapeout).toEqual(plan.stages.tapeoutEmb.end);
     expect(plan.firstSilicon).toEqual(plan.stages.fabricationEmb.end);
     expect(plan.production).toEqual(plan.stages.qualificationEmb.end);
     /* and their checkpoints are still the three the countdowns show */
@@ -124,7 +125,7 @@ describe('the Embedded SoC template', () => {
       expect(keys.has(gone), gone).toBe(false);
     }
     /* and runs none of the SoC content it rewrote */
-    for (const gone of ['productDefinition', 'architecture', 'technology', 'rtl', 'fabrication', 'qualification']) {
+    for (const gone of ['productDefinition', 'architecture', 'technology', 'ipReadiness', 'rtl', 'tapeout', 'fabrication', 'qualification']) {
       expect(keys.has(gone), gone).toBe(false);
     }
   });
@@ -219,7 +220,7 @@ describe('FPGA prototype verification', () => {
     expect(span('FPV-01').end).toBeLessThanOrEqual(span('FPV-03').start);
     expect(span('FPV-03').start).toBeGreaterThanOrEqual(stageAt('rtlEmb').start);
     expect(span('FPV-06').start).toBeGreaterThanOrEqual(stageAt('rtlEmb').end);
-    expect(span('FPV-06').end).toBeLessThanOrEqual(span('TO-05').start);
+    expect(span('FPV-06').end).toBeLessThanOrEqual(span(emb('TO-05')).start);
     /* software gets the verified images, not its own build of them */
     expect(span('VP-02').start).toBeGreaterThanOrEqual(span('FPV-03').start);
   });
@@ -249,15 +250,15 @@ describe('the embedded plan runs nothing before what it consumes exists', () => 
 
   it('launches the Playground on the compiler alpha, before tapeout', () => {
     expect(span('CMP-07').end).toBeLessThanOrEqual(span('VP-05').end);
-    expect(stageAt('virtualPlatform').end).toBeLessThanOrEqual(stageAt('tapeout').end);
+    expect(stageAt('virtualPlatform').end).toBeLessThanOrEqual(stageAt('tapeoutEmb').end);
     expect(span('VP-02').start).toBeGreaterThanOrEqual(stageAt('rtlEmb').start);
     expect(span('EAP-03').start).toBeGreaterThanOrEqual(stageAt('virtualPlatform').end);
   });
 
   it('signs off before tapeout, and fabricates on the masks the tapeout ordered', () => {
-    expect(stageAt('signoffEmb').end).toBeLessThanOrEqual(stageAt('tapeout').start);
-    expect(span(emb('FAB-01')).start).toBeGreaterThanOrEqual(span('TO-08').end);
-    expect(span(emb('FAB-03')).start).toBeGreaterThanOrEqual(span('TO-11').end);
+    expect(stageAt('signoffEmb').end).toBeLessThanOrEqual(stageAt('tapeoutEmb').start);
+    expect(span(emb('FAB-01')).start).toBeGreaterThanOrEqual(span(emb('TO-08')).end);
+    expect(span(emb('FAB-03')).start).toBeGreaterThanOrEqual(span(emb('TO-11')).end);
   });
 
   /* The same DFT relations the SoC flow is held to, on the derived stages. */
@@ -268,7 +269,7 @@ describe('the embedded plan runs nothing before what it consumes exists', () => 
     expect(span(emb('DFT-10')).end).toBeGreaterThanOrEqual(span(emb('SYN-12')).end);
     expect(span(emb('DFT-10')).end).toBeGreaterThanOrEqual(span(emb('PD-13')).end);
     expect(span(emb('DFT-11')).start).toBeGreaterThanOrEqual(span(emb('SYN-12')).end);
-    expect(span(emb('DFT-11')).end).toBeLessThanOrEqual(span('TO-01').start);
+    expect(span(emb('DFT-11')).end).toBeLessThanOrEqual(span(emb('TO-01')).start);
   });
 
   it('builds the netlists before the turns that consume them', () => {

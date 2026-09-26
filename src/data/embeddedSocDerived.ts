@@ -20,11 +20,11 @@
  * than authored so the embedded flow cannot drift from the SoC one by accident,
  * and so the generated SoC modules stay untouched.
  *
- * The front of the programme — definition, architecture, foundry — and the
- * fab and qualification at the back are derived at full length: the work
- * takes as long, but what it is about differs. Their wording is corrected in
- * /data/embeddedSocEdits. IP readiness and tapeout say nothing an embedded
- * programme would say differently, and are inherited unchanged.
+ * The front of the programme — definition, architecture, foundry, IP — and
+ * the tapeout, fab and qualification at the back are derived at full length:
+ * the work takes as long, but what it is about differs. Their wording is
+ * corrected in /data/embeddedSocEdits, and their write-ups in
+ * /data/embeddedWriteUpEdits.
  */
 import { activitySteps, type ActivityStepEntry } from './activitySteps';
 import { detailActivityTitles } from './activityIndex';
@@ -79,6 +79,28 @@ export const EMBEDDED_DERIVED = [
     drop: [],
     time: 1,
     effort: 0.6,
+  },
+  /* The IP plan and the tapeout run as they do anywhere; they are derived so
+     that what their write-ups point at is the embedded programme's work — the
+     power manager and eMRAM rather than custom AMS, the package it has rather
+     than an interposer — and not the SoC's. */
+  {
+    base: 'ipReadiness',
+    key: 'ipReadinessEmb',
+    from: 'IPR',
+    to: 'EIPR',
+    drop: [],
+    time: 1,
+    effort: 0.7,
+  },
+  {
+    base: 'tapeout',
+    key: 'tapeoutEmb',
+    from: 'TO',
+    to: 'ETO',
+    drop: [],
+    time: 1,
+    effort: 0.7,
   },
   /* A mature, production PDK: no version churn to chase, and the custom memory
      decision is the eMRAM stage's. */
