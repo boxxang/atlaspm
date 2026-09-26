@@ -1461,6 +1461,7 @@ export const activitySteps: Record<string, ActivityStepEntry> = {
    "Reconciliation note against the DEF-05 targets",
    "Per-block area allocation",
    "Per-block and per-domain power allocation",
+   "Per-block and per-clock-domain timing budget",
    "Per-block area, power and timing budget",
    "Margin reservation record",
    "Owner acceptance sheet per block",
@@ -1471,6 +1472,7 @@ export const activitySteps: Record<string, ActivityStepEntry> = {
    2,
    3,
    4,
+   7,
    5,
    6,
    7
@@ -1543,6 +1545,7 @@ export const activitySteps: Record<string, ActivityStepEntry> = {
    ]
   ],
   "o": [
+   "Block specification template and review cadence",
    "Microarchitecture specification per block",
    "Block owner assignment and kickoff record",
    "Per-block pipeline and datapath definition",
@@ -1554,6 +1557,7 @@ export const activitySteps: Record<string, ActivityStepEntry> = {
   ],
   "ob": [
    1,
+   8,
    2,
    3,
    4,
@@ -6912,7 +6916,7 @@ export const activitySteps: Record<string, ActivityStepEntry> = {
    5,
    6,
    7,
-   8,
+   4,
    8
   ],
   "r": [
@@ -9452,7 +9456,7 @@ export const activitySteps: Record<string, ActivityStepEntry> = {
    4,
    5,
    6,
-   7,
+   6,
    7,
    8,
    8
@@ -9918,7 +9922,7 @@ export const activitySteps: Record<string, ActivityStepEntry> = {
    5,
    6,
    7,
-   8,
+   6,
    8
   ],
   "r": [

@@ -244,8 +244,12 @@ export const EMBEDDED_DERIVED_ACTIVITIES: Record<string, ActivityStepEntry> = Ob
             out[2] = Math.max(0.25, quarter(step[2] * p.d.time));
             return out;
           }),
-          /* an output is edited with the step that hands it over */
-          o: a.o.map((o, i) => toEmbeddedRef(edit?.steps?.[a.ob[i]]?.o ?? o)),
+          /* an output is edited with the step that hands it over — its first
+             output, since a step can hand over two and an edit names one */
+          o: a.o.map((o, i) => {
+            const first = a.ob.indexOf(a.ob[i]) === i;
+            return toEmbeddedRef((first && edit?.steps?.[a.ob[i]]?.o) || o);
+          }),
           ob: [...a.ob],
           /* Relations to a deliverable the stage no longer has go with it. */
           r: a.r.filter(([d]) => REF_MAP[d]).map(([d, rel]) => [REF_MAP[d], rel]),

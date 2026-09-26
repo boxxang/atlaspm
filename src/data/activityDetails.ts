@@ -3660,6 +3660,7 @@ export const activityDetails: Record<string, ActivityDetail> = {
    "Reconciliation note against the DEF-05 targets",
    "Per-block area allocation",
    "Per-block and per-domain power allocation",
+   "Per-block and per-clock-domain timing budget",
    "Per-block area, power and timing budget",
    "Margin reservation record",
    "Owner acceptance sheet per block",
@@ -3670,6 +3671,7 @@ export const activityDetails: Record<string, ActivityDetail> = {
    2,
    3,
    4,
+   7,
    5,
    6,
    7
@@ -3882,6 +3884,7 @@ export const activityDetails: Record<string, ActivityDetail> = {
    "Verification strategy intent from DV-01"
   ],
   "produces": [
+   "Block specification template and review cadence",
    "Microarchitecture specification per block",
    "Block owner assignment and kickoff record",
    "Per-block pipeline and datapath definition",
@@ -3893,6 +3896,7 @@ export const activityDetails: Record<string, ActivityDetail> = {
   ],
   "producedBy": [
    1,
+   8,
    2,
    3,
    4,
@@ -18001,7 +18005,7 @@ export const activityDetails: Record<string, ActivityDetail> = {
    5,
    6,
    7,
-   8,
+   4,
    8
   ],
   "rel": [
@@ -24894,7 +24898,7 @@ export const activityDetails: Record<string, ActivityDetail> = {
    4,
    5,
    6,
-   7,
+   6,
    7,
    8,
    8
@@ -26142,7 +26146,7 @@ export const activityDetails: Record<string, ActivityDetail> = {
    5,
    6,
    7,
-   8,
+   6,
    8
   ],
   "rel": [

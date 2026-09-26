@@ -487,6 +487,15 @@ describe('the derived stages', () => {
           const i = Number(n) - 1;
           expect(a.s[i]?.[0], `${ref} has no step ${n}`).toBe(Number(n));
           if (step.t) expect(step.t, `${ref} step ${n}`).not.toBe(a.s[i][1]);
+          /* an output edit replaces the step's first output and no other */
+          if (step.o) {
+            const outs = a.o.filter((_, k) => a.ob[k] === Number(n));
+            expect(outs.length, `${ref} step ${n} hands nothing over`).toBeGreaterThan(0);
+            const mine = ownActivities[emb(ref)];
+            const mineOuts = mine.o.filter((_, k) => mine.ob[k] === Number(n));
+            expect(mineOuts[0], `${ref} step ${n}`).toBe(step.o);
+            expect(mineOuts.slice(1), `${ref} step ${n}`).toEqual(outs.slice(1));
+          }
         }
       }
       const soc = journeyData.find((j) => j.id === base)!;

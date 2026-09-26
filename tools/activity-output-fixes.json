@@ -5,7 +5,8 @@
     "on top. Each entry maps an output's exact text to the step number that adds",
     "it. Every output named must exist in the activity, and every step named must",
     "exist, or the generator stops.",
-    "Run `node tools/check-step-outputs.mjs` to see what else might belong here."
+    "Run `node tools/check-step-outputs.mjs` to see what else might belong here.",
+    "An entry may also carry `adds`: step number -> the output that step hands over, for a step the document leaves with none once its misplaced output has moved to where it belongs."
   ],
   "EVB-10": {
     "why": "The outputs of steps 3 to 6 sat one step late, with step 3's landing on step 6: telemetry validation was credited to the interface loopback step, and the thermal fit check to the step that validates clocking. Each moves onto the step whose name it repeats.",
@@ -14,6 +15,42 @@
       "Clocking and reference validation": 4,
       "Thermal fit check": 5,
       "Interface loopback and signal validation results": 6
+    }
+  },
+  "ARCH-09": {
+    "why": "The combined per-block area, power and timing budget sat on step 4, which only defines the frequency and timing budgets. It is the table step 7 publishes, once area, power and timing are all allocated. Step 4 then hands over what it actually defines: the timing budget.",
+    "producedBy": {
+      "Per-block area, power and timing budget": 7
+    },
+    "adds": {
+      "4": "Per-block and per-clock-domain timing budget"
+    }
+  },
+  "ARCH-10": {
+    "why": "The per-block microarchitecture specification sat on step 1, which only sets the template and review cadence. The specification is what step 8 hands to RTL. Step 1 then hands over the template and cadence it defines.",
+    "producedBy": {
+      "Microarchitecture specification per block": 8
+    },
+    "adds": {
+      "1": "Block specification template and review cadence"
+    }
+  },
+  "DV-05": {
+    "why": "The bound assertions sat on step 8, the block signoff. They are what step 4, which writes and binds them, adds.",
+    "producedBy": {
+      "Assertions bound to block interfaces": 4
+    }
+  },
+  "PD-05": {
+    "why": "The turn-1 placed and routed database sat on step 7, the power analysis that reads it. The first full route in step 6 is what produces it, as PD-15 has it for the final turn.",
+    "producedBy": {
+      "Turn 1 placed and routed database": 6
+    }
+  },
+  "PD-11": {
+    "why": "The turn-2 placed and routed database sat on step 8, the closure risk statement. Converging the route in step 6 is what produces it.",
+    "producedBy": {
+      "Turn 2 placed and routed database": 6
     }
   }
 }

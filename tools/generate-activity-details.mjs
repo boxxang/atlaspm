@@ -93,6 +93,18 @@ for (const [id, fix] of Object.entries(FIXES)) {
     if (!ns.has(n)) throw new Error(`fix for ${id} names step ${n}, which does not exist`);
     if (d.producedBy[i] !== n) { applied.push(`${id}: "${out}" ${d.producedBy[i]} -> ${n}`); d.producedBy[i] = n; }
   }
+  /* a step left with nothing once its misplaced output moved on is given the
+     output it does hand over, placed among the outputs in step order */
+  for (const [nStr, out] of Object.entries(fix.adds ?? {})) {
+    const n = Number(nStr);
+    if (!ns.has(n)) throw new Error(`fix for ${id} adds to step ${n}, which does not exist`);
+    if (d.produces.includes(out)) continue;
+    let at = d.producedBy.findIndex(b => b > n);
+    if (at < 0) at = d.produces.length;
+    d.produces.splice(at, 0, out);
+    d.producedBy.splice(at, 0, n);
+    applied.push(`${id}: step ${n} adds "${out}"`);
+  }
 }
 
 /* a step whose duration was blanked in the editor; the document lays it out at
@@ -333,7 +345,7 @@ if (realigned.length) {
 }
 if (blanks.length) console.log(`${blanks.length} outputs had no text and were dropped: ${[...new Set(blanks)].join(', ')}`);
 if (applied.length) {
-  console.log(`${applied.length} outputs moved to the step named in tools/activity-output-fixes.json:`);
+  console.log(`${applied.length} outputs moved or added by tools/activity-output-fixes.json:`);
   for (const a of applied) console.log(`   ${a}`);
 }
 if (blankTat.length) {
