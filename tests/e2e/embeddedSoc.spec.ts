@@ -47,11 +47,11 @@ test.describe('the Embedded SoC template', () => {
     for (const key of ['compiler', 'virtualPlatform', 'sdk', 'evkDesign', 'evkLaunch', 'softwareRelease', 'earlyAccess']) {
       await expect(page.locator(`[data-stage="${key}"]`), key).toBeVisible();
     }
-    for (const key of ['emram', 'pmu', 'fpgaVerification', 'rtlEmb', 'physicalDesignEmb', 'tapeout', 'fabrication', 'qualification']) {
+    for (const key of ['emram', 'pmu', 'fpgaVerification', 'rtlEmb', 'physicalDesignEmb', 'tapeout', 'fabricationEmb', 'qualificationEmb']) {
       await expect(page.locator(`[data-stage="${key}"]`), key).toBeVisible();
     }
     /* and none of the leading-node stages it has no use for */
-    for (const key of ['packageTestVehicle', 'chipPackageCoVerification', 'amsIp', 'rtl']) {
+    for (const key of ['packageTestVehicle', 'chipPackageCoVerification', 'amsIp', 'rtl', 'productDefinition', 'fabrication']) {
       await expect(page.locator(`[data-stage="${key}"]`), key).toHaveCount(0);
     }
   });

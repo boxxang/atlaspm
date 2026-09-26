@@ -20,12 +20,15 @@
  * than authored so the embedded flow cannot drift from the SoC one by accident,
  * and so the generated SoC modules stay untouched.
  *
- * Tapeout, fabrication and qualification are not derived: the mask, wafer and
- * reliability flows are the node's rather than the design's, and the
- * countdowns every screen shows read those three stage keys.
+ * The front of the programme — definition, architecture, foundry — and the
+ * fab and qualification at the back are derived at full length: the work
+ * takes as long, but what it is about differs. Their wording is corrected in
+ * /data/embeddedSocEdits. IP readiness and tapeout say nothing an embedded
+ * programme would say differently, and are inherited unchanged.
  */
 import { activitySteps, type ActivityStepEntry } from './activitySteps';
 import { detailActivityTitles } from './activityIndex';
+import { EMBEDDED_EDITS } from './embeddedSocEdits';
 import { journeyData } from './journey';
 import { BASELINES } from './scheduleProfiles';
 import type { JourneyStage } from './types';
@@ -47,6 +50,36 @@ export interface EmbeddedDerivation {
 }
 
 export const EMBEDDED_DERIVED = [
+  /* The same decisions, about an embedded part: energy per task and battery
+     life rather than tokens per second, eMRAM and peripherals rather than HBM
+     and PCIe, a pad ring rather than a bump field. */
+  {
+    base: 'productDefinition',
+    key: 'productDefinitionEmb',
+    from: 'DEF',
+    to: 'EDEF',
+    drop: [],
+    time: 1,
+    effort: 0.7,
+  },
+  {
+    base: 'technology',
+    key: 'technologyEmb',
+    from: 'TECH',
+    to: 'ETECH',
+    drop: [],
+    time: 1,
+    effort: 0.8,
+  },
+  {
+    base: 'architecture',
+    key: 'architectureEmb',
+    from: 'ARCH',
+    to: 'EARCH',
+    drop: [],
+    time: 1,
+    effort: 0.6,
+  },
   /* A mature, production PDK: no version churn to chase, and the custom memory
      decision is the eMRAM stage's. */
   { base: 'pdk', key: 'pdkEmb', from: 'PDK', to: 'EPDK', drop: ['PDK-11'], time: 22 / 36, effort: 0.5 },
@@ -103,24 +136,32 @@ export const EMBEDDED_DERIVED = [
     time: 14 / 18,
     effort: 0.6,
   },
+  /* The fab runs to the node, at the SoC's length; only what it says about
+     masks and process modules changes. */
+  {
+    base: 'fabrication',
+    key: 'fabricationEmb',
+    from: 'FAB',
+    to: 'EFAB',
+    drop: [],
+    time: 1,
+    effort: 1,
+  },
+  /* Qualification adds the eMRAM's retention, endurance and reflow survival,
+     and loses the HBM supply and the PCIe plugfest. */
+  {
+    base: 'qualification',
+    key: 'qualificationEmb',
+    from: 'MP',
+    to: 'EMP',
+    drop: [],
+    time: 1,
+    effort: 0.7,
+  },
 ] as const satisfies readonly EmbeddedDerivation[];
 
-/**
- * SoC wording that names hardware an embedded part does not have, where the
- * step itself still happens. Matched on the whole text, so a change to the SoC
- * wording shows up as a test failure rather than a silent miss.
- */
-export const EMBEDDED_REWORDED: Record<string, string> = {
-  'Develop the interface and HBM test content': 'Develop the interface, eMRAM and analog test content',
-  'Interface and HBM test content': 'Interface, eMRAM and analog test content',
-  'Extract the probe card requirement and bump map': 'Extract the probe card requirement and pad map',
-  'Probe card requirement and bump map': 'Probe card requirement and pad map',
-  /* the FPGA prototype is a verification method in its own right here */
-  'Assign a verification strategy per feature — simulation, formal or emulation':
-    'Assign a verification strategy per feature — simulation, formal, emulation or the FPGA prototype',
-};
-
-const reword = (text: string): string => EMBEDDED_REWORDED[text] ?? toEmbeddedRef(text);
+/** The edit, if any, the embedded flow makes to a SoC activity. */
+const editOf = (base: string, ref: string) => EMBEDDED_EDITS[base]?.activities?.[ref];
 
 const quarter = (x: number) => Math.round(x * 4) / 4;
 const tenth = (x: number) => Math.max(0.1, Math.round(x * 10) / 10);
@@ -191,6 +232,7 @@ export const EMBEDDED_DERIVED_ACTIVITIES: Record<string, ActivityStepEntry> = Ob
   PLANS.flatMap((p) =>
     p.kept.map((ref): [string, ActivityStepEntry] => {
       const a = activitySteps[ref];
+      const edit = editOf(p.d.base, ref);
       return [
         REF_MAP[ref],
         {
@@ -198,11 +240,12 @@ export const EMBEDDED_DERIVED_ACTIVITIES: Record<string, ActivityStepEntry> = Ob
           w: scaleWindow(a.w, p),
           s: a.s.map((step) => {
             const out = [...step] as typeof step;
-            out[1] = reword(step[1]);
+            out[1] = toEmbeddedRef(edit?.steps?.[step[0]]?.t ?? step[1]);
             out[2] = Math.max(0.25, quarter(step[2] * p.d.time));
             return out;
           }),
-          o: a.o.map(reword),
+          /* an output is edited with the step that hands it over */
+          o: a.o.map((o, i) => toEmbeddedRef(edit?.steps?.[a.ob[i]]?.o ?? o)),
           ob: [...a.ob],
           /* Relations to a deliverable the stage no longer has go with it. */
           r: a.r.filter(([d]) => REF_MAP[d]).map(([d, rel]) => [REF_MAP[d], rel]),
@@ -214,7 +257,9 @@ export const EMBEDDED_DERIVED_ACTIVITIES: Record<string, ActivityStepEntry> = Ob
 );
 
 export const EMBEDDED_DERIVED_ACTIVITY_TITLES: Record<string, string> = Object.fromEntries(
-  PLANS.flatMap((p) => p.kept.map((ref) => [REF_MAP[ref], detailActivityTitles[ref]])),
+  PLANS.flatMap((p) =>
+    p.kept.map((ref) => [REF_MAP[ref], editOf(p.d.base, ref)?.title ?? detailActivityTitles[ref]]),
+  ),
 );
 
 export const EMBEDDED_DERIVED_STAGES: readonly JourneyStage[] = PLANS.map((p) => {
@@ -241,20 +286,21 @@ export const EMBEDDED_DERIVED_STAGES: readonly JourneyStage[] = PLANS.map((p) =>
     )[0];
   };
   const deliverableFrom = keptDeliverables.map((_, j) => producerOf(`${d.to}-D${j + 1}`));
+  const edits = EMBEDDED_EDITS[d.base];
 
   return {
     ...soc,
+    ...edits?.stage,
     id: d.key,
     shortTitle: d.to,
-    activities: soc.activities,
-    deliverables: keptDeliverables.map((i) => soc.deliverables[i]),
+    deliverables: keptDeliverables.map((i) => edits?.deliverables?.[i + 1] ?? soc.deliverables[i]),
     deliverableFrom,
     /* Due when the SoC date says, scaled — but never before the work that
        makes it, which the SoC dates do not all honour. */
     deliverableWeek: keptDeliverables.map((i, j) =>
       Math.min(duration, Math.max(quarter((soc.deliverableWeek?.[i] ?? duration) * d.time), acts[deliverableFrom[j]].w[1])),
     ),
-    engineeringView: kept.map((ref) => detailActivityTitles[ref]),
+    engineeringView: kept.map((ref) => EMBEDDED_DERIVED_ACTIVITY_TITLES[REF_MAP[ref]]),
     engineeringTat: kept.map((ref, i) => {
       const span = acts[i].w[1] - acts[i].w[0];
       return soc.engineeringTat[at(ref)] < 0 ? -span : span;
@@ -267,3 +313,19 @@ export const EMBEDDED_DERIVED_STAGES: readonly JourneyStage[] = PLANS.map((p) =>
 export const EMBEDDED_DERIVED_DELIVERABLES: Record<string, string> = Object.fromEntries(
   EMBEDDED_DERIVED_STAGES.flatMap((s) => s.deliverables.map((title, i) => [`${s.shortTitle}-D${i + 1}`, title])),
 );
+
+/**
+ * The stages whose ends the countdowns read — Tapeout, First Silicon, Mass
+ * Production — under every key they go by: the SoC's own, and each embedded
+ * stage derived from one.
+ */
+const keysOf = (base: string): string[] => [
+  base,
+  ...(EMBEDDED_DERIVED as readonly EmbeddedDerivation[]).filter((d) => d.base === base).map((d) => d.key),
+];
+
+export const COUNTDOWN_STAGES: Readonly<Record<'tapeout' | 'firstSilicon' | 'production', readonly string[]>> = {
+  tapeout: keysOf('tapeout'),
+  firstSilicon: keysOf('fabrication'),
+  production: keysOf('qualification'),
+};

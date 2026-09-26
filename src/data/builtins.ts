@@ -29,6 +29,7 @@ import {
   EMBEDDED_STAGES,
 } from './embeddedSoc';
 import {
+  COUNTDOWN_STAGES,
   EMBEDDED_DERIVED_ACTIVITIES,
   EMBEDDED_DERIVED_ACTIVITY_TITLES,
   EMBEDDED_DERIVED_DELIVERABLES,
@@ -52,6 +53,8 @@ import {
   TOP_DIE_STAGES,
 } from './threeDicTopDie';
 import type { JourneyStage, MilestoneDef, ScheduleProfile } from './types';
+
+export { COUNTDOWN_STAGES };
 
 /** Every template the app ships, in the order the pickers list them. */
 export const BUILTIN_PROFILES: readonly ScheduleProfile[] = [

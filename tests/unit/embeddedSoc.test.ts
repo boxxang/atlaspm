@@ -18,9 +18,10 @@ import {
   EMBEDDED_DERIVED_ACTIVITY_TITLES,
   EMBEDDED_DERIVED_STAGES,
   EMBEDDED_DROPPED,
-  EMBEDDED_REWORDED,
+  COUNTDOWN_STAGES,
   socRefOf,
 } from '@/data/embeddedSocDerived';
+import { EMBEDDED_EDITS } from '@/data/embeddedSocEdits';
 import { journeyData } from '@/data/journey';
 import { BASELINES, BUILTIN_PROFILE, lifecyclePhases, milestoneDefs } from '@/data/scheduleProfiles';
 import { THREE_DIC_ACTIVITIES } from '@/data/threeDic';
@@ -93,18 +94,28 @@ describe('the Embedded SoC template', () => {
     });
   });
 
-  /* The countdowns read these three stage keys, so they are the SoC's, run as
-     the SoC runs them — only moved. */
-  it('keeps the SoC tapeout, fabrication and qualification, so the countdowns have dates', () => {
-    for (const key of ['tapeout', 'fabrication', 'qualification']) {
+  /* The countdowns count to the ends of tapeout, fabrication and
+     qualification. The embedded programme runs its own fabrication and
+     qualification, and the countdowns read those. */
+  it('gives the countdowns their dates, from its own fabrication and qualification', () => {
+    expect(COUNTDOWN_STAGES.firstSilicon).toContain('fabricationEmb');
+    expect(COUNTDOWN_STAGES.production).toContain('qualificationEmb');
+    for (const key of ['tapeout', 'fabricationEmb', 'qualificationEmb']) {
       const st = EMBEDDED_PROFILE.stages.find((s) => s.key === key)!;
-      expect(st.baseKey, key).toBe(key);
-      expect(st.durationWeeks, key).toBe(BASELINES[key].durationWeeks);
+      expect(st, key).toBeTruthy();
     }
-    const plan = computeSchedule(new Date('2027-01-04T00:00:00Z'), EMBEDDED_PROFILE);
-    expect(plan.tapeout).toBeTruthy();
-    expect(plan.firstSilicon).toBeTruthy();
-    expect(plan.production).toBeTruthy();
+    const kickoff = new Date('2027-01-04T00:00:00Z');
+    const plan = computeSchedule(kickoff, EMBEDDED_PROFILE);
+    expect(plan.tapeout).toEqual(plan.stages.tapeout.end);
+    expect(plan.firstSilicon).toEqual(plan.stages.fabricationEmb.end);
+    expect(plan.production).toEqual(plan.stages.qualificationEmb.end);
+    /* and their checkpoints are still the three the countdowns show */
+    const majors = plan.milestones.filter((m) => m.major).map((m) => m.label);
+    for (const label of ['Tapeout (BEOL MTO)', 'First Silicon', 'Mass Production']) expect(majors).toContain(label);
+    /* the SoC programme's countdowns are where they were */
+    const soc = computeSchedule(kickoff, BUILTIN_PROFILE);
+    expect(soc.firstSilicon).toEqual(soc.stages.fabrication.end);
+    expect(soc.production).toEqual(soc.stages.qualification.end);
   });
 
   it('drops the SoC stages an embedded part has no use for', () => {
@@ -112,11 +123,15 @@ describe('the Embedded SoC template', () => {
     for (const gone of ['packageTestVehicle', 'chipPackageCoVerification', 'amsIp', 'testChip', 'packageDesign', 'packaging']) {
       expect(keys.has(gone), gone).toBe(false);
     }
+    /* and runs none of the SoC content it rewrote */
+    for (const gone of ['productDefinition', 'architecture', 'technology', 'rtl', 'fabrication', 'qualification']) {
+      expect(keys.has(gone), gone).toBe(false);
+    }
   });
 
   it('is shorter and cheaper than the leading-node SoC flow', () => {
     const end = Math.max(...EMBEDDED_PROFILE.stages.map((s) => s.startOffsetWeeks + s.durationWeeks));
-    expect(end).toBe(stageAt('qualification').end);
+    expect(end).toBe(stageAt('qualificationEmb').end);
     expect(end).toBeLessThan(136);
     const mm = (keys: readonly (string | null)[]) =>
       keys.reduce((t, k) => t + stageContent(k)!.engineeringEffort.reduce((a, b) => a + b, 0), 0);
@@ -241,8 +256,8 @@ describe('the embedded plan runs nothing before what it consumes exists', () => 
 
   it('signs off before tapeout, and fabricates on the masks the tapeout ordered', () => {
     expect(stageAt('signoffEmb').end).toBeLessThanOrEqual(stageAt('tapeout').start);
-    expect(span('FAB-01').start).toBeGreaterThanOrEqual(span('TO-08').end);
-    expect(span('FAB-03').start).toBeGreaterThanOrEqual(span('TO-11').end);
+    expect(span(emb('FAB-01')).start).toBeGreaterThanOrEqual(span('TO-08').end);
+    expect(span(emb('FAB-03')).start).toBeGreaterThanOrEqual(span('TO-11').end);
   });
 
   /* The same DFT relations the SoC flow is held to, on the derived stages. */
@@ -264,7 +279,7 @@ describe('the embedded plan runs nothing before what it consumes exists', () => 
 
   it('sorts and assembles the wafers once they ship, and brings up the units once they exist', () => {
     expect(stageAt('packageEmb').end).toBeLessThanOrEqual(stageAt('assemblyEmb').start);
-    expect(span('EASSY-02').start).toBeGreaterThanOrEqual(span('FAB-10').end);
+    expect(span('EASSY-02').start).toBeGreaterThanOrEqual(span(emb('FAB-10')).end);
     expect(stageAt('bringupEmb').start).toBeGreaterThanOrEqual(span('EASSY-03').end);
     expect(span('EVK-05').start).toBeGreaterThanOrEqual(span('EASSY-03').end);
     expect(span('SDK-06').start).toBeGreaterThanOrEqual(stageAt('bringupEmb').start);
@@ -277,8 +292,8 @@ describe('the embedded plan runs nothing before what it consumes exists', () => 
   it('releases the software after the silicon is correlated, and the EVK on released software', () => {
     expect(span('CREL-05').start).toBeGreaterThanOrEqual(span('CREL-01').end);
     expect(stageAt('softwareRelease').end).toBeLessThanOrEqual(stageAt('evkLaunch').end);
-    expect(stageAt('evkLaunch').end).toBeLessThanOrEqual(stageAt('qualification').end);
-    expect(stageAt('earlyAccess').end).toBe(stageAt('qualification').end);
+    expect(stageAt('evkLaunch').end).toBeLessThanOrEqual(stageAt('qualificationEmb').end);
+    expect(stageAt('earlyAccess').end).toBe(stageAt('qualificationEmb').end);
   });
 });
 
@@ -418,15 +433,34 @@ describe('every stage it owns lines up with its activities', () => {
 });
 
 describe('the derived stages', () => {
-  it('say nothing about hardware an embedded part does not have', () => {
-    const leading = /\b(HBM|PCIe|CXL|SerDes|D2D|die-to-die|chiplet|DRAM|DDR|UCIe)\b/i;
-    for (const [ref, a] of Object.entries(EMBEDDED_DERIVED_ACTIVITIES)) {
-      for (const t of [EMBEDDED_DERIVED_ACTIVITY_TITLES[ref], ...a.s.map((s) => String(s[1])), ...a.o]) {
-        expect(t, `${ref}: "${t}"`).not.toMatch(leading);
-      }
+  /* The SoC template is a leading-node AI accelerator on a 2.5D package. What
+     the embedded programme shows from it — derived or inherited — names none
+     of that. HBM the ESD model is fine; HBM the memory is not. */
+  it('say nothing about a product an embedded part is not', () => {
+    const leading =
+      /\b(HBM(?! ESD|, CDM)|PCIe|CXL|SerDes|D2D|die-to-die|chiplet|DRAM|DDR|UCIe|interposer|bumps?|EUV|LLM|tokens|TTFT|FP8|NoC|VRMs?|DVFS|cooling|airflow|thermal solution|high-speed)\b/i;
+    const shown = [...EMBEDDED_DERIVED_STAGES, ...EMBEDDED_INHERITED_KEYS.map((k) => stageContent(k)!)];
+    for (const s of shown) {
+      const texts = [
+        s.tagline,
+        s.description,
+        ...s.activities,
+        ...s.deliverables,
+        ...s.risks,
+        ...s.potentialRisks,
+        ...s.collaboration,
+        ...s.tools,
+        ...s.programView,
+        ...s.engineeringView,
+      ];
+      for (const t of texts) expect(t, `${s.id}: "${t}"`).not.toMatch(leading);
     }
-    for (const s of EMBEDDED_DERIVED_STAGES) {
-      for (const t of s.deliverables) expect(t, s.id).not.toMatch(leading);
+    const acts = Object.entries(ALL_ACTIVITIES).filter(([, a]) =>
+      shown.some((s) => s.id === a.st),
+    );
+    expect(acts.length).toBeGreaterThan(100);
+    for (const [ref, a] of acts) {
+      for (const t of [...a.s.map((s) => String(s[1])), ...a.o]) expect(t, `${ref}: "${t}"`).not.toMatch(leading);
     }
   });
 
@@ -438,17 +472,36 @@ describe('the derived stages', () => {
     }
   });
 
-  it('reword only text the SoC flow still says', () => {
-    const said = new Set(Object.values(activitySteps).flatMap((a) => [...a.s.map((s) => String(s[1])), ...a.o]));
-    for (const from of Object.keys(EMBEDDED_REWORDED)) expect(said.has(from), from).toBe(true);
+  /* Each edit names the SoC step it replaces. One that names a step the SoC
+     flow no longer has — renumbered, or dropped — would silently edit nothing. */
+  it('edit only steps the SoC flow still has, and change what they say', () => {
+    for (const [base, edit] of Object.entries(EMBEDDED_EDITS)) {
+      const d = EMBEDDED_DERIVED.find((x) => x.base === base);
+      expect(d, `${base} is edited but not derived`).toBeTruthy();
+      for (const [ref, e] of Object.entries(edit.activities ?? {})) {
+        const a = activitySteps[ref];
+        expect(a?.st, `${ref} is not an activity of ${base}`).toBe(base);
+        expect((d!.drop as readonly string[]).includes(ref), `${ref} is dropped`).toBe(false);
+        if (e.title) expect(e.title, ref).not.toBe(detailActivityTitles[ref]);
+        for (const [n, step] of Object.entries(e.steps ?? {})) {
+          const i = Number(n) - 1;
+          expect(a.s[i]?.[0], `${ref} has no step ${n}`).toBe(Number(n));
+          if (step.t) expect(step.t, `${ref} step ${n}`).not.toBe(a.s[i][1]);
+        }
+      }
+      const soc = journeyData.find((j) => j.id === base)!;
+      for (const n of Object.keys(edit.deliverables ?? {})) {
+        expect(soc.deliverables[Number(n) - 1], `${base} has no deliverable ${n}`).toBeTruthy();
+      }
+    }
   });
 
-  it('are shorter and lighter than the SoC stages they come from', () => {
+  it('are no longer and no heavier than the SoC stages they come from', () => {
     for (const d of EMBEDDED_DERIVED) {
       const soc = stageContent(d.base)!;
       const mine = stageContent(d.key)!;
       const sum = (xs: readonly number[]) => xs.reduce((a, b) => a + b, 0);
-      expect(sum(mine.engineeringEffort), d.key).toBeLessThan(sum(soc.engineeringEffort));
+      expect(sum(mine.engineeringEffort), d.key).toBeLessThanOrEqual(sum(soc.engineeringEffort) + 1e-6);
       const st = EMBEDDED_PROFILE.stages.find((s) => s.key === d.key)!;
       expect(st.durationWeeks, d.key).toBeLessThanOrEqual(BASELINES[d.base].durationWeeks);
       expect(st.title, d.key).toBe(soc.title);

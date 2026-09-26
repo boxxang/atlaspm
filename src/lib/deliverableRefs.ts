@@ -58,7 +58,12 @@ export function deliverableRefs(
 
   for (const d of rows) {
     const open = (byNorm.get(normTitle(d.title)) ?? []).filter((r) => !taken.has(r));
-    const ref = open.find((r) => stageOfRef[r.split('-')[0]] === d.stageId) ?? open[0];
+    /* A reference whose prefix belongs to no stage this programme runs is
+       another template's row with the same words — EDEF-D5 in an SoC
+       programme — and is not an answer at all. */
+    const ref =
+      open.find((r) => stageOfRef[r.split('-')[0]] === d.stageId) ??
+      open.find((r) => stageOfRef[r.split('-')[0]] !== undefined);
     if (ref) {
       out.set(d.id, ref);
       taken.add(ref);

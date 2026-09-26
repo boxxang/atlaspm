@@ -18,9 +18,12 @@
  *
  * Three kinds of stage:
  *
- *  - inherited unchanged from the SoC flow by key: definition, architecture,
- *    foundry, IP, tapeout, fabrication and qualification;
- *  - derived from the SoC flow at embedded scale (/data/embeddedSocDerived);
+ *  - inherited unchanged from the SoC flow by key: IP readiness and tapeout;
+ *  - derived from the SoC flow (/data/embeddedSocDerived), at embedded scale
+ *    and with the steps that name the wrong product rewritten
+ *    (/data/embeddedSocEdits): definition, architecture, foundry, PDK, RTL,
+ *    verification, DFT, synthesis, physical design, signoff, the bring-up
+ *    board, test development, bring-up, fabrication and qualification;
  *  - authored here: the fabric and compiler co-design, eMRAM, the power
  *    manager, FPGA prototype verification, the package and its assembly, the
  *    compiler, the virtual platform and Playground, the SDK, the software
@@ -44,16 +47,12 @@ import type { JourneyStage, MilestoneDef, ProfileStageDef, ScheduleProfile } fro
 export type EmbeddedStage = JourneyStage &
   Required<Pick<JourneyStage, 'engineeringStart' | 'deliverableFrom' | 'deliverableWeek'>>;
 
-/** The SoC stages an embedded programme runs exactly as the SoC one does. */
-export const EMBEDDED_INHERITED_KEYS = [
-  'productDefinition',
-  'technology',
-  'ipReadiness',
-  'architecture',
-  'tapeout',
-  'fabrication',
-  'qualification',
-] as const;
+/**
+ * The SoC stages an embedded programme runs exactly as the SoC one does: IP
+ * readiness and tapeout say nothing an embedded programme would word
+ * differently. Everything else it shares with the SoC flow is derived.
+ */
+export const EMBEDDED_INHERITED_KEYS = ['ipReadiness', 'tapeout'] as const;
 
 /** The stages written for this template, in the order they start. */
 export const EMBEDDED_STAGE_KEYS = [
@@ -76,10 +75,10 @@ export const EMBEDDED_STAGE_KEYS = [
 export const EMBEDDED_BASELINES: Record<string, { startOffsetWeeks: number; durationWeeks: number }> = {
   /* The front of the programme is the SoC's: requirements, foundry and IP
      decisions, and the architecture, run as they do anywhere. */
-  productDefinition: BASELINES.productDefinition,
-  technology: BASELINES.technology,
+  productDefinitionEmb: BASELINES.productDefinition,
+  technologyEmb: BASELINES.technology,
   ipReadiness: BASELINES.ipReadiness,
-  architecture: BASELINES.architecture,
+  architectureEmb: BASELINES.architecture,
   /* The fabric and the compiler are one design: what the hardware leaves out
      the compiler has to do, and the contract between them closes before RTL
      is written against it. */
@@ -121,17 +120,17 @@ export const EMBEDDED_BASELINES: Record<string, { startOffsetWeeks: number; dura
   /* The EVK is designed and proven without silicon, so the first packaged
      samples go straight onto EVT boards. */
   evkDesign: { startOffsetWeeks: 56, durationWeeks: 44 },
-  /* Tapeout and fabrication are the SoC's chain, moved: the mask shop and the
-     fab run to the node, not to the size of the design. */
+  /* Tapeout and fabrication are the SoC's chain at its length, moved: the mask
+     shop and the fab run to the node, not to the size of the design. */
   tapeout: { startOffsetWeeks: 66, durationWeeks: BASELINES.tapeout.durationWeeks },
-  fabrication: { startOffsetWeeks: 70, durationWeeks: BASELINES.fabrication.durationWeeks },
+  fabricationEmb: { startOffsetWeeks: 70, durationWeeks: BASELINES.fabrication.durationWeeks },
   /* Tooling is built while the wafers are in the fab; the line runs when they
      ship. */
   assemblyEmb: { startOffsetWeeks: 70, durationWeeks: 26 },
   softwareRelease: { startOffsetWeeks: 92, durationWeeks: 24 },
   /* Bring-up starts on the first assembled units. */
   bringupEmb: { startOffsetWeeks: 96, durationWeeks: EMBEDDED_DERIVED_DURATION.bringupEmb },
-  qualification: { startOffsetWeeks: 100, durationWeeks: BASELINES.qualification.durationWeeks },
+  qualificationEmb: { startOffsetWeeks: 100, durationWeeks: BASELINES.qualification.durationWeeks },
   evkLaunch: { startOffsetWeeks: 100, durationWeeks: 22 },
 };
 
@@ -163,7 +162,13 @@ const PHASE_OF_EMBEDDED: Record<string, string> = {
  */
 const DERIVED_MILESTONES: MilestoneDef[] = EMBEDDED_DERIVED.map((d) => {
   const soc = stageMilestone[d.base];
-  return { id: `${soc.id}Emb`, label: soc.label, anchor: { stage: d.key, at: 'end' as const } };
+  return {
+    id: `${soc.id}Emb`,
+    label: soc.label,
+    anchor: { stage: d.key, at: 'end' as const },
+    /* First Silicon and Mass Production stay what the countdowns count to */
+    ...(soc.major ? { major: true } : {}),
+  };
 });
 
 export const EMBEDDED_MILESTONES: readonly MilestoneDef[] = [

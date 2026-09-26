@@ -2,7 +2,7 @@
  * /lib/scheduleCalculator.ts — schedule math and the one date formatter set.
  * Pure: no DOM, no state, no UI imports. Ported 1:1 from the prototype.
  */
-import { ALL_MILESTONES } from '@/data/builtins';
+import { ALL_MILESTONES, COUNTDOWN_STAGES } from '@/data/builtins';
 import type {
   MilestoneDef,
   ScheduleProfile,
@@ -121,14 +121,17 @@ export function computeSchedule(
      program that does not run Fabrication has no First Silicon; saying so is
      the only honest answer, and it is one the screens can draw. */
   const endOf = (key: StageId) => stages[key]?.end ?? null;
+  /* A template may run its own version of the stage — the Embedded SoC's
+     fabrication is fabricationEmb — so each date reads whichever it has. */
+  const endOfAny = (keys: readonly StageId[]) => keys.map(endOf).find((d) => d) ?? null;
 
   return {
     stages,
     totalWeeks,
     milestones,
-    tapeout: endOf('tapeout'),
-    firstSilicon: endOf('fabrication'),
-    production: endOf('qualification'),
+    tapeout: endOfAny(COUNTDOWN_STAGES.tapeout),
+    firstSilicon: endOfAny(COUNTDOWN_STAGES.firstSilicon),
+    production: endOfAny(COUNTDOWN_STAGES.production),
   };
 }
 
