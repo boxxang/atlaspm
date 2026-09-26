@@ -181,6 +181,44 @@ describe('the compiler, SDK and EVK are part of the plan', () => {
   });
 });
 
+/* FPGA verification is planned, run and signed off — not a platform brought
+   up and handed over. */
+describe('FPGA prototype verification', () => {
+  it('is a stage of its own, with a plan, a campaign and a signoff', () => {
+    const st = EMBEDDED_PROFILE.stages.find((s) => s.key === 'fpgaVerification')!;
+    expect(st.phaseId).toBe('designVerify');
+    const said = refsOf('fpgaVerification')
+      .map((r) => `${ownTitles[r]} ${ownActivities[r].s.map((s) => s[1]).join(' ')}`)
+      .join(' ')
+      .toLowerCase();
+    for (const w of ['exit criteria', 'test list', 'rtl drop', 'regression', 'soak', 'boot', 'sensors', 'models', 'go / no-go']) {
+      expect(said, `FPGA verification never mentions ${w}`).toContain(w);
+    }
+    expect(EMBEDDED_MILESTONES.find((m) => m.anchor.stage === 'fpgaVerification')?.label).toBe(
+      'FPGA Verification Signoff',
+    );
+  });
+
+  it('is planned with the DV plan, runs on the RTL, and signs off on the final RTL before tapeout', () => {
+    expect(span('FPV-01').start).toBeGreaterThanOrEqual(span(emb('DV-01')).start);
+    expect(span('FPV-01').end).toBeLessThanOrEqual(span('FPV-03').start);
+    expect(span('FPV-03').start).toBeGreaterThanOrEqual(stageAt('rtlEmb').start);
+    expect(span('FPV-06').start).toBeGreaterThanOrEqual(stageAt('rtlEmb').end);
+    expect(span('FPV-06').end).toBeLessThanOrEqual(span('TO-05').start);
+    /* software gets the verified images, not its own build of them */
+    expect(span('VP-02').start).toBeGreaterThanOrEqual(span('FPV-03').start);
+  });
+
+  it('owns the FPGA work alone — DV no longer brings up a prototype of its own', () => {
+    expect(EMBEDDED_DROPPED.has('DV-03')).toBe(true);
+    for (const [ref, a] of Object.entries(EMBEDDED_DERIVED_ACTIVITIES)) {
+      if (a.st !== 'verificationEmb') continue;
+      expect(EMBEDDED_DERIVED_ACTIVITY_TITLES[ref], ref).not.toMatch(/FPGA/);
+    }
+    expect(ownActivities[emb('DV-01')].s.map((s) => s[1]).join(' ')).toContain('FPGA prototype');
+  });
+});
+
 describe('the embedded plan runs nothing before what it consumes exists', () => {
   it('freezes the co-design before RTL, and the boot ROM with the RTL', () => {
     expect(stageAt('fabricCodesign').end).toBeLessThanOrEqual(stageAt('rtlEmb').start);

@@ -22,8 +22,9 @@
  *    foundry, IP, tapeout, fabrication and qualification;
  *  - derived from the SoC flow at embedded scale (/data/embeddedSocDerived);
  *  - authored here: the fabric and compiler co-design, eMRAM, the power
- *    manager, the package and its assembly, the compiler, the virtual platform
- *    and Playground, the SDK, the software release, the EVK, and early access.
+ *    manager, FPGA prototype verification, the package and its assembly, the
+ *    compiler, the virtual platform and Playground, the SDK, the software
+ *    release, the EVK, and early access.
  *
  * Written here rather than in journey.ts because that file and the activity
  * modules beside it are generated. Held to the same invariants as the 3DIC
@@ -61,6 +62,7 @@ export const EMBEDDED_STAGE_KEYS = [
   'emram',
   'pmu',
   'virtualPlatform',
+  'fpgaVerification',
   'sdk',
   'packageEmb',
   'earlyAccess',
@@ -92,6 +94,9 @@ export const EMBEDDED_BASELINES: Record<string, { startOffsetWeeks: number; dura
   emram: { startOffsetWeeks: 10, durationWeeks: 36 },
   pmu: { startOffsetWeeks: 12, durationWeeks: 36 },
   virtualPlatform: { startOffsetWeeks: 16, durationWeeks: 42 },
+  /* Planned with the DV plan, run on every RTL drop, and signed off on the
+     final RTL before the tapeout Go / No-Go. */
+  fpgaVerification: { startOffsetWeeks: 24, durationWeeks: 40 },
   /* Scan architecture starts with the RTL and its patterns close on the final
      netlist and the reordered chains, before the design freezes. */
   dftEmb: { startOffsetWeeks: 19, durationWeeks: EMBEDDED_DERIVED_DURATION.dftEmb },
@@ -137,6 +142,7 @@ const PHASE_OF_EMBEDDED: Record<string, string> = {
   fabricCodesign: 'define',
   emram: 'enable',
   pmu: 'enable',
+  fpgaVerification: 'designVerify',
   packageEmb: 'integrate',
   assemblyEmb: 'integrate',
   compiler: 'platform',
@@ -170,6 +176,11 @@ export const EMBEDDED_MILESTONES: readonly MilestoneDef[] = [
     label: 'Developer Playground Launch',
     anchor: { stage: 'virtualPlatform', at: 'end' },
     major: true,
+  },
+  {
+    id: 'fpgaVerificationSignoff',
+    label: 'FPGA Verification Signoff',
+    anchor: { stage: 'fpgaVerification', at: 'end' },
   },
   { id: 'sdkBeta', label: 'SDK Beta on Silicon', anchor: { stage: 'sdk', at: 'end' } },
   { id: 'packageFreezeEmb', label: 'Package Design Freeze', anchor: { stage: 'packageEmb', at: 'end' } },
@@ -774,21 +785,21 @@ export const EMBEDDED_ACTIVITIES: Record<string, ActivityStepEntry> = {
   ),
   'VP-02': act(
     'virtualPlatform',
-    [14, 32],
+    [16, 32],
     'Prototyping engineer',
     [
-      [1, 'Partition the RTL onto the FPGA platform', 3],
-      [2, 'Build the fabric and peripheral images from each RTL drop', 4],
-      [3, 'Run firmware and compiled workloads at speed', 4],
-      [4, 'Feed the bugs back to RTL and the compiler', 3, 1],
+      [1, 'Take each verified FPGA image from FPV-03 with its known issues', 1],
+      [2, 'Package the image with the board set-up and flashing guide', 2],
+      [3, 'Distribute the prototype boards to the SDK, compiler and early-access teams', 3],
+      [4, 'Route the bugs software finds into the FPV-05 tracker', 3, 1],
       [5, 'Release the prototype to the software teams', 1],
     ],
     [
-      'FPGA partition of the RTL',
-      'FPGA images per RTL drop',
-      'Firmware and workload runs at speed',
-      'Prototype bug reports to RTL and compiler',
-      'FPGA prototype, released',
+      'Verified FPGA image intake per RTL drop',
+      'Image package with set-up and flashing guide',
+      'Prototype board distribution record',
+      'Software-found bugs in the FPGA tracker',
+      'FPGA prototype, released to software',
     ],
     [['VP-D2', 'produces']],
   ),
@@ -847,6 +858,130 @@ export const EMBEDDED_ACTIVITIES: Record<string, ActivityStepEntry> = {
       'Playground launch decision and announcement',
     ],
     [['VP-D5', 'produces']],
+  ),
+
+  /* --- FPGA prototype verification --- */
+  'FPV-01': act(
+    'fpgaVerification',
+    [0, 6],
+    'FPGA verification lead',
+    [
+      [1, 'Split the verification scope between simulation, emulation and the FPGA prototype, feature by feature', 1.5],
+      [2, 'List what only the FPGA can prove — real peripherals, boot, long runs, compiled workloads at speed', 1],
+      [3, 'Write the test list with owners and the RTL drop each test needs', 1.5],
+      [4, 'Set the coverage targets and the exit criteria for signoff', 1, 1],
+      [5, 'Review the plan with DV, firmware and the compiler team', 1],
+    ],
+    [
+      'Verification scope split by feature and method',
+      'FPGA-only verification targets',
+      'FPGA test list with owners and RTL drops',
+      'Coverage targets and signoff exit criteria',
+      'FPGA verification plan, reviewed',
+    ],
+    [['FPV-D1', 'produces']],
+  ),
+  'FPV-02': act(
+    'fpgaVerification',
+    [2, 8],
+    'Prototyping engineer',
+    [
+      [1, 'Size the design against FPGA capacity and choose the platform', 1.5],
+      [2, 'Decide the fabric configuration that fits — the full array or a reduced tile count', 1.5],
+      [3, 'Plan the clock scaling and peripheral timing at prototype speed', 1, 1],
+      [4, 'Replace the PMU, oscillators and eMRAM with FPGA models and stubs', 2],
+      [5, 'Record what the prototype cannot show — power gating, analog behaviour, silicon timing', 1],
+      [6, 'Release the platform plan', 0.5],
+    ],
+    [
+      'FPGA capacity estimate and platform choice',
+      'Prototype fabric configuration',
+      'Prototype clock and peripheral timing plan',
+      'PMU, oscillator and eMRAM models for the FPGA',
+      'Coverage gaps the FPGA cannot close, with their owners',
+      'FPGA platform, capacity and model plan',
+    ],
+    [['FPV-D2', 'produces'], ['FPV-D1', 'feeds']],
+  ),
+  'FPV-03': act(
+    'fpgaVerification',
+    [8, 22],
+    'Prototyping engineer',
+    [
+      [1, 'Synthesise and place each RTL drop onto the FPGA', 4],
+      [2, 'Close FPGA timing at the prototype clock', 3],
+      [3, 'Boot the ROM image and run the smoke tests', 2],
+      [4, 'Tag each image with its RTL drop and known issues', 1, 1],
+      [5, 'Release the verified image to the test and software teams', 1],
+    ],
+    [
+      'FPGA build per RTL drop',
+      'FPGA timing closure report',
+      'Boot and smoke-test results per image',
+      'Image tag with RTL drop and known issues',
+      'FPGA images per RTL drop, smoke-tested',
+    ],
+    [['FPV-D3', 'produces']],
+  ),
+  'FPV-04': act(
+    'fpgaVerification',
+    [10, 36],
+    'FPGA verification lead',
+    [
+      [1, 'Test the peripherals against real sensors, radios and Arduino shields', 6],
+      [2, 'Verify every boot path — eMRAM, UART, SPI flash, JTAG, secure boot', 4],
+      [3, 'Run the compiler-generated workloads and check the results against the simulator', 6],
+      [4, 'Run randomised and long-duration soak tests for stability', 6, 1],
+      [5, 'Run the SDK driver and RTOS regression on the prototype', 4, 1],
+      [6, 'Report the results against the test list', 2],
+    ],
+    [
+      'Peripheral interoperability results with real devices',
+      'Boot path verification results',
+      'Compiled workload results against the simulator',
+      'Soak and stability test results',
+      'SDK driver and RTOS regression on the prototype',
+      'FPGA verification results against the test list',
+    ],
+    [['FPV-D4', 'produces'], ['FPV-D6', 'feeds']],
+  ),
+  'FPV-05': act(
+    'fpgaVerification',
+    [10, 38],
+    'FPGA verification lead',
+    [
+      [1, 'Triage every failure into RTL, compiler, firmware or platform', 4],
+      [2, 'Track the bug burn-down with DV in one tracker', 4, 1],
+      [3, 'Rerun the regression on each new RTL drop and ECO', 8],
+      [4, 'Report escape trends and open issues every week', 4, 1],
+      [5, 'Publish the regression dashboard', 1],
+    ],
+    [
+      'Failure triage by owner',
+      'Shared bug burn-down with DV',
+      'Regression results per RTL drop and ECO',
+      'Weekly escape and open-issue report',
+      'FPGA bug tracker and regression dashboard',
+    ],
+    [['FPV-D5', 'produces'], ['FPV-D6', 'feeds']],
+  ),
+  'FPV-06': act(
+    'fpgaVerification',
+    [38, 40],
+    'FPGA verification lead',
+    [
+      [1, 'Run the full regression on the final RTL', 1],
+      [2, 'Check the results against the exit criteria', 0.5],
+      [3, 'Disposition the open issues with a waiver or a fix plan', 0.5, 1],
+      [4, 'Sign off and feed the tapeout Go / No-Go', 0.5],
+    ],
+    [
+      'Full regression on the final RTL',
+      'Exit criteria check',
+      'Open issue dispositions',
+      'FPGA verification signoff report',
+    ],
+    [['FPV-D6', 'produces']],
   ),
 
   /* --- SDK, boot ROM, HAL and RTOS --- */
@@ -1608,10 +1743,16 @@ export const EMBEDDED_ACTIVITY_TITLES: Record<string, string> = {
   'PMU-06': 'Mode Transition and Energy Budget Verification',
   'PMU-07': 'PMU and Always-On Signoff',
   'VP-01': 'SoC Virtual Platform',
-  'VP-02': 'FPGA Prototype',
+  'VP-02': 'FPGA Prototype Release to Software Teams',
   'VP-03': 'Developer Playground',
   'VP-04': 'Energy Profiler and Lifetime Modeller',
   'VP-05': 'Playground Launch Readiness',
+  'FPV-01': 'FPGA Verification Plan and Exit Criteria',
+  'FPV-02': 'FPGA Platform, Capacity and Model Plan',
+  'FPV-03': 'FPGA Bring-Up per RTL Drop',
+  'FPV-04': 'FPGA Verification Execution',
+  'FPV-05': 'Bug Tracking and Regression per Drop',
+  'FPV-06': 'FPGA Verification Signoff',
   'SDK-01': 'Boot ROM and Secure Boot',
   'SDK-02': 'HAL and Peripheral Drivers',
   'SDK-03': 'RTOS Ports and Board Support Packages',
@@ -1829,11 +1970,11 @@ export const EMBEDDED_STAGES: readonly EmbeddedStage[] = [
     shortTitle: 'VP',
     tagline: 'Customers write code before the silicon exists.',
     description:
-      'Give software and customers something to run on long before first silicon: a virtual platform of the SoC, an FPGA prototype built from each RTL drop, and a browser Playground where anyone can compile code, run it on the simulator and see its energy by region — with a lifetime modeller that turns that into battery life.',
-    activities: ['Virtual platform', 'FPGA prototype', 'Playground', 'Energy profiler', 'Launch'],
+      'Give software and customers something to run on long before first silicon: a virtual platform of the SoC, the verified FPGA prototype of each RTL drop in the software teams’ hands, and a browser Playground where anyone can compile code, run it on the simulator and see its energy by region — with a lifetime modeller that turns that into battery life.',
+    activities: ['Virtual platform', 'FPGA release to software', 'Playground', 'Energy profiler', 'Launch'],
     deliverables: [
       'SoC virtual platform for software development',
-      'FPGA prototype of the fabric and peripherals',
+      'FPGA prototype, released to the software teams',
       'Developer Playground — browser compile, run and energy report',
       'Energy profiler and lifetime modeller',
       'Playground launch readiness review',
@@ -1844,7 +1985,7 @@ export const EMBEDDED_STAGES: readonly EmbeddedStage[] = [
     risks: ['Platform drifts from RTL', 'Playground energy numbers disputed', 'Launch before the compiler is ready'],
     potentialRisks: [
       'Virtual platform not updated after RTL changes',
-      'FPGA prototype capacity too small for the full fabric',
+      'Software teams working on an FPGA image older than the RTL',
       'Energy estimates shown to customers without accuracy bounds',
       'Cloud service security and cost not planned',
       'Playground launched with no support channel behind it',
@@ -1855,6 +1996,41 @@ export const EMBEDDED_STAGES: readonly EmbeddedStage[] = [
     programView: ['Playground launch date', 'Active developer accounts', 'Prototype RTL drop currency'],
     perspective:
       'The Playground is the first datasheet most customers will read. Launch it when the numbers are defensible, not when marketing needs a date.',
+  },
+  {
+    id: 'fpgaVerification',
+    stage: 42,
+    title: 'FPGA Prototype Verification',
+    shortTitle: 'FPV',
+    tagline: 'What only real hardware at speed can prove, before tapeout.',
+    description:
+      'Plan and run verification on an FPGA prototype of the SoC: what it proves that simulation and emulation cannot — real sensors and shields on the peripherals, every boot path, compiler-generated workloads at speed, soak runs for stability — and what it cannot, since the power manager, oscillators and eMRAM are models on the FPGA. Built from every RTL drop, regressed on every ECO, and signed off on the final RTL as an input to the tapeout Go / No-Go.',
+    activities: ['Verification plan', 'Platform and models', 'Bring-up per drop', 'Verification runs', 'Bug tracking and regression', 'Signoff'],
+    deliverables: [
+      'FPGA verification plan — scope split, test list, exit criteria',
+      'FPGA platform, capacity and model plan',
+      'FPGA images per RTL drop, smoke-tested',
+      'FPGA verification results — peripherals, boot, workloads, soak',
+      'FPGA bug tracker and regression dashboard',
+      'FPGA verification signoff report',
+    ],
+    deliverableFrom: [0, 1, 2, 3, 4, 5],
+    deliverableWeek: [6, 8, 22, 36, 38, 40],
+    ...aligned('fpgaVerification', [3, 3, 8, 14, 8, 1.5]),
+    risks: ['Prototype lags the RTL', 'Design does not fit the FPGA', 'Signoff without the final RTL'],
+    potentialRisks: [
+      'FPGA scope never agreed with DV, so both or neither verify a feature',
+      'The fabric reduced to fit the FPGA and nobody records what that leaves unverified',
+      'Power-mode transitions assumed verified because the prototype boots',
+      'Regression run on an image two drops old',
+      'FPGA bugs tracked apart from the DV tracker and never counted at tapeout',
+    ],
+    leader: leaderOf('Victor Lindqvist', 'V. Lindqvist', '0458', 'victor.lindqvist@example.com'),
+    collaboration: ['Verification', 'RTL', 'Firmware', 'Compiler'],
+    tools: ['FPGA prototyping platform', 'FPGA synthesis', 'Logic analyzer', 'Regression CI'],
+    programView: ['FPGA verification signoff date', 'Test list pass rate', 'Open FPGA bugs by owner', 'Image currency vs RTL drop'],
+    perspective:
+      'An FPGA prototype that boots proves little. Hold it to a test list and exit criteria like any other verification, and state in writing what it cannot show.',
   },
   {
     id: 'sdk',

@@ -29,8 +29,8 @@ test.describe('the Embedded SoC template', () => {
     await expect(emb).toBeVisible();
     await expect(emb).toContainText('Built-in');
     await expect(emb).toContainText('Embedded SoC');
-    /* 7 SoC stages as they are, 10 at embedded scale, 12 of its own */
-    await expect(emb).toContainText('29');
+    /* 7 SoC stages as they are, 10 at embedded scale, 13 of its own */
+    await expect(emb).toContainText('30');
     await expect(emb.locator('[data-duplicate]')).toHaveCount(1);
     await expect(emb.locator('[data-edit-template]')).toHaveCount(0);
 
@@ -40,14 +40,14 @@ test.describe('the Embedded SoC template', () => {
 
   test('starts a programme that runs the compiler, SDK and EVK as stages', async ({ page }) => {
     const id = await newProgram(page, 'AtlasEdge1');
-    await expect(stagesLink(page)).toContainText('29');
+    await expect(stagesLink(page)).toContainText('30');
 
     await page.goto(`/p/${id}/stages`);
     await expect(page.getByText('Developer Platform & Ecosystem').first()).toBeVisible();
     for (const key of ['compiler', 'virtualPlatform', 'sdk', 'evkDesign', 'evkLaunch', 'softwareRelease', 'earlyAccess']) {
       await expect(page.locator(`[data-stage="${key}"]`), key).toBeVisible();
     }
-    for (const key of ['emram', 'pmu', 'rtlEmb', 'physicalDesignEmb', 'tapeout', 'fabrication', 'qualification']) {
+    for (const key of ['emram', 'pmu', 'fpgaVerification', 'rtlEmb', 'physicalDesignEmb', 'tapeout', 'fabrication', 'qualification']) {
       await expect(page.locator(`[data-stage="${key}"]`), key).toBeVisible();
     }
     /* and none of the leading-node stages it has no use for */
@@ -103,6 +103,19 @@ test.describe('the Embedded SoC template', () => {
     await expect(rows.last()).toContainText('ERTL-D7');
   });
 
+  test('plans, runs and signs off FPGA prototype verification', async ({ page }) => {
+    const id = await newProgram(page, 'AtlasEdge5');
+
+    await page.goto(`/p/${id}/stage/fpgaVerification/activity`);
+    await expect(page.locator('[data-act]')).toHaveCount(6);
+    await expect(page.locator('[data-act="FPV-01"]')).toContainText('FPGA Verification Plan');
+    await expect(page.locator('[data-act="FPV-06"]')).toContainText('FPGA Verification Signoff');
+
+    await page.locator('[data-act="FPV-04"]').click();
+    await expect(page.locator('[data-step^="FPV-04:"]')).toHaveCount(6);
+    await expect(page.locator('[data-step^="FPV-04:"]').first()).toContainText('Arduino shields');
+  });
+
   test('cuts down its own stages, not the SoC flow’s', async ({ page }) => {
     await page.goto('/');
     await page.locator('[data-new-project]').click();
@@ -111,6 +124,6 @@ test.describe('the Embedded SoC template', () => {
     await expect(picker.locator('[data-pick="compiler"]')).toBeVisible();
     await expect(picker.locator('[data-pick="evkLaunch"]')).toContainText('EVK General Availability');
     await expect(picker.locator('[data-pick="packageTestVehicle"]')).toHaveCount(0);
-    await expect(picker.locator('[data-pick]')).toHaveCount(29);
+    await expect(picker.locator('[data-pick]')).toHaveCount(30);
   });
 });

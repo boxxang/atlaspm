@@ -53,7 +53,18 @@ export const EMBEDDED_DERIVED = [
   /* A tiled fabric is one tile designed well and replicated, plus a small
      scalar subsystem and peripherals. */
   { base: 'rtl', key: 'rtlEmb', from: 'RTL', to: 'ERTL', drop: [], time: 0.75, effort: 0.4 },
-  { base: 'verification', key: 'verificationEmb', from: 'DV', to: 'EDV', drop: [], time: 0.75, effort: 0.4 },
+  /* Emulation and the FPGA prototype are a stage of their own here, with a
+     plan, a campaign and a signoff, rather than one platform bring-up inside
+     DV (see fpgaVerification in /data/embeddedSoc). */
+  {
+    base: 'verification',
+    key: 'verificationEmb',
+    from: 'DV',
+    to: 'EDV',
+    drop: ['DV-03'],
+    time: 0.75,
+    effort: 0.4,
+  },
   { base: 'dft', key: 'dftEmb', from: 'DFT', to: 'EDFT', drop: [], time: 0.75, effort: 0.5 },
   { base: 'synthesis', key: 'synthesisEmb', from: 'SYN', to: 'ESYN', drop: [], time: 0.75, effort: 0.5 },
   /* Wire-bond or FC-CSP: the pad ring is planned with the package in EPKG, and
@@ -104,6 +115,9 @@ export const EMBEDDED_REWORDED: Record<string, string> = {
   'Interface and HBM test content': 'Interface, eMRAM and analog test content',
   'Extract the probe card requirement and bump map': 'Extract the probe card requirement and pad map',
   'Probe card requirement and bump map': 'Probe card requirement and pad map',
+  /* the FPGA prototype is a verification method in its own right here */
+  'Assign a verification strategy per feature — simulation, formal or emulation':
+    'Assign a verification strategy per feature — simulation, formal, emulation or the FPGA prototype',
 };
 
 const reword = (text: string): string => EMBEDDED_REWORDED[text] ?? toEmbeddedRef(text);

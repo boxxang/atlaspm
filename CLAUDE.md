@@ -66,9 +66,10 @@ open it in a browser, serve the directory — Chrome refuses `file://` for this.
   `/data/embeddedSoc.ts`. That one inherits seven SoC stages by key (tapeout,
   fabrication and qualification among them, because the countdowns read those
   keys), derives ten at embedded scale under E-prefixes
-  (`/data/embeddedSocDerived.ts`, like the 3DIC top die) and authors twelve,
-  including the compiler, Playground, SDK, EVK and early access under the
-  `platform` band. The authored content is written by hand because the modules
+  (`/data/embeddedSocDerived.ts`, like the 3DIC top die) and authors
+  thirteen, including FPGA prototype verification (which owns the FPGA work
+  the derived DV stage drops) and the compiler, Playground, SDK, EVK and early
+  access under the `platform` band. The authored content is written by hand because the modules
   beside journey.ts are generated. `/data/builtins.ts` composes all three: the
   templates that ship, the activity library every programme resolves against,
   and each stage's content. Derived stages keep the SoC wording, so a
