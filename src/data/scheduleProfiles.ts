@@ -140,7 +140,10 @@ export const milestoneDefs = [
 /**
  * The roadmap's bands. A stage names the one it sits under. `enable` carries the
  * workstreams that must exist before design can start — technology selection,
- * PDK, IP readiness, custom IP, test chip.
+ * PDK, IP readiness, custom IP, test chip. `platform` is what a part sold with
+ * its own toolchain ships beside the silicon — compiler, SDK, evaluation kit,
+ * early access — and only the Embedded SoC template runs it; a band no stage
+ * sits under is not drawn.
  */
 export const lifecyclePhases = [
   { id: 'define',       label: 'Define' },
@@ -149,6 +152,7 @@ export const lifecyclePhases = [
   { id: 'implement',    label: 'Implement' },
   { id: 'manufacture',  label: 'Manufacture' },
   { id: 'integrate',    label: 'Integrate' },
+  { id: 'platform',     label: 'Developer Platform & Ecosystem' },
   { id: 'validateRamp', label: 'Validate & Ramp' },
 ] satisfies readonly LifecyclePhase[];
 

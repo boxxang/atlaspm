@@ -9,8 +9,8 @@
  * both are composed here, once, and every reader takes them from this module
  * rather than from one of the two sources.
  *
- * Pure data: the generated modules are untouched and the authored 3DIC module
- * sits beside them.
+ * Pure data: the generated modules are untouched, and the authored 3DIC and
+ * Embedded SoC modules sit beside them.
  */
 import { activitySteps, type ActivityStepEntry } from './activitySteps';
 import {
@@ -20,6 +20,20 @@ import {
   writtenActivities,
   type GlossaryTerm,
 } from './activityIndex';
+import {
+  EMBEDDED_ACTIVITIES,
+  EMBEDDED_ACTIVITY_TITLES,
+  EMBEDDED_DELIVERABLES,
+  EMBEDDED_MILESTONES,
+  EMBEDDED_PROFILE,
+  EMBEDDED_STAGES,
+} from './embeddedSoc';
+import {
+  EMBEDDED_DERIVED_ACTIVITIES,
+  EMBEDDED_DERIVED_ACTIVITY_TITLES,
+  EMBEDDED_DERIVED_DELIVERABLES,
+  EMBEDDED_DERIVED_STAGES,
+} from './embeddedSocDerived';
 import { journeyData } from './journey';
 import { BUILTIN_PROFILE, milestoneDefs } from './scheduleProfiles';
 import {
@@ -40,7 +54,11 @@ import {
 import type { JourneyStage, MilestoneDef, ScheduleProfile } from './types';
 
 /** Every template the app ships, in the order the pickers list them. */
-export const BUILTIN_PROFILES: readonly ScheduleProfile[] = [BUILTIN_PROFILE, THREE_DIC_PROFILE];
+export const BUILTIN_PROFILES: readonly ScheduleProfile[] = [
+  BUILTIN_PROFILE,
+  THREE_DIC_PROFILE,
+  EMBEDDED_PROFILE,
+];
 
 /**
  * Every activity either template runs, keyed by reference.
@@ -53,13 +71,17 @@ export const ALL_ACTIVITIES: Record<string, ActivityStepEntry> = {
   ...activitySteps,
   ...THREE_DIC_ACTIVITIES,
   ...TOP_DIE_ACTIVITIES,
+  ...EMBEDDED_DERIVED_ACTIVITIES,
+  ...EMBEDDED_ACTIVITIES,
 };
 
-/** Their titles, from the same two sources. */
+/** Their titles, from the same sources. */
 export const ALL_ACTIVITY_TITLES: Record<string, string> = {
   ...detailActivityTitles,
   ...THREE_DIC_ACTIVITY_TITLES,
   ...TOP_DIE_ACTIVITY_TITLES,
+  ...EMBEDDED_DERIVED_ACTIVITY_TITLES,
+  ...EMBEDDED_ACTIVITY_TITLES,
 };
 
 /** Every stage's content, by the key a profile stage points at with `baseKey`. */
@@ -67,10 +89,16 @@ export const ALL_STAGE_CONTENT: readonly JourneyStage[] = [
   ...journeyData,
   ...THREE_DIC_STAGES,
   ...TOP_DIE_STAGES,
+  ...EMBEDDED_DERIVED_STAGES,
+  ...EMBEDDED_STAGES,
 ];
 
 /** The checkpoints of both templates; a profile keeps the ones it runs. */
-export const ALL_MILESTONES: readonly MilestoneDef[] = [...milestoneDefs, ...THREE_DIC_MILESTONES];
+export const ALL_MILESTONES: readonly MilestoneDef[] = [
+  ...milestoneDefs,
+  ...THREE_DIC_MILESTONES,
+  ...EMBEDDED_MILESTONES,
+];
 
 /** The content a stage shows, or undefined for one nobody has written up. */
 export const stageContent = (key: string | null | undefined): JourneyStage | undefined =>
@@ -84,6 +112,8 @@ export const ALL_DELIVERABLE_TITLES: Record<string, string> = {
   ...detailDeliverables,
   ...THREE_DIC_DELIVERABLES,
   ...TOP_DIE_DELIVERABLES,
+  ...EMBEDDED_DERIVED_DELIVERABLES,
+  ...EMBEDDED_DELIVERABLES,
 };
 
 /** The terms a write-up may offer to explain, from both corpora. */

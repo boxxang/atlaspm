@@ -43,15 +43,23 @@ export function deliverableRefs(
   catalogue: Readonly<Record<string, string>>,
   stageOfRef: Readonly<Record<string, string>>,
 ): Map<string, string> {
-  const byNorm = new Map<string, string>();
-  for (const [ref, title] of Object.entries(catalogue)) byNorm.set(normTitle(title), ref);
+  /* Several references can share a title: a template derived from another
+     keeps its deliverables' wording under its own prefix (ERTL-D7 is RTL-D7 at
+     embedded scale). So a title names every reference that carries it, and the
+     row's own stage decides between them. */
+  const byNorm = new Map<string, string[]>();
+  for (const [ref, title] of Object.entries(catalogue)) {
+    const key = normTitle(title);
+    byNorm.set(key, [...(byNorm.get(key) ?? []), ref]);
+  }
 
   const out = new Map<string, string>();
   const taken = new Set<string>();
 
   for (const d of rows) {
-    const ref = byNorm.get(normTitle(d.title));
-    if (ref && !taken.has(ref)) {
+    const open = (byNorm.get(normTitle(d.title)) ?? []).filter((r) => !taken.has(r));
+    const ref = open.find((r) => stageOfRef[r.split('-')[0]] === d.stageId) ?? open[0];
+    if (ref) {
       out.set(d.id, ref);
       taken.add(ref);
     }

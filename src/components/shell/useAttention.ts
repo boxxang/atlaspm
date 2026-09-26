@@ -2,10 +2,10 @@
 
 import { useProgramActivities } from './useProgramActivities';
 import { useMemo } from 'react';
-import { ALL_DELIVERABLE_TITLES as detailDeliverables } from '@/data/builtins';
 import { attention, type AttentionRow } from '@/lib/attention';
 import { deliverableStep, producersOf } from '@/lib/deliverableStatus';
 import { useAppStore } from '@/store/useAppStore';
+import { useDeliverableRefs } from './useDeliverableRefs';
 import { useProgramWork } from './useProgramWork';
 
 /**
@@ -21,18 +21,19 @@ export function useAttention(limit: number): AttentionRow[] {
   const deliverables = useAppStore((s) => s.deliverables);
   const schedule = useAppStore((s) => s.schedule);
   const today = useAppStore((s) => s.today);
+  const refOf = useDeliverableRefs();
 
   return useMemo(() => {
-    /* Deliverable titles drift between the two seed lists; references do not,
-       so the title is matched back to a reference once here. */
-    const refOfTitle = new Map<string, string>();
-    for (const [ref, title] of Object.entries(detailDeliverables)) refOfTitle.set(title, ref);
-
+    /* The reference each row carries, from the one resolver every table
+       uses. A title alone cannot answer it: the Embedded SoC template keeps
+       the SoC wording under its own prefixes, so "FFN — final full netlist"
+       is SYN-D8 in one programme and ESYN-D8 in another, and a map from title
+       to reference sent an SoC row to a step its programme does not have. */
     const producers = producersOf(activitySteps);
 
     const rows = Object.entries(deliverables).flatMap(([stageId, list]) =>
       list.map((d) => {
-        const ref = refOfTitle.get(d.title) ?? null;
+        const ref = refOf.get(d.id) ?? null;
         return {
           id: d.id,
           title: d.title,
@@ -58,5 +59,5 @@ export function useAttention(limit: number): AttentionRow[] {
       upcoming,
       limit,
     });
-  }, [activitySteps, overdue, upcoming, risks, deliverables, schedule, today, limit]);
+  }, [activitySteps, overdue, upcoming, risks, deliverables, schedule, today, limit, refOf]);
 }

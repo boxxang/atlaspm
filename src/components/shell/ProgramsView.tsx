@@ -5,9 +5,9 @@ import { useRouter } from 'next/navigation';
 import { useEffect, useMemo, useRef, useState, useSyncExternalStore, useTransition } from 'react';
 import { createProject, deleteProject } from '@/app/actions';
 import { SEED_COST_PER_MAN_MONTH } from '@/data/projectSeed';
-import { BUILTIN_PROFILES, stageContent } from '@/data/builtins';
-import { BUILTIN_PROFILE, lifecyclePhases, stageMilestone } from '@/data/scheduleProfiles';
-import type { ProfileSummary } from '@/data/types';
+import { ALL_MILESTONES, BUILTIN_PROFILES, stageContent } from '@/data/builtins';
+import { BUILTIN_PROFILE, lifecyclePhases } from '@/data/scheduleProfiles';
+import type { ProfileStageDef, ProfileSummary } from '@/data/types';
 import { kickoffForAnchor, pickStages } from '@/lib/customProfile';
 import { estimateCost } from '@/lib/effort';
 import {
@@ -1051,9 +1051,10 @@ function NewProgramDialog({
           <Field
             label="Stages"
             hint="Everything the template names, ticked. Untick what this chip does not do. A checkpoint leaves with its stage: a program without Tapeout & Mask Release reads No tapeout rather than counting down to a date it does not have."
-            count={`${keep.size} of ${BUILTIN_PROFILE.stages.length}`}
+            count={`${keep.size} of ${source.stages.length}`}
           >
             <StagePicker
+              stages={source.stages}
               keep={keep}
               onToggle={(key, on) =>
                 setKeep((prev) => {
@@ -1064,7 +1065,7 @@ function NewProgramDialog({
                 })
               }
               onAll={(on) =>
-                setKeep(on ? new Set(BUILTIN_PROFILE.stages.map((s) => s.key)) : new Set())
+                setKeep(on ? new Set(source.stages.map((s) => s.key)) : new Set())
               }
             />
           </Field>
@@ -1134,16 +1135,24 @@ export function Field({
  * does not tape out is a real program; the screens say so rather than counting
  * down to a date it does not have.
  */
+/** The checkpoint closing a stage marks, from whichever template owns it. */
+const closesOn = (key: string) => ALL_MILESTONES.find((m) => m.anchor.stage === key && m.anchor.at === 'end');
+
 function StagePicker({
+  stages,
   keep,
   onToggle,
   onAll,
 }: {
+  /* The chosen template's stages. It listed the SoC ones whatever was chosen,
+     so cutting down the 3DIC template offered stages it does not have and hid
+     the ones it does. */
+  stages: readonly ProfileStageDef[];
   keep: ReadonlySet<string>;
   onToggle: (key: string, on: boolean) => void;
   onAll: (on: boolean) => void;
 }) {
-  const all = keep.size === BUILTIN_PROFILE.stages.length;
+  const all = keep.size === stages.length;
   return (
     <div className="stagepick" data-stage-picker>
       <div className="stagepick-hd">
@@ -1155,7 +1164,7 @@ function StagePicker({
       </div>
 
       {lifecyclePhases.map(({ id, label }) => {
-        const mine = BUILTIN_PROFILE.stages.filter((s) => s.phaseId === id);
+        const mine = stages.filter((s) => s.phaseId === id);
         if (!mine.length) return null;
         return (
           <div key={id}>
@@ -1194,12 +1203,12 @@ function StagePicker({
                   </span>
                   {/* what closing this stage marks. The three the countdowns
                       read are locked on; the rest leave with their stage. */}
-                  {stageMilestone[st.key] && (
+                  {closesOn(st.key) && (
                     <span
-                      className={stageMilestone[st.key].major ? 'pill acc' : 'pill'}
+                      className={closesOn(st.key)!.major ? 'pill acc' : 'pill'}
                       style={{ fontSize: 10 }}
                     >
-                      {stageMilestone[st.key].label}
+                      {closesOn(st.key)!.label}
                     </span>
                   )}
                   <span style={{ flexGrow: 1 }} />

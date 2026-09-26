@@ -37,6 +37,8 @@ export const tabLabel = (slug: StageTab): string =>
 
 /**
  * Which stages show the QoR tab. The base key rather than the stage key, so a
- * programme that renamed or copied its Physical Design stage keeps it.
+ * programme that renamed or copied its Physical Design stage keeps it — and
+ * the Embedded SoC template's physical design, which is the same work.
  */
-export const qorTabApplies = (vizKey: string | null | undefined) => vizKey === 'physicalDesign';
+const QOR_STAGES = new Set(['physicalDesign', 'physicalDesignEmb']);
+export const qorTabApplies = (vizKey: string | null | undefined) => !!vizKey && QOR_STAGES.has(vizKey);

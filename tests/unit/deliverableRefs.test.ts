@@ -64,6 +64,25 @@ describe('tagging a key deliverable with its reference', () => {
     expect(refs.has('b')).toBe(false);
   });
 
+  /* A derived template keeps the SoC wording under its own prefix, so one
+     title answers to two references. Whichever the catalogue lists last used
+     to win, and an SoC programme's RTL freeze package read ERTL-D7. */
+  it('lets the row’s stage choose between references that share a title', () => {
+    const shared = { 'RTL-D7': 'RTL Freeze package', 'ERTL-D7': 'RTL Freeze package' };
+    const soc = deliverableRefs(
+      [{ id: 'a', title: 'RTL Freeze package', stageId: 'rtl' }],
+      shared,
+      { RTL: 'rtl' },
+    );
+    expect(soc.get('a')).toBe('RTL-D7');
+    const embedded = deliverableRefs(
+      [{ id: 'a', title: 'RTL Freeze package', stageId: 'rtlEmb' }],
+      shared,
+      { ERTL: 'rtlEmb' },
+    );
+    expect(embedded.get('a')).toBe('ERTL-D7');
+  });
+
   it('leaves a row nothing in the catalogue answers untagged', () => {
     const refs = deliverableRefs(
       [{ id: 'a', title: 'Chase the substrate quote', stageId: 'tech' }],
