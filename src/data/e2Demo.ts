@@ -282,7 +282,13 @@ export const E2_POSTS: readonly ScenarioPost[] = [
     at: '2026-08-19 18:40',
     step: 'FPV-04:4',
     text:
-      'Soak run 14 hung after 31 h on workload W7 (keyword spotting + concurrent eMRAM logging). Fabric stalled with all 4 NoC arbiter queues full; no recovery without reset. Reproduced twice on FPGA image fpga-rtl-2026.08.14. Ravi Kumar looking at the arbiter credit return path. DV has not seen it — 31 h is far beyond any simulation run.',
+      `Soak run 14 hung after 31 h on workload W7 (keyword spotting + concurrent eMRAM logging).
+
+- Symptom: fabric stalled with all 4 NoC arbiter queues full; no recovery without reset
+- Reproduced twice on FPGA image fpga-rtl-2026.08.14
+- DV has not seen it — 31 h is far beyond any simulation run
+
+Next: Ravi Kumar is looking at the arbiter credit return path.`,
   },
   {
     key: 'risk-ffn-late',
@@ -291,7 +297,14 @@ export const E2_POSTS: readonly ScenarioPost[] = [
     at: '2026-08-20 11:15',
     step: 'FPV-04:4',
     text:
-      'FFN (planned 08/26) at risk: the FPGA soak test found a deadlock in the fabric NoC arbiter (credit return starves when two eMRAM write bursts overlap a fabric-to-SRAM burst). Root cause and fix size unknown. Options on the table: hold the FFN for an RTL fix, or release the FFN on time and carry the fix as a post-FFN functional ECO. Owner: Ethan Brooks. Decision needed by 08/27.',
+      `FFN (planned 08/26) at risk — the FPGA soak test found a deadlock in the fabric NoC arbiter.
+
+- Trigger: credit return starves when two eMRAM write bursts overlap a fabric-to-SRAM burst
+- Root cause and fix size: unknown yet
+- Option A: hold the FFN for an RTL fix
+- Option B: release the FFN on time and carry the fix as a post-FFN functional ECO
+
+Owner: Ethan Brooks. Decision needed by 08/27.`,
   },
   {
     key: 'soak-rootcause',
@@ -299,7 +312,13 @@ export const E2_POSTS: readonly ScenarioPost[] = [
     at: '2026-08-24 17:20',
     step: 'FPV-05:3',
     text:
-      'Root cause confirmed by Ravi Kumar and Irene Wu: the arbiter returns a credit one cycle late when a write-back and a read retry hit the same port in the same cycle, and under sustained load the lost credits accumulate until all queues block. Formal now reproduces it in 38 cycles with the right assumption set — the original proof had over-constrained the retry input. Fix is ~120 lines in noc_arb and a new assertion set; about 2,400 gates.',
+      `Root cause confirmed by Ravi Kumar and Irene Wu.
+
+- The arbiter returns a credit one cycle late when a write-back and a read retry hit the same port in the same cycle
+- Under sustained load the lost credits accumulate until all queues block
+- Formal now reproduces it in 38 cycles — the original proof had over-constrained the retry input
+
+Fix: ~120 lines in noc_arb plus a new assertion set, about 2,400 gates.`,
   },
   {
     key: 'risk-ffn-late-hold',
@@ -307,7 +326,12 @@ export const E2_POSTS: readonly ScenarioPost[] = [
     at: '2026-08-27 16:30',
     parent: 'risk-ffn-late',
     text:
-      'Decided at the FFN slip review: hold the FFN for the RTL fix. A post-FFN functional ECO touching the arbiter in all 576 tiles would reopen the final turn and signoff; holding costs 2.5 weeks up front. FFN re-planned to 09/11. Recovery: signoff runs its dry run and deck correlation on the Turn 2 database, so the FFN database needs one signoff iteration fewer; PD handoff moves 11/08 → 11/13. Design Freeze and MTO unchanged.',
+      `Decided at the FFN slip review: hold the FFN for the RTL fix.
+
+- Why: a post-FFN functional ECO touching the arbiter in all 576 tiles would reopen the final turn and signoff; holding costs 2.5 weeks up front
+- FFN re-planned to 09/11
+- Recovery: signoff runs its dry run and deck correlation on the Turn 2 database, so the FFN database needs one signoff iteration fewer
+- PD handoff 11/08 → 11/13; Design Freeze and MTO unchanged`,
   },
   {
     key: 'fix-verified',
@@ -315,14 +339,23 @@ export const E2_POSTS: readonly ScenarioPost[] = [
     at: '2026-09-04 19:05',
     step: 'FPV-05:3',
     text:
-      'Arbiter fix (rtl-2026.09.01) through the full regression: 0 new failures, formal proofs on the arbiter re-run with the relaxed retry assumption — all proven. FPGA image fpga-rtl-2026.09.02 built; 72 h soak restarted on W7 and W3.',
+      `Arbiter fix (rtl-2026.09.01) verified.
+
+- Full regression: 0 new failures
+- Formal: arbiter proofs re-run with the relaxed retry assumption — all proven
+- FPGA: image fpga-rtl-2026.09.02 built; 72 h soak restarted on W7 and W3`,
   },
   {
     key: 'soak-clean',
     kind: 'update',
     at: '2026-09-10 09:30',
     step: 'FPV-04:4',
-    text: 'Soak clean: 72 h on W7 and 72 h on W3 with the fix, no stall, no ECC event. Closing the soak item for the FFN; the long-run soak continues on the FFN image for FPGA signoff.',
+    text: `Soak clean with the fix.
+
+- W7: 72 h, no stall, no ECC event
+- W3: 72 h, no stall, no ECC event
+
+Closing the soak item for the FFN. The long-run soak continues on the FFN image for FPGA signoff.`,
   },
   {
     key: 'ffn-released',
@@ -330,14 +363,24 @@ export const E2_POSTS: readonly ScenarioPost[] = [
     at: '2026-09-11 20:10',
     step: 'ESYN-12:6',
     text:
-      'FFN released: tag e2-ffn-2026.09.11, RTL rtl-2026.09.01. Equivalence RTL → FFN clean on all 3 modes, UPF consistency clean, SDC frozen (sdc-v3.4). 3.91 M instances, +1.8% against N2. Functional freeze declared — from now on changes come in only as ECOs through the ECO board.',
+      `FFN released: tag e2-ffn-2026.09.11 (RTL rtl-2026.09.01).
+
+- Equivalence RTL → FFN: clean on all 3 modes
+- UPF consistency: clean
+- SDC: frozen at sdc-v3.4
+- Size: 3.91 M instances, +1.8% against N2
+
+Functional freeze declared — from now on changes come in only as ECOs through the ECO board.`,
   },
   {
     key: 'risk-ffn-late-closed',
     kind: 'reply',
     at: '2026-09-11 20:20',
     parent: 'risk-ffn-late',
-    text: 'Closed: FFN released 09/11 with the arbiter fix and 72 h clean soak. Cost 2.5 weeks on the FFN, 1 week on the start of the final turn; Design Freeze 11/23 and MTO 01/18 held by the signoff recovery plan.',
+    text: `Closed: FFN released 09/11 with the arbiter fix and a 72 h clean soak.
+
+- Cost: 2.5 weeks on the FFN, 1 week on the start of the final turn
+- Held: Design Freeze 11/23 and MTO 01/18, through the signoff recovery plan`,
   },
 
   /* ---- the final turn ---- */
@@ -347,7 +390,15 @@ export const E2_POSTS: readonly ScenarioPost[] = [
     at: '2026-09-15 17:45',
     step: 'EPD-13:1',
     text:
-      'FFN intake done. Against N2: +1.8% instances overall; noc_arb +6.1% (the fix plus its assertions stripped in synthesis), emram_ctrl +4.2% (ECC scrub counter from the ECO board), aon_hub +3.0%. No block above 72% placement utilization. Floorplan and PDN unchanged. ECO-only change discipline in force from today.',
+      `FFN intake done — delta against N2:
+
+- Chip: +1.8% instances
+- noc_arb: +6.1% (the fix, with its assertions stripped in synthesis)
+- emram_ctrl: +4.2% (ECC scrub counter from the ECO board)
+- aon_hub: +3.0%
+- No block above 72% placement utilization; floorplan and PDN unchanged
+
+ECO-only change discipline in force from today.`,
   },
   {
     key: 'note-ffn-delta',
@@ -416,14 +467,23 @@ export const E2_POSTS: readonly ScenarioPost[] = [
     at: '2026-09-08 16:00',
     step: 'EPD-09:7',
     text:
-      'Always-on domain leakage 2.3 µA at 25 °C on the Turn 2 database against the 1.5 µA deep-sleep target — the sensor hub and its retention flops are mostly SVT. Deep-sleep current is the number the coin-cell design-ins are sold on. Owner: Ben Carter, with Owen Gallagher (PMU).',
+      `Always-on domain leakage 2.3 µA at 25 °C on the Turn 2 database — target 1.5 µA deep sleep.
+
+- Cause: the sensor hub and its retention flops are mostly SVT
+- Impact: deep-sleep current is the number the coin-cell design-ins are sold on
+
+Owner: Ben Carter, with Owen Gallagher (PMU).`,
   },
   {
     key: 'risk-aon-leakage-closed',
     kind: 'reply',
     at: '2026-09-18 15:40',
     parent: 'risk-aon-leakage',
-    text: 'Closed: HVT swap on the always-on domain outside the wake path (14.2 k cells), wake-path timing still met with 11% margin. AON leakage 1.42 µA at 25 °C, total deep-sleep 1.46 µA with retention on — inside the 1.5 µA target. Carried into the FFN run as a placement constraint.',
+    text: `Closed: HVT swap on the always-on domain outside the wake path.
+
+- 14.2 k cells swapped; wake-path timing still met with 11% margin
+- AON leakage 1.42 µA at 25 °C; total deep sleep 1.46 µA with retention on — inside the 1.5 µA target
+- Carried into the FFN run as a placement constraint`,
   },
   {
     key: 'risk-fabric-timing',
@@ -432,7 +492,14 @@ export const E2_POSTS: readonly ScenarioPost[] = [
     step: 'EPD-13:8',
     meeting: 'pnr-0915',
     text:
-      'Setup timing on the FFN placement: WNS −61 ps, TNS −6.8 ns, 1,480 endpoints at SSG 0.72 V / −40 °C on the NoC arbiter → PE input paths (Turn 2 was −17 ps). The arbiter grew 6.1% and its paths now cross two tile rows. 120 MHz fabric target at risk; LVT swap is limited by the always-on leakage just recovered. Owner: Yuki Tanaka. Plan: useful skew on the arbiter clock, pipeline-aware placement, then LVT only on the top 300 paths.',
+      `Setup timing on the FFN placement — 120 MHz fabric target at risk.
+
+- SSG 0.72 V / −40 °C: WNS −61 ps, TNS −6.8 ns, 1,480 endpoints (Turn 2 was −17 ps)
+- Paths: NoC arbiter → PE inputs; the arbiter grew 6.1% and its paths now cross two tile rows
+- Constraint: LVT swap is limited by the always-on leakage just recovered
+
+Plan: useful skew on the arbiter clock → pipeline-aware placement → LVT only on the top 300 paths.
+Owner: Yuki Tanaka.`,
   },
   {
     key: 'turn2-closure-risk',
@@ -440,7 +507,14 @@ export const E2_POSTS: readonly ScenarioPost[] = [
     at: '2026-09-23 17:00',
     step: 'EPD-09:8',
     text:
-      'Turn 2 closure risk statement for the final turn (retrospective on the N2 database): timing −17 ps / 212 endpoints, 312 DRC after route, dynamic IR 7.4% worst — all inside what the final turn plan assumed. The two things Turn 2 did not exercise: the arbiter fix (now the worst timing) and concurrent eMRAM writes during a fabric burst (now the worst IR).',
+      `Turn 2 closure risk statement for the final turn (retrospective on the N2 database).
+
+- Timing: −17 ps / 212 endpoints
+- Route: 312 DRC after route
+- Dynamic IR: 7.4% worst
+- All inside what the final turn plan assumed
+
+Not exercised by Turn 2: the arbiter fix (now the worst timing) and concurrent eMRAM writes during a fabric burst (now the worst IR).`,
   },
   {
     key: 'risk-mram-ir',
@@ -449,7 +523,18 @@ export const E2_POSTS: readonly ScenarioPost[] = [
     step: 'EPD-13:5',
     meeting: 'pnr-0922',
     text:
-      'Dynamic IR drop 11.2% at eMRAM banks 2 and 3 on the FFN placement (budget 8%) when all four banks write while the fabric runs a burst — the vectorless run never hit it, the FFN W7 activity vectors do. eMRAM write margin falls off below 0.74 V at the macro. Owner: Ben Carter, with Hana Yoshida and Kenji Mori (foundry). Options: extra M8/M9 straps and decap over the bank channel, or throttle concurrent bank writes in emram_ctrl (an ECO), or both.',
+      `Dynamic IR drop 11.2% at eMRAM banks 2 and 3 on the FFN placement — budget 8%.
+
+- When: all four banks write while the fabric runs a burst
+- Why now: the vectorless run never hit it; the FFN W7 activity vectors do
+- Impact: eMRAM write margin falls off below 0.74 V at the macro
+
+Options:
+1. Extra M8/M9 straps and decap over the bank channel
+2. Throttle concurrent bank writes in emram_ctrl (an ECO)
+3. Both
+
+Owner: Ben Carter, with Hana Yoshida and Kenji Mori (foundry).`,
   },
   {
     key: 'place-done',
@@ -457,7 +542,13 @@ export const E2_POSTS: readonly ScenarioPost[] = [
     at: '2026-09-25 18:50',
     step: 'EPD-13:2',
     text:
-      'Final placement done on the FFN. With useful skew on the arbiter clock and pipeline-aware placement: WNS −61 → −38 ps, TNS −6.8 → −2.9 ns, endpoints 1,480 → 604 at SSG 0.72 V / −40 °C. Utilization 69.2%, no block above 72%. Starting final CTS; LVT on the top 300 paths held back until after CTS so the leakage cost is spent only where CTS does not recover it.',
+      `Final placement done on the FFN.
+
+- At SSG 0.72 V / −40 °C, with useful skew on the arbiter clock and pipeline-aware placement:
+  WNS −61 → −38 ps · TNS −6.8 → −2.9 ns · endpoints 1,480 → 604
+- Utilization 69.2%, no block above 72%
+
+Next: final CTS. LVT on the top 300 paths is held back until after CTS, so the leakage cost is spent only where CTS does not recover it.`,
   },
   {
     key: 'dryrun',
@@ -465,7 +556,17 @@ export const E2_POSTS: readonly ScenarioPost[] = [
     at: '2026-09-25 16:20',
     step: 'ESO-01:2',
     text:
-      'Signoff dry run on the Turn 2 database: all decks run end to end — STA 27 MCMM views in 9.5 h, DRC / LVS / antenna in 14 h, EM/IR in 11 h. Found and fixed: a stale LVS rule file (v1.3 → v1.4 from the foundry), and a missing low-voltage 0.6 V corner in the EM run. Triage dashboard live. We are ready for the FFN database the day it lands.',
+      `Signoff dry run on the Turn 2 database — all decks run end to end.
+
+- STA: 27 MCMM views in 9.5 h
+- DRC / LVS / antenna: 14 h
+- EM/IR: 11 h
+
+Found and fixed:
+- Stale LVS rule file (v1.3 → v1.4 from the foundry)
+- Missing low-voltage 0.6 V corner in the EM run
+
+Triage dashboard is live — ready for the FFN database the day it lands.`,
   },
   {
     key: 'risk-atpg-volume',
@@ -473,7 +574,17 @@ export const E2_POSTS: readonly ScenarioPost[] = [
     at: '2026-09-24 14:25',
     step: 'EDFT-10:6',
     text:
-      'ATPG coverage targets met (stuck-at 99.1%, transition 93.6% against 92%, cell-aware 84%), but the compacted pattern set is 1.34× the vector memory of the production tester configuration. Options: raise the compression ratio from 60× to 100× (a DFT ECO, re-verify), drop the lowest-yield cell-aware patterns, or split into two loads (+18% test time). Owner: Kevin Tran. Pattern release (EDFT-10 step 8) moves to 10/16 at the latest.',
+      `ATPG pattern set is 1.34× the vector memory of the production tester configuration.
+
+- Coverage met: stuck-at 99.1%, transition 93.6% (target 92%), cell-aware 84%
+
+Options:
+1. Raise compression from 60× to 100× (a DFT ECO, re-verify)
+2. Drop the lowest-yield cell-aware patterns
+3. Split into two loads (+18% test time)
+
+Pattern release (EDFT-10 step 8) moves to 10/16 at the latest.
+Owner: Kevin Tran.`,
   },
   {
     key: 'risk-mram-ir-options',
@@ -481,7 +592,15 @@ export const E2_POSTS: readonly ScenarioPost[] = [
     at: '2026-09-26 11:30',
     parent: 'risk-mram-ir',
     text:
-      'First mitigation run (extra M9 straps over banks 2–3, +180 pF decap in the bank channel): 11.2% → 9.4%. Foundry (Kenji Mori) confirms the macro is characterised to 8% only. Proposal for Tuesday: add the write throttle in emram_ctrl — max two banks writing during a fabric burst, a 4-gate ECO plus one CSR — expected to take it under 7%. Firmware impact: none for the SDK, the throttle is transparent.',
+      `First mitigation run: 11.2% → 9.4% — still above the 8% budget.
+
+- Applied: extra M9 straps over banks 2–3, +180 pF decap in the bank channel
+- Foundry (Kenji Mori): the macro is characterised to 8% only
+
+Proposal for Tuesday:
+- Add a write throttle in emram_ctrl — max two banks writing during a fabric burst (a 4-gate ECO plus one CSR)
+- Expected to take it under 7%
+- Firmware impact: none for the SDK; the throttle is transparent`,
   },
   {
     key: 'note-qor-tracker',
@@ -513,7 +632,13 @@ export const E2_POSTS: readonly ScenarioPost[] = [
     at: '2026-09-14 17:00',
     stageId: 'compiler',
     text:
-      'Compiler Alpha released on plan: cmp-0.9.0-alpha. 42 of 45 reference kernels compile and match the simulator; the 3 misses are dynamic-shape ONNX ops, deferred to beta. Mapper runtime down from 11 min to 3.5 min on the largest model. Going to the four early-access partners with the Playground next week.',
+      `Compiler Alpha released on plan: cmp-0.9.0-alpha.
+
+- 42 of 45 reference kernels compile and match the simulator
+- The 3 misses are dynamic-shape ONNX ops, deferred to beta
+- Mapper runtime down from 11 min to 3.5 min on the largest model
+
+Going to the four early-access partners with the Playground next week.`,
   },
   {
     key: 'playground',
@@ -521,14 +646,26 @@ export const E2_POSTS: readonly ScenarioPost[] = [
     at: '2026-09-24 18:10',
     stageId: 'virtualPlatform',
     text:
-      'Playground launch readiness: browser compile-run-energy loop working on the FFN-level cycle model; energy numbers within 6% of the FPGA-measured reference on W3 and W7. Load test at 200 concurrent compiles passed. Launch review with Rachel Kim and Chris Donovan on 09/28.',
+      `Playground launch readiness.
+
+- Browser compile → run → energy loop working on the FFN-level cycle model
+- Energy numbers within 6% of the FPGA-measured reference on W3 and W7
+- Load test at 200 concurrent compiles: passed
+
+Launch review with Rachel Kim and Chris Donovan on 09/28.`,
   },
   {
     key: 'atpg-coverage',
     kind: 'update',
     at: '2026-09-18 17:30',
     step: 'EDFT-10:7',
-    text: 'Coverage closed against the EDFT-02 targets on the FFN: stuck-at 99.1% (target 98.5%), transition 93.6% (92%), cell-aware 84% (goal, no target). Untestable faults justified in the coverage report, 0.4% in the eMRAM wrapper boundary.',
+    text: `Coverage closed against the EDFT-02 targets on the FFN.
+
+- Stuck-at: 99.1% (target 98.5%)
+- Transition: 93.6% (target 92%)
+- Cell-aware: 84% (goal, no target)
+
+Untestable faults justified in the coverage report — 0.4%, in the eMRAM wrapper boundary.`,
   },
 ];
 
