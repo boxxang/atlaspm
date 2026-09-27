@@ -99,3 +99,19 @@ export const handoverComplete = (
 ): boolean =>
   !!post && post.text.trim().length > 0 && post.attachments.length > 0 && !!post.doneAt;
 
+
+/**
+ * Whether a deliverable is done, and since when. A gate with an in-app
+ * checklist closes when every item on it is confirmed as well as when it is
+ * handed over; the handover dates it when there is one, being the record of
+ * what was actually delivered.
+ */
+export const deliverableClosure = (
+  post: { text: string; attachments: readonly unknown[]; doneAt: Date | null } | null,
+  checklistDoneAt: Date | null,
+): { done: boolean; completedAt: Date | null } =>
+  handoverComplete(post)
+    ? { done: true, completedAt: post!.doneAt }
+    : checklistDoneAt
+      ? { done: true, completedAt: checklistDoneAt }
+      : { done: false, completedAt: null };

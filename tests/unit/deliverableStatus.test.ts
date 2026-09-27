@@ -125,3 +125,18 @@ describe('handoverComplete', () => {
   });
 });
 
+
+describe('a gate closes on its handover or on its checklist', () => {
+  it('is done by whichever completed, dated by the handover first', async () => {
+    const { deliverableClosure } = await import('@/lib/deliverableStatus');
+    const post = (doneAt: Date | null) => ({ text: 'Handed over', attachments: [1], doneAt });
+    const may = new Date(2027, 4, 16);
+    const june = new Date(2027, 5, 1);
+    expect(deliverableClosure(null, null)).toEqual({ done: false, completedAt: null });
+    expect(deliverableClosure(post(may), null)).toEqual({ done: true, completedAt: may });
+    expect(deliverableClosure(null, june)).toEqual({ done: true, completedAt: june });
+    expect(deliverableClosure(post(may), june)).toEqual({ done: true, completedAt: may });
+    /* an unfinished handover leaves it to the checklist */
+    expect(deliverableClosure(post(null), june)).toEqual({ done: true, completedAt: june });
+  });
+});

@@ -193,6 +193,18 @@ export async function setDeliverableDone(
   touch(projectId);
 }
 
+/** A gate's checklist completed, or no longer: the day it was, and what that makes the deliverable. */
+export async function setDeliverableChecklist(
+  projectId: string,
+  id: string,
+  checklistDoneAt: Date | null,
+  done: boolean,
+  completedAt: Date | null,
+) {
+  await prisma.deliverable.update({ where: { id }, data: { checklistDoneAt, done, completedAt } });
+  touch(projectId);
+}
+
 /**
  * The completion stamp is written when the box is ticked, but it is a date like
  * any other after that: a deliverable finished last week and ticked off today

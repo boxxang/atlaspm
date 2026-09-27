@@ -141,8 +141,9 @@ test.describe('the Embedded SoC template', () => {
     await expect(page.locator('.ad-title')).toHaveText('Placement, Routing and Static Scheduling');
   });
 
-  /* A gate deliverable's handover offers the document it is written in. */
-  test('offers a gate template beside the Handover heading, and only on a gate', async ({ page }) => {
+  /* A gate deliverable's handover opens its checklist; the workbook of the
+     same items is on the checklist's page. */
+  test('offers a Checklist beside the Handover heading, and only on a gate', async ({ page }) => {
     const id = await newProgram(page, 'AtlasEdge7');
 
     await page.goto(`/p/${id}/stage/verificationEmb/deliverables`);
@@ -150,15 +151,20 @@ test.describe('the Embedded SoC template', () => {
     await rows.filter({ hasText: 'EDV-D7' }).click();
     const card = page.locator('[data-handover]');
     await expect(card).toContainText('Handover');
-    const link = card.locator('[data-template-download="EDV-D7"]');
+    const open = card.locator('[data-signoff-open="EDV-D7"]');
+    await expect(open).toHaveText('Checklist');
+    await expect(card.locator('[data-template-download]')).toHaveCount(0);
+    await open.click();
+    await page.waitForURL(/\/signoff\/EDV-D7$/);
+    await expect(page.locator('[data-signoff="EDV-D7"] [data-item]')).toHaveCount(24);
+    const link = page.getByRole('link', { name: /Excel/ });
     await expect(link).toHaveAttribute('href', '/templates/EDV-D7-dv-closure-signoff.xlsx');
-    const [download] = await Promise.all([page.waitForEvent('download'), link.click()]);
-    expect(download.suggestedFilename()).toBe('EDV-D7-dv-closure-signoff-template.xlsx');
 
     /* a deliverable that is not a gate offers nothing */
+    await page.goto(`/p/${id}/stage/verificationEmb/deliverables`);
     await rows.filter({ hasText: 'EDV-D1' }).click();
     await expect(page.locator('[data-handover]')).toContainText('Handover');
-    await expect(page.locator('[data-template-download]')).toHaveCount(0);
+    await expect(page.locator('[data-signoff-open]')).toHaveCount(0);
   });
 
   /* ESO-D7 is confirmed in the app as well as in the workbook: the same
@@ -184,11 +190,7 @@ test.describe('the Embedded SoC template', () => {
     await page.goto(`/p/${id}/stage/signoffEmb/deliverables`);
     await page.locator('[data-board] [data-deliverable]').filter({ hasText: 'ESO-D7' }).click();
     const card = page.locator('[data-handover]');
-    /* the checklist sits left of the workbook download */
-    const icons = card.locator('.notecard-hd .tpl-dl');
-    await expect(icons).toHaveCount(2);
-    await expect(icons.first()).toHaveAttribute('data-signoff-open', 'ESO-D7');
-    await icons.first().click();
+    await card.locator('[data-signoff-open="ESO-D7"]').click();
     await page.waitForURL(/\/signoff\/ESO-D7$/);
 
     const board = page.locator('[data-signoff="ESO-D7"]');
@@ -243,12 +245,17 @@ test.describe('the Embedded SoC template', () => {
     await expect(item.locator('[data-view="C-01"]')).toContainText('Nothing recorded yet');
     await expect(item.locator('input, select, textarea')).toHaveCount(0);
 
-    /* a confirmation without evidence is flagged, and clears when it has some */
+    /* the two statuses and what they offer */
     await item.locator('[data-edit-item="C-01"]').click();
+    await expect(item.getByLabel('C-01 evidence status').locator('option')).toHaveText(['Not updated', 'Under review', 'Confirmed']);
+    await expect(item.getByLabel('C-01 item status').locator('option')).toHaveText(['Pending', 'Under review', 'Confirmed']);
+    await expect(item.getByLabel('C-01 evidence status')).toHaveValue('Not updated');
+    await expect(item.getByLabel('C-01 item status')).toHaveValue('Pending');
+
+    /* a confirmation without evidence is flagged, and clears when it has some */
     await item.getByLabel('C-01 item status').selectOption('Confirmed');
-    /* confirming passes the evidence, and it cannot be changed while confirmed */
-    await expect(item.getByLabel('C-01 evidence status')).toHaveValue('Pass');
-    await expect(item.getByLabel('C-01 evidence status')).toBeDisabled();
+    /* confirming the item confirms its evidence */
+    await expect(item.getByLabel('C-01 evidence status')).toHaveValue('Confirmed');
     /* only the stage lead or the TPM can be named */
     await expect(item.getByLabel('C-01 confirmed by').locator('option:not([value=""])')).toHaveText([/Tomas Rivera/, /Sangwook Park/]);
     await item.locator('[data-save-item="C-01"]').click();
@@ -258,7 +265,7 @@ test.describe('the Embedded SoC template', () => {
     await expect(board.locator('[data-item="C-01"] [data-col="confirmed-by"] .av')).toHaveText('TR');
     /* the opened item says where the confirmation stands */
     await expect(item.locator('[data-card-state="Confirmed"]')).toContainText('Tomas Rivera');
-    await expect(board.locator('[data-item="C-01"] [data-owner-status]')).toHaveText('Pass');
+    await expect(board.locator('[data-item="C-01"] [data-owner-status]')).toHaveText('Confirmed');
     await expect(board.locator('[data-item="C-01"] [data-lead]')).toHaveText('Confirmed');
     await expect(board.locator('[data-item="C-01"] [data-flag]')).toHaveText('Evidence missing');
     await expect(board.locator('[data-stat="flagged"]')).toHaveText('1');
@@ -298,34 +305,36 @@ test.describe('the Embedded SoC template', () => {
     await expect(item.getByLabel('C-01 evidence owner').locator('option', { hasText: 'Sangwook Park' })).toHaveCount(1);
     await item.getByRole('button', { name: 'Cancel' }).click();
 
-    /* reopening puts the item back to Not updated, its evidence open again,
-       with what was recorded kept to be brought up to date */
+    /* reopening puts the item back to Pending and its evidence to Not
+       updated, with what was recorded kept to be brought up to date */
     await item.locator('[data-reopen-item="C-01"]').click();
-    await expect(board.locator('[data-item="C-01"] [data-lead]')).toHaveText('Not updated');
-    await expect(board.locator('[data-item="C-01"] [data-owner-status]')).toHaveText('Open');
+    await expect(board.locator('[data-item="C-01"] [data-lead]')).toHaveText('Pending');
+    await expect(board.locator('[data-item="C-01"] [data-owner-status]')).toHaveText('Not updated');
     await expect(board.locator('[data-item="C-01"] [data-col="confirmed-by"]')).toHaveText('—');
     await expect(item.locator('[data-view="C-01"] [data-evidence-files]')).toContainText('sta_summary.txt');
     await expect(item.locator('[data-reopen-item]')).toHaveCount(0);
     await item.locator('[data-edit-item="C-01"]').click();
+    await item.getByLabel('C-01 evidence status').selectOption('Under review');
     await item.getByLabel('C-01 item status').selectOption('Under review');
     await item.locator('[data-save-item="C-01"]').click();
     await expect(board.locator('[data-item="C-01"] [data-lead]')).toHaveText('Under review');
+    await expect(board.locator('[data-item="C-01"] [data-owner-status]')).toHaveText('Under review');
     await expect(board.locator('[data-stat="confirmed"]')).toHaveText('0/23');
+    await expect(board.locator('[data-stat="review"]')).toHaveText('1');
     await item.locator('[data-edit-item="C-01"]').click();
     await item.getByLabel('C-01 item status').selectOption('Confirmed');
     await item.getByLabel('C-01 confirmed by').selectOption('Sangwook Park');
     await item.locator('[data-save-item="C-01"]').click();
-    await expect(board.locator('[data-item="C-01"] [data-owner-status]')).toHaveText('Pass');
+    await expect(board.locator('[data-item="C-01"] [data-owner-status]')).toHaveText('Confirmed');
     await expect(board.locator('[data-item="C-01"] [data-col="confirmed-by"] .so-name')).toHaveText('Sangwook Park');
 
-    /* a waived item is flagged until a waiver is raised against it */
-    await board.locator('[data-item="C-02"]').click();
-    const card2 = board.locator('[data-card="C-02"]');
-    await card2.locator('[data-edit-item="C-02"]').click();
-    await card2.getByLabel('C-02 evidence status').selectOption('Waived');
-    await expect(card2.getByLabel(/Waiver ID/)).toHaveCount(0);
-    await card2.locator('[data-save-item="C-02"]').click();
-    await expect(board.locator('[data-item="C-02"] [data-flag]')).toHaveText('No waiver for this item');
+    /* setting a confirmed item's evidence back reopens the item */
+    await item.locator('[data-edit-item="C-01"]').click();
+    await item.getByLabel('C-01 evidence status').selectOption('Under review');
+    await expect(item.getByLabel('C-01 item status')).toHaveValue('Pending');
+    await item.getByRole('button', { name: 'Cancel' }).click();
+
+    /* a waiver is raised against its item, and needs an approver */
     await board.locator('[data-so-tab="waivers"]').click();
     await board.locator('[data-add="waiver"]').click();
     await board.getByLabel('W-01 Item').selectOption('C-02');
@@ -334,7 +343,6 @@ test.describe('the Embedded SoC template', () => {
     await expect(board.locator('[data-row="W-01"]')).toContainText('Tomas Rivera');
     await expect(board.locator('[data-row="W-01"] input')).toHaveCount(0);
     await board.locator('[data-so-tab="checklist"]').click();
-    await expect(board.locator('[data-item="C-02"] [data-flag]')).toHaveText('');
 
     /* signing off against the counts is allowed, and called out */
     await board.locator('[data-so-tab="signoff"]').click();
@@ -348,18 +356,50 @@ test.describe('the Embedded SoC template', () => {
     await expect(page.locator('.so-save')).toHaveText('Saved');
     await page.reload();
     await expect(page.locator('[data-signoff="ESO-D7"] [data-stat="confirmed"]')).toHaveText('1/23');
-    await expect(page.locator('[data-signoff="ESO-D7"] [data-item="C-02"] [data-flag]')).toHaveText('');
+    await expect(page.locator('[data-signoff="ESO-D7"] [data-item="C-01"] [data-lead]')).toHaveText('Confirmed');
   });
 
-  test('offers the in-app checklist on ESO-D7 only, for now', async ({ page }) => {
+  /* Every gate is a checklist now, and a complete one closes its deliverable. */
+  test('closes a gate deliverable when its checklist reaches 100%, and reopens it', async ({ page }) => {
     const id = await newProgram(page, 'AtlasEdge9');
-    await page.goto(`/p/${id}/stage/verificationEmb/deliverables`);
-    await page.locator('[data-board] [data-deliverable]').filter({ hasText: 'EDV-D7' }).click();
-    await expect(page.locator('[data-handover] [data-template-download="EDV-D7"]')).toBeVisible();
-    await expect(page.locator('[data-handover] [data-signoff-open]')).toHaveCount(0);
-    await page.goto(`/p/${id}/signoff/EDV-D7`);
-    await expect(page.getByText(/could not be found|404/i).first()).toBeVisible();
-    await expect(page.locator('[data-signoff]')).toHaveCount(0);
+    await page.goto(`/p/${id}/stage/rtlEmb/deliverables`);
+    const row = page.locator('[data-board] [data-deliverable]').filter({ hasText: 'ERTL-D7' });
+    await expect(row.locator('.cb.on')).toHaveCount(0);
+    await row.click();
+    await page.locator('[data-signoff-open="ERTL-D7"]').click();
+    await page.waitForURL(/\/signoff\/ERTL-D7$/);
+    const board = page.locator('[data-signoff="ERTL-D7"]');
+    const ids = await board.locator('[data-item]').evaluateAll((els) => els.map((e) => e.getAttribute('data-item')!));
+    expect(ids).toHaveLength(23);
+    /* the stage has no lead, so the TPM confirms */
+    for (const it of ids) {
+      await board.locator(`[data-item="${it}"]`).click();
+      const card = board.locator(`[data-card="${it}"]`);
+      await card.locator(`[data-edit-item="${it}"]`).click();
+      await card.getByLabel(`${it} item status`).selectOption('Confirmed');
+      await expect(card.getByLabel(`${it} confirmed by`)).toHaveValue('Sangwook Park');
+      await card.locator(`[data-save-item="${it}"]`).click();
+      await board.locator(`[data-item="${it}"]`).click();
+    }
+    await expect(board.locator('[data-stat="confirmed"]')).toHaveText('23/23');
+    await expect(board.locator('[data-summary]')).toContainText('ERTL-D7 closed');
+    await expect(page.locator('.so-save')).toHaveText('Saved');
+
+    /* the deliverable is closed, and says by what — after a reload too */
+    await page.goto(`/p/${id}/stage/rtlEmb/deliverables`);
+    await expect(row.locator('.cb.on')).toHaveCount(1);
+    await row.click();
+    await expect(page.locator('[data-closed-by-checklist]')).toContainText('Closed by its checklist');
+
+    /* reopening one item reopens the deliverable */
+    await page.locator('[data-signoff-open="ERTL-D7"]').click();
+    await page.waitForURL(/\/signoff\/ERTL-D7$/);
+    await board.locator(`[data-item="${ids[0]}"]`).click();
+    await board.locator(`[data-reopen-item="${ids[0]}"]`).click();
+    await expect(board.locator('[data-stat="confirmed"]')).toHaveText('22/23');
+    await expect(page.locator('.so-save')).toHaveText('Saved');
+    await page.goto(`/p/${id}/stage/rtlEmb/deliverables`);
+    await expect(row.locator('.cb.on')).toHaveCount(0);
   });
 
   test('cuts down its own stages, not the SoC flow’s', async ({ page }) => {

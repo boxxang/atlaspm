@@ -171,6 +171,7 @@ interface DeliverableRow {
   due: Date | null;
   done: boolean;
   completedAt: Date | null;
+  checklistDoneAt?: Date | null;
   note: string;
   attachments?: AttachmentRow[];
 }
@@ -353,6 +354,7 @@ export function buildProjectState(project: {
       due: d.due,
       done: d.done,
       completedAt: d.completedAt,
+      checklistDoneAt: d.checklistDoneAt ?? null,
       note: d.note ?? '',
       attachments: d.attachments ?? [],
     });

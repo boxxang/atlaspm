@@ -1,34 +1,28 @@
 /**
  * /lib/signoff.ts — confirming a gate deliverable item by item, in the app.
  *
- * The sign-off workbook (tools/deliverable-templates) has a Checklist the
- * owners fill with a result, its evidence and a status, and a stage lead who
- * confirms each item on that evidence before deciding. These are its rules,
- * as functions, so the page and the workbook judge a row the same way.
+ * Every item carries a result and its evidence, and two statuses:
  *
- * In the page an item moves Not updated → Under review → Confirmed. The
- * stage lead or the TPM confirms it, which passes its evidence (a waived or
- * not-applicable item stays so); reopening a confirmed item puts it back to
- * Not updated, with its evidence open again, to be brought up to date.
+ *  - the evidence status, the owner's: Not updated → Under review, as the
+ *    result and its evidence are recorded and put up for checking;
+ *  - the item status: Pending → Under review → Confirmed. The stage lead or
+ *    the TPM confirms, and that confirms the evidence with it. Reopening a
+ *    confirmed item sends it back to Pending with its evidence Not updated, to
+ *    be brought up to date; what was recorded stays.
  *
- *
- *  - a row is flagged when the evidence does not support what it claims —
- *    confirmed without evidence, waived without a waiver, a failing item
- *    confirmed, a confirmation nobody put their name to or undated. The page names no waiver on the item, as the
- *    workbook does: a waived item is covered by a waiver in the register
- *    raised against it;
- *  - the outcome is Not ready if anything blocks (a Fail, or a Critical or
- *    High issue still open), Ready to sign off once every item is
- *    confirmed with nothing flagged and every waiver approved, and In review
- *    otherwise.
+ * A row is flagged when a confirmation is not supported — no evidence written
+ * or attached, nobody named, no date. The outcome is Not ready while a
+ * Critical or High issue is open, Ready to sign off once every item is
+ * confirmed with nothing flagged and every waiver approved, and In review
+ * otherwise. When every item is confirmed the checklist is complete, and the
+ * deliverable it gates closes on the day of the last confirmation.
  *
  * Pure: the page holds the state, the server stores it as JSON.
  */
 
-export const OWNER_STATUSES = ['Pass', 'Fail', 'Waived', 'N/A', 'Open'] as const;
-export type OwnerStatus = (typeof OWNER_STATUSES)[number];
-/** where an item stands: nothing recorded yet, recorded and being checked, confirmed */
-export const LEAD_STATUSES = ['Not updated', 'Under review', 'Confirmed'] as const;
+export const EVIDENCE_STATUSES = ['Not updated', 'Under review', 'Confirmed'] as const;
+export type EvidenceStatus = (typeof EVIDENCE_STATUSES)[number];
+export const LEAD_STATUSES = ['Pending', 'Under review', 'Confirmed'] as const;
 export type LeadStatus = (typeof LEAD_STATUSES)[number];
 export const FINAL_DECISIONS = ['Signed off', 'Signed off with conditions', 'Not signed off'] as const;
 export type FinalDecision = (typeof FINAL_DECISIONS)[number];
@@ -49,10 +43,9 @@ export interface ItemEntry {
   result: string;
   evidence: string;
   evidenceOwner: string;
-  status: OwnerStatus;
-  /** no longer asked for — the register links a waiver to its item — but read on entries saved when it was */
-  waiverId: string;
-  /** the item's status */
+  /** the evidence status */
+  status: EvidenceStatus;
+  /** the item status */
   lead: LeadStatus;
   comment: string;
   /** who confirmed it — the stage lead or the TPM */
@@ -127,37 +120,46 @@ export const blankEntry = (): ItemEntry => ({
   result: '',
   evidence: '',
   evidenceOwner: '',
-  status: 'Open',
-  waiverId: '',
-  lead: 'Not updated',
+  status: 'Not updated',
+  lead: 'Pending',
   comment: '',
   confirmedBy: '',
   confirmedOn: '',
 });
 
-/* what entries saved before the item statuses were renamed said */
-const OLD_LEAD: Record<string, LeadStatus> = { Pending: 'Not updated', Rejected: 'Under review' };
+/* Entries saved under earlier names: the item statuses were Pending,
+   Confirmed and Rejected, then Not updated, Under review and Confirmed; the
+   evidence was Pass, Fail, Waived, N/A or Open. */
+const OLD_LEAD: Record<string, LeadStatus> = { 'Not updated': 'Pending', Rejected: 'Under review' };
 
 /** An item's entry, or the blank one every item starts from. */
 export const entryOf = (state: SignoffState, id: string): ItemEntry => {
   const e = { ...blankEntry(), ...state.items[id] };
-  return OLD_LEAD[e.lead] ? { ...e, lead: OLD_LEAD[e.lead] } : e;
+  const lead = OLD_LEAD[e.lead] ?? e.lead;
+  const status = (EVIDENCE_STATUSES as readonly string[]).includes(e.status)
+    ? e.status
+    : lead === 'Confirmed'
+      ? 'Confirmed'
+      : (e.status as string) === 'Open'
+        ? 'Not updated'
+        : 'Under review';
+  return { ...e, lead, status };
 };
 
-/** Confirmed, by whom and when: the evidence passes, unless it was waived or does not apply. */
+/** Confirmed, by whom and when — and its evidence with it. */
 export const confirmEntry = (entry: ItemEntry, by: string, on: string): ItemEntry => ({
   ...entry,
   lead: 'Confirmed',
-  status: entry.status === 'Waived' || entry.status === 'N/A' ? entry.status : 'Pass',
+  status: 'Confirmed',
   confirmedBy: by,
   confirmedOn: on,
 });
 
-/** Reopened: back to Not updated, the evidence open again; what was recorded stays to be brought up to date. */
+/** Reopened: Pending, its evidence Not updated; what was recorded stays to be brought up to date. */
 export const reopenEntry = (entry: ItemEntry): ItemEntry => ({
   ...entry,
-  lead: 'Not updated',
-  status: 'Open',
+  lead: 'Pending',
+  status: 'Not updated',
   confirmedBy: '',
   confirmedOn: '',
 });
@@ -170,45 +172,28 @@ const blank = (s: string) => !s.trim();
 
 /**
  * What stops a row being taken as confirmed, or '' when nothing does. The
- * first reason only, in the workbook's order, so the row says the next thing
- * to fix.
+ * first reason only, so the row says the next thing to fix.
  */
-export function flagOf(
-  entry: ItemEntry,
-  waivers: readonly WaiverRow[],
-  evidenceFiles = 0,
-  /** the item's ID, which a waiver in the register names */
-  itemId = '',
-): string {
+export function flagOf(entry: ItemEntry, _waivers: readonly WaiverRow[] = [], evidenceFiles = 0): string {
+  if (entry.lead !== 'Confirmed') return '';
   /* evidence is a link or file name written down, or a file attached */
-  if (entry.lead === 'Confirmed' && blank(entry.evidence) && evidenceFiles === 0) return 'Evidence missing';
-  if (entry.status === 'Waived' && !waiverFor(entry, waivers, itemId)) return 'No waiver for this item';
-  if (entry.lead === 'Confirmed' && (entry.status === 'Fail' || entry.status === 'Open'))
-    return 'Confirmed without a passing status';
-  /* a confirmation is somebody's: it names who gave it */
-  if (entry.lead === 'Confirmed' && blank(entry.confirmedBy)) return 'Confirmed by missing';
-  if (entry.lead === 'Confirmed' && blank(entry.confirmedOn)) return 'Date missing';
+  if (blank(entry.evidence) && evidenceFiles === 0) return 'Evidence missing';
+  /* a confirmation is somebody's, and dated */
+  if (blank(entry.confirmedBy)) return 'Confirmed by missing';
+  if (blank(entry.confirmedOn)) return 'Date missing';
   return '';
 }
-
-/** The waiver covering a waived item: raised against it, or named by an older entry. */
-export const waiverFor = (entry: ItemEntry, waivers: readonly WaiverRow[], itemId: string): WaiverRow | undefined =>
-  waivers.find((w) => (!blank(itemId) && w.itemId.trim() === itemId) || (!blank(entry.waiverId) && w.id.trim() === entry.waiverId.trim()));
 
 export type Outcome = 'Ready to sign off' | 'In review' | 'Not ready — blocking items';
 
 export interface SignoffSummary {
   total: number;
-  pass: number;
-  waived: number;
-  na: number;
-  fail: number;
-  open: number;
+  /** item status */
   confirmed: number;
-  /** recorded and being checked */
   review: number;
-  /** nothing recorded yet */
-  notUpdated: number;
+  pending: number;
+  /** evidence status, by value */
+  evidence: Record<EvidenceStatus, number>;
   /** confirmed / total, 0 when there is nothing to confirm */
   progress: number;
   flagged: number;
@@ -228,35 +213,51 @@ export function summarize(
   const entries = items.map((it) => entryOf(state, it.id));
   const count = (f: (e: ItemEntry) => boolean) => entries.filter(f).length;
   const total = items.length;
-  const fail = count((e) => e.status === 'Fail');
   const confirmed = count((e) => e.lead === 'Confirmed');
-  const flagged = items.filter((it) => flagOf(entryOf(state, it.id), state.waivers, files[it.id] ?? 0, it.id) !== '').length;
+  const flagged = items.filter((it, i) => flagOf(entries[i], state.waivers, files[it.id] ?? 0) !== '').length;
   const blocking = state.issues.filter(
     (i) => i.status === 'Open' && (i.severity === 'Critical' || i.severity === 'High'),
   ).length;
   const unapproved = state.waivers.filter((w) => !blank(w.id) && blank(w.approvedBy)).length;
   const outcome: Outcome =
-    fail > 0 || blocking > 0
+    blocking > 0
       ? 'Not ready — blocking items'
       : total > 0 && confirmed === total && flagged === 0 && unapproved === 0
         ? 'Ready to sign off'
         : 'In review';
   return {
     total,
-    pass: count((e) => e.status === 'Pass'),
-    waived: count((e) => e.status === 'Waived'),
-    na: count((e) => e.status === 'N/A'),
-    fail,
-    open: count((e) => e.status === 'Open'),
     confirmed,
     review: count((e) => e.lead === 'Under review'),
-    notUpdated: count((e) => e.lead === 'Not updated'),
+    pending: count((e) => e.lead === 'Pending'),
+    evidence: {
+      'Not updated': count((e) => e.status === 'Not updated'),
+      'Under review': count((e) => e.status === 'Under review'),
+      Confirmed: count((e) => e.status === 'Confirmed'),
+    },
     progress: total ? confirmed / total : 0,
     flagged,
     blocking,
     unapproved,
     outcome,
   };
+}
+
+/**
+ * The day the checklist was completed — every item confirmed — as an ISO
+ * date, or '' while it is not. The latest confirmation dates it, and `today`
+ * when none is dated.
+ */
+export function checklistCompletedOn(
+  items: readonly SignoffItem[],
+  state: SignoffState,
+  /** the date to use when no confirmation carries one */
+  today = '',
+): string {
+  if (!items.length) return '';
+  const entries = items.map((it) => entryOf(state, it.id));
+  if (entries.some((e) => e.lead !== 'Confirmed')) return '';
+  return entries.map((e) => e.confirmedOn).filter(Boolean).sort().at(-1) ?? today;
 }
 
 /** The stage lead may sign off against the counts — but the page says so. */

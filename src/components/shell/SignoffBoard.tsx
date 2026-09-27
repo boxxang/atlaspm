@@ -12,7 +12,8 @@ import {
   approversOf,
   confirmEntry,
   LEAD_STATUSES,
-  OWNER_STATUSES,
+  checklistCompletedOn,
+  EVIDENCE_STATUSES,
   reopenEntry,
   ROLE_DECISIONS,
   SEVERITIES,
@@ -25,14 +26,13 @@ import {
   type ItemEntry,
   type SignoffItem,
   type SignoffState,
-  type WaiverRow,
-  waiverFor,
 } from '@/lib/signoff';
 import type { SignoffDefinition } from '@/lib/signoffDefinition';
 import { teamRoster, type TeamMember } from '@/lib/people';
 import { fmtDate, fromISO } from '@/lib/schedule';
 import { uid, useAppStore } from '@/store/useAppStore';
 import { Avatar, IconDownload, IconFile, IconPlus } from './icons';
+import { useDeliverableRefs } from './useDeliverableRefs';
 
 /**
  * A gate deliverable confirmed item by item — the sign-off workbook, in the
@@ -56,14 +56,10 @@ const today = () => new Date().toISOString().slice(0, 10);
 const shownDate = (iso: string) => (iso ? fmtDate(fromISO(iso)) : '—');
 
 const STATUS_PILL: Record<string, string> = {
-  Pass: 'pill ok',
-  Fail: 'pill risk',
-  Waived: 'pill warn',
-  'N/A': 'pill',
-  Open: 'pill',
   Confirmed: 'pill ok',
   'Under review': 'pill acc',
   'Not updated': 'pill',
+  Pending: 'pill',
 };
 
 const OUTCOME_PILL: Record<string, string> = {
@@ -128,6 +124,27 @@ export function SignoffBoard({
   }, [state, projectId, def.ref]);
 
   const summary = useMemo(() => summarize(def.items, state, fileCounts), [def.items, state, fileCounts]);
+
+  /* The deliverable this checklist gates closes when every item is confirmed,
+     on the day of the last confirmation, and reopens if one is reopened. The
+     store keeps the rule — a handover closes it too — and does nothing when
+     nothing changed, so this can run on every change. */
+  const refs = useDeliverableRefs();
+  const deliverables = useAppStore((s) => s.deliverables);
+  const setChecklistDone = useAppStore((s) => s.setChecklistDone);
+  let gatedStage = '';
+  let gatedId = '';
+  for (const [stageId, list] of Object.entries(deliverables))
+    for (const d of list)
+      if (!gatedId && refs.get(d.id) === def.ref) {
+        gatedStage = stageId;
+        gatedId = d.id;
+      }
+  useEffect(() => {
+    if (!gatedId) return;
+    const on = checklistCompletedOn(def.items, state, today());
+    setChecklistDone(gatedStage, gatedId, on ? fromISO(on) : null);
+  }, [gatedStage, gatedId, def.items, state, setChecklistDone]);
   const template = templateFor(def.ref);
   const update = (f: (s: SignoffState) => void) =>
     setState((prev) => {
@@ -177,19 +194,24 @@ export function SignoffBoard({
         <h2 style={{ fontSize: 22, fontWeight: 600, letterSpacing: '-.02em', margin: '0 0 6px' }}>{def.title}</h2>
         <p style={{ fontSize: 14.5, lineHeight: 1.55, color: 'var(--ink-2)', maxWidth: '76ch' }}>
           Produced by <b>{def.act}</b> {def.actTitle}. Owners record a result, its evidence and a status against every
-          item; the stage lead or the TPM confirms each on that evidence, and the stage lead decides on the Sign-off tab.
+          item and put it up for review; the stage lead or the TPM confirms each on that evidence. When every item is
+          confirmed the deliverable closes, and the stage lead decides on the Sign-off tab.
         </p>
 
         <div className="card sdash" data-summary>
           <Dstat
             cap="Confirmed"
             value={`${summary.confirmed}/${summary.total}`}
-            sub={`${Math.round(summary.progress * 100)}% by the stage lead or TPM`}
+            sub={
+              summary.progress === 1
+                ? `complete — ${def.ref} closed`
+                : `${Math.round(summary.progress * 100)}% by the stage lead or TPM`
+            }
             bar={Math.round(summary.progress * 100)}
             stat="confirmed"
           />
-          <Dstat cap="Pass" value={String(summary.pass)} sub={`${summary.waived} waived · ${summary.na} N/A`} />
-          <Dstat cap="Fail" value={String(summary.fail)} sub={`${summary.open} still open`} tone={summary.fail > 0} />
+          <Dstat cap="Under review" value={String(summary.review)} sub={`evidence in review: ${summary.evidence['Under review']}`} stat="review" />
+          <Dstat cap="Pending" value={String(summary.pending)} sub={`evidence not updated: ${summary.evidence['Not updated']}`} stat="pending" />
           <Dstat cap="Flagged rows" value={String(summary.flagged)} sub="not yet supported" tone={summary.flagged > 0} stat="flagged" />
           <Dstat cap="Blocking issues" value={String(summary.blocking)} sub="Critical or High, open" tone={summary.blocking > 0} />
           <Dstat cap="Unapproved waivers" value={String(summary.unapproved)} sub="no approver yet" tone={summary.unapproved > 0} />
@@ -205,7 +227,7 @@ export function SignoffBoard({
                 ? 'Every item confirmed on its evidence — the stage lead can decide.'
                 : summary.outcome === 'In review'
                   ? 'Items still to confirm, or rows the evidence does not yet support.'
-                  : 'A failing item or an open Critical or High issue holds the gate.'}
+                  : 'An open Critical or High issue holds the gate.'}
             </span>
           </div>
         </div>
@@ -278,7 +300,7 @@ export function SignoffBoard({
         <Register
           people={people}
           what="waiver"
-          intro="Every item marked Waived needs a waiver here, raised against that item, and every waiver needs an approver. A waiver without one holds the gate."
+          intro="Anything waived on the way to the gate, raised against the item it concerns. Every waiver needs an approver; a waiver without one holds the gate."
           rows={state.waivers}
           columns={[
             { key: 'id', label: 'ID', width: '64px', given: true },
@@ -479,7 +501,7 @@ function Checklist({
   const [widths, commitWidths, resetWidths] = useColumnWidths();
   const table = useRef<HTMLDivElement>(null);
   const sections = [...new Set(items.map((i) => i.section))];
-  const flagFor = (id: string) => flagOf(entryOf(state, id), state.waivers, files[id]?.length ?? 0, id);
+  const flagFor = (id: string) => flagOf(entryOf(state, id), state.waivers, files[id]?.length ?? 0);
   const shown = items.filter((it) => {
     if (filter === 'flagged') return flagFor(it.id) !== '';
     if (filter === 'pending') return entryOf(state, it.id).lead !== 'Confirmed';
@@ -642,7 +664,6 @@ function Checklist({
                         flag={flag}
                         files={files[it.id] ?? []}
                         setFiles={(f) => setFiles((all) => ({ ...all, [it.id]: f(all[it.id] ?? []) }))}
-                        waiver={waiverFor(e, state.waivers, it.id)}
                         onSave={(entry) => onSave(it.id, entry)}
                       />
                     )}
@@ -680,7 +701,6 @@ function ItemCard({
   flag,
   files,
   setFiles,
-  waiver,
   onSave,
 }: {
   refName: string;
@@ -690,8 +710,6 @@ function ItemCard({
   flag: string;
   files: AttachmentMeta[];
   setFiles: (f: (prev: AttachmentMeta[]) => AttachmentMeta[]) => void;
-  /** the waiver in the register covering this item, if it is waived */
-  waiver: WaiverRow | undefined;
   onSave: (entry: ItemEntry) => void;
 }) {
   const [draft, setDraft] = useState<ItemEntry | null>(null);
@@ -702,17 +720,18 @@ function ItemCard({
     setDraft((d) => {
       const prev = d ?? entry;
       const next = { ...prev, ...patch };
-      /* Confirming passes the evidence, and is dated today and the stage
-         lead's unless somebody dated it or named the TPM; moving a confirmed
-         item back reopens it. */
-      if (patch.lead === 'Confirmed' && prev.lead !== 'Confirmed')
+      /* Confirming either status confirms the item and its evidence, dated
+         today and the stage lead's unless somebody dated it or named the TPM.
+         Moving either back from Confirmed reopens the item, then takes the
+         status chosen. */
+      const moved = patch.lead ?? patch.status;
+      if (moved === 'Confirmed' && prev.lead !== 'Confirmed')
         return confirmEntry(
           next,
           people.approvers.includes(next.confirmedBy) ? next.confirmedBy : people.stageLead,
           next.confirmedOn || today(),
         );
-      if (patch.lead && patch.lead !== 'Confirmed' && prev.lead === 'Confirmed')
-        return { ...reopenEntry(next), lead: patch.lead };
+      if (moved && moved !== 'Confirmed' && prev.lead === 'Confirmed') return { ...reopenEntry(next), ...patch };
       return next;
     });
 
@@ -827,18 +846,9 @@ function ItemCard({
                 <EvidenceFiles files={files} />
                 {!evidenceText && !files.length && <p className="mono-note">No evidence yet.</p>}
               </div>
-              {(entry.comment || (entry.status === 'Waived' && waiver)) && (
+              {entry.comment && (
                 <div className="so-sec so-note">
-                  {entry.status === 'Waived' && waiver && (
-                    <span className="pill warn" style={{ marginRight: 8 }}>
-                      Waiver {waiver.id}
-                    </span>
-                  )}
-                  {entry.comment && (
-                    <span>
-                      <b>Comment:</b> {entry.comment}
-                    </span>
-                  )}
+                  <b>Comment:</b> {entry.comment}
                 </div>
               )}
               {flag && (
@@ -890,24 +900,18 @@ function ItemCard({
                 <PersonSelect people={people} label={`${item.id} evidence owner`} value={draft.evidenceOwner} onChange={(v) => set({ evidenceOwner: v })} />
               </label>
               <label className="so-f">
-                <span className="subcap">Evidence status{draft.lead === 'Confirmed' ? ' — reopen the item to change it' : ''}</span>
+                <span className="subcap">Evidence status{draft.lead === 'Confirmed' ? ' — changing it reopens the item' : ''}</span>
                 <select
                   className="dateinp"
                   aria-label={`${item.id} evidence status`}
-                  disabled={draft.lead === 'Confirmed'}
                   value={draft.status}
                   onChange={(ev) => set({ status: ev.target.value as ItemEntry['status'] })}
                 >
-                  {OWNER_STATUSES.map((st) => (
+                  {EVIDENCE_STATUSES.map((st) => (
                     <option key={st}>{st}</option>
                   ))}
                 </select>
               </label>
-              {draft.status === 'Waived' && (
-                <p className="mono-note so-f" style={{ alignSelf: 'end' }}>
-                  {waiver ? `Covered by ${waiver.id} in the Waivers register.` : 'Raise a waiver against this item in the Waivers register.'}
-                </p>
-              )}
 
               <div className="so-formhd">Item status</div>
               <label className="so-f">
@@ -941,9 +945,9 @@ function ItemCard({
                 </>
               ) : (
                 <p className="mono-note so-f" style={{ alignSelf: 'end' }}>
-                  {draft.lead === 'Not updated'
-                    ? 'Record the result and its evidence, then set Under review.'
-                    : 'The stage lead or the TPM confirms it; confirming passes the evidence.'}
+                  {draft.lead === 'Pending'
+                    ? 'Record the result and its evidence, and set both Under review.'
+                    : 'The stage lead or the TPM confirms it, and the evidence with it.'}
                 </p>
               )}
               <label className="so-f so-span">
@@ -1193,7 +1197,6 @@ function SignoffTab({
   const readiness: [string, React.ReactNode][] = [
     ['Items confirmed', `${summary.confirmed} of ${summary.total} (${Math.round(summary.progress * 100)}%)`],
     ['Under review', summary.review],
-    ['Failing items', summary.fail],
     ['Rows flagged', summary.flagged],
     ['Critical or High issues still open', summary.blocking],
     ['Waivers without an approver', summary.unapproved],

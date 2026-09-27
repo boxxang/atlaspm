@@ -97,7 +97,9 @@ export function DeliverableTable({
               className={d.done ? 'cb on' : 'cb'}
               title={
                 d.done
-                  ? 'Completed by a handover'
+                  ? d.checklistDoneAt && !(handover?.doneAt)
+                    ? 'Closed by its sign-off checklist'
+                    : 'Completed by a handover'
                   : 'Attach an output and say what was handed over to complete this'
               }
               aria-label={`Open the handover for ${d.title}`}

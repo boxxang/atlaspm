@@ -13,7 +13,7 @@ import { resolveStages } from '@/lib/stages';
 import { rejectFile, rejectionMessage } from '@/lib/attachments';
 import { serialiseEffort, serialiseTat } from '@/lib/effort';
 import { isEmptyOverride, type StageDetailOverride } from '@/lib/stageDetail';
-import { handoverComplete } from '@/lib/deliverableStatus';
+import { deliverableClosure } from '@/lib/deliverableStatus';
 import { stepKey, type StepStateRecord } from '@/lib/steps';
 import type {
   AttachmentRef,
@@ -167,6 +167,8 @@ export interface AppState {
   detachFromHandover: (stageId: StageId, deliverableId: string, attachmentId: string) => void;
   /** Recompute a deliverable's stored done flag from its handover. */
   syncHandoverDone: (stageId: StageId, deliverableId: string) => void;
+  /** Record that a gate's checklist was completed (or reopened), and close or reopen the deliverable with it. */
+  setChecklistDone: (stageId: StageId, deliverableId: string, at: Date | null) => void;
   /** Delete a post, and the replies under it. */
   deletePost: (id: string) => void;
   editStageDate: (stageId: StageId, which: 'start' | 'end', date: Date) => void;
@@ -737,9 +739,9 @@ export const useAppStore = create<AppState>()((set, get) => ({
     const post = get().posts.find(
       (p) => p.deliverableId === deliverableId && p.kind === 'handover',
     );
-    const done = handoverComplete(post ?? null);
-    const completedAt = done ? (post?.doneAt ?? null) : null;
     const current = get().deliverables[stageId]?.find((d) => d.id === deliverableId);
+    /* a gate with a checklist closes on it as well as on its handover */
+    const { done, completedAt } = deliverableClosure(post ?? null, current?.checklistDoneAt ?? null);
     if (!current || (current.done === done && sameDay(current.completedAt, completedAt))) return;
     set((s) => ({
       deliverables: {
@@ -750,6 +752,28 @@ export const useAppStore = create<AppState>()((set, get) => ({
       },
     }));
     sync(api.setDeliverableDone(get().projectId, deliverableId, done, completedAt));
+  },
+
+  setChecklistDone: (stageId, deliverableId, at) => {
+    const current = get().deliverables[stageId]?.find((d) => d.id === deliverableId);
+    if (!current) return;
+    const post = get().posts.find((p) => p.deliverableId === deliverableId && p.kind === 'handover');
+    const { done, completedAt } = deliverableClosure(post ?? null, at);
+    if (
+      sameDay(current.checklistDoneAt ?? null, at) &&
+      current.done === done &&
+      sameDay(current.completedAt, completedAt)
+    )
+      return;
+    set((s) => ({
+      deliverables: {
+        ...s.deliverables,
+        [stageId]: s.deliverables[stageId].map((d) =>
+          d.id === deliverableId ? { ...d, checklistDoneAt: at, done, completedAt } : d,
+        ),
+      },
+    }));
+    sync(api.setDeliverableChecklist(get().projectId, deliverableId, at, done, completedAt));
   },
 
   attachToStep: async (act, n, files) => {

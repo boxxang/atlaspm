@@ -10,9 +10,9 @@ import { deliverableStep, handoverComplete, producersOf } from '@/lib/deliverabl
 import type { ProgramPost } from '@/lib/projectState';
 import { fmtDate, fmtDT, fromISO, toISO } from '@/lib/schedule';
 import { uid, useAppStore } from '@/store/useAppStore';
-import { signoffInApp, templateFor } from '@/data/deliverableTemplates';
+import { signoffInApp } from '@/data/deliverableTemplates';
 import { DeliverableDecisions } from '../meetings/MeetingSource';
-import { Avatar, IconChecklist, IconDownload, IconFile, IconPlus } from './icons';
+import { Avatar, IconChecklist, IconFile, IconPlus } from './icons';
 import { useDeliverableRefs } from './useDeliverableRefs';
 
 /**
@@ -85,9 +85,7 @@ export function HandoverPanel({
   const files = handover?.attachments ?? [];
   const ref = refOf.get(deliverableId) ?? null;
   const step = deliverableStep(ref, producers);
-  /* A gate deliverable offers the document it is written in, so a handover
-     does not start from a blank page. */
-  const template = templateFor(ref);
+  const complete = handoverComplete(handover ?? null);
   const replies = posts
     .filter((p) => p.parentId === handover?.id)
     .sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime());
@@ -130,26 +128,20 @@ export function HandoverPanel({
           <span className="cap">Handover</span>
           {signoffInApp(ref) && (
             <Link
-              className="tpl-dl"
+              className="so-open"
               href={`/p/${projectId}/signoff/${ref}`}
               title={`Confirm ${ref} item by item in AtlasPM`}
               aria-label={`Open the ${ref} sign-off checklist`}
               data-signoff-open={ref}
             >
               <IconChecklist size={13} />
+              Checklist
             </Link>
           )}
-          {template && (
-            <a
-              className="tpl-dl"
-              href={template.href}
-              download={template.filename}
-              title={`Download the ${ref} sign-off workbook (.xlsx)`}
-              aria-label={`Download the ${ref} template`}
-              data-template-download={ref}
-            >
-              <IconDownload size={13} />
-            </a>
+          {deliverable.checklistDoneAt && !complete && (
+            <span className="so-closed" data-closed-by-checklist>
+              Closed by its checklist on {fmtDate(deliverable.checklistDoneAt)}
+            </span>
           )}
           <span style={{ flexGrow: 1 }} />
           {step && (

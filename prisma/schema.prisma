@@ -384,6 +384,9 @@ model Deliverable {
   due         DateTime?
   done        Boolean   @default(false)
   completedAt DateTime?
+  /// The day its in-app sign-off checklist was completed — every item
+  /// confirmed — or null. A gate closes on this as well as on its handover.
+  checklistDoneAt DateTime?
   /// How the thing came to be: the development history written when it was
   /// filed. Kept beside the artefact, because neither is much use alone.
   note        String    @default("")

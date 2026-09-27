@@ -192,6 +192,8 @@ export interface Deliverable {
   done: boolean;
   due: Date | null;
   completedAt: Date | null;
+  /** The day its sign-off checklist was completed, for a gate that has one; it closes the deliverable. */
+  checklistDoneAt?: Date | null;
   /** The delivery record's development history. Empty until one is filed. */
   note: string;
   /** The artefact itself — what makes the deliverable delivered. */
