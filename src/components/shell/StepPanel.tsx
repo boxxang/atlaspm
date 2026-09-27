@@ -11,6 +11,8 @@ import { RISK_AUTHOR } from '@/data/riskSeeds';
 import { useAppStore } from '@/store/useAppStore';
 import { useRailStore } from '@/store/railStore';
 import { RelatedMeetings } from '../meetings/RelatedMeetings';
+import { SectionHead } from './SectionHead';
+import { useRailSections } from './useRailSections';
 import { DeliverableLines } from './DeliverableLines';
 import { Avatar, IconFile, IconPlus, IconTick } from './icons';
 import { PostThread } from './PostThread';
@@ -54,6 +56,9 @@ export function StepPanel({ act, n, projectId }: { act: string; n: number; proje
      open so Cancel means something. Keyed on the step below, so moving to
      another step closes the editor rather than carrying the draft to it. */
   const [draft, setDraft] = useState<Facts | null>(null);
+  /* the sections above the updates fold away, so the composer gets the room */
+  const { isFolded, toggle, setAll } = useRailSections();
+  const fold = (key: string) => ({ folded: isFolded(key), onToggle: () => toggle(key) });
 
   /* The post a link named — the step pills in the Updates feed and on the
      Overview carry it. The thread sits under Progress, Outputs and Details, so
@@ -171,12 +176,27 @@ export function StepPanel({ act, n, projectId }: { act: string; n: number; proje
               TICKS {firstRef}
             </span>
           )}
+          <span style={{ flexGrow: 1 }} />
+          {(() => {
+            const all = FOLDABLE.every(isFolded);
+            return (
+              <button
+                type="button"
+                className="sec-all"
+                data-fold-all
+                title={all ? 'Open every section' : 'Fold everything above the updates'}
+                onClick={() => setAll(FOLDABLE, !all)}
+              >
+                {all ? 'Expand all' : 'Collapse all'}
+              </button>
+            );
+          })()}
         </div>
 
         {/* progress — the number, the bar, and the handle that sets it */}
         <div style={{ borderTop: '1px solid var(--line-soft)', paddingTop: 13 }}>
-          <div style={{ display: 'flex', alignItems: 'baseline', gap: 8, marginBottom: 9 }}>
-            <span className="cap">Progress</span>
+          <div style={{ display: 'flex', alignItems: 'baseline', gap: 8, marginBottom: isFolded('progress') ? 0 : 9 }}>
+            <SectionHead title="Progress" section="progress" {...fold('progress')} />
             <span style={{ flexGrow: 1 }} />
             <b
               className="num"
@@ -189,27 +209,31 @@ export function StepPanel({ act, n, projectId }: { act: string; n: number; proje
               {step.pct}%
             </b>
           </div>
-          <input
-            className="rng"
-            type="range"
-            min={0}
-            max={100}
-            step={5}
-            value={step.pct}
-            aria-label="Percent complete"
-            style={{ background: rangeFill(step.pct, step.done) }}
-            onChange={(e) => setStepState(act, n, { pct: Number(e.target.value) })}
-          />
-          <p className="mono-note" style={{ marginTop: 7 }}>
-            Drag to record how far this step has got. 100% marks it Completed, the same as
-            attaching an output.
-          </p>
+          {!isFolded('progress') && (
+            <>
+              <input
+                className="rng"
+                type="range"
+                min={0}
+                max={100}
+                step={5}
+                value={step.pct}
+                aria-label="Percent complete"
+                style={{ background: rangeFill(step.pct, step.done) }}
+                onChange={(e) => setStepState(act, n, { pct: Number(e.target.value) })}
+              />
+              <p className="mono-note" style={{ marginTop: 7 }}>
+                Drag to record how far this step has got. 100% marks it Completed, the same as
+                attaching an output.
+              </p>
+            </>
+          )}
         </div>
 
         {/* what has actually been handed over */}
         <div style={{ borderTop: '1px solid var(--line-soft)', marginTop: 15, paddingTop: 14 }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
-            <span className="cap">Outputs</span>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: isFolded('outputs') ? 0 : 10 }}>
+            <SectionHead title="Outputs" section="outputs" {...fold('outputs')} />
             <span className="pill" style={{ fontSize: 10.5 }}>
               {outputs.length}
             </span>
@@ -233,7 +257,7 @@ export function StepPanel({ act, n, projectId }: { act: string; n: number; proje
               e.target.value = '';
             }}
           />
-          {outputs.length === 0 ? (
+          {isFolded('outputs') ? null : outputs.length === 0 ? (
             <p className="mono-note">
               Nothing attached yet. Attaching an output marks this step Completed.
             </p>
@@ -273,7 +297,7 @@ export function StepPanel({ act, n, projectId }: { act: string; n: number; proje
               </div>
             ))
           )}
-          {problems.map((p) => (
+          {!isFolded('outputs') && problems.map((p) => (
             <p className="mono-note late" key={p}>
               {p}
             </p>
@@ -289,6 +313,7 @@ export function StepPanel({ act, n, projectId }: { act: string; n: number; proje
             stageId={stageId}
             projectId={projectId}
             empty=""
+            fold={fold('deliverables')}
           />
         )}
 
@@ -299,8 +324,8 @@ export function StepPanel({ act, n, projectId }: { act: string; n: number; proje
             date fields sitting open look like a form waiting to be filled in,
             and one stray click changes a date nobody meant to touch. */}
         <div style={{ borderTop: '1px solid var(--line-soft)', marginTop: 15, paddingTop: 11 }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 9 }}>
-            <span className="cap">Details</span>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: isFolded('details') ? 0 : 9 }}>
+            <SectionHead title="Details" section="details" {...fold('details')} />
             <span style={{ flexGrow: 1 }} />
             {editingFacts ? (
               <>
@@ -318,170 +343,176 @@ export function StepPanel({ act, n, projectId }: { act: string; n: number; proje
             )}
           </div>
 
-          <div className="prop">
-            <span className="pk">Activity</span>
-            <button
-              type="button"
-              className="ell"
-              style={{
-                justifySelf: 'start',
-                fontSize: 12.5,
-                color: 'var(--accent)',
-                fontWeight: 550,
-                maxWidth: '100%',
-              }}
-              title={detailActivityTitles[act] ?? act}
-              onClick={() => select({ kind: 'activity', act })}
-            >
-              {detailActivityTitles[act] ?? act}
-            </button>
-          </div>
-
-          <div className="prop">
-            <span className="pk">Owner</span>
-            <span style={{ display: 'flex', alignItems: 'center', gap: 7, minWidth: 0 }}>
-              {shownOwner && <Avatar name={shownOwner} small />}
-              {editingFacts ? (
-                <select
-                  className="lnkin"
-                  value={draft.owner}
-                  aria-label="Owner"
-                  onChange={(e) => setDraft({ ...draft, owner: e.target.value })}
-                >
-                  <option value="">Unassigned</option>
-                  {people.map((p) => (
-                    <option key={p} value={p}>
-                      {p}
-                    </option>
-                  ))}
-                </select>
-              ) : (
-                <span
-                  className="ell"
-                  style={{ fontSize: 13, color: shownOwner ? undefined : 'var(--ink-4)' }}
-                >
-                  {shownOwner || 'Unassigned'}
-                </span>
-              )}
-            </span>
-          </div>
-
-          <div className="prop">
-            <span className="pk">Lead role</span>
-            <span className="ell" style={{ fontSize: 13 }}>
-              {a.activity.role || '—'}
-            </span>
-          </div>
-
-          {/* Both dates stay correctable after the fact — the upload sets the
-              completion date, and someone can still put it right when the file
-              went up a day late. */}
-          <div className="prop">
-            <span className="pk">Due</span>
-            <span style={{ display: 'flex', alignItems: 'center', gap: 7, minWidth: 0 }}>
-              {editingFacts ? (
-                <input
-                  type="date"
-                  className={late ? 'dateinp late' : 'dateinp'}
-                  value={draft.due}
-                  aria-label="Due"
-                  /* Clearing the field puts the step back on the schedule's own
-                     date rather than leaving it with none. */
-                  onChange={(e) => setDraft({ ...draft, due: e.target.value })}
-                />
-              ) : (
-                <span
-                  className="num"
-                  style={{
-                    fontSize: 13,
-                    color: late ? 'var(--risk)' : undefined,
-                    fontWeight: late ? 600 : 400,
-                  }}
-                >
-                  {fmtDate(step.due)}
-                </span>
-              )}
-              {late && (
-                <span className="pill risk" style={{ fontSize: 10 }}>
-                  overdue
-                </span>
-              )}
-              {editingFacts && step.dueSet && (
+          {!isFolded('details') && (
+            <>
+              <div className="prop">
+                <span className="pk">Activity</span>
                 <button
                   type="button"
-                  style={{ fontSize: 11, color: 'var(--accent)', whiteSpace: 'nowrap' }}
-                  title="back to the schedule baseline"
-                  onClick={() => setDraft({ ...draft, due: '' })}
+                  className="ell"
+                  style={{
+                    justifySelf: 'start',
+                    fontSize: 12.5,
+                    color: 'var(--accent)',
+                    fontWeight: 550,
+                    maxWidth: '100%',
+                  }}
+                  title={detailActivityTitles[act] ?? act}
+                  onClick={() => select({ kind: 'activity', act })}
                 >
-                  reset
+                  {detailActivityTitles[act] ?? act}
                 </button>
-              )}
-            </span>
-          </div>
+              </div>
 
-          <div className="prop">
-            <span className="pk">Completed</span>
-            <span style={{ display: 'flex', alignItems: 'center', gap: 7, minWidth: 0 }}>
-              {editingFacts ? (
-                <input
-                  type="date"
-                  className="dateinp"
-                  value={draft.doneAt}
-                  aria-label="Completed"
-                  onChange={(e) => setDraft({ ...draft, doneAt: e.target.value })}
-                />
-              ) : (
+              <div className="prop">
+                <span className="pk">Owner</span>
+                <span style={{ display: 'flex', alignItems: 'center', gap: 7, minWidth: 0 }}>
+                  {shownOwner && <Avatar name={shownOwner} small />}
+                  {editingFacts ? (
+                    <select
+                      className="lnkin"
+                      value={draft.owner}
+                      aria-label="Owner"
+                      onChange={(e) => setDraft({ ...draft, owner: e.target.value })}
+                    >
+                      <option value="">Unassigned</option>
+                      {people.map((p) => (
+                        <option key={p} value={p}>
+                          {p}
+                        </option>
+                      ))}
+                    </select>
+                  ) : (
+                    <span
+                      className="ell"
+                      style={{ fontSize: 13, color: shownOwner ? undefined : 'var(--ink-4)' }}
+                    >
+                      {shownOwner || 'Unassigned'}
+                    </span>
+                  )}
+                </span>
+              </div>
+
+              <div className="prop">
+                <span className="pk">Lead role</span>
+                <span className="ell" style={{ fontSize: 13 }}>
+                  {a.activity.role || '—'}
+                </span>
+              </div>
+
+              {/* Both dates stay correctable after the fact — the upload sets the
+                  completion date, and someone can still put it right when the file
+                  went up a day late. */}
+              <div className="prop">
+                <span className="pk">Due</span>
+                <span style={{ display: 'flex', alignItems: 'center', gap: 7, minWidth: 0 }}>
+                  {editingFacts ? (
+                    <input
+                      type="date"
+                      className={late ? 'dateinp late' : 'dateinp'}
+                      value={draft.due}
+                      aria-label="Due"
+                      /* Clearing the field puts the step back on the schedule's own
+                         date rather than leaving it with none. */
+                      onChange={(e) => setDraft({ ...draft, due: e.target.value })}
+                    />
+                  ) : (
+                    <span
+                      className="num"
+                      style={{
+                        fontSize: 13,
+                        color: late ? 'var(--risk)' : undefined,
+                        fontWeight: late ? 600 : 400,
+                      }}
+                    >
+                      {fmtDate(step.due)}
+                    </span>
+                  )}
+                  {late && (
+                    <span className="pill risk" style={{ fontSize: 10 }}>
+                      overdue
+                    </span>
+                  )}
+                  {editingFacts && step.dueSet && (
+                    <button
+                      type="button"
+                      style={{ fontSize: 11, color: 'var(--accent)', whiteSpace: 'nowrap' }}
+                      title="back to the schedule baseline"
+                      onClick={() => setDraft({ ...draft, due: '' })}
+                    >
+                      reset
+                    </button>
+                  )}
+                </span>
+              </div>
+
+              <div className="prop">
+                <span className="pk">Completed</span>
+                <span style={{ display: 'flex', alignItems: 'center', gap: 7, minWidth: 0 }}>
+                  {editingFacts ? (
+                    <input
+                      type="date"
+                      className="dateinp"
+                      value={draft.doneAt}
+                      aria-label="Completed"
+                      onChange={(e) => setDraft({ ...draft, doneAt: e.target.value })}
+                    />
+                  ) : (
+                    <span className="num" style={{ fontSize: 13 }}>
+                      {step.doneAt ? fmtDate(step.doneAt) : '—'}
+                    </span>
+                  )}
+                  {!step.doneAt && !editingFacts && (
+                    <span style={{ fontSize: 11, color: 'var(--ink-4)' }}>
+                      set when an output is attached
+                    </span>
+                  )}
+                </span>
+              </div>
+
+              <div className="prop">
+                <span className="pk">TAT</span>
                 <span className="num" style={{ fontSize: 13 }}>
-                  {step.doneAt ? fmtDate(step.doneAt) : '—'}
+                  {step.tat} week{step.tat === 1 ? '' : 's'}
                 </span>
-              )}
-              {!step.doneAt && !editingFacts && (
-                <span style={{ fontSize: 11, color: 'var(--ink-4)' }}>
-                  set when an output is attached
-                </span>
-              )}
-            </span>
-          </div>
+              </div>
 
-          <div className="prop">
-            <span className="pk">TAT</span>
-            <span className="num" style={{ fontSize: 13 }}>
-              {step.tat} week{step.tat === 1 ? '' : 's'}
-            </span>
-          </div>
-
-          {a.outputs.get(n) && a.outputs.get(n)!.length > 0 && (
-            <div className="prop" style={{ alignItems: 'start' }}>
-              <span className="pk" style={{ paddingTop: 2 }}>
-                Hands over
-              </span>
-              <span style={{ fontSize: 12.5, lineHeight: 1.45, color: 'var(--ink-body)' }}>
-                {a.outputs.get(n)!.join(' · ')}
-              </span>
-            </div>
+              {a.outputs.get(n) && a.outputs.get(n)!.length > 0 && (
+                <div className="prop" style={{ alignItems: 'start' }}>
+                  <span className="pk" style={{ paddingTop: 2 }}>
+                    Hands over
+                  </span>
+                  <span style={{ fontSize: 12.5, lineHeight: 1.45, color: 'var(--ink-body)' }}>
+                    {a.outputs.get(n)!.join(' · ')}
+                  </span>
+                </div>
+          )}
+            </>
           )}
         </div>
 
-        <RelatedMeetings projectId={projectId} act={act} n={n} />
+        <RelatedMeetings projectId={projectId} act={act} n={n} fold={fold('meetings')} />
 
         {/* the thread, filtered to this step */}
         <div style={{ borderTop: '1px solid var(--line-soft)', marginTop: 15, paddingTop: 13 }}>
           <div style={{ display: 'flex', alignItems: 'baseline', gap: 8, marginBottom: 13 }}>
-            <span className="cap">Updates on this step</span>
+            <SectionHead title="Updates on this step" section="updates" {...fold('updates')} />
             <span className="pill" style={{ fontSize: 10.5 }}>
               {onThisStep.length}
             </span>
           </div>
-          <PostThread
-            posts={onThisStep}
-            target={{ kind: 'update', activityRef: act, stepN: n }}
-            placeholder={`What happened on step ${n}…`}
-            fixedStep={n}
-            squareBar
-            allowRisk
-            arrived={arrived}
-            emptyText="No updates on this step yet."
-          />
+          {!isFolded('updates') && (
+            <PostThread
+              posts={onThisStep}
+              target={{ kind: 'update', activityRef: act, stepN: n }}
+              placeholder={`What happened on step ${n}…`}
+              fixedStep={n}
+              squareBar
+              allowRisk
+              arrived={arrived}
+              emptyText="No updates on this step yet."
+            />
+          )}
         </div>
       </div>
 
@@ -518,6 +549,9 @@ export function StepPanel({ act, n, projectId }: { act: string; n: number; proje
  * The filled part of the range track, painted rather than left grey: a slider
  * whose left side is not coloured reads as unset, whatever number is beside it.
  */
+/** The sections above the updates — what Collapse all folds away. */
+const FOLDABLE = ['progress', 'outputs', 'deliverables', 'details', 'meetings'] as const;
+
 /** What Edit opens: the three things about a step somebody corrects by hand. */
 interface Facts {
   owner: string;

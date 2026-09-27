@@ -7,6 +7,7 @@ import { fmtZonedDate } from '@/lib/meetings/zonedTime';
 import { fmtDate } from '@/lib/schedule';
 import { useMeetingStore } from '@/store/meetingStore';
 import { useAppStore } from '@/store/useAppStore';
+import { SectionHead } from '../shell/SectionHead';
 import { DecisionStatusPill, MeetingStatusPill, TimingPill } from './atoms';
 
 /**
@@ -17,7 +18,18 @@ import { DecisionStatusPill, MeetingStatusPill, TimingPill } from './atoms';
  * An action marked done does not tick the step, and an overdue one moves no
  * date; this only says what was said and what is owed.
  */
-export function RelatedMeetings({ projectId, act, n }: { projectId: string; act: string; n?: number }) {
+export function RelatedMeetings({
+  projectId,
+  act,
+  n,
+  fold,
+}: {
+  projectId: string;
+  act: string;
+  n?: number;
+  /** Given, the heading folds the section away. */
+  fold?: { folded: boolean; onToggle: () => void };
+}) {
   const meetings = useMeetingStore((s) => s.meetings);
   const agenda = useMeetingStore((s) => s.agenda);
   const decisions = useMeetingStore((s) => s.decisions);
@@ -48,7 +60,7 @@ export function RelatedMeetings({ projectId, act, n }: { projectId: string; act:
   return (
     <div className="mt-section" data-related-meetings={isStep ? `${act}:${n}` : act}>
       <span className="cap">
-        Meetings
+        {fold ? <SectionHead title="Meetings" section="meetings" folded={fold.folded} onToggle={fold.onToggle} /> : 'Meetings'}
         <span className="pill" style={{ fontSize: 10.5 }}>
           {r.upcoming.length + r.recent.length}
         </span>
@@ -58,7 +70,7 @@ export function RelatedMeetings({ projectId, act, n }: { projectId: string; act:
         </Link>
       </span>
 
-      {nothing ? (
+      {fold?.folded ? null : nothing ? (
         <p className="mono-note">
           {isStep
             ? 'No meeting has discussed this step yet. Link it from a meeting, an agenda item or an action item.'

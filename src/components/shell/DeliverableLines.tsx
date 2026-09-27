@@ -10,6 +10,7 @@ import type { Deliverable } from '@/data/types';
 import { useAppStore } from '@/store/useAppStore';
 import { useRailStore } from '@/store/railStore';
 import { IconClip, IconTick } from './icons';
+import { SectionHead } from './SectionHead';
 import { useDeliverableRefs } from './useDeliverableRefs';
 
 /**
@@ -30,12 +31,15 @@ export function DeliverableLines({
   stageId,
   projectId,
   empty,
+  fold,
 }: {
   title: string;
   list: readonly Deliverable[];
   stageId: string;
   projectId: string;
   empty: string;
+  /** Given, the heading folds the list away. */
+  fold?: { folded: boolean; onToggle: () => void };
 }) {
   const posts = useAppStore((s) => s.posts);
   const schedule = useAppStore((s) => s.schedule);
@@ -66,7 +70,11 @@ export function DeliverableLines({
           marginBottom: 10,
         }}
       >
-        <span className="cap">{title}</span>
+        {fold ? (
+          <SectionHead title={title} section="deliverables" folded={fold.folded} onToggle={fold.onToggle} />
+        ) : (
+          <span className="cap">{title}</span>
+        )}
         <span className="pill" style={{ fontSize: 10.5 }}>
           {done}/{list.length}
         </span>
@@ -79,7 +87,7 @@ export function DeliverableLines({
         </Link>
       </div>
 
-      {list.length === 0 ? (
+      {fold?.folded ? null : list.length === 0 ? (
         <p className="mono-note">{empty}</p>
       ) : (
         list.map((d) => {

@@ -361,3 +361,42 @@ test.describe('posting on a step', () => {
     await expect(risks).toContainText('7');
   });
 });
+
+/* The step panel stacks six sections in one column and the updates come last,
+   where most of the writing happens. Everything above them folds away, and the
+   fold is remembered from one step to the next; the composer starts tall and
+   drags taller. */
+test('the step panel folds its sections, and the composer can be made taller', async ({ page }) => {
+  await openStep(page, 'PD-02', 2);
+  const r = rail(page);
+  await expect(r.locator('[data-section="details"]')).toBeVisible();
+  await expect(r.getByLabel('Percent complete')).toBeVisible();
+
+  /* one section */
+  await r.locator('[data-section="details"] button').click();
+  await expect(r.locator('[data-section="details"]')).toHaveAttribute('data-folded', '');
+  await expect(r.getByText('Lead role')).toHaveCount(0);
+
+  /* everything above the updates */
+  await r.locator('[data-fold-all]').click();
+  await expect(r.getByLabel('Percent complete')).toHaveCount(0);
+  await expect(r.getByText(/^Nothing attached yet/)).toHaveCount(0);
+  for (const s of ['progress', 'outputs', 'details', 'meetings'])
+    await expect(r.locator(`[data-section="${s}"]`)).toHaveAttribute('data-folded', '');
+  await expect(r.getByPlaceholder(/^What happened on step/)).toBeVisible();
+
+  /* remembered on the next step, and after a reload */
+  await page.locator('[data-step="PD-02:3"]').click();
+  await expect(rail(page).getByLabel('Percent complete')).toHaveCount(0);
+  await page.reload();
+  await openStep(page, 'PD-02', 3);
+  await expect(rail(page).locator('[data-section="progress"]')).toHaveAttribute('data-folded', '');
+
+  /* the composer starts tall, and is resizable */
+  const box = rail(page).getByPlaceholder(/^What happened on step/);
+  expect(await box.evaluate((el) => getComputedStyle(el).resize)).toBe('vertical');
+  expect((await box.boundingBox())!.height).toBeGreaterThanOrEqual(118);
+
+  await rail(page).locator('[data-fold-all]').click();
+  await expect(rail(page).getByLabel('Percent complete')).toBeVisible();
+});
