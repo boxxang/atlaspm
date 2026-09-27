@@ -133,7 +133,7 @@ export function HandoverPanel({
               className="tpl-dl"
               href={template.href}
               download={template.filename}
-              title={`Download the ${ref} template (.docx)`}
+              title={`Download the ${ref} sign-off workbook (.xlsx)`}
               aria-label={`Download the ${ref} template`}
               data-template-download={ref}
             >

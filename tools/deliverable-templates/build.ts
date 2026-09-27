@@ -1,15 +1,21 @@
 /**
- * Writes the sign-off templates a key deliverable's handover can be started
+ * Writes the sign-off workbooks a key deliverable's handover can be started
  * from, into public/templates/.
  *
  *   npx tsx --tsconfig tsconfig.json tools/deliverable-templates/build.ts
  *
- * A template is the document the handover attaches: the gate evidence for
- * RTL freeze, DV closure, the FPGA signoff, the PD handoff, the signoff
- * summary, and the eMRAM, PMU and DFT signoffs that feed them. Each is built
- * from the write-up of the activity that produces the deliverable — its entry
- * and exit criteria, its risks, its roles and whom it hands over to — so the
- * template and the page cannot ask for different things. What only a template
+ * A gate — a freeze, a closure, a signoff — is confirmed item by item. Each
+ * workbook lists every item the gate stands on: the baseline it is taken
+ * against, the entry criteria, the checks with their targets, the exit
+ * criteria and the failure modes the write-up warns of. The people doing the
+ * work record a result, the evidence and a status against each; the stage
+ * lead confirms or rejects each item on that evidence; and the Sign-off sheet
+ * counts what is confirmed, flags what is not supported, suggests an outcome
+ * and takes the lead's final decision.
+ *
+ * Built from the write-up of the activity that produces the deliverable — its
+ * entry and exit criteria, risks, roles and receiving activities — so the
+ * workbook and the page cannot ask for different things. What only a workbook
  * needs, the baseline to name and the checks to record, is written here.
  *
  * Generated rather than drawn by hand so that a change to a write-up reaches
@@ -18,24 +24,7 @@
  */
 import fs from 'node:fs';
 import path from 'node:path';
-import {
-  AlignmentType,
-  BorderStyle,
-  Document,
-  Footer,
-  Header,
-  HeadingLevel,
-  Packer,
-  PageNumber,
-  Paragraph,
-  ShadingType,
-  Table,
-  TableCell,
-  TableLayoutType,
-  TableRow,
-  TextRun,
-  WidthType,
-} from 'docx';
+import ExcelJS from 'exceljs';
 import { ALL_ACTIVITIES, ALL_ACTIVITY_TITLES, ALL_DELIVERABLE_TITLES } from '../../src/data/builtins';
 import { DELIVERABLE_TEMPLATES } from '../../src/data/deliverableTemplates';
 import { EMBEDDED_PROFILE } from '../../src/data/embeddedSoc';
@@ -240,16 +229,25 @@ const SPECS: Record<string, Spec> = {
   },
 };
 
-/* ---------- document building blocks ---------- */
+/* ---------- the workbook ---------- */
 
 const FONT = 'Arial';
-const INK = '1F2328';
-const MUTED = '6E7781';
-const ACCENT = '5B5BD6';
-const RULE = 'D0D7DE';
-const HEAD_FILL = 'EEF0FB';
-/* A4 with 2 cm margins: 11906 − 2 × 1134 twips of text width. */
-const WIDTH = 9638;
+const INK = 'FF1F2328';
+const MUTED = 'FF6E7781';
+const ACCENT = 'FF5B5BD6';
+const HEAD_FILL = 'FFEEF0FB';
+/* the cells somebody fills in */
+const INPUT_FILL = 'FFFFF8D6';
+/* the cells the template fills in */
+const GIVEN_FILL = 'FFF6F8FA';
+const RULE = 'FFD0D7DE';
+
+const OWNER_STATUS = ['Pass', 'Fail', 'Waived', 'N/A', 'Open'];
+const LEAD_STATUS = ['Pending', 'Confirmed', 'Rejected'];
+const FINAL_DECISION = ['Signed off', 'Signed off with conditions', 'Not signed off'];
+const ROLE_DECISION = ['Approve', 'Approve with conditions', 'Reject'];
+const SEVERITY = ['Critical', 'High', 'Medium', 'Low'];
+const ISSUE_STATUS = ['Open', 'Closed'];
 
 const strip = (s: string) =>
   s
@@ -258,66 +256,101 @@ const strip = (s: string) =>
     .replace(/&lt;/g, '<')
     .replace(/&gt;/g, '>');
 
-const text = (t: string, o: { bold?: boolean; color?: string; size?: number; italics?: boolean } = {}) =>
-  new TextRun({ text: t, font: FONT, bold: o.bold, color: o.color ?? INK, size: o.size ?? 20, italics: o.italics });
+type Sheet = ExcelJS.Worksheet;
+type Cell = ExcelJS.Cell;
 
-const para = (t: string, o: Parameters<typeof text>[1] & { after?: number } = {}) =>
-  new Paragraph({ children: [text(t, o)], spacing: { after: o.after ?? 80 } });
+const thin = { style: 'thin' as const, color: { argb: RULE } };
+const boxed: Partial<ExcelJS.Borders> = { top: thin, bottom: thin, left: thin, right: thin };
 
-const heading = (t: string) =>
-  new Paragraph({
-    heading: HeadingLevel.HEADING_2,
-    children: [new TextRun({ text: t, font: FONT, bold: true, size: 24, color: INK })],
-    spacing: { before: 280, after: 100 },
-    border: { bottom: { style: BorderStyle.SINGLE, size: 4, color: RULE, space: 2 } },
-  });
-
-const border = { style: BorderStyle.SINGLE, size: 4, color: RULE };
-const borders = { top: border, bottom: border, left: border, right: border };
-
-const cell = (t: string, width: number, o: { head?: boolean; muted?: boolean } = {}) =>
-  new TableCell({
-    width: { size: width, type: WidthType.DXA },
-    borders,
-    shading: o.head ? { fill: HEAD_FILL, type: ShadingType.CLEAR, color: 'auto' } : undefined,
-    margins: { top: 60, bottom: 60, left: 100, right: 100 },
-    children: [
-      new Paragraph({
-        children: [text(t, { bold: o.head, size: o.head ? 18 : 19, color: o.muted ? MUTED : INK })],
-      }),
-    ],
-  });
-
-/** A table: header row, filled rows, then blank rows to write in. */
-const table = (columns: string[], widths: number[], rows: string[][], blank = 0) =>
-  new Table({
-    width: { size: WIDTH, type: WidthType.DXA },
-    layout: TableLayoutType.FIXED,
-    columnWidths: widths,
-    rows: [
-      new TableRow({ tableHeader: true, children: columns.map((c, i) => cell(c, widths[i], { head: true })) }),
-      ...rows.map((r) => new TableRow({ children: r.map((c, i) => cell(c, widths[i], { muted: !c })) })),
-      ...Array.from({ length: blank }, () => new TableRow({ children: widths.map((w) => cell('', w)) })),
-    ],
-  });
-
-const split = (fractions: number[]) => {
-  const w = fractions.map((f) => Math.floor(WIDTH * f));
-  w[w.length - 1] += WIDTH - w.reduce((a, b) => a + b, 0);
-  return w;
+const style = (c: Cell, o: { bold?: boolean; fill?: string; color?: string; size?: number; wrap?: boolean; italic?: boolean } = {}) => {
+  c.font = { name: FONT, size: o.size ?? 10, bold: o.bold, italic: o.italic, color: { argb: o.color ?? INK } };
+  if (o.fill) c.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: o.fill } };
+  c.alignment = { vertical: 'top', wrapText: o.wrap ?? true };
 };
 
-/* a checklist line: the box is the mark, so no list numbering is wanted */
-const checkLine = (t: string) => new Paragraph({ indent: { left: 200 }, children: [text(t)], spacing: { after: 60 } });
+const list = (values: string[]): ExcelJS.DataValidation => ({
+  type: 'list',
+  allowBlank: true,
+  formulae: [`"${values.join(',')}"`],
+  showErrorMessage: true,
+  errorTitle: 'Pick from the list',
+  error: `One of: ${values.join(', ')}`,
+});
 
-const gap = () => new Paragraph({ children: [], spacing: { after: 60 } });
+const dateRule: ExcelJS.DataValidation = {
+  type: 'date',
+  operator: 'greaterThan',
+  allowBlank: true,
+  formulae: [new Date(Date.UTC(2020, 0, 1))],
+  showErrorMessage: true,
+  error: 'A date, e.g. 2027-03-15',
+};
 
-/* ---------- one template ---------- */
+/** A title block: the sheet's name for the reader and one line on what it is for. */
+const titled = (ws: Sheet, title: string, line: string, span: number) => {
+  ws.mergeCells(1, 1, 1, span);
+  ws.getCell(1, 1).value = title;
+  style(ws.getCell(1, 1), { bold: true, size: 14, wrap: false });
+  ws.mergeCells(2, 1, 2, span);
+  ws.getCell(2, 1).value = line;
+  style(ws.getCell(2, 1), { italic: true, color: MUTED, size: 9 });
+  ws.getRow(2).height = 28;
+};
+
+const header = (ws: Sheet, row: number, labels: string[]) => {
+  labels.forEach((l, i) => {
+    const c = ws.getCell(row, i + 1);
+    c.value = l;
+    style(c, { bold: true, fill: HEAD_FILL, size: 9 });
+    c.border = boxed;
+  });
+  ws.getRow(row).height = 30;
+};
+
+/** A register of blank rows to write in, with each column's rule. */
+const register = (
+  ws: Sheet,
+  first: number,
+  rows: number,
+  columns: { validation?: ExcelJS.DataValidation; date?: boolean }[],
+) => {
+  for (let r = first; r < first + rows; r++) {
+    columns.forEach((col, i) => {
+      const c = ws.getCell(r, i + 1);
+      style(c, { fill: INPUT_FILL });
+      c.border = boxed;
+      if (col.validation) c.dataValidation = col.validation;
+      if (col.date) {
+        c.dataValidation = dateRule;
+        c.numFmt = 'yyyy-mm-dd';
+      }
+    });
+  }
+};
+
+const setWidths = (ws: Sheet, widths: number[]) => widths.forEach((w, i) => (ws.getColumn(i + 1).width = w));
+
+const landscape = (ws: Sheet) => {
+  ws.pageSetup = { orientation: 'landscape', paperSize: 9, fitToPage: true, fitToWidth: 1, fitToHeight: 0 };
+};
+
+/* ---------- one workbook ---------- */
 
 const producers = producersOf(ALL_ACTIVITIES);
 const stageTitle = (key: string) => EMBEDDED_PROFILE.stages.find((s) => s.key === key)?.title ?? key;
 
-function build(ref: string): Document {
+interface Item {
+  id: string;
+  section: string;
+  item: string;
+  target: string;
+}
+
+const ISSUE_ROWS = 40;
+const WAIVER_ROWS = 30;
+const SPARE_ROWS = 10;
+
+async function build(ref: string): Promise<ExcelJS.Workbook> {
   const spec = SPECS[ref];
   if (!spec) throw new Error(`no template spec for ${ref}`);
   const step = deliverableStep(ref, producers);
@@ -327,138 +360,328 @@ function build(ref: string): Document {
   const w = embeddedDetail(act);
   if (!w) throw new Error(`${act} has no write-up`);
   const title = ALL_DELIVERABLE_TITLES[ref];
+  const pad = (n: number) => String(n).padStart(2, '0');
 
-  const body = [
-    new Paragraph({
-      children: [text('AtlasPM · Embedded SoC · Key deliverable template', { size: 18, color: ACCENT, bold: true })],
-      spacing: { after: 60 },
-    }),
-    new Paragraph({
-      heading: HeadingLevel.HEADING_1,
-      children: [new TextRun({ text: `${ref} — ${title}`, font: FONT, bold: true, size: 34, color: INK })],
-      spacing: { after: 80 },
-    }),
-    para(
-      `Produced by ${act} ${ALL_ACTIVITY_TITLES[act]} (${stageTitle(a.st)}). Fill in each section, attach the completed document to this deliverable's Handover in AtlasPM, and date the handover when it is accepted.`,
-      { color: MUTED, italics: true, size: 19, after: 160 },
-    ),
-
-    heading('1. Document control'),
-    table(
-      ['Field', 'Entry'],
-      split([0.32, 0.68]),
-      [
-        ['Programme', ''],
-        ['Deliverable', `${ref} — ${title}`],
-        ['Stage', stageTitle(a.st)],
-        ['Producing activity', `${act} — ${ALL_ACTIVITY_TITLES[act]}`],
-        ['Owner', a.ro],
-        ['Version / date', ''],
-        ['Status', 'Draft  /  For review  /  Signed'],
-      ],
-    ),
-
-    heading('2. Decision'),
-    para('☐ Signed off     ☐ Signed off with conditions     ☐ Not signed off', { bold: true }),
-    table(['Field', 'Entry'], split([0.32, 0.68]), [['Summary', ''], ['Conditions', ''], ['Next review', '']]),
-
-    heading('3. Baseline signed off against'),
-    table(['Item', 'Version / tag / ID'], split([0.55, 0.45]), spec.baseline.map((b) => [b, ''])),
-
-    heading('4. Entry criteria'),
-    table(
-      ['Criterion', 'Evidence (link or file)', 'Met'],
-      split([0.5, 0.38, 0.12]),
-      w.entry.map((e) => [strip(e), '', '☐']),
-    ),
-
-    heading('5. Checks and results'),
-    table(
-      ['Check', 'Target / limit', 'Result', 'Status'],
-      split([0.4, 0.26, 0.22, 0.12]),
-      spec.checks.map(([c, t]) => [c, t, '', '☐']),
-    ),
-
-    heading('6. Exit criteria'),
-    table(
-      ['Criterion', 'Evidence (link or file)', 'Met'],
-      split([0.5, 0.38, 0.12]),
-      w.exit.map((e) => [strip(e), '', '☐']),
-    ),
-
-    ...(spec.extra
-      ? [
-          heading(`7. ${spec.extra.heading}`),
-          para(spec.extra.intro, { color: MUTED, italics: true, size: 19 }),
-          table(spec.extra.columns, split(spec.extra.columns.map(() => 1 / spec.extra!.columns.length)), [], spec.extra.rows),
-        ]
-      : []),
-
-    heading(`${spec.extra ? 8 : 7}. Open issues`),
-    table(['ID', 'Description', 'Severity', 'Owner', 'Due', 'Disposition'], split([0.08, 0.36, 0.12, 0.14, 0.1, 0.2]), [], 3),
-
-    heading(`${spec.extra ? 9 : 8}. Waivers`),
-    table(
-      ['ID', 'Check / rule', 'Justification and risk', 'Condition / expiry', 'Approver'],
-      split([0.08, 0.2, 0.34, 0.2, 0.18]),
-      [],
-      3,
-    ),
-
-    heading(`${spec.extra ? 10 : 9}. Known failure modes — confirm each is addressed`),
-    ...w.risks.map((r) => checkLine(`☐ ${strip(r)}`)),
-
-    heading(`${spec.extra ? 11 : 10}. Handover`),
-    para('Who receives this deliverable, and what they take from it.', { color: MUTED, italics: true, size: 19 }),
-    table(
-      ['Receiving activity', 'What it takes', 'Received (date)'],
-      split([0.45, 0.35, 0.2]),
-      w.feedsInto.map((f) => [`${f} — ${ALL_ACTIVITY_TITLES[f] ?? ''}`, '', '']),
-    ),
-
-    heading(`${spec.extra ? 12 : 11}. Sign-off`),
-    table(
-      ['Role', 'Name', 'Decision', 'Signature', 'Date'],
-      split([0.3, 0.2, 0.18, 0.18, 0.14]),
-      w.roles.map((r) => [r.r, '', '', '', '']),
-    ),
-
-    heading('Revision history'),
-    table(['Version', 'Date', 'Change', 'Author'], split([0.12, 0.16, 0.52, 0.2]), [['0.1', '', 'Template issued', '']], 2),
-    gap(),
+  const items: Item[] = [
+    ...spec.baseline.map((b, i) => ({ id: `B-${pad(i + 1)}`, section: 'Baseline', item: b, target: 'Version, tag or ID recorded' })),
+    ...w.entry.map((e, i) => ({ id: `E-${pad(i + 1)}`, section: 'Entry criteria', item: strip(e), target: 'Met' })),
+    ...spec.checks.map(([c, t], i) => ({ id: `C-${pad(i + 1)}`, section: 'Checks', item: c, target: t })),
+    ...w.exit.map((e, i) => ({ id: `X-${pad(i + 1)}`, section: 'Exit criteria', item: strip(e), target: 'Met' })),
+    ...w.risks.map((r, i) => ({
+      id: `F-${pad(i + 1)}`,
+      section: 'Failure modes',
+      item: strip(r),
+      target: 'Addressed — say how in the result',
+    })),
   ];
 
-  return new Document({
-    creator: 'AtlasPM',
-    title: `${ref} — ${title}`,
-    description: `Template for ${ref}, produced by ${act}`,
-    styles: { default: { document: { run: { font: FONT, size: 20 } } } },
-    sections: [
-      {
-        properties: {
-          page: { size: { width: 11906, height: 16838 }, margin: { top: 1134, bottom: 1134, left: 1134, right: 1134 } },
-        },
-        headers: {
-          default: new Header({
-            children: [new Paragraph({ alignment: AlignmentType.RIGHT, children: [text(`${ref} · ${title}`, { size: 16, color: MUTED })] })],
-          }),
-        },
-        footers: {
-          default: new Footer({
-            children: [
-              new Paragraph({
-                alignment: AlignmentType.RIGHT,
-                children: [
-                  new TextRun({ font: FONT, size: 16, color: MUTED, children: ['Page ', PageNumber.CURRENT, ' of ', PageNumber.TOTAL_PAGES] }),
-                ],
-              }),
-            ],
-          }),
-        },
-        children: body,
-      },
+  const wb = new ExcelJS.Workbook();
+  wb.creator = 'AtlasPM';
+  wb.title = `${ref} — ${title}`;
+  wb.calcProperties.fullCalcOnLoad = true;
+
+  /* sheets in the order a stage lead reads them */
+  const signoff = wb.addWorksheet('Sign-off', { views: [{ showGridLines: false }] });
+  const check = wb.addWorksheet('Checklist', { views: [{ state: 'frozen', ySplit: 3, xSplit: 3 }] });
+  const issues = wb.addWorksheet('Open issues', { views: [{ state: 'frozen', ySplit: 3 }] });
+  const waivers = wb.addWorksheet('Waivers', { views: [{ state: 'frozen', ySplit: 3 }] });
+  const extra = spec.extra ? wb.addWorksheet(spec.extra.heading.slice(0, 31), { views: [{ state: 'frozen', ySplit: 3 }] }) : null;
+  const handover = wb.addWorksheet('Handover', { views: [{ state: 'frozen', ySplit: 3 }] });
+  const guide = wb.addWorksheet('Guide', { views: [{ showGridLines: false }] });
+
+  /* ----- Checklist ----- */
+  const CL = ['ID', 'Section', 'Item', 'Target / acceptance', 'Result or measured value', 'Evidence — link or file name', 'Evidence owner', 'Owner status', 'Waiver ID', 'Stage lead confirmation', 'Stage lead comment', 'Confirmed on', 'Flag'];
+  titled(
+    check,
+    `${ref} checklist — confirm every item on its evidence`,
+    'Owners fill Result, Evidence, Evidence owner and Owner status. The stage lead then confirms or rejects each item. Yellow cells are for input; grey cells come from the template. The Flag column names any row that cannot yet be confirmed as filled in.',
+    CL.length,
+  );
+  header(check, 3, CL);
+  setWidths(check, [7, 13, 46, 26, 28, 30, 16, 12, 10, 14, 28, 12, 26]);
+  const first = 4;
+  const last = first + items.length + SPARE_ROWS - 1;
+  for (let i = 0; i < items.length + SPARE_ROWS; i++) {
+    const r = first + i;
+    const it = items[i];
+    /* a spare row is left truly empty: a cell holding "" is counted as filled */
+    const given = [it?.id ?? null, it?.section ?? null, it?.item ?? null, it?.target ?? null];
+    given.forEach((v, k) => {
+      const c = check.getCell(r, k + 1);
+      c.value = v;
+      style(c, { fill: it ? GIVEN_FILL : INPUT_FILL, bold: k === 0 });
+      c.border = boxed;
+    });
+    for (let k = 5; k <= 12; k++) {
+      const c = check.getCell(r, k);
+      style(c, { fill: INPUT_FILL });
+      c.border = boxed;
+    }
+    check.getCell(r, 8).dataValidation = list(OWNER_STATUS);
+    check.getCell(r, 10).dataValidation = list(LEAD_STATUS);
+    check.getCell(r, 12).dataValidation = dateRule;
+    check.getCell(r, 12).numFmt = 'yyyy-mm-dd';
+    if (it) {
+      check.getCell(r, 8).value = 'Open';
+      check.getCell(r, 10).value = 'Pending';
+    }
+    const f = check.getCell(r, 13);
+    f.value = {
+      formula:
+        `IF(C${r}="","",` +
+        `IF(AND(J${r}="Confirmed",F${r}=""),"Evidence missing",` +
+        `IF(AND(H${r}="Waived",I${r}=""),"Waiver ID missing",` +
+        `IF(AND(J${r}="Rejected",K${r}=""),"Comment required",` +
+        `IF(AND(J${r}="Confirmed",OR(H${r}="Fail",H${r}="Open",H${r}="")),"Confirmed without a passing status",` +
+        `IF(AND(J${r}="Confirmed",L${r}=""),"Date missing",""))))))`,
+      /* the value a viewer that does not calculate shows: nothing is flagged yet */
+      result: '',
+    };
+    style(f, { color: 'FFCF222E', bold: true });
+    f.border = boxed;
+  }
+  const H = `H${first}:H${last}`;
+  const J = `J${first}:J${last}`;
+  check.addConditionalFormatting({
+    ref: H,
+    rules: [
+      { type: 'cellIs', operator: 'equal', formulae: ['"Pass"'], priority: 1, style: { fill: { type: 'pattern', pattern: 'solid', bgColor: { argb: 'FFDAFBE1' } } } },
+      { type: 'cellIs', operator: 'equal', formulae: ['"Fail"'], priority: 2, style: { fill: { type: 'pattern', pattern: 'solid', bgColor: { argb: 'FFFFD8D3' } } } },
+      { type: 'cellIs', operator: 'equal', formulae: ['"Waived"'], priority: 3, style: { fill: { type: 'pattern', pattern: 'solid', bgColor: { argb: 'FFFFEFC6' } } } },
     ],
   });
+  check.addConditionalFormatting({
+    ref: J,
+    rules: [
+      { type: 'cellIs', operator: 'equal', formulae: ['"Confirmed"'], priority: 4, style: { fill: { type: 'pattern', pattern: 'solid', bgColor: { argb: 'FFDAFBE1' } } } },
+      { type: 'cellIs', operator: 'equal', formulae: ['"Rejected"'], priority: 5, style: { fill: { type: 'pattern', pattern: 'solid', bgColor: { argb: 'FFFFD8D3' } } } },
+    ],
+  });
+  check.autoFilter = { from: { row: 3, column: 1 }, to: { row: last, column: CL.length } };
+  landscape(check);
+
+  /* ----- Open issues ----- */
+  const OI = ['Issue ID', 'Description', 'Linked item ID', 'Severity', 'Owner', 'Due', 'Status', 'Disposition'];
+  titled(issues, 'Open issues', 'Anything that stops an item being confirmed. Link it to the checklist item it blocks. A Critical or High issue left Open blocks the sign-off.', OI.length);
+  header(issues, 3, OI);
+  setWidths(issues, [10, 46, 13, 11, 16, 12, 10, 36]);
+  register(issues, 4, ISSUE_ROWS, [{}, {}, {}, { validation: list(SEVERITY) }, {}, { date: true }, { validation: list(ISSUE_STATUS) }, {}]);
+  landscape(issues);
+  const IL = 4 + ISSUE_ROWS - 1;
+
+  /* ----- Waivers ----- */
+  const WV = ['Waiver ID', 'Linked item ID', 'Check or rule waived', 'Justification', 'Risk accepted', 'Condition or expiry', 'Approved by', 'Approved on'];
+  titled(waivers, 'Waivers', 'Every item whose Owner status is Waived needs a row here, and every waiver needs an approver. A waiver without one blocks the sign-off.', WV.length);
+  header(waivers, 3, WV);
+  setWidths(waivers, [10, 13, 30, 40, 30, 26, 18, 12]);
+  register(waivers, 4, WAIVER_ROWS, [{}, {}, {}, {}, {}, {}, {}, { date: true }]);
+  landscape(waivers);
+  const WL = 4 + WAIVER_ROWS - 1;
+
+  /* ----- the gate's own sheet ----- */
+  if (extra && spec.extra) {
+    titled(extra, spec.extra.heading, spec.extra.intro, spec.extra.columns.length);
+    header(extra, 3, spec.extra.columns);
+    setWidths(extra, spec.extra.columns.map(() => 36));
+    register(extra, 4, 10, spec.extra.columns.map(() => ({})));
+    landscape(extra);
+  }
+
+  /* ----- Handover ----- */
+  const HO = ['Receiving activity', 'What it takes from this deliverable', 'Received by', 'Received on'];
+  titled(handover, 'Handover', `Who receives ${ref}, and what they take from it. The receiving owner records receipt.`, HO.length);
+  header(handover, 3, HO);
+  setWidths(handover, [46, 46, 20, 12]);
+  w.feedsInto.forEach((f, i) => {
+    const r = 4 + i;
+    const c = handover.getCell(r, 1);
+    c.value = `${f} — ${ALL_ACTIVITY_TITLES[f] ?? ''}`;
+    style(c, { fill: GIVEN_FILL });
+    c.border = boxed;
+  });
+  register(handover, 4, w.feedsInto.length, [{}, {}, {}, { date: true }].map((x, i) => (i === 0 ? {} : x)));
+  w.feedsInto.forEach((f, i) => {
+    const c = handover.getCell(4 + i, 1);
+    c.value = `${f} — ${ALL_ACTIVITY_TITLES[f] ?? ''}`;
+    style(c, { fill: GIVEN_FILL });
+  });
+  landscape(handover);
+
+  /* ----- Sign-off ----- */
+  setWidths(signoff, [34, 22, 20, 18, 30]);
+  titled(signoff, `${ref} — ${title}`, `Sign-off for ${ref}, produced by ${act} ${ALL_ACTIVITY_TITLES[act]}. Work through the Checklist first; this sheet counts it. See Guide for how to use the workbook.`, 5);
+  let r = 4;
+  const section = (t: string) => {
+    signoff.mergeCells(r, 1, r, 5);
+    const c = signoff.getCell(r, 1);
+    c.value = t;
+    style(c, { bold: true, color: ACCENT, size: 11, wrap: false });
+    r++;
+  };
+  const row = (label: string, value: ExcelJS.CellValue, o: { input?: boolean; validation?: ExcelJS.DataValidation; fmt?: string; date?: boolean; strong?: boolean } = {}) => {
+    const l = signoff.getCell(r, 1);
+    l.value = label;
+    style(l, { bold: true, fill: HEAD_FILL, size: 9 });
+    l.border = boxed;
+    signoff.mergeCells(r, 2, r, 5);
+    const v = signoff.getCell(r, 2);
+    v.value = value;
+    style(v, { fill: o.input ? INPUT_FILL : GIVEN_FILL, bold: o.strong });
+    v.border = boxed;
+    if (o.validation) v.dataValidation = o.validation;
+    if (o.date) {
+      v.dataValidation = dateRule;
+      v.numFmt = 'yyyy-mm-dd';
+    }
+    if (o.fmt) v.numFmt = o.fmt;
+    return `B${r++}`;
+  };
+
+  section('Document control');
+  row('Programme', '', { input: true });
+  row('Deliverable', `${ref} — ${title}`);
+  row('Stage', stageTitle(a.st));
+  row('Producing activity', `${act} — ${ALL_ACTIVITY_TITLES[act]}`);
+  row('Activity owner', a.ro);
+  row('Version', '', { input: true });
+  row('Date issued for review', '', { input: true, date: true });
+  r++;
+
+  section('Readiness — counted from the Checklist');
+  const C = `Checklist!$C$${first}:$C$${last}`;
+  const HH = `Checklist!$H$${first}:$H$${last}`;
+  const JJ = `Checklist!$J$${first}:$J$${last}`;
+  const MM = `Checklist!$M$${first}:$M$${last}`;
+  /* LEN rather than COUNTA or a wildcard COUNTIF: every engine agrees on it,
+     and a formula that returns "" is not counted as a value */
+  /* Each formula carries the value it has in the blank template, so a viewer
+     that does not calculate — a mail preview, a file browser — shows the
+     starting state rather than empty cells. Excel recalculates on open. */
+  const n = items.length;
+  const total = row('Items to confirm', { formula: `SUMPRODUCT(--(LEN(${C})>0))`, result: n });
+  const pass = row('Owner status — Pass', { formula: `COUNTIFS(${C},"<>",${HH},"Pass")`, result: 0 });
+  const waived = row('Owner status — Waived', { formula: `COUNTIFS(${C},"<>",${HH},"Waived")`, result: 0 });
+  const na = row('Owner status — N/A', { formula: `COUNTIFS(${C},"<>",${HH},"N/A")`, result: 0 });
+  const fail = row('Owner status — Fail', { formula: `COUNTIFS(${C},"<>",${HH},"Fail")`, result: 0 });
+  const open = row('Owner status — Open or blank', { formula: `COUNTIFS(${C},"<>",${HH},"Open")+COUNTIFS(${C},"<>",${HH},"")`, result: n });
+  const confirmed = row('Stage lead — Confirmed', { formula: `COUNTIFS(${C},"<>",${JJ},"Confirmed")`, result: 0 });
+  const rejected = row('Stage lead — Rejected', { formula: `COUNTIFS(${C},"<>",${JJ},"Rejected")`, result: 0 });
+  row('Stage lead — Pending or blank', { formula: `COUNTIFS(${C},"<>",${JJ},"Pending")+COUNTIFS(${C},"<>",${JJ},"")`, result: n });
+  const progress = row('Confirmed so far', { formula: `IF(${total}=0,0,${confirmed}/${total})`, result: 0 }, { fmt: '0%' });
+  const flags = row('Rows flagged on the Checklist', { formula: `SUMPRODUCT(--(LEN(${MM})>0))`, result: 0 });
+  const blocking = row('Critical or High issues still Open', {
+    formula:
+      `COUNTIFS('Open issues'!$D$4:$D$${IL},"Critical",'Open issues'!$G$4:$G$${IL},"Open")` +
+      `+COUNTIFS('Open issues'!$D$4:$D$${IL},"High",'Open issues'!$G$4:$G$${IL},"Open")`,
+    result: 0,
+  });
+  const unapproved = row('Waivers without an approver', { formula: `COUNTIFS(Waivers!$A$4:$A$${WL},"<>",Waivers!$G$4:$G$${WL},"")`, result: 0 });
+  const suggested = row(
+    'Suggested outcome',
+    {
+      formula:
+        `IF(OR(${fail}>0,${rejected}>0,${blocking}>0),"Not ready — blocking items",` +
+        `IF(AND(${total}>0,${confirmed}=${total},${flags}=0,${unapproved}=0),"Ready to sign off","In review"))`,
+      result: 'In review',
+    },
+    { strong: true },
+  );
+  void pass;
+  void waived;
+  void na;
+  void open;
+  void progress;
+  r++;
+
+  section('Final decision — stage lead');
+  const decision = row('Decision', '', { input: true, validation: list(FINAL_DECISION), strong: true });
+  row('Conditions (if any)', '', { input: true });
+  row('Stage lead', '', { input: true });
+  row('Decided on', '', { input: true, date: true });
+  row('Consistency check', {
+    formula: `IF(AND(${decision}="Signed off",${suggested}<>"Ready to sign off"),"Signed off while the checklist is not ready — record the reason in Conditions","")`,
+    result: '',
+  });
+  signoff.getCell(r - 1, 2).font = { name: FONT, size: 10, bold: true, color: { argb: 'FFCF222E' } };
+  signoff.addConditionalFormatting({
+    ref: suggested,
+    rules: [
+      { type: 'containsText', operator: 'containsText', text: 'Ready', priority: 1, style: { fill: { type: 'pattern', pattern: 'solid', bgColor: { argb: 'FFDAFBE1' } } } },
+      { type: 'containsText', operator: 'containsText', text: 'Not ready', priority: 2, style: { fill: { type: 'pattern', pattern: 'solid', bgColor: { argb: 'FFFFD8D3' } } } },
+    ],
+  });
+  r++;
+
+  section('Sign-off by role');
+  const SR = ['Role', 'Name', 'Decision', 'Date', 'Comment'];
+  SR.forEach((l, i) => {
+    const c = signoff.getCell(r, i + 1);
+    c.value = l;
+    style(c, { bold: true, fill: HEAD_FILL, size: 9 });
+    c.border = boxed;
+  });
+  r++;
+  for (const role of w.roles) {
+    const c = signoff.getCell(r, 1);
+    c.value = role.r;
+    style(c, { fill: GIVEN_FILL });
+    c.border = boxed;
+    for (let k = 2; k <= 5; k++) {
+      const x = signoff.getCell(r, k);
+      style(x, { fill: INPUT_FILL });
+      x.border = boxed;
+    }
+    signoff.getCell(r, 3).dataValidation = list(ROLE_DECISION);
+    signoff.getCell(r, 4).dataValidation = dateRule;
+    signoff.getCell(r, 4).numFmt = 'yyyy-mm-dd';
+    r++;
+  }
+  signoff.pageSetup = { orientation: 'portrait', paperSize: 9, fitToPage: true, fitToWidth: 1, fitToHeight: 0 };
+
+  /* ----- Guide ----- */
+  setWidths(guide, [22, 90]);
+  titled(guide, 'How to use this workbook', `${ref} is signed off on evidence, item by item. This sheet says who fills what.`, 2);
+  let g = 4;
+  const gline = (label: string, text: string, fill?: string) => {
+    const l = guide.getCell(g, 1);
+    l.value = label;
+    style(l, { bold: true, fill: fill ?? HEAD_FILL, size: 9 });
+    l.border = boxed;
+    const v = guide.getCell(g, 2);
+    v.value = text;
+    style(v, {});
+    v.border = boxed;
+    g++;
+  };
+  gline('1. Owners', 'On the Checklist, for each item: write the Result or measured value, the Evidence (a link to the report, dashboard or file name), who owns that evidence, and set Owner status. Waived needs a Waiver ID that exists on the Waivers sheet.');
+  gline('2. Stage lead', 'Review each item against its evidence. Set Stage lead confirmation to Confirmed, or Rejected with a comment saying what is missing. Date every confirmation.');
+  gline('3. Flags', 'The Flag column names any row that is not yet supported: evidence missing, a waiver without an ID, a rejection without a comment, a confirmation of a failing item, or an undated confirmation. Clear every flag.');
+  gline('4. Issues and waivers', 'Record anything blocking an item on Open issues, linked by item ID. A Critical or High issue left Open, or a waiver without an approver, holds the gate.');
+  gline('5. Final decision', 'The Sign-off sheet counts the Checklist and suggests an outcome. The stage lead records the Decision, any conditions, and the date. Each role then records its own decision.');
+  gline('6. Handover', 'Attach the completed workbook to this deliverable\'s Handover in AtlasPM and date the handover when it is accepted.');
+  g++;
+  gline('Yellow cells', 'Input — fill these in.', INPUT_FILL);
+  gline('Grey cells', 'Given by the template from the activity write-up — do not edit.', GIVEN_FILL);
+  gline('Owner status', 'Pass — meets the target. Fail — does not. Waived — does not, and a waiver accepts it. N/A — does not apply, with the reason in Result. Open — not yet assessed.');
+  gline('Lead confirmation', 'Pending — not yet reviewed. Confirmed — the evidence supports the status. Rejected — it does not; the comment says why.');
+  g++;
+  const ex = guide.getCell(g, 1);
+  ex.value = 'Example row';
+  style(ex, { bold: true, color: ACCENT });
+  g++;
+  const exHead = ['Item', 'Macro pin timing — setup and hold, all signoff corners'];
+  const exRows: [string, string][] = [
+    exHead as [string, string],
+    ['Target', 'Within vendor limits, no negative slack'],
+    ['Result', 'Worst setup slack +42 ps (ss_0p72v_125c); worst hold +18 ps (ff_0p88v_m40c)'],
+    ['Evidence', 'sta/turn3/emram_pins_summary.rpt (run 2027-05-14)'],
+    ['Evidence owner', 'Timing closure lead'],
+    ['Owner status', 'Pass'],
+    ['Stage lead', 'Confirmed — 2027-05-16'],
+  ];
+  for (const [k, v] of exRows) gline(k, v);
+
+  return wb;
 }
 
 /* ---------- write them ---------- */
@@ -471,7 +694,8 @@ async function main() {
   for (const [ref, t] of Object.entries(DELIVERABLE_TEMPLATES)) {
     const file = path.join(out, t.href.replace(/^\//, ''));
     fs.mkdirSync(path.dirname(file), { recursive: true });
-    fs.writeFileSync(file, await Packer.toBuffer(build(ref)));
+    const wb = await build(ref);
+    await wb.xlsx.writeFile(file);
     console.log(`wrote ${path.relative(process.cwd(), file)}`);
   }
 }

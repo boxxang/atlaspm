@@ -44,9 +44,9 @@
     "@types/pg": "^8.23.1",
     "@types/react": "^19",
     "@types/react-dom": "^19",
-    "docx": "^9.7.2",
     "eslint": "^9",
     "eslint-config-next": "16.3.1",
+    "exceljs": "^4.4.0",
     "tailwindcss": "^4",
     "typescript": "^5",
     "vitest": "^4.1.11"

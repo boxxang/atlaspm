@@ -151,9 +151,9 @@ test.describe('the Embedded SoC template', () => {
     const card = page.locator('[data-handover]');
     await expect(card).toContainText('Handover');
     const link = card.locator('[data-template-download="EDV-D7"]');
-    await expect(link).toHaveAttribute('href', '/templates/EDV-D7-dv-closure-signoff.docx');
+    await expect(link).toHaveAttribute('href', '/templates/EDV-D7-dv-closure-signoff.xlsx');
     const [download] = await Promise.all([page.waitForEvent('download'), link.click()]);
-    expect(download.suggestedFilename()).toBe('EDV-D7-dv-closure-signoff-template.docx');
+    expect(download.suggestedFilename()).toBe('EDV-D7-dv-closure-signoff-template.xlsx');
 
     /* a deliverable that is not a gate offers nothing */
     await rows.filter({ hasText: 'EDV-D1' }).click();
