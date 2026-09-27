@@ -3,18 +3,22 @@
  *
  * The sign-off workbook (tools/deliverable-templates) has a Checklist the
  * owners fill with a result, its evidence and a status, and a stage lead who
- * confirms or rejects each item on that evidence before deciding. These are
- * its rules, as functions, so the page and the workbook judge a row the same
- * way:
+ * confirms each item on that evidence before deciding. These are its rules,
+ * as functions, so the page and the workbook judge a row the same way.
+ *
+ * In the page an item moves Not updated → Under review → Confirmed. The
+ * stage lead or the TPM confirms it, which passes its evidence (a waived or
+ * not-applicable item stays so); reopening a confirmed item puts it back to
+ * Not updated, with its evidence open again, to be brought up to date.
+ *
  *
  *  - a row is flagged when the evidence does not support what it claims —
- *    confirmed without evidence, waived without a waiver, rejected without a
- *    reason, a failing item confirmed, a review nobody put their name to, a
- *    confirmation undated. The page names no waiver on the item, as the
+ *    confirmed without evidence, waived without a waiver, a failing item
+ *    confirmed, a confirmation nobody put their name to or undated. The page names no waiver on the item, as the
  *    workbook does: a waived item is covered by a waiver in the register
  *    raised against it;
- *  - the outcome is Not ready if anything blocks (a Fail, a rejection, a
- *    Critical or High issue still open), Ready to sign off once every item is
+ *  - the outcome is Not ready if anything blocks (a Fail, or a Critical or
+ *    High issue still open), Ready to sign off once every item is
  *    confirmed with nothing flagged and every waiver approved, and In review
  *    otherwise.
  *
@@ -23,7 +27,8 @@
 
 export const OWNER_STATUSES = ['Pass', 'Fail', 'Waived', 'N/A', 'Open'] as const;
 export type OwnerStatus = (typeof OWNER_STATUSES)[number];
-export const LEAD_STATUSES = ['Pending', 'Confirmed', 'Rejected'] as const;
+/** where an item stands: nothing recorded yet, recorded and being checked, confirmed */
+export const LEAD_STATUSES = ['Not updated', 'Under review', 'Confirmed'] as const;
 export type LeadStatus = (typeof LEAD_STATUSES)[number];
 export const FINAL_DECISIONS = ['Signed off', 'Signed off with conditions', 'Not signed off'] as const;
 export type FinalDecision = (typeof FINAL_DECISIONS)[number];
@@ -47,9 +52,10 @@ export interface ItemEntry {
   status: OwnerStatus;
   /** no longer asked for — the register links a waiver to its item — but read on entries saved when it was */
   waiverId: string;
+  /** the item's status */
   lead: LeadStatus;
   comment: string;
-  /** who confirmed or rejected it — a member of the programme team */
+  /** who confirmed it — the stage lead or the TPM */
   confirmedBy: string;
   /** ISO date, or '' */
   confirmedOn: string;
@@ -123,14 +129,42 @@ export const blankEntry = (): ItemEntry => ({
   evidenceOwner: '',
   status: 'Open',
   waiverId: '',
-  lead: 'Pending',
+  lead: 'Not updated',
   comment: '',
   confirmedBy: '',
   confirmedOn: '',
 });
 
+/* what entries saved before the item statuses were renamed said */
+const OLD_LEAD: Record<string, LeadStatus> = { Pending: 'Not updated', Rejected: 'Under review' };
+
 /** An item's entry, or the blank one every item starts from. */
-export const entryOf = (state: SignoffState, id: string): ItemEntry => ({ ...blankEntry(), ...state.items[id] });
+export const entryOf = (state: SignoffState, id: string): ItemEntry => {
+  const e = { ...blankEntry(), ...state.items[id] };
+  return OLD_LEAD[e.lead] ? { ...e, lead: OLD_LEAD[e.lead] } : e;
+};
+
+/** Confirmed, by whom and when: the evidence passes, unless it was waived or does not apply. */
+export const confirmEntry = (entry: ItemEntry, by: string, on: string): ItemEntry => ({
+  ...entry,
+  lead: 'Confirmed',
+  status: entry.status === 'Waived' || entry.status === 'N/A' ? entry.status : 'Pass',
+  confirmedBy: by,
+  confirmedOn: on,
+});
+
+/** Reopened: back to Not updated, the evidence open again; what was recorded stays to be brought up to date. */
+export const reopenEntry = (entry: ItemEntry): ItemEntry => ({
+  ...entry,
+  lead: 'Not updated',
+  status: 'Open',
+  confirmedBy: '',
+  confirmedOn: '',
+});
+
+/** Who may confirm an item: the stage lead, and the TPM. */
+export const approversOf = (stageLead: string, tpm: string): string[] =>
+  [...new Set([stageLead.trim(), tpm.trim()].filter(Boolean))];
 
 const blank = (s: string) => !s.trim();
 
@@ -149,11 +183,10 @@ export function flagOf(
   /* evidence is a link or file name written down, or a file attached */
   if (entry.lead === 'Confirmed' && blank(entry.evidence) && evidenceFiles === 0) return 'Evidence missing';
   if (entry.status === 'Waived' && !waiverFor(entry, waivers, itemId)) return 'No waiver for this item';
-  if (entry.lead === 'Rejected' && blank(entry.comment)) return 'Comment required';
   if (entry.lead === 'Confirmed' && (entry.status === 'Fail' || entry.status === 'Open'))
     return 'Confirmed without a passing status';
-  /* a confirmation, or a rejection, is somebody's: it names who gave it */
-  if (entry.lead !== 'Pending' && blank(entry.confirmedBy)) return 'Confirmed by missing';
+  /* a confirmation is somebody's: it names who gave it */
+  if (entry.lead === 'Confirmed' && blank(entry.confirmedBy)) return 'Confirmed by missing';
   if (entry.lead === 'Confirmed' && blank(entry.confirmedOn)) return 'Date missing';
   return '';
 }
@@ -172,8 +205,10 @@ export interface SignoffSummary {
   fail: number;
   open: number;
   confirmed: number;
-  rejected: number;
-  pending: number;
+  /** recorded and being checked */
+  review: number;
+  /** nothing recorded yet */
+  notUpdated: number;
   /** confirmed / total, 0 when there is nothing to confirm */
   progress: number;
   flagged: number;
@@ -195,14 +230,13 @@ export function summarize(
   const total = items.length;
   const fail = count((e) => e.status === 'Fail');
   const confirmed = count((e) => e.lead === 'Confirmed');
-  const rejected = count((e) => e.lead === 'Rejected');
   const flagged = items.filter((it) => flagOf(entryOf(state, it.id), state.waivers, files[it.id] ?? 0, it.id) !== '').length;
   const blocking = state.issues.filter(
     (i) => i.status === 'Open' && (i.severity === 'Critical' || i.severity === 'High'),
   ).length;
   const unapproved = state.waivers.filter((w) => !blank(w.id) && blank(w.approvedBy)).length;
   const outcome: Outcome =
-    fail > 0 || rejected > 0 || blocking > 0
+    fail > 0 || blocking > 0
       ? 'Not ready — blocking items'
       : total > 0 && confirmed === total && flagged === 0 && unapproved === 0
         ? 'Ready to sign off'
@@ -215,8 +249,8 @@ export function summarize(
     fail,
     open: count((e) => e.status === 'Open'),
     confirmed,
-    rejected,
-    pending: count((e) => e.lead === 'Pending'),
+    review: count((e) => e.lead === 'Under review'),
+    notUpdated: count((e) => e.lead === 'Not updated'),
     progress: total ? confirmed / total : 0,
     flagged,
     blocking,

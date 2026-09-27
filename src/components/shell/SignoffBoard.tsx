@@ -5,12 +5,15 @@ import { Fragment, useCallback, useEffect, useMemo, useRef, useState, useSyncExt
 import { deleteAttachment, saveSignoff, uploadAttachments } from '@/app/actions';
 import { PROGRAM_DEFAULT_TEAM, PROGRAM_TPM } from '@/data/programTeam';
 import { attachmentUrl, formatBytes, rejectFile, rejectionMessage, type AttachmentMeta } from '@/lib/attachments';
-import { clampWidth, gridTemplate, readWidths, tableMinWidth, type ColumnSpec, type Widths } from '@/lib/columnWidths';
+import { dragBoundary, gridTemplate, readWidths, tableMinWidth, type ColumnSpec, type Widths } from '@/lib/columnWidths';
 import { templateFor } from '@/data/deliverableTemplates';
 import {
   FINAL_DECISIONS,
+  approversOf,
+  confirmEntry,
   LEAD_STATUSES,
   OWNER_STATUSES,
+  reopenEntry,
   ROLE_DECISIONS,
   SEVERITIES,
   consistencyWarning,
@@ -59,8 +62,8 @@ const STATUS_PILL: Record<string, string> = {
   'N/A': 'pill',
   Open: 'pill',
   Confirmed: 'pill ok',
-  Rejected: 'pill risk',
-  Pending: 'pill',
+  'Under review': 'pill acc',
+  'Not updated': 'pill',
 };
 
 const OUTCOME_PILL: Record<string, string> = {
@@ -96,6 +99,7 @@ export function SignoffBoard({
     stageKey: def.stageKey,
     projectId,
     stageLead: leaders[def.stageKey]?.name || PROGRAM_TPM.name,
+    approvers: approversOf(leaders[def.stageKey]?.name ?? '', PROGRAM_TPM.name),
   };
   const [files, setFiles] = useState<Record<string, AttachmentMeta[]>>(initialFiles);
   const fileCounts = useMemo(
@@ -173,14 +177,14 @@ export function SignoffBoard({
         <h2 style={{ fontSize: 22, fontWeight: 600, letterSpacing: '-.02em', margin: '0 0 6px' }}>{def.title}</h2>
         <p style={{ fontSize: 14.5, lineHeight: 1.55, color: 'var(--ink-2)', maxWidth: '76ch' }}>
           Produced by <b>{def.act}</b> {def.actTitle}. Owners record a result, its evidence and a status against every
-          item; the stage lead confirms or rejects each on that evidence, then decides on the Sign-off tab.
+          item; the stage lead or the TPM confirms each on that evidence, and the stage lead decides on the Sign-off tab.
         </p>
 
         <div className="card sdash" data-summary>
           <Dstat
             cap="Confirmed"
             value={`${summary.confirmed}/${summary.total}`}
-            sub={`${Math.round(summary.progress * 100)}% by the stage lead`}
+            sub={`${Math.round(summary.progress * 100)}% by the stage lead or TPM`}
             bar={Math.round(summary.progress * 100)}
             stat="confirmed"
           />
@@ -201,7 +205,7 @@ export function SignoffBoard({
                 ? 'Every item confirmed on its evidence — the stage lead can decide.'
                 : summary.outcome === 'In review'
                   ? 'Items still to confirm, or rows the evidence does not yet support.'
-                  : 'A failing item, a rejection or an open Critical or High issue holds the gate.'}
+                  : 'A failing item or an open Critical or High issue holds the gate.'}
             </span>
           </div>
         </div>
@@ -406,8 +410,8 @@ const CHECK_COLS: ColumnSpec[] = [
   { key: 'ref', label: 'REF', width: 60, min: 52, align: 'center' },
   { key: 'item', label: 'ITEM AND TARGET', width: 260, min: 180, grow: true, align: 'left' },
   { key: 'owner', label: 'EVIDENCE OWNER', width: 150, min: 112, align: 'center' },
-  { key: 'status', label: 'STATUS', width: 100, min: 80, align: 'center' },
-  { key: 'lead', label: 'CONFIRMATION', width: 118, min: 104, align: 'center' },
+  { key: 'status', label: 'EVIDENCE STATUS', width: 136, min: 120, align: 'center' },
+  { key: 'lead', label: 'ITEM STATUS', width: 120, min: 104, align: 'center' },
   { key: 'by', label: 'CONFIRMED BY', width: 146, min: 104, align: 'center' },
   { key: 'on', label: 'CONFIRMED ON', width: 116, min: 104, align: 'center' },
   { key: 'flag', label: 'FLAG', width: 150, min: 90, align: 'center' },
@@ -484,21 +488,26 @@ function Checklist({
   const confirmed = items.filter((i) => entryOf(state, i.id).lead === 'Confirmed').length;
   const template = gridTemplate(CHECK_COLS, widths);
 
-  /* Dragging a column's edge. Nothing re-renders while the pointer moves: the
-     grid template is written straight onto the table, and only the width the
-     drag settles on is kept — the way the side panels are dragged. */
-  const drag = (col: ColumnSpec) => (e: React.PointerEvent<HTMLSpanElement>) => {
+  /* Dragging the boundary between two columns: the one on the left gains
+     what the one on the right gives, so the boundary follows the pointer and
+     nothing else moves. Nothing re-renders while the pointer moves: the grid
+     template is written straight onto the table, and only the widths the drag
+     settles on are kept — the way the side panels are dragged. */
+  const drag = (index: number) => (e: React.PointerEvent<HTMLSpanElement>) => {
     if (e.button !== 0) return;
     e.preventDefault();
     e.stopPropagation();
     const grip = e.currentTarget;
     const startX = e.clientX;
-    const from = widths[col.key];
+    /* the widths the columns are shown at — the item column is wider than its stored minimum */
+    const heads = table.current?.querySelectorAll<HTMLElement>('[data-col-head]') ?? [];
+    const shown: Widths = {};
+    heads.forEach((h) => (shown[h.dataset.colHead!] = h.getBoundingClientRect().width));
     let live = widths;
     grip.setPointerCapture(e.pointerId);
     document.body.classList.add('col-resizing');
     const move = (ev: PointerEvent) => {
-      live = { ...widths, [col.key]: clampWidth(col, from + ev.clientX - startX) };
+      live = dragBoundary(CHECK_COLS, widths, shown, index, ev.clientX - startX);
       table.current?.style.setProperty('--so-cols', gridTemplate(CHECK_COLS, live));
       table.current?.style.setProperty('--so-minw', `${tableMinWidth(CHECK_COLS, live, COL_GAP) + 40}px`);
     };
@@ -530,7 +539,7 @@ function Checklist({
         ))}
         <span style={{ flexGrow: 1 }} />
         <span className="num" style={{ fontSize: 12, color: 'var(--ink-3)' }}>
-          {confirmed} of {items.length} confirmed by the stage lead
+          {confirmed} of {items.length} confirmed
         </span>
         <button type="button" className="btn sm" onClick={resetWidths} title="Put every column back to its default width">
           Reset columns
@@ -547,16 +556,16 @@ function Checklist({
         }
       >
         <div className="thead so-grid so-head" role="row">
-          {CHECK_COLS.map((c) => (
+          {CHECK_COLS.map((c, i) => (
             <span key={c.key} className="so-th" role="columnheader" data-col-head={c.key}>
               <span className="so-thl">{c.label}</span>
               <span
                 className="so-grip"
                 role="separator"
                 aria-orientation="vertical"
-                aria-label={`Resize ${c.label}`}
+                aria-label={`Resize between ${c.label} and ${CHECK_COLS[i + 1]?.label ?? ''}`}
                 data-grip={c.key}
-                onPointerDown={drag(c)}
+                onPointerDown={drag(i)}
                 onDoubleClick={() => commitWidths({ ...widths, [c.key]: c.width })}
               />
             </span>
@@ -691,11 +700,19 @@ function ItemCard({
   const input = useRef<HTMLInputElement>(null);
   const set = (patch: Partial<ItemEntry>) =>
     setDraft((d) => {
-      const next = { ...(d ?? entry), ...patch };
-      /* a confirmation is dated when it is given, unless somebody dated it, and
-         is the stage lead's unless somebody else is named */
-      if (patch.lead === 'Confirmed' && !next.confirmedOn) next.confirmedOn = today();
-      if (patch.lead && patch.lead !== 'Pending' && !next.confirmedBy) next.confirmedBy = people.stageLead;
+      const prev = d ?? entry;
+      const next = { ...prev, ...patch };
+      /* Confirming passes the evidence, and is dated today and the stage
+         lead's unless somebody dated it or named the TPM; moving a confirmed
+         item back reopens it. */
+      if (patch.lead === 'Confirmed' && prev.lead !== 'Confirmed')
+        return confirmEntry(
+          next,
+          people.approvers.includes(next.confirmedBy) ? next.confirmedBy : people.stageLead,
+          next.confirmedOn || today(),
+        );
+      if (patch.lead && patch.lead !== 'Confirmed' && prev.lead === 'Confirmed')
+        return { ...reopenEntry(next), lead: patch.lead };
       return next;
     });
 
@@ -742,14 +759,25 @@ function ItemCard({
           <span style={{ flexGrow: 1 }} />
           {!draft && (
             <span className="so-state" data-card-state={entry.lead}>
-              <span className={STATUS_PILL[entry.lead]}>{entry.lead === 'Pending' ? 'Pending confirmation' : entry.lead}</span>
-              {entry.lead !== 'Pending' && entry.confirmedBy && (
+              <span className={STATUS_PILL[entry.lead]}>{entry.lead}</span>
+              {entry.lead === 'Confirmed' && entry.confirmedBy && (
                 <span className="so-meta">
                   by <Who name={entry.confirmedBy} />
                   {entry.confirmedOn && <> on {shownDate(entry.confirmedOn)}</>}
                 </span>
               )}
             </span>
+          )}
+          {!draft && entry.lead === 'Confirmed' && (
+            <button
+              type="button"
+              className="btn sm"
+              data-reopen-item={item.id}
+              title="Back to Not updated, with the evidence open again"
+              onClick={() => onSave(reopenEntry(entry))}
+            >
+              Reopen
+            </button>
           )}
           {!draft ? (
             <button type="button" className="btn sm" onClick={() => setDraft({ ...entry })} data-edit-item={item.id}>
@@ -808,7 +836,7 @@ function ItemCard({
                   )}
                   {entry.comment && (
                     <span>
-                      <b>Stage lead:</b> {entry.comment}
+                      <b>Comment:</b> {entry.comment}
                     </span>
                   )}
                 </div>
@@ -862,10 +890,11 @@ function ItemCard({
                 <PersonSelect people={people} label={`${item.id} evidence owner`} value={draft.evidenceOwner} onChange={(v) => set({ evidenceOwner: v })} />
               </label>
               <label className="so-f">
-                <span className="subcap">Status</span>
+                <span className="subcap">Evidence status{draft.lead === 'Confirmed' ? ' — reopen the item to change it' : ''}</span>
                 <select
                   className="dateinp"
-                  aria-label={`${item.id} status`}
+                  aria-label={`${item.id} evidence status`}
+                  disabled={draft.lead === 'Confirmed'}
                   value={draft.status}
                   onChange={(ev) => set({ status: ev.target.value as ItemEntry['status'] })}
                 >
@@ -880,12 +909,12 @@ function ItemCard({
                 </p>
               )}
 
-              <div className="so-formhd">Stage lead</div>
+              <div className="so-formhd">Item status</div>
               <label className="so-f">
-                <span className="subcap">Confirmation</span>
+                <span className="subcap">Item status</span>
                 <select
                   className="dateinp"
-                  aria-label={`${item.id} stage lead confirmation`}
+                  aria-label={`${item.id} item status`}
                   value={draft.lead}
                   onChange={(ev) => set({ lead: ev.target.value as ItemEntry['lead'] })}
                 >
@@ -894,16 +923,31 @@ function ItemCard({
                   ))}
                 </select>
               </label>
-              <label className="so-f">
-                <span className="subcap">Confirmed by {draft.lead !== 'Pending' ? '(required)' : ''}</span>
-                <PersonSelect people={people} label={`${item.id} confirmed by`} value={draft.confirmedBy} onChange={(v) => set({ confirmedBy: v })} />
-              </label>
-              <label className="so-f">
-                <span className="subcap">Confirmed on</span>
-                <input type="date" className="dateinp" value={draft.confirmedOn} onChange={(ev) => set({ confirmedOn: ev.target.value })} />
-              </label>
+              {draft.lead === 'Confirmed' ? (
+                <>
+                  <label className="so-f">
+                    <span className="subcap">Confirmed by — the stage lead or the TPM</span>
+                    <PersonSelect
+                      people={{ ...people, roster: people.roster.filter((m) => people.approvers.includes(m.name)) }}
+                      label={`${item.id} confirmed by`}
+                      value={draft.confirmedBy}
+                      onChange={(v) => set({ confirmedBy: v })}
+                    />
+                  </label>
+                  <label className="so-f">
+                    <span className="subcap">Confirmed on</span>
+                    <input type="date" className="dateinp" value={draft.confirmedOn} onChange={(ev) => set({ confirmedOn: ev.target.value })} />
+                  </label>
+                </>
+              ) : (
+                <p className="mono-note so-f" style={{ alignSelf: 'end' }}>
+                  {draft.lead === 'Not updated'
+                    ? 'Record the result and its evidence, then set Under review.'
+                    : 'The stage lead or the TPM confirms it; confirming passes the evidence.'}
+                </p>
+              )}
               <label className="so-f so-span">
-                <span className="subcap">Comment {draft.lead === 'Rejected' ? '(required)' : ''}</span>
+                <span className="subcap">Comment</span>
                 <textarea className="notebody so-ta" rows={2} value={draft.comment} onChange={(ev) => set({ comment: ev.target.value })} />
               </label>
             </div>
@@ -1148,7 +1192,7 @@ function SignoffTab({
 
   const readiness: [string, React.ReactNode][] = [
     ['Items confirmed', `${summary.confirmed} of ${summary.total} (${Math.round(summary.progress * 100)}%)`],
-    ['Rejected by the stage lead', summary.rejected],
+    ['Under review', summary.review],
     ['Failing items', summary.fail],
     ['Rows flagged', summary.flagged],
     ['Critical or High issues still open', summary.blocking],
@@ -1388,6 +1432,8 @@ interface People {
   projectId: string;
   /** who confirms by default: the stage's own lead, if the Team tab names one */
   stageLead: string;
+  /** who may confirm an item: the stage lead and the TPM */
+  approvers: string[];
 }
 
 /**

@@ -49,3 +49,27 @@ export const gridTemplate = (cols: readonly ColumnSpec[], widths: Widths): strin
 /** The narrowest the table can be — what a narrow window scrolls to see. */
 export const tableMinWidth = (cols: readonly ColumnSpec[], widths: Widths, gap: number): number =>
   cols.reduce((t, c) => t + widths[c.key], 0) + gap * (cols.length - 1);
+
+/**
+ * A boundary dragged by dx px: the column on its left gains what the one on
+ * its right gives, so the boundary stays under the pointer and nothing else
+ * moves. It works from the widths the columns are shown at, because the
+ * growing column is shown wider than its stored minimum; a column the drag
+ * touches is kept at the width it then shows. Neither goes below its
+ * minimum. `index` is the column on the boundary's left.
+ */
+export function dragBoundary(
+  cols: readonly ColumnSpec[],
+  stored: Widths,
+  shown: Widths,
+  index: number,
+  dx: number,
+): Widths {
+  const l = cols[index];
+  const r = cols[index + 1];
+  if (!l || !r || !Number.isFinite(dx)) return stored;
+  const lw = shown[l.key] ?? stored[l.key];
+  const rw = shown[r.key] ?? stored[r.key];
+  const d = Math.round(Math.min(Math.max(dx, l.min - lw), rw - r.min));
+  return { ...stored, [l.key]: Math.round(lw + d), [r.key]: Math.round(rw - d) };
+}

@@ -198,22 +198,35 @@ test.describe('the Embedded SoC template', () => {
        every header sits on one line */
     const heads = board.locator('.so-head [data-col-head]');
     await expect(heads).toHaveText([
-      'REF', 'ITEM AND TARGET', 'EVIDENCE OWNER', 'STATUS', 'CONFIRMATION', 'CONFIRMED BY', 'CONFIRMED ON', 'FLAG',
+      'REF', 'ITEM AND TARGET', 'EVIDENCE OWNER', 'EVIDENCE STATUS', 'ITEM STATUS', 'CONFIRMED BY', 'CONFIRMED ON', 'FLAG',
     ]);
     for (const h of await heads.all()) {
       const box = await h.locator('.so-thl').evaluate((el) => ({ w: el.scrollWidth, cw: el.clientWidth, h: el.getBoundingClientRect().height }));
       expect(box.w).toBeLessThanOrEqual(box.cw);
       expect(box.h).toBeLessThan(24);
     }
-    /* a column is widened by dragging its edge, and keeps the width */
+    /* a boundary is dragged left or right and follows the pointer: the
+       column on its right gains what the item column gives */
     const owner = board.locator('[data-col-head="owner"]');
     const before = (await owner.boundingBox())!.width;
-    const grip = (await board.locator('[data-grip="owner"]').boundingBox())!;
+    const grip = (await board.locator('[data-grip="item"]').boundingBox())!;
     await page.mouse.move(grip.x + grip.width / 2, grip.y + grip.height / 2);
     await page.mouse.down();
-    await page.mouse.move(grip.x + 80, grip.y + grip.height / 2, { steps: 4 });
+    await page.mouse.move(grip.x + grip.width / 2 - 60, grip.y + grip.height / 2, { steps: 4 });
     await page.mouse.up();
-    await expect.poll(async () => (await owner.boundingBox())!.width).toBeGreaterThan(before + 40);
+    await expect.poll(async () => Math.round((await owner.boundingBox())!.width - before)).toBe(60);
+    const moved = (await board.locator('[data-grip="item"]').boundingBox())!;
+    expect(Math.abs(moved.x - (grip.x - 60))).toBeLessThan(2);
+    /* and back to the right, between two fixed columns: the status column
+       gives what the owner column gains, and the item column is left alone */
+    const item0 = (await board.locator('[data-col-head="item"]').boundingBox())!.width;
+    const g2 = (await board.locator('[data-grip="owner"]').boundingBox())!;
+    await page.mouse.move(g2.x + g2.width / 2, g2.y + g2.height / 2);
+    await page.mouse.down();
+    await page.mouse.move(g2.x + g2.width / 2 + 10, g2.y + g2.height / 2, { steps: 2 });
+    await page.mouse.up();
+    await expect.poll(async () => Math.round((await owner.boundingBox())!.width - before)).toBe(70);
+    expect(Math.round((await board.locator('[data-col-head="item"]').boundingBox())!.width)).toBe(Math.round(item0));
     await expect(board.locator('[data-outcome]')).toHaveText('In review');
 
     /* the page scrolls in the shell like every other page */
@@ -232,8 +245,12 @@ test.describe('the Embedded SoC template', () => {
 
     /* a confirmation without evidence is flagged, and clears when it has some */
     await item.locator('[data-edit-item="C-01"]').click();
-    await item.getByLabel('C-01 status').selectOption('Pass');
-    await item.getByLabel('C-01 stage lead confirmation').selectOption('Confirmed');
+    await item.getByLabel('C-01 item status').selectOption('Confirmed');
+    /* confirming passes the evidence, and it cannot be changed while confirmed */
+    await expect(item.getByLabel('C-01 evidence status')).toHaveValue('Pass');
+    await expect(item.getByLabel('C-01 evidence status')).toBeDisabled();
+    /* only the stage lead or the TPM can be named */
+    await expect(item.getByLabel('C-01 confirmed by').locator('option:not([value=""])')).toHaveText([/Tomas Rivera/, /Sangwook Park/]);
     await item.locator('[data-save-item="C-01"]').click();
     /* confirming names the stage lead unless somebody else is picked */
     await expect(board.locator('[data-item="C-01"] [data-col="confirmed-by"] .so-name')).toHaveText('Tomas Rivera');
@@ -278,14 +295,34 @@ test.describe('the Embedded SoC template', () => {
 
     /* the TPM is on the team whatever the Team tab says */
     await item.locator('[data-edit-item="C-01"]').click();
-    await expect(item.getByLabel('C-01 confirmed by').locator('option', { hasText: 'Sangwook Park' })).toHaveCount(1);
+    await expect(item.getByLabel('C-01 evidence owner').locator('option', { hasText: 'Sangwook Park' })).toHaveCount(1);
     await item.getByRole('button', { name: 'Cancel' }).click();
+
+    /* reopening puts the item back to Not updated, its evidence open again,
+       with what was recorded kept to be brought up to date */
+    await item.locator('[data-reopen-item="C-01"]').click();
+    await expect(board.locator('[data-item="C-01"] [data-lead]')).toHaveText('Not updated');
+    await expect(board.locator('[data-item="C-01"] [data-owner-status]')).toHaveText('Open');
+    await expect(board.locator('[data-item="C-01"] [data-col="confirmed-by"]')).toHaveText('—');
+    await expect(item.locator('[data-view="C-01"] [data-evidence-files]')).toContainText('sta_summary.txt');
+    await expect(item.locator('[data-reopen-item]')).toHaveCount(0);
+    await item.locator('[data-edit-item="C-01"]').click();
+    await item.getByLabel('C-01 item status').selectOption('Under review');
+    await item.locator('[data-save-item="C-01"]').click();
+    await expect(board.locator('[data-item="C-01"] [data-lead]')).toHaveText('Under review');
+    await expect(board.locator('[data-stat="confirmed"]')).toHaveText('0/23');
+    await item.locator('[data-edit-item="C-01"]').click();
+    await item.getByLabel('C-01 item status').selectOption('Confirmed');
+    await item.getByLabel('C-01 confirmed by').selectOption('Sangwook Park');
+    await item.locator('[data-save-item="C-01"]').click();
+    await expect(board.locator('[data-item="C-01"] [data-owner-status]')).toHaveText('Pass');
+    await expect(board.locator('[data-item="C-01"] [data-col="confirmed-by"] .so-name')).toHaveText('Sangwook Park');
 
     /* a waived item is flagged until a waiver is raised against it */
     await board.locator('[data-item="C-02"]').click();
     const card2 = board.locator('[data-card="C-02"]');
     await card2.locator('[data-edit-item="C-02"]').click();
-    await card2.getByLabel('C-02 status').selectOption('Waived');
+    await card2.getByLabel('C-02 evidence status').selectOption('Waived');
     await expect(card2.getByLabel(/Waiver ID/)).toHaveCount(0);
     await card2.locator('[data-save-item="C-02"]').click();
     await expect(board.locator('[data-item="C-02"] [data-flag]')).toHaveText('No waiver for this item');

@@ -3435,8 +3435,8 @@ body.panedrag *{cursor:col-resize !important}
 .so-th{position:relative;display:block;text-align:center;min-width:0}
 .so-thl{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .so-th[data-col-head="item"]{text-align:left}
-.so-grip{position:absolute;top:-12px;bottom:-12px;right:-7px;width:10px;cursor:col-resize;touch-action:none;z-index:1}
-.so-grip::after{content:"";position:absolute;top:10px;bottom:10px;left:4px;width:2px;border-radius:1px;background:var(--line)}
+.so-grip{position:absolute;top:-12px;bottom:-12px;right:-12px;width:12px;cursor:col-resize;touch-action:none;z-index:1}
+.so-grip::after{content:"";position:absolute;top:10px;bottom:10px;left:5px;width:2px;border-radius:1px;background:var(--line)}
 .so-grip:hover::after,.col-resizing .so-grip::after{background:var(--accent)}
 .so-th:last-child .so-grip{display:none}
 .so-c{display:flex;justify-content:center;text-align:center;min-width:0}

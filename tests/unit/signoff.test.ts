@@ -3,9 +3,12 @@ import {
   consistencyWarning,
   emptySignoff,
   entryOf,
+  approversOf,
+  confirmEntry,
   flagOf,
   nextId,
   parseSignoff,
+  reopenEntry,
   summarize,
   type ItemEntry,
   type SignoffItem,
@@ -51,11 +54,11 @@ describe('a row is flagged when its evidence does not support it', () => {
   it('names the first thing to fix, in the workbook’s order', () => {
     expect(flagOf({ ...good, evidence: ' ' }, [])).toBe('Evidence missing');
     expect(flagOf({ ...good, status: 'Waived' }, [], 0, 'C-01')).toBe('No waiver for this item');
-    expect(flagOf({ ...good, lead: 'Rejected' }, [])).toBe('Comment required');
     expect(flagOf({ ...good, status: 'Fail' }, [])).toBe('Confirmed without a passing status');
     expect(flagOf({ ...good, status: 'Open' }, [])).toBe('Confirmed without a passing status');
     expect(flagOf({ ...good, confirmedBy: '' }, [])).toBe('Confirmed by missing');
-    expect(flagOf({ ...good, lead: 'Rejected', comment: 'stale report', confirmedBy: ' ' }, [])).toBe('Confirmed by missing');
+    /* an item still being worked on names nobody */
+    expect(flagOf({ ...good, lead: 'Under review', confirmedBy: '', confirmedOn: '' }, [])).toBe('');
     expect(flagOf({ ...good, confirmedOn: '' }, [])).toBe('Date missing');
   });
 
@@ -74,7 +77,7 @@ describe('a row is flagged when its evidence does not support it', () => {
 describe('the suggested outcome', () => {
   it('is In review on a blank sign-off', () => {
     const s = summarize(ITEMS, emptySignoff());
-    expect(s).toMatchObject({ total: 3, open: 3, pending: 3, confirmed: 0, flagged: 0, progress: 0 });
+    expect(s).toMatchObject({ total: 3, open: 3, notUpdated: 3, review: 0, confirmed: 0, flagged: 0, progress: 0 });
     expect(s.outcome).toBe('In review');
   });
 
@@ -84,14 +87,10 @@ describe('the suggested outcome', () => {
     expect(s.outcome).toBe('Ready to sign off');
   });
 
-  it('is Not ready on a failing item, a rejection or a blocking issue', () => {
+  it('is Not ready on a failing item or a blocking issue', () => {
     const fail = allConfirmed();
-    fail.items['C-01'] = { ...good, status: 'Fail', lead: 'Pending' };
-    expect(summarize(ITEMS, fail).outcome).toBe('Not ready — blocking items');
-
-    const rejected = allConfirmed();
-    rejected.items['C-01'] = { ...good, lead: 'Rejected', comment: 'report is from turn 2' };
-    expect(summarize(ITEMS, rejected).outcome).toBe('Not ready — blocking items');
+    fail.items['C-01'] = { ...good, status: 'Fail', lead: 'Under review' };
+    expect(summarize(ITEMS, fail)).toMatchObject({ review: 1, outcome: 'Not ready — blocking items' });
 
     const issue = allConfirmed();
     issue.issues.push({ id: 'I-01', description: 'IR hotspot', itemId: 'C-01', severity: 'High', owner: '', due: '', status: 'Open', disposition: '' });
@@ -201,5 +200,63 @@ describe('column widths', () => {
     expect(gridTemplate(cols, { ref: 70, item: 360 })).toBe('70px minmax(360px, 1fr)');
     expect(tableMinWidth(cols, { ref: 70, item: 360 }, 10)).toBe(440);
     expect(clampWidth(cols[0], NaN)).toBe(70);
+  });
+});
+
+describe('an item moves Not updated → Under review → Confirmed', () => {
+  it('starts Not updated, and reads entries saved under the old names', () => {
+    expect(entryOf(emptySignoff(), 'C-01').lead).toBe('Not updated');
+    const s = emptySignoff();
+    s.items['C-01'] = { ...good, lead: 'Pending' as never };
+    s.items['C-02'] = { ...good, lead: 'Rejected' as never };
+    expect(entryOf(s, 'C-01').lead).toBe('Not updated');
+    expect(entryOf(s, 'C-02').lead).toBe('Under review');
+  });
+
+  it('passes the evidence when confirmed, unless it was waived or not applicable', () => {
+    const review = { ...good, status: 'Open' as const, lead: 'Under review' as const, confirmedBy: '', confirmedOn: '' };
+    expect(confirmEntry(review, 'Tomas Rivera', '2027-05-16')).toMatchObject({
+      lead: 'Confirmed', status: 'Pass', confirmedBy: 'Tomas Rivera', confirmedOn: '2027-05-16',
+    });
+    expect(confirmEntry({ ...review, status: 'Waived' }, 'T', '2027-05-16').status).toBe('Waived');
+    expect(confirmEntry({ ...review, status: 'N/A' }, 'T', '2027-05-16').status).toBe('N/A');
+    expect(confirmEntry({ ...review, status: 'Fail' }, 'T', '2027-05-16').status).toBe('Pass');
+  });
+
+  it('goes back to Not updated on reopening, keeping what was recorded', () => {
+    const r = reopenEntry(good);
+    expect(r).toMatchObject({ lead: 'Not updated', status: 'Open', confirmedBy: '', confirmedOn: '' });
+    expect(r.result).toBe(good.result);
+    expect(r.evidence).toBe(good.evidence);
+  });
+
+  it('is confirmed by the stage lead or the TPM', () => {
+    expect(approversOf('Tomas Rivera', 'Sangwook Park')).toEqual(['Tomas Rivera', 'Sangwook Park']);
+    expect(approversOf('', 'Sangwook Park')).toEqual(['Sangwook Park']);
+    expect(approversOf('Sangwook Park', 'Sangwook Park')).toEqual(['Sangwook Park']);
+  });
+});
+
+describe('dragging a column boundary', () => {
+  it('moves the boundary with the pointer: the column left of it gains what the right one gives', async () => {
+    const { dragBoundary } = await import('@/lib/columnWidths');
+    const cols = [
+      { key: 'ref', label: 'REF', width: 60, min: 50 },
+      { key: 'item', label: 'ITEM', width: 200, min: 150, grow: true },
+      { key: 'a', label: 'A', width: 100, min: 80 },
+      { key: 'b', label: 'B', width: 100, min: 80 },
+    ];
+    const stored = { ref: 60, item: 200, a: 100, b: 100 };
+    const shown = { ref: 60, item: 340, a: 100, b: 100 };
+    /* between two fixed columns */
+    expect(dragBoundary(cols, stored, shown, 2, 15)).toEqual({ ref: 60, item: 200, a: 115, b: 85 });
+    /* never below a minimum, on either side */
+    expect(dragBoundary(cols, stored, shown, 2, 60)).toEqual({ ref: 60, item: 200, a: 120, b: 80 });
+    expect(dragBoundary(cols, stored, shown, 2, -60)).toEqual({ ref: 60, item: 200, a: 80, b: 120 });
+    /* beside the growing column, it is held at what it shows */
+    expect(dragBoundary(cols, stored, shown, 1, 40)).toEqual({ ref: 60, item: 360, a: 80, b: 100 });
+    expect(dragBoundary(cols, stored, shown, 1, -40)).toEqual({ ref: 60, item: 300, a: 140, b: 100 });
+    /* the last column has no boundary on its right */
+    expect(dragBoundary(cols, stored, shown, 3, 20)).toEqual(stored);
   });
 });
