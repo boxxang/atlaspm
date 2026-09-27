@@ -22,12 +22,14 @@ import {
   type ItemEntry,
   type SignoffItem,
   type SignoffState,
+  type WaiverRow,
+  waiverFor,
 } from '@/lib/signoff';
 import type { SignoffDefinition } from '@/lib/signoffDefinition';
 import { teamRoster, type TeamMember } from '@/lib/people';
 import { fmtDate, fromISO } from '@/lib/schedule';
 import { uid, useAppStore } from '@/store/useAppStore';
-import { IconDownload, IconFile, IconPlus } from './icons';
+import { Avatar, IconDownload, IconFile, IconPlus } from './icons';
 
 /**
  * A gate deliverable confirmed item by item — the sign-off workbook, in the
@@ -272,7 +274,7 @@ export function SignoffBoard({
         <Register
           people={people}
           what="waiver"
-          intro="Every item whose owner status is Waived names a waiver here, and every waiver needs an approver. A waiver without one holds the gate."
+          intro="Every item marked Waived needs a waiver here, raised against that item, and every waiver needs an approver. A waiver without one holds the gate."
           rows={state.waivers}
           columns={[
             { key: 'id', label: 'ID', width: '64px', given: true },
@@ -403,10 +405,10 @@ function Dstat({
 const CHECK_COLS: ColumnSpec[] = [
   { key: 'ref', label: 'REF', width: 60, min: 52, align: 'center' },
   { key: 'item', label: 'ITEM AND TARGET', width: 260, min: 180, grow: true, align: 'left' },
-  { key: 'owner', label: 'EVIDENCE OWNER', width: 128, min: 112, align: 'center' },
-  { key: 'status', label: 'OWNER STATUS', width: 112, min: 100, align: 'center' },
-  { key: 'lead', label: 'STAGE LEAD', width: 100, min: 88, align: 'center' },
-  { key: 'by', label: 'CONFIRMED BY', width: 124, min: 104, align: 'center' },
+  { key: 'owner', label: 'EVIDENCE OWNER', width: 150, min: 112, align: 'center' },
+  { key: 'status', label: 'STATUS', width: 100, min: 80, align: 'center' },
+  { key: 'lead', label: 'CONFIRMATION', width: 118, min: 104, align: 'center' },
+  { key: 'by', label: 'CONFIRMED BY', width: 146, min: 104, align: 'center' },
   { key: 'on', label: 'CONFIRMED ON', width: 116, min: 104, align: 'center' },
   { key: 'flag', label: 'FLAG', width: 150, min: 90, align: 'center' },
 ];
@@ -473,7 +475,7 @@ function Checklist({
   const [widths, commitWidths, resetWidths] = useColumnWidths();
   const table = useRef<HTMLDivElement>(null);
   const sections = [...new Set(items.map((i) => i.section))];
-  const flagFor = (id: string) => flagOf(entryOf(state, id), state.waivers, files[id]?.length ?? 0);
+  const flagFor = (id: string) => flagOf(entryOf(state, id), state.waivers, files[id]?.length ?? 0, id);
   const shown = items.filter((it) => {
     if (filter === 'flagged') return flagFor(it.id) !== '';
     if (filter === 'pending') return entryOf(state, it.id).lead !== 'Confirmed';
@@ -599,8 +601,8 @@ function Checklist({
                           )}
                         </span>
                       </span>
-                      <span className="so-c so-clamp" data-col="evidence-owner">
-                        {e.evidenceOwner || <span className="so-none">—</span>}
+                      <span className="so-c" data-col="evidence-owner">
+                        <Who name={e.evidenceOwner} />
                       </span>
                       <span className="so-c">
                         <span className={STATUS_PILL[e.status]} data-owner-status>
@@ -612,8 +614,8 @@ function Checklist({
                           {e.lead}
                         </span>
                       </span>
-                      <span className="so-c so-clamp" data-col="confirmed-by">
-                        {e.confirmedBy || <span className="so-none">—</span>}
+                      <span className="so-c" data-col="confirmed-by">
+                        <Who name={e.confirmedBy} />
                       </span>
                       <span className="so-c num" data-col="confirmed-on">
                         {e.confirmedOn ? shownDate(e.confirmedOn) : <span className="so-none">—</span>}
@@ -631,7 +633,7 @@ function Checklist({
                         flag={flag}
                         files={files[it.id] ?? []}
                         setFiles={(f) => setFiles((all) => ({ ...all, [it.id]: f(all[it.id] ?? []) }))}
-                        waiverIds={state.waivers.map((w) => w.id)}
+                        waiver={waiverFor(e, state.waivers, it.id)}
                         onSave={(entry) => onSave(it.id, entry)}
                       />
                     )}
@@ -669,7 +671,7 @@ function ItemCard({
   flag,
   files,
   setFiles,
-  waiverIds,
+  waiver,
   onSave,
 }: {
   refName: string;
@@ -679,7 +681,8 @@ function ItemCard({
   flag: string;
   files: AttachmentMeta[];
   setFiles: (f: (prev: AttachmentMeta[]) => AttachmentMeta[]) => void;
-  waiverIds: string[];
+  /** the waiver in the register covering this item, if it is waived */
+  waiver: WaiverRow | undefined;
   onSave: (entry: ItemEntry) => void;
 }) {
   const [draft, setDraft] = useState<ItemEntry | null>(null);
@@ -737,6 +740,17 @@ function ItemCard({
         <div className="notecard-hd">
           <span className="cap">Result and evidence</span>
           <span style={{ flexGrow: 1 }} />
+          {!draft && (
+            <span className="so-state" data-card-state={entry.lead}>
+              <span className={STATUS_PILL[entry.lead]}>{entry.lead === 'Pending' ? 'Pending confirmation' : entry.lead}</span>
+              {entry.lead !== 'Pending' && entry.confirmedBy && (
+                <span className="so-meta">
+                  by <Who name={entry.confirmedBy} />
+                  {entry.confirmedOn && <> on {shownDate(entry.confirmedOn)}</>}
+                </span>
+              )}
+            </span>
+          )}
           {!draft ? (
             <button type="button" className="btn sm" onClick={() => setDraft({ ...entry })} data-edit-item={item.id}>
               Edit
@@ -785,11 +799,11 @@ function ItemCard({
                 <EvidenceFiles files={files} />
                 {!evidenceText && !files.length && <p className="mono-note">No evidence yet.</p>}
               </div>
-              {(entry.comment || (entry.status === 'Waived' && entry.waiverId)) && (
+              {(entry.comment || (entry.status === 'Waived' && waiver)) && (
                 <div className="so-sec so-note">
-                  {entry.status === 'Waived' && entry.waiverId && (
+                  {entry.status === 'Waived' && waiver && (
                     <span className="pill warn" style={{ marginRight: 8 }}>
-                      Waiver {entry.waiverId}
+                      Waiver {waiver.id}
                     </span>
                   )}
                   {entry.comment && (
@@ -848,10 +862,10 @@ function ItemCard({
                 <PersonSelect people={people} label={`${item.id} evidence owner`} value={draft.evidenceOwner} onChange={(v) => set({ evidenceOwner: v })} />
               </label>
               <label className="so-f">
-                <span className="subcap">Owner status</span>
+                <span className="subcap">Status</span>
                 <select
                   className="dateinp"
-                  aria-label={`${item.id} owner status`}
+                  aria-label={`${item.id} status`}
                   value={draft.status}
                   onChange={(ev) => set({ status: ev.target.value as ItemEntry['status'] })}
                 >
@@ -861,15 +875,9 @@ function ItemCard({
                 </select>
               </label>
               {draft.status === 'Waived' && (
-                <label className="so-f">
-                  <span className="subcap">Waiver ID (required)</span>
-                  <input className="lnkin" list={`so-w-${item.id}`} value={draft.waiverId} onChange={(ev) => set({ waiverId: ev.target.value })} />
-                  <datalist id={`so-w-${item.id}`}>
-                    {waiverIds.map((w) => (
-                      <option key={w} value={w} />
-                    ))}
-                  </datalist>
-                </label>
+                <p className="mono-note so-f" style={{ alignSelf: 'end' }}>
+                  {waiver ? `Covered by ${waiver.id} in the Waivers register.` : 'Raise a waiver against this item in the Waivers register.'}
+                </p>
               )}
 
               <div className="so-formhd">Stage lead</div>
@@ -1028,6 +1036,12 @@ function Register({
                   return (
                     <span key={c.key}>
                       <span className={pillFor(v)}>{v}</span>
+                    </span>
+                  );
+                if (c.person)
+                  return (
+                    <span key={c.key} className="so-cell">
+                      <Who name={v} />
                     </span>
                   );
                 return (
@@ -1288,7 +1302,7 @@ function SignoffTab({
                 onChange={(v) => setDecision({ ...decision, d: { ...decision.d, lead: v } })}
               />
             ) : (
-              state.decision.lead || '—'
+              <Who name={state.decision.lead} />
             )}
           </Prop>
           <Prop label="Decided on">
@@ -1330,7 +1344,9 @@ function SignoffTab({
                   </>
                 ) : (
                   <>
-                    <span className="so-cell">{rd.name || '—'}</span>
+                    <span className="so-cell">
+                      <Who name={rd.name} />
+                    </span>
                     <span>{rd.decision ? <span className={rd.decision === 'Reject' ? 'pill risk' : 'pill ok'}>{rd.decision}</span> : '—'}</span>
                     <span className="so-cell">{shownDate(rd.date)}</span>
                   </>
@@ -1354,6 +1370,17 @@ function Prop({ label, children }: { label: string; children: React.ReactNode })
 }
 
 /* ---------- naming a person ---------- */
+
+/** A person as the rest of the app shows one: their initials in a circle, then the name. */
+function Who({ name }: { name: string }) {
+  if (!name.trim()) return <span className="so-none">—</span>;
+  return (
+    <span className="so-who">
+      <Avatar name={name} small />
+      <span className="so-name">{name}</span>
+    </span>
+  );
+}
 
 interface People {
   roster: TeamMember[];

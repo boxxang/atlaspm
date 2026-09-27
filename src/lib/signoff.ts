@@ -10,8 +10,9 @@
  *  - a row is flagged when the evidence does not support what it claims —
  *    confirmed without evidence, waived without a waiver, rejected without a
  *    reason, a failing item confirmed, a review nobody put their name to, a
- *    confirmation undated — and, here as the workbook cannot, a waiver ID
- *    that names no waiver;
+ *    confirmation undated. The page names no waiver on the item, as the
+ *    workbook does: a waived item is covered by a waiver in the register
+ *    raised against it;
  *  - the outcome is Not ready if anything blocks (a Fail, a rejection, a
  *    Critical or High issue still open), Ready to sign off once every item is
  *    confirmed with nothing flagged and every waiver approved, and In review
@@ -44,6 +45,7 @@ export interface ItemEntry {
   evidence: string;
   evidenceOwner: string;
   status: OwnerStatus;
+  /** no longer asked for — the register links a waiver to its item — but read on entries saved when it was */
   waiverId: string;
   lead: LeadStatus;
   comment: string;
@@ -137,12 +139,16 @@ const blank = (s: string) => !s.trim();
  * first reason only, in the workbook's order, so the row says the next thing
  * to fix.
  */
-export function flagOf(entry: ItemEntry, waivers: readonly WaiverRow[], evidenceFiles = 0): string {
+export function flagOf(
+  entry: ItemEntry,
+  waivers: readonly WaiverRow[],
+  evidenceFiles = 0,
+  /** the item's ID, which a waiver in the register names */
+  itemId = '',
+): string {
   /* evidence is a link or file name written down, or a file attached */
   if (entry.lead === 'Confirmed' && blank(entry.evidence) && evidenceFiles === 0) return 'Evidence missing';
-  if (entry.status === 'Waived' && blank(entry.waiverId)) return 'Waiver ID missing';
-  if (entry.status === 'Waived' && !waivers.some((w) => w.id.trim() === entry.waiverId.trim()))
-    return 'Waiver not found';
+  if (entry.status === 'Waived' && !waiverFor(entry, waivers, itemId)) return 'No waiver for this item';
   if (entry.lead === 'Rejected' && blank(entry.comment)) return 'Comment required';
   if (entry.lead === 'Confirmed' && (entry.status === 'Fail' || entry.status === 'Open'))
     return 'Confirmed without a passing status';
@@ -151,6 +157,10 @@ export function flagOf(entry: ItemEntry, waivers: readonly WaiverRow[], evidence
   if (entry.lead === 'Confirmed' && blank(entry.confirmedOn)) return 'Date missing';
   return '';
 }
+
+/** The waiver covering a waived item: raised against it, or named by an older entry. */
+export const waiverFor = (entry: ItemEntry, waivers: readonly WaiverRow[], itemId: string): WaiverRow | undefined =>
+  waivers.find((w) => (!blank(itemId) && w.itemId.trim() === itemId) || (!blank(entry.waiverId) && w.id.trim() === entry.waiverId.trim()));
 
 export type Outcome = 'Ready to sign off' | 'In review' | 'Not ready — blocking items';
 
@@ -186,7 +196,7 @@ export function summarize(
   const fail = count((e) => e.status === 'Fail');
   const confirmed = count((e) => e.lead === 'Confirmed');
   const rejected = count((e) => e.lead === 'Rejected');
-  const flagged = items.filter((it) => flagOf(entryOf(state, it.id), state.waivers, files[it.id] ?? 0) !== '').length;
+  const flagged = items.filter((it) => flagOf(entryOf(state, it.id), state.waivers, files[it.id] ?? 0, it.id) !== '').length;
   const blocking = state.issues.filter(
     (i) => i.status === 'Open' && (i.severity === 'Critical' || i.severity === 'High'),
   ).length;

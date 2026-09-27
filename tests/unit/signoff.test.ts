@@ -50,7 +50,7 @@ describe('a row is flagged when its evidence does not support it', () => {
 
   it('names the first thing to fix, in the workbook’s order', () => {
     expect(flagOf({ ...good, evidence: ' ' }, [])).toBe('Evidence missing');
-    expect(flagOf({ ...good, status: 'Waived' }, [])).toBe('Waiver ID missing');
+    expect(flagOf({ ...good, status: 'Waived' }, [], 0, 'C-01')).toBe('No waiver for this item');
     expect(flagOf({ ...good, lead: 'Rejected' }, [])).toBe('Comment required');
     expect(flagOf({ ...good, status: 'Fail' }, [])).toBe('Confirmed without a passing status');
     expect(flagOf({ ...good, status: 'Open' }, [])).toBe('Confirmed without a passing status');
@@ -59,12 +59,15 @@ describe('a row is flagged when its evidence does not support it', () => {
     expect(flagOf({ ...good, confirmedOn: '' }, [])).toBe('Date missing');
   });
 
-  /* what the workbook cannot check and the page can */
-  it('flags a waiver ID that names no waiver', () => {
-    const waived = { ...good, status: 'Waived' as const, waiverId: 'W-07' };
-    expect(flagOf(waived, [])).toBe('Waiver not found');
+  /* the page names no waiver on the item: the register links the waiver to it */
+  it('takes a waived item as covered by a waiver raised against it', () => {
+    const waived = { ...good, status: 'Waived' as const };
     const w = { id: 'W-07', itemId: 'C-01', rule: '', justification: '', risk: '', condition: '', approvedBy: 'Signoff lead', approvedOn: '' };
-    expect(flagOf(waived, [w])).toBe('');
+    expect(flagOf(waived, [], 0, 'C-01')).toBe('No waiver for this item');
+    expect(flagOf(waived, [w], 0, 'C-02')).toBe('No waiver for this item');
+    expect(flagOf(waived, [w], 0, 'C-01')).toBe('');
+    /* an entry saved when the item named its waiver still counts */
+    expect(flagOf({ ...waived, waiverId: 'W-07' }, [{ ...w, itemId: '' }], 0, 'C-01')).toBe('');
   });
 });
 
@@ -103,7 +106,7 @@ describe('the suggested outcome', () => {
     expect(summarize(ITEMS, noEvidence)).toMatchObject({ flagged: 1, outcome: 'In review' });
 
     const unapproved = allConfirmed();
-    unapproved.items['C-01'] = { ...good, status: 'Waived', waiverId: 'W-01' };
+    unapproved.items['C-01'] = { ...good, status: 'Waived' };
     unapproved.waivers.push({ id: 'W-01', itemId: 'C-01', rule: 'hold at ff', justification: '', risk: '', condition: '', approvedBy: '', approvedOn: '' });
     expect(summarize(ITEMS, unapproved)).toMatchObject({ unapproved: 1, outcome: 'In review' });
     unapproved.waivers[0].approvedBy = 'Signoff lead';

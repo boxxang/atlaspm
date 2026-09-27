@@ -198,7 +198,7 @@ test.describe('the Embedded SoC template', () => {
        every header sits on one line */
     const heads = board.locator('.so-head [data-col-head]');
     await expect(heads).toHaveText([
-      'REF', 'ITEM AND TARGET', 'EVIDENCE OWNER', 'OWNER STATUS', 'STAGE LEAD', 'CONFIRMED BY', 'CONFIRMED ON', 'FLAG',
+      'REF', 'ITEM AND TARGET', 'EVIDENCE OWNER', 'STATUS', 'CONFIRMATION', 'CONFIRMED BY', 'CONFIRMED ON', 'FLAG',
     ]);
     for (const h of await heads.all()) {
       const box = await h.locator('.so-thl').evaluate((el) => ({ w: el.scrollWidth, cw: el.clientWidth, h: el.getBoundingClientRect().height }));
@@ -232,11 +232,15 @@ test.describe('the Embedded SoC template', () => {
 
     /* a confirmation without evidence is flagged, and clears when it has some */
     await item.locator('[data-edit-item="C-01"]').click();
-    await item.getByLabel('C-01 owner status').selectOption('Pass');
+    await item.getByLabel('C-01 status').selectOption('Pass');
     await item.getByLabel('C-01 stage lead confirmation').selectOption('Confirmed');
     await item.locator('[data-save-item="C-01"]').click();
     /* confirming names the stage lead unless somebody else is picked */
-    await expect(board.locator('[data-item="C-01"] [data-col="confirmed-by"]')).toHaveText('Tomas Rivera');
+    await expect(board.locator('[data-item="C-01"] [data-col="confirmed-by"] .so-name')).toHaveText('Tomas Rivera');
+    /* names wear their initials, as everywhere else in the app */
+    await expect(board.locator('[data-item="C-01"] [data-col="confirmed-by"] .av')).toHaveText('TR');
+    /* the opened item says where the confirmation stands */
+    await expect(item.locator('[data-card-state="Confirmed"]')).toContainText('Tomas Rivera');
     await expect(board.locator('[data-item="C-01"] [data-owner-status]')).toHaveText('Pass');
     await expect(board.locator('[data-item="C-01"] [data-lead]')).toHaveText('Confirmed');
     await expect(board.locator('[data-item="C-01"] [data-flag]')).toHaveText('Evidence missing');
@@ -246,7 +250,7 @@ test.describe('the Embedded SoC template', () => {
     /* the evidence owner is picked from the programme team */
     await item.getByLabel('C-01 evidence owner').selectOption('Grace Park');
     await item.locator('[data-save-item="C-01"]').click();
-    await expect(board.locator('[data-item="C-01"] [data-col="evidence-owner"]')).toHaveText('Grace Park');
+    await expect(board.locator('[data-item="C-01"] [data-col="evidence-owner"] .so-name')).toHaveText('Grace Park');
     await expect(item.locator('[data-view="C-01"]')).toContainText('sta/final/signoff_summary.rpt');
     await expect(board.locator('[data-item="C-01"] [data-flag]')).toHaveText('');
     await expect(board.locator('[data-stat="confirmed"]')).toHaveText('1/23');
@@ -277,16 +281,17 @@ test.describe('the Embedded SoC template', () => {
     await expect(item.getByLabel('C-01 confirmed by').locator('option', { hasText: 'Sangwook Park' })).toHaveCount(1);
     await item.getByRole('button', { name: 'Cancel' }).click();
 
-    /* a waiver ID that names no waiver is flagged until the waiver exists */
+    /* a waived item is flagged until a waiver is raised against it */
     await board.locator('[data-item="C-02"]').click();
     const card2 = board.locator('[data-card="C-02"]');
     await card2.locator('[data-edit-item="C-02"]').click();
-    await card2.getByLabel('C-02 owner status').selectOption('Waived');
-    await card2.getByLabel(/Waiver ID/).fill('W-01');
+    await card2.getByLabel('C-02 status').selectOption('Waived');
+    await expect(card2.getByLabel(/Waiver ID/)).toHaveCount(0);
     await card2.locator('[data-save-item="C-02"]').click();
-    await expect(board.locator('[data-item="C-02"] [data-flag]')).toHaveText('Waiver not found');
+    await expect(board.locator('[data-item="C-02"] [data-flag]')).toHaveText('No waiver for this item');
     await board.locator('[data-so-tab="waivers"]').click();
     await board.locator('[data-add="waiver"]').click();
+    await board.getByLabel('W-01 Item').selectOption('C-02');
     await board.getByLabel('W-01 Approved by').selectOption('Tomas Rivera');
     await board.locator('[data-save-row="W-01"]').click();
     await expect(board.locator('[data-row="W-01"]')).toContainText('Tomas Rivera');
