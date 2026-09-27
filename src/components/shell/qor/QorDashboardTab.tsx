@@ -150,7 +150,7 @@ export function QorDashboardTab({ stageId }: { stageId: StageId }) {
 
       {view === 'chip' ? (
         <>
-          <QorTiles now={roll} prev={prev} />
+          <QorTiles now={roll} prev={prev} targets={data.targets} />
           <div className="qor-panel">
             <h2>Full-chip QoR</h2>
             <QorChipTable now={roll} prev={prev} targets={data.targets} />

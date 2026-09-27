@@ -34,9 +34,21 @@ const scnOf = (r: QorBlockRow, which: 'setup' | 'hold') => {
   return c || m ? [c, m].filter(Boolean).join(' · ') : '';
 };
 
-export function QorTiles({ now, prev }: { now: QorRollup; prev: QorRollup | null }) {
+export function QorTiles({
+  now,
+  prev,
+  targets,
+}: {
+  now: QorRollup;
+  prev: QorRollup | null;
+  /** the workbook's own targets, which the table below reads too */
+  targets: Partial<Record<MeasureKey, number>>;
+}) {
   const v = now.values;
   const p = prev?.values;
+  const irTarget = targets.irDynamic ?? MEASURES.irDynamic.target;
+  /* a low-power part is read in milliwatts; watts only once there is a watt to read */
+  const power = (mw: number) => (mw < 1000 ? `${mw.toLocaleString()} mW` : `${(mw / 1000).toFixed(2)} W`);
   const against = (a: number | null | undefined, t: number | null | undefined, unit = '') =>
     nn(a) && nn(t) ? `${a > t ? '+' : ''}${+(a - t).toFixed(2)}${unit} against target` : 'no target to read against';
 
@@ -47,10 +59,10 @@ export function QorTiles({ now, prev }: { now: QorRollup; prev: QorRollup | null
       sub: <><Delta now={v.tns ?? null} before={p?.tns} good="up" digits={1} /> vs last drop</> },
     { cap: 'Setup failing endpoints', value: nn(v.feps) ? v.feps.toLocaleString() : '—', bad: !!v.feps,
       sub: <><Delta now={v.feps ?? null} before={p?.feps} good="down" /> vs last drop</> },
-    { cap: 'Total power', value: nn(v.power) ? `${(v.power / 1000).toFixed(2)} W` : '—',
+    { cap: 'Total power', value: nn(v.power) ? power(v.power) : '—',
       bad: nn(v.power) && nn(now.budget) && v.power > now.budget, sub: against(v.power, now.budget, ' mW') },
     { cap: 'IR drop — dynamic', value: tx(v.irDynamic, ' mV'),
-      bad: nn(v.irDynamic) && v.irDynamic > (MEASURES.irDynamic.target ?? 0), sub: against(v.irDynamic, MEASURES.irDynamic.target, ' mV') },
+      bad: nn(v.irDynamic) && v.irDynamic > (irTarget ?? 0), sub: against(v.irDynamic, irTarget, ' mV') },
     { cap: 'DRC after route', value: nn(v.drc) ? v.drc.toLocaleString() : '—', bad: !!v.drc,
       sub: <><Delta now={v.drc ?? null} before={p?.drc} good="down" /> vs last drop</> },
   ];
