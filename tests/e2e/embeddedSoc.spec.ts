@@ -141,6 +141,26 @@ test.describe('the Embedded SoC template', () => {
     await expect(page.locator('.ad-title')).toHaveText('Placement, Routing and Static Scheduling');
   });
 
+  /* A gate deliverable's handover offers the document it is written in. */
+  test('offers a gate template beside the Handover heading, and only on a gate', async ({ page }) => {
+    const id = await newProgram(page, 'AtlasEdge7');
+
+    await page.goto(`/p/${id}/stage/verificationEmb/deliverables`);
+    const rows = page.locator('[data-board] [data-deliverable]');
+    await rows.filter({ hasText: 'EDV-D7' }).click();
+    const card = page.locator('[data-handover]');
+    await expect(card).toContainText('Handover');
+    const link = card.locator('[data-template-download="EDV-D7"]');
+    await expect(link).toHaveAttribute('href', '/templates/EDV-D7-dv-closure-signoff.docx');
+    const [download] = await Promise.all([page.waitForEvent('download'), link.click()]);
+    expect(download.suggestedFilename()).toBe('EDV-D7-dv-closure-signoff-template.docx');
+
+    /* a deliverable that is not a gate offers nothing */
+    await rows.filter({ hasText: 'EDV-D1' }).click();
+    await expect(page.locator('[data-handover]')).toContainText('Handover');
+    await expect(page.locator('[data-template-download]')).toHaveCount(0);
+  });
+
   test('cuts down its own stages, not the SoC flow’s', async ({ page }) => {
     await page.goto('/');
     await page.locator('[data-new-project]').click();

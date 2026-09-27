@@ -2405,6 +2405,9 @@ a:hover{color:var(--accent-hov)}
    a page rather than as a row, and carries whatever was attached to it. */
 .notecard-hd{display:flex;align-items:center;gap:8px;padding:9px 14px;background:var(--accent-soft);border-bottom:1px solid var(--accent-line)}
 .notecard-hd .btn{flex-shrink:0}
+/* the template a gate deliverable's handover is written in, beside its heading */
+.tpl-dl{display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:5px;color:var(--accent);border:1px solid var(--accent-line);background:var(--bg,#fff);flex-shrink:0}
+.tpl-dl:hover{background:var(--accent);color:#fff;border-color:var(--accent)}
 .notecard-body{padding:16px 18px 14px;max-width:900px}
 .delivcard .notecard-body{max-width:820px}
 .clip{cursor:pointer}

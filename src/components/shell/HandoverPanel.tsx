@@ -10,8 +10,9 @@ import { deliverableStep, handoverComplete, producersOf } from '@/lib/deliverabl
 import type { ProgramPost } from '@/lib/projectState';
 import { fmtDate, fmtDT, fromISO, toISO } from '@/lib/schedule';
 import { uid, useAppStore } from '@/store/useAppStore';
+import { templateFor } from '@/data/deliverableTemplates';
 import { DeliverableDecisions } from '../meetings/MeetingSource';
-import { Avatar, IconFile, IconPlus } from './icons';
+import { Avatar, IconDownload, IconFile, IconPlus } from './icons';
 import { useDeliverableRefs } from './useDeliverableRefs';
 
 /**
@@ -84,6 +85,9 @@ export function HandoverPanel({
   const files = handover?.attachments ?? [];
   const ref = refOf.get(deliverableId) ?? null;
   const step = deliverableStep(ref, producers);
+  /* A gate deliverable offers the document it is written in, so a handover
+     does not start from a blank page. */
+  const template = templateFor(ref);
   const replies = posts
     .filter((p) => p.parentId === handover?.id)
     .sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime());
@@ -124,6 +128,18 @@ export function HandoverPanel({
         <div className="notecard-hd">
           {ref && <span className="ref">{ref}</span>}
           <span className="cap">Handover</span>
+          {template && (
+            <a
+              className="tpl-dl"
+              href={template.href}
+              download={template.filename}
+              title={`Download the ${ref} template (.docx)`}
+              aria-label={`Download the ${ref} template`}
+              data-template-download={ref}
+            >
+              <IconDownload size={13} />
+            </a>
+          )}
           <span style={{ flexGrow: 1 }} />
           {step && (
             <Link
