@@ -58,3 +58,39 @@ export function resolveEmail(dir: Directory, owner: string): string | null {
   if (!owner?.trim()) return null;
   return dir.byName.get(key(owner)) ?? dir.bySurname.get(surname(owner)) ?? null;
 }
+
+/** A member of the programme team, as a picker offers them. */
+export interface TeamMember {
+  name: string;
+  role: string;
+  stageId: StageId;
+}
+
+/**
+ * Everyone on the programme, once each, with the given stage's people first —
+ * the list a field that names a person picks from. A person on two stages is
+ * listed under the first that names them, in the order given; a name nobody
+ * filled in is nobody.
+ */
+export function teamRoster(
+  stageOrder: readonly StageId[],
+  leaders: Record<StageId, Leader>,
+  contacts: Record<StageId, Contact[]>,
+  first?: StageId,
+  leadRole = 'Stage lead',
+): TeamMember[] {
+  const order = first ? [first, ...stageOrder.filter((s) => s !== first)] : [...stageOrder];
+  const seen = new Set<string>();
+  const out: TeamMember[] = [];
+  const add = (name: string, role: string, stageId: StageId) => {
+    if (!name.trim() || seen.has(key(name))) return;
+    seen.add(key(name));
+    out.push({ name: name.trim(), role, stageId });
+  };
+  for (const id of order) {
+    const l = leaders[id];
+    if (l?.name) add(l.name, leadRole, id);
+    for (const c of contacts[id] ?? []) add(c.name, c.role, id);
+  }
+  return out;
+}

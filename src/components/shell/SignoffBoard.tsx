@@ -21,6 +21,7 @@ import {
   type SignoffState,
 } from '@/lib/signoff';
 import type { SignoffDefinition } from '@/lib/signoffDefinition';
+import { teamRoster, type TeamMember } from '@/lib/people';
 import { fmtDate, fromISO } from '@/lib/schedule';
 import { useAppStore } from '@/store/useAppStore';
 import { IconDownload } from './icons';
@@ -73,6 +74,15 @@ export function SignoffBoard({
   initial: string | null;
 }) {
   const programme = useAppStore((s) => s.projectName);
+  const stages = useAppStore((s) => s.stages);
+  const leaders = useAppStore((s) => s.leaders);
+  const contacts = useAppStore((s) => s.contacts);
+  /* who a field that names a person can name: the programme team, this stage first */
+  const roster = useMemo(
+    () => teamRoster(stages.map((s) => s.id), leaders, contacts, def.stageKey),
+    [stages, leaders, contacts, def.stageKey],
+  );
+  const people: People = { roster, stageKey: def.stageKey, projectId, stageLead: leaders[def.stageKey]?.name ?? '' };
   const [state, setState] = useState<SignoffState>(() => parseSignoff(initial));
   const [tab, setTab] = useState<Tab>('checklist');
   const [saving, setSaving] = useState<'saved' | 'saving' | 'failed'>('saved');
@@ -200,11 +210,12 @@ export function SignoffBoard({
       </div>
 
       {tab === 'checklist' && (
-        <Checklist items={def.items} state={state} onSave={(id, entry) => update((s) => void (s.items[id] = entry))} />
+        <Checklist items={def.items} state={state} people={people} onSave={(id, entry) => update((s) => void (s.items[id] = entry))} />
       )}
 
       {tab === 'issues' && (
         <Register
+          people={people}
           what="issue"
           intro="Anything that stops an item being confirmed, linked to the item it blocks. A Critical or High issue left Open holds the gate."
           rows={state.issues}
@@ -213,7 +224,7 @@ export function SignoffBoard({
             { key: 'description', label: 'Description', width: '2fr', long: true },
             { key: 'itemId', label: 'Item', width: '80px', options: def.items.map((i) => i.id) },
             { key: 'severity', label: 'Severity', width: '96px', options: [...SEVERITIES], pill: true },
-            { key: 'owner', label: 'Owner', width: '1fr' },
+            { key: 'owner', label: 'Owner', width: '1fr', person: true },
             { key: 'due', label: 'Due', width: '120px', date: true },
             { key: 'status', label: 'Status', width: '84px', options: ['Open', 'Closed'], pill: true },
             { key: 'disposition', label: 'Disposition', width: '1.4fr', long: true },
@@ -234,6 +245,7 @@ export function SignoffBoard({
 
       {tab === 'waivers' && (
         <Register
+          people={people}
           what="waiver"
           intro="Every item whose owner status is Waived names a waiver here, and every waiver needs an approver. A waiver without one holds the gate."
           rows={state.waivers}
@@ -244,7 +256,7 @@ export function SignoffBoard({
             { key: 'justification', label: 'Justification', width: '1.6fr', long: true },
             { key: 'risk', label: 'Risk accepted', width: '1.2fr', long: true },
             { key: 'condition', label: 'Condition or expiry', width: '1fr' },
-            { key: 'approvedBy', label: 'Approved by', width: '1fr' },
+            { key: 'approvedBy', label: 'Approved by', width: '1fr', person: true },
             { key: 'approvedOn', label: 'Approved on', width: '120px', date: true },
           ]}
           blank={() => ({
@@ -263,6 +275,7 @@ export function SignoffBoard({
 
       {tab === 'extra' && def.extra && (
         <Register
+          people={people}
           what="entry"
           intro={def.extra.intro}
           rows={state.extra.map((cells, i) => ({
@@ -282,6 +295,7 @@ export function SignoffBoard({
 
       {tab === 'handover' && (
         <Register
+          people={people}
           what="receipt"
           intro={`Who receives ${def.ref}, and what they take from it. The receiving owner records receipt.`}
           fixed
@@ -293,7 +307,7 @@ export function SignoffBoard({
           columns={[
             { key: 'activity', label: 'Receiving activity', width: '1.5fr', given: true },
             { key: 'takes', label: 'What it takes', width: '1.6fr', long: true },
-            { key: 'receivedBy', label: 'Received by', width: '1fr' },
+            { key: 'receivedBy', label: 'Received by', width: '1fr', person: true },
             { key: 'receivedOn', label: 'Received on', width: '120px', date: true },
           ]}
           onSave={(rows) =>
@@ -309,7 +323,9 @@ export function SignoffBoard({
         />
       )}
 
-      {tab === 'signoff' && <SignoffTab def={def} state={state} programme={programme} summary={summary} update={update} />}
+      {tab === 'signoff' && (
+        <SignoffTab def={def} state={state} programme={programme} summary={summary} update={update} people={people} />
+      )}
     </div>
   );
 }
@@ -358,10 +374,12 @@ function Dstat({
 function Checklist({
   items,
   state,
+  people,
   onSave,
 }: {
   items: SignoffItem[];
   state: SignoffState;
+  people: People;
   onSave: (id: string, entry: ItemEntry) => void;
 }) {
   const [filter, setFilter] = useState<'all' | 'flagged' | 'pending'>('all');
@@ -394,11 +412,18 @@ function Checklist({
           {confirmed} of {items.length} confirmed by the stage lead
         </span>
       </div>
+      <div className="so-table">
       <div className="thead so-grid">
         <span>REF</span>
-        <span>ITEM</span>
+        <span>ITEM AND TARGET</span>
+        <span>RESULT</span>
+        <span>EVIDENCE</span>
+        <span>EVIDENCE OWNER</span>
         <span>OWNER STATUS</span>
+        <span>WAIVER</span>
         <span>STAGE LEAD</span>
+        <span>CONFIRMED BY</span>
+        <span>CONFIRMED ON</span>
         <span>FLAG</span>
       </div>
       {sections.map((sec) => {
@@ -430,15 +455,31 @@ function Checklist({
                       <span>{it.item}</span>
                       <span className="so-sub">Target: {it.target}</span>
                     </span>
+                    <span className="so-clamp" data-col="result">
+                      {e.result || <span className="so-none">—</span>}
+                    </span>
+                    <span className="so-clamp so-evcell" data-col="evidence">
+                      {e.evidence || <span className="so-none">—</span>}
+                    </span>
+                    <span className="so-clamp" data-col="evidence-owner">
+                      {e.evidenceOwner || <span className="so-none">—</span>}
+                    </span>
                     <span>
                       <span className={STATUS_PILL[e.status]} data-owner-status>
                         {e.status}
                       </span>
                     </span>
+                    <span data-col="waiver">{e.waiverId || <span className="so-none">—</span>}</span>
                     <span>
                       <span className={STATUS_PILL[e.lead]} data-lead>
                         {e.lead}
                       </span>
+                    </span>
+                    <span className="so-clamp" data-col="confirmed-by">
+                      {e.confirmedBy || <span className="so-none">—</span>}
+                    </span>
+                    <span className="num" data-col="confirmed-on">
+                      {e.confirmedOn ? shownDate(e.confirmedOn) : <span className="so-none">—</span>}
                     </span>
                     <span className="so-flag" data-flag={flag}>
                       {flag}
@@ -446,6 +487,7 @@ function Checklist({
                   </button>
                   {isOpen && (
                     <ItemCard
+                      people={people}
                       item={it}
                       entry={e}
                       flag={flag}
@@ -459,6 +501,7 @@ function Checklist({
           </Fragment>
         );
       })}
+      </div>
       {!shown.length && (
         <div className="empty">
           <p className="mono-note">Nothing to show under this filter.</p>
@@ -476,12 +519,14 @@ const isUrl = (s: string) => /^https?:\/\//i.test(s.trim());
  * somebody chooses Edit; then it is a form, kept only on Save.
  */
 function ItemCard({
+  people,
   item,
   entry,
   flag,
   waiverIds,
   onSave,
 }: {
+  people: People;
   item: SignoffItem;
   entry: ItemEntry;
   flag: string;
@@ -492,8 +537,10 @@ function ItemCard({
   const set = (patch: Partial<ItemEntry>) =>
     setDraft((d) => {
       const next = { ...(d ?? entry), ...patch };
-      /* a confirmation is dated when it is given, unless somebody dated it */
+      /* a confirmation is dated when it is given, unless somebody dated it, and
+         is the stage lead's unless somebody else is named */
       if (patch.lead === 'Confirmed' && !next.confirmedOn) next.confirmedOn = today();
+      if (patch.lead && patch.lead !== 'Pending' && !next.confirmedBy) next.confirmedBy = people.stageLead;
       return next;
     });
   const recorded = entry.result || entry.evidence || entry.evidenceOwner;
@@ -572,6 +619,7 @@ function ItemCard({
                 <div className="who">
                   <b>Stage lead</b>
                   <span className={STATUS_PILL[entry.lead]}>{entry.lead}</span>
+                  {entry.confirmedBy && <span className="so-meta">by {entry.confirmedBy}</span>}
                   {entry.confirmedOn && <span className="so-meta">{shownDate(entry.confirmedOn)}</span>}
                 </div>
                 {reviewed ? entry.comment && <div className="txt">{entry.comment}</div> : <p className="mono-note">Not yet reviewed.</p>}
@@ -596,7 +644,12 @@ function ItemCard({
               </label>
               <label className="so-f">
                 <span className="subcap">Evidence owner</span>
-                <input className="lnkin" value={draft.evidenceOwner} onChange={(ev) => set({ evidenceOwner: ev.target.value })} />
+                <PersonSelect
+                  people={people}
+                  label={`${item.id} evidence owner`}
+                  value={draft.evidenceOwner}
+                  onChange={(v) => set({ evidenceOwner: v })}
+                />
               </label>
               <label className="so-f">
                 <span className="subcap">Owner status</span>
@@ -636,6 +689,15 @@ function ItemCard({
                 </select>
               </label>
               <label className="so-f">
+                <span className="subcap">Confirmed by {draft.lead !== 'Pending' ? '(required)' : ''}</span>
+                <PersonSelect
+                  people={people}
+                  label={`${item.id} confirmed by`}
+                  value={draft.confirmedBy}
+                  onChange={(v) => set({ confirmedBy: v })}
+                />
+              </label>
+              <label className="so-f">
                 <span className="subcap">Confirmed on</span>
                 <input type="date" className="dateinp" value={draft.confirmedOn} onChange={(ev) => set({ confirmedOn: ev.target.value })} />
               </label>
@@ -662,6 +724,8 @@ interface Column {
   date?: boolean;
   long?: boolean;
   pill?: boolean;
+  /** names a person: picked from the programme team */
+  person?: boolean;
 }
 
 type Row = { id: string } & Record<string, string>;
@@ -675,6 +739,7 @@ const pillFor = (v: string) =>
  * come from the write-up — takes no new rows and loses none.
  */
 function Register({
+  people,
   what,
   intro,
   rows,
@@ -683,6 +748,7 @@ function Register({
   fixed,
   onSave,
 }: {
+  people: People;
   what: string;
   intro: string;
   rows: Row[] | readonly object[];
@@ -788,6 +854,8 @@ function Register({
                 );
               if (c.date)
                 return <input key={c.key} type="date" className="dateinp" value={v} aria-label={`${row.id} ${c.label}`} onChange={(ev) => set(c.key, ev.target.value)} />;
+              if (c.person)
+                return <PersonSelect key={c.key} people={people} label={`${row.id} ${c.label}`} value={v} onChange={(x) => set(c.key, x)} />;
               if (c.long)
                 return <textarea key={c.key} className="lnkin so-ta" rows={2} value={v} aria-label={`${row.id} ${c.label}`} onChange={(ev) => set(c.key, ev.target.value)} />;
               return <input key={c.key} className="lnkin" value={v} aria-label={`${row.id} ${c.label}`} onChange={(ev) => set(c.key, ev.target.value)} />;
@@ -833,7 +901,9 @@ function SignoffTab({
   programme,
   summary,
   update,
+  people,
 }: {
+  people: People;
   def: SignoffDefinition;
   state: SignoffState;
   programme: string;
@@ -993,7 +1063,12 @@ function SignoffTab({
           </Prop>
           <Prop label="Stage lead">
             {decision ? (
-              <input className="lnkin" value={decision.d.lead} onChange={(e) => setDecision({ ...decision, d: { ...decision.d, lead: e.target.value } })} />
+              <PersonSelect
+                people={people}
+                label="Stage lead"
+                value={decision.d.lead}
+                onChange={(v) => setDecision({ ...decision, d: { ...decision.d, lead: v } })}
+              />
             ) : (
               state.decision.lead || '—'
             )}
@@ -1026,7 +1101,7 @@ function SignoffTab({
                 <span className="so-rolename">{role}</span>
                 {decision ? (
                   <>
-                    <input className="lnkin" placeholder="Name" aria-label={`${role} name`} value={rd.name} onChange={(e) => set({ name: e.target.value })} />
+                    <PersonSelect people={people} label={`${role} name`} value={rd.name} onChange={(v) => set({ name: v })} />
                     <select className="dateinp" aria-label={`${role} decision`} value={rd.decision} onChange={(e) => set({ decision: e.target.value })}>
                       <option value="">—</option>
                       {ROLE_DECISIONS.map((d) => (
@@ -1057,5 +1132,57 @@ function Prop({ label, children }: { label: string; children: React.ReactNode })
       <span className="pk">{label}</span>
       <span className="so-pv">{children}</span>
     </div>
+  );
+}
+
+/* ---------- naming a person ---------- */
+
+interface People {
+  roster: TeamMember[];
+  stageKey: string;
+  projectId: string;
+  /** who confirms by default: the stage's own lead, if the Team tab names one */
+  stageLead: string;
+}
+
+/**
+ * A person, picked from the programme team — the stage's own people first.
+ * A name already recorded that is no longer on the team stays selectable, so
+ * editing a row never silently drops who it named.
+ */
+function PersonSelect({
+  people,
+  label,
+  value,
+  onChange,
+}: {
+  people: People;
+  label: string;
+  value: string;
+  onChange: (v: string) => void;
+}) {
+  const { roster, stageKey, projectId } = people;
+  if (!roster.length)
+    return (
+      <span className="so-meta">
+        No one on the team yet —{' '}
+        <Link href={`/p/${projectId}/team`}>add people on the Team page</Link>
+      </span>
+    );
+  const here = roster.filter((m) => m.stageId === stageKey);
+  const rest = roster.filter((m) => m.stageId !== stageKey);
+  const known = roster.some((m) => m.name === value);
+  const option = (m: TeamMember) => (
+    <option key={m.name} value={m.name}>
+      {m.name} — {m.role}
+    </option>
+  );
+  return (
+    <select className="dateinp so-person" aria-label={label} value={value} onChange={(e) => onChange(e.target.value)}>
+      <option value="">— select —</option>
+      {value && !known && <option value={value}>{value} (not on the team)</option>}
+      {here.length > 0 && <optgroup label="This stage">{here.map(option)}</optgroup>}
+      {rest.length > 0 && <optgroup label="Programme">{rest.map(option)}</optgroup>}
+    </select>
   );
 }

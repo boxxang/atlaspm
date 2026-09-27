@@ -32,6 +32,7 @@ const good: ItemEntry = {
   waiverId: '',
   lead: 'Confirmed',
   comment: '',
+  confirmedBy: 'Tomas Rivera',
   confirmedOn: '2027-05-16',
 };
 
@@ -53,6 +54,8 @@ describe('a row is flagged when its evidence does not support it', () => {
     expect(flagOf({ ...good, lead: 'Rejected' }, [])).toBe('Comment required');
     expect(flagOf({ ...good, status: 'Fail' }, [])).toBe('Confirmed without a passing status');
     expect(flagOf({ ...good, status: 'Open' }, [])).toBe('Confirmed without a passing status');
+    expect(flagOf({ ...good, confirmedBy: '' }, [])).toBe('Confirmed by missing');
+    expect(flagOf({ ...good, lead: 'Rejected', comment: 'stale report', confirmedBy: ' ' }, [])).toBe('Confirmed by missing');
     expect(flagOf({ ...good, confirmedOn: '' }, [])).toBe('Date missing');
   });
 
@@ -130,5 +133,30 @@ describe('what is stored', () => {
   it('numbers new register rows after the highest', () => {
     expect(nextId('W', [])).toBe('W-01');
     expect(nextId('W', [{ id: 'W-01' }, { id: 'W-04' }])).toBe('W-05');
+  });
+});
+
+describe('who can be named', () => {
+  it('offers the programme team once each, the stage’s own people first', async () => {
+    const { teamRoster } = await import('@/lib/people');
+    const leaders = {
+      rtl: { name: 'Minho Lee', short: 'M. Lee', phone: '', email: '' },
+      signoff: { name: 'Tomas Rivera', short: 'T. Rivera', phone: '', email: '' },
+    };
+    const contacts = {
+      rtl: [{ id: 'c1', name: 'Priya Raman', role: 'Compiler lead', email: '', phone: '' }],
+      signoff: [
+        { id: 'c2', name: 'Grace Park', role: 'PD lead', email: '', phone: '' },
+        { id: 'c3', name: 'priya raman', role: 'duplicate', email: '', phone: '' },
+        { id: 'c4', name: ' ', role: 'nobody', email: '', phone: '' },
+      ],
+    };
+    const roster = teamRoster(['rtl', 'signoff'], leaders, contacts, 'signoff');
+    expect(roster.map((m) => [m.name, m.role, m.stageId])).toEqual([
+      ['Tomas Rivera', 'Stage lead', 'signoff'],
+      ['Grace Park', 'PD lead', 'signoff'],
+      ['priya raman', 'duplicate', 'signoff'],
+      ['Minho Lee', 'Stage lead', 'rtl'],
+    ]);
   });
 });

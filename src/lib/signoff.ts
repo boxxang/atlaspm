@@ -9,8 +9,9 @@
  *
  *  - a row is flagged when the evidence does not support what it claims —
  *    confirmed without evidence, waived without a waiver, rejected without a
- *    reason, a failing item confirmed, a confirmation undated — and, here as
- *    the workbook cannot, a waiver ID that names no waiver;
+ *    reason, a failing item confirmed, a review nobody put their name to, a
+ *    confirmation undated — and, here as the workbook cannot, a waiver ID
+ *    that names no waiver;
  *  - the outcome is Not ready if anything blocks (a Fail, a rejection, a
  *    Critical or High issue still open), Ready to sign off once every item is
  *    confirmed with nothing flagged and every waiver approved, and In review
@@ -46,6 +47,8 @@ export interface ItemEntry {
   waiverId: string;
   lead: LeadStatus;
   comment: string;
+  /** who confirmed or rejected it — a member of the programme team */
+  confirmedBy: string;
   /** ISO date, or '' */
   confirmedOn: string;
 }
@@ -120,6 +123,7 @@ export const blankEntry = (): ItemEntry => ({
   waiverId: '',
   lead: 'Pending',
   comment: '',
+  confirmedBy: '',
   confirmedOn: '',
 });
 
@@ -141,6 +145,8 @@ export function flagOf(entry: ItemEntry, waivers: readonly WaiverRow[]): string 
   if (entry.lead === 'Rejected' && blank(entry.comment)) return 'Comment required';
   if (entry.lead === 'Confirmed' && (entry.status === 'Fail' || entry.status === 'Open'))
     return 'Confirmed without a passing status';
+  /* a confirmation, or a rejection, is somebody's: it names who gave it */
+  if (entry.lead !== 'Pending' && blank(entry.confirmedBy)) return 'Confirmed by missing';
   if (entry.lead === 'Confirmed' && blank(entry.confirmedOn)) return 'Date missing';
   return '';
 }

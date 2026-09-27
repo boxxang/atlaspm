@@ -48,6 +48,7 @@ describe('the deliverable templates', () => {
       const check = wb.getWorksheet('Checklist')!;
       expect(check.getCell(3, 6).value, ref).toMatch(/Evidence/);
       expect(check.getCell(3, 10).value, ref).toBe('Stage lead confirmation');
+      expect(check.getCell(3, 12).value, ref).toBe('Confirmed by');
       const items: number[] = [];
       for (let r = 4; r <= check.rowCount; r++) if (check.getCell(r, 3).value) items.push(r);
       expect(items.length, `${ref} lists too few items`).toBeGreaterThan(15);
@@ -59,7 +60,9 @@ describe('the deliverable templates', () => {
         expect(check.getCell(r, 10).value, `${ref} row ${r}`).toBe('Pending');
         expect(check.getCell(r, 10).dataValidation?.formulae?.[0], `${ref} row ${r}`).toBe('"Pending,Confirmed,Rejected"');
         expect(check.getCell(r, 8).dataValidation?.formulae?.[0], `${ref} row ${r}`).toBe('"Pass,Fail,Waived,N/A,Open"');
-        expect(String((check.getCell(r, 13).value as { formula?: string })?.formula), `${ref} row ${r}`).toContain('Evidence missing');
+        const flag = String((check.getCell(r, 14).value as { formula?: string })?.formula);
+        expect(flag, `${ref} row ${r}`).toContain('Evidence missing');
+        expect(flag, `${ref} row ${r}`).toContain('Confirmed by missing');
       }
       const signoff = wb.getWorksheet('Sign-off')!;
       const labels: string[] = [];

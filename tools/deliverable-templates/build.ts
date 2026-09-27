@@ -155,15 +155,15 @@ async function build(ref: string): Promise<ExcelJS.Workbook> {
   const guide = wb.addWorksheet('Guide', { views: [{ showGridLines: false }] });
 
   /* ----- Checklist ----- */
-  const CL = ['ID', 'Section', 'Item', 'Target / acceptance', 'Result or measured value', 'Evidence — link or file name', 'Evidence owner', 'Owner status', 'Waiver ID', 'Stage lead confirmation', 'Stage lead comment', 'Confirmed on', 'Flag'];
+  const CL = ['ID', 'Section', 'Item', 'Target / acceptance', 'Result or measured value', 'Evidence — link or file name', 'Evidence owner', 'Owner status', 'Waiver ID', 'Stage lead confirmation', 'Stage lead comment', 'Confirmed by', 'Confirmed on', 'Flag'];
   titled(
     check,
     `${ref} checklist — confirm every item on its evidence`,
-    'Owners fill Result, Evidence, Evidence owner and Owner status. The stage lead then confirms or rejects each item. Yellow cells are for input; grey cells come from the template. The Flag column names any row that cannot yet be confirmed as filled in.',
+    'Owners fill Result, Evidence, Evidence owner and Owner status. The stage lead then confirms or rejects each item, naming who confirmed it and when. Yellow cells are for input; grey cells come from the template. The Flag column names any row that cannot yet be confirmed as filled in.',
     CL.length,
   );
   header(check, 3, CL);
-  setWidths(check, [7, 13, 46, 26, 28, 30, 16, 12, 10, 14, 28, 12, 26]);
+  setWidths(check, [7, 13, 46, 26, 28, 30, 16, 12, 10, 14, 28, 18, 12, 26]);
   const first = 4;
   const last = first + items.length + SPARE_ROWS - 1;
   for (let i = 0; i < items.length + SPARE_ROWS; i++) {
@@ -177,20 +177,20 @@ async function build(ref: string): Promise<ExcelJS.Workbook> {
       style(c, { fill: it ? GIVEN_FILL : INPUT_FILL, bold: k === 0 });
       c.border = boxed;
     });
-    for (let k = 5; k <= 12; k++) {
+    for (let k = 5; k <= 13; k++) {
       const c = check.getCell(r, k);
       style(c, { fill: INPUT_FILL });
       c.border = boxed;
     }
     check.getCell(r, 8).dataValidation = list(OWNER_STATUS);
     check.getCell(r, 10).dataValidation = list(LEAD_STATUS);
-    check.getCell(r, 12).dataValidation = dateRule;
-    check.getCell(r, 12).numFmt = 'yyyy-mm-dd';
+    check.getCell(r, 13).dataValidation = dateRule;
+    check.getCell(r, 13).numFmt = 'yyyy-mm-dd';
     if (it) {
       check.getCell(r, 8).value = 'Open';
       check.getCell(r, 10).value = 'Pending';
     }
-    const f = check.getCell(r, 13);
+    const f = check.getCell(r, 14);
     f.value = {
       formula:
         `IF(C${r}="","",` +
@@ -198,7 +198,9 @@ async function build(ref: string): Promise<ExcelJS.Workbook> {
         `IF(AND(H${r}="Waived",I${r}=""),"Waiver ID missing",` +
         `IF(AND(J${r}="Rejected",K${r}=""),"Comment required",` +
         `IF(AND(J${r}="Confirmed",OR(H${r}="Fail",H${r}="Open",H${r}="")),"Confirmed without a passing status",` +
-        `IF(AND(J${r}="Confirmed",L${r}=""),"Date missing",""))))))`,
+        /* a confirmation or a rejection names who gave it */
+        `IF(AND(OR(J${r}="Confirmed",J${r}="Rejected"),L${r}=""),"Confirmed by missing",` +
+        `IF(AND(J${r}="Confirmed",M${r}=""),"Date missing","")))))))`,
       /* the value a viewer that does not calculate shows: nothing is flagged yet */
       result: '',
     };
@@ -309,7 +311,7 @@ async function build(ref: string): Promise<ExcelJS.Workbook> {
   const C = `Checklist!$C$${first}:$C$${last}`;
   const HH = `Checklist!$H$${first}:$H$${last}`;
   const JJ = `Checklist!$J$${first}:$J$${last}`;
-  const MM = `Checklist!$M$${first}:$M$${last}`;
+  const MM = `Checklist!$N$${first}:$N$${last}`;
   /* LEN rather than COUNTA or a wildcard COUNTIF: every engine agrees on it,
      and a formula that returns "" is not counted as a value */
   /* Each formula carries the value it has in the blank template, so a viewer
@@ -412,8 +414,8 @@ async function build(ref: string): Promise<ExcelJS.Workbook> {
     g++;
   };
   gline('1. Owners', 'On the Checklist, for each item: write the Result or measured value, the Evidence (a link to the report, dashboard or file name), who owns that evidence, and set Owner status. Waived needs a Waiver ID that exists on the Waivers sheet.');
-  gline('2. Stage lead', 'Review each item against its evidence. Set Stage lead confirmation to Confirmed, or Rejected with a comment saying what is missing. Date every confirmation.');
-  gline('3. Flags', 'The Flag column names any row that is not yet supported: evidence missing, a waiver without an ID, a rejection without a comment, a confirmation of a failing item, or an undated confirmation. Clear every flag.');
+  gline('2. Stage lead', 'Review each item against its evidence. Set Stage lead confirmation to Confirmed, or Rejected with a comment saying what is missing. Name who confirmed it in Confirmed by, and date every confirmation.');
+  gline('3. Flags', 'The Flag column names any row that is not yet supported: evidence missing, a waiver without an ID, a rejection without a comment, a confirmation of a failing item, a confirmation or rejection nobody put their name to, or an undated confirmation. Clear every flag.');
   gline('4. Issues and waivers', 'Record anything blocking an item on Open issues, linked by item ID. A Critical or High issue left Open, or a waiver without an approver, holds the gate.');
   gline('5. Final decision', 'The Sign-off sheet counts the Checklist and suggests an outcome. The stage lead records the Decision, any conditions, and the date. Each role then records its own decision.');
   gline('6. Handover', 'Attach the completed workbook to this deliverable\'s Handover in AtlasPM and date the handover when it is accepted.');

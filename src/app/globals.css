@@ -3427,7 +3427,15 @@ body.panedrag *{cursor:col-resize !important}
 .so-save.saving{color:var(--accent)}
 .so-save.failed{color:var(--risk-ink)}
 .filterbar .btn.so-on{background:var(--accent-soft);border-color:var(--accent-line);color:var(--accent)}
-.so-grid{grid-template-columns:64px minmax(0,1fr) 116px 116px 220px}
+.so-table{overflow-x:auto}
+.so-table > *{min-width:1240px}
+.so-grid{grid-template-columns:58px minmax(180px,1.7fr) minmax(140px,1.4fr) minmax(110px,1fr) 104px 76px 52px 90px 104px 84px 128px;gap:9px}
+.so-clamp{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;font-size:12.5px;line-height:1.4;overflow-wrap:anywhere}
+.so-evcell{color:var(--accent)}
+.so-grid .num{font-size:12.5px}
+.so-flag{line-height:1.35}
+.so-none{color:var(--ink-4)}
+.so-person{width:100%;max-width:100%}
 .trow.so-grid{padding-top:9px;padding-bottom:9px;align-items:start;cursor:pointer}
 .so-item{display:flex;flex-direction:column;gap:2px;min-width:0;line-height:1.4}
 .so-sub{font-size:12px;color:var(--ink-3)}
@@ -3465,4 +3473,4 @@ body.panedrag *{cursor:col-resize !important}
 .so-pv .lnkin,.so-pv .notebody{width:100%}
 .so-role{display:grid;grid-template-columns:1.2fr 1fr 1fr 130px;gap:8px;align-items:center;padding:6px 0;border-bottom:1px solid var(--line-soft);font-size:13px}
 .so-rolename{color:var(--ink-2)}
-@media (max-width:1100px){.so-cols{grid-template-columns:1fr}.so-grid{grid-template-columns:56px minmax(0,1fr) 96px 96px 150px}}
+@media (max-width:1100px){.so-cols{grid-template-columns:1fr}}

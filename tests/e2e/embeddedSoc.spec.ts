@@ -166,6 +166,21 @@ test.describe('the Embedded SoC template', () => {
   test('confirms ESO-D7 item by item in the app', async ({ page }) => {
     const id = await newProgram(page, 'AtlasEdge8');
 
+    /* the people a sign-off can name are the programme team: a stage lead and
+       an engineer on the signoff stage */
+    await page.goto(`/p/${id}/stage/signoffEmb/team`);
+    await page.locator('[data-add-person="signoffEmb"]').click();
+    await page.getByLabel('Name', { exact: true }).fill('Tomas Rivera');
+    await page.locator('[data-person-role]').selectOption('lead');
+    await page.getByRole('button', { name: 'Save' }).click();
+    await expect(page.locator('[data-person]')).toHaveCount(1);
+    await page.locator('[data-add-person="signoffEmb"]').click();
+    await page.getByLabel('Name', { exact: true }).fill('Grace Park');
+    await page.locator('[data-person-role]').selectOption('manual');
+    await page.locator('[data-person-role-text]').fill('Timing closure lead');
+    await page.getByRole('button', { name: 'Save' }).click();
+    await expect(page.locator('[data-person]')).toHaveCount(2);
+
     await page.goto(`/p/${id}/stage/signoffEmb/deliverables`);
     await page.locator('[data-board] [data-deliverable]').filter({ hasText: 'ESO-D7' }).click();
     const card = page.locator('[data-handover]');
@@ -199,13 +214,19 @@ test.describe('the Embedded SoC template', () => {
     await item.getByLabel('C-01 owner status').selectOption('Pass');
     await item.getByLabel('C-01 stage lead confirmation').selectOption('Confirmed');
     await item.locator('[data-save-item="C-01"]').click();
+    /* confirming names the stage lead unless somebody else is picked */
+    await expect(board.locator('[data-item="C-01"] [data-col="confirmed-by"]')).toHaveText('Tomas Rivera');
     await expect(board.locator('[data-item="C-01"] [data-owner-status]')).toHaveText('Pass');
     await expect(board.locator('[data-item="C-01"] [data-lead]')).toHaveText('Confirmed');
     await expect(board.locator('[data-item="C-01"] [data-flag]')).toHaveText('Evidence missing');
     await expect(board.locator('[data-stat="flagged"]')).toHaveText('1');
     await item.locator('[data-edit-item="C-01"]').click();
     await item.getByLabel('Evidence — link or file name').fill('sta/final/signoff_summary.rpt');
+    /* the evidence owner is picked from the programme team */
+    await item.getByLabel('C-01 evidence owner').selectOption('Grace Park');
     await item.locator('[data-save-item="C-01"]').click();
+    await expect(board.locator('[data-item="C-01"] [data-col="evidence-owner"]')).toHaveText('Grace Park');
+    await expect(board.locator('[data-item="C-01"] [data-col="evidence"]')).toHaveText('sta/final/signoff_summary.rpt');
     await expect(item.locator('[data-view="C-01"]')).toContainText('sta/final/signoff_summary.rpt');
     await expect(board.locator('[data-item="C-01"] [data-flag]')).toHaveText('');
     await expect(board.locator('[data-stat="confirmed"]')).toHaveText('1/23');
@@ -226,9 +247,9 @@ test.describe('the Embedded SoC template', () => {
     await expect(board.locator('[data-item="C-02"] [data-flag]')).toHaveText('Waiver not found');
     await board.locator('[data-so-tab="waivers"]').click();
     await board.locator('[data-add="waiver"]').click();
-    await board.getByLabel('W-01 Approved by').fill('Signoff lead');
+    await board.getByLabel('W-01 Approved by').selectOption('Tomas Rivera');
     await board.locator('[data-save-row="W-01"]').click();
-    await expect(board.locator('[data-row="W-01"]')).toContainText('Signoff lead');
+    await expect(board.locator('[data-row="W-01"]')).toContainText('Tomas Rivera');
     await expect(board.locator('[data-row="W-01"] input')).toHaveCount(0);
     await board.locator('[data-so-tab="checklist"]').click();
     await expect(board.locator('[data-item="C-02"] [data-flag]')).toHaveText('');
