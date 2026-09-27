@@ -1329,8 +1329,19 @@ export async function uploadAttachments(form: FormData): Promise<AttachmentMeta[
   /* A file on a meeting, a decision or an action item — the MeetingFile row
      says which, and it has to be this programme's. */
   const meetingFileId = String(form.get('meetingFileId') ?? '') || null;
-  if (!itemId && !postId && !deliverableId && !meetingFileId && !(activityRef && stepN !== null))
-    throw new Error('An attachment needs an item, a post, a deliverable, a meeting file or a step.');
+  /* Evidence for one item of a gate's in-app sign-off. */
+  const signoffRef = String(form.get('signoffRef') ?? '') || null;
+  const signoffItem = String(form.get('signoffItem') ?? '') || null;
+  if (
+    !itemId &&
+    !postId &&
+    !deliverableId &&
+    !meetingFileId &&
+    !(activityRef && stepN !== null) &&
+    !(signoffRef && signoffItem)
+  )
+    throw new Error('An attachment needs an item, a post, a deliverable, a meeting file, a step or a sign-off item.');
+  if (signoffRef && !signoffInApp(signoffRef)) throw new Error(`${signoffRef} has no in-app sign-off.`);
   await assertProject(projectId);
   if (meetingFileId) {
     const owner = await prisma.meetingFile.findFirst({
@@ -1364,6 +1375,8 @@ export async function uploadAttachments(form: FormData): Promise<AttachmentMeta[
         meetingFileId,
         activityRef,
         stepN,
+        signoffRef,
+        signoffItem,
         data: Buffer.from(await file.arrayBuffer()),
         createdAt: new Date(),
       },

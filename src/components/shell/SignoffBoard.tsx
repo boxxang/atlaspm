@@ -1,8 +1,11 @@
 'use client';
 
 import Link from 'next/link';
-import { Fragment, useEffect, useMemo, useRef, useState } from 'react';
-import { saveSignoff } from '@/app/actions';
+import { Fragment, useCallback, useEffect, useMemo, useRef, useState, useSyncExternalStore } from 'react';
+import { deleteAttachment, saveSignoff, uploadAttachments } from '@/app/actions';
+import { PROGRAM_DEFAULT_TEAM, PROGRAM_TPM } from '@/data/programTeam';
+import { attachmentUrl, formatBytes, rejectFile, rejectionMessage, type AttachmentMeta } from '@/lib/attachments';
+import { clampWidth, gridTemplate, readWidths, tableMinWidth, type ColumnSpec, type Widths } from '@/lib/columnWidths';
 import { templateFor } from '@/data/deliverableTemplates';
 import {
   FINAL_DECISIONS,
@@ -23,8 +26,8 @@ import {
 import type { SignoffDefinition } from '@/lib/signoffDefinition';
 import { teamRoster, type TeamMember } from '@/lib/people';
 import { fmtDate, fromISO } from '@/lib/schedule';
-import { useAppStore } from '@/store/useAppStore';
-import { IconDownload } from './icons';
+import { uid, useAppStore } from '@/store/useAppStore';
+import { IconDownload, IconFile, IconPlus } from './icons';
 
 /**
  * A gate deliverable confirmed item by item — the sign-off workbook, in the
@@ -68,10 +71,13 @@ export function SignoffBoard({
   projectId,
   def,
   initial,
+  initialFiles,
 }: {
   projectId: string;
   def: SignoffDefinition;
   initial: string | null;
+  /** evidence files attached to each item, by item ID */
+  initialFiles: Record<string, AttachmentMeta[]>;
 }) {
   const programme = useAppStore((s) => s.projectName);
   const stages = useAppStore((s) => s.stages);
@@ -79,10 +85,21 @@ export function SignoffBoard({
   const contacts = useAppStore((s) => s.contacts);
   /* who a field that names a person can name: the programme team, this stage first */
   const roster = useMemo(
-    () => teamRoster(stages.map((s) => s.id), leaders, contacts, def.stageKey),
+    () => teamRoster(stages.map((s) => s.id), leaders, contacts, def.stageKey, 'Stage lead', PROGRAM_DEFAULT_TEAM),
     [stages, leaders, contacts, def.stageKey],
   );
-  const people: People = { roster, stageKey: def.stageKey, projectId, stageLead: leaders[def.stageKey]?.name ?? '' };
+  /* the stage's own lead confirms by default; with none named, the TPM */
+  const people: People = {
+    roster,
+    stageKey: def.stageKey,
+    projectId,
+    stageLead: leaders[def.stageKey]?.name || PROGRAM_TPM.name,
+  };
+  const [files, setFiles] = useState<Record<string, AttachmentMeta[]>>(initialFiles);
+  const fileCounts = useMemo(
+    () => Object.fromEntries(Object.entries(files).map(([k, v]) => [k, v.length])),
+    [files],
+  );
   const [state, setState] = useState<SignoffState>(() => parseSignoff(initial));
   const [tab, setTab] = useState<Tab>('checklist');
   const [saving, setSaving] = useState<'saved' | 'saving' | 'failed'>('saved');
@@ -104,7 +121,7 @@ export function SignoffBoard({
     return () => clearTimeout(t);
   }, [state, projectId, def.ref]);
 
-  const summary = useMemo(() => summarize(def.items, state), [def.items, state]);
+  const summary = useMemo(() => summarize(def.items, state, fileCounts), [def.items, state, fileCounts]);
   const template = templateFor(def.ref);
   const update = (f: (s: SignoffState) => void) =>
     setState((prev) => {
@@ -210,7 +227,15 @@ export function SignoffBoard({
       </div>
 
       {tab === 'checklist' && (
-        <Checklist items={def.items} state={state} people={people} onSave={(id, entry) => update((s) => void (s.items[id] = entry))} />
+        <Checklist
+          refName={def.ref}
+          items={def.items}
+          state={state}
+          people={people}
+          files={files}
+          setFiles={setFiles}
+          onSave={(id, entry) => update((s) => void (s.items[id] = entry))}
+        />
       )}
 
       {tab === 'issues' && (
@@ -371,27 +396,121 @@ function Dstat({
 
 /* ---------- the checklist ---------- */
 
+/**
+ * The checklist's columns. The item takes what width is left; the rest can be
+ * dragged, and what somebody drags them to is kept in this browser.
+ */
+const CHECK_COLS: ColumnSpec[] = [
+  { key: 'ref', label: 'REF', width: 60, min: 52, align: 'center' },
+  { key: 'item', label: 'ITEM AND TARGET', width: 260, min: 180, grow: true, align: 'left' },
+  { key: 'owner', label: 'EVIDENCE OWNER', width: 128, min: 112, align: 'center' },
+  { key: 'status', label: 'OWNER STATUS', width: 112, min: 100, align: 'center' },
+  { key: 'lead', label: 'STAGE LEAD', width: 100, min: 88, align: 'center' },
+  { key: 'by', label: 'CONFIRMED BY', width: 124, min: 104, align: 'center' },
+  { key: 'on', label: 'CONFIRMED ON', width: 116, min: 104, align: 'center' },
+  { key: 'flag', label: 'FLAG', width: 150, min: 90, align: 'center' },
+];
+const COL_GAP = 12;
+const WIDTHS_KEY = 'atlaspm.signoff.columns.v1';
+
+/* The column widths, kept in this browser. localStorage is read as the
+   external store it is, as the attention panel's row limit is: the server
+   renders the defaults and the stored widths come in after hydration.
+   Storage that is unavailable is simply not used. */
+const widthListeners = new Set<() => void>();
+const DEFAULT_WIDTHS = readWidths(CHECK_COLS, null);
+let cachedWidths: Widths | null = null;
+const subscribeWidths = (fn: () => void) => {
+  widthListeners.add(fn);
+  return () => {
+    widthListeners.delete(fn);
+  };
+};
+const widthsSnapshot = (): Widths => {
+  if (cachedWidths) return cachedWidths;
+  try {
+    cachedWidths = readWidths(CHECK_COLS, window.localStorage.getItem(WIDTHS_KEY));
+  } catch {
+    cachedWidths = DEFAULT_WIDTHS;
+  }
+  return cachedWidths;
+};
+
+function useColumnWidths(): [Widths, (w: Widths) => void, () => void] {
+  const widths = useSyncExternalStore(subscribeWidths, widthsSnapshot, () => DEFAULT_WIDTHS);
+  const commit = useCallback((w: Widths) => {
+    cachedWidths = w;
+    try {
+      window.localStorage.setItem(WIDTHS_KEY, JSON.stringify(w));
+    } catch {
+      /* the widths still hold for this visit */
+    }
+    for (const fn of widthListeners) fn();
+  }, []);
+  const reset = useCallback(() => commit(DEFAULT_WIDTHS), [commit]);
+  return [widths, commit, reset];
+}
+
 function Checklist({
+  refName,
   items,
   state,
   people,
+  files,
+  setFiles,
   onSave,
 }: {
+  refName: string;
   items: SignoffItem[];
   state: SignoffState;
   people: People;
+  files: Record<string, AttachmentMeta[]>;
+  setFiles: React.Dispatch<React.SetStateAction<Record<string, AttachmentMeta[]>>>;
   onSave: (id: string, entry: ItemEntry) => void;
 }) {
   const [filter, setFilter] = useState<'all' | 'flagged' | 'pending'>('all');
   const [open, setOpen] = useState<string | null>(null);
+  const [widths, commitWidths, resetWidths] = useColumnWidths();
+  const table = useRef<HTMLDivElement>(null);
   const sections = [...new Set(items.map((i) => i.section))];
+  const flagFor = (id: string) => flagOf(entryOf(state, id), state.waivers, files[id]?.length ?? 0);
   const shown = items.filter((it) => {
-    const e = entryOf(state, it.id);
-    if (filter === 'flagged') return flagOf(e, state.waivers) !== '';
-    if (filter === 'pending') return e.lead !== 'Confirmed';
+    if (filter === 'flagged') return flagFor(it.id) !== '';
+    if (filter === 'pending') return entryOf(state, it.id).lead !== 'Confirmed';
     return true;
   });
   const confirmed = items.filter((i) => entryOf(state, i.id).lead === 'Confirmed').length;
+  const template = gridTemplate(CHECK_COLS, widths);
+
+  /* Dragging a column's edge. Nothing re-renders while the pointer moves: the
+     grid template is written straight onto the table, and only the width the
+     drag settles on is kept — the way the side panels are dragged. */
+  const drag = (col: ColumnSpec) => (e: React.PointerEvent<HTMLSpanElement>) => {
+    if (e.button !== 0) return;
+    e.preventDefault();
+    e.stopPropagation();
+    const grip = e.currentTarget;
+    const startX = e.clientX;
+    const from = widths[col.key];
+    let live = widths;
+    grip.setPointerCapture(e.pointerId);
+    document.body.classList.add('col-resizing');
+    const move = (ev: PointerEvent) => {
+      live = { ...widths, [col.key]: clampWidth(col, from + ev.clientX - startX) };
+      table.current?.style.setProperty('--so-cols', gridTemplate(CHECK_COLS, live));
+      table.current?.style.setProperty('--so-minw', `${tableMinWidth(CHECK_COLS, live, COL_GAP) + 40}px`);
+    };
+    const up = () => {
+      document.body.classList.remove('col-resizing');
+      grip.removeEventListener('pointermove', move);
+      grip.removeEventListener('pointerup', up);
+      grip.removeEventListener('pointercancel', up);
+      commitWidths(live);
+    };
+    grip.addEventListener('pointermove', move);
+    grip.addEventListener('pointerup', up);
+    grip.addEventListener('pointercancel', up);
+  };
 
   return (
     <>
@@ -411,96 +530,117 @@ function Checklist({
         <span className="num" style={{ fontSize: 12, color: 'var(--ink-3)' }}>
           {confirmed} of {items.length} confirmed by the stage lead
         </span>
+        <button type="button" className="btn sm" onClick={resetWidths} title="Put every column back to its default width">
+          Reset columns
+        </button>
       </div>
-      <div className="so-table">
-      <div className="thead so-grid">
-        <span>REF</span>
-        <span>ITEM AND TARGET</span>
-        <span>RESULT</span>
-        <span>EVIDENCE</span>
-        <span>EVIDENCE OWNER</span>
-        <span>OWNER STATUS</span>
-        <span>WAIVER</span>
-        <span>STAGE LEAD</span>
-        <span>CONFIRMED BY</span>
-        <span>CONFIRMED ON</span>
-        <span>FLAG</span>
-      </div>
-      {sections.map((sec) => {
-        const rows = shown.filter((i) => i.section === sec);
-        if (!rows.length) return null;
-        return (
-          <Fragment key={sec}>
-            <div className="groupbar" style={{ cursor: 'default' }}>
-              <b>{sec}</b>
-              <span className="pill" style={{ fontSize: 10.5 }}>
-                {rows.filter((i) => entryOf(state, i.id).lead === 'Confirmed').length}/{rows.length}
-              </span>
-            </div>
-            {rows.map((it) => {
-              const e = entryOf(state, it.id);
-              const flag = flagOf(e, state.waivers);
-              const isOpen = open === it.id;
-              return (
-                <Fragment key={it.id}>
-                  <button
-                    type="button"
-                    className={`trow so-grid${isOpen ? ' open' : ''}`}
-                    data-item={it.id}
-                    aria-expanded={isOpen}
-                    onClick={() => setOpen(isOpen ? null : it.id)}
-                  >
-                    <span className="ref">{it.id}</span>
-                    <span className="so-item">
-                      <span>{it.item}</span>
-                      <span className="so-sub">Target: {it.target}</span>
-                    </span>
-                    <span className="so-clamp" data-col="result">
-                      {e.result || <span className="so-none">—</span>}
-                    </span>
-                    <span className="so-clamp so-evcell" data-col="evidence">
-                      {e.evidence || <span className="so-none">—</span>}
-                    </span>
-                    <span className="so-clamp" data-col="evidence-owner">
-                      {e.evidenceOwner || <span className="so-none">—</span>}
-                    </span>
-                    <span>
-                      <span className={STATUS_PILL[e.status]} data-owner-status>
-                        {e.status}
+      <div
+        className="so-table"
+        ref={table}
+        style={
+          {
+            '--so-cols': template,
+            '--so-minw': `${tableMinWidth(CHECK_COLS, widths, COL_GAP) + 40}px`,
+          } as React.CSSProperties
+        }
+      >
+        <div className="thead so-grid so-head" role="row">
+          {CHECK_COLS.map((c) => (
+            <span key={c.key} className="so-th" role="columnheader" data-col-head={c.key}>
+              <span className="so-thl">{c.label}</span>
+              <span
+                className="so-grip"
+                role="separator"
+                aria-orientation="vertical"
+                aria-label={`Resize ${c.label}`}
+                data-grip={c.key}
+                onPointerDown={drag(c)}
+                onDoubleClick={() => commitWidths({ ...widths, [c.key]: c.width })}
+              />
+            </span>
+          ))}
+        </div>
+        {sections.map((sec) => {
+          const rows = shown.filter((i) => i.section === sec);
+          if (!rows.length) return null;
+          return (
+            <Fragment key={sec}>
+              <div className="groupbar" style={{ cursor: 'default' }}>
+                <b>{sec}</b>
+                <span className="pill" style={{ fontSize: 10.5 }}>
+                  {rows.filter((i) => entryOf(state, i.id).lead === 'Confirmed').length}/{rows.length}
+                </span>
+              </div>
+              {rows.map((it) => {
+                const e = entryOf(state, it.id);
+                const flag = flagFor(it.id);
+                const isOpen = open === it.id;
+                const count = files[it.id]?.length ?? 0;
+                return (
+                  <Fragment key={it.id}>
+                    <button
+                      type="button"
+                      className={`trow so-grid${isOpen ? ' open' : ''}`}
+                      data-item={it.id}
+                      aria-expanded={isOpen}
+                      onClick={() => setOpen(isOpen ? null : it.id)}
+                    >
+                      <span className="so-c">
+                        <span className="ref">{it.id}</span>
                       </span>
-                    </span>
-                    <span data-col="waiver">{e.waiverId || <span className="so-none">—</span>}</span>
-                    <span>
-                      <span className={STATUS_PILL[e.lead]} data-lead>
-                        {e.lead}
+                      <span className="so-item">
+                        <span>{it.item}</span>
+                        <span className="so-sub">
+                          Target: {it.target}
+                          {count > 0 && (
+                            <span className="so-clip" title={`${count} evidence file${count === 1 ? '' : 's'}`}>
+                              <IconFile /> {count}
+                            </span>
+                          )}
+                        </span>
                       </span>
-                    </span>
-                    <span className="so-clamp" data-col="confirmed-by">
-                      {e.confirmedBy || <span className="so-none">—</span>}
-                    </span>
-                    <span className="num" data-col="confirmed-on">
-                      {e.confirmedOn ? shownDate(e.confirmedOn) : <span className="so-none">—</span>}
-                    </span>
-                    <span className="so-flag" data-flag={flag}>
-                      {flag}
-                    </span>
-                  </button>
-                  {isOpen && (
-                    <ItemCard
-                      people={people}
-                      item={it}
-                      entry={e}
-                      flag={flag}
-                      waiverIds={state.waivers.map((w) => w.id)}
-                      onSave={(entry) => onSave(it.id, entry)}
-                    />
-                  )}
-                </Fragment>
-              );
-            })}
-          </Fragment>
-        );
-      })}
+                      <span className="so-c so-clamp" data-col="evidence-owner">
+                        {e.evidenceOwner || <span className="so-none">—</span>}
+                      </span>
+                      <span className="so-c">
+                        <span className={STATUS_PILL[e.status]} data-owner-status>
+                          {e.status}
+                        </span>
+                      </span>
+                      <span className="so-c">
+                        <span className={STATUS_PILL[e.lead]} data-lead>
+                          {e.lead}
+                        </span>
+                      </span>
+                      <span className="so-c so-clamp" data-col="confirmed-by">
+                        {e.confirmedBy || <span className="so-none">—</span>}
+                      </span>
+                      <span className="so-c num" data-col="confirmed-on">
+                        {e.confirmedOn ? shownDate(e.confirmedOn) : <span className="so-none">—</span>}
+                      </span>
+                      <span className="so-c so-flag" data-flag={flag}>
+                        {flag}
+                      </span>
+                    </button>
+                    {isOpen && (
+                      <ItemCard
+                        refName={refName}
+                        people={people}
+                        item={it}
+                        entry={e}
+                        flag={flag}
+                        files={files[it.id] ?? []}
+                        setFiles={(f) => setFiles((all) => ({ ...all, [it.id]: f(all[it.id] ?? []) }))}
+                        waiverIds={state.waivers.map((w) => w.id)}
+                        onSave={(entry) => onSave(it.id, entry)}
+                      />
+                    )}
+                  </Fragment>
+                );
+              })}
+            </Fragment>
+          );
+        })}
       </div>
       {!shown.length && (
         <div className="empty">
@@ -514,26 +654,38 @@ function Checklist({
 const isUrl = (s: string) => /^https?:\/\//i.test(s.trim());
 
 /**
- * One check item, opened where it sits. It reads as a post — what the owner
- * recorded, on what evidence, and what the stage lead made of it — until
- * somebody chooses Edit; then it is a form, kept only on Save.
+ * One check item, opened under its row. The row already says what the item
+ * is, who owns its evidence and where it stands, so the card says none of
+ * that again: it is the result and the evidence — what was measured, the
+ * link or file name, and the files themselves — with the stage lead's
+ * comment under them. It becomes a form on Edit and is kept on Save; files
+ * are attached while editing and go up at once, as a handover's do.
  */
 function ItemCard({
+  refName,
   people,
   item,
   entry,
   flag,
+  files,
+  setFiles,
   waiverIds,
   onSave,
 }: {
+  refName: string;
   people: People;
   item: SignoffItem;
   entry: ItemEntry;
   flag: string;
+  files: AttachmentMeta[];
+  setFiles: (f: (prev: AttachmentMeta[]) => AttachmentMeta[]) => void;
   waiverIds: string[];
   onSave: (entry: ItemEntry) => void;
 }) {
   const [draft, setDraft] = useState<ItemEntry | null>(null);
+  const [problems, setProblems] = useState<string[]>([]);
+  const [uploading, setUploading] = useState(false);
+  const input = useRef<HTMLInputElement>(null);
   const set = (patch: Partial<ItemEntry>) =>
     setDraft((d) => {
       const next = { ...(d ?? entry), ...patch };
@@ -543,15 +695,47 @@ function ItemCard({
       if (patch.lead && patch.lead !== 'Pending' && !next.confirmedBy) next.confirmedBy = people.stageLead;
       return next;
     });
-  const recorded = entry.result || entry.evidence || entry.evidenceOwner;
-  const reviewed = entry.lead !== 'Pending' || entry.comment;
+
+  const attach = async (picked: FileList) => {
+    const accepted: File[] = [];
+    const refused: string[] = [];
+    for (const f of Array.from(picked)) {
+      const reason = rejectFile(f, files.length + accepted.length);
+      if (reason) refused.push(rejectionMessage(reason, f.name));
+      else accepted.push(f);
+    }
+    setProblems(refused);
+    if (!accepted.length) return;
+    const form = new FormData();
+    form.set('projectId', people.projectId);
+    form.set('signoffRef', refName);
+    form.set('signoffItem', item.id);
+    for (const f of accepted) {
+      form.append('files', f);
+      form.append('ids', uid());
+    }
+    setUploading(true);
+    try {
+      const saved = await uploadAttachments(form);
+      setFiles((prev) => [...prev, ...saved]);
+    } catch {
+      setProblems((p) => [...p, 'Upload failed — the files were not attached.']);
+    } finally {
+      setUploading(false);
+    }
+  };
+  const detach = async (id: string) => {
+    setFiles((prev) => prev.filter((f) => f.id !== id));
+    await deleteAttachment(people.projectId, id);
+  };
+
+  const evidenceText = (draft ?? entry).evidence;
 
   return (
     <div className="delivwrap">
-      <div className="delivcard" data-card={item.id}>
+      <div className="delivcard so-card" data-card={item.id}>
         <div className="notecard-hd">
-          <span className="ref">{item.id}</span>
-          <span className="cap">{item.section}</span>
+          <span className="cap">Result and evidence</span>
           <span style={{ flexGrow: 1 }} />
           {!draft ? (
             <button type="button" className="btn sm" onClick={() => setDraft({ ...entry })} data-edit-item={item.id}>
@@ -578,53 +762,43 @@ function ItemCard({
         </div>
 
         <div className="notecard-body">
-          <p className="so-title">{item.item}</p>
-          <p className="so-sub" style={{ marginBottom: 14 }}>
-            Target: {item.target}
-          </p>
-
           {!draft ? (
             <div data-view={item.id}>
-              <div className="so-post">
-                <div className="who">
-                  <b>Owner</b>
-                  <span className={STATUS_PILL[entry.status]}>{entry.status}</span>
-                  {entry.status === 'Waived' && entry.waiverId && <span className="pill">Waiver {entry.waiverId}</span>}
-                  {entry.evidenceOwner && <span className="so-meta">Evidence owner: {entry.evidenceOwner}</span>}
-                </div>
-                {recorded ? (
-                  <>
-                    <div className="txt">{entry.result || 'No result written.'}</div>
-                    <div className="so-meta" style={{ marginTop: 6 }}>
-                      Evidence:{' '}
-                      {entry.evidence ? (
-                        isUrl(entry.evidence) ? (
-                          <a href={entry.evidence} target="_blank" rel="noreferrer">
-                            {entry.evidence}
-                          </a>
-                        ) : (
-                          <span className="so-evidence">{entry.evidence}</span>
-                        )
-                      ) : (
-                        <i>none attached</i>
-                      )}
-                    </div>
-                  </>
+              <div className="so-sec">
+                <div className="subcap">Result</div>
+                {entry.result ? (
+                  <div className="so-result">{entry.result}</div>
                 ) : (
                   <p className="mono-note">Nothing recorded yet. Choose Edit to add the result and its evidence.</p>
                 )}
               </div>
-
-              <div className="so-post">
-                <div className="who">
-                  <b>Stage lead</b>
-                  <span className={STATUS_PILL[entry.lead]}>{entry.lead}</span>
-                  {entry.confirmedBy && <span className="so-meta">by {entry.confirmedBy}</span>}
-                  {entry.confirmedOn && <span className="so-meta">{shownDate(entry.confirmedOn)}</span>}
-                </div>
-                {reviewed ? entry.comment && <div className="txt">{entry.comment}</div> : <p className="mono-note">Not yet reviewed.</p>}
+              <div className="so-sec">
+                <div className="subcap">Evidence</div>
+                {evidenceText &&
+                  (isUrl(evidenceText) ? (
+                    <a className="so-evlink" href={evidenceText} target="_blank" rel="noreferrer">
+                      {evidenceText}
+                    </a>
+                  ) : (
+                    <div className="so-evtext">{evidenceText}</div>
+                  ))}
+                <EvidenceFiles files={files} />
+                {!evidenceText && !files.length && <p className="mono-note">No evidence yet.</p>}
               </div>
-
+              {(entry.comment || (entry.status === 'Waived' && entry.waiverId)) && (
+                <div className="so-sec so-note">
+                  {entry.status === 'Waived' && entry.waiverId && (
+                    <span className="pill warn" style={{ marginRight: 8 }}>
+                      Waiver {entry.waiverId}
+                    </span>
+                  )}
+                  {entry.comment && (
+                    <span>
+                      <b>Stage lead:</b> {entry.comment}
+                    </span>
+                  )}
+                </div>
+              )}
               {flag && (
                 <p className="mono-note late" data-card-flag>
                   {flag}
@@ -633,23 +807,45 @@ function ItemCard({
             </div>
           ) : (
             <div className="so-form" data-form={item.id}>
-              <div className="so-formhd">Owner</div>
               <label className="so-f so-span">
                 <span className="subcap">Result or measured value</span>
-                <textarea className="notebody so-ta" rows={3} value={draft.result} onChange={(ev) => set({ result: ev.target.value })} />
+                <textarea className="notebody so-ta so-big" rows={4} value={draft.result} onChange={(ev) => set({ result: ev.target.value })} />
               </label>
-              <label className="so-f so-span">
-                <span className="subcap">Evidence — link or file name</span>
-                <input className="lnkin" value={draft.evidence} onChange={(ev) => set({ evidence: ev.target.value })} />
-              </label>
+              <div className="so-f so-span">
+                <span className="subcap">Evidence — a link or file name, and the files</span>
+                <input
+                  className="lnkin"
+                  aria-label="Evidence — link or file name"
+                  placeholder="https://… or a path the reviewer can find"
+                  value={draft.evidence}
+                  onChange={(ev) => set({ evidence: ev.target.value })}
+                />
+                <div className="so-files">
+                  <EvidenceFiles files={files} onRemove={detach} />
+                  <button type="button" className="btn sm" disabled={uploading} onClick={() => input.current?.click()} data-attach={item.id}>
+                    <IconPlus /> {uploading ? 'Uploading…' : 'Attach file'}
+                  </button>
+                  <input
+                    ref={input}
+                    type="file"
+                    multiple
+                    className="visually-hidden"
+                    aria-label={`Attach evidence to ${item.id}`}
+                    onChange={async (ev) => {
+                      if (ev.target.files?.length) await attach(ev.target.files);
+                      ev.target.value = '';
+                    }}
+                  />
+                </div>
+                {problems.map((p) => (
+                  <p className="mono-note late" key={p}>
+                    {p}
+                  </p>
+                ))}
+              </div>
               <label className="so-f">
                 <span className="subcap">Evidence owner</span>
-                <PersonSelect
-                  people={people}
-                  label={`${item.id} evidence owner`}
-                  value={draft.evidenceOwner}
-                  onChange={(v) => set({ evidenceOwner: v })}
-                />
+                <PersonSelect people={people} label={`${item.id} evidence owner`} value={draft.evidenceOwner} onChange={(v) => set({ evidenceOwner: v })} />
               </label>
               <label className="so-f">
                 <span className="subcap">Owner status</span>
@@ -659,20 +855,22 @@ function ItemCard({
                   value={draft.status}
                   onChange={(ev) => set({ status: ev.target.value as ItemEntry['status'] })}
                 >
-                  {OWNER_STATUSES.map((s) => (
-                    <option key={s}>{s}</option>
+                  {OWNER_STATUSES.map((st) => (
+                    <option key={st}>{st}</option>
                   ))}
                 </select>
               </label>
-              <label className="so-f">
-                <span className="subcap">Waiver ID {draft.status === 'Waived' ? '(required)' : ''}</span>
-                <input className="lnkin" list={`so-w-${item.id}`} value={draft.waiverId} onChange={(ev) => set({ waiverId: ev.target.value })} />
-                <datalist id={`so-w-${item.id}`}>
-                  {waiverIds.map((w) => (
-                    <option key={w} value={w} />
-                  ))}
-                </datalist>
-              </label>
+              {draft.status === 'Waived' && (
+                <label className="so-f">
+                  <span className="subcap">Waiver ID (required)</span>
+                  <input className="lnkin" list={`so-w-${item.id}`} value={draft.waiverId} onChange={(ev) => set({ waiverId: ev.target.value })} />
+                  <datalist id={`so-w-${item.id}`}>
+                    {waiverIds.map((w) => (
+                      <option key={w} value={w} />
+                    ))}
+                  </datalist>
+                </label>
+              )}
 
               <div className="so-formhd">Stage lead</div>
               <label className="so-f">
@@ -683,19 +881,14 @@ function ItemCard({
                   value={draft.lead}
                   onChange={(ev) => set({ lead: ev.target.value as ItemEntry['lead'] })}
                 >
-                  {LEAD_STATUSES.map((s) => (
-                    <option key={s}>{s}</option>
+                  {LEAD_STATUSES.map((st) => (
+                    <option key={st}>{st}</option>
                   ))}
                 </select>
               </label>
               <label className="so-f">
                 <span className="subcap">Confirmed by {draft.lead !== 'Pending' ? '(required)' : ''}</span>
-                <PersonSelect
-                  people={people}
-                  label={`${item.id} confirmed by`}
-                  value={draft.confirmedBy}
-                  onChange={(v) => set({ confirmedBy: v })}
-                />
+                <PersonSelect people={people} label={`${item.id} confirmed by`} value={draft.confirmedBy} onChange={(v) => set({ confirmedBy: v })} />
               </label>
               <label className="so-f">
                 <span className="subcap">Confirmed on</span>
@@ -709,6 +902,31 @@ function ItemCard({
           )}
         </div>
       </div>
+    </div>
+  );
+}
+
+/** The files attached as evidence, as chips that open them; removable while editing. */
+function EvidenceFiles({ files, onRemove }: { files: AttachmentMeta[]; onRemove?: (id: string) => void }) {
+  if (!files.length) return null;
+  return (
+    <div className="att-list" data-evidence-files>
+      {files.map((f) => (
+        <span key={f.id} className="att">
+          <a className="att-link" href={attachmentUrl(f.id)} target="_blank" rel="noreferrer" title={f.filename}>
+            <span className="att-doc">
+              <IconFile />
+            </span>
+            <span className="att-name">{f.filename}</span>
+            <span className="att-size">{formatBytes(f.size)}</span>
+          </a>
+          {onRemove && (
+            <button type="button" className="att-del" aria-label={`Remove ${f.filename}`} onClick={() => onRemove(f.id)}>
+              ×
+            </button>
+          )}
+        </span>
+      ))}
     </div>
   );
 }

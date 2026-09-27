@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { PROGRAM_DEFAULT_TEAM } from '@/data/programTeam';
 import type { Contact, Leader } from '@/data/types';
 import { LEAD_ROLE, planTeamEdit, type PersonDraft } from '@/lib/teamEdit';
 import { useAppStore } from '@/store/useAppStore';
@@ -151,6 +152,39 @@ export function TeamTable({ stageId }: { stageId: string }) {
           <span style={{ fontSize: 13 }}>Add someone to this stage</span>
         </button>
       )}
+    </>
+  );
+}
+
+/**
+ * The people on every programme whatever its stages — the TPM. They are not a
+ * stage's to add or remove, so the rows carry no Edit.
+ */
+export function ProgrammeTable() {
+  return (
+    <>
+      <div className="thead" style={{ ...COLS, marginTop: 10 }}>
+        <span />
+        <span>NAME</span>
+        <span>RESPONSIBILITY</span>
+        <span>EMAIL</span>
+        <span>PHONE</span>
+        <span />
+      </div>
+      {PROGRAM_DEFAULT_TEAM.map((p) => (
+        <div key={p.name} className="trow feedrow" data-person="programme" style={{ ...COLS, background: 'var(--accent-wash)' }}>
+          <Avatar name={p.name} />
+          <span className="wrapcell" style={{ fontWeight: 600 }}>
+            {p.name}
+          </span>
+          <span className="wrapcell" style={{ fontSize: 12.5, color: 'var(--ink-2)' }}>
+            {p.role}
+          </span>
+          <span />
+          <span />
+          <span />
+        </div>
+      ))}
     </>
   );
 }

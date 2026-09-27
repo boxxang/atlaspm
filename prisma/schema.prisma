@@ -350,6 +350,12 @@ model Attachment {
   /// that closed an action item. The MeetingFile row says which; the bytes
   /// stay here, served by the same route as every other attachment.
   meetingFileId String?
+  /// Evidence for a gate's sign-off: the deliverable reference (ESO-D7) and
+  /// the checklist item (C-01) it supports. The sign-off itself is a JSON
+  /// document, so its items have no rows to point at — like a step, the pair
+  /// is the whole address.
+  signoffRef    String?
+  signoffItem   String?
   filename      String
   mimeType      String
   size          Int
@@ -367,6 +373,7 @@ model Attachment {
   @@index([deliverableId])
   @@index([projectId, activityRef, stepN])
   @@index([meetingFileId])
+  @@index([projectId, signoffRef])
 }
 
 model Deliverable {

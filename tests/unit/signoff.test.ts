@@ -160,3 +160,43 @@ describe('who can be named', () => {
     ]);
   });
 });
+
+describe('evidence can be a file', () => {
+  it('takes an attached file as evidence for a confirmation', () => {
+    const noText = { ...good, evidence: '' };
+    expect(flagOf(noText, [])).toBe('Evidence missing');
+    expect(flagOf(noText, [], 1)).toBe('');
+    const s = allConfirmed();
+    s.items['C-01'] = noText;
+    expect(summarize(ITEMS, s).outcome).toBe('In review');
+    expect(summarize(ITEMS, s, { 'C-01': 2 }).outcome).toBe('Ready to sign off');
+  });
+});
+
+describe('the TPM is on every team', () => {
+  it('lists the default members first, on the programme rather than a stage', async () => {
+    const { teamRoster } = await import('@/lib/people');
+    const { PROGRAM_DEFAULT_TEAM, PROGRAM_TPM } = await import('@/data/programTeam');
+    const roster = teamRoster(['signoff'], {}, {}, 'signoff', 'Stage lead', PROGRAM_DEFAULT_TEAM);
+    expect(roster).toEqual([{ name: PROGRAM_TPM.name, role: PROGRAM_TPM.role, stageId: '' }]);
+    /* and is not listed twice when a Team tab names them as well */
+    const twice = teamRoster(['signoff'], {}, { signoff: [{ id: 'c', name: PROGRAM_TPM.name, role: 'x', email: '', phone: '' }] }, 'signoff', 'Stage lead', PROGRAM_DEFAULT_TEAM);
+    expect(twice).toHaveLength(1);
+  });
+});
+
+describe('column widths', () => {
+  it('reads what was stored, leniently, and clamps to each minimum', async () => {
+    const { readWidths, gridTemplate, tableMinWidth, clampWidth } = await import('@/lib/columnWidths');
+    const cols = [
+      { key: 'ref', label: 'REF', width: 70, min: 56 },
+      { key: 'item', label: 'ITEM', width: 360, min: 200, grow: true },
+    ];
+    expect(readWidths(cols, null)).toEqual({ ref: 70, item: 360 });
+    expect(readWidths(cols, '{"ref":20,"item":400,"gone":9}')).toEqual({ ref: 56, item: 400 });
+    expect(readWidths(cols, 'nonsense')).toEqual({ ref: 70, item: 360 });
+    expect(gridTemplate(cols, { ref: 70, item: 360 })).toBe('70px minmax(360px, 1fr)');
+    expect(tableMinWidth(cols, { ref: 70, item: 360 }, 10)).toBe(440);
+    expect(clampWidth(cols[0], NaN)).toBe(70);
+  });
+});

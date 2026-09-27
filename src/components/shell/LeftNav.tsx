@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { PROGRAM_DEFAULT_TEAM } from '@/data/programTeam';
 import { RISK_AUTHOR } from '@/data/riskSeeds';
 import { useAppStore } from '@/store/useAppStore';
 import {
@@ -75,6 +76,7 @@ export function LeftNav({ projectId }: { projectId: string }) {
   /* Counts what the Team page lists, which includes each stage's lead — a
      badge that disagrees with the page behind it is worse than no badge. */
   const people =
+    PROGRAM_DEFAULT_TEAM.length +
     Object.values(contacts).flat().length +
     Object.values(leaders).filter((l) => l?.name).length;
 

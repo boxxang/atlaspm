@@ -137,8 +137,9 @@ const blank = (s: string) => !s.trim();
  * first reason only, in the workbook's order, so the row says the next thing
  * to fix.
  */
-export function flagOf(entry: ItemEntry, waivers: readonly WaiverRow[]): string {
-  if (entry.lead === 'Confirmed' && blank(entry.evidence)) return 'Evidence missing';
+export function flagOf(entry: ItemEntry, waivers: readonly WaiverRow[], evidenceFiles = 0): string {
+  /* evidence is a link or file name written down, or a file attached */
+  if (entry.lead === 'Confirmed' && blank(entry.evidence) && evidenceFiles === 0) return 'Evidence missing';
   if (entry.status === 'Waived' && blank(entry.waiverId)) return 'Waiver ID missing';
   if (entry.status === 'Waived' && !waivers.some((w) => w.id.trim() === entry.waiverId.trim()))
     return 'Waiver not found';
@@ -173,14 +174,19 @@ export interface SignoffSummary {
   outcome: Outcome;
 }
 
-export function summarize(items: readonly SignoffItem[], state: SignoffState): SignoffSummary {
+export function summarize(
+  items: readonly SignoffItem[],
+  state: SignoffState,
+  /** files attached as evidence, by item */
+  files: Readonly<Record<string, number>> = {},
+): SignoffSummary {
   const entries = items.map((it) => entryOf(state, it.id));
   const count = (f: (e: ItemEntry) => boolean) => entries.filter(f).length;
   const total = items.length;
   const fail = count((e) => e.status === 'Fail');
   const confirmed = count((e) => e.lead === 'Confirmed');
   const rejected = count((e) => e.lead === 'Rejected');
-  const flagged = count((e) => flagOf(e, state.waivers) !== '');
+  const flagged = items.filter((it) => flagOf(entryOf(state, it.id), state.waivers, files[it.id] ?? 0) !== '').length;
   const blocking = state.issues.filter(
     (i) => i.status === 'Open' && (i.severity === 'Critical' || i.severity === 'High'),
   ).length;

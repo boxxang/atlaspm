@@ -78,6 +78,8 @@ export function teamRoster(
   contacts: Record<StageId, Contact[]>,
   first?: StageId,
   leadRole = 'Stage lead',
+  /** people on every programme whatever the Team tabs say — the TPM */
+  always: readonly { name: string; role: string }[] = [],
 ): TeamMember[] {
   const order = first ? [first, ...stageOrder.filter((s) => s !== first)] : [...stageOrder];
   const seen = new Set<string>();
@@ -87,6 +89,8 @@ export function teamRoster(
     seen.add(key(name));
     out.push({ name: name.trim(), role, stageId });
   };
+  /* on the programme rather than on a stage: listed first, with no stage */
+  for (const m of always) add(m.name, m.role, '');
   for (const id of order) {
     const l = leaders[id];
     if (l?.name) add(l.name, leadRole, id);

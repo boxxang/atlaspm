@@ -193,6 +193,27 @@ test.describe('the Embedded SoC template', () => {
 
     const board = page.locator('[data-signoff="ESO-D7"]');
     await expect(board.locator('[data-item]')).toHaveCount(23);
+
+    /* the columns: result, evidence and waiver live in the opened item, and
+       every header sits on one line */
+    const heads = board.locator('.so-head [data-col-head]');
+    await expect(heads).toHaveText([
+      'REF', 'ITEM AND TARGET', 'EVIDENCE OWNER', 'OWNER STATUS', 'STAGE LEAD', 'CONFIRMED BY', 'CONFIRMED ON', 'FLAG',
+    ]);
+    for (const h of await heads.all()) {
+      const box = await h.locator('.so-thl').evaluate((el) => ({ w: el.scrollWidth, cw: el.clientWidth, h: el.getBoundingClientRect().height }));
+      expect(box.w).toBeLessThanOrEqual(box.cw);
+      expect(box.h).toBeLessThan(24);
+    }
+    /* a column is widened by dragging its edge, and keeps the width */
+    const owner = board.locator('[data-col-head="owner"]');
+    const before = (await owner.boundingBox())!.width;
+    const grip = (await board.locator('[data-grip="owner"]').boundingBox())!;
+    await page.mouse.move(grip.x + grip.width / 2, grip.y + grip.height / 2);
+    await page.mouse.down();
+    await page.mouse.move(grip.x + 80, grip.y + grip.height / 2, { steps: 4 });
+    await page.mouse.up();
+    await expect.poll(async () => (await owner.boundingBox())!.width).toBeGreaterThan(before + 40);
     await expect(board.locator('[data-outcome]')).toHaveText('In review');
 
     /* the page scrolls in the shell like every other page */
@@ -226,7 +247,6 @@ test.describe('the Embedded SoC template', () => {
     await item.getByLabel('C-01 evidence owner').selectOption('Grace Park');
     await item.locator('[data-save-item="C-01"]').click();
     await expect(board.locator('[data-item="C-01"] [data-col="evidence-owner"]')).toHaveText('Grace Park');
-    await expect(board.locator('[data-item="C-01"] [data-col="evidence"]')).toHaveText('sta/final/signoff_summary.rpt');
     await expect(item.locator('[data-view="C-01"]')).toContainText('sta/final/signoff_summary.rpt');
     await expect(board.locator('[data-item="C-01"] [data-flag]')).toHaveText('');
     await expect(board.locator('[data-stat="confirmed"]')).toHaveText('1/23');
@@ -236,6 +256,26 @@ test.describe('the Embedded SoC template', () => {
     await item.getByLabel('Evidence — link or file name').fill('something else');
     await item.getByRole('button', { name: 'Cancel' }).click();
     await expect(item.locator('[data-view="C-01"]')).toContainText('sta/final/signoff_summary.rpt');
+
+    /* evidence can be a file: attached while editing, it stands in for a
+       written link, and stays attached */
+    await item.locator('[data-edit-item="C-01"]').click();
+    await item.getByLabel('Attach evidence to C-01').setInputFiles({
+      name: 'sta_summary.txt',
+      mimeType: 'text/plain',
+      buffer: Buffer.from('WNS 0.012 ns'),
+    });
+    await expect(item.locator('[data-evidence-files]')).toContainText('sta_summary.txt');
+    await item.getByLabel('Evidence — link or file name').fill('');
+    await item.locator('[data-save-item="C-01"]').click();
+    await expect(item.locator('[data-view="C-01"] [data-evidence-files]')).toContainText('sta_summary.txt');
+    await expect(board.locator('[data-item="C-01"] [data-flag]')).toHaveText('');
+    await expect(board.locator('[data-item="C-01"] .so-clip')).toContainText('1');
+
+    /* the TPM is on the team whatever the Team tab says */
+    await item.locator('[data-edit-item="C-01"]').click();
+    await expect(item.getByLabel('C-01 confirmed by').locator('option', { hasText: 'Sangwook Park' })).toHaveCount(1);
+    await item.getByRole('button', { name: 'Cancel' }).click();
 
     /* a waiver ID that names no waiver is flagged until the waiver exists */
     await board.locator('[data-item="C-02"]').click();
