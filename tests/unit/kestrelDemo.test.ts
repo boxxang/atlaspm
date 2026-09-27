@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { ALL_ACTIVITIES } from '@/data/builtins';
-import { E2_SCENARIO } from '@/data/e2Demo';
+import { KESTREL_SCENARIO } from '@/data/kestrelDemo';
 import { EMBEDDED_PROFILE } from '@/data/embeddedSoc';
 import { RISK_AUTHOR } from '@/data/riskSeeds';
 import { buildScenario } from '@/lib/scenario';
@@ -8,7 +8,7 @@ import { computeSchedule, fmtDate } from '@/lib/schedule';
 import { plannedSteps } from '@/lib/steps';
 
 /**
- * Embedded_SoC: the E2 interview example, read on 09/27/2026 in the second
+ * Embedded_SoC: the Kestrel interview example, read on 09/27/2026 in the second
  * week of the final turn on the FFN.
  *
  * It is shown live, so it has to hold together the way a running programme
@@ -17,7 +17,7 @@ import { plannedSteps } from '@/lib/steps';
  * left hanging without a reason, every risk sits on a step, and everything a
  * meeting or a post points at exists.
  */
-const demo = buildScenario(E2_SCENARIO, { builtin: EMBEDDED_PROFILE, library: ALL_ACTIVITIES });
+const demo = buildScenario(KESTREL_SCENARIO, { builtin: EMBEDDED_PROFILE, library: ALL_ACTIVITIES });
 const plan = computeSchedule(demo.project.kickoff, demo.profile, {});
 const ME = RISK_AUTHOR;
 const TODAY = new Date(2026, 8, 27);
@@ -27,7 +27,7 @@ const milestone = (s: typeof plan, id: string) => {
   return m ? fmtDate(m.date) : null;
 };
 
-describe('Embedded_SoC — E2 in the final turn on the FFN', () => {
+describe('Embedded_SoC — Kestrel in the final turn on the FFN', () => {
   it('replaces the existing programme in place, on the built-in template, without adding one', () => {
     expect(demo.project.id).toBe('embedded-soc-cd0t9');
     expect(demo.project.name).toBe('Embedded_SoC');
@@ -68,7 +68,7 @@ describe('Embedded_SoC — E2 in the final turn on the FFN', () => {
 
   it('leaves open only the steps the story leaves open', () => {
     /* a step planned to finish before today that is not done is one the record explains */
-    const listed = new Set(E2_SCENARIO.steps.map((s) => `${s.ref}:${s.n}`));
+    const listed = new Set(KESTREL_SCENARIO.steps.map((s) => `${s.ref}:${s.n}`));
     for (const a of demo.activities)
       for (const p of plannedSteps(demo.schedule.stages[a.stageId].start, a)) {
         if (p.end >= TODAY) continue;
@@ -89,14 +89,14 @@ describe('Embedded_SoC — E2 in the final turn on the FFN', () => {
 
   it('is written by the PM, with every risk on a step and every thread answered where closed', () => {
     for (const p of demo.posts) expect(p.author).toBe(ME);
-    const risks = E2_SCENARIO.posts.filter((p) => p.kind === 'risk');
+    const risks = KESTREL_SCENARIO.posts.filter((p) => p.kind === 'risk');
     expect(risks.filter((r) => !r.closed).map((r) => r.key).sort()).toEqual(['risk-atpg-volume', 'risk-fabric-timing', 'risk-mram-ir']);
     for (const r of risks) {
       expect(r.step, r.key).toBeTruthy();
-      if (r.closed) expect(E2_SCENARIO.posts.some((p) => p.parent === r.key), r.key).toBe(true);
+      if (r.closed) expect(KESTREL_SCENARIO.posts.some((p) => p.parent === r.key), r.key).toBe(true);
     }
-    const keys = new Set(E2_SCENARIO.posts.map((p) => p.key));
-    for (const p of E2_SCENARIO.posts) if (p.parent) expect(keys.has(p.parent), p.key).toBe(true);
+    const keys = new Set(KESTREL_SCENARIO.posts.map((p) => p.key));
+    for (const p of KESTREL_SCENARIO.posts) if (p.parent) expect(keys.has(p.parent), p.key).toBe(true);
   });
 
   it('points only at things that exist', () => {
@@ -112,15 +112,15 @@ describe('Embedded_SoC — E2 in the final turn on the FFN', () => {
       if (l.targetType === 'stage') expect(stages.has(l.targetRef), l.targetRef).toBe(true);
       if (l.targetType === 'milestone') expect(milestones.has(l.targetRef), l.targetRef).toBe(true);
     }
-    for (const p of E2_SCENARIO.posts) if (p.step) expect(stepRefs.has(p.step), p.step).toBe(true);
+    for (const p of KESTREL_SCENARIO.posts) if (p.step) expect(stepRefs.has(p.step), p.step).toBe(true);
   });
 
   it('holds its meetings on the series day, done before today and scheduled after', () => {
-    const tz = E2_SCENARIO.program.timeZone;
-    for (const m of E2_SCENARIO.meetings) {
+    const tz = KESTREL_SCENARIO.program.timeZone;
+    for (const m of KESTREL_SCENARIO.meetings) {
       expect(m.status === 'completed' ? m.date < '2026-09-27' : m.date > '2026-09-27', m.key).toBe(true);
       if (!m.series) continue;
-      const s = E2_SCENARIO.series.find((x) => x.key === m.series)!;
+      const s = KESTREL_SCENARIO.series.find((x) => x.key === m.series)!;
       const [y, mo, d] = m.date.split('-').map(Number);
       expect(s.weekdays, m.key).toContain(new Date(y, mo - 1, d).getDay());
       expect(m.date >= s.startDate, m.key).toBe(true);
@@ -138,19 +138,19 @@ describe('Embedded_SoC — E2 in the final turn on the FFN', () => {
 
 describe('Embedded_SoC — the sign-off checklists', () => {
   it('fill the gates’ own items, confirmed by the stage lead or the TPM, naming people on the team', async () => {
-    const { E2_SIGNOFFS, E2_SIGNOFF_CLOSED } = await import('@/data/e2Signoffs');
+    const { KESTREL_SIGNOFFS, KESTREL_SIGNOFF_CLOSED } = await import('@/data/kestrelSignoffs');
     const { signoffDefinition } = await import('@/lib/signoffDefinition');
     const { parseSignoff, checklistCompletedOn, entryOf, summarize } = await import('@/lib/signoff');
-    const { E2_LEADERS, E2_CONTACTS } = await import('@/data/e2Demo');
+    const { KESTREL_LEADERS, KESTREL_CONTACTS } = await import('@/data/kestrelDemo');
     const team = new Set([
       '@me',
-      ...Object.values(E2_LEADERS).map((p) => p.name),
-      ...Object.values(E2_CONTACTS).flatMap((l) => l.map((p) => p.name)),
+      ...Object.values(KESTREL_LEADERS).map((p) => p.name),
+      ...Object.values(KESTREL_CONTACTS).flatMap((l) => l.map((p) => p.name)),
     ]);
-    for (const [ref, payload] of Object.entries(E2_SIGNOFFS)) {
+    for (const [ref, payload] of Object.entries(KESTREL_SIGNOFFS)) {
       const def = signoffDefinition(ref)!;
       const ids = new Set(def.items.map((i) => i.id));
-      const lead = E2_LEADERS[def.stageKey].name;
+      const lead = KESTREL_LEADERS[def.stageKey].name;
       for (const [id, e] of Object.entries(payload.items)) {
         expect(ids.has(id), `${ref} ${id}`).toBe(true);
         expect(team.has(e.evidenceOwner), `${ref} ${id} ${e.evidenceOwner}`).toBe(true);
@@ -159,9 +159,9 @@ describe('Embedded_SoC — the sign-off checklists', () => {
       }
       for (const r of Object.values(payload.roles)) expect(team.has(r.name), `${ref} ${r.name}`).toBe(true);
       const state = parseSignoff(JSON.stringify(payload));
-      expect(checklistCompletedOn(def.items, state), ref).toBe(E2_SIGNOFF_CLOSED[ref] ?? '');
+      expect(checklistCompletedOn(def.items, state), ref).toBe(KESTREL_SIGNOFF_CLOSED[ref] ?? '');
       /* a closed gate is ready: nothing flagged, nothing blocking */
-      if (E2_SIGNOFF_CLOSED[ref]) expect(summarize(def.items, state).outcome, ref).toBe('Ready to sign off');
+      if (KESTREL_SIGNOFF_CLOSED[ref]) expect(summarize(def.items, state).outcome, ref).toBe('Ready to sign off');
       else expect(def.items.some((i) => entryOf(state, i.id).lead === 'Pending'), ref).toBe(true);
     }
   });

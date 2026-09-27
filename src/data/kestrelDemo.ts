@@ -1,12 +1,12 @@
 /**
- * /data/e2Demo.ts — Embedded_SoC: a second-generation ultra-low-power
- * dataflow processor ("E2"), read in the middle of physical design.
+ * /data/kestrelDemo.ts — Embedded_SoC: a second-generation ultra-low-power
+ * dataflow processor ("Kestrel"), read in the middle of physical design.
  *
- * An interview example, and hypothetical: the programme is modelled on the
- * class of part Efficient Computer's Electron E1 represents, and assumes a
- * successor — twice the fabric, 4 MB of eMRAM, a new always-on sensor hub — on
- * the same mature 22 nm ULL node with embedded MRAM. No figure in it describes
- * a real product.
+ * An interview example, and fictional: a generic spatial-dataflow embedded
+ * processor on the Embedded SoC template, and its second generation — twice
+ * the fabric, 4 MB of eMRAM, a new always-on sensor hub — on the same mature
+ * 22 nm ULL node with embedded MRAM. Kestrel is a made-up codename, and no
+ * figure in it describes a real product.
  *
  * Where it stands on 09/27/2026: the FFN went out on 09/11, two and a half
  * weeks late. A long-duration FPGA soak test found a deadlock in the fabric
@@ -35,23 +35,23 @@ import type {
   ScenarioStep,
 } from './scenarioTypes';
 
-export const E2_ID = 'embedded-soc-cd0t9';
-export const E2_NAME = 'Embedded_SoC';
+export const KESTREL_ID = 'embedded-soc-cd0t9';
+export const KESTREL_NAME = 'Embedded_SoC';
 /** Programme kickoff: product definition starts. */
-export const E2_KICKOFF = '2025-08-18';
-export const E2_TODAY = '2026-09-27';
+export const KESTREL_KICKOFF = '2025-08-18';
+export const KESTREL_TODAY = '2026-09-27';
 
 /* ---------- schedule ---------- */
 
 /** The plan: the built-in Embedded SoC template as it ships. */
-export const E2_PLAN: readonly ({ key: string } & StageSpan)[] = EMBEDDED_PROFILE.stages.map((s) => ({
+export const KESTREL_PLAN: readonly ({ key: string } & StageSpan)[] = EMBEDDED_PROFILE.stages.map((s) => ({
   key: s.key,
   startOffsetWeeks: s.startOffsetWeeks,
   durationWeeks: s.durationWeeks,
 }));
 
 /** Where the stages actually ran, where that was not the plan. */
-export const E2_ACTUAL: Readonly<Record<string, StageSpan>> = {
+export const KESTREL_ACTUAL: Readonly<Record<string, StageSpan>> = {
   /* the FFN held two and a half weeks for the NoC arbiter fix */
   synthesisEmb: { startOffsetWeeks: 36, durationWeeks: 20 },
   /* the final turn starts a week late and runs its full length; signoff keeps its
@@ -92,8 +92,8 @@ const ACTUAL_WINDOWS: Windows = {
 
 /* ---------- people ---------- */
 
-export const E2_LEADERS: Readonly<Record<string, ScenarioPerson>> = {
-  productDefinitionEmb: { name: 'Rachel Kim', role: 'Product manager, E2' },
+export const KESTREL_LEADERS: Readonly<Record<string, ScenarioPerson>> = {
+  productDefinitionEmb: { name: 'Rachel Kim', role: 'Product manager, Kestrel' },
   technologyEmb: { name: 'Arjun Mehta', role: 'Foundry and technology lead' },
   ipReadinessEmb: { name: 'Lena Fischer', role: 'IP program lead' },
   fabricCodesign: { name: 'Daniel Ortiz', role: 'Fabric architect' },
@@ -125,7 +125,7 @@ export const E2_LEADERS: Readonly<Record<string, ScenarioPerson>> = {
   evkLaunch: { name: 'Sofia Russo', role: 'Developer platform lead' },
 };
 
-export const E2_CONTACTS: Readonly<Record<string, readonly ScenarioPerson[]>> = {
+export const KESTREL_CONTACTS: Readonly<Record<string, readonly ScenarioPerson[]>> = {
   physicalDesignEmb: [
     { name: 'Yuki Tanaka', role: 'Timing closure — fabric and NoC' },
     { name: 'Ben Carter', role: 'Floorplan, PDN and IR' },
@@ -156,7 +156,7 @@ export const E2_CONTACTS: Readonly<Record<string, readonly ScenarioPerson[]>> = 
 /* ---------- the record ---------- */
 
 /** Step records the story needs, beyond "done on the day the plan said". */
-export const E2_STEPS: readonly ScenarioStep[] = [
+export const KESTREL_STEPS: readonly ScenarioStep[] = [
   /* the soak test that found the deadlock, and the fix going back through FPGA */
   { ref: 'FPV-04', n: 4, owner: 'Emily Novak', doneAt: '2026-09-10' },
   { ref: 'FPV-04', n: 6, owner: 'Jonas Weber', doneAt: '2026-09-10' },
@@ -206,7 +206,7 @@ export const E2_STEPS: readonly ScenarioStep[] = [
  * Deliverables past their date in a running stage are done on it; these are
  * the ones that were not. The FFN and its package went out with the FFN.
  */
-export const E2_DELIVERABLES: readonly ScenarioDeliverable[] = [
+export const KESTREL_DELIVERABLES: readonly ScenarioDeliverable[] = [
   { stageId: 'synthesisEmb', position: 3, doneAt: '2026-08-07' },
   { stageId: 'synthesisEmb', position: 4, doneAt: '2026-09-11' },
   { stageId: 'synthesisEmb', position: 5, doneAt: '2026-09-11' },
@@ -235,21 +235,21 @@ const CORE_TEAM = [
   'Arjun Mehta',
 ];
 
-export const E2_POSTS: readonly ScenarioPost[] = [
+export const KESTREL_POSTS: readonly ScenarioPost[] = [
   /* ---- the programme, as it was set up ---- */
   {
-    key: 'note-e2-summary',
+    key: 'note-kestrel-summary',
     kind: 'note',
     at: '2025-08-20 10:00',
     stageId: 'productDefinitionEmb',
-    text: 'E2 — product summary and top-level targets',
+    text: 'Kestrel — product summary and top-level targets',
     blocks: [
       {
         p: 'Second-generation general-purpose dataflow processor for battery-powered edge devices. Same programming model as the first generation — C, C++ and LiteRT / ONNX models compiled onto a spatial fabric — with twice the fabric, more non-volatile memory and an always-on sensor hub, so a design can keep its model resident and wake on an event.',
       },
       {
         table: {
-          head: ['Parameter', 'Gen 1 (reference)', 'E2 target', 'Why'],
+          head: ['Parameter', 'Gen 1 (reference)', 'Kestrel target', 'Why'],
           rows: [
             ['Process', '22 nm ULL + eMRAM', '22 nm ULL + eMRAM (same node)', 'Reuse the qualified eMRAM macro and PDK; no node risk'],
             ['Compute fabric', '12 × 12 tiles', '24 × 24 tiles (576 PEs)', '2× throughput per wake for vision and audio models'],
@@ -363,7 +363,7 @@ Closing the soak item for the FFN. The long-run soak continues on the FFN image 
     at: '2026-09-11 20:10',
     step: 'ESYN-12:6',
     text:
-      `FFN released: tag e2-ffn-2026.09.11 (RTL rtl-2026.09.01).
+      `FFN released: tag ks-ffn-2026.09.11 (RTL rtl-2026.09.01).
 
 - Equivalence RTL → FFN: clean on all 3 modes
 - UPF consistency: clean
@@ -407,7 +407,7 @@ ECO-only change discipline in force from today.`,
     stageId: 'physicalDesignEmb',
     text: 'FFN delta against N2 — by block',
     blocks: [
-      { p: 'FFN e2-ffn-2026.09.11 against N2 e2-n2-2026.08.07. Die 4.6 × 4.6 mm, floorplan and PDN frozen at Turn 2.' },
+      { p: 'FFN ks-ffn-2026.09.11 against N2 ks-n2-2026.08.07. Die 4.6 × 4.6 mm, floorplan and PDN frozen at Turn 2.' },
       {
         table: {
           head: ['Block', 'Function', 'N2 instances', 'FFN instances', 'Δ', 'Placement utilization'],
@@ -671,10 +671,10 @@ Untestable faults justified in the coverage report — 0.4%, in the eMRAM wrappe
 
 /* ---------- meetings ---------- */
 
-export const E2_SERIES: readonly ScenarioSeries[] = [
+export const KESTREL_SERIES: readonly ScenarioSeries[] = [
   {
     key: 'core',
-    title: 'E2 Core Team Weekly',
+    title: 'Kestrel Core Team Weekly',
     purpose: 'Programme status against the plan by stage, milestones in the next 8 weeks, risks and decisions that need the core team, and actions review.',
     type: 'program_review',
     attendees: CORE_TEAM,
@@ -693,7 +693,7 @@ export const E2_SERIES: readonly ScenarioSeries[] = [
   },
   {
     key: 'pnr',
-    title: 'E2 PnR Weekly',
+    title: 'Kestrel PnR Weekly',
     purpose: 'Physical design by turn and block — timing, route, power / IR and DFT — the ECOs coming in, and what signoff needs next.',
     type: 'working_group',
     attendees: [...PD_TEAM, 'Nikhil Rao', 'Hannah Scott', 'Olivia Park', 'Kevin Tran', 'Tariq Aziz', 'Hana Yoshida'],
@@ -712,7 +712,7 @@ export const E2_SERIES: readonly ScenarioSeries[] = [
   },
   {
     key: 'tor',
-    title: 'E2 Tapeout Readiness Review',
+    title: 'Kestrel Tapeout Readiness Review',
     purpose: 'Every input the MTO depends on, owner by owner, from Design Freeze back: signoff, DFT patterns, boot ROM, package, test program and the mask order.',
     type: 'readiness_review',
     attendees: ['Mark Ellison', 'Olivia Park', 'Alex Morgan', 'Kevin Tran', 'Grace Liu', 'Tom Becker', 'Wei Zhang', 'Arjun Mehta'],
@@ -728,7 +728,7 @@ export const E2_SERIES: readonly ScenarioSeries[] = [
   },
 ];
 
-export const E2_MEETINGS: readonly ScenarioMeeting[] = [
+export const KESTREL_MEETINGS: readonly ScenarioMeeting[] = [
   {
     key: 'ffn-slip',
     title: 'FFN Slip Review — NoC Arbiter Deadlock',
@@ -1130,37 +1130,37 @@ export const E2_MEETINGS: readonly ScenarioMeeting[] = [
   },
 ];
 
-export const E2_SCENARIO: Scenario = {
+export const KESTREL_SCENARIO: Scenario = {
   program: {
-    id: E2_ID,
-    name: E2_NAME,
-    kickoff: E2_KICKOFF,
+    id: KESTREL_ID,
+    name: KESTREL_NAME,
+    kickoff: KESTREL_KICKOFF,
     costPerManMonth: 18000,
-    today: E2_TODAY,
+    today: KESTREL_TODAY,
     now: '2026-09-27 20:00',
     timeZone: 'America/New_York',
-    emailDomain: 'e2-program.example',
+    emailDomain: 'kestrel-program.example',
     phoneStart: 100,
     phonePrefix: '+1 412 555 0',
   },
   template: {
     id: EMBEDDED_PROFILE.id,
     name: EMBEDDED_PROFILE.label,
-    stages: E2_PLAN,
+    stages: KESTREL_PLAN,
     windows: {},
     create: false,
   },
   actual: {
-    overrides: E2_ACTUAL,
+    overrides: KESTREL_ACTUAL,
     windows: ACTUAL_WINDOWS,
   },
-  doneStages: E2_PLAN.map((s) => s.key),
+  doneStages: KESTREL_PLAN.map((s) => s.key),
   doneDeliverablesBeforeToday: true,
-  leaders: E2_LEADERS,
-  contacts: E2_CONTACTS,
-  steps: E2_STEPS,
-  deliverables: E2_DELIVERABLES,
-  posts: E2_POSTS,
-  series: E2_SERIES,
-  meetings: E2_MEETINGS,
+  leaders: KESTREL_LEADERS,
+  contacts: KESTREL_CONTACTS,
+  steps: KESTREL_STEPS,
+  deliverables: KESTREL_DELIVERABLES,
+  posts: KESTREL_POSTS,
+  series: KESTREL_SERIES,
+  meetings: KESTREL_MEETINGS,
 };

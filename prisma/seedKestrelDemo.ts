@@ -1,7 +1,7 @@
 /**
- * `npx tsx prisma/seedE2Demo.ts` — Embedded_SoC, the E2 interview example,
+ * `npx tsx prisma/seedKestrelDemo.ts` — Embedded_SoC, the Kestrel interview example,
  * written over the programme of that id: its record, and the sign-off
- * checklists of three gates. See /data/e2Demo.ts for the story and
+ * checklists of three gates. See /data/kestrelDemo.ts for the story and
  * /prisma/scenarioSeed.ts for what writing a scenario does.
  *
  * Re-running replaces Embedded_SoC and nothing else. It is started straight
@@ -10,8 +10,8 @@
 import { PrismaPg } from '@prisma/adapter-pg';
 import 'dotenv/config';
 import { ALL_ACTIVITIES } from '../src/data/builtins';
-import { E2_SCENARIO } from '../src/data/e2Demo';
-import { E2_SIGNOFF_CLOSED, E2_SIGNOFFS } from '../src/data/e2Signoffs';
+import { KESTREL_SCENARIO } from '../src/data/kestrelDemo';
+import { KESTREL_SIGNOFF_CLOSED, KESTREL_SIGNOFFS } from '../src/data/kestrelSignoffs';
 import { EMBEDDED_PROFILE } from '../src/data/embeddedSoc';
 import { RISK_AUTHOR } from '../src/data/riskSeeds';
 import { PrismaClient } from '../src/generated/prisma/client';
@@ -32,7 +32,7 @@ const day = (key: string) => {
 };
 
 async function main() {
-  const demo = buildScenario(E2_SCENARIO, { builtin: EMBEDDED_PROFILE, library: ALL_ACTIVITIES });
+  const demo = buildScenario(KESTREL_SCENARIO, { builtin: EMBEDDED_PROFILE, library: ALL_ACTIVITIES });
   const pid = demo.project.id;
 
   const before = await prisma.project.findUnique({
@@ -43,7 +43,7 @@ async function main() {
 
   await seedScenario(prisma, demo, EMBEDDED_PROFILE.id);
 
-  for (const [ref, payload] of Object.entries(E2_SIGNOFFS)) {
+  for (const [ref, payload] of Object.entries(KESTREL_SIGNOFFS)) {
     const def = signoffDefinition(ref);
     if (!def) throw new Error(`${ref} has no sign-off definition.`);
     await prisma.deliverableSignoff.upsert({
@@ -51,7 +51,7 @@ async function main() {
       create: { id: `${pid}:signoff:${ref}`, projectId: pid, ref, payload: me(payload) },
       update: { payload: me(payload) },
     });
-    const closed = E2_SIGNOFF_CLOSED[ref];
+    const closed = KESTREL_SIGNOFF_CLOSED[ref];
     if (!closed) continue;
     /* the gate's own row: its stage, by title */
     const row = demo.deliverables.find((d) => d.stageId === def.stageKey && d.title === def.title);
@@ -61,7 +61,7 @@ async function main() {
       data: { checklistDoneAt: day(closed), done: true, completedAt: day(closed) },
     });
   }
-  console.log(`Sign-off checklists: ${Object.keys(E2_SIGNOFFS).join(', ')}; closed by checklist: ${Object.keys(E2_SIGNOFF_CLOSED).join(', ')}.`);
+  console.log(`Sign-off checklists: ${Object.keys(KESTREL_SIGNOFFS).join(', ')}; closed by checklist: ${Object.keys(KESTREL_SIGNOFF_CLOSED).join(', ')}.`);
 }
 
 main()

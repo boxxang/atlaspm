@@ -1,8 +1,8 @@
 /**
- * `npx tsx tools/qor-samples/e2.ts [out.xlsx]` — the E2 example's P&R QoR
+ * `npx tsx tools/qor-samples/kestrel.ts [out.xlsx]` — the Kestrel example's P&R QoR
  * workbook, for the QoR Dashboard tab of Embedded_SoC's physical design stage.
  *
- * The numbers are the story's (/data/e2Demo.ts, the "PnR QoR tracker" note):
+ * The numbers are the story's (/data/kestrelDemo.ts, the "PnR QoR tracker" note):
  * Turn 1 on N1, Turn 2 on N2, and the final turn on the FFN — placement,
  * placement with useful skew on the arbiter clock, and the CTS that is under
  * way on 09/27 with four of ten blocks reported. Chip totals roll up to what
@@ -17,7 +17,7 @@ import { parseSheets, type Cell } from '../../src/lib/qor/parse';
 import { rollup } from '../../src/lib/qor/rollup';
 import { SHEET_COLS } from '../../src/lib/qor/schema';
 
-const OUT = process.argv[2] ?? `${process.env.HOME}/Downloads/embedded-soc-e2-qor.xlsx`;
+const OUT = process.argv[2] ?? `${process.env.HOME}/Downloads/embedded-soc-kestrel-qor.xlsx`;
 
 /* ── the design ── */
 
@@ -31,7 +31,7 @@ const BLOCKS: [string, string][] = [
   ['aon_hub', 'Always-on'],
   ['scalar_ctl', 'Control'],
   ['periph_top', 'Peripherals'],
-  ['e2_top', 'Top'],
+  ['kestrel_top', 'Top'],
 ];
 
 const DROPS: [string, string, string][] = [
@@ -42,7 +42,7 @@ const DROPS: [string, string, string][] = [
   ['F3', 'Final — FFN CTS (in progress)', '2026-09-27'],
 ];
 
-/** What E2 is signed off against — a 120 MHz ULP part, not the template's SoC defaults. */
+/** What Kestrel is signed off against — a 120 MHz ULP part, not the template's SoC defaults. */
 const TARGETS: [string, number][] = [
   ['wns', 0], ['tns', 0], ['feps', 0], ['holdW', 0], ['holdTns', 0], ['holdV', 0],
   ['skew', 120], ['maxTran', 0], ['maxCap', 0], ['maxFanout', 0], ['worstTran', 0.45],
@@ -77,7 +77,7 @@ const SHIFT = 'scan_shift';
 /* total power (dynamic + leakage) each block is allowed; 92 mW for the chip */
 const BUDGET: Record<string, number> = {
   fabric_q0: 17, fabric_q1: 17, fabric_q2: 17, fabric_q3: 17, noc_arb: 6,
-  emram_ctrl: 5, aon_hub: 1, scalar_ctl: 4, periph_top: 3, e2_top: 5,
+  emram_ctrl: 5, aon_hub: 1, scalar_ctl: 4, periph_top: 3, kestrel_top: 5,
 };
 
 const b = (name: string, r: Omit<Row, 'budget'>): [string, Row] => [name, { ...r, budget: BUDGET[name] }];
@@ -94,7 +94,7 @@ const DATA: Record<string, [string, Row][]> = {
     b('aon_hub', { stage: 'Post-route opt', inst: 72000, util: 57.6, wns: -12, tns: -0.1, feps: 18, sc: SS_LV, sm: 'aon_32k', holdW: 3, holdTns: 0, holdV: 0, hc: FF, hm: 'aon_32k', skew: 22, maxTran: 3, worstTran: 0.39, maxCap: 0, maxFanout: 0, overflow: 0.2, drc: 12, dyn: 1, leak: 0.62, irS: 9.8, irD: 21.4, runtime: 4.1, ecos: 3, ecoRounds: 1 }),
     b('scalar_ctl', { stage: 'Post-route opt', inst: 119000, util: 65.8, wns: -35, tns: -0.4, feps: 96, sc: SS, sm: FUNC, holdW: -6, holdTns: -0.02, holdV: 31, hc: FF, hm: FUNC, skew: 55, maxTran: 11, worstTran: 0.43, maxCap: 1, maxFanout: 0, overflow: 0.4, drc: 45, dyn: 3, leak: 0.3, irS: 13.7, irD: 49.2, runtime: 7.4, ecos: 12, ecoRounds: 2 }),
     b('periph_top', { stage: 'Post-route opt', inst: 201000, util: 59.7, wns: -22, tns: -0.2, feps: 64, sc: SS, sm: FUNC, holdW: -11, holdTns: -0.05, holdV: 88, hc: FF, hm: SHIFT, skew: 63, maxTran: 14, worstTran: 0.44, maxCap: 3, maxFanout: 1, overflow: 0.3, drc: 38, dyn: 2, leak: 0.5, irS: 11.9, irD: 38.7, runtime: 8.3, ecos: 10, ecoRounds: 1 }),
-    b('e2_top', { stage: 'Post-route opt', inst: 548000, util: 61.2, wns: -61, tns: -0.3, feps: 242, sc: SS, sm: FUNC, holdW: -18, holdTns: -0.09, holdV: 160, hc: FF, hm: SHIFT, skew: 118, maxTran: 36, worstTran: 0.49, maxCap: 8, maxFanout: 3, overflow: 0.8, drc: 135, dyn: 4, leak: 1.1, irS: 16.5, irD: 55.0, runtime: 18.6, ecos: 22, ecoRounds: 2 }),
+    b('kestrel_top', { stage: 'Post-route opt', inst: 548000, util: 61.2, wns: -61, tns: -0.3, feps: 242, sc: SS, sm: FUNC, holdW: -18, holdTns: -0.09, holdV: 160, hc: FF, hm: SHIFT, skew: 118, maxTran: 36, worstTran: 0.49, maxCap: 8, maxFanout: 3, overflow: 0.8, drc: 135, dyn: 4, leak: 1.1, irS: 16.5, irD: 55.0, runtime: 18.6, ecos: 22, ecoRounds: 2 }),
   ],
   /* Turn 2 on N2: close — the fabric's worst paths move to the low-voltage mode;
      the always-on leakage comes down with the HVT swap */
@@ -108,7 +108,7 @@ const DATA: Record<string, [string, Row][]> = {
     b('aon_hub', { stage: 'Post-route opt', inst: 74000, util: 58.0, wns: 6, tns: 0, feps: 0, sc: SS_LV, sm: 'aon_32k', holdW: 4, holdTns: 0, holdV: 0, hc: FF, hm: 'aon_32k', skew: 19, maxTran: 0, worstTran: 0.36, maxCap: 0, maxFanout: 0, overflow: 0.2, drc: 0, dyn: 1, leak: 0.19, irS: 9.5, irD: 20.8, runtime: 4.4, ecos: 5, ecoRounds: 1 }),
     b('scalar_ctl', { stage: 'Post-route opt', inst: 121000, util: 66.0, wns: -2, tns: -0.01, feps: 3, sc: SS, sm: FUNC, holdW: 1, holdTns: 0, holdV: 0, hc: FF, hm: FUNC, skew: 44, maxTran: 0, worstTran: 0.39, maxCap: 0, maxFanout: 0, overflow: 0.3, drc: 4, dyn: 3, leak: 0.3, irS: 13.2, irD: 47.6, runtime: 7.1, ecos: 14, ecoRounds: 2 }),
     b('periph_top', { stage: 'Post-route opt', inst: 205000, util: 60.0, wns: 1, tns: 0, feps: 0, sc: SS, sm: FUNC, holdW: -1, holdTns: 0, holdV: 1, hc: FF, hm: SHIFT, skew: 51, maxTran: 0, worstTran: 0.4, maxCap: 0, maxFanout: 0, overflow: 0.3, drc: 3, dyn: 2, leak: 0.5, irS: 11.6, irD: 37.9, runtime: 8.0, ecos: 12, ecoRounds: 2 }),
-    b('e2_top', { stage: 'Post-route opt', inst: 553000, util: 61.8, wns: -12, tns: -0.16, feps: 21, sc: SS, sm: FUNC, holdW: -5, holdTns: -0.02, holdV: 9, hc: FF, hm: SHIFT, skew: 104, maxTran: 4, worstTran: 0.42, maxCap: 1, maxFanout: 0, overflow: 0.6, drc: 17, dyn: 4, leak: 1.1, irS: 16.1, irD: 53.4, runtime: 17.2, ecos: 31, ecoRounds: 3 }),
+    b('kestrel_top', { stage: 'Post-route opt', inst: 553000, util: 61.8, wns: -12, tns: -0.16, feps: 21, sc: SS, sm: FUNC, holdW: -5, holdTns: -0.02, holdV: 9, hc: FF, hm: SHIFT, skew: 104, maxTran: 4, worstTran: 0.42, maxCap: 1, maxFanout: 0, overflow: 0.6, drc: 17, dyn: 4, leak: 1.1, irS: 16.1, irD: 53.4, runtime: 17.2, ecos: 31, ecoRounds: 3 }),
   ],
   /* the FFN placed: the arbiter fix is the worst timing; W7 vectors find the eMRAM IR.
      DRC from trial detail route, hold from ideal-clock analysis — see Meta */
@@ -122,7 +122,7 @@ const DATA: Record<string, [string, Row][]> = {
     b('aon_hub', { stage: 'Place', inst: 76000, util: 60.0, wns: 4, tns: 0, feps: 0, sc: SS_LV, sm: 'aon_32k', holdW: 3, holdTns: 0, holdV: 0, hc: FF, hm: 'aon_32k', skew: null, maxTran: 2, worstTran: 0.38, maxCap: 0, maxFanout: 0, overflow: 0.2, drc: 0, dyn: 1, leak: 0.19, irS: 9.6, irD: 21.1, runtime: 1.6, ecos: 0, ecoRounds: 0 }),
     b('scalar_ctl', { stage: 'Place', inst: 121000, util: 66.0, wns: -8, tns: -0.05, feps: 14, sc: SS, sm: FUNC, holdW: 1, holdTns: 0, holdV: 0, hc: FF, hm: FUNC, skew: null, maxTran: 9, worstTran: 0.44, maxCap: 1, maxFanout: 0, overflow: 0.3, drc: 6, dyn: 3, leak: 0.3, irS: 13.3, irD: 48.1, runtime: 2.4, ecos: 0, ecoRounds: 0 }),
     b('periph_top', { stage: 'Place', inst: 206000, util: 60.2, wns: -5, tns: -0.02, feps: 9, sc: SS, sm: FUNC, holdW: 0, holdTns: 0, holdV: 0, hc: FF, hm: SHIFT, skew: null, maxTran: 11, worstTran: 0.45, maxCap: 1, maxFanout: 0, overflow: 0.3, drc: 5, dyn: 2, leak: 0.5, irS: 11.7, irD: 38.2, runtime: 2.7, ecos: 0, ecoRounds: 0 }),
-    b('e2_top', { stage: 'Place', inst: 582000, util: 62.3, wns: -19, tns: -0.13, feps: 25, sc: SS, sm: FUNC, holdW: -1, holdTns: 0, holdV: 2, hc: FF, hm: SHIFT, skew: null, maxTran: 52, worstTran: 0.55, maxCap: 11, maxFanout: 2, overflow: 0.7, drc: 29, dyn: 4, leak: 1.1, irS: 16.3, irD: 54.2, runtime: 5.8, ecos: 0, ecoRounds: 0 }),
+    b('kestrel_top', { stage: 'Place', inst: 582000, util: 62.3, wns: -19, tns: -0.13, feps: 25, sc: SS, sm: FUNC, holdW: -1, holdTns: 0, holdV: 2, hc: FF, hm: SHIFT, skew: null, maxTran: 52, worstTran: 0.55, maxCap: 11, maxFanout: 2, overflow: 0.7, drc: 29, dyn: 4, leak: 1.1, irS: 16.3, irD: 54.2, runtime: 5.8, ecos: 0, ecoRounds: 0 }),
   ],
   /* useful skew on the arbiter clock, pipeline-aware placement; first PDN mitigation over banks 2–3 */
   F2: [
@@ -135,7 +135,7 @@ const DATA: Record<string, [string, Row][]> = {
     b('aon_hub', { stage: 'Place', inst: 76000, util: 60.0, wns: 5, tns: 0, feps: 0, sc: SS_LV, sm: 'aon_32k', holdW: 3, holdTns: 0, holdV: 0, hc: FF, hm: 'aon_32k', skew: null, maxTran: 1, worstTran: 0.37, maxCap: 0, maxFanout: 0, overflow: 0.2, drc: 0, dyn: 1, leak: 0.2, irS: 9.6, irD: 21.0, runtime: 1.7, ecos: 0, ecoRounds: 0 }),
     b('scalar_ctl', { stage: 'Place', inst: 121000, util: 66.0, wns: -4, tns: -0.02, feps: 6, sc: SS, sm: FUNC, holdW: 1, holdTns: 0, holdV: 0, hc: FF, hm: FUNC, skew: null, maxTran: 5, worstTran: 0.42, maxCap: 0, maxFanout: 0, overflow: 0.3, drc: 5, dyn: 3, leak: 0.3, irS: 13.2, irD: 47.8, runtime: 2.6, ecos: 0, ecoRounds: 0 }),
     b('periph_top', { stage: 'Place', inst: 206000, util: 60.2, wns: -3, tns: -0.01, feps: 4, sc: SS, sm: FUNC, holdW: 0, holdTns: 0, holdV: 0, hc: FF, hm: SHIFT, skew: null, maxTran: 6, worstTran: 0.43, maxCap: 0, maxFanout: 0, overflow: 0.3, drc: 4, dyn: 2, leak: 0.5, irS: 11.6, irD: 38.0, runtime: 2.9, ecos: 0, ecoRounds: 0 }),
-    b('e2_top', { stage: 'Place', inst: 582000, util: 62.3, wns: -10, tns: -0.11, feps: 24, sc: SS, sm: FUNC, holdW: -1, holdTns: 0, holdV: 2, hc: FF, hm: SHIFT, skew: null, maxTran: 33, worstTran: 0.5, maxCap: 7, maxFanout: 1, overflow: 0.7, drc: 26, dyn: 4, leak: 1.1, irS: 16.2, irD: 53.9, runtime: 6.3, ecos: 0, ecoRounds: 0 }),
+    b('kestrel_top', { stage: 'Place', inst: 582000, util: 62.3, wns: -10, tns: -0.11, feps: 24, sc: SS, sm: FUNC, holdW: -1, holdTns: 0, holdV: 2, hc: FF, hm: SHIFT, skew: null, maxTran: 33, worstTran: 0.5, maxCap: 7, maxFanout: 1, overflow: 0.7, drc: 26, dyn: 4, leak: 1.1, irS: 16.2, irD: 53.9, runtime: 6.3, ecos: 0, ecoRounds: 0 }),
   ],
   /* final CTS, four blocks back so far: hold opens up as it always does before hold fixing */
   F3: [
@@ -171,8 +171,8 @@ const SHEETS: [string, Cell[][]][] = [
     ['Key', 'Value'],
     ['Template version', 1],
     ['Slack unit', 'ps'],
-    ['Programme', 'Embedded_SoC (E2)'],
-    ['Design', 'e2_top'],
+    ['Programme', 'Embedded_SoC (Kestrel)'],
+    ['Design', 'kestrel_top'],
     ['Process', '22 nm ULL + eMRAM, 9-track libraries'],
     ['Clocks', 'fabric 120 MHz @ 0.8 V (func_120m); 40 MHz @ 0.6 V (func_lv40m); AON 32 kHz'],
     ['Setup signoff corners', 'ssg_0p72v_m40c (func_120m), ssg_0p54v_m40c (func_lv40m, aon_32k)'],
@@ -184,7 +184,7 @@ const SHEETS: [string, Cell[][]][] = [
     ['F3 (CTS in progress)', '4 of 10 blocks through final CTS on 09/27; hold before hold fixing'],
     ['Generated at', '2026-09-27 18:40'],
     ['Generated by', 'pnr_qor_report.tcl v2.3'],
-    ['Run directory', '/proj/e2/pd/final'],
+    ['Run directory', '/proj/kestrel/pd/final'],
   ]],
   ['Blocks', [['Block', 'Group'], ...BLOCKS]],
   ['Drops', [['Drop', 'Label', 'Date'], ...DROPS]],
@@ -194,7 +194,7 @@ const SHEETS: [string, Cell[][]][] = [
 
 /* ── check it with the dashboard's own parser, then write it ── */
 
-const parsed = parseSheets(Object.fromEntries(SHEETS), 'embedded-soc-e2-qor.xlsx');
+const parsed = parseSheets(Object.fromEntries(SHEETS), 'embedded-soc-kestrel-qor.xlsx');
 /* the one thing it may say: placement has no clock trees, so F1 and F2 report no skew */
 const unexpected = parsed.warn.filter((w) => !/^F[12]: 10 values blank/.test(w));
 if (unexpected.length) throw new Error(`The dashboard would warn:\n${unexpected.join('\n')}`);
