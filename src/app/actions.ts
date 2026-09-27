@@ -8,6 +8,7 @@ import type { ItemKind, ScheduleProfile, StageBaseline, StageId } from '@/data/t
 import { pickStages } from '@/lib/customProfile';
 import { copyActivities as copyProfileActivities } from '@/lib/profileCopy';
 import { prisma } from '@/lib/db';
+import { signoffInApp } from '@/data/deliverableTemplates';
 import { assertPrefixes, normalizePrefix, refRenames } from '@/lib/profileEdit';
 import { DB_KIND } from '@/lib/projectState';
 import { parseNoteDoc } from '@/lib/noteDoc';
@@ -1280,6 +1281,29 @@ export async function clearQorDataset(projectId: string, stageId: StageId) {
   const pid = await assertProject(projectId);
   await prisma.qorDataset.deleteMany({ where: { projectId: pid, stageId } });
   touch(projectId);
+}
+
+/* ---------- deliverable sign-off ---------- */
+
+/**
+ * Stores a gate's in-app sign-off: the checklist entries, issues, waivers and
+ * decisions as one JSON document. Parsed rather than trusted, and bounded, as
+ * the QoR dataset is — a server action is reachable by direct POST.
+ */
+const MAX_SIGNOFF_BYTES = 1024 * 1024;
+
+export async function saveSignoff(projectId: string, ref: string, payload: string) {
+  const pid = await assertProject(projectId);
+  if (!signoffInApp(ref)) throw new Error(`${ref} has no in-app sign-off.`);
+  if (payload.length > MAX_SIGNOFF_BYTES) throw new Error('That sign-off is too large to store.');
+  const parsed: unknown = JSON.parse(payload);
+  if (!parsed || typeof parsed !== 'object' || (parsed as { v?: number }).v !== 1)
+    throw new Error('That is not a sign-off this version can read.');
+  await prisma.deliverableSignoff.upsert({
+    where: { projectId_ref: { projectId: pid, ref } },
+    create: { id: `${pid}:signoff:${ref}`, projectId: pid, ref, payload },
+    update: { payload },
+  });
 }
 
 /* ---------- attachments ---------- */

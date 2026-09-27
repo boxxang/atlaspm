@@ -165,6 +165,14 @@ export const IconDownload = ({ size = 12 }: { size?: number }) => (
   </S>
 );
 
+/** A list with its items ticked — what a gate is confirmed on. */
+export const IconChecklist = ({ size = 12 }: { size?: number }) => (
+  <S size={size}>
+    <path d="M10 6h10M10 12h10M10 18h10" />
+    <path d="M3.5 6l1.5 1.5L7.5 5M3.5 12l1.5 1.5L7.5 11M3.5 18l1.5 1.5L7.5 17" />
+  </S>
+);
+
 export const IconUpload = ({ size = 12 }: { size?: number }) => (
   <S size={size} width={2}>
     <path d="M12 17V5" />

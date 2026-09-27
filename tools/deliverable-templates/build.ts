@@ -25,209 +25,9 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import ExcelJS from 'exceljs';
-import { ALL_ACTIVITIES, ALL_ACTIVITY_TITLES, ALL_DELIVERABLE_TITLES } from '../../src/data/builtins';
+import { signoffDefinition } from '../../src/lib/signoffDefinition';
+import { SIGNOFF_SPECS } from '../../src/data/deliverableSignoffSpecs';
 import { DELIVERABLE_TEMPLATES } from '../../src/data/deliverableTemplates';
-import { EMBEDDED_PROFILE } from '../../src/data/embeddedSoc';
-import { embeddedDetail } from '../../src/data/embeddedSocDetails';
-import { deliverableStep, producersOf } from '../../src/lib/deliverableStatus';
-
-/* ---------- what only the templates say ---------- */
-
-interface Spec {
-  /** What the signoff is taken against: each a row to name a version or tag. */
-  baseline: string[];
-  /** The checks recorded, each [check, target or limit]. */
-  checks: [string, string][];
-  /** A section only this deliverable carries. */
-  extra?: { heading: string; intro: string; columns: string[]; rows: number };
-}
-
-const SPECS: Record<string, Spec> = {
-  'MRAM-D7': {
-    baseline: [
-      'eMRAM macro view release (vendor version)',
-      'PDK and eMRAM module rule version',
-      'Placement database and turn signed off on',
-      'IR / EM analysis run ID and corner set',
-      'Controller, ECC and trim configuration (MRAM-D2 version)',
-    ],
-    checks: [
-      ['Macro pin timing — setup and hold, all signoff corners', 'Within vendor limits, no negative slack'],
-      ['Static IR drop at the macro supply pins', 'Below the vendor limit'],
-      ['Dynamic IR drop during write', 'Below the vendor limit at the write corner'],
-      ['Electromigration on the write supply', 'Clean at the hot corner'],
-      ['Keep-out and placement rules around the macro', 'No violations'],
-      ['Magnetic immunity guidance carried into customer documentation (MRAM-D4)', 'Referenced in the datasheet draft'],
-      ['Test, repair and trim flow consistent with the integrated configuration (MRAM-D6)', 'Aligned'],
-    ],
-    extra: {
-      heading: 'Conditions for reopening',
-      intro: 'A trial layout is not the final one. List what change to the database reopens this signoff.',
-      columns: ['Trigger', 'What is re-checked', 'Owner'],
-      rows: 3,
-    },
-  },
-  'PMU-D7': {
-    baseline: [
-      'Analog macro view release (regulators, POR/BOR, oscillators, PLL)',
-      'Top-level database and run signed off on',
-      'ESD / latch-up rule deck version',
-      'Energy budget version (PMU-D6)',
-    ],
-    checks: [
-      ['ESD on every supply pin — HBM and CDM', 'Meets the pin classification target'],
-      ['Latch-up spacing around the regulators and I/O', 'No violations'],
-      ['Electromigration on regulator outputs and supply straps', 'Clean at the hot corner'],
-      ['Analog macros clean in top-level DRC and LVS', 'Zero errors or waived'],
-      ['POR and brown-out thresholds in context', 'Match the power architecture specification'],
-      ['Regulator line and load response across 1.8–5.5 V in context', 'Within specification'],
-      ['Sleep and deep-sleep current estimate after integration', 'Within the PMU-D6 budget'],
-      ['Oscillator placement and noise isolation', 'Per layout guidance'],
-    ],
-    extra: {
-      heading: 'Conditions for reopening',
-      intro: 'The first top-level runs are not the final ones. List what change reopens this signoff.',
-      columns: ['Trigger', 'What is re-checked', 'Owner'],
-      rows: 3,
-    },
-  },
-  'EDFT-D7': {
-    baseline: [
-      'Gate-level netlist and SDF version',
-      'Pattern set release (stuck-at, transition, cell-aware, MBIST)',
-      'Target ATE platform and timing set',
-      'Tester memory depth assumed',
-    ],
-    checks: [
-      ['Stuck-at coverage', 'At or above the EDFT-D1 target'],
-      ['Transition (at-speed) coverage', 'At or above the EDFT-D1 target'],
-      ['Cell-aware coverage', 'At or above the EDFT-D1 target'],
-      ['MBIST — SRAM and eMRAM algorithms, repair and trim paths', 'All memories covered and validated'],
-      ['Zero-delay gate-level pattern simulation', 'All sets pass'],
-      ['SDF-annotated pattern simulation at the signoff corners', 'All sets pass'],
-      ['STIL / WGL conversion validated on the ATE', 'Loads and runs with the target timing set'],
-      ['Pattern volume against tester memory', 'Fits with margin'],
-      ['Test time against the ETEST-D6 budget', 'Within budget'],
-      ['JTAG / IJTAG description files (BSDL, ICL, PDL)', 'Validated'],
-    ],
-  },
-  'ERTL-D7': {
-    baseline: [
-      'RTL release tag (block and top level)',
-      'IP version manifest (ERTL-D4)',
-      'UPF power intent version',
-      'Register map / RDL version',
-      'Boot ROM image frozen for tapeout (SDK-D1)',
-    ],
-    checks: [
-      ['Every block tagged in the release', 'All blocks'],
-      ['Lint, CDC and RDC', 'Clean, with every waiver signed'],
-      ['Trial synthesis QoR against the block budgets', 'Within budget or dispositioned'],
-      ['Open change requests', 'None open, or each deferred with an owner'],
-      ['Verification status at freeze (EDV)', 'Stated, with the remaining holes listed'],
-      ['IP deliveries final', 'All IP at its final version'],
-      ['UPF consistent with the RTL', 'Checked'],
-    ],
-    extra: {
-      heading: 'Post-freeze exception policy',
-      intro: 'After freeze, a change is admitted only through this policy. State who approves and on what evidence.',
-      columns: ['Change class', 'Admission rule', 'Approver'],
-      rows: 3,
-    },
-  },
-  'EDV-D7': {
-    baseline: [
-      'RTL release verified (tag)',
-      'Regression suite version and tier',
-      'Merged coverage database ID',
-      'Verification plan version (EDV-D1)',
-    ],
-    checks: [
-      ['Functional coverage, per block and chip level', 'At or above the vPlan target'],
-      ['Code coverage — line, branch, toggle, FSM', 'At or above target, every hole analysed'],
-      ['Assertion coverage', 'At or above target'],
-      ['Formal proofs', 'All proven or bounded with the bound stated'],
-      ['Low-power — every sleep mode, retention and wake source', 'All scenarios passing'],
-      ['Gate-level simulation', 'Passing, X-propagation clean'],
-      ['Regression pass rate and flake rate', 'Stable over the last three weeks'],
-      ['Open bugs by severity', 'No open critical or high'],
-      ['Coverage trend over the last four weeks', 'Flat — not still climbing'],
-    ],
-  },
-  'FPV-D6': {
-    baseline: [
-      'Final RTL tag including every ECO',
-      'FPGA image ID built from that tag',
-      'Test list version (FPV-D1)',
-      'Compiler and SDK versions used',
-    ],
-    checks: [
-      ['Full regression on the tapeout RTL', 'All tests run'],
-      ['Test list pass rate', 'At or above the exit criterion'],
-      ['Peripheral interoperability with real devices and shields', 'Pass'],
-      ['Boot paths — eMRAM, UART, SPI flash, JTAG, secure boot', 'Pass'],
-      ['Compiled workloads against the simulator', 'Results match'],
-      ['Soak and stability run', 'Hours met without failure'],
-      ['SDK driver and RTOS regression', 'Pass'],
-      ['Open FPGA bugs', 'Each fixed, or waived with a workaround and owner'],
-    ],
-    extra: {
-      heading: 'What the prototype could not show',
-      intro: 'Restate the blind spots from FPV-D2 and who covers each — power gating, analog behaviour, silicon timing.',
-      columns: ['Blind spot', 'Covered by', 'Owner'],
-      rows: 3,
-    },
-  },
-  'EPD-D8': {
-    baseline: [
-      'FFN tag the database is built from',
-      'Database version and handoff directory',
-      'SDC and UPF versions',
-      'PDK, library and signoff deck versions',
-    ],
-    checks: [
-      ['Setup and hold timing across all corners and modes', 'WNS ≥ 0, TNS reported'],
-      ['Block models correlated against flat analysis', 'Within the agreed tolerance'],
-      ['DRC, LVS and antenna', 'Clean or waived'],
-      ['Static and dynamic IR drop', 'Within budget'],
-      ['Electromigration — power and signal', 'Clean at the hot corner'],
-      ['Scan chains verified after reordering', 'All chains pass'],
-      ['Fill and density', 'Compliant'],
-      ['eMRAM, PMU and oscillator macro placement against vendor rules', 'Compliant'],
-      ['ECO log reconciled with the netlist', 'Reconciled'],
-    ],
-    extra: {
-      heading: 'Handoff file list',
-      intro: 'Every file signoff and tapeout will read, with its version and checksum.',
-      columns: ['File (GDS/OASIS, netlist, SPEF, SDF, UPF, …)', 'Version', 'Checksum'],
-      rows: 6,
-    },
-  },
-  'ESO-D7': {
-    baseline: [
-      'Final database signed off (version and checksum)',
-      'Signoff deck versions per domain',
-      'Foundry waiver submission references',
-    ],
-    checks: [
-      ['Static timing — all corners and modes', 'Signed off'],
-      ['DRC, LVS, antenna and density', 'Clean or waived'],
-      ['EM / IR', 'Signed off'],
-      ['ESD, latch-up and FIT', 'Signed off'],
-      ['DFM and lithography hotspots', 'Signed off'],
-      ['Signal integrity', 'Signed off'],
-      ['Final formal equivalence', 'Equivalent'],
-      ['Gate-level simulation with final SDF', 'Passing'],
-      ['Leakage and sleep current against the budget', 'Within budget'],
-    ],
-    extra: {
-      heading: 'Residual risk statement',
-      intro: 'One statement for the gate: what risk the design is frozen with, and why it is accepted.',
-      columns: ['Residual risk', 'Accepted because', 'Owner'],
-      rows: 3,
-    },
-  },
-};
 
 /* ---------- the workbook ---------- */
 
@@ -249,12 +49,6 @@ const ROLE_DECISION = ['Approve', 'Approve with conditions', 'Reject'];
 const SEVERITY = ['Critical', 'High', 'Medium', 'Low'];
 const ISSUE_STATUS = ['Open', 'Closed'];
 
-const strip = (s: string) =>
-  s
-    .replace(/<\/?(b|code)>/g, '')
-    .replace(/&amp;/g, '&')
-    .replace(/&lt;/g, '<')
-    .replace(/&gt;/g, '>');
 
 type Sheet = ExcelJS.Worksheet;
 type Cell = ExcelJS.Cell;
@@ -336,44 +130,15 @@ const landscape = (ws: Sheet) => {
 
 /* ---------- one workbook ---------- */
 
-const producers = producersOf(ALL_ACTIVITIES);
-const stageTitle = (key: string) => EMBEDDED_PROFILE.stages.find((s) => s.key === key)?.title ?? key;
-
-interface Item {
-  id: string;
-  section: string;
-  item: string;
-  target: string;
-}
-
 const ISSUE_ROWS = 40;
 const WAIVER_ROWS = 30;
 const SPARE_ROWS = 10;
 
 async function build(ref: string): Promise<ExcelJS.Workbook> {
-  const spec = SPECS[ref];
-  if (!spec) throw new Error(`no template spec for ${ref}`);
-  const step = deliverableStep(ref, producers);
-  if (!step) throw new Error(`${ref} has no producing activity`);
-  const act = step.act;
-  const a = ALL_ACTIVITIES[act];
-  const w = embeddedDetail(act);
-  if (!w) throw new Error(`${act} has no write-up`);
-  const title = ALL_DELIVERABLE_TITLES[ref];
-  const pad = (n: number) => String(n).padStart(2, '0');
-
-  const items: Item[] = [
-    ...spec.baseline.map((b, i) => ({ id: `B-${pad(i + 1)}`, section: 'Baseline', item: b, target: 'Version, tag or ID recorded' })),
-    ...w.entry.map((e, i) => ({ id: `E-${pad(i + 1)}`, section: 'Entry criteria', item: strip(e), target: 'Met' })),
-    ...spec.checks.map(([c, t], i) => ({ id: `C-${pad(i + 1)}`, section: 'Checks', item: c, target: t })),
-    ...w.exit.map((e, i) => ({ id: `X-${pad(i + 1)}`, section: 'Exit criteria', item: strip(e), target: 'Met' })),
-    ...w.risks.map((r, i) => ({
-      id: `F-${pad(i + 1)}`,
-      section: 'Failure modes',
-      item: strip(r),
-      target: 'Addressed — say how in the result',
-    })),
-  ];
+  const def = signoffDefinition(ref);
+  if (!def) throw new Error(`no sign-off definition for ${ref}`);
+  const { items, title, act, actTitle } = def;
+  const spec = { extra: def.extra };
 
   const wb = new ExcelJS.Workbook();
   wb.creator = 'AtlasPM';
@@ -492,24 +257,17 @@ async function build(ref: string): Promise<ExcelJS.Workbook> {
   titled(handover, 'Handover', `Who receives ${ref}, and what they take from it. The receiving owner records receipt.`, HO.length);
   header(handover, 3, HO);
   setWidths(handover, [46, 46, 20, 12]);
-  w.feedsInto.forEach((f, i) => {
-    const r = 4 + i;
-    const c = handover.getCell(r, 1);
-    c.value = `${f} — ${ALL_ACTIVITY_TITLES[f] ?? ''}`;
-    style(c, { fill: GIVEN_FILL });
-    c.border = boxed;
-  });
-  register(handover, 4, w.feedsInto.length, [{}, {}, {}, { date: true }].map((x, i) => (i === 0 ? {} : x)));
-  w.feedsInto.forEach((f, i) => {
+  register(handover, 4, def.receivers.length, [{}, {}, {}, { date: true }]);
+  def.receivers.forEach((f, i) => {
     const c = handover.getCell(4 + i, 1);
-    c.value = `${f} — ${ALL_ACTIVITY_TITLES[f] ?? ''}`;
+    c.value = `${f.ref} — ${f.title}`;
     style(c, { fill: GIVEN_FILL });
   });
   landscape(handover);
 
   /* ----- Sign-off ----- */
   setWidths(signoff, [34, 22, 20, 18, 30]);
-  titled(signoff, `${ref} — ${title}`, `Sign-off for ${ref}, produced by ${act} ${ALL_ACTIVITY_TITLES[act]}. Work through the Checklist first; this sheet counts it. See Guide for how to use the workbook.`, 5);
+  titled(signoff, `${ref} — ${title}`, `Sign-off for ${ref}, produced by ${act} ${actTitle}. Work through the Checklist first; this sheet counts it. See Guide for how to use the workbook.`, 5);
   let r = 4;
   const section = (t: string) => {
     signoff.mergeCells(r, 1, r, 5);
@@ -540,9 +298,9 @@ async function build(ref: string): Promise<ExcelJS.Workbook> {
   section('Document control');
   row('Programme', '', { input: true });
   row('Deliverable', `${ref} — ${title}`);
-  row('Stage', stageTitle(a.st));
-  row('Producing activity', `${act} — ${ALL_ACTIVITY_TITLES[act]}`);
-  row('Activity owner', a.ro);
+  row('Stage', def.stageTitle);
+  row('Producing activity', `${act} — ${actTitle}`);
+  row('Activity owner', def.owner);
   row('Version', '', { input: true });
   row('Date issued for review', '', { input: true, date: true });
   r++;
@@ -621,9 +379,9 @@ async function build(ref: string): Promise<ExcelJS.Workbook> {
     c.border = boxed;
   });
   r++;
-  for (const role of w.roles) {
+  for (const role of def.roles) {
     const c = signoff.getCell(r, 1);
-    c.value = role.r;
+    c.value = role;
     style(c, { fill: GIVEN_FILL });
     c.border = boxed;
     for (let k = 2; k <= 5; k++) {
@@ -687,7 +445,7 @@ async function build(ref: string): Promise<ExcelJS.Workbook> {
 /* ---------- write them ---------- */
 
 async function main() {
-  for (const ref of Object.keys(SPECS)) {
+  for (const ref of Object.keys(SIGNOFF_SPECS)) {
     if (!DELIVERABLE_TEMPLATES[ref]) throw new Error(`${ref} has a spec but is not listed in deliverableTemplates.ts`);
   }
   const out = path.join(process.cwd(), 'public');

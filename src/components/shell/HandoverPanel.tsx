@@ -10,9 +10,9 @@ import { deliverableStep, handoverComplete, producersOf } from '@/lib/deliverabl
 import type { ProgramPost } from '@/lib/projectState';
 import { fmtDate, fmtDT, fromISO, toISO } from '@/lib/schedule';
 import { uid, useAppStore } from '@/store/useAppStore';
-import { templateFor } from '@/data/deliverableTemplates';
+import { signoffInApp, templateFor } from '@/data/deliverableTemplates';
 import { DeliverableDecisions } from '../meetings/MeetingSource';
-import { Avatar, IconDownload, IconFile, IconPlus } from './icons';
+import { Avatar, IconChecklist, IconDownload, IconFile, IconPlus } from './icons';
 import { useDeliverableRefs } from './useDeliverableRefs';
 
 /**
@@ -128,6 +128,17 @@ export function HandoverPanel({
         <div className="notecard-hd">
           {ref && <span className="ref">{ref}</span>}
           <span className="cap">Handover</span>
+          {signoffInApp(ref) && (
+            <Link
+              className="tpl-dl"
+              href={`/p/${projectId}/signoff/${ref}`}
+              title={`Confirm ${ref} item by item in AtlasPM`}
+              aria-label={`Open the ${ref} sign-off checklist`}
+              data-signoff-open={ref}
+            >
+              <IconChecklist size={13} />
+            </Link>
+          )}
           {template && (
             <a
               className="tpl-dl"

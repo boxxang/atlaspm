@@ -161,6 +161,69 @@ test.describe('the Embedded SoC template', () => {
     await expect(page.locator('[data-template-download]')).toHaveCount(0);
   });
 
+  /* ESO-D7 is confirmed in the app as well as in the workbook: the same
+     items, the same rules, saved as it is typed. */
+  test('confirms ESO-D7 item by item in the app', async ({ page }) => {
+    const id = await newProgram(page, 'AtlasEdge8');
+
+    await page.goto(`/p/${id}/stage/signoffEmb/deliverables`);
+    await page.locator('[data-board] [data-deliverable]').filter({ hasText: 'ESO-D7' }).click();
+    const card = page.locator('[data-handover]');
+    /* the checklist sits left of the workbook download */
+    const icons = card.locator('.notecard-hd .tpl-dl');
+    await expect(icons).toHaveCount(2);
+    await expect(icons.first()).toHaveAttribute('data-signoff-open', 'ESO-D7');
+    await icons.first().click();
+    await page.waitForURL(/\/signoff\/ESO-D7$/);
+
+    const board = page.locator('[data-signoff="ESO-D7"]');
+    await expect(board.locator('[data-item]')).toHaveCount(23);
+    await expect(board.locator('[data-outcome]')).toHaveText('In review');
+
+    /* a confirmation without evidence is flagged, and clears when it has some */
+    await board.getByLabel('C-01 owner status').selectOption('Pass');
+    await board.getByLabel('C-01 stage lead confirmation').selectOption('Confirmed');
+    await expect(board.locator('[data-item="C-01"] [data-flag]')).toHaveText('Evidence missing');
+    await expect(board.locator('[data-flagged]')).toHaveText('1');
+    await board.locator('[data-item="C-01"]').click();
+    await board.locator('[data-edit="C-01"]').getByLabel('Evidence — link or file name').fill('sta/final/signoff_summary.rpt');
+    await expect(board.locator('[data-item="C-01"] [data-flag]')).toHaveText('');
+    await expect(board.locator('[data-confirmed]')).toHaveText('1 / 23');
+
+    /* a waiver ID that names no waiver is flagged until the waiver exists */
+    await board.getByLabel('C-02 owner status').selectOption('Waived');
+    await board.locator('[data-item="C-02"]').click();
+    await board.locator('[data-edit="C-02"]').getByLabel(/Waiver ID/).fill('W-01');
+    await expect(board.locator('[data-item="C-02"] [data-flag]')).toHaveText('Waiver not found');
+    await board.locator('[data-so-tab="waivers"]').click();
+    await board.locator('[data-add="waiver"]').click();
+    await expect(board.locator('[data-row="W-01"]')).toBeVisible();
+    await board.locator('[data-so-tab="checklist"]').click();
+    await expect(board.locator('[data-item="C-02"] [data-flag]')).toHaveText('');
+
+    /* signing off against the counts is allowed, and called out */
+    await board.locator('[data-so-tab="signoff"]').click();
+    await board.getByLabel('Final decision').selectOption('Signed off');
+    await expect(board.locator('[data-warning]')).toContainText('not ready');
+
+    /* it was saved as it was typed */
+    await expect(page.locator('.so-save')).toHaveText('Saved');
+    await page.reload();
+    await expect(page.locator('[data-signoff="ESO-D7"] [data-confirmed]')).toHaveText('1 / 23');
+    await expect(page.locator('[data-signoff="ESO-D7"] [data-item="C-02"] [data-flag]')).toHaveText('');
+  });
+
+  test('offers the in-app checklist on ESO-D7 only, for now', async ({ page }) => {
+    const id = await newProgram(page, 'AtlasEdge9');
+    await page.goto(`/p/${id}/stage/verificationEmb/deliverables`);
+    await page.locator('[data-board] [data-deliverable]').filter({ hasText: 'EDV-D7' }).click();
+    await expect(page.locator('[data-handover] [data-template-download="EDV-D7"]')).toBeVisible();
+    await expect(page.locator('[data-handover] [data-signoff-open]')).toHaveCount(0);
+    await page.goto(`/p/${id}/signoff/EDV-D7`);
+    await expect(page.getByText(/could not be found|404/i).first()).toBeVisible();
+    await expect(page.locator('[data-signoff]')).toHaveCount(0);
+  });
+
   test('cuts down its own stages, not the SoC flow’s', async ({ page }) => {
     await page.goto('/');
     await page.locator('[data-new-project]').click();

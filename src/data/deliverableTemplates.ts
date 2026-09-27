@@ -37,3 +37,12 @@ export const DELIVERABLE_TEMPLATES: Record<string, DeliverableTemplate> = {
 
 export const templateFor = (ref: string | null | undefined): DeliverableTemplate | undefined =>
   ref ? DELIVERABLE_TEMPLATES[ref] : undefined;
+
+/**
+ * The gates that can be confirmed in the app as well as in the workbook.
+ * ESO-D7 alone while the in-app sign-off is tried; the others follow once it
+ * has been.
+ */
+const IN_APP = new Set(['ESO-D7']);
+
+export const signoffInApp = (ref: string | null | undefined): boolean => !!ref && IN_APP.has(ref);

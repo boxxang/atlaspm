@@ -150,6 +150,7 @@ model Project {
   contacts     Contact[]
   stageDetails StageDetail[]
   qorDatasets  QorDataset[]
+  signoffs     DeliverableSignoff[]
   posts        Post[]
   stepStates   StepState[]
   attachments  Attachment[]
@@ -439,6 +440,26 @@ model QorDataset {
   project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
 
   @@unique([projectId, stageId])
+}
+
+/// A gate deliverable confirmed item by item in the app — what the owners
+/// recorded against each checklist item, the stage lead's confirmations, the
+/// issues, waivers and final decision. One JSON document per deliverable, as
+/// QorDataset holds its workbook: /lib/signoff.ts reads it, and the items it is
+/// recorded against are code (/data/deliverableSignoff.ts), not rows.
+/// Keyed by the deliverable's reference (ESO-D7), which is how the gate is
+/// named on every screen.
+model DeliverableSignoff {
+  id        String   @id
+  projectId String
+  ref       String
+  /// SignoffState from /lib/signoff.ts, JSON.stringify'd
+  payload   String
+  updatedAt DateTime @updatedAt
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@unique([projectId, ref])
 }
 
 model Leader {
