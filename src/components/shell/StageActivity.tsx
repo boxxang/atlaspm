@@ -432,7 +432,8 @@ function StatusPill({ step, late, today }: { step: ResolvedStep; late: boolean; 
         Overdue
       </span>
     );
-  if (today >= step.start)
+  /* started by the calendar, or by somebody recording progress on it early */
+  if (step.pct > 0 || today >= step.start)
     return (
       <span className="pill acc" style={{ fontSize: 10.5 }}>
         In progress

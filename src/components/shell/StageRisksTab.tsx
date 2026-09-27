@@ -141,7 +141,7 @@ export function StageRisksTab({
                       ? 'Completed'
                       : late
                         ? 'Overdue'
-                        : today >= step.start
+                        : step.pct > 0 || today >= step.start
                           ? 'In progress'
                           : 'Not started'}
                 </span>

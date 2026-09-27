@@ -162,7 +162,7 @@ export function StepPanel({ act, n, projectId }: { act: string; n: number; proje
             <span className="pill risk" style={{ fontSize: 10.5 }}>
               Overdue
             </span>
-          ) : today >= step.start ? (
+          ) : step.pct > 0 || today >= step.start ? (
             <span className="pill acc" style={{ fontSize: 10.5 }}>
               In progress
             </span>
