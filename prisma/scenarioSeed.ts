@@ -17,29 +17,40 @@ import { ensureBuiltinProfile } from '../src/lib/builtinProfile';
 import { copyActivities } from '../src/lib/profileCopy';
 import type { ScenarioDemo } from '../src/lib/scenario';
 
-export async function seedScenario(prisma: PrismaClient, demo: ScenarioDemo): Promise<void> {
+export async function seedScenario(
+  prisma: PrismaClient,
+  demo: ScenarioDemo,
+  /** the built-in template the scenario's is copied from */
+  builtinId: string = BUILTIN_PROFILE.id,
+): Promise<void> {
   const { template, project } = demo;
+  /* a program started straight from the built-in copies it, and writes no template */
+  const source = template.create ? template.id : builtinId;
   const privateProfileId = `${project.id}:stages`;
   const stageKeys = template.stages.map((s) => s.key);
 
   await ensureBuiltinProfile(prisma);
 
-  /* the name is how templates are told apart */
-  const templates = await prisma.profile.findMany({ where: { template: true }, select: { id: true, name: true } });
-  const clash = templates.find(
-    (p) => p.id !== template.id && p.name.trim().toLocaleLowerCase() === template.name.toLocaleLowerCase(),
-  );
-  if (clash) throw new Error(`A template called "${template.name}" already exists (${clash.id}).`);
+  if (template.create) {
+    /* the name is how templates are told apart */
+    const templates = await prisma.profile.findMany({ where: { template: true }, select: { id: true, name: true } });
+    const clash = templates.find(
+      (p) => p.id !== template.id && p.name.trim().toLocaleLowerCase() === template.name.toLocaleLowerCase(),
+    );
+    if (clash) throw new Error(`A template called "${template.name}" already exists (${clash.id}).`);
 
-  const others = await prisma.project.count({ where: { profileId: template.id, id: { not: project.id } } });
-  if (others) throw new Error(`${others} other program(s) run on ${template.id}; not replacing it.`);
+    const others = await prisma.project.count({ where: { profileId: template.id, id: { not: project.id } } });
+    if (others) throw new Error(`${others} other program(s) run on ${template.id}; not replacing it.`);
+  }
 
   /* ---- the previous run, if any ---- */
   if (await prisma.project.findUnique({ where: { id: project.id }, select: { id: true } })) {
     await prisma.project.delete({ where: { id: project.id } });
     console.log(`Removed the previous ${project.name}.`);
   }
-  await prisma.profile.deleteMany({ where: { id: { in: [privateProfileId, template.id] } } });
+  await prisma.profile.deleteMany({
+    where: { id: { in: template.create ? [privateProfileId, template.id] : [privateProfileId] } },
+  });
 
   /* ---- the template: a copy of the built-in one, re-staged ---- */
   const stageRows = (profileId: string) =>
@@ -55,17 +66,19 @@ export async function seedScenario(prisma: PrismaClient, demo: ScenarioDemo): Pr
       durationWeeks: st.durationWeeks,
     }));
 
-  await prisma.profile.create({
-    data: { id: template.id, name: template.name, builtin: false, template: true, stages: { create: stageRows(template.id) } },
-  });
-  await copyActivities(prisma, BUILTIN_PROFILE.id, template.id);
-  /* the activities of the stages it dropped go with them */
-  await prisma.profileActivity.deleteMany({ where: { profileId: template.id, stageKey: { notIn: stageKeys } } });
-  for (const [ref, [from, to]] of Object.entries(template.windows)) {
-    await prisma.profileActivity.update({
-      where: { profileId_ref: { profileId: template.id, ref } },
-      data: { windowFrom: from, windowTo: to },
+  if (template.create) {
+    await prisma.profile.create({
+      data: { id: template.id, name: template.name, builtin: false, template: true, stages: { create: stageRows(template.id) } },
     });
+    await copyActivities(prisma, builtinId, template.id);
+    /* the activities of the stages it dropped go with them */
+    await prisma.profileActivity.deleteMany({ where: { profileId: template.id, stageKey: { notIn: stageKeys } } });
+    for (const [ref, [from, to]] of Object.entries(template.windows)) {
+      await prisma.profileActivity.update({
+        where: { profileId_ref: { profileId: template.id, ref } },
+        data: { windowFrom: from, windowTo: to },
+      });
+    }
   }
 
   /* ---- the programme: its own copy of the template's stages ---- */
@@ -78,9 +91,13 @@ export async function seedScenario(prisma: PrismaClient, demo: ScenarioDemo): Pr
       stages: { create: stageRows(privateProfileId) },
     },
   });
-  await copyActivities(prisma, template.id, privateProfileId);
+  await copyActivities(prisma, source, privateProfileId);
+  if (!template.create)
+    await prisma.profileActivity.deleteMany({ where: { profileId: privateProfileId, stageKey: { notIn: stageKeys } } });
   /* where the program's own activities ran, where that was not the plan */
-  for (const [ref, [from, to]] of Object.entries(demo.programWindows)) {
+  for (const [ref, [from, to]] of Object.entries(
+    template.create ? demo.programWindows : { ...template.windows, ...demo.programWindows },
+  )) {
     await prisma.profileActivity.update({
       where: { profileId_ref: { profileId: privateProfileId, ref } },
       data: { windowFrom: from, windowTo: to },
@@ -134,7 +151,9 @@ export async function seedScenario(prisma: PrismaClient, demo: ScenarioDemo): Pr
   );
 
   console.log(
-    `Created template "${template.name}" (${template.stages.length} stages, ${demo.activities.length} activities) and ${project.name}: ` +
+    (template.create
+      ? `Created template "${template.name}" (${template.stages.length} stages, ${demo.activities.length} activities) and ${project.name}: `
+      : `Created ${project.name} on ${builtinId} (${template.stages.length} stages, ${demo.activities.length} activities): `) +
       `${demo.deliverables.length} deliverables, ${demo.stepStates.length} step records, ${demo.posts.length} posts, ` +
       `${m.meetings.length} meetings, ${m.decisions.length} decisions, ${m.actions.length} action items.`,
   );

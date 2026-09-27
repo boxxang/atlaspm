@@ -35,6 +35,8 @@ export interface Scenario {
     emailDomain: string;
     /** People's phone numbers count up from this line. */
     phoneStart: number;
+    /** What the numbers start with; a Korean office line unless it says otherwise. */
+    phonePrefix?: string;
   };
   template: {
     id: string;
@@ -43,6 +45,13 @@ export interface Scenario {
     stages: readonly ({ key: string } & StageSpan)[];
     /** Activity windows re-timed in the template, [from, to] weeks from the stage start. */
     windows: Windows;
+    /**
+     * Whether the scenario writes the template as one of its own. A program
+     * started straight from a built-in template says false: it takes its own
+     * copy of the built-in's stages and activities, as the Programs screen
+     * does, and no template is added to the list.
+     */
+    create?: boolean;
   };
   actual?: {
     /** Where the program's stages actually ran. */
@@ -52,6 +61,12 @@ export interface Scenario {
   };
   /** Stages whose steps planned before `today` are simply done. */
   doneStages: readonly string[];
+  /**
+   * Whether the deliverables of those stages that fell due before `today` are
+   * done on their due date, as their steps are — for a program read in the
+   * middle, where listing every one would be most of the record.
+   */
+  doneDeliverablesBeforeToday?: boolean;
   leaders: Readonly<Record<string, ScenarioPerson>>;
   contacts: Readonly<Record<string, readonly ScenarioPerson[]>>;
   steps: readonly ScenarioStep[];

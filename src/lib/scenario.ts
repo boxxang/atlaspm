@@ -82,6 +82,8 @@ export interface ScenarioDemo {
   template: {
     id: string;
     name: string;
+    /** false: the program is started straight from the built-in, and no template is written */
+    create: boolean;
     stages: ProfileStageDef[];
     windows: Readonly<Record<string, readonly [number, number]>>;
   };
@@ -172,11 +174,14 @@ export function buildScenario(scenario: Scenario, { builtin, library }: Scenario
         stage.deliverableWeek?.[position] ?? (span.durationWeeks * (position + 1)) / stage.deliverables.length,
       );
       let completedAt: Date | null = null;
-      for (const o of scenario.deliverables) {
-        if (o.stageId !== stage.id || (o.position !== 'all' && o.position !== position)) continue;
-        if (o.due) due = day(o.due);
-        if (o.doneAt) completedAt = o.doneAt === 'due' ? due : day(o.doneAt);
-      }
+      const listed = scenario.deliverables.filter(
+        (o) => o.stageId === stage.id && (o.position === 'all' || o.position === position),
+      );
+      for (const o of listed) if (o.due) due = day(o.due);
+      /* past its (possibly re-dated) day in a running stage: done on it */
+      if (scenario.doneDeliverablesBeforeToday && scenario.doneStages.includes(stage.id) && due < today)
+        completedAt = due;
+      for (const o of listed) if (o.doneAt) completedAt = o.doneAt === 'due' ? due : day(o.doneAt);
       return {
         id: `${PID}:dlv:${stage.id}:${position}`,
         projectId: PID,
@@ -193,7 +198,7 @@ export function buildScenario(scenario: Scenario, { builtin, library }: Scenario
   /* ---- people ---- */
   let line = program.phoneStart;
   const reach = (name: string) => ({
-    phone: `+82 31 555 0${line++}`,
+    phone: `${program.phonePrefix ?? '+82 31 555 0'}${line++}`,
     email: `${name.toLowerCase().replace(/\s+/g, '.')}@${program.emailDomain}`,
   });
   const leaders = Object.entries(scenario.leaders).map(([stageId, p]) => {
@@ -452,7 +457,13 @@ export function buildScenario(scenario: Scenario, { builtin, library }: Scenario
   }
 
   return {
-    template: { id: scenario.template.id, name: scenario.template.name, stages, windows: scenario.template.windows },
+    template: {
+      id: scenario.template.id,
+      name: scenario.template.name,
+      create: scenario.template.create ?? true,
+      stages,
+      windows: scenario.template.windows,
+    },
     project: { id: PID, name: program.name, kickoff, costPerManMonth: program.costPerManMonth },
     profile,
     schedule,
