@@ -14,6 +14,7 @@
 import { ALL_ACTIVITIES, ALL_ACTIVITY_TITLES, ALL_DELIVERABLE_TITLES } from '@/data/builtins';
 import { SIGNOFF_SPECS, type SignoffSpec } from '@/data/deliverableSignoffSpecs';
 import { EMBEDDED_PROFILE } from '@/data/embeddedSoc';
+import { phaseById } from '@/data/scheduleProfiles';
 import { embeddedDetail } from '@/data/embeddedSocDetails';
 import { deliverableStep, producersOf } from '@/lib/deliverableStatus';
 import type { SignoffItem } from '@/lib/signoff';
@@ -26,6 +27,8 @@ export interface SignoffDefinition {
   actTitle: string;
   stageKey: string;
   stageTitle: string;
+  /** the roadmap band the stage sits under, for the breadcrumb */
+  bandLabel: string;
   owner: string;
   items: SignoffItem[];
   extra?: SignoffSpec['extra'];
@@ -56,6 +59,7 @@ export function signoffDefinition(ref: string): SignoffDefinition | undefined {
     actTitle: ALL_ACTIVITY_TITLES[step.act],
     stageKey: a.st,
     stageTitle: EMBEDDED_PROFILE.stages.find((s) => s.key === a.st)?.title ?? a.st,
+    bandLabel: phaseById(EMBEDDED_PROFILE.stages.find((s) => s.key === a.st)?.phaseId ?? '').label,
     owner: a.ro,
     items: [
       ...spec.baseline.map((b, i) => ({ id: `B-${pad(i + 1)}`, section: 'Baseline', item: b, target: 'Version, tag or ID recorded' })),

@@ -3420,54 +3420,49 @@ a.mt-mini:hover{color:inherit;background:var(--hover)}
 body.panedrag{cursor:col-resize;user-select:none}
 body.panedrag *{cursor:col-resize !important}
 
-/* ---------- in-app sign-off (/p/:id/signoff/:ref) ---------- */
-.so-page{display:flex;flex-direction:column;min-height:0;height:100%}
-.so-body{overflow:auto;padding:16px 20px 40px;display:flex;flex-direction:column;gap:14px}
-.so-lede{font-size:13px;color:var(--ink-2);max-width:900px;line-height:1.5}
+/* ---------- in-app sign-off (/p/:id/signoff/:ref) ----------
+   Laid out as a stage is — the same header, dashboard strip, tabs, filter bar
+   and full-width rows — so only what is new here is styled here. */
 .so-save{font-size:12px;color:var(--ink-3)}
 .so-save.saving{color:var(--accent)}
 .so-save.failed{color:var(--risk-ink)}
-.so-strip{display:grid;grid-template-columns:1.2fr 2fr repeat(3,1fr) 1.5fr;gap:10px}
-.so-stat{border:1px solid var(--line);border-radius:var(--r-lg);padding:10px 12px;display:flex;flex-direction:column;gap:5px;background:var(--bg)}
-.so-stat b{font-size:18px;font-weight:600}
-.so-counts{display:flex;gap:10px;flex-wrap:wrap;font-size:12.5px;color:var(--ink-2)}
-.so-neg{color:var(--risk-ink)!important}
-.so-bar{height:4px;border-radius:2px;background:var(--muted);overflow:hidden}
-.so-bar span{display:block;height:100%;background:var(--accent)}
-.so-outcome{display:inline-block;padding:3px 9px;border-radius:999px;font-size:12.5px;font-weight:600;width:max-content}
-.so-outcome.so-ok{background:var(--ok-soft);color:var(--ok-ink)}
-.so-outcome.so-rev{background:var(--warn-soft);color:var(--warn-ink)}
-.so-outcome.so-bad{background:var(--risk-soft);color:var(--risk-ink)}
-.so-tabs{border-bottom:1px solid var(--line);padding-bottom:6px}
-.so-tabs .pill{font-size:10.5px}
-.so-card{overflow:hidden}
-.so-tools{display:flex;align-items:center;gap:6px;padding:10px 14px}
-.so-tools .btn.on{background:var(--accent-soft);border-color:var(--accent-line);color:var(--accent)}
-.so-grid{grid-template-columns:62px minmax(0,1fr) 110px 120px 210px}
-.trow.so-grid{padding-top:8px;padding-bottom:8px;cursor:pointer;align-items:start}
-.so-id{font-family:var(--mono,ui-monospace,monospace);font-size:12px;font-weight:600;color:var(--ink-2)}
-.so-item{display:flex;flex-direction:column;gap:2px;min-width:0}
-.so-target,.so-ev{font-size:12px;color:var(--ink-3)}
-.so-ev{color:var(--ink-2)}
-.so-st{width:100%}
-.so-st.st-Pass,.so-st.ld-Confirmed{background:var(--ok-soft);border-color:var(--ok);color:var(--ok-ink)}
-.so-st.st-Fail,.so-st.ld-Rejected{background:var(--risk-soft);border-color:var(--risk-line);color:var(--risk-ink)}
-.so-st.st-Waived{background:var(--warn-soft);color:var(--warn-ink)}
+.filterbar .btn.so-on{background:var(--accent-soft);border-color:var(--accent-line);color:var(--accent)}
+.so-grid{grid-template-columns:64px minmax(0,1fr) 116px 116px 220px}
+.trow.so-grid{padding-top:9px;padding-bottom:9px;align-items:start;cursor:pointer}
+.so-item{display:flex;flex-direction:column;gap:2px;min-width:0;line-height:1.4}
+.so-sub{font-size:12px;color:var(--ink-3)}
 .so-flag{font-size:12px;font-weight:600;color:var(--risk-ink)}
-.so-edit{display:grid;grid-template-columns:1fr 1fr;gap:10px 14px;padding:12px 20px 14px 82px;background:var(--accent-wash);border-bottom:1px solid var(--line)}
-.so-f{display:flex;flex-direction:column;gap:4px}
-.so-f.so-wide{grid-column:span 1}
-.so-f textarea,.so-regrow textarea{resize:vertical;font-family:inherit}
-.so-intro{font-size:12.5px;color:var(--ink-2);padding:12px 14px 4px}
-.so-reg{display:grid;gap:8px;align-items:center}
-.thead.so-reg{padding:0 14px}
-.so-regrow{padding:6px 14px;border-bottom:1px solid var(--line-soft)}
-.so-regrow .lnkin,.so-regrow .dateinp{width:100%}
-.so-given{font-size:13px;color:var(--ink-body)}
-.so-cols{display:grid;grid-template-columns:1fr 1fr;gap:14px;align-items:start}
-.so-h{font-size:12px;font-weight:600;color:var(--accent);padding:12px 14px 6px;text-transform:uppercase;letter-spacing:.3px}
-.so-field{display:grid;grid-template-columns:190px minmax(0,1fr);gap:10px;align-items:center;padding:5px 14px}
-.so-label{font-size:12.5px;color:var(--ink-2)}
-.so-value .lnkin,.so-value textarea{width:100%}
-.so-warn{margin:8px 14px;padding:8px 10px;border-radius:var(--r);background:var(--risk-soft);color:var(--risk-ink);font-size:12.5px;font-weight:550}
-@media (max-width:1100px){.so-strip{grid-template-columns:repeat(3,1fr)}.so-cols{grid-template-columns:1fr}}
+/* the card opened under a row reads as a post: title, then who said what */
+.so-title{font-size:15px;font-weight:600;line-height:1.45;margin:0 0 2px}
+.so-post{margin-bottom:14px}
+.so-post .who{display:flex;align-items:center;gap:7px;flex-wrap:wrap;font-size:13px}
+.so-post .txt{font-size:13.5px;line-height:1.55;margin-top:6px;white-space:pre-wrap;overflow-wrap:break-word;border:1px solid var(--line-soft);border-radius:var(--r);padding:7px 10px;background:var(--sunken)}
+.so-meta{font-size:12px;color:var(--ink-3)}
+.so-evidence{font-family:var(--mono,ui-monospace,monospace);font-size:12px;color:var(--ink-2);overflow-wrap:anywhere}
+.so-pre{white-space:pre-wrap}
+/* edit mode: the same fields as a form, two columns */
+.so-form{display:grid;grid-template-columns:1fr 1fr;gap:10px 14px}
+.so-formhd{grid-column:1/-1;font-size:11.5px;font-weight:600;color:var(--ink-3);text-transform:uppercase;letter-spacing:.3px;margin-top:6px;padding-top:8px;border-top:1px solid var(--line-soft)}
+.so-form .so-formhd:first-child{margin-top:0;padding-top:0;border-top:0}
+.so-f{display:flex;flex-direction:column;gap:5px;min-width:0}
+.so-f.so-span{grid-column:1/-1}
+.so-f .lnkin,.so-f .dateinp{width:100%}
+.notebody.so-ta{min-height:0;font-size:13.5px;padding:7px 10px}
+.lnkin.so-ta{resize:vertical;font-family:inherit;line-height:1.45}
+/* registers */
+.trow.so-regrow{align-items:start;padding-top:8px;padding-bottom:8px;cursor:default}
+.trow.so-regrow:hover{background:var(--hover)}
+.trow.so-regrow.so-editing{background:var(--accent-wash)}
+.so-cell{font-size:13px;min-width:0;overflow-wrap:anywhere}
+.so-cell.long{white-space:pre-wrap}
+.so-editing .lnkin,.so-editing .dateinp{width:100%}
+.so-rowacts{display:flex;gap:5px;justify-content:flex-end}
+/* the decision tab: two cards side by side */
+.so-cols{display:grid;grid-template-columns:1fr 1fr;gap:16px;padding:16px 20px 32px;align-items:start}
+.so-cols .notecard-body{max-width:none}
+.so-prop{grid-template-columns:200px minmax(0,1fr)}
+.so-pv{font-size:13px;min-width:0}
+.so-pv .lnkin,.so-pv .notebody{width:100%}
+.so-role{display:grid;grid-template-columns:1.2fr 1fr 1fr 130px;gap:8px;align-items:center;padding:6px 0;border-bottom:1px solid var(--line-soft);font-size:13px}
+.so-rolename{color:var(--ink-2)}
+@media (max-width:1100px){.so-cols{grid-template-columns:1fr}.so-grid{grid-template-columns:56px minmax(0,1fr) 96px 96px 150px}}

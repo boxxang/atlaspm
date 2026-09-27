@@ -180,36 +180,71 @@ test.describe('the Embedded SoC template', () => {
     await expect(board.locator('[data-item]')).toHaveCount(23);
     await expect(board.locator('[data-outcome]')).toHaveText('In review');
 
-    /* a confirmation without evidence is flagged, and clears when it has some */
-    await board.getByLabel('C-01 owner status').selectOption('Pass');
-    await board.getByLabel('C-01 stage lead confirmation').selectOption('Confirmed');
-    await expect(board.locator('[data-item="C-01"] [data-flag]')).toHaveText('Evidence missing');
-    await expect(board.locator('[data-flagged]')).toHaveText('1');
+    /* the page scrolls in the shell like every other page */
+    const scrolled = await page.locator('#view').evaluate((el) => {
+      el.scrollTop = 100000;
+      return el.scrollTop;
+    });
+    expect(scrolled).toBeGreaterThan(0);
+    await page.locator('#view').evaluate((el) => (el.scrollTop = 0));
+
+    /* an item reads as a post until Edit: no inputs in view mode */
     await board.locator('[data-item="C-01"]').click();
-    await board.locator('[data-edit="C-01"]').getByLabel('Evidence — link or file name').fill('sta/final/signoff_summary.rpt');
+    const item = board.locator('[data-card="C-01"]');
+    await expect(item.locator('[data-view="C-01"]')).toContainText('Nothing recorded yet');
+    await expect(item.locator('input, select, textarea')).toHaveCount(0);
+
+    /* a confirmation without evidence is flagged, and clears when it has some */
+    await item.locator('[data-edit-item="C-01"]').click();
+    await item.getByLabel('C-01 owner status').selectOption('Pass');
+    await item.getByLabel('C-01 stage lead confirmation').selectOption('Confirmed');
+    await item.locator('[data-save-item="C-01"]').click();
+    await expect(board.locator('[data-item="C-01"] [data-owner-status]')).toHaveText('Pass');
+    await expect(board.locator('[data-item="C-01"] [data-lead]')).toHaveText('Confirmed');
+    await expect(board.locator('[data-item="C-01"] [data-flag]')).toHaveText('Evidence missing');
+    await expect(board.locator('[data-stat="flagged"]')).toHaveText('1');
+    await item.locator('[data-edit-item="C-01"]').click();
+    await item.getByLabel('Evidence — link or file name').fill('sta/final/signoff_summary.rpt');
+    await item.locator('[data-save-item="C-01"]').click();
+    await expect(item.locator('[data-view="C-01"]')).toContainText('sta/final/signoff_summary.rpt');
     await expect(board.locator('[data-item="C-01"] [data-flag]')).toHaveText('');
-    await expect(board.locator('[data-confirmed]')).toHaveText('1 / 23');
+    await expect(board.locator('[data-stat="confirmed"]')).toHaveText('1/23');
+
+    /* Cancel keeps nothing */
+    await item.locator('[data-edit-item="C-01"]').click();
+    await item.getByLabel('Evidence — link or file name').fill('something else');
+    await item.getByRole('button', { name: 'Cancel' }).click();
+    await expect(item.locator('[data-view="C-01"]')).toContainText('sta/final/signoff_summary.rpt');
 
     /* a waiver ID that names no waiver is flagged until the waiver exists */
-    await board.getByLabel('C-02 owner status').selectOption('Waived');
     await board.locator('[data-item="C-02"]').click();
-    await board.locator('[data-edit="C-02"]').getByLabel(/Waiver ID/).fill('W-01');
+    const card2 = board.locator('[data-card="C-02"]');
+    await card2.locator('[data-edit-item="C-02"]').click();
+    await card2.getByLabel('C-02 owner status').selectOption('Waived');
+    await card2.getByLabel(/Waiver ID/).fill('W-01');
+    await card2.locator('[data-save-item="C-02"]').click();
     await expect(board.locator('[data-item="C-02"] [data-flag]')).toHaveText('Waiver not found');
     await board.locator('[data-so-tab="waivers"]').click();
     await board.locator('[data-add="waiver"]').click();
-    await expect(board.locator('[data-row="W-01"]')).toBeVisible();
+    await board.getByLabel('W-01 Approved by').fill('Signoff lead');
+    await board.locator('[data-save-row="W-01"]').click();
+    await expect(board.locator('[data-row="W-01"]')).toContainText('Signoff lead');
+    await expect(board.locator('[data-row="W-01"] input')).toHaveCount(0);
     await board.locator('[data-so-tab="checklist"]').click();
     await expect(board.locator('[data-item="C-02"] [data-flag]')).toHaveText('');
 
     /* signing off against the counts is allowed, and called out */
     await board.locator('[data-so-tab="signoff"]').click();
+    await board.locator('[data-edit-decision]').click();
     await board.getByLabel('Final decision').selectOption('Signed off');
+    await board.locator('[data-save-decision]').click();
+    await expect(board.locator('[data-decision]')).toHaveText('Signed off');
     await expect(board.locator('[data-warning]')).toContainText('not ready');
 
-    /* it was saved as it was typed */
+    /* it was saved */
     await expect(page.locator('.so-save')).toHaveText('Saved');
     await page.reload();
-    await expect(page.locator('[data-signoff="ESO-D7"] [data-confirmed]')).toHaveText('1 / 23');
+    await expect(page.locator('[data-signoff="ESO-D7"] [data-stat="confirmed"]')).toHaveText('1/23');
     await expect(page.locator('[data-signoff="ESO-D7"] [data-item="C-02"] [data-flag]')).toHaveText('');
   });
 
