@@ -78,8 +78,8 @@ async function main() {
   if (!flowAt) throw new Error('No PD flow note in the scenario.');
   const assets = path.join(__dirname, 'assets', 'kestrel');
   for (const [file, mimeType] of [
-    ['soc-pd-flow-cadence.png', 'image/png'],
-    ['soc-pd-flow-cadence.html', 'text/html'],
+    ['soc-pd-flow-synopsys.png', 'image/png'],
+    ['soc-pd-flow-synopsys.html', 'text/html'],
   ] as const) {
     const data = readFileSync(path.join(assets, file));
     await prisma.attachment.create({

@@ -176,7 +176,7 @@ describe('Embedded_SoC — physical design’s reference flow', () => {
     expect(note.stageId).toBe('physicalDesignEmb');
     /* posted in the stage's first week */
     expect(fmtDate(note.createdAt)).toBe('05/26/2026');
-    for (const f of ['soc-pd-flow-cadence.png', 'soc-pd-flow-cadence.html']) {
+    for (const f of ['soc-pd-flow-synopsys.png', 'soc-pd-flow-synopsys.html']) {
       const at = `prisma/assets/kestrel/${f}`;
       expect(existsSync(at), at).toBe(true);
       expect(statSync(at).size, at).toBeLessThan(5 * 1024 * 1024);

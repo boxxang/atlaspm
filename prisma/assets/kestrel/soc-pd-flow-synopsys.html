@@ -85,7 +85,7 @@ el("path",{d:"M0,0 L10,5 L0,10 z",fill:K.risk},m2);
 // background + title
 el("rect",{x:0,y:0,width:1600,height:900,fill:K.page});
 const ttl=txt(28,40,"SoC Physical Design Flow",{size:26,w:650,a:"start",ls:-0.5});
-txt(28+ttl.getBBox().width+16,42,"RTL → Tape Out · Cadence tool set",{mono:true,size:12.5,c:K.ink3,a:"start"});
+txt(28+ttl.getBBox().width+16,42,"RTL → Tape Out · Synopsys tool set",{mono:true,size:12.5,c:K.ink3,a:"start"});
 
 // column panels
 [[20,500],[530,330],[870,460],[1340,240]]
@@ -98,24 +98,24 @@ colHead(1340,240,"04","Release");
 /* ===== 01 PRE-LAYOUT (center 270) ===== */
 data(150,135,240,38,"RTL / SDC / UPF / DKIT / Info");
 arrow([[270,173],[270,185]]);
-box(160,185,220,40,"pi","DK Preparation · SRAM Gen","Liberate MX");
+box(160,185,220,40,"pi","DK Preparation · SRAM Gen","PrimeLib");
 arrow([[270,225],[270,237]]);
-box(160,237,220,40,"pi","Logical Synthesis","Genus");
+box(160,237,220,40,"pi","Logical Synthesis","Fusion Compiler");
 arrow([[270,277],[270,285]],false); arrow([[205,285],[335,285]],false);
 arrow([[205,285],[205,293]]); arrow([[335,285],[335,293]]);
-box(145,293,120,40,"pd","Floorplan","Innovus");
-box(275,293,120,40,"dft","Scan Insertion","Modus DFT");
+box(145,293,120,40,"pd","Floorplan","Fusion Compiler");
+box(275,293,120,40,"dft","Scan Insertion","TestMAX DFT");
 arrow([[205,333],[205,341]],false); arrow([[335,333],[335,341]],false); arrow([[205,341],[335,341]],false);
 arrow([[270,341],[270,349]]);
-box(160,349,220,40,"pi","Physical Synthesis","Genus iSpatial");
+box(160,349,220,40,"pi","Physical Synthesis","Fusion Compiler");
 arrow([[270,389],[270,400]]);
 data(140,400,260,40,"DFT-inserted netlist","SDC / UPF / PD info");
 arrow([[270,440],[270,465]]);
 
 gate(58,476,424,166,"Sign-off Gate 1");
-[[72,498,"pi","Equivalence Check","Conformal LEC"],[276,498,"pi","Pre-layout STA","Tempus"],
- [72,544,"pi","Low Power Check","Conformal LP"],[276,544,"dft","ATPG","Modus ATPG"],
- [72,590,"pi","Logical DRC","Jasper Superlint"],[276,590,"dft","Pre-layout Sim","Xcelium"]]
+[[72,498,"pi","Equivalence Check","Formality"],[276,498,"pi","Pre-layout STA","PrimeTime"],
+ [72,544,"pi","Low Power Check","VC LP"],[276,544,"dft","ATPG","TestMAX ATPG"],
+ [72,590,"pi","Logical DRC","VC SpyGlass"],[276,590,"dft","Pre-layout Sim","VCS"]]
  .forEach(([x,y,d,n,t])=>box(x,y,192,40,d,n,t));
 arrow([[270,642],[270,660]]);
 diamond(270,700,100,40,"Meet","criteria?");
@@ -130,24 +130,24 @@ label(280,758,"Yes",K.accent);
 /* ===== 02 P&R (center 695) ===== */
 data(575,135,240,40,"DFT-inserted netlist","SDC / UPF / PD info");
 arrow([[695,175],[695,200]]);
-box(595,200,200,44,"pd","Place & Route","Innovus");
+box(595,200,200,44,"pd","Place & Route","Fusion Compiler");
 arrow([[695,244],[695,272]]);
-box(595,272,200,44,"pd","Metal Dummy Fill","Pegasus");
+box(595,272,200,44,"pd","Metal Dummy Fill","IC Validator");
 arrow([[695,316],[695,344]]);
-box(595,344,200,44,"pd","Parasitic Extraction","Quantus");
+box(595,344,200,44,"pd","Parasitic Extraction","StarRC");
 arrow([[695,388],[695,416]]);
 data(575,416,240,44,"Post-layout netlist","SPEF / DEF / GDS");
 arrow([[695,460],[695,490],[880,490],[880,300],[896,300]]);
 
 /* ===== 03 POST-LAYOUT (center 1105) ===== */
 gate(896,150,418,338,"Sign-off Gate 2");
-[[910,172,"pi","Equivalence Check","Conformal LEC"],[1108,172,"pi","Logical DRC","Jasper Superlint"],
- [910,222,"pi","Low Power Check","Conformal LP"],[1108,222,"pi","Post-layout STA","Tempus"],
- [910,272,"dft","ATPG","Modus ATPG"],[1108,272,"dft","Post-layout Sim","Xcelium"],
- [910,322,"psi","IR Drop Analysis","Voltus"],[1108,322,"psi","Power / Signal EM","Voltus"],
- [910,372,"pi","Power Calculation","Voltus"],[1108,372,"pi","Glitch Noise Analysis","Tempus SI"]]
+[[910,172,"pi","Equivalence Check","Formality"],[1108,172,"pi","Logical DRC","VC SpyGlass"],
+ [910,222,"pi","Low Power Check","VC LP"],[1108,222,"pi","Post-layout STA","PrimeTime"],
+ [910,272,"dft","ATPG","TestMAX ATPG"],[1108,272,"dft","Post-layout Sim","VCS"],
+ [910,322,"psi","IR Drop Analysis","RedHawk-SC"],[1108,322,"psi","Power / Signal EM","RedHawk-SC"],
+ [910,372,"pi","Power Calculation","PrimePower"],[1108,372,"pi","Glitch Noise Analysis","PrimeTime SI"]]
  .forEach(([x,y,d,n,t])=>box(x,y,192,42,d,n,t));
-box(910,422,390,42,"pd","Physical Verification (DRC / LVS / PERC)","Pegasus");
+box(910,422,390,42,"pd","Physical Verification (DRC / LVS / PERC)","IC Validator");
 arrow([[1105,488],[1105,512]]);
 diamond(1105,552,105,40,"All clear?");
 // No -> iteration
@@ -185,7 +185,7 @@ el("polygon",{points:`${lx+15},830 ${lx+30},842 ${lx+15},854 ${lx},842`,fill:K.s
 txt(lx+40,842,"Decision",{size:12.5,a:"start",c:K.ink2}); lx+=112;
 el("line",{x1:lx,y1:842,x2:lx+30,y2:842,stroke:K.risk,"stroke-width":1.5});
 txt(lx+40,842,"Fail / rework",{size:12.5,a:"start",c:K.ink2});
-txt(1572,842,"All EDA tools: Cadence Design Systems",{mono:true,size:11,c:K.ink3,a:"end"});
+txt(1572,842,"All EDA tools: Synopsys",{mono:true,size:11,c:K.ink3,a:"end"});
 
 // red arrowhead for fail paths
 const m3=el("marker",{id:"ahr",viewBox:"0 0 10 10",refX:9,refY:5,markerWidth:7,markerHeight:7,orient:"auto"},defs);
@@ -197,7 +197,7 @@ document.getElementById("png").onclick=()=>{
   const img=new Image(), c=document.createElement("canvas"); c.width=3200; c.height=1800;
   img.onload=()=>{const g=c.getContext("2d");g.fillStyle=K.page;g.fillRect(0,0,c.width,c.height);
     g.drawImage(img,0,0,c.width,c.height);
-    const a=document.createElement("a");a.download="soc_pd_flow_cadence.png";a.href=c.toDataURL("image/png");a.click();};
+    const a=document.createElement("a");a.download="soc_pd_flow_synopsys.png";a.href=c.toDataURL("image/png");a.click();};
   img.src="data:image/svg+xml;charset=utf-8,"+encodeURIComponent(s);
 };
 </script>

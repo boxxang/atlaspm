@@ -281,7 +281,7 @@ export const KESTREL_POSTS: readonly ScenarioPost[] = [
     kind: 'note',
     at: '2026-05-26 09:30',
     stageId: 'physicalDesignEmb',
-    text: 'PD flow — RTL to tapeout, Cadence tool set',
+    text: 'PD flow — RTL to tapeout, Synopsys tool set',
     blocks: [
       {
         p: 'The flow every turn runs, from the synthesis inputs to the tapeout database, with the tool at each step and the two sign-off gates. The picture is below; the attached HTML is the original diagram, which exports a PNG.',
