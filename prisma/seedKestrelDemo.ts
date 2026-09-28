@@ -43,7 +43,16 @@ async function main() {
   });
   if (before) console.log(`Replacing ${before.name} (${pid}), kickoff ${before.kickoff.toISOString().slice(0, 10)}, ${before._count.posts} posts.`);
 
+  /* A QoR workbook somebody uploaded is theirs, not the scenario's: replacing
+     the programme would cascade it away, so it is carried across. */
+  const qor = await prisma.qorDataset.findMany({ where: { projectId: pid } });
+
   await seedScenario(prisma, demo, EMBEDDED_PROFILE.id);
+
+  if (qor.length) {
+    await prisma.qorDataset.createMany({ data: qor });
+    console.log(`Kept the uploaded QoR workbook(s): ${qor.map((q) => q.fileName).join(', ')}.`);
+  }
 
   for (const [ref, payload] of Object.entries(KESTREL_SIGNOFFS)) {
     const def = signoffDefinition(ref);
