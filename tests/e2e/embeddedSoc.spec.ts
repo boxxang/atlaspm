@@ -413,3 +413,20 @@ test.describe('the Embedded SoC template', () => {
     await expect(picker.locator('[data-pick]')).toHaveCount(30);
   });
 });
+
+/* Each built-in template opens the flowchart drawn for it. */
+test('opens each built-in template’s flowchart from the Templates list', async ({ page }) => {
+  await page.goto('/templates');
+  for (const [id, href] of [
+    ['typicalSoC', '/flowcharts/typical-soc.html'],
+    ['threeDic', '/flowcharts/3dic.html'],
+    ['embeddedSoc', '/flowcharts/embedded-soc.html'],
+  ]) {
+    const link = page.locator(`[data-template="${id}"] [data-flowchart="${id}"]`);
+    await expect(link).toHaveText('Flowchart');
+    await expect(link).toHaveAttribute('href', href);
+    expect((await page.request.get(href)).status(), href).toBe(200);
+  }
+  /* a template somebody made has no flowchart of its own */
+  await expect(page.locator('[data-flowchart]')).toHaveCount(3);
+});

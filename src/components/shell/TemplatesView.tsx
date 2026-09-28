@@ -11,6 +11,7 @@ import {
 } from '@/app/actions';
 import { ALL_ACTIVITIES as activityLibrary } from '@/data/builtins';
 import { BUILTIN_STAGE_LIBRARY } from '@/data/builtins';
+import { flowchartOf } from '@/data/builtinFlowcharts';
 import { lifecyclePhases } from '@/data/scheduleProfiles';
 import type { ProfileStageDef } from '@/data/types';
 import { uid } from '@/store/useAppStore';
@@ -31,7 +32,7 @@ import {
 } from '@/lib/profileEdit';
 import { fromISO, startOfDay, toISO } from '@/lib/schedule';
 import { ctVar, CTHead, type Col } from './ctable';
-import { IconPlus } from './icons';
+import { IconFlowchart, IconPlus } from './icons';
 
 /**
  * Templates: the stage lists a program can be started from.
@@ -111,6 +112,20 @@ export function TemplatesView({ profiles }: { profiles: TemplateRow[] }) {
                 <span className="pill" style={{ fontSize: 10.5 }}>
                   Built-in
                 </span>
+              )}
+              {p.builtin && flowchartOf(p.id) && (
+                <a
+                  className="tpl-flow"
+                  href={flowchartOf(p.id)}
+                  target="_blank"
+                  rel="noreferrer"
+                  title={`Open the ${p.label} flowchart`}
+                  aria-label={`Open the ${p.label} flowchart`}
+                  data-flowchart={p.id}
+                >
+                  <IconFlowchart size={13} />
+                  Flowchart
+                </a>
               )}
             </span>
             <span className="num">{p.stageCount}</span>

@@ -1,0 +1,578 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Typical SoC Flow</title>
+<style>
+:root {
+  --bg: #ffffff;
+  --surface: #f8f8fa;
+  --card: #ffffff;
+  --line: #e4e4e9;
+  --line-strong: #c9c9d3;
+  --text: #1c1c24;
+  --muted: #6b6b7b;
+  --faint: #9a9aa8;
+  --accent: #5b5bd6;
+  --accent-soft: #ededfc;
+  --risk: #e5484d;
+  --edge: #b9b9c6;
+  --shadow: 0 1px 2px rgba(20,20,40,.06), 0 2px 8px rgba(20,20,40,.04);
+  --b-define: #5b5bd6;
+  --b-enable: #0f8f84;
+  --b-designVerify: #2b6cd4;
+  --b-implement: #7a4bd0;
+  --b-manufacture: #b8680d;
+  --b-integrate: #0b8aa8;
+  --b-validateRamp: #2f8f46;
+  --b-platform: #c9357a;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; background: var(--bg); color: var(--text); }
+body { font-size: 14px; line-height: 1.45; }
+.wrap { max-width: 1480px; margin: 0 auto; padding: 28px 16px 64px; }
+header h1 { font-size: 24px; margin: 0 0 4px; letter-spacing: -.01em; }
+header p { margin: 0; color: var(--muted); max-width: 820px; }
+.stats { display: flex; flex-wrap: wrap; gap: 10px; margin: 18px 0 20px; }
+.stat { border: 1px solid var(--line); border-radius: 8px; padding: 8px 14px; background: var(--surface); }
+.stat b { display: block; font-size: 18px; font-variant-numeric: tabular-nums; }
+.stat span { color: var(--muted); font-size: 12px; }
+
+/* major milestone strip */
+.strip { border: 1px solid var(--line); border-radius: 10px; padding: 14px 18px 10px; margin-bottom: 18px; }
+.strip h2, .section-h { font-size: 12px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); margin: 0 0 10px; font-weight: 600; }
+.axis { position: relative; height: 128px; margin: 0 10px; }
+.axis .rail { position: absolute; left: 0; right: 0; top: 62px; height: 2px; background: var(--line-strong); }
+.axis .tick { position: absolute; top: 68px; font-size: 11px; color: var(--faint); transform: translateX(-50%); font-variant-numeric: tabular-nums; }
+.axis .tick::before { content: ""; position: absolute; left: 50%; top: -8px; width: 1px; height: 5px; background: var(--line-strong); }
+.ms { position: absolute; top: 56px; transform: translateX(-50%); cursor: pointer; }
+.ms i { display: block; width: 12px; height: 12px; background: var(--accent); transform: rotate(45deg); margin: 1px auto 0; border: 2px solid #fff; box-shadow: 0 0 0 1px var(--accent); }
+.ms span { position: absolute; left: 50%; transform: translateX(-50%); white-space: nowrap; font-size: 11.5px; font-weight: 600; }
+.ms span::before { content: ""; position: absolute; left: 50%; width: 1px; background: var(--line-strong); }
+.ms.up span { bottom: 20px; }
+.ms.up.l2 span { bottom: 42px; }
+.ms.down span { top: 30px; }
+.ms.down.l2 span { top: 50px; }
+.ms.end span { left: auto; right: -6px; transform: none; }
+.ms span em { font-style: normal; color: var(--muted); font-weight: 400; margin-left: 4px; }
+
+/* toolbar */
+.toolbar { display: flex; flex-wrap: wrap; gap: 8px 12px; align-items: center; margin-bottom: 12px; }
+.toolbar .hint { flex: 1 1 380px; }
+.seg { display: inline-flex; border: 1px solid var(--line-strong); border-radius: 8px; overflow: hidden; }
+.seg button { border: 0; background: var(--card); padding: 6px 12px; font: inherit; font-size: 13px; color: var(--text); cursor: pointer; }
+.seg button + button { border-left: 1px solid var(--line-strong); }
+.seg button[aria-pressed="true"] { background: var(--accent); color: #fff; }
+.hint { color: var(--muted); font-size: 12.5px; }
+
+/* flowchart */
+.scroller { overflow: auto; max-height: calc(100vh - 90px); min-height: 420px; overscroll-behavior: contain; border: 1px solid var(--line); border-radius: 10px; background: var(--surface); }
+.chart { position: relative; min-width: 1272px; }
+.grid { position: relative; z-index: 1; display: grid; grid-template-columns: 56px repeat(7, minmax(128px, 1fr)); column-gap: 40px; padding: 0 40px 20px 0; }
+.lanehead { position: sticky; top: 0; z-index: 6; box-shadow: 20px 0 0 var(--surface), -20px 0 0 var(--surface), 20px 1px 0 var(--line), -20px 1px 0 var(--line); padding: 12px 6px 10px; font-size: 11.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; background: var(--surface); border-bottom: 1px solid var(--line); }
+.lanehead::before { content: ""; display: block; width: 22px; height: 3px; border-radius: 2px; background: var(--c); margin-bottom: 6px; }
+.lanebg { position: absolute; top: 0; bottom: 0; z-index: 0; border-left: 1px dashed var(--line); }
+.rowlabel { padding-top: 54px; padding-left: 12px; font-size: 11px; color: var(--faint); font-variant-numeric: tabular-nums; font-weight: 600; }
+.cell { display: flex; flex-direction: column; gap: 22px; padding-top: 50px; }
+svg.edges { position: absolute; inset: 0; z-index: 0; pointer-events: none; overflow: visible; }
+.nodes-layer { position: relative; z-index: 4; }
+
+.node { position: relative; z-index: 4; background: var(--card); border: 1px solid var(--line); border-left: 4px solid var(--c); border-radius: 8px; padding: 8px 10px 9px; box-shadow: var(--shadow); cursor: pointer; transition: opacity .15s, box-shadow .15s, transform .15s; text-align: left; font: inherit; color: inherit; width: 100%; }
+.node:hover { box-shadow: 0 2px 4px rgba(20,20,40,.08), 0 6px 18px rgba(20,20,40,.08); }
+.node:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.node .code { font-size: 10.5px; font-weight: 700; color: var(--c); letter-spacing: .03em; }
+.node .ttl { display: block; font-weight: 600; font-size: 13px; line-height: 1.3; margin: 1px 0 5px; }
+.node .wk { font-size: 11px; color: var(--muted); font-variant-numeric: tabular-nums; }
+.node .bar { height: 3px; background: var(--line); border-radius: 2px; margin: 5px 0 6px; position: relative; overflow: hidden; }
+.node .bar i { position: absolute; top: 0; bottom: 0; background: var(--c); opacity: .7; border-radius: 2px; }
+.node .mst { display: flex; gap: 5px; align-items: flex-start; font-size: 11px; color: var(--muted); line-height: 1.3; }
+.node .mst::before { content: ""; flex: none; width: 7px; height: 7px; margin-top: 3px; transform: rotate(45deg); border: 1.5px solid var(--muted); }
+.node .mst.major { color: var(--accent); font-weight: 600; }
+.node .mst.major::before { background: var(--accent); border-color: var(--accent); }
+.node .tag { float: right; font-size: 9.5px; font-weight: 700; color: var(--b-platform); background: #fbeaf2; border-radius: 4px; padding: 0 5px; letter-spacing: .02em; }
+.chart.focus .node { opacity: .28; }
+.chart.focus .node.on { opacity: 1; }
+.chart.focus .node.sel { box-shadow: 0 0 0 2px var(--accent), var(--shadow); }
+.endnode { grid-column: 2 / -1; margin-top: 40px; border: 1px solid var(--accent); background: var(--accent-soft); border-radius: 10px; padding: 12px 16px; display: flex; flex-wrap: wrap; gap: 6px 22px; align-items: center; position: relative; z-index: 4; }
+.endnode b { font-size: 14px; }
+.endnode span { font-size: 12.5px; color: var(--muted); }
+
+path.e { fill: none; stroke: var(--edge); stroke-width: 1.4; transition: opacity .15s; }
+path.e { stroke-linejoin: round; }
+.chart.focus path.e.on.spine { stroke-width: 3.2; }
+.chart.focus path.e.on.rib { stroke-dasharray: 5 4; }
+.chart.focus.path-mode path.e:not(.on) { opacity: 0; }
+.chart.focus .node.spine { box-shadow: 0 0 0 1.5px var(--accent), var(--shadow); }
+.chart.focus path.e.on:not(.spine) { stroke-width: 1.6; }
+.chart:not(.focus) path.e:hover { stroke: var(--muted); }
+.chart.focus path.e { opacity: .12; }
+.chart.focus path.e.on { opacity: 1; stroke: var(--accent); stroke-width: 2.2; }
+.chart.focus path.e.on.in { stroke: #8a8aa0; }
+
+/* legend */
+.legend { display: flex; flex-wrap: wrap; gap: 6px 18px; margin: 12px 2px 0; font-size: 12px; color: var(--muted); }
+.legend span { display: inline-flex; align-items: center; gap: 6px; }
+.legend .sw { width: 10px; height: 10px; border-radius: 3px; background: var(--c); }
+
+/* drawer */
+.drawer { position: fixed; top: 0; right: 0; bottom: 0; width: min(460px, 100vw); background: var(--card); border-left: 1px solid var(--line); box-shadow: -8px 0 30px rgba(20,20,40,.08); z-index: 20; transform: translateX(105%); transition: transform .2s ease; display: flex; flex-direction: column; }
+.drawer.open { transform: none; }
+.drawer .dh { padding: 18px 20px 14px; border-bottom: 1px solid var(--line); border-top: 4px solid var(--c); }
+.drawer .dh .code { font-size: 11px; font-weight: 700; color: var(--c); letter-spacing: .04em; }
+.drawer .dh h3 { margin: 2px 0 4px; font-size: 18px; line-height: 1.3; }
+.drawer .dh p { margin: 0; color: var(--muted); font-style: italic; }
+.drawer .x { position: absolute; top: 14px; right: 14px; border: 1px solid var(--line); background: var(--card); border-radius: 6px; width: 30px; height: 30px; font-size: 16px; cursor: pointer; color: var(--muted); }
+.drawer .db { overflow-y: auto; padding: 14px 20px 30px; }
+.facts { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 16px; }
+.facts div { background: var(--surface); border-radius: 8px; padding: 7px 10px; }
+.facts b { display: block; font-size: 14px; font-variant-numeric: tabular-nums; }
+.facts span { font-size: 11px; color: var(--muted); }
+.drawer h4 { font-size: 11.5px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); margin: 18px 0 6px; }
+.drawer ol, .drawer ul { margin: 0; padding-left: 20px; }
+.drawer li { margin: 3px 0; }
+.drawer .msbox { display: flex; gap: 8px; align-items: center; background: var(--accent-soft); border-radius: 8px; padding: 8px 12px; font-weight: 600; }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.chip { border: 1px solid var(--line-strong); background: var(--card); border-left: 3px solid var(--c); border-radius: 6px; padding: 3px 9px; font: inherit; font-size: 12.5px; cursor: pointer; color: var(--text); }
+.chip:hover { background: var(--surface); }
+.none { color: var(--faint); font-size: 12.5px; }
+
+/* sequence table */
+.seq { margin-top: 30px; }
+table { width: 100%; border-collapse: collapse; font-size: 13px; }
+th, td { text-align: left; padding: 7px 8px; border-bottom: 1px solid var(--line); vertical-align: top; }
+th { font-size: 11px; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); font-weight: 600; }
+td.n { color: var(--faint); font-variant-numeric: tabular-nums; width: 32px; }
+td.w { font-variant-numeric: tabular-nums; white-space: nowrap; color: var(--muted); }
+td .dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: var(--c); margin-right: 7px; }
+tr.clk { cursor: pointer; }
+tr.clk:hover td { background: var(--surface); }
+.tblwrap { overflow-x: auto; }
+.gantt { position: relative; height: 8px; min-width: 160px; background: var(--surface); border-radius: 4px; margin-top: 5px; }
+.gantt i { position: absolute; top: 0; bottom: 0; border-radius: 4px; background: var(--c); opacity: .75; }
+footer { margin-top: 26px; color: var(--faint); font-size: 12px; }
+@media (max-width: 720px) {
+  header h1 { font-size: 20px; }
+  .ms span { display: none; }
+  .ms.lbl span { display: block; }
+  .hide-sm { display: none; }
+}
+.e-dec { transition: opacity .15s; }
+.chart.focus .e-dec { opacity: .12; }
+.chart.focus .e-dec.on { opacity: 1; }
+.chart.focus.path-mode .e-dec:not(.on) { opacity: 0; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Typical SoC — Program Flowchart</h1>
+    <p>The full development flow of AtlasPM’s built-in <b>Typical SoC</b> template: a leading-node SoC with custom and AMS IP proven on a test chip, and a flip-chip package co-designed and co-verified with the die. Stages flow top to bottom by start week; columns are the lifecycle bands. Click any stage for its activities, deliverables and links.</p>
+  </header>
+
+  <div class="stats" id="stats"></div>
+
+  <section class="strip">
+    <h2>Major milestones · weeks from kickoff</h2>
+    <div class="axis" id="axis"></div>
+  </section>
+
+  <div class="toolbar">
+    <div class="seg" role="group" aria-label="Highlight">
+      <button data-mode="all" aria-pressed="true">All links</button>
+      <button data-mode="silicon" aria-pressed="false">Silicon path</button>
+      <button data-mode="platform" aria-pressed="false">Package &amp; test path</button>
+    </div>
+    <span class="hint" id="modeNote"></span>
+  </div>
+
+  <div class="scroller">
+    <div class="chart" id="chart">
+      <svg class="edges" id="edges"></svg>
+      <div class="grid" id="grid"></div>
+    </div>
+  </div>
+  <div class="legend" id="legend"></div>
+
+  <section class="seq">
+    <h2 class="section-h">Stage sequence · ordered by start</h2>
+    <div class="tblwrap"><table id="seq"></table></div>
+  </section>
+
+  <footer>Source: <code>src/data/scheduleProfiles.ts</code>, <code>journey.ts</code> — the <code>typicalSoC</code> profile’s baselines, milestones and stage content. Links between stages summarise the hand-offs described in the baseline notes; a link that a longer chain already implies is not drawn, but the side panel lists every hand-off; the app itself stores schedules, not a dependency graph.</footer>
+</div>
+
+<aside class="drawer" id="drawer" aria-hidden="true">
+  <button class="x" id="dclose" aria-label="Close">×</button>
+  <div class="dh" id="dhead"></div>
+  <div class="db" id="dbody"></div>
+</aside>
+
+<script>
+const STAGES = [{"key": "productDefinition", "order": 0, "title": "Product Definition", "short": "DEF", "phase": "define", "start": 0, "dur": 8, "tagline": "Setting the boundaries of the program.", "activities": ["Customer and Market Requirements Definition", "Competitive benchmarking and gap analysis", "Workload Definition and KPI Targets", "Memory and Interface Requirements", "PPA target definition", "Product Cost and Margin Model", "Technology Node Feasibility Assessment", "Program Planning and Resourcing", "Business Case and Funding Approval"], "deliverables": ["Product requirements document (PRD)", "Target specification — PPA and KPI table", "Product cost and margin model", "Feasibility report", "Program charter, staffing and budget plan", "Kickoff Go / No-Go decision record"], "milestones": [{"label": "Program Go / No-Go", "major": false}]}, {"key": "architecture", "order": 1, "title": "Architecture", "short": "ARCH", "phase": "define", "start": 6, "dur": 18, "tagline": "The decisions that shape everything downstream.", "activities": ["System-level performance modeling and workload simulation", "System Architecture Partitioning", "Interface and protocol selection", "Dataflow and Memory Hierarchy Definition", "Security and Safety Architecture", "Power, Clock, and DVFS Architecture", "Architecture Specification and Freeze", "Chip-Level Floorplan and Bump Planning", "Block-Level PPA Budget Allocation", "Block Microarchitecture Definition"], "deliverables": ["Interface and protocol definition document", "Power / clock / reset architecture and UPF intent", "Performance model and workload analysis report", "Chip-level block diagram with pin and bump budget", "Block partitioning and PPA budget table", "Architecture specification", "Architecture Freeze review package"], "milestones": [{"label": "Arch Freeze", "major": false}]}, {"key": "technology", "order": 2, "title": "Technology & Foundry Selection", "short": "TECH", "phase": "enable", "start": 0, "dur": 14, "tagline": "The choice everything else is downstream of.", "activities": ["Foundry and Process Node Selection", "Foundry Roadmap and Production Readiness Alignment", "Foundry Commercial and Legal Alignment", "Process PPA Benchmarking and DTCO Assessment", "Process Option and Flavor Selection", "Wafer, Mask, and NRE Cost Assessment", "Fab Capacity and Tapeout Slot Planning", "Second-Source and Node Migration Assessment", "OSAT and Backend Supply Chain Alignment"], "deliverables": ["Technology selection report and decision record", "Process option / flavour sheet agreed with foundry", "Node risk assessment — maturity, defect density, yield learning curve", "Executed foundry design agreement (DA) and NDA", "Wafer, mask and NRE cost sheet", "Capacity and tapeout slot commitment"], "milestones": [{"label": "Foundry Commit", "major": false}]}, {"key": "pdk", "order": 3, "title": "PDK & Design Enablement", "short": "PDK", "phase": "enable", "start": 8, "dur": 36, "tagline": "What the flow is allowed to assume.", "activities": ["PDK Version Readiness and Change Management", "Design Rule Review and Disposition", "Standard Cell Library Selection and Qualification", "Signoff Deck and QRC Version Control", "Memory Compiler Evaluation and Instance Planning", "I/O, ESD, and Latch-Up Library Qualification", "EDA Tool Qualification", "Reference Flow Bring-Up and Methodology Development", "Memory Compiler PPA Characterization", "Compute, License, and Storage Capacity Planning", "Custom Memory Decision and Planning", "Signoff Corner and Derate Definition", "Golden Design Environment Release and Regression"], "deliverables": ["PDK readiness dashboard — version, release date, open gap list", "Qualified library list with .lib / LEF / GDS views", "EDA tool and version matrix (qualified and frozen)", "Memory PPA gap analysis and custom-instance decision record", "Compute and license capacity plan", "Internal reference flow and methodology guide", "Signoff corner definition agreed with foundry", "Golden environment release notes"], "milestones": [{"label": "PDK 1.0 Release", "major": false}]}, {"key": "ipReadiness", "order": 4, "title": "IP Strategy & Readiness", "short": "IPR", "phase": "enable", "start": 4, "dur": 22, "tagline": "Knowing what you need before you need it.", "activities": ["IP Requirement Definition", "Internal IP Reuse Assessment", "IP Make / Buy / Reuse Decision", "IP Vendor Evaluation and Selection", "IP Silicon-Proven and Node Readiness Assessment", "IP Licensing and Procurement", "IP Deliverable and Integration Readiness Review", "IP Porting and Hardening Planning", "IP Delivery and Integration Schedule Alignment", "IP Maturity Risk and Contingency Planning"], "deliverables": ["IP bill of materials with make / buy / reuse decision per block", "Vendor evaluation matrix and selection record", "IP readiness report — silicon-proven status and maturity level per IP", "IP deliverable acceptance checklist", "Executed licences and POs with committed delivery dates", "IP risk register and contingency plan", "IP delivery schedule folded into the program plan"], "milestones": [{"label": "IP Plan Freeze", "major": false}]}, {"key": "amsIp", "order": 5, "title": "Custom, AMS & Memory IP Development", "short": "AMS", "phase": "enable", "start": 18, "dur": 42, "tagline": "The blocks nobody will sell you.", "activities": ["AMS IP Specification and Budget Definition", "Custom SRAM Architecture", "PLL and Clock Generator Design", "SerDes and PHY Design / Hardening", "AMS Schematic Design and Pre-Layout Verification", "Analog Power Management Design", "SRAM Read / Write Assist Design", "Memory Redundancy and Repair Integration", "Custom SRAM Layout and Foundry Rule Closure", "SRAM Statistical Margin and Yield Analysis", "AMS Custom Layout and Physical Verification", "Post-Layout Extracted Verification", "AMS–Digital Integration and Co-Simulation", "Custom Memory Characterization and View Generation", "AMS Reliability Verification", "Hard Macro Abstraction and View Generation"], "deliverables": ["AMS IP specifications and design review packages", "Custom SRAM instance specification with Vmin and sigma-yield report", "Per-macro DRC / LVS clean signoff, pushed rules approved by foundry", "Reliability report — EM/IR, ESD, latch-up, aging", "Characterisation reports across PVT and Monte Carlo", "Custom memory views characterised to compiler equivalence", "Hard macro GDS with abstract views (LEF, .lib, CDL, UPF, wreal/Verilog model)", "Integration guide with known limitations and errata"], "milestones": [{"label": "AMS Macro Handoff", "major": false}]}, {"key": "testChip", "order": 6, "title": "Test Chip / MPW Shuttle", "short": "TC", "phase": "enable", "start": 22, "dur": 40, "tagline": "Buying certainty with a small piece of silicon.", "activities": ["Test Chip Objectives and Risk Coverage", "Test Chip Design and Integration", "MPW Shuttle Planning and Booking", "Test Chip Physical Implementation and Signoff", "MPW Tapeout and Fabrication", "Test Chip Board and Lab Preparation", "Silicon Characterization and Model Correlation", "Production Design Feedback and Margin Update"], "deliverables": ["Test chip specification and risk coverage matrix", "Test chip GDS and shuttle submission record", "Test chip silicon and characterisation report", "Silicon-to-model correlation report", "Design guidance and margin decisions for the production chip"], "milestones": [{"label": "Test Chip Silicon", "major": false}]}, {"key": "rtl", "order": 7, "title": "RTL Design & Integration", "short": "RTL", "phase": "designVerify", "start": 20, "dur": 32, "tagline": "Implementing the architecture in logic.", "activities": ["Block Microarchitecture Specification Completion", "CI Build, Nightly Regression, and Release Management", "Specification Change Control and ECO Board", "Register Map / RDL Definition and Header Generation", "Block-Level RTL Implementation", "Clock, Reset, and Power Intent (UPF) Implementation", "Third-Party and Internal IP Integration", "Trial Synthesis and RTL PPA Feedback Loop", "Lint, CDC, and RDC Closure", "Chip-Level Integration and Top-Level Assembly"], "deliverables": ["Integration testbench and build system", "Register map / RDL and generated headers", "UPF power intent file", "IP integration report and version manifest", "Block and top-level RTL release, tagged", "Lint / CDC / RDC clean reports with waiver list", "RTL Freeze package"], "milestones": [{"label": "RTL Freeze", "major": false}]}, {"key": "verification", "order": 8, "title": "Verification", "short": "DV", "phase": "designVerify", "start": 26, "dur": 40, "tagline": "Building confidence before silicon.", "activities": ["Verification Plan and Coverage Model Definition", "UVM Environment and VIP Bring-Up", "Emulation and FPGA Prototype Bring-Up", "Bug Triage and Disposition Board", "Block-Level Constrained-Random and Directed Testing", "Formal Verification of Control, Connectivity, and Security Properties", "Coverage Closure and Regression Stability Management", "Chip-Level and System-Level Scenario Testing", "AMS / Mixed-Signal Co-Simulation", "Low-Power (UPF) Verification", "Performance and Bandwidth Validation Against the Architecture Model", "Functional and Timing-Annotated Gate-Level Simulation"], "deliverables": ["Verification plan (vPlan) and coverage model", "UVM testbenches and integrated VIP", "Emulation platform and system test suite", "Formal proof reports with assumption list", "Low-power verification report", "Regression and coverage dashboards", "Gate-level simulation report", "DV closure signoff package"], "milestones": [{"label": "DV Closure", "major": false}]}, {"key": "dft", "order": 9, "title": "DFT Architecture", "short": "DFT", "phase": "designVerify", "start": 18, "dur": 60, "tagline": "Deciding now how it will be tested later.", "activities": ["DFT Architecture and Test Strategy Definition", "Test Coverage and Test-Time Target Negotiation", "TAP, Boundary Scan, and IJTAG Debug Access Architecture", "Design-for-Debug and Trace Observability Architecture", "MBIST / BIRA / BISR Architecture for Embedded Memories", "On-Chip Clock Controller Design for At-Speed Test", "eFuse, Chip ID, and Memory Repair Infrastructure", "Scan Insertion and DFT DRC Closure", "Scan Compression and Chain Routing Feasibility with Physical Design", "ATPG Pattern Generation and Coverage Closure", "Gate-Level Pattern Validation and ATE Format Conversion"], "deliverables": ["DFT architecture specification and coverage plan", "MBIST / BISR insertion and test collateral", "JTAG / IJTAG description files (BSDL, ICL, PDL)", "DFT DRC clean report", "ATPG pattern sets with coverage report", "Pattern validation (GLS) report and ATE-ready pattern files", "DFT signoff entry for the tapeout checklist"], "milestones": [{"label": "DFT Signoff", "major": false}]}, {"key": "synthesis", "order": 10, "title": "Logic Synthesis & Netlist Drops", "short": "SYN", "phase": "implement", "start": 42, "dur": 24, "tagline": "Four netlists, not one handover.", "activities": ["SDC Constraint Development and Validation", "Technology Mapping and Optimization", "Per-Drop QoR Reporting Against PPA Budgets", "Per-Drop Netlist Handoff and QoR Delta Review", "N0 Flow-Flush Netlist Release", "RTL-to-Netlist Formal Equivalence Checking per Drop", "Physical-Aware Synthesis with Congestion Feedback", "N1 Netlist Drop and QoR Baseline", "Dynamic and Leakage Power Optimization", "Low-Power Synthesis and UPF Consistency Checking", "N2 Netlist Drop and Closure Risk Statement", "FFN (Final Full Netlist) Release and Functional Freeze"], "deliverables": ["N0 flow-flush netlist for PD flow setup", "Validated SDC constraint set per mode and corner", "Power intent implementation report", "N1 and N2 netlist drops with QoR delta reports", "Synthesis QoR report per drop against PPA targets", "Formal equivalence clean report per drop", "Physical design handoff package per drop", "FFN — final full netlist, release-tagged"], "milestones": [{"label": "FFN Release", "major": false}]}, {"key": "physicalDesign", "order": 11, "title": "Physical Design", "short": "PD", "phase": "implement", "start": 46, "dur": 30, "tagline": "Turn by turn, until it closes.", "activities": ["Flow Setup and MMMC Environment Build on N0", "Floorplan, Macro Placement, and Partition Definition", "Power Delivery Network Design and Early IR Analysis", "Bump and RDL Planning with Chip-Package Co-Design", "Turn 1 on the N1 Netlist and QoR Baseline", "Multi-Corner Multi-Mode Timing Closure", "Clock Tree Synthesis with Skew and Jitter Budgeting", "Detailed Routing and DRC Convergence", "Functional and Timing ECO Implementation", "Chip Power Model (CPM/CPS) Extraction and Handoff", "Turn 2 on the N2 Netlist and Closure Risk Quantification", "Hierarchical Block Closure and Top-Level Assembly", "Scan Chain Reordering and DFT-Aware Routing", "Signal and Power Integrity Iteration", "Final Turn on the FFN and Full Closure", "Chip Finishing and Post-Fill Verification"], "deliverables": ["Flow setup release — MMMC environment, scripts and runtime baseline", "Floorplan and PDN specification", "Bump map, RDL and package interface files", "Turn 1 and Turn 2 databases with QoR delta reports", "Interim physical DRC / LVS clean", "MCMM timing closure reports with violation burn-down across turns", "ECO log and change control record", "Final-turn routed database on the FFN, per block and top", "Signoff-ready database handoff"], "milestones": [{"label": "PD Database Handoff", "major": false}]}, {"key": "signoff", "order": 12, "title": "Signoff", "short": "SO", "phase": "implement", "start": 62, "dur": 16, "tagline": "Proving the design is manufacturable.", "activities": ["Signoff Flow Dry Run on the Turn 2 Database", "Signoff Corner Correlation Against Foundry Decks", "Multi-Corner Multi-Mode Signoff STA and Closure", "Full-Chip DRC, LVS, Antenna, and Density Verification", "Static and Dynamic EM / IR-Drop Signoff", "ESD, Latch-Up, and Soft Error / FIT Verification", "DFM, Lithography Hotspot, and CMP Analysis", "Power and Signal Integrity Signoff", "Final Formal Equivalence and LVS Netlist Consistency", "Gate-Level Simulation with Final SDF", "Waiver Review Board and Foundry Waiver Alignment", "Chip-Package-System Co-Analysis Signoff Review"], "deliverables": ["Reliability reports — ESD, latch-up, FIT", "DFM and lithography hotspot report", "EM/IR and SI/PI signoff reports", "STA signoff reports across all corners and modes, with waiver list", "Clean DRC / LVS / antenna / density reports", "Final formal equivalence report", "Signoff summary and Design Freeze package"], "milestones": [{"label": "Design Freeze", "major": false}]}, {"key": "tapeout", "order": 13, "title": "Tapeout & Mask Release (MTO)", "short": "TO", "phase": "manufacture", "start": 78, "dur": 8, "tagline": "Two releases, four weeks apart.", "activities": ["Final GDSII / OASIS Assembly and Layer Map Verification", "Final Full-Chip Verification Re-Run on the Released Database", "Tapeout Checklist Completion and Owner Signoff", "Open-Issue Risk Assessment and Waiver Acceptance", "Go / No-Go Decision Meeting", "FEOL Layer Data Preparation and MTO Release", "BEOL Fix Window for Metal-Layer ECOs", "FEOL Mask Order Confirmation and Mask Shop Scheduling", "BEOL DRC, LVS, Antenna, and Density Re-Verification", "BEOL Layer Data Preparation and MTO Release", "BEOL Mask Order Confirmation and Full Mask Set Completion Tracking"], "deliverables": ["Released GDSII / OASIS database with checksum record", "Tapeout checklist with sign-off matrix", "Open issue and risk acceptance record", "Go / No-Go decision minutes", "FEOL MTO release package and mask order confirmation", "BEOL ECO log covering the fix window", "BEOL MTO release package and mask order confirmation", "Full mask set completion record"], "milestones": [{"label": "Tapeout (BEOL MTO)", "major": true}]}, {"key": "fabrication", "order": 14, "title": "Fabrication", "short": "FAB", "phase": "manufacture", "start": 82, "dur": 19, "tagline": "Hundreds of steps, weeks of patience.", "activities": ["FEOL Mask Set Fabrication, Inspection, and Qualification", "Hot-Lot Management and WIP Tracking", "BEOL Mask Set Fabrication, Inspection, and Qualification", "Inline Metrology and Defect Inspection Monitoring", "Wafer Start on FEOL Mask Availability", "Front-End Wafer Processing", "Back-End-of-Line Wafer Processing", "E-Test / PCM Data Review", "Wafer Acceptance Test and Lot Disposition", "Wafer Shipment and Logistics to Sort and Assembly"], "deliverables": ["FEOL and BEOL mask sets with qualification reports", "Wafer-out forecast versus actual log", "Inline, PCM and WAT data package", "Processed engineering-lot wafers", "Wafer acceptance disposition record", "First Silicon availability notice"], "milestones": [{"label": "First Silicon", "major": true}]}, {"key": "packageDesign", "order": 15, "title": "Package & Substrate Design", "short": "PKGD", "phase": "integrate", "start": 24, "dur": 52, "tagline": "Substrate lead time sets this date, not the die.", "activities": ["Package Architecture Selection", "Bump Map, Pitch, and Power-Ground Planning with Physical Design", "Test Vehicle Requirement Definition and Handoff to PTV", "Interposer / RDL Routing Design", "Substrate Stack-Up, Escape Routing, and Package DRC", "Thermal and Mechanical (Warpage) Simulation", "Substrate and Interposer Supplier Selection and Lead-Time Booking", "OSAT Selection and Assembly Process Definition", "Package Routing for Signal Integrity", "Package PDN and Decap Footprint Design", "Package Design Freeze, DRC, and Tooling Release"], "deliverables": ["Package architecture specification", "Test vehicle requirement specification for PTV", "Bump map and interposer / RDL database", "Substrate and interposer PO with committed lead time", "Substrate design files (Gerber / ODB++) and stack-up", "Package electrical design intent and model handoff to co-verification", "OSAT assembly process flow and agreement", "Thermal and mechanical (warpage) simulation reports", "Package Design Freeze package"], "milestones": [{"label": "Package Design Freeze", "major": false}]}, {"key": "packageTestVehicle", "order": 16, "title": "Package Test Vehicle (CPI / TTV)", "short": "PTV", "phase": "integrate", "start": 36, "dur": 52, "tagline": "Stress the package before the die exists.", "activities": ["Test Vehicle Strategy and Risk Coverage Definition", "Mechanical Test Vehicle (MTV) Design", "Thermal Test Vehicle (TTV) Design", "Daisy-Chain Electrical Vehicle Design", "TV Die Fabrication and Interposer / Substrate Vehicle Build", "OSAT Vehicle Assembly with Process Window DOE", "Board-Level Reliability Testing on Vehicles", "Chip-Package Interaction (CPI) Stress Evaluation", "Warpage and Co-Planarity Measurement Across the Reflow Profile", "Thermal Characterization and Model Correlation", "Daisy-Chain Continuity Test and Assembly Yield Learning", "Package Design Feedback and Assembly Process Window Freeze"], "deliverables": ["Test vehicle plan and risk coverage matrix", "MTV, TTV and daisy-chain vehicle designs", "Built vehicle lots with assembly travelers", "Warpage and co-planarity data across the reflow profile", "CPI stress assessment report — ULK, bump and BEOL integrity", "Thermal characterisation report with model correlation (Rjc, TIM, hotspot map)", "Board-level reliability data on vehicles", "Frozen assembly process window definition", "Package validation complete record — gate for product wafer-out"], "milestones": [{"label": "Assembly Window Freeze", "major": false}]}, {"key": "chipPackageCoVerification", "order": 17, "title": "Chip-Package-System Co-Verification", "short": "SIPI", "phase": "integrate", "start": 50, "dur": 26, "tagline": "One power network, one channel, one signoff.", "activities": ["Chip Power Model (CPM/CPS) Extraction per Power Domain and Operating Mode", "Package and Board Electrical Model Extraction", "Die-Package-Board PDN Impedance Co-Simulation", "High-Speed Channel Simulation with Extracted Package Models", "Dynamic Voltage-Drop Analysis with Package Inductance", "Decap Budget and Placement Optimization Across Die, Package, and Board", "Simultaneous-Switching Noise (SSN / SSO) Analysis at the IO Ring", "Eye, Jitter, and BER Budget Closure per Interface", "Power-Aware STA Correlation with Back-Annotated Voltage Drop", "Electro-Thermal Co-Analysis with the Package Thermal Model", "Co-Verification Signoff Review and Criteria Disposition"], "deliverables": ["Chip power model (CPM/CPS) release per domain and mode", "Extracted package and board electrical models", "Channel compliance report per interface, with margins", "PDN impedance and dynamic IR co-simulation report", "Decap budget and placement specification across die, package and board", "Power-aware STA correlation report", "Eye, jitter and BER budget closure record", "Chip-package-system co-verification signoff — tapeout gate"], "milestones": [{"label": "Co-Verification Signoff", "major": false}]}, {"key": "packaging", "order": 18, "title": "Assembly & Package Build", "short": "ASSY", "phase": "integrate", "start": 76, "dur": 31, "tagline": "The journey leaves the die.", "activities": ["Production Package Substrate Build", "Production Silicon Interposer Fabrication", "Known-Good-Die Sort and Selection", "HBM Stack Procurement and Incoming Inspection", "Die Attach and Micro-Bump Thermo-Compression Bonding", "X-Ray, CSAM, and Warpage Inline Inspection", "Interposer-to-Substrate Attach, Underfill, and Molding", "Assembly Yield Analysis and Process Tuning", "Lid / TIM Attach and Ball Attach", "Unit Build and Allocation for Bring-Up, Qualification, and Samples", "Package-Level Open / Short and Continuity Test"], "deliverables": ["Assembly travelers and process data", "Assembled units — bring-up, qualification and sample lots", "Package-level inspection and test data", "Assembly yield report and failure pareto", "Unit allocation record across bring-up, qual and customers"], "milestones": [{"label": "First Assembled Units", "major": false}]}, {"key": "validationHardware", "order": 19, "title": "Validation Hardware / EVB", "short": "EVB", "phase": "validateRamp", "start": 52, "dur": 38, "tagline": "Ready before the silicon arrives.", "activities": ["Validation Platform Requirements and Topology Definition", "EVB Schematic Design and BOM", "Power Delivery, VRM, and Telemetry Design and Bring-Up", "Debug and Trace Access Infrastructure", "PCB Layout with High-Speed Channel SI/PI Simulation", "Thermal Solution and Cooling for the Lab Platform", "PCB Fabrication and Assembly", "Lab Instrumentation Reservation and Test Rack Build", "Minimum Host-Side Enablement for Power-On", "Board Bring-Up with Socketed or Dummy Parts"], "deliverables": ["Validation platform specification", "Debug and trace access documentation", "EVB schematics, BOM and layout database", "Lab setup and instrument reservation plan", "Fabricated and assembled boards, rev A/B with quantity plan", "Board bring-up report and known issues"], "milestones": [{"label": "EVB Ready", "major": false}]}, {"key": "testDevelopment", "order": 20, "title": "Test Development", "short": "TEST", "phase": "validateRamp", "start": 54, "dur": 42, "tagline": "Probe card lead time is the critical path.", "activities": ["Test Plan and Coverage Strategy Definition", "ATE Platform Selection and Tester Time Booking", "Test Time and Cost Optimization", "Probe Card Design, Fabrication, and Qualification", "Load Board / DUT Board Design, Fabrication, and Bring-Up", "Wafer Sort Test Program Development", "Final / Package Test Program Development", "DFT Pattern Porting to ATE Format and Pattern Debug", "Characterization Test Suite Development", "Test Data Infrastructure and Yield Database", "ATE, Bench, and System Correlation"], "deliverables": ["Test plan and test coverage matrix", "Qualified probe card and load board", "ATE-ready pattern set with debug log", "Test data infrastructure and yield database", "Characterisation test suite", "Test time and test cost model", "Wafer sort and final test programs, release-tagged"], "milestones": [{"label": "Probe Card Ready", "major": false}]}, {"key": "bringup", "order": 21, "title": "Silicon Bring-up", "short": "BU", "phase": "validateRamp", "start": 106, "dur": 18, "tagline": "The moment of truth.", "activities": ["Sample Receipt, Incoming Inspection, and Board Mounting", "Power-On, Power Sequencing, and Basic Health Check", "Reset, Clocking, and PLL Lock Validation", "Boot, Firmware Load, and Functional Smoke Test", "Silicon Anomaly Debug and Failure Analysis", "PCIe/CXL, HBM, and Die-to-Die Interface Bring-Up", "Memory Subsystem and Bandwidth Validation", "Shmoo Across Voltage, Frequency, and Temperature", "Errata Capture, Workaround Definition, and Documentation", "Performance Validation Against the Architecture Model", "Respin versus Metal-Fix Decision Analysis", "Customer Sample Readiness and Release Package"], "deliverables": ["Bring-up report with per-milestone health status", "Failure analysis reports", "Interface compliance results with training margins", "Characterisation data set — V/F/T shmoo and power measurements", "Respin versus metal-fix decision record", "Errata list with workarounds", "Customer sample release package"], "milestones": [{"label": "Customer Samples", "major": false}]}, {"key": "qualification", "order": 22, "title": "Qualification & Production", "short": "MP", "phase": "validateRamp", "start": 110, "dur": 26, "tagline": "Engineering becomes a product.", "activities": ["Qualification Plan Definition Against JEDEC / AEC Standards", "Yield Learning, Failure Pareto, and Defect Analysis", "Reliability Stress Execution (HTOL, HTS, Temperature Cycle, uHAST, THB)", "ESD (HBM, CDM) and Latch-Up Qualification", "Process Corner and Split-Lot Validation", "Package Qualification (MSL, Drop, Bend, Board-Level Reliability)", "Production Test Program Release and Guard-Band Validation", "Capacity, Supply Chain, and Ramp Commitment", "Compliance and Certification (PCIe/CXL, RoHS/REACH, Safety)", "Test Time Reduction and Multi-Site Conversion", "Product Documentation Release", "Production Readiness Review and Change Control (PCN) Setup"], "deliverables": ["Qualification plan and JEDEC-compliant qualification report", "Yield model versus cost target report", "Production test program release", "Compliance certificates", "Ramp plan and supply commitment", "Reliability and package qualification data packages", "Datasheet and product documentation set", "Production readiness review sign-off", "Mass Production release record"], "milestones": [{"label": "Mass Production", "major": true}]}];
+const CFG = {"rows": [["productDefinition", "technology"], ["architecture", "ipReadiness"], ["pdk"], ["amsIp", "dft"], ["testChip", "rtl", "packageDesign"], ["verification", "packageTestVehicle"], ["synthesis"], ["physicalDesign", "validationHardware"], ["chipPackageCoVerification", "testDevelopment"], ["signoff"], ["tapeout"], ["fabrication", "packaging"], ["bringup"], ["qualification"]], "edges": [["productDefinition", "technology"], ["productDefinition", "architecture"], ["technology", "ipReadiness"], ["technology", "pdk"], ["ipReadiness", "amsIp"], ["ipReadiness", "rtl"], ["architecture", "rtl"], ["architecture", "dft"], ["architecture", "packageDesign"], ["pdk", "amsIp"], ["pdk", "testChip"], ["pdk", "synthesis"], ["pdk", "physicalDesign"], ["amsIp", "testChip"], ["amsIp", "physicalDesign"], ["testChip", "signoff"], ["rtl", "verification"], ["rtl", "synthesis"], ["dft", "synthesis"], ["dft", "testDevelopment"], ["verification", "signoff"], ["synthesis", "physicalDesign"], ["physicalDesign", "signoff"], ["physicalDesign", "chipPackageCoVerification"], ["packageDesign", "physicalDesign"], ["packageDesign", "packageTestVehicle"], ["packageDesign", "chipPackageCoVerification"], ["packageDesign", "validationHardware"], ["chipPackageCoVerification", "signoff"], ["packageTestVehicle", "packaging"], ["signoff", "tapeout"], ["tapeout", "fabrication"], ["fabrication", "packaging"], ["packaging", "bringup"], ["validationHardware", "bringup"], ["testDevelopment", "bringup"], ["testDevelopment", "qualification"], ["bringup", "qualification"]], "spine": ["productDefinition", "architecture", "rtl", "synthesis", "physicalDesign", "signoff", "tapeout", "fabrication", "packaging", "bringup", "qualification"], "ribs": [["ipReadiness", "rtl"], ["pdk", "synthesis"], ["dft", "synthesis"], ["amsIp", "physicalDesign"], ["packageDesign", "physicalDesign"], ["verification", "signoff"], ["chipPackageCoVerification", "signoff"], ["testChip", "signoff"], ["packageTestVehicle", "packaging"], ["testDevelopment", "bringup"], ["validationHardware", "bringup"]], "siliconNote": "<b>Spine</b> (bold) from definition to mass production. <b>Feeds</b> (dashed) show where each block of work lands on it: IP → RTL, PDK &amp; DFT → Synthesis, AMS IP &amp; package → PD, DV, co-verification &amp; test chip → Signoff, test vehicle → Assembly, test program &amp; board → Bring-up.", "second": {"label": "Package &amp; test path", "nodes": ["packageDesign", "packageTestVehicle", "chipPackageCoVerification", "packaging", "validationHardware", "dft", "testDevelopment", "bringup", "qualification"], "note": "Package design → test vehicle → assembly, and → co-verification and the validation board; DFT → test program → bring-up and qualification."}, "tags": {}, "tagStyle": {}, "origin": {}, "originDefault": "", "statExtra": [], "endTitle": "Mass Production", "endNote": "Tapeout at W86 · First Silicon at W101 · Customer Samples at W124"};
+
+const ALL_BANDS = [
+  { id: 'define', label: 'Define' },
+  { id: 'enable', label: 'Technology & IP Enablement' },
+  { id: 'designVerify', label: 'Design & Verify' },
+  { id: 'implement', label: 'Implement' },
+  { id: 'manufacture', label: 'Manufacture' },
+  { id: 'integrate', label: 'Integrate' },
+  { id: 'validateRamp', label: 'Validate & Ramp' },
+  { id: 'platform', label: 'Developer Platform & Ecosystem' },
+];
+/* a band no stage sits under is not drawn */
+const BANDS = ALL_BANDS.filter(b => STAGES.some(s => s.phase === b.id));
+
+const ROWS = CFG.rows;
+const EDGES = CFG.edges;
+
+/* The silicon path: the spine a die travels from spec to mass production,
+   and the work that lands on it — each feed drawn as the one link by which it
+   joins the spine, so the view stays a spine with ribs rather than a web. */
+const SILICON_SPINE = CFG.spine;
+const SILICON_RIBS = CFG.ribs;
+const SILICON_FEEDS = SILICON_RIBS.map(r => r[0]);
+const SPINE_EDGES = new Set(SILICON_SPINE.slice(1).map((k, i) => SILICON_SPINE[i] + '>' + k));
+const PATHS = {
+  silicon: [...SILICON_SPINE, ...SILICON_FEEDS],
+  platform: CFG.second.nodes,
+};
+const PATH_EDGES = {
+  silicon: [...SPINE_EDGES, ...SILICON_RIBS.map(([a, z]) => a + '>' + z)],
+  platform: EDGES.filter(([a, z]) => CFG.second.nodes.includes(a) && CFG.second.nodes.includes(z)).map(([a, z]) => a + '>' + z),
+};
+
+/* Stages this template adds to, or derives from, the Typical SoC flow. */
+const TAG = CFG.tags;
+const originOf = k => CFG.origin[k] ?? CFG.originDefault;
+
+const byKey = Object.fromEntries(STAGES.map(s => [s.key, s]));
+const band = id => BANDS.find(b => b.id === id);
+const color = id => `var(--b-${id})`;
+const END = Math.max(...STAGES.map(s => s.start + s.dur));
+const endOf = s => s.start + s.dur;
+const esc = t => String(t).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const preds = k => EDGES.filter(e => e[1] === k).map(e => e[0]);
+const succs = k => EDGES.filter(e => e[0] === k).map(e => e[1]);
+
+/* ---- stats ---- */
+const majors = STAGES.flatMap(s => s.milestones.filter(m => m.major).map(m => ({ ...m, key: s.key, wk: endOf(s) }))).sort((a, b) => a.wk - b.wk);
+document.getElementById('stats').innerHTML = [
+  [STAGES.length, 'stages'],
+  ...CFG.statExtra,
+  [STAGES.reduce((n, s) => n + s.activities.length, 0), 'activities'],
+  [STAGES.reduce((n, s) => n + s.deliverables.length, 0), 'deliverables'],
+  [STAGES.reduce((n, s) => n + s.milestones.length, 0), 'milestones'],
+  [END + ' wk', '≈ ' + (END / 52).toFixed(1) + ' years kickoff → MP'],
+].map(([b, s]) => `<div class="stat"><b>${b}</b><span>${s}</span></div>`).join('');
+
+/* ---- milestone strip ---- */
+(function () {
+  const ax = document.getElementById('axis');
+  let h = '<div class="rail"></div>';
+  for (let w = 0; w <= END; w += 13) h += `<div class="tick" style="left:${w / END * 100}%">W${w}</div>`;
+  majors.forEach((m, i) => {
+    const up = i % 2 === 0, l2 = i % 4 >= 2, end = m.wk / END > 0.9;
+    h += `<div class="ms ${up ? 'up' : 'down'}${l2 ? ' l2' : ''}${end ? ' end' : ''}" style="left:${m.wk / END * 100}%" data-k="${m.key}" title="${esc(m.label)} — W${m.wk}"><i></i><span>${esc(m.label)}<em>W${m.wk}</em></span></div>`;
+  });
+  ax.innerHTML = h;
+  ax.querySelectorAll('.ms').forEach(el => el.addEventListener('click', () => select(el.dataset.k)));
+})();
+
+/* ---- grid ---- */
+const grid = document.getElementById('grid');
+let html = '<div class="lanehead" style="--c:var(--faint)">Start</div>' +
+  BANDS.map(b => `<div class="lanehead" style="--c:${color(b.id)}">${esc(b.label)}</div>`).join('');
+ROWS.forEach((row, r) => {
+  const starts = row.map(k => byKey[k].start);
+  const lo = Math.min(...starts), hi = Math.max(...starts);
+  html += `<div class="rowlabel" style="grid-row:${r + 2}">W${lo}${hi !== lo ? '–' + hi : ''}</div>`;
+  BANDS.forEach((b, c) => {
+    const ks = row.filter(k => byKey[k].phase === b.id).sort((a, z) => byKey[a].start - byKey[z].start);
+    html += `<div class="cell" style="grid-row:${r + 2};grid-column:${c + 2}">` + ks.map(nodeHtml).join('') + '</div>';
+  });
+});
+html += `<div class="endnode" style="grid-row:${ROWS.length + 2}"><b>◆ W${END} — ${CFG.endTitle}</b><span>${CFG.endNote}</span></div>`;
+grid.innerHTML = html;
+
+function nodeHtml(k) {
+  const s = byKey[k];
+  const ms = s.milestones.map(m => `<div class="mst${m.major ? ' major' : ''}">${esc(m.label)}</div>`).join('');
+  return `<button class="node" id="n-${k}" data-k="${k}" style="--c:${color(s.phase)}">
+    <span class="code">${esc(s.short)}</span>${TAG[k] ? `<span class="tag" style="color:${CFG.tagStyle[TAG[k]][0]};background:${CFG.tagStyle[TAG[k]][1]}">${esc(TAG[k])}</span>` : ''}
+    <span class="ttl">${esc(s.title)}</span>
+    <span class="wk">W${s.start}–W${endOf(s)} · ${s.dur} wk</span>
+    <div class="bar"><i style="left:${s.start / END * 100}%;width:${s.dur / END * 100}%"></i></div>
+    ${ms}
+  </button>`;
+}
+
+/* ---- edges: shared ---- */
+const chart = document.getElementById('chart');
+const svg = document.getElementById('edges');
+const ROW_OF = {};
+ROWS.forEach((row, r) => row.forEach(k => { ROW_OF[k] = r; }));
+const LANE_OF = k => BANDS.findIndex(b => b.id === byKey[k].phase);
+
+/* transitive reduction: drop a→z when z is reachable from a another way,
+   except on the silicon spine, which reads as one unbroken line */
+const DRAWN = EDGES.filter(([a, z]) => {
+  if (SPINE_EDGES.has(a + '>' + z)) return true;
+  const seen = new Set(), stack = succs(a).filter(x => x !== z);
+  while (stack.length) {
+    const k = stack.pop();
+    if (k === z) return false;
+    if (seen.has(k)) continue;
+    seen.add(k); stack.push(...succs(k));
+  }
+  return true;
+});
+
+const cssVar = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+const bandOf = k => byKey[k].phase;
+
+function measure() {
+  const cr = chart.getBoundingClientRect();
+  svg.setAttribute('width', cr.width);
+  svg.setAttribute('height', cr.height);
+  const rel = el => { const r = el.getBoundingClientRect(); return { l: r.left - cr.left, r: r.right - cr.left, t: r.top - cr.top, b: r.bottom - cr.top }; };
+  const B = Object.fromEntries(STAGES.map(s => [s.key, rel(document.getElementById('n-' + s.key))]));
+  Object.values(B).forEach(b => { b.cx = (b.l + b.r) / 2; });
+  const heads = [...grid.querySelectorAll('.lanehead')].slice(1).map(rel);
+  const gap = heads[1].l - heads[0].r;
+  const gutterX = g => g < heads.length ? heads[g].l - gap / 2 : heads[heads.length - 1].r + gap / 2;
+  const rowBottom = ROWS.map(row => Math.max(...row.map(k => B[k].b)));
+  const rowTop = ROWS.map(row => Math.min(...row.map(k => B[k].t)));
+  return {
+    B, gap, gutterX, rowBottom, rowTop,
+    chanY: r => (rowBottom[r] + rowTop[r + 1]) / 2,
+    chanH: r => rowTop[r + 1] - rowBottom[r],
+  };
+}
+
+function roundPath(pts, r) {
+  let d = `M${pts[0][0]},${pts[0][1]}`;
+  for (let i = 1; i < pts.length - 1; i++) {
+    const [x0, y0] = pts[i - 1], [x1, y1] = pts[i], [x2, y2] = pts[i + 1];
+    const l1 = Math.hypot(x1 - x0, y1 - y0), l2 = Math.hypot(x2 - x1, y2 - y1);
+    const rr = Math.min(r, l1 / 2, l2 / 2);
+    if (rr < 0.5) { d += ` L${x1},${y1}`; continue; }
+    d += ` L${x1 - (x1 - x0) / l1 * rr},${y1 - (y1 - y0) / l1 * rr} Q${x1},${y1} ${x1 + (x2 - x1) / l2 * rr},${y1 + (y2 - y1) / l2 * rr}`;
+  }
+  const [xn, yn] = pts[pts.length - 1];
+  return d + ` L${xn},${yn}`;
+}
+/* corners cut at 45°, as on a metro map */
+function chamferPath(pts, c) {
+  let d = `M${pts[0][0]},${pts[0][1]}`;
+  for (let i = 1; i < pts.length - 1; i++) {
+    const [x0, y0] = pts[i - 1], [x1, y1] = pts[i], [x2, y2] = pts[i + 1];
+    const l1 = Math.hypot(x1 - x0, y1 - y0), l2 = Math.hypot(x2 - x1, y2 - y1);
+    const cc = Math.min(c, l1 / 2, l2 / 2);
+    if (cc < 0.5) { d += ` L${x1},${y1}`; continue; }
+    d += ` L${x1 - (x1 - x0) / l1 * cc},${y1 - (y1 - y0) / l1 * cc} L${x1 + (x2 - x1) / l2 * cc},${y1 + (y2 - y1) / l2 * cc}`;
+  }
+  const [xn, yn] = pts[pts.length - 1];
+  return d + ` L${xn},${yn}`;
+}
+const clean = pts => pts.filter((q, j) => j === 0 || Math.abs(q[0] - pts[j - 1][0]) > 0.1 || Math.abs(q[1] - pts[j - 1][1]) > 0.1);
+
+function markers() {
+  const m = (id, fill, s = 7) => `<marker id="${id}" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="${s}" markerHeight="${s}" orient="auto-start-reverse"><path d="M0,1 L9,5 L0,9 z" fill="${fill}"/></marker>`;
+  return '<defs>' + m('ah', '#a9a9b8') + m('ahA', '#5b5bd6', 6) +
+    BANDS.map(b => m('ah-' + b.id, cssVar('--b-' + b.id), 5.5)).join('') + '</defs>';
+}
+/* one link: applyMode highlights it by data-a / data-z and restores data-m */
+const edgePath = (a, z, d, { cls = '', stroke = null, marker = 'url(#ah)' } = {}) =>
+  `<path class="e ${cls}" data-a="${a}" data-z="${z}" data-m="${marker}" d="${d}"${stroke ? ` style="--lc:${stroke}"` : ''}${marker ? ` marker-end="${marker}"` : ''}/>`;
+
+/* spread ports along a card edge, ordered by where the other end is */
+const group = pairs => pairs.reduce((m, [k, i]) => ((m[k] = m[k] || []).push(i), m), {});
+function spreadX(b, list, i, keyOf, inset = 0.25) {
+  const sorted = list.slice().sort((x, y) => keyOf(x) - keyOf(y)), n = sorted.length;
+  return b.l + (b.r - b.l) * (n === 1 ? 0.5 : inset + (1 - 2 * inset) * sorted.indexOf(i) / (n - 1));
+}
+
+/*
+ * Orthogonal routes through the empty space: the channel under a row, the
+ * gutter beside a lane, the channel over the target's row. With `bundle`,
+ * every link from one source shares its exit, trunk and slots, so they read as
+ * one line that forks; without it each link has lanes of its own.
+ */
+function orthoRoutes(M, edges, { bundle }) {
+  const { B } = M;
+  const info = edges.map(([a, z]) => ({ a, z, ra: ROW_OF[a], rz: ROW_OF[z], la: LANE_OF(a), lz: LANE_OF(z) }));
+  /* the trunk gutter: on the side of the far targets */
+  const trunk = {};
+  info.forEach((e, i) => {
+    if (e.rz <= e.ra + 1) return;
+    const key = bundle ? e.a : i;
+    if (trunk[key] !== undefined) return;
+    const far = info.filter((f, j) => (bundle ? f.a === e.a : j === i) && f.rz > f.ra + 1);
+    const mean = far.reduce((s, f) => s + B[f.z].cx, 0) / far.length;
+    trunk[key] = mean >= B[e.a].cx ? e.la + 1 : e.la;
+  });
+  const slots = {};
+  const use = (t, key, order) => { (slots[t] = slots[t] || new Map()); if (!slots[t].has(key)) slots[t].set(key, order); };
+  info.forEach((e, i) => {
+    if (e.ra === e.rz) return;
+    const key = bundle ? e.a : i;
+    use('c' + e.ra, key, B[e.a].cx);
+    if (e.rz > e.ra + 1) {
+      use('g' + trunk[key], key, e.ra);
+      use('c' + (e.rz - 1), key, M.gutterX(trunk[key]));
+    }
+  });
+  const slotOf = (t, key, room) => {
+    const m = slots[t], keys = [...m.keys()].sort((x, y) => m.get(x) - m.get(y)), n = keys.length;
+    return (keys.indexOf(key) - (n - 1) / 2) * Math.min(7, (room - 16) / Math.max(1, n - 1));
+  };
+  /* ports */
+  const downs = info.map((e, i) => i).filter(i => info[i].ra !== info[i].rz);
+  const outs = group(downs.map(i => [info[i].a, i])), ins = group(downs.map(i => [info[i].z, i]));
+  const approachX = i => { const e = info[i], key = bundle ? e.a : i; return e.rz > e.ra + 1 ? M.gutterX(trunk[key]) : B[e.a].cx; };
+  return info.map((e, i) => {
+    const A = B[e.a], Z = B[e.z];
+    if (e.ra === e.rz) {
+      const right = Z.cx > A.cx, y = (Math.max(A.t, Z.t) + Math.min(A.b, Z.b)) / 2;
+      return [[right ? A.r : A.l, y], [right ? Z.l : Z.r, y]];
+    }
+    const key = bundle ? e.a : i;
+    const sx = bundle ? A.cx : spreadX(A, outs[e.a], i, j => B[info[j].z].cx);
+    const ex = spreadX(Z, ins[e.z], i, approachX);
+    const y1 = M.chanY(e.ra) + slotOf('c' + e.ra, key, M.chanH(e.ra));
+    if (e.rz === e.ra + 1) return clean([[sx, A.b], [sx, y1], [ex, y1], [ex, Z.t]]);
+    const gx = M.gutterX(trunk[key]) + slotOf('g' + trunk[key], key, M.gap);
+    const y2 = M.chanY(e.rz - 1) + slotOf('c' + (e.rz - 1), key, M.chanH(e.rz - 1));
+    return clean([[sx, A.b], [sx, y1], [gx, y1], [gx, y2], [ex, y2], [ex, Z.t]]);
+  });
+}
+
+/* redraw only when the chart's size really changes, once per frame */
+let drawnSize = '', pending = 0;
+function watchSize() {
+  new ResizeObserver(() => {
+    const size = chart.clientWidth + 'x' + chart.clientHeight;
+    if (size === drawnSize || pending) return;
+    pending = requestAnimationFrame(() => { pending = 0; drawnSize = chart.clientWidth + 'x' + chart.clientHeight; drawEdges(); });
+  }).observe(chart);
+}
+
+/* v1 — Bus: orthogonal, bundled by source. Each stage has one exit and one
+   trunk that forks to everything it feeds. */
+function drawEdges() {
+  const M = measure();
+  const routes = orthoRoutes(M, DRAWN, { bundle: true });
+  svg.innerHTML = markers() + DRAWN.map(([a, z], i) => edgePath(a, z, roundPath(routes[i], 6))).join('');
+  applyMode();
+}
+
+/* ---- modes & selection ---- */
+let mode = 'all', selected = null;
+const MODE_NOTE = {
+  all: 'Click a stage to trace what feeds it and what it unblocks.',
+  silicon: CFG.siliconNote,
+  platform: CFG.second.note,
+};
+document.querySelectorAll('.seg button').forEach(b => b.addEventListener('click', () => {
+  mode = b.dataset.mode;
+  document.querySelectorAll('.seg button').forEach(x => x.setAttribute('aria-pressed', x === b));
+  selected = null; closeDrawer(); applyMode();
+}));
+function applyMode() {
+  const nodes = chart.querySelectorAll('.node'), paths = svg.querySelectorAll('.e, .e-dec');
+  nodes.forEach(n => n.classList.remove('on', 'sel', 'spine'));
+  document.getElementById('modeNote').innerHTML = MODE_NOTE[selected ? 'all' : mode];
+  chart.classList.toggle('path-mode', !selected && mode !== 'all');
+  paths.forEach(p => { p.classList.remove('on', 'in', 'path', 'spine', 'rib'); if (p.dataset.m) p.setAttribute('marker-end', p.dataset.m); });
+  if (selected) {
+    chart.classList.add('focus');
+    const lit = new Set([selected, ...preds(selected), ...succs(selected)]);
+    nodes.forEach(n => lit.has(n.dataset.k) && n.classList.add('on'));
+    document.getElementById('n-' + selected).classList.add('sel');
+    paths.forEach(p => {
+      if (p.dataset.a === selected || p.dataset.z === selected) {
+        p.classList.add('on'); if (p.dataset.z === selected) p.classList.add('in');
+        if (p.dataset.a === selected) p.dataset.m && p.setAttribute('marker-end', 'url(#ahA)');
+      }
+    });
+  } else if (mode !== 'all') {
+    chart.classList.add('focus');
+    const lit = new Set(PATHS[mode]), pe = new Set(PATH_EDGES[mode]);
+    nodes.forEach(n => lit.has(n.dataset.k) && n.classList.add('on'));
+    if (mode === 'silicon') nodes.forEach(n => SILICON_SPINE.includes(n.dataset.k) && n.classList.add('spine'));
+    paths.forEach(p => {
+      const id = p.dataset.a + '>' + p.dataset.z;
+      if (pe.has(id)) { p.classList.add('on'); p.dataset.m && p.setAttribute('marker-end', 'url(#ahA)'); }
+      if (mode === 'silicon' && SPINE_EDGES.has(id)) p.classList.add('spine');
+      else if (mode === 'silicon' && pe.has(id)) p.classList.add('rib');
+    });
+    /* drawn last so the spine sits on top of the links that feed it */
+    paths.forEach(p => p.classList.contains('spine') && svg.appendChild(p));
+  } else {
+    chart.classList.remove('focus');
+  }
+}
+
+const drawer = document.getElementById('drawer');
+function chip(k) {
+  const s = byKey[k];
+  return `<button class="chip" data-k="${k}" style="--c:${color(s.phase)}">${esc(s.title)}</button>`;
+}
+function select(k) {
+  selected = k;
+  const s = byKey[k];
+  drawer.style.setProperty('--c', color(s.phase));
+  document.getElementById('dhead').innerHTML =
+    `<div class="code">${esc(s.short)} · ${esc(band(s.phase).label)}${originOf(k) ? ' · ' + esc(originOf(k)) : ''}</div>
+     <h3>${esc(s.title)}</h3><p>${esc(s.tagline || '')}</p>`;
+  const p = preds(k), z = succs(k);
+  document.getElementById('dbody').innerHTML =
+    `<div class="facts"><div><b>W${s.start}</b><span>starts</span></div><div><b>W${endOf(s)}</b><span>ends</span></div><div><b>${s.dur} wk</b><span>duration</span></div></div>` +
+    s.milestones.map(m => `<div class="msbox">◆ ${esc(m.label)}${m.major ? ' <span class="hint">· major</span>' : ''}<span class="hint" style="margin-left:auto">W${endOf(s)}</span></div>`).join('') +
+    `<h4>Fed by</h4>${p.length ? '<div class="chips">' + p.map(chip).join('') + '</div>' : '<div class="none">Program kickoff</div>'}` +
+    `<h4>Unblocks</h4>${z.length ? '<div class="chips">' + z.map(chip).join('') + '</div>' : '<div class="none">Program close — production &amp; launch</div>'}` +
+    `<h4>Activities (${s.activities.length})</h4><ol>${s.activities.map(a => `<li>${esc(a)}</li>`).join('')}</ol>` +
+    `<h4>Deliverables (${s.deliverables.length})</h4><ul>${s.deliverables.map(a => `<li>${esc(a)}</li>`).join('')}</ul>`;
+  document.getElementById('dbody').scrollTop = 0;
+  document.getElementById('dbody').querySelectorAll('.chip').forEach(c => c.addEventListener('click', () => select(c.dataset.k)));
+  drawer.classList.add('open'); drawer.setAttribute('aria-hidden', 'false');
+  applyMode();
+  const n = document.getElementById('n-' + k);
+  n.scrollIntoView({ block: 'nearest', inline: 'nearest', behavior: 'smooth' });
+}
+function closeDrawer() {
+  drawer.classList.remove('open'); drawer.setAttribute('aria-hidden', 'true');
+  selected = null; applyMode();
+}
+document.getElementById('dclose').addEventListener('click', closeDrawer);
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeDrawer(); });
+chart.addEventListener('click', e => {
+  const n = e.target.closest('.node');
+  if (n) select(n.dataset.k); else if (selected) closeDrawer();
+});
+
+/* ---- sequence table ---- */
+document.getElementById('seq').innerHTML =
+  '<thead><tr><th>#</th><th>Stage</th><th class="hide-sm">Band</th><th>Weeks</th><th>Milestone</th></tr></thead><tbody>' +
+  [...STAGES].sort((a, b) => a.start - b.start || a.order - b.order).map((s, i) =>
+    `<tr class="clk" data-k="${s.key}" style="--c:${color(s.phase)}"><td class="n">${i + 1}</td>
+      <td><span class="dot"></span><b>${esc(s.title)}</b><div class="gantt"><i style="left:${s.start / END * 100}%;width:${s.dur / END * 100}%"></i></div></td>
+      <td class="hide-sm">${esc(band(s.phase).label)}</td>
+      <td class="w">W${s.start}–W${endOf(s)}<br>${s.dur} wk</td>
+      <td>${s.milestones.map(m => m.major ? `<b style="color:var(--accent)">◆ ${esc(m.label)}</b>` : esc(m.label)).join('')}</td></tr>`).join('') +
+  '</tbody>';
+document.querySelectorAll('#seq tr.clk').forEach(tr => tr.addEventListener('click', () => select(tr.dataset.k)));
+
+/* ---- legend ---- */
+document.getElementById('legend').innerHTML =
+  BANDS.map(b => `<span style="--c:${color(b.id)}"><i class="sw"></i>${esc(b.label)}</span>`).join('') +
+  '<span><i class="sw" style="--c:var(--accent);transform:rotate(45deg);width:8px;height:8px"></i>Major milestone</span>';
+
+watchSize();
+</script>
+</body>
+</html>

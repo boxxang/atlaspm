@@ -9,6 +9,8 @@
  */
 import { PrismaPg } from '@prisma/adapter-pg';
 import 'dotenv/config';
+import { readFileSync } from 'node:fs';
+import path from 'node:path';
 import { ALL_ACTIVITIES } from '../src/data/builtins';
 import { KESTREL_SCENARIO } from '../src/data/kestrelDemo';
 import { KESTREL_SIGNOFF_CLOSED, KESTREL_SIGNOFFS } from '../src/data/kestrelSignoffs';
@@ -61,6 +63,21 @@ async function main() {
       data: { checklistDoneAt: day(closed), done: true, completedAt: day(closed) },
     });
   }
+  /* the PD flow note carries its picture and the diagram it was drawn from */
+  const flowNote = `${pid}:post:note-pd-flow`;
+  const flowAt = demo.posts.find((p) => p.id === flowNote)?.createdAt;
+  if (!flowAt) throw new Error('No PD flow note in the scenario.');
+  const assets = path.join(__dirname, 'assets', 'kestrel');
+  for (const [file, mimeType] of [
+    ['soc-pd-flow-cadence.png', 'image/png'],
+    ['soc-pd-flow-cadence.html', 'text/html'],
+  ] as const) {
+    const data = readFileSync(path.join(assets, file));
+    await prisma.attachment.create({
+      data: { id: `${flowNote}:att:${file}`, projectId: pid, postId: flowNote, filename: file, mimeType, size: data.length, data, createdAt: flowAt },
+    });
+  }
+
   console.log(`Sign-off checklists: ${Object.keys(KESTREL_SIGNOFFS).join(', ')}; closed by checklist: ${Object.keys(KESTREL_SIGNOFF_CLOSED).join(', ')}.`);
 }
 

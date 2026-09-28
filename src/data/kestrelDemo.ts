@@ -275,6 +275,39 @@ export const KESTREL_POSTS: readonly ScenarioPost[] = [
     ],
   },
 
+  /* ---- physical design's reference flow, pinned at the start of the stage ---- */
+  {
+    key: 'note-pd-flow',
+    kind: 'note',
+    at: '2026-05-26 09:30',
+    stageId: 'physicalDesignEmb',
+    text: 'PD flow — RTL to tapeout, Cadence tool set',
+    blocks: [
+      {
+        p: 'The flow every turn runs, from the synthesis inputs to the tapeout database, with the tool at each step and the two sign-off gates. The picture is below; the attached HTML is the original diagram, which exports a PNG.',
+      },
+      {
+        table: {
+          head: ['Phase', 'What runs', 'Gate'],
+          rows: [
+            ['01 Pre-layout', 'Libraries and SRAM views, logical synthesis, floorplan and scan insertion, physical synthesis', 'Sign-off gate 1 — LEC, LP, logical DRC, pre-layout STA, ATPG, simulation'],
+            ['02 P&R', 'Place and route on the DFT-inserted netlist, metal fill, parasitic extraction', '—'],
+            ['03 Post-layout', 'Post-layout netlist into the second gate', 'Sign-off gate 2 — LEC, LP, logical DRC, STA, ATPG, simulation, IR, EM, power, glitch noise, DRC / LVS / PERC'],
+            ['04 Release', 'Final GDS, layout fixes, data preparation', 'Tapeout'],
+          ],
+        },
+      },
+      { h: 'How the Kestrel turns use it' },
+      {
+        bullets: [
+          'Turn 1 (N1) and Turn 2 (N2) run phases 01–03 end to end; gate 2 findings go back to the owning team as rework',
+          'The final turn on the FFN is the only one that goes through to 04 Release',
+          'Signoff (ESO) runs gate 2 on the handed-over database; its dry run used the Turn 2 database',
+        ],
+      },
+    ],
+  },
+
   /* ---- the deadlock, and the decision to hold the FFN ---- */
   {
     key: 'soak-hang',

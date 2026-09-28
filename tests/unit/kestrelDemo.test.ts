@@ -166,3 +166,20 @@ describe('Embedded_SoC — the sign-off checklists', () => {
     }
   });
 });
+
+describe('Embedded_SoC — physical design’s reference flow', () => {
+  it('sits in the stage’s key info from the start, with its picture on disk for the seed', async () => {
+    const { existsSync, statSync } = await import('node:fs');
+    const note = demo.posts.find((p) => p.id === 'embedded-soc-cd0t9:post:note-pd-flow')!;
+    expect(note, 'the PD flow note').toBeTruthy();
+    expect(note.kind).toBe('note');
+    expect(note.stageId).toBe('physicalDesignEmb');
+    /* posted in the stage's first week */
+    expect(fmtDate(note.createdAt)).toBe('05/26/2026');
+    for (const f of ['soc-pd-flow-cadence.png', 'soc-pd-flow-cadence.html']) {
+      const at = `prisma/assets/kestrel/${f}`;
+      expect(existsSync(at), at).toBe(true);
+      expect(statSync(at).size, at).toBeLessThan(5 * 1024 * 1024);
+    }
+  });
+});

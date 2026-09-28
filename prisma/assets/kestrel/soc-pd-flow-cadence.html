@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SoC PD Flow</title>
+<style>
+  :root{
+    --page:#f9f9f7; --surface:#fcfcfb; --ink:#0b0b0b; --ink-2:#52514e; --ink-3:#898781;
+    --line:#e1e0d9; --line-strong:#c3c2b7; --accent:#256abf; --accent-soft:#e7effa;
+  }
+  body{margin:0;background:var(--page);color:var(--ink);
+    font-family:system-ui,-apple-system,"Segoe UI",sans-serif;}
+  .wrap{max-width:1600px;margin:0 auto;padding:24px 16px}
+  .slide{background:var(--page);aspect-ratio:16/9;border:1.25px solid var(--line);border-radius:5px;overflow:hidden}
+  svg{display:block;width:100%;height:100%}
+  .bar{display:flex;justify-content:flex-end;margin-bottom:10px}
+  button{font:700 10.5px ui-monospace,"SF Mono",Menlo,monospace;letter-spacing:1.3px;text-transform:uppercase;
+    padding:7px 12px;border-radius:3px;border:1.25px solid var(--line-strong);background:var(--surface);color:var(--ink-2);cursor:pointer}
+  button:hover{border-color:var(--accent);color:var(--accent)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="bar"><button id="png">Export PNG</button></div>
+  <div class="slide"><svg id="flow" viewBox="0 0 1600 900" xmlns="http://www.w3.org/2000/svg"></svg></div>
+</div>
+
+<script>
+const NS="http://www.w3.org/2000/svg", svg=document.getElementById("flow");
+const SANS='system-ui,-apple-system,"Segoe UI",sans-serif';
+const MONO='ui-monospace,"SF Mono",Menlo,Consolas,monospace';
+// AtlasPM tokens
+const K={page:"#f9f9f7",surface:"#fcfcfb",ink:"#0b0b0b",ink2:"#52514e",ink3:"#898781",
+  line:"#e1e0d9",strong:"#c3c2b7",future:"#ecebe5",panel:"#f4f3ee",
+  accent:"#256abf",accentSoft:"#e7effa",risk:"#d03b3b",riskSoft:"#fdf4f4",
+  // discipline markers, tuned to sit alongside the AtlasPM palette
+  pi:"#256abf",pd:"#3d7a68",dft:"#b07a1f",psi:"#7a4fb0"};
+
+function el(t,a,p=svg){const e=document.createElementNS(NS,t);for(const k in a)e.setAttribute(k,a[k]);p.appendChild(e);return e;}
+function txt(x,y,s,o={}){const e=el("text",{x,y,"font-family":o.mono?MONO:SANS,"font-size":o.size||13,
+  "font-weight":o.w||400,"text-anchor":o.a||"middle","dominant-baseline":"central",fill:o.c||K.ink,
+  "letter-spacing":o.ls||0});e.textContent=s;return e;}
+function cap(x,y,s,o={}){return txt(x,y,s.toUpperCase(),{mono:true,size:o.size||11,w:700,ls:1.5,c:o.c||K.ink3,a:o.a||"start"});}
+
+function box(x,y,w,h,d,name,tool){
+  el("rect",{x,y,width:w,height:h,rx:5,fill:K.surface,stroke:K.strong,"stroke-width":1.25});
+  if(d) el("rect",{x:x+1,y:y+1,width:3.5,height:h-2,fill:K[d]});
+  const cx=x+w/2+(d?2:0);
+  if(tool){txt(cx,y+h/2-8,name,{size:13,w:650});txt(cx,y+h/2+9,tool,{mono:true,size:11,c:K.ink2});}
+  else txt(cx,y+h/2,name,{size:13.5,w:650});
+}
+function data(x,y,w,h,l1,l2){
+  const s=14;
+  el("polygon",{points:`${x+s},${y} ${x+w},${y} ${x+w-s},${y+h} ${x},${y+h}`,fill:K.future,stroke:K.strong,"stroke-width":1.25});
+  if(l2){txt(x+w/2,y+h/2-8,l1,{size:12.5,w:650});txt(x+w/2,y+h/2+9,l2,{mono:true,size:10.5,c:K.ink2});}
+  else txt(x+w/2,y+h/2,l1,{size:13,w:650});
+}
+function diamond(cx,cy,hw,hh,l1,l2){
+  el("polygon",{points:`${cx},${cy-hh} ${cx+hw},${cy} ${cx},${cy+hh} ${cx-hw},${cy}`,fill:K.surface,stroke:K.ink2,"stroke-width":1.5});
+  if(l2){txt(cx,cy-8,l1,{size:13.5,w:650});txt(cx,cy+9,l2,{size:13.5,w:650});}else txt(cx,cy,l1,{size:14,w:650});
+}
+function arrow(p,head=true){el("polyline",{points:p.map(q=>q.join(",")).join(" "),fill:"none",stroke:K.ink2,
+  "stroke-width":1.25,"stroke-linejoin":"round","marker-end":head?"url(#ah)":""});}
+function gate(x,y,w,h,title){
+  el("rect",{x,y,width:w,height:h,rx:5,fill:K.panel,stroke:K.strong,"stroke-width":1.25,"stroke-dasharray":"4 3"});
+  const tw=title.length*8.6+22;
+  el("rect",{x:x+w/2-tw/2,y:y-11,width:tw,height:22,rx:3,fill:K.accentSoft,stroke:K.accent,"stroke-width":1});
+  txt(x+w/2,y,title.toUpperCase(),{mono:true,size:11,w:700,ls:1.4,c:K.accent});
+}
+function colHead(x,w,n,t){
+  txt(x+14,104,n,{mono:true,size:12,w:700,c:K.accent,a:"start"});
+  cap(x+38,104,t,{size:12,c:K.ink});
+  el("line",{x1:x+14,y1:118,x2:x+w-14,y2:118,stroke:K.strong,"stroke-width":1.25});
+}
+function label(x,y,s,c){txt(x,y,s.toUpperCase(),{mono:true,size:11,w:700,ls:1,c,a:"start"});}
+
+// defs
+const defs=el("defs",{});
+const m=el("marker",{id:"ah",viewBox:"0 0 10 10",refX:9,refY:5,markerWidth:7,markerHeight:7,orient:"auto"},defs);
+el("path",{d:"M0,0 L10,5 L0,10 z",fill:K.ink2},m);
+const m2=el("marker",{id:"ah2",viewBox:"0 0 10 10",refX:5,refY:5,markerWidth:3.4,markerHeight:3.4,orient:"auto"},defs);
+el("path",{d:"M0,0 L10,5 L0,10 z",fill:K.risk},m2);
+
+// background + title
+el("rect",{x:0,y:0,width:1600,height:900,fill:K.page});
+const ttl=txt(28,40,"SoC Physical Design Flow",{size:26,w:650,a:"start",ls:-0.5});
+txt(28+ttl.getBBox().width+16,42,"RTL → Tape Out · Cadence tool set",{mono:true,size:12.5,c:K.ink3,a:"start"});
+
+// column panels
+[[20,500],[530,330],[870,460],[1340,240]]
+  .forEach(([x,w])=>el("rect",{x,y:82,width:w,height:720,rx:5,fill:K.surface,stroke:K.line,"stroke-width":1.25}));
+colHead(20,500,"01","Pre-Layout");
+colHead(530,330,"02","P&R");
+colHead(870,460,"03","Post-Layout");
+colHead(1340,240,"04","Release");
+
+/* ===== 01 PRE-LAYOUT (center 270) ===== */
+data(150,135,240,38,"RTL / SDC / UPF / DKIT / Info");
+arrow([[270,173],[270,185]]);
+box(160,185,220,40,"pi","DK Preparation · SRAM Gen","Liberate MX");
+arrow([[270,225],[270,237]]);
+box(160,237,220,40,"pi","Logical Synthesis","Genus");
+arrow([[270,277],[270,285]],false); arrow([[205,285],[335,285]],false);
+arrow([[205,285],[205,293]]); arrow([[335,285],[335,293]]);
+box(145,293,120,40,"pd","Floorplan","Innovus");
+box(275,293,120,40,"dft","Scan Insertion","Modus DFT");
+arrow([[205,333],[205,341]],false); arrow([[335,333],[335,341]],false); arrow([[205,341],[335,341]],false);
+arrow([[270,341],[270,349]]);
+box(160,349,220,40,"pi","Physical Synthesis","Genus iSpatial");
+arrow([[270,389],[270,400]]);
+data(140,400,260,40,"DFT-inserted netlist","SDC / UPF / PD info");
+arrow([[270,440],[270,465]]);
+
+gate(58,476,424,166,"Sign-off Gate 1");
+[[72,498,"pi","Equivalence Check","Conformal LEC"],[276,498,"pi","Pre-layout STA","Tempus"],
+ [72,544,"pi","Low Power Check","Conformal LP"],[276,544,"dft","ATPG","Modus ATPG"],
+ [72,590,"pi","Logical DRC","Jasper Superlint"],[276,590,"dft","Pre-layout Sim","Xcelium"]]
+ .forEach(([x,y,d,n,t])=>box(x,y,192,40,d,n,t));
+arrow([[270,642],[270,660]]);
+diamond(270,700,100,40,"Meet","criteria?");
+// No loop
+el("polyline",{points:"170,700 40,700 40,257",fill:"none",stroke:K.risk,"stroke-width":1.25});
+[[257,160],[313,145],[369,160]].forEach(([y,x])=>el("polyline",{points:`40,${y} ${x},${y}`,fill:"none",stroke:K.risk,"stroke-width":1.25,"marker-end":"url(#ahr)"}));
+label(112,688,"No",K.risk);
+// Yes -> P&R
+arrow([[270,740],[270,772],[515,772],[515,128],[695,128],[695,135]]);
+label(280,758,"Yes",K.accent);
+
+/* ===== 02 P&R (center 695) ===== */
+data(575,135,240,40,"DFT-inserted netlist","SDC / UPF / PD info");
+arrow([[695,175],[695,200]]);
+box(595,200,200,44,"pd","Place & Route","Innovus");
+arrow([[695,244],[695,272]]);
+box(595,272,200,44,"pd","Metal Dummy Fill","Pegasus");
+arrow([[695,316],[695,344]]);
+box(595,344,200,44,"pd","Parasitic Extraction","Quantus");
+arrow([[695,388],[695,416]]);
+data(575,416,240,44,"Post-layout netlist","SPEF / DEF / GDS");
+arrow([[695,460],[695,490],[880,490],[880,300],[896,300]]);
+
+/* ===== 03 POST-LAYOUT (center 1105) ===== */
+gate(896,150,418,338,"Sign-off Gate 2");
+[[910,172,"pi","Equivalence Check","Conformal LEC"],[1108,172,"pi","Logical DRC","Jasper Superlint"],
+ [910,222,"pi","Low Power Check","Conformal LP"],[1108,222,"pi","Post-layout STA","Tempus"],
+ [910,272,"dft","ATPG","Modus ATPG"],[1108,272,"dft","Post-layout Sim","Xcelium"],
+ [910,322,"psi","IR Drop Analysis","Voltus"],[1108,322,"psi","Power / Signal EM","Voltus"],
+ [910,372,"pi","Power Calculation","Voltus"],[1108,372,"pi","Glitch Noise Analysis","Tempus SI"]]
+ .forEach(([x,y,d,n,t])=>box(x,y,192,42,d,n,t));
+box(910,422,390,42,"pd","Physical Verification (DRC / LVS / PERC)","Pegasus");
+arrow([[1105,488],[1105,512]]);
+diamond(1105,552,105,40,"All clear?");
+// No -> iteration
+el("polyline",{points:"1105,592 1105,622",fill:"none",stroke:K.risk,"stroke-width":1.25,"marker-end":"url(#ahr)"});
+label(1116,606,"No",K.risk);
+el("ellipse",{cx:1105,cy:679,rx:92,ry:58,fill:K.riskSoft,stroke:"none"});
+el("path",{d:"M 1037 668 A 72 46 0 0 1 1168 646",fill:"none",stroke:K.risk,"stroke-width":4,"stroke-linecap":"round","marker-end":"url(#ah2)"});
+el("path",{d:"M 1173 690 A 72 46 0 0 1 1042 712",fill:"none",stroke:K.risk,"stroke-width":4,"stroke-linecap":"round","marker-end":"url(#ah2)"});
+txt(1105,670,"PI / PD / DFT / PSI",{size:13,w:650});
+txt(1105,688,"Iteration",{size:13,w:650});
+txt(1105,756,"Owning team fixes → re-verify",{mono:true,size:11,c:K.ink3});
+// Yes -> Release
+arrow([[1210,552],[1330,552],[1330,128],[1460,128],[1460,135]]);
+label(1222,540,"Yes",K.accent);
+
+/* ===== 04 RELEASE (center 1460) ===== */
+data(1370,135,180,44,"Final GDS");
+arrow([[1460,179],[1460,207]]);
+box(1375,207,170,44,null,"Layout Post Fix");
+arrow([[1460,251],[1460,279]]);
+box(1375,279,170,44,null,"Data Preparation");
+arrow([[1460,323],[1460,351]]);
+el("rect",{x:1370,y:351,width:180,height:52,rx:10,fill:K.accent});
+txt(1460,377,"Tape Out",{size:19,w:650,c:"#fff",ls:-0.2});
+
+/* ===== legend ===== */
+let lx=28; cap(lx,842,"Legend"); lx+=84;
+[["pi","PI"],["pd","PD"],["dft","DFT"],["psi","PSI"]].forEach(([d,t])=>{
+  el("rect",{x:lx,y:831,width:3.5,height:22,fill:K[d]}); txt(lx+11,842,t,{mono:true,size:12,w:700,a:"start"}); lx+=66;});
+el("polygon",{points:`${lx+10},832 ${lx+44},832 ${lx+36},852 ${lx+2},852`,fill:K.future,stroke:K.strong,"stroke-width":1.25});
+txt(lx+54,842,"Data",{size:12.5,a:"start",c:K.ink2}); lx+=108;
+el("rect",{x:lx,y:831,width:34,height:21,rx:5,fill:K.surface,stroke:K.strong,"stroke-width":1.25});
+txt(lx+44,842,"Process",{size:12.5,a:"start",c:K.ink2}); lx+=116;
+el("polygon",{points:`${lx+15},830 ${lx+30},842 ${lx+15},854 ${lx},842`,fill:K.surface,stroke:K.ink2,"stroke-width":1.25});
+txt(lx+40,842,"Decision",{size:12.5,a:"start",c:K.ink2}); lx+=112;
+el("line",{x1:lx,y1:842,x2:lx+30,y2:842,stroke:K.risk,"stroke-width":1.5});
+txt(lx+40,842,"Fail / rework",{size:12.5,a:"start",c:K.ink2});
+txt(1572,842,"All EDA tools: Cadence Design Systems",{mono:true,size:11,c:K.ink3,a:"end"});
+
+// red arrowhead for fail paths
+const m3=el("marker",{id:"ahr",viewBox:"0 0 10 10",refX:9,refY:5,markerWidth:7,markerHeight:7,orient:"auto"},defs);
+el("path",{d:"M0,0 L10,5 L0,10 z",fill:K.risk},m3);
+
+/* PNG export */
+document.getElementById("png").onclick=()=>{
+  const s=new XMLSerializer().serializeToString(svg);
+  const img=new Image(), c=document.createElement("canvas"); c.width=3200; c.height=1800;
+  img.onload=()=>{const g=c.getContext("2d");g.fillStyle=K.page;g.fillRect(0,0,c.width,c.height);
+    g.drawImage(img,0,0,c.width,c.height);
+    const a=document.createElement("a");a.download="soc_pd_flow_cadence.png";a.href=c.toDataURL("image/png");a.click();};
+  img.src="data:image/svg+xml;charset=utf-8,"+encodeURIComponent(s);
+};
+</script>
+</body>
+</html>

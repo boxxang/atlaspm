@@ -173,6 +173,16 @@ export const IconChecklist = ({ size = 12 }: { size?: number }) => (
   </S>
 );
 
+/** A flowchart: three boxes, joined top to bottom and across. */
+export const IconFlowchart = ({ size = 12 }: { size?: number }) => (
+  <S size={size}>
+    <rect x="3" y="3" width="7" height="5" rx="1" />
+    <rect x="14" y="3" width="7" height="5" rx="1" />
+    <rect x="8.5" y="16" width="7" height="5" rx="1" />
+    <path d="M6.5 8v3.5h11V8M12 11.5V16" />
+  </S>
+);
+
 export const IconUpload = ({ size = 12 }: { size?: number }) => (
   <S size={size} width={2}>
     <path d="M12 17V5" />

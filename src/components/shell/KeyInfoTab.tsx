@@ -3,7 +3,7 @@
 import dynamic from 'next/dynamic';
 import { useRef, useState } from 'react';
 import { RISK_AUTHOR } from '@/data/riskSeeds';
-import { attachmentUrl, formatBytes } from '@/lib/attachments';
+import { attachmentUrl, formatBytes, isInlineImage } from '@/lib/attachments';
 import { docText, noteText, parseNoteDoc, textToDoc, type NoteDoc } from '@/lib/noteDoc';
 import { fmtDate, fmtDT } from '@/lib/schedule';
 import type { ProgramPost } from '@/lib/projectState';
@@ -296,6 +296,20 @@ function NoteCard({
                 </p>
               )}
             </div>
+          </div>
+        )}
+        {/* a picture attached to a note is part of what the note says — a flow,
+            a floorplan, a plot — so it shows, and opens full size on a click */}
+        {note.attachments.some((a) => isInlineImage(a.mimeType)) && (
+          <div className="noteimgs">
+            {note.attachments
+              .filter((a) => isInlineImage(a.mimeType))
+              .map((a) => (
+                <a key={a.id} href={attachmentUrl(a.id)} target="_blank" rel="noreferrer" title={`Open ${a.filename} full size`}>
+                  {/* eslint-disable-next-line @next/next/no-img-element -- bytes served from our own route, sized by the note */}
+                  <img src={attachmentUrl(a.id)} alt={a.filename} data-note-image={a.id} />
+                </a>
+              ))}
           </div>
         )}
         {note.attachments.length > 0 && (
