@@ -114,18 +114,16 @@ export function TemplatesView({ profiles }: { profiles: TemplateRow[] }) {
                 </span>
               )}
               {p.builtin && flowchartOf(p.id) && (
-                <a
+                <Link
                   className="tpl-flow"
-                  href={flowchartOf(p.id)}
-                  target="_blank"
-                  rel="noreferrer"
+                  href={`/templates/${p.id}/flowchart`}
                   title={`Open the ${p.label} flowchart`}
                   aria-label={`Open the ${p.label} flowchart`}
                   data-flowchart={p.id}
                 >
                   <IconFlowchart size={13} />
                   Flowchart
-                </a>
+                </Link>
               )}
             </span>
             <span className="num">{p.stageCount}</span>

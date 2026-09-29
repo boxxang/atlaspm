@@ -424,9 +424,24 @@ test('opens each built-in template’s flowchart from the Templates list', async
   ]) {
     const link = page.locator(`[data-template="${id}"] [data-flowchart="${id}"]`);
     await expect(link).toHaveText('Flowchart');
-    await expect(link).toHaveAttribute('href', href);
+    await expect(link).toHaveAttribute('href', `/templates/${id}/flowchart`);
+    await expect(link).not.toHaveAttribute('target', /.+/);
     expect((await page.request.get(href)).status(), href).toBe(200);
   }
   /* a template somebody made has no flowchart of its own */
   await expect(page.locator('[data-flowchart]')).toHaveCount(3);
+
+  /* it opens in the same window, under a way back to the list */
+  await page.locator('[data-flowchart="threeDic"]').click();
+  await page.waitForURL(/\/templates\/threeDic\/flowchart$/);
+  await expect(page.locator('iframe.flowframe')).toHaveAttribute('src', '/flowcharts/3dic.html');
+  await expect(page.frameLocator('iframe.flowframe').locator('h1')).toBeVisible();
+  await page.locator('[data-back-templates]').click();
+  await page.waitForURL(/\/templates$/);
+  await expect(page.locator('[data-template="threeDic"]')).toBeVisible();
+});
+
+test('a template without a flowchart has no flowchart page', async ({ page }) => {
+  await page.goto('/templates/nope/flowchart');
+  await expect(page.locator('[data-flowchart-page]')).toHaveCount(0);
 });
