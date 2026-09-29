@@ -1,0 +1,216 @@
+/**
+ * SDBG — Silicon Debug, ECO & Stepping. Weeks 140–186; closes on the
+ * Production Stepping Decision.
+ */
+import type { CpoStageModule } from '../types';
+
+export const SDBG: CpoStageModule = {
+  content: {
+    tagline: 'Assume first silicon has bugs, find every one of them early, and decide which ones the product can live with.',
+    description:
+      'Run the debug loop that starts the day first silicon powers on and ends when a production stepping is chosen: every anomaly from bring-up, characterization, compliance and qualification is reproduced, triaged and driven to root cause across the switch ASIC, I/O silicon, electrical ICs, photonic ICs, optical source and package. Each is contained by a firmware workaround or a test screen where that is good enough, and fixed in silicon where it is not — by metal ECO on held wafers or a full-mask re-spin, chosen on cost, schedule and risk. The new stepping is taped out, fabricated, built into optical packages and validated, and its cut-in to the NPI builds and qualification lots is planned. The stage closes on the production stepping decision with the new stepping validated and its delta qualification plan agreed.',
+    activities: ['Anomaly triage', 'Root cause and FA', 'Containment', 'ECO vs re-spin', 'Stepping tapeout', 'Regression and delta qual', 'Stepping build and validation', 'Stepping cut-in'],
+    deliverables: [
+      'Silicon anomaly database and triage board record',
+      'Root cause and failure analysis reports — silicon, photonics and package',
+      'Firmware workaround and test screen containment plan',
+      'Metal ECO versus full-mask re-spin decision record',
+      'Stepping tapeout database and fix change list',
+      'New-stepping silicon validation report',
+      'Stepping regression results and delta qualification plan',
+      'Production stepping decision package',
+      'Stepping cut-in map and conditional-release criteria',
+    ],
+    deliverableFrom: [0, 1, 2, 3, 4, 6, 5, 5, 7],
+    deliverableWeek: [38, 34, 32, 24, 24, 44, 44, 46, 46],
+    engineeringEffort: [24, 40, 18, 5, 30, 12, 30, 6],
+    risks: [
+      'A must-fix anomaly root-caused after the stepping tapes out, forcing a second stepping',
+      'Stepping decision taken on schedule pressure with containment costs unmeasured',
+    ],
+    potentialRisks: [
+      'Check that every anomaly has been reproduced on a second unit and a second board before engineering time is spent on root cause.',
+      'Check that photonic and package failures have the same FA path and turnaround as silicon ones — optical FA capacity is usually the bottleneck nobody booked.',
+      'Check that every firmware workaround has its performance, power and yield cost measured, not estimated, before it is counted as containment.',
+      'Check that the stepping scope is frozen at the decision and that late additions go through the same review, because every late fix risks the tapeout date.',
+      'Check that wafers were held before metal layers at first tapeout, or the metal ECO option does not actually exist.',
+      'Check that the delta qualification plan covers every mechanism the change touches, and that qualification is not being run to completion on a stepping that will not ship.',
+    ],
+    leader: { name: 'Marcus Oyelaran', short: 'M. Oyelaran', phone: '+1 (408) 555-0522', email: 'marcus.oyelaran@example.com' },
+    collaboration: [
+      'Validation',
+      'Quality',
+      'Firmware',
+      'Physical design',
+      'Photonics',
+      'Packaging',
+      'Test engineering',
+      'Program management',
+    ],
+    tools: [
+      'Anomaly and defect tracking system',
+      'Scan diagnosis and fault isolation software',
+      'Emission microscopy and laser voltage probing',
+      'Acoustic microscopy, X-ray and cross-section lab',
+      'Optical loss mapping and near-field inspection bench',
+      'Digital place and route with metal ECO support',
+    ],
+    programView: [
+      'Open anomalies by severity and age',
+      'Anomalies without root cause',
+      'Must-fix list size and stepping scope',
+      'Stepping tapeout and first-wafer dates',
+      'Production stepping decision date',
+    ],
+    perspective:
+      'The stepping date is set by the last must-fix bug to be root-caused, not by the first one found. Push reproduction and FA on the hardest anomalies first, and freeze the fix list the day the decision is taken.',
+  },
+  steps: {
+    'SDBG-01': {
+      s: [
+        [1, 'Stand up the anomaly database with severity, reproduction, owner and disposition fields', 1],
+        [2, 'Take intake from bring-up, characterization, compliance and qualification labs with unit and setup traceability', 4],
+        [3, 'Reproduce each anomaly on a second unit and a second board to separate silicon from setup', 8],
+        [4, 'Run the weekly triage board to classify, prioritize and assign each anomaly', 20, 1],
+        [5, 'Drive each anomaly to root cause, containment and a fix-in-stepping disposition', 20],
+        [6, 'Release the anomaly database snapshot and close-out record at the stepping decision', 1],
+      ],
+      o: [
+        'Anomaly database with defined fields and workflow',
+        'Anomaly intake records with unit and setup traceability',
+        'Reproduction results per anomaly',
+        'Weekly triage board minutes and priority list',
+        'Disposition per anomaly — fixed, contained, accepted or open',
+        'Silicon anomaly database and triage board record',
+      ],
+      r: [['SDBG-D1', 'produces'], ['SDBG-D4', 'feeds'], ['SDBG-D8', 'feeds']],
+    },
+    'SDBG-02': {
+      s: [
+        [1, 'Isolate each failure to a die, interface or assembly with fault-isolation tests and bench swaps', 4],
+        [2, 'Localize silicon faults with scan diagnosis, emission microscopy and laser probing', 6],
+        [3, 'Run optical FA — waveguide and coupler inspection, loss mapping and optical source analysis', 6, 1],
+        [4, 'Run package FA — acoustic imaging, X-ray and cross-section of bumps, bridge and fiber attach', 6],
+        [5, 'Confirm each root cause by reproducing the mechanism in simulation or on a controlled split', 5],
+        [6, 'Release the root cause and failure analysis reports with corrective actions', 2],
+      ],
+      o: [
+        'Failure isolated to die, interface or assembly',
+        'Silicon fault localization results',
+        'Optical failure analysis results',
+        'Package and fiber attach failure analysis results',
+        'Confirmed root cause per anomaly',
+        'Root cause and failure analysis reports — silicon, photonics and package',
+      ],
+      r: [['SDBG-D2', 'produces'], ['SDBG-D3', 'feeds'], ['SDBG-D4', 'feeds']],
+    },
+    'SDBG-03': {
+      s: [
+        [1, 'Assess each root-caused anomaly for a firmware, register or calibration workaround', 3],
+        [2, 'Implement workarounds in firmware and regress them on the traffic and optical suites', 8],
+        [3, 'Assess test screens that catch the defect at sort, final test or system-level test', 4, 1],
+        [4, 'Measure the performance, power, test-time and yield cost of each workaround and screen', 4],
+        [5, 'Decide per anomaly whether containment is sufficient or a silicon fix is required', 3],
+        [6, 'Release the containment plan with workaround firmware and screen specifications', 2],
+      ],
+      o: [
+        'Workaround feasibility per anomaly',
+        'Workaround firmware build with regression results',
+        'Test screen proposals with escape estimates',
+        'Measured cost of each workaround and screen',
+        'Containment-sufficient or must-fix decision per anomaly',
+        'Firmware workaround and test screen containment plan',
+      ],
+      r: [['SDBG-D3', 'produces'], ['SDBG-D4', 'feeds']],
+    },
+    'SDBG-04': {
+      s: [
+        [1, 'Consolidate the must-fix list from triage, root cause and containment decisions', 2],
+        [2, 'Classify each fix as metal-only, base-layer or photonic mask change and count the layers per die', 3],
+        [3, 'Estimate cost, schedule and risk of metal ECO on held wafers against a full-mask re-spin', 3],
+        [4, 'Assess customer sampling, qualification and ramp impact of each option', 2, 1],
+        [5, 'Hold the stepping decision review and record the option, fix scope and conditions', 1.5],
+      ],
+      o: [
+        'Consolidated must-fix list',
+        'Fix classification and affected layers per die',
+        'Cost, schedule and risk comparison of the options',
+        'Customer, qualification and ramp impact assessment',
+        'Metal ECO versus full-mask re-spin decision record',
+      ],
+      r: [['SDBG-D4', 'produces'], ['SDBG-D5', 'feeds'], ['SDBG-D8', 'feeds']],
+    },
+    'SDBG-05': {
+      s: [
+        [1, 'Implement the approved fixes as spare-cell and metal-only edits, or base-layer and photonic layout changes', 3],
+        [2, 'Rerun timing, physical verification, equivalence and optical rule signoff on the changed databases', 3],
+        [3, 'Update test patterns and the production test program for the new stepping', 2, 1],
+        [4, 'Hold the stepping tapeout review against the full signoff checklist', 1],
+        [5, 'Tape out the stepping, release the changed masks and release the held wafers for processing', 1],
+      ],
+      o: [
+        'Fix implementation databases per die',
+        'Signoff results for the changed databases',
+        'Updated patterns and production test program',
+        'Stepping tapeout review record',
+        'Stepping tapeout database and fix change list',
+      ],
+      r: [['SDBG-D5', 'produces'], ['SDBG-D6', 'feeds'], ['SDBG-D7', 'feeds']],
+    },
+    'SDBG-06': {
+      s: [
+        [1, 'Define the stepping regression suite from the fix change list and the anomaly database', 2],
+        [2, 'Run the regression on the new stepping — electrical, optical, traffic, power and firmware', 5],
+        [3, 'Classify each qualification test as full, delta or carried over by the change impact', 2, 1],
+        [4, 'Agree the delta qualification plan with reliability and quality', 1.5],
+        [5, 'Assemble the production stepping decision package and hold the decision review', 1.5],
+      ],
+      o: [
+        'Stepping regression suite traced to the change list',
+        'Stepping regression results',
+        'Qualification test classification by change impact',
+        'Stepping regression results and delta qualification plan',
+        'Production stepping decision package',
+      ],
+      r: [['SDBG-D7', 'produces'], ['SDBG-D8', 'produces']],
+    },
+    'SDBG-07': {
+      s: [
+        [1, 'Process the held wafers through the changed metal layers, or start new wafers for a full-mask re-spin', 7],
+        [2, 'Sort the stepping wafers and release known-good die with the updated test program', 2],
+        [3, 'Assemble stepping packages, optical engines and fiber attach on the engineering line', 3],
+        [4, 'Bring up the stepping units, reload calibration and confirm electrical and optical links', 2],
+        [5, 'Verify every fixed anomaly closed on at least three stepping units', 2],
+        [6, 'Rerun bring-up and characterization spot checks and release the stepping validation report', 2],
+      ],
+      o: [
+        'Processed stepping wafers',
+        'Sorted stepping wafers and known-good die',
+        'Assembled stepping packages and optical engines',
+        'Stepping units running electrical and optical links',
+        'Fixed-anomaly verification per unit',
+        'New-stepping silicon validation report',
+      ],
+      r: [['SDBG-D6', 'produces'], ['SDBG-D7', 'feeds'], ['SDBG-D8', 'feeds']],
+    },
+    'SDBG-08': {
+      s: [
+        [1, 'Map every DVT, PVT and qualification lot to a stepping for each possible ECO outcome', 1.5],
+        [2, 'Size stress time on stepping units and confirm the qualification lots can start on the production stepping', 1.5],
+        [3, 'Plan wafer starts, die bank conversion and disposition of old-stepping inventory', 2, 1],
+        [4, 'Plan replacement of customer samples built on the old stepping', 1.5],
+        [5, 'Set conditional-release criteria for shipping before delta qualification completes', 1.5],
+        [6, 'Release the cut-in map and hand the conditional-release criteria to the production release review', 1],
+      ],
+      o: [
+        'Build and lot to stepping map per ECO outcome',
+        'Stress time sizing on stepping units',
+        'Wafer start, die bank and old-stepping inventory plan',
+        'Customer sample replacement plan',
+        'Conditional-release criteria',
+        'Stepping cut-in map and conditional-release criteria',
+      ],
+      r: [['SDBG-D9', 'produces'], ['SDBG-D8', 'feeds']],
+    },
+  },
+};

@@ -451,6 +451,8 @@ test.describe('the program list', () => {
         'custom:threeDic',
         'embeddedSoc',
         'custom:embeddedSoc',
+        'cpoSwitch',
+        'custom:cpoSwitch',
       ]);
 
       await page.locator('.pf-profile').selectOption('typicalSoC');

@@ -1,0 +1,400 @@
+/**
+ * PON — Power-On & Electrical Bring-Up, written up.
+ */
+import type { CpoWriteUps } from '../types';
+
+export const PON_WRITE_UPS: CpoWriteUps = {
+  'PON-01': {
+    criticalPath: true,
+    purpose: [
+      '<b>Execute the bring-up plan</b> written and rehearsed in PKGA-09 on a daily rhythm: units, systems and owners assigned to every step, a daily stand-up on results, blockers and anomalies, and units moved between labs as steps pass or stall.',
+      'The first weeks of bring-up generate more findings than any meeting can absorb, and the few good units are fought over. A daily status against the plan’s pass criteria keeps the labs on the same sequence, shows the program which gate date is slipping and why, and makes sure every deviation reaches the anomaly register the same day.',
+    ],
+    flowNote:
+      'Step 1 assigns units and owners. Step 2 runs the daily stand-up while step 3 rebalances units and labs in parallel as steps pass or block. Step 4 publishes the daily status against the plan.',
+    consumes: [
+      'Bring-up plan, certified stations and debug infrastructure from PKGA-09',
+      'Bring-up systems, electrical-only packages and known-issue list from PKGA-07 and PKGA-13',
+      'Bring-up firmware, SDK and diagnostics from PKGA-11',
+      'Unit allocation from the build matrix in PKGA-02',
+      'Anomaly intake process from PON-06',
+    ],
+    rel: {
+      'PON-D1': '<b>Bring-up execution tracker and daily status record.</b> Produced here; it is the record of which step passed on which unit, and when.',
+      'PON-D2': '<b>First power-on and rail verification report.</b> First power-on is the first step the daily cadence runs.',
+    },
+    risks: [
+      '<b>Steps skipped.</b> Teams jump to link training before power and registers have passed.',
+      '<b>Units hoarded.</b> One lab keeps units another lab is blocked on.',
+      '<b>Status by anecdote.</b> Daily status reports impressions instead of pass criteria.',
+      '<b>Anomalies batched.</b> Findings reach the register days later.',
+      '<b>Plan frozen.</b> The sequence is not adjusted when a step is blocked by a known silicon issue.',
+    ],
+    roles: [
+      { r: 'Validation', d: 'Owns bring-up execution and the daily status' },
+      { r: 'Board hardware engineer', d: 'Power and board steps' },
+      { r: 'Firmware engineer', d: 'Boot and register steps' },
+      { r: 'Silicon debug lead', d: 'Anomaly intake from the stand-up' },
+      { r: 'Program TPM', d: 'Gate date tracking and escalation' },
+    ],
+    effort: [
+      ['Assignment and setup', 1],
+      ['Daily stand-up and tracking', 2],
+      ['Unit and lab rebalancing', 1],
+    ],
+    entry: [
+      'Bring-up stations certified in PKGA-09',
+      'First systems delivered to the labs',
+      'Bring-up firmware release available',
+    ],
+    exit: [
+      'Every bring-up step has an owner and a unit assigned in the tracker',
+      'Daily status published every working day against the pass criteria from the first power-on',
+      'Every deviation raised in the stand-up entered in the anomaly register within one day',
+    ],
+    dependsOn: ['PKGA-09', 'PKGA-07'],
+    dependsNote: 'The plan and the stations are ready before this starts; this activity runs them, it does not write them.',
+    feedsInto: ['PON-02', 'PON-03', 'PON-04', 'PON-05'],
+    measuredBy: [
+      'Bring-up steps passed per day against plan',
+      'Days a unit sits idle',
+      'Hours from observation to anomaly entry',
+    ],
+    links: {
+      dependsOn: ['PKGA-09', 'PKGA-07', 'PKGA-11'],
+      feedsInto: ['PON-02', 'PON-03', 'PON-04', 'PON-05', 'PON-06'],
+      runsWith: [],
+      revisedBy: [],
+      feedsBackInto: [],
+    },
+    terms: ['Anomaly register', 'KPI'],
+  },
+  'PON-02': {
+    criticalPath: true,
+    purpose: [
+      'Take the <b>first power-on</b> safely: prove the board alone, then apply current-limited power to the package, verify every rail, its ripple and its sequencing, and compare idle current with the power model.',
+      'First silicon may have shorts, latch-up or a sequencing defect that no simulation caught. Current limits and a board proven without the package mean such a defect is found as a measurement rather than as a burned unit — and the idle current is the first number that says whether the power model can be trusted.',
+    ],
+    flowNote:
+      'Step 1 proves the board alone. Step 2 applies first power with limits and step 3 verifies rails and sequencing, while step 4 measures idle current in parallel. Step 5 releases the report and the safe procedure other labs follow.',
+    consumes: [
+      'Bring-up plan from PON-01',
+      'Electrical-only packages and bring-up systems from PKGA-13 and PKGA-07',
+      'Board power delivery design and sequencing from DSGN-14',
+      'System power model from MODL-08',
+      'Package test results and known issues from PKGA-06',
+    ],
+    rel: {
+      'PON-D2': '<b>First power-on and rail verification report.</b> Produced here with the safe power-up procedure every lab then follows.',
+      'PON-D6': '<b>Initial silicon anomaly register and triage record.</b> Rail, current or sequencing deviations are logged as anomalies.',
+    },
+    risks: [
+      '<b>No current limit.</b> A short on first power destroys the unit and the evidence.',
+      '<b>Sequencing wrong.</b> A rail comes up out of order and stresses an interface.',
+      '<b>Idle current ignored.</b> A leakage excess is noted but not chased until power characterization.',
+      '<b>Ripple measured at the regulator.</b> The rail at the package is never probed.',
+      '<b>Thermal solution missing.</b> The unit overheats while engineers debug.',
+    ],
+    roles: [
+      { r: 'Board and system hardware', d: 'Owns first power-on and rail verification' },
+      { r: 'Validation engineer', d: 'Runs the sequence and records results' },
+      { r: 'SI/PI engineer', d: 'Rail ripple and droop measurement' },
+      { r: 'Thermal engineer', d: 'Monitors temperature at first power' },
+      { r: 'Silicon debug lead', d: 'Receives power anomalies' },
+    ],
+    effort: [
+      ['Board-only verification', 1],
+      ['First power and rail checks', 2],
+      ['Idle current and report', 1],
+    ],
+    entry: [
+      'Bring-up plan released',
+      'Board passed dummy package checks in PKGA-07',
+      'Current limits set from the power model',
+    ],
+    exit: [
+      'Every rail within voltage and ripple specification at the package on at least three units',
+      'Power-up and power-down sequencing verified against the specification',
+      'Idle current per rail recorded and within the stated tolerance of the model or logged as an anomaly',
+    ],
+    dependsOn: ['PON-01', 'PKGA-07'],
+    dependsNote: null,
+    feedsInto: ['PON-03', 'PON-04', 'PON-06'],
+    measuredBy: [
+      'Units powered without damage',
+      'Rails within specification',
+      'Idle current error against the model',
+    ],
+    links: {
+      dependsOn: ['PON-01', 'PKGA-07', 'PKGA-13', 'PKGA-09', 'DSGN-14'],
+      feedsInto: ['PON-03', 'PON-04', 'PON-06', 'OBU-01'],
+      runsWith: [],
+      revisedBy: [],
+      feedsBackInto: ['MODL-08'],
+    },
+    terms: ['Power sequencing', 'VRM', 'PDN'],
+  },
+  'PON-03': {
+    criticalPath: true,
+    purpose: [
+      'Get <b>debug access and boot</b> working: confirm the scan chain and device identifiers, run the boot ROM to the first-stage loader, bring up the management firmware and console, and exercise the secure boot path with development keys.',
+      'Everything after this — register access, link training, optical control — runs through firmware. Debug access that does not depend on firmware is what lets the team see a boot failure rather than guess at it.',
+    ],
+    flowNote:
+      'Step 1 confirms debug access first, because it is the way in if boot fails. Steps 2 and 3 boot to the loader and then the management firmware, while step 4 exercises secure boot in parallel. Step 5 releases the image and log.',
+    consumes: [
+      'Powered units from PON-02',
+      'Boot and initialization firmware from DSGN-16',
+      'Bring-up firmware release on the final netlist from PKGA-11',
+      'Boot ROM and debug lock design from DSGN-10',
+      'Development keys and secure boot procedure',
+    ],
+    rel: {
+      'PON-D3': '<b>Bring-up firmware image and first boot log.</b> Produced here; every later bring-up activity runs on this image.',
+      'PON-D6': '<b>Initial silicon anomaly register and triage record.</b> Boot and debug access failures are logged as anomalies.',
+    },
+    risks: [
+      '<b>Boot ROM defect.</b> A bug in masked boot code has no patch path but a fuse or a stepping.',
+      '<b>Debug locked.</b> The debug lock engages on first silicon and the team is locked out.',
+      '<b>Emulation differences.</b> Firmware that booted on emulation depends on timing silicon does not have.',
+      '<b>Secure boot deferred.</b> Development keys are bypassed and the real path is first tested in certification.',
+      '<b>No console.</b> Firmware runs silently and failures are invisible.',
+    ],
+    roles: [
+      { r: 'Firmware', d: 'Owns boot and firmware bring-up' },
+      { r: 'DFT engineer', d: 'Scan chain and debug access' },
+      { r: 'Security engineer', d: 'Secure boot path and key handling' },
+      { r: 'Validation engineer', d: 'Runs the sequence on each unit' },
+      { r: 'Silicon debug lead', d: 'Receives boot anomalies' },
+    ],
+    effort: [
+      ['Debug access', 1],
+      ['Boot ROM and loader', 2],
+      ['Management firmware', 2],
+      ['Secure boot path', 1],
+    ],
+    entry: [
+      'Units powered with rails verified',
+      'Bring-up firmware image built from the pre-silicon release',
+      'Development keys provisioned for the lab',
+    ],
+    exit: [
+      'Scan chain and device identifiers read correctly on every die of at least three units',
+      'Management firmware boots to its console on every unit through the secure boot path in debug mode',
+      'Firmware image tagged, archived and released to every bring-up lab',
+    ],
+    dependsOn: ['PON-02', 'DSGN-16'],
+    dependsNote: null,
+    feedsInto: ['PON-04', 'PON-05', 'OBU-05'],
+    measuredBy: [
+      'Units booting to console',
+      'Boot failures by cause',
+      'Days from first power to first boot',
+    ],
+    links: {
+      dependsOn: ['PON-02', 'DSGN-16', 'PSV-09', 'DSGN-10', 'PKGA-11'],
+      feedsInto: ['PON-04', 'PON-05', 'PON-06', 'OBU-05', 'SINT-02'],
+      runsWith: [],
+      revisedBy: [],
+      feedsBackInto: [],
+    },
+    terms: ['JTAG', 'ROM', 'Root of trust'],
+  },
+  'PON-04': {
+    criticalPath: true,
+    purpose: [
+      'Prove the <b>clocks, resets and register access</b> on every die: reference clocks and PLL lock, reset sequencing across the dies, a walk of the register map through both debug and management paths, and in-system memory BIST and scan to show every die is alive.',
+      'A multi-die switch has several clock domains and a reset order across dies that only the whole system can exercise. Register access through two paths separates a silicon defect from a management interface defect, which saves the debug board from chasing the wrong one.',
+    ],
+    flowNote:
+      'Steps 1 and 2 verify clocks and resets. Step 3 walks the register map while step 4 runs in-system BIST and scan in parallel. Step 5 releases the record.',
+    consumes: [
+      'Powered and booted units from PON-02 and PON-03',
+      'Clock, reset and power architecture from SARC-06',
+      'Register map and reset specification from DSGN-03',
+      'In-system test patterns from DFT closure in IMPL-11',
+      'Bring-up plan from PON-01',
+    ],
+    rel: {
+      'PON-D4': '<b>Clock, reset and register access verification record.</b> Produced here; link training starts only once it passes.',
+      'PON-D5': '<b>First electrical link report.</b> SerDes and die-to-die configuration depends on proven register access.',
+    },
+    risks: [
+      '<b>PLL lock marginal.</b> A PLL locks at room temperature and loses lock at corners.',
+      '<b>Reset order across dies.</b> One die leaves reset before its partner and the interface hangs.',
+      '<b>Register defaults wrong.</b> A reset value differs from the specification and firmware assumes the specification.',
+      '<b>One access path only.</b> A management interface defect is masked by debug access.',
+      '<b>BIST passes, logic fails.</b> Memory BIST passes while a logic block is dead, found only at traffic.',
+    ],
+    roles: [
+      { r: 'Validation', d: 'Owns clock, reset and register bring-up' },
+      { r: 'RTL designer', d: 'Register map and reset behavior' },
+      { r: 'DFT engineer', d: 'In-system BIST and scan' },
+      { r: 'Firmware engineer', d: 'Management path access' },
+      { r: 'Clocking engineer', d: 'PLL and clock measurements' },
+    ],
+    effort: [
+      ['Clocks and resets', 1],
+      ['Register map walk', 2],
+      ['In-system BIST and scan', 1],
+    ],
+    entry: [
+      'Units booted with debug access',
+      'Register map and reset sequence available from design',
+      'In-system test patterns loaded',
+    ],
+    exit: [
+      'Every PLL locks and every generated clock is within frequency tolerance on every die',
+      'Every register block written and read back through both debug and management paths with no unexplained mismatch',
+      'In-system memory BIST and scan pass on every die or failures logged as anomalies',
+    ],
+    dependsOn: ['PON-02', 'PON-03'],
+    dependsNote: null,
+    feedsInto: ['PON-05', 'SINT-01'],
+    measuredBy: [
+      'Registers verified through both paths',
+      'Dies passing in-system BIST',
+      'Clock and reset anomalies opened',
+    ],
+    links: {
+      dependsOn: ['PON-02', 'PON-03', 'DSGN-03'],
+      feedsInto: ['PON-05', 'PON-06', 'SINT-01', 'OBU-02'],
+      runsWith: [],
+      revisedBy: [],
+      feedsBackInto: [],
+    },
+    terms: ['PLL', 'MBIST', 'CDC'],
+  },
+  'PON-05': {
+    criticalPath: true,
+    purpose: [
+      'Close the <b>first electrical link</b>: train the die-to-die links, run SerDes loopback with PRBS on every lane, tune equalization across the board channel, and measure the pre-correction bit error rate per lane against the channel model.',
+      'A link declared up without a BER number is not a link. The electrical path is what the optical engines will be driven through, so its margin is measured per lane and compared with the model — a lane below prediction is either a silicon issue for the debug board or a model error for correlation, and both need to be known before optical bring-up starts.',
+    ],
+    flowNote:
+      'Step 1 trains the die-to-die links, step 2 runs SerDes loopback, step 3 tunes equalization across the board channel and step 4 measures BER against the model. Step 5 declares the link and releases the report.',
+    consumes: [
+      'Register access and clocking from PON-04',
+      'Firmware link training code from PON-03 and DSGN-16',
+      'Electrical channel and SerDes link models from MODL-03',
+      'Die-to-die and switch-to-I/O interface definitions from ICD-02',
+      'Validation board channel characterization',
+    ],
+    rel: {
+      'PON-D5': '<b>First electrical link report — die-to-die and SerDes training, loopback and PRBS results.</b> Produced here; it closes the stage on the First Electrical Link gate.',
+      'PON-D6': '<b>Initial silicon anomaly register and triage record.</b> Lanes that fail to train or miss the BER target are logged as anomalies.',
+    },
+    risks: [
+      '<b>Reduced-rate link declared.</b> The link trains only below the target lane rate and is reported as up.',
+      '<b>Board channel blamed on silicon.</b> Validation board loss is mistaken for SerDes margin loss.',
+      '<b>Die-to-die lanes repaired silently.</b> Redundant lanes are used without recording which failed.',
+      '<b>Equalization tuned per unit.</b> Settings found by hand do not generalize to firmware defaults.',
+      '<b>BER measured too briefly.</b> A short PRBS run misses errors at the target rate.',
+    ],
+    roles: [
+      { r: 'SerDes and high-speed I/O', d: 'Owns link training and the first electrical link' },
+      { r: 'Validation engineer', d: 'Runs PRBS and BER measurements' },
+      { r: 'Firmware engineer', d: 'Link training and equalization code' },
+      { r: 'SI/PI engineer', d: 'Board channel and model comparison' },
+      { r: 'Silicon debug lead', d: 'Receives link anomalies' },
+    ],
+    effort: [
+      ['Die-to-die training', 2],
+      ['SerDes loopback', 2],
+      ['Equalization and training', 3],
+      ['BER measurement and model comparison', 2],
+      ['Report', 1],
+    ],
+    entry: [
+      'Register access and clocks verified in PON-04',
+      'Firmware link training code loaded',
+      'Channel model for the validation board available',
+    ],
+    exit: [
+      'Every die-to-die lane trained at the target rate with PRBS error-free for the stated duration, or repaired lanes recorded',
+      'Every SerDes lane in loopback at the target lane rate with pre-correction BER below the specification',
+      'Measured BER per lane compared with the channel model and every outlier logged',
+    ],
+    dependsOn: ['PON-04', 'PON-03'],
+    dependsNote: null,
+    feedsInto: ['OBU-03', 'CHAR-02'],
+    measuredBy: [
+      'Lanes trained at target rate',
+      'Pre-correction BER per lane',
+      'Measured to modeled margin per lane',
+    ],
+    links: {
+      dependsOn: ['PON-03', 'PON-04', 'MODL-03', 'PON-01'],
+      feedsInto: ['OBU-03', 'CHAR-02', 'SINT-03', 'PON-06'],
+      runsWith: [],
+      revisedBy: [],
+      feedsBackInto: ['MODL-03'],
+    },
+    terms: ['SerDes', 'D2D', 'PRBS', 'BER', 'Link training', 'Loopback'],
+  },
+  'PON-06': {
+    criticalPath: false,
+    purpose: [
+      'Start <b>silicon anomaly intake and triage</b> on the first day of bring-up: every deviation logged with its data, reproduced on a second unit to separate silicon from setup, triaged by die and block, and handed to the silicon debug board.',
+      'First silicon is never fully healthy. The anomalies that cost the most are the ones fixed in the lab with a quiet workaround and never recorded — they reappear at characterization, at a customer, or in the stepping decision without their history.',
+    ],
+    flowNote:
+      'Step 1 sets up intake. Step 2 logs deviations throughout bring-up while step 3 reproduces each on a second unit in parallel. Step 4 triages and hands off, and step 5 releases the register to silicon debug.',
+    consumes: [
+      'Deviations from power-on, boot, register access and link training in PON-02 to PON-05',
+      'Package test results and failing units from PKGA-06',
+      'Known-issue list from PKGA-07',
+      'Anomaly tracking process from the program',
+      'Unit genealogy from the manufacturing data system in TINF-10',
+    ],
+    rel: {
+      'PON-D6': '<b>Initial silicon anomaly register and triage record.</b> Produced here and handed to SDBG-01, which owns every anomaly from then on.',
+    },
+    risks: [
+      '<b>Workarounds unrecorded.</b> Lab fixes are kept in personal scripts.',
+      '<b>Setup mistaken for silicon.</b> Anomalies are not reproduced on a second unit.',
+      '<b>No genealogy.</b> An anomaly cannot be tied to its wafer, die or build split.',
+      '<b>Severity inflated.</b> Everything is critical, so nothing is.',
+      '<b>Handoff late.</b> The debug board sees anomalies weeks after they were first seen.',
+    ],
+    roles: [
+      { r: 'Validation', d: 'Owns anomaly intake and first triage' },
+      { r: 'Silicon debug lead', d: 'Receives triaged anomalies' },
+      { r: 'Firmware engineer', d: 'Firmware workarounds and their record' },
+      { r: 'Product engineer', d: 'Genealogy and test data per unit' },
+      { r: 'Program TPM', d: 'Anomaly counts and severity in the program review' },
+    ],
+    effort: [
+      ['Intake setup', 0.5],
+      ['Logging', 1.5],
+      ['Reproduction', 1],
+      ['Triage and handoff', 1],
+    ],
+    entry: [
+      'Anomaly tracking system available',
+      'Bring-up started on at least one unit',
+      'Unit genealogy available from the data system',
+    ],
+    exit: [
+      'Every deviation observed in the stage logged with unit serial, conditions and data',
+      'Every anomaly reproduced on a second unit or marked as not reproduced',
+      'Initial register accepted by the silicon debug board with an owner on every item',
+    ],
+    dependsOn: ['PON-02', 'PON-03', 'PON-04'],
+    dependsNote: 'Runs across the whole stage; it depends on each bring-up step as a source of anomalies rather than as a predecessor.',
+    feedsInto: ['SDBG-01', 'SDBG-02'],
+    measuredBy: [
+      'Anomalies logged per day of bring-up',
+      'Anomalies reproduced on a second unit',
+      'Days from observation to debug board handoff',
+    ],
+    links: {
+      dependsOn: ['PON-02', 'PON-03', 'PON-04', 'PON-05', 'PKGA-06'],
+      feedsInto: ['SDBG-01', 'SDBG-02', 'SDBG-03'],
+      runsWith: [],
+      revisedBy: [],
+      feedsBackInto: [],
+    },
+    terms: ['Anomaly register', 'FA'],
+  },
+};

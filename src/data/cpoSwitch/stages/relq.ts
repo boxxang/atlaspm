@@ -1,0 +1,192 @@
+/**
+ * RELQ — Reliability Qualification. Weeks 160–202; closes on Qualification
+ * Complete.
+ */
+import type { CpoStageModule } from '../types';
+
+export const RELQ: CpoStageModule = {
+  content: {
+    tagline: 'Show, with stress data on the stepping that ships, that the switch and its optics will last as long as the customer expects.',
+    description:
+      'Qualify every part of the product that can wear out: the switch, I/O and electrical IC silicon for operating life, ESD, latch-up and electromigration; the photonic ICs and optical source for aging, humidity and temperature cycling, with wavelength and power drift fitted to lifetime models; the package, bridge and fiber attach for board-level, mechanical and fiber retention stresses; and the system for environmental limits and a failure-rate prediction. Tests are started on first silicon only where the stepping cannot change the stressed mechanism, early aging data from the test vehicles and first builds is carried forward, and the delta qualification is run on the production stepping itself. The stage closes on an approved qualification report with every failure dispositioned and the production burn-in decision taken.',
+    activities: ['Qualification plan', 'Silicon reliability', 'Photonic and source reliability', 'Package and fiber reliability', 'System reliability and FIT', 'Qualification report', 'Stepping delta qual'],
+    deliverables: [
+      'Reliability qualification plan and stress matrix',
+      'Silicon reliability qualification report — lifetime, ESD, latch-up and electromigration',
+      'Photonic IC and optical source reliability report with lifetime drift models',
+      'Package, board-level and fiber attach reliability report',
+      'System environmental reliability and failure-rate prediction report',
+      'Product qualification report and approval record',
+      'Production stepping delta qualification report',
+      'Production burn-in and system run-in decision with reduction criteria',
+    ],
+    deliverableFrom: [0, 1, 2, 3, 4, 5, 6, 5],
+    deliverableWeek: [4, 24, 28, 26, 28, 42, 40, 42],
+    engineeringEffort: [4, 18, 30, 26, 20, 5, 14],
+    risks: [
+      'Optical source aging too slow to finish before production release, leaving lifetime extrapolated from short data',
+      'Qualification run on a stepping that changes before release, invalidating the silicon results',
+    ],
+    potentialRisks: [
+      'Check that the qualification units come from the production stepping, production assembly line and production fiber attach process — or that the delta qualification plan justifies each exception.',
+      'Check that optical source aging started as early as units existed, because its duration is the longest pole in the stage.',
+      'Check that fiber attach and optical coupling are measured in situ at each readpoint, not only electrically tested after stress.',
+      'Check that sample sizes and lot counts support the failure-rate claim in the datasheet, not just a pass on the test.',
+      'Check that every failure in stress has a completed FA and a corrective action before it is called unrelated to the product.',
+      'Check that chamber and burn-in board capacity was booked for the whole stage, since optical stresses need custom fixtures with fiber feedthroughs.',
+    ],
+    leader: { name: 'Tomasz Brennan', short: 'T. Brennan', phone: '+1 (408) 555-0524', email: 'tomasz.brennan@example.com' },
+    collaboration: ['Reliability', 'Quality', 'Photonics', 'Laser and optical source', 'Packaging', 'Test engineering', 'Board and system hardware'],
+    tools: [
+      'Burn-in and high-temperature operating life system',
+      'Temperature, humidity and thermal-cycling chambers with optical feedthroughs',
+      'ESD and latch-up tester',
+      'Mechanical shock, vibration and fiber pull test equipment',
+      'Reliability statistics and failure-rate prediction software',
+    ],
+    programView: [
+      'Stress tests started, at readpoint and complete',
+      'Units failed in stress and FA status',
+      'Optical source aging hours accumulated versus plan',
+      'Predicted system failure rate versus target',
+      'Qualification approval date versus production release',
+    ],
+    perspective:
+      'Silicon qualification is a well-trodden path; the optics are not. Start optical source aging and fiber attach stress on the first units that exist, measure optical power and coupling in situ, and treat a slow drift as seriously as a hard fail.',
+  },
+  steps: {
+    'RELQ-01': {
+      s: [
+        [1, 'Map the design FMEA reliability failure modes, the requirements and the mission profile to stress tests per component and assembly', 1],
+        [2, 'Set sample sizes, lots, readpoints and acceptance criteria per test', 1],
+        [3, 'Mark which tests start on first silicon and which wait for the production stepping', 0.5, 1],
+        [4, 'Book chambers, burn-in boards and optical test capacity, and reserve the qualification unit build', 1],
+        [5, 'Release the qualification plan and stress matrix', 0.5],
+      ],
+      o: [
+        'Stress test list traced to failure modes, requirements and mission profile',
+        'Sample size, lot, readpoint and acceptance table',
+        'First-silicon versus production-stepping test allocation',
+        'Chamber, board and qualification unit reservations',
+        'Reliability qualification plan and stress matrix',
+      ],
+      r: [['RELQ-D1', 'produces'], ['RELQ-D6', 'feeds']],
+    },
+    'RELQ-02': {
+      s: [
+        [1, 'Build and verify burn-in boards and the stress test program for the switch, I/O and electrical IC dies', 3],
+        [2, 'Run ESD and latch-up qualification on every die and on the packaged part', 3],
+        [3, 'Run high-temperature operating life with electrical readpoints on three lots', 8],
+        [4, 'Run high-temperature storage and early-failure-rate testing', 8, 1],
+        [5, 'Validate electromigration and interconnect lifetime against measured current density and temperature', 3],
+        [6, 'Analyze parametric drift and failures and release the silicon reliability report', 2],
+      ],
+      o: [
+        'Verified burn-in boards and stress test program',
+        'ESD and latch-up results per die and package',
+        'Operating life results at each readpoint',
+        'High-temperature storage and early-failure-rate results',
+        'Electromigration lifetime assessment',
+        'Silicon reliability qualification report — lifetime, ESD, latch-up and electromigration',
+      ],
+      r: [['RELQ-D2', 'produces'], ['RELQ-D5', 'feeds'], ['RELQ-D6', 'feeds']],
+    },
+    'RELQ-03': {
+      s: [
+        [1, 'Screen the stress lots and carry forward early aging data from test-vehicle and first-build stress', 2],
+        [2, 'Run accelerated aging of the optical source at elevated temperature and drive current with power and wavelength readpoints', 16],
+        [3, 'Run damp heat and humidity stress on photonic ICs and assembled optical engines', 12, 1],
+        [4, 'Temperature-cycle optical engines with in-situ optical power and coupling loss readpoints', 12, 1],
+        [5, 'Fit wavelength and power drift to lifetime models at the use condition', 3],
+        [6, 'Release the photonic and optical source reliability report', 2],
+      ],
+      o: [
+        'Screened stress lots with baselines and early aging data',
+        'Optical source aging data at each readpoint',
+        'Damp heat and humidity results with optical readpoints',
+        'Temperature cycling results with coupling loss drift',
+        'Lifetime drift models at the use condition',
+        'Photonic IC and optical source reliability report with lifetime drift models',
+      ],
+      r: [['RELQ-D3', 'produces'], ['RELQ-D5', 'feeds'], ['RELQ-D6', 'feeds']],
+    },
+    'RELQ-04': {
+      s: [
+        [1, 'Precondition packages with moisture soak and reflow or socket-mount cycles, checking fiber attach survival', 3],
+        [2, 'Run package temperature cycling, unbiased humidity stress and high-temperature storage with acoustic inspection', 12],
+        [3, 'Run board-level reliability — thermal cycling of mounted packages with solder joint monitoring', 12, 1],
+        [4, 'Run mechanical shock, vibration, and fiber pull and side-load retention tests with optical readpoints', 4],
+        [5, 'Run optical connector mating-cycle durability and contamination tolerance tests', 3, 1],
+        [6, 'Qualify reworked units — re-attached fiber and replaced optical engine or source — through the stress subset', 3, 1],
+        [7, 'Section and inspect failures and release the package and fiber attach reliability report', 3],
+      ],
+      o: [
+        'Preconditioned packages with fiber attach survival results',
+        'Package stress results with acoustic images',
+        'Board-level reliability results',
+        'Shock, vibration and fiber retention results',
+        'Connector mating-cycle and contamination results',
+        'Reworked-unit qualification results',
+        'Package, board-level and fiber attach reliability report',
+      ],
+      r: [['RELQ-D4', 'produces'], ['RELQ-D5', 'feeds'], ['RELQ-D6', 'feeds']],
+    },
+    'RELQ-05': {
+      s: [
+        [1, 'Build the system failure-rate model from component FIT data and the mission profile', 2],
+        [2, 'Run system environmental tests — operating temperature, altitude, humidity and fan failure', 6],
+        [3, 'Run system shock, vibration and transport tests on packaged systems', 4, 1],
+        [4, 'Run a reliability demonstration on a population of systems under full traffic', 8],
+        [5, 'Update the FIT and MTBF prediction with stress results and field data from comparable products', 2],
+        [6, 'Release the system reliability and failure-rate prediction report', 1],
+      ],
+      o: [
+        'System failure-rate model',
+        'System environmental test results',
+        'System shock, vibration and transport results',
+        'Reliability demonstration results under traffic',
+        'Updated FIT and MTBF prediction',
+        'System environmental reliability and failure-rate prediction report',
+      ],
+      r: [['RELQ-D5', 'produces'], ['RELQ-D6', 'feeds']],
+    },
+    'RELQ-06': {
+      s: [
+        [1, 'Collect results from every stress test and confirm sample sizes and readpoints are complete', 1],
+        [2, 'Disposition every stress failure with its FA and corrective action', 1.5],
+        [3, 'Confirm the delta qualification on the production stepping closes every open change', 1, 1],
+        [4, 'Write the qualification report with the reliability claims the product can make', 1.5],
+        [5, 'Decide production burn-in and system run-in duration from early-failure data, with criteria to reduce it', 1, 1],
+        [6, 'Hold the qualification approval review and record approval with its conditions', 1],
+      ],
+      o: [
+        'Consolidated stress results with completeness check',
+        'Failure dispositions with FA and corrective actions',
+        'Delta qualification closure record',
+        'Qualification report draft with reliability claims',
+        'Production burn-in and system run-in decision with reduction criteria',
+        'Product qualification report and approval record',
+      ],
+      r: [['RELQ-D6', 'produces'], ['RELQ-D8', 'produces']],
+    },
+    'RELQ-07': {
+      s: [
+        [1, 'Confirm the delta test list against the final fix change list and the stepping cut-in map', 1],
+        [2, 'Build the delta qualification units from the production stepping on the production line', 2],
+        [3, 'Rerun operating life and every stress the change can affect, with readpoints', 8],
+        [4, 'Rerun ESD and latch-up on the changed dies', 2, 1],
+        [5, 'Compare stepping results with first-silicon qualification to justify every carried-over test', 1.5],
+        [6, 'Release the delta qualification report on the production stepping', 1],
+      ],
+      o: [
+        'Confirmed delta test list',
+        'Delta qualification units from the production stepping',
+        'Operating life and stress results on the stepping',
+        'ESD and latch-up results on the changed dies',
+        'Carry-over justification per test',
+        'Production stepping delta qualification report',
+      ],
+      r: [['RELQ-D7', 'produces'], ['RELQ-D6', 'feeds']],
+    },
+  },
+};

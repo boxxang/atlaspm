@@ -1,0 +1,201 @@
+/**
+ * CERT — Compliance, Interoperability & Security Certification. Weeks 162–186;
+ * closes on Compliance & Interoperability Complete.
+ */
+import type { CpoStageModule } from '../types';
+
+export const CERT: CpoStageModule = {
+  content: {
+    tagline: 'Prove the switch meets the standards, works with everyone else’s equipment, is safe, and cannot be subverted.',
+    description:
+      'Take the characterized system through every external test it must pass before a customer can deploy it: compliance with the applicable Ethernet electrical and optical specifications, protocol and management-interface conformance, interoperability with other vendors’ equipment at plugfests and in customer labs, laser safety, EMC and regional regulatory certification, and security validation of secure boot, firmware authentication, rollback protection, debug lock and fuse state, closed by independent penetration testing. Material declarations, restricted-substance compliance and export classification are assembled for the customers and markets that require them. Early-access customers qualify the product in their own networks in parallel. The stage closes when every compliance, interoperability and certification result is in and every gap has an owner.',
+    activities: ['Standards compliance', 'Protocol conformance', 'Interoperability', 'Safety and regulatory', 'Security validation', 'Early access', 'Material and export'],
+    deliverables: [
+      'Electrical and optical standards compliance test report',
+      'Protocol and management interface conformance report',
+      'Multi-vendor interoperability matrix and plugfest results',
+      'Laser safety classification and certification file',
+      'EMC, electrical safety and regional regulatory certificates',
+      'Security validation and penetration test report',
+      'Early-access customer feedback and qualification status log',
+      'Compliance and interoperability completion package',
+      'Material compliance, material declaration and export classification file',
+    ],
+    deliverableFrom: [0, 1, 2, 3, 3, 4, 5, 5, 6],
+    deliverableWeek: [16, 16, 22, 17, 20, 20, 22, 24, 20],
+    engineeringEffort: [20, 12, 24, 14, 16, 13, 8],
+    risks: [
+      'Compliance failures found late on parameters the characterization did not measure the same way',
+      'Accredited lab and plugfest slots missed, pushing certification past production release',
+    ],
+    potentialRisks: [
+      'Check that compliance fixtures and de-embedding were correlated before results were recorded, because a fixture error looks exactly like a silicon failure.',
+      'Check that interoperability covers the link partners and optics the lead customers actually deploy, not only the ones in the lab.',
+      'Check that laser safety classification covers single-fault conditions and fiber disconnect with the optical source still powered.',
+      'Check that accredited EMC and safety lab slots are booked on the production-intent mechanical build, since any enclosure change reopens emissions.',
+      'Check that security validation ran on production-fused parts with debug locked, not on engineering parts with debug open.',
+      'Check that early-access customer issues enter the anomaly database and change control rather than a separate sales tracker.',
+    ],
+    leader: { name: 'Hannah Lindqvist', short: 'H. Lindqvist', phone: '+1 (408) 555-0523', email: 'hannah.lindqvist@example.com' },
+    collaboration: [
+      'Compliance and interoperability',
+      'Software',
+      'Firmware',
+      'Security',
+      'Photonics',
+      'Product management',
+      'Field applications',
+    ],
+    tools: [
+      'Standards compliance test suite and fixtures',
+      'Protocol conformance test system',
+      'EMC pre-scan receiver and anechoic test chamber',
+      'Optical power and eye compliance analyzer',
+      'Firmware security and fuzz testing framework',
+    ],
+    programView: [
+      'Compliance parameters passed, failed and open',
+      'Interoperability partners passed per reach and mode',
+      'Certificates received versus required per market',
+      'Open security findings by severity',
+      'Early-access customers in qualification',
+    ],
+    perspective:
+      'Customers do not buy characterization data; they buy a switch that links to whatever is on the other end of the fiber on the first try. Interoperability in their labs is the result that decides adoption, so start it as early as the silicon allows.',
+  },
+  steps: {
+    'CERT-01': {
+      s: [
+        [1, 'Map every applicable Ethernet electrical and optical specification parameter to a test, fixture and limit', 1.5],
+        [2, 'Correlate compliance fixtures and de-embedding against a reference channel and a reference transmitter', 1.5],
+        [3, 'Run electrical compliance on every exposed electrical port and specified host-side interface across corner units', 4],
+        [4, 'Run optical compliance — transmitter, receiver and link parameters — per lane at temperature extremes', 4, 1],
+        [5, 'Disposition failures as silicon, calibration, fixture or specification-interpretation issues and retest', 3],
+        [6, 'Release the standards compliance test report with every parameter traced to its result', 1.5],
+      ],
+      o: [
+        'Compliance parameter map with tests and limits',
+        'Fixture and de-embedding correlation record',
+        'Electrical compliance results per port and corner unit',
+        'Optical compliance results per lane and temperature',
+        'Failure dispositions and retest results',
+        'Electrical and optical standards compliance test report',
+      ],
+      r: [['CERT-D1', 'produces'], ['CERT-D8', 'feeds']],
+    },
+    'CERT-02': {
+      s: [
+        [1, 'Build the conformance test list for link protocols, auto-negotiation, link training and FEC modes', 1.5],
+        [2, 'Run protocol conformance — link state, FEC modes, flow control and control frames — against conformance suites', 4],
+        [3, 'Validate management interfaces — optics management, telemetry models and network management APIs', 4, 1],
+        [4, 'Fix conformance defects in firmware and the SDK and rerun the affected suites', 3],
+        [5, 'Release the protocol and management interface conformance report', 1],
+      ],
+      o: [
+        'Conformance test list traced to requirements',
+        'Protocol conformance results',
+        'Management interface validation results',
+        'Defect fixes with rerun results',
+        'Protocol and management interface conformance report',
+      ],
+      r: [['CERT-D2', 'produces'], ['CERT-D8', 'feeds']],
+    },
+    'CERT-03': {
+      s: [
+        [1, 'Build the interoperability matrix of link partners, optics, network adapters and switches by reach and mode', 1.5],
+        [2, 'Run in-house interoperability against link partners across fiber types and reaches', 5],
+        [3, 'Take systems to industry plugfests and record results per partner', 3, 1],
+        [4, 'Run interoperability in lead customer labs on their topologies and software', 5],
+        [5, 'Root-cause interoperability failures and deliver tuning or firmware fixes', 3],
+        [6, 'Release the interoperability matrix with pass, conditional and fail per partner', 1],
+      ],
+      o: [
+        'Interoperability test matrix',
+        'In-house interoperability results per partner',
+        'Plugfest results per partner',
+        'Customer lab interoperability results',
+        'Interoperability fixes with retest results',
+        'Multi-vendor interoperability matrix and plugfest results',
+      ],
+      r: [['CERT-D3', 'produces'], ['CERT-D7', 'feeds'], ['CERT-D8', 'feeds']],
+    },
+    'CERT-04': {
+      s: [
+        [1, 'Determine the laser safety class under normal operation and single-fault conditions', 2],
+        [2, 'Validate laser safety controls — interlocks, shutdown on fiber disconnect and optical power limiting', 3],
+        [3, 'Close the emission and immunity margins found in pre-compliance on first-build hardware', 3],
+        [4, 'Run accredited-lab EMC, electrical safety and laser safety certification on the design validation build', 5],
+        [5, 'Compile regional regulatory filings, declarations and markings for the target markets', 3, 1],
+        [6, 'Release the laser safety file and the EMC and regulatory certificates', 2],
+      ],
+      o: [
+        'Laser safety classification analysis',
+        'Laser safety control validation results',
+        'EMC margin fixes with pre-scan confirmation',
+        'Accredited-lab test reports',
+        'Regional regulatory filings and declarations',
+        'Laser safety file and EMC and regulatory certificates',
+      ],
+      r: [['CERT-D4', 'produces'], ['CERT-D5', 'produces'], ['CERT-D8', 'feeds']],
+    },
+    'CERT-05': {
+      s: [
+        [1, 'Build the security test plan from the threat model and the product security requirements', 1.5],
+        [2, 'Verify the secure boot chain, firmware image authentication and rejection of unsigned images on production-fused parts', 3],
+        [3, 'Verify rollback protection, anti-downgrade counters and secure update recovery', 2.5],
+        [4, 'Verify debug access lock, fuse and OTP state, and key provisioning on locked parts', 2.5, 1],
+        [5, 'Run independent penetration testing of hardware, firmware and management interfaces', 4],
+        [6, 'Close findings and release the security validation and penetration test report', 2],
+      ],
+      o: [
+        'Security test plan traced to the threat model',
+        'Secure boot and image authentication results',
+        'Rollback protection and update recovery results',
+        'Debug lock, fuse and key provisioning results',
+        'Penetration test findings',
+        'Security validation and penetration test report',
+      ],
+      r: [['CERT-D6', 'produces'], ['CERT-D8', 'feeds']],
+    },
+    'CERT-06': {
+      s: [
+        [1, 'Select early-access customers and agree evaluation criteria, support terms and feedback channels', 1.5],
+        [2, 'Agree customer quality agreements and capture customer-specific requirements into change control', 1.5, 1],
+        [3, 'Ship early-access systems with release notes, the errata list and supported firmware', 2],
+        [4, 'Support customer qualification with weekly issue reviews and field applications engineering', 8],
+        [5, 'Route customer findings into the anomaly database and requirement change control', 8, 1],
+        [6, 'Collect customer qualification status and every compliance result into the completion package', 2],
+        [7, 'Hold the compliance and interoperability completion review', 1],
+      ],
+      o: [
+        'Early-access customer list and evaluation agreements',
+        'Customer quality agreements and customer-specific requirement list',
+        'Early-access shipment record with errata and firmware versions',
+        'Weekly customer issue review record',
+        'Customer findings logged in the anomaly database',
+        'Early-access customer feedback and qualification status log',
+        'Compliance and interoperability completion package',
+      ],
+      r: [['CERT-D7', 'produces'], ['CERT-D8', 'produces']],
+    },
+    'CERT-07': {
+      s: [
+        [1, 'Collect material declarations from every supplier of die, substrate, optical source, fiber, connector and board parts', 4],
+        [2, 'Assess restricted-substance compliance of the full bill of materials, exemptions included', 3],
+        [3, 'Run conflict-minerals due diligence through the supply chain', 3, 1],
+        [4, 'Classify the product and its security cryptography for export control and file what each market requires', 3],
+        [5, 'Prepare customer compliance documents — material declarations, certificates and questionnaires', 2],
+        [6, 'Release the material compliance and export classification file', 1],
+      ],
+      o: [
+        'Supplier material declarations for the full bill of materials',
+        'Restricted-substance compliance assessment with exemptions',
+        'Conflict-minerals due diligence record',
+        'Export classification and filings per market',
+        'Customer compliance document set',
+        'Material compliance, material declaration and export classification file',
+      ],
+      r: [['CERT-D9', 'produces'], ['CERT-D8', 'feeds']],
+    },
+  },
+};

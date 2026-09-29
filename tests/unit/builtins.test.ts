@@ -14,19 +14,20 @@ import { THREE_DIC_ACTIVITIES, THREE_DIC_PROFILE, THREE_DIC_STAGE_KEYS } from '@
 import { TOP_DIE_ACTIVITIES, TOP_DIE_SPLIT } from '@/data/threeDicTopDie';
 import { EMBEDDED_ACTIVITIES, EMBEDDED_PROFILE, EMBEDDED_STAGE_KEYS } from '@/data/embeddedSoc';
 import { EMBEDDED_DERIVED, EMBEDDED_DERIVED_ACTIVITIES } from '@/data/embeddedSocDerived';
+import { CPO_ACTIVITIES, CPO_PROFILE, CPO_SKELETON } from '@/data/cpoSwitch';
 
 /**
  * The templates the app ships and the content they resolve against.
  *
- * Three of them now, so "the built-in profile" and "the activity library" are
+ * Four of them now, so "the built-in profile" and "the activity library" are
  * no longer the same thing as "the SoC one". Everything a programme reads goes
  * through here, and a stage or an activity any template names has to be
  * findable — a programme whose stage shows nothing is a blank screen nobody
  * can explain.
  */
 describe('the templates that ship', () => {
-  it('are the SoC, 3DIC and Embedded SoC ones, each built in and offered', () => {
-    expect(BUILTIN_PROFILES.map((p) => p.id)).toEqual(['typicalSoC', 'threeDic', 'embeddedSoc']);
+  it('are the SoC, 3DIC, Embedded SoC and CPO switch ones, each built in and offered', () => {
+    expect(BUILTIN_PROFILES.map((p) => p.id)).toEqual(['typicalSoC', 'threeDic', 'embeddedSoc', 'cpoSwitch']);
     for (const p of BUILTIN_PROFILES) {
       expect(p.builtin, p.id).toBe(true);
       expect(p.template, p.id).toBe(true);
@@ -47,13 +48,14 @@ describe('the templates that ship', () => {
     expect(stageContent('nothing-of-the-sort')).toBeUndefined();
   });
 
-  it('holds every activity of all three, titled, with no reference claimed twice', () => {
+  it('holds every activity of all four, titled, with no reference claimed twice', () => {
     expect(Object.keys(ALL_ACTIVITIES)).toHaveLength(
       Object.keys(activitySteps).length +
         Object.keys(THREE_DIC_ACTIVITIES).length +
         Object.keys(TOP_DIE_ACTIVITIES).length +
         Object.keys(EMBEDDED_DERIVED_ACTIVITIES).length +
-        Object.keys(EMBEDDED_ACTIVITIES).length,
+        Object.keys(EMBEDDED_ACTIVITIES).length +
+        Object.keys(CPO_ACTIVITIES).length,
     );
     for (const ref of Object.keys(ALL_ACTIVITIES)) {
       expect(ALL_ACTIVITY_TITLES[ref], `${ref} has no title`).toBeTruthy();
@@ -66,8 +68,9 @@ describe('the templates that ship', () => {
     const socKeys = new Set(BUILTIN_PROFILE.stages.map((s) => s.key));
     const dicKeys = new Set(THREE_DIC_PROFILE.stages.map((s) => s.key));
     const embKeys = new Set(EMBEDDED_PROFILE.stages.map((s) => s.key));
+    const cpoKeys = new Set(CPO_PROFILE.stages.map((s) => s.key));
     for (const [ref, a] of Object.entries(ALL_ACTIVITIES)) {
-      expect(socKeys.has(a.st) || dicKeys.has(a.st) || embKeys.has(a.st), `${ref} runs in ${a.st}`).toBe(true);
+      expect(socKeys.has(a.st) || dicKeys.has(a.st) || embKeys.has(a.st) || cpoKeys.has(a.st), `${ref} runs in ${a.st}`).toBe(true);
     }
     /* and the stack activities only in the stack stages */
     for (const [ref, a] of Object.entries(THREE_DIC_ACTIVITIES)) {
@@ -86,13 +89,14 @@ describe('the templates that ship', () => {
     expect(new Set(ALL_MILESTONES.map((m) => m.id)).size).toBe(ALL_MILESTONES.length);
   });
 
-  it('keeps the stage content of all three, without losing journey’s', () => {
+  it('keeps the stage content of all four, without losing journey’s', () => {
     expect(ALL_STAGE_CONTENT.length).toBe(
       journeyData.length +
         THREE_DIC_STAGE_KEYS.length +
         TOP_DIE_SPLIT.length +
         EMBEDDED_DERIVED.length +
-        EMBEDDED_STAGE_KEYS.length,
+        EMBEDDED_STAGE_KEYS.length +
+        CPO_SKELETON.length,
     );
     expect(new Set(ALL_STAGE_CONTENT.map((s) => s.id)).size).toBe(ALL_STAGE_CONTENT.length);
     for (const s of journeyData) expect(stageContent(s.id)).toBe(s);

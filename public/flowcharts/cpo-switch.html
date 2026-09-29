@@ -1,0 +1,578 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CPO Network Switch System Flow</title>
+<style>
+:root {
+  --bg: #ffffff;
+  --surface: #f8f8fa;
+  --card: #ffffff;
+  --line: #e4e4e9;
+  --line-strong: #c9c9d3;
+  --text: #1c1c24;
+  --muted: #6b6b7b;
+  --faint: #9a9aa8;
+  --accent: #5b5bd6;
+  --accent-soft: #ededfc;
+  --risk: #e5484d;
+  --edge: #b9b9c6;
+  --shadow: 0 1px 2px rgba(20,20,40,.06), 0 2px 8px rgba(20,20,40,.04);
+  --b-define: #5b5bd6;
+  --b-enable: #0f8f84;
+  --b-designVerify: #2b6cd4;
+  --b-implement: #7a4bd0;
+  --b-manufacture: #b8680d;
+  --b-integrate: #0b8aa8;
+  --b-validateRamp: #2f8f46;
+  --b-platform: #c9357a;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; background: var(--bg); color: var(--text); }
+body { font-size: 14px; line-height: 1.45; }
+.wrap { max-width: 1480px; margin: 0 auto; padding: 28px 16px 64px; }
+header h1 { font-size: 24px; margin: 0 0 4px; letter-spacing: -.01em; }
+header p { margin: 0; color: var(--muted); max-width: 820px; }
+.stats { display: flex; flex-wrap: wrap; gap: 10px; margin: 18px 0 20px; }
+.stat { border: 1px solid var(--line); border-radius: 8px; padding: 8px 14px; background: var(--surface); }
+.stat b { display: block; font-size: 18px; font-variant-numeric: tabular-nums; }
+.stat span { color: var(--muted); font-size: 12px; }
+
+/* major milestone strip */
+.strip { border: 1px solid var(--line); border-radius: 10px; padding: 14px 18px 10px; margin-bottom: 18px; }
+.strip h2, .section-h { font-size: 12px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); margin: 0 0 10px; font-weight: 600; }
+.axis { position: relative; height: 128px; margin: 0 10px; }
+.axis .rail { position: absolute; left: 0; right: 0; top: 62px; height: 2px; background: var(--line-strong); }
+.axis .tick { position: absolute; top: 68px; font-size: 11px; color: var(--faint); transform: translateX(-50%); font-variant-numeric: tabular-nums; }
+.axis .tick::before { content: ""; position: absolute; left: 50%; top: -8px; width: 1px; height: 5px; background: var(--line-strong); }
+.ms { position: absolute; top: 56px; transform: translateX(-50%); cursor: pointer; }
+.ms i { display: block; width: 12px; height: 12px; background: var(--accent); transform: rotate(45deg); margin: 1px auto 0; border: 2px solid #fff; box-shadow: 0 0 0 1px var(--accent); }
+.ms span { position: absolute; left: 50%; transform: translateX(-50%); white-space: nowrap; font-size: 11.5px; font-weight: 600; }
+.ms span::before { content: ""; position: absolute; left: 50%; width: 1px; background: var(--line-strong); }
+.ms.up span { bottom: 20px; }
+.ms.up.l2 span { bottom: 42px; }
+.ms.down span { top: 30px; }
+.ms.down.l2 span { top: 50px; }
+.ms.end span { left: auto; right: -6px; transform: none; }
+.ms span em { font-style: normal; color: var(--muted); font-weight: 400; margin-left: 4px; }
+
+/* toolbar */
+.toolbar { display: flex; flex-wrap: wrap; gap: 8px 12px; align-items: center; margin-bottom: 12px; }
+.toolbar .hint { flex: 1 1 380px; }
+.seg { display: inline-flex; border: 1px solid var(--line-strong); border-radius: 8px; overflow: hidden; }
+.seg button { border: 0; background: var(--card); padding: 6px 12px; font: inherit; font-size: 13px; color: var(--text); cursor: pointer; }
+.seg button + button { border-left: 1px solid var(--line-strong); }
+.seg button[aria-pressed="true"] { background: var(--accent); color: #fff; }
+.hint { color: var(--muted); font-size: 12.5px; }
+
+/* flowchart */
+.scroller { overflow: auto; max-height: calc(100vh - 90px); min-height: 420px; overscroll-behavior: contain; border: 1px solid var(--line); border-radius: 10px; background: var(--surface); }
+.chart { position: relative; min-width: 1272px; }
+.grid { position: relative; z-index: 1; display: grid; grid-template-columns: 56px repeat(7, minmax(128px, 1fr)); column-gap: 40px; padding: 0 40px 20px 0; }
+.lanehead { position: sticky; top: 0; z-index: 6; box-shadow: 20px 0 0 var(--surface), -20px 0 0 var(--surface), 20px 1px 0 var(--line), -20px 1px 0 var(--line); padding: 12px 6px 10px; font-size: 11.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; background: var(--surface); border-bottom: 1px solid var(--line); }
+.lanehead::before { content: ""; display: block; width: 22px; height: 3px; border-radius: 2px; background: var(--c); margin-bottom: 6px; }
+.lanebg { position: absolute; top: 0; bottom: 0; z-index: 0; border-left: 1px dashed var(--line); }
+.rowlabel { padding-top: 54px; padding-left: 12px; font-size: 11px; color: var(--faint); font-variant-numeric: tabular-nums; font-weight: 600; }
+.cell { display: flex; flex-direction: column; gap: 22px; padding-top: 50px; }
+svg.edges { position: absolute; inset: 0; z-index: 0; pointer-events: none; overflow: visible; }
+.nodes-layer { position: relative; z-index: 4; }
+
+.node { position: relative; z-index: 4; background: var(--card); border: 1px solid var(--line); border-left: 4px solid var(--c); border-radius: 8px; padding: 8px 10px 9px; box-shadow: var(--shadow); cursor: pointer; transition: opacity .15s, box-shadow .15s, transform .15s; text-align: left; font: inherit; color: inherit; width: 100%; }
+.node:hover { box-shadow: 0 2px 4px rgba(20,20,40,.08), 0 6px 18px rgba(20,20,40,.08); }
+.node:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.node .code { font-size: 10.5px; font-weight: 700; color: var(--c); letter-spacing: .03em; }
+.node .ttl { display: block; font-weight: 600; font-size: 13px; line-height: 1.3; margin: 1px 0 5px; }
+.node .wk { font-size: 11px; color: var(--muted); font-variant-numeric: tabular-nums; }
+.node .bar { height: 3px; background: var(--line); border-radius: 2px; margin: 5px 0 6px; position: relative; overflow: hidden; }
+.node .bar i { position: absolute; top: 0; bottom: 0; background: var(--c); opacity: .7; border-radius: 2px; }
+.node .mst { display: flex; gap: 5px; align-items: flex-start; font-size: 11px; color: var(--muted); line-height: 1.3; }
+.node .mst::before { content: ""; flex: none; width: 7px; height: 7px; margin-top: 3px; transform: rotate(45deg); border: 1.5px solid var(--muted); }
+.node .mst.major { color: var(--accent); font-weight: 600; }
+.node .mst.major::before { background: var(--accent); border-color: var(--accent); }
+.node .tag { float: right; font-size: 9.5px; font-weight: 700; color: var(--b-platform); background: #fbeaf2; border-radius: 4px; padding: 0 5px; letter-spacing: .02em; }
+.chart.focus .node { opacity: .28; }
+.chart.focus .node.on { opacity: 1; }
+.chart.focus .node.sel { box-shadow: 0 0 0 2px var(--accent), var(--shadow); }
+.endnode { grid-column: 2 / -1; margin-top: 40px; border: 1px solid var(--accent); background: var(--accent-soft); border-radius: 10px; padding: 12px 16px; display: flex; flex-wrap: wrap; gap: 6px 22px; align-items: center; position: relative; z-index: 4; }
+.endnode b { font-size: 14px; }
+.endnode span { font-size: 12.5px; color: var(--muted); }
+
+path.e { fill: none; stroke: var(--edge); stroke-width: 1.4; transition: opacity .15s; }
+path.e { stroke-linejoin: round; }
+.chart.focus path.e.on.spine { stroke-width: 3.2; }
+.chart.focus path.e.on.rib { stroke-dasharray: 5 4; }
+.chart.focus.path-mode path.e:not(.on) { opacity: 0; }
+.chart.focus .node.spine { box-shadow: 0 0 0 1.5px var(--accent), var(--shadow); }
+.chart.focus path.e.on:not(.spine) { stroke-width: 1.6; }
+.chart:not(.focus) path.e:hover { stroke: var(--muted); }
+.chart.focus path.e { opacity: .12; }
+.chart.focus path.e.on { opacity: 1; stroke: var(--accent); stroke-width: 2.2; }
+.chart.focus path.e.on.in { stroke: #8a8aa0; }
+
+/* legend */
+.legend { display: flex; flex-wrap: wrap; gap: 6px 18px; margin: 12px 2px 0; font-size: 12px; color: var(--muted); }
+.legend span { display: inline-flex; align-items: center; gap: 6px; }
+.legend .sw { width: 10px; height: 10px; border-radius: 3px; background: var(--c); }
+
+/* drawer */
+.drawer { position: fixed; top: 0; right: 0; bottom: 0; width: min(460px, 100vw); background: var(--card); border-left: 1px solid var(--line); box-shadow: -8px 0 30px rgba(20,20,40,.08); z-index: 20; transform: translateX(105%); transition: transform .2s ease; display: flex; flex-direction: column; }
+.drawer.open { transform: none; }
+.drawer .dh { padding: 18px 20px 14px; border-bottom: 1px solid var(--line); border-top: 4px solid var(--c); }
+.drawer .dh .code { font-size: 11px; font-weight: 700; color: var(--c); letter-spacing: .04em; }
+.drawer .dh h3 { margin: 2px 0 4px; font-size: 18px; line-height: 1.3; }
+.drawer .dh p { margin: 0; color: var(--muted); font-style: italic; }
+.drawer .x { position: absolute; top: 14px; right: 14px; border: 1px solid var(--line); background: var(--card); border-radius: 6px; width: 30px; height: 30px; font-size: 16px; cursor: pointer; color: var(--muted); }
+.drawer .db { overflow-y: auto; padding: 14px 20px 30px; }
+.facts { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 16px; }
+.facts div { background: var(--surface); border-radius: 8px; padding: 7px 10px; }
+.facts b { display: block; font-size: 14px; font-variant-numeric: tabular-nums; }
+.facts span { font-size: 11px; color: var(--muted); }
+.drawer h4 { font-size: 11.5px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); margin: 18px 0 6px; }
+.drawer ol, .drawer ul { margin: 0; padding-left: 20px; }
+.drawer li { margin: 3px 0; }
+.drawer .msbox { display: flex; gap: 8px; align-items: center; background: var(--accent-soft); border-radius: 8px; padding: 8px 12px; font-weight: 600; }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.chip { border: 1px solid var(--line-strong); background: var(--card); border-left: 3px solid var(--c); border-radius: 6px; padding: 3px 9px; font: inherit; font-size: 12.5px; cursor: pointer; color: var(--text); }
+.chip:hover { background: var(--surface); }
+.none { color: var(--faint); font-size: 12.5px; }
+
+/* sequence table */
+.seq { margin-top: 30px; }
+table { width: 100%; border-collapse: collapse; font-size: 13px; }
+th, td { text-align: left; padding: 7px 8px; border-bottom: 1px solid var(--line); vertical-align: top; }
+th { font-size: 11px; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); font-weight: 600; }
+td.n { color: var(--faint); font-variant-numeric: tabular-nums; width: 32px; }
+td.w { font-variant-numeric: tabular-nums; white-space: nowrap; color: var(--muted); }
+td .dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: var(--c); margin-right: 7px; }
+tr.clk { cursor: pointer; }
+tr.clk:hover td { background: var(--surface); }
+.tblwrap { overflow-x: auto; }
+.gantt { position: relative; height: 8px; min-width: 160px; background: var(--surface); border-radius: 4px; margin-top: 5px; }
+.gantt i { position: absolute; top: 0; bottom: 0; border-radius: 4px; background: var(--c); opacity: .75; }
+footer { margin-top: 26px; color: var(--faint); font-size: 12px; }
+@media (max-width: 720px) {
+  header h1 { font-size: 20px; }
+  .ms span { display: none; }
+  .ms.lbl span { display: block; }
+  .hide-sm { display: none; }
+}
+.e-dec { transition: opacity .15s; }
+.chart.focus .e-dec { opacity: .12; }
+.chart.focus .e-dec.on { opacity: 1; }
+.chart.focus.path-mode .e-dec:not(.on) { opacity: 0; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>CPO Network Switch System — Program Flowchart</h1>
+    <p>The full development flow of AtlasPM’s built-in <b>CPO Network Switch System</b> template: a switch whose optics are co-packaged with the switching silicon — switch ASIC, high-speed I/O, electrical and photonic ICs, optical source, bridge and silicon capacitors, advanced package and fiber, board, cooling, firmware and software — from concept to sustaining. Stages are the program lifecycle, each closing on a gate; the components run as parallel activities inside them. Stages flow top to bottom by start week; columns are the lifecycle bands. Click any stage for its activities, deliverables and links.</p>
+  </header>
+
+  <div class="stats" id="stats"></div>
+
+  <section class="strip">
+    <h2>Major milestones · weeks from kickoff</h2>
+    <div class="axis" id="axis"></div>
+  </section>
+
+  <div class="toolbar">
+    <div class="seg" role="group" aria-label="Highlight">
+      <button data-mode="all" aria-pressed="true">All links</button>
+      <button data-mode="silicon" aria-pressed="false">Silicon path</button>
+      <button data-mode="platform" aria-pressed="false">Package, optics &amp; test path</button>
+    </div>
+    <span class="hint" id="modeNote"></span>
+  </div>
+
+  <div class="scroller">
+    <div class="chart" id="chart">
+      <svg class="edges" id="edges"></svg>
+      <div class="grid" id="grid"></div>
+    </div>
+  </div>
+  <div class="legend" id="legend"></div>
+
+  <section class="seq">
+    <h2 class="section-h">Stage sequence · ordered by start</h2>
+    <div class="tblwrap"><table id="seq"></table></div>
+  </section>
+
+  <footer>Source: <code>src/data/cpoSwitch/skeleton.ts</code> and the stage modules beside it — the <code>cpoSwitch</code> profile’s baselines, gates and stage content. Links between stages summarise the hand-offs between lifecycle gates; each activity’s own dependencies are on its write-up page in the app.</footer>
+</div>
+
+<aside class="drawer" id="drawer" aria-hidden="true">
+  <button class="x" id="dclose" aria-label="Close">×</button>
+  <div class="dh" id="dhead"></div>
+  <div class="db" id="dbody"></div>
+</aside>
+
+<script>
+const STAGES = [{"key":"cpoConcept","order":0,"title":"Concept & Product Planning","short":"CON","phase":"define","start":0,"dur":10,"tagline":"Decide what the switch is for before anyone decides how to build it.","activities":["Market and Customer Requirements Capture","Competitive and Technology Landscape Assessment","Product Concept — Bandwidth, Port Configuration, Power per Bit and Form Factor","Business Case, Cost Model and Pricing Targets","Program Plan — Schedule, Resources, Budget and Partners","Program Risk Assessment and Go / No-Go Review"],"deliverables":["Market requirements document","Competitive and technology landscape assessment","Product concept brief — bandwidth, ports, power per bit, form factor","Business case and cost-of-goods model","Program plan — schedule, resources, budget and partners","Program go / no-go decision package"],"milestones":[{"label":"Program Go / No-Go","major":false}]},{"key":"cpoRequirements","order":1,"title":"Product & System Requirements","short":"REQ","phase":"define","start":4,"dur":16,"tagline":"Turn the concept into numbers every workstream can be held to, and freeze them together.","activities":["Product Requirements Document","System Requirements Specification","Switching Feature, Buffering and Telemetry Requirements","Optical Link Requirements — Reach, Wavelength Plan, Budget and BER","Standards, Compliance and Interoperability Targets","Product Security Requirements and Threat Model","Reliability, Serviceability and Environmental Requirements","Manufacturability, Test, Supply and Cost-of-Goods Targets","Requirements Traceability and Baseline Review"],"deliverables":["CPO switch product requirements document","CPO switch system requirements specification","Switching feature, packet buffer, network timing and telemetry requirements","Optical link requirements — reach classes, wavelength plan, link budget and BER","Standards compliance and interoperability target matrix","Product security requirements and threat model","Reliability, serviceability and environmental requirements","Manufacturability, test-cost, supply and cost-of-goods target sheet","Requirements traceability matrix — need to verification method","Requirements baseline review package"],"milestones":[{"label":"Requirements Baseline","major":false}]},{"key":"cpoFeasibility","order":2,"title":"Technology Feasibility & Test Vehicles","short":"FEAS","phase":"enable","start":6,"dur":50,"tagline":"Prove on real silicon, glass and fiber that every technology the concept bets on works before the design depends on it.","activities":["Feasibility Plan and Test Vehicle Strategy","SerDes and High-Speed I/O Test Chip","Photonic IC Test Vehicle — Modulators, Detectors, Waveguides, Couplers","Electrical IC Test Vehicle — Drivers and Transimpedance Amplifiers","Optical Source and Laser Coupling Feasibility","Fiber Attach and Optical Coupling Test Vehicle","Package, Bridge and Thermal Test Vehicle","End-to-End Optical Link Feasibility Demonstration","Feasibility Review and Technology Selection Decision","Interim Technology Down-Select Before the Partition Freeze","Early Optical Source and Fiber-Attach Reliability Screening on Test Vehicles"],"deliverables":["Feasibility plan and test vehicle charter","SerDes test chip characterization report","Photonic IC test vehicle characterization report","Electrical IC driver and TIA test vehicle report","Optical source and laser-to-PIC coupling feasibility report","Fiber attach alignment tolerance and coupling loss report","Package, bridge and thermal test vehicle report — warpage, bump yield, thermal","End-to-end optical link feasibility demonstration report","Technology selection decision and go / no-go record","Interim technology down-select record for the partition freeze","Early optical source and fiber attach reliability screening report"],"milestones":[{"label":"Technology Feasibility Proven","major":false}]},{"key":"cpoReadiness","order":3,"title":"Technology, IP & Supply Readiness","short":"TRDY","phase":"enable","start":8,"dur":52,"tagline":"Make sure every process, IP block, tool and supplier the design will need is real, qualified and reserved before the design needs it.","activities":["Silicon Process and Foundry Selection for the Switch and I/O Silicon","Photonics Process, Foundry and Photonic PDK Readiness","Digital PDK, Standard Cells and Memory Compilers","SerDes and High-Speed I/O IP Readiness","Third-Party and Internal IP Qualification","Package Technology, Substrate and Assembly Partner Readiness","Optical Source and Laser Supplier Qualification","Fiber, Connector, Passive, PCB and Cooling Supplier Readiness","Electronic-Photonic Co-Design Flow and EDA Readiness","Long-Lead Material Plan and Supply Agreements","Technology, IP and Supply Readiness Review","Electrical IC Process and Foundry Selection","System Manufacturing Partner Selection and Line Readiness","IP Rights, Freedom-to-Operate and Licensing Clearance"],"deliverables":["Switch and I/O silicon foundry and process selection record","Photonics foundry selection and photonic PDK readiness assessment","Digital PDK, standard cell and memory compiler readiness report","SerDes and high-speed I/O IP readiness and deliverables checklist","Third-party and internal IP qualification register","Package technology, substrate and OSAT readiness assessment","Optical source supplier qualification report","Fiber, connector, passive, PCB and cooling approved supplier list","Electronic-photonic co-design flow release","Long-lead material plan and executed supply agreements","Technology, IP and supply readiness gate package","Electrical IC process and foundry selection record","System manufacturing partner selection and line readiness plan","Freedom-to-operate opinion and licensing clearance record"],"milestones":[{"label":"Technology, IP & Supply Readiness","major":false}]},{"key":"cpoArchitecture","order":4,"title":"System Architecture & Partitioning","short":"SARC","phase":"define","start":10,"dur":26,"tagline":"Decide what every die, engine, package and board does — together, and before anyone lays out a gate.","activities":["Switch ASIC Architecture — Pipeline, Packet Buffer, Traffic Management","High-Speed I/O and SerDes Architecture","Optical Engine Architecture — Electrical IC, Photonic IC and Optical Source Split","Die Partitioning, Die-to-Die and Bridge / Interposer Strategy","Package and System Mechanical Architecture — Optical Engine Placement and Fiber Egress","Clock, Reset and Power Architecture","Thermal Architecture and Cooling Concept","Firmware, Software and Management Architecture","Security Architecture — Root of Trust, Boot, Debug and Keys","DFT, Known-Good-Die and Production Test Architecture","Power, Performance, Area and Cost Budget Allocation","Architecture Convergence Review and Partition Freeze"],"deliverables":["Switch ASIC architecture specification — pipeline, packet buffer and traffic manager","SerDes and high-speed I/O architecture specification","Optical engine architecture and SerDes-to-fiber lane map","Die partitioning and die-to-die, bridge and interposer decision record","Package and system mechanical architecture — engine placement and fiber egress","Clock, reset, network timing and power architecture with power tree and PDN budget","Thermal architecture and cooling concept","Firmware, software and management architecture specification","Security architecture — root of trust, boot chain, debug and key hierarchy","DFT, known-good-die and production test architecture","Power, performance, area and cost budget allocation by subsystem","Architecture convergence and partition freeze package"],"milestones":[{"label":"Architecture Convergence & Partition Freeze","major":false}]},{"key":"cpoModeling","order":5,"title":"System Modeling & Co-Simulation","short":"MODL","phase":"designVerify","start":16,"dur":40,"tagline":"Build the models every design decision leans on, state how accurate each must be, and plan how silicon will prove it.","activities":["Modeling Plan and Model Accuracy Targets","Network Traffic, Buffer and Congestion Performance Model","Electrical Channel and SerDes Link Models","Optical Link Budget and Optical Channel Model","Electrical IC and Photonic IC Behavioral Co-Simulation Models","Package Signal Integrity, Power Integrity and PDN Models","System Thermal, Mechanical and Warpage Models","System Power Model and Power-per-Bit Estimate","Virtual Platform and End-to-End System Model for Firmware and Software","Model Correlation Plan and Model Readiness Review","Test-Vehicle-to-Model Correlation"],"deliverables":["Modeling plan with model accuracy targets","Network traffic, buffer and congestion performance model","Electrical channel models and SerDes link model release","Optical link budget and optical channel model","Electrical and photonic IC behavioural co-simulation model library","Package SI, PI and PDN model set","Thermal, mechanical and warpage model release","System power model and power-per-bit estimate","Virtual platform release for firmware and software","Model correlation plan and model readiness gate package","Test-vehicle-correlated model set and residual error report"],"milestones":[{"label":"Required Models Ready","major":false}]},{"key":"cpoInterfaces","order":6,"title":"Interface Definition & Control","short":"ICD","phase":"define","start":20,"dur":28,"tagline":"Write down every boundary in the system once, give it two owners and one version, and freeze it before design commits.","activities":["Interface Register, Ownership and Change Control Board","Die-to-Die, Switch-to-I/O and Host Processor Electrical Interfaces","Electrical-to-Photonic and Optical Source-to-Photonic Interfaces","Photonic-to-Fiber and Front-Panel Optical Interfaces","Die-to-Package and Package-to-Board Interfaces","Power, Clock and Reset Interfaces","Thermal and Mechanical Interfaces","Firmware-to-Hardware and Software-to-Firmware Interfaces","Manufacturing, Test and Calibration Data Interfaces","Interface Freeze Review and Change Control Baseline"],"deliverables":["Interface register with owners, versioning rules and change control board charter","Die-to-die, switch-to-I/O and host processor electrical interface control document","Electrical IC-to-photonic IC and optical source-to-photonic IC interface control document","Photonic IC-to-fiber and front-panel optical interface control document","Die-to-package and package-to-board interface control document with bump and ball maps","Power, clock and reset interface control document","Thermal and mechanical interface control document","Firmware-to-hardware register map and software-to-firmware API specification","Manufacturing, test and calibration data interface control document","Interface validation plan — co-simulation and silicon checks per parameter","Interface freeze and change control baseline package"],"milestones":[{"label":"Interface Freeze","major":false}]},{"key":"cpoProgramControl","order":7,"title":"Program Integration & Change Control","short":"PCTL","phase":"define","start":20,"dur":190,"tagline":"Hold the program together between the gates: one schedule, one risk log, one configuration and one change board.","activities":["Integrated Master Schedule and Cross-Workstream Dependency Tracking","Program Risk, Issue and Decision Log Management","Interface Change Control Board Operation After the Interface Freeze","Configuration Management — Design Databases, Firmware, Test Programs and Bills of Materials","Supplier and Partner Program Reviews","Cost-of-Goods and Budget Tracking Against Target","Change Control Handover to Sustaining"],"deliverables":["Integrated master schedule and cross-workstream dependency register","Program risk, issue and decision log","Interface change request log and ICD revision history","Configuration baseline index — design databases, firmware, test programs and BOMs","Supplier and partner program review record and scorecards","Cost-of-goods and program budget tracking report","Change control handover package to sustaining"],"milestones":[{"label":"Change Control Handed to Sustaining","major":false}]},{"key":"cpoDesign","order":8,"title":"Detailed Design","short":"DSGN","phase":"designVerify","start":32,"dur":52,"tagline":"Every die, the package, the board and the code designed at once, against frozen interfaces.","activities":["Switch ASIC Microarchitecture and Block Specifications","Switch ASIC RTL Development and Integration","Clock, Reset, Power Management and Low-Power Intent","High-Speed I/O and SerDes Silicon Design","Electrical IC Circuit Design — Drivers, TIAs, Bias and Control","Photonic IC Design — Modulators, Detectors, Multiplexing, Heaters and Monitors","Optical Source Subsystem Design","Optical Control, Tuning and Calibration Algorithms","Bridge / Interposer and Silicon Capacitor Design","Security Hardware — Root of Trust, Boot ROM, Fuses and Debug Lock","DFT Design — Scan, Memory BIST, JTAG, Loopback, PRBS and Analog / Optical Test Access","Package and Substrate Design — Floorplan, Bump Map and Die-to-Die Routing","Fiber Assembly, Optical Connector and Front-Panel Design","System Board, Voltage Regulation and Power Delivery Design","Thermal Solution and Cooling Design","Firmware Development — Boot, Initialization, Link Training and Optical Control","SDK, Drivers, Management and Telemetry Software Development","Design Freeze Review — RTL, Circuit and Photonic Freeze","Optical Engine Sub-Assembly Design — Electrical-to-Photonic Attach and Engine Substrate","Optical Source Module Packaging, Serviceability and Front-Panel Integration","Early Die Floorplan, Die Size and Bump Plan Trials for Every Die","System Enclosure, Power Supplies, Fan Trays and Control-Plane Processor Design"],"deliverables":["Switch ASIC microarchitecture and block specifications","Switch ASIC frozen RTL and UPF power-intent release","SerDes and high-speed I/O silicon design database","Electrical IC schematic database and pre-layout simulation report","Photonic IC design database and optical loss allocation","Optical source subsystem design specification","Optical control, tuning and calibration algorithm specification","Bridge / interposer and silicon capacitor design database","Security hardware design and fuse / OTP map","DFT design specification and test access map","Package and substrate design database — floorplan, bump map and die-to-die routing","Fiber assembly, optical connector and front-panel design package","System board schematic and power delivery design","Thermal solution and cooling design package","Pre-silicon firmware image — boot, initialization, link training and optical control","Pre-silicon SDK, driver and management software release","Design freeze decision package — RTL, circuit and photonic","Optical engine sub-assembly design package — electrical-to-photonic attach and engine substrate","Optical source module packaging and serviceability design package","Early die floorplan, die size and bump plan trial report for every die","System enclosure, power supply, fan tray and control-plane processor design package"],"milestones":[{"label":"Design Freeze — RTL, Circuit & Photonic","major":false}]},{"key":"cpoPresilicon","order":9,"title":"Pre-Silicon Verification & Validation","short":"PSV","phase":"designVerify","start":36,"dur":56,"tagline":"Prove every die, every link and the code that runs them before a mask is paid for.","activities":["Verification Plan and Coverage Model Across Every Die and the System","Block and Subsystem Verification and Regression","Full-Chip Simulation and Regression","Formal, CDC / RDC and Low-Power Verification","Mixed-Signal Verification of the Electrical IC and SerDes","Photonic IC and Optical Link Simulation Against the Budget","Link-Level Co-Simulation — Switch, SerDes, Electrical IC, Photonic IC and Fiber","Emulation and FPGA Prototyping of the Switch ASIC","Firmware and Software Pre-Silicon Validation","Gate-Level Simulation and Test Pattern Simulation","Pre-Silicon Validation Closure Review","Pre-Silicon Security Verification — Boot ROM, Fuses, Debug Lock and Key Handling","Bridge / Interposer and Silicon Capacitor Verification","Emulation-Based Power Analysis and Worst-Case Current-Step Vectors"],"deliverables":["Verification plan and coverage model across every die and the system","Block and subsystem verification closure report","Full-chip regression and functional coverage closure report","Formal, CDC / RDC and low-power verification signoff report","Mixed-signal verification report for the electrical IC and SerDes","Photonic IC and optical link simulation report against the budget","End-to-end link co-simulation margin report","Emulation and FPGA prototype platform with traffic validation results","Pre-silicon firmware and software validation report","Gate-level and test pattern simulation report","Pre-silicon validation closure package","Pre-silicon security verification report — boot ROM, fuses, debug lock and keys","Bridge / interposer and silicon capacitor verification report","Emulated power profiles and worst-case current-step vector set"],"milestones":[{"label":"Pre-Silicon Validation Complete","major":false}]},{"key":"cpoTestInfra","order":10,"title":"Test & Manufacturing Infrastructure","short":"TINF","phase":"integrate","start":50,"dur":68,"tagline":"Build the factory that tests, calibrates and assembles the switch before the first wafer exists.","activities":["Production Test Strategy and Coverage Plan — Wafer, Die, Package, Module and System","Probe Cards and Electrical Wafer Sort Hardware","Optical Wafer Probe and Optical Test Fixtures","Load Boards, Sockets and Final Test Hardware","System-Level Test Platform","Production Test Programs — Electrical, Optical and Calibration","Factory Calibration Process and Calibration Data Flow","Tester Capacity, Test Time and Test Cost Model","Assembly, Optical Alignment and Fiber Attach Process Development","Manufacturing Data, Traceability and Yield Infrastructure","Test and Manufacturing Readiness Review","Optical Source Module Burn-In and Incoming Screening Stations","Secure Key and Fuse Provisioning Infrastructure","Post-Silicon Validation, Characterization and Qualification Plans and Test Content","Test Site Strategy and Test Subcontractor Qualification","Rework, Repair and Scrap Policy — Optical Engine, Fiber Attach and Optical Source","System Board Assembly and Box Build Process — In-Circuit Test, Run-In and Final System Test"],"deliverables":["Production test strategy and per-insertion coverage plan","Electrical probe card and wafer sort hardware set","Optical wafer probe station and optical test fixture set with loss-correction tables","Package and final test load boards and sockets","System-level test platform and rack configuration","Production test program release — wafer sort, final test and system-level test","Factory calibration process specification and per-lane calibration data flow","Tester capacity, test time and test cost model","Assembly, optical alignment and fiber attach process specification","Manufacturing traceability, data and yield system","Test and manufacturing readiness review package","Optical source burn-in and incoming screening stations with screening limits","Secure key and fuse provisioning infrastructure and custody procedures","Post-silicon validation plan, characterization corner and skew-lot matrix, and qualification sample plan","Test site plan and test subcontractor qualification report","Rework, repair and scrap policy for optical engines, fiber attach and optical sources","System board assembly and box build process specification — in-circuit test, run-in and final system test"],"milestones":[{"label":"Test & Manufacturing Infrastructure Ready","major":false}]},{"key":"cpoImplementation","order":11,"title":"Physical Implementation & Layout","short":"IMPL","phase":"implement","start":64,"dur":36,"tagline":"Turn every frozen design into geometry a foundry, a substrate house and a board shop can build.","activities":["Switch ASIC Synthesis and Netlist Drops","Switch ASIC Floorplan, Place and Route and Timing Closure","High-Speed I/O and SerDes Silicon Physical Implementation","Electrical IC Layout, Extraction and Post-Layout Simulation","Photonic IC Layout and Optical Design Rule Closure","Bridge / Interposer and Silicon Capacitor Layout","Package Layout, Substrate and RDL Routing and Bump Map Closure","Package and Board Signal and Power Integrity Closure","Thermal, Mechanical and Warpage Co-Analysis on the Layout","Validation, Reference and Production System Board Layout and Fabrication Release","Scan Stitching, DFT Closure and Test Pattern Generation","Implementation Completion Review and Database Handoff to Signoff","Customer Design-In Kit and Engineering Sample Plan"],"deliverables":["Switch ASIC synthesized netlist and QoR report","Switch ASIC timing-closed place-and-route database","SerDes and I/O silicon layout database with post-layout jitter and eye results","Electrical IC layout and post-layout simulation report","Photonic IC layout with optical design rule closure record","Bridge / interposer and silicon capacitor layout databases","Package substrate and RDL layout with closed bump map","Package and board SI/PI closure report","Thermal, mechanical and warpage co-analysis report on the layout","Validation, reference and production system board fabrication release package","Scan-stitched netlist and ATPG pattern set with coverage report","Implementation completion review record and signoff database handoff","Customer design-in kit — reference board files, simulation, thermal and mechanical models","Engineering sample plan and customer allocation"],"milestones":[{"label":"Implementation Complete","major":false}]},{"key":"cpoSignoff","order":12,"title":"Signoff & Tapeout Readiness","short":"SGNO","phase":"implement","start":88,"dur":18,"tagline":"Prove every die, the package that joins them and the lock that protects them before a mask is paid for.","activities":["Switch ASIC Timing, EM / IR and Physical Verification Signoff","High-Speed I/O and SerDes Silicon Signoff","Electrical IC Analog Signoff","Photonic IC Signoff — Optical Rules, Connectivity and Performance","Bridge / Interposer and Silicon Capacitor Signoff","Multi-Die Package Signoff — Die-to-Die Timing, SI / PI and Thermal","Final Equivalence, DFT Signoff and Pattern Delivery","Security Signoff — Keys, Fuses and Debug Lock","Tapeout Readiness Review Across Every Die","Substrate and RDL Tooling Release to Suppliers"],"deliverables":["Switch ASIC signoff report — timing, EM / IR and physical verification","SerDes and I/O silicon signoff report","Electrical IC analog signoff report","Photonic IC signoff report — optical rules, connectivity and loss budget","Bridge / interposer and silicon capacitor signoff report","Multi-die package signoff report — die-to-die timing, SI / PI and thermal","Substrate and RDL tooling release to the substrate and assembly suppliers","Final equivalence and DFT signoff report","Production test pattern delivery package","Security signoff record — keys, fuse map and debug lock","Tapeout readiness decision package across every die"],"milestones":[{"label":"All Silicon Ready for Tapeout","major":false}]},{"key":"cpoAssembly","order":13,"title":"Package & Optical Assembly — First Build","short":"PKGA","phase":"integrate","start":100,"dur":44,"tagline":"Turn known-good die, optical engines, optical sources and fiber into the first working switch packages.","activities":["Substrate, Bridge and Component Procurement for the First Builds","Engineering Build Plan and Build Matrix","Die Attach, Bridge Attach and Multi-Die Assembly","Optical Engine Assembly, Fiber Alignment and Attach","Optical Source Module Integration","Package-Level Test and First-Build Yield Analysis","Validation Board and System Assembly","Pre-Qualification Reliability Stress on First-Build Units","Bring-Up Lab, Debug Infrastructure and Station Readiness","Optical Engine-Level Test and Yield Tracking","Bring-Up Firmware, SDK and Diagnostics Readiness on the Final Netlist","Optical Engine Standalone Bring-Up on an Engine Evaluation Board","Electrical-Only Engineering Package Build — Switch and I/O Dies Without Optical Engines","Mechanical and Daisy-Chain Dry-Run Build on the Product Substrate"],"deliverables":["First-build material kit — substrates, bridges, optical source modules, fiber assemblies and passives","Engineering build plan and split-condition build matrix","Assembled multi-die packages with assembly travelers","Optical engine and fiber attach build record with per-lane coupling loss","Optical source integration record with delivered optical power per lane","First-build package test results and yield analysis report","Assembled validation boards and bring-up systems","First package build release to bring-up — unit allocation and known-issue list","Pre-qualification stress results on first-build units","Bring-up plan, lab readiness certificate and debug station inventory","Optical engine-level test results and engine yield tracker","Bring-up firmware, SDK and diagnostics release validated on the final netlist","Optical engine standalone bring-up report from the engine evaluation board","Electrical-only engineering packages for early power-on","Daisy-chain dry-run build report on the product substrate"],"milestones":[{"label":"First Package Build","major":true}]},{"key":"cpoTapeout","order":14,"title":"Tapeout & Mask Release","short":"MTO","phase":"manufacture","start":104,"dur":8,"tagline":"Hand every die to its own foundry on its own checklist, and plan the wafers before they start.","activities":["Switch ASIC Tapeout and Mask Release","High-Speed I/O and SerDes Silicon Tapeout","Electrical IC Tapeout","Photonic IC Tapeout","Bridge / Interposer and Silicon Capacitor Release","Wafer Start Plan, Lot Splits and Engineering Lot Strategy","Tapeout Archive and Configuration Baseline"],"deliverables":["Switch ASIC mask release record and foundry handoff checklist","SerDes and I/O silicon tapeout record","Electrical IC tapeout record and mask order","Photonic IC tapeout record with in-line monitor structures","Bridge / interposer and silicon capacitor mask release record","Wafer start plan with lot splits and engineering lot strategy","Tapeout archive and silicon configuration baseline"],"milestones":[{"label":"Tapeout — All Dies","major":true}]},{"key":"cpoFabrication","order":15,"title":"Wafer Fabrication","short":"WFAB","phase":"manufacture","start":108,"dur":14,"tagline":"Several foundries, one first-silicon date — track every lot, and have everything else on the dock when the wafers come out.","activities":["Switch ASIC and I/O Silicon Wafer Fabrication","Electrical IC Wafer Fabrication","Photonic IC Wafer Fabrication and In-Line Optical Monitoring","Bridge / Interposer and Silicon Capacitor Fabrication","Optical Source, Fiber and Substrate Material Arrival for the First Build","Wafer Acceptance and First Silicon Release"],"deliverables":["Switch ASIC and I/O silicon lot tracking and wafer-out record","Electrical IC wafer lot and parametric record","Photonic IC in-line optical monitor report","Bridge / interposer and silicon capacitor wafer lot record","First-build material receipt and incoming inspection record","Wafer acceptance review and first silicon release record"],"milestones":[{"label":"First Silicon","major":true}]},{"key":"cpoSort","order":16,"title":"Wafer Sort & Known-Good-Die","short":"SORT","phase":"manufacture","start":122,"dur":10,"tagline":"Every die that goes into a co-packaged switch must be good before it goes in — nothing comes back out.","activities":["Electrical Wafer Sort Bring-Up for the Switch, I/O and Electrical ICs","Photonic IC Wafer-Level Optical Test","Known-Good-Die Screening Criteria, Binning and Correlation","Die Bank, Inventory and Known-Good-Die Release to Assembly"],"deliverables":["Electrical wafer sort program release and first-lot sort data","Photonic IC wafer-level optical test results and wafer maps","Known-good-die screening specification and bin definitions","Sort correlation and compound yield report","Die bank inventory and known-good-die release to assembly"],"milestones":[{"label":"Known-Good-Die Ready","major":false}]},{"key":"cpoPowerOn","order":17,"title":"Power-On & Electrical Bring-Up","short":"PON","phase":"validateRamp","start":140,"dur":10,"tagline":"Power the first packages safely, get the silicon talking, and close the first electrical link.","activities":["Bring-Up Plan Execution and Daily Bring-Up Stand-Up","First Power-On, Power Sequencing and Rail Verification","Boot, Debug Access and Firmware Bring-Up","Clock, Reset and Register Access Bring-Up","Die-to-Die and SerDes Link Training — First Electrical Link","Silicon Anomaly Intake and Triage Start"],"deliverables":["Bring-up execution tracker and daily status record","First power-on and rail verification report","Bring-up firmware image and first boot log","Clock, reset and register access verification record","First electrical link report — die-to-die and SerDes training, loopback and PRBS results","Initial silicon anomaly register and triage record"],"milestones":[{"label":"First Electrical Link","major":false}]},{"key":"cpoDebug","order":18,"title":"Silicon Debug, ECO & Stepping","short":"SDBG","phase":"validateRamp","start":140,"dur":46,"tagline":"Assume first silicon has bugs, find every one of them early, and decide which ones the product can live with.","activities":["Anomaly Tracking, Reproduction and Triage Board","Root Cause and Failure Analysis Across Silicon, Photonics and Package","Containment — Firmware Workaround and Test Screen Assessment","Metal ECO Versus Full-Mask Re-Spin Decision","Stepping Implementation and Tapeout","Stepping Regression and Delta Qualification Plan","Stepping Silicon Fabrication, Build and Validation","Production Stepping Cut-In to NPI Builds and Qualification Lots"],"deliverables":["Silicon anomaly database and triage board record","Root cause and failure analysis reports — silicon, photonics and package","Firmware workaround and test screen containment plan","Metal ECO versus full-mask re-spin decision record","Stepping tapeout database and fix change list","New-stepping silicon validation report","Stepping regression results and delta qualification plan","Production stepping decision package","Stepping cut-in map and conditional-release criteria"],"milestones":[{"label":"Production Stepping Decision","major":false}]},{"key":"cpoOpticalBringup","order":19,"title":"Optical Bring-Up & Calibration","short":"OBU","phase":"validateRamp","start":146,"dur":10,"tagline":"Light the optical engines, lock every lane to its wavelength, and close the first optical link against the budget.","activities":["Optical Source Power-Up and Optical Power Verification","Electrical and Photonic IC Bias, Heater Tuning and Wavelength Lock","Optical Loopback and First Optical Link","Per-Lane Calibration Flow Bring-Up","Optical Monitoring and Control Firmware Bring-Up","Optical Link Margin Correlation Against the Budget"],"deliverables":["Optical source power-up and laser safety interlock verification report","Bias, heater tuning and wavelength lock bring-up record per lane","First optical link report — optical loopback, BER and link-up per lane","Per-lane calibration flow bring-up report with first-silicon calibration tables","Optical monitoring and control firmware release for bring-up","Optical link margin versus budget correlation report"],"milestones":[{"label":"First Optical Link","major":false}]},{"key":"cpoNpi","order":20,"title":"NPI Builds & Production Readiness","short":"NPI","phase":"validateRamp","start":148,"dur":54,"tagline":"Prove the switch can be built, calibrated and tested at volume, not just once in the lab.","activities":["NPI Plan, Build Strategy and Golden Unit Definition","Engineering Validation Build","Design Validation and Qualification Build","Production Validation and Pilot Build on the Production Line","Process Window, Yield Model and First Yield Pareto","Volume Capacity Plan and Second-Source Qualification","Golden Units, Factory Calibration and Test Correlation","Production Readiness Review","Supplier Production Qualification, Process FMEA and Control Plan"],"deliverables":["NPI plan and build strategy — EVT, DVT and PVT","EVT engineering validation build report","DVT build report and qualification sample record","PVT pilot-line build report with line yield and throughput","Process window report and CPO yield model with first yield Pareto","Volume capacity plan and second-source qualification record","Golden unit set and cross-site test and calibration correlation report","Production readiness review package and PVT exit decision","Supplier production qualification record, process FMEA and control plan"],"milestones":[{"label":"PVT Complete","major":false}]},{"key":"cpoSystemIntegration","order":21,"title":"System Integration & Traffic Bring-Up","short":"SINT","phase":"validateRamp","start":150,"dur":12,"tagline":"Make the switch forward real traffic through every port, under its own software, at line rate.","activities":["Switch Datapath and Forwarding Bring-Up","SDK, Network Software and Management Plane Integration","Port Bring-Up Across Every Optical and Electrical Port","First End-to-End Traffic at Line Rate","Telemetry, Diagnostics and Health Monitoring Bring-Up","Thermal and Power Behavior Under Traffic","Laser Safety Classification and EMC Pre-Compliance on First-Build Hardware"],"deliverables":["Switch datapath and forwarding bring-up report","Integrated SDK, network OS and management plane build for bring-up systems","Port bring-up matrix — link status, BER and error statistics for every optical and electrical port","First end-to-end traffic at line rate report","Telemetry, diagnostics and health monitoring bring-up release","System thermal and power behavior under traffic report","Laser safety classification assessment and EMC pre-compliance report on first-build hardware"],"milestones":[{"label":"First End-to-End Traffic","major":false}]},{"key":"cpoCharacterization","order":22,"title":"Characterization & Full-Bandwidth Validation","short":"CHAR","phase":"validateRamp","start":156,"dur":20,"tagline":"Measure what the silicon, the optics and the system actually do, across corners, before anyone promises it.","activities":["Characterization Plan and Corner / Lot Matrix","Electrical Link and SerDes Characterization","Optical Transmit and Receive Characterization Across Temperature","Switching Performance and Feature Validation","Power and Power-per-Bit Characterization","Interface Validation Against the Interface Control Documents","Silicon-to-Model Correlation","Full-Bandwidth, All-Port System Demonstration","Datasheet, Application Notes and Design-In Collateral","Serviceability and Field-Replacement Validation","Firmware and Software System Test — Scale, Stability, Warm Restart, Upgrade and Fault Recovery"],"deliverables":["Characterization plan and corner lot matrix","Electrical link and SerDes characterization report","Optical transmit and receive characterization report across temperature","Switching performance and feature validation report","Power and power-per-bit characterization report","Interface validation matrix against every interface control document","Silicon-to-model correlation report and corrected model set","Full-bandwidth demonstration record and characterization gate package","Product datasheet, application notes and design-in guide","Serviceability and field-replacement validation report","Firmware and software system test report"],"milestones":[{"label":"Full-Bandwidth Demonstration","major":false}]},{"key":"cpoQualification","order":23,"title":"Reliability Qualification","short":"RELQ","phase":"validateRamp","start":160,"dur":42,"tagline":"Show, with stress data on the stepping that ships, that the switch and its optics will last as long as the customer expects.","activities":["Qualification Plan — Silicon, Photonics, Optical Source, Package, Board and System","Silicon Reliability — Lifetime, ESD, Latch-Up and Electromigration","Photonic and Optical Source Reliability — Aging, Humidity and Temperature Cycling","Package and Fiber Attach Reliability — Board-Level, Mechanical and Fiber Retention","System-Level Reliability, Environmental Testing and Failure-Rate Prediction","Qualification Report and Approval","Delta Qualification on the Production Stepping"],"deliverables":["Reliability qualification plan and stress matrix","Silicon reliability qualification report — lifetime, ESD, latch-up and electromigration","Photonic IC and optical source reliability report with lifetime drift models","Package, board-level and fiber attach reliability report","System environmental reliability and failure-rate prediction report","Product qualification report and approval record","Production stepping delta qualification report","Production burn-in and system run-in decision with reduction criteria"],"milestones":[{"label":"Qualification Complete","major":false}]},{"key":"cpoCompliance","order":24,"title":"Compliance, Interoperability & Security Certification","short":"CERT","phase":"validateRamp","start":162,"dur":24,"tagline":"Prove the switch meets the standards, works with everyone else’s equipment, is safe, and cannot be subverted.","activities":["Electrical and Optical Standards Compliance Testing","Protocol and Management Interface Conformance","Multi-Vendor and Customer Interoperability Testing","Laser Safety, EMC and Regulatory Certification","Security Validation — Secure Boot, Authentication, Rollback and Penetration Testing","Customer Qualification and Early-Access Program","Material Compliance, Material Declarations and Export Classification"],"deliverables":["Electrical and optical standards compliance test report","Protocol and management interface conformance report","Multi-vendor interoperability matrix and plugfest results","Laser safety classification and certification file","EMC, electrical safety and regional regulatory certificates","Security validation and penetration test report","Early-access customer feedback and qualification status log","Compliance and interoperability completion package","Material compliance, material declaration and export classification file"],"milestones":[{"label":"Compliance & Interoperability Complete","major":false}]},{"key":"cpoRamp","order":25,"title":"Production Release & Ramp","short":"RAMP","phase":"validateRamp","start":200,"dur":14,"tagline":"Release one configuration to production and grow its volume without losing control of it.","activities":["Production Release Package and Configuration Baseline","Production Firmware and Software Release with Secure Update","Volume Ramp Plan and Build Schedule","Yield Dashboard and Line Monitoring","Supply and Inventory Ramp","Customer Shipments and Outgoing Quality Monitoring","Production Release Decision Review"],"deliverables":["CPO production release package and configuration baseline","Production configuration audit against the PVT build","Signed production firmware and software release with rollback protection","Volume ramp plan and build schedule","Production yield dashboard and SPC control plan","Supply and inventory ramp plan with long-lead buffers","Outgoing quality report and early-shipment DPPM baseline","Production release decision record and gate package"],"milestones":[{"label":"Production Release","major":true}]},{"key":"cpoSustaining","order":26,"title":"Yield, Cost & Sustaining","short":"SUST","phase":"validateRamp","start":210,"dur":52,"tagline":"Keep the shipped product improving, supportable and under control until its last unit.","activities":["Yield Improvement and Defect Pareto Reduction","Test Time and Cost-of-Goods Reduction","Failure Analysis and Return Material Authorization Process","Change Control — Product, Process, Supplier and Material Changes","Firmware and Software Maintenance, Security Updates and Field Telemetry","Field Reliability Monitoring and Optical Aging Tracking","End-of-Life Planning and Sustaining Handover","Field Service, Spares and Repair Logistics","Supply Continuity — Supplier Scorecards, Capacity, Second Sources and Obsolescence"],"deliverables":["Yield improvement record and defect Pareto trend","Test time and cost-of-goods reduction report","RMA and field failure analysis report with corrective actions","Product change notification and requalification record","Firmware and software maintenance release record with security advisories","Field reliability and optical aging trend report","End-of-life plan with last-time-buy forecast","Sustaining handover package","Field service, spares and depot repair record","Supplier scorecards and supply continuity record"],"milestones":[{"label":"Sustaining Handover","major":false}]}];
+const CFG = {"rows":[["cpoConcept"],["cpoRequirements","cpoFeasibility"],["cpoReadiness"],["cpoArchitecture"],["cpoModeling"],["cpoInterfaces"],["cpoProgramControl"],["cpoDesign"],["cpoPresilicon","cpoTestInfra"],["cpoImplementation"],["cpoSignoff"],["cpoTapeout"],["cpoFabrication"],["cpoSort","cpoAssembly"],["cpoPowerOn"],["cpoDebug"],["cpoOpticalBringup"],["cpoSystemIntegration"],["cpoNpi"],["cpoCharacterization"],["cpoCompliance"],["cpoQualification"],["cpoRamp"],["cpoSustaining"]],"edges":[["cpoConcept","cpoRequirements"],["cpoConcept","cpoFeasibility"],["cpoConcept","cpoReadiness"],["cpoRequirements","cpoArchitecture"],["cpoFeasibility","cpoArchitecture"],["cpoArchitecture","cpoInterfaces"],["cpoArchitecture","cpoModeling"],["cpoInterfaces","cpoProgramControl"],["cpoInterfaces","cpoDesign"],["cpoModeling","cpoDesign"],["cpoReadiness","cpoDesign"],["cpoFeasibility","cpoReadiness"],["cpoModeling","cpoPresilicon"],["cpoDesign","cpoPresilicon"],["cpoDesign","cpoImplementation"],["cpoDesign","cpoTestInfra"],["cpoPresilicon","cpoSignoff"],["cpoImplementation","cpoSignoff"],["cpoSignoff","cpoTapeout"],["cpoTapeout","cpoFabrication"],["cpoFabrication","cpoSort"],["cpoTestInfra","cpoSort"],["cpoReadiness","cpoAssembly"],["cpoSort","cpoAssembly"],["cpoAssembly","cpoPowerOn"],["cpoPowerOn","cpoOpticalBringup"],["cpoPowerOn","cpoDebug"],["cpoOpticalBringup","cpoSystemIntegration"],["cpoSystemIntegration","cpoCharacterization"],["cpoSystemIntegration","cpoNpi"],["cpoTestInfra","cpoNpi"],["cpoCharacterization","cpoCompliance"],["cpoCharacterization","cpoQualification"],["cpoDebug","cpoQualification"],["cpoQualification","cpoRamp"],["cpoCompliance","cpoRamp"],["cpoNpi","cpoRamp"],["cpoRamp","cpoSustaining"],["cpoProgramControl","cpoSustaining"]],"spine":["cpoConcept","cpoRequirements","cpoArchitecture","cpoInterfaces","cpoDesign","cpoImplementation","cpoSignoff","cpoTapeout","cpoFabrication","cpoSort","cpoAssembly","cpoPowerOn","cpoOpticalBringup","cpoSystemIntegration","cpoCharacterization","cpoQualification","cpoRamp","cpoSustaining"],"ribs":[["cpoFeasibility","cpoArchitecture"],["cpoReadiness","cpoDesign"],["cpoModeling","cpoDesign"],["cpoPresilicon","cpoSignoff"],["cpoTestInfra","cpoSort"],["cpoDebug","cpoQualification"],["cpoCompliance","cpoRamp"],["cpoNpi","cpoRamp"]],"siliconNote":"<b>Spine</b> (bold) from concept to sustaining. <b>Feeds</b> (dashed) show where each block of work lands on it: feasibility → architecture, readiness &amp; models → detailed design, pre-silicon validation → signoff, test infrastructure → wafer sort, debug → qualification, compliance &amp; NPI → production release.","second":{"label":"Package, optics &amp; test path","nodes":["cpoFeasibility","cpoReadiness","cpoArchitecture","cpoInterfaces","cpoDesign","cpoTestInfra","cpoSort","cpoAssembly","cpoOpticalBringup","cpoSystemIntegration","cpoNpi","cpoRamp"],"note":"Test vehicles and supplier readiness → package, optics and test designed beside the silicon → sort and first package build → optical bring-up → NPI builds → production release."},"tags":{},"tagStyle":{},"origin":{},"originDefault":"","statExtra":[],"endTitle":"Production Release","endNote":"Tapeout at W112 · First Silicon at W122 · First Optical Link at W156 · Production Release at W214"};
+
+const ALL_BANDS = [
+  { id: 'define', label: 'Define' },
+  { id: 'enable', label: 'Technology & IP Enablement' },
+  { id: 'designVerify', label: 'Design & Verify' },
+  { id: 'implement', label: 'Implement' },
+  { id: 'manufacture', label: 'Manufacture' },
+  { id: 'integrate', label: 'Integrate' },
+  { id: 'validateRamp', label: 'Validate & Ramp' },
+  { id: 'platform', label: 'Developer Platform & Ecosystem' },
+];
+/* a band no stage sits under is not drawn */
+const BANDS = ALL_BANDS.filter(b => STAGES.some(s => s.phase === b.id));
+
+const ROWS = CFG.rows;
+const EDGES = CFG.edges;
+
+/* The silicon path: the spine a die travels from spec to mass production,
+   and the work that lands on it — each feed drawn as the one link by which it
+   joins the spine, so the view stays a spine with ribs rather than a web. */
+const SILICON_SPINE = CFG.spine;
+const SILICON_RIBS = CFG.ribs;
+const SILICON_FEEDS = SILICON_RIBS.map(r => r[0]);
+const SPINE_EDGES = new Set(SILICON_SPINE.slice(1).map((k, i) => SILICON_SPINE[i] + '>' + k));
+const PATHS = {
+  silicon: [...SILICON_SPINE, ...SILICON_FEEDS],
+  platform: CFG.second.nodes,
+};
+const PATH_EDGES = {
+  silicon: [...SPINE_EDGES, ...SILICON_RIBS.map(([a, z]) => a + '>' + z)],
+  platform: EDGES.filter(([a, z]) => CFG.second.nodes.includes(a) && CFG.second.nodes.includes(z)).map(([a, z]) => a + '>' + z),
+};
+
+/* Stages this template adds to, or derives from, the Typical SoC flow. */
+const TAG = CFG.tags;
+const originOf = k => CFG.origin[k] ?? CFG.originDefault;
+
+const byKey = Object.fromEntries(STAGES.map(s => [s.key, s]));
+const band = id => BANDS.find(b => b.id === id);
+const color = id => `var(--b-${id})`;
+const END = Math.max(...STAGES.map(s => s.start + s.dur));
+const endOf = s => s.start + s.dur;
+const esc = t => String(t).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const preds = k => EDGES.filter(e => e[1] === k).map(e => e[0]);
+const succs = k => EDGES.filter(e => e[0] === k).map(e => e[1]);
+
+/* ---- stats ---- */
+const majors = STAGES.flatMap(s => s.milestones.filter(m => m.major).map(m => ({ ...m, key: s.key, wk: endOf(s) }))).sort((a, b) => a.wk - b.wk);
+document.getElementById('stats').innerHTML = [
+  [STAGES.length, 'stages'],
+  ...CFG.statExtra,
+  [STAGES.reduce((n, s) => n + s.activities.length, 0), 'activities'],
+  [STAGES.reduce((n, s) => n + s.deliverables.length, 0), 'deliverables'],
+  [STAGES.reduce((n, s) => n + s.milestones.length, 0), 'milestones'],
+  [END + ' wk', '≈ ' + (END / 52).toFixed(1) + ' years kickoff → sustaining handover'],
+].map(([b, s]) => `<div class="stat"><b>${b}</b><span>${s}</span></div>`).join('');
+
+/* ---- milestone strip ---- */
+(function () {
+  const ax = document.getElementById('axis');
+  let h = '<div class="rail"></div>';
+  for (let w = 0; w <= END; w += 13) h += `<div class="tick" style="left:${w / END * 100}%">W${w}</div>`;
+  majors.forEach((m, i) => {
+    const up = i % 2 === 0, l2 = i % 4 >= 2, end = m.wk / END > 0.9;
+    h += `<div class="ms ${up ? 'up' : 'down'}${l2 ? ' l2' : ''}${end ? ' end' : ''}" style="left:${m.wk / END * 100}%" data-k="${m.key}" title="${esc(m.label)} — W${m.wk}"><i></i><span>${esc(m.label)}<em>W${m.wk}</em></span></div>`;
+  });
+  ax.innerHTML = h;
+  ax.querySelectorAll('.ms').forEach(el => el.addEventListener('click', () => select(el.dataset.k)));
+})();
+
+/* ---- grid ---- */
+const grid = document.getElementById('grid');
+let html = '<div class="lanehead" style="--c:var(--faint)">Start</div>' +
+  BANDS.map(b => `<div class="lanehead" style="--c:${color(b.id)}">${esc(b.label)}</div>`).join('');
+ROWS.forEach((row, r) => {
+  const starts = row.map(k => byKey[k].start);
+  const lo = Math.min(...starts), hi = Math.max(...starts);
+  html += `<div class="rowlabel" style="grid-row:${r + 2}">W${lo}${hi !== lo ? '–' + hi : ''}</div>`;
+  BANDS.forEach((b, c) => {
+    const ks = row.filter(k => byKey[k].phase === b.id).sort((a, z) => byKey[a].start - byKey[z].start);
+    html += `<div class="cell" style="grid-row:${r + 2};grid-column:${c + 2}">` + ks.map(nodeHtml).join('') + '</div>';
+  });
+});
+html += `<div class="endnode" style="grid-row:${ROWS.length + 2}"><b>◆ W${END} — ${CFG.endTitle}</b><span>${CFG.endNote}</span></div>`;
+grid.innerHTML = html;
+
+function nodeHtml(k) {
+  const s = byKey[k];
+  const ms = s.milestones.map(m => `<div class="mst${m.major ? ' major' : ''}">${esc(m.label)}</div>`).join('');
+  return `<button class="node" id="n-${k}" data-k="${k}" style="--c:${color(s.phase)}">
+    <span class="code">${esc(s.short)}</span>${TAG[k] ? `<span class="tag" style="color:${CFG.tagStyle[TAG[k]][0]};background:${CFG.tagStyle[TAG[k]][1]}">${esc(TAG[k])}</span>` : ''}
+    <span class="ttl">${esc(s.title)}</span>
+    <span class="wk">W${s.start}–W${endOf(s)} · ${s.dur} wk</span>
+    <div class="bar"><i style="left:${s.start / END * 100}%;width:${s.dur / END * 100}%"></i></div>
+    ${ms}
+  </button>`;
+}
+
+/* ---- edges: shared ---- */
+const chart = document.getElementById('chart');
+const svg = document.getElementById('edges');
+const ROW_OF = {};
+ROWS.forEach((row, r) => row.forEach(k => { ROW_OF[k] = r; }));
+const LANE_OF = k => BANDS.findIndex(b => b.id === byKey[k].phase);
+
+/* transitive reduction: drop a→z when z is reachable from a another way,
+   except on the silicon spine, which reads as one unbroken line */
+const DRAWN = EDGES.filter(([a, z]) => {
+  if (SPINE_EDGES.has(a + '>' + z)) return true;
+  const seen = new Set(), stack = succs(a).filter(x => x !== z);
+  while (stack.length) {
+    const k = stack.pop();
+    if (k === z) return false;
+    if (seen.has(k)) continue;
+    seen.add(k); stack.push(...succs(k));
+  }
+  return true;
+});
+
+const cssVar = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+const bandOf = k => byKey[k].phase;
+
+function measure() {
+  const cr = chart.getBoundingClientRect();
+  svg.setAttribute('width', cr.width);
+  svg.setAttribute('height', cr.height);
+  const rel = el => { const r = el.getBoundingClientRect(); return { l: r.left - cr.left, r: r.right - cr.left, t: r.top - cr.top, b: r.bottom - cr.top }; };
+  const B = Object.fromEntries(STAGES.map(s => [s.key, rel(document.getElementById('n-' + s.key))]));
+  Object.values(B).forEach(b => { b.cx = (b.l + b.r) / 2; });
+  const heads = [...grid.querySelectorAll('.lanehead')].slice(1).map(rel);
+  const gap = heads[1].l - heads[0].r;
+  const gutterX = g => g < heads.length ? heads[g].l - gap / 2 : heads[heads.length - 1].r + gap / 2;
+  const rowBottom = ROWS.map(row => Math.max(...row.map(k => B[k].b)));
+  const rowTop = ROWS.map(row => Math.min(...row.map(k => B[k].t)));
+  return {
+    B, gap, gutterX, rowBottom, rowTop,
+    chanY: r => (rowBottom[r] + rowTop[r + 1]) / 2,
+    chanH: r => rowTop[r + 1] - rowBottom[r],
+  };
+}
+
+function roundPath(pts, r) {
+  let d = `M${pts[0][0]},${pts[0][1]}`;
+  for (let i = 1; i < pts.length - 1; i++) {
+    const [x0, y0] = pts[i - 1], [x1, y1] = pts[i], [x2, y2] = pts[i + 1];
+    const l1 = Math.hypot(x1 - x0, y1 - y0), l2 = Math.hypot(x2 - x1, y2 - y1);
+    const rr = Math.min(r, l1 / 2, l2 / 2);
+    if (rr < 0.5) { d += ` L${x1},${y1}`; continue; }
+    d += ` L${x1 - (x1 - x0) / l1 * rr},${y1 - (y1 - y0) / l1 * rr} Q${x1},${y1} ${x1 + (x2 - x1) / l2 * rr},${y1 + (y2 - y1) / l2 * rr}`;
+  }
+  const [xn, yn] = pts[pts.length - 1];
+  return d + ` L${xn},${yn}`;
+}
+/* corners cut at 45°, as on a metro map */
+function chamferPath(pts, c) {
+  let d = `M${pts[0][0]},${pts[0][1]}`;
+  for (let i = 1; i < pts.length - 1; i++) {
+    const [x0, y0] = pts[i - 1], [x1, y1] = pts[i], [x2, y2] = pts[i + 1];
+    const l1 = Math.hypot(x1 - x0, y1 - y0), l2 = Math.hypot(x2 - x1, y2 - y1);
+    const cc = Math.min(c, l1 / 2, l2 / 2);
+    if (cc < 0.5) { d += ` L${x1},${y1}`; continue; }
+    d += ` L${x1 - (x1 - x0) / l1 * cc},${y1 - (y1 - y0) / l1 * cc} L${x1 + (x2 - x1) / l2 * cc},${y1 + (y2 - y1) / l2 * cc}`;
+  }
+  const [xn, yn] = pts[pts.length - 1];
+  return d + ` L${xn},${yn}`;
+}
+const clean = pts => pts.filter((q, j) => j === 0 || Math.abs(q[0] - pts[j - 1][0]) > 0.1 || Math.abs(q[1] - pts[j - 1][1]) > 0.1);
+
+function markers() {
+  const m = (id, fill, s = 7) => `<marker id="${id}" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="${s}" markerHeight="${s}" orient="auto-start-reverse"><path d="M0,1 L9,5 L0,9 z" fill="${fill}"/></marker>`;
+  return '<defs>' + m('ah', '#a9a9b8') + m('ahA', '#5b5bd6', 6) +
+    BANDS.map(b => m('ah-' + b.id, cssVar('--b-' + b.id), 5.5)).join('') + '</defs>';
+}
+/* one link: applyMode highlights it by data-a / data-z and restores data-m */
+const edgePath = (a, z, d, { cls = '', stroke = null, marker = 'url(#ah)' } = {}) =>
+  `<path class="e ${cls}" data-a="${a}" data-z="${z}" data-m="${marker}" d="${d}"${stroke ? ` style="--lc:${stroke}"` : ''}${marker ? ` marker-end="${marker}"` : ''}/>`;
+
+/* spread ports along a card edge, ordered by where the other end is */
+const group = pairs => pairs.reduce((m, [k, i]) => ((m[k] = m[k] || []).push(i), m), {});
+function spreadX(b, list, i, keyOf, inset = 0.25) {
+  const sorted = list.slice().sort((x, y) => keyOf(x) - keyOf(y)), n = sorted.length;
+  return b.l + (b.r - b.l) * (n === 1 ? 0.5 : inset + (1 - 2 * inset) * sorted.indexOf(i) / (n - 1));
+}
+
+/*
+ * Orthogonal routes through the empty space: the channel under a row, the
+ * gutter beside a lane, the channel over the target's row. With `bundle`,
+ * every link from one source shares its exit, trunk and slots, so they read as
+ * one line that forks; without it each link has lanes of its own.
+ */
+function orthoRoutes(M, edges, { bundle }) {
+  const { B } = M;
+  const info = edges.map(([a, z]) => ({ a, z, ra: ROW_OF[a], rz: ROW_OF[z], la: LANE_OF(a), lz: LANE_OF(z) }));
+  /* the trunk gutter: on the side of the far targets */
+  const trunk = {};
+  info.forEach((e, i) => {
+    if (e.rz <= e.ra + 1) return;
+    const key = bundle ? e.a : i;
+    if (trunk[key] !== undefined) return;
+    const far = info.filter((f, j) => (bundle ? f.a === e.a : j === i) && f.rz > f.ra + 1);
+    const mean = far.reduce((s, f) => s + B[f.z].cx, 0) / far.length;
+    trunk[key] = mean >= B[e.a].cx ? e.la + 1 : e.la;
+  });
+  const slots = {};
+  const use = (t, key, order) => { (slots[t] = slots[t] || new Map()); if (!slots[t].has(key)) slots[t].set(key, order); };
+  info.forEach((e, i) => {
+    if (e.ra === e.rz) return;
+    const key = bundle ? e.a : i;
+    use('c' + e.ra, key, B[e.a].cx);
+    if (e.rz > e.ra + 1) {
+      use('g' + trunk[key], key, e.ra);
+      use('c' + (e.rz - 1), key, M.gutterX(trunk[key]));
+    }
+  });
+  const slotOf = (t, key, room) => {
+    const m = slots[t], keys = [...m.keys()].sort((x, y) => m.get(x) - m.get(y)), n = keys.length;
+    return (keys.indexOf(key) - (n - 1) / 2) * Math.min(7, (room - 16) / Math.max(1, n - 1));
+  };
+  /* ports */
+  const downs = info.map((e, i) => i).filter(i => info[i].ra !== info[i].rz);
+  const outs = group(downs.map(i => [info[i].a, i])), ins = group(downs.map(i => [info[i].z, i]));
+  const approachX = i => { const e = info[i], key = bundle ? e.a : i; return e.rz > e.ra + 1 ? M.gutterX(trunk[key]) : B[e.a].cx; };
+  return info.map((e, i) => {
+    const A = B[e.a], Z = B[e.z];
+    if (e.ra === e.rz) {
+      const right = Z.cx > A.cx, y = (Math.max(A.t, Z.t) + Math.min(A.b, Z.b)) / 2;
+      return [[right ? A.r : A.l, y], [right ? Z.l : Z.r, y]];
+    }
+    const key = bundle ? e.a : i;
+    const sx = bundle ? A.cx : spreadX(A, outs[e.a], i, j => B[info[j].z].cx);
+    const ex = spreadX(Z, ins[e.z], i, approachX);
+    const y1 = M.chanY(e.ra) + slotOf('c' + e.ra, key, M.chanH(e.ra));
+    if (e.rz === e.ra + 1) return clean([[sx, A.b], [sx, y1], [ex, y1], [ex, Z.t]]);
+    const gx = M.gutterX(trunk[key]) + slotOf('g' + trunk[key], key, M.gap);
+    const y2 = M.chanY(e.rz - 1) + slotOf('c' + (e.rz - 1), key, M.chanH(e.rz - 1));
+    return clean([[sx, A.b], [sx, y1], [gx, y1], [gx, y2], [ex, y2], [ex, Z.t]]);
+  });
+}
+
+/* redraw only when the chart's size really changes, once per frame */
+let drawnSize = '', pending = 0;
+function watchSize() {
+  new ResizeObserver(() => {
+    const size = chart.clientWidth + 'x' + chart.clientHeight;
+    if (size === drawnSize || pending) return;
+    pending = requestAnimationFrame(() => { pending = 0; drawnSize = chart.clientWidth + 'x' + chart.clientHeight; drawEdges(); });
+  }).observe(chart);
+}
+
+/* v1 — Bus: orthogonal, bundled by source. Each stage has one exit and one
+   trunk that forks to everything it feeds. */
+function drawEdges() {
+  const M = measure();
+  const routes = orthoRoutes(M, DRAWN, { bundle: true });
+  svg.innerHTML = markers() + DRAWN.map(([a, z], i) => edgePath(a, z, roundPath(routes[i], 6))).join('');
+  applyMode();
+}
+
+/* ---- modes & selection ---- */
+let mode = 'all', selected = null;
+const MODE_NOTE = {
+  all: 'Click a stage to trace what feeds it and what it unblocks.',
+  silicon: CFG.siliconNote,
+  platform: CFG.second.note,
+};
+document.querySelectorAll('.seg button').forEach(b => b.addEventListener('click', () => {
+  mode = b.dataset.mode;
+  document.querySelectorAll('.seg button').forEach(x => x.setAttribute('aria-pressed', x === b));
+  selected = null; closeDrawer(); applyMode();
+}));
+function applyMode() {
+  const nodes = chart.querySelectorAll('.node'), paths = svg.querySelectorAll('.e, .e-dec');
+  nodes.forEach(n => n.classList.remove('on', 'sel', 'spine'));
+  document.getElementById('modeNote').innerHTML = MODE_NOTE[selected ? 'all' : mode];
+  chart.classList.toggle('path-mode', !selected && mode !== 'all');
+  paths.forEach(p => { p.classList.remove('on', 'in', 'path', 'spine', 'rib'); if (p.dataset.m) p.setAttribute('marker-end', p.dataset.m); });
+  if (selected) {
+    chart.classList.add('focus');
+    const lit = new Set([selected, ...preds(selected), ...succs(selected)]);
+    nodes.forEach(n => lit.has(n.dataset.k) && n.classList.add('on'));
+    document.getElementById('n-' + selected).classList.add('sel');
+    paths.forEach(p => {
+      if (p.dataset.a === selected || p.dataset.z === selected) {
+        p.classList.add('on'); if (p.dataset.z === selected) p.classList.add('in');
+        if (p.dataset.a === selected) p.dataset.m && p.setAttribute('marker-end', 'url(#ahA)');
+      }
+    });
+  } else if (mode !== 'all') {
+    chart.classList.add('focus');
+    const lit = new Set(PATHS[mode]), pe = new Set(PATH_EDGES[mode]);
+    nodes.forEach(n => lit.has(n.dataset.k) && n.classList.add('on'));
+    if (mode === 'silicon') nodes.forEach(n => SILICON_SPINE.includes(n.dataset.k) && n.classList.add('spine'));
+    paths.forEach(p => {
+      const id = p.dataset.a + '>' + p.dataset.z;
+      if (pe.has(id)) { p.classList.add('on'); p.dataset.m && p.setAttribute('marker-end', 'url(#ahA)'); }
+      if (mode === 'silicon' && SPINE_EDGES.has(id)) p.classList.add('spine');
+      else if (mode === 'silicon' && pe.has(id)) p.classList.add('rib');
+    });
+    /* drawn last so the spine sits on top of the links that feed it */
+    paths.forEach(p => p.classList.contains('spine') && svg.appendChild(p));
+  } else {
+    chart.classList.remove('focus');
+  }
+}
+
+const drawer = document.getElementById('drawer');
+function chip(k) {
+  const s = byKey[k];
+  return `<button class="chip" data-k="${k}" style="--c:${color(s.phase)}">${esc(s.title)}</button>`;
+}
+function select(k) {
+  selected = k;
+  const s = byKey[k];
+  drawer.style.setProperty('--c', color(s.phase));
+  document.getElementById('dhead').innerHTML =
+    `<div class="code">${esc(s.short)} · ${esc(band(s.phase).label)}${originOf(k) ? ' · ' + esc(originOf(k)) : ''}</div>
+     <h3>${esc(s.title)}</h3><p>${esc(s.tagline || '')}</p>`;
+  const p = preds(k), z = succs(k);
+  document.getElementById('dbody').innerHTML =
+    `<div class="facts"><div><b>W${s.start}</b><span>starts</span></div><div><b>W${endOf(s)}</b><span>ends</span></div><div><b>${s.dur} wk</b><span>duration</span></div></div>` +
+    s.milestones.map(m => `<div class="msbox">◆ ${esc(m.label)}${m.major ? ' <span class="hint">· major</span>' : ''}<span class="hint" style="margin-left:auto">W${endOf(s)}</span></div>`).join('') +
+    `<h4>Fed by</h4>${p.length ? '<div class="chips">' + p.map(chip).join('') + '</div>' : '<div class="none">Program kickoff</div>'}` +
+    `<h4>Unblocks</h4>${z.length ? '<div class="chips">' + z.map(chip).join('') + '</div>' : '<div class="none">Program close — production &amp; launch</div>'}` +
+    `<h4>Activities (${s.activities.length})</h4><ol>${s.activities.map(a => `<li>${esc(a)}</li>`).join('')}</ol>` +
+    `<h4>Deliverables (${s.deliverables.length})</h4><ul>${s.deliverables.map(a => `<li>${esc(a)}</li>`).join('')}</ul>`;
+  document.getElementById('dbody').scrollTop = 0;
+  document.getElementById('dbody').querySelectorAll('.chip').forEach(c => c.addEventListener('click', () => select(c.dataset.k)));
+  drawer.classList.add('open'); drawer.setAttribute('aria-hidden', 'false');
+  applyMode();
+  const n = document.getElementById('n-' + k);
+  n.scrollIntoView({ block: 'nearest', inline: 'nearest', behavior: 'smooth' });
+}
+function closeDrawer() {
+  drawer.classList.remove('open'); drawer.setAttribute('aria-hidden', 'true');
+  selected = null; applyMode();
+}
+document.getElementById('dclose').addEventListener('click', closeDrawer);
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeDrawer(); });
+chart.addEventListener('click', e => {
+  const n = e.target.closest('.node');
+  if (n) select(n.dataset.k); else if (selected) closeDrawer();
+});
+
+/* ---- sequence table ---- */
+document.getElementById('seq').innerHTML =
+  '<thead><tr><th>#</th><th>Stage</th><th class="hide-sm">Band</th><th>Weeks</th><th>Milestone</th></tr></thead><tbody>' +
+  [...STAGES].sort((a, b) => a.start - b.start || a.order - b.order).map((s, i) =>
+    `<tr class="clk" data-k="${s.key}" style="--c:${color(s.phase)}"><td class="n">${i + 1}</td>
+      <td><span class="dot"></span><b>${esc(s.title)}</b><div class="gantt"><i style="left:${s.start / END * 100}%;width:${s.dur / END * 100}%"></i></div></td>
+      <td class="hide-sm">${esc(band(s.phase).label)}</td>
+      <td class="w">W${s.start}–W${endOf(s)}<br>${s.dur} wk</td>
+      <td>${s.milestones.map(m => m.major ? `<b style="color:var(--accent)">◆ ${esc(m.label)}</b>` : esc(m.label)).join('')}</td></tr>`).join('') +
+  '</tbody>';
+document.querySelectorAll('#seq tr.clk').forEach(tr => tr.addEventListener('click', () => select(tr.dataset.k)));
+
+/* ---- legend ---- */
+document.getElementById('legend').innerHTML =
+  BANDS.map(b => `<span style="--c:${color(b.id)}"><i class="sw"></i>${esc(b.label)}</span>`).join('') +
+  '<span><i class="sw" style="--c:var(--accent);transform:rotate(45deg);width:8px;height:8px"></i>Major milestone</span>';
+
+watchSize();
+</script>
+</body>
+</html>

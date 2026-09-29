@@ -29,7 +29,17 @@ import {
   EMBEDDED_STAGES,
 } from './embeddedSoc';
 import {
-  COUNTDOWN_STAGES,
+  CPO_ACTIVITIES,
+  CPO_ACTIVITY_TITLES,
+  CPO_COUNTDOWN_KEYS,
+  CPO_DELIVERABLES,
+  CPO_MILESTONES,
+  CPO_PROFILE,
+  CPO_STAGES,
+} from './cpoSwitch';
+import { CPO_GLOSSARY } from './cpoSwitch/glossary';
+import {
+  COUNTDOWN_STAGES as EMBEDDED_COUNTDOWN_STAGES,
   EMBEDDED_DERIVED_ACTIVITIES,
   EMBEDDED_DERIVED_ACTIVITY_TITLES,
   EMBEDDED_DERIVED_DELIVERABLES,
@@ -55,13 +65,22 @@ import {
 } from './threeDicTopDie';
 import type { JourneyStage, MilestoneDef, ScheduleProfile } from './types';
 
-export { COUNTDOWN_STAGES };
+/**
+ * The stages whose ends the countdowns read — Tapeout, First Silicon, Mass
+ * Production — under every key any template gives them.
+ */
+export const COUNTDOWN_STAGES: Readonly<Record<'tapeout' | 'firstSilicon' | 'production', readonly string[]>> = {
+  tapeout: [...EMBEDDED_COUNTDOWN_STAGES.tapeout, CPO_COUNTDOWN_KEYS.tapeout],
+  firstSilicon: [...EMBEDDED_COUNTDOWN_STAGES.firstSilicon, CPO_COUNTDOWN_KEYS.firstSilicon],
+  production: [...EMBEDDED_COUNTDOWN_STAGES.production, CPO_COUNTDOWN_KEYS.production],
+};
 
 /** Every template the app ships, in the order the pickers list them. */
 export const BUILTIN_PROFILES: readonly ScheduleProfile[] = [
   BUILTIN_PROFILE,
   THREE_DIC_PROFILE,
   EMBEDDED_PROFILE,
+  CPO_PROFILE,
 ];
 
 /**
@@ -77,6 +96,7 @@ export const ALL_ACTIVITIES: Record<string, ActivityStepEntry> = {
   ...TOP_DIE_ACTIVITIES,
   ...EMBEDDED_DERIVED_ACTIVITIES,
   ...EMBEDDED_ACTIVITIES,
+  ...CPO_ACTIVITIES,
 };
 
 /** Their titles, from the same sources. */
@@ -86,6 +106,7 @@ export const ALL_ACTIVITY_TITLES: Record<string, string> = {
   ...TOP_DIE_ACTIVITY_TITLES,
   ...EMBEDDED_DERIVED_ACTIVITY_TITLES,
   ...EMBEDDED_ACTIVITY_TITLES,
+  ...CPO_ACTIVITY_TITLES,
 };
 
 /** Every stage's content, by the key a profile stage points at with `baseKey`. */
@@ -95,6 +116,7 @@ export const ALL_STAGE_CONTENT: readonly JourneyStage[] = [
   ...TOP_DIE_STAGES,
   ...EMBEDDED_DERIVED_STAGES,
   ...EMBEDDED_STAGES,
+  ...CPO_STAGES,
 ];
 
 /** The checkpoints of both templates; a profile keeps the ones it runs. */
@@ -102,6 +124,7 @@ export const ALL_MILESTONES: readonly MilestoneDef[] = [
   ...milestoneDefs,
   ...THREE_DIC_MILESTONES,
   ...EMBEDDED_MILESTONES,
+  ...CPO_MILESTONES,
 ];
 
 /** The content a stage shows, or undefined for one nobody has written up. */
@@ -118,10 +141,13 @@ export const ALL_DELIVERABLE_TITLES: Record<string, string> = {
   ...TOP_DIE_DELIVERABLES,
   ...EMBEDDED_DERIVED_DELIVERABLES,
   ...EMBEDDED_DELIVERABLES,
+  ...CPO_DELIVERABLES,
 };
 
 /** The terms a write-up may offer to explain, from both corpora. */
 export const ALL_GLOSSARY: Record<string, GlossaryTerm> = {
+  /* first, so a term the other corpora already explain keeps their wording */
+  ...CPO_GLOSSARY,
   ...activityGlossary,
   ...THREE_DIC_GLOSSARY,
   ...EMBEDDED_GLOSSARY,
@@ -141,6 +167,7 @@ export const ALL_WRITTEN_ACTIVITIES: readonly string[] = [
   ...Object.keys(TOP_DIE_ACTIVITIES),
   ...Object.keys(EMBEDDED_DERIVED_ACTIVITIES),
   ...Object.keys(EMBEDDED_ACTIVITIES),
+  ...Object.keys(CPO_ACTIVITIES),
 ];
 
 const WRITTEN = new Set(ALL_WRITTEN_ACTIVITIES);

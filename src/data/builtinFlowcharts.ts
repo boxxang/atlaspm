@@ -9,6 +9,7 @@ export const BUILTIN_FLOWCHARTS: Readonly<Record<string, string>> = {
   typicalSoC: '/flowcharts/typical-soc.html',
   threeDic: '/flowcharts/3dic.html',
   embeddedSoc: '/flowcharts/embedded-soc.html',
+  cpoSwitch: '/flowcharts/cpo-switch.html',
 };
 
 export const flowchartOf = (profileId: string): string | undefined => BUILTIN_FLOWCHARTS[profileId];

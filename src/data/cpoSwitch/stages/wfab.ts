@@ -1,0 +1,152 @@
+/**
+ * WFAB — Wafer Fabrication. Weeks 108–124; closes on First Silicon.
+ */
+import type { CpoStageModule } from '../types';
+
+export const WFAB: CpoStageModule = {
+  content: {
+    tagline: 'Several foundries, one first-silicon date — track every lot, and have everything else on the dock when the wafers come out.',
+    description:
+      'Track the wafers of every die through their own foundries at once: the switch ASIC and I/O silicon, the electrical IC, the photonic IC with in-line optical monitoring of waveguide loss, ring resonance and coupler efficiency, and the bridge or interposer and silicon capacitors. Engineering lots are held and released at the planned metal layers, in-line excursions are dispositioned with each foundry, and the optical sources, fiber assemblies and substrates for the first build are chased, received and inspected so assembly is not waiting on material. The stage closes on first silicon: wafer acceptance data reviewed against limits and the lot split targets, and wafers released to sort.',
+    activities: ['Switch and I/O fab', 'EIC fab', 'PIC fab and optical monitors', 'Bridge and Si capacitor fab', 'First-build material', 'Wafer acceptance'],
+    deliverables: [
+      'Switch ASIC and I/O silicon lot tracking and wafer-out record',
+      'Electrical IC wafer lot and parametric record',
+      'Photonic IC in-line optical monitor report',
+      'Bridge / interposer and silicon capacitor wafer lot record',
+      'First-build material receipt and incoming inspection record',
+      'Wafer acceptance review and first silicon release record',
+    ],
+    deliverableFrom: [0, 1, 2, 3, 4, 5],
+    deliverableWeek: [14, 12, 14, 12, 14, 14],
+    engineeringEffort: [8, 4, 8, 3, 6, 4],
+    risks: [
+      'One foundry’s cycle time slips and the first build waits for the slowest die',
+      'Photonic process drift discovered only at sort because in-line optical data was not reviewed',
+    ],
+    potentialRisks: [
+      'Lots tracked by weekly email rather than against committed cycle time, so a slip is seen only when wafer out is missed',
+      'Engineering lot hold point passed without a decision, so the metal fix option is lost by default',
+      'Photonic in-line monitor data received but not compared against the link budget assumptions',
+      'Substrates or optical sources arrive after the known-good dies, and the first package build waits on material',
+      'Wafer acceptance limits set by the foundry alone, with no link to the corners the lot splits were meant to hit',
+    ],
+    leader: { name: 'Hannah Lindqvist', short: 'H. Lindqvist', phone: '+1 (408) 555-0513', email: 'hannah.lindqvist@example.com' },
+    collaboration: ['Technology and foundry', 'Photonics', 'Packaging', 'Supply chain', 'Laser and optical source', 'Manufacturing and NPI', 'Quality'],
+    tools: ['Foundry lot tracking portal', 'Wafer acceptance and parametric data analysis', 'In-line optical monitor data analysis', 'Supplier delivery tracking', 'Incoming inspection system'],
+    programView: [
+      'Lot position and projected wafer out per die against commitment',
+      'In-line excursions open per foundry',
+      'Photonic waveguide loss from in-line monitors against budget',
+      'First-build material on hand against the assembly start',
+    ],
+    perspective:
+      'First silicon is the date the slowest of four foundries and three suppliers delivers. Track every lot and every material order on the same weekly chart — the critical path moves between them without anybody announcing it.',
+  },
+  steps: {
+    'WFAB-01': {
+      s: [
+        [1, 'Confirm lot starts, split assignments and hot-lot priority with the foundry', 0.5],
+        [2, 'Track lots through front-end and middle-of-line processing against committed cycle time', 5],
+        [3, 'Review in-line metrology and defect excursions with the foundry', 3, 1],
+        [4, 'Hold engineering lots at the planned metal layer and record the release or metal fix decision', 1],
+        [5, 'Track back-end-of-line processing to wafer out', 5],
+        [6, 'Receive the wafer-out notice with WAT data', 0.5],
+      ],
+      o: [
+        'Confirmed lot start and split record',
+        'Weekly lot position against cycle time',
+        'In-line excursion disposition log',
+        'Engineering lot hold decision record',
+        'Back-end lot tracking record',
+        'Switch ASIC and I/O silicon lot tracking and wafer-out record',
+      ],
+      r: [['WFAB-D1', 'produces'], ['WFAB-D6', 'feeds']],
+    },
+    'WFAB-02': {
+      s: [
+        [1, 'Confirm electrical IC lot starts and split assignments', 0.5],
+        [2, 'Track lots through the analog process against committed cycle time', 8],
+        [3, 'Review in-line excursions and device parametric monitors', 3, 1],
+        [4, 'Receive the wafer-out notice with WAT data', 0.5],
+      ],
+      o: [
+        'Confirmed electrical IC lot start record',
+        'Weekly lot position against cycle time',
+        'Device parametric monitor review',
+        'Electrical IC wafer lot and parametric record',
+      ],
+      r: [['WFAB-D2', 'produces'], ['WFAB-D6', 'feeds']],
+    },
+    'WFAB-03': {
+      s: [
+        [1, 'Confirm photonic lot starts and process split assignments with the foundry', 0.5],
+        [2, 'Track waveguide definition and review critical dimension and film thickness metrology', 4],
+        [3, 'Measure in-line optical monitors — propagation loss, ring resonance and coupler efficiency', 3, 1],
+        [4, 'Disposition lots outside the optical window — continue, hold or scrap', 1],
+        [5, 'Track the doping, heater, metallization and pad modules to wafer out', 5],
+        [6, 'Release the in-line optical monitor report with the wafer-out notice', 0.5],
+      ],
+      o: [
+        'Confirmed photonic lot and split record',
+        'Waveguide critical dimension and thickness data',
+        'In-line optical monitor measurements per lot',
+        'Out-of-window lot disposition record',
+        'Back-end photonic lot tracking record',
+        'Photonic IC in-line optical monitor report',
+      ],
+      r: [['WFAB-D3', 'produces'], ['WFAB-D6', 'feeds']],
+    },
+    'WFAB-04': {
+      s: [
+        [1, 'Confirm bridge / interposer and capacitor lot starts', 0.5],
+        [2, 'Track bridge and capacitor lots through the process against cycle time', 7],
+        [3, 'Review capacitor density and leakage monitor data', 2, 1],
+        [4, 'Receive wafer out and WAT data and plan thinning and dicing for assembly', 1],
+      ],
+      o: [
+        'Confirmed bridge and capacitor lot start record',
+        'Weekly lot position against cycle time',
+        'Capacitor density and leakage review',
+        'Bridge / interposer and silicon capacitor wafer lot record',
+      ],
+      r: [['WFAB-D4', 'produces'], ['WFAB-D5', 'informs'], ['WFAB-D6', 'feeds']],
+    },
+    'WFAB-05': {
+      s: [
+        [1, 'Confirm orders and delivery dates for optical sources, fiber assemblies, substrates, lids and thermal materials', 1],
+        [2, 'Track substrate fabrication from tooling release to delivery', 10],
+        [3, 'Track optical source builds and burn-in at the supplier', 8, 1],
+        [4, 'Run incoming inspection on substrates — warpage, flatness and electrical open / short test', 2],
+        [5, 'Run incoming inspection on optical sources and fiber assemblies — output power, wavelength and end-face', 2, 1],
+        [6, 'Kit the first-build material and release it to assembly', 1],
+      ],
+      o: [
+        'Confirmed first-build order and delivery schedule',
+        'Substrate fabrication tracking record',
+        'Optical source build and burn-in tracking record',
+        'Substrate incoming inspection results',
+        'Optical source and fiber assembly incoming inspection results',
+        'First-build material receipt and incoming inspection record',
+      ],
+      r: [['WFAB-D5', 'produces']],
+    },
+    'WFAB-06': {
+      s: [
+        [1, 'Collect WAT and process control monitor data per die and lot from every foundry', 1],
+        [2, 'Compare parametrics against acceptance limits and the lot split corner targets', 1.5],
+        [3, 'Disposition out-of-limit wafers with the foundries', 1, 1],
+        [4, 'Confirm wafer shipment, probe-ready packing and traceability records', 1],
+        [5, 'Hold the first silicon release review and release wafers to sort', 0.5],
+      ],
+      o: [
+        'Consolidated WAT and PCM data per die and lot',
+        'Parametric comparison against limits and split targets',
+        'Out-of-limit wafer disposition record',
+        'Shipment and traceability confirmation',
+        'Wafer acceptance review and first silicon release record',
+      ],
+      r: [['WFAB-D6', 'produces']],
+    },
+  },
+};

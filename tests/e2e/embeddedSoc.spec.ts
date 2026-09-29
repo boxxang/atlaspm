@@ -421,6 +421,7 @@ test('opens each built-in template’s flowchart from the Templates list', async
     ['typicalSoC', '/flowcharts/typical-soc.html'],
     ['threeDic', '/flowcharts/3dic.html'],
     ['embeddedSoc', '/flowcharts/embedded-soc.html'],
+    ['cpoSwitch', '/flowcharts/cpo-switch.html'],
   ]) {
     const link = page.locator(`[data-template="${id}"] [data-flowchart="${id}"]`);
     await expect(link).toHaveText('Flowchart');
@@ -429,7 +430,7 @@ test('opens each built-in template’s flowchart from the Templates list', async
     expect((await page.request.get(href)).status(), href).toBe(200);
   }
   /* a template somebody made has no flowchart of its own */
-  await expect(page.locator('[data-flowchart]')).toHaveCount(3);
+  await expect(page.locator('[data-flowchart]')).toHaveCount(4);
 
   /* it opens in the same window, under a way back to the list */
   await page.locator('[data-flowchart="threeDic"]').click();

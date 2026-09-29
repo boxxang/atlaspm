@@ -1,0 +1,117 @@
+/**
+ * SORT — Wafer Sort & Known-Good-Die. Weeks 120–130; closes on Known-Good-Die Ready.
+ */
+import type { CpoStageModule } from '../types';
+
+export const SORT: CpoStageModule = {
+  content: {
+    tagline: 'Every die that goes into a co-packaged switch must be good before it goes in — nothing comes back out.',
+    description:
+      'Bring up electrical wafer sort on first silicon for the switch ASIC, the I/O silicon and the electrical ICs, and wafer-level optical test for the photonic IC, then turn the first-lot data into known-good-die screening criteria: limits, bins, outlier screens and the correlation that shows a die passing sort will work in the package. Because a package needs every one of its dies to be good, per-die escapes multiply into package loss, so the screens are set against the compound yield model rather than each die alone. The stage closes when kits of known-good dies are banked, traceable and released to the first package build.',
+    activities: ['Electrical sort bring-up', 'PIC optical wafer test', 'KGD criteria and correlation', 'Die bank and release'],
+    deliverables: [
+      'Electrical wafer sort program release and first-lot sort data',
+      'Photonic IC wafer-level optical test results and wafer maps',
+      'Known-good-die screening specification and bin definitions',
+      'Sort correlation and compound yield report',
+      'Die bank inventory and known-good-die release to assembly',
+    ],
+    deliverableFrom: [0, 1, 2, 2, 3],
+    deliverableWeek: [6, 7, 9, 9, 10],
+    engineeringEffort: [10, 8, 6, 3],
+    risks: [
+      'Screens too loose, so bad dies are assembled and each escape scraps a package full of good ones',
+      'Photonic wafer-level test does not correlate with packaged optical performance',
+    ],
+    potentialRisks: [
+      'Sort program debugged on first silicon for so long that the first package build starts without known-good dies',
+      'Limits set from one lot’s distribution and not from the link budget or the package yield model',
+      'Optical probe insertion loss uncalibrated, so photonic dies are binned on probe variation rather than die performance',
+      'Security provisioning at sort run on an open tester, exposing keys before the device is locked',
+      'Die bank without per-die traceability, so a later package failure cannot be joined to its sort data',
+    ],
+    leader: { name: 'Arjun Mehta', short: 'A. Mehta', phone: '+1 (408) 555-0514', email: 'arjun.mehta@example.com' },
+    collaboration: ['Test engineering', 'Photonics', 'Optical engineering', 'Manufacturing and NPI', 'DFT', 'Security', 'Quality'],
+    tools: ['Automatic test equipment', 'Wafer prober with optical probe', 'Test data analytics and wafer map viewer', 'Manufacturing execution and die bank inventory system'],
+    programView: [
+      'Sort yield per die per lot',
+      'Known-good dies banked against the first-build kit count',
+      'Photonic wafer-level test correlation to reference',
+      'Test time per wafer against the cost model',
+    ],
+    perspective:
+      'Known-good die is a yield decision, not a test decision. Set every screen against what an escape costs in a package holding several other good dies, and the right limit is usually tighter than the die team would choose alone.',
+  },
+  steps: {
+    'SORT-01': {
+      s: [
+        [1, 'Install probe cards and verify contact, planarity and continuity on the first wafers', 1],
+        [2, 'Debug the sort program on first silicon — continuity, leakage, scan, memory BIST and supply currents', 2],
+        [3, 'Bring up SerDes loopback and PRBS tests and the electrical IC driver and TIA checks', 1.5, 1],
+        [4, 'Program trims, fuses and keys through the agreed secure provisioning flow', 1],
+        [5, 'Sort the first lots across the corner splits and collect wafer maps and data logs', 1.5],
+        [6, 'Release the sort program and first-lot sort data', 0.5],
+      ],
+      o: [
+        'Probe contact and continuity verification',
+        'Debugged structural and parametric sort tests',
+        'Working SerDes and electrical IC sort tests',
+        'Trim, fuse and key programming verified',
+        'First-lot wafer maps and data logs',
+        'Electrical wafer sort program release and first-lot sort data',
+      ],
+      r: [['SORT-D1', 'produces'], ['SORT-D3', 'feeds']],
+    },
+    'SORT-02': {
+      s: [
+        [1, 'Align the optical probe to the test couplers and calibrate insertion loss against reference structures', 1],
+        [2, 'Measure waveguide and coupler loss, detector responsivity and dark current per die', 2],
+        [3, 'Measure modulator efficiency and ring resonance with the heater tuning range', 2, 1],
+        [4, 'Correlate wafer-level results with the in-line optical monitors and split conditions', 1],
+        [5, 'Generate wafer maps and per-die optical pass / fail', 1.5],
+        [6, 'Release the optical wafer test results and wafer maps', 0.5],
+      ],
+      o: [
+        'Calibrated optical probe setup',
+        'Per-die loss, responsivity and dark current data',
+        'Per-die modulator and resonance data',
+        'Correlation to in-line monitors and splits',
+        'Photonic wafer maps with pass / fail',
+        'Photonic IC wafer-level optical test results and wafer maps',
+      ],
+      r: [['SORT-D2', 'produces'], ['SORT-D3', 'feeds']],
+    },
+    'SORT-03': {
+      s: [
+        [1, 'Set known-good-die limits per die from first-lot distributions, the link budget and the package yield model', 1.5],
+        [2, 'Define bins and die-level screens — outlier detection and stress screens where required', 1.5],
+        [3, 'Correlate sort results with bench characterization on sampled dies and across testers', 1.5, 1],
+        [4, 'Compute compound package yield from per-die yield and set escape targets', 1],
+        [5, 'Release the screening specification and the correlation and yield report', 1],
+      ],
+      o: [
+        'Known-good-die limits per die',
+        'Bin definitions and outlier screens',
+        'Sort-to-bench and tester-to-tester correlation',
+        'Compound yield estimate with escape targets',
+        'Known-good-die screening specification and correlation report',
+      ],
+      r: [['SORT-D3', 'produces'], ['SORT-D4', 'produces'], ['SORT-D5', 'feeds']],
+    },
+    'SORT-04': {
+      s: [
+        [1, 'Singulate, pick and pack known-good dies into the die bank with per-die traceability', 1.5],
+        [2, 'Match dies into kits per the build matrix — switch, I/O, electrical and photonic ICs and bridge', 1],
+        [3, 'Reconcile inventory against the build plan and flag shortfalls', 0.5, 1],
+        [4, 'Release the known-good-die kits to assembly', 0.5],
+      ],
+      o: [
+        'Banked known-good dies with traceability',
+        'Matched first-build kits',
+        'Inventory reconciliation and shortfall list',
+        'Die bank inventory and known-good-die release to assembly',
+      ],
+      r: [['SORT-D5', 'produces']],
+    },
+  },
+};

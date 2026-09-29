@@ -1,0 +1,401 @@
+/**
+ * WFAB — Wafer Fabrication, written up.
+ */
+import type { CpoWriteUps } from '../types';
+
+export const WFAB_WRITE_UPS: CpoWriteUps = {
+  'WFAB-01': {
+    criticalPath: true,
+    purpose: [
+      'Track the switch ASIC and I/O silicon wafers through the foundry <b>against committed cycle time, with excursions dispositioned and the engineering lot hold decided on time</b>, so wafer out is predicted weeks ahead rather than discovered on the day.',
+      'This is the longest fabrication in the program and usually the first-silicon critical path. The engineering lot hold is the one decision inside it: wafers parked before the upper metals keep a metal fix possible, but only if someone decides to release or hold them before the foundry’s hold window closes.',
+    ],
+    flowNote:
+      'Step 1 confirms starts and priority. Step 2 tracks front-end processing while step 3 reviews in-line excursions in parallel. Step 4 decides the engineering lot hold, step 5 tracks the back end and step 6 receives wafer out with WAT data.',
+    consumes: [
+      'Switch ASIC mask release record from MTO-01',
+      'I/O silicon tapeout record from MTO-02',
+      'Wafer start plan and lot splits from MTO-06',
+      'Foundry committed cycle time and hot-lot agreement',
+      'Late bug reports from emulation and firmware validation in PSV-08 and PSV-09',
+    ],
+    rel: {
+      'WFAB-D1': '<b>Switch ASIC and I/O silicon lot tracking and wafer-out record.</b> Produced here; it carries lot history, splits, holds and excursions for every wafer.',
+      'WFAB-D6': '<b>Wafer acceptance review and first silicon release record.</b> The lot history and WAT data are the switch ASIC input to wafer acceptance.',
+    },
+    risks: [
+      '<b>Cycle time slip seen late.</b> Lot position is reported only as done or not done, and a two-week delay shows up at wafer out.',
+      '<b>Hold window missed.</b> The engineering lot passes the planned metal layer before the hold decision is made.',
+      '<b>Excursion accepted silently.</b> An in-line defect excursion is dispositioned by the foundry without program visibility.',
+      '<b>Split mix-up.</b> Split wafers are processed at the wrong condition and characterization loses its corners.',
+      '<b>Priority lost.</b> The hot-lot priority lapses during a capacity crunch at the foundry.',
+    ],
+    roles: [
+      { r: 'Technology and foundry', d: 'Owns lot tracking and the foundry relationship' },
+      { r: 'Foundry customer engineer', d: 'Lot position, excursions and wafer-out notice' },
+      { r: 'Physical design lead', d: 'Engineering lot hold and metal fix decision input' },
+      { r: 'Manufacturing planner', d: 'Split and priority tracking against the plan' },
+      { r: 'Program TPM', d: 'Reports projected wafer out and escalates slips' },
+    ],
+    effort: [
+      ['Lot tracking', 3],
+      ['Excursion review', 2],
+      ['Engineering lot hold decision', 2],
+      ['Wafer-out and data receipt', 1],
+    ],
+    entry: [
+      'Masks released and lots started per MTO-06',
+      'Committed cycle time received from the foundry',
+      'Engineering lot hold layer agreed',
+    ],
+    exit: [
+      'Every lot out of fab with its split condition confirmed by the foundry',
+      'Engineering lot hold decision recorded before the hold window closed',
+      'Wafer-out date within one week of the committed date or the slip escalated with a recovery plan',
+    ],
+    dependsOn: ['MTO-01', 'MTO-02', 'MTO-06'],
+    dependsNote: 'Lots start as soon as masks are released, which is inside the tapeout stage.',
+    feedsInto: ['WFAB-06', 'SORT-01'],
+    measuredBy: [
+      'Projected wafer out against commitment, weekly',
+      'In-line excursions open',
+      'Engineering lots held and their decision dates',
+    ],
+    links: {
+      dependsOn: ['MTO-01', 'MTO-02', 'MTO-06'],
+      feedsInto: ['WFAB-06', 'SORT-01'],
+      runsWith: ['WFAB-02', 'WFAB-03'],
+      revisedBy: [],
+      feedsBackInto: [],
+    },
+    terms: ['WAT', 'Hot lot', 'BEOL', 'Lot split'],
+  },
+  'WFAB-02': {
+    criticalPath: false,
+    purpose: [
+      'Track the electrical IC wafers through their analog process <b>against cycle time, with device parametric monitors reviewed</b> so the drivers and TIAs are known to be on target before the wafers reach sort.',
+      'Electrical IC fabrication is shorter than the switch ASIC and rarely on the critical path. Its risk is parametric: a device shift that moves driver swing or TIA bandwidth appears in the monitors weeks before it appears as a failed optical link.',
+    ],
+    flowNote:
+      'Step 1 confirms the starts. Step 2 tracks lots while step 3 reviews in-line and device parametric monitors in parallel. Step 4 receives wafer out with WAT data.',
+    consumes: [
+      'Electrical IC tapeout record from MTO-03',
+      'Wafer start plan and splits from MTO-06',
+      'Device parametric targets from circuit design',
+      'Foundry committed cycle time',
+      'Device test structure positions from the reticle frame',
+    ],
+    rel: {
+      'WFAB-D2': '<b>Electrical IC wafer lot and parametric record.</b> Produced here.',
+      'WFAB-D6': '<b>Wafer acceptance review and first silicon release record.</b> The electrical IC parametrics are reviewed in wafer acceptance.',
+    },
+    risks: [
+      '<b>Parametric shift unnoticed.</b> Device monitors drift and nobody compares them to the driver and TIA design targets.',
+      '<b>Shuttle schedule slips.</b> A multi-project wafer run waits for other customers.',
+      '<b>Too few wafers.</b> Scrap on a small lot leaves too few dies for the first optical engines.',
+      '<b>Split not run.</b> A requested corner lot is dropped by the foundry.',
+      '<b>Data late.</b> WAT data arrives after the wafers and delays acceptance.',
+    ],
+    roles: [
+      { r: 'Technology and foundry', d: 'Owns electrical IC lot tracking' },
+      { r: 'Foundry customer engineer', d: 'Lot status and monitor data' },
+      { r: 'Analog circuit designer', d: 'Interprets device parametrics' },
+      { r: 'Manufacturing planner', d: 'Wafer count against the build plan' },
+      { r: 'Program TPM', d: 'Reports electrical IC wafer out' },
+    ],
+    effort: [
+      ['Lot tracking', 1.5],
+      ['Parametric monitor review', 1.5],
+      ['Wafer-out and data receipt', 1],
+    ],
+    entry: [
+      'Electrical IC mask order released',
+      'Lots started with splits per the wafer start plan',
+      'Device parametric targets available',
+    ],
+    exit: [
+      'Every lot out of fab with WAT data received',
+      'Device parametric monitors within the design target window or deviation dispositioned',
+      'Wafer count delivered covers the first-build optical engine need',
+    ],
+    dependsOn: ['MTO-03', 'MTO-06'],
+    dependsNote: null,
+    feedsInto: ['WFAB-06', 'SORT-01'],
+    measuredBy: [
+      'Wafer out against commitment',
+      'Device parameters outside target',
+      'Good wafers delivered against plan',
+    ],
+    links: {
+      dependsOn: ['MTO-03', 'MTO-06'],
+      feedsInto: ['WFAB-06', 'SORT-01'],
+      runsWith: ['WFAB-01'],
+      revisedBy: [],
+      feedsBackInto: [],
+    },
+    terms: ['EIC', 'WAT', 'PCM'],
+  },
+  'WFAB-03': {
+    criticalPath: true,
+    purpose: [
+      'Track the photonic IC wafers and <b>measure the in-line optical monitors — waveguide propagation loss, ring resonance and coupler efficiency — while the wafers are still in the fab</b>, so a process shift is caught and dispositioned before it becomes a sort failure.',
+      'Photonic performance depends on nanometre-scale waveguide dimensions and film thicknesses that vary more than a digital process. In-line optical data is the earliest look at whether the link budget assumptions hold, and lots outside the optical window are cheaper to hold or scrap in the fab than to sort, assemble and debug.',
+    ],
+    flowNote:
+      'Step 1 confirms starts and splits. Step 2 tracks waveguide definition while step 3 measures the in-line optical monitors in parallel. Step 4 dispositions out-of-window lots, step 5 tracks the back-end modules and step 6 releases the monitor report.',
+    consumes: [
+      'Photonic IC tapeout record and monitor structure list from MTO-04',
+      'Photonic process splits from MTO-06',
+      'Optical link budget allocations from MODL-04',
+      'Photonics foundry process window and monitor limits from TRDY-02',
+      'Photonic IC test vehicle monitor baselines from FEAS-03',
+    ],
+    rel: {
+      'WFAB-D3': '<b>Photonic IC in-line optical monitor report.</b> Produced here; sort and characterization use it to separate process effects from design.',
+      'WFAB-D6': '<b>Wafer acceptance review and first silicon release record.</b> The optical monitor data is the photonic input to wafer acceptance.',
+    },
+    risks: [
+      '<b>Monitor data not reviewed.</b> In-line loss measurements are collected by the foundry and never compared with the budget.',
+      '<b>Waveguide loss high.</b> Sidewall roughness or thickness drift raises propagation loss beyond the allocation.',
+      '<b>Ring resonance off target.</b> Resonances shift beyond what heaters can tune.',
+      '<b>Out-of-window lot processed anyway.</b> A lot outside the optical window continues to the end and consumes sort and assembly.',
+      '<b>Splits indistinguishable.</b> Split conditions are too close to separate in the monitor data.',
+    ],
+    roles: [
+      { r: 'Photonics', d: 'Owns photonic lot tracking and in-line optical review' },
+      { r: 'Photonics foundry liaison', d: 'Lot status, metrology and monitor data' },
+      { r: 'Optical test engineer', d: 'Analyzes monitor data against the budget' },
+      { r: 'Photonic device engineer', d: 'Interprets resonance and coupler shifts' },
+      { r: 'Program TPM', d: 'Reports photonic wafer out and lot dispositions' },
+    ],
+    effort: [
+      ['Lot tracking', 2],
+      ['Metrology review', 1.5],
+      ['In-line optical monitor analysis', 3],
+      ['Lot disposition and report', 1.5],
+    ],
+    entry: [
+      'Photonic mask set released and lots started with splits',
+      'Monitor limits agreed with the photonics foundry',
+      'Link budget allocations current',
+    ],
+    exit: [
+      'In-line optical monitors measured on every lot at the waveguide and back-end checkpoints',
+      'Every lot outside the optical window dispositioned with the foundry in writing',
+      'Wafer out with the monitor report released to sort and characterization',
+    ],
+    dependsOn: ['MTO-04', 'MTO-06'],
+    dependsNote: null,
+    feedsInto: ['WFAB-06', 'SORT-02'],
+    measuredBy: [
+      'Propagation loss per lot against allocation',
+      'Ring resonance offset against tuning range',
+      'Lots held or scrapped for optical window',
+    ],
+    links: {
+      dependsOn: ['MTO-04', 'MTO-06', 'MODL-04'],
+      feedsInto: ['WFAB-06', 'SORT-02', 'CHAR-03'],
+      runsWith: ['WFAB-01'],
+      revisedBy: [],
+      feedsBackInto: ['MODL-04'],
+    },
+    terms: ['PIC', 'In-line optical monitor', 'Link budget', 'Lot split'],
+  },
+  'WFAB-04': {
+    criticalPath: false,
+    purpose: [
+      'Track the <b>bridge or interposer and silicon capacitor wafers</b> through their foundry, review capacitor density and leakage monitors, and plan thinning and dicing so the parts are ready when assembly starts.',
+      'These wafers are needed at assembly, not at sort, but they need their own back-end preparation — thinning, bumping and dicing — which is easy to leave off the plan.',
+    ],
+    flowNote:
+      'Step 1 confirms starts. Step 2 tracks the lots while step 3 reviews capacitor monitors in parallel. Step 4 receives wafer out and plans thinning and dicing.',
+    consumes: [
+      'Bridge and capacitor mask release record from MTO-05',
+      'Wafer start plan from MTO-06',
+      'Capacitor density and leakage targets from DSGN-09',
+      'Assembly start date from PKGA-02',
+      'Thinning and bumping requirements from the assembly process in TINF-09',
+    ],
+    rel: {
+      'WFAB-D4': '<b>Bridge / interposer and silicon capacitor wafer lot record.</b> Produced here.',
+      'WFAB-D5': '<b>First-build material receipt and incoming inspection record.</b> Bridge and capacitor dies join the first-build kit.',
+      'WFAB-D6': '<b>Wafer acceptance review and first silicon release record.</b> Bridge and capacitor WAT data is reviewed in wafer acceptance.',
+    },
+    risks: [
+      '<b>Back-end preparation forgotten.</b> Thinning, bumping and dicing are not scheduled and the wafers wait.',
+      '<b>Capacitor leakage high.</b> Leakage exceeds the power budget.',
+      '<b>Density low.</b> Capacitance per area below design and PDN margin shrinks.',
+      '<b>Low foundry priority.</b> Small lots queue behind larger ones.',
+      '<b>Wafer out after assembly start.</b> Assembly waits on bridges.',
+    ],
+    roles: [
+      { r: 'Packaging', d: 'Owns bridge and capacitor wafer tracking' },
+      { r: 'Foundry customer engineer', d: 'Lot status and monitor data' },
+      { r: 'SI/PI engineer', d: 'Reviews capacitor density and leakage' },
+      { r: 'Assembly engineer', d: 'Thinning, bumping and dicing plan' },
+      { r: 'Manufacturing planner', d: 'Aligns wafer out with assembly' },
+    ],
+    effort: [
+      ['Lot tracking', 1],
+      ['Capacitor monitor review', 1],
+      ['Back-end preparation planning', 1],
+    ],
+    entry: [
+      'Bridge and capacitor masks released',
+      'Lots started per the wafer start plan',
+      'Thinning and dicing requirements known',
+    ],
+    exit: [
+      'Every lot out of fab with WAT data received',
+      'Capacitor density and leakage within design target',
+      'Thinning, bumping and dicing scheduled to finish before the first assembly start',
+    ],
+    dependsOn: ['MTO-05', 'MTO-06'],
+    dependsNote: null,
+    feedsInto: ['WFAB-06', 'PKGA-03'],
+    measuredBy: [
+      'Wafer out against commitment',
+      'Capacitor density and leakage against target',
+      'Days of margin to the assembly start',
+    ],
+    links: {
+      dependsOn: ['MTO-05', 'MTO-06'],
+      feedsInto: ['WFAB-06', 'PKGA-03'],
+      runsWith: ['WFAB-05'],
+      revisedBy: [],
+      feedsBackInto: [],
+    },
+    terms: ['Bridge', 'Interposer', 'Si capacitor', 'WAT'],
+  },
+  'WFAB-05': {
+    criticalPath: true,
+    purpose: [
+      'Make sure <b>everything else the first package build needs — optical sources, fiber assemblies, substrates, lids and thermal materials — arrives and passes incoming inspection</b> before the known-good dies are ready.',
+      'In a co-packaged switch the silicon is only part of the kit. Optical sources need supplier burn-in, substrates need tooling from the package signoff, and fiber assemblies are often custom. Any one of them late holds the whole first build while good dies wait in the die bank.',
+    ],
+    flowNote:
+      'Step 1 confirms orders and dates. Step 2 tracks substrate fabrication while step 3 tracks optical source builds in parallel. Step 4 inspects substrates and step 5 inspects optical sources and fiber alongside it. Step 6 kits and releases the material.',
+    consumes: [
+      'Substrate and RDL tooling release from SGNO-10',
+      'Long-lead material plan and supply agreements from TRDY-10',
+      'Qualified optical source suppliers from TRDY-07',
+      'Fiber, connector and cooling supplier readiness from TRDY-08',
+      'First-build quantities from the build matrix in PKGA-02',
+    ],
+    rel: {
+      'WFAB-D5': '<b>First-build material receipt and incoming inspection record.</b> Produced here; assembly starts against the kit it describes.',
+    },
+    risks: [
+      '<b>Substrates late.</b> Tooling release slipped and substrate delivery lands after the known-good dies.',
+      '<b>Optical source burn-in failures.</b> Supplier burn-in fallout leaves too few sources for the first engines.',
+      '<b>Incoming inspection skipped.</b> Warped substrates or damaged fiber end-faces reach assembly and cost yield.',
+      '<b>Custom fiber assemblies late.</b> A custom length or connector variant has a longer lead than planned.',
+      '<b>Kit incomplete.</b> One low-cost part — a lid, a thermal material — is missing and the build waits.',
+    ],
+    roles: [
+      { r: 'Supply chain', d: 'Owns first-build material arrival' },
+      { r: 'Substrate supplier manager', d: 'Substrate fabrication and delivery' },
+      { r: 'Laser and optical source lead', d: 'Optical source build and burn-in' },
+      { r: 'Incoming quality engineer', d: 'Incoming inspection' },
+      { r: 'Manufacturing planner', d: 'Kitting and release to assembly' },
+    ],
+    effort: [
+      ['Order confirmation and tracking', 2],
+      ['Substrate follow-up', 1],
+      ['Optical source follow-up', 1],
+      ['Incoming inspection', 1.5],
+      ['Kitting and release', 0.5],
+    ],
+    entry: [
+      'Substrate tooling released in SGNO-10',
+      'Purchase orders placed for every first-build item',
+      'Incoming inspection criteria agreed with quality',
+    ],
+    exit: [
+      'Every first-build item received in the quantity the build matrix needs',
+      'Incoming inspection passed on substrates, optical sources and fiber assemblies with results recorded',
+      'Kit released to assembly at least one week before the first die attach',
+    ],
+    dependsOn: ['SGNO-10', 'TRDY-10'],
+    dependsNote: 'Most orders were placed in readiness and procurement; this activity chases them to the dock and inspects what arrives.',
+    feedsInto: ['PKGA-03', 'PKGA-04', 'PKGA-05'],
+    measuredBy: [
+      'Items on hand against the build matrix',
+      'Incoming inspection fallout per item',
+      'Days of margin between kit release and die attach',
+    ],
+    links: {
+      dependsOn: ['SGNO-10', 'TRDY-10', 'TRDY-07', 'TRDY-08'],
+      feedsInto: ['PKGA-03', 'PKGA-04', 'PKGA-05'],
+      runsWith: ['PKGA-01'],
+      revisedBy: [],
+      feedsBackInto: [],
+    },
+    terms: ['Optical source', 'Fiber attach', 'Warpage', 'TIM', 'BOM'],
+  },
+  'WFAB-06': {
+    criticalPath: true,
+    purpose: [
+      'Accept the wafers from every foundry and <b>release first silicon to sort</b> — WAT and process control monitor data reviewed against the acceptance limits and against the corners the lot splits were meant to hit, out-of-limit wafers dispositioned and traceability confirmed.',
+      'Acceptance is not only a pass or fail against the foundry’s limits. The lot splits were started to hit particular corners; if the data shows they did not, characterization will be planned on the wrong wafers.',
+    ],
+    flowNote:
+      'Step 1 collects the data and step 2 compares it to limits and split targets, with out-of-limit wafers dispositioned in parallel in step 3. Step 4 confirms shipment and traceability and step 5 holds the release review.',
+    consumes: [
+      'Switch ASIC and I/O silicon wafer-out record from WFAB-01',
+      'Electrical IC parametric record from WFAB-02',
+      'Photonic IC in-line optical monitor report from WFAB-03',
+      'Bridge and capacitor wafer lot record from WFAB-04',
+      'Wafer start plan and split targets from MTO-06',
+    ],
+    rel: {
+      'WFAB-D6': '<b>Wafer acceptance review and first silicon release record.</b> Produced here; it closes the First Silicon gate.',
+    },
+    risks: [
+      '<b>Limits without targets.</b> Wafers pass the foundry limits but missed the split corners and nobody notices.',
+      '<b>Traceability gap.</b> Wafer identities are lost in shipment and sort data cannot be joined to lot history.',
+      '<b>Out-of-limit wafers shipped.</b> Wafers outside limits are sent to sort without disposition.',
+      '<b>One die late.</b> The release waits for the slowest foundry and the others idle.',
+      '<b>Data format mismatch.</b> Each foundry reports parametrics differently and comparison is manual.',
+    ],
+    roles: [
+      { r: 'Manufacturing and NPI', d: 'Owns wafer acceptance and first silicon release' },
+      { r: 'Technology and foundry manager', d: 'Foundry data and dispositions' },
+      { r: 'Test engineering lead', d: 'Confirms sort readiness' },
+      { r: 'Quality engineer', d: 'Traceability and disposition records' },
+      { r: 'Program TPM', d: 'Announces first silicon' },
+    ],
+    effort: [
+      ['Data collection', 0.5],
+      ['Parametric review', 1.5],
+      ['Disposition', 1],
+      ['Traceability and release', 1],
+    ],
+    entry: [
+      'Wafers out of fab for at least the switch ASIC and photonic IC',
+      'Acceptance limits and split targets agreed',
+      'Manufacturing data system ready to receive lot data',
+    ],
+    exit: [
+      'Every wafer released to sort has WAT data within limits or a signed disposition',
+      'Split wafers confirmed at their intended corner or relabelled',
+      'Traceability from wafer to lot history confirmed in the manufacturing data system',
+    ],
+    dependsOn: ['WFAB-01', 'WFAB-02', 'WFAB-03', 'WFAB-04'],
+    dependsNote: 'The first silicon gate: every die’s fabrication feeds it.',
+    feedsInto: ['SORT-01', 'SORT-02'],
+    measuredBy: [
+      'Wafers released against wafers out',
+      'Split wafers on target',
+      'Wafers with traceability gaps',
+    ],
+    links: {
+      dependsOn: ['WFAB-01', 'WFAB-02', 'WFAB-03', 'WFAB-04', 'MTO-06', 'TINF-10'],
+      feedsInto: ['SORT-01', 'SORT-02', 'CHAR-01'],
+      runsWith: ['WFAB-05'],
+      revisedBy: [],
+      feedsBackInto: [],
+    },
+    terms: ['WAT', 'PCM', 'Corner lot'],
+  },
+};

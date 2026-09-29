@@ -69,7 +69,7 @@ const emb = (socRef: string) => {
 
 describe('the Embedded SoC template', () => {
   it('ships as a third built-in, and leaves the other two alone', () => {
-    expect(BUILTIN_PROFILES.map((p) => p.id)).toEqual(['typicalSoC', 'threeDic', 'embeddedSoc']);
+    expect(BUILTIN_PROFILES.map((p) => p.id).slice(0, 3)).toEqual(['typicalSoC', 'threeDic', 'embeddedSoc']);
     expect(EMBEDDED_PROFILE.builtin).toBe(true);
     expect(EMBEDDED_PROFILE.template).toBe(true);
     expect(EMBEDDED_PROFILE.label).toBe('Embedded SoC');
