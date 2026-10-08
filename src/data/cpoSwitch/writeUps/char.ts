@@ -13,7 +13,7 @@ export const CHAR_WRITE_UPS: CpoWriteUps = {
     flowNote:
       'Step 1 updates the pre-silicon plan against what the engineering lots actually delivered. Step 2 rebuilds the matrix from that inventory rather than from the lot plan. Step 3 allocates units and benches in parallel, because the same corner units are wanted by every workstream. Step 4 sets limits and the data format, and step 5 releases the plan.',
     consumes: [
-      'Wafer start plan and lot splits from MTO-06',
+      'Wafer start plan and lot splits from MTO-04',
       'Known-good-die bins and wafer acceptance data from SORT-05',
       'First optical link margin correlation from OBU-06',
       'First electrical link results from PON-05',
@@ -62,7 +62,7 @@ export const CHAR_WRITE_UPS: CpoWriteUps = {
       'Weeks from plan release to first corner data',
     ],
     links: {
-      dependsOn: ['TINF-14', 'PON-05', 'OBU-06', 'MTO-06', 'SORT-05', 'SORT-02', 'SORT-03'],
+      dependsOn: ['TINF-14', 'PON-05', 'OBU-06', 'MTO-04', 'SORT-05', 'SORT-02', 'SORT-03'],
       feedsInto: ['CHAR-02', 'CHAR-03', 'CHAR-04', 'CHAR-05', 'CHAR-06', 'CHAR-10', 'CHAR-11', 'CERT-01'],
       runsWith: ['SINT-04'],
       revisedBy: ['SDBG-04'],

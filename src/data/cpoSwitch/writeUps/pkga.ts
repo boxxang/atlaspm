@@ -80,7 +80,7 @@ export const PKGA_WRITE_UPS: CpoWriteUps = {
       'Step 1 sets the objectives and step 2 the splits. Step 3 allocates units to their uses while step 4 aligns the schedule with the assembly partner in parallel. Step 5 releases the plan.',
     consumes: [
       'Assembly and fiber attach process specification from TINF-09',
-      'Wafer lot splits and engineering lot strategy from MTO-06',
+      'Wafer lot splits and engineering lot strategy from MTO-04',
       'Signed-off package design from IMPL-07',
       'Unit needs from bring-up, characterization and reliability owners',
       'Assembly partner capacity and schedule',
@@ -129,7 +129,7 @@ export const PKGA_WRITE_UPS: CpoWriteUps = {
     links: {
       dependsOn: ['TINF-09', 'IMPL-07'],
       feedsInto: ['PKGA-01', 'PKGA-03', 'PKGA-04', 'PKGA-05', 'PKGA-06', 'PKGA-07'],
-      runsWith: ['MTO-06'],
+      runsWith: ['MTO-04'],
       revisedBy: [],
       feedsBackInto: [],
     },

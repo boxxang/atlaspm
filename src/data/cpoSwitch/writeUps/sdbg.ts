@@ -285,8 +285,8 @@ export const SDBG_WRITE_UPS: CpoWriteUps = {
       'Step 1 implements the fixes, starting with those the decision review has already confirmed. Step 2 reruns signoff while step 3 updates test patterns and the test program in parallel. Step 4 holds the tapeout review, and step 5 tapes out and releases masks and held wafers to SDBG-07.',
     consumes: [
       'Stepping decision and fix scope from SDBG-04',
-      'Tapeout archive and configuration baseline from MTO-07',
-      'Signoff flows and tapeout readiness checklist from SGNO-09',
+      'Tapeout archive and configuration baseline from MTO-05',
+      'Signoff flows and tapeout readiness checklist from SGNO-10',
       'Held-wafer inventory parked before metal at the foundry',
       'Root cause reports from SDBG-02',
     ],
@@ -325,7 +325,7 @@ export const SDBG_WRITE_UPS: CpoWriteUps = {
       'Updated test program and patterns released for the stepping',
       'Masks and held wafers released with the fix change list signed by every die owner',
     ],
-    dependsOn: ['SDBG-04', 'MTO-07'],
+    dependsOn: ['SDBG-04', 'MTO-05'],
     dependsNote: null,
     feedsInto: ['SDBG-07', 'SDBG-06'],
     measuredBy: [
@@ -334,7 +334,7 @@ export const SDBG_WRITE_UPS: CpoWriteUps = {
       'Fixes added after scope freeze',
     ],
     links: {
-      dependsOn: ['SDBG-04', 'MTO-07', 'SGNO-09'],
+      dependsOn: ['SDBG-04', 'MTO-05', 'SGNO-10'],
       feedsInto: ['SDBG-07', 'SDBG-06', 'SDBG-08'],
       runsWith: ['SDBG-03'],
       revisedBy: [],

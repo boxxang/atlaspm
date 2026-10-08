@@ -1,5 +1,7 @@
 /**
- * SORT — Wafer Sort & Known-Good-Die. Closes on Known-Good-Die Ready.
+ * SORT — Wafer Sort & Known-Good-Die. Weeks 114–132; closes on Known-Good-Die Ready.
+ * The electrical IC is sorted first (weeks 114–120) and the photonic IC next
+ * (120–125), ahead of the Switch SoC and I/O die (122–128).
  */
 import type { CpoStageModule } from '../types';
 
@@ -7,7 +9,7 @@ export const SORT: CpoStageModule = {
   content: {
     tagline: 'Every die that goes into a co-packaged switch must be good before it goes in — nothing comes back out.',
     description:
-      'Bring up wafer sort on first silicon for each die on its own program and probe card — the Switch SoC, the I/O die with its SerDes and die-to-die PHY tests, and the electrical IC with its driver and TIA tests — and wafer-level optical test for the photonic IC, then turn the first-lot data into known-good-die screening criteria: limits, bins, outlier screens and the correlation that shows a die passing sort will work in the package. Because a package needs every one of its dies to be good, per-die escapes multiply into package loss, so the screens are set against the compound yield model rather than each die alone. The stage closes when kits of known-good dies are banked, traceable and released to the first package build.',
+      'Bring up wafer sort on first silicon for each die on its own program and probe card — the Switch SoC, the I/O die with its SerDes and die-to-die PHY tests, and the electrical IC with its driver and TIA tests — and wafer-level optical test for the photonic IC, then turn the first-lot data into known-good-die screening criteria: limits, bins, outlier screens and the correlation that shows a die passing sort will work in the package. Because a package needs every one of its dies to be good, per-die escapes multiply into package loss, so the screens are set against the compound yield model rather than each die alone. The dies arrive in the order their waves left: the electrical IC is sorted first and the photonic IC next, so the optical engine build can start on them, then the Switch SoC and the I/O die. The stage closes when kits of known-good dies are banked, traceable and released to the first package build.',
     activities: ['Switch SoC sort bring-up', 'I/O die sort bring-up', 'EIC sort bring-up', 'PIC optical wafer test', 'KGD criteria and correlation', 'Die bank and release'],
     deliverables: [
       'Switch SoC electrical wafer sort program release and first-lot sort data',
@@ -19,7 +21,7 @@ export const SORT: CpoStageModule = {
       'Die bank inventory and known-good-die release to assembly',
     ],
     deliverableFrom: [0, 1, 2, 3, 4, 4, 5],
-    deliverableWeek: [6, 6, 5, 7, 9, 9, 10],
+    deliverableWeek: [14, 14, 6, 11, 16, 16, 18],
     engineeringEffort: [6, 4, 3, 8, 6, 3],
     risks: [
       'Screens too loose, so bad dies are assembled and each escape scraps a package full of good ones',
@@ -105,10 +107,10 @@ export const SORT: CpoStageModule = {
     'SORT-04': {
       s: [
         [1, 'Align the optical probe to the test couplers and calibrate insertion loss against reference structures', 1],
-        [2, 'Measure waveguide and coupler loss, detector responsivity and dark current per die', 2],
+        [2, 'Measure waveguide and coupler loss, detector responsivity and dark current per die', 1.5],
         [3, 'Measure modulator efficiency and ring resonance with the heater tuning range', 2, 1],
         [4, 'Correlate wafer-level results with the in-line optical monitors and split conditions', 1],
-        [5, 'Generate wafer maps and per-die optical pass / fail', 1.5],
+        [5, 'Generate wafer maps and per-die optical pass / fail', 1],
         [6, 'Release the optical wafer test results and wafer maps', 0.5],
       ],
       o: [

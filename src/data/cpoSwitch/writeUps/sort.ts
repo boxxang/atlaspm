@@ -218,7 +218,7 @@ export const SORT_WRITE_UPS: CpoWriteUps = {
       'In-line optical monitor report from WFAB-04',
       'Optical wafer probe and fixtures from TINF-03',
       'Factory calibration process and limits from TINF-07',
-      'Test coupler positions and reference structures from MTO-04',
+      'Test coupler positions and reference structures from OTO-02',
     ],
     rel: {
       'SORT-D4': '<b>Photonic IC wafer-level optical test results and wafer maps.</b> Produced here.',
@@ -264,7 +264,7 @@ export const SORT_WRITE_UPS: CpoWriteUps = {
       'Optical test time per wafer',
     ],
     links: {
-      dependsOn: ['WFAB-07', 'WFAB-04', 'TINF-03', 'TINF-07'],
+      dependsOn: ['WFAB-07', 'WFAB-04', 'TINF-03', 'TINF-07', 'OTO-02'],
       feedsInto: ['SORT-05', 'SORT-06', 'CHAR-03'],
       runsWith: ['SORT-01'],
       revisedBy: [],

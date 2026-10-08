@@ -714,7 +714,7 @@ export const PSV_WRITE_UPS: CpoWriteUps = {
     ],
     dependsOn: ['PSV-02', 'PSV-03', 'PSV-04', 'PSV-05', 'PSV-06', 'PSV-07', 'PSV-08', 'PSV-09', 'PSV-10', 'PSV-12', 'PSV-13', 'PSV-14', 'PSV-15', 'DSGN-18'],
     dependsNote: null,
-    feedsInto: ['SGNO-09', 'MTO-01'],
+    feedsInto: ['SGNO-09', 'MTO-01', 'SGNO-10'],
     measuredBy: [
       'Closure criteria met',
       'Accepted risks',
@@ -722,7 +722,7 @@ export const PSV_WRITE_UPS: CpoWriteUps = {
     ],
     links: {
       dependsOn: ['PSV-01', 'PSV-02', 'PSV-03', 'PSV-04', 'PSV-05', 'PSV-06', 'PSV-07', 'PSV-08', 'PSV-09', 'PSV-10', 'PSV-12', 'PSV-13', 'PSV-14', 'PSV-15', 'DSGN-18'],
-      feedsInto: ['SGNO-09', 'MTO-01'],
+      feedsInto: ['SGNO-09', 'MTO-01', 'SGNO-10'],
       runsWith: [],
       revisedBy: [],
       feedsBackInto: [],

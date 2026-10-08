@@ -801,7 +801,7 @@ export const ICD_WRITE_UPS: CpoWriteUps = {
     ],
     links: {
       dependsOn: ['ICD-01', 'ICD-02', 'ICD-03', 'ICD-04', 'ICD-05', 'ICD-06', 'ICD-07', 'ICD-08', 'ICD-09', 'ICD-10', 'ICD-11', 'SARC-12', 'FEAS-10'],
-      feedsInto: ['DSGN-18', 'PSV-07', 'CHAR-06', 'PCTL-03', 'SUST-04', 'MTO-07'],
+      feedsInto: ['DSGN-18', 'PSV-07', 'CHAR-06', 'PCTL-03', 'SUST-04', 'MTO-05'],
       runsWith: [],
       revisedBy: ['PSV-07', 'CHAR-06'],
       feedsBackInto: ['SARC-12'],

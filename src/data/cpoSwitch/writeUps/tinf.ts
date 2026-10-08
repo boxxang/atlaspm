@@ -899,7 +899,7 @@ export const TINF_WRITE_UPS: CpoWriteUps = {
       'Link and performance models from MODL-03 and MODL-04',
     ],
     rel: {
-      'TINF-D14': '<b>Post-silicon validation plan, characterization corner and skew-lot matrix, and qualification sample plan.</b> Produced here; MTO-06, CHAR-01 and RELQ-01 act on it.',
+      'TINF-D14': '<b>Post-silicon validation plan, characterization corner and skew-lot matrix, and qualification sample plan.</b> Produced here; MTO-04, CHAR-01 and RELQ-01 act on it.',
       'TINF-D11': '<b>Test and manufacturing readiness review package.</b> Plan and test content readiness is reviewed with the rest of the infrastructure.',
     },
     risks: [
@@ -933,8 +933,8 @@ export const TINF_WRITE_UPS: CpoWriteUps = {
       'Qualification chambers booked and sample quantities reserved in the build matrix',
     ],
     dependsOn: ['PSV-08', 'PSV-01', 'REQ-07'],
-    dependsNote: 'The skew-lot matrix has to reach MTO-06 before wafers start, which is why this runs well before tapeout.',
-    feedsInto: ['MTO-06', 'CHAR-01', 'RELQ-01'],
+    dependsNote: 'The skew-lot matrix has to reach MTO-04 before wafers start, which is why this runs well before tapeout.',
+    feedsInto: ['MTO-04', 'CHAR-01', 'RELQ-01'],
     measuredBy: [
       'Validation tests passing on emulation',
       'Skew corners requested before wafer start',
@@ -942,7 +942,7 @@ export const TINF_WRITE_UPS: CpoWriteUps = {
     ],
     links: {
       dependsOn: ['PSV-08', 'PSV-01', 'REQ-07', 'TINF-01'],
-      feedsInto: ['MTO-06', 'CHAR-01', 'RELQ-01', 'PKGA-02', 'PKGA-09', 'TINF-11'],
+      feedsInto: ['MTO-04', 'CHAR-01', 'RELQ-01', 'PKGA-02', 'PKGA-09', 'TINF-11'],
       runsWith: [],
       revisedBy: [],
       feedsBackInto: [],

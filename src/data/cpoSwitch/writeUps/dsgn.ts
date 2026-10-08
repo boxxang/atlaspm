@@ -1187,7 +1187,7 @@ export const DSGN_WRITE_UPS: CpoWriteUps = {
     ],
     dependsOn: ['DSGN-02', 'DSGN-04', 'DSGN-05', 'DSGN-06', 'DSGN-12', 'PSV-07'],
     dependsNote: null,
-    feedsInto: ['IMPL-01', 'PSV-11', 'SGNO-09'],
+    feedsInto: ['IMPL-01', 'PSV-11', 'SGNO-09', 'SGNO-10'],
     measuredBy: [
       'Workstreams passing freeze criteria',
       'Exceptions open after freeze',
@@ -1219,7 +1219,7 @@ export const DSGN_WRITE_UPS: CpoWriteUps = {
         'PSV-04',
         'PSV-07',
       ],
-      feedsInto: ['IMPL-01', 'IMPL-02', 'PSV-11', 'SGNO-09'],
+      feedsInto: ['IMPL-01', 'IMPL-02', 'PSV-11', 'SGNO-09', 'SGNO-10'],
       runsWith: [],
       revisedBy: [],
       feedsBackInto: [],

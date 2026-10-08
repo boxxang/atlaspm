@@ -196,7 +196,7 @@ export const PCTL_WRITE_UPS: CpoWriteUps = {
     ],
     links: {
       dependsOn: ['ICD-12', 'ICD-01'],
-      feedsInto: ['PCTL-07', 'SUST-04', 'MTO-07', 'CHAR-06'],
+      feedsInto: ['PCTL-07', 'SUST-04', 'MTO-05', 'CHAR-06'],
       runsWith: ['PCTL-04'],
       revisedBy: ['CHAR-06'],
       feedsBackInto: ['ICD-12'],
@@ -255,7 +255,7 @@ export const PCTL_WRITE_UPS: CpoWriteUps = {
     ],
     dependsOn: ['REQ-09', 'SARC-12'],
     dependsNote: null,
-    feedsInto: ['MTO-07', 'RAMP-01', 'PCTL-07'],
+    feedsInto: ['MTO-05', 'RAMP-01', 'PCTL-07'],
     measuredBy: [
       'Builds with a reconciled configuration record (%)',
       'Untracked changes found in audits',
@@ -263,7 +263,7 @@ export const PCTL_WRITE_UPS: CpoWriteUps = {
     ],
     links: {
       dependsOn: ['REQ-09', 'SARC-12', 'ICD-12'],
-      feedsInto: ['PCTL-07', 'MTO-07', 'RAMP-01', 'SUST-04'],
+      feedsInto: ['PCTL-07', 'MTO-05', 'RAMP-01', 'SUST-04'],
       runsWith: ['PCTL-03'],
       revisedBy: [],
       feedsBackInto: [],

@@ -14,6 +14,7 @@ import { DSGN } from './dsgn';
 import { PSV } from './psv';
 import { IMPL } from './impl';
 import { SGNO } from './sgno';
+import { OTO } from './oto';
 import { MTO } from './mto';
 import { WFAB } from './wfab';
 import { SORT } from './sort';
@@ -43,6 +44,7 @@ export const CPO_STAGE_MODULES: Record<string, CpoStageModule> = {
   PSV,
   IMPL,
   SGNO,
+  OTO,
   MTO,
   WFAB,
   SORT,

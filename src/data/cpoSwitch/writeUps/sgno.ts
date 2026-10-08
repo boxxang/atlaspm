@@ -22,7 +22,7 @@ export const SGNO_WRITE_UPS: CpoWriteUps = {
     rel: {
       'SGNO-D1': '<b>Switch SoC signoff report — timing, EM / IR and physical verification.</b> Produced here; it quotes the database identifier every check was run on.',
       'SGNO-D8': '<b>Final equivalence and DFT signoff report.</b> The signoff netlist written here is the one final equivalence and DFT coverage are rerun on.',
-      'SGNO-D11': '<b>Tapeout readiness decision package across every die.</b> The Switch SoC signoff report is the largest entry in it.',
+      'SGNO-D12': '<b>Tapeout wave 2 readiness decision package — Switch SoC, I/O die, bridge and package.</b> The Switch SoC signoff report is the largest entry in it.',
     },
     risks: [
       '<b>Late ECO after the final run.</b> A fix is merged and one check is not rerun, so the taped-out database was never signed off.',
@@ -56,7 +56,7 @@ export const SGNO_WRITE_UPS: CpoWriteUps = {
     ],
     dependsOn: ['IMPL-02', 'IMPL-11'],
     dependsNote: 'Signoff runs start on the closure database while the last ECOs land; the final runs wait for the frozen one.',
-    feedsInto: ['SGNO-06', 'SGNO-07', 'SGNO-09', 'MTO-01'],
+    feedsInto: ['SGNO-06', 'SGNO-07', 'SGNO-10', 'MTO-01'],
     measuredBy: [
       'Violations remaining per check per day to the final run',
       'Waivers open and approved',
@@ -64,7 +64,7 @@ export const SGNO_WRITE_UPS: CpoWriteUps = {
     ],
     links: {
       dependsOn: ['IMPL-02', 'IMPL-11', 'TRDY-03'],
-      feedsInto: ['SGNO-06', 'SGNO-07', 'SGNO-09', 'MTO-01'],
+      feedsInto: ['SGNO-06', 'SGNO-07', 'SGNO-10', 'MTO-01'],
       runsWith: ['SGNO-02'],
       revisedBy: [],
       feedsBackInto: ['IMPL-02'],
@@ -89,7 +89,7 @@ export const SGNO_WRITE_UPS: CpoWriteUps = {
     rel: {
       'SGNO-D2': '<b>I/O die signoff report.</b> Produced here; performance and rule results on one database.',
       'SGNO-D6': '<b>Multi-die package signoff report — die-to-die timing, SI / PI and thermal.</b> The I/O timing and driver models signed off here are what the cross-die analysis uses.',
-      'SGNO-D11': '<b>Tapeout readiness decision package across every die.</b> The I/O die go decision rests on this report.',
+      'SGNO-D12': '<b>Tapeout wave 2 readiness decision package — Switch SoC, I/O die, bridge and package.</b> The I/O die go decision rests on this report.',
     },
     risks: [
       '<b>Performance signed on schematic results.</b> The final report quotes pre-layout jitter because post-layout runs did not finish.',
@@ -124,7 +124,7 @@ export const SGNO_WRITE_UPS: CpoWriteUps = {
     ],
     dependsOn: ['IMPL-03', 'TRDY-04'],
     dependsNote: null,
-    feedsInto: ['SGNO-06', 'SGNO-09', 'MTO-02'],
+    feedsInto: ['SGNO-06', 'SGNO-10', 'MTO-02'],
     measuredBy: [
       'Post-layout eye margin against budget per corner',
       'Pads with ESD or CDM waivers',
@@ -132,7 +132,7 @@ export const SGNO_WRITE_UPS: CpoWriteUps = {
     ],
     links: {
       dependsOn: ['IMPL-03', 'TRDY-04', 'IMPL-08'],
-      feedsInto: ['SGNO-06', 'SGNO-09', 'MTO-02', 'SORT-02'],
+      feedsInto: ['SGNO-06', 'SGNO-10', 'MTO-02', 'SORT-02'],
       runsWith: ['SGNO-01'],
       revisedBy: [],
       feedsBackInto: ['IMPL-03'],
@@ -156,7 +156,7 @@ export const SGNO_WRITE_UPS: CpoWriteUps = {
     ],
     rel: {
       'SGNO-D3': '<b>Electrical IC analog signoff report.</b> Produced here; it states performance against the link budget, not only against the block specification.',
-      'SGNO-D11': '<b>Tapeout readiness decision package across every die.</b> The electrical IC go decision rests on this report.',
+      'SGNO-D11': '<b>Tapeout wave 1 readiness decision package — electrical IC and photonic IC.</b> The electrical IC go decision rests on this report.',
     },
     risks: [
       '<b>Offset beyond trim range.</b> Monte Carlo shows tails the calibration cannot correct.',
@@ -186,11 +186,11 @@ export const SGNO_WRITE_UPS: CpoWriteUps = {
     exit: [
       'Bandwidth, gain and input-referred noise meet the link budget allocation at every corner',
       'Monte Carlo offset at 3 sigma within the calibration trim range',
-      'Reliability and physical verification clean and report released to MTO-03',
+      'Reliability and physical verification clean and report released to OTO-01',
     ],
     dependsOn: ['IMPL-04', 'PSV-15'],
     dependsNote: null,
-    feedsInto: ['SGNO-09', 'MTO-03'],
+    feedsInto: ['SGNO-09', 'OTO-01'],
     measuredBy: [
       'Performance margin to the link budget per corner',
       'Offset tail against trim range',
@@ -198,7 +198,7 @@ export const SGNO_WRITE_UPS: CpoWriteUps = {
     ],
     links: {
       dependsOn: ['IMPL-04', 'PSV-15', 'PSV-07'],
-      feedsInto: ['SGNO-09', 'MTO-03', 'SORT-03'],
+      feedsInto: ['SGNO-09', 'OTO-01', 'SORT-03'],
       runsWith: ['SGNO-04'],
       revisedBy: [],
       feedsBackInto: ['IMPL-04'],
@@ -222,7 +222,7 @@ export const SGNO_WRITE_UPS: CpoWriteUps = {
     ],
     rel: {
       'SGNO-D4': '<b>Photonic IC signoff report — optical rules, connectivity and loss budget.</b> Produced here; it carries the foundry waiver approvals.',
-      'SGNO-D11': '<b>Tapeout readiness decision package across every die.</b> The photonic IC go decision rests on this report.',
+      'SGNO-D11': '<b>Tapeout wave 1 readiness decision package — electrical IC and photonic IC.</b> The photonic IC go decision rests on this report.',
     },
     risks: [
       '<b>Waivers without foundry sign.</b> Waivers approved internally are rejected at the foundry intake.',
@@ -253,11 +253,11 @@ export const SGNO_WRITE_UPS: CpoWriteUps = {
     exit: [
       'Zero optical rule violations open without a waiver signed by the photonics foundry',
       'Per-channel routed insertion loss and crosstalk within the link budget allocation with margin stated',
-      'Connectivity clean and report released to MTO-04',
+      'Connectivity clean and report released to OTO-02',
     ],
     dependsOn: ['IMPL-05', 'PSV-06'],
     dependsNote: null,
-    feedsInto: ['SGNO-09', 'MTO-04'],
+    feedsInto: ['SGNO-09', 'OTO-02'],
     measuredBy: [
       'Open optical rule violations and foundry-approved waivers',
       'Channel loss margin to budget',
@@ -265,7 +265,7 @@ export const SGNO_WRITE_UPS: CpoWriteUps = {
     ],
     links: {
       dependsOn: ['IMPL-05', 'PSV-06', 'TRDY-02', 'MODL-04'],
-      feedsInto: ['SGNO-09', 'MTO-04', 'TINF-03'],
+      feedsInto: ['SGNO-09', 'OTO-02', 'TINF-03'],
       runsWith: ['SGNO-03'],
       revisedBy: [],
       feedsBackInto: ['IMPL-05'],
@@ -319,11 +319,11 @@ export const SGNO_WRITE_UPS: CpoWriteUps = {
     exit: [
       'Zero microbump coordinate mismatches against every attached die',
       'Every channel within budget and capacitor ESR within the PDN model assumption',
-      'Physical verification clean and report released to MTO-05',
+      'Physical verification clean and report released to MTO-03',
     ],
     dependsOn: ['IMPL-06'],
     dependsNote: null,
-    feedsInto: ['SGNO-06', 'SGNO-09', 'MTO-05'],
+    feedsInto: ['SGNO-06', 'SGNO-10', 'MTO-03'],
     measuredBy: [
       'Microbump mismatches against attached die databases',
       'Die-to-die channels over budget',
@@ -331,7 +331,7 @@ export const SGNO_WRITE_UPS: CpoWriteUps = {
     ],
     links: {
       dependsOn: ['IMPL-06', 'MODL-06'],
-      feedsInto: ['SGNO-06', 'SGNO-09', 'MTO-05'],
+      feedsInto: ['SGNO-06', 'SGNO-10', 'MTO-03'],
       runsWith: ['SGNO-01'],
       revisedBy: [],
       feedsBackInto: [],
@@ -341,11 +341,11 @@ export const SGNO_WRITE_UPS: CpoWriteUps = {
   'SGNO-06': {
     criticalPath: true,
     purpose: [
-      'Sign off the <b>multi-die package as one system</b> — die-to-die timing across dies with the extracted bridge channels, system-level SI / PI on the assembled package and board, final thermal and warpage and bump-to-ball connectivity — so the substrate and RDL tooling can be released against a signed-off package in SGNO-10.',
+      'Sign off the <b>multi-die package as one system</b> — die-to-die timing across dies with the extracted bridge channels, system-level SI / PI on the assembled package and board, final thermal and warpage and bump-to-ball connectivity — so the substrate and RDL tooling can be released against a signed-off package in SGNO-11.',
       'Each die can be signed off and the package still fail: timing across a die-to-die link depends on both ends and the channel between them, and power noise on one die couples through shared planes to another. This activity is the only place those interactions are checked before the first build.',
     ],
     flowNote:
-      'Step 1 assembles the model. Step 2 closes cross-die timing while step 3 runs system SI / PI in parallel. Step 4 confirms thermal and warpage, step 5 checks connectivity alongside it, and step 6 releases the signoff report that gates the tooling release in SGNO-10.',
+      'Step 1 assembles the model. Step 2 closes cross-die timing while step 3 runs system SI / PI in parallel. Step 4 confirms thermal and warpage, step 5 checks connectivity alongside it, and step 6 releases the signoff report that gates the tooling release in SGNO-11.',
     consumes: [
       'Package layout database from IMPL-07',
       'Package and board SI / PI closure report from IMPL-08',
@@ -356,7 +356,7 @@ export const SGNO_WRITE_UPS: CpoWriteUps = {
     rel: {
       'SGNO-D6': '<b>Multi-die package signoff report — die-to-die timing, SI / PI and thermal.</b> Produced here.',
       'SGNO-D7': '<b>Substrate and RDL tooling release to the substrate and assembly suppliers.</b> Package signoff gates it: no tooling is released against a package that has not been signed off.',
-      'SGNO-D11': '<b>Tapeout readiness decision package across every die.</b> Package signoff is a condition of every die go decision.',
+      'SGNO-D12': '<b>Tapeout wave 2 readiness decision package — Switch SoC, I/O die, bridge and package.</b> Package signoff is a condition of every die go decision.',
     },
     risks: [
       '<b>Cross-die timing assumed.</b> Each die signs its half of a die-to-die link against an assumed channel and nobody signs the whole link.',
@@ -387,11 +387,11 @@ export const SGNO_WRITE_UPS: CpoWriteUps = {
     exit: [
       'Every die-to-die interface meets timing with positive margin across dies at every corner',
       'Package and board SI / PI and thermal within limits with the final layouts',
-      'Signoff report released and accepted by packaging as the basis for the tooling release in SGNO-10',
+      'Signoff report released and accepted by packaging as the basis for the tooling release in SGNO-11',
     ],
     dependsOn: ['IMPL-07', 'IMPL-08', 'IMPL-09', 'SGNO-05'],
     dependsNote: null,
-    feedsInto: ['SGNO-09', 'SGNO-10'],
+    feedsInto: ['SGNO-10', 'SGNO-11'],
     measuredBy: [
       'Cross-die timing margin',
       'Days from final package layout to signoff report',
@@ -399,7 +399,7 @@ export const SGNO_WRITE_UPS: CpoWriteUps = {
     ],
     links: {
       dependsOn: ['IMPL-07', 'IMPL-08', 'IMPL-09', 'SGNO-05', 'SGNO-01', 'SGNO-02'],
-      feedsInto: ['SGNO-09', 'SGNO-10', 'MTO-05', 'PKGA-01'],
+      feedsInto: ['SGNO-10', 'SGNO-11', 'MTO-03', 'PKGA-01'],
       runsWith: [],
       revisedBy: [],
       feedsBackInto: [],
@@ -424,7 +424,7 @@ export const SGNO_WRITE_UPS: CpoWriteUps = {
     rel: {
       'SGNO-D8': '<b>Final equivalence and DFT signoff report.</b> Produced here; it quotes the same database identifier as the Switch SoC GDS.',
       'SGNO-D9': '<b>Production test pattern delivery package.</b> Produced here; sort and final test programs are built on it.',
-      'SGNO-D11': '<b>Tapeout readiness decision package across every die.</b> DFT signoff is a condition for the Switch SoC go decision.',
+      'SGNO-D12': '<b>Tapeout wave 2 readiness decision package — Switch SoC, I/O die, bridge and package.</b> DFT signoff is a condition for the Switch SoC go decision.',
     },
     risks: [
       '<b>Equivalence on the wrong netlist.</b> The final check is run against the pre-ECO netlist and a signoff fix is never verified.',
@@ -459,7 +459,7 @@ export const SGNO_WRITE_UPS: CpoWriteUps = {
     ],
     dependsOn: ['IMPL-11', 'SGNO-01', 'PSV-10'],
     dependsNote: null,
-    feedsInto: ['SGNO-09', 'TINF-06', 'SORT-01'],
+    feedsInto: ['SGNO-10', 'TINF-06', 'SORT-01'],
     measuredBy: [
       'Non-equivalent points in the final equivalence run',
       'Coverage delta between IMPL-11 and the signoff netlist',
@@ -467,7 +467,7 @@ export const SGNO_WRITE_UPS: CpoWriteUps = {
     ],
     links: {
       dependsOn: ['IMPL-11', 'SGNO-01', 'PSV-10'],
-      feedsInto: ['SGNO-09', 'TINF-06', 'SORT-01', 'MTO-01', 'SORT-02', 'SORT-03'],
+      feedsInto: ['SGNO-10', 'TINF-06', 'SORT-01', 'MTO-01', 'SORT-02', 'SORT-03'],
       runsWith: ['SGNO-08'],
       revisedBy: [],
       feedsBackInto: [],
@@ -491,7 +491,7 @@ export const SGNO_WRITE_UPS: CpoWriteUps = {
     ],
     rel: {
       'SGNO-D10': '<b>Security signoff record — keys, fuse map and debug lock.</b> Produced here; security validation in CERT-05 tests the silicon against it.',
-      'SGNO-D11': '<b>Tapeout readiness decision package across every die.</b> Security signoff gates the Switch SoC go decision.',
+      'SGNO-D12': '<b>Tapeout wave 2 readiness decision package — Switch SoC, I/O die, bridge and package.</b> Security signoff gates the Switch SoC go decision.',
     },
     risks: [
       '<b>Scan bypass.</b> Scan chains pass through key or lifecycle registers and can shift their contents out on a tester.',
@@ -525,7 +525,7 @@ export const SGNO_WRITE_UPS: CpoWriteUps = {
     ],
     dependsOn: ['DSGN-10', 'IMPL-11'],
     dependsNote: null,
-    feedsInto: ['SGNO-09', 'CERT-05'],
+    feedsInto: ['SGNO-10', 'CERT-05'],
     measuredBy: [
       'Open security findings by severity',
       'Lifecycle states with the debug lock verified',
@@ -533,7 +533,7 @@ export const SGNO_WRITE_UPS: CpoWriteUps = {
     ],
     links: {
       dependsOn: ['DSGN-10', 'IMPL-11', 'SARC-09'],
-      feedsInto: ['SGNO-09', 'CERT-05', 'TINF-06'],
+      feedsInto: ['SGNO-10', 'CERT-05', 'TINF-06'],
       runsWith: ['SGNO-07'],
       revisedBy: [],
       feedsBackInto: [],
@@ -543,33 +543,97 @@ export const SGNO_WRITE_UPS: CpoWriteUps = {
   'SGNO-09': {
     criticalPath: true,
     purpose: [
-      'Decide, die by die, whether <b>every die and the package are ready for tapeout</b> — each signoff report checked against its foundry tapeout checklist, waivers and residual risks reviewed, foundry slots and mask orders confirmed.',
-      'The dies go to different foundries on the same week. A die that is not ready either slips alone — and the package waits for it — or tapes out with a known risk the program has accepted in writing.',
+      'Decide whether <b>the electrical IC and the photonic IC are ready for the wave 1 tapeout</b> — each signoff report checked against its foundry tapeout checklist, waivers and residual risks reviewed, the analog and photonics foundry slots and mask orders confirmed — six weeks before the Switch SoC and the I/O die go.',
+      'The optical silicon goes first because its path to the first package build is the longest: photonic fabrication runs longer than the digital process, and the stacked optical engines must then be built, tested and passed as known good before the main package can take them. A wave 1 slip lands directly on the first package build, so this review is held on its own date rather than folded into the one for every die.',
     ],
     flowNote:
-      'Step 1 collects every report against its checklist and step 2 reviews the waivers, with foundry slots and mask orders confirmed in parallel in step 3. Step 4 holds the review and records a decision per die.',
+      'Step 1 collects the two signoff reports against their checklists and step 2 reviews the waivers, with foundry slots and mask orders confirmed in parallel in step 3. Step 4 holds the review and records a decision per die.',
     consumes: [
-      'Signoff reports from SGNO-01 to SGNO-05',
-      'Multi-die package signoff from SGNO-06 and the substrate tooling release from SGNO-10',
-      'DFT signoff from SGNO-07',
-      'Security signoff from SGNO-08',
+      'Electrical IC analog signoff report and final GDS from SGNO-03',
+      'Photonic IC signoff report and final layout from SGNO-04',
+      'Electrical IC final layout and post-layout results from IMPL-04',
+      'Photonic IC final layout and optical rule closure from IMPL-05',
       'Pre-silicon validation closure from PSV-11',
     ],
     rel: {
-      'SGNO-D11': '<b>Tapeout readiness decision package across every die.</b> Produced here; it closes the All Silicon Ready for Tapeout gate.',
+      'SGNO-D11': '<b>Tapeout wave 1 readiness decision package — electrical IC and photonic IC.</b> Produced here; it releases the optical silicon to OTO-01 and OTO-02.',
+    },
+    risks: [
+      '<b>Wave 1 held for wave 2.</b> The optical silicon waits for the Switch SoC to be ready and the longer path starts late.',
+      '<b>Checklist marked without evidence.</b> A foundry checklist item is ticked from memory rather than from a report quoting the database.',
+      '<b>Stack interface unchecked.</b> The electrical IC and photonic IC go separately while the bond pad maps between them were never compared.',
+      '<b>Photonics slot lost.</b> A slip of days at the photonics foundry costs weeks because the next slot is far out.',
+      '<b>Decision not recorded per die.</b> A blanket go hides which die carries accepted risk into fabrication.',
+    ],
+    roles: [
+      { r: 'Program management', d: 'Owns the wave 1 readiness review' },
+      { r: 'Photonics lead', d: 'Photonic IC readiness' },
+      { r: 'Analog design manager', d: 'Electrical IC readiness' },
+      { r: 'Foundry program manager', d: 'Analog and photonics slots and mask orders' },
+      { r: 'VP engineering', d: 'Approves the go decisions' },
+    ],
+    effort: [
+      ['Report collection', 0.5],
+      ['Waiver review', 0.5],
+      ['Review and decision', 1],
+    ],
+    entry: [
+      'Electrical IC and photonic IC signoff reports released with their database identifiers',
+      'Both foundry tapeout checklists filled in by the die owners',
+      'Decision owners for both dies present at the review',
+    ],
+    exit: [
+      'A go, conditional go or hold decision recorded for the electrical IC and the photonic IC',
+      'Every open waiver on either die signed by its approver and entered in the risk register',
+      'Analog and photonics foundry slots and mask orders confirmed in writing for week 98',
+    ],
+    dependsOn: ['SGNO-03', 'SGNO-04', 'IMPL-04', 'IMPL-05', 'PSV-11'],
+    dependsNote: 'Wave 1 does not wait for the Switch SoC, the I/O die, the bridge or the package signoff; those go to SGNO-10.',
+    feedsInto: ['OTO-01', 'OTO-02', 'OTO-03'],
+    measuredBy: [
+      'Wave 1 go date against week 98',
+      'Open waivers carried into optical silicon fabrication',
+      'Photonics and analog foundry slot dates held',
+    ],
+    links: {
+      dependsOn: ['SGNO-03', 'SGNO-04', 'IMPL-04', 'IMPL-05', 'PSV-11'],
+      feedsInto: ['OTO-01', 'OTO-02', 'OTO-03', 'OTO-04', 'SGNO-10'],
+      runsWith: [],
+      revisedBy: [],
+      feedsBackInto: [],
+    },
+    terms: ['Tapeout checklist', 'GDS'],
+  },
+  'SGNO-10': {
+    criticalPath: true,
+    purpose: [
+      'Decide, die by die, whether <b>the Switch SoC, the I/O die, the bridge and silicon capacitors and the multi-die package are ready for the wave 2 tapeout</b> — each signoff report checked against its foundry tapeout checklist, DFT and security signoff confirmed, waivers and residual risks reviewed, foundry slots, mask orders and the substrate tooling release confirmed.',
+      'Wave 2 tapes out about six weeks after the optical silicon and still has to meet it: the Switch SoC and I/O die must be sorted and attached by the time the known-good optical engines arrive at main package assembly. A die that is not ready either slips alone and holds the first build, or tapes out with a known risk the program has accepted in writing. This review closes the stage gate, so it also confirms wave 1 went.',
+    ],
+    flowNote:
+      'Step 1 collects every wave 2 report against its checklist and step 2 reviews the waivers, with foundry slots and mask orders confirmed in parallel in step 3. Step 4 checks substrate tooling and assembly alignment and step 5 holds the review and records a decision per die.',
+    consumes: [
+      'Switch SoC, I/O die and bridge signoff reports from SGNO-01, SGNO-02 and SGNO-05',
+      'Multi-die package signoff from SGNO-06 and the substrate tooling release from SGNO-11',
+      'DFT signoff from SGNO-07',
+      'Security signoff from SGNO-08',
+      'Wave 1 readiness decision package from SGNO-09',
+    ],
+    rel: {
+      'SGNO-D12': '<b>Tapeout wave 2 readiness decision package — Switch SoC, I/O die, bridge and package.</b> Produced here; it closes the All Silicon Ready for Tapeout gate.',
     },
     risks: [
       '<b>Checklist marked without evidence.</b> A foundry checklist item is ticked from memory rather than from a report quoting the database.',
       '<b>Waivers accepted in bulk.</b> Schedule pressure turns the waiver review into a signature exercise and a real violation passes.',
-      '<b>One die late.</b> A single die misses readiness and the program has not decided whether the others tape out without it.',
-      '<b>Foundry slot lost.</b> A slip of days at one foundry costs weeks because the next shuttle or mask slot is far out.',
+      '<b>One die late.</b> The Switch SoC or the I/O die misses readiness and the program has not decided whether the other tapes out without it.',
+      '<b>Waves drift apart.</b> Wave 2 slips while wave 1 is already in the fab, and the known-good optical engines wait for dies.',
       '<b>Decision not recorded per die.</b> A blanket go hides which dies carry accepted risk into fabrication.',
     ],
     roles: [
-      { r: 'Program management', d: 'Owns the readiness review' },
+      { r: 'Program management', d: 'Owns the wave 2 readiness review' },
       { r: 'Physical design manager', d: 'Switch SoC readiness' },
-      { r: 'Photonics lead', d: 'Photonic IC readiness' },
-      { r: 'Foundry program manager', d: 'Slots and mask orders' },
+      { r: 'SerDes lead', d: 'I/O die readiness' },
+      { r: 'Foundry program manager', d: 'Digital and bridge slots and mask orders' },
       { r: 'VP engineering', d: 'Approves the go decisions' },
     ],
     effort: [
@@ -578,33 +642,33 @@ export const SGNO_WRITE_UPS: CpoWriteUps = {
       ['Review and decision', 1],
     ],
     entry: [
-      'Every die and package signoff report released with its database identifier',
+      'Every wave 2 die and package signoff report released with its database identifier',
       'Each foundry tapeout checklist filled in by the die owner',
-      'Decision owners for every die present at the review',
+      'Wave 1 decision recorded in SGNO-09',
     ],
     exit: [
-      'A go, conditional go or hold decision recorded for every die and the substrate',
+      'A go, conditional go or hold decision recorded for the Switch SoC, the I/O die, the bridge and the substrate',
       'Every open waiver signed by its approver and entered in the risk register',
-      'Foundry slot and mask order confirmed in writing for every die with a go',
+      'Foundry slot and mask order confirmed in writing for every wave 2 die with a go',
     ],
-    dependsOn: ['SGNO-01', 'SGNO-02', 'SGNO-03', 'SGNO-04', 'SGNO-05', 'SGNO-06', 'SGNO-07', 'SGNO-08', 'SGNO-10', 'PSV-11'],
-    dependsNote: 'The gate of the stage: every signoff activity feeds it.',
-    feedsInto: ['MTO-01', 'MTO-02', 'MTO-03', 'MTO-04', 'MTO-05', 'MTO-06'],
+    dependsOn: ['SGNO-01', 'SGNO-02', 'SGNO-05', 'SGNO-06', 'SGNO-07', 'SGNO-08', 'SGNO-11', 'SGNO-09'],
+    dependsNote: 'The gate of the stage: every wave 2 signoff activity feeds it, and the wave 1 decision is carried into it.',
+    feedsInto: ['MTO-01', 'MTO-02', 'MTO-03', 'MTO-04'],
     measuredBy: [
-      'Dies with a go decision against the plan',
+      'Wave 2 dies with a go decision against the plan',
       'Open waivers carried into fabrication',
       'Foundry slot dates held',
     ],
     links: {
-      dependsOn: ['SGNO-01', 'SGNO-02', 'SGNO-03', 'SGNO-04', 'SGNO-05', 'SGNO-06', 'SGNO-07', 'SGNO-08', 'SGNO-10', 'PSV-11'],
-      feedsInto: ['MTO-01', 'MTO-02', 'MTO-03', 'MTO-04', 'MTO-05', 'MTO-06'],
+      dependsOn: ['SGNO-01', 'SGNO-02', 'SGNO-05', 'SGNO-06', 'SGNO-07', 'SGNO-08', 'SGNO-11', 'SGNO-09', 'PSV-11'],
+      feedsInto: ['MTO-01', 'MTO-02', 'MTO-03', 'MTO-04', 'MTO-05'],
       runsWith: [],
       revisedBy: [],
       feedsBackInto: [],
     },
     terms: ['Tapeout checklist', 'GDS'],
   },
-  'SGNO-10': {
+  'SGNO-11': {
     criticalPath: true,
     purpose: [
       'Release the <b>substrate and RDL tooling to the suppliers that build them</b> — fabrication data generated from the signed-off package, engineering queries closed with the substrate supplier, RDL or interposer build data handed to the assembly partner, and first-build substrates ordered with committed delivery dates.',
@@ -621,7 +685,7 @@ export const SGNO_WRITE_UPS: CpoWriteUps = {
     ],
     rel: {
       'SGNO-D7': '<b>Substrate and RDL tooling release to the substrate and assembly suppliers.</b> Produced here; its committed delivery date sets when the first package build can start.',
-      'SGNO-D11': '<b>Tapeout readiness decision package across every die.</b> The substrate release status is part of the go decision, since dies without substrates cannot be built.',
+      'SGNO-D12': '<b>Tapeout wave 2 readiness decision package — Switch SoC, I/O die, bridge and package.</b> The substrate release status is part of the go decision, since dies without substrates cannot be built.',
     },
     risks: [
       '<b>Released before signoff closes.</b> Tooling is cut against a layout that package signoff later changes, and the substrates are scrap.',
@@ -656,7 +720,7 @@ export const SGNO_WRITE_UPS: CpoWriteUps = {
     ],
     dependsOn: ['SGNO-06', 'IMPL-07'],
     dependsNote: 'Waits for package signoff by design: tooling is the first money spent on the package.',
-    feedsInto: ['SGNO-09', 'PKGA-01', 'WFAB-06'],
+    feedsInto: ['SGNO-10', 'PKGA-01', 'WFAB-06'],
     measuredBy: [
       'Tooling release date against plan',
       'Supplier engineering queries open',
@@ -664,7 +728,7 @@ export const SGNO_WRITE_UPS: CpoWriteUps = {
     ],
     links: {
       dependsOn: ['SGNO-06', 'IMPL-07', 'TRDY-06'],
-      feedsInto: ['SGNO-09', 'PKGA-01', 'WFAB-06', 'MTO-05'],
+      feedsInto: ['SGNO-10', 'PKGA-01', 'WFAB-06', 'MTO-03'],
       runsWith: [],
       revisedBy: [],
       feedsBackInto: [],

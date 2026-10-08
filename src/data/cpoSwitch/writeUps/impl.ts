@@ -794,7 +794,7 @@ export const IMPL_WRITE_UPS: CpoWriteUps = {
     ],
     links: {
       dependsOn: ['IMPL-01', 'IMPL-02', 'IMPL-03', 'IMPL-04', 'IMPL-05', 'IMPL-06', 'IMPL-07', 'IMPL-08', 'IMPL-09', 'IMPL-10', 'IMPL-11'],
-      feedsInto: ['SGNO-01', 'SGNO-02', 'SGNO-03', 'SGNO-04', 'SGNO-05', 'SGNO-06', 'SGNO-09'],
+      feedsInto: ['SGNO-01', 'SGNO-02', 'SGNO-03', 'SGNO-04', 'SGNO-05', 'SGNO-06', 'SGNO-09', 'SGNO-10'],
       runsWith: [],
       revisedBy: [],
       feedsBackInto: [],

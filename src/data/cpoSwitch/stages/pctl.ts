@@ -66,7 +66,7 @@ export const PCTL: CpoStageModule = {
         [1, 'Build the integrated master schedule from every stage plan with cross-workstream dependencies and the critical path', 6],
         [2, 'Agree each cross-workstream handoff with a date, an owner on both sides and an acceptance criterion', 4, 1],
         [3, 'Run the weekly schedule review — critical and near-critical paths, slipping handoffs and recovery actions', 178],
-        [4, 'Re-plan at each major gate — tapeout, first silicon, first package build and production release', 20, 1],
+        [4, 'Re-plan at each major gate — both tapeout waves, first silicon, first package build and production release', 20, 1],
         [5, 'Report integrated schedule health to the steering committee every month', 178, 1],
         [6, 'Close the schedule and archive the as-run record and dependency history at handover', 4],
       ],

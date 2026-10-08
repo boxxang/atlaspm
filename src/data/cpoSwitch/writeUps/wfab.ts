@@ -8,13 +8,13 @@ export const WFAB_WRITE_UPS: CpoWriteUps = {
     criticalPath: true,
     purpose: [
       'Track the Switch SoC wafers through the foundry <b>against committed cycle time, with excursions dispositioned and the engineering lot hold decided on time</b>, so wafer out is predicted weeks ahead rather than discovered on the day.',
-      'This is the longest fabrication in the program and usually the first-silicon critical path. The engineering lot hold is the one decision inside it: wafers parked before the upper metals keep a metal fix possible, but only if someone decides to release or hold them before the foundry’s hold window closes.',
+      'It is the longest digital fabrication and sets the first-silicon date, but it starts in week 108 from wave 2, six weeks after the optical silicon, so the photonic IC rather than this die is on the path to the first package build. The engineering lot hold is the one decision inside it: wafers parked before the upper metals keep a metal fix possible, but only if someone decides to release or hold them before the foundry’s hold window closes.',
     ],
     flowNote:
       'Step 1 confirms starts and priority. Step 2 tracks front-end processing while step 3 reviews in-line excursions in parallel. Step 4 decides the engineering lot hold, step 5 tracks the back end and step 6 receives wafer out with WAT data.',
     consumes: [
       'Switch SoC mask release record from MTO-01',
-      'Wafer start plan and lot splits from MTO-06',
+      'Wafer start plan and lot splits from MTO-04',
       'Foundry committed cycle time and hot-lot agreement',
       'Engineering lot hold layer agreed with physical design',
       'Late bug reports from emulation and firmware validation in PSV-08 and PSV-09',
@@ -44,7 +44,7 @@ export const WFAB_WRITE_UPS: CpoWriteUps = {
       ['Wafer-out and data receipt', 0.5],
     ],
     entry: [
-      'Masks released and lots started per MTO-06',
+      'Masks released and lots started per MTO-04',
       'Committed cycle time received from the foundry',
       'Engineering lot hold layer agreed',
     ],
@@ -53,7 +53,7 @@ export const WFAB_WRITE_UPS: CpoWriteUps = {
       'Engineering lot hold decision recorded before the hold window closed',
       'Wafer-out date within one week of the committed date or the slip escalated with a recovery plan',
     ],
-    dependsOn: ['MTO-01', 'MTO-06'],
+    dependsOn: ['MTO-01', 'MTO-04'],
     dependsNote: 'Lots start as soon as masks are released, which is inside the tapeout stage.',
     feedsInto: ['WFAB-07', 'SORT-01'],
     measuredBy: [
@@ -62,7 +62,7 @@ export const WFAB_WRITE_UPS: CpoWriteUps = {
       'Engineering lots held and their decision dates',
     ],
     links: {
-      dependsOn: ['MTO-01', 'MTO-06'],
+      dependsOn: ['MTO-01', 'MTO-04'],
       feedsInto: ['WFAB-07', 'SORT-01'],
       runsWith: ['WFAB-02', 'WFAB-04'],
       revisedBy: [],
@@ -80,7 +80,7 @@ export const WFAB_WRITE_UPS: CpoWriteUps = {
       'Step 1 confirms starts and splits. Step 2 tracks front-end processing while step 3 reviews in-line excursions and SerDes device monitors in parallel. Step 4 decides the engineering lot hold, step 5 tracks the back end and step 6 receives wafer out with WAT and device data.',
     consumes: [
       'I/O die tapeout record from MTO-02',
-      'Wafer start plan and lot splits from MTO-06',
+      'Wafer start plan and lot splits from MTO-04',
       'SerDes device parametric targets from DSGN-04',
       'Foundry committed cycle time for the I/O die process from TRDY-01',
       'Mixed-signal verification corners from PSV-05',
@@ -110,7 +110,7 @@ export const WFAB_WRITE_UPS: CpoWriteUps = {
       ['Wafer-out and data receipt', 0.5],
     ],
     entry: [
-      'I/O die masks released and lots started per MTO-06',
+      'I/O die masks released and lots started per MTO-04',
       'Committed cycle time received from the I/O die foundry',
       'SerDes device parametric targets available from design',
     ],
@@ -119,7 +119,7 @@ export const WFAB_WRITE_UPS: CpoWriteUps = {
       'Engineering lot hold decision recorded before the hold window closed',
       'SerDes device monitors within the design window or every deviation dispositioned with the SerDes team',
     ],
-    dependsOn: ['MTO-02', 'MTO-06'],
+    dependsOn: ['MTO-02', 'MTO-04'],
     dependsNote: null,
     feedsInto: ['WFAB-07', 'SORT-02'],
     measuredBy: [
@@ -128,7 +128,7 @@ export const WFAB_WRITE_UPS: CpoWriteUps = {
       'Good I/O die wafers delivered against the kit plan',
     ],
     links: {
-      dependsOn: ['MTO-02', 'MTO-06', 'DSGN-04'],
+      dependsOn: ['MTO-02', 'MTO-04', 'DSGN-04'],
       feedsInto: ['WFAB-07', 'SORT-02'],
       runsWith: ['WFAB-01', 'WFAB-03'],
       revisedBy: [],
@@ -145,8 +145,8 @@ export const WFAB_WRITE_UPS: CpoWriteUps = {
     flowNote:
       'Step 1 confirms the starts. Step 2 tracks lots while step 3 reviews in-line and device parametric monitors in parallel. Step 4 receives wafer out with WAT data.',
     consumes: [
-      'Electrical IC tapeout record from MTO-03',
-      'Wafer start plan and splits from MTO-06',
+      'Electrical IC tapeout record from OTO-01',
+      'Optical silicon wafer start plan and splits from OTO-03',
       'Device parametric targets from circuit design',
       'Foundry committed cycle time',
       'Device test structure positions from the reticle frame',
@@ -184,7 +184,7 @@ export const WFAB_WRITE_UPS: CpoWriteUps = {
       'Device parametric monitors within the design target window or deviation dispositioned',
       'Wafer count delivered covers the first-build optical engine need',
     ],
-    dependsOn: ['MTO-03', 'MTO-06'],
+    dependsOn: ['OTO-01', 'OTO-03'],
     dependsNote: null,
     feedsInto: ['WFAB-07', 'SORT-03'],
     measuredBy: [
@@ -193,7 +193,7 @@ export const WFAB_WRITE_UPS: CpoWriteUps = {
       'Good wafers delivered against plan',
     ],
     links: {
-      dependsOn: ['MTO-03', 'MTO-06'],
+      dependsOn: ['OTO-01', 'OTO-03'],
       feedsInto: ['WFAB-07', 'SORT-03'],
       runsWith: ['WFAB-01'],
       revisedBy: [],
@@ -205,13 +205,13 @@ export const WFAB_WRITE_UPS: CpoWriteUps = {
     criticalPath: true,
     purpose: [
       'Track the photonic IC wafers and <b>measure the in-line optical monitors — waveguide propagation loss, ring resonance and coupler efficiency — while the wafers are still in the fab</b>, so a process shift is caught and dispositioned before it becomes a sort failure.',
-      'Photonic performance depends on nanometre-scale waveguide dimensions and film thicknesses that vary more than a digital process. In-line optical data is the earliest look at whether the link budget assumptions hold, and lots outside the optical window are cheaper to hold or scrap in the fab than to sort, assemble and debug.',
+      'Photonic performance depends on nanometre-scale waveguide dimensions and film thicknesses that vary more than a digital process. This is the longest fabrication in the program and the head of the critical path: the photonic wafers out, sorted and stacked into known-good optical engines set the first package build. In-line optical data is the earliest look at whether the link budget assumptions hold, and lots outside the optical window are cheaper to hold or scrap in the fab than to sort, assemble and debug.',
     ],
     flowNote:
       'Step 1 confirms starts and splits. Step 2 tracks waveguide definition while step 3 measures the in-line optical monitors in parallel. Step 4 dispositions out-of-window lots, step 5 tracks the back-end modules and step 6 releases the monitor report.',
     consumes: [
-      'Photonic IC tapeout record and monitor structure list from MTO-04',
-      'Photonic process splits from MTO-06',
+      'Photonic IC tapeout record and monitor structure list from OTO-02',
+      'Photonic process splits from OTO-03',
       'Optical link budget allocations from MODL-04',
       'Photonics foundry process window and monitor limits from TRDY-02',
       'Photonic IC test vehicle monitor baselines from FEAS-03',
@@ -250,7 +250,7 @@ export const WFAB_WRITE_UPS: CpoWriteUps = {
       'Every lot outside the optical window dispositioned with the foundry in writing',
       'Wafer out with the monitor report released to sort and characterization',
     ],
-    dependsOn: ['MTO-04', 'MTO-06'],
+    dependsOn: ['OTO-02', 'OTO-03'],
     dependsNote: null,
     feedsInto: ['WFAB-07', 'SORT-04'],
     measuredBy: [
@@ -259,7 +259,7 @@ export const WFAB_WRITE_UPS: CpoWriteUps = {
       'Lots held or scrapped for optical window',
     ],
     links: {
-      dependsOn: ['MTO-04', 'MTO-06', 'MODL-04'],
+      dependsOn: ['OTO-02', 'OTO-03', 'MODL-04'],
       feedsInto: ['WFAB-07', 'SORT-04', 'CHAR-03'],
       runsWith: ['WFAB-01'],
       revisedBy: [],
@@ -276,8 +276,8 @@ export const WFAB_WRITE_UPS: CpoWriteUps = {
     flowNote:
       'Step 1 confirms starts. Step 2 tracks the lots while step 3 reviews capacitor monitors in parallel. Step 4 receives wafer out and plans thinning and dicing.',
     consumes: [
-      'Bridge and capacitor mask release record from MTO-05',
-      'Wafer start plan from MTO-06',
+      'Bridge and capacitor mask release record from MTO-03',
+      'Wafer start plan from MTO-04',
       'Capacitor density and leakage targets from DSGN-09',
       'Assembly start date from PKGA-02',
       'Thinning and bumping requirements from the assembly process in TINF-09',
@@ -316,7 +316,7 @@ export const WFAB_WRITE_UPS: CpoWriteUps = {
       'Capacitor density and leakage within design target',
       'Thinning, bumping and dicing scheduled to finish before the first assembly start',
     ],
-    dependsOn: ['MTO-05', 'MTO-06'],
+    dependsOn: ['MTO-03', 'MTO-04'],
     dependsNote: null,
     feedsInto: ['WFAB-07', 'PKGA-03'],
     measuredBy: [
@@ -325,7 +325,7 @@ export const WFAB_WRITE_UPS: CpoWriteUps = {
       'Days of margin to the assembly start',
     ],
     links: {
-      dependsOn: ['MTO-05', 'MTO-06'],
+      dependsOn: ['MTO-03', 'MTO-04'],
       feedsInto: ['WFAB-07', 'PKGA-03'],
       runsWith: ['WFAB-06'],
       revisedBy: [],
@@ -342,7 +342,7 @@ export const WFAB_WRITE_UPS: CpoWriteUps = {
     flowNote:
       'Step 1 confirms orders and dates. Step 2 tracks substrate fabrication while step 3 tracks optical source builds in parallel. Step 4 inspects substrates and step 5 inspects optical sources and fiber alongside it. Step 6 kits and releases the material.',
     consumes: [
-      'Substrate and RDL tooling release from SGNO-10',
+      'Substrate and RDL tooling release from SGNO-11',
       'Long-lead material plan and supply agreements from TRDY-10',
       'Qualified optical source suppliers from TRDY-07',
       'Fiber, connector and cooling supplier readiness from TRDY-08',
@@ -373,7 +373,7 @@ export const WFAB_WRITE_UPS: CpoWriteUps = {
       ['Kitting and release', 0.5],
     ],
     entry: [
-      'Substrate tooling released in SGNO-10',
+      'Substrate tooling released in SGNO-11',
       'Purchase orders placed for every first-build item',
       'Incoming inspection criteria agreed with quality',
     ],
@@ -382,7 +382,7 @@ export const WFAB_WRITE_UPS: CpoWriteUps = {
       'Incoming inspection passed on substrates, optical sources and fiber assemblies with results recorded',
       'Kit released to assembly at least one week before the first die attach',
     ],
-    dependsOn: ['SGNO-10', 'TRDY-10'],
+    dependsOn: ['SGNO-11', 'TRDY-10'],
     dependsNote: 'Most orders were placed in readiness and procurement; this activity chases them to the dock and inspects what arrives.',
     feedsInto: ['PKGA-03', 'PKGA-04', 'PKGA-05'],
     measuredBy: [
@@ -391,7 +391,7 @@ export const WFAB_WRITE_UPS: CpoWriteUps = {
       'Days of margin between kit release and die attach',
     ],
     links: {
-      dependsOn: ['SGNO-10', 'TRDY-10', 'TRDY-07', 'TRDY-08'],
+      dependsOn: ['SGNO-11', 'TRDY-10', 'TRDY-07', 'TRDY-08'],
       feedsInto: ['PKGA-03', 'PKGA-04', 'PKGA-05'],
       runsWith: ['PKGA-01'],
       revisedBy: [],
@@ -456,7 +456,7 @@ export const WFAB_WRITE_UPS: CpoWriteUps = {
       'Wafers with traceability gaps',
     ],
     links: {
-      dependsOn: ['WFAB-01', 'WFAB-02', 'WFAB-03', 'WFAB-04', 'WFAB-05', 'MTO-06', 'TINF-10'],
+      dependsOn: ['WFAB-01', 'WFAB-02', 'WFAB-03', 'WFAB-04', 'WFAB-05', 'MTO-04', 'TINF-10'],
       feedsInto: ['SORT-01', 'SORT-02', 'SORT-03', 'SORT-04', 'CHAR-01'],
       runsWith: ['WFAB-06'],
       revisedBy: [],

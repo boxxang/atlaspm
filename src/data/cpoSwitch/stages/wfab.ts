@@ -1,5 +1,6 @@
 /**
- * WFAB — Wafer Fabrication. Closes on First Silicon.
+ * WFAB — Wafer Fabrication. Weeks 102–122; closes on First Silicon. The wave 1
+ * optical silicon starts at week 102, the wave 2 dies at week 108.
  */
 import type { CpoStageModule } from '../types';
 
@@ -7,7 +8,7 @@ export const WFAB: CpoStageModule = {
   content: {
     tagline: 'Several foundries, one first-silicon date — track every lot, and have everything else on the dock when the wafers come out.',
     description:
-      'Track the wafers of every die through their own foundries at once: the Switch SoC, the I/O die — its own die, on its own process, mask set and lots — the electrical IC, the photonic IC with in-line optical monitoring of waveguide loss, ring resonance and coupler efficiency, and the bridge or interposer and silicon capacitors. Engineering lots are held and released at the planned metal layers, in-line excursions are dispositioned with each foundry, and the optical sources, fiber assemblies and substrates for the first build are chased, received and inspected so assembly is not waiting on material. The stage closes on first silicon: wafer acceptance data reviewed against limits and the lot split targets, and wafers released to sort.',
+      'Track the wafers of every die through its own foundry, in two waves. The electrical IC and the photonic IC, with in-line optical monitoring of waveguide loss, ring resonance and coupler efficiency, start in week 102 from the wave 1 tapeout, and the photonic IC’s longer process sets the optical engine path; the Switch SoC, the I/O die — its own die, on its own process, mask set and lots — and the bridge or interposer and silicon capacitors start in week 108 from wave 2. Engineering lots are held and released at the planned metal layers, in-line excursions are dispositioned with each foundry, and the optical sources, fiber assemblies and substrates for the first build are chased, received and inspected so assembly is not waiting on material. The stage closes on first silicon: wafer acceptance data reviewed against limits and the lot split targets, and wafers released to sort.',
     activities: ['Switch SoC fab', 'I/O die fab', 'EIC fab', 'PIC fab and optical monitors', 'Bridge and Si capacitor fab', 'First-build material', 'Wafer acceptance'],
     deliverables: [
       'Switch SoC lot tracking and wafer-out record',
@@ -19,7 +20,7 @@ export const WFAB: CpoStageModule = {
       'Wafer acceptance review and first silicon release record',
     ],
     deliverableFrom: [0, 1, 2, 3, 4, 5, 6],
-    deliverableWeek: [14, 12, 12, 14, 12, 14, 14],
+    deliverableWeek: [20, 18, 12, 17, 18, 20, 20],
     engineeringEffort: [6, 4, 4, 8, 3, 6, 4],
     risks: [
       'One foundry’s cycle time slips and the first build waits for the slowest die',
@@ -101,10 +102,10 @@ export const WFAB: CpoStageModule = {
     'WFAB-04': {
       s: [
         [1, 'Confirm photonic lot starts and process split assignments with the foundry', 0.5],
-        [2, 'Track waveguide definition and review critical dimension and film thickness metrology', 4],
+        [2, 'Track waveguide definition and review critical dimension and film thickness metrology', 5],
         [3, 'Measure in-line optical monitors — propagation loss, ring resonance and coupler efficiency', 3, 1],
         [4, 'Disposition lots outside the optical window — continue, hold or scrap', 1],
-        [5, 'Track the doping, heater, metallization and pad modules to wafer out', 5],
+        [5, 'Track the detector, doping, heater, metallization and pad modules to wafer out', 8],
         [6, 'Release the in-line optical monitor report with the wafer-out notice', 0.5],
       ],
       o: [

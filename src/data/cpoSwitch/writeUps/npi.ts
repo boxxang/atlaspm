@@ -63,7 +63,7 @@ export const NPI_WRITE_UPS: CpoWriteUps = {
       'Allocation changes after the plan is released',
     ],
     links: {
-      dependsOn: ['TINF-11', 'PKGA-06', 'REQ-08', 'MTO-06'],
+      dependsOn: ['TINF-11', 'PKGA-06', 'REQ-08', 'MTO-04'],
       feedsInto: ['NPI-02', 'NPI-03', 'NPI-04', 'NPI-05', 'NPI-06', 'NPI-07', 'NPI-09', 'RELQ-01'],
       runsWith: ['CHAR-01'],
       revisedBy: ['SDBG-04'],

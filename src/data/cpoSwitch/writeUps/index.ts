@@ -16,6 +16,7 @@ import { DSGN_WRITE_UPS } from './dsgn';
 import { PSV_WRITE_UPS } from './psv';
 import { IMPL_WRITE_UPS } from './impl';
 import { SGNO_WRITE_UPS } from './sgno';
+import { OTO_WRITE_UPS } from './oto';
 import { MTO_WRITE_UPS } from './mto';
 import { WFAB_WRITE_UPS } from './wfab';
 import { SORT_WRITE_UPS } from './sort';
@@ -45,6 +46,7 @@ export const CPO_WRITE_UPS: CpoWriteUps = {
   ...PSV_WRITE_UPS,
   ...IMPL_WRITE_UPS,
   ...SGNO_WRITE_UPS,
+  ...OTO_WRITE_UPS,
   ...MTO_WRITE_UPS,
   ...WFAB_WRITE_UPS,
   ...SORT_WRITE_UPS,

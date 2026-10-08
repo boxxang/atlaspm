@@ -113,13 +113,14 @@ describe('CPO skeleton', () => {
     expect([...starts].sort((a, b) => a - b)).toEqual(starts);
     expect(CPO_MILESTONES).toHaveLength(CPO_SKELETON.length);
     expect(CPO_MILESTONES.filter((m) => m.major).map((m) => m.id)).toEqual(
-      expect.arrayContaining(['cpoTapeoutAll', 'cpoFirstSilicon', 'cpoProductionRelease']),
+      expect.arrayContaining(['cpoTapeoutOptical', 'cpoTapeoutAll', 'cpoFirstSilicon', 'cpoProductionRelease']),
     );
   });
 
   it('dates the countdowns in order: tapeout, first silicon, production', () => {
     const s = computeSchedule(new Date(2027, 0, 4), CPO_PROFILE, {});
     const at = (id: string) => s.milestones.find((m) => m.id === id)!.date.getTime();
+    expect(at('cpoTapeoutOptical'), 'wave 1 tapes out before wave 2').toBeLessThan(at('cpoTapeoutAll'));
     expect(at('cpoTapeoutAll')).toBeLessThan(at('cpoFirstSilicon'));
     expect(at('cpoFirstSilicon')).toBeLessThan(at('cpoKgdReady'));
     expect(at('cpoKgdReady')).toBeLessThanOrEqual(at('cpoFirstPackageBuild'));

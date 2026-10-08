@@ -1,5 +1,7 @@
 /**
  * SGNO — Signoff & Tapeout Readiness. Weeks 88–106; closes on All Silicon Ready for Tapeout.
+ * The optical silicon signs off first and goes in wave 1 at week 98; the rest
+ * signs off for wave 2.
  */
 import type { CpoStageModule } from '../types';
 
@@ -7,7 +9,7 @@ export const SGNO: CpoStageModule = {
   content: {
     tagline: 'Prove every die, the package that joins them and the lock that protects them before a mask is paid for.',
     description:
-      'Run the signoff each die type actually needs — multi-corner timing, EM / IR and physical verification for the Switch SoC; post-layout jitter, ESD and electromigration for the I/O die; analog post-layout, matching, isolation and reliability for the electrical IC; optical rules, connectivity and loss-budget performance for the photonic IC; and physical and channel signoff for the bridge or interposer and silicon capacitors. Across the dies, the multi-die package is signed off for die-to-die timing, SI / PI and thermal, DFT closes with final equivalence and delivered patterns, security signs off keys, fuses and debug lock, and the substrate and RDL tooling is released to its suppliers against the signed-off package. The stage closes on a tapeout readiness review that takes a go decision per die against its foundry checklist.',
+      'Run the signoff each die type actually needs — multi-corner timing, EM / IR and physical verification for the Switch SoC; post-layout jitter, ESD and electromigration for the I/O die; analog post-layout, matching, isolation and reliability for the electrical IC; optical rules, connectivity and loss-budget performance for the photonic IC; and physical and channel signoff for the bridge or interposer and silicon capacitors. Across the dies, the multi-die package is signed off for die-to-die timing, SI / PI and thermal, DFT closes with final equivalence and delivered patterns, security signs off keys, fuses and debug lock, and the substrate and RDL tooling is released to its suppliers against the signed-off package. Signoff runs in two waves. The electrical and photonic ICs sign off first and take their go decision at a wave 1 readiness review in week 98, because their fabrication and the optical engine stacking that follows are the longer path to the first package build; the Switch SoC, the I/O die, the bridge and the package follow, and the stage closes on the wave 2 readiness review that takes the go decision for them, every report checked against its foundry checklist.',
     activities: [
       'Switch SoC signoff',
       'I/O die signoff',
@@ -17,7 +19,8 @@ export const SGNO: CpoStageModule = {
       'Multi-die package signoff',
       'DFT signoff and patterns',
       'Security signoff',
-      'Tapeout readiness',
+      'Wave 1 tapeout readiness',
+      'Wave 2 tapeout readiness',
       'Substrate tooling release',
     ],
     deliverables: [
@@ -31,11 +34,12 @@ export const SGNO: CpoStageModule = {
       'Final equivalence and DFT signoff report',
       'Production test pattern delivery package',
       'Security signoff record — keys, fuse map and debug lock',
-      'Tapeout readiness decision package across every die',
+      'Tapeout wave 1 readiness decision package — electrical IC and photonic IC',
+      'Tapeout wave 2 readiness decision package — Switch SoC, I/O die, bridge and package',
     ],
-    deliverableFrom: [0, 1, 2, 3, 4, 5, 9, 6, 6, 7, 8],
-    deliverableWeek: [14, 14, 14, 14, 14, 16, 17, 15, 16, 16, 18],
-    engineeringEffort: [60, 20, 16, 16, 6, 17, 14, 6, 3, 5],
+    deliverableFrom: [0, 1, 2, 3, 4, 5, 10, 6, 6, 7, 8, 9],
+    deliverableWeek: [14, 14, 9, 9, 14, 16, 17, 15, 16, 16, 10, 18],
+    engineeringEffort: [60, 20, 16, 16, 6, 17, 14, 6, 2, 3, 5],
     risks: [
       'One die slips signoff and the others tape out into a package that cannot be built without it',
       'Waivers approved in bulk under schedule pressure hide a real violation',
@@ -63,7 +67,7 @@ export const SGNO: CpoStageModule = {
       'Signoff status per die against its checklist',
       'Open waivers per die and who approved them',
       'Days from final ECO to last clean signoff run',
-      'Tapeout go / no-go date per die against foundry slot',
+      'Tapeout go / no-go date per die against foundry slot, wave 1 and wave 2',
     ],
     perspective:
       'Signoff is not one event but five foundries’ checklists, one package and one security review that all have to say yes about the same databases. Freeze the database identifiers first; every report that does not quote one is evidence about something else.',
@@ -86,7 +90,7 @@ export const SGNO: CpoStageModule = {
         'Final equivalence result for the Switch SoC',
         'Switch SoC final GDS and signoff report',
       ],
-      r: [['SGNO-D1', 'produces'], ['SGNO-D8', 'feeds'], ['SGNO-D11', 'feeds']],
+      r: [['SGNO-D1', 'produces'], ['SGNO-D8', 'feeds'], ['SGNO-D12', 'feeds']],
     },
     'SGNO-02': {
       s: [
@@ -105,16 +109,16 @@ export const SGNO: CpoStageModule = {
         'I/O die-to-Switch SoC die-to-die timing results',
         'I/O die signoff report and final GDS',
       ],
-      r: [['SGNO-D2', 'produces'], ['SGNO-D6', 'feeds'], ['SGNO-D11', 'feeds']],
+      r: [['SGNO-D2', 'produces'], ['SGNO-D6', 'feeds'], ['SGNO-D12', 'feeds']],
     },
     'SGNO-03': {
       s: [
-        [1, 'Rerun post-layout driver and TIA bandwidth, gain and noise across corners on the frozen layout', 4],
+        [1, 'Rerun post-layout driver and TIA bandwidth, gain and noise across corners on the frozen layout', 3],
         [2, 'Run Monte Carlo on offset and matching against the calibration trim range', 2, 1],
-        [3, 'Check lane-to-lane isolation and substrate coupling from drivers into receivers', 2],
-        [4, 'Sign off ESD, latch-up and electromigration on the final layout', 2],
-        [5, 'Run final DRC and LVS', 2],
-        [6, 'Release the electrical IC analog signoff report and final GDS', 1],
+        [3, 'Check lane-to-lane isolation and substrate coupling from drivers into receivers', 1.5],
+        [4, 'Sign off ESD, latch-up and electromigration on the final layout', 1.5],
+        [5, 'Run final DRC and LVS', 1.5],
+        [6, 'Release the electrical IC analog signoff report and final GDS for wave 1', 0.5],
       ],
       o: [
         'Final post-layout bandwidth, gain and noise results',
@@ -128,12 +132,12 @@ export const SGNO: CpoStageModule = {
     },
     'SGNO-04': {
       s: [
-        [1, 'Run the foundry optical rule deck on the final layout and disposition every waiver with the foundry', 3],
-        [2, 'Verify optical and electrical connectivity against the photonic schematic', 2],
-        [3, 'Simulate each routed channel for insertion loss, crosstalk and extinction against the link budget', 4],
+        [1, 'Run the foundry optical rule deck on the final layout and disposition every waiver with the foundry', 2],
+        [2, 'Verify optical and electrical connectivity against the photonic schematic', 1.5],
+        [3, 'Simulate each routed channel for insertion loss, crosstalk and extinction against the link budget', 3],
         [4, 'Confirm heater power and thermal crosstalk against the tuning budget', 2, 1],
-        [5, 'Check fill, density and optical exclusion zones against the photonics process rules', 2],
-        [6, 'Release the photonic IC signoff report and final layout', 1],
+        [5, 'Check fill, density and optical exclusion zones against the photonics process rules', 1.5],
+        [6, 'Release the photonic IC signoff report and final layout for wave 1', 0.5],
       ],
       o: [
         'Optical rule results with foundry-approved waivers',
@@ -179,7 +183,7 @@ export const SGNO: CpoStageModule = {
         'Bump-to-ball connectivity check result',
         'Multi-die package signoff report',
       ],
-      r: [['SGNO-D6', 'produces'], ['SGNO-D7', 'gates'], ['SGNO-D11', 'feeds']],
+      r: [['SGNO-D6', 'produces'], ['SGNO-D7', 'gates'], ['SGNO-D12', 'feeds']],
     },
     'SGNO-07': {
       s: [
@@ -198,7 +202,7 @@ export const SGNO: CpoStageModule = {
         'Production test pattern delivery package',
         'Final equivalence and DFT signoff report',
       ],
-      r: [['SGNO-D8', 'produces'], ['SGNO-D9', 'produces'], ['SGNO-D11', 'feeds']],
+      r: [['SGNO-D8', 'produces'], ['SGNO-D9', 'produces'], ['SGNO-D12', 'feeds']],
     },
     'SGNO-08': {
       s: [
@@ -217,24 +221,41 @@ export const SGNO: CpoStageModule = {
         'Key provisioning and fuse programming flow',
         'Security signoff record',
       ],
-      r: [['SGNO-D10', 'produces'], ['SGNO-D11', 'gates']],
+      r: [['SGNO-D10', 'produces'], ['SGNO-D12', 'gates']],
     },
     'SGNO-09': {
       s: [
-        [1, 'Collect every die and package signoff report against its foundry tapeout checklist', 1],
-        [2, 'Review open waivers, exceptions and residual risks die by die', 1],
-        [3, 'Confirm foundry slots, mask orders and wafer start readiness per die', 1, 1],
-        [4, 'Hold the tapeout readiness review and record a go decision per die', 1],
+        [1, 'Collect the electrical IC and photonic IC signoff reports against their foundry tapeout checklists', 1],
+        [2, 'Review open waivers and residual risks for both optical silicon dies', 1],
+        [3, 'Confirm the analog and photonics foundry slots, mask orders and wafer start readiness', 1, 1],
+        [4, 'Hold the wave 1 readiness review and record a go decision per die', 1],
       ],
       o: [
-        'Signoff report set against the tapeout checklists',
-        'Waiver and residual risk register per die',
-        'Foundry slot and mask order confirmation',
-        'Tapeout readiness decision package across every die',
+        'Optical silicon signoff reports against the tapeout checklists',
+        'Waiver and residual risk register for the electrical and photonic ICs',
+        'Analog and photonics foundry slot and mask order confirmation',
+        'Tapeout wave 1 readiness decision package — electrical IC and photonic IC',
       ],
       r: [['SGNO-D11', 'produces']],
     },
     'SGNO-10': {
+      s: [
+        [1, 'Collect the Switch SoC, I/O die, bridge, package, DFT and security signoff reports against their checklists', 1],
+        [2, 'Review open waivers and residual risks die by die, and the wave 1 risks still open', 1],
+        [3, 'Confirm the digital and bridge foundry slots, mask orders and wafer start readiness', 1, 1],
+        [4, 'Confirm the substrate tooling release and that wave 2 silicon still meets the optical engines at assembly', 1],
+        [5, 'Hold the wave 2 readiness review and record a go decision per die', 1],
+      ],
+      o: [
+        'Wave 2 signoff report set against the tapeout checklists',
+        'Waiver and residual risk register per wave 2 die',
+        'Digital and bridge foundry slot and mask order confirmation',
+        'Substrate and assembly alignment check',
+        'Tapeout wave 2 readiness decision package — Switch SoC, I/O die, bridge and package',
+      ],
+      r: [['SGNO-D12', 'produces']],
+    },
+    'SGNO-11': {
       s: [
         [1, 'Confirm the substrate and RDL database against the package signoff and the final die bump maps', 1],
         [2, 'Generate the substrate fabrication data — layer artwork, drill, stackup and electrical test netlist', 1.5],
@@ -251,7 +272,7 @@ export const SGNO: CpoStageModule = {
         'First-build substrate and test fixture orders',
         'Substrate and RDL tooling release with committed delivery dates',
       ],
-      r: [['SGNO-D7', 'produces'], ['SGNO-D11', 'feeds']],
+      r: [['SGNO-D7', 'produces'], ['SGNO-D12', 'feeds']],
     },
   },
 };

@@ -17,7 +17,7 @@ export const RAMP_WRITE_UPS: CpoWriteUps = {
       'Qualification report and approval from RELQ-06',
       'Signed production firmware release from RAMP-02',
       'Correlation offsets and test program revisions from NPI-07',
-      'Tapeout archive and silicon configuration baseline from MTO-07',
+      'Tapeout archive and silicon configuration baseline from MTO-05',
     ],
     rel: {
       'RAMP-D1': '<b>CPO production release package and configuration baseline.</b> Produced here; it is the definition of the product every later change is measured against.',
@@ -64,7 +64,7 @@ export const RAMP_WRITE_UPS: CpoWriteUps = {
       'Uncontrolled changes found after release',
     ],
     links: {
-      dependsOn: ['NPI-08', 'NPI-04', 'NPI-07', 'RELQ-06', 'RAMP-02', 'MTO-07'],
+      dependsOn: ['NPI-08', 'NPI-04', 'NPI-07', 'RELQ-06', 'RAMP-02', 'MTO-05'],
       feedsInto: ['RAMP-03', 'RAMP-06', 'RAMP-07', 'SUST-04'],
       runsWith: [],
       revisedBy: ['SUST-04'],
