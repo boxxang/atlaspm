@@ -1,5 +1,5 @@
 /**
- * SGNO — Signoff & Tapeout Readiness. Weeks 88–106; closes on All Silicon Ready for Tapeout.
+ * SGNO — Signoff & Tapeout Readiness. Weeks 88–104; closes on All Silicon Ready for Tapeout.
  * The optical silicon signs off first and goes in wave 1 at week 98; the rest
  * signs off for wave 2.
  */
@@ -9,7 +9,7 @@ export const SGNO: CpoStageModule = {
   content: {
     tagline: 'Prove every die, the package that joins them and the lock that protects them before a mask is paid for.',
     description:
-      'Run the signoff each die type actually needs — multi-corner timing, EM / IR and physical verification for the Switch SoC; post-layout jitter, ESD and electromigration for the I/O die; analog post-layout, matching, isolation and reliability for the electrical IC; optical rules, connectivity and loss-budget performance for the photonic IC; and physical and channel signoff for the bridge or interposer and silicon capacitors. Across the dies, the multi-die package is signed off for die-to-die timing, SI / PI and thermal, DFT closes with final equivalence and delivered patterns, security signs off keys, fuses and debug lock, the optical engine stack is signed off across its dies — every electrical IC pad to its photonic IC pad, the coupler placement and the engine substrate — against the stack design frozen in OESD-07, and the main package and engine substrate and RDL tooling is released to its suppliers against the signed-off package. Signoff runs in two waves. The electrical and photonic ICs sign off first and take their go decision at a wave 1 readiness review in week 98, because their fabrication and the optical engine stacking that follows are the longer path to the first package build; the Switch SoC, the I/O die, the bridge and the package follow, and the stage closes on the wave 2 readiness review that takes the go decision for them, every report checked against its foundry checklist.',
+      'Run the signoff each die type actually needs — multi-corner timing, EM / IR and physical verification for the Switch SoC; post-layout jitter, ESD and electromigration for the I/O die; analog post-layout, matching, isolation and reliability for the electrical IC; optical rules, connectivity and loss-budget performance for the photonic IC; and physical and channel signoff for the bridge or interposer and silicon capacitors. Across the dies, the multi-die package is signed off for die-to-die timing, SI / PI and thermal, DFT closes with final equivalence and delivered patterns, security signs off keys, fuses and debug lock, the end-to-end link budget is signed off on extracted views from the I/O die SerDes through the main package, the engine substrate, the electrical IC and the photonic IC to the fiber, the optical engine stack is signed off across its dies — every electrical IC pad to its photonic IC pad, the coupler placement and the engine substrate — against the stack design frozen in OESD-07, and the main package and engine substrate and RDL tooling is released to its suppliers against the signed-off package. Signoff runs in two waves. The electrical and photonic ICs sign off first and take their go decision at a wave 1 readiness review in week 98, because their fabrication and the optical engine stacking that follows are the longer path to the first package build; the Switch SoC, the I/O die, the bridge and the package follow, and the stage closes in week 104, the day wave 2 tapes out, on the wave 2 readiness review that takes the go decision for them, every report checked against its foundry checklist.',
     activities: [
       'Switch SoC signoff',
       'I/O die signoff',
@@ -23,6 +23,7 @@ export const SGNO: CpoStageModule = {
       'Wave 2 tapeout readiness',
       'Substrate tooling release',
       'OE stack cross-die signoff',
+      'End-to-end link signoff',
     ],
     deliverables: [
       'Switch SoC signoff report — timing, EM / IR and physical verification',
@@ -38,10 +39,11 @@ export const SGNO: CpoStageModule = {
       'Tapeout wave 1 readiness decision package — electrical IC and photonic IC',
       'Tapeout wave 2 readiness decision package — Switch SoC, I/O die, bridge and package',
       'Optical engine stack cross-die signoff report — bond pad alignment, coupler placement and engine substrate',
+      'End-to-end link budget signoff report on extracted views — I/O die to fiber, per lane',
     ],
-    deliverableFrom: [0, 1, 2, 3, 4, 5, 10, 6, 6, 7, 8, 9, 11],
-    deliverableWeek: [14, 14, 9, 9, 14, 16, 17, 15, 16, 16, 10, 18, 9],
-    engineeringEffort: [60, 20, 16, 16, 6, 17, 14, 6, 2, 3, 5, 4],
+    deliverableFrom: [0, 1, 2, 3, 4, 5, 10, 6, 6, 7, 8, 9, 11, 12],
+    deliverableWeek: [14, 14, 9, 9, 14, 16, 16, 15, 16, 16, 10, 16, 9, 9],
+    engineeringEffort: [60, 20, 16, 16, 6, 17, 14, 6, 2, 3, 5, 4, 5],
     risks: [
       'One die slips signoff and the others tape out into a package that cannot be built without it',
       'Waivers approved in bulk under schedule pressure hide a real violation',
@@ -294,6 +296,25 @@ export const SGNO: CpoStageModule = {
         'Optical engine stack cross-die signoff report — bond pad alignment, coupler placement and engine substrate',
       ],
       r: [['SGNO-D13', 'produces'], ['SGNO-D11', 'feeds']],
+    },
+    'SGNO-13': {
+      s: [
+        [1, 'Collect the extracted views — I/O die SerDes and bumps, main package and engine substrate routes, electrical IC and photonic IC post-layout models', 1.5],
+        [2, 'Assemble the per-lane end-to-end channel from the I/O die transmitter through the electrical IC and photonic IC to the fiber', 1],
+        [3, 'Simulate electrical eye, jitter and crosstalk to the electrical IC input across corners on the extracted package and engine substrate', 2],
+        [4, 'Compute the optical budget per lane on the extracted photonic IC — insertion loss, modulation, coupling and source power', 1.5, 1],
+        [5, 'Compare every lane with the link budget, and send any lane short of margin back to its layout owner', 1],
+        [6, 'Release the end-to-end link budget signoff report to both readiness reviews', 0.5],
+      ],
+      o: [
+        'Extracted view set for every die, the package and the engine substrate',
+        'Per-lane end-to-end channel assembly',
+        'Electrical eye, jitter and crosstalk results on extracted views',
+        'Per-lane optical budget on the extracted photonic IC',
+        'Lane margin table against the link budget with open actions',
+        'End-to-end link budget signoff report on extracted views — I/O die to fiber, per lane',
+      ],
+      r: [['SGNO-D14', 'produces'], ['SGNO-D11', 'feeds'], ['SGNO-D12', 'feeds']],
     },
   },
 };

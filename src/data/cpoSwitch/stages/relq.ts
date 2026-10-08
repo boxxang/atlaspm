@@ -1,5 +1,5 @@
 /**
- * RELQ — Reliability Qualification. Weeks 164–206; closes on Qualification
+ * RELQ — Reliability Qualification. Weeks 142–206; closes on Qualification
  * Complete.
  */
 import type { CpoStageModule } from '../types';
@@ -8,7 +8,7 @@ export const RELQ: CpoStageModule = {
   content: {
     tagline: 'Show, with stress data on the stepping that ships, that the switch and its optics will last as long as the customer expects.',
     description:
-      'Qualify every part of the product that can wear out: the switch, I/O and electrical IC silicon for operating life, ESD, latch-up and electromigration; the photonic ICs and optical source for aging, humidity and temperature cycling, with wavelength and power drift fitted to lifetime models; the optical engine package as an item of its own — the bond between electrical and photonic IC, the coupling to the fiber and the stack under thermal cycling — on known-good engines; the main package, bridge and fiber attach for board-level, mechanical and fiber retention stresses; and the system for environmental limits and a failure-rate prediction. Tests are started on first silicon only where the stepping cannot change the stressed mechanism, early aging data from the test vehicles and first builds is carried forward, and the delta qualification is run on the production stepping itself. The stage closes on an approved qualification report with every failure dispositioned and the production burn-in decision taken.',
+      'Write the qualification plan as the first known-good engines and packages exist, in week 142, and qualify every part of the product that can wear out: the switch, I/O and electrical IC silicon for operating life, ESD, latch-up and electromigration; the photonic ICs and optical source for aging, humidity and temperature cycling, with wavelength and power drift fitted to lifetime models; the optical engine package as an item of its own — the bond between electrical and photonic IC, the coupling to the fiber and the stack under thermal cycling — started in week 144 on the first known-good engines, ahead of everything else, because the stack is the newest reliability risk in the product; the main package, bridge and fiber attach for board-level, mechanical and fiber retention stresses; and the system for environmental limits and a failure-rate prediction. Tests are started on first silicon only where the stepping cannot change the stressed mechanism, early aging data from the test vehicles and first builds is carried forward, and the delta qualification is run on the production stepping itself. The stage closes on an approved qualification report with every failure dispositioned and the production burn-in decision taken.',
     activities: ['Qualification plan', 'Silicon reliability', 'Photonic and source reliability', 'Package and fiber reliability', 'System reliability and FIT', 'Qualification report', 'Stepping delta qual', 'Optical engine stack qual'],
     deliverables: [
       'Reliability qualification plan and stress matrix — silicon, photonics, optical source, optical engine package, main package, board and system',
@@ -22,7 +22,7 @@ export const RELQ: CpoStageModule = {
       'Optical engine stack qualification report — bond interface, coupling stability and thermal cycling',
     ],
     deliverableFrom: [0, 1, 2, 3, 4, 5, 6, 5, 7],
-    deliverableWeek: [4, 24, 28, 26, 28, 42, 40, 42, 28],
+    deliverableWeek: [4, 46, 50, 48, 50, 64, 62, 64, 28],
     engineeringEffort: [4, 18, 30, 26, 20, 5, 14, 16],
     risks: [
       'Optical source aging too slow to finish before production release, leaving lifetime extrapolated from short data',

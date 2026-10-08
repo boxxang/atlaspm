@@ -131,7 +131,7 @@ export const CHAR_WRITE_UPS: CpoWriteUps = {
       'Post-FEC error floor demonstrated',
     ],
     links: {
-      dependsOn: ['CHAR-01', 'PON-05', 'MODL-03', 'ICD-02', 'SORT-02', 'WFAB-02'],
+      dependsOn: ['CHAR-01', 'PON-05', 'MODL-03', 'ICD-02', 'SORT-02', 'WFAB-02', 'DSGN-11'],
       feedsInto: ['CHAR-07', 'CHAR-08', 'CERT-01', 'SDBG-01', 'SDBG-04'],
       runsWith: ['CHAR-03', 'CHAR-05'],
       revisedBy: ['SDBG-05'],
@@ -268,7 +268,7 @@ export const CHAR_WRITE_UPS: CpoWriteUps = {
       'Measured latency against the model',
     ],
     links: {
-      dependsOn: ['CHAR-01', 'SINT-04', 'SINT-02', 'MODL-02'],
+      dependsOn: ['CHAR-01', 'SINT-04', 'SINT-02', 'MODL-02', 'REQ-03'],
       feedsInto: ['CHAR-07', 'CHAR-08', 'CERT-02', 'CERT-03', 'SDBG-01', 'SDBG-04'],
       runsWith: ['SINT-05'],
       revisedBy: ['SDBG-05'],
@@ -336,9 +336,9 @@ export const CHAR_WRITE_UPS: CpoWriteUps = {
       'Rail droop margin under load steps',
     ],
     links: {
-      dependsOn: ['CHAR-01', 'MODL-08', 'MODL-06'],
+      dependsOn: ['CHAR-01', 'MODL-08', 'MODL-06', 'SINT-06', 'CHAR-03'],
       feedsInto: ['CHAR-07', 'CHAR-08', 'RELQ-05'],
-      runsWith: ['CHAR-03', 'SINT-06'],
+      runsWith: [],
       revisedBy: ['SDBG-05'],
       feedsBackInto: ['MODL-08'],
     },
@@ -403,7 +403,7 @@ export const CHAR_WRITE_UPS: CpoWriteUps = {
       'Discrepancies closed through change control',
     ],
     links: {
-      dependsOn: ['CHAR-01', 'ICD-12', 'ICD-02', 'ICD-04', 'ICD-06', 'ICD-07', 'ICD-08', 'ICD-09', 'ICD-10', 'ICD-11', 'ICD-03', 'ICD-05'],
+      dependsOn: ['CHAR-01', 'ICD-12', 'ICD-02', 'ICD-04', 'ICD-06', 'ICD-07', 'ICD-08', 'ICD-09', 'ICD-10', 'ICD-11', 'ICD-03', 'ICD-05', 'ICD-01'],
       feedsInto: ['CHAR-08', 'SDBG-01', 'NPI-07'],
       runsWith: ['CHAR-02', 'CHAR-03'],
       revisedBy: [],
@@ -601,9 +601,9 @@ export const CHAR_WRITE_UPS: CpoWriteUps = {
       'Customer design questions not answered by the collateral',
     ],
     links: {
-      dependsOn: ['CHAR-02', 'CHAR-03', 'CHAR-04', 'CHAR-05', 'CHAR-07', 'IMPL-13'],
+      dependsOn: ['CHAR-02', 'CHAR-03', 'CHAR-04', 'CHAR-05', 'CHAR-07', 'IMPL-13', 'CHAR-10'],
       feedsInto: ['CERT-06', 'RAMP-01'],
-      runsWith: ['CHAR-08', 'CHAR-10'],
+      runsWith: ['CHAR-08'],
       revisedBy: [],
       feedsBackInto: [],
     },
@@ -804,7 +804,7 @@ export const CHAR_WRITE_UPS: CpoWriteUps = {
       'Sort limit changes proposed from characterization',
     ],
     links: {
-      dependsOn: ['CHAR-01', 'SORT-03', 'OEB-05', 'PSV-15'],
+      dependsOn: ['CHAR-01', 'SORT-03', 'OEB-05', 'PSV-15', 'MODL-05', 'SORT-05'],
       feedsInto: ['CHAR-07', 'SDBG-01'],
       runsWith: ['CHAR-13', 'CHAR-03'],
       revisedBy: [],
@@ -871,7 +871,7 @@ export const CHAR_WRITE_UPS: CpoWriteUps = {
       'Wafer-level test parameters correlated to engine behavior',
     ],
     links: {
-      dependsOn: ['CHAR-01', 'SORT-04', 'OEB-06', 'OBU-04', 'PSV-06'],
+      dependsOn: ['CHAR-01', 'SORT-04', 'OEB-06', 'OBU-04', 'PSV-06', 'SORT-05'],
       feedsInto: ['CHAR-07', 'SDBG-01'],
       runsWith: ['CHAR-12', 'CHAR-03'],
       revisedBy: [],

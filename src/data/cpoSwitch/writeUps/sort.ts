@@ -13,7 +13,7 @@ export const SORT_WRITE_UPS: CpoWriteUps = {
     flowNote:
       'Step 1 verifies probe contact. Step 2 debugs the structural and parametric tests, with at-speed scan and die-to-die loopback brought up in parallel in step 3. Step 4 programs trims, fuses and keys, step 5 sorts the first lots and step 6 releases the program and data.',
     consumes: [
-      'Switch SoC wafers from WFAB-01 released in WFAB-07',
+      'Switch SoC wafers accepted on WAT data and released to sort from WFAB-01',
       'Probe cards and electrical sort hardware from TINF-02',
       'Production test programs from TINF-06',
       'Production test pattern delivery package from SGNO-07',
@@ -45,7 +45,7 @@ export const SORT_WRITE_UPS: CpoWriteUps = {
       ['First-lot sort and release', 1],
     ],
     entry: [
-      'Switch SoC wafers released to sort in WFAB-07',
+      'Switch SoC wafers accepted and released to sort from WFAB-01',
       'Probe cards received and verified on the tester in TINF-02',
       'Sort program and patterns loaded from TINF-06 and SGNO-07',
     ],
@@ -54,7 +54,7 @@ export const SORT_WRITE_UPS: CpoWriteUps = {
       'Every sort test failure on the first lots bucketed as die, program, pattern or hardware',
       'Sort program released and first-lot data for every corner split loaded in the manufacturing data system',
     ],
-    dependsOn: ['WFAB-07', 'TINF-02', 'TINF-06', 'SGNO-07'],
+    dependsOn: ['WFAB-01', 'TINF-02', 'TINF-06', 'SGNO-07'],
     dependsNote: null,
     feedsInto: ['SORT-06', 'SORT-07'],
     measuredBy: [
@@ -63,7 +63,7 @@ export const SORT_WRITE_UPS: CpoWriteUps = {
       'Test time per wafer against the cost model',
     ],
     links: {
-      dependsOn: ['WFAB-07', 'TINF-02', 'TINF-06', 'SGNO-07', 'WFAB-01'],
+      dependsOn: ['WFAB-01', 'TINF-02', 'TINF-06', 'SGNO-07', 'SGNO-08'],
       feedsInto: ['SORT-06', 'SORT-07', 'CHAR-01'],
       runsWith: ['SORT-02', 'SORT-03', 'SORT-04'],
       revisedBy: [],
@@ -80,7 +80,7 @@ export const SORT_WRITE_UPS: CpoWriteUps = {
     flowNote:
       'Step 1 verifies probe contact. Step 2 debugs the structural and parametric tests, with the SerDes loopback, PRBS and eye margin tests brought up in parallel in step 3. Step 4 brings up the die-to-die PHY tests, step 5 programs trims and sorts the first lots and step 6 releases the program and data.',
     consumes: [
-      'I/O die wafers and SerDes device monitors from WFAB-02 released in WFAB-07',
+      'I/O die wafers and SerDes device monitors accepted and released to sort from WFAB-02',
       'Probe cards and electrical sort hardware from TINF-02',
       'I/O die sort program from TINF-06',
       'I/O die signoff record and test access list from SGNO-02',
@@ -112,7 +112,7 @@ export const SORT_WRITE_UPS: CpoWriteUps = {
       ['First-lot sort and release', 0.5],
     ],
     entry: [
-      'I/O die wafers released to sort in WFAB-07',
+      'I/O die wafers accepted and released to sort from WFAB-02',
       'I/O die probe cards received and verified on the tester in TINF-02',
       'Sort program and patterns loaded from TINF-06 and SGNO-07',
     ],
@@ -121,7 +121,7 @@ export const SORT_WRITE_UPS: CpoWriteUps = {
       'Every first-lot failure bucketed as die, program, pattern or hardware',
       'I/O die sort program released and first-lot data with trims loaded in the manufacturing data system',
     ],
-    dependsOn: ['WFAB-02', 'WFAB-07', 'TINF-02', 'TINF-06'],
+    dependsOn: ['WFAB-02', 'TINF-02', 'TINF-06'],
     dependsNote: null,
     feedsInto: ['SORT-06', 'SORT-07'],
     measuredBy: [
@@ -130,7 +130,7 @@ export const SORT_WRITE_UPS: CpoWriteUps = {
       'I/O die test time per wafer against the cost model',
     ],
     links: {
-      dependsOn: ['WFAB-02', 'WFAB-07', 'TINF-02', 'TINF-06', 'SGNO-02', 'SGNO-07'],
+      dependsOn: ['WFAB-02', 'TINF-02', 'TINF-06', 'SGNO-02', 'SGNO-07'],
       feedsInto: ['SORT-06', 'SORT-07', 'CHAR-02'],
       runsWith: ['SORT-01', 'SORT-03'],
       revisedBy: [],
@@ -147,7 +147,7 @@ export const SORT_WRITE_UPS: CpoWriteUps = {
     flowNote:
       'Step 1 verifies the probe and high-frequency setup. Step 2 debugs the DC parametrics, with the driver swing and TIA tests brought up in parallel in step 3. Step 4 trims the bias and control DACs, step 5 sorts the first lots and step 6 releases the results and trim data.',
     consumes: [
-      'Electrical IC wafers from WFAB-03 released in WFAB-07',
+      'Electrical IC wafers accepted on WAT data and released to sort from WFAB-03',
       'Probe cards and electrical sort hardware from TINF-02',
       'Electrical IC sort program from TINF-06',
       'Electrical IC analog signoff record from SGNO-03',
@@ -165,8 +165,8 @@ export const SORT_WRITE_UPS: CpoWriteUps = {
       '<b>Too few good dies.</b> Yield at sort leaves fewer electrical ICs than the optical engine build matrix needs.',
     ],
     roles: [
-      { r: 'Analog and mixed-signal', d: 'Owns electrical IC sort bring-up and its limits' },
-      { r: 'Test engineering lead', d: 'Sort program, tester and probe card integration' },
+      { r: 'Test engineering', d: 'Owns electrical IC sort bring-up, the sort program and tester integration' },
+      { r: 'Analog and mixed-signal engineer', d: 'Driver, TIA and bias limits and trims' },
       { r: 'High-frequency test engineer', d: 'Probe setup and de-embedding' },
       { r: 'Photonics engineer', d: 'Checks limits against the optical link budget' },
       { r: 'Product engineer', d: 'Wafer maps, trims and bin review' },
@@ -179,7 +179,7 @@ export const SORT_WRITE_UPS: CpoWriteUps = {
       ['First-lot sort and release', 0.5],
     ],
     entry: [
-      'Electrical IC wafers released to sort in WFAB-07',
+      'Electrical IC wafers accepted and released to sort from WFAB-03',
       'Probe cards and high-frequency fixtures verified in TINF-02',
       'Electrical IC limits drafted from the interface control document',
     ],
@@ -188,7 +188,7 @@ export const SORT_WRITE_UPS: CpoWriteUps = {
       'Per-die trims programmed and stored in the manufacturing data system',
       'Wafer maps and sort results released to the known-good-die criteria',
     ],
-    dependsOn: ['WFAB-03', 'WFAB-07', 'TINF-02', 'TINF-06'],
+    dependsOn: ['WFAB-03', 'TINF-02', 'TINF-06'],
     dependsNote: null,
     feedsInto: ['SORT-05'],
     measuredBy: [
@@ -197,7 +197,7 @@ export const SORT_WRITE_UPS: CpoWriteUps = {
       'Dies with trims stored against dies sorted',
     ],
     links: {
-      dependsOn: ['WFAB-03', 'WFAB-07', 'TINF-02', 'TINF-06', 'SGNO-03'],
+      dependsOn: ['WFAB-03', 'TINF-02', 'TINF-06', 'SGNO-03', 'ICD-04'],
       feedsInto: ['SORT-05', 'OEB-07'],
       runsWith: ['SORT-01', 'SORT-02'],
       revisedBy: [],
@@ -214,7 +214,7 @@ export const SORT_WRITE_UPS: CpoWriteUps = {
     flowNote:
       'Step 1 aligns and calibrates the probe. Step 2 measures loss, responsivity and dark current while step 3 measures modulators and resonances in parallel. Step 4 correlates with the in-line monitors, step 5 generates wafer maps and step 6 releases the results.',
     consumes: [
-      'Photonic IC wafers released from WFAB-07',
+      'Bump-finished, via-revealed and bond-ready photonic wafers from WFAB-08',
       'In-line optical monitor report from WFAB-04',
       'Optical wafer probe and fixtures from TINF-03',
       'Factory calibration process and limits from TINF-07',
@@ -246,7 +246,7 @@ export const SORT_WRITE_UPS: CpoWriteUps = {
       ['Wafer maps and release', 1.5],
     ],
     entry: [
-      'Photonic wafers released in WFAB-07 with the in-line monitor report',
+      'Photonic wafers released to sort from WFAB-04 with the in-line monitor report',
       'Optical probe qualified on reference wafers in TINF-03',
       'Optical test limits drafted from the link budget',
     ],
@@ -255,7 +255,7 @@ export const SORT_WRITE_UPS: CpoWriteUps = {
       'Every die binned on loss, responsivity, modulation and tunable resonance',
       'Wafer-level results correlated with in-line monitors per lot and released with wafer maps',
     ],
-    dependsOn: ['WFAB-07', 'WFAB-04', 'TINF-03'],
+    dependsOn: ['WFAB-08', 'WFAB-04', 'TINF-03'],
     dependsNote: null,
     feedsInto: ['SORT-05'],
     measuredBy: [
@@ -264,7 +264,7 @@ export const SORT_WRITE_UPS: CpoWriteUps = {
       'Optical test time per wafer',
     ],
     links: {
-      dependsOn: ['WFAB-07', 'WFAB-04', 'TINF-03', 'TINF-07', 'OTO-02'],
+      dependsOn: ['WFAB-08', 'WFAB-04', 'TINF-03', 'TINF-07', 'OTO-02'],
       feedsInto: ['SORT-05', 'OEB-07', 'CHAR-03'],
       runsWith: ['SORT-01'],
       revisedBy: [],
@@ -275,11 +275,11 @@ export const SORT_WRITE_UPS: CpoWriteUps = {
   'SORT-05': {
     criticalPath: true,
     purpose: [
-      'Release the <b>electrical and photonic IC known-good dies to the optical engine build</b>: interim known-good limits set from the first-lot data and the engine link budget, the two die types paired by bin into stack kits per the engine build matrix, every die packed with its wafer, position and bin, and the kits reconciled against the engine plan before they leave.',
+      'Release the <b>electrical and photonic IC known-good dies to the optical engine build</b>: interim known-good limits set from the first-lot data and the engine link budget, the photonic wafers diced with their edge-coupler facets prepared and inspected, a set of both die types put aside for die-level characterization and reliability, the rest paired by bin into stack kits per the engine build matrix, every die packed with its wafer, position and bin, and the kits reconciled against the engine plan before they leave.',
       'The optical engine build is the start of the program’s critical path after sort, so it cannot wait for the full screening specification the Switch SoC and I/O die get. The interim limits are deliberately set from the budget rather than from yield, and bin pairing keeps a slow electrical IC off the best photonic die so the engine does not inherit the worse of the two.',
     ],
     flowNote:
-      'Step 1 sets interim limits and step 2 pairs dies by bin, while step 3 singulates and packs them with traceability in parallel. Step 4 reconciles the kits against the engine plan and step 5 releases them.',
+      'Step 1 sets interim limits and step 2 dices the wafers with facet preparation, while step 3 sets aside characterization and reliability dies in parallel. Step 4 pairs the rest by bin, step 5 packs and reconciles the kits and step 6 releases them.',
     consumes: [
       'Electrical IC wafer sort results, wafer maps and trims from SORT-03',
       'Photonic IC wafer-level optical test results and wafer maps from SORT-04',
@@ -294,7 +294,7 @@ export const SORT_WRITE_UPS: CpoWriteUps = {
       '<b>Interim limits too loose.</b> Marginal photonic dies are stacked and lost at engine test with their electrical ICs and fiber.',
       '<b>Pairs without bins.</b> Dies are kitted in pick order and engines inherit the worse die.',
       '<b>Traceability lost.</b> A die is packed without wafer position and an engine failure cannot be joined to its sort data.',
-      '<b>Facet damage.</b> Photonic edge facets or bond pads are damaged in pick and pack.',
+      '<b>Facet damage.</b> Photonic edge facets are chipped at dicing or bond pads damaged in pick and pack, and coupling loss rises at the engine.',
       '<b>Kits short.</b> Electrical IC yield leaves photonic dies unpaired and the engine build idles.',
     ],
     roles: [
@@ -306,9 +306,9 @@ export const SORT_WRITE_UPS: CpoWriteUps = {
     ],
     effort: [
       ['Interim limits', 0.5],
-      ['Bin pairing', 1],
-      ['Pick, pack and traceability', 1],
-      ['Reconciliation and release', 0.5],
+      ['Dicing and facet preparation', 1],
+      ['Characterization set-aside and bin pairing', 0.5],
+      ['Pick, pack, traceability and release', 1],
     ],
     entry: [
       'Electrical IC sort complete on the first lots in SORT-03',
@@ -317,7 +317,7 @@ export const SORT_WRITE_UPS: CpoWriteUps = {
     ],
     exit: [
       'Interim limits for every screened electrical and photonic parameter traced to the engine link budget',
-      'Every die in a stack kit traceable to wafer, position, bin and sort data',
+      'Every die in a stack kit or set aside for characterization and reliability traceable to wafer, position, bin and sort data',
       'Stack kits for the first engine build released on or before the stacking start',
     ],
     dependsOn: ['SORT-03', 'SORT-04', 'OEB-01'],
@@ -330,7 +330,7 @@ export const SORT_WRITE_UPS: CpoWriteUps = {
     ],
     links: {
       dependsOn: ['SORT-03', 'SORT-04', 'OEB-01', 'OESD-05', 'TINF-10'],
-      feedsInto: ['OEB-02', 'OEB-05'],
+      feedsInto: ['OEB-02', 'OEB-05', 'CHAR-12', 'CHAR-13'],
       runsWith: [],
       revisedBy: ['OEB-07'],
       feedsBackInto: [],
@@ -397,7 +397,7 @@ export const SORT_WRITE_UPS: CpoWriteUps = {
       'Projected compound main package yield',
     ],
     links: {
-      dependsOn: ['SORT-01', 'SORT-02', 'TINF-01', 'SARC-10', 'MODL-03'],
+      dependsOn: ['SORT-01', 'SORT-02', 'TINF-01', 'SARC-10', 'MODL-03', 'WFAB-07'],
       feedsInto: ['SORT-07', 'OEB-07', 'PKGA-06', 'NPI-05'],
       runsWith: [],
       revisedBy: ['PKGA-06'],

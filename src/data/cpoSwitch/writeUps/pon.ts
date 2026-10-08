@@ -52,7 +52,7 @@ export const PON_WRITE_UPS: CpoWriteUps = {
       'Daily status published every working day against the pass criteria from the first power-on',
       'Every deviation raised in the stand-up entered in the anomaly register within one day',
     ],
-    dependsOn: ['PKGA-09', 'PKGA-07'],
+    dependsOn: ['PKGA-09', 'PKGA-11', 'PKGA-07'],
     dependsNote: 'The plan and the stations are ready before this starts; this activity runs them, it does not write them.',
     feedsInto: ['PON-02', 'PON-03', 'PON-04', 'PON-05'],
     measuredBy: [
@@ -61,9 +61,9 @@ export const PON_WRITE_UPS: CpoWriteUps = {
       'Hours from observation to anomaly entry',
     ],
     links: {
-      dependsOn: ['PKGA-09', 'PKGA-07', 'PKGA-10'],
+      dependsOn: ['PKGA-09', 'PKGA-07', 'PKGA-10', 'PKGA-11', 'PKGA-02'],
       feedsInto: ['PON-02', 'PON-03', 'PON-04', 'PON-05', 'PON-06'],
-      runsWith: [],
+      runsWith: ['PON-06'],
       revisedBy: [],
       feedsBackInto: [],
     },
@@ -82,7 +82,7 @@ export const PON_WRITE_UPS: CpoWriteUps = {
       'Electrical-only packages and bring-up systems from PKGA-11 and PKGA-07',
       'Board power delivery design and sequencing from DSGN-14',
       'System power model from MODL-08',
-      'Package test results and known issues from PKGA-06',
+      'Electrical-only build record and package continuity screen from PKGA-11',
     ],
     rel: {
       'PON-D2': '<b>First power-on and rail verification report.</b> Produced here with the safe power-up procedure every lab then follows.',
@@ -109,7 +109,7 @@ export const PON_WRITE_UPS: CpoWriteUps = {
     ],
     entry: [
       'Bring-up plan released',
-      'Board passed dummy package checks in PKGA-07',
+      'Electrical-only packages from PKGA-11 mounted on boards that passed dummy package checks in PKGA-07',
       'Current limits set from the power model',
     ],
     exit: [
@@ -117,7 +117,7 @@ export const PON_WRITE_UPS: CpoWriteUps = {
       'Power-up and power-down sequencing verified against the specification',
       'Idle current per rail recorded and within the stated tolerance of the model or logged as an anomaly',
     ],
-    dependsOn: ['PON-01', 'PKGA-07'],
+    dependsOn: ['PON-01', 'PKGA-11', 'PKGA-07'],
     dependsNote: null,
     feedsInto: ['PON-03', 'PON-04', 'PON-06'],
     measuredBy: [
@@ -126,7 +126,7 @@ export const PON_WRITE_UPS: CpoWriteUps = {
       'Idle current error against the model',
     ],
     links: {
-      dependsOn: ['PON-01', 'PKGA-07', 'PKGA-11', 'PKGA-09', 'DSGN-14'],
+      dependsOn: ['PON-01', 'PKGA-07', 'PKGA-11', 'PKGA-09', 'DSGN-14', 'MODL-08'],
       feedsInto: ['PON-03', 'PON-04', 'PON-06', 'OBU-01'],
       runsWith: [],
       revisedBy: [],
@@ -192,7 +192,7 @@ export const PON_WRITE_UPS: CpoWriteUps = {
       'Days from first power to first boot',
     ],
     links: {
-      dependsOn: ['PON-02', 'DSGN-16', 'PSV-09', 'DSGN-10', 'PKGA-10'],
+      dependsOn: ['PON-02', 'DSGN-16', 'PSV-09', 'DSGN-10', 'PKGA-10', 'PKGA-11'],
       feedsInto: ['PON-04', 'PON-05', 'PON-06', 'OBU-05', 'SINT-02'],
       runsWith: [],
       revisedBy: [],
@@ -257,7 +257,7 @@ export const PON_WRITE_UPS: CpoWriteUps = {
       'Clock and reset anomalies opened',
     ],
     links: {
-      dependsOn: ['PON-02', 'PON-03', 'DSGN-03'],
+      dependsOn: ['PON-02', 'PON-03', 'DSGN-03', 'SARC-06', 'IMPL-11', 'PON-01', 'PKGA-11'],
       feedsInto: ['PON-05', 'PON-06', 'SINT-01', 'OBU-02'],
       runsWith: [],
       revisedBy: [],
@@ -278,7 +278,7 @@ export const PON_WRITE_UPS: CpoWriteUps = {
       'Firmware link training code from PON-03 and DSGN-16',
       'Electrical channel and SerDes link models from MODL-03',
       'Die-to-die and switch-to-I/O interface definitions from ICD-02',
-      'Validation board channel characterization',
+      'Electrical-only packages on validation boards from PKGA-11, with the board channel characterization',
     ],
     rel: {
       'PON-D5': '<b>First electrical link report — die-to-die and SerDes training, loopback and PRBS results.</b> Produced here; it closes the stage on the First Electrical Link gate.',
@@ -324,7 +324,7 @@ export const PON_WRITE_UPS: CpoWriteUps = {
       'Measured to modeled margin per lane',
     ],
     links: {
-      dependsOn: ['PON-03', 'PON-04', 'MODL-03', 'PON-01'],
+      dependsOn: ['PON-03', 'PON-04', 'MODL-03', 'PON-01', 'DSGN-16', 'ICD-02', 'PKGA-11'],
       feedsInto: ['OBU-03', 'CHAR-02', 'SINT-03', 'PON-06'],
       runsWith: [],
       revisedBy: [],
@@ -389,7 +389,7 @@ export const PON_WRITE_UPS: CpoWriteUps = {
       'Days from observation to debug board handoff',
     ],
     links: {
-      dependsOn: ['PON-02', 'PON-03', 'PON-04', 'PON-05', 'PKGA-06'],
+      dependsOn: ['PON-02', 'PON-03', 'PON-04', 'PON-05', 'PKGA-06', 'PKGA-07', 'TINF-10'],
       feedsInto: ['SDBG-01', 'SDBG-02', 'SDBG-03'],
       runsWith: [],
       revisedBy: [],

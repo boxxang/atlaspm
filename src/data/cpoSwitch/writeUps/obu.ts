@@ -62,7 +62,7 @@ export const OBU_WRITE_UPS: CpoWriteUps = {
       'Change in delivered power since integration',
     ],
     links: {
-      dependsOn: ['PKGA-05', 'PON-02', 'DSGN-07', 'PKGA-09'],
+      dependsOn: ['PKGA-05', 'PON-02', 'DSGN-07', 'PKGA-09', 'MODL-04'],
       feedsInto: ['OBU-02', 'OBU-03', 'OBU-06', 'CERT-04', 'SDBG-01'],
       runsWith: [],
       revisedBy: [],
@@ -129,7 +129,7 @@ export const OBU_WRITE_UPS: CpoWriteUps = {
       'Lock losses per thermal step',
     ],
     links: {
-      dependsOn: ['OBU-01', 'PON-04', 'DSGN-08', 'OEB-06'],
+      dependsOn: ['OBU-01', 'PON-04', 'DSGN-08', 'OEB-06', 'DSGN-05'],
       feedsInto: ['OBU-03', 'OBU-04', 'CHAR-03'],
       runsWith: ['OBU-05'],
       revisedBy: [],
@@ -196,7 +196,7 @@ export const OBU_WRITE_UPS: CpoWriteUps = {
       'Units reaching first optical link',
     ],
     links: {
-      dependsOn: ['OBU-02', 'PON-05', 'OBU-01', 'OEB-06'],
+      dependsOn: ['OBU-02', 'PON-05', 'OBU-01', 'OEB-06', 'MODL-04', 'TINF-03'],
       feedsInto: ['SINT-03', 'OBU-06', 'CHAR-03', 'SDBG-01'],
       runsWith: ['OBU-04'],
       revisedBy: [],
@@ -263,7 +263,7 @@ export const OBU_WRITE_UPS: CpoWriteUps = {
       'Differences between calibrated and lab-tuned settings',
     ],
     links: {
-      dependsOn: ['TINF-07', 'OBU-02', 'PON-03'],
+      dependsOn: ['TINF-07', 'OBU-02', 'PON-03', 'TINF-06', 'TINF-10'],
       feedsInto: ['NPI-07', 'SINT-03'],
       runsWith: ['OBU-03', 'OBU-05'],
       revisedBy: [],
@@ -329,7 +329,7 @@ export const OBU_WRITE_UPS: CpoWriteUps = {
       'Monitor error against instruments',
     ],
     links: {
-      dependsOn: ['PON-03', 'DSGN-16', 'OBU-01', 'PKGA-10'],
+      dependsOn: ['PON-03', 'DSGN-16', 'OBU-01', 'PKGA-10', 'DSGN-08', 'ICD-10'],
       feedsInto: ['SINT-05', 'SINT-03', 'OBU-06'],
       runsWith: ['OBU-02', 'OBU-04'],
       revisedBy: [],
@@ -394,7 +394,7 @@ export const OBU_WRITE_UPS: CpoWriteUps = {
       'Model corrections filed',
     ],
     links: {
-      dependsOn: ['OBU-01', 'OBU-03', 'OEB-04', 'MODL-04'],
+      dependsOn: ['OBU-01', 'OBU-03', 'OEB-04', 'MODL-04', 'PSV-06'],
       feedsInto: ['CHAR-03', 'CHAR-07', 'SDBG-01'],
       runsWith: [],
       revisedBy: [],

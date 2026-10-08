@@ -197,7 +197,7 @@ export const IMPL_WRITE_UPS: CpoWriteUps = {
       'Lanes with ESD or electromigration waivers',
     ],
     links: {
-      dependsOn: ['DSGN-04', 'TRDY-04', 'ICD-02', 'ICD-03', 'MODL-03'],
+      dependsOn: ['DSGN-04', 'TRDY-04', 'ICD-02', 'ICD-03', 'MODL-03', 'DSGN-12'],
       feedsInto: ['SGNO-02', 'IMPL-07', 'IMPL-08'],
       runsWith: ['PSV-05'],
       revisedBy: [],
@@ -216,7 +216,7 @@ export const IMPL_WRITE_UPS: CpoWriteUps = {
     consumes: [
       'Electrical IC schematics and design targets from DSGN-05',
       'Electrical-to-photonic interface and pad pitch from ICD-04',
-      'Bond interface, pad map and through-connection rules from OESD-01, with the co-design flow from TRDY-09',
+      'Frozen bond interface, pad map and through-connections from the optical engine stack design freeze in OESD-07 and OESD-01, with the co-design flow from TRDY-09',
       'Behavioral co-simulation models from MODL-05',
       'Electrical IC mixed-signal verification status from PSV-15',
     ],
@@ -226,7 +226,7 @@ export const IMPL_WRITE_UPS: CpoWriteUps = {
     risks: [
       '<b>Input capacitance grows.</b> Routing to the TIA input adds capacitance that costs receiver bandwidth and sensitivity.',
       '<b>Driver-to-receiver coupling.</b> Aggressive drivers couple into neighbouring TIAs through substrate and supply.',
-      '<b>Pad pitch mismatch.</b> A late photonic IC pad change forces an electrical IC relayout.',
+      '<b>Pad map reopened.</b> A pad change after the stack freeze forces an electrical IC relayout and goes through change control.',
       '<b>Matching lost in layout.</b> Offset from asymmetric layout exceeds what the calibration range can trim.',
       '<b>Self-heating on drivers.</b> Output stages meet electromigration limits only at typical conditions.',
     ],
@@ -246,7 +246,7 @@ export const IMPL_WRITE_UPS: CpoWriteUps = {
     ],
     entry: [
       'Electrical IC schematics frozen and pre-layout simulation passing',
-      'Photonic IC pad pitch and pad order agreed in ICD-04',
+      'Photonic IC pad pitch and pad order agreed in ICD-04, and the optical engine stack design frozen in OESD-07',
       'Extraction and post-layout simulation flow proven on a test block',
     ],
     exit: [
@@ -254,7 +254,7 @@ export const IMPL_WRITE_UPS: CpoWriteUps = {
       'Lane-to-lane crosstalk below the budget allocated in the link co-simulation',
       'DRC and LVS clean, ESD and electromigration checks passed, layout released to SGNO-03',
     ],
-    dependsOn: ['DSGN-05', 'ICD-04', 'TRDY-09', 'OESD-01'],
+    dependsOn: ['DSGN-05', 'ICD-04', 'TRDY-09', 'OESD-01', 'OESD-07'],
     dependsNote: null,
     feedsInto: ['SGNO-03', 'PSV-07', 'IMPL-07', 'SGNO-12'],
     measuredBy: [
@@ -263,9 +263,9 @@ export const IMPL_WRITE_UPS: CpoWriteUps = {
       'Open DRC and LVS violations',
     ],
     links: {
-      dependsOn: ['DSGN-05', 'ICD-04', 'TRDY-09', 'MODL-05', 'OESD-01'],
+      dependsOn: ['DSGN-05', 'ICD-04', 'TRDY-09', 'MODL-05', 'OESD-01', 'OESD-07', 'PSV-15'],
       feedsInto: ['SGNO-03', 'PSV-07', 'IMPL-07', 'SGNO-12'],
-      runsWith: ['IMPL-05', 'PSV-15'],
+      runsWith: ['IMPL-05'],
       revisedBy: [],
       feedsBackInto: ['DSGN-05'],
     },
@@ -283,7 +283,7 @@ export const IMPL_WRITE_UPS: CpoWriteUps = {
       'Photonic IC circuit and component design from DSGN-06',
       'Photonic PDK, rule deck and component library from TRDY-02',
       'Photonic-to-fiber interface and coupler definitions from ICD-06',
-      'Bond pad map, through-connections and coupler keep-outs from OESD-01 and OESD-03, against the pad array in ICD-04',
+      'Frozen bond pad map, through-connections and coupler keep-outs from the stack design freeze in OESD-07, as designed in OESD-01 and OESD-03 against the pad array in ICD-04',
       'Electronic-photonic co-design flow from TRDY-09',
     ],
     rel: {
@@ -313,14 +313,14 @@ export const IMPL_WRITE_UPS: CpoWriteUps = {
     entry: [
       'Photonic IC design frozen and component library released in the photonic PDK',
       'Optical rule deck at a foundry-approved revision',
-      'Pad array agreed with the electrical IC and coupler definition agreed with optical engineering',
+      'Pad array, coupler placement and keep-outs frozen with the optical engine stack in OESD-07',
     ],
     exit: [
       'Zero optical rule violations open other than waivers approved in writing by the photonics foundry',
       'Layout connectivity matches the photonic schematic with no open or unintended optical paths',
       'Routed insertion loss per channel within the allocation in the optical link budget, layout released to SGNO-04',
     ],
-    dependsOn: ['DSGN-06', 'TRDY-02', 'ICD-06', 'OESD-01', 'OESD-03'],
+    dependsOn: ['DSGN-06', 'TRDY-02', 'ICD-06', 'OESD-01', 'OESD-03', 'OESD-07'],
     dependsNote: null,
     feedsInto: ['SGNO-04', 'IMPL-07', 'IMPL-09', 'SGNO-12'],
     measuredBy: [
@@ -329,7 +329,7 @@ export const IMPL_WRITE_UPS: CpoWriteUps = {
       'Heater crosstalk-induced detuning against the tuning range',
     ],
     links: {
-      dependsOn: ['DSGN-06', 'TRDY-02', 'ICD-06', 'ICD-04', 'TRDY-09', 'OESD-01', 'OESD-03'],
+      dependsOn: ['DSGN-06', 'TRDY-02', 'ICD-06', 'ICD-04', 'TRDY-09', 'OESD-01', 'OESD-03', 'OESD-07'],
       feedsInto: ['SGNO-04', 'IMPL-07', 'IMPL-09', 'TINF-03', 'SGNO-12'],
       runsWith: ['IMPL-04', 'PSV-06'],
       revisedBy: [],
@@ -395,9 +395,9 @@ export const IMPL_WRITE_UPS: CpoWriteUps = {
       'Open DRC and LVS violations',
     ],
     links: {
-      dependsOn: ['DSGN-09', 'ICD-02', 'TRDY-06'],
+      dependsOn: ['DSGN-09', 'ICD-02', 'TRDY-06', 'MODL-06', 'IMPL-02', 'IMPL-03'],
       feedsInto: ['SGNO-05', 'IMPL-07', 'SGNO-06'],
-      runsWith: ['IMPL-02', 'IMPL-03'],
+      runsWith: [],
       revisedBy: [],
       feedsBackInto: [],
     },
@@ -530,7 +530,7 @@ export const IMPL_WRITE_UPS: CpoWriteUps = {
       'Model-to-layout correlation delta',
     ],
     links: {
-      dependsOn: ['IMPL-07', 'MODL-06', 'MODL-03', 'DSGN-14'],
+      dependsOn: ['IMPL-07', 'MODL-06', 'MODL-03', 'DSGN-14', 'IMPL-03'],
       feedsInto: ['SGNO-06', 'IMPL-10', 'CHAR-05'],
       runsWith: ['IMPL-09'],
       revisedBy: [],
@@ -663,7 +663,7 @@ export const IMPL_WRITE_UPS: CpoWriteUps = {
       'Long-lead parts without confirmed delivery',
     ],
     links: {
-      dependsOn: ['DSGN-14', 'IMPL-07', 'ICD-08'],
+      dependsOn: ['DSGN-14', 'IMPL-07', 'ICD-08', 'DSGN-13'],
       feedsInto: ['PKGA-07', 'PON-02', 'PON-01', 'NPI-02', 'IMPL-13'],
       runsWith: ['IMPL-08'],
       revisedBy: [],
@@ -674,7 +674,7 @@ export const IMPL_WRITE_UPS: CpoWriteUps = {
   'IMPL-11': {
     criticalPath: true,
     purpose: [
-      'Close DFT on the implemented Switch SoC and the other digital content — <b>stitched scan, test-mode timing, and a generated pattern set that meets the coverage target</b> — along with the BIST, loopback and PRBS sequences the SerDes and electrical ICs are tested with.',
+      'Close DFT on the implemented Switch SoC and the I/O die — <b>stitched scan, test-mode timing, and a generated ATPG pattern set that meets the coverage target on each die</b> — along with the BIST, loopback and PRBS sequences the SerDes, the I/O die and the electrical ICs are tested with, and the scan on the electrical IC’s control logic.',
       'Coverage shortfalls are cheap to fix with test points while place and route is still open and expensive once the netlist is frozen. Pattern count also sets test time, and test time sets cost.',
     ],
     flowNote:
@@ -729,9 +729,9 @@ export const IMPL_WRITE_UPS: CpoWriteUps = {
       'Timing-annotated simulation mismatches open',
     ],
     links: {
-      dependsOn: ['IMPL-01', 'DSGN-11', 'SARC-10', 'TINF-01'],
+      dependsOn: ['IMPL-01', 'DSGN-11', 'SARC-10', 'TINF-01', 'IMPL-02'],
       feedsInto: ['SGNO-07', 'PSV-10', 'TINF-06'],
-      runsWith: ['IMPL-02'],
+      runsWith: [],
       revisedBy: [],
       feedsBackInto: [],
     },

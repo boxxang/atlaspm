@@ -126,8 +126,8 @@ export const SDBG: CpoStageModule = {
     'SDBG-04': {
       s: [
         [1, 'Consolidate the must-fix list from triage, root cause and containment decisions', 2],
-        [2, 'Classify each fix as metal-only, base-layer or photonic mask change and count the layers per die', 3],
-        [3, 'Estimate cost, schedule and risk of metal ECO on held wafers against a full-mask re-spin', 3],
+        [2, 'Classify each fix per die — Switch SoC, I/O die, electrical IC, photonic IC — as metal-only, base-layer or photonic mask change and count the layers', 3],
+        [3, 'Estimate cost, schedule and risk of metal ECO on held wafers against a full-mask re-spin, adding an optical engine rebuild lane wherever the electrical or photonic IC changes', 3],
         [4, 'Assess customer sampling, qualification and ramp impact of each option', 2, 1],
         [5, 'Hold the stepping decision review and record the option, fix scope and conditions', 1.5],
       ],
@@ -178,7 +178,7 @@ export const SDBG: CpoStageModule = {
       s: [
         [1, 'Process the held wafers through the changed metal layers, or start new wafers for a full-mask re-spin', 7],
         [2, 'Sort the stepping wafers and release known-good die with the updated test program', 2],
-        [3, 'Assemble stepping packages, optical engines and fiber attach on the engineering line', 3],
+        [3, 'Rebuild optical engines on the engine line where the electrical or photonic IC changed — stacking, fiber attach and engine test — and assemble the stepping packages', 3],
         [4, 'Bring up the stepping units, reload calibration and confirm electrical and optical links', 2],
         [5, 'Verify every fixed anomaly closed on at least three stepping units', 2],
         [6, 'Rerun bring-up and characterization spot checks and release the stepping validation report', 2],

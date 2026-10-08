@@ -126,9 +126,9 @@ export const CON_WRITE_UPS: CpoWriteUps = {
       'Time since the assessment was last refreshed',
     ],
     links: {
-      dependsOn: [],
+      dependsOn: ['CON-01'],
       feedsInto: ['CON-03', 'CON-06', 'FEAS-01'],
-      runsWith: ['CON-01'],
+      runsWith: [],
       revisedBy: ['FEAS-09'],
       feedsBackInto: [],
     },

@@ -146,7 +146,7 @@ export const SARC: CpoStageModule = {
       s: [
         [1, 'Partition the product into its items — Switch SoC, I/O die, electrical IC, photonic IC, the optical engine package and the main package — and write what each one owns', 1.5],
         [2, 'Choose the Switch SoC-to-I/O die die-to-die interface — bandwidth density, latency and bump pitch', 2],
-        [3, 'Select bridge, interposer or substrate-only interconnect for the die-to-die links and place the silicon capacitors', 2],
+        [3, 'Select the die-to-die interconnect — a silicon bridge or interposer placed at main package assembly, not embedded in the substrate — and place the silicon capacitors', 2],
         [4, 'Define the optical engine package as its own product — electrical IC stacked on photonic IC, engine substrate, fiber coupling and its own known-good gate — and score the partition on yield, cost, power, thermal and supply risk', 2, 1],
         [5, 'Confirm assembly feasibility of the optical engine stack and the main package with the package and assembly partners', 1.5],
         [6, 'Record the product partition and the options it rejected', 1],
@@ -154,7 +154,7 @@ export const SARC: CpoStageModule = {
       o: [
         'Product item list with ownership boundaries',
         'Die-to-die interface selection',
-        'Bridge, interposer and silicon capacitor strategy',
+        'Bridge, interposer and silicon capacitor strategy — die-attached at assembly',
         'Optical engine package definition and weighted partition scoring',
         'Package and assembly partner feasibility statement',
         'Product partitioning record — four dies, optical engine package and main package',

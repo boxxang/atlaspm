@@ -130,9 +130,9 @@ export const CERT_WRITE_UPS: CpoWriteUps = {
       'Days from defect to fixed release',
     ],
     links: {
-      dependsOn: ['SINT-02', 'SINT-05', 'REQ-05', 'ICD-10'],
+      dependsOn: ['SINT-02', 'SINT-05', 'REQ-05', 'ICD-10', 'CHAR-04'],
       feedsInto: ['CERT-03', 'CERT-06', 'RAMP-02'],
-      runsWith: ['CHAR-04', 'CHAR-11', 'CERT-05'],
+      runsWith: ['CHAR-11', 'CERT-05'],
       revisedBy: [],
       feedsBackInto: [],
     },
@@ -266,7 +266,7 @@ export const CERT_WRITE_UPS: CpoWriteUps = {
       'Retests forced by build changes',
     ],
     links: {
-      dependsOn: ['REQ-05', 'DSGN-07', 'NPI-03', 'SINT-07'],
+      dependsOn: ['REQ-05', 'DSGN-07', 'NPI-03', 'SINT-07', 'CHAR-03'],
       feedsInto: ['CERT-06', 'RAMP-01'],
       runsWith: ['CERT-01'],
       revisedBy: [],

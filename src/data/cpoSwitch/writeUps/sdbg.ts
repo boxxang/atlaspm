@@ -64,9 +64,9 @@ export const SDBG_WRITE_UPS: CpoWriteUps = {
       'Anomalies reopened after closure',
     ],
     links: {
-      dependsOn: ['PON-01', 'TINF-10'],
+      dependsOn: ['PON-01', 'TINF-10', 'PON-06'],
       feedsInto: ['SDBG-02', 'SDBG-03', 'SDBG-04', 'SDBG-06', 'SUST-03'],
-      runsWith: ['PON-06', 'CHAR-02', 'CHAR-03', 'CHAR-04', 'CERT-01', 'RELQ-02'],
+      runsWith: ['CHAR-02', 'CHAR-03', 'CHAR-04', 'CERT-01', 'RELQ-02'],
       revisedBy: [],
       feedsBackInto: ['TINF-06'],
     },
@@ -200,7 +200,7 @@ export const SDBG_WRITE_UPS: CpoWriteUps = {
       'Workarounds in production firmware',
     ],
     links: {
-      dependsOn: ['SDBG-01', 'SDBG-02', 'DSGN-16'],
+      dependsOn: ['SDBG-01', 'SDBG-02', 'DSGN-16', 'TINF-06'],
       feedsInto: ['SDBG-04', 'NPI-07', 'RAMP-02'],
       runsWith: ['SDBG-02'],
       revisedBy: [],
@@ -212,7 +212,7 @@ export const SDBG_WRITE_UPS: CpoWriteUps = {
     criticalPath: true,
     purpose: [
       'Take the <b>metal ECO versus full-mask re-spin decision</b>: which dies need a new stepping, whether each fix can be done in metal layers on held wafers or needs base layers or photonic masks, and what each option costs in money, schedule and risk.',
-      'On a multi-die product the decision is per die and the answers interact. A metal ECO on the Switch SoC can land in weeks from held wafers; a photonic mask change or base-layer fix restarts fab and re-opens qualification. The decision records what was fixed, what was contained, and what the program accepted.',
+      'On a multi-die product the decision is per die and the answers interact. A metal ECO on the Switch SoC can land in weeks from held wafers; a photonic mask change or base-layer fix restarts fab and re-opens qualification. The decision records what was fixed, what was contained, and what the program accepted. An electrical or photonic IC change costs more than its mask: the optical engines built from it are rebuilt through stacking, fiber attach and engine test before a single stepping package can be mounted, so that lane is planned with the decision.',
     ],
     flowNote:
       'Step 1 consolidates the must-fix list. Step 2 classifies each fix by the layers it touches, and step 3 prices metal ECO against re-spin while step 4 assesses customer, qualification and ramp impact in parallel. Step 5 holds the review and records the decision.',
@@ -260,7 +260,7 @@ export const SDBG_WRITE_UPS: CpoWriteUps = {
     ],
     dependsOn: ['SDBG-01', 'SDBG-02', 'SDBG-03', 'CHAR-02', 'CHAR-03'],
     dependsNote: null,
-    feedsInto: ['SDBG-05', 'SDBG-06', 'RELQ-01'],
+    feedsInto: ['SDBG-05', 'SDBG-06'],
     measuredBy: [
       'Fixes in scope by die and layer type',
       'Fixes added after the decision',
@@ -268,17 +268,17 @@ export const SDBG_WRITE_UPS: CpoWriteUps = {
     ],
     links: {
       dependsOn: ['SDBG-01', 'SDBG-02', 'SDBG-03', 'CHAR-02', 'CHAR-03', 'CHAR-04'],
-      feedsInto: ['SDBG-05', 'SDBG-06', 'SDBG-08', 'RELQ-01', 'NPI-03'],
+      feedsInto: ['SDBG-05', 'SDBG-06', 'SDBG-08', 'NPI-03'],
       runsWith: [],
       revisedBy: [],
-      feedsBackInto: ['CHAR-01'],
+      feedsBackInto: ['CHAR-01', 'RELQ-01'],
     },
     terms: ['Metal ECO', 'Full-mask re-spin', 'Stepping', 'ECO'],
   },
   'SDBG-05': {
     criticalPath: true,
     purpose: [
-      'Implement and tape out the <b>new stepping</b>: the approved fixes in each changed die, full signoff on the changed databases, updated test patterns and test program, and release of the changed masks and the held wafers.',
+      'Implement and tape out the <b>new stepping</b>: the approved fixes in each changed die — the Switch SoC, the I/O die, the electrical IC or the photonic IC — full signoff on the changed databases, updated test patterns and test program, and release of the changed masks and the held wafers.',
       'A stepping is a small tapeout run under more schedule pressure than the first. Signoff cannot be abbreviated because the change looked small: a metal ECO can break timing or design rules anywhere its spare cells are wired, and a photonic change can shift a resonance. The same gates apply, on a shorter clock.',
     ],
     flowNote:
@@ -334,7 +334,7 @@ export const SDBG_WRITE_UPS: CpoWriteUps = {
       'Fixes added after scope freeze',
     ],
     links: {
-      dependsOn: ['SDBG-04', 'MTO-05', 'SGNO-10'],
+      dependsOn: ['SDBG-04', 'MTO-05', 'SGNO-10', 'SDBG-02'],
       feedsInto: ['SDBG-07', 'SDBG-06', 'SDBG-08'],
       runsWith: ['SDBG-03'],
       revisedBy: [],
@@ -412,7 +412,7 @@ export const SDBG_WRITE_UPS: CpoWriteUps = {
     criticalPath: true,
     purpose: [
       'Fabricate, build and validate the <b>new stepping</b>: the changed metal layers on held wafers or a full new wafer run, sort, package and optical engine assembly with fiber attach, bring-up with calibration, and proof on several units that every fixed anomaly is gone and nothing else moved.',
-      'This window is sized for a metal ECO on wafers held before metal. A full-mask re-spin needs new wafer starts through every layer, which takes several times longer than the metal-only path; if SDBG-04 chooses it, the stepping validation, the delta qualification and the Production Stepping Decision all move out, and the program should say so on the day of the decision rather than at this gate.',
+      'This window is sized for a metal ECO on wafers held before metal. A full-mask re-spin needs new wafer starts through every layer, which takes several times longer than the metal-only path; if SDBG-04 chooses it, the stepping validation, the delta qualification and the Production Stepping Decision all move out, and the program should say so on the day of the decision rather than at this gate. Where the electrical or photonic IC changed, the new dies go through the optical engine build line again — stacking, fiber attach, engine test and binning — and that lane, not the switch fab, usually sets the stepping date.',
     ],
     flowNote:
       'Step 1 fabricates the stepping. Step 2 sorts it with the updated test program, step 3 assembles packages and optical engines, and step 4 brings units up with calibration reloaded. Step 5 verifies each fixed anomaly, and step 6 reruns spot checks and releases the validation report.',
@@ -468,7 +468,7 @@ export const SDBG_WRITE_UPS: CpoWriteUps = {
       'New anomalies found on the stepping',
     ],
     links: {
-      dependsOn: ['SDBG-05', 'SDBG-04', 'SDBG-01'],
+      dependsOn: ['SDBG-05', 'SDBG-04', 'SDBG-01', 'TINF-09', 'OEB-01'],
       feedsInto: ['SDBG-06', 'SDBG-08', 'RELQ-07', 'NPI-04'],
       runsWith: ['RELQ-02'],
       revisedBy: [],

@@ -7,7 +7,7 @@ export const PKGA_WRITE_UPS: CpoWriteUps = {
   'PKGA-01': {
     criticalPath: true,
     purpose: [
-      'Procure and kit the <b>first-build material</b> — main package substrates, bridges, optical source modules, fiber egress hardware and passives — so every split in the build matrix can start the week known-good die are released.',
+      'Procure and kit the <b>first-build material</b> — main package substrates, bridges, fiber egress hardware and passives, and the external optical source modules the validation systems will use — so every split in the build matrix can start the week known-good die are released.',
       'Substrates and optical source modules carry lead times as long as the wafer fab cycle, and they are ordered on a package design that has only just been signed off. Material that is late, or built to the wrong revision, idles the known-good die the program has been waiting a year for.',
     ],
     flowNote:
@@ -20,7 +20,7 @@ export const PKGA_WRITE_UPS: CpoWriteUps = {
       'Fiber, connector and passive supplier readiness from TRDY-08',
     ],
     rel: {
-      'PKGA-D1': '<b>First-build material kit — main package substrates, bridges, optical source modules, fiber egress hardware and passives.</b> Produced here and released to the assembly partner by split.',
+      'PKGA-D1': '<b>First-build material kit — main package substrates, bridges, fiber egress hardware and passives, with optical source modules for the validation systems.</b> Produced here; the package material goes to the assembly partner by split, the source modules to system assembly.',
       'PKGA-D3': '<b>Assembled Switch SoC and I/O die packages with assembly travelers.</b> Substrates, bridges and passives from this kit are what the packages are built on.',
     },
     risks: [
@@ -193,7 +193,7 @@ export const PKGA_WRITE_UPS: CpoWriteUps = {
       'Die-to-die continuity failures',
     ],
     links: {
-      dependsOn: ['SORT-07', 'TINF-09', 'PKGA-01', 'PKGA-02', 'PKGA-12'],
+      dependsOn: ['SORT-07', 'TINF-09', 'PKGA-01', 'PKGA-02', 'PKGA-12', 'WFAB-05'],
       feedsInto: ['PKGA-04', 'PKGA-06'],
       runsWith: ['PKGA-11'],
       revisedBy: [],
@@ -271,25 +271,25 @@ export const PKGA_WRITE_UPS: CpoWriteUps = {
   'PKGA-05': {
     criticalPath: false,
     purpose: [
-      'Integrate the <b>optical source</b> — external or integrated, as the architecture defines — with the main package or system once the engines are mounted: screen the modules, bin them to the matrix, attach or connect them, and verify delivered optical power into every lane with the laser safety interlock working.',
-      'The optical source is the part most likely to fail early and the one most sensitive to how it is handled. Its screening data, bin and serial are tied to each package, so a lane with low power at bring-up can be traced to the source rather than blamed on the photonic IC.',
+      'Integrate the <b>external optical source modules</b> — front-panel modules that feed the engines through fiber, not parts of the package — with the validation systems once the engines are mounted: screen the modules, bin them to the matrix, connect them through the system fiber, and verify delivered optical power into every lane with the laser safety interlock working.',
+      'The optical source sits outside the package so it can be serviced, which is why package test runs on a calibrated lab laser and this integration belongs to the system. It is also the part most likely to fail early and the one most sensitive to how it is handled. Its screening data, bin and serial are tied to each system and package, so a lane with low power at bring-up can be traced to the source rather than blamed on the photonic IC.',
     ],
     flowNote:
-      'Step 1 screens incoming modules and step 2 bins them in parallel. Step 3 integrates them, step 4 verifies delivered power per lane with the interlock enabled, and step 5 records serials and releases the units.',
+      'Step 1 screens incoming modules and step 2 bins them in parallel. Step 3 connects them to the validation systems, step 4 verifies delivered power per lane with the interlock enabled, and step 5 records serials and releases the units.',
     consumes: [
-      'Main packages with mounted engines from PKGA-04',
+      'Main packages with mounted engines from PKGA-04, on their way into the validation systems',
       'Optical source subsystem design from DSGN-07',
       'Build matrix with source bins from PKGA-02',
       'Burn-in and screening stations from TINF-12',
       'Laser safety interlock design and procedures',
     ],
     rel: {
-      'PKGA-D5': '<b>Optical source integration record with delivered optical power per lane.</b> Produced here; OBU-01 starts from these values.',
-      'PKGA-D6': '<b>First-build package test results and yield analysis report.</b> Delivered power per lane is part of the optical yield analysis.',
+      'PKGA-D5': '<b>Optical source integration record on the validation systems with delivered optical power per lane.</b> Produced here; OBU-01 starts from these values.',
+      'PKGA-D7': '<b>Assembled validation boards and bring-up systems.</b> Systems go to the labs with their optical sources connected and power per lane recorded.',
     },
     risks: [
       '<b>Infant failures.</b> Sources without adequate burn-in fail in the first hours of bring-up.',
-      '<b>Connector contamination.</b> A dirty optical connection between source and package costs decibels.',
+      '<b>Connector contamination.</b> A dirty fiber connection between the front-panel source and the engine costs decibels.',
       '<b>Interlock not verified.</b> Sources are powered on an open fiber path.',
       '<b>Wavelength out of grid.</b> A source outside the wavelength plan is integrated and found at bring-up.',
       '<b>Serial not recorded.</b> A failing source cannot be traced to its supplier lot.',
@@ -309,7 +309,7 @@ export const PKGA_WRITE_UPS: CpoWriteUps = {
     ],
     entry: [
       'Optical source modules on dock with burn-in data',
-      'Laser safety procedures approved for the assembly area',
+      'Laser safety procedures approved for the system assembly and bring-up area',
       'Source bins defined in the build matrix',
     ],
     exit: [
@@ -319,7 +319,7 @@ export const PKGA_WRITE_UPS: CpoWriteUps = {
     ],
     dependsOn: ['PKGA-04', 'PKGA-01', 'PKGA-02'],
     dependsNote: null,
-    feedsInto: ['PKGA-06', 'OBU-01'],
+    feedsInto: ['PKGA-07', 'OBU-01'],
     measuredBy: [
       'Delivered optical power per lane',
       'Source screening reject rate',
@@ -327,7 +327,7 @@ export const PKGA_WRITE_UPS: CpoWriteUps = {
     ],
     links: {
       dependsOn: ['PKGA-04', 'PKGA-01', 'PKGA-02', 'DSGN-07', 'TINF-12'],
-      feedsInto: ['PKGA-06', 'OBU-01'],
+      feedsInto: ['PKGA-07', 'OBU-01'],
       runsWith: [],
       revisedBy: [],
       feedsBackInto: [],
@@ -338,14 +338,14 @@ export const PKGA_WRITE_UPS: CpoWriteUps = {
     criticalPath: true,
     purpose: [
       'Run <b>package-level test</b> on the first build — electrical and optical — bin every unit to its use, and turn the results into a first-build yield pareto by assembly step, die source and attach split.',
-      'The first build answers whether the assembly process works, not only which units are good. A pareto that separates die, bridge, optical engine mounting, fiber egress and optical source failures tells the program which of its many suppliers and processes to fix before the next build.',
+      'The first build answers whether the assembly process works, not only which units are good. A pareto that separates die, bridge, optical engine mounting and fiber egress failures — the optical source is out of the loop, replaced by a calibrated lab laser — tells the program which of its many suppliers and processes to fix before the next build.',
     ],
     flowNote:
       'Step 1 runs electrical test while step 2 runs optical test in parallel on the same insertion flow. Step 3 bins and allocates units, step 4 builds the pareto while step 5 sends failures to analysis, and step 6 releases the report.',
     consumes: [
       'Load boards and sockets from TINF-04',
       'Production test programs from TINF-06',
-      'Assembled units from PKGA-03, PKGA-04 and PKGA-05',
+      'Assembled units from PKGA-03 and PKGA-04, tested optically on a calibrated lab reference laser',
       'Build matrix and allocation from PKGA-02',
       'Readiness decision from TINF-11',
     ],
@@ -357,7 +357,7 @@ export const PKGA_WRITE_UPS: CpoWriteUps = {
       '<b>Test failure looks like silicon.</b> Program or fixture problems are counted as yield loss.',
       '<b>No failure analysis follow-through.</b> Failing units sit in a drawer.',
       '<b>Optical test skipped.</b> Units go to bring-up with only electrical screening.',
-      '<b>Pareto without splits.</b> Failures cannot be tied back to the attach recipe or source bin.',
+      '<b>Pareto without splits.</b> Failures cannot be tied back to the attach recipe or engine bin.',
       '<b>Marginal units allocated to bring-up.</b> Bring-up time is spent on units test already flagged.',
     ],
     roles: [
@@ -383,7 +383,7 @@ export const PKGA_WRITE_UPS: CpoWriteUps = {
       'Yield pareto attributes at least ninety percent of failures to a category',
       'Every failing unit either in failure analysis or dispositioned with a reason',
     ],
-    dependsOn: ['TINF-04', 'TINF-06', 'PKGA-04', 'PKGA-05'],
+    dependsOn: ['TINF-04', 'TINF-06', 'PKGA-04'],
     dependsNote: null,
     feedsInto: ['PKGA-07', 'SDBG-02', 'NPI-05'],
     measuredBy: [
@@ -392,7 +392,7 @@ export const PKGA_WRITE_UPS: CpoWriteUps = {
       'Units delivered per use against the matrix',
     ],
     links: {
-      dependsOn: ['TINF-04', 'TINF-06', 'TINF-11', 'PKGA-03', 'PKGA-04', 'PKGA-05', 'OEB-05', 'OEB-07'],
+      dependsOn: ['TINF-04', 'TINF-06', 'TINF-11', 'PKGA-03', 'PKGA-04', 'OEB-05', 'OEB-07', 'PKGA-02'],
       feedsInto: ['PKGA-07', 'PKGA-08', 'SDBG-02', 'NPI-05', 'PON-06'],
       runsWith: [],
       revisedBy: [],
@@ -413,7 +413,7 @@ export const PKGA_WRITE_UPS: CpoWriteUps = {
       'Thermal solution from DSGN-15',
       'Tested and binned units from PKGA-06',
       'Unit allocation from the build matrix in PKGA-02',
-      'Electrical-only packages from PKGA-11 and the box build process from TINF-17',
+      'Electrical-only packages from PKGA-11, external optical source modules from PKGA-05 and the box build process from TINF-17',
     ],
     rel: {
       'PKGA-D7': '<b>Assembled validation boards and bring-up systems.</b> Produced here; PON-01 and PON-02 start on them.',
@@ -458,7 +458,7 @@ export const PKGA_WRITE_UPS: CpoWriteUps = {
       'Fiber damage during integration',
     ],
     links: {
-      dependsOn: ['IMPL-10', 'PKGA-06', 'PKGA-02', 'PKGA-11', 'DSGN-15', 'TINF-17'],
+      dependsOn: ['IMPL-10', 'PKGA-06', 'PKGA-02', 'PKGA-11', 'DSGN-15', 'TINF-17', 'PKGA-05'],
       feedsInto: ['PON-01', 'PON-02', 'NPI-02'],
       runsWith: [],
       revisedBy: [],
@@ -524,7 +524,7 @@ export const PKGA_WRITE_UPS: CpoWriteUps = {
       'Units failing pre-qualification stress',
     ],
     links: {
-      dependsOn: ['PKGA-06', 'PKGA-02', 'TINF-14', 'PKGA-04', 'PKGA-05'],
+      dependsOn: ['PKGA-06', 'PKGA-02', 'TINF-14', 'PKGA-04', 'PKGA-05', 'REQ-07'],
       feedsInto: ['RELQ-01', 'RELQ-03', 'RELQ-04', 'SDBG-02'],
       runsWith: [],
       revisedBy: [],

@@ -1,5 +1,5 @@
 /**
- * OESD — Optical Engine Stack Design & Process Development. Weeks 44–96;
+ * OESD — Optical Engine Stack Design & Process Development. Weeks 30–66;
  * closes on Optical Engine Stack Design Freeze.
  */
 import type { CpoStageModule } from '../types';
@@ -8,9 +8,9 @@ export const OESD: CpoStageModule = {
   content: {
     tagline: 'Design the optical engine as the small package it is — stack, substrate, fiber, heat and test — and freeze it before the optical silicon tapes out.',
     description:
-      'The optical engine is a package of its own: an electrical IC stacked face-down on a photonic IC, joined by a fine-pitch bond and through-connections to an engine substrate, with fiber coupled and aligned at its edge, its own thermal path and its own test before it is ever mounted on the main package. This stage designs that stack as one object: the bond interface — pitch, pad map and through-connections — the engine substrate and the electrical-to-photonic attach, the fiber coupling and alignment structures, the thermal path and heater crosstalk across the stack, the test access and known-good optical engine strategy, and the assembly design rules and stacking process developed with the assembly partner on test vehicles. The bond pads and the coupler keep-outs are drawn into the electrical and photonic IC layouts, so the stack design freeze closes before the wave 1 tapeout of those two dies in week 98: a pad map that changes after it is a mask re-spin on both of them.',
+      'The optical engine is a package of its own: an electrical IC stacked face-down on a photonic IC, joined by a fine-pitch bond and through-connections to an engine substrate, with fiber coupled and aligned at its edge, its own thermal path and its own test before it is ever mounted on the main package. This stage designs that stack as one object: the physical bond interface — pad geometry, through-connections and the bonding format, built to the pad map the stack interface in ICD-04 owns — the engine substrate and the electrical-to-photonic attach, the fiber coupling and alignment structures, the thermal path and heater crosstalk across the stack, the test access and known-good optical engine strategy, and the assembly design rules and stacking process developed with the assembly partner on test vehicles. The bond pads and the coupler keep-outs are drawn into the electrical and photonic IC layouts, so the stack design freezes in week 66, before that layout starts, and the pad map, coupler placement and keep-outs are drawn once. Completing the engine substrate and maturing the stacking process continue after the freeze, in SGNO-11, TRDY-15 and TINF-09, under change control; the cross-die stack signoff in SGNO-12 checks the finished layouts against the freeze before the wave 1 tapeout in week 98.',
     activities: [
-      'Bond interface and pad map',
+      'Bond interface physical design',
       'Engine sub-assembly and substrate',
       'Fiber coupling and alignment',
       'Thermal path and crosstalk',
@@ -19,7 +19,7 @@ export const OESD: CpoStageModule = {
       'Stack design freeze',
     ],
     deliverables: [
-      'Optical engine stack bond interface specification — pitch, pad map and through-connections',
+      'Optical engine stack bond interface specification — pad geometry, through-connections and bonding format',
       'Optical engine sub-assembly design package — electrical-to-photonic attach and engine substrate',
       'Optical engine fiber coupling and alignment structure design — coupler, fiber block and alignment features',
       'Optical engine thermal path and heater crosstalk analysis report',
@@ -28,7 +28,7 @@ export const OESD: CpoStageModule = {
       'Optical engine stack design freeze decision package',
     ],
     deliverableFrom: [0, 1, 2, 3, 4, 5, 6],
-    deliverableWeek: [16, 34, 32, 34, 36, 44, 52],
+    deliverableWeek: [14, 34, 30, 30, 32, 34, 36],
     engineeringEffort: [40, 70, 30, 18, 20, 36, 6],
     risks: [
       'The bond pad map changes after the electrical and photonic IC layouts have drawn it, costing a re-spin of both dies',
@@ -41,7 +41,7 @@ export const OESD: CpoStageModule = {
       'Coupler keep-outs and alignment features not handed to photonic layout before its placement is fixed',
       'Known-good optical engine limits written without a link to the optical link budget or the main package yield model',
       'Assembly design rules held by the partner as process knowledge and never written down as rules the designers can check',
-      'Freeze review held after the electrical and photonic IC signoff has already started on an unfrozen pad map',
+      'Freeze review held after electrical and photonic IC layout has started on an unfrozen pad map and keep-outs',
     ],
     leader: { name: 'Elena Varga', short: 'E. Varga', phone: '+1 (408) 555-0531', email: 'elena.varga@example.com' },
     collaboration: ['Packaging', 'Photonics', 'Analog and mixed-signal', 'Optical engineering', 'Thermal and mechanical', 'Test engineering', 'Supply chain'],
@@ -56,7 +56,7 @@ export const OESD: CpoStageModule = {
       'Bond pad map revision and changes since the last layout drop',
       'Process development lot bond yield and coupling loss against target',
       'Thermal margin and heater crosstalk detuning per channel against the tuning range',
-      'Freeze criteria met against the week 96 freeze and the week 98 wave 1 tapeout',
+      'Freeze criteria met by week 66, when electrical and photonic IC layout starts',
     ],
     perspective:
       'Most of what makes an optical engine good or bad is decided where the two dies meet and where the fiber meets the photonic IC. Freeze those two boundaries first, write them as rules the layout teams can check, and the rest of the engine can still move.',
@@ -64,22 +64,22 @@ export const OESD: CpoStageModule = {
   steps: {
     'OESD-01': {
       s: [
-        [1, 'Collect the electrical and photonic IC pad-out, signal count and interface budget from the stack interface and the architecture', 2],
-        [2, 'Select the stack structure — the electrical IC face-down on the photonic IC by hybrid bonding or fine-pitch microbumps — from the test vehicle results', 3],
-        [3, 'Set bond pitch, pad size and alignment tolerance against the assembly partner’s demonstrated capability', 2, 1],
-        [4, 'Draw the bond pad map — signal, bias, heater, monitor, power and ground pads per lane and per engine', 4],
-        [5, 'Define the through-connections from the stack to the engine substrate — through-oxide vias or bonded routing', 3, 1],
-        [6, 'Extract bond and through-connection parasitics and confirm driver and TIA bandwidth margin with the circuit designers', 3],
+        [1, 'Take the pad map, signal assignment and budgets from the stack interface control document and the architecture', 1.5],
+        [2, 'Select the stack structure — the electrical IC face-down on the photonic IC by hybrid bonding or fine-pitch microbumps — from the test vehicle results', 2.5],
+        [3, 'Set pad geometry, pad size and alignment tolerance against the assembly partner’s demonstrated capability', 2, 1],
+        [4, 'Record the bonding format — electrical IC dies bonded die-to-die at the assembly partner, or onto photonic IC wafers — and where thinning, through-oxide-via reveal and dicing sit in it', 2],
+        [5, 'Design the physical bond interface to the pad map — pad geometry, alignment marks and the through-connections to the engine substrate', 3],
+        [6, 'Extract bond and through-connection parasitics and confirm driver and TIA bandwidth margin with the circuit designers', 2.5],
         [7, 'Release the bond interface specification under change control', 1],
       ],
       o: [
-        'Stack interface inputs collected per lane',
+        'Pad map, signal assignment and budgets taken from the stack interface',
         'Stack structure decision record',
-        'Bond pitch, pad size and alignment tolerance',
-        'Bond pad map per lane and per engine',
-        'Through-connection definition to the engine substrate',
+        'Pad geometry, pad size and alignment tolerance',
+        'Bonding format decision with the place of thinning, via reveal and dicing',
+        'Physical bond interface design with alignment marks and through-connections',
         'Bond and through-connection parasitic models with bandwidth margin',
-        'Optical engine stack bond interface specification — pitch, pad map and through-connections',
+        'Optical engine stack bond interface specification — pad geometry, through-connections and bonding format',
       ],
       r: [['OESD-D1', 'produces'], ['OESD-D7', 'feeds']],
     },
@@ -110,14 +110,16 @@ export const OESD: CpoStageModule = {
         [2, 'Design the coupler geometry and mode match to the fiber, with the polarization handling the fiber interface requires', 6],
         [3, 'Design the alignment features — V-grooves, fiducials and mechanical stops — and the monitor paths for active alignment', 5, 1],
         [4, 'Define the fiber block, adhesive, cure and strain relief at the engine edge', 4],
-        [5, 'Model coupling loss over alignment error, cure shrinkage and temperature and allocate the tolerance', 4],
-        [6, 'Release the coupling and alignment design with the coupler keep-outs for photonic layout', 2],
+        [5, 'Decide pigtailed fiber or a detachable fiber connector at the engine, against the main package reflow, underfill and board assembly heat the attach must survive', 3, 1],
+        [6, 'Model coupling loss over alignment error, cure shrinkage and temperature and allocate the tolerance', 4],
+        [7, 'Release the coupling and alignment design with the coupler keep-outs for photonic layout', 2],
       ],
       o: [
         'Engine coupling scheme decision',
         'Coupler geometry and mode match design',
         'Alignment features and active alignment monitor paths',
         'Fiber block, adhesive, cure and strain relief definition',
+        'Pigtail or detachable connector decision with its thermal limits',
         'Coupling loss tolerance allocation',
         'Optical engine fiber coupling and alignment structure design — coupler, fiber block and alignment features',
       ],
@@ -183,14 +185,14 @@ export const OESD: CpoStageModule = {
     'OESD-07': {
       s: [
         [1, 'Collect the stack, coupling, thermal, test and process evidence against the freeze criteria', 1.5],
-        [2, 'Check the bond pad map and coupler keep-outs against the electrical and photonic IC layouts as they stand', 1.5],
+        [2, 'Check the bond pad map and coupler keep-outs against the stack interface and the electrical and photonic IC floorplans layout will start from', 1.5],
         [3, 'Review open exceptions and residual risks with photonics, analog, packaging and the assembly partner', 1, 1],
         [4, 'Hold the freeze review and record the decision and the change control baseline', 1.5],
-        [5, 'Release the freeze package to signoff and the wave 1 tapeout readiness review', 0.5],
+        [5, 'Release the freeze package to electrical and photonic IC layout, cross-die signoff and the wave 1 readiness review', 0.5],
       ],
       o: [
         'Freeze evidence set against the criteria',
-        'Pad map and keep-out check against the layouts',
+        'Pad map and keep-out check against the interface and floorplans',
         'Exception and residual risk register',
         'Freeze decision and change control baseline',
         'Optical engine stack design freeze decision package',

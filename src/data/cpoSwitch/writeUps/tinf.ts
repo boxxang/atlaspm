@@ -62,7 +62,7 @@ export const TINF_WRITE_UPS: CpoWriteUps = {
       'Content moved between insertions after release',
     ],
     links: {
-      dependsOn: ['SARC-10', 'ICD-11', 'REQ-08'],
+      dependsOn: ['SARC-10', 'ICD-11', 'REQ-08', 'DSGN-06'],
       feedsInto: ['TINF-02', 'TINF-03', 'TINF-04', 'TINF-05', 'TINF-06', 'TINF-08', 'TINF-15', 'TINF-18'],
       runsWith: ['DSGN-11'],
       revisedBy: [],
@@ -195,7 +195,7 @@ export const TINF_WRITE_UPS: CpoWriteUps = {
       'Weeks between station release and first photonic wafer',
     ],
     links: {
-      dependsOn: ['TINF-01', 'DSGN-06', 'FEAS-03', 'DSGN-13'],
+      dependsOn: ['TINF-01', 'DSGN-06', 'FEAS-03', 'DSGN-13', 'MODL-04'],
       feedsInto: ['SORT-04', 'TINF-06', 'TINF-07', 'TINF-11'],
       runsWith: ['TINF-02'],
       revisedBy: [],
@@ -261,7 +261,7 @@ export const TINF_WRITE_UPS: CpoWriteUps = {
       'Loopback channel loss against budget',
     ],
     links: {
-      dependsOn: ['TINF-01', 'IMPL-07', 'DSGN-13'],
+      dependsOn: ['TINF-01', 'IMPL-07', 'DSGN-13', 'DSGN-12'],
       feedsInto: ['PKGA-06', 'TINF-06', 'TINF-11'],
       runsWith: ['TINF-02'],
       revisedBy: [],
@@ -327,7 +327,7 @@ export const TINF_WRITE_UPS: CpoWriteUps = {
       'Racks ready against the NPI build plan',
     ],
     links: {
-      dependsOn: ['TINF-01', 'IMPL-10', 'DSGN-14', 'DSGN-17'],
+      dependsOn: ['TINF-01', 'IMPL-10', 'DSGN-14', 'DSGN-17', 'TINF-03'],
       feedsInto: ['NPI-02', 'TINF-11', 'TINF-08'],
       runsWith: ['TINF-06'],
       revisedBy: [],
@@ -394,7 +394,7 @@ export const TINF_WRITE_UPS: CpoWriteUps = {
       'Program revisions needed after first silicon',
     ],
     links: {
-      dependsOn: ['TINF-01', 'TINF-02', 'TINF-03', 'TINF-04', 'TINF-07', 'TINF-13', 'IMPL-11', 'SGNO-07', 'PSV-10', 'OESD-05'],
+      dependsOn: ['TINF-01', 'TINF-02', 'TINF-03', 'TINF-04', 'TINF-07', 'TINF-13', 'IMPL-11', 'SGNO-07', 'PSV-10', 'OESD-05', 'FEAS-02', 'FEAS-03'],
       feedsInto: ['SORT-01', 'SORT-04', 'SORT-06', 'PKGA-06', 'TINF-11', 'SORT-02', 'SORT-03'],
       runsWith: ['TINF-05'],
       revisedBy: [],
@@ -792,7 +792,7 @@ export const TINF_WRITE_UPS: CpoWriteUps = {
       'Weeks between station release and first module arrival',
     ],
     links: {
-      dependsOn: ['TRDY-07', 'TINF-01', 'DSGN-07'],
+      dependsOn: ['TRDY-07', 'TINF-01', 'DSGN-07', 'REQ-07', 'TINF-10'],
       feedsInto: ['PKGA-05', 'TINF-11', 'NPI-07'],
       runsWith: [],
       revisedBy: [],
@@ -858,7 +858,7 @@ export const TINF_WRITE_UPS: CpoWriteUps = {
       'Audit findings on key custody',
     ],
     links: {
-      dependsOn: ['SARC-09', 'DSGN-10', 'TINF-15', 'TINF-01'],
+      dependsOn: ['SARC-09', 'DSGN-10', 'TINF-15', 'TINF-01', 'REQ-06'],
       feedsInto: ['TINF-06', 'TINF-11', 'CERT-05'],
       runsWith: [],
       revisedBy: [],
@@ -924,7 +924,7 @@ export const TINF_WRITE_UPS: CpoWriteUps = {
       'Qualification chamber weeks booked against need',
     ],
     links: {
-      dependsOn: ['PSV-08', 'PSV-01', 'REQ-07', 'TINF-01'],
+      dependsOn: ['PSV-08', 'PSV-01', 'REQ-07', 'TINF-01', 'MODL-03', 'MODL-04'],
       feedsInto: ['MTO-04', 'CHAR-01', 'RELQ-01', 'PKGA-02', 'PKGA-09', 'TINF-11'],
       runsWith: [],
       revisedBy: [],
@@ -990,9 +990,9 @@ export const TINF_WRITE_UPS: CpoWriteUps = {
       'Test hardware downtime at remote sites',
     ],
     links: {
-      dependsOn: ['TINF-01', 'TRDY-06'],
+      dependsOn: ['TINF-01', 'TRDY-06', 'TINF-03', 'ICD-11', 'TINF-02', 'TINF-04'],
       feedsInto: ['TINF-08', 'TINF-10', 'TINF-11', 'TINF-13', 'SORT-01', 'SORT-02', 'SORT-03'],
-      runsWith: ['TINF-02', 'TINF-04'],
+      runsWith: [],
       revisedBy: [],
       feedsBackInto: [],
     },
@@ -1056,7 +1056,7 @@ export const TINF_WRITE_UPS: CpoWriteUps = {
       'Scrap cost per build',
     ],
     links: {
-      dependsOn: ['TINF-09', 'TINF-01', 'REQ-07'],
+      dependsOn: ['TINF-09', 'TINF-01', 'REQ-07', 'CON-04', 'DSGN-07'],
       feedsInto: ['OEB-04', 'OEB-08', 'PKGA-05', 'TINF-11', 'NPI-05'],
       runsWith: [],
       revisedBy: [],
@@ -1123,7 +1123,7 @@ export const TINF_WRITE_UPS: CpoWriteUps = {
       'Fiber damage per box build',
     ],
     links: {
-      dependsOn: ['DSGN-14', 'IMPL-10', 'DSGN-13', 'TINF-05', 'TINF-01'],
+      dependsOn: ['DSGN-14', 'IMPL-10', 'DSGN-13', 'TINF-05', 'TINF-01', 'DSGN-15'],
       feedsInto: ['PKGA-07', 'NPI-02', 'TINF-11'],
       runsWith: [],
       revisedBy: [],
@@ -1189,7 +1189,7 @@ export const TINF_WRITE_UPS: CpoWriteUps = {
       'Engine test time per unit against the capacity model',
     ],
     links: {
-      dependsOn: ['OESD-05', 'TINF-01', 'OESD-03', 'FEAS-12'],
+      dependsOn: ['OESD-05', 'TINF-01', 'OESD-03', 'FEAS-12', 'OESD-01'],
       feedsInto: ['OEB-01', 'OEB-02', 'OEB-05', 'OEB-07', 'TINF-11'],
       runsWith: ['TINF-03', 'TINF-06'],
       revisedBy: [],

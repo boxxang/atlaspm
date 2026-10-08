@@ -63,7 +63,7 @@ export const MTO_WRITE_UPS: CpoWriteUps = {
       'Critical layers with a reviewed mask data preparation job',
     ],
     links: {
-      dependsOn: ['SGNO-01', 'SGNO-07', 'SGNO-08', 'SGNO-10'],
+      dependsOn: ['SGNO-01', 'SGNO-07', 'SGNO-08', 'SGNO-10', 'TRDY-01'],
       feedsInto: ['WFAB-01', 'MTO-05'],
       runsWith: ['MTO-02'],
       revisedBy: ['SDBG-05'],
@@ -129,9 +129,9 @@ export const MTO_WRITE_UPS: CpoWriteUps = {
       'Tapeout date against the Switch SoC tapeout',
     ],
     links: {
-      dependsOn: ['SGNO-02', 'SGNO-10'],
+      dependsOn: ['SGNO-02', 'SGNO-10', 'MTO-01'],
       feedsInto: ['WFAB-02', 'MTO-05'],
-      runsWith: ['MTO-01'],
+      runsWith: [],
       revisedBy: ['SDBG-05'],
       feedsBackInto: [],
     },
@@ -195,7 +195,7 @@ export const MTO_WRITE_UPS: CpoWriteUps = {
       'Option mismatches found at order review',
     ],
     links: {
-      dependsOn: ['SGNO-05', 'SGNO-06', 'SGNO-10'],
+      dependsOn: ['SGNO-05', 'SGNO-06', 'SGNO-10', 'SGNO-11', 'PKGA-02'],
       feedsInto: ['WFAB-05', 'MTO-05'],
       runsWith: [],
       revisedBy: [],
@@ -260,9 +260,9 @@ export const MTO_WRITE_UPS: CpoWriteUps = {
       'Wafers held before metal per die',
     ],
     links: {
-      dependsOn: ['SGNO-10', 'TINF-01', 'TRDY-10', 'OTO-03'],
+      dependsOn: ['SGNO-10', 'TINF-01', 'TRDY-10', 'OTO-03', 'PKGA-02'],
       feedsInto: ['WFAB-01', 'WFAB-02', 'WFAB-05', 'PKGA-02', 'CHAR-01', 'RELQ-01'],
-      runsWith: ['PKGA-02'],
+      runsWith: [],
       revisedBy: [],
       feedsBackInto: [],
     },

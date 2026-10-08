@@ -52,8 +52,7 @@ const ROWS = [
   ['cpoTapeout'],
   ['cpoFabrication'],
   ['cpoSort'],
-  ['cpoOeBuild'],
-  ['cpoAssembly'],
+  ['cpoOeBuild', 'cpoAssembly'],
   ['cpoPowerOn'],
   ['cpoDebug'],
   ['cpoOpticalBringup'],
@@ -190,6 +189,9 @@ const CFG = {
     ],
     note: 'Test vehicles and supplier readiness → optical engine stack and main package designed beside the silicon → sort → known-good optical engines → main package first build from known-good dies and known-good engines → optical bring-up → NPI builds → production release.',
   },
+  /* hand-offs drawn even though a longer route reaches the same stage: the
+     main package build's second input, and the standalone engine bring-up */
+  keep: ['cpoSort>cpoAssembly', 'cpoOeBuild>cpoOpticalBringup'],
   tags: {},
   tagStyle: {},
   origin: {},
@@ -199,6 +201,7 @@ const CFG = {
   endNote: `Wave 1 Tapeout at W${at('cpoTapeoutOptical')} · All Dies Taped Out at W${at('cpoTapeout')} · First Silicon at W${at('cpoFabrication')} · Known-Good Optical Engines at W${at('cpoOeBuild')} · First Package Build at W${at('cpoAssembly')} · First Optical Link at W${at('cpoOpticalBringup')} · Production Release at W${at('cpoRamp')}`,
 };
 
+if (!CFG.keep.every((k) => EDGES.some(([a, z]) => `${a}>${z}` === k))) throw new Error('A kept link is not a link.');
 const edgesOk = EDGES.every(([a, z]) => STAGES.some((s) => s.key === a) && STAGES.some((s) => s.key === z));
 const rowsOk = ROWS.flat().length === STAGES.length && STAGES.every((s) => ROWS.flat().includes(s.key));
 for (const row of ROWS) {
@@ -226,6 +229,11 @@ const swap = (from: string, to: string) => {
   out = out.replace(from, to);
 };
 swap('<title>Typical SoC Flow</title>', '<title>CPO Network Switch System Flow</title>');
+/* the engine draws a transitive reduction; keep the hand-offs CFG.keep names */
+swap(
+  "if (SPINE_EDGES.has(a + '>' + z)) return true;",
+  "if (SPINE_EDGES.has(a + '>' + z) || (CFG.keep || []).includes(a + '>' + z)) return true;",
+);
 swap('<h1>Typical SoC — Program Flowchart</h1>', '<h1>CPO Network Switch System — Program Flowchart</h1>');
 out = out.replace(
   /<p>The full development flow of AtlasPM’s built-in <b>Typical SoC<\/b> template:[^<]*(<[^>]+>[^<]*)*?<\/p>/,

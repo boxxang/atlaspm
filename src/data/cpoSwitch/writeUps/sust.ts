@@ -64,9 +64,9 @@ export const SUST_WRITE_UPS: CpoWriteUps = {
       'Weeks from detractor identified to fix verified',
     ],
     links: {
-      dependsOn: ['NPI-05', 'RAMP-04', 'TINF-10'],
+      dependsOn: ['NPI-05', 'RAMP-04', 'TINF-10', 'SORT-06', 'SUST-03'],
       feedsInto: ['SUST-02', 'SUST-04', 'SUST-07'],
-      runsWith: ['SUST-03'],
+      runsWith: [],
       revisedBy: [],
       feedsBackInto: ['SORT-06', 'TINF-09'],
     },
@@ -200,7 +200,7 @@ export const SUST_WRITE_UPS: CpoWriteUps = {
       'Days from return receipt to root cause',
     ],
     links: {
-      dependsOn: ['RAMP-06', 'SDBG-02', 'TINF-10'],
+      dependsOn: ['RAMP-06', 'SDBG-02', 'TINF-10', 'SUST-05'],
       feedsInto: ['SUST-04', 'SUST-06', 'SUST-07'],
       runsWith: ['SUST-01'],
       revisedBy: [],
@@ -337,7 +337,7 @@ export const SUST_WRITE_UPS: CpoWriteUps = {
     links: {
       dependsOn: ['RAMP-02', 'SINT-05', 'CERT-05'],
       feedsInto: ['SUST-06', 'SUST-07', 'SUST-03'],
-      runsWith: [],
+      runsWith: ['SUST-03'],
       revisedBy: [],
       feedsBackInto: [],
     },
@@ -538,9 +538,9 @@ export const SUST_WRITE_UPS: CpoWriteUps = {
       'Repair yield at depot retest',
     ],
     links: {
-      dependsOn: ['RAMP-06', 'CHAR-10', 'TINF-16', 'RAMP-07'],
+      dependsOn: ['RAMP-06', 'CHAR-10', 'TINF-16', 'RAMP-07', 'SUST-06', 'SUST-03'],
       feedsInto: ['SUST-07', 'SUST-03'],
-      runsWith: ['SUST-03'],
+      runsWith: [],
       revisedBy: [],
       feedsBackInto: [],
     },

@@ -7,31 +7,31 @@ export const OESD_WRITE_UPS: CpoWriteUps = {
   'OESD-01': {
     criticalPath: true,
     purpose: [
-      'Define the <b>stack the optical engine is built on</b>: the electrical IC face-down on the photonic IC, the bond between them — hybrid bonding or fine-pitch microbumps, its pitch, pad size and alignment tolerance — the bond pad map for every signal, bias, heater, monitor, power and ground pad per lane, and the through-connections that carry power and control down to the engine substrate.',
-      'The pad map is drawn into two dies from two foundries, and it is the one thing in the optical engine that cannot be changed after either tapes out. Fixing it early, with the parasitics through the bond handed back to the driver and TIA designers, is what lets both layouts proceed in parallel without a re-spin waiting at the end.',
+      'Design the <b>physical stack the optical engine is built on</b>: the electrical IC face-down on the photonic IC, the bond between them — hybrid bonding or fine-pitch microbumps, its pad geometry, pad size and alignment tolerance — the alignment marks and through-connections that carry power and control down to the engine substrate, and the bonding format: dies bonded to dies at the assembly partner, or electrical IC dies bonded onto photonic IC wafers, with where thinning, through-oxide-via reveal and dicing sit in each.',
+      'The pad map itself — which signal sits on which pad — has one owner, the stack interface in ICD-04; this activity builds the physical interface to it and never reassigns a pad. The map is drawn into two dies from two foundries and cannot change after either tapes out, so fixing the physical design early, with the parasitics through the bond handed back to the driver and TIA designers, lets both layouts start from a frozen stack.',
     ],
     flowNote:
-      'Step 1 collects the pad-out and budgets. Step 2 selects the stack structure while step 3 sets pitch and tolerance with the assembly partner beside it. Step 4 draws the pad map with step 5 defining the through-connections in parallel. Step 6 extracts parasitics and confirms bandwidth, and step 7 releases.',
+      'Step 1 takes the pad map and budgets from ICD-04. Step 2 selects the stack structure while step 3 sets pad geometry and tolerance with the assembly partner beside it. Step 4 records the bonding format and step 5 designs the physical interface to the pad map. Step 6 extracts parasitics and confirms bandwidth, and step 7 releases.',
     consumes: [
-      'Electrical IC-to-photonic IC stack interface from ICD-04',
+      'Bond pad map, signal assignment and stack budgets from the stack interface control document ICD-D4 in ICD-04',
       'Optical engine architecture and EIC / PIC split from SARC-03',
       'Product partitioning and optical engine package definition from SARC-04',
       'Fiber attach and optical coupling test vehicle results from FEAS-06',
       'Electrical IC and photonic IC test vehicle results from FEAS-03 and FEAS-04',
     ],
     rel: {
-      'OESD-D1': '<b>Optical engine stack bond interface specification — pitch, pad map and through-connections.</b> Produced here; IMPL-04 and IMPL-05 draw the pad map into the electrical and photonic IC layouts.',
+      'OESD-D1': '<b>Optical engine stack bond interface specification — pad geometry, through-connections and bonding format.</b> Produced here; IMPL-04 and IMPL-05 draw the bond interface into the electrical and photonic IC layouts after the freeze.',
       'OESD-D7': '<b>Optical engine stack design freeze decision package.</b> The bond interface is the first item the freeze baselines.',
     },
     risks: [
       '<b>Pitch chosen by today’s capability.</b> The bond pitch is set by what the assembly line runs now, and the driver and TIA lose the bandwidth a finer pitch would give.',
-      '<b>Pad map drawn twice.</b> The electrical and photonic IC teams each keep their own copy of the map and the copies drift.',
+      '<b>Pad map owned twice.</b> The physical design reassigns pads the stack interface owns, and the interface and the layouts drift apart.',
       '<b>Through-connections forgotten.</b> Power and control to the engine substrate are routed late and force a pad map change.',
       '<b>Parasitics never handed back.</b> Circuits are designed to an ideal bond and miss bandwidth on the real one.',
       '<b>Tolerance unproven.</b> Alignment tolerance is taken from a data sheet rather than from test vehicle bonds.',
     ],
     roles: [
-      { r: 'Packaging', d: 'Owns the stack structure, bond interface and pad map' },
+      { r: 'Packaging', d: 'Owns the stack structure, the physical bond interface and the bonding format' },
       { r: 'Analog designer', d: 'Electrical IC pad-out and bandwidth through the bond' },
       { r: 'Photonics designer', d: 'Photonic IC pad-out, heater and monitor pads' },
       { r: 'Assembly partner process engineer', d: 'Demonstrated pitch, alignment and bond yield' },
@@ -50,7 +50,7 @@ export const OESD_WRITE_UPS: CpoWriteUps = {
       'First bond and coupling test vehicle results from FEAS-06',
     ],
     exit: [
-      'Bond pad map released under change control and acknowledged by both layout owners',
+      'Physical bond interface released under change control against the ICD-04 pad map, with no pad reassigned, and acknowledged by both layout owners',
       'Driver and TIA bandwidth margin through the extracted bond positive at every corner',
       'Bond pitch and alignment tolerance inside what the assembly partner has demonstrated on test vehicles',
     ],
@@ -145,7 +145,7 @@ export const OESD_WRITE_UPS: CpoWriteUps = {
       'Coupling loss is usually the largest single loss in the optical link, and most of it is decided by structures drawn on the photonic IC. The coupler keep-outs and alignment features therefore go to photonic layout as a frozen input, not as a request after placement.',
     ],
     flowNote:
-      'Step 1 chooses the coupling scheme. Step 2 designs the coupler while step 3 designs the alignment features in parallel. Step 4 defines the fiber block and cure, step 5 allocates the coupling tolerance and step 6 releases the design with the keep-outs.',
+      'Step 1 chooses the coupling scheme. Step 2 designs the coupler while step 3 designs the alignment features in parallel. Step 4 defines the fiber block and cure, with step 5 deciding between pigtailed fiber and a detachable connector beside it. Step 6 allocates the coupling tolerance and step 7 releases the design with the keep-outs.',
     consumes: [
       'Photonic IC-to-fiber and front-panel optical interfaces from ICD-06',
       'Fiber attach and optical coupling test vehicle results from FEAS-06',
@@ -186,7 +186,7 @@ export const OESD_WRITE_UPS: CpoWriteUps = {
     exit: [
       'Coupling loss at the allocated alignment tolerance inside the link budget, over temperature',
       'Coupler keep-outs and alignment features accepted by photonic layout',
-      'Fiber block, adhesive and cure defined with the assembly partner',
+      'Fiber block, adhesive and cure defined with the assembly partner, and the pigtail or detachable connector choice recorded with the reflow and underfill temperatures it must survive',
     ],
     dependsOn: ['ICD-06', 'FEAS-06', 'OESD-01'],
     dependsNote: null,
@@ -198,7 +198,7 @@ export const OESD_WRITE_UPS: CpoWriteUps = {
     ],
     links: {
       dependsOn: ['ICD-06', 'FEAS-06', 'OESD-01', 'DSGN-06', 'MODL-04'],
-      feedsInto: ['IMPL-05', 'OESD-06', 'OESD-07', 'TINF-09', 'DSGN-13', 'OEB-04'],
+      feedsInto: ['IMPL-05', 'OESD-06', 'OESD-07', 'TINF-09', 'DSGN-13', 'OEB-04', 'PKGA-04'],
       runsWith: ['OESD-02'],
       revisedBy: [],
       feedsBackInto: ['DSGN-06'],
@@ -330,7 +330,7 @@ export const OESD_WRITE_UPS: CpoWriteUps = {
       'Estimated escape rate into the main package',
     ],
     links: {
-      dependsOn: ['SARC-10', 'OESD-01', 'ICD-11', 'MODL-04'],
+      dependsOn: ['SARC-10', 'OESD-01', 'ICD-11', 'MODL-04', 'DSGN-11'],
       feedsInto: ['TINF-06', 'TINF-07', 'OESD-07', 'DSGN-11', 'OEB-05', 'OEB-07', 'SORT-05', 'OEB-01', 'TINF-18'],
       runsWith: ['OESD-02'],
       revisedBy: [],
@@ -408,11 +408,11 @@ export const OESD_WRITE_UPS: CpoWriteUps = {
   'OESD-07': {
     criticalPath: true,
     purpose: [
-      'Hold the <b>optical engine stack design freeze</b>: the bond interface and pad map, the engine substrate, the coupling and alignment structures, the thermal path, the test access and the stacking process scored against written freeze criteria, the pad map and coupler keep-outs checked against the electrical and photonic IC layouts as they stand, and a decision recorded with the change control baseline.',
-      'The freeze has to close before the wave 1 tapeout of the electrical and photonic ICs, because their signoff checks the layouts against what is frozen here. A freeze after signoff starts is a freeze in name only: any change it records is a change to two databases already on their way to the foundry.',
+      'Hold the <b>optical engine stack design freeze</b>: the bond interface and pad map, the engine substrate, the coupling and alignment structures, the thermal path, the test access and the stacking process scored against written freeze criteria, the pad map and coupler keep-outs checked against the stack interface and the floorplans layout starts from, and a decision recorded with the change control baseline.',
+      'The freeze closes in week 66, before electrical and photonic IC layout starts, so the pad map, coupler placement and keep-outs are drawn once rather than redrawn. A freeze after layout starts is a freeze in name only: any change it records is a change to two layouts already in progress. The cross-die stack signoff in SGNO-12 then checks the finished layouts against what is frozen here.',
     ],
     flowNote:
-      'Step 1 collects the evidence. Step 2 checks pad map and keep-outs against the layouts while step 3 reviews exceptions in parallel. Step 4 holds the review and step 5 releases the package to signoff.',
+      'Step 1 collects the evidence. Step 2 checks pad map and keep-outs against the interface and floorplans while step 3 reviews exceptions in parallel. Step 4 holds the review and step 5 releases the package to layout, cross-die signoff and the wave 1 readiness review.',
     consumes: [
       'Bond interface specification from OESD-01',
       'Optical engine sub-assembly design from OESD-02',
@@ -421,19 +421,19 @@ export const OESD_WRITE_UPS: CpoWriteUps = {
       'Design rules and stacking process baseline from OESD-06',
     ],
     rel: {
-      'OESD-D7': '<b>Optical engine stack design freeze decision package.</b> Produced here; signoff in SGNO-03, SGNO-04 and SGNO-12 checks the layouts against it.',
+      'OESD-D7': '<b>Optical engine stack design freeze decision package.</b> Produced here; IMPL-04 and IMPL-05 lay out to it, and signoff in SGNO-03, SGNO-04 and SGNO-12 checks the layouts against it.',
     },
     risks: [
-      '<b>Freeze after signoff starts.</b> The electrical and photonic IC signoff runs against an unfrozen pad map.',
+      '<b>Freeze after layout starts.</b> Electrical and photonic IC layout starts on an unfrozen pad map and redraws it.',
       '<b>Criteria unstated.</b> The freeze is declared without values to score against.',
       '<b>Partner absent.</b> The assembly partner does not sign the freeze it has to build.',
       '<b>Exceptions unowned.</b> Open items carry into the build with no owner.',
-      '<b>Layouts unchecked.</b> The pad map is frozen but never compared with the layouts drawing it.',
+      '<b>Floorplans unchecked.</b> The pad map is frozen but never compared with the floorplans layout will draw it into.',
     ],
     roles: [
       { r: 'System architecture', d: 'Chairs the optical engine stack design freeze' },
       { r: 'Packaging lead', d: 'Stack, substrate and process evidence' },
-      { r: 'Photonics lead', d: 'Coupler and photonic IC layout check' },
+      { r: 'Photonics lead', d: 'Coupler and photonic IC floorplan check' },
       { r: 'Analog lead', d: 'Electrical IC pad-out and bandwidth check' },
       { r: 'Program management', d: 'Approves the freeze and its baseline' },
     ],
@@ -444,25 +444,25 @@ export const OESD_WRITE_UPS: CpoWriteUps = {
     ],
     entry: [
       'Every stack design deliverable from OESD-01 to OESD-06 released',
-      'Electrical and photonic IC layouts carry the current pad map',
+      'Electrical and photonic IC floorplans carry the current pad map and keep-outs',
       'Freeze criteria agreed with the assembly partner',
     ],
     exit: [
       'Every freeze criterion scored pass or an exception with an owner and a date',
-      'Pad map and coupler keep-outs match the electrical and photonic IC layouts',
-      'Freeze decision recorded by week 96, before the wave 1 readiness review',
+      'Pad map and coupler keep-outs match the stack interface and the electrical and photonic IC floorplans',
+      'Freeze decision recorded by week 66, before electrical and photonic IC layout starts',
     ],
     dependsOn: ['OESD-01', 'OESD-02', 'OESD-03', 'OESD-04', 'OESD-05', 'OESD-06'],
     dependsNote: null,
-    feedsInto: ['SGNO-03', 'SGNO-04', 'SGNO-12', 'SGNO-09'],
+    feedsInto: ['IMPL-04', 'IMPL-05', 'SGNO-03', 'SGNO-04', 'SGNO-12', 'SGNO-09'],
     measuredBy: [
       'Freeze criteria met',
       'Exceptions open at freeze',
       'Pad map changes after freeze',
     ],
     links: {
-      dependsOn: ['OESD-01', 'OESD-02', 'OESD-03', 'OESD-04', 'OESD-05', 'OESD-06', 'IMPL-04', 'IMPL-05'],
-      feedsInto: ['SGNO-03', 'SGNO-04', 'SGNO-12', 'SGNO-09', 'OTO-01', 'OTO-02'],
+      dependsOn: ['OESD-01', 'OESD-02', 'OESD-03', 'OESD-04', 'OESD-05', 'OESD-06', 'FEAS-12', 'ICD-04'],
+      feedsInto: ['IMPL-04', 'IMPL-05', 'SGNO-03', 'SGNO-04', 'SGNO-12', 'SGNO-09', 'OTO-01', 'OTO-02'],
       runsWith: [],
       revisedBy: [],
       feedsBackInto: [],

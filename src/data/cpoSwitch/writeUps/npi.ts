@@ -64,10 +64,10 @@ export const NPI_WRITE_UPS: CpoWriteUps = {
     ],
     links: {
       dependsOn: ['TINF-11', 'PKGA-06', 'REQ-08', 'MTO-04'],
-      feedsInto: ['NPI-02', 'NPI-03', 'NPI-04', 'NPI-05', 'NPI-06', 'NPI-07', 'NPI-09', 'RELQ-01'],
+      feedsInto: ['NPI-02', 'NPI-03', 'NPI-04', 'NPI-05', 'NPI-06', 'NPI-07', 'NPI-09'],
       runsWith: ['CHAR-01'],
       revisedBy: ['SDBG-04'],
-      feedsBackInto: [],
+      feedsBackInto: ['RELQ-01'],
     },
     terms: ['NPI', 'EVT', 'DVT', 'PVT (build)', 'Golden unit'],
   },
@@ -130,7 +130,7 @@ export const NPI_WRITE_UPS: CpoWriteUps = {
       'Validation matrix cells completed',
     ],
     links: {
-      dependsOn: ['NPI-01', 'SORT-07', 'PKGA-06', 'TINF-06', 'SDBG-03'],
+      dependsOn: ['NPI-01', 'SORT-07', 'PKGA-06', 'TINF-06', 'SDBG-03', 'TINF-09'],
       feedsInto: ['NPI-03', 'NPI-05', 'NPI-07', 'SDBG-01'],
       runsWith: ['CHAR-02', 'CHAR-03'],
       revisedBy: [],
@@ -201,7 +201,7 @@ export const NPI_WRITE_UPS: CpoWriteUps = {
     links: {
       dependsOn: ['NPI-02', 'NPI-01', 'RELQ-01', 'SDBG-04'],
       feedsInto: ['NPI-04', 'NPI-05', 'RELQ-02', 'RELQ-03', 'RELQ-04', 'CERT-06'],
-      runsWith: ['CHAR-03'],
+      runsWith: ['CHAR-03', 'CERT-06'],
       revisedBy: ['SDBG-08', 'RELQ-07'],
       feedsBackInto: [],
     },
@@ -335,9 +335,9 @@ export const NPI_WRITE_UPS: CpoWriteUps = {
       'Share of loss attributed to a root cause',
     ],
     links: {
-      dependsOn: ['NPI-01', 'NPI-02', 'TINF-09', 'TINF-10', 'PKGA-06'],
+      dependsOn: ['NPI-01', 'NPI-02', 'TINF-09', 'TINF-10', 'PKGA-06', 'NPI-03', 'NPI-04'],
       feedsInto: ['NPI-08', 'RAMP-04', 'SUST-01'],
-      runsWith: ['NPI-03', 'NPI-04'],
+      runsWith: [],
       revisedBy: [],
       feedsBackInto: ['TINF-09', 'SORT-06'],
     },

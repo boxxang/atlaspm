@@ -1,3 +1,4 @@
+import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { ALL_ACTIVITIES, ALL_DELIVERABLE_TITLES, ALL_GLOSSARY, ALL_MILESTONES, ALL_STAGE_CONTENT } from '@/data/builtins';
 import {
@@ -16,6 +17,8 @@ import { deliverableRefs } from '@/lib/deliverableRefs';
 import { deliverableStep, producersOf } from '@/lib/deliverableStatus';
 import { parseRich, type RichNode } from '@/lib/activityRefs';
 import { computeSchedule } from '@/lib/schedule';
+import * as Flow from '../../tools/cpoFlow/analysis';
+import { ACTIVITY_FATE, DELIVERABLE_FATE } from '../../tools/cpoFlow/refMap';
 
 /**
  * The CPO Network Switch System template: a co-packaged-optics switch, from
@@ -411,5 +414,82 @@ describe('CPO dependency integrity', () => {
         expect(refOf.get(`${s.id}:${i}`), `${s.id} "${title}"`).toBe(`${s.shortTitle}-D${i + 1}`);
       });
     }
+  });
+});
+
+/* ---------------- the template as a program flow (tools/cpoFlow) ---------------- */
+
+describe('CPO program flow', () => {
+  const base = JSON.parse(readFileSync('tests/unit/fixtures/cpoSwitchBaseline.json', 'utf8')) as {
+    activities: { ref: string }[];
+    deliverables: { ref: string }[];
+  };
+
+  it('accounts for every activity and deliverable the template had before the die split', () => {
+    for (const { ref } of base.activities) {
+      const f = ACTIVITY_FATE[ref];
+      expect(f, `${ref} is unaccounted for`).toBeTruthy();
+      if (f.fate === 'deleted') expect(f.why, `${ref} deleted without a reason`).toBeTruthy();
+      else for (const to of f.to) expect(CPO_ACTIVITY_TITLES[to], `${ref} → ${to}`).toBeTruthy();
+    }
+    for (const { ref } of base.deliverables) {
+      const f = DELIVERABLE_FATE[ref];
+      expect(f, `${ref} is unaccounted for`).toBeTruthy();
+      if (f.fate === 'deleted') expect(f.why, `${ref} deleted without a reason`).toBeTruthy();
+      else for (const to of f.to) expect(CPO_DELIVERABLES[to], `${ref} → ${to}`).toBeTruthy();
+    }
+  });
+
+  it('links every input a write-up consumes to the activity that produces it, and leaves nothing isolated', () => {
+    for (const y of Flow.ALL_REFS) {
+      const l = CPO_WRITE_UPS[y].links;
+      const linked = new Set([...l.dependsOn, ...l.runsWith, ...l.revisedBy, ...CPO_WRITE_UPS[y].dependsOn]);
+      for (const x of Flow.namedProducers(y)) if (x !== y) expect(linked.has(x), `${y} consumes from ${x} without a link`).toBe(true);
+    }
+    expect(Flow.isolated()).toEqual([]);
+  });
+
+  it('makes the hand-offs the optical engine split exists for, each finished before it is used', () => {
+    for (const h of Flow.KEY_HANDOFFS) {
+      for (const y of h.to) {
+        for (const x of h.from) {
+          expect(Flow.predecessorsOf(y), `${h.what}: ${y} does not wait on ${x}`).toContain(x);
+          expect(Flow.absEnd(x), `${h.what}: ${x} ends after ${y} ends`).toBeLessThanOrEqual(Flow.absEnd(y));
+        }
+      }
+    }
+  });
+
+  it('closes every gate on an activity of its own stage, at the stage’s end', () => {
+    for (const s of CPO_SKELETON) {
+      const ref = Flow.GATE_CLOSERS[s.key];
+      const a = s.activities.find((x) => x.ref === ref);
+      expect(a, `${s.key} has no gate closer`).toBeTruthy();
+      expect(a!.w[1], `${ref} ends ${s.dur - a!.w[1]} weeks before the ${s.gate.label} gate`).toBeGreaterThanOrEqual(s.dur - 2);
+    }
+  });
+
+  it('sets the first package build by the photonic IC and optical engine path, with slack on the Switch SoC and I/O path', () => {
+    const cpm = Flow.cpm();
+    const intoBuild = cpm.chainTo('PKGA-06').map((s) => s.ref);
+    for (const ref of ['OTO-02', 'WFAB-04', 'SORT-04', 'OEB-02', 'OEB-09', 'PKGA-04']) {
+      expect(intoBuild, `the critical path into the first package build misses ${ref}`).toContain(ref);
+    }
+    /* no float on the engine path, two weeks on the Switch SoC and four on the I/O die, into the build and into production */
+    const intoBuildFloat = cpm.floatTo('PKGA-06');
+    const intoProduction = cpm.floatTo('RAMP-07');
+    for (const ref of ['OTO-02', 'WFAB-04', 'SORT-04', 'SORT-05', 'OEB-02', 'OEB-09', 'PKGA-04']) {
+      expect(intoBuildFloat(ref), `${ref} has float into the first package build`).toBe(0);
+      expect(intoProduction(ref), `${ref} has float into production release`).toBe(0);
+    }
+    expect(intoBuildFloat('PKGA-03'), 'Switch SoC and I/O die attach').toBeGreaterThan(0);
+    expect(intoBuildFloat('WFAB-01'), 'Switch SoC fab').toBeGreaterThan(0);
+    expect(intoBuildFloat('WFAB-02'), 'I/O die fab').toBeGreaterThan(0);
+  });
+
+  it('stays within eight weeks of the program length it had before the split', () => {
+    const before = JSON.parse(readFileSync('tests/unit/fixtures/cpoSwitchBaseline.json', 'utf8')).programWeeks as number;
+    const after = Math.max(...CPO_SKELETON.map((s) => s.start + s.dur));
+    expect(after - before).toBeLessThanOrEqual(8);
   });
 });

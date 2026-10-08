@@ -62,7 +62,7 @@ export const WFAB_WRITE_UPS: CpoWriteUps = {
       'Engineering lots held and their decision dates',
     ],
     links: {
-      dependsOn: ['MTO-01', 'MTO-04'],
+      dependsOn: ['MTO-01', 'MTO-04', 'PSV-08', 'PSV-09'],
       feedsInto: ['WFAB-07', 'SORT-01'],
       runsWith: ['WFAB-02', 'WFAB-04'],
       revisedBy: [],
@@ -128,7 +128,7 @@ export const WFAB_WRITE_UPS: CpoWriteUps = {
       'Good I/O die wafers delivered against the kit plan',
     ],
     links: {
-      dependsOn: ['MTO-02', 'MTO-04', 'DSGN-04'],
+      dependsOn: ['MTO-02', 'MTO-04', 'DSGN-04', 'TRDY-01', 'PSV-05'],
       feedsInto: ['WFAB-07', 'SORT-02'],
       runsWith: ['WFAB-01', 'WFAB-03'],
       revisedBy: [],
@@ -208,7 +208,7 @@ export const WFAB_WRITE_UPS: CpoWriteUps = {
       'Photonic performance depends on nanometre-scale waveguide dimensions and film thicknesses that vary more than a digital process. This is the longest fabrication in the program and the head of the critical path: the photonic wafers out, sorted and stacked into known-good optical engines set the first package build. In-line optical data is the earliest look at whether the link budget assumptions hold, and lots outside the optical window are cheaper to hold or scrap in the fab than to sort, assemble and debug.',
     ],
     flowNote:
-      'Step 1 confirms starts and splits. Step 2 tracks waveguide definition while step 3 measures the in-line optical monitors in parallel. Step 4 dispositions out-of-window lots, step 5 tracks the back-end modules and step 6 releases the monitor report.',
+      'Step 1 confirms starts and splits. Step 2 tracks waveguide definition while step 3 measures the in-line optical monitors in parallel. Step 4 dispositions out-of-window lots, step 5 tracks the back-end modules and step 6 accepts the lots and hands them, with the monitor report, to bumping and via reveal in WFAB-08.',
     consumes: [
       'Photonic IC tapeout record and monitor structure list from OTO-02',
       'Photonic process splits from OTO-03',
@@ -248,19 +248,19 @@ export const WFAB_WRITE_UPS: CpoWriteUps = {
     exit: [
       'In-line optical monitors measured on every lot at the waveguide and back-end checkpoints',
       'Every lot outside the optical window dispositioned with the foundry in writing',
-      'Wafer out with the monitor report released to sort and characterization',
+      'Wafer out with the monitor report released to post-fab processing in WFAB-08 and to characterization',
     ],
     dependsOn: ['OTO-02', 'OTO-03'],
     dependsNote: null,
-    feedsInto: ['WFAB-07', 'SORT-04'],
+    feedsInto: ['WFAB-07', 'WFAB-08'],
     measuredBy: [
       'Propagation loss per lot against allocation',
       'Ring resonance offset against tuning range',
       'Lots held or scrapped for optical window',
     ],
     links: {
-      dependsOn: ['OTO-02', 'OTO-03', 'MODL-04'],
-      feedsInto: ['WFAB-07', 'SORT-04', 'CHAR-03'],
+      dependsOn: ['OTO-02', 'OTO-03', 'MODL-04', 'TRDY-02', 'FEAS-03'],
+      feedsInto: ['WFAB-07', 'WFAB-08', 'SORT-04', 'CHAR-03'],
       runsWith: ['WFAB-01'],
       revisedBy: [],
       feedsBackInto: ['MODL-04'],
@@ -307,7 +307,7 @@ export const WFAB_WRITE_UPS: CpoWriteUps = {
       ['Back-end preparation planning', 1],
     ],
     entry: [
-      'Bridge and capacitor masks released',
+      'Bridge and capacitor masks released in MTO-03',
       'Lots started per the wafer start plan',
       'Thinning and dicing requirements known',
     ],
@@ -317,7 +317,7 @@ export const WFAB_WRITE_UPS: CpoWriteUps = {
       'Thinning, bumping and dicing scheduled to finish before the first assembly start',
     ],
     dependsOn: ['MTO-03', 'MTO-04'],
-    dependsNote: null,
+    dependsNote: 'The bridge lots start when the bridge masks are released at the end of MTO-03, in week 111 — not with the wave 2 dies in week 108.',
     feedsInto: ['WFAB-07', 'PKGA-03'],
     measuredBy: [
       'Wafer out against commitment',
@@ -325,7 +325,7 @@ export const WFAB_WRITE_UPS: CpoWriteUps = {
       'Days of margin to the assembly start',
     ],
     links: {
-      dependsOn: ['MTO-03', 'MTO-04'],
+      dependsOn: ['MTO-03', 'MTO-04', 'DSGN-09', 'PKGA-02', 'TINF-09'],
       feedsInto: ['WFAB-07', 'PKGA-03'],
       runsWith: ['WFAB-06'],
       revisedBy: [],
@@ -391,7 +391,7 @@ export const WFAB_WRITE_UPS: CpoWriteUps = {
       'Days of margin between kit release and die attach',
     ],
     links: {
-      dependsOn: ['SGNO-11', 'TRDY-10', 'TRDY-07', 'TRDY-08'],
+      dependsOn: ['SGNO-11', 'TRDY-10', 'TRDY-07', 'TRDY-08', 'PKGA-02'],
       feedsInto: ['PKGA-03', 'PKGA-04', 'PKGA-05'],
       runsWith: ['PKGA-01'],
       revisedBy: [],
@@ -402,11 +402,11 @@ export const WFAB_WRITE_UPS: CpoWriteUps = {
   'WFAB-07': {
     criticalPath: true,
     purpose: [
-      'Accept the wafers from every foundry and <b>release first silicon to sort</b> — WAT and process control monitor data reviewed against the acceptance limits and against the corners the lot splits were meant to hit, out-of-limit wafers dispositioned and traceability confirmed.',
+      'Review the acceptance of every die’s wafers and <b>declare first silicon</b> — WAT and process control monitor data reviewed against the acceptance limits and against the corners the lot splits were meant to hit, out-of-limit wafers dispositioned and traceability confirmed.',
       'Acceptance is not only a pass or fail against the foundry’s limits. The lot splits were started to hit particular corners; if the data shows they did not, characterization will be planned on the wrong wafers.',
     ],
     flowNote:
-      'Step 1 collects the data and step 2 compares it to limits and split targets, with out-of-limit wafers dispositioned in parallel in step 3. Step 4 confirms shipment and traceability and step 5 holds the release review.',
+      'Step 1 collects the data and step 2 compares it to limits and split targets, with out-of-limit wafers dispositioned in parallel in step 3. Step 4 confirms shipment and traceability and step 5 holds the review that declares first silicon. Each die’s lots go to sort from its own fab activity as they are accepted; this review does not hold them.',
     consumes: [
       'Switch SoC wafer-out record from WFAB-01',
       'I/O die wafer-out record and SerDes device monitors from WFAB-02',
@@ -421,7 +421,7 @@ export const WFAB_WRITE_UPS: CpoWriteUps = {
       '<b>Limits without targets.</b> Wafers pass the foundry limits but missed the split corners and nobody notices.',
       '<b>Traceability gap.</b> Wafer identities are lost in shipment and sort data cannot be joined to lot history.',
       '<b>Out-of-limit wafers shipped.</b> Wafers outside limits are sent to sort without disposition.',
-      '<b>One die late.</b> The release waits for the slowest foundry and the others idle.',
+      '<b>One die late.</b> Sort waits for the slowest foundry and the others idle, which is why each die is released to sort from its own fab activity rather than from this review.',
       '<b>Data format mismatch.</b> Each foundry reports parametrics differently and comparison is manual.',
     ],
     roles: [
@@ -447,21 +447,86 @@ export const WFAB_WRITE_UPS: CpoWriteUps = {
       'Split wafers confirmed at their intended corner or relabelled',
       'Traceability from wafer to lot history confirmed in the manufacturing data system',
     ],
-    dependsOn: ['WFAB-01', 'WFAB-02', 'WFAB-03', 'WFAB-04', 'WFAB-05'],
-    dependsNote: 'The first silicon gate: every die’s fabrication feeds it.',
-    feedsInto: ['SORT-01', 'SORT-02', 'SORT-03', 'SORT-04'],
+    dependsOn: ['WFAB-01', 'WFAB-02', 'WFAB-03', 'WFAB-04', 'WFAB-05', 'WFAB-08'],
+    dependsNote: 'The first silicon gate: every die’s fabrication feeds it. Sort does not wait on it — each die is released to sort as its own lots are accepted.',
+    feedsInto: ['SORT-06', 'CHAR-01'],
     measuredBy: [
       'Wafers released against wafers out',
       'Split wafers on target',
       'Wafers with traceability gaps',
     ],
     links: {
-      dependsOn: ['WFAB-01', 'WFAB-02', 'WFAB-03', 'WFAB-04', 'WFAB-05', 'MTO-04', 'TINF-10'],
-      feedsInto: ['SORT-01', 'SORT-02', 'SORT-03', 'SORT-04', 'CHAR-01'],
+      dependsOn: ['WFAB-01', 'WFAB-02', 'WFAB-03', 'WFAB-04', 'WFAB-05', 'WFAB-08', 'MTO-04', 'TINF-10'],
+      feedsInto: ['SORT-06', 'CHAR-01'],
       runsWith: ['WFAB-06'],
       revisedBy: [],
       feedsBackInto: [],
     },
     terms: ['WAT', 'PCM', 'Corner lot'],
+  },
+  'WFAB-08': {
+    criticalPath: true,
+    purpose: [
+      'Take the accepted photonic wafers through <b>post-fab processing — thinning, through-oxide-via reveal, the bump or hybrid-bond pad finish and bond-surface preparation</b> — and release them bond-ready to wafer-level optical test.',
+      'This sits on the critical path between the photonic fab and the optical engine build, and it is the step most often left off a plan because the fab has already reported wafer out. The bond surface prepared here is what the electrical IC will be stacked on, so its planarity, roughness and pad recess are checked against the stack design rules before any wafer is tested or diced.',
+    ],
+    flowNote:
+      'Step 1 receives the wafers. Step 2 thins them and reveals the vias while step 3 puts down the pad finish in parallel. Step 4 inspects the bond surface, step 5 checks for post-fab optical damage and step 6 releases the bond-ready wafers.',
+    consumes: [
+      'Accepted photonic wafers and the in-line monitor report from WFAB-04',
+      'Bond interface pad geometry, through-connections and bonding format from OESD-01',
+      'Stacking design rules and bond-surface limits from OESD-06',
+      'Optical silicon wafer start plan and process splits from OTO-03',
+      'Post-fab line readiness and qualification from TRDY-15',
+    ],
+    rel: {
+      'WFAB-D8': '<b>Photonic IC bumped, via-revealed and bond-ready wafer record.</b> Produced here; wafer-level optical test and the engine build both start from it.',
+      'WFAB-D7': '<b>Wafer acceptance review and first silicon release record.</b> The bond-ready photonic wafers are the last optical silicon reviewed for first silicon.',
+    },
+    risks: [
+      '<b>Via reveal uneven.</b> Thinning leaves vias under- or over-exposed and through-connection resistance fails across the wafer.',
+      '<b>Bond surface out of limits.</b> Planarity or pad recess outside the stack rules shows up only as voids at stacking.',
+      '<b>Edge couplers damaged.</b> Handling and thinning chip the coupler edge and raise insertion loss.',
+      '<b>Post-fab line not ready.</b> The bump and via-reveal line is booked after wafer out and the wafers queue.',
+      '<b>Wafer warpage.</b> Thinned photonic wafers bow beyond what the optical prober can chuck.',
+    ],
+    roles: [
+      { r: 'Technology and foundry', d: 'Owns photonic post-fab processing and the line booking' },
+      { r: 'Packaging process engineer', d: 'Bond-surface limits and pad finish' },
+      { r: 'Photonic device engineer', d: 'Edge coupler and waveguide damage review' },
+      { r: 'Optical test engineer', d: 'Receives the bond-ready wafers for wafer-level test' },
+      { r: 'Program TPM', d: 'Tracks the step against the engine build start' },
+    ],
+    effort: [
+      ['Thinning and via reveal', 1.5],
+      ['Pad finish and bond-surface preparation', 1.5],
+      ['Inspection and release', 1],
+    ],
+    entry: [
+      'Photonic lots accepted on WAT and in-line optical data in WFAB-04',
+      'Post-fab line booked against the wafer-out date',
+      'Bond-surface limits released from the stack design rules',
+    ],
+    exit: [
+      'Through-oxide-via resistance within limits on every wafer’s monitor structures',
+      'Bond surface planarity, roughness and pad recess within the stack design rules',
+      'Bond-ready wafers released to wafer-level optical test with wafer maps',
+    ],
+    dependsOn: ['WFAB-04'],
+    dependsNote: null,
+    feedsInto: ['SORT-04', 'WFAB-07'],
+    measuredBy: [
+      'Wafers bond-ready against the engine build start',
+      'Via resistance and bond-surface yield per wafer',
+      'Coupler damage found at post-fab inspection',
+    ],
+    links: {
+      dependsOn: ['WFAB-04', 'OESD-01', 'OESD-06', 'OTO-03', 'TRDY-15'],
+      feedsInto: ['SORT-04', 'WFAB-07', 'SORT-05'],
+      runsWith: [],
+      revisedBy: [],
+      feedsBackInto: ['OESD-06'],
+    },
+    terms: ['PIC', 'Through-oxide via', 'Hybrid bonding', 'Edge coupler'],
   },
 };

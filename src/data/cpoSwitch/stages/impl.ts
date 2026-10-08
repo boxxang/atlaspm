@@ -286,7 +286,7 @@ export const IMPL: CpoStageModule = {
     },
     'IMPL-11': {
       s: [
-        [1, 'Stitch and reorder scan chains on the placed design', 3],
+        [1, 'Stitch and reorder scan chains on the placed Switch SoC and I/O die', 3],
         [2, 'Verify test-mode timing constraints and shift and capture timing', 3],
         [3, 'Generate stuck-at, transition and path-delay patterns', 5],
         [4, 'Generate memory BIST, loopback and PRBS test sequences for the SerDes and electrical IC', 3, 1],

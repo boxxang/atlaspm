@@ -129,7 +129,7 @@ export const PSV: CpoStageModule = {
     },
     'PSV-03': {
       s: [
-        [1, 'Build the full-chip testbench with die-to-die, SerDes and management interfaces modelled', 6],
+        [1, 'Build the full-chip testbenches for the Switch SoC and the I/O die controller logic, with die-to-die, SerDes and management interfaces modelled', 6],
         [2, 'Write full-chip scenarios — packet flows, congestion, boot and power-state sequences', 8],
         [3, 'Run full-chip regressions on the compute farm and triage every failure', 14],
         [4, 'Run power-aware full-chip simulation with the UPF', 4, 1],
@@ -148,7 +148,7 @@ export const PSV: CpoStageModule = {
     },
     'PSV-04': {
       s: [
-        [1, 'Write formal properties for control logic, arbiters, credit and flow control', 6],
+        [1, 'Write formal properties for control logic, arbiters, credit and flow control on the Switch SoC and the I/O die', 6],
         [2, 'Run formal proofs and close counter-examples with the RTL owners', 10],
         [3, 'Run clock-domain and reset-domain crossing analysis and close violations', 8, 1],
         [4, 'Run static low-power checks on the UPF — isolation, retention and level shifting', 6],
@@ -262,7 +262,7 @@ export const PSV: CpoStageModule = {
     },
     'PSV-10': {
       s: [
-        [1, 'Run timing-annotated gate-level simulation of reset, boot and power-state sequences', 5],
+        [1, 'Run timing-annotated gate-level simulation of reset, boot and power-state sequences on the Switch SoC and I/O die netlists', 5],
         [2, 'Run zero-delay gate-level regression on a selected subset of full-chip tests', 4, 1],
         [3, 'Simulate scan, memory BIST and loopback patterns on the netlist in serial and parallel modes', 5],
         [4, 'Simulate JTAG, boundary-scan and PRBS test modes and debug-lock behaviour', 3],

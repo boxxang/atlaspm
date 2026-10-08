@@ -1,5 +1,5 @@
 /**
- * PON — Power-On & Electrical Bring-Up. Weeks 144–154; closes on First
+ * PON — Power-On & Electrical Bring-Up. Weeks 140–150; closes on First
  * Electrical Link.
  */
 import type { CpoStageModule } from '../types';
@@ -8,7 +8,7 @@ export const PON: CpoStageModule = {
   content: {
     tagline: 'Power the first packages safely, get the silicon talking, and close the first electrical link.',
     description:
-      'Bring the first packaged switches to life on their validation boards — electrical-only packages first, so power-on does not wait for optical assembly: the bring-up plan executed on a daily cadence against its pass criteria, safe first power-on and rail verification, debug access and boot, clocks, resets and register access on every die, then die-to-die and SerDes link training through loopback and PRBS to a first electrical link. Nothing assumes the silicon is healthy — every deviation is logged, reproduced and handed to the silicon debug board from the first day. The stage closes on First Electrical Link, the point where optical bring-up has a working electrical path to drive.',
+      'Bring the first packaged switches to life on their validation boards, starting in week 140 on the electrical-only build — Switch SoC and I/O die packages without optical engines, finished in PKGA-11 — so power-on and the first electrical link do not wait for the known-good optical engines or the full build, which follow into optical bring-up: the bring-up plan executed on a daily cadence against its pass criteria, safe first power-on and rail verification, debug access and boot, clocks, resets and register access on every die, then die-to-die and SerDes link training through loopback and PRBS to a first electrical link. Nothing assumes the silicon is healthy — every deviation is logged, reproduced and handed to the silicon debug board from the first day. The stage closes on First Electrical Link, the point where optical bring-up has a working electrical path to drive.',
     activities: ['Daily bring-up execution', 'First power-on', 'Boot and firmware', 'Clock, reset, registers', 'First electrical link', 'Anomaly intake'],
     deliverables: [
       'Bring-up execution tracker and daily status record',

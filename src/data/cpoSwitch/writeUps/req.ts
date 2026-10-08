@@ -63,7 +63,7 @@ export const REQ_WRITE_UPS: CpoWriteUps = {
       'Customer asks not traced to a requirement',
     ],
     links: {
-      dependsOn: ['CON-01', 'CON-03', 'CON-06'],
+      dependsOn: ['CON-01', 'CON-03', 'CON-06', 'CON-04'],
       feedsInto: ['REQ-02', 'REQ-03', 'REQ-04', 'REQ-05', 'REQ-08', 'REQ-09', 'CERT-06'],
       runsWith: [],
       revisedBy: ['SARC-12'],
@@ -131,9 +131,9 @@ export const REQ_WRITE_UPS: CpoWriteUps = {
       'Power envelope margin against the concept estimate',
     ],
     links: {
-      dependsOn: ['REQ-01', 'CON-03'],
+      dependsOn: ['REQ-01', 'CON-03', 'REQ-04', 'REQ-03'],
       feedsInto: ['REQ-06', 'REQ-07', 'REQ-09', 'SARC-01', 'SARC-02', 'SARC-03', 'SARC-07', 'MODL-01', 'MODL-08'],
-      runsWith: ['REQ-03', 'REQ-04'],
+      runsWith: [],
       revisedBy: ['SARC-11', 'SARC-12'],
       feedsBackInto: [],
     },
@@ -265,7 +265,7 @@ export const REQ_WRITE_UPS: CpoWriteUps = {
       'Changes to the wavelength plan after baseline',
     ],
     links: {
-      dependsOn: ['REQ-01', 'CON-03'],
+      dependsOn: ['REQ-01', 'CON-03', 'CON-02'],
       feedsInto: ['SARC-02', 'SARC-03', 'ICD-04', 'ICD-06', 'REQ-09', 'MODL-04', 'FEAS-03'],
       runsWith: ['REQ-02', 'FEAS-01'],
       revisedBy: ['FEAS-09', 'MODL-04'],

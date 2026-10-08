@@ -130,7 +130,7 @@ export const OTO_WRITE_UPS: CpoWriteUps = {
       'Wafers in each agreed process split',
     ],
     links: {
-      dependsOn: ['SGNO-04', 'SGNO-09'],
+      dependsOn: ['SGNO-04', 'SGNO-09', 'TRDY-02', 'FEAS-03', 'TINF-03'],
       feedsInto: ['WFAB-04', 'OTO-03', 'OTO-04', 'SORT-04'],
       runsWith: ['OTO-01'],
       revisedBy: ['SDBG-05'],

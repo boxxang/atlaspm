@@ -62,7 +62,7 @@ export const PSV_WRITE_UPS: CpoWriteUps = {
       'Plan changes after release',
     ],
     links: {
-      dependsOn: ['REQ-02', 'SARC-12', 'DSGN-01', 'ICD-02', 'MODL-01'],
+      dependsOn: ['REQ-02', 'SARC-12', 'DSGN-01', 'ICD-02', 'MODL-01', 'ICD-04'],
       feedsInto: ['PSV-02', 'PSV-03', 'PSV-04', 'PSV-05', 'PSV-06', 'PSV-07', 'PSV-08', 'PSV-09', 'PSV-10', 'PSV-11', 'PSV-15'],
       runsWith: [],
       revisedBy: [],
@@ -128,7 +128,7 @@ export const PSV_WRITE_UPS: CpoWriteUps = {
       'Regression pass rate',
     ],
     links: {
-      dependsOn: ['PSV-01', 'DSGN-01', 'DSGN-02'],
+      dependsOn: ['PSV-01', 'DSGN-01', 'DSGN-02', 'MODL-02'],
       feedsInto: ['PSV-03', 'PSV-08', 'DSGN-18', 'PSV-11'],
       runsWith: ['PSV-04'],
       revisedBy: [],
@@ -139,7 +139,7 @@ export const PSV_WRITE_UPS: CpoWriteUps = {
   'PSV-03': {
     criticalPath: true,
     purpose: [
-      'Verify the <b>full Switch SoC</b> as it will be taped out: packet flows end to end, congestion, boot and power-state sequences, with die-to-die, SerDes and management interfaces modelled, and all coverage merged and closed against the plan.',
+      'Verify the <b>full Switch SoC and the I/O die’s controller logic</b> as they will be taped out: packet flows end to end, congestion, boot and power-state sequences, with die-to-die, SerDes and management interfaces modelled, and all coverage merged and closed against the plan. The I/O die’s digital controllers — link training, lane repair, register access — get full-chip simulation of their own, not only the mixed-signal checks in PSV-05.',
       'Full-chip simulation is slow, so it is spent on what only full chip can show: interactions between blocks, clock and reset domains, boot and power states. Its bug rate is the most honest indicator of tapeout readiness on the program.',
     ],
     flowNote:
@@ -206,7 +206,7 @@ export const PSV_WRITE_UPS: CpoWriteUps = {
   'PSV-04': {
     criticalPath: false,
     purpose: [
-      'Prove what simulation can only sample: <b>formal verification</b> of control logic, arbiters and flow control; <b>clock-domain and reset-domain crossing</b> analysis; <b>static low-power checks</b> of the UPF; and power-aware equivalence between RTL and netlist.',
+      'Prove what simulation can only sample: <b>formal verification</b> of control logic, arbiters and flow control; <b>clock-domain and reset-domain crossing</b> analysis; <b>static low-power checks</b> of the UPF; and power-aware equivalence between RTL and netlist — on the Switch SoC and on the I/O die’s controller logic, whose die-to-die and SerDes clock crossings are the likeliest to escape.',
       'Crossing and power-intent bugs are the classic silicon escapes, because they depend on timing or power states simulation rarely hits. Every waiver in these flows is a decision that a real violation is safe, so each is reviewed by someone outside the team that wrote the RTL.',
     ],
     flowNote:
@@ -261,9 +261,9 @@ export const PSV_WRITE_UPS: CpoWriteUps = {
       'Low-power check errors open',
     ],
     links: {
-      dependsOn: ['PSV-01', 'DSGN-02', 'DSGN-03', 'DSGN-10'],
+      dependsOn: ['PSV-01', 'DSGN-02', 'DSGN-03', 'DSGN-10', 'IMPL-01'],
       feedsInto: ['DSGN-18', 'PSV-11', 'SGNO-07'],
-      runsWith: ['IMPL-01', 'PSV-02'],
+      runsWith: ['PSV-02'],
       revisedBy: [],
       feedsBackInto: ['DSGN-02', 'DSGN-03'],
     },
@@ -525,7 +525,7 @@ export const PSV_WRITE_UPS: CpoWriteUps = {
       'Firmware and software hours on the platform',
     ],
     links: {
-      dependsOn: ['PSV-01', 'DSGN-02', 'MODL-09'],
+      dependsOn: ['PSV-01', 'DSGN-02', 'MODL-09', 'MODL-02', 'PSV-02'],
       feedsInto: ['PSV-09', 'PSV-11', 'PON-01', 'SINT-01'],
       runsWith: ['PSV-03', 'DSGN-16'],
       revisedBy: [],
@@ -592,7 +592,7 @@ export const PSV_WRITE_UPS: CpoWriteUps = {
       'Features validated before tapeout',
     ],
     links: {
-      dependsOn: ['PSV-08', 'DSGN-16', 'DSGN-17', 'MODL-09'],
+      dependsOn: ['PSV-08', 'DSGN-16', 'DSGN-17', 'MODL-09', 'DSGN-08'],
       feedsInto: ['PSV-11', 'PON-03', 'OBU-05', 'SINT-02'],
       runsWith: [],
       revisedBy: [],
@@ -603,7 +603,7 @@ export const PSV_WRITE_UPS: CpoWriteUps = {
   'PSV-10': {
     criticalPath: true,
     purpose: [
-      'Simulate the <b>netlist and the test patterns</b>: timing-annotated gate-level simulation of reset, boot and power-state sequences, zero-delay regression of a test subset, and simulation of scan, memory BIST, loopback, JTAG, boundary-scan and PRBS modes as the tester will apply them.',
+      'Simulate the <b>netlist and the test patterns</b> of the Switch SoC and the I/O die: timing-annotated gate-level simulation of reset, boot and power-state sequences, zero-delay regression of a test subset, and simulation of scan, memory BIST, loopback, JTAG, boundary-scan and PRBS modes as the tester will apply them.',
       'Some bugs exist only in the netlist — uninitialized state, synthesis mismatches, timing on asynchronous paths — and some patterns fail only when simulated with timing. Both are cheap to find here and expensive on the tester.',
     ],
     flowNote:
@@ -657,9 +657,9 @@ export const PSV_WRITE_UPS: CpoWriteUps = {
       'Netlist-only bugs found',
     ],
     links: {
-      dependsOn: ['PSV-03', 'DSGN-11', 'IMPL-01'],
+      dependsOn: ['PSV-03', 'DSGN-11', 'IMPL-01', 'IMPL-11'],
       feedsInto: ['PSV-11', 'SGNO-07', 'TINF-06'],
-      runsWith: ['IMPL-11'],
+      runsWith: [],
       revisedBy: [],
       feedsBackInto: [],
     },
@@ -855,9 +855,9 @@ export const PSV_WRITE_UPS: CpoWriteUps = {
       'Capacitor impedance margin',
     ],
     links: {
-      dependsOn: ['DSGN-09', 'DSGN-12', 'PSV-01', 'ICD-02'],
+      dependsOn: ['DSGN-09', 'DSGN-12', 'PSV-01', 'ICD-02', 'MODL-06'],
       feedsInto: ['PSV-07', 'PSV-11', 'IMPL-06', 'SGNO-05', 'SGNO-06'],
-      runsWith: ['MODL-06'],
+      runsWith: [],
       revisedBy: [],
       feedsBackInto: ['DSGN-09'],
     },
@@ -921,7 +921,7 @@ export const PSV_WRITE_UPS: CpoWriteUps = {
       'Worst current step per rail',
     ],
     links: {
-      dependsOn: ['PSV-08', 'DSGN-02', 'DSGN-03', 'MODL-08'],
+      dependsOn: ['PSV-08', 'DSGN-02', 'DSGN-03', 'MODL-08', 'PSV-01'],
       feedsInto: ['IMPL-08', 'IMPL-02', 'SGNO-01', 'PSV-11'],
       runsWith: ['PSV-03'],
       revisedBy: [],

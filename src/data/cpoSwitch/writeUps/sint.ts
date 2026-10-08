@@ -62,7 +62,7 @@ export const SINT_WRITE_UPS: CpoWriteUps = {
       'Datapath anomalies opened',
     ],
     links: {
-      dependsOn: ['PON-04', 'PON-05', 'DSGN-17', 'PSV-08'],
+      dependsOn: ['PON-04', 'PON-05', 'DSGN-17', 'PSV-08', 'DSGN-01'],
       feedsInto: ['SINT-04', 'CHAR-04', 'SDBG-01'],
       runsWith: ['SINT-02'],
       revisedBy: [],
@@ -129,7 +129,7 @@ export const SINT_WRITE_UPS: CpoWriteUps = {
       'Labs on the released build',
     ],
     links: {
-      dependsOn: ['DSGN-17', 'PSV-09', 'PON-03', 'PKGA-10'],
+      dependsOn: ['DSGN-17', 'PSV-09', 'PON-03', 'PKGA-10', 'ICD-10'],
       feedsInto: ['SINT-03', 'SINT-04', 'SINT-05', 'CERT-02'],
       runsWith: ['SINT-01'],
       revisedBy: [],
@@ -263,7 +263,7 @@ export const SINT_WRITE_UPS: CpoWriteUps = {
       'Days from first optical link to first traffic',
     ],
     links: {
-      dependsOn: ['SINT-01', 'SINT-02', 'SINT-03'],
+      dependsOn: ['SINT-01', 'SINT-02', 'SINT-03', 'MODL-02'],
       feedsInto: ['SINT-06', 'CHAR-04', 'CHAR-08', 'CERT-03'],
       runsWith: ['SINT-05'],
       revisedBy: [],
@@ -330,7 +330,7 @@ export const SINT_WRITE_UPS: CpoWriteUps = {
       'Control processor load from telemetry',
     ],
     links: {
-      dependsOn: ['SINT-02', 'OBU-05', 'DSGN-17'],
+      dependsOn: ['SINT-02', 'OBU-05', 'DSGN-17', 'REQ-03'],
       feedsInto: ['CERT-02', 'SUST-05', 'CHAR-04'],
       runsWith: ['SINT-04'],
       revisedBy: [],
@@ -395,7 +395,7 @@ export const SINT_WRITE_UPS: CpoWriteUps = {
       'Measured to modeled thermal gap',
     ],
     links: {
-      dependsOn: ['SINT-04', 'MODL-07', 'MODL-08'],
+      dependsOn: ['SINT-04', 'MODL-07', 'MODL-08', 'DSGN-15', 'OBU-02'],
       feedsInto: ['CHAR-05', 'CHAR-03', 'SDBG-01'],
       runsWith: [],
       revisedBy: [],
@@ -460,7 +460,7 @@ export const SINT_WRITE_UPS: CpoWriteUps = {
       'Findings open at certification start',
     ],
     links: {
-      dependsOn: ['OBU-01', 'SINT-04', 'REQ-05'],
+      dependsOn: ['OBU-01', 'SINT-04', 'REQ-05', 'DSGN-13', 'DSGN-14'],
       feedsInto: ['CERT-04', 'SDBG-01'],
       runsWith: [],
       revisedBy: [],

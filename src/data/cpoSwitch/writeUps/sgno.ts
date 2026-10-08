@@ -63,7 +63,7 @@ export const SGNO_WRITE_UPS: CpoWriteUps = {
       'Days between final ECO and last clean run',
     ],
     links: {
-      dependsOn: ['IMPL-02', 'IMPL-11', 'TRDY-03'],
+      dependsOn: ['IMPL-02', 'IMPL-11', 'TRDY-03', 'PSV-08'],
       feedsInto: ['SGNO-06', 'SGNO-07', 'SGNO-10', 'MTO-01'],
       runsWith: ['SGNO-02'],
       revisedBy: [],
@@ -131,7 +131,7 @@ export const SGNO_WRITE_UPS: CpoWriteUps = {
       'Open physical verification violations',
     ],
     links: {
-      dependsOn: ['IMPL-03', 'TRDY-04', 'IMPL-08'],
+      dependsOn: ['IMPL-03', 'TRDY-04', 'IMPL-08', 'ICD-02', 'IMPL-02'],
       feedsInto: ['SGNO-06', 'SGNO-10', 'MTO-02', 'SORT-02'],
       runsWith: ['SGNO-01'],
       revisedBy: [],
@@ -197,7 +197,7 @@ export const SGNO_WRITE_UPS: CpoWriteUps = {
       'Open reliability waivers',
     ],
     links: {
-      dependsOn: ['IMPL-04', 'PSV-15', 'PSV-07', 'OESD-07'],
+      dependsOn: ['IMPL-04', 'PSV-15', 'PSV-07', 'OESD-07', 'DSGN-08'],
       feedsInto: ['SGNO-09', 'OTO-01', 'SORT-03'],
       runsWith: ['SGNO-04'],
       revisedBy: [],
@@ -264,7 +264,7 @@ export const SGNO_WRITE_UPS: CpoWriteUps = {
       'Worst-case heater power against supply',
     ],
     links: {
-      dependsOn: ['IMPL-05', 'PSV-06', 'TRDY-02', 'MODL-04', 'OESD-07'],
+      dependsOn: ['IMPL-05', 'PSV-06', 'TRDY-02', 'MODL-04', 'OESD-07', 'ICD-06'],
       feedsInto: ['SGNO-09', 'OTO-02', 'TINF-03'],
       runsWith: ['SGNO-03'],
       revisedBy: [],
@@ -330,7 +330,7 @@ export const SGNO_WRITE_UPS: CpoWriteUps = {
       'Open physical verification violations on bridge and capacitors',
     ],
     links: {
-      dependsOn: ['IMPL-06', 'MODL-06'],
+      dependsOn: ['IMPL-06', 'MODL-06', 'ICD-02'],
       feedsInto: ['SGNO-06', 'SGNO-10', 'MTO-03'],
       runsWith: ['SGNO-01'],
       revisedBy: [],
@@ -468,7 +468,7 @@ export const SGNO_WRITE_UPS: CpoWriteUps = {
     links: {
       dependsOn: ['IMPL-11', 'SGNO-01', 'PSV-10'],
       feedsInto: ['SGNO-10', 'TINF-06', 'SORT-01', 'MTO-01', 'SORT-02', 'SORT-03'],
-      runsWith: ['SGNO-08'],
+      runsWith: ['SGNO-08', 'TINF-06'],
       revisedBy: [],
       feedsBackInto: [],
     },
@@ -532,7 +532,7 @@ export const SGNO_WRITE_UPS: CpoWriteUps = {
       'Boot ROM image hash match between database and signed release',
     ],
     links: {
-      dependsOn: ['DSGN-10', 'IMPL-11', 'SARC-09'],
+      dependsOn: ['DSGN-10', 'IMPL-11', 'SARC-09', 'REQ-06'],
       feedsInto: ['SGNO-10', 'CERT-05', 'TINF-06'],
       runsWith: ['SGNO-07'],
       revisedBy: [],
@@ -553,7 +553,7 @@ export const SGNO_WRITE_UPS: CpoWriteUps = {
       'Photonic IC signoff report and final layout from SGNO-04',
       'Electrical IC final layout and post-layout results from IMPL-04',
       'Photonic IC final layout and optical rule closure from IMPL-05',
-      'Pre-silicon validation closure from PSV-11, the optical engine stack freeze from OESD-07 and the cross-die stack signoff from SGNO-12',
+      'Electrical IC and photonic IC verification results from PSV-15 and PSV-06, the optical engine stack freeze from OESD-07 and the cross-die stack signoff from SGNO-12',
     ],
     rel: {
       'SGNO-D11': '<b>Tapeout wave 1 readiness decision package — electrical IC and photonic IC.</b> Produced here; it releases the optical silicon to OTO-01 and OTO-02.',
@@ -587,7 +587,7 @@ export const SGNO_WRITE_UPS: CpoWriteUps = {
       'Every open waiver on either die signed by its approver and entered in the risk register',
       'Analog and photonics foundry slots and mask orders confirmed in writing for week 98',
     ],
-    dependsOn: ['SGNO-03', 'SGNO-04', 'IMPL-04', 'IMPL-05', 'PSV-11', 'OESD-07', 'SGNO-12'],
+    dependsOn: ['SGNO-03', 'SGNO-04', 'IMPL-04', 'IMPL-05', 'PSV-06', 'PSV-15', 'OESD-07', 'SGNO-12', 'SGNO-13'],
     dependsNote: 'Wave 1 does not wait for the Switch SoC, the I/O die, the bridge or the package signoff; those go to SGNO-10.',
     feedsInto: ['OTO-01', 'OTO-02', 'OTO-03'],
     measuredBy: [
@@ -596,7 +596,7 @@ export const SGNO_WRITE_UPS: CpoWriteUps = {
       'Photonics and analog foundry slot dates held',
     ],
     links: {
-      dependsOn: ['SGNO-03', 'SGNO-04', 'IMPL-04', 'IMPL-05', 'PSV-11', 'OESD-07', 'SGNO-12'],
+      dependsOn: ['SGNO-03', 'SGNO-04', 'IMPL-04', 'IMPL-05', 'PSV-06', 'PSV-15', 'OESD-07', 'SGNO-12', 'SGNO-13'],
       feedsInto: ['OTO-01', 'OTO-02', 'OTO-03', 'OTO-04', 'SGNO-10'],
       runsWith: [],
       revisedBy: [],
@@ -651,7 +651,7 @@ export const SGNO_WRITE_UPS: CpoWriteUps = {
       'Every open waiver signed by its approver and entered in the risk register',
       'Foundry slot and mask order confirmed in writing for every wave 2 die with a go',
     ],
-    dependsOn: ['SGNO-01', 'SGNO-02', 'SGNO-05', 'SGNO-06', 'SGNO-07', 'SGNO-08', 'SGNO-11', 'SGNO-09'],
+    dependsOn: ['SGNO-01', 'SGNO-02', 'SGNO-05', 'SGNO-06', 'SGNO-07', 'SGNO-08', 'SGNO-11', 'SGNO-09', 'SGNO-13'],
     dependsNote: 'The gate of the stage: every wave 2 signoff activity feeds it, and the wave 1 decision is carried into it.',
     feedsInto: ['MTO-01', 'MTO-02', 'MTO-03', 'MTO-04'],
     measuredBy: [
@@ -660,7 +660,7 @@ export const SGNO_WRITE_UPS: CpoWriteUps = {
       'Foundry slot dates held',
     ],
     links: {
-      dependsOn: ['SGNO-01', 'SGNO-02', 'SGNO-05', 'SGNO-06', 'SGNO-07', 'SGNO-08', 'SGNO-11', 'SGNO-09', 'PSV-11'],
+      dependsOn: ['SGNO-01', 'SGNO-02', 'SGNO-05', 'SGNO-06', 'SGNO-07', 'SGNO-08', 'SGNO-11', 'SGNO-09', 'PSV-11', 'SGNO-13'],
       feedsInto: ['MTO-01', 'MTO-02', 'MTO-03', 'MTO-04', 'MTO-05'],
       runsWith: [],
       revisedBy: [],
@@ -727,10 +727,10 @@ export const SGNO_WRITE_UPS: CpoWriteUps = {
       'Committed substrate delivery against first die attach',
     ],
     links: {
-      dependsOn: ['SGNO-06', 'IMPL-07', 'TRDY-06', 'OESD-02'],
+      dependsOn: ['SGNO-06', 'IMPL-07', 'TRDY-06', 'OESD-02', 'SGNO-01', 'SGNO-05'],
       feedsInto: ['SGNO-10', 'PKGA-01', 'WFAB-06', 'MTO-03', 'OEB-01', 'OEB-03'],
       runsWith: [],
-      revisedBy: [],
+      revisedBy: ['PKGA-02'],
       feedsBackInto: [],
     },
     terms: ['RDL', 'Bump map', 'Interposer', 'OSAT'],
@@ -800,5 +800,72 @@ export const SGNO_WRITE_UPS: CpoWriteUps = {
       feedsBackInto: ['IMPL-04', 'IMPL-05'],
     },
     terms: ['Cross-die LVS', 'Bond pad map', 'LVS', 'Optical engine'],
+  },
+  'SGNO-13': {
+    criticalPath: true,
+    purpose: [
+      'Sign off the <b>end-to-end link on extracted views</b>, lane by lane: from the I/O die SerDes transmitter through its bumps, the main package and engine substrate routes, the electrical IC driver and receiver and the photonic IC modulator, waveguides and coupler to the fiber — electrical eye, jitter and crosstalk to the electrical IC input, and the optical budget to the fiber, each against the link budget.',
+      'Every piece of the link signs off on its own, and the co-simulation in PSV-07 ran on pre-layout models of all of them. Nothing else puts the extracted package, engine substrate and both optical engine dies in one channel before the masks are ordered, so a lane can be clean in every report and still short of margin end to end. This check feeds both readiness reviews, because wave 1 commits the optical dies and wave 2 commits the I/O die and package on the other side of the same lanes.',
+    ],
+    flowNote:
+      'Step 1 collects every extracted view and step 2 assembles the per-lane channel. Step 3 simulates the electrical side while step 4 computes the optical budget in parallel. Step 5 compares each lane with the budget and returns short lanes to their owners, and step 6 releases the report to both readiness reviews.',
+    consumes: [
+      'I/O die post-layout SerDes and bump models from IMPL-03',
+      'Electrical IC and photonic IC post-layout models from IMPL-04 and IMPL-05',
+      'Main package routed database from IMPL-07',
+      'Package and board SI / PI extraction from IMPL-08',
+      'Engine substrate design from OESD-02',
+    ],
+    rel: {
+      'SGNO-D14': '<b>End-to-end link budget signoff report on extracted views — I/O die to fiber, per lane.</b> Produced here.',
+      'SGNO-D11': '<b>Tapeout wave 1 readiness decision package — electrical IC and photonic IC.</b> The wave 1 go needs every lane in margin through the optical dies.',
+      'SGNO-D12': '<b>Tapeout wave 2 readiness decision package — Switch SoC, I/O die, bridge and package.</b> The wave 2 go needs the same lanes in margin from the I/O die side.',
+    },
+    risks: [
+      '<b>Pre-layout budget trusted.</b> The link is signed off on the co-simulation models and the extracted routes are never put together.',
+      '<b>Engine substrate left out.</b> The channel stops at the main package pad and the engine substrate loss is nobody’s.',
+      '<b>Worst lane missed.</b> Only a typical lane is simulated and the longest route is short of margin.',
+      '<b>Optical side assumed.</b> Coupling and insertion loss are taken from the budget rather than the extracted photonic IC.',
+      '<b>Late finding.</b> A short lane is found after wave 1 has gone and only the I/O die side can still change.',
+    ],
+    roles: [
+      { r: 'SI/PI', d: 'Owns the end-to-end link budget signoff' },
+      { r: 'SerDes engineer', d: 'I/O die transmitter models and equalization settings' },
+      { r: 'Photonic design engineer', d: 'Extracted photonic IC optical budget' },
+      { r: 'Analog design engineer', d: 'Electrical IC receiver and driver models' },
+      { r: 'System architect', d: 'Approves the lane margins against the link budget' },
+    ],
+    effort: [
+      ['Extracted view collection and channel assembly', 1],
+      ['Electrical eye, jitter and crosstalk', 2],
+      ['Optical budget per lane', 1],
+      ['Margin review and release', 1],
+    ],
+    entry: [
+      'Post-layout views of the I/O die, electrical IC and photonic IC from IMPL-03, IMPL-04 and IMPL-05',
+      'Main package routes extracted in IMPL-07 and IMPL-08',
+      'Engine substrate design released from OESD-02',
+    ],
+    exit: [
+      'Every lane simulated end to end on extracted views, worst routes included',
+      'Every lane in margin against the link budget, or a waiver signed by the system architect',
+      'Report released to the wave 1 and wave 2 readiness reviews',
+    ],
+    dependsOn: ['IMPL-03', 'IMPL-04', 'IMPL-05', 'IMPL-07', 'IMPL-08', 'OESD-02'],
+    dependsNote: 'It runs on the views as layout closes, so it starts before the last layout has finished and ends on the final ones.',
+    feedsInto: ['SGNO-09', 'SGNO-10'],
+    measuredBy: [
+      'Lanes in margin end to end',
+      'Worst-lane electrical and optical margin',
+      'Lanes returned to layout',
+    ],
+    links: {
+      dependsOn: ['IMPL-03', 'IMPL-04', 'IMPL-05', 'IMPL-07', 'IMPL-08', 'OESD-02'],
+      feedsInto: ['SGNO-09', 'SGNO-10'],
+      runsWith: ['SGNO-06', 'SGNO-12'],
+      revisedBy: [],
+      feedsBackInto: ['IMPL-03', 'IMPL-07'],
+    },
+    terms: ['SI', 'Link budget', 'Coupling loss'],
   },
 };

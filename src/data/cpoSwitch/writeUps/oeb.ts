@@ -276,7 +276,7 @@ export const OEB_WRITE_UPS: CpoWriteUps = {
       'An optical engine mounted on the main package carries the Switch SoC, the I/O die and the substrate with it. Screening engines first keeps a bad engine from scrapping a good package, and engine yield tracked separately tells the program whether a loss belongs to the photonic die, the electrical IC, the bond or the fiber attach.',
     ],
     flowNote:
-      'Step 1 mounts the engines and step 2 measures optical parameters while step 3 checks the electrical IC and continuity in parallel. Step 4 bins each engine, step 5 tracks yield by source and step 6 releases the results.',
+      'Step 1 mounts the engines and step 2 measures optical parameters while step 3 checks the electrical IC and continuity in parallel. Step 4 screens each engine through a few temperature cycles and re-reads its coupling loss, step 5 bins it, step 6 tracks yield by source and step 7 releases the results. No engine is binned known-good before it has survived the screen.',
     consumes: [
       'Fiber-attached engines with per-lane coupling loss from OEB-04',
       'Known-good optical engine test strategy and test access from OESD-05',
@@ -414,7 +414,7 @@ export const OEB_WRITE_UPS: CpoWriteUps = {
       'Engine-level test distributions from OEB-05',
       'Known-good optical engine test strategy from OESD-05',
       'Optical link budget from MODL-04',
-      'Switch SoC and I/O die known-good-die criteria and compound yield from SORT-06',
+      'Electrical and photonic IC interim known-good limits and die bins from SORT-05',
       'Standalone engine bring-up results from OEB-06',
     ],
     rel: {
@@ -444,7 +444,7 @@ export const OEB_WRITE_UPS: CpoWriteUps = {
     entry: [
       'Engine test data from the first engines in OEB-05',
       'Link budget allocation per engine lane from MODL-04',
-      'Switch SoC and I/O die compound yield from SORT-06',
+      'Interim electrical and photonic IC known-good limits from SORT-05, which the engine limits must not loosen',
     ],
     exit: [
       'Every engine parameter limit traced to the link budget or the compound yield model',
@@ -460,7 +460,7 @@ export const OEB_WRITE_UPS: CpoWriteUps = {
       'Predicted engine escape rate against target',
     ],
     links: {
-      dependsOn: ['OEB-05', 'OESD-05', 'MODL-04', 'SORT-06', 'OEB-06', 'TINF-18'],
+      dependsOn: ['OEB-05', 'OESD-05', 'MODL-04', 'SORT-05', 'OEB-06', 'TINF-18'],
       feedsInto: ['OEB-08', 'OEB-09', 'PKGA-06', 'NPI-05'],
       runsWith: [],
       revisedBy: [],

@@ -1,5 +1,5 @@
 /**
- * PCTL — Program Integration & Change Control. Weeks 20–214; closes on Change Control Handed to Sustaining.
+ * PCTL — Program Integration & Change Control. Weeks 20–218; closes on Change Control Handed to Sustaining.
  */
 import type { CpoStageModule } from '../types';
 
@@ -27,7 +27,7 @@ export const PCTL: CpoStageModule = {
       'Change control handover package to sustaining',
     ],
     deliverableFrom: [0, 1, 2, 3, 4, 5, 6],
-    deliverableWeek: [188, 188, 188, 188, 188, 188, 190],
+    deliverableWeek: [196, 196, 196, 196, 196, 196, 198],
     engineeringEffort: [30, 15, 20, 24, 14, 10, 2],
     risks: [
       'Changes after the interface freeze agreed between two engineers and never reaching the baseline',
@@ -65,9 +65,9 @@ export const PCTL: CpoStageModule = {
       s: [
         [1, 'Build the integrated master schedule from every stage plan with cross-workstream dependencies and the critical path', 6],
         [2, 'Agree each cross-workstream handoff with a date, an owner on both sides and an acceptance criterion', 4, 1],
-        [3, 'Run the weekly schedule review — critical and near-critical paths, slipping handoffs and recovery actions', 178],
+        [3, 'Run the weekly schedule review — critical and near-critical paths, slipping handoffs and recovery actions', 186],
         [4, 'Re-plan at each major gate — both tapeout waves, first silicon, first package build and production release', 20, 1],
-        [5, 'Report integrated schedule health to the steering committee every month', 178, 1],
+        [5, 'Report integrated schedule health to the steering committee every month', 186, 1],
         [6, 'Close the schedule and archive the as-run record and dependency history at handover', 4],
       ],
       o: [
@@ -83,9 +83,9 @@ export const PCTL: CpoStageModule = {
     'PCTL-02': {
       s: [
         [1, 'Set up the risk, issue and decision logs with scoring, owners, thresholds and escalation rules', 3],
-        [2, 'Run the weekly risk and issue review — score changes, mitigations due and new entries from every workstream', 181],
-        [3, 'Record every cross-workstream decision with its options, rationale, approver and date', 181, 1],
-        [4, 'Escalate risks past threshold to the steering committee with a recovery plan and a decision date', 181, 1],
+        [2, 'Run the weekly risk and issue review — score changes, mitigations due and new entries from every workstream', 189],
+        [3, 'Record every cross-workstream decision with its options, rationale, approver and date', 189, 1],
+        [4, 'Escalate risks past threshold to the steering committee with a recovery plan and a decision date', 189, 1],
         [5, 'Hand open risks, issues and the decision history to sustaining', 4],
       ],
       o: [
@@ -100,10 +100,10 @@ export const PCTL: CpoStageModule = {
     'PCTL-03': {
       s: [
         [1, 'Take over the change control baseline from the interface freeze in ICD-12 and publish the board calendar', 2],
-        [2, 'Run the weekly interface change board — impact assessment from both sides of each ICD for every request', 144],
-        [3, 'Issue new ICD revisions and notify every design, test and supplier team building to the old revision', 144, 1],
+        [2, 'Run the weekly interface change board — impact assessment from both sides of each ICD for every request', 152],
+        [3, 'Issue new ICD revisions and notify every design, test and supplier team building to the old revision', 152, 1],
         [4, 'Audit design databases against the current ICD revisions before each tapeout and each build', 10],
-        [5, 'Track freeze waivers to closure at their named gates', 144, 1],
+        [5, 'Track freeze waivers to closure at their named gates', 152, 1],
         [6, 'Hand the interface baseline, open change requests and waivers to product change control in sustaining', 4],
       ],
       o: [
@@ -120,8 +120,8 @@ export const PCTL: CpoStageModule = {
       s: [
         [1, 'Define configuration items and identifiers — design databases, firmware, test programs, calibration tables and BOMs', 4],
         [2, 'Stand up version control and release procedures for every configuration item class', 6],
-        [3, 'Release a configuration baseline at every gate and record exactly what each tapeout and build used', 156],
-        [4, 'Reconcile the as-built configuration of every engineering and NPI build against its baseline', 156, 1],
+        [3, 'Release a configuration baseline at every gate and record exactly what each tapeout and build used', 164],
+        [4, 'Reconcile the as-built configuration of every engineering and NPI build against its baseline', 164, 1],
         [5, 'Audit configuration at tapeout and production release for untracked changes', 8],
         [6, 'Hand the production configuration baseline to sustaining', 4],
       ],
@@ -138,9 +138,9 @@ export const PCTL: CpoStageModule = {
     'PCTL-05': {
       s: [
         [1, 'Set the review cadence, scorecard and escalation path for every supplier and partner', 3],
-        [2, 'Run monthly program reviews with the silicon and photonic foundries, optical source, substrate, OSAT and system manufacturing partners', 181],
-        [3, 'Track partner deliverables, capacity commitments and long-lead orders against the master schedule', 181, 1],
-        [4, 'Run quarterly executive reviews with critical partners on scorecards and open escalations', 181, 1],
+        [2, 'Run monthly program reviews with the silicon and photonic foundries, optical source, substrate, OSAT and system manufacturing partners', 189],
+        [3, 'Track partner deliverables, capacity commitments and long-lead orders against the master schedule', 189, 1],
+        [4, 'Run quarterly executive reviews with critical partners on scorecards and open escalations', 189, 1],
         [5, 'Hand supplier scorecards and open supplier actions to sustaining supplier management', 4],
       ],
       o: [
@@ -155,9 +155,9 @@ export const PCTL: CpoStageModule = {
     'PCTL-06': {
       s: [
         [1, 'Baseline the cost-of-goods model and program budget from the business case and the budget allocation', 4],
-        [2, 'Refresh the cost-of-goods roll-up at each gate from quotes, measured yields and test times', 158],
-        [3, 'Track program spend, NRE and headcount against the budget every month', 158, 1],
-        [4, 'Report cost variance with recovery actions to the steering committee', 158, 1],
+        [2, 'Refresh the cost-of-goods roll-up at each gate from quotes, measured yields and test times', 166],
+        [3, 'Track program spend, NRE and headcount against the budget every month', 166, 1],
+        [4, 'Report cost variance with recovery actions to the steering committee', 166, 1],
         [5, 'Deliver the cost-of-goods position to the production readiness review and the release decision', 6],
         [6, 'Hand the cost baseline and the cost-reduction backlog to sustaining', 4],
       ],

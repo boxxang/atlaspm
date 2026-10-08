@@ -141,7 +141,7 @@ export const ICD: CpoStageModule = {
     'ICD-04': {
       s: [
         [1, 'Define the electrical IC-to-photonic IC signal interface — driver swing, impedance, bandwidth and the bond interconnect it crosses', 3],
-        [2, 'Define the stack bond pad map, pitch and through-connections shared by the two dies, with power and ground per lane group', 3],
+        [2, 'Define the stack bond pad map — the signal on every pad, pitch class and through-connection count, with power and ground per lane group — as the one map both dies and the stack design work to', 3],
         [3, 'Define bias, heater and monitor photodiode signals between electrical IC and photonic IC', 2.5, 1],
         [4, 'Define the thermal interface through the stack — electrical IC heat into the photonic IC, heater crosstalk and the temperature limits of the rings', 3],
         [5, 'Allocate the electrical and thermal budget across the bond and agree it with both die owners and the stack design', 3],
@@ -149,7 +149,7 @@ export const ICD: CpoStageModule = {
       ],
       o: [
         'Electrical IC-to-photonic IC signal parameter table',
-        'Stack bond pad map, pitch and through-connection definition',
+        'Stack bond pad map with signal assignment, pitch class and through-connection count',
         'Bias, heater and monitor signal definition',
         'Stack thermal interface and heater crosstalk limits',
         'Agreed cross-bond electrical and thermal budget',
