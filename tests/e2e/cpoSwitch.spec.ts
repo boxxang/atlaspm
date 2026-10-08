@@ -46,7 +46,10 @@ test.describe('the CPO Network Switch System template', () => {
       'cpoProgramControl',
       'cpoDesign',
       'cpoPresilicon',
+      'cpoOeStackDesign',
+      'cpoTapeoutOptical',
       'cpoTapeout',
+      'cpoOeBuild',
       'cpoAssembly',
       'cpoOpticalBringup',
       'cpoQualification',
@@ -58,7 +61,17 @@ test.describe('the CPO Network Switch System template', () => {
 
     /* the countdowns read this template's tapeout, first silicon and production release */
     await page.goto(`/p/${id}/timeline`);
-    for (const gate of ['Interface Freeze', 'Tapeout — All Dies', 'First Silicon', 'First Optical Link', 'Production Release']) {
+    for (const gate of [
+      'Interface Freeze',
+      'Optical Engine Stack Design Freeze',
+      'Tapeout — Optical Engine Silicon',
+      'Tapeout — All Dies',
+      'First Silicon',
+      'Known-Good Optical Engines Ready',
+      'First Package Build',
+      'First Optical Link',
+      'Production Release',
+    ]) {
       await expect(page.getByText(gate).first(), gate).toBeVisible();
     }
   });
@@ -91,7 +104,12 @@ test.describe('the CPO Network Switch System template', () => {
     await page.goto('/templates');
     await page.locator('[data-flowchart="cpoSwitch"]').click();
     await page.waitForURL(/\/templates\/cpoSwitch\/flowchart$/);
-    await expect(page.frameLocator('iframe.flowframe').locator('h1')).toContainText('CPO Network Switch System');
+    const frame = page.frameLocator('iframe.flowframe');
+    await expect(frame.locator('h1')).toContainText('CPO Network Switch System');
+    /* the optical engine stages are drawn, and the main package build takes both inputs */
+    for (const t of ['Optical Engine Stack Design', 'Tapeout Wave 1', 'Known-Good Optical Engines']) {
+      await expect(frame.getByText(t).first(), t).toBeVisible();
+    }
     await page.locator('[data-back-templates]').click();
     await page.waitForURL(/\/templates$/);
   });

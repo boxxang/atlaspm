@@ -44,7 +44,7 @@ export const SINT: CpoStageModule = {
       'Thermal and power measured idle, with the full-traffic corner left to characterization',
     ],
     leader: { name: 'Adaeze Lindqvist', short: 'A. Lindqvist', phone: '+1 (408) 555-0519', email: 'adaeze.lindqvist@example.com' },
-    collaboration: ['Validation', 'Software', 'Firmware', 'Switch ASIC architecture', 'Thermal and mechanical', 'Photonics', 'Board and system hardware'],
+    collaboration: ['Validation', 'Software', 'Firmware', 'Switch SoC architecture', 'Thermal and mechanical', 'Photonics', 'Board and system hardware'],
     tools: ['Line-rate network traffic generator and analyzer', 'Network operating system test harness', 'Thermal imaging and data logging', 'Power analyzer', 'Anomaly tracking system'],
     programView: [
       'Ports up per type against the total',

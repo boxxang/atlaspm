@@ -32,7 +32,7 @@ export const SARC_WRITE_UPS: CpoWriteUps = {
       '<b>Power estimated at typical.</b> Block power is estimated at typical corner and activity, and the roll-up misses power per bit.',
     ],
     roles: [
-      { r: 'Switch ASIC architecture', d: 'Owns the Switch SoC architecture specification' },
+      { r: 'Switch SoC architecture', d: 'Owns the Switch SoC architecture specification' },
       { r: 'Performance modeling lead', d: 'Buffer and congestion sizing' },
       { r: 'Physical design lead', d: 'Area, floorplan and reticle feasibility' },
       { r: 'SerDes architect', d: 'I/O count and die-edge placement' },

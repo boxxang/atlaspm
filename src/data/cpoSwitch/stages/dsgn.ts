@@ -72,7 +72,7 @@ export const DSGN: CpoStageModule = {
     ],
     leader: { name: 'Priya Venkataraman', short: 'P. Venkataraman', phone: '+1 (408) 555-0508', email: 'priya.venkataraman@example.com' },
     collaboration: [
-      'Switch ASIC architecture',
+      'Switch SoC architecture',
       'RTL design',
       'SerDes and high-speed I/O',
       'Analog and mixed-signal',

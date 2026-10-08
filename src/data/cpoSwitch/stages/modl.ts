@@ -52,7 +52,7 @@ export const MODL: CpoStageModule = {
       'No accuracy target per model, so nobody can say after silicon whether a model was right',
     ],
     leader: { name: 'Mei Lin Tan', short: 'M. L. Tan', phone: '+1 (408) 555-0523', email: 'meilin.tan@example.com' },
-    collaboration: ['System architecture', 'SI/PI', 'Photonics', 'Analog and mixed-signal', 'Thermal and mechanical', 'Switch ASIC architecture', 'Firmware', 'Software', 'Validation'],
+    collaboration: ['System architecture', 'SI/PI', 'Photonics', 'Analog and mixed-signal', 'Thermal and mechanical', 'Switch SoC architecture', 'Firmware', 'Software', 'Validation'],
     tools: ['Network performance simulator', 'Statistical link and channel simulator', 'Photonic circuit simulator', 'Electromagnetic field solver', 'Computational thermal and mechanical analysis', 'Virtual platform modeling environment'],
     programView: [
       'Required models released against the design dates that need them',

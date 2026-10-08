@@ -166,7 +166,7 @@ export const REQ_WRITE_UPS: CpoWriteUps = {
       '<b>Scale targets untraced.</b> Table sizes are set without a customer configuration that needs them.',
     ],
     roles: [
-      { r: 'Switch ASIC architecture', d: 'Owns the feature, buffer and telemetry requirements' },
+      { r: 'Switch SoC architecture', d: 'Owns the feature, buffer and telemetry requirements' },
       { r: 'Product manager', d: 'Customer trace and priority of each feature' },
       { r: 'Network software architect', d: 'Telemetry consumption and management needs' },
       { r: 'Performance modeling lead', d: 'Buffer and congestion sizing against traffic' },

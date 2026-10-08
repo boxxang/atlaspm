@@ -54,7 +54,7 @@ export const SARC: CpoStageModule = {
     leader: { name: 'Mira Lindqvist', short: 'M. Lindqvist', phone: '+1 (408) 555-0513', email: 'mira.lindqvist@example.com' },
     collaboration: [
       'System architecture',
-      'Switch ASIC architecture',
+      'Switch SoC architecture',
       'SerDes and high-speed I/O',
       'Photonics',
       'Packaging',

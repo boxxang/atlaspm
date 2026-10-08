@@ -31,7 +31,7 @@ export const DSGN_WRITE_UPS: CpoWriteUps = {
       '<b>Specifications unchanged when RTL diverges.</b> The documents stop describing the design and verification tests the wrong thing.',
     ],
     roles: [
-      { r: 'Switch ASIC architecture', d: 'Owns the microarchitecture and every block specification' },
+      { r: 'Switch SoC architecture', d: 'Owns the microarchitecture and every block specification' },
       { r: 'RTL design lead', d: 'Confirms each block can be coded to its specification and schedule' },
       { r: 'Verification lead', d: 'Checks each specification is testable and derives the test plans' },
       { r: 'Physical design lead', d: 'Checks area, memory and floorplan assumptions' },

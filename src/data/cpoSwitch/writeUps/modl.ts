@@ -97,7 +97,7 @@ export const MODL_WRITE_UPS: CpoWriteUps = {
       '<b>No correlation target.</b> Nobody plans to measure the model’s predictions on silicon.',
     ],
     roles: [
-      { r: 'Switch ASIC architecture', d: 'Owns the performance model' },
+      { r: 'Switch SoC architecture', d: 'Owns the performance model' },
       { r: 'Performance modeling engineer', d: 'Model build and sweeps' },
       { r: 'Network systems engineer', d: 'Workloads and congestion control' },
       { r: 'Product manager', d: 'Customer traffic patterns' },

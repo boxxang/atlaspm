@@ -65,7 +65,7 @@ export const CPO_OWNERS = [
   'Product management',
   'Program management',
   'System architecture',
-  'Switch ASIC architecture',
+  'Switch SoC architecture',
   'RTL design',
   'Design verification',
   'Physical design',
@@ -131,7 +131,7 @@ export const CPO_SKELETON: readonly CpoStageSkeleton[] = [
     activities: [
       a('REQ-01', 'Product Requirements Document', 'Product management', [0, 6], 'program'),
       a('REQ-02', 'System Requirements Specification', 'System architecture', [2, 10], 'system'),
-      a('REQ-03', 'Switching Feature, Buffering and Telemetry Requirements', 'Switch ASIC architecture', [3, 11], 'switch'),
+      a('REQ-03', 'Switching Feature, Buffering and Telemetry Requirements', 'Switch SoC architecture', [3, 11], 'switch'),
       a('REQ-04', 'Optical Link Requirements — Reach, Wavelength Plan, Budget and BER', 'Photonics', [3, 11], 'oe'),
       a('REQ-05', 'Standards, Compliance and Interoperability Targets', 'Compliance and interoperability', [4, 12], 'system'),
       a('REQ-06', 'Product Security Requirements and Threat Model', 'Security', [5, 12], 'system'),
@@ -149,7 +149,7 @@ export const CPO_SKELETON: readonly CpoStageSkeleton[] = [
     dur: 26,
     gate: { id: 'cpoPartitionFreeze', label: 'Architecture Convergence & Partition Freeze' },
     activities: [
-      a('SARC-01', 'Switch SoC Architecture — Pipeline, Packet Buffer, Traffic Management', 'Switch ASIC architecture', [0, 14], 'switch'),
+      a('SARC-01', 'Switch SoC Architecture — Pipeline, Packet Buffer, Traffic Management', 'Switch SoC architecture', [0, 14], 'switch'),
       a('SARC-02', 'I/O Die Architecture — SerDes, Die-to-Die PHY and Lane Mapping', 'SerDes and high-speed I/O', [0, 12], 'io'),
       a('SARC-03', 'Optical Engine Architecture — Electrical IC, Photonic IC and Optical Source Split', 'Photonics', [2, 14], 'oe'),
       a('SARC-04', 'Product Partitioning — Switch SoC, I/O Die, Electrical IC, Photonic IC, Optical Engine Package and Main Package', 'System architecture', [4, 16], 'system'),
@@ -268,7 +268,7 @@ export const CPO_SKELETON: readonly CpoStageSkeleton[] = [
     gate: { id: 'cpoModelsReady', label: 'Required Models Ready' },
     activities: [
       a('MODL-01', 'Modeling Plan and Model Accuracy Targets', 'System architecture', [0, 4], 'system'),
-      a('MODL-02', 'Network Traffic, Buffer and Congestion Performance Model', 'Switch ASIC architecture', [2, 24], 'switch'),
+      a('MODL-02', 'Network Traffic, Buffer and Congestion Performance Model', 'Switch SoC architecture', [2, 24], 'switch'),
       a('MODL-03', 'Electrical Channel and SerDes Link Models', 'SI/PI', [4, 26], 'io'),
       a('MODL-04', 'Optical Link Budget and Optical Channel Model', 'Photonics', [4, 28], 'oe'),
       a('MODL-05', 'Electrical IC and Photonic IC Behavioral Co-Simulation Models', 'Analog and mixed-signal', [6, 30], 'oe'),
@@ -289,7 +289,7 @@ export const CPO_SKELETON: readonly CpoStageSkeleton[] = [
     dur: 52,
     gate: { id: 'cpoDesignFreeze', label: 'Design Freeze — RTL, Circuit & Photonic' },
     activities: [
-      a('DSGN-01', 'Switch SoC Microarchitecture and Block Specifications', 'Switch ASIC architecture', [0, 12], 'switch'),
+      a('DSGN-01', 'Switch SoC Microarchitecture and Block Specifications', 'Switch SoC architecture', [0, 12], 'switch'),
       a('DSGN-02', 'Switch SoC RTL Development and Integration', 'RTL design', [6, 44], 'switch'),
       a('DSGN-03', 'Clock, Reset, Power Management and Low-Power Intent', 'RTL design', [8, 34], 'switch'),
       a('DSGN-04', 'I/O Die Design — SerDes, Die-to-Die PHY, Die Top Level and Integration', 'SerDes and high-speed I/O', [4, 44], 'io'),

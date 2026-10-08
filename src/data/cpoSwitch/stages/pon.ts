@@ -35,7 +35,7 @@ export const PON: CpoStageModule = {
       'Bring-up workarounds kept in engineers’ scripts instead of the anomaly register and the firmware',
     ],
     leader: { name: 'Priya Castellanos', short: 'P. Castellanos', phone: '+1 (408) 555-0517', email: 'priya.castellanos@example.com' },
-    collaboration: ['Validation', 'Board and system hardware', 'Firmware', 'SerDes and high-speed I/O', 'DFT', 'Switch ASIC architecture'],
+    collaboration: ['Validation', 'Board and system hardware', 'Firmware', 'SerDes and high-speed I/O', 'DFT', 'Switch SoC architecture'],
     tools: ['Debug probe and boundary scan', 'Bit error rate tester', 'High-bandwidth oscilloscope', 'Programmable power supplies with current limit', 'Anomaly tracking system'],
     programView: [
       'Bring-up steps passed against the plan, day by day',
