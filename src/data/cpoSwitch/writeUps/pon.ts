@@ -14,8 +14,8 @@ export const PON_WRITE_UPS: CpoWriteUps = {
       'Step 1 assigns units and owners. Step 2 runs the daily stand-up while step 3 rebalances units and labs in parallel as steps pass or block. Step 4 publishes the daily status against the plan.',
     consumes: [
       'Bring-up plan, certified stations and debug infrastructure from PKGA-09',
-      'Bring-up systems, electrical-only packages and known-issue list from PKGA-07 and PKGA-13',
-      'Bring-up firmware, SDK and diagnostics from PKGA-11',
+      'Bring-up systems, electrical-only packages and known-issue list from PKGA-07 and PKGA-11',
+      'Bring-up firmware, SDK and diagnostics from PKGA-10',
       'Unit allocation from the build matrix in PKGA-02',
       'Anomaly intake process from PON-06',
     ],
@@ -61,7 +61,7 @@ export const PON_WRITE_UPS: CpoWriteUps = {
       'Hours from observation to anomaly entry',
     ],
     links: {
-      dependsOn: ['PKGA-09', 'PKGA-07', 'PKGA-11'],
+      dependsOn: ['PKGA-09', 'PKGA-07', 'PKGA-10'],
       feedsInto: ['PON-02', 'PON-03', 'PON-04', 'PON-05', 'PON-06'],
       runsWith: [],
       revisedBy: [],
@@ -79,7 +79,7 @@ export const PON_WRITE_UPS: CpoWriteUps = {
       'Step 1 proves the board alone. Step 2 applies first power with limits and step 3 verifies rails and sequencing, while step 4 measures idle current in parallel. Step 5 releases the report and the safe procedure other labs follow.',
     consumes: [
       'Bring-up plan from PON-01',
-      'Electrical-only packages and bring-up systems from PKGA-13 and PKGA-07',
+      'Electrical-only packages and bring-up systems from PKGA-11 and PKGA-07',
       'Board power delivery design and sequencing from DSGN-14',
       'System power model from MODL-08',
       'Package test results and known issues from PKGA-06',
@@ -126,7 +126,7 @@ export const PON_WRITE_UPS: CpoWriteUps = {
       'Idle current error against the model',
     ],
     links: {
-      dependsOn: ['PON-01', 'PKGA-07', 'PKGA-13', 'PKGA-09', 'DSGN-14'],
+      dependsOn: ['PON-01', 'PKGA-07', 'PKGA-11', 'PKGA-09', 'DSGN-14'],
       feedsInto: ['PON-03', 'PON-04', 'PON-06', 'OBU-01'],
       runsWith: [],
       revisedBy: [],
@@ -145,7 +145,7 @@ export const PON_WRITE_UPS: CpoWriteUps = {
     consumes: [
       'Powered units from PON-02',
       'Boot and initialization firmware from DSGN-16',
-      'Bring-up firmware release on the final netlist from PKGA-11',
+      'Bring-up firmware release on the final netlist from PKGA-10',
       'Boot ROM and debug lock design from DSGN-10',
       'Development keys and secure boot procedure',
     ],
@@ -192,7 +192,7 @@ export const PON_WRITE_UPS: CpoWriteUps = {
       'Days from first power to first boot',
     ],
     links: {
-      dependsOn: ['PON-02', 'DSGN-16', 'PSV-09', 'DSGN-10', 'PKGA-11'],
+      dependsOn: ['PON-02', 'DSGN-16', 'PSV-09', 'DSGN-10', 'PKGA-10'],
       feedsInto: ['PON-04', 'PON-05', 'PON-06', 'OBU-05', 'SINT-02'],
       runsWith: [],
       revisedBy: [],

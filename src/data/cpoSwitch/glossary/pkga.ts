@@ -19,4 +19,9 @@ export const PKGA_GLOSSARY: CpoGlossary = {
     group: 'process',
     note: 'The record that follows a unit through every assembly and test step — its split, material lots, recipes, inspection results and dispositions — so any later failure can be traced back to how it was built.',
   },
+  'Fiber egress': {
+    full: 'Fiber egress',
+    group: 'pkg',
+    note: 'The path by which the optical engines’ fibers leave the main package for the front panel — the routing, bend radius, strain relief and the mechanical exit through the lid or frame. It is designed with the package because its clearances constrain lid, thermal solution and board.',
+  },
 };

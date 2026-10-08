@@ -728,7 +728,7 @@ export const SGNO_WRITE_UPS: CpoWriteUps = {
     ],
     links: {
       dependsOn: ['SGNO-06', 'IMPL-07', 'TRDY-06', 'OESD-02'],
-      feedsInto: ['SGNO-10', 'PKGA-01', 'WFAB-06', 'MTO-03'],
+      feedsInto: ['SGNO-10', 'PKGA-01', 'WFAB-06', 'MTO-03', 'OEB-01', 'OEB-03'],
       runsWith: [],
       revisedBy: [],
       feedsBackInto: [],

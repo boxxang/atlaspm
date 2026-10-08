@@ -19,6 +19,7 @@ import { OTO } from './oto';
 import { MTO } from './mto';
 import { WFAB } from './wfab';
 import { SORT } from './sort';
+import { OEB } from './oeb';
 import { TINF } from './tinf';
 import { PKGA } from './pkga';
 import { PON } from './pon';
@@ -50,6 +51,7 @@ export const CPO_STAGE_MODULES: Record<string, CpoStageModule> = {
   MTO,
   WFAB,
   SORT,
+  OEB,
   TINF,
   PKGA,
   PON,

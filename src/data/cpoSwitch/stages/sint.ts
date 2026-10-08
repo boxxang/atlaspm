@@ -1,5 +1,5 @@
 /**
- * SINT — System Integration & Traffic Bring-Up. Weeks 148–160; closes on
+ * SINT — System Integration & Traffic Bring-Up. Weeks 154–166; closes on
  * First End-to-End Traffic.
  */
 import type { CpoStageModule } from '../types';

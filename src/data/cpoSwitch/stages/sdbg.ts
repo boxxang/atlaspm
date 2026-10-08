@@ -1,5 +1,5 @@
 /**
- * SDBG — Silicon Debug, ECO & Stepping. Weeks 140–186; closes on the
+ * SDBG — Silicon Debug, ECO & Stepping. Weeks 144–190; closes on the
  * Production Stepping Decision.
  */
 import type { CpoStageModule } from '../types';

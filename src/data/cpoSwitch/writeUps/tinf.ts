@@ -395,7 +395,7 @@ export const TINF_WRITE_UPS: CpoWriteUps = {
     ],
     links: {
       dependsOn: ['TINF-01', 'TINF-02', 'TINF-03', 'TINF-04', 'TINF-07', 'TINF-13', 'IMPL-11', 'SGNO-07', 'PSV-10', 'OESD-05'],
-      feedsInto: ['SORT-01', 'SORT-04', 'SORT-05', 'PKGA-06', 'TINF-11', 'SORT-02', 'SORT-03'],
+      feedsInto: ['SORT-01', 'SORT-04', 'SORT-06', 'PKGA-06', 'TINF-11', 'SORT-02', 'SORT-03'],
       runsWith: ['TINF-05'],
       revisedBy: [],
       feedsBackInto: [],
@@ -462,7 +462,7 @@ export const TINF_WRITE_UPS: CpoWriteUps = {
     ],
     links: {
       dependsOn: ['DSGN-08', 'TINF-03', 'DSGN-16', 'ICD-11', 'OESD-05'],
-      feedsInto: ['TINF-06', 'TINF-10', 'OBU-04', 'NPI-07', 'TINF-11'],
+      feedsInto: ['TINF-06', 'TINF-10', 'OBU-04', 'NPI-07', 'TINF-11', 'OEB-05'],
       runsWith: [],
       revisedBy: [],
       feedsBackInto: ['DSGN-08'],
@@ -551,7 +551,7 @@ export const TINF_WRITE_UPS: CpoWriteUps = {
       'Warpage model from the thermal and mechanical analysis',
     ],
     rel: {
-      'TINF-D9': '<b>Assembly, optical alignment and fiber attach process specification.</b> Produced here; PKGA-03 and PKGA-04 build the first packages to it.',
+      'TINF-D9': '<b>Assembly, optical alignment and fiber attach process specification.</b> Produced here; the optical engine build in OEB-02 to OEB-04 and the main package build in PKGA-03 and PKGA-04 work to it.',
       'TINF-D11': '<b>Test and manufacturing readiness review package.</b> Process window closure is a readiness criterion for the first build.',
     },
     risks: [
@@ -588,7 +588,7 @@ export const TINF_WRITE_UPS: CpoWriteUps = {
     ],
     dependsOn: ['FEAS-06', 'FEAS-07', 'TRDY-06'],
     dependsNote: 'Starts from the feasibility vehicles rather than the product package; the product floorplan from DSGN-12 is folded in as it closes.',
-    feedsInto: ['PKGA-03', 'PKGA-04'],
+    feedsInto: ['OEB-02', 'OEB-04', 'PKGA-03', 'PKGA-04'],
     measuredBy: [
       'Coupling loss shift from attach to end of assembly',
       'Pilot lot assembly yield',
@@ -596,7 +596,7 @@ export const TINF_WRITE_UPS: CpoWriteUps = {
     ],
     links: {
       dependsOn: ['FEAS-06', 'FEAS-07', 'TRDY-06', 'DSGN-12', 'OESD-06', 'OESD-03'],
-      feedsInto: ['PKGA-03', 'PKGA-04', 'TINF-11'],
+      feedsInto: ['OEB-02', 'OEB-03', 'OEB-04', 'PKGA-03', 'PKGA-04', 'TINF-11'],
       runsWith: [],
       revisedBy: [],
       feedsBackInto: ['DSGN-12'],
@@ -655,7 +655,7 @@ export const TINF_WRITE_UPS: CpoWriteUps = {
     ],
     dependsOn: ['ICD-11', 'TINF-01', 'TINF-07'],
     dependsNote: null,
-    feedsInto: ['SORT-06', 'NPI-05', 'TINF-11'],
+    feedsInto: ['SORT-07', 'NPI-05', 'TINF-11'],
     measuredBy: [
       'Units with complete genealogy',
       'Time to trace a unit from serial to source lots',
@@ -663,7 +663,7 @@ export const TINF_WRITE_UPS: CpoWriteUps = {
     ],
     links: {
       dependsOn: ['ICD-11', 'TINF-01', 'TINF-07'],
-      feedsInto: ['SORT-06', 'NPI-05', 'TINF-11'],
+      feedsInto: ['SORT-07', 'NPI-05', 'TINF-11', 'SORT-05', 'OEB-08'],
       runsWith: [],
       revisedBy: [],
       feedsBackInto: [],
@@ -1066,7 +1066,7 @@ export const TINF_WRITE_UPS: CpoWriteUps = {
     ],
     dependsOn: ['TINF-09', 'TINF-01'],
     dependsNote: null,
-    feedsInto: ['PKGA-04', 'PKGA-05', 'TINF-11'],
+    feedsInto: ['OEB-04', 'OEB-08', 'PKGA-05', 'TINF-11'],
     measuredBy: [
       'Rework yield per failure mode',
       'Reworked units in reliability samples',
@@ -1074,7 +1074,7 @@ export const TINF_WRITE_UPS: CpoWriteUps = {
     ],
     links: {
       dependsOn: ['TINF-09', 'TINF-01', 'REQ-07'],
-      feedsInto: ['PKGA-04', 'PKGA-05', 'TINF-11', 'NPI-05'],
+      feedsInto: ['OEB-04', 'OEB-08', 'PKGA-05', 'TINF-11', 'NPI-05'],
       runsWith: [],
       revisedBy: [],
       feedsBackInto: [],

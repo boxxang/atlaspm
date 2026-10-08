@@ -1,5 +1,5 @@
 /**
- * CERT — Compliance, Interoperability & Security Certification. Weeks 162–186;
+ * CERT — Compliance, Interoperability & Security Certification. Weeks 166–190;
  * closes on Compliance & Interoperability Complete.
  */
 import type { CpoStageModule } from '../types';

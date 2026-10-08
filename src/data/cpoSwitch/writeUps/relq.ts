@@ -80,7 +80,7 @@ export const RELQ_WRITE_UPS: CpoWriteUps = {
       'Step 1 builds burn-in boards and programs. Step 2 runs ESD and latch-up. Step 3 runs operating life while step 4 runs storage and early-failure-rate tests in parallel. Step 5 validates electromigration lifetime, and step 6 releases the report.',
     consumes: [
       'Qualification plan and stress matrix from RELQ-01',
-      'Known-good-die released to assembly from SORT-06',
+      'Known-good-die released to assembly from SORT-07',
       'Stepping fix change list from SDBG-05',
       'Production test program for stress readpoints',
       'Electromigration and EM/IR signoff data from SGNO-01',
@@ -121,7 +121,7 @@ export const RELQ_WRITE_UPS: CpoWriteUps = {
       'ESD and latch-up levels met on every die and on the package',
       'Electromigration lifetime at measured current meets the mission profile',
     ],
-    dependsOn: ['RELQ-01', 'SORT-06'],
+    dependsOn: ['RELQ-01', 'SORT-07'],
     dependsNote: 'Results that must be on the shipping silicon are rerun on the production stepping in RELQ-07 under the delta plan.',
     feedsInto: ['RELQ-05', 'RELQ-06'],
     measuredBy: [
@@ -130,7 +130,7 @@ export const RELQ_WRITE_UPS: CpoWriteUps = {
       'Parametric drift at the last readpoint',
     ],
     links: {
-      dependsOn: ['RELQ-01', 'SORT-06', 'SGNO-01'],
+      dependsOn: ['RELQ-01', 'SORT-07', 'SGNO-01'],
       feedsInto: ['RELQ-05', 'RELQ-06', 'RELQ-07'],
       runsWith: ['SDBG-07'],
       revisedBy: ['SDBG-06'],
@@ -216,7 +216,7 @@ export const RELQ_WRITE_UPS: CpoWriteUps = {
       'Step 1 preconditions packages and checks fiber attach survival. Step 2 runs package stresses while step 3 runs board-level reliability in parallel. Step 4 runs mechanical and fiber retention tests while steps 5 and 6 run connector durability and reworked-unit qualification in parallel. Step 7 sections failures and releases the report.',
     consumes: [
       'Qualification plan and stress matrix from RELQ-01',
-      'Optical engine assembly and fiber attach process from PKGA-04',
+      'Optical engine fiber attach process and build record from OEB-04',
       'Assembly, alignment and fiber attach process development from TINF-09',
       'Warpage and thermal-mechanical models from MODL-07',
       'Rework, repair and scrap policy for optical engines, fiber attach and optical sources from TINF-16',
@@ -259,7 +259,7 @@ export const RELQ_WRITE_UPS: CpoWriteUps = {
       'Coupling loss change after every stress within the link-budget allowance',
       'Fiber retention, connector mating-cycle and reworked-unit results meet their specifications on every sample',
     ],
-    dependsOn: ['RELQ-01', 'PKGA-04', 'TINF-09'],
+    dependsOn: ['RELQ-01', 'OEB-04', 'TINF-09'],
     dependsNote: null,
     feedsInto: ['RELQ-05', 'RELQ-06', 'NPI-05'],
     measuredBy: [
@@ -268,7 +268,7 @@ export const RELQ_WRITE_UPS: CpoWriteUps = {
       'Fiber retention failures',
     ],
     links: {
-      dependsOn: ['RELQ-01', 'PKGA-04', 'TINF-09', 'TINF-16', 'MODL-07'],
+      dependsOn: ['RELQ-01', 'OEB-04', 'TINF-09', 'TINF-16', 'MODL-07'],
       feedsInto: ['RELQ-05', 'RELQ-06', 'NPI-05'],
       runsWith: ['RELQ-03'],
       revisedBy: [],

@@ -20,6 +20,7 @@ import { SGNO_GLOSSARY } from './sgno';
 import { MTO_GLOSSARY } from './mto';
 import { WFAB_GLOSSARY } from './wfab';
 import { SORT_GLOSSARY } from './sort';
+import { OEB_GLOSSARY } from './oeb';
 import { TINF_GLOSSARY } from './tinf';
 import { PKGA_GLOSSARY } from './pkga';
 import { PON_GLOSSARY } from './pon';
@@ -51,6 +52,7 @@ export const CPO_GLOSSARY: CpoGlossary = {
   ...MTO_GLOSSARY,
   ...WFAB_GLOSSARY,
   ...SORT_GLOSSARY,
+  ...OEB_GLOSSARY,
   ...TINF_GLOSSARY,
   ...PKGA_GLOSSARY,
   ...PON_GLOSSARY,

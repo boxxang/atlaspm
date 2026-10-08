@@ -1,5 +1,5 @@
 /**
- * PCTL — Program Integration & Change Control. Weeks 20–210; closes on Change Control Handed to Sustaining.
+ * PCTL — Program Integration & Change Control. Weeks 20–214; closes on Change Control Handed to Sustaining.
  */
 import type { CpoStageModule } from '../types';
 

@@ -1,5 +1,5 @@
 /**
- * OBU — Optical Bring-Up & Calibration. Weeks 144–154; closes on First
+ * OBU — Optical Bring-Up & Calibration. Weeks 150–160; closes on First
  * Optical Link.
  */
 import type { CpoStageModule } from '../types';

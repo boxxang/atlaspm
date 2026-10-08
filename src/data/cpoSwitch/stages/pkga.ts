@@ -1,91 +1,87 @@
 /**
- * PKGA — Package & Optical Assembly — First Build. Weeks 100–140; closes on
- * First Package Build.
+ * PKGA — Main Package Assembly — First Build (Switch SoC, I/O Die and
+ * Known-Good Optical Engines). Weeks 100–148; closes on First Package Build.
  */
 import type { CpoStageModule } from '../types';
 
 export const PKGA: CpoStageModule = {
   content: {
-    tagline: 'Turn known-good die, optical engines, optical sources and fiber into the first working switch packages.',
+    tagline: 'Put the Switch SoC, the I/O die and the known-good optical engines on one substrate and turn them into the first working switch packages.',
     description:
-      'Procure the long-lead first-build material while the wafers are still in the fab, plan the engineering build as a matrix of split conditions, prove the product substrate with a daisy-chain dry run, and get firmware, the SDK, the bring-up labs and a standalone optical engine ready before the packages are. Then assemble — an electrical-only package so power-on can start early, and the full build: bridge and die attach, optical engine assembly with active fiber alignment and attach, optical source integration, package-level electrical and optical test, the validation boards and systems bring-up will run on, and a first pre-qualification stress on early units. The first build is an experiment as much as a build, so every unit carries its split, its traveler and its per-lane coupling loss. The stage closes when packaged units have been tested, binned and delivered on boards to the bring-up labs.',
+      'The main package takes two inputs that arrive by different roads: known-good Switch SoC and I/O dies from the die bank, and known-good optical engines from the engine build, each with its own gate. Procure the long-lead material — main package substrates, bridges, optical source modules and fiber egress hardware — while the wafers are still in the fab, plan the engineering build as a matrix of split conditions, prove the product substrate with a daisy-chain dry run, and build an electrical-only package so power-on can start before a single engine is ready. Then assemble the full build: bridge and Switch SoC and I/O die attach as soon as the die kits are released, known-good optical engine mounting with fiber egress routing and strain relief once the engines are, optical source integration, package-level electrical and optical test, the validation boards and systems bring-up will run on, and a first pre-qualification stress on early units. Firmware, the SDK and the bring-up labs are made ready alongside. The engines arrive last — the optical path is the longer one — so die attach is scheduled to finish just before them. The stage closes when packaged units have been tested, binned and delivered on boards to the bring-up labs.',
     activities: [
       'First-build material',
       'Build matrix',
-      'Multi-die assembly',
-      'Optical engine and fiber',
+      'Switch SoC and I/O die attach',
+      'Known-good engine mounting',
       'Optical source integration',
       'Package test and yield',
       'Boards and systems',
       'Pre-qualification stress',
       'Bring-up lab readiness',
-      'Engine-level test',
       'Bring-up firmware and SDK',
-      'Engine standalone bring-up',
       'Electrical-only build',
       'Daisy-chain dry run',
     ],
     deliverables: [
-      'First-build material kit — substrates, bridges, optical source modules, fiber assemblies and passives',
+      'First-build material kit — main package substrates, bridges, optical source modules, fiber egress hardware and passives',
       'Engineering build plan and split-condition build matrix',
-      'Assembled multi-die packages with assembly travelers',
-      'Optical engine and fiber attach build record with per-lane coupling loss',
+      'Assembled Switch SoC and I/O die packages with assembly travelers',
+      'Known-good optical engine mounting and fiber egress record per package',
       'Optical source integration record with delivered optical power per lane',
       'First-build package test results and yield analysis report',
       'Assembled validation boards and bring-up systems',
       'First package build release to bring-up — unit allocation and known-issue list',
       'Pre-qualification stress results on first-build units',
       'Bring-up plan, lab readiness certificate and debug station inventory',
-      'Optical engine-level test results and engine yield tracker',
       'Bring-up firmware, SDK and diagnostics release validated on the final netlist',
-      'Optical engine standalone bring-up report from the engine evaluation board',
       'Electrical-only engineering packages for early power-on',
       'Daisy-chain dry-run build report on the product substrate',
     ],
-    deliverableFrom: [0, 1, 2, 3, 4, 5, 6, 6, 7, 8, 9, 10, 11, 12, 13],
-    deliverableWeek: [26, 12, 38, 42, 42, 44, 44, 44, 44, 40, 42, 36, 40, 38, 30],
-    engineeringEffort: [6, 3, 10, 12, 6, 8, 10, 4, 8, 6, 30, 12, 5, 4],
+    deliverableFrom: [0, 1, 2, 3, 4, 5, 6, 6, 7, 8, 9, 10, 11],
+    deliverableWeek: [26, 12, 38, 43, 45, 48, 48, 48, 48, 44, 36, 38, 30],
+    engineeringEffort: [6, 3, 10, 6, 6, 8, 10, 4, 8, 30, 5, 4],
     risks: [
-      'Substrate, optical source or fiber assembly arrives after the known-good die',
-      'Fiber attach loss on real packages worse than on the process vehicles',
+      'Known-good optical engines arrive later than planned and every assembled Switch SoC and I/O die package waits for them',
+      'Main package substrate, optical source or fiber egress hardware arrives after the known-good dies',
       'Too few units per split to learn anything from the first build',
     ],
     potentialRisks: [
       'Substrate and bridge orders placed on a package revision that changed at signoff',
       'Optical source modules delivered without burn-in data, so early failures reach package test',
       'Build matrix that spends all units on bring-up and leaves none for reliability or failure analysis',
-      'Warpage of the full multi-die package larger than the fiber attach process window allows',
-      'Package test run without optical fixtures correlated to the lab, so yield loss cannot be attributed',
-      'Validation boards assembled and powered for the first time with a real package on them',
-      'Units shipped to labs without travelers, so a bring-up anomaly cannot be traced to its split',
+      'Warpage of the full main package larger than the engine mounting and fiber egress window allows',
+      'Engine mounting heat moves the engine fiber attach and per-lane loss grows after mounting',
+      'Package test run without optical fixtures correlated to the engine test, so yield loss cannot be attributed',
+      'Units shipped to labs without travelers, so a bring-up anomaly cannot be traced to its split, engine or die',
     ],
     leader: { name: 'Hana Veldkamp', short: 'H. Veldkamp', phone: '+1 (408) 555-0516', email: 'hana.veldkamp@example.com' },
     collaboration: ['Packaging', 'Optical engineering', 'Laser and optical source', 'Supply chain', 'Test engineering', 'Board and system hardware', 'Manufacturing and NPI'],
-    tools: ['Build tracking and traveler system', 'Active alignment station', 'Acoustic and X-ray inspection', 'Automated test equipment', 'Yield analysis database'],
+    tools: ['Build tracking and traveler system', 'Die and engine placement equipment', 'Acoustic and X-ray inspection', 'Automated test equipment', 'Yield analysis database'],
     programView: [
-      'First-build material on dock against the assembly start date',
+      'Known-good dies and known-good engines on hand against the build dates',
       'Units assembled per split against the build matrix',
-      'Per-lane coupling loss distribution against budget',
+      'Per-lane loss after engine mounting against the engine record',
       'Package test yield by failure category',
       'Systems delivered to bring-up labs',
     ],
     perspective:
-      'The first build is the first time every part of a co-packaged switch meets every other. Plan it as an experiment — splits, unit allocation, a traveler per unit — so that when half the units fail, the program learns why instead of just counting them.',
+      'The first build is the first time every part of a co-packaged switch meets every other, and it is fed by two gates rather than one. Schedule die attach to finish just as the known-good engines arrive, and plan the build as an experiment — splits, unit allocation, a traveler per unit — so that when half the units fail, the program learns why instead of just counting them.',
   },
   steps: {
     'PKGA-01': {
       s: [
         [1, 'Convert the build matrix and long-lead plan into a first-build bill of materials with quantities per split', 2],
         [2, 'Release substrate and bridge purchase orders against the signed-off package design', 2],
-        [3, 'Order optical source modules and fiber assemblies with their incoming inspection criteria', 2, 1],
-        [4, 'Track supplier builds — substrate fabrication, bridge wafers, optical source burn-in, fiber assembly', 14],
+        [3, 'Order optical source modules and fiber egress and front-panel hardware with their incoming inspection criteria', 2, 1],
+        [4, 'Track supplier builds — main package substrate fabrication, bridge wafers, optical source burn-in, fiber egress hardware', 14],
         [5, 'Inspect incoming material — substrate warpage, optical source power, fiber end faces and loss', 3],
         [6, 'Kit material by build split and release it to the assembly partner', 2],
       ],
       o: [
         'First-build bill of materials by split',
         'Substrate and bridge purchase orders',
-        'Optical source and fiber assembly purchase orders',
+        'Optical source and fiber egress hardware purchase orders',
         'Supplier build tracking log',
         'Incoming inspection results',
         'First-build material kit released to assembly',
@@ -95,9 +91,9 @@ export const PKGA: CpoStageModule = {
     'PKGA-02': {
       s: [
         [1, 'Define what the first build must prove for bring-up, characterization and reliability', 1],
-        [2, 'Define the split conditions — die corners, bridge attach variants, fiber attach recipes, optical source bins', 2],
+        [2, 'Define the split conditions — die corners, bridge attach variants, optical engine bins and mounting recipes, optical source bins', 2],
         [3, 'Allocate units per split to bring-up, characterization, reliability and failure analysis', 1.5],
-        [4, 'Align the build schedule with the assembly partner and known-good-die availability', 1.5, 1],
+        [4, 'Align the build schedule with the assembly partner, known-good-die and known-good optical engine availability', 1.5, 1],
         [5, 'Release the engineering build plan and build matrix', 1],
       ],
       o: [
@@ -113,10 +109,10 @@ export const PKGA: CpoStageModule = {
       s: [
         [1, 'Receive known-good die and bridges from the die bank with their screening data', 0.5],
         [2, 'Attach the bridge and silicon capacitors to the substrate', 1],
-        [3, 'Attach the switch, high-speed I/O and electrical IC die and reflow', 1.5],
+        [3, 'Attach the Switch SoC and I/O die and reflow', 1.5],
         [4, 'Underfill, cure and inspect by acoustic imaging and X-ray', 1],
         [5, 'Measure warpage and die-to-die continuity and record each unit on its traveler', 1],
-        [6, 'Release assembled packages to optical engine assembly', 0.5],
+        [6, 'Release assembled packages to optical engine mounting', 0.5],
       ],
       o: [
         'Known-good die and bridges received with screening data',
@@ -124,35 +120,33 @@ export const PKGA: CpoStageModule = {
         'Multi-die attach and reflow complete',
         'Underfill and inspection results',
         'Warpage and continuity data per unit',
-        'Assembled multi-die packages with travelers',
+        'Assembled Switch SoC and I/O die packages with travelers',
       ],
-      r: [['PKGA-D3', 'produces'], ['PKGA-D6', 'feeds']],
+      r: [['PKGA-D3', 'produces'], ['PKGA-D4', 'feeds']],
     },
     'PKGA-04': {
       s: [
-        [1, 'Assemble each electrical IC onto its photonic IC to form the optical engines', 1.5],
-        [2, 'Place the engines that passed engine-level test on the assembled packages', 1.5],
-        [3, 'Actively align and attach the fiber arrays and cure', 2],
-        [4, 'Measure coupling loss per lane after cure and after the final thermal step', 1],
-        [5, 'Inspect and clean every fiber end face to the handling standard and log the result', 0.5, 1],
-        [6, 'Release the fiber-attached units with their per-lane coupling loss record', 0.5],
+        [1, 'Receive the released known-good optical engine kits with their bins, serials and per-lane loss records', 0.5],
+        [2, 'Place and attach the engines on the engine sites of the assembled main packages and cure', 1],
+        [3, 'Route the engine fibers to the package fiber egress and fix strain relief', 1],
+        [4, 'Re-measure per-lane optical continuity after mounting and compare with the engine record', 0.5, 1],
+        [5, 'Record engine serials against each package traveler and release units to source integration and package test', 0.5],
       ],
       o: [
-        'Assembled optical engines handed to engine-level test',
-        'Passing optical engines placed on packages',
-        'Fiber arrays aligned, attached and cured',
-        'Per-lane coupling loss after cure and thermal steps',
-        'End-face inspection log per fiber',
-        'Optical engine and fiber attach build record',
+        'Known-good engine kits received with records',
+        'Engines mounted on the main packages',
+        'Fiber egress routed with strain relief',
+        'Per-lane continuity after mounting against the engine record',
+        'Known-good optical engine mounting and fiber egress record',
       ],
       r: [['PKGA-D4', 'produces'], ['PKGA-D6', 'feeds']],
     },
     'PKGA-05': {
       s: [
-        [1, 'Screen incoming optical source modules for output power, wavelength and burn-in data', 1.5],
-        [2, 'Bin optical sources to the build matrix splits', 0.5],
-        [3, 'Attach or connect the optical sources to the package or system as the architecture defines', 2],
-        [4, 'Verify delivered optical power into each photonic lane with the laser safety interlock enabled', 1.5],
+        [1, 'Screen incoming optical source modules for output power, wavelength and burn-in data', 1],
+        [2, 'Bin optical sources to the build matrix splits', 0.5, 1],
+        [3, 'Attach or connect the optical sources to the main package or system as the architecture defines', 1.5],
+        [4, 'Verify delivered optical power into each engine lane with the laser safety interlock enabled', 1],
         [5, 'Record source serials against each package and release the integrated units', 0.5],
       ],
       o: [
@@ -169,7 +163,7 @@ export const PKGA: CpoStageModule = {
         [1, 'Run package-level electrical test — continuity, scan, memory BIST and die-to-die loopback', 1.5],
         [2, 'Run package-level optical test — insertion loss, per-lane responsivity and optical loopback', 1.5, 1],
         [3, 'Bin units and assign them to bring-up, characterization and reliability per the build matrix', 0.5],
-        [4, 'Build the first-build yield pareto by assembly step, die source and fiber attach split', 1.5],
+        [4, 'Build the first-build yield pareto by assembly step, die source, engine bin and mounting split', 1.5],
         [5, 'Send failing units to failure analysis and open anomalies', 0.5, 1],
         [6, 'Release the package test results and first-build yield report', 0.5],
       ],
@@ -240,25 +234,6 @@ export const PKGA: CpoStageModule = {
     },
     'PKGA-10': {
       s: [
-        [1, 'Mount assembled optical engines on the engine test fixture with a temporary fiber connection', 1],
-        [2, 'Measure per-lane insertion loss, responsivity, modulator bandwidth and heater efficiency', 2],
-        [3, 'Run electrical IC functional checks through the engine fixture', 1, 1],
-        [4, 'Bin engines against the engine-level limits and release passing engines to placement', 1],
-        [5, 'Track engine yield by photonic wafer, electrical IC lot and assembly step', 1.5],
-        [6, 'Release the engine-level test results and yield tracker', 0.5],
-      ],
-      o: [
-        'Engines mounted on the engine test fixture',
-        'Per-lane engine optical measurements',
-        'Electrical IC functional check results',
-        'Engine bins and passing engines released',
-        'Engine yield by source and step',
-        'Optical engine-level test results and yield tracker',
-      ],
-      r: [['PKGA-D11', 'produces'], ['PKGA-D4', 'feeds']],
-    },
-    'PKGA-11': {
-      s: [
         [1, 'Rebuild firmware, SDK and diagnostics against the final netlist and register map', 4],
         [2, 'Run them on emulation of the final netlist and fix regressions from earlier drops', 10],
         [3, 'Build the bring-up diagnostics — rail, clock, register, memory, link and optical checks', 8, 1],
@@ -274,28 +249,9 @@ export const PKGA: CpoStageModule = {
         'Bring-up rehearsal record on emulation',
         'Bring-up firmware, SDK and diagnostics release',
       ],
-      r: [['PKGA-D12', 'produces'], ['PKGA-D10', 'feeds']],
+      r: [['PKGA-D11', 'produces'], ['PKGA-D10', 'feeds']],
     },
-    'PKGA-12': {
-      s: [
-        [1, 'Assemble early optical engines from first photonic and electrical IC die onto the engine evaluation board', 3],
-        [2, 'Bias the electrical IC and photonic IC and tune heaters with bench control', 3],
-        [3, 'Close optical loopback on the engine and measure per-lane BER with bench PRBS', 4],
-        [4, 'Run the calibration algorithms on the engine and compare with the models', 3, 1],
-        [5, 'Measure engine behavior across temperature on the evaluation board', 3],
-        [6, 'Release the standalone engine bring-up report', 1],
-      ],
-      o: [
-        'Optical engines on engine evaluation boards',
-        'Bias and heater tuning settings per lane',
-        'Engine-level optical loopback BER per lane',
-        'Calibration algorithm results against models',
-        'Engine behavior across temperature',
-        'Optical engine standalone bring-up report',
-      ],
-      r: [['PKGA-D13', 'produces'], ['PKGA-D11', 'informs']],
-    },
-    'PKGA-13': {
+    'PKGA-11': {
       s: [
         [1, 'Kit known-good Switch SoC and I/O die with substrates and bridges for the electrical-only build', 0.5],
         [2, 'Attach bridges, silicon capacitors and die, and reflow, with optical engine sites left empty or capped', 2],
@@ -310,9 +266,9 @@ export const PKGA: CpoStageModule = {
         'Electrical screening results',
         'Electrical-only engineering packages released',
       ],
-      r: [['PKGA-D14', 'produces'], ['PKGA-D7', 'feeds']],
+      r: [['PKGA-D12', 'produces'], ['PKGA-D7', 'feeds']],
     },
-    'PKGA-14': {
+    'PKGA-12': {
       s: [
         [1, 'Build daisy-chain die and mechanical dummies matched to the product bump map', 1],
         [2, 'Assemble them on product substrates with the production attach, underfill and lid flow', 2],
@@ -327,7 +283,7 @@ export const PKGA: CpoStageModule = {
         'Board-level thermal cycle and clearance results',
         'Daisy-chain dry-run build report',
       ],
-      r: [['PKGA-D15', 'produces'], ['PKGA-D3', 'informs']],
+      r: [['PKGA-D13', 'produces'], ['PKGA-D3', 'informs']],
     },
   },
 };

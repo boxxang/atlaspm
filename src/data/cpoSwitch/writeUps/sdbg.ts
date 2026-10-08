@@ -137,7 +137,7 @@ export const SDBG_WRITE_UPS: CpoWriteUps = {
       feedsInto: ['SDBG-03', 'SDBG-04', 'SUST-03'],
       runsWith: ['SDBG-03'],
       revisedBy: [],
-      feedsBackInto: ['TINF-06', 'SORT-05'],
+      feedsBackInto: ['TINF-06', 'SORT-06'],
     },
     terms: ['FA', 'Optical FA', 'CSAM', 'ATPG'],
   },

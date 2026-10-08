@@ -1,5 +1,5 @@
 /**
- * PON — Power-On & Electrical Bring-Up. Weeks 140–148; closes on First
+ * PON — Power-On & Electrical Bring-Up. Weeks 144–154; closes on First
  * Electrical Link.
  */
 import type { CpoStageModule } from '../types';

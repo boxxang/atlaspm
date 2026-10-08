@@ -81,7 +81,7 @@ export const NPI_WRITE_UPS: CpoWriteUps = {
       'Step 1 freezes the matrix of lots and configurations. Step 2 builds with deviations logged. Step 3 tests and calibrates every unit, and step 4 runs the validation matrix in parallel on units as they pass. Step 5 dispositions every failure and step 6 releases the report DVT is entered on.',
     consumes: [
       'NPI plan and EVT criteria from NPI-01',
-      'Known-good-die released to assembly by SORT-06',
+      'Known-good-die released to assembly by SORT-07',
       'Production test programs in their first release from TINF-06',
       'Firmware workarounds and test screens from SDBG-03',
       'Assembly and fiber attach process from TINF-09',
@@ -121,7 +121,7 @@ export const NPI_WRITE_UPS: CpoWriteUps = {
       'Every failure dispositioned to design, process or test with an owner',
       'Engineering validation matrix run to completion across temperature with results published',
     ],
-    dependsOn: ['NPI-01', 'SORT-06'],
+    dependsOn: ['NPI-01', 'SORT-07'],
     dependsNote: null,
     feedsInto: ['NPI-03', 'NPI-05'],
     measuredBy: [
@@ -130,7 +130,7 @@ export const NPI_WRITE_UPS: CpoWriteUps = {
       'Validation matrix cells completed',
     ],
     links: {
-      dependsOn: ['NPI-01', 'SORT-06', 'PKGA-06', 'TINF-06', 'SDBG-03'],
+      dependsOn: ['NPI-01', 'SORT-07', 'PKGA-06', 'TINF-06', 'SDBG-03'],
       feedsInto: ['NPI-03', 'NPI-05', 'NPI-07', 'SDBG-01'],
       runsWith: ['CHAR-02', 'CHAR-03'],
       revisedBy: [],
@@ -339,7 +339,7 @@ export const NPI_WRITE_UPS: CpoWriteUps = {
       feedsInto: ['NPI-08', 'RAMP-04', 'SUST-01'],
       runsWith: ['NPI-03', 'NPI-04'],
       revisedBy: [],
-      feedsBackInto: ['TINF-09', 'SORT-05'],
+      feedsBackInto: ['TINF-09', 'SORT-06'],
     },
     terms: ['Cpk', 'DOE', 'Coupling loss', 'Fiber attach'],
   },

@@ -1,7 +1,8 @@
 /**
  * SORT — Wafer Sort & Known-Good-Die. Weeks 114–132; closes on Known-Good-Die Ready.
  * The electrical IC is sorted first (weeks 114–120) and the photonic IC next
- * (120–125), ahead of the Switch SoC and I/O die (122–128).
+ * (120–125); their known-good dies go to the optical engine build at week 126,
+ * ahead of the Switch SoC and I/O die (122–128).
  */
 import type { CpoStageModule } from '../types';
 
@@ -9,20 +10,29 @@ export const SORT: CpoStageModule = {
   content: {
     tagline: 'Every die that goes into a co-packaged switch must be good before it goes in — nothing comes back out.',
     description:
-      'Bring up wafer sort on first silicon for each die on its own program and probe card — the Switch SoC, the I/O die with its SerDes and die-to-die PHY tests, and the electrical IC with its driver and TIA tests — and wafer-level optical test for the photonic IC, then turn the first-lot data into known-good-die screening criteria: limits, bins, outlier screens and the correlation that shows a die passing sort will work in the package. Because a package needs every one of its dies to be good, per-die escapes multiply into package loss, so the screens are set against the compound yield model rather than each die alone. The dies arrive in the order their waves left: the electrical IC is sorted first and the photonic IC next, so the optical engine build can start on them, then the Switch SoC and the I/O die. The stage closes when kits of known-good dies are banked, traceable and released to the first package build.',
-    activities: ['Switch SoC sort bring-up', 'I/O die sort bring-up', 'EIC sort bring-up', 'PIC optical wafer test', 'KGD criteria and correlation', 'Die bank and release'],
+      'Bring up wafer sort on first silicon for each die on its own program and probe card — the Switch SoC, the I/O die with its SerDes and die-to-die PHY tests, and the electrical IC with its driver and TIA tests — and wafer-level optical test for the photonic IC, then turn the first-lot data into known-good-die screening criteria: limits, bins, outlier screens and the correlation that shows a die passing sort will work in the package. Because a package needs every one of its dies to be good, per-die escapes multiply into package loss, so the screens are set against the compound yield model rather than each die alone. The dies arrive in the order their waves left: the electrical IC is sorted first and the photonic IC next, and their known-good dies are paired by bin and released to the optical engine build in week 126 — the start of the engine stack build on the critical path. The Switch SoC and the I/O die follow. The stage closes when kits of known-good Switch SoC and I/O dies are banked, traceable and released to main package assembly.',
+    activities: [
+      'Switch SoC sort bring-up',
+      'I/O die sort bring-up',
+      'EIC sort bring-up',
+      'PIC optical wafer test',
+      'EIC and PIC release to engine build',
+      'Switch and I/O KGD criteria',
+      'Die bank and release',
+    ],
     deliverables: [
       'Switch SoC electrical wafer sort program release and first-lot sort data',
       'I/O die electrical wafer sort program release and first-lot sort data',
       'Electrical IC wafer sort results and wafer maps with trim data',
       'Photonic IC wafer-level optical test results and wafer maps',
-      'Known-good-die screening specification and bin definitions',
+      'Electrical and photonic IC known-good-die release to the optical engine build with lot and bin traceability',
+      'Switch SoC and I/O die known-good-die screening specification and bin definitions',
       'Sort correlation and compound yield report',
-      'Die bank inventory and known-good-die release to assembly',
+      'Die bank inventory and known-good-die release to main package assembly',
     ],
-    deliverableFrom: [0, 1, 2, 3, 4, 4, 5],
-    deliverableWeek: [14, 14, 6, 11, 16, 16, 18],
-    engineeringEffort: [6, 4, 3, 8, 6, 3],
+    deliverableFrom: [0, 1, 2, 3, 4, 5, 5, 6],
+    deliverableWeek: [14, 14, 6, 11, 12, 16, 16, 18],
+    engineeringEffort: [6, 4, 3, 8, 3, 6, 3],
     risks: [
       'Screens too loose, so bad dies are assembled and each escape scraps a package full of good ones',
       'Photonic wafer-level test does not correlate with packaged optical performance',
@@ -64,7 +74,7 @@ export const SORT: CpoStageModule = {
         'First-lot wafer maps and data logs',
         'Switch SoC electrical wafer sort program release and first-lot sort data',
       ],
-      r: [['SORT-D1', 'produces'], ['SORT-D5', 'feeds']],
+      r: [['SORT-D1', 'produces'], ['SORT-D6', 'feeds']],
     },
     'SORT-02': {
       s: [
@@ -83,7 +93,7 @@ export const SORT: CpoStageModule = {
         'I/O die first-lot wafer maps with trims programmed',
         'I/O die electrical wafer sort program release and first-lot sort data',
       ],
-      r: [['SORT-D2', 'produces'], ['SORT-D5', 'feeds']],
+      r: [['SORT-D2', 'produces'], ['SORT-D6', 'feeds']],
     },
     'SORT-03': {
       s: [
@@ -125,10 +135,27 @@ export const SORT: CpoStageModule = {
     },
     'SORT-05': {
       s: [
-        [1, 'Set known-good-die limits per die from first-lot distributions, the link budget and the package yield model', 1.5],
+        [1, 'Set interim electrical and photonic IC known-good limits from the first-lot data and the engine link budget', 0.5],
+        [2, 'Pair photonic and electrical IC dies by bin into stack kits per the optical engine build matrix', 1],
+        [3, 'Singulate, pick and pack the paired dies with per-die traceability to wafer, position and bin', 1, 1],
+        [4, 'Reconcile the stack kits against the engine build plan and flag shortfalls', 0.5],
+        [5, 'Release the electrical and photonic IC known-good-die kits to the optical engine build', 0.5],
+      ],
+      o: [
+        'Interim electrical and photonic IC known-good limits',
+        'Bin-paired stack kits',
+        'Packed dies with per-die traceability',
+        'Stack kit reconciliation and shortfall list',
+        'Electrical and photonic IC known-good-die release to the optical engine build',
+      ],
+      r: [['SORT-D5', 'produces']],
+    },
+    'SORT-06': {
+      s: [
+        [1, 'Set Switch SoC and I/O die known-good limits from first-lot distributions, the link budget and the main package yield model', 1.5],
         [2, 'Define bins and die-level screens — outlier detection and stress screens where required', 1.5],
         [3, 'Correlate sort results with bench characterization on sampled dies and across testers', 1.5, 1],
-        [4, 'Compute compound package yield from per-die yield and set escape targets', 1],
+        [4, 'Compute compound main package yield from the Switch SoC, I/O die and engine yields and set escape targets', 1],
         [5, 'Release the screening specification and the correlation and yield report', 1],
       ],
       o: [
@@ -138,22 +165,22 @@ export const SORT: CpoStageModule = {
         'Compound yield estimate with escape targets',
         'Known-good-die screening specification and correlation report',
       ],
-      r: [['SORT-D5', 'produces'], ['SORT-D6', 'produces'], ['SORT-D7', 'feeds']],
+      r: [['SORT-D6', 'produces'], ['SORT-D7', 'produces'], ['SORT-D8', 'feeds']],
     },
-    'SORT-06': {
+    'SORT-07': {
       s: [
         [1, 'Singulate, pick and pack known-good dies into the die bank with per-die traceability', 1.5],
-        [2, 'Match dies into kits per the build matrix — Switch SoC, I/O die, electrical and photonic ICs and bridge', 1],
+        [2, 'Match dies into kits per the main package build matrix — Switch SoC, I/O die, bridge and silicon capacitors', 1],
         [3, 'Reconcile inventory against the build plan and flag shortfalls', 0.5, 1],
-        [4, 'Release the known-good-die kits to assembly', 0.5],
+        [4, 'Release the known-good-die kits to main package assembly', 0.5],
       ],
       o: [
         'Banked known-good dies with traceability',
         'Matched first-build kits',
         'Inventory reconciliation and shortfall list',
-        'Die bank inventory and known-good-die release to assembly',
+        'Die bank inventory and known-good-die release to main package assembly',
       ],
-      r: [['SORT-D7', 'produces']],
+      r: [['SORT-D8', 'produces']],
     },
   },
 };

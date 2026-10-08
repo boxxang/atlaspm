@@ -1,5 +1,5 @@
 /**
- * CHAR — Characterization & Full-Bandwidth Validation. Weeks 156–176; closes on
+ * CHAR — Characterization & Full-Bandwidth Validation. Weeks 160–180; closes on
  * the Full-Bandwidth Demonstration.
  */
 import type { CpoStageModule } from '../types';

@@ -82,7 +82,7 @@ export const OBU_WRITE_UPS: CpoWriteUps = {
       'Delivered optical power per lane from OBU-01',
       'Register access to the electrical and photonic ICs from PON-04',
       'Optical control, tuning and calibration algorithms from DSGN-08',
-      'Standalone engine bias and tuning results from PKGA-12',
+      'Standalone engine bias and tuning results from OEB-06',
       'Electrical IC bias design from DSGN-05',
     ],
     rel: {
@@ -129,7 +129,7 @@ export const OBU_WRITE_UPS: CpoWriteUps = {
       'Lock losses per thermal step',
     ],
     links: {
-      dependsOn: ['OBU-01', 'PON-04', 'DSGN-08', 'PKGA-12'],
+      dependsOn: ['OBU-01', 'PON-04', 'DSGN-08', 'OEB-06'],
       feedsInto: ['OBU-03', 'OBU-04', 'CHAR-03'],
       runsWith: ['OBU-05'],
       revisedBy: [],
@@ -196,7 +196,7 @@ export const OBU_WRITE_UPS: CpoWriteUps = {
       'Units reaching first optical link',
     ],
     links: {
-      dependsOn: ['OBU-02', 'PON-05', 'OBU-01'],
+      dependsOn: ['OBU-02', 'PON-05', 'OBU-01', 'OEB-06'],
       feedsInto: ['SINT-03', 'OBU-06', 'CHAR-03', 'SDBG-01'],
       runsWith: ['OBU-04'],
       revisedBy: [],
@@ -329,7 +329,7 @@ export const OBU_WRITE_UPS: CpoWriteUps = {
       'Monitor error against instruments',
     ],
     links: {
-      dependsOn: ['PON-03', 'DSGN-16', 'OBU-01', 'PKGA-11'],
+      dependsOn: ['PON-03', 'DSGN-16', 'OBU-01', 'PKGA-10'],
       feedsInto: ['SINT-05', 'SINT-03', 'OBU-06'],
       runsWith: ['OBU-02', 'OBU-04'],
       revisedBy: [],
@@ -348,7 +348,7 @@ export const OBU_WRITE_UPS: CpoWriteUps = {
     consumes: [
       'Delivered power per lane from OBU-01',
       'BER and link state per lane from OBU-03',
-      'Per-lane coupling loss from PKGA-04',
+      'Per-lane coupling loss from OEB-04',
       'Optical link budget and channel model from MODL-04',
       'Photonic IC simulation against the budget from PSV-06',
     ],
@@ -385,7 +385,7 @@ export const OBU_WRITE_UPS: CpoWriteUps = {
       'Every gap larger than the stated tolerance attributed to a term and an owner',
       'Model corrections filed and anomalies opened for every lane outside budget',
     ],
-    dependsOn: ['OBU-01', 'OBU-03', 'PKGA-04'],
+    dependsOn: ['OBU-01', 'OBU-03', 'OEB-04'],
     dependsNote: null,
     feedsInto: ['CHAR-03', 'CHAR-07'],
     measuredBy: [
@@ -394,7 +394,7 @@ export const OBU_WRITE_UPS: CpoWriteUps = {
       'Model corrections filed',
     ],
     links: {
-      dependsOn: ['OBU-01', 'OBU-03', 'PKGA-04', 'MODL-04'],
+      dependsOn: ['OBU-01', 'OBU-03', 'OEB-04', 'MODL-04'],
       feedsInto: ['CHAR-03', 'CHAR-07', 'SDBG-01'],
       runsWith: [],
       revisedBy: [],

@@ -1,5 +1,5 @@
 /**
- * RELQ — Reliability Qualification. Weeks 160–202; closes on Qualification
+ * RELQ — Reliability Qualification. Weeks 164–206; closes on Qualification
  * Complete.
  */
 import type { CpoStageModule } from '../types';

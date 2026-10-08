@@ -113,7 +113,7 @@ describe('CPO skeleton', () => {
     expect([...starts].sort((a, b) => a - b)).toEqual(starts);
     expect(CPO_MILESTONES).toHaveLength(CPO_SKELETON.length);
     expect(CPO_MILESTONES.filter((m) => m.major).map((m) => m.id)).toEqual(
-      expect.arrayContaining(['cpoTapeoutOptical', 'cpoTapeoutAll', 'cpoFirstSilicon', 'cpoProductionRelease']),
+      expect.arrayContaining(['cpoTapeoutOptical', 'cpoTapeoutAll', 'cpoFirstSilicon', 'cpoKgoeReady', 'cpoFirstPackageBuild', 'cpoProductionRelease']),
     );
   });
 
@@ -124,6 +124,7 @@ describe('CPO skeleton', () => {
     expect(at('cpoTapeoutAll')).toBeLessThan(at('cpoFirstSilicon'));
     expect(at('cpoFirstSilicon')).toBeLessThan(at('cpoKgdReady'));
     expect(at('cpoKgdReady')).toBeLessThanOrEqual(at('cpoFirstPackageBuild'));
+    expect(at('cpoKgoeReady')).toBeLessThanOrEqual(at('cpoFirstPackageBuild'));
     expect(at('cpoFirstPackageBuild')).toBeLessThanOrEqual(at('cpoFirstElectricalLink'));
     expect(at('cpoFirstElectricalLink')).toBeLessThan(at('cpoFirstOpticalLink'));
     expect(at('cpoFirstOpticalLink')).toBeLessThan(at('cpoFirstTraffic'));
@@ -148,6 +149,21 @@ describe('CPO skeleton', () => {
   it('freezes the optical engine stack before the photonic and electrical ICs tape out', () => {
     /* the bond pads and coupler keep-outs drawn into both dies come from the stack design */
     expect(stageEnd('cpoOeStackDesign')).toBeLessThanOrEqual(CPO_SKELETON.find((s) => s.key === 'cpoTapeoutOptical')!.start);
+  });
+
+  it('builds known-good optical engines from sorted dies, and mounts them only once they are known good', () => {
+    /* the photonic and electrical dies are sorted and released before they are stacked */
+    for (const ref of ['SORT-03', 'SORT-04', 'SORT-05']) expect(absEnd(ref), ref).toBeLessThanOrEqual(absStart('OEB-02'));
+    /* the main package takes known-good engines and known-good Switch SoC and I/O dies, each after its gate */
+    expect(stageEnd('cpoOeBuild')).toBeLessThanOrEqual(absStart('PKGA-04'));
+    expect(stageEnd('cpoSort')).toBeLessThanOrEqual(absStart('PKGA-03'));
+    expect(stageEnd('cpoOeBuild')).toBeLessThanOrEqual(stageEnd('cpoAssembly'));
+    /* the electrical-only build and the dry run need no engine */
+    for (const ref of ['PKGA-11', 'PKGA-12']) {
+      const deps = [...CPO_WRITE_UPS[ref].links.dependsOn, ...CPO_WRITE_UPS[ref].dependsOn];
+      expect(deps.filter((d) => d.startsWith('OEB-')), ref).toEqual([]);
+      expect(absStart(ref), ref).toBeLessThan(stageEnd('cpoOeBuild'));
+    }
   });
 
   it('starts the long-lead workstreams before the silicon they serve is finished', () => {

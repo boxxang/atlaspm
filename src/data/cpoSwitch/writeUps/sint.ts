@@ -129,7 +129,7 @@ export const SINT_WRITE_UPS: CpoWriteUps = {
       'Labs on the released build',
     ],
     links: {
-      dependsOn: ['DSGN-17', 'PSV-09', 'PON-03', 'PKGA-11'],
+      dependsOn: ['DSGN-17', 'PSV-09', 'PON-03', 'PKGA-10'],
       feedsInto: ['SINT-03', 'SINT-04', 'SINT-05', 'CERT-02'],
       runsWith: ['SINT-01'],
       revisedBy: [],

@@ -64,7 +64,7 @@ export const OESD_WRITE_UPS: CpoWriteUps = {
     ],
     links: {
       dependsOn: ['ICD-04', 'SARC-03', 'SARC-04', 'FEAS-06', 'FEAS-03', 'FEAS-04'],
-      feedsInto: ['OESD-02', 'OESD-03', 'OESD-04', 'OESD-05', 'OESD-06', 'OESD-07', 'IMPL-04', 'IMPL-05', 'DSGN-05', 'DSGN-06'],
+      feedsInto: ['OESD-02', 'OESD-03', 'OESD-04', 'OESD-05', 'OESD-06', 'OESD-07', 'IMPL-04', 'IMPL-05', 'DSGN-05', 'DSGN-06', 'OEB-02'],
       runsWith: [],
       revisedBy: [],
       feedsBackInto: [],
@@ -123,7 +123,7 @@ export const OESD_WRITE_UPS: CpoWriteUps = {
     ],
     dependsOn: ['SARC-03', 'ICD-04', 'FEAS-07', 'DSGN-05', 'DSGN-06', 'OESD-01'],
     dependsNote: 'The engine footprint is agreed with the package floorplan in DSGN-12 at each iteration.',
-    feedsInto: ['DSGN-12', 'TINF-09', 'PKGA-04', 'SGNO-11', 'OESD-07'],
+    feedsInto: ['DSGN-12', 'TINF-09', 'OEB-03', 'SGNO-11', 'OESD-07'],
     measuredBy: [
       'Interconnect bandwidth margin at the EIC-to-PIC connection',
       'Lanes testable at engine level',
@@ -131,7 +131,7 @@ export const OESD_WRITE_UPS: CpoWriteUps = {
     ],
     links: {
       dependsOn: ['SARC-03', 'ICD-04', 'FEAS-07', 'DSGN-05', 'DSGN-06', 'OESD-01'],
-      feedsInto: ['DSGN-12', 'TINF-09', 'PKGA-04', 'PKGA-10', 'IMPL-07', 'SGNO-11', 'SGNO-12', 'OESD-07'],
+      feedsInto: ['DSGN-12', 'TINF-09', 'OEB-03', 'OEB-05', 'IMPL-07', 'SGNO-11', 'SGNO-12', 'OESD-07'],
       runsWith: ['DSGN-12', 'DSGN-13', 'OESD-03', 'OESD-04', 'OESD-06'],
       revisedBy: [],
       feedsBackInto: ['DSGN-05', 'DSGN-06'],
@@ -198,7 +198,7 @@ export const OESD_WRITE_UPS: CpoWriteUps = {
     ],
     links: {
       dependsOn: ['ICD-06', 'FEAS-06', 'OESD-01', 'DSGN-06', 'MODL-04'],
-      feedsInto: ['IMPL-05', 'OESD-06', 'OESD-07', 'TINF-09', 'DSGN-13'],
+      feedsInto: ['IMPL-05', 'OESD-06', 'OESD-07', 'TINF-09', 'DSGN-13', 'OEB-04'],
       runsWith: ['OESD-02'],
       revisedBy: [],
       feedsBackInto: ['DSGN-06'],
@@ -331,7 +331,7 @@ export const OESD_WRITE_UPS: CpoWriteUps = {
     ],
     links: {
       dependsOn: ['SARC-10', 'OESD-01', 'ICD-11', 'MODL-04'],
-      feedsInto: ['TINF-06', 'TINF-07', 'OESD-07', 'DSGN-11'],
+      feedsInto: ['TINF-06', 'TINF-07', 'OESD-07', 'DSGN-11', 'OEB-05', 'OEB-07', 'SORT-05', 'OEB-01'],
       runsWith: ['OESD-02'],
       revisedBy: [],
       feedsBackInto: [],
@@ -398,7 +398,7 @@ export const OESD_WRITE_UPS: CpoWriteUps = {
     ],
     links: {
       dependsOn: ['TRDY-06', 'FEAS-06', 'OESD-01', 'OESD-03'],
-      feedsInto: ['TINF-09', 'OESD-07'],
+      feedsInto: ['TINF-09', 'OESD-07', 'OEB-01', 'OEB-02'],
       runsWith: ['OESD-02'],
       revisedBy: [],
       feedsBackInto: ['OESD-01'],

@@ -21,6 +21,7 @@ import { OTO_WRITE_UPS } from './oto';
 import { MTO_WRITE_UPS } from './mto';
 import { WFAB_WRITE_UPS } from './wfab';
 import { SORT_WRITE_UPS } from './sort';
+import { OEB_WRITE_UPS } from './oeb';
 import { TINF_WRITE_UPS } from './tinf';
 import { PKGA_WRITE_UPS } from './pkga';
 import { PON_WRITE_UPS } from './pon';
@@ -52,6 +53,7 @@ export const CPO_WRITE_UPS: CpoWriteUps = {
   ...MTO_WRITE_UPS,
   ...WFAB_WRITE_UPS,
   ...SORT_WRITE_UPS,
+  ...OEB_WRITE_UPS,
   ...TINF_WRITE_UPS,
   ...PKGA_WRITE_UPS,
   ...PON_WRITE_UPS,

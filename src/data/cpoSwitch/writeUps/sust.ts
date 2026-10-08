@@ -16,7 +16,7 @@ export const SUST_WRITE_UPS: CpoWriteUps = {
       'Yield model and first Pareto from NPI-05',
       'Yield dashboard and excursion history from RAMP-04',
       'Manufacturing data and genealogy from TINF-10',
-      'Known-good-die screening criteria from SORT-05',
+      'Known-good-die screening criteria from SORT-06',
       'Failure analysis results from SUST-03',
     ],
     rel: {
@@ -68,7 +68,7 @@ export const SUST_WRITE_UPS: CpoWriteUps = {
       feedsInto: ['SUST-02', 'SUST-04', 'SUST-07'],
       runsWith: ['SUST-03'],
       revisedBy: [],
-      feedsBackInto: ['SORT-05', 'TINF-09'],
+      feedsBackInto: ['SORT-06', 'TINF-09'],
     },
     terms: ['KGD', 'Coupling loss', 'Fiber attach', 'SPC'],
   },

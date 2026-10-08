@@ -1,5 +1,5 @@
 /**
- * NPI — NPI Builds & Production Readiness. Weeks 148–192; closes on PVT Complete.
+ * NPI — NPI Builds & Production Readiness. Weeks 152–206; closes on PVT Complete.
  */
 import type { CpoStageModule } from '../types';
 

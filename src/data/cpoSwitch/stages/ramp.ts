@@ -1,5 +1,5 @@
 /**
- * RAMP — Production Release & Ramp. Weeks 188–202; closes on Production Release.
+ * RAMP — Production Release & Ramp. Weeks 204–218; closes on Production Release.
  */
 import type { CpoStageModule } from '../types';
 
