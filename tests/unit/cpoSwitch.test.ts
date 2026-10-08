@@ -145,6 +145,11 @@ describe('CPO skeleton', () => {
     expect(stageEnd('cpoSort')).toBeLessThanOrEqual(absStart('PKGA-03'));
   });
 
+  it('freezes the optical engine stack before the photonic and electrical ICs tape out', () => {
+    /* the bond pads and coupler keep-outs drawn into both dies come from the stack design */
+    expect(stageEnd('cpoOeStackDesign')).toBeLessThanOrEqual(CPO_SKELETON.find((s) => s.key === 'cpoTapeoutOptical')!.start);
+  });
+
   it('starts the long-lead workstreams before the silicon they serve is finished', () => {
     const tapeoutStart = CPO_SKELETON.find((s) => s.key === 'cpoTapeout')!.start;
     const firstSilicon = stageEnd('cpoFabrication');

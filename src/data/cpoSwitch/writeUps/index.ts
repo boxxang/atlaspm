@@ -14,6 +14,7 @@ import { TRDY_WRITE_UPS } from './trdy';
 import { MODL_WRITE_UPS } from './modl';
 import { DSGN_WRITE_UPS } from './dsgn';
 import { PSV_WRITE_UPS } from './psv';
+import { OESD_WRITE_UPS } from './oesd';
 import { IMPL_WRITE_UPS } from './impl';
 import { SGNO_WRITE_UPS } from './sgno';
 import { OTO_WRITE_UPS } from './oto';
@@ -44,6 +45,7 @@ export const CPO_WRITE_UPS: CpoWriteUps = {
   ...MODL_WRITE_UPS,
   ...DSGN_WRITE_UPS,
   ...PSV_WRITE_UPS,
+  ...OESD_WRITE_UPS,
   ...IMPL_WRITE_UPS,
   ...SGNO_WRITE_UPS,
   ...OTO_WRITE_UPS,

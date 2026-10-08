@@ -27,7 +27,6 @@ export const DSGN: CpoStageModule = {
       'Firmware',
       'SDK and software',
       'Design freeze',
-      'Optical engine sub-assembly',
       'Optical source module',
       'Early floorplan trials',
       'System enclosure and control plane',
@@ -50,14 +49,13 @@ export const DSGN: CpoStageModule = {
       'Pre-silicon firmware image — boot, initialization, link training and optical control',
       'Pre-silicon SDK, driver and management software release',
       'Design freeze decision package — RTL, circuit and photonic',
-      'Optical engine sub-assembly design package — electrical-to-photonic attach and engine substrate',
       'Optical source module packaging and serviceability design package',
       'Early die floorplan, die size and bump plan trial report for every die',
       'System enclosure, power supply, fan tray and control-plane processor design package',
     ],
-    deliverableFrom: [0, 1, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21],
-    deliverableWeek: [12, 44, 44, 44, 46, 44, 44, 40, 40, 48, 48, 48, 50, 48, 52, 52, 52, 46, 46, 22, 50],
-    engineeringEffort: [30, 420, 60, 240, 180, 200, 60, 70, 50, 60, 120, 110, 45, 90, 50, 160, 220, 10, 70, 45, 40, 80],
+    deliverableFrom: [0, 1, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20],
+    deliverableWeek: [12, 44, 44, 44, 46, 44, 44, 40, 40, 48, 48, 48, 50, 48, 52, 52, 52, 46, 22, 50],
+    engineeringEffort: [30, 420, 60, 240, 180, 200, 60, 70, 50, 60, 120, 110, 45, 90, 50, 160, 220, 10, 45, 40, 80],
     risks: [
       'Photonic and electrical IC designs converge on different link budget assumptions',
       'Package and board design stall waiting for bump maps the dies have not frozen',
@@ -485,27 +483,6 @@ export const DSGN: CpoStageModule = {
     },
     'DSGN-19': {
       s: [
-        [1, 'Select the electrical-to-photonic attach — stacking, side-by-side or flip-chip — from the interface and test vehicle results', 3],
-        [2, 'Design the engine substrate or carrier — layer stack, EIC-to-PIC interconnect and engine-to-package interface', 8],
-        [3, 'Extract the EIC-to-PIC interconnect parasitics and hand them to the driver and TIA designers', 4, 1],
-        [4, 'Define fiber-attach and optical-source ports on the engine and their alignment features', 5],
-        [5, 'Analyze engine-level thermal paths, warpage and heater crosstalk', 5, 1],
-        [6, 'Define engine-level test access and the engine test flow before package attach', 4],
-        [7, 'Release the optical engine sub-assembly design package', 2],
-      ],
-      o: [
-        'Electrical-to-photonic attach decision record',
-        'Engine substrate or carrier design',
-        'EIC-to-PIC interconnect parasitic models',
-        'Engine optical port and alignment feature definition',
-        'Engine thermal, warpage and crosstalk analysis',
-        'Engine-level test access and test flow definition',
-        'Optical engine sub-assembly design package — electrical-to-photonic attach and engine substrate',
-      ],
-      r: [['DSGN-D18', 'produces'], ['DSGN-D11', 'feeds']],
-    },
-    'DSGN-20': {
-      s: [
         [1, 'Fix the source module form — external serviceable module or attached source — from the source architecture and service requirements', 3],
         [2, 'Design the module package — laser mount, temperature control, optical output and electrical connector', 8],
         [3, 'Design the optical path from the module to the photonic ICs, including connectors and blind-mate features', 6, 1],
@@ -523,9 +500,9 @@ export const DSGN: CpoStageModule = {
         'Mock-up insertion loss and repeatability results',
         'Optical source module packaging and serviceability design package',
       ],
-      r: [['DSGN-D19', 'produces'], ['DSGN-D6', 'feeds']],
+      r: [['DSGN-D18', 'produces'], ['DSGN-D6', 'feeds']],
     },
-    'DSGN-21': {
+    'DSGN-20': {
       s: [
         [1, 'Run trial synthesis on early switch RTL and memory configurations for area and timing', 4],
         [2, 'Build trial floorplans for the Switch SoC and the I/O die with memories, SerDes and die-to-die macros placed', 4],
@@ -542,9 +519,9 @@ export const DSGN: CpoStageModule = {
         'Agreed die size and bump plan iteration record',
         'Early die floorplan, die size and bump plan trial report for every die',
       ],
-      r: [['DSGN-D20', 'produces'], ['DSGN-D11', 'feeds']],
+      r: [['DSGN-D19', 'produces'], ['DSGN-D11', 'feeds']],
     },
-    'DSGN-22': {
+    'DSGN-21': {
       s: [
         [1, 'Define the enclosure — rack units, front-panel port layout, airflow direction and serviceable parts', 4],
         [2, 'Specify and select power supplies — capacity, redundancy, efficiency and hot-swap', 5],
@@ -565,7 +542,7 @@ export const DSGN: CpoStageModule = {
         'Mechanical prototype fit, airflow and service results',
         'System enclosure, power supply, fan tray and control-plane processor design package',
       ],
-      r: [['DSGN-D21', 'produces'], ['DSGN-D17', 'feeds']],
+      r: [['DSGN-D20', 'produces'], ['DSGN-D17', 'feeds']],
     },
   },
 };

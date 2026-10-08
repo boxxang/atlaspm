@@ -9,7 +9,7 @@ export const SGNO: CpoStageModule = {
   content: {
     tagline: 'Prove every die, the package that joins them and the lock that protects them before a mask is paid for.',
     description:
-      'Run the signoff each die type actually needs — multi-corner timing, EM / IR and physical verification for the Switch SoC; post-layout jitter, ESD and electromigration for the I/O die; analog post-layout, matching, isolation and reliability for the electrical IC; optical rules, connectivity and loss-budget performance for the photonic IC; and physical and channel signoff for the bridge or interposer and silicon capacitors. Across the dies, the multi-die package is signed off for die-to-die timing, SI / PI and thermal, DFT closes with final equivalence and delivered patterns, security signs off keys, fuses and debug lock, and the substrate and RDL tooling is released to its suppliers against the signed-off package. Signoff runs in two waves. The electrical and photonic ICs sign off first and take their go decision at a wave 1 readiness review in week 98, because their fabrication and the optical engine stacking that follows are the longer path to the first package build; the Switch SoC, the I/O die, the bridge and the package follow, and the stage closes on the wave 2 readiness review that takes the go decision for them, every report checked against its foundry checklist.',
+      'Run the signoff each die type actually needs — multi-corner timing, EM / IR and physical verification for the Switch SoC; post-layout jitter, ESD and electromigration for the I/O die; analog post-layout, matching, isolation and reliability for the electrical IC; optical rules, connectivity and loss-budget performance for the photonic IC; and physical and channel signoff for the bridge or interposer and silicon capacitors. Across the dies, the multi-die package is signed off for die-to-die timing, SI / PI and thermal, DFT closes with final equivalence and delivered patterns, security signs off keys, fuses and debug lock, the optical engine stack is signed off across its dies — every electrical IC pad to its photonic IC pad, the coupler placement and the engine substrate — against the stack design frozen in OESD-07, and the main package and engine substrate and RDL tooling is released to its suppliers against the signed-off package. Signoff runs in two waves. The electrical and photonic ICs sign off first and take their go decision at a wave 1 readiness review in week 98, because their fabrication and the optical engine stacking that follows are the longer path to the first package build; the Switch SoC, the I/O die, the bridge and the package follow, and the stage closes on the wave 2 readiness review that takes the go decision for them, every report checked against its foundry checklist.',
     activities: [
       'Switch SoC signoff',
       'I/O die signoff',
@@ -22,6 +22,7 @@ export const SGNO: CpoStageModule = {
       'Wave 1 tapeout readiness',
       'Wave 2 tapeout readiness',
       'Substrate tooling release',
+      'OE stack cross-die signoff',
     ],
     deliverables: [
       'Switch SoC signoff report — timing, EM / IR and physical verification',
@@ -36,10 +37,11 @@ export const SGNO: CpoStageModule = {
       'Security signoff record — keys, fuse map and debug lock',
       'Tapeout wave 1 readiness decision package — electrical IC and photonic IC',
       'Tapeout wave 2 readiness decision package — Switch SoC, I/O die, bridge and package',
+      'Optical engine stack cross-die signoff report — bond pad alignment, coupler placement and engine substrate',
     ],
-    deliverableFrom: [0, 1, 2, 3, 4, 5, 10, 6, 6, 7, 8, 9],
-    deliverableWeek: [14, 14, 9, 9, 14, 16, 17, 15, 16, 16, 10, 18],
-    engineeringEffort: [60, 20, 16, 16, 6, 17, 14, 6, 2, 3, 5],
+    deliverableFrom: [0, 1, 2, 3, 4, 5, 10, 6, 6, 7, 8, 9, 11],
+    deliverableWeek: [14, 14, 9, 9, 14, 16, 17, 15, 16, 16, 10, 18, 9],
+    engineeringEffort: [60, 20, 16, 16, 6, 17, 14, 6, 2, 3, 5, 4],
     risks: [
       'One die slips signoff and the others tape out into a package that cannot be built without it',
       'Waivers approved in bulk under schedule pressure hide a real violation',
@@ -257,7 +259,7 @@ export const SGNO: CpoStageModule = {
     },
     'SGNO-11': {
       s: [
-        [1, 'Confirm the substrate and RDL database against the package signoff and the final die bump maps', 1],
+        [1, 'Confirm the main package substrate, RDL and engine substrate databases against the package signoff and the final die bump maps', 1],
         [2, 'Generate the substrate fabrication data — layer artwork, drill, stackup and electrical test netlist', 1.5],
         [3, 'Review the tooling data with the substrate supplier and close its engineering queries', 1.5],
         [4, 'Release the RDL or interposer build data to the assembly partner where the RDL is built there', 1, 1],
@@ -273,6 +275,25 @@ export const SGNO: CpoStageModule = {
         'Substrate and RDL tooling release with committed delivery dates',
       ],
       r: [['SGNO-D7', 'produces'], ['SGNO-D12', 'feeds']],
+    },
+    'SGNO-12': {
+      s: [
+        [1, 'Merge the electrical IC, photonic IC and engine substrate layouts into one stack assembly view with the frozen bond pad map', 1.5],
+        [2, 'Run cross-die connectivity and LVS across the bond — every electrical IC pad to its photonic IC pad and through-connection', 2],
+        [3, 'Check bond pad alignment, pitch, keep-outs and coupler placement against the stack design rules', 2, 1],
+        [4, 'Check the engine substrate against the stack — landing pads, through-connections and thermal vias', 1.5],
+        [5, 'Close the mismatches with the layout owners and re-run the checks clean', 2],
+        [6, 'Release the optical engine stack cross-die signoff report', 0.5],
+      ],
+      o: [
+        'Stack assembly view with the frozen pad map',
+        'Cross-die connectivity and LVS results',
+        'Bond pad alignment, keep-out and coupler placement check',
+        'Engine substrate landing and via check',
+        'Mismatch closure log with clean re-run',
+        'Optical engine stack cross-die signoff report — bond pad alignment, coupler placement and engine substrate',
+      ],
+      r: [['SGNO-D13', 'produces'], ['SGNO-D11', 'feeds']],
     },
   },
 };

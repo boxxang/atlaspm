@@ -14,6 +14,7 @@ import { TRDY_GLOSSARY } from './trdy';
 import { MODL_GLOSSARY } from './modl';
 import { DSGN_GLOSSARY } from './dsgn';
 import { PSV_GLOSSARY } from './psv';
+import { OESD_GLOSSARY } from './oesd';
 import { IMPL_GLOSSARY } from './impl';
 import { SGNO_GLOSSARY } from './sgno';
 import { MTO_GLOSSARY } from './mto';
@@ -44,6 +45,7 @@ export const CPO_GLOSSARY: CpoGlossary = {
   ...MODL_GLOSSARY,
   ...DSGN_GLOSSARY,
   ...PSV_GLOSSARY,
+  ...OESD_GLOSSARY,
   ...IMPL_GLOSSARY,
   ...SGNO_GLOSSARY,
   ...MTO_GLOSSARY,

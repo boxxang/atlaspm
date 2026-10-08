@@ -619,7 +619,7 @@ export const CHAR_WRITE_UPS: CpoWriteUps = {
       'Step 1 defines the replaceable units and procedures. Step 2 hot-swaps optical source modules while step 3 checks interlocks and shutdown on the same units. Step 4 validates connector care, step 5 covers the other replaceable units, and step 6 times the procedures with technicians and releases the report.',
     consumes: [
       'Reliability, serviceability and environmental requirements from REQ-07',
-      'Optical source module packaging and serviceability design from DSGN-20',
+      'Optical source module packaging and serviceability design from DSGN-19',
       'Rework, repair and scrap policy from TINF-16',
       'Corner lot matrix and unit allocation from CHAR-01',
       'Laser safety classification and pre-compliance results from SINT-07',
@@ -660,7 +660,7 @@ export const CHAR_WRITE_UPS: CpoWriteUps = {
       'No accessible optical output above the laser safety class limit during removal or insertion',
       'Every procedure completed by a field technician within the target service time',
     ],
-    dependsOn: ['CHAR-01', 'DSGN-20', 'REQ-07'],
+    dependsOn: ['CHAR-01', 'DSGN-19', 'REQ-07'],
     dependsNote: null,
     feedsInto: ['CHAR-08', 'CHAR-09', 'SUST-08'],
     measuredBy: [
@@ -669,11 +669,11 @@ export const CHAR_WRITE_UPS: CpoWriteUps = {
       'Coupling loss change after re-mating',
     ],
     links: {
-      dependsOn: ['CHAR-01', 'DSGN-20', 'REQ-07', 'TINF-16', 'SINT-07'],
+      dependsOn: ['CHAR-01', 'DSGN-19', 'REQ-07', 'TINF-16', 'SINT-07'],
       feedsInto: ['CHAR-08', 'CHAR-09', 'CERT-04', 'RELQ-04', 'SUST-08'],
       runsWith: ['CHAR-03'],
       revisedBy: [],
-      feedsBackInto: ['DSGN-20'],
+      feedsBackInto: ['DSGN-19'],
     },
     terms: ['Optical source', 'Laser safety', 'Coupling loss'],
   },

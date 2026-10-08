@@ -1,0 +1,201 @@
+/**
+ * OESD — Optical Engine Stack Design & Process Development. Weeks 44–96;
+ * closes on Optical Engine Stack Design Freeze.
+ */
+import type { CpoStageModule } from '../types';
+
+export const OESD: CpoStageModule = {
+  content: {
+    tagline: 'Design the optical engine as the small package it is — stack, substrate, fiber, heat and test — and freeze it before the optical silicon tapes out.',
+    description:
+      'The optical engine is a package of its own: an electrical IC stacked face-down on a photonic IC, joined by a fine-pitch bond and through-connections to an engine substrate, with fiber coupled and aligned at its edge, its own thermal path and its own test before it is ever mounted on the main package. This stage designs that stack as one object: the bond interface — pitch, pad map and through-connections — the engine substrate and the electrical-to-photonic attach, the fiber coupling and alignment structures, the thermal path and heater crosstalk across the stack, the test access and known-good optical engine strategy, and the assembly design rules and stacking process developed with the assembly partner on test vehicles. The bond pads and the coupler keep-outs are drawn into the electrical and photonic IC layouts, so the stack design freeze closes before the wave 1 tapeout of those two dies in week 98: a pad map that changes after it is a mask re-spin on both of them.',
+    activities: [
+      'Bond interface and pad map',
+      'Engine sub-assembly and substrate',
+      'Fiber coupling and alignment',
+      'Thermal path and crosstalk',
+      'Test access and KGOE strategy',
+      'Design rules and stacking process',
+      'Stack design freeze',
+    ],
+    deliverables: [
+      'Optical engine stack bond interface specification — pitch, pad map and through-connections',
+      'Optical engine sub-assembly design package — electrical-to-photonic attach and engine substrate',
+      'Optical engine fiber coupling and alignment structure design — coupler, fiber block and alignment features',
+      'Optical engine thermal path and heater crosstalk analysis report',
+      'Known-good optical engine test strategy and test access specification',
+      'Optical engine assembly design rules and stacking process baseline agreed with the assembly partner',
+      'Optical engine stack design freeze decision package',
+    ],
+    deliverableFrom: [0, 1, 2, 3, 4, 5, 6],
+    deliverableWeek: [16, 34, 32, 34, 36, 44, 52],
+    engineeringEffort: [40, 70, 30, 18, 20, 36, 6],
+    risks: [
+      'The bond pad map changes after the electrical and photonic IC layouts have drawn it, costing a re-spin of both dies',
+      'The stacking process is developed on test vehicles that do not represent the product pitch, warpage or fiber count',
+      'No engine-level test access, so a bad engine is found only after it is mounted on an expensive main package',
+    ],
+    potentialRisks: [
+      'Stack structure chosen by the assembly partner’s current capability rather than the bandwidth the driver and TIA need through the bond',
+      'Heater crosstalk through the stack and engine substrate larger than the photonic IC’s own isolation assumed',
+      'Coupler keep-outs and alignment features not handed to photonic layout before its placement is fixed',
+      'Known-good optical engine limits written without a link to the optical link budget or the main package yield model',
+      'Assembly design rules held by the partner as process knowledge and never written down as rules the designers can check',
+      'Freeze review held after the electrical and photonic IC signoff has already started on an unfrozen pad map',
+    ],
+    leader: { name: 'Elena Varga', short: 'E. Varga', phone: '+1 (408) 555-0531', email: 'elena.varga@example.com' },
+    collaboration: ['Packaging', 'Photonics', 'Analog and mixed-signal', 'Optical engineering', 'Thermal and mechanical', 'Test engineering', 'Supply chain'],
+    tools: [
+      'Multi-die stack layout and assembly verification',
+      'Electromagnetic and parasitic extraction',
+      'Optical mode and coupling simulator',
+      'Thermal and thermo-mechanical finite element analysis',
+      'Process development lot tracking and statistical analysis',
+    ],
+    programView: [
+      'Bond pad map revision and changes since the last layout drop',
+      'Process development lot bond yield and coupling loss against target',
+      'Thermal margin and heater crosstalk detuning per channel against the tuning range',
+      'Freeze criteria met against the week 96 freeze and the week 98 wave 1 tapeout',
+    ],
+    perspective:
+      'Most of what makes an optical engine good or bad is decided where the two dies meet and where the fiber meets the photonic IC. Freeze those two boundaries first, write them as rules the layout teams can check, and the rest of the engine can still move.',
+  },
+  steps: {
+    'OESD-01': {
+      s: [
+        [1, 'Collect the electrical and photonic IC pad-out, signal count and interface budget from the stack interface and the architecture', 2],
+        [2, 'Select the stack structure — the electrical IC face-down on the photonic IC by hybrid bonding or fine-pitch microbumps — from the test vehicle results', 3],
+        [3, 'Set bond pitch, pad size and alignment tolerance against the assembly partner’s demonstrated capability', 2, 1],
+        [4, 'Draw the bond pad map — signal, bias, heater, monitor, power and ground pads per lane and per engine', 4],
+        [5, 'Define the through-connections from the stack to the engine substrate — through-oxide vias or bonded routing', 3, 1],
+        [6, 'Extract bond and through-connection parasitics and confirm driver and TIA bandwidth margin with the circuit designers', 3],
+        [7, 'Release the bond interface specification under change control', 1],
+      ],
+      o: [
+        'Stack interface inputs collected per lane',
+        'Stack structure decision record',
+        'Bond pitch, pad size and alignment tolerance',
+        'Bond pad map per lane and per engine',
+        'Through-connection definition to the engine substrate',
+        'Bond and through-connection parasitic models with bandwidth margin',
+        'Optical engine stack bond interface specification — pitch, pad map and through-connections',
+      ],
+      r: [['OESD-D1', 'produces'], ['OESD-D7', 'feeds']],
+    },
+    'OESD-02': {
+      s: [
+        [1, 'Select the electrical-to-photonic attach — stacking, side-by-side or flip-chip — from the interface and test vehicle results', 3],
+        [2, 'Design the engine substrate or carrier — layer stack, EIC-to-PIC interconnect and engine-to-package interface', 8],
+        [3, 'Extract the EIC-to-PIC interconnect parasitics and hand them to the driver and TIA designers', 4, 1],
+        [4, 'Define fiber-attach and optical-source ports on the engine and their alignment features', 5],
+        [5, 'Analyze engine-level thermal paths, warpage and heater crosstalk', 5, 1],
+        [6, 'Define engine-level test access and the engine test flow before package attach', 4],
+        [7, 'Release the optical engine sub-assembly design package', 2],
+      ],
+      o: [
+        'Electrical-to-photonic attach decision record',
+        'Engine substrate or carrier design',
+        'EIC-to-PIC interconnect parasitic models',
+        'Engine optical port and alignment feature definition',
+        'Engine thermal, warpage and crosstalk analysis',
+        'Engine-level test access and test flow definition',
+        'Optical engine sub-assembly design package — electrical-to-photonic attach and engine substrate',
+      ],
+      r: [['OESD-D2', 'produces'], ['OESD-D7', 'feeds']],
+    },
+    'OESD-03': {
+      s: [
+        [1, 'Choose the engine coupling scheme — edge couplers to a fiber array or grating couplers to an angled block — against the loss and assembly budget', 3],
+        [2, 'Design the coupler geometry and mode match to the fiber, with the polarization handling the fiber interface requires', 6],
+        [3, 'Design the alignment features — V-grooves, fiducials and mechanical stops — and the monitor paths for active alignment', 5, 1],
+        [4, 'Define the fiber block, adhesive, cure and strain relief at the engine edge', 4],
+        [5, 'Model coupling loss over alignment error, cure shrinkage and temperature and allocate the tolerance', 4],
+        [6, 'Release the coupling and alignment design with the coupler keep-outs for photonic layout', 2],
+      ],
+      o: [
+        'Engine coupling scheme decision',
+        'Coupler geometry and mode match design',
+        'Alignment features and active alignment monitor paths',
+        'Fiber block, adhesive, cure and strain relief definition',
+        'Coupling loss tolerance allocation',
+        'Optical engine fiber coupling and alignment structure design — coupler, fiber block and alignment features',
+      ],
+      r: [['OESD-D3', 'produces'], ['OESD-D7', 'feeds']],
+    },
+    'OESD-04': {
+      s: [
+        [1, 'Map the heat sources in the stack per lane — driver and TIA power, heaters and absorbed optical source power', 3],
+        [2, 'Model the thermal path from the electrical IC through the bond and the photonic IC into the engine substrate and the cold plate', 6],
+        [3, 'Analyze heater crosstalk and resonance detuning between neighbouring channels across the stack', 5, 1],
+        [4, 'Set thermal design limits — junction temperature, gradient across the photonic IC and bond line stress — and place thermal vias', 4],
+        [5, 'Correlate the model with test vehicle thermal measurements and close the gaps', 4],
+        [6, 'Release the thermal path and heater crosstalk analysis report', 1],
+      ],
+      o: [
+        'Per-lane heat source map',
+        'Stack thermal path model',
+        'Heater crosstalk and detuning analysis',
+        'Thermal design limits and thermal via placement',
+        'Model-to-test-vehicle thermal correlation',
+        'Optical engine thermal path and heater crosstalk analysis report',
+      ],
+      r: [['OESD-D4', 'produces'], ['OESD-D7', 'feeds']],
+    },
+    'OESD-05': {
+      s: [
+        [1, 'List what each engine must prove before it is mounted — continuity, bias, driver swing, TIA response and coupling loss per lane', 3],
+        [2, 'Define the electrical test access — probe pads on the engine substrate and electrical loopback in the electrical IC', 5],
+        [3, 'Define the optical test interface — fiber connection to the engine under test, optical loopback and reference structures', 4, 1],
+        [4, 'Write the known-good optical engine test flow, bins and draft limits from the optical link budget', 5],
+        [5, 'Specify the engine test hardware, test time and capacity the build plan needs', 3],
+        [6, 'Release the known-good optical engine test strategy and test access specification', 1],
+      ],
+      o: [
+        'Engine-level test content list',
+        'Electrical test access definition',
+        'Optical test interface definition',
+        'Known-good optical engine test flow, bins and draft limits',
+        'Engine test hardware, test time and capacity specification',
+        'Known-good optical engine test strategy and test access specification',
+      ],
+      r: [['OESD-D5', 'produces'], ['OESD-D7', 'feeds']],
+    },
+    'OESD-06': {
+      s: [
+        [1, 'Agree the stacking process flow with the assembly partner — bond, underfill, substrate attach, fiber attach and cure', 4],
+        [2, 'Write the assembly design rules — pad pitch, keep-outs, fiducials, warpage and bond line limits — as a kit the designers check against', 6],
+        [3, 'Run process development lots on stack test vehicles and measure bond yield, alignment and coupling loss', 12],
+        [4, 'Close design rule exceptions with the electrical IC, photonic IC and engine substrate designers', 4, 1],
+        [5, 'Set the process windows and in-line inspection points for the stacking line', 6],
+        [6, 'Release the design rules and the stacking process baseline', 2],
+      ],
+      o: [
+        'Agreed stacking process flow',
+        'Optical engine assembly design rule kit',
+        'Process development lot results — bond yield, alignment and coupling loss',
+        'Design rule exception closure log',
+        'Process windows and in-line inspection plan',
+        'Optical engine assembly design rules and stacking process baseline agreed with the assembly partner',
+      ],
+      r: [['OESD-D6', 'produces'], ['OESD-D7', 'feeds']],
+    },
+    'OESD-07': {
+      s: [
+        [1, 'Collect the stack, coupling, thermal, test and process evidence against the freeze criteria', 1.5],
+        [2, 'Check the bond pad map and coupler keep-outs against the electrical and photonic IC layouts as they stand', 1.5],
+        [3, 'Review open exceptions and residual risks with photonics, analog, packaging and the assembly partner', 1, 1],
+        [4, 'Hold the freeze review and record the decision and the change control baseline', 1.5],
+        [5, 'Release the freeze package to signoff and the wave 1 tapeout readiness review', 0.5],
+      ],
+      o: [
+        'Freeze evidence set against the criteria',
+        'Pad map and keep-out check against the layouts',
+        'Exception and residual risk register',
+        'Freeze decision and change control baseline',
+        'Optical engine stack design freeze decision package',
+      ],
+      r: [['OESD-D7', 'produces']],
+    },
+  },
+};

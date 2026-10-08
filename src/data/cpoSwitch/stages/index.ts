@@ -12,6 +12,7 @@ import { TRDY } from './trdy';
 import { MODL } from './modl';
 import { DSGN } from './dsgn';
 import { PSV } from './psv';
+import { OESD } from './oesd';
 import { IMPL } from './impl';
 import { SGNO } from './sgno';
 import { OTO } from './oto';
@@ -42,6 +43,7 @@ export const CPO_STAGE_MODULES: Record<string, CpoStageModule> = {
   MODL,
   DSGN,
   PSV,
+  OESD,
   IMPL,
   SGNO,
   OTO,

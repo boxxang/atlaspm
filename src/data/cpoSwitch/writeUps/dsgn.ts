@@ -750,7 +750,7 @@ export const DSGN_WRITE_UPS: CpoWriteUps = {
       'Die-to-package and package-to-board interfaces from ICD-07',
       'Bridge / interposer design from DSGN-09',
       'Optical source subsystem design from DSGN-07',
-      'Trial die sizes and bump plans from DSGN-21',
+      'Trial die sizes and bump plans from DSGN-20',
     ],
     rel: {
       'DSGN-D11': '<b>Package and substrate design database — floorplan, bump map and die-to-die routing.</b> Produced here; package layout, SI/PI closure and assembly process development start from it.',
@@ -786,7 +786,7 @@ export const DSGN_WRITE_UPS: CpoWriteUps = {
       'First-pass SI, PI and warpage results within targets or with owned actions',
       'Optical engine placement meets fiber bend radius and thermal limits',
     ],
-    dependsOn: ['SARC-05', 'ICD-07', 'DSGN-09', 'DSGN-07', 'DSGN-21'],
+    dependsOn: ['SARC-05', 'ICD-07', 'DSGN-09', 'DSGN-07', 'DSGN-20'],
     dependsNote: 'Package models in MODL-06 and MODL-07 are refined from this floorplan and fed back at each iteration.',
     feedsInto: ['IMPL-07', 'IMPL-08', 'TINF-09', 'DSGN-13', 'DSGN-14', 'DSGN-15'],
     measuredBy: [
@@ -795,9 +795,9 @@ export const DSGN_WRITE_UPS: CpoWriteUps = {
       'Warpage against assembly limit',
     ],
     links: {
-      dependsOn: ['SARC-05', 'ICD-07', 'DSGN-09', 'DSGN-07', 'TRDY-06', 'DSGN-21', 'ICD-03'],
+      dependsOn: ['SARC-05', 'ICD-07', 'DSGN-09', 'DSGN-07', 'TRDY-06', 'DSGN-20', 'ICD-03'],
       feedsInto: ['IMPL-07', 'IMPL-08', 'IMPL-09', 'TINF-09', 'DSGN-13', 'DSGN-14', 'DSGN-15', 'PSV-07', 'PSV-13'],
-      runsWith: ['MODL-06', 'MODL-07', 'DSGN-09', 'DSGN-19'],
+      runsWith: ['MODL-06', 'MODL-07', 'DSGN-09', 'OESD-02'],
       revisedBy: [],
       feedsBackInto: [],
     },
@@ -1214,7 +1214,6 @@ export const DSGN_WRITE_UPS: CpoWriteUps = {
         'DSGN-19',
         'DSGN-20',
         'DSGN-21',
-        'DSGN-22',
         'PSV-02',
         'PSV-04',
         'PSV-07',
@@ -1227,73 +1226,6 @@ export const DSGN_WRITE_UPS: CpoWriteUps = {
     terms: ['Design freeze', 'RTL', 'Interface freeze', 'DFMEA'],
   },
   'DSGN-19': {
-    criticalPath: true,
-    purpose: [
-      'Design the <b>optical engine sub-assembly</b>: how the electrical IC attaches to the photonic IC, the engine substrate or carrier that joins them, the EIC-to-PIC interconnect, the engine’s fiber and optical-source ports, and the engine-level test that screens it before it is committed to the switch package.',
-      'The optical engine is a small package inside the large one, and it sits between three teams — analog, photonics and packaging — that each assume another owns it. Its interconnect parasitics set the driver and TIA bandwidth, its alignment features set the coupling loss, and its test flow decides whether a bad engine is caught before or after an expensive switch package is built around it.',
-    ],
-    flowNote:
-      'Step 1 selects the attach approach. Step 2 designs the substrate while step 3 extracts interconnect parasitics for the circuit designers in parallel. Step 4 defines the optical ports, with step 5 analyzing thermal and warpage beside it. Step 6 defines engine-level test, and step 7 releases.',
-    consumes: [
-      'Optical engine architecture and EIC / PIC split from SARC-03',
-      'Electrical-to-photonic interface from ICD-04',
-      'Package, bridge and thermal test vehicle results from FEAS-07',
-      'Electrical IC pad-out and load requirements from DSGN-05',
-      'Photonic IC pad-out, coupler and port positions from DSGN-06',
-    ],
-    rel: {
-      'DSGN-D18': '<b>Optical engine sub-assembly design package — electrical-to-photonic attach and engine substrate.</b> Produced here; engine assembly process development and the package floorplan build to it.',
-      'DSGN-D11': '<b>Package and substrate design database — floorplan, bump map and die-to-die routing.</b> The engine footprint and engine-to-package interface are placed in the package floorplan.',
-    },
-    risks: [
-      '<b>Nobody owns the engine.</b> Analog, photonics and packaging each assume another team is designing the attach.',
-      '<b>Interconnect parasitics late.</b> Drivers and TIAs are designed to an ideal connection and lose bandwidth on the real one.',
-      '<b>Engine untestable alone.</b> A defective engine is found only after it is built into the switch package.',
-      '<b>Heater crosstalk through the carrier.</b> The substrate conducts heat between channels the PIC isolated.',
-      '<b>Alignment features ignored.</b> Fiber and source ports cannot be aligned at the assembly tolerance.',
-    ],
-    roles: [
-      { r: 'Packaging', d: 'Owns the optical engine sub-assembly design' },
-      { r: 'Analog designer', d: 'EIC pad-out and interconnect load limits' },
-      { r: 'Photonics designer', d: 'PIC pad-out, couplers and port positions' },
-      { r: 'Optical assembly engineer', d: 'Alignment features and attach process' },
-      { r: 'Test engineer', d: 'Engine-level test access and flow' },
-    ],
-    effort: [
-      ['Attach selection and substrate design', 30],
-      ['Interconnect extraction', 10],
-      ['Optical ports and alignment', 12],
-      ['Thermal and warpage analysis', 8],
-      ['Engine test definition', 10],
-    ],
-    entry: [
-      'Electrical-to-photonic interface drafted in ICD-04',
-      'EIC and PIC pad-outs available from DSGN-05 and DSGN-06',
-      'Package, bridge and thermal test vehicle results from FEAS-07',
-    ],
-    exit: [
-      'EIC-to-PIC interconnect parasitics accepted by the driver and TIA designers with bandwidth margin',
-      'Engine-level test flow defined that screens every lane before package attach',
-      'Engine design package signed by packaging, photonics, analog and the assembly partner',
-    ],
-    dependsOn: ['SARC-03', 'ICD-04', 'FEAS-07', 'DSGN-05', 'DSGN-06'],
-    dependsNote: 'The engine footprint is agreed with the package floorplan in DSGN-12 at each iteration.',
-    feedsInto: ['DSGN-12', 'TINF-09', 'PKGA-04'],
-    measuredBy: [
-      'Interconnect bandwidth margin at the EIC-to-PIC connection',
-      'Lanes testable at engine level',
-      'Engine design changes after the package floorplan freeze',
-    ],
-    links: {
-      dependsOn: ['SARC-03', 'ICD-04', 'FEAS-07', 'DSGN-05', 'DSGN-06'],
-      feedsInto: ['DSGN-12', 'TINF-09', 'PKGA-04', 'PKGA-10', 'IMPL-07', 'DSGN-18'],
-      runsWith: ['DSGN-12', 'DSGN-13'],
-      revisedBy: [],
-      feedsBackInto: ['DSGN-05', 'DSGN-06'],
-    },
-    terms: ['Optical engine', 'EIC', 'PIC', 'Fiber attach', 'KGD'],
-  },
-  'DSGN-20': {
     criticalPath: false,
     purpose: [
       'Package the <b>optical source as a module</b> and design how it is serviced: the module’s laser mount, temperature control and connectors, the optical path to the photonic ICs, its integration in the front panel or inside the box, and the field-replacement sequence — whether the source is an external serviceable module or attached near the package.',
@@ -1309,7 +1241,7 @@ export const DSGN_WRITE_UPS: CpoWriteUps = {
       'Laser coupling feasibility results from FEAS-05',
     ],
     rel: {
-      'DSGN-D19': '<b>Optical source module packaging and serviceability design package.</b> Produced here; the source supplier, burn-in screening and module integration build to it.',
+      'DSGN-D18': '<b>Optical source module packaging and serviceability design package.</b> Produced here; the source supplier, burn-in screening and module integration build to it.',
       'DSGN-D6': '<b>Optical source subsystem design specification.</b> Module connector loss and thermal limits feed back into the source power budget.',
     },
     risks: [
@@ -1344,7 +1276,7 @@ export const DSGN_WRITE_UPS: CpoWriteUps = {
     ],
     dependsOn: ['DSGN-07', 'ICD-06', 'SARC-05', 'REQ-07'],
     dependsNote: null,
-    feedsInto: ['DSGN-13', 'DSGN-22', 'TINF-12', 'PKGA-05'],
+    feedsInto: ['DSGN-13', 'DSGN-21', 'TINF-12', 'PKGA-05'],
     measuredBy: [
       'Module insertion loss and repeatability',
       'Measured replacement time',
@@ -1352,14 +1284,14 @@ export const DSGN_WRITE_UPS: CpoWriteUps = {
     ],
     links: {
       dependsOn: ['DSGN-07', 'ICD-06', 'SARC-05', 'REQ-07', 'FEAS-05'],
-      feedsInto: ['DSGN-13', 'DSGN-22', 'TINF-12', 'PKGA-05', 'CHAR-10', 'DSGN-18'],
+      feedsInto: ['DSGN-13', 'DSGN-21', 'TINF-12', 'PKGA-05', 'CHAR-10', 'DSGN-18'],
       runsWith: ['DSGN-15'],
       revisedBy: [],
       feedsBackInto: ['DSGN-07'],
     },
     terms: ['Optical source', 'Laser safety', 'Coupling loss'],
   },
-  'DSGN-21': {
+  'DSGN-20': {
     criticalPath: true,
     purpose: [
       'Run <b>early floorplan and die-size trials for every die</b> — switch, I/O, electrical IC, photonic IC and bridge — from trial synthesis on early RTL and sized analog and optical blocks, and derive the die sizes and bump plans the package floorplan and the die-to-package interface are built on.',
@@ -1375,7 +1307,7 @@ export const DSGN_WRITE_UPS: CpoWriteUps = {
       'Early block RTL and circuit sizes from DSGN-02, DSGN-05 and DSGN-06',
     ],
     rel: {
-      'DSGN-D20': '<b>Early die floorplan, die size and bump plan trial report for every die.</b> Produced here; the package floorplan and the die-to-package interface are built on it.',
+      'DSGN-D19': '<b>Early die floorplan, die size and bump plan trial report for every die.</b> Produced here; the package floorplan and the die-to-package interface are built on it.',
       'DSGN-D11': '<b>Package and substrate design database — floorplan, bump map and die-to-die routing.</b> Trial die sizes and bump plans are the starting point of the package bump map.',
     },
     risks: [
@@ -1425,7 +1357,7 @@ export const DSGN_WRITE_UPS: CpoWriteUps = {
     },
     terms: ['PPA', 'Microbump', 'D2D', 'SRAM'],
   },
-  'DSGN-22': {
+  'DSGN-21': {
     criticalPath: false,
     purpose: [
       'Design the <b>switch system around the package</b>: the enclosure and front-panel layout, power supplies, fan trays and fan control, the control-plane processor that runs the network operating system, and chassis management — because the product the customer racks is the whole box, not the package.',
@@ -1441,7 +1373,7 @@ export const DSGN_WRITE_UPS: CpoWriteUps = {
       'Thermal and mechanical interfaces from ICD-09',
     ],
     rel: {
-      'DSGN-D21': '<b>System enclosure, power supply, fan tray and control-plane processor design package.</b> Produced here; system build, box assembly process and certification work from it.',
+      'DSGN-D20': '<b>System enclosure, power supply, fan tray and control-plane processor design package.</b> Produced here; system build, box assembly process and certification work from it.',
       'DSGN-D17': '<b>Design freeze decision package — RTL, circuit and photonic.</b> System design readiness is scored at the freeze with the board and thermal designs.',
     },
     risks: [
@@ -1476,7 +1408,7 @@ export const DSGN_WRITE_UPS: CpoWriteUps = {
       'Safety, EMC and laser safety design rule check closed with zero open items',
     ],
     dependsOn: ['SARC-05', 'SARC-06', 'SARC-07', 'REQ-07'],
-    dependsNote: 'Board, thermal and source module designs in DSGN-14, DSGN-15 and DSGN-20 run alongside and are fitted into the enclosure at each iteration.',
+    dependsNote: 'Board, thermal and source module designs in DSGN-14, DSGN-15 and DSGN-19 run alongside and are fitted into the enclosure at each iteration.',
     feedsInto: ['IMPL-10', 'TINF-17', 'CERT-04'],
     measuredBy: [
       'Power supply margin at worst-case load',
@@ -1486,7 +1418,7 @@ export const DSGN_WRITE_UPS: CpoWriteUps = {
     links: {
       dependsOn: ['SARC-05', 'SARC-06', 'SARC-07', 'REQ-07', 'ICD-09'],
       feedsInto: ['IMPL-10', 'TINF-17', 'SINT-06', 'CERT-04', 'DSGN-18'],
-      runsWith: ['DSGN-14', 'DSGN-15', 'DSGN-20'],
+      runsWith: ['DSGN-14', 'DSGN-15', 'DSGN-19'],
       revisedBy: [],
       feedsBackInto: [],
     },

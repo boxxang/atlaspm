@@ -28,7 +28,7 @@ test.describe('the CPO Network Switch System template', () => {
     await expect(cpo).toBeVisible();
     await expect(cpo).toContainText('CPO Network Switch System');
     await expect(cpo).toContainText('Built-in');
-    await expect(cpo).toContainText('28');
+    await expect(cpo).toContainText('29');
     await expect(cpo.locator('[data-edit-template]')).toHaveCount(0);
     await expect(cpo.locator('[data-flowchart="cpoSwitch"]')).toBeVisible();
     for (const id of ['typicalSoC', 'threeDic', 'embeddedSoc']) await expect(page.locator(`[data-template="${id}"]`)).toBeVisible();
@@ -36,7 +36,7 @@ test.describe('the CPO Network Switch System template', () => {
 
   test('starts a program staged by lifecycle, with the gates it is held to', async ({ page }) => {
     const id = await newProgram(page, 'SwitchOne');
-    await expect(stagesLink(page)).toContainText('28');
+    await expect(stagesLink(page)).toContainText('29');
 
     await page.goto(`/p/${id}/stages`);
     for (const key of [

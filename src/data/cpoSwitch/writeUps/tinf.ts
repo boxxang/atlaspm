@@ -394,7 +394,7 @@ export const TINF_WRITE_UPS: CpoWriteUps = {
       'Program revisions needed after first silicon',
     ],
     links: {
-      dependsOn: ['TINF-01', 'TINF-02', 'TINF-03', 'TINF-04', 'TINF-07', 'TINF-13', 'IMPL-11', 'SGNO-07', 'PSV-10'],
+      dependsOn: ['TINF-01', 'TINF-02', 'TINF-03', 'TINF-04', 'TINF-07', 'TINF-13', 'IMPL-11', 'SGNO-07', 'PSV-10', 'OESD-05'],
       feedsInto: ['SORT-01', 'SORT-04', 'SORT-05', 'PKGA-06', 'TINF-11', 'SORT-02', 'SORT-03'],
       runsWith: ['TINF-05'],
       revisedBy: [],
@@ -461,7 +461,7 @@ export const TINF_WRITE_UPS: CpoWriteUps = {
       'Tables traceable end to end',
     ],
     links: {
-      dependsOn: ['DSGN-08', 'TINF-03', 'DSGN-16', 'ICD-11'],
+      dependsOn: ['DSGN-08', 'TINF-03', 'DSGN-16', 'ICD-11', 'OESD-05'],
       feedsInto: ['TINF-06', 'TINF-10', 'OBU-04', 'NPI-07', 'TINF-11'],
       runsWith: [],
       revisedBy: [],
@@ -595,7 +595,7 @@ export const TINF_WRITE_UPS: CpoWriteUps = {
       'Active alignment cycle time per fiber',
     ],
     links: {
-      dependsOn: ['FEAS-06', 'FEAS-07', 'TRDY-06', 'DSGN-12'],
+      dependsOn: ['FEAS-06', 'FEAS-07', 'TRDY-06', 'DSGN-12', 'OESD-06', 'OESD-03'],
       feedsInto: ['PKGA-03', 'PKGA-04', 'TINF-11'],
       runsWith: [],
       revisedBy: [],

@@ -939,7 +939,7 @@ export const TRDY_WRITE_UPS: CpoWriteUps = {
     ],
     links: {
       dependsOn: ['CON-02', 'FEAS-01'],
-      feedsInto: ['TRDY-11', 'FEAS-10', 'DSGN-06', 'DSGN-07', 'DSGN-19'],
+      feedsInto: ['TRDY-11', 'FEAS-10', 'DSGN-06', 'DSGN-07', 'OESD-02'],
       runsWith: ['SARC-03'],
       revisedBy: [],
       feedsBackInto: [],

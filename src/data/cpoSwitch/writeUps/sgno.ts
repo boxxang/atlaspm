@@ -151,7 +151,7 @@ export const SGNO_WRITE_UPS: CpoWriteUps = {
       'Electrical IC layout and post-layout report from IMPL-04',
       'Electrical IC mixed-signal verification results from PSV-15',
       'Link co-simulation budget allocation from PSV-07',
-      'Calibration trim range from DSGN-08',
+      'Calibration trim range from DSGN-08, and the frozen bond pad map from the optical engine stack freeze in OESD-07',
       'Foundry analog and reliability rule decks',
     ],
     rel: {
@@ -188,7 +188,7 @@ export const SGNO_WRITE_UPS: CpoWriteUps = {
       'Monte Carlo offset at 3 sigma within the calibration trim range',
       'Reliability and physical verification clean and report released to OTO-01',
     ],
-    dependsOn: ['IMPL-04', 'PSV-15'],
+    dependsOn: ['IMPL-04', 'PSV-15', 'OESD-07'],
     dependsNote: null,
     feedsInto: ['SGNO-09', 'OTO-01'],
     measuredBy: [
@@ -197,7 +197,7 @@ export const SGNO_WRITE_UPS: CpoWriteUps = {
       'Open reliability waivers',
     ],
     links: {
-      dependsOn: ['IMPL-04', 'PSV-15', 'PSV-07'],
+      dependsOn: ['IMPL-04', 'PSV-15', 'PSV-07', 'OESD-07'],
       feedsInto: ['SGNO-09', 'OTO-01', 'SORT-03'],
       runsWith: ['SGNO-04'],
       revisedBy: [],
@@ -218,7 +218,7 @@ export const SGNO_WRITE_UPS: CpoWriteUps = {
       'Photonic IC and optical link simulation results from PSV-06',
       'Foundry optical rule deck and tapeout checklist from TRDY-02',
       'Optical link budget from MODL-04',
-      'Coupler definitions from ICD-06',
+      'Coupler definitions from ICD-06, frozen with the optical engine stack in OESD-07',
     ],
     rel: {
       'SGNO-D4': '<b>Photonic IC signoff report — optical rules, connectivity and loss budget.</b> Produced here; it carries the foundry waiver approvals.',
@@ -255,7 +255,7 @@ export const SGNO_WRITE_UPS: CpoWriteUps = {
       'Per-channel routed insertion loss and crosstalk within the link budget allocation with margin stated',
       'Connectivity clean and report released to OTO-02',
     ],
-    dependsOn: ['IMPL-05', 'PSV-06'],
+    dependsOn: ['IMPL-05', 'PSV-06', 'OESD-07'],
     dependsNote: null,
     feedsInto: ['SGNO-09', 'OTO-02'],
     measuredBy: [
@@ -264,7 +264,7 @@ export const SGNO_WRITE_UPS: CpoWriteUps = {
       'Worst-case heater power against supply',
     ],
     links: {
-      dependsOn: ['IMPL-05', 'PSV-06', 'TRDY-02', 'MODL-04'],
+      dependsOn: ['IMPL-05', 'PSV-06', 'TRDY-02', 'MODL-04', 'OESD-07'],
       feedsInto: ['SGNO-09', 'OTO-02', 'TINF-03'],
       runsWith: ['SGNO-03'],
       revisedBy: [],
@@ -553,7 +553,7 @@ export const SGNO_WRITE_UPS: CpoWriteUps = {
       'Photonic IC signoff report and final layout from SGNO-04',
       'Electrical IC final layout and post-layout results from IMPL-04',
       'Photonic IC final layout and optical rule closure from IMPL-05',
-      'Pre-silicon validation closure from PSV-11',
+      'Pre-silicon validation closure from PSV-11, the optical engine stack freeze from OESD-07 and the cross-die stack signoff from SGNO-12',
     ],
     rel: {
       'SGNO-D11': '<b>Tapeout wave 1 readiness decision package — electrical IC and photonic IC.</b> Produced here; it releases the optical silicon to OTO-01 and OTO-02.',
@@ -587,7 +587,7 @@ export const SGNO_WRITE_UPS: CpoWriteUps = {
       'Every open waiver on either die signed by its approver and entered in the risk register',
       'Analog and photonics foundry slots and mask orders confirmed in writing for week 98',
     ],
-    dependsOn: ['SGNO-03', 'SGNO-04', 'IMPL-04', 'IMPL-05', 'PSV-11'],
+    dependsOn: ['SGNO-03', 'SGNO-04', 'IMPL-04', 'IMPL-05', 'PSV-11', 'OESD-07', 'SGNO-12'],
     dependsNote: 'Wave 1 does not wait for the Switch SoC, the I/O die, the bridge or the package signoff; those go to SGNO-10.',
     feedsInto: ['OTO-01', 'OTO-02', 'OTO-03'],
     measuredBy: [
@@ -596,7 +596,7 @@ export const SGNO_WRITE_UPS: CpoWriteUps = {
       'Photonics and analog foundry slot dates held',
     ],
     links: {
-      dependsOn: ['SGNO-03', 'SGNO-04', 'IMPL-04', 'IMPL-05', 'PSV-11'],
+      dependsOn: ['SGNO-03', 'SGNO-04', 'IMPL-04', 'IMPL-05', 'PSV-11', 'OESD-07', 'SGNO-12'],
       feedsInto: ['OTO-01', 'OTO-02', 'OTO-03', 'OTO-04', 'SGNO-10'],
       runsWith: [],
       revisedBy: [],
@@ -678,7 +678,7 @@ export const SGNO_WRITE_UPS: CpoWriteUps = {
       'Step 1 confirms the database against signoff and the die bump maps. Step 2 generates the fabrication data and step 3 closes the supplier queries, with the RDL build data released to the assembly partner in parallel in step 4. Step 5 orders substrates and fixtures, and step 6 releases the tooling.',
     consumes: [
       'Multi-die package signoff report from SGNO-06',
-      'Package layout database from IMPL-07',
+      'Package layout database from IMPL-07, and the engine substrate design from OESD-02',
       'Final die microbump maps from the die signoffs in SGNO-01 to SGNO-05',
       'Substrate supplier design rules and tooling lead times from TRDY-06',
       'First-build substrate quantities from PKGA-02',
@@ -718,7 +718,7 @@ export const SGNO_WRITE_UPS: CpoWriteUps = {
       'All supplier engineering queries closed and tooling accepted in writing',
       'First-build substrates ordered with a committed delivery at least two weeks before the first die attach',
     ],
-    dependsOn: ['SGNO-06', 'IMPL-07'],
+    dependsOn: ['SGNO-06', 'IMPL-07', 'OESD-02'],
     dependsNote: 'Waits for package signoff by design: tooling is the first money spent on the package.',
     feedsInto: ['SGNO-10', 'PKGA-01', 'WFAB-06'],
     measuredBy: [
@@ -727,12 +727,78 @@ export const SGNO_WRITE_UPS: CpoWriteUps = {
       'Committed substrate delivery against first die attach',
     ],
     links: {
-      dependsOn: ['SGNO-06', 'IMPL-07', 'TRDY-06'],
+      dependsOn: ['SGNO-06', 'IMPL-07', 'TRDY-06', 'OESD-02'],
       feedsInto: ['SGNO-10', 'PKGA-01', 'WFAB-06', 'MTO-03'],
       runsWith: [],
       revisedBy: [],
       feedsBackInto: [],
     },
     terms: ['RDL', 'Bump map', 'Interposer', 'OSAT'],
+  },
+  'SGNO-12': {
+    criticalPath: true,
+    purpose: [
+      'Sign off the <b>optical engine stack across its dies</b>: merge the electrical IC, photonic IC and engine substrate layouts into one assembly view, run cross-die connectivity and LVS through the bond so every electrical IC pad lands on its photonic IC pad and through-connection, and check pad alignment, pitch, keep-outs, coupler placement and the engine substrate landing pads and thermal vias against the frozen stack design.',
+      'Each die signs off clean on its own and the stack can still be wrong: a mirrored pad map, a coupler under a keep-out, a through-connection that lands nowhere. This is the check that sees both dies at once, and it has to pass before either goes in wave 1.',
+    ],
+    flowNote:
+      'Step 1 merges the layouts into one stack view. Step 2 runs cross-die connectivity and LVS while step 3 checks alignment, keep-outs and coupler placement in parallel. Step 4 checks the engine substrate, step 5 closes mismatches and step 6 releases.',
+    consumes: [
+      'Optical engine stack design freeze package from OESD-07',
+      'Electrical IC final layout from IMPL-04',
+      'Photonic IC final layout from IMPL-05',
+      'Engine substrate design from OESD-02',
+      'Assembly design rules and stacking process baseline from OESD-06',
+    ],
+    rel: {
+      'SGNO-D13': '<b>Optical engine stack cross-die signoff report — bond pad alignment, coupler placement and engine substrate.</b> Produced here.',
+      'SGNO-D11': '<b>Tapeout wave 1 readiness decision package — electrical IC and photonic IC.</b> The wave 1 go needs a clean cross-die signoff.',
+    },
+    risks: [
+      '<b>Mirrored pad map.</b> The face-down electrical IC is checked unflipped and every pad is on the wrong side.',
+      '<b>Signed off per die only.</b> Both dies are clean alone and the stack has never been checked as one.',
+      '<b>Coupler under a keep-out.</b> A coupler sits where the fiber block or bond cannot reach it.',
+      '<b>Substrate out of step.</b> The engine substrate is checked against an older pad map.',
+      '<b>Late mismatch.</b> A cross-die error is found days before the wave 1 slot.',
+    ],
+    roles: [
+      { r: 'Packaging', d: 'Owns the optical engine stack cross-die signoff' },
+      { r: 'Analog layout lead', d: 'Electrical IC pad and layout fixes' },
+      { r: 'Photonics layout lead', d: 'Photonic IC pad, coupler and layout fixes' },
+      { r: 'Physical verification engineer', d: 'Cross-die connectivity and LVS runs' },
+      { r: 'Assembly partner process engineer', d: 'Stack design rule interpretation' },
+    ],
+    effort: [
+      ['Stack assembly view', 0.5],
+      ['Cross-die connectivity and LVS', 1.5],
+      ['Alignment, keep-out and substrate checks', 1],
+      ['Mismatch closure and release', 1],
+    ],
+    entry: [
+      'Stack design frozen in OESD-07',
+      'Final electrical and photonic IC layouts from IMPL-04 and IMPL-05',
+      'Engine substrate design released from OESD-02',
+    ],
+    exit: [
+      'Cross-die LVS clean with every electrical IC pad connected to its photonic IC pad or through-connection',
+      'No coupler, pad or fiducial violating the stack keep-outs and design rules',
+      'Engine substrate landing pads and thermal vias matching the stack',
+    ],
+    dependsOn: ['OESD-07', 'IMPL-04', 'IMPL-05', 'OESD-02'],
+    dependsNote: null,
+    feedsInto: ['SGNO-09'],
+    measuredBy: [
+      'Cross-die connectivity errors at first run',
+      'Mismatches open against the wave 1 date',
+      'Keep-out violations',
+    ],
+    links: {
+      dependsOn: ['OESD-07', 'IMPL-04', 'IMPL-05', 'OESD-02', 'OESD-06'],
+      feedsInto: ['SGNO-09', 'OTO-01', 'OTO-02'],
+      runsWith: ['SGNO-03', 'SGNO-04'],
+      revisedBy: [],
+      feedsBackInto: ['IMPL-04', 'IMPL-05'],
+    },
+    terms: ['Cross-die LVS', 'Bond pad map', 'LVS', 'Optical engine'],
   },
 };

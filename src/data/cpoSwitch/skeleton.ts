@@ -305,10 +305,9 @@ export const CPO_SKELETON: readonly CpoStageSkeleton[] = [
       a('DSGN-16', 'Firmware Development — Boot, Initialization, Link Training and Optical Control', 'Firmware', [12, 52], 'system'),
       a('DSGN-17', 'SDK, Drivers, Management and Telemetry Software Development', 'Software', [14, 52], 'system'),
       a('DSGN-18', 'Design Freeze Review — RTL, Circuit and Photonic Freeze', 'System architecture', [46, 52], 'system'),
-      a('DSGN-19', 'Optical Engine Sub-Assembly Design — Electrical-to-Photonic Attach and Engine Substrate', 'Packaging', [10, 46], 'oe'),
-      a('DSGN-20', 'Optical Source Module Packaging, Serviceability and Front-Panel Integration', 'Laser and optical source', [12, 46], 'source'),
-      a('DSGN-21', 'Early Die Floorplan, Die Size and Bump Plan Trials for Every Die', 'Physical design', [4, 22], 'system'),
-      a('DSGN-22', 'System Enclosure, Power Supplies, Fan Trays and Control-Plane Processor Design', 'Board and system hardware', [14, 50], 'system'),
+      a('DSGN-19', 'Optical Source Module Packaging, Serviceability and Front-Panel Integration', 'Laser and optical source', [12, 46], 'source'),
+      a('DSGN-20', 'Early Die Floorplan, Die Size and Bump Plan Trials for Every Die', 'Physical design', [4, 22], 'system'),
+      a('DSGN-21', 'System Enclosure, Power Supplies, Fan Trays and Control-Plane Processor Design', 'Board and system hardware', [14, 50], 'system'),
     ],
   },
   {
@@ -335,6 +334,25 @@ export const CPO_SKELETON: readonly CpoStageSkeleton[] = [
       a('PSV-13', 'Bridge / Interposer and Silicon Capacitor Verification', 'Packaging', [20, 48], 'bridge'),
       a('PSV-14', 'Emulation-Based Power Analysis and Worst-Case Current-Step Vectors', 'Design verification', [30, 50], 'switch'),
       a('PSV-15', 'Electrical IC Mixed-Signal Verification — Drivers, TIAs, Bias and Control Loops', 'Analog and mixed-signal', [10, 48], 'eic'),
+    ],
+  },
+
+  {
+    key: 'cpoOeStackDesign',
+    prefix: 'OESD',
+    title: 'Optical Engine Stack Design & Process Development',
+    band: 'designVerify',
+    start: 44,
+    dur: 52,
+    gate: { id: 'cpoOeStackDesignFreeze', label: 'Optical Engine Stack Design Freeze' },
+    activities: [
+      a('OESD-01', 'Electrical-IC-on-Photonic-IC Stack Structure and Bond Interface — Pitch, Pad Map and Through-Connections', 'Packaging', [0, 16], 'oe'),
+      a('OESD-02', 'Optical Engine Sub-Assembly Design — Electrical-to-Photonic Attach and Engine Substrate', 'Packaging', [0, 34], 'oe'),
+      a('OESD-03', 'Optical Engine Fiber Coupling and Alignment Structure Design', 'Optical engineering', [4, 32], 'oe'),
+      a('OESD-04', 'Optical Engine Thermal Path Design and Heater Crosstalk Analysis', 'Thermal and mechanical', [6, 34], 'oe'),
+      a('OESD-05', 'Optical Engine Test Access and Known-Good Optical Engine Test Strategy', 'Test engineering', [8, 36], 'oe'),
+      a('OESD-06', 'Optical Engine Design Rules and Stacking Process Co-Development with the Assembly Partner', 'Packaging', [4, 44], 'oe'),
+      a('OESD-07', 'Optical Engine Stack Design Freeze Review', 'System architecture', [46, 52], 'oe'),
     ],
   },
 
@@ -383,6 +401,7 @@ export const CPO_SKELETON: readonly CpoStageSkeleton[] = [
       a('SGNO-09', 'Tapeout Wave 1 Readiness Review — Electrical IC and Photonic IC', 'Program management', [7, 10], 'program'),
       a('SGNO-10', 'Tapeout Wave 2 Readiness Review — Switch SoC, I/O Die, Bridge and Silicon Capacitors', 'Program management', [14, 18], 'program'),
       a('SGNO-11', 'Main Package and Engine Substrate and RDL Tooling Release to Suppliers', 'Packaging', [10, 18], 'package'),
+      a('SGNO-12', 'Optical Engine Stack Cross-Die Signoff — Bond Pad Alignment, Coupler Placement and Engine Substrate Check', 'Packaging', [0, 9], 'oe'),
     ],
   },
 
