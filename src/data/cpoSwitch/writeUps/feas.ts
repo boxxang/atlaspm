@@ -62,7 +62,7 @@ export const FEAS_WRITE_UPS: CpoWriteUps = {
     ],
     links: {
       dependsOn: ['CON-06', 'CON-02', 'CON-03'],
-      feedsInto: ['FEAS-02', 'FEAS-03', 'FEAS-04', 'FEAS-05', 'FEAS-06', 'FEAS-07', 'FEAS-08', 'FEAS-09', 'FEAS-10', 'FEAS-11', 'TRDY-01', 'SARC-03'],
+      feedsInto: ['FEAS-02', 'FEAS-03', 'FEAS-04', 'FEAS-05', 'FEAS-06', 'FEAS-07', 'FEAS-08', 'FEAS-09', 'FEAS-10', 'FEAS-11', 'TRDY-01', 'SARC-03', 'FEAS-12'],
       runsWith: ['REQ-02'],
       revisedBy: [],
       feedsBackInto: [],
@@ -600,7 +600,7 @@ export const FEAS_WRITE_UPS: CpoWriteUps = {
       'Architecture or interface changes forced by the decision',
     ],
     links: {
-      dependsOn: ['FEAS-01', 'FEAS-02', 'FEAS-03', 'FEAS-04', 'FEAS-05', 'FEAS-06', 'FEAS-07', 'FEAS-08', 'FEAS-10', 'FEAS-11', 'TRDY-02', 'TRDY-07'],
+      dependsOn: ['FEAS-01', 'FEAS-02', 'FEAS-03', 'FEAS-04', 'FEAS-05', 'FEAS-06', 'FEAS-07', 'FEAS-08', 'FEAS-10', 'FEAS-11', 'TRDY-02', 'TRDY-07', 'FEAS-12'],
       feedsInto: ['TRDY-11', 'MODL-10', 'DSGN-06', 'DSGN-07', 'DSGN-18'],
       runsWith: [],
       revisedBy: [],
@@ -738,5 +738,72 @@ export const FEAS_WRITE_UPS: CpoWriteUps = {
       feedsBackInto: [],
     },
     terms: ['Optical source', 'Fiber attach', 'FIT', 'THB'],
+  },
+  'FEAS-12': {
+    criticalPath: false,
+    purpose: [
+      'Build and measure an <b>optical engine stack test vehicle</b> — electrical IC test dies bonded onto photonic IC test dies across bond pitch and process splits, with fiber attached — so the bond interface, the stacking yield, the coupling loss the stacking costs and the stack thermal path are measured before the optical engine stack is designed.',
+      'The separate electrical and photonic test vehicles prove each die; they do not prove the stack. Bonding warps the photonic die, moves the coupler and puts the hottest circuits directly over the most temperature-sensitive devices, and none of that shows until the two are joined. A pitch or a process chosen here without data is the one the product has to live with.',
+    ],
+    flowNote:
+      'Step 1 defines the vehicle and step 2 adds its structures to the test vehicle reticles. Step 3 builds the stacks, step 4 inspects the bonds and step 5 measures coupling, while step 6 measures the thermal path in parallel. Step 7 cycles the samples and step 8 releases the report.',
+    consumes: [
+      'Feasibility plan and test vehicle charter from FEAS-01',
+      'Photonic IC test vehicle dies and coupler structures from FEAS-03',
+      'Electrical IC test vehicle dies from FEAS-04',
+      'Fiber attach process and coupons from FEAS-06',
+      'Assembly partner stacking process options and capacity',
+    ],
+    rel: {
+      'FEAS-D12': '<b>Optical engine stack test vehicle report — bond pitch, stacking yield, coupling shift and thermal path.</b> Produced here; it carries the pitch and process recommendation the stack design starts from.',
+      'FEAS-D9': '<b>Technology selection decision and go / no-go record.</b> Stacking yield, coupling shift and thermal results are scored in the stack technology selection.',
+    },
+    risks: [
+      '<b>Test dies unlike the product.</b> Test vehicle dies of a different thickness or metal stack bond and warp differently from the product dies.',
+      '<b>Too few samples per split.</b> Two stacks per pitch give an anecdote, not a yield.',
+      '<b>Coupling shift not measured.</b> Fiber is attached only to unstacked dies and the loss the stacking adds is missed.',
+      '<b>Unpowered thermal data.</b> Thermal resistance is simulated rather than measured with the electrical IC running.',
+      '<b>No stress before selection.</b> A bond that passes at time zero opens after cycling, after the pitch is chosen.',
+    ],
+    roles: [
+      { r: 'Packaging', d: 'Owns the stack test vehicle and its builds' },
+      { r: 'Photonic device engineer', d: 'Coupler and waveguide structures and coupling measurements' },
+      { r: 'Analog and mixed-signal designer', d: 'Electrical IC test die pads and powered thermal tests' },
+      { r: 'Assembly partner engineer', d: 'Stacking process splits and bond inspection' },
+      { r: 'System architect', d: 'Uses the results in the technology selection' },
+    ],
+    effort: [
+      ['Vehicle definition and reticle structures', 4],
+      ['Stack builds across splits', 9],
+      ['Bond inspection', 4],
+      ['Coupling and thermal measurement', 8],
+      ['Thermal cycling and report', 5],
+    ],
+    entry: [
+      'Feasibility plan approved in FEAS-01 with stack pitch and process candidates listed',
+      'Photonic and electrical test vehicle dies available from FEAS-03 and FEAS-04',
+      'Assembly partner committed to stacking splits and sample counts',
+    ],
+    exit: [
+      'At least three pitch or process splits built with ten or more stacks each',
+      'Bond yield, coupling shift from stacking and stack thermal resistance measured per split',
+      'Report released with a recommended pitch, bond process and through-connection option',
+    ],
+    dependsOn: ['FEAS-01', 'FEAS-03', 'FEAS-04'],
+    dependsNote: 'The stack vehicle uses dies from the photonic and electrical test vehicles, so it starts while they are still being measured and builds as their dies arrive.',
+    feedsInto: ['FEAS-09', 'OESD-01', 'OESD-06'],
+    measuredBy: [
+      'Bond yield per split',
+      'Coupling loss added by stacking per lane',
+      'Bond resistance drift after thermal cycling',
+    ],
+    links: {
+      dependsOn: ['FEAS-01', 'FEAS-03', 'FEAS-04', 'FEAS-06'],
+      feedsInto: ['FEAS-09', 'OESD-01', 'OESD-06', 'TRDY-15'],
+      runsWith: ['FEAS-07'],
+      revisedBy: [],
+      feedsBackInto: [],
+    },
+    terms: ['Hybrid bonding', 'Microbump', 'Scanning acoustic microscopy', 'Coupling loss', 'Thermal crosstalk', 'TV'],
   },
 };

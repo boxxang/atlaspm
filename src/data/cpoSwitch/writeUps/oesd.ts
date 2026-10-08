@@ -63,7 +63,7 @@ export const OESD_WRITE_UPS: CpoWriteUps = {
       'Bond pitch against demonstrated capability',
     ],
     links: {
-      dependsOn: ['ICD-04', 'SARC-03', 'SARC-04', 'FEAS-06', 'FEAS-03', 'FEAS-04'],
+      dependsOn: ['ICD-04', 'SARC-03', 'SARC-04', 'FEAS-06', 'FEAS-03', 'FEAS-04', 'FEAS-12'],
       feedsInto: ['OESD-02', 'OESD-03', 'OESD-04', 'OESD-05', 'OESD-06', 'OESD-07', 'IMPL-04', 'IMPL-05', 'DSGN-05', 'DSGN-06', 'OEB-02'],
       runsWith: [],
       revisedBy: [],
@@ -331,7 +331,7 @@ export const OESD_WRITE_UPS: CpoWriteUps = {
     ],
     links: {
       dependsOn: ['SARC-10', 'OESD-01', 'ICD-11', 'MODL-04'],
-      feedsInto: ['TINF-06', 'TINF-07', 'OESD-07', 'DSGN-11', 'OEB-05', 'OEB-07', 'SORT-05', 'OEB-01'],
+      feedsInto: ['TINF-06', 'TINF-07', 'OESD-07', 'DSGN-11', 'OEB-05', 'OEB-07', 'SORT-05', 'OEB-01', 'TINF-18'],
       runsWith: ['OESD-02'],
       revisedBy: [],
       feedsBackInto: [],
@@ -397,7 +397,7 @@ export const OESD_WRITE_UPS: CpoWriteUps = {
       'Process capability on the critical parameters',
     ],
     links: {
-      dependsOn: ['TRDY-06', 'FEAS-06', 'OESD-01', 'OESD-03'],
+      dependsOn: ['TRDY-06', 'FEAS-06', 'OESD-01', 'OESD-03', 'FEAS-12', 'TRDY-15'],
       feedsInto: ['TINF-09', 'OESD-07', 'OEB-01', 'OEB-02'],
       runsWith: ['OESD-02'],
       revisedBy: [],

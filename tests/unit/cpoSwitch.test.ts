@@ -105,6 +105,21 @@ describe('CPO skeleton', () => {
     }
   });
 
+  it('gives every die and both packages a track from design through validation', () => {
+    const PHASES: Record<string, string[]> = {
+      design: ['cpoDesign', 'cpoOeStackDesign'],
+      'implementation or signoff': ['cpoImplementation', 'cpoSignoff'],
+      'tapeout or build': ['cpoTapeoutOptical', 'cpoTapeout', 'cpoOeBuild', 'cpoAssembly'],
+      validation: ['cpoPowerOn', 'cpoOpticalBringup', 'cpoSystemIntegration', 'cpoCharacterization', 'cpoQualification'],
+    };
+    for (const item of ['switch', 'io', 'eic', 'pic', 'oe', 'package'] as const) {
+      for (const [phase, keys] of Object.entries(PHASES)) {
+        const refs = CPO_SKELETON.filter((s) => keys.includes(s.key)).flatMap((s) => s.activities.filter((a) => a.item === item));
+        expect(refs.length, `${item} has no ${phase} activity`).toBeGreaterThan(0);
+      }
+    }
+  });
+
   it('is a fourth built-in profile, ordered by start, one gate per stage', () => {
     expect(CPO_PROFILE.id).toBe('cpoSwitch');
     expect(CPO_PROFILE.label).toBe('CPO Network Switch System');

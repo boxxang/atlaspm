@@ -737,7 +737,7 @@ export const TRDY_WRITE_UPS: CpoWriteUps = {
       'Single-source risks accepted versus mitigated',
     ],
     links: {
-      dependsOn: ['TRDY-01', 'TRDY-02', 'TRDY-03', 'TRDY-04', 'TRDY-05', 'TRDY-06', 'TRDY-07', 'TRDY-08', 'TRDY-09', 'TRDY-10', 'TRDY-12', 'TRDY-13', 'TRDY-14', 'FEAS-09'],
+      dependsOn: ['TRDY-01', 'TRDY-02', 'TRDY-03', 'TRDY-04', 'TRDY-05', 'TRDY-06', 'TRDY-07', 'TRDY-08', 'TRDY-09', 'TRDY-10', 'TRDY-12', 'TRDY-13', 'TRDY-14', 'FEAS-09', 'TRDY-15'],
       feedsInto: ['DSGN-18', 'PKGA-01', 'NPI-06'],
       runsWith: [],
       revisedBy: [],
@@ -945,5 +945,71 @@ export const TRDY_WRITE_UPS: CpoWriteUps = {
       feedsBackInto: [],
     },
     terms: ['FTO', 'NDA'],
+  },
+  'TRDY-15': {
+    criticalPath: false,
+    purpose: [
+      'Qualify the <b>optical engine stacking process and the assembly partner that will run it</b> — stacking, underfill, engine substrate attach and fiber attach — with process qualification lots, an agreed assembly design kit, reserved line capacity and engine substrate supply, so the engine build has a line to run on when the dies arrive.',
+      'Stacking an electrical IC on a photonic IC is a different line from attaching a die to a package substrate, and few partners run both at product yield. The partner choice fixes the design rules the stack is drawn to, so it has to be made while the stack is still being designed, not after it is frozen.',
+    ],
+    flowNote:
+      'Step 1 lists the process steps and step 2 audits the candidates. Step 3 runs qualification lots while step 4 agrees the design kit in parallel. Step 5 reserves capacity and supply, step 6 confirms tooling and traceability, and step 7 releases the assessment.',
+    consumes: [
+      'Package technology and assembly partner assessment from TRDY-06',
+      'Stack test vehicle results and process recommendation from FEAS-12',
+      'Engine substrate technology options from the substrate suppliers',
+      'Volume and first-build quantities from the program plan',
+      'Manufacturing traceability requirements',
+    ],
+    rel: {
+      'TRDY-D15': '<b>Optical engine stacking process and assembly partner readiness assessment.</b> Produced here; it names the partner, the qualified process and the reserved capacity.',
+      'TRDY-D11': '<b>Technology, IP and supply readiness gate package.</b> Engine line readiness is one of the items the gate reviews.',
+    },
+    risks: [
+      '<b>Partner chosen after the freeze.</b> The stack is designed to rules the selected line cannot run.',
+      '<b>Qualification on easy parts.</b> Process lots use thick, flat test dies and miss the warpage of the product dies.',
+      '<b>Capacity assumed.</b> The engine line is shared and the first build waits behind another customer.',
+      '<b>Substrate single-sourced late.</b> Engine substrate lead time is found when the first order is placed.',
+      '<b>No traceability.</b> Engines leave the partner without per-engine records joined to die and bond data.',
+    ],
+    roles: [
+      { r: 'Packaging', d: 'Owns engine process and partner readiness' },
+      { r: 'Assembly partner program manager', d: 'Line capability, capacity and process qualification lots' },
+      { r: 'Supply chain manager', d: 'Engine substrate supply and capacity reservation' },
+      { r: 'Quality engineer', d: 'Partner audit and process capability review' },
+      { r: 'Program manager', d: 'Takes the assessment to the readiness gate' },
+    ],
+    effort: [
+      ['Process definition and partner audit', 2],
+      ['Process qualification lots', 3],
+      ['Design kit and change notification', 1],
+      ['Capacity, supply and traceability', 2],
+    ],
+    entry: [
+      'Assembly partner shortlist from TRDY-06',
+      'Stack pitch and process candidates from the stack test vehicle in FEAS-12',
+      'First-build engine quantities estimated',
+    ],
+    exit: [
+      'Partner selected with process qualification lot yield and capability reported per step',
+      'Assembly design kit and change notification agreed and handed to the stack design',
+      'Engine line capacity and engine substrate supply reserved for the first build',
+    ],
+    dependsOn: ['TRDY-06', 'FEAS-12'],
+    dependsNote: null,
+    feedsInto: ['TRDY-11', 'OESD-06', 'OEB-01'],
+    measuredBy: [
+      'Process qualification lot yield per step',
+      'Engine line capacity reserved against the first-build need',
+      'Engine substrate lead time against the build plan',
+    ],
+    links: {
+      dependsOn: ['TRDY-06', 'FEAS-12', 'TRDY-10'],
+      feedsInto: ['TRDY-11', 'OESD-06', 'OEB-01'],
+      runsWith: ['TRDY-13'],
+      revisedBy: [],
+      feedsBackInto: [],
+    },
+    terms: ['OSAT', 'Assembly design kit', 'Engine substrate', 'Cpk', 'Process qualification run'],
   },
 };

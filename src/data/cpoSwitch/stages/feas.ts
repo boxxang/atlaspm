@@ -8,7 +8,7 @@ export const FEAS: CpoStageModule = {
   content: {
     tagline: 'Prove on real silicon, glass and fiber that every technology the concept bets on works before the design depends on it.',
     description:
-      'Retire the technology risks the concept carries by building and measuring test vehicles for each of them: a SerDes test chip, a photonic IC test vehicle, an electrical IC driver and TIA test vehicle, optical source and laser-to-PIC coupling samples, fiber attach coupons, and a package, bridge and thermal test vehicle. The parts are then joined into one end-to-end optical link on the bench and measured against the link budget. An interim down-select on the early data lets the partition and interface freezes proceed on named technologies and fallbacks, and early aging and humidity screens start the long optical reliability clock. The stage closes on a technology selection decision taken per technology against go / no-go criteria written before the first vehicle was designed.',
+      'Retire the technology risks the concept carries by building and measuring test vehicles for each of them: a SerDes test chip, a photonic IC test vehicle, an electrical IC driver and TIA test vehicle, optical source and laser-to-PIC coupling samples, fiber attach coupons, and a package, bridge and thermal test vehicle. The parts are then joined into one end-to-end optical link on the bench and measured against the link budget. An interim down-select on the early data lets the partition and interface freezes proceed on named technologies and fallbacks, and early aging and humidity screens start the long optical reliability clock. The stage closes on a technology selection decision taken per technology against go / no-go criteria written before the first vehicle was designed. A stack test vehicle bonds electrical IC test dies onto photonic IC test dies across pitch and process splits and attaches fiber, so the bond interface, the coupling loss stacking adds and the stack thermal path are measured before the optical engine stack is designed.',
     activities: [
       'Feasibility plan',
       'SerDes test chip',
@@ -21,6 +21,7 @@ export const FEAS: CpoStageModule = {
       'Technology selection',
       'Interim down-select',
       'Early reliability screens',
+      'Optical engine stack vehicle',
     ],
     deliverables: [
       'Feasibility plan and test vehicle charter',
@@ -34,10 +35,11 @@ export const FEAS: CpoStageModule = {
       'Technology selection decision and go / no-go record',
       'Interim technology down-select record for the partition freeze',
       'Early optical source and fiber attach reliability screening report',
+      'Optical engine stack test vehicle report — bond pitch, stacking yield, coupling shift and thermal path',
     ],
-    deliverableFrom: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
-    deliverableWeek: [4, 40, 40, 40, 36, 38, 44, 48, 50, 24, 50],
-    engineeringEffort: [3, 60, 54, 36, 24, 20, 30, 14, 3, 2, 8],
+    deliverableFrom: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11],
+    deliverableWeek: [4, 40, 40, 40, 36, 38, 44, 48, 50, 24, 50, 44],
+    engineeringEffort: [3, 60, 54, 36, 24, 20, 30, 14, 3, 2, 8, 30],
     risks: [
       'Test vehicles measured on best-case parts and read as production capability',
       'Technology selection arrives after the architecture it should have informed is frozen',
@@ -269,6 +271,29 @@ export const FEAS: CpoStageModule = {
         'Early optical source and fiber attach reliability screening report',
       ],
       r: [['FEAS-D11', 'produces'], ['FEAS-D9', 'feeds']],
+    },
+    'FEAS-12': {
+      s: [
+        [1, 'Define the stack test vehicle — bond pitch splits, pad map, through-connection options and coupling structures', 3],
+        [2, 'Add stack test structures and daisy chains to the photonic and electrical test vehicle reticles', 2],
+        [3, 'Build stacked electrical-IC-on-photonic-IC samples across pitch and process splits with the assembly partner', 10],
+        [4, 'Inspect the bonds — acoustic microscopy, cross-sections, daisy-chain resistance and alignment offset', 4],
+        [5, 'Attach fiber to stacked samples and measure coupling loss and its shift from the stacking process', 6],
+        [6, 'Measure the stack thermal path and heater crosstalk on powered samples', 4, 1],
+        [7, 'Thermally cycle the samples and re-measure bond resistance and coupling loss', 6],
+        [8, 'Release the stack test vehicle report with a pitch and process recommendation', 2],
+      ],
+      o: [
+        'Stack test vehicle definition with pitch and process splits',
+        'Stack test structures placed on the test vehicle reticles',
+        'Stacked samples per split with build records',
+        'Bond inspection results and daisy-chain resistance per split',
+        'Coupling loss and stacking-induced shift per sample',
+        'Measured stack thermal resistance and heater crosstalk',
+        'Bond resistance and coupling drift after thermal cycling',
+        'Optical engine stack test vehicle report with pitch and process recommendation',
+      ],
+      r: [['FEAS-D12', 'produces'], ['FEAS-D9', 'feeds']],
     },
   },
 };

@@ -8,10 +8,10 @@ export const RELQ: CpoStageModule = {
   content: {
     tagline: 'Show, with stress data on the stepping that ships, that the switch and its optics will last as long as the customer expects.',
     description:
-      'Qualify every part of the product that can wear out: the switch, I/O and electrical IC silicon for operating life, ESD, latch-up and electromigration; the photonic ICs and optical source for aging, humidity and temperature cycling, with wavelength and power drift fitted to lifetime models; the package, bridge and fiber attach for board-level, mechanical and fiber retention stresses; and the system for environmental limits and a failure-rate prediction. Tests are started on first silicon only where the stepping cannot change the stressed mechanism, early aging data from the test vehicles and first builds is carried forward, and the delta qualification is run on the production stepping itself. The stage closes on an approved qualification report with every failure dispositioned and the production burn-in decision taken.',
-    activities: ['Qualification plan', 'Silicon reliability', 'Photonic and source reliability', 'Package and fiber reliability', 'System reliability and FIT', 'Qualification report', 'Stepping delta qual'],
+      'Qualify every part of the product that can wear out: the switch, I/O and electrical IC silicon for operating life, ESD, latch-up and electromigration; the photonic ICs and optical source for aging, humidity and temperature cycling, with wavelength and power drift fitted to lifetime models; the optical engine package as an item of its own — the bond between electrical and photonic IC, the coupling to the fiber and the stack under thermal cycling — on known-good engines; the main package, bridge and fiber attach for board-level, mechanical and fiber retention stresses; and the system for environmental limits and a failure-rate prediction. Tests are started on first silicon only where the stepping cannot change the stressed mechanism, early aging data from the test vehicles and first builds is carried forward, and the delta qualification is run on the production stepping itself. The stage closes on an approved qualification report with every failure dispositioned and the production burn-in decision taken.',
+    activities: ['Qualification plan', 'Silicon reliability', 'Photonic and source reliability', 'Package and fiber reliability', 'System reliability and FIT', 'Qualification report', 'Stepping delta qual', 'Optical engine stack qual'],
     deliverables: [
-      'Reliability qualification plan and stress matrix',
+      'Reliability qualification plan and stress matrix — silicon, photonics, optical source, optical engine package, main package, board and system',
       'Silicon reliability qualification report — lifetime, ESD, latch-up and electromigration',
       'Photonic IC and optical source reliability report with lifetime drift models',
       'Package, board-level and fiber attach reliability report',
@@ -19,10 +19,11 @@ export const RELQ: CpoStageModule = {
       'Product qualification report and approval record',
       'Production stepping delta qualification report',
       'Production burn-in and system run-in decision with reduction criteria',
+      'Optical engine stack qualification report — bond interface, coupling stability and thermal cycling',
     ],
-    deliverableFrom: [0, 1, 2, 3, 4, 5, 6, 5],
-    deliverableWeek: [4, 24, 28, 26, 28, 42, 40, 42],
-    engineeringEffort: [4, 18, 30, 26, 20, 5, 14],
+    deliverableFrom: [0, 1, 2, 3, 4, 5, 6, 5, 7],
+    deliverableWeek: [4, 24, 28, 26, 28, 42, 40, 42, 28],
+    engineeringEffort: [4, 18, 30, 26, 20, 5, 14, 16],
     risks: [
       'Optical source aging too slow to finish before production release, leaving lifetime extrapolated from short data',
       'Qualification run on a stepping that changes before release, invalidating the silicon results',
@@ -57,14 +58,14 @@ export const RELQ: CpoStageModule = {
   steps: {
     'RELQ-01': {
       s: [
-        [1, 'Map the design FMEA reliability failure modes, the requirements and the mission profile to stress tests per component and assembly', 1],
+        [1, 'Map the design FMEA failure modes, the requirements and the mission profile to stress tests per item — silicon, photonics, optical source, optical engine package, main package, board and system', 1],
         [2, 'Set sample sizes, lots, readpoints and acceptance criteria per test', 1],
         [3, 'Mark which tests start on first silicon and which wait for the production stepping', 0.5, 1],
         [4, 'Book chambers, burn-in boards and optical test capacity, and reserve the qualification unit build', 1],
         [5, 'Release the qualification plan and stress matrix', 0.5],
       ],
       o: [
-        'Stress test list traced to failure modes, requirements and mission profile',
+        'Stress test list per item traced to failure modes, requirements and mission profile',
         'Sample size, lot, readpoint and acceptance table',
         'First-silicon versus production-stepping test allocation',
         'Chamber, board and qualification unit reservations',
@@ -187,6 +188,27 @@ export const RELQ: CpoStageModule = {
         'Production stepping delta qualification report',
       ],
       r: [['RELQ-D7', 'produces'], ['RELQ-D6', 'feeds']],
+    },
+    'RELQ-08': {
+      s: [
+        [1, 'Define the optical engine stack stress matrix — bond interface, coupling stability and thermal cycling — from the qualification plan and the stack failure modes', 1],
+        [2, 'Build qualification engines from known-good optical engines with per-lane coupling loss and bond inspection baselines recorded', 2],
+        [3, 'Run temperature cycling and thermal shock on stacked engines with in-situ coupling loss and continuity at every readpoint', 10],
+        [4, 'Run high-temperature operating life with drivers and heaters biased, tracking responsivity, modulation and heater power drift', 10, 1],
+        [5, 'Check bond interface integrity on sampled engines after stress — cross-section, acoustic microscopy and bond shear', 3],
+        [6, 'Fit coupling stability and bond degradation to lifetime models at the mission profile', 2],
+        [7, 'Release the optical engine stack qualification report', 1],
+      ],
+      o: [
+        'Optical engine stack stress matrix',
+        'Qualification engines with coupling and bond baselines',
+        'Temperature cycling and thermal shock results with in-situ coupling loss',
+        'Operating life drift data per engine and lane',
+        'Post-stress bond integrity results',
+        'Coupling stability and bond lifetime models',
+        'Optical engine stack qualification report',
+      ],
+      r: [['RELQ-D9', 'produces'], ['RELQ-D6', 'feeds']],
     },
   },
 };

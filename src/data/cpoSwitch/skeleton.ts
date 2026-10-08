@@ -227,6 +227,7 @@ export const CPO_SKELETON: readonly CpoStageSkeleton[] = [
       a('FEAS-09', 'Feasibility Review and Technology Selection Decision', 'System architecture', [44, 50], 'system'),
       a('FEAS-10', 'Interim Technology Down-Select Before the Partition Freeze', 'System architecture', [18, 24], 'system'),
       a('FEAS-11', 'Early Optical Source and Fiber-Attach Reliability Screening on Test Vehicles', 'Reliability', [30, 50], 'source'),
+      a('FEAS-12', 'Optical Engine Stack Test Vehicle — Electrical-IC-on-Photonic-IC Bond and Optical Coupling', 'Packaging', [6, 44], 'oe'),
     ],
   },
   {
@@ -252,6 +253,7 @@ export const CPO_SKELETON: readonly CpoStageSkeleton[] = [
       a('TRDY-12', 'Electrical IC Process and Foundry Selection', 'Technology and foundry', [0, 12], 'eic'),
       a('TRDY-13', 'System Manufacturing Partner Selection and Line Readiness', 'Supply chain', [20, 52], 'system'),
       a('TRDY-14', 'IP Rights, Freedom-to-Operate and Licensing Clearance', 'Product management', [4, 40], 'program'),
+      a('TRDY-15', 'Optical Engine Stacking Process and Assembly Partner Readiness', 'Packaging', [12, 52], 'oe'),
     ],
   },
 
@@ -522,6 +524,7 @@ export const CPO_SKELETON: readonly CpoStageSkeleton[] = [
       a('TINF-15', 'Test Site Strategy and Test Subcontractor Qualification', 'Test engineering', [16, 50], 'program'),
       a('TINF-16', 'Rework, Repair and Scrap Policy — Optical Engine, Fiber Attach and Optical Source', 'Manufacturing and NPI', [30, 62], 'oe'),
       a('TINF-17', 'System Board Assembly and Box Build Process — In-Circuit Test, Run-In and Final System Test', 'Manufacturing and NPI', [24, 64], 'system'),
+      a('TINF-18', 'Optical Engine Unit Test Hardware, Test Program and Capacity', 'Test engineering', [30, 66], 'oe'),
     ],
   },
   {
@@ -621,6 +624,8 @@ export const CPO_SKELETON: readonly CpoStageSkeleton[] = [
       a('CHAR-09', 'Datasheet, Application Notes and Design-In Collateral', 'Product management', [12, 20], 'program'),
       a('CHAR-10', 'Serviceability and Field-Replacement Validation', 'Laser and optical source', [8, 20], 'source'),
       a('CHAR-11', 'Firmware and Software System Test — Scale, Stability, Warm Restart, Upgrade and Fault Recovery', 'Software', [4, 20], 'system'),
+      a('CHAR-12', 'Electrical IC Characterization — Driver Swing, TIA Sensitivity and Bias Control Across Corners', 'Analog and mixed-signal', [2, 14], 'eic'),
+      a('CHAR-13', 'Photonic IC Characterization — Modulator, Detector, Ring Tuning and Loss Across Temperature', 'Photonics', [2, 14], 'pic'),
     ],
   },
   {
@@ -676,6 +681,7 @@ export const CPO_SKELETON: readonly CpoStageSkeleton[] = [
       a('RELQ-05', 'System-Level Reliability, Environmental Testing and Failure-Rate Prediction', 'Reliability', [6, 28], 'system'),
       a('RELQ-06', 'Qualification Report and Approval', 'Quality', [36, 42], 'program'),
       a('RELQ-07', 'Delta Qualification on the Production Stepping', 'Reliability', [26, 40], 'switch'),
+      a('RELQ-08', 'Optical Engine Stack Qualification — Bond Interface, Coupling Stability and Thermal Cycling', 'Reliability', [2, 28], 'oe'),
     ],
   },
   {

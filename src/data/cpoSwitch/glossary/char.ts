@@ -29,4 +29,9 @@ export const CHAR_GLOSSARY: CpoGlossary = {
     group: 'test',
     note: 'The lowest optical power at which a receiver still meets the target error rate. The gap between it and the power actually delivered is the receive margin of the link.',
   },
+  'Dark current': {
+    full: 'Dark current',
+    group: 'test',
+    note: 'The current a photodetector passes with no light on it. It sets a noise floor for the receiver and rises steeply with temperature, so it is characterized across the case temperature range rather than at room temperature.',
+  },
 };

@@ -62,7 +62,7 @@ export const OEB_WRITE_UPS: CpoWriteUps = {
       'Engines planned per main package unit',
     ],
     links: {
-      dependsOn: ['PKGA-02', 'OESD-05', 'OESD-06', 'SGNO-11', 'OTO-03', 'TRDY-06'],
+      dependsOn: ['PKGA-02', 'OESD-05', 'OESD-06', 'SGNO-11', 'OTO-03', 'TRDY-06', 'TRDY-15', 'TINF-18'],
       feedsInto: ['SORT-05', 'OEB-02', 'OEB-03', 'OEB-04', 'OEB-09'],
       runsWith: [],
       revisedBy: [],
@@ -129,7 +129,7 @@ export const OEB_WRITE_UPS: CpoWriteUps = {
       'Stacks lost to inspection by failure mode',
     ],
     links: {
-      dependsOn: ['SORT-05', 'OEB-01', 'OESD-01', 'OESD-06', 'TINF-09'],
+      dependsOn: ['SORT-05', 'OEB-01', 'OESD-01', 'OESD-06', 'TINF-09', 'TINF-18'],
       feedsInto: ['OEB-03', 'OEB-05', 'OEB-09'],
       runsWith: [],
       revisedBy: [],
@@ -318,7 +318,7 @@ export const OEB_WRITE_UPS: CpoWriteUps = {
       'Engine yield attributed by photonic wafer, electrical IC lot, bond and attach step',
       'No engine released without a passing engine-level record',
     ],
-    dependsOn: ['OEB-04', 'OESD-05', 'TINF-03', 'TINF-07'],
+    dependsOn: ['OEB-04', 'OESD-05', 'TINF-03', 'TINF-07', 'TINF-18'],
     dependsNote: null,
     feedsInto: ['OEB-06', 'OEB-07', 'OEB-08'],
     measuredBy: [
@@ -327,7 +327,7 @@ export const OEB_WRITE_UPS: CpoWriteUps = {
       'Engine test time per unit',
     ],
     links: {
-      dependsOn: ['OEB-04', 'OESD-05', 'TINF-03', 'TINF-07', 'SORT-05', 'OEB-02', 'OEB-03'],
+      dependsOn: ['OEB-04', 'OESD-05', 'TINF-03', 'TINF-07', 'SORT-05', 'OEB-02', 'OEB-03', 'TINF-18'],
       feedsInto: ['OEB-06', 'OEB-07', 'OEB-08', 'PKGA-06', 'NPI-05'],
       runsWith: [],
       revisedBy: [],
@@ -460,7 +460,7 @@ export const OEB_WRITE_UPS: CpoWriteUps = {
       'Predicted engine escape rate against target',
     ],
     links: {
-      dependsOn: ['OEB-05', 'OESD-05', 'MODL-04', 'SORT-06', 'OEB-06'],
+      dependsOn: ['OEB-05', 'OESD-05', 'MODL-04', 'SORT-06', 'OEB-06', 'TINF-18'],
       feedsInto: ['OEB-08', 'OEB-09', 'PKGA-06', 'NPI-05'],
       runsWith: [],
       revisedBy: [],

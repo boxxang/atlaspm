@@ -44,4 +44,9 @@ export const TINF_GLOSSARY: CpoGlossary = {
     group: 'test',
     note: 'Operating a finished system for a set period, often under load and temperature, before final test and shipment, to expose early failures at the system level.',
   },
+  'Optical test socket': {
+    full: 'Optical test socket',
+    group: 'test',
+    note: 'A test socket that makes electrical contact to a packaged part and couples light into and out of its fiber or optical ports repeatably, so optical parameters can be measured in production without permanent connections.',
+  },
 };

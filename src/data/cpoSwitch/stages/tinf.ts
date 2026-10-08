@@ -8,7 +8,7 @@ export const TINF: CpoStageModule = {
   content: {
     tagline: 'Build the factory that tests, calibrates and assembles the switch before the first wafer exists.',
     description:
-      'Turn the test architecture into hardware, programs and processes a factory can run: probe cards and optical wafer probe, load boards and sockets, the system-level test platform, electrical, optical and calibration test programs, the factory calibration flow and its per-lane data, optical source burn-in and screening, key and fuse provisioning, the assembly, fiber attach, rework and box build processes, the test sites that will run all of it, the post-silicon validation, characterization and qualification plans, and the data system that traces every unit from wafer to shipped switch. Test hardware and optical fixtures carry lead times longer than the fab cycle, so this work starts a year before tapeout. The stage closes when every insertion the first builds need has correlated hardware, a debugged program and a place to put its data.',
+      'Turn the test architecture into hardware, programs and processes a factory can run: probe cards and optical wafer probe, load boards and sockets, the system-level test platform, electrical, optical and calibration test programs, the factory calibration flow and its per-lane data, optical source burn-in and screening, key and fuse provisioning, the assembly, fiber attach, rework and box build processes, the test sites that will run all of it, the post-silicon validation, characterization and qualification plans, and the data system that traces every unit from wafer to shipped switch. Test hardware and optical fixtures carry lead times longer than the fab cycle, so this work starts a year before tapeout. The stage closes when every insertion the first builds need has correlated hardware, a debugged program and a place to put its data. The optical engine gets its own unit test — socket, fiber interface, program and capacity — separate from the optical wafer probe, so every stacked engine is binned before a main package is risked on it.',
     activities: [
       'Test strategy',
       'Probe cards',
@@ -27,6 +27,7 @@ export const TINF: CpoStageModule = {
       'Test sites',
       'Rework and scrap policy',
       'Box build process',
+      'Engine test hardware',
     ],
     deliverables: [
       'Production test strategy and per-insertion coverage plan',
@@ -46,10 +47,11 @@ export const TINF: CpoStageModule = {
       'Test site plan and test subcontractor qualification report',
       'Rework, repair and scrap policy for optical engines, fiber attach and optical sources',
       'System board assembly and box build process specification — in-circuit test, run-in and final system test',
+      'Optical engine unit test hardware, test program and capacity plan',
     ],
-    deliverableFrom: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16],
-    deliverableWeek: [8, 50, 56, 60, 64, 66, 64, 60, 60, 64, 68, 60, 64, 58, 50, 62, 64],
-    engineeringEffort: [6, 14, 22, 16, 24, 36, 18, 6, 30, 20, 3, 12, 10, 14, 8, 6, 16],
+    deliverableFrom: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17],
+    deliverableWeek: [8, 50, 56, 60, 64, 66, 64, 60, 60, 64, 68, 60, 64, 58, 50, 62, 64, 66],
+    engineeringEffort: [6, 14, 22, 16, 24, 36, 18, 6, 30, 20, 3, 12, 10, 14, 8, 6, 16, 14],
     risks: [
       'Probe cards, load boards and optical fixtures arrive after the first wafers',
       'Optical test fixtures that do not correlate with each other or with the lab',
@@ -408,6 +410,27 @@ export const TINF: CpoStageModule = {
         'Box build process specification',
       ],
       r: [['TINF-D17', 'produces'], ['TINF-D11', 'feeds']],
+    },
+    'TINF-18': {
+      s: [
+        [1, 'Derive the engine-level test list from the known-good engine test strategy — electrical, optical, thermal and calibration', 2],
+        [2, 'Design the engine test socket and fiber interface with repeatable coupling to the test optics', 6],
+        [3, 'Build and qualify the engine test fixtures against reference engines from the test vehicle builds', 8],
+        [4, 'Write the engine test program — supplies, driver and receiver checks, optical power, extinction ratio and sensitivity', 10, 1],
+        [5, 'Correlate the engine tester against the lab bench and set guard bands', 4],
+        [6, 'Model engine test time and size test capacity for the first builds and the ramp', 3, 1],
+        [7, 'Release the engine test hardware, program and capacity plan to the engine build', 2],
+      ],
+      o: [
+        'Engine-level test list with limits source per test',
+        'Engine test socket and fiber interface design',
+        'Qualified engine test fixtures',
+        'Engine test program',
+        'Tester-to-bench correlation with guard bands',
+        'Engine test time and capacity model',
+        'Optical engine unit test hardware, test program and capacity plan',
+      ],
+      r: [['TINF-D18', 'produces'], ['TINF-D11', 'feeds']],
     },
   },
 };

@@ -8,7 +8,7 @@ export const CHAR: CpoStageModule = {
   content: {
     tagline: 'Measure what the silicon, the optics and the system actually do, across corners, before anyone promises it.',
     description:
-      'Characterize every workstream on corner and skew units rather than the one golden board that brought the link up: electrical and die-to-die link margins, optical transmit and receive performance across temperature, switching throughput, latency and congestion behavior, and power per bit at full load. Every frozen interface control document is checked parameter by parameter on real hardware, and the pre-silicon models are corrected against measurement. Firmware and software are system-tested for scale, stability, restart, upgrade and fault recovery, field replacement is proven on the units a technician will service, and the datasheet is written from measured data. The stage closes on an all-port, full-bandwidth system demonstration run at worst-case thermal conditions with production-intent firmware and calibration.',
+      'Characterize every workstream on corner and skew units rather than the one golden board that brought the link up: electrical and die-to-die link margins, the electrical IC and the photonic IC each on its own — driver, TIA and bias loops, modulators, detectors, ring tuning and loss — so a weak engine can be traced to the die behind it, optical transmit and receive performance across temperature, switching throughput, latency and congestion behavior, and power per bit at full load. Every frozen interface control document is checked parameter by parameter on real hardware, and the pre-silicon models are corrected against measurement. Firmware and software are system-tested for scale, stability, restart, upgrade and fault recovery, field replacement is proven on the units a technician will service, and the datasheet is written from measured data. The stage closes on an all-port, full-bandwidth system demonstration run at worst-case thermal conditions with production-intent firmware and calibration.',
     activities: [
       'Characterization plan',
       'Electrical link',
@@ -21,6 +21,8 @@ export const CHAR: CpoStageModule = {
       'Datasheet and collateral',
       'Serviceability',
       'FW / SW system test',
+      'Electrical IC characterization',
+      'Photonic IC characterization',
     ],
     deliverables: [
       'Characterization plan and corner lot matrix',
@@ -34,10 +36,12 @@ export const CHAR: CpoStageModule = {
       'Product datasheet, application notes and design-in guide',
       'Serviceability and field-replacement validation report',
       'Firmware and software system test report',
+      'Electrical IC characterization report — driver, TIA and bias control across corners',
+      'Photonic IC characterization report — modulator, detector, ring tuning and loss across temperature',
     ],
-    deliverableFrom: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
-    deliverableWeek: [3, 16, 16, 18, 16, 18, 20, 20, 20, 20, 20],
-    engineeringEffort: [3, 30, 36, 30, 10, 14, 10, 12, 6, 10, 24],
+    deliverableFrom: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
+    deliverableWeek: [3, 16, 16, 18, 16, 18, 20, 20, 20, 20, 20, 14, 14],
+    engineeringEffort: [3, 30, 36, 30, 10, 14, 10, 12, 6, 10, 24, 8, 10],
     risks: [
       'Characterization run on golden units only, so corner-lot margins are unknown at the gate',
       'Optical performance measured at room temperature and extrapolated to the thermal envelope',
@@ -195,7 +199,7 @@ export const CHAR: CpoStageModule = {
     'CHAR-07': {
       s: [
         [1, 'Collect the characterized electrical, optical, power and performance data sets', 1],
-        [2, 'Correlate the SerDes channel and optical link models against measured margins', 2],
+        [2, 'Correlate the SerDes channel, optical link and electrical and photonic IC models against measured margins', 2],
         [3, 'Correlate the power, thermal and PDN models against measured silicon', 2, 1],
         [4, 'Correlate the traffic and buffer model against measured congestion behavior', 1.5],
         [5, 'Update model parameters and record residual error against the accuracy targets', 1.5],
@@ -282,6 +286,44 @@ export const CHAR: CpoStageModule = {
         'Firmware and software system test report',
       ],
       r: [['CHAR-D11', 'produces'], ['CHAR-D8', 'feeds']],
+    },
+    'CHAR-12': {
+      s: [
+        [1, 'Select electrical IC units across the corner lot matrix and the bias trim bins', 0.5],
+        [2, 'Measure driver output swing, rise time and equalization range across supply and temperature', 3],
+        [3, 'Measure TIA sensitivity, bandwidth, input-referred noise and overload across corners', 3, 1],
+        [4, 'Characterize the bias, heater driver and monitor photodiode loops — DAC linearity, settling and loop stability', 2.5],
+        [5, 'Compare measured electrical IC behavior with the pre-silicon models and the sort limits', 2],
+        [6, 'Release the electrical IC characterization report', 1],
+      ],
+      o: [
+        'Selected electrical IC units with corner and trim bin',
+        'Driver swing, rise time and equalization results',
+        'TIA sensitivity, bandwidth, noise and overload results',
+        'Bias, heater driver and monitor loop characterization',
+        'Measured-versus-model and sort-limit comparison',
+        'Electrical IC characterization report',
+      ],
+      r: [['CHAR-D12', 'produces'], ['CHAR-D7', 'feeds']],
+    },
+    'CHAR-13': {
+      s: [
+        [1, 'Select photonic IC units and engines across process splits and wafer positions', 0.5],
+        [2, 'Measure modulator efficiency, bandwidth and extinction ratio across temperature', 3],
+        [3, 'Measure detector responsivity, dark current and bandwidth across temperature', 3, 1],
+        [4, 'Characterize ring resonance, heater tuning efficiency and thermal crosstalk between neighboring channels', 2.5],
+        [5, 'Measure waveguide, coupler and multiplexer loss against the loss allocation and correlate with wafer-level optical test', 2],
+        [6, 'Release the photonic IC characterization report', 1],
+      ],
+      o: [
+        'Selected photonic IC units with split and wafer position',
+        'Modulator efficiency, bandwidth and extinction ratio results',
+        'Detector responsivity, dark current and bandwidth results',
+        'Ring resonance, tuning efficiency and thermal crosstalk results',
+        'Measured loss against allocation and wafer-level correlation',
+        'Photonic IC characterization report',
+      ],
+      r: [['CHAR-D13', 'produces'], ['CHAR-D7', 'feeds']],
     },
   },
 };

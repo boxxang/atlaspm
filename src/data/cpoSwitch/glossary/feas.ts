@@ -24,4 +24,9 @@ export const FEAS_GLOSSARY: CpoGlossary = {
     group: 'pkg',
     note: 'The out-of-plane bow of a substrate or assembled package across temperature, driven by CTE mismatch between die, bridge, substrate and lid. In a co-packaged optics package it also moves the optical engines relative to their fibers.',
   },
+  'Scanning acoustic microscopy': {
+    full: 'Scanning acoustic microscopy',
+    group: 'test',
+    note: 'Non-destructive inspection that images voids, delamination and non-wet bonds inside a stack or under an underfill by reflecting ultrasound off the internal interfaces.',
+  },
 };

@@ -29,4 +29,9 @@ export const TRDY_GLOSSARY: CpoGlossary = {
     group: 'program',
     note: 'A legal opinion that the product can be made and sold without infringing third-party patents, reached by mapping the design against a patent landscape and resolving each exposure by design-around, licence or accepted risk.',
   },
+  'Process qualification run': {
+    full: 'Process qualification run',
+    group: 'process',
+    note: 'A set of lots built on the production process and line with the production recipe to show each step meets its yield and capability targets before product material is committed to it.',
+  },
 };

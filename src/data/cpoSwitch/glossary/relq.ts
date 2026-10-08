@@ -34,4 +34,9 @@ export const RELQ_GLOSSARY: CpoGlossary = {
     group: 'qual',
     note: 'A structured list of the ways the design can fail, their effects and causes, ranked by severity, occurrence and detection. Qualification maps its high-ranked reliability failure modes to stress tests that can accelerate them.',
   },
+  'Temperature cycling': {
+    full: 'Temperature cycling',
+    group: 'test',
+    note: 'Repeated swings between cold and hot extremes that fatigue joints and interfaces through mismatched expansion. On an optical engine it stresses the bond between the stacked dies and the fiber coupling, so coupling loss is measured at each readpoint, not only electrical continuity.',
+  },
 };

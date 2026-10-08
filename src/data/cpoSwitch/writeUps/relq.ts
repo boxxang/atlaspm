@@ -7,7 +7,7 @@ export const RELQ_WRITE_UPS: CpoWriteUps = {
   'RELQ-01': {
     criticalPath: true,
     purpose: [
-      'Plan the <b>qualification of every part that can wear out</b> — silicon, photonic ICs, optical source, package and bridge, fiber attach, board and system — with the stress tests, sample sizes, lots, readpoints and acceptance criteria each needs, and which tests start now versus on the production stepping.',
+      'Plan the <b>qualification of every part that can wear out</b> — silicon, photonic ICs, optical source, the optical engine package as an item of its own, the main package and bridge, fiber attach, board and system — with the stress tests, sample sizes, lots, readpoints and acceptance criteria each needs, and which tests start now versus on the production stepping.',
       'A co-packaged switch mixes qualification cultures: silicon has mature stress methods, the optical source and photonics have their own, and fiber attach inside a package has few precedents. The plan brings them to one mission profile and one schedule, and it is where the long optical aging tests are started early enough to finish.',
     ],
     flowNote:
@@ -49,7 +49,7 @@ export const RELQ_WRITE_UPS: CpoWriteUps = {
       'Qualification unit build slots available in the NPI plan',
     ],
     exit: [
-      'Every high-ranked design FMEA failure mode and every component has a named stress test with sample sizes, lots and acceptance criteria',
+      'Every high-ranked design FMEA failure mode and every item, the optical engine package included, has a named stress test with sample sizes, lots and acceptance criteria',
       'Every test marked as first-silicon or production-stepping with the reason',
       'Plan approved by reliability, quality and the owners of each component',
     ],
@@ -63,7 +63,7 @@ export const RELQ_WRITE_UPS: CpoWriteUps = {
     ],
     links: {
       dependsOn: ['REQ-07', 'TINF-14', 'SDBG-04', 'NPI-01', 'TRDY-07', 'DSGN-18'],
-      feedsInto: ['RELQ-02', 'RELQ-03', 'RELQ-04', 'RELQ-05', 'RELQ-06', 'RELQ-07', 'NPI-03', 'SDBG-06'],
+      feedsInto: ['RELQ-02', 'RELQ-03', 'RELQ-04', 'RELQ-05', 'RELQ-06', 'RELQ-07', 'NPI-03', 'SDBG-06', 'RELQ-08'],
       runsWith: [],
       revisedBy: ['SDBG-06'],
       feedsBackInto: [],
@@ -393,7 +393,7 @@ export const RELQ_WRITE_UPS: CpoWriteUps = {
       'Every failure dispositioned with root cause and corrective action',
       'Qualification approved and signed, with burn-in and run-in durations set and any conditions owned and dated before production release',
     ],
-    dependsOn: ['RELQ-01', 'RELQ-02', 'RELQ-03', 'RELQ-04', 'RELQ-05', 'RELQ-07', 'SDBG-06'],
+    dependsOn: ['RELQ-01', 'RELQ-02', 'RELQ-03', 'RELQ-04', 'RELQ-05', 'RELQ-07', 'SDBG-06', 'RELQ-08'],
     dependsNote: null,
     feedsInto: ['NPI-08', 'RAMP-01', 'RAMP-07'],
     measuredBy: [
@@ -402,7 +402,7 @@ export const RELQ_WRITE_UPS: CpoWriteUps = {
       'Approval conditions open',
     ],
     links: {
-      dependsOn: ['RELQ-01', 'RELQ-02', 'RELQ-03', 'RELQ-04', 'RELQ-05', 'RELQ-07', 'SDBG-06'],
+      dependsOn: ['RELQ-01', 'RELQ-02', 'RELQ-03', 'RELQ-04', 'RELQ-05', 'RELQ-07', 'SDBG-06', 'RELQ-08'],
       feedsInto: ['NPI-08', 'RAMP-01', 'RAMP-07', 'SUST-02'],
       runsWith: [],
       revisedBy: [],
@@ -475,5 +475,72 @@ export const RELQ_WRITE_UPS: CpoWriteUps = {
       feedsBackInto: [],
     },
     terms: ['Delta qualification', 'Stepping', 'HTOL', 'Latch-up'],
+  },
+  'RELQ-08': {
+    criticalPath: false,
+    purpose: [
+      'Qualify the <b>optical engine package as an item of its own</b>: the bond interface between the electrical IC and the photonic IC, the stability of the fiber coupling and the stack as a whole under temperature cycling, thermal shock and biased operating life — on known-good engines from the optical engine build, with coupling loss and continuity measured in situ at every readpoint.',
+      'The boundaries are deliberate. RELQ-03 qualifies the photonic die and the optical source as components, and RELQ-04 the main package, its fiber egress and the board-level joints; neither stresses the stacked bond or the engine-level coupling, which are what an optical engine is bought as. Because the engine is a known-good sub-product with its own build line, it carries its own qualification, so an engine-line change can be requalified without rerunning the whole package.',
+    ],
+    flowNote:
+      'Step 1 sets the stack stress matrix. Step 2 builds qualification engines with baselines. Step 3 runs temperature cycling and thermal shock while step 4 runs biased operating life in parallel. Step 5 checks bond integrity after stress, step 6 fits lifetime models and step 7 releases the report.',
+    consumes: [
+      'Reliability qualification plan and stress matrix from RELQ-01',
+      'Known-good optical engines and their release record from OEB-09',
+      'Per-engine electrical and optical test baselines from OEB-05',
+      'Optical engine stack design freeze package and bond interface rules from OESD-07',
+      'Mission profile and environmental requirements from REQ-07',
+    ],
+    rel: {
+      'RELQ-D9': '<b>Optical engine stack qualification report — bond interface, coupling stability and thermal cycling.</b> Produced here; it is the evidence that a known-good engine stays good in the field.',
+      'RELQ-D6': '<b>Product qualification report and approval record.</b> The optical engine package is one of the items the approval covers.',
+    },
+    risks: [
+      '<b>Engine stresses folded into the package.</b> The stack is only stressed inside complete packages, so a bond failure cannot be separated from a package failure.',
+      '<b>Coupling measured only at the end.</b> Coupling loss is checked after stress, missing a drift that recovers at room temperature.',
+      '<b>Engines not from the engine line.</b> Qualification engines are hand-built and do not represent the stacking and attach process that ships.',
+      '<b>Bond integrity unexamined.</b> Electrical continuity passes while voids or cracks grow in the bond interface.',
+      '<b>Lifetime extrapolated from too few cycles.</b> Cycling stops at the minimum count and the coupling drift has no slope to fit.',
+    ],
+    roles: [
+      { r: 'Reliability', d: 'Owns the optical engine stack qualification' },
+      { r: 'Packaging engineer', d: 'Bond interface failure modes and post-stress analysis' },
+      { r: 'Optical engineer', d: 'In-situ coupling loss measurement at each readpoint' },
+      { r: 'Photonics engineer', d: 'Responsivity, modulation and heater drift interpretation' },
+      { r: 'Quality engineer', d: 'Approves the report for the qualification record' },
+    ],
+    effort: [
+      ['Stress matrix and engine build', 2],
+      ['Temperature cycling and thermal shock', 5],
+      ['Biased operating life', 5],
+      ['Bond integrity analysis', 2],
+      ['Lifetime models and report', 2],
+    ],
+    entry: [
+      'Qualification plan released with the optical engine package as its own item',
+      'Known-good engines released from the optical engine build',
+      'In-situ optical measurement fixtures qualified in the stress chambers',
+    ],
+    exit: [
+      'Every stack stress completed on engines from the production stacking and attach process, with readpoints logged',
+      'Coupling loss drift per lane within the link budget allocation at end of life',
+      'Every failure dispositioned with bond or coupling root cause and the report approved',
+    ],
+    dependsOn: ['RELQ-01', 'OEB-09', 'OEB-05'],
+    dependsNote: 'Stressing starts on known-good engines from the first build, so engine qualification runs beside the main package qualification rather than after it.',
+    feedsInto: ['RELQ-06'],
+    measuredBy: [
+      'Engines through each stress readpoint versus plan',
+      'Coupling loss drift per lane against the allocation',
+      'Bond interface failures found in post-stress analysis',
+    ],
+    links: {
+      dependsOn: ['RELQ-01', 'OEB-09', 'OEB-05', 'OESD-07'],
+      feedsInto: ['RELQ-06', 'NPI-08'],
+      runsWith: ['RELQ-03', 'RELQ-04'],
+      revisedBy: [],
+      feedsBackInto: ['OEB-07'],
+    },
+    terms: ['KGOE', 'Hybrid bonding', 'Coupling loss', 'Temperature cycling', 'CSAM', 'HTOL'],
   },
 };

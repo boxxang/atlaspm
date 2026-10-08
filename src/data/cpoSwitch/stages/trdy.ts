@@ -8,7 +8,7 @@ export const TRDY: CpoStageModule = {
   content: {
     tagline: 'Make sure every process, IP block, tool and supplier the design will need is real, qualified and reserved before the design needs it.',
     description:
-      'Select the foundries and processes for the Switch SoC and I/O die, the electrical ICs and the photonic ICs, and prove the PDKs, libraries, memory compilers, compact models and co-design EDA flow are mature enough to design on. Qualify the SerDes and third-party IP, the package, substrate and assembly partners, the optical source suppliers, the fiber, connector, board and cooling supply base and the system manufacturing partner, and clear the patent and licensing position. Lock the long-lead materials — substrates, optical sources, fiber assemblies and test hardware — with supply agreements, capacity reservations and second sources. The stage closes on a readiness review that rates every item ready, conditional or not ready, with the supply risks stated.',
+      'Select the foundries and processes for the Switch SoC and I/O die, the electrical ICs and the photonic ICs, and prove the PDKs, libraries, memory compilers, compact models and co-design EDA flow are mature enough to design on. Qualify the SerDes and third-party IP, the package, substrate and assembly partners, the optical source suppliers, the fiber, connector, board and cooling supply base and the system manufacturing partner, and clear the patent and licensing position. Lock the long-lead materials — substrates, optical sources, fiber assemblies and test hardware — with supply agreements, capacity reservations and second sources. The stage closes on a readiness review that rates every item ready, conditional or not ready, with the supply risks stated. The optical engine stacking process is qualified with its assembly partner on its own, because stacking an electrical IC on a photonic IC is a different line from main package assembly and its design rules fix how the stack is drawn.',
     activities: [
       'Foundry selection',
       'Photonics foundry and PDK',
@@ -24,6 +24,7 @@ export const TRDY: CpoStageModule = {
       'Electrical IC foundry selection',
       'System manufacturing partner',
       'IP rights and freedom to operate',
+      'Engine stacking readiness',
     ],
     deliverables: [
       'Switch SoC and I/O die foundry and process selection record',
@@ -40,10 +41,11 @@ export const TRDY: CpoStageModule = {
       'Electrical IC process and foundry selection record',
       'System manufacturing partner selection and line readiness plan',
       'Freedom-to-operate opinion and licensing clearance record',
+      'Optical engine stacking process and assembly partner readiness assessment',
     ],
-    deliverableFrom: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13],
-    deliverableWeek: [10, 24, 30, 36, 36, 32, 40, 40, 28, 44, 52, 12, 52, 40],
-    engineeringEffort: [4, 12, 14, 16, 12, 10, 10, 6, 14, 5, 2, 3, 6, 5],
+    deliverableFrom: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14],
+    deliverableWeek: [10, 24, 30, 36, 36, 32, 40, 40, 28, 44, 52, 12, 52, 40, 52],
+    engineeringEffort: [4, 12, 14, 16, 12, 10, 10, 6, 14, 5, 2, 3, 6, 5, 8],
     risks: [
       'Single-source optical source or substrate with no reserved capacity',
       'Photonic PDK and compact models too immature to sign off against',
@@ -333,6 +335,27 @@ export const TRDY: CpoStageModule = {
         'Freedom-to-operate opinion and licensing clearance record',
       ],
       r: [['TRDY-D14', 'produces'], ['TRDY-D11', 'feeds']],
+    },
+    'TRDY-15': {
+      s: [
+        [1, 'List the stacking, underfill, engine substrate attach and fiber attach steps the engine needs and the capability each requires', 2],
+        [2, 'Audit candidate assembly partners for stacking equipment, alignment accuracy, cleanliness and capacity', 4],
+        [3, 'Run process qualification lots on test vehicle stacks and review yield and capability per step', 12],
+        [4, 'Agree the assembly design kit, design rules and change notification with the selected partner', 4, 1],
+        [5, 'Reserve engineering and first-build line capacity and the engine substrate supply', 4],
+        [6, 'Confirm tooling, fixtures, inspection and per-engine traceability into the manufacturing data system', 6],
+        [7, 'Release the optical engine stacking process and assembly partner readiness assessment', 2],
+      ],
+      o: [
+        'Engine process step list with required capabilities',
+        'Assembly partner audit results',
+        'Process qualification lot yield and capability per step',
+        'Agreed assembly design kit and change notification terms',
+        'Reserved line capacity and engine substrate supply',
+        'Engine line tooling, inspection and traceability confirmation',
+        'Optical engine stacking process and assembly partner readiness assessment',
+      ],
+      r: [['TRDY-D15', 'produces'], ['TRDY-D11', 'feeds']],
     },
   },
 };
