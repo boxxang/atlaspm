@@ -82,7 +82,7 @@ export const IMPL_WRITE_UPS: CpoWriteUps = {
       'Step 1 fixes the floorplan and the die edges. Steps 2 and 3 place and build clocks. Step 4 is the long closure loop, with IR drop and electromigration fixed in parallel in step 5. Step 6 cleans physical verification; step 7 absorbs late ECOs alongside it, and step 8 hands the database to signoff.',
     consumes: [
       'Staged and final netlists from IMPL-01',
-      'Die-to-package interface and bump pitch from ICD-07',
+      'Die-to-package interface and bump pitch from ICD-07, with the crack stop, seal ring, corner keep-out and dummy bump rules from the CPI vehicle in PKTV-04',
       'Die-to-die and switch-to-I/O interface placement from ICD-02',
       'Standard cells, memories and technology files from TRDY-03',
       'Timing constraints and the mode and corner list signed off with RTL',
@@ -130,7 +130,7 @@ export const IMPL_WRITE_UPS: CpoWriteUps = {
       'Open DRC and LVS violations on the routed database',
     ],
     links: {
-      dependsOn: ['IMPL-01', 'ICD-07', 'ICD-02', 'TRDY-03'],
+      dependsOn: ['IMPL-01', 'ICD-07', 'ICD-02', 'TRDY-03', 'PKTV-04'],
       feedsInto: ['SGNO-01', 'IMPL-07', 'IMPL-11', 'IMPL-08', 'IMPL-09'],
       runsWith: ['IMPL-07'],
       revisedBy: ['PSV-10'],
@@ -149,7 +149,7 @@ export const IMPL_WRITE_UPS: CpoWriteUps = {
     consumes: [
       'I/O die design database — SerDes, die-to-die PHY and die top level — from DSGN-04',
       'Qualified SerDes IP views from TRDY-04',
-      'Switch SoC-to-I/O die and I/O die-to-optical engine interfaces from ICD-02 and ICD-03',
+      'Switch SoC-to-I/O die and I/O die-to-optical engine interfaces from ICD-02 and ICD-03, with the corner keep-out and dummy bump rules from the CPI vehicle in PKTV-04',
       'Electrical channel and SerDes link models from MODL-03',
       'Preliminary package bump map from DSGN-12',
     ],
@@ -197,7 +197,7 @@ export const IMPL_WRITE_UPS: CpoWriteUps = {
       'Lanes with ESD or electromigration waivers',
     ],
     links: {
-      dependsOn: ['DSGN-04', 'TRDY-04', 'ICD-02', 'ICD-03', 'MODL-03', 'DSGN-12'],
+      dependsOn: ['DSGN-04', 'TRDY-04', 'ICD-02', 'ICD-03', 'MODL-03', 'DSGN-12', 'PKTV-04'],
       feedsInto: ['SGNO-02', 'IMPL-07', 'IMPL-08'],
       runsWith: ['PSV-05'],
       revisedBy: [],
@@ -412,7 +412,7 @@ export const IMPL_WRITE_UPS: CpoWriteUps = {
     flowNote:
       'Step 1 closes the bump maps. Step 2 places the components with fiber keep-outs. Step 3 routes the substrate and RDL while step 4 routes the ball map to the board in parallel. Step 5 reviews rules with the substrate supplier and step 6 releases the layout.',
     consumes: [
-      'Package floorplan and preliminary bump map from DSGN-12',
+      'Package floorplan and preliminary bump map from DSGN-12, with the stack-up, core and lid or stiffener decision from PKTV-02 and the preliminary bump, underfill and keep-out rules from PKTV-04, confirmed at the freeze in PKTV-09',
       'Die-to-package and package-to-board interfaces from ICD-07',
       'Die floorplans and bump positions from IMPL-02 and IMPL-03',
       'Bridge and capacitor footprints from IMPL-06',
@@ -463,10 +463,10 @@ export const IMPL_WRITE_UPS: CpoWriteUps = {
       'Substrate layer count against the cost model',
     ],
     links: {
-      dependsOn: ['DSGN-12', 'ICD-07', 'IMPL-02', 'IMPL-03', 'IMPL-06', 'DSGN-13'],
+      dependsOn: ['DSGN-12', 'ICD-07', 'IMPL-02', 'IMPL-03', 'IMPL-06', 'DSGN-13', 'PKTV-02', 'PKTV-04'],
       feedsInto: ['IMPL-08', 'IMPL-09', 'IMPL-10', 'SGNO-06', 'PKGA-01'],
       runsWith: ['IMPL-05'],
-      revisedBy: ['IMPL-09'],
+      revisedBy: ['IMPL-09', 'PKTV-08', 'PKTV-09'],
       feedsBackInto: [],
     },
     terms: ['RDL', 'Bump map', 'KOZ', 'Fiber attach', 'Optical engine'],
@@ -597,10 +597,10 @@ export const IMPL_WRITE_UPS: CpoWriteUps = {
       'Photonic gradient against tuning range',
     ],
     links: {
-      dependsOn: ['IMPL-07', 'MODL-07', 'DSGN-15', 'IMPL-05'],
+      dependsOn: ['IMPL-07', 'MODL-07', 'DSGN-15', 'IMPL-05', 'PKTV-03'],
       feedsInto: ['SGNO-06', 'TINF-09', 'SINT-06'],
       runsWith: ['IMPL-08'],
-      revisedBy: [],
+      revisedBy: ['PKTV-08'],
       feedsBackInto: ['IMPL-07', 'MODL-07'],
     },
     terms: ['CTE', 'Warpage', 'TIM', 'PIC'],

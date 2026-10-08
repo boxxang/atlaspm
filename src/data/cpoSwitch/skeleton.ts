@@ -358,6 +358,27 @@ export const CPO_SKELETON: readonly CpoStageSkeleton[] = [
     ],
   },
 
+  {
+    key: 'cpoPackageTestVehicle',
+    prefix: 'PKTV',
+    title: 'Package Test Vehicles — MTV, TTV & CPI',
+    band: 'designVerify',
+    start: 40,
+    dur: 56,
+    gate: { id: 'cpoPackageWindowFrozen', label: 'Package Process Window Frozen' },
+    activities: [
+      a('PKTV-01', 'Package Test Vehicle Strategy and Risk Coverage Matrix — Main Package and Optical Engine Package', 'Packaging', [0, 6], 'package'),
+      a('PKTV-02', 'Main Package Mechanical Test Vehicle (MTV) — Product Body, Stack-Up, Bump Map, Bridge, Lid or Stiffener and Optical Engine Sites', 'Packaging', [8, 38], 'package'),
+      a('PKTV-03', 'Main Package Thermal Test Vehicle (TTV) — Switch SoC Power Map, TIM, Lid and Optical Engine Site Temperature', 'Thermal and mechanical', [8, 42], 'package'),
+      a('PKTV-04', 'Chip-Package Interaction (CPI) Vehicle — Low-k and BEOL Stress, Bump and Underfill DOE on the Switch SoC and I/O Die Node', 'Technology and foundry', [0, 40], 'package'),
+      a('PKTV-05', 'Optical Engine Package Thermal and Mechanical Test Vehicle — Heater Crosstalk, Fiber Strain Relief and Coupling Shift Through Reflow', 'Optical engineering', [16, 44], 'oe'),
+      a('PKTV-06', 'Assembly Process Window DOE Response Fit and Confirmation Lot — Die and Bridge Attach, Underfill, Lid and Engine Mounting', 'Manufacturing and NPI', [30, 48], 'package'),
+      a('PKTV-07', 'Board-Level Reliability on the Vehicles — Temperature Cycling, Shock and Fiber Retention', 'Reliability', [16, 48], 'package'),
+      a('PKTV-08', 'Vehicle-to-Model Correlation — Warpage, Thermal and Stress Models', 'Thermal and mechanical', [40, 52], 'package'),
+      a('PKTV-09', 'Package Process Window Freeze Review', 'Packaging', [52, 56], 'package'),
+    ],
+  },
+
   /* ---------------- implement ---------------- */
   {
     key: 'cpoImplementation',
@@ -549,7 +570,7 @@ export const CPO_SKELETON: readonly CpoStageSkeleton[] = [
       a('PKGA-09', 'Bring-Up Lab, Debug Infrastructure and Station Readiness', 'Validation', [24, 48], 'system'),
       a('PKGA-10', 'Bring-Up Firmware, SDK and Diagnostics Readiness on the Final Netlist', 'Firmware', [0, 36], 'system'),
       a('PKGA-11', 'Electrical-Only Engineering Package Build — Switch and I/O Dies Without Optical Engines', 'Packaging', [32, 38], 'package'),
-      a('PKGA-12', 'Mechanical and Daisy-Chain Dry-Run Build on the Product Substrate', 'Packaging', [24, 30], 'package'),
+      a('PKGA-12', 'Final Daisy-Chain Dry-Run Build on the Released Product Substrate', 'Packaging', [24, 30], 'package'),
     ],
   },
 

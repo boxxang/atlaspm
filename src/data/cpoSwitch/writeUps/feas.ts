@@ -414,7 +414,7 @@ export const FEAS_WRITE_UPS: CpoWriteUps = {
     criticalPath: true,
     purpose: [
       'Prove the <b>package can be built and cooled</b>: a test vehicle at product body size with the bridge or interposer, daisy chains, thermal test die and optical engine sites, measured for warpage, bump and bridge yield and thermal resistance.',
-      'A co-packaged optics package is larger and more heterogeneous than any the assembly partner has made at volume, and it has to hold fibers still. Warpage at the optical engine sites, bridge yield and the temperature the engines see beside the switch die are the three results that decide whether the package architecture holds.',
+      'A co-packaged optics package is larger and more heterogeneous than any the assembly partner has made at volume, and it has to hold fibers still. Warpage at the optical engine sites, bridge yield and the temperature the engines see beside the switch die are the three results that decide whether the package architecture holds. This is the feasibility vehicle on candidate technology; the product-specific MTV, TTV and CPI vehicles on the frozen body size, bump map and bridge follow in PKTV after the interface freeze.',
     ],
     flowNote:
       'Step 1 defines the vehicle and step 2 designs it. Step 3 fabricates and assembles at the partner. Step 4 measures warpage, then step 5 runs daisy-chain yield and thermal cycling in parallel with the thermal measurements in step 6. Step 7 releases the report.',
@@ -462,7 +462,7 @@ export const FEAS_WRITE_UPS: CpoWriteUps = {
     ],
     dependsOn: ['FEAS-01', 'CON-03'],
     dependsNote: 'Runs with the package and thermal architecture in SARC-05 and SARC-07, which it informs.',
-    feedsInto: ['FEAS-09', 'MODL-07', 'DSGN-12'],
+    feedsInto: ['FEAS-09', 'MODL-07', 'DSGN-12', 'PKTV-01'],
     measuredBy: [
       'Warpage at optical engine sites',
       'Daisy-chain yield after cycling',
@@ -470,7 +470,7 @@ export const FEAS_WRITE_UPS: CpoWriteUps = {
     ],
     links: {
       dependsOn: ['FEAS-01', 'CON-03'],
-      feedsInto: ['FEAS-09', 'FEAS-10', 'TRDY-06', 'MODL-06', 'MODL-07', 'MODL-11', 'DSGN-12', 'DSGN-15'],
+      feedsInto: ['FEAS-09', 'FEAS-10', 'TRDY-06', 'MODL-06', 'MODL-07', 'MODL-11', 'DSGN-12', 'DSGN-15', 'PKTV-01', 'PKTV-06'],
       runsWith: ['SARC-05', 'SARC-07', 'TRDY-06'],
       revisedBy: [],
       feedsBackInto: [],
@@ -799,7 +799,7 @@ export const FEAS_WRITE_UPS: CpoWriteUps = {
     ],
     links: {
       dependsOn: ['FEAS-01', 'FEAS-03', 'FEAS-04', 'FEAS-06'],
-      feedsInto: ['FEAS-09', 'OESD-01', 'OESD-06', 'TRDY-15'],
+      feedsInto: ['FEAS-09', 'OESD-01', 'OESD-06', 'TRDY-15', 'PKTV-01', 'PKTV-05'],
       runsWith: ['FEAS-07'],
       revisedBy: [],
       feedsBackInto: [],

@@ -45,7 +45,8 @@ const ROWS = [
   ['cpoProgramControl'],
   ['cpoDesign'],
   ['cpoPresilicon'],
-  ['cpoOeStackDesign', 'cpoTestInfra'],
+  ['cpoOeStackDesign'],
+  ['cpoPackageTestVehicle', 'cpoTestInfra'],
   ['cpoImplementation'],
   ['cpoSignoff'],
   ['cpoTapeoutOptical'],
@@ -88,6 +89,14 @@ const EDGES: [string, string][] = [
   ['cpoReadiness', 'cpoOeStackDesign'],
   ['cpoOeStackDesign', 'cpoTestInfra'],
   ['cpoOeStackDesign', 'cpoImplementation'],
+  ['cpoInterfaces', 'cpoPackageTestVehicle'],
+  ['cpoDesign', 'cpoPackageTestVehicle'],
+  ['cpoFeasibility', 'cpoPackageTestVehicle'],
+  ['cpoOeStackDesign', 'cpoPackageTestVehicle'],
+  ['cpoPackageTestVehicle', 'cpoTestInfra'],
+  ['cpoPackageTestVehicle', 'cpoImplementation'],
+  ['cpoPackageTestVehicle', 'cpoSignoff'],
+  ['cpoPackageTestVehicle', 'cpoAssembly'],
   ['cpoOeStackDesign', 'cpoSignoff'],
   ['cpoOeStackDesign', 'cpoTapeoutOptical'],
   ['cpoPresilicon', 'cpoSignoff'],
@@ -149,6 +158,7 @@ const RIBS: [string, string][] = [
   ['cpoModeling', 'cpoDesign'],
   ['cpoOeStackDesign', 'cpoTapeoutOptical'],
   ['cpoPresilicon', 'cpoSignoff'],
+  ['cpoPackageTestVehicle', 'cpoSignoff'],
   ['cpoTapeout', 'cpoFabrication'],
   ['cpoTestInfra', 'cpoSort'],
   ['cpoSort', 'cpoAssembly'],
@@ -168,7 +178,7 @@ const CFG = {
   spine: SPINE,
   ribs: RIBS,
   siliconNote:
-    '<b>Spine</b> (bold) from concept to sustaining, through the path that sets the first package build: photonic and electrical ICs taped out in wave 1, fabricated, sorted and stacked into known-good optical engines, then mounted on the main package. <b>Feeds</b> (dashed) show where each block of work lands on it: feasibility → architecture, readiness &amp; models → detailed design, optical engine stack freeze → wave 1 tapeout, pre-silicon validation → signoff, wave 2 tapeout (Switch SoC and I/O die) → fabrication, test infrastructure → wafer sort, known-good Switch SoC and I/O dies → main package build (its second input), debug → qualification, compliance &amp; NPI → production release.',
+    '<b>Spine</b> (bold) from concept to sustaining, through the path that sets the first package build: photonic and electrical ICs taped out in wave 1, fabricated, sorted and stacked into known-good optical engines, then mounted on the main package. <b>Feeds</b> (dashed) show where each block of work lands on it: feasibility → architecture, readiness &amp; models → detailed design, optical engine stack freeze → wave 1 tapeout, pre-silicon validation and the package test vehicles (MTV, TTV, CPI) → signoff, wave 2 tapeout (Switch SoC and I/O die) → fabrication, test infrastructure → wafer sort, known-good Switch SoC and I/O dies → main package build (its second input), debug → qualification, compliance &amp; NPI → production release.',
   second: {
     label: 'Package, optics &amp; test path',
     nodes: [
@@ -178,6 +188,7 @@ const CFG = {
       'cpoInterfaces',
       'cpoDesign',
       'cpoOeStackDesign',
+      'cpoPackageTestVehicle',
       'cpoTestInfra',
       'cpoSort',
       'cpoOeBuild',
@@ -187,7 +198,7 @@ const CFG = {
       'cpoNpi',
       'cpoRamp',
     ],
-    note: 'Test vehicles and supplier readiness → optical engine stack and main package designed beside the silicon → sort → known-good optical engines → main package first build from known-good dies and known-good engines → optical bring-up → NPI builds → production release.',
+    note: 'Test vehicles and supplier readiness → optical engine stack and main package designed beside the silicon → package test vehicles (MTV, TTV, CPI) freeze the assembly process window before the substrate is released → sort → known-good optical engines → main package first build from known-good dies and known-good engines → optical bring-up → NPI builds → production release.',
   },
   /* hand-offs drawn even though a longer route reaches the same stage: the
      main package build's second input, and the standalone engine bring-up */

@@ -8,7 +8,7 @@ export const PKGA: CpoStageModule = {
   content: {
     tagline: 'Put the Switch SoC, the I/O die and the known-good optical engines on one substrate and turn them into the first working switch packages.',
     description:
-      'The main package takes two inputs that arrive by different roads: known-good Switch SoC and I/O dies from the die bank, and known-good optical engines from the engine build, each with its own gate. Procure the long-lead material — main package substrates, bridges, fiber egress hardware and the optical source modules the validation systems will use — while the wafers are still in the fab, plan the engineering build as a matrix of split conditions, prove the product substrate with a daisy-chain dry run, and build an electrical-only package so power-on can start before a single engine is ready. Then assemble the full build: bridge and Switch SoC and I/O die attach as soon as the die kits are released, known-good optical engine mounting with fiber egress routing and strain relief once the engines are, package-level electrical and optical test on a calibrated lab laser, the validation boards and systems bring-up will run on with the external optical source modules connected to them — the source is serviced from the front panel and is never part of the package — and a first pre-qualification stress on early units. Firmware, the SDK and the bring-up labs are made ready alongside. The engines arrive last — the optical path is the longer one — so die attach is scheduled to finish just before them. The stage closes when packaged units have been tested, binned and delivered on boards to the bring-up labs.',
+      'The main package takes two inputs that arrive by different roads: known-good Switch SoC and I/O dies from the die bank, and known-good optical engines from the engine build, each with its own gate. Procure the long-lead material — main package substrates, bridges, fiber egress hardware and the optical source modules the validation systems will use — while the wafers are still in the fab, plan the engineering build as a matrix of split conditions, confirm the process window frozen on the package test vehicles with a final daisy-chain dry run on the released product substrate, and build an electrical-only package so power-on can start before a single engine is ready. Then assemble the full build: bridge and Switch SoC and I/O die attach as soon as the die kits are released, known-good optical engine mounting with fiber egress routing and strain relief once the engines are, package-level electrical and optical test on a calibrated lab laser, the validation boards and systems bring-up will run on with the external optical source modules connected to them — the source is serviced from the front panel and is never part of the package — and a first pre-qualification stress on early units. Firmware, the SDK and the bring-up labs are made ready alongside. The engines arrive last — the optical path is the longer one — so die attach is scheduled to finish just before them. The stage closes when packaged units have been tested, binned and delivered on boards to the bring-up labs.',
     activities: [
       'First-build material',
       'Build matrix',
@@ -36,7 +36,7 @@ export const PKGA: CpoStageModule = {
       'Bring-up plan, lab readiness certificate and debug station inventory',
       'Bring-up firmware, SDK and diagnostics release validated on the final netlist',
       'Electrical-only engineering packages for early power-on',
-      'Daisy-chain dry-run build report on the product substrate',
+      'Final daisy-chain dry-run report on the released product substrate, confirming the frozen process window',
     ],
     deliverableFrom: [0, 1, 2, 3, 4, 5, 6, 6, 7, 8, 9, 10, 11],
     deliverableWeek: [26, 12, 38, 43, 45, 48, 48, 48, 48, 44, 36, 38, 30],
@@ -270,18 +270,18 @@ export const PKGA: CpoStageModule = {
     },
     'PKGA-12': {
       s: [
-        [1, 'Build daisy-chain die and mechanical dummies matched to the product bump map', 1],
-        [2, 'Assemble them on product substrates with the production attach, underfill and lid flow', 2],
-        [3, 'Measure daisy-chain continuity, warpage and coplanarity at each step', 1],
+        [1, 'Assemble daisy-chain and mechanical dummy die on the first released product substrates with the frozen process window', 2],
+        [2, 'Confirm daisy-chain continuity, warpage and coplanarity at each step against the package test vehicle results', 1],
+        [3, 'Close the open risks the window freeze handed to the dry run', 1, 1],
         [4, 'Mount on a board and run a short thermal cycle to check joints and fiber egress clearances', 1, 1],
-        [5, 'Release the dry-run report with process adjustments for the real build', 1],
+        [5, 'Release the final dry-run report, confirming the window or recording the adjustment for the real build', 1],
       ],
       o: [
-        'Daisy-chain and mechanical dummy die',
-        'Dry-run packages on product substrates',
-        'Continuity, warpage and coplanarity per step',
+        'Dry-run packages on released product substrates',
+        'Continuity, warpage and coplanarity against the vehicle results',
+        'Open freeze risks closed or carried with owners',
         'Board-level thermal cycle and clearance results',
-        'Daisy-chain dry-run build report',
+        'Final daisy-chain dry-run report on the released product substrate',
       ],
       r: [['PKGA-D13', 'produces'], ['PKGA-D3', 'informs']],
     },

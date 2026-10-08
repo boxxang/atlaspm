@@ -100,6 +100,7 @@ export const TRACKS: Track[] = [
       { step: 'Feasibility test vehicle', refs: ['FEAS-06', 'FEAS-12'] },
       { step: 'Stack design and process development', refs: ['OESD-01', 'OESD-02', 'OESD-03', 'OESD-04', 'OESD-05', 'OESD-06'] },
       { step: 'Design freeze', refs: ['OESD-07', 'SGNO-12'] },
+      { step: 'Package test vehicle', refs: ['PKTV-05'] },
       { step: 'Optical engine build', refs: ['OEB-02', 'OEB-03', 'OEB-04'] },
       { step: 'Optical engine test', refs: ['OEB-05', 'OEB-06'] },
       { step: 'Known-good optical engines', refs: ['OEB-07', 'OEB-08', 'OEB-09'] },
@@ -114,6 +115,7 @@ export const TRACKS: Track[] = [
     steps: [
       { step: 'Architecture', refs: ['SARC-05'] },
       { step: 'Design', refs: ['DSGN-12'] },
+      { step: 'Test vehicles (MTV, TTV, CPI) and process window', refs: ['PKTV-02', 'PKTV-03', 'PKTV-04', 'PKTV-06', 'PKTV-07', 'PKTV-08', 'PKTV-09'] },
       { step: 'Implementation', refs: ['IMPL-07'] },
       { step: 'Signoff', refs: ['SGNO-06'] },
       { step: 'Substrate release', refs: ['SGNO-11'] },

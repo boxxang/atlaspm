@@ -65,7 +65,7 @@ export const TRDY_WRITE_UPS: CpoWriteUps = {
     ],
     links: {
       dependsOn: ['CON-06', 'CON-03', 'CON-04', 'FEAS-01'],
-      feedsInto: ['TRDY-03', 'TRDY-04', 'TRDY-05', 'TRDY-06', 'TRDY-11', 'FEAS-02', 'SARC-02'],
+      feedsInto: ['TRDY-03', 'TRDY-04', 'TRDY-05', 'TRDY-06', 'TRDY-11', 'FEAS-02', 'SARC-02', 'PKTV-04'],
       runsWith: ['SARC-01'],
       revisedBy: [],
       feedsBackInto: [],
@@ -403,7 +403,7 @@ export const TRDY_WRITE_UPS: CpoWriteUps = {
     ],
     links: {
       dependsOn: ['TRDY-01', 'FEAS-01', 'FEAS-07'],
-      feedsInto: ['TRDY-10', 'TRDY-11', 'DSGN-12', 'TINF-09'],
+      feedsInto: ['TRDY-10', 'TRDY-11', 'DSGN-12', 'TINF-09', 'PKTV-02'],
       runsWith: ['SARC-05'],
       revisedBy: [],
       feedsBackInto: [],

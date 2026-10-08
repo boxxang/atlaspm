@@ -15,6 +15,7 @@ import { MODL_WRITE_UPS } from './modl';
 import { DSGN_WRITE_UPS } from './dsgn';
 import { PSV_WRITE_UPS } from './psv';
 import { OESD_WRITE_UPS } from './oesd';
+import { PKTV_WRITE_UPS } from './pktv';
 import { IMPL_WRITE_UPS } from './impl';
 import { SGNO_WRITE_UPS } from './sgno';
 import { OTO_WRITE_UPS } from './oto';
@@ -47,6 +48,7 @@ export const CPO_WRITE_UPS: CpoWriteUps = {
   ...DSGN_WRITE_UPS,
   ...PSV_WRITE_UPS,
   ...OESD_WRITE_UPS,
+  ...PKTV_WRITE_UPS,
   ...IMPL_WRITE_UPS,
   ...SGNO_WRITE_UPS,
   ...OTO_WRITE_UPS,

@@ -277,6 +277,7 @@ export const GATE_CLOSERS: Record<string, string> = {
   cpoDesign: 'DSGN-18',
   cpoPresilicon: 'PSV-11',
   cpoOeStackDesign: 'OESD-07',
+  cpoPackageTestVehicle: 'PKTV-09',
   cpoImplementation: 'IMPL-12',
   cpoSignoff: 'SGNO-10',
   cpoTapeoutOptical: 'OTO-04',
@@ -307,6 +308,8 @@ export const KEY_HANDOFFS: { what: string; from: string[]; to: string[] }[] = [
   { what: 'Known-good optical engines → main package engine mounting', from: ['OEB-09'], to: ['PKGA-04'] },
   { what: 'Known-good Switch SoC and I/O dies → main package die attach', from: ['SORT-07'], to: ['PKGA-03'] },
   { what: 'Substrate tooling release → first-build material', from: ['SGNO-11'], to: ['PKGA-01'] },
+  { what: 'Package process window freeze → package signoff, substrate release and the first-build plan', from: ['PKTV-09'], to: ['SGNO-06', 'SGNO-11', 'PKGA-01', 'PKGA-02'] },
+  { what: 'Optical engine stack freeze → optical engine package test vehicle', from: ['OESD-07'], to: ['PKTV-05'] },
   { what: 'Engine unit test hardware → optical engine build and test', from: ['TINF-18'], to: ['OEB-02', 'OEB-05'] },
   { what: 'Optical engine standalone bring-up → system optical bring-up', from: ['OEB-06'], to: ['OBU-03'] },
 ];

@@ -28,7 +28,7 @@ test.describe('the CPO Network Switch System template', () => {
     await expect(cpo).toBeVisible();
     await expect(cpo).toContainText('CPO Network Switch System');
     await expect(cpo).toContainText('Built-in');
-    await expect(cpo).toContainText('30');
+    await expect(cpo).toContainText('31');
     await expect(cpo.locator('[data-edit-template]')).toHaveCount(0);
     await expect(cpo.locator('[data-flowchart="cpoSwitch"]')).toBeVisible();
     for (const id of ['typicalSoC', 'threeDic', 'embeddedSoc']) await expect(page.locator(`[data-template="${id}"]`)).toBeVisible();
@@ -36,7 +36,7 @@ test.describe('the CPO Network Switch System template', () => {
 
   test('starts a program staged by lifecycle, with the gates it is held to', async ({ page }) => {
     const id = await newProgram(page, 'SwitchOne');
-    await expect(stagesLink(page)).toContainText('30');
+    await expect(stagesLink(page)).toContainText('31');
 
     await page.goto(`/p/${id}/stages`);
     for (const key of [
@@ -47,6 +47,7 @@ test.describe('the CPO Network Switch System template', () => {
       'cpoDesign',
       'cpoPresilicon',
       'cpoOeStackDesign',
+      'cpoPackageTestVehicle',
       'cpoTapeoutOptical',
       'cpoTapeout',
       'cpoOeBuild',
@@ -64,6 +65,7 @@ test.describe('the CPO Network Switch System template', () => {
     for (const gate of [
       'Interface Freeze',
       'Optical Engine Stack Design Freeze',
+      'Package Process Window Frozen',
       'Tapeout — Optical Engine Silicon',
       'Tapeout — All Dies',
       'First Silicon',
@@ -107,7 +109,7 @@ test.describe('the CPO Network Switch System template', () => {
     const frame = page.frameLocator('iframe.flowframe');
     await expect(frame.locator('h1')).toContainText('CPO Network Switch System');
     /* the optical engine stages are drawn, and the main package build takes both inputs */
-    for (const t of ['Optical Engine Stack Design', 'Tapeout Wave 1', 'Known-Good Optical Engines']) {
+    for (const t of ['Optical Engine Stack Design', 'Package Test Vehicles', 'Tapeout Wave 1', 'Known-Good Optical Engines']) {
       await expect(frame.getByText(t).first(), t).toBeVisible();
     }
     await page.locator('[data-back-templates]').click();

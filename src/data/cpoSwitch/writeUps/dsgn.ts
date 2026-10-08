@@ -130,7 +130,7 @@ export const DSGN_WRITE_UPS: CpoWriteUps = {
     ],
     links: {
       dependsOn: ['DSGN-01', 'TRDY-05', 'TRDY-03', 'DSGN-03', 'DSGN-10', 'DSGN-11'],
-      feedsInto: ['PSV-02', 'PSV-03', 'PSV-04', 'PSV-08', 'IMPL-01', 'DSGN-18'],
+      feedsInto: ['PSV-02', 'PSV-03', 'PSV-04', 'PSV-08', 'IMPL-01', 'DSGN-18', 'PKTV-04'],
       runsWith: [],
       revisedBy: ['PSV-02', 'PSV-03', 'PSV-04'],
       feedsBackInto: [],
@@ -264,7 +264,7 @@ export const DSGN_WRITE_UPS: CpoWriteUps = {
     ],
     links: {
       dependsOn: ['SARC-02', 'ICD-02', 'ICD-03', 'MODL-03', 'FEAS-02', 'TRDY-04'],
-      feedsInto: ['IMPL-03', 'PSV-05', 'PSV-07', 'DSGN-16', 'DSGN-18'],
+      feedsInto: ['IMPL-03', 'PSV-05', 'PSV-07', 'DSGN-16', 'DSGN-18', 'PKTV-04'],
       runsWith: ['DSGN-05', 'DSGN-12'],
       revisedBy: ['PSV-05', 'PSV-07'],
       feedsBackInto: [],
@@ -597,7 +597,7 @@ export const DSGN_WRITE_UPS: CpoWriteUps = {
     ],
     links: {
       dependsOn: ['SARC-04', 'ICD-02', 'ICD-07', 'FEAS-07'],
-      feedsInto: ['IMPL-06', 'DSGN-12', 'PSV-07', 'DSGN-18'],
+      feedsInto: ['IMPL-06', 'DSGN-12', 'PSV-07', 'DSGN-18', 'PKTV-02'],
       runsWith: ['DSGN-12'],
       revisedBy: [],
       feedsBackInto: [],
@@ -796,7 +796,7 @@ export const DSGN_WRITE_UPS: CpoWriteUps = {
     ],
     links: {
       dependsOn: ['SARC-05', 'ICD-07', 'DSGN-09', 'DSGN-07', 'TRDY-06', 'DSGN-20', 'ICD-03'],
-      feedsInto: ['IMPL-07', 'IMPL-08', 'IMPL-09', 'TINF-09', 'DSGN-13', 'DSGN-14', 'DSGN-15', 'PSV-07', 'PSV-13'],
+      feedsInto: ['IMPL-07', 'IMPL-08', 'IMPL-09', 'TINF-09', 'DSGN-13', 'DSGN-14', 'DSGN-15', 'PSV-07', 'PSV-13', 'PKTV-02', 'PKTV-04'],
       runsWith: ['MODL-06', 'MODL-07', 'DSGN-09', 'OESD-02'],
       revisedBy: [],
       feedsBackInto: [],
@@ -929,7 +929,7 @@ export const DSGN_WRITE_UPS: CpoWriteUps = {
     ],
     links: {
       dependsOn: ['SARC-06', 'ICD-08', 'ICD-07', 'DSGN-12', 'DSGN-03'],
-      feedsInto: ['IMPL-10', 'IMPL-08', 'DSGN-16', 'TINF-05', 'DSGN-18'],
+      feedsInto: ['IMPL-10', 'IMPL-08', 'DSGN-16', 'TINF-05', 'DSGN-18', 'PKTV-07'],
       runsWith: ['MODL-06', 'DSGN-07'],
       revisedBy: [],
       feedsBackInto: [],
@@ -995,7 +995,7 @@ export const DSGN_WRITE_UPS: CpoWriteUps = {
     ],
     links: {
       dependsOn: ['SARC-07', 'ICD-09', 'DSGN-12', 'MODL-08', 'MODL-07'],
-      feedsInto: ['IMPL-09', 'SINT-06', 'DSGN-18'],
+      feedsInto: ['IMPL-09', 'SINT-06', 'DSGN-18', 'PKTV-03'],
       runsWith: ['DSGN-13'],
       revisedBy: [],
       feedsBackInto: [],
@@ -1350,7 +1350,7 @@ export const DSGN_WRITE_UPS: CpoWriteUps = {
     ],
     links: {
       dependsOn: ['DSGN-01', 'SARC-04', 'SARC-12', 'TRDY-03', 'DSGN-02', 'DSGN-05', 'DSGN-06'],
-      feedsInto: ['DSGN-12', 'ICD-07', 'IMPL-02', 'DSGN-09', 'DSGN-18'],
+      feedsInto: ['DSGN-12', 'ICD-07', 'IMPL-02', 'DSGN-09', 'DSGN-18', 'PKTV-01'],
       runsWith: [],
       revisedBy: [],
       feedsBackInto: [],

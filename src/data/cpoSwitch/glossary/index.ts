@@ -15,6 +15,7 @@ import { MODL_GLOSSARY } from './modl';
 import { DSGN_GLOSSARY } from './dsgn';
 import { PSV_GLOSSARY } from './psv';
 import { OESD_GLOSSARY } from './oesd';
+import { PKTV_GLOSSARY } from './pktv';
 import { IMPL_GLOSSARY } from './impl';
 import { SGNO_GLOSSARY } from './sgno';
 import { MTO_GLOSSARY } from './mto';
@@ -47,6 +48,7 @@ export const CPO_GLOSSARY: CpoGlossary = {
   ...DSGN_GLOSSARY,
   ...PSV_GLOSSARY,
   ...OESD_GLOSSARY,
+  ...PKTV_GLOSSARY,
   ...IMPL_GLOSSARY,
   ...SGNO_GLOSSARY,
   ...MTO_GLOSSARY,

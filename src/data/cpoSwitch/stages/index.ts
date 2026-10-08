@@ -13,6 +13,7 @@ import { MODL } from './modl';
 import { DSGN } from './dsgn';
 import { PSV } from './psv';
 import { OESD } from './oesd';
+import { PKTV } from './pktv';
 import { IMPL } from './impl';
 import { SGNO } from './sgno';
 import { OTO } from './oto';
@@ -45,6 +46,7 @@ export const CPO_STAGE_MODULES: Record<string, CpoStageModule> = {
   DSGN,
   PSV,
   OESD,
+  PKTV,
   IMPL,
   SGNO,
   OTO,

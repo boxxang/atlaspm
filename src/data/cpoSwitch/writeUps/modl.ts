@@ -470,7 +470,7 @@ export const MODL_WRITE_UPS: CpoWriteUps = {
     ],
     links: {
       dependsOn: ['MODL-01', 'FEAS-07', 'SARC-07'],
-      feedsInto: ['MODL-08', 'MODL-10', 'MODL-11', 'DSGN-15', 'IMPL-09', 'SINT-06'],
+      feedsInto: ['MODL-08', 'MODL-10', 'MODL-11', 'DSGN-15', 'IMPL-09', 'SINT-06', 'PKTV-03', 'PKTV-08'],
       runsWith: ['ICD-09'],
       revisedBy: [],
       feedsBackInto: [],

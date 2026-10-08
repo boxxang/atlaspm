@@ -342,7 +342,7 @@ export const SARC_WRITE_UPS: CpoWriteUps = {
     ],
     links: {
       dependsOn: ['SARC-03', 'SARC-04', 'REQ-07', 'REQ-02', 'TRDY-06'],
-      feedsInto: ['SARC-07', 'SARC-11', 'SARC-12', 'ICD-06', 'ICD-07', 'ICD-09', 'DSGN-12', 'DSGN-13', 'MODL-07'],
+      feedsInto: ['SARC-07', 'SARC-11', 'SARC-12', 'ICD-06', 'ICD-07', 'ICD-09', 'DSGN-12', 'DSGN-13', 'MODL-07', 'PKTV-01'],
       runsWith: ['SARC-07'],
       revisedBy: ['FEAS-07', 'MODL-07'],
       feedsBackInto: ['REQ-07'],

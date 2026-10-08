@@ -18,9 +18,9 @@ in `tests/unit/cpoSwitch.test.ts`.
 
 | | Before | After |
 |---|---|---|
-| Stages | 27 | 30 (new: OESD, OTO, OEB) |
-| Activities | 264 | 296 |
-| Key deliverables | 275 | 307 |
+| Stages | 27 | 31 (new: OESD, PKTV, OTO, OEB) |
+| Activities | 264 | 305 |
+| Key deliverables | 275 | 320 |
 | Major gates | 4 | 6 (added Tapeout — Optical Engine Silicon, Known-Good Optical Engines Ready) |
 | First package build | W144 | W148 |
 | Production release | W214 | W218 |
@@ -31,6 +31,7 @@ in `tests/unit/cpoSwitch.test.ts`.
 | Key | Prefix | Gate | Weeks | Change |
 |---|---|---|---|---|
 | `cpoOeStackDesign` | OESD | `cpoOeStackDesignFreeze` Optical Engine Stack Design Freeze | W30–66 | new (band designVerify) |
+| `cpoPackageTestVehicle` | PKTV | `cpoPackageWindowFrozen` Package Process Window Frozen | W40–96 | new (band designVerify), added after the first release — see the addendum |
 | `cpoSignoff` | SGNO | All Silicon Ready for Tapeout | W88–104 (was 88–106) | readiness review per wave; cross-die OE stack signoff (SGNO-12); post-layout end-to-end link signoff (SGNO-13) |
 | `cpoTapeoutOptical` | OTO | `cpoTapeoutOptical` Tapeout — Optical Engine Silicon ★ | W98–104 | new: wave 1, EIC and PIC |
 | `cpoTapeout` | MTO | `cpoTapeoutAll` Tapeout — All Dies ★ | W104–112 | now wave 2: Switch SoC, I/O die, bridge |
@@ -451,6 +452,111 @@ the V6 durations and owner peak. It raised 12 more findings:
 - `npm run typecheck` and `npm run lint` are clean.
 - No further findings remained to fix.
 
+## Addendum — package test vehicles (PKTV)
+
+**Why it was added.** After the first release, the question was where package
+development's own vehicles sit once the component specs are set: the
+mechanical (MTV), thermal (TTV) and chip-package interaction (CPI) test
+vehicles. They had no stage. Two activities came close but did not do the job:
+
+- FEAS-07 built a package and thermal vehicle, but it was a feasibility
+  vehicle from before the specs were set.
+- PKGA-12 was a daisy-chain dry run one build before the first package build,
+  too late to change anything.
+
+CPI was not covered at all. Between the interface freeze and the substrate
+release, the package was carried only by analysis (MODL-07, IMPL-09, SGNO-06).
+
+**The stage.** `cpoPackageTestVehicle` (PKTV) runs W40–96 and closes on
+"Package Process Window Frozen", before the substrate tooling release (SGNO-11,
+W96–104).
+
+| Ref | Activity | Owner | Weeks |
+|---|---|---|---|
+| PKTV-01 | Vehicle strategy and risk coverage. It sets the first-spin splits as the DOE cells, records the geometry baseline and books substrate and die slots for a confirmation lot and a possible second spin. | Packaging | W40–46 |
+| PKTV-02 | Main package MTV. It covers the product body, stack-up, bump map, bridge, lid or stiffener and the OE sites. Splits: core and stack-up, lid versus ring stiffener plus lid, underfill A/B and lid opening. It decides on a second spin at about W78 and releases the stack-up, core and lid decision (W78). | Packaging | W48–78 |
+| PKTV-03 | Main package TTV. It uses a thermal test die on the Switch SoC power map and measures TIM, the lid and the OE site temperatures. It runs on its own board and socket, with a cold plate calibrated to DSGN-15. | Thermal and mechanical | W48–82 |
+| PKTV-04 | CPI vehicle on the product node, through a shuttle or by reusing the foundry's CPI vehicle. It covers ULK/BEOL integrity and bump and underfill. It releases preliminary bump, underfill and keep-out rules to package and die layout (W80). It feeds back into IMPL-02/03: crack stop, seal ring, corner keep-out and dummy bumps. | Technology and foundry | W40–80 |
+| PKTV-05 | OE package vehicle. It measures heater crosstalk on TTV substrates, fiber strain relief, and coupling shift through reflow. It is built to the W56 stack design snapshot and its delta is checked against the OESD-07 freeze (W66). | Optical engineering | W56–84 |
+| PKTV-06 | DOE response fit across the first-spin splits, plus a confirmation lot | Manufacturing and NPI | W70–88 |
+| PKTV-07 | Board-level reliability on product-representative boards: temperature cycling, shock and fiber retention | Reliability | W56–88 |
+| PKTV-08 | Vehicle-to-model correlation of the warpage, thermal and stress models, including the cold-plate offset | Thermal and mechanical | W80–92 |
+| PKTV-09 | Process window freeze. It checks the vehicles against the current layout. It agrees the incoming substrate warpage specification and the coplanarity limits with the substrate supplier and the board line, and fixes the lid or stiffener architecture and its tooling. | Packaging | W92–96 |
+
+**What it hands to the rest of the program:**
+
+- package and die layout (IMPL-07, IMPL-02/03): the interim decisions at W78–80 and the confirmed window at W96;
+- package signoff (SGNO-06);
+- substrate and lid tooling release (SGNO-11);
+- the assembly process (TINF-09);
+- first-build material and plan (PKGA-01/02);
+- the final dry run on the released substrate (PKGA-12, now a confirmation step);
+- package reliability qualification (RELQ-04).
+
+FEAS-07 stays as the feasibility vehicle and feeds PKTV-01.
+
+**Effect on the program.**
+
+- **Critical path:** unchanged. The OE path has 0 float into the first package
+  build. The Switch SoC path has 2 weeks and the I/O die path 4.
+- **Program length:** unchanged at W266. PKTV closes on the day the substrate
+  release starts.
+- **Counts:** 31 stages, 305 activities, 320 deliverables.
+- **Tests:** a unit test now holds three things:
+  - the MTV and TTV start after the interface freeze;
+  - the CPI die starts before it, because the shuttle needs the lead time;
+  - the stage closes before the substrate release and the first die attach,
+    and has MTV, TTV, CPI and OE package vehicles.
+
+**Independent review of PKTV.** A fresh agent reviewed the first draft of the
+stage and returned 10 findings. All 10 were applied:
+
+1. The DOE started before the results it was built on. The DOE is now built
+   into the first-spin splits, and PKTV-06 is the response fit plus a
+   confirmation lot.
+2. Layout ran 28 weeks on unproven rules. Interim releases now reach layout at
+   W78 and W80, and PKTV-09 confirms them.
+3. There was no recovery from a failed vehicle.
+   - Splits are now built into the first spin, with a second-spin decision at
+     W78 on pre-booked slots.
+   - A risk now states that a second spin moves the substrate release by 16–20
+     weeks, or by about 8–10 weeks with booked slots.
+4. The CPI die started too late and fed nothing back to the dies. It now
+   starts at W40 on a product-node shuttle and feeds back into IMPL-02/03 and
+   DSGN-02/04.
+5. The OE vehicle was built before the stack froze. It is now built to the W56
+   snapshot with a delta check against the W66 freeze, and is mounted on the
+   TTV.
+6. Nothing owned the test hardware. Thermal boards, sockets and the cold plate
+   are now built in PKTV-03, and reliability boards in PKTV-07.
+7. No warpage specification was agreed with the substrate supplier and the
+   board line. PKTV-09 now produces it, and SGNO-11 consumes it.
+8. The lid or stiffener architecture was implicit. It is now an MTV split, a
+   PKTV-09 decision and a tooling release in SGNO-11.
+9. Vehicle geometry could drift from the layout. PKTV-01 records a baseline,
+   PKTV-09 checks the delta, and PCTL-03 routes interface changes to PKTV.
+10. Critical-path flags and reverse links were missing. They are set, and
+    PKTV-05 → TINF-09 is added.
+
+**Owner load.** Packaging's peak is now 9 activities at once in W40–44, while
+the package and OE test vehicles, the OE stack design and partner readiness
+overlap. It was 8 before.
+
+- The CPI vehicle went to Technology and foundry. That team owns product-node
+  BEOL qualification, so this follows the work and is not a way to lower the
+  count.
+- The rest is real load and is flagged for staffing, as in V6.
+
+**Accepted overlaps.** The new start-to-start dependencies are expected for a
+strategy step and for vehicle work:
+
+- PKTV-01 starts on converging interfaces (ICD-12 ends W48) and early
+  floorplans (DSGN-20 ends W54).
+- The MTV uses the draft package floorplan (DSGN-12 ends W80).
+- Correlation uses the interim layout co-analysis (IMPL-09 ends W98).
+
+Each is re-checked at the freeze review.
+
 ## V8 — in the app
 
 **Setup.** `next dev` against the local database. A test program, "CPO Flow
@@ -762,7 +868,7 @@ Regenerate with `npx tsx tools/cpoFlow/report.ts`.
 | SUST-08 | Field Service, Spares and Repair Logistics | Kept | SUST-08 |
 | SUST-09 | Supply Continuity — Supplier Scorecards, Capacity, Second Sources and Obsolescence | Kept | SUST-09 |
 
-New activities with no predecessor in the baseline (26):
+New activities with no predecessor in the baseline (35):
 
 | Ref | Title | Item |
 | --- | --- | --- |
@@ -775,6 +881,15 @@ New activities with no predecessor in the baseline (26):
 | OESD-05 | Optical Engine Test Access and Known-Good Optical Engine Test Strategy | oe |
 | OESD-06 | Optical Engine Design Rules and Stacking Process Co-Development with the Assembly Partner | oe |
 | OESD-07 | Optical Engine Stack Design Freeze Review | oe |
+| PKTV-01 | Package Test Vehicle Strategy and Risk Coverage Matrix — Main Package and Optical Engine Package | package |
+| PKTV-02 | Main Package Mechanical Test Vehicle (MTV) — Product Body, Stack-Up, Bump Map, Bridge, Lid or Stiffener and Optical Engine Sites | package |
+| PKTV-03 | Main Package Thermal Test Vehicle (TTV) — Switch SoC Power Map, TIM, Lid and Optical Engine Site Temperature | package |
+| PKTV-04 | Chip-Package Interaction (CPI) Vehicle — Low-k and BEOL Stress, Bump and Underfill DOE on the Switch SoC and I/O Die Node | package |
+| PKTV-05 | Optical Engine Package Thermal and Mechanical Test Vehicle — Heater Crosstalk, Fiber Strain Relief and Coupling Shift Through Reflow | oe |
+| PKTV-06 | Assembly Process Window DOE Response Fit and Confirmation Lot — Die and Bridge Attach, Underfill, Lid and Engine Mounting | package |
+| PKTV-07 | Board-Level Reliability on the Vehicles — Temperature Cycling, Shock and Fiber Retention | package |
+| PKTV-08 | Vehicle-to-Model Correlation — Warpage, Thermal and Stress Models | package |
+| PKTV-09 | Package Process Window Freeze Review | package |
 | SGNO-12 | Optical Engine Stack Cross-Die Signoff — Bond Pad Alignment, Coupler Placement and Engine Substrate Check | oe |
 | SGNO-13 | End-to-End Link Budget Signoff on Extracted Views — I/O Die, Main Package, Engine Substrate, Electrical IC, Photonic IC and Fiber | system |
 | OTO-03 | Optical Silicon Wafer Start Plan, Process Splits and Engineering Lot Strategy | program |
@@ -988,7 +1103,7 @@ New activities with no predecessor in the baseline (26):
 | PKGA-D12 | Kept (renumbered) | PKGA-D11 | Bring-up firmware, SDK and diagnostics release validated on the final netlist |
 | PKGA-D13 | Moved | OEB-D6 | Optical engine standalone bring-up report from the engine evaluation board |
 | PKGA-D14 | Kept (renumbered) | PKGA-D12 | Electrical-only engineering packages for early power-on |
-| PKGA-D15 | Kept (renumbered) | PKGA-D13 | Daisy-chain dry-run build report on the product substrate |
+| PKGA-D15 | Kept (renumbered) | PKGA-D13 | Final daisy-chain dry-run report on the released product substrate, confirming the frozen process window |
 | PON-D1 | Kept | PON-D1 | Bring-up execution tracker and daily status record |
 | PON-D2 | Kept | PON-D2 | First power-on and rail verification report |
 | PON-D3 | Kept | PON-D3 | Bring-up firmware image and first boot log |
@@ -1156,6 +1271,7 @@ New activities with no predecessor in the baseline (26):
 | Feasibility test vehicle | FEAS-06 (W12–44), FEAS-12 (W12–50) |
 | Stack design and process development | OESD-01 (W30–44), OESD-02 (W34–64), OESD-03 (W32–60), OESD-04 (W34–60), OESD-05 (W36–62), OESD-06 (W32–64) |
 | Design freeze | OESD-07 (W60–66), SGNO-12 (W88–97) |
+| Package test vehicle | PKTV-05 (W56–84) |
 | Optical engine build | OEB-02 (W126–130), OEB-03 (W129–132), OEB-04 (W131–135) |
 | Optical engine test | OEB-05 (W133–138), OEB-06 (W134–140) |
 | Known-good optical engines | OEB-07 (W135–139), OEB-08 (W136–140), OEB-09 (W138–140) |
@@ -1169,6 +1285,7 @@ New activities with no predecessor in the baseline (26):
 | --- | --- |
 | Architecture | SARC-05 (W16–28) |
 | Design | DSGN-12 (W42–80) |
+| Test vehicles (MTV, TTV, CPI) and process window | PKTV-02 (W48–78), PKTV-03 (W48–82), PKTV-04 (W40–80), PKTV-06 (W70–88), PKTV-07 (W56–88), PKTV-08 (W80–92), PKTV-09 (W92–96) |
 | Implementation | IMPL-07 (W68–96) |
 | Signoff | SGNO-06 (W92–104) |
 | Substrate release | SGNO-11 (W96–104) |
@@ -1212,7 +1329,7 @@ New activities with no predecessor in the baseline (26):
 
 ### V3 — producer → consumer
 
-Inputs named in a write-up's consumes list whose producer is not among its dependencies: 18
+Inputs named in a write-up's consumes list whose producer is not among its dependencies: 20
 - SARC-05 consumes from SARC-07
 - SARC-10 consumes from SARC-09
 - PCTL-05 consumes from PCTL-01
@@ -1220,6 +1337,8 @@ Inputs named in a write-up's consumes list whose producer is not among its depen
 - TRDY-04 consumes from SARC-02
 - TRDY-06 consumes from SARC-05
 - MODL-02 consumes from SARC-01
+- PKTV-06 consumes from TINF-09
+- IMPL-07 consumes from PKTV-09
 - SGNO-07 consumes from TINF-06
 - SGNO-11 consumes from PKGA-02
 - PKGA-02 consumes from MTO-04
@@ -1232,7 +1351,7 @@ Inputs named in a write-up's consumes list whose producer is not among its depen
 - NPI-03 consumes from CERT-06
 - SUST-05 consumes from SUST-03
 
-Dependencies where the producer finishes after the consumer (start-to-start on an interim output): 86
+Dependencies where the producer finishes after the consumer (start-to-start on an interim output): 92
 
 | Producer (ends) | Consumer (ends) |
 | --- | --- |
@@ -1295,6 +1414,12 @@ Dependencies where the producer finishes after the consumer (start-to-start on a
 | DSGN-06 (W78) | OESD-03 (W60) |
 | DSGN-05 (W76) | OESD-04 (W60) |
 | DSGN-11 (W80) | OESD-05 (W62) |
+| ICD-12 (W48) | PKTV-01 (W46) |
+| DSGN-20 (W54) | PKTV-01 (W46) |
+| FEAS-07 (W50) | PKTV-01 (W46) |
+| FEAS-12 (W50) | PKTV-01 (W46) |
+| DSGN-12 (W80) | PKTV-02 (W78) |
+| IMPL-09 (W98) | PKTV-08 (W92) |
 | IMPL-02 (W98) | IMPL-06 (W92) |
 | IMPL-03 (W94) | IMPL-06 (W92) |
 | IMPL-02 (W98) | IMPL-07 (W96) |
@@ -1336,14 +1461,15 @@ Deliverables whose producer feeds nothing downstream: 2
 | CON | Program Go / No-Go | W10 | CON-06 | REQ-01, REQ-02, REQ-03, REQ-04, REQ-05, FEAS-01, FEAS-02, FEAS-03, TRDY-01, TRDY-02, TRDY-12 |
 | REQ | Requirements Baseline | W20 | REQ-09 | SARC-01, SARC-02, SARC-03, SARC-05, SARC-06, SARC-07, SARC-08, SARC-09, SARC-10, MODL-01, MODL-02 |
 | SARC | Architecture Convergence & Partition Freeze | W36 | SARC-12 | ICD-01, ICD-02, ICD-03, ICD-04, ICD-05, ICD-06, ICD-07, ICD-08, ICD-09, ICD-10, ICD-11, PCTL-02, PCTL-04, MODL-06, MODL-07, MODL-09, DSGN-01, OESD-01, OESD-02 |
-| ICD | Interface Freeze | W48 | ICD-12 | PCTL-01, PCTL-02, PCTL-04, DSGN-01, DSGN-03, DSGN-04, DSGN-05, DSGN-06, DSGN-07, DSGN-08, DSGN-09, DSGN-11, DSGN-12, DSGN-13, DSGN-14, DSGN-15, DSGN-16, DSGN-17, DSGN-19, DSGN-21, PSV-01, PSV-05, PSV-15, OESD-01, OESD-02, OESD-03, OESD-04, OESD-05, TINF-01 |
+| ICD | Interface Freeze | W48 | ICD-12 | PCTL-01, PCTL-02, PCTL-04, DSGN-01, DSGN-03, DSGN-04, DSGN-05, DSGN-06, DSGN-07, DSGN-08, DSGN-09, DSGN-11, DSGN-12, DSGN-13, DSGN-14, DSGN-15, DSGN-16, DSGN-17, DSGN-19, DSGN-21, PSV-01, PSV-05, PSV-15, OESD-01, OESD-02, OESD-03, OESD-04, OESD-05, PKTV-01, TINF-01 |
 | PCTL | Change Control Handed to Sustaining | W218 | PCTL-07 | SUST-04, SUST-09 |
-| FEAS | Technology Feasibility Proven | W56 | FEAS-09 | SARC-02, SARC-03, SARC-04, SARC-07, SARC-12, ICD-02, ICD-04, ICD-05, ICD-06, ICD-09, ICD-12, TRDY-01, TRDY-02, TRDY-04, TRDY-06, TRDY-07, TRDY-08, TRDY-11, TRDY-12, TRDY-14, TRDY-15, MODL-01, MODL-03, MODL-04, MODL-05, MODL-06, MODL-07, MODL-10, MODL-11, DSGN-04, DSGN-05, DSGN-06, DSGN-07, DSGN-09, DSGN-13, DSGN-19, OESD-01, OESD-02, OESD-03, OESD-04, OESD-06, TINF-09 |
-| TRDY | Technology, IP & Supply Readiness | W60 | TRDY-11 | SARC-02, SARC-04, SARC-05, SARC-09, ICD-07, PCTL-05, MODL-03, MODL-05, DSGN-02, DSGN-03, DSGN-04, DSGN-06, DSGN-07, DSGN-12, DSGN-13, DSGN-20, OESD-06, TINF-09 |
-| MODL | Required Models Ready | W56 | MODL-10 | ICD-02, ICD-03, ICD-12, DSGN-01, DSGN-04, DSGN-05, DSGN-06, DSGN-08, DSGN-15, DSGN-16, DSGN-17, PSV-01, PSV-02, PSV-05, PSV-06, PSV-07, PSV-08, PSV-15, OESD-03, OESD-04, OESD-05 |
-| DSGN | Design Freeze — RTL, Circuit & Photonic | W84 | DSGN-18 | PSV-01, PSV-02, PSV-03, PSV-04, PSV-05, PSV-06, PSV-07, PSV-08, PSV-09, PSV-10, PSV-12, PSV-13, PSV-14, PSV-15, IMPL-01, IMPL-03, IMPL-04, IMPL-05, IMPL-06, IMPL-07, IMPL-08, IMPL-09, IMPL-10, IMPL-11, TINF-01, TINF-02, TINF-03, TINF-04, TINF-05, TINF-07, TINF-09, TINF-12, TINF-13, TINF-16, TINF-17 |
+| FEAS | Technology Feasibility Proven | W56 | FEAS-09 | SARC-02, SARC-03, SARC-04, SARC-07, SARC-12, ICD-02, ICD-04, ICD-05, ICD-06, ICD-09, ICD-12, TRDY-01, TRDY-02, TRDY-04, TRDY-06, TRDY-07, TRDY-08, TRDY-11, TRDY-12, TRDY-14, TRDY-15, MODL-01, MODL-03, MODL-04, MODL-05, MODL-06, MODL-07, MODL-10, MODL-11, DSGN-04, DSGN-05, DSGN-06, DSGN-07, DSGN-09, DSGN-13, DSGN-19, OESD-01, OESD-02, OESD-03, OESD-04, OESD-06, PKTV-01, TINF-09 |
+| TRDY | Technology, IP & Supply Readiness | W60 | TRDY-11 | SARC-02, SARC-04, SARC-05, SARC-09, ICD-07, PCTL-05, MODL-03, MODL-05, DSGN-02, DSGN-03, DSGN-04, DSGN-06, DSGN-07, DSGN-12, DSGN-13, DSGN-20, OESD-06, PKTV-02, PKTV-04, TINF-09 |
+| MODL | Required Models Ready | W56 | MODL-10 | ICD-02, ICD-03, ICD-12, DSGN-01, DSGN-04, DSGN-05, DSGN-06, DSGN-08, DSGN-15, DSGN-16, DSGN-17, PSV-01, PSV-02, PSV-05, PSV-06, PSV-07, PSV-08, PSV-15, OESD-03, OESD-04, OESD-05, PKTV-03 |
+| DSGN | Design Freeze — RTL, Circuit & Photonic | W84 | DSGN-18 | PSV-01, PSV-02, PSV-03, PSV-04, PSV-05, PSV-06, PSV-07, PSV-08, PSV-09, PSV-10, PSV-12, PSV-13, PSV-14, PSV-15, PKTV-01, PKTV-02, PKTV-03, PKTV-04, PKTV-07, IMPL-01, IMPL-03, IMPL-04, IMPL-05, IMPL-06, IMPL-07, IMPL-08, IMPL-09, IMPL-10, IMPL-11, TINF-01, TINF-02, TINF-03, TINF-04, TINF-05, TINF-07, TINF-09, TINF-12, TINF-13, TINF-16, TINF-17 |
 | PSV | Pre-Silicon Validation Complete | W92 | PSV-11 | IMPL-04, SGNO-01, SGNO-03, SGNO-04, TINF-06, TINF-14 |
-| OESD | Optical Engine Stack Design Freeze | W66 | OESD-07 | TINF-09 |
+| OESD | Optical Engine Stack Design Freeze | W66 | OESD-07 | PKTV-05, TINF-09 |
+| PKTV | Package Process Window Frozen | W96 | PKTV-09 | IMPL-02, IMPL-03, IMPL-07, IMPL-09, SGNO-06, TINF-09 |
 | IMPL | Implementation Complete | W100 | IMPL-12 | SGNO-01, SGNO-02, SGNO-03, SGNO-04, SGNO-05, SGNO-06, SGNO-07, SGNO-08, SGNO-09, SGNO-11, SGNO-12, SGNO-13 |
 | SGNO | All Silicon Ready for Tapeout | W104 | SGNO-10 | OTO-01, OTO-02, OTO-03, OTO-04, PKGA-01 |
 | OTO | Tapeout — Optical Engine Silicon ★ | W104 | OTO-04 | WFAB-03, WFAB-04 |
@@ -1460,26 +1586,26 @@ Program length: before W262, after W266.
 
 | Owner | Activities | Most at once | Weeks | Which |
 | --- | --- | --- | --- | --- |
-| Packaging | 26 | 8 | W34–44 | ICD-07, FEAS-07, FEAS-12, TRDY-06, TRDY-15, OESD-01, OESD-02, OESD-06 |
+| Packaging | 29 | 9 | W40–44 | ICD-07, FEAS-07, FEAS-12, TRDY-15, DSGN-09, OESD-01, OESD-02, OESD-06, PKTV-01 |
 | Program management | 18 | 6 | W101–104 | PCTL-01, PCTL-02, PCTL-04, PCTL-06, SGNO-10, OTO-04 |
-| Manufacturing and NPI | 23 | 6 | W104–106 | MTO-04, TINF-08, TINF-10, TINF-16, TINF-17, PKGA-02 |
+| Manufacturing and NPI | 24 | 6 | W104–106 | MTO-04, TINF-08, TINF-10, TINF-16, TINF-17, PKGA-02 |
 | Test engineering | 18 | 6 | W76–96 | TINF-02, TINF-04, TINF-05, TINF-06, TINF-15, TINF-18 |
 | Design verification | 7 | 6 | W76–80 | PSV-02, PSV-03, PSV-04, PSV-08, PSV-10, PSV-14 |
 | System architecture | 19 | 5 | W54–56 | PCTL-03, FEAS-09, MODL-10, MODL-11, PSV-07 |
 | Photonics | 21 | 5 | W22–24 | SARC-03, ICD-04, FEAS-03, TRDY-02, MODL-04 |
-| Reliability | 11 | 5 | W170–172 | RELQ-02, RELQ-03, RELQ-04, RELQ-05, RELQ-08 |
+| Reliability | 12 | 5 | W170–172 | RELQ-02, RELQ-03, RELQ-04, RELQ-05, RELQ-08 |
 | SerDes and high-speed I/O | 12 | 5 | W36–38 | ICD-02, ICD-03, FEAS-02, TRDY-04, DSGN-04 |
 | Quality | 9 | 5 | W214–218 | PCTL-07, RAMP-06, SUST-03, SUST-04, SUST-08 |
 | Compliance and interoperability | 6 | 4 | W170–182 | CERT-01, CERT-03, CERT-04, CERT-07 |
 | Laser and optical source | 9 | 4 | W38–40 | ICD-05, FEAS-05, TRDY-07, DSGN-07 |
+| Optical engineering | 8 | 4 | W58–60 | DSGN-13, OESD-03, PKTV-05, TINF-03 |
 | Supply chain | 9 | 4 | W28–48 | PCTL-05, TRDY-08, TRDY-10, TRDY-13 |
 | Validation | 16 | 4 | W144–145 | PKGA-09, PON-04, PON-06, SDBG-01 |
 | Product management | 8 | 3 | W3–4 | CON-01, CON-02, CON-04 |
 | Board and system hardware | 7 | 3 | W72–82 | DSGN-14, DSGN-21, IMPL-10 |
-| Thermal and mechanical | 7 | 3 | W26–28 | SARC-07, ICD-09, MODL-07 |
-| Optical engineering | 7 | 3 | W32–40 | ICD-06, FEAS-06, OESD-03 |
+| Thermal and mechanical | 9 | 3 | W26–28 | SARC-07, ICD-09, MODL-07 |
 | Analog and mixed-signal | 8 | 3 | W36–46 | FEAS-04, MODL-05, DSGN-05 |
-| Technology and foundry | 6 | 3 | W108–114 | WFAB-01, WFAB-02, WFAB-03 |
+| Technology and foundry | 7 | 3 | W108–114 | WFAB-01, WFAB-02, WFAB-03 |
 | Physical design | 8 | 3 | W96–98 | IMPL-02, IMPL-12, SGNO-01 |
 | RTL design | 3 | 3 | W40–44 | TRDY-05, DSGN-02, DSGN-03 |
 | SI/PI | 6 | 3 | W92–98 | IMPL-08, SGNO-06, SGNO-13 |

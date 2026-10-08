@@ -586,7 +586,7 @@ export const TINF_WRITE_UPS: CpoWriteUps = {
       'Process windows documented for die attach, underfill and fiber attach with capability indices above target',
       'Fiber handling, end-face inspection and cleaning standard in force at every station, with inspection results logged per unit',
     ],
-    dependsOn: ['FEAS-06', 'FEAS-07', 'TRDY-06'],
+    dependsOn: ['FEAS-06', 'FEAS-07', 'TRDY-06', 'PKTV-06'],
     dependsNote: 'Starts from the feasibility vehicles rather than the product package; the product floorplan from DSGN-12 is folded in as it closes.',
     feedsInto: ['OEB-02', 'OEB-04', 'PKGA-03', 'PKGA-04'],
     measuredBy: [
@@ -595,7 +595,7 @@ export const TINF_WRITE_UPS: CpoWriteUps = {
       'Active alignment cycle time per fiber',
     ],
     links: {
-      dependsOn: ['FEAS-06', 'FEAS-07', 'TRDY-06', 'DSGN-12', 'OESD-06', 'OESD-03'],
+      dependsOn: ['FEAS-06', 'FEAS-07', 'TRDY-06', 'DSGN-12', 'OESD-06', 'OESD-03', 'PKTV-06', 'PKTV-09', 'PKTV-05'],
       feedsInto: ['OEB-02', 'OEB-03', 'OEB-04', 'PKGA-03', 'PKGA-04', 'TINF-11'],
       runsWith: [],
       revisedBy: [],

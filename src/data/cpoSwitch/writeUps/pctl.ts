@@ -139,7 +139,7 @@ export const PCTL_WRITE_UPS: CpoWriteUps = {
   'PCTL-03': {
     criticalPath: true,
     purpose: [
-      'Operate the <b>interface change control board</b> from the interface freeze in ICD-12 to production release: every change request assessed from both sides of the ICD, new revisions issued and distributed, design databases audited against the current revisions before each tapeout and build, and freeze waivers tracked to closure.',
+      'Operate the <b>interface change control board</b> from the interface freeze in ICD-12 to production release: every change request assessed from both sides of the ICD, new revisions issued and distributed, design databases audited against the current revisions before each tapeout and build, interface changes routed to the package test vehicles while vehicles are in build so their geometry baseline stays current, and freeze waivers tracked to closure.',
       'The freeze is only worth what the board does afterwards. Changes after the freeze are normal — silicon findings, supplier process changes, firmware discoveries — but each one has to reach every team and supplier building to the old revision before hardware does, and after production release the same discipline continues under SUST-04.',
     ],
     flowNote:

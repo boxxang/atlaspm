@@ -218,7 +218,7 @@ export const RELQ_WRITE_UPS: CpoWriteUps = {
       'Qualification plan and stress matrix from RELQ-01',
       'Optical engine fiber attach process and build record from OEB-04',
       'Assembly, alignment and fiber attach process development from TINF-09',
-      'Warpage and thermal-mechanical models from MODL-07',
+      'Board-level reliability baseline on the package test vehicles from PKTV-07, and the warpage models from MODL-07',
       'Rework, repair and scrap policy for optical engines, fiber attach and optical sources from TINF-16',
     ],
     rel: {
@@ -259,7 +259,7 @@ export const RELQ_WRITE_UPS: CpoWriteUps = {
       'Coupling loss change after every stress within the link-budget allowance',
       'Fiber retention, connector mating-cycle and reworked-unit results meet their specifications on every sample',
     ],
-    dependsOn: ['RELQ-01', 'OEB-04', 'TINF-09'],
+    dependsOn: ['RELQ-01', 'OEB-04', 'TINF-09', 'PKTV-07'],
     dependsNote: null,
     feedsInto: ['RELQ-05', 'RELQ-06', 'NPI-05'],
     measuredBy: [
@@ -268,7 +268,7 @@ export const RELQ_WRITE_UPS: CpoWriteUps = {
       'Fiber retention failures',
     ],
     links: {
-      dependsOn: ['RELQ-01', 'OEB-04', 'TINF-09', 'TINF-16', 'MODL-07'],
+      dependsOn: ['RELQ-01', 'OEB-04', 'TINF-09', 'TINF-16', 'MODL-07', 'PKTV-07'],
       feedsInto: ['RELQ-05', 'RELQ-06', 'NPI-05'],
       runsWith: ['RELQ-03'],
       revisedBy: [],

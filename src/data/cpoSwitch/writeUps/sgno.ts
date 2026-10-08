@@ -347,9 +347,9 @@ export const SGNO_WRITE_UPS: CpoWriteUps = {
     flowNote:
       'Step 1 assembles the model. Step 2 closes cross-die timing while step 3 runs system SI / PI in parallel. Step 4 confirms thermal and warpage, step 5 checks connectivity alongside it, and step 6 releases the signoff report that gates the tooling release in SGNO-11.',
     consumes: [
-      'Package layout database from IMPL-07',
+      'Package layout database from IMPL-07, drawn to the frozen package rules and process window from PKTV-09',
       'Package and board SI / PI closure report from IMPL-08',
-      'Thermal, mechanical and warpage co-analysis from IMPL-09',
+      'Thermal, mechanical and warpage co-analysis from IMPL-09, on the models correlated to the package test vehicles in PKTV-08',
       'Die timing and driver models from SGNO-01 and SGNO-02',
       'Bridge channel signoff from SGNO-05',
     ],
@@ -389,7 +389,7 @@ export const SGNO_WRITE_UPS: CpoWriteUps = {
       'Package and board SI / PI and thermal within limits with the final layouts',
       'Signoff report released and accepted by packaging as the basis for the tooling release in SGNO-11',
     ],
-    dependsOn: ['IMPL-07', 'IMPL-08', 'IMPL-09', 'SGNO-05'],
+    dependsOn: ['IMPL-07', 'IMPL-08', 'IMPL-09', 'SGNO-05', 'PKTV-09'],
     dependsNote: null,
     feedsInto: ['SGNO-10', 'SGNO-11'],
     measuredBy: [
@@ -398,7 +398,7 @@ export const SGNO_WRITE_UPS: CpoWriteUps = {
       'Open package signoff issues',
     ],
     links: {
-      dependsOn: ['IMPL-07', 'IMPL-08', 'IMPL-09', 'SGNO-05', 'SGNO-01', 'SGNO-02'],
+      dependsOn: ['IMPL-07', 'IMPL-08', 'IMPL-09', 'SGNO-05', 'SGNO-01', 'SGNO-02', 'PKTV-08', 'PKTV-09'],
       feedsInto: ['SGNO-10', 'SGNO-11', 'MTO-03', 'PKGA-01'],
       runsWith: [],
       revisedBy: [],
@@ -675,12 +675,12 @@ export const SGNO_WRITE_UPS: CpoWriteUps = {
       'Substrates are usually the longest lead item in the first package build, often longer than the wafers. Released too early, tooling is built against a package that signoff then changes; released too late, known-good dies wait in the die bank for something to be attached to.',
     ],
     flowNote:
-      'Step 1 confirms the database against signoff and the die bump maps. Step 2 generates the fabrication data and step 3 closes the supplier queries, with the RDL build data released to the assembly partner in parallel in step 4. Step 5 orders substrates and fixtures, and step 6 releases the tooling.',
+      'Step 1 confirms the database against signoff and the die bump maps. Step 2 generates the fabrication data and step 3 closes the supplier queries, with the RDL build data released to the assembly partner in parallel in step 4. Step 5 releases the lid or stiffener tooling in parallel, step 6 orders substrates against the agreed warpage specification and their fixtures, and step 7 releases the tooling.',
     consumes: [
       'Multi-die package signoff report from SGNO-06',
       'Package layout database from IMPL-07, and the engine substrate design from OESD-02',
       'Final die microbump maps from the die signoffs in SGNO-01 to SGNO-05',
-      'Substrate supplier design rules and tooling lead times from TRDY-06',
+      'Substrate supplier design rules and tooling lead times from TRDY-06, and from PKTV-09 the frozen package process window, the lid or stiffener decision and the agreed incoming substrate warpage specification',
       'First-build substrate quantities from PKGA-02',
     ],
     rel: {
@@ -718,7 +718,7 @@ export const SGNO_WRITE_UPS: CpoWriteUps = {
       'All supplier engineering queries closed and tooling accepted in writing',
       'First-build substrates ordered with a committed delivery at least two weeks before the first die attach',
     ],
-    dependsOn: ['SGNO-06', 'IMPL-07', 'OESD-02'],
+    dependsOn: ['SGNO-06', 'IMPL-07', 'OESD-02', 'PKTV-09'],
     dependsNote: 'Waits for package signoff by design: tooling is the first money spent on the package.',
     feedsInto: ['SGNO-10', 'PKGA-01', 'WFAB-06'],
     measuredBy: [
@@ -727,7 +727,7 @@ export const SGNO_WRITE_UPS: CpoWriteUps = {
       'Committed substrate delivery against first die attach',
     ],
     links: {
-      dependsOn: ['SGNO-06', 'IMPL-07', 'TRDY-06', 'OESD-02', 'SGNO-01', 'SGNO-05'],
+      dependsOn: ['SGNO-06', 'IMPL-07', 'TRDY-06', 'OESD-02', 'SGNO-01', 'SGNO-05', 'PKTV-09'],
       feedsInto: ['SGNO-10', 'PKGA-01', 'WFAB-06', 'MTO-03', 'OEB-01', 'OEB-03'],
       runsWith: [],
       revisedBy: ['PKGA-02'],

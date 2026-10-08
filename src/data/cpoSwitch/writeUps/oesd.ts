@@ -198,7 +198,7 @@ export const OESD_WRITE_UPS: CpoWriteUps = {
     ],
     links: {
       dependsOn: ['ICD-06', 'FEAS-06', 'OESD-01', 'DSGN-06', 'MODL-04'],
-      feedsInto: ['IMPL-05', 'OESD-06', 'OESD-07', 'TINF-09', 'DSGN-13', 'OEB-04', 'PKGA-04'],
+      feedsInto: ['IMPL-05', 'OESD-06', 'OESD-07', 'TINF-09', 'DSGN-13', 'OEB-04', 'PKGA-04', 'PKTV-05'],
       runsWith: ['OESD-02'],
       revisedBy: [],
       feedsBackInto: ['DSGN-06'],
@@ -264,7 +264,7 @@ export const OESD_WRITE_UPS: CpoWriteUps = {
     ],
     links: {
       dependsOn: ['OESD-01', 'MODL-07', 'ICD-04', 'FEAS-07', 'DSGN-05'],
-      feedsInto: ['OESD-07', 'IMPL-09', 'DSGN-15'],
+      feedsInto: ['OESD-07', 'IMPL-09', 'DSGN-15', 'PKTV-05'],
       runsWith: ['OESD-02'],
       revisedBy: [],
       feedsBackInto: ['DSGN-06'],
@@ -462,7 +462,7 @@ export const OESD_WRITE_UPS: CpoWriteUps = {
     ],
     links: {
       dependsOn: ['OESD-01', 'OESD-02', 'OESD-03', 'OESD-04', 'OESD-05', 'OESD-06', 'FEAS-12', 'ICD-04'],
-      feedsInto: ['IMPL-04', 'IMPL-05', 'SGNO-03', 'SGNO-04', 'SGNO-12', 'SGNO-09', 'OTO-01', 'OTO-02'],
+      feedsInto: ['IMPL-04', 'IMPL-05', 'SGNO-03', 'SGNO-04', 'SGNO-12', 'SGNO-09', 'OTO-01', 'OTO-02', 'PKTV-05'],
       runsWith: [],
       revisedBy: [],
       feedsBackInto: [],

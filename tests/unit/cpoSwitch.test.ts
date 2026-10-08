@@ -169,6 +169,19 @@ describe('CPO skeleton', () => {
     expect(stageEnd('cpoOeStackDesign')).toBeLessThanOrEqual(CPO_SKELETON.find((s) => s.key === 'cpoTapeoutOptical')!.start);
   });
 
+  it('freezes the package process window on test vehicles before the substrate is released', () => {
+    const pktv = CPO_SKELETON.find((s) => s.key === 'cpoPackageTestVehicle')!;
+    /* the vehicles are drawn to the frozen interfaces and the product floorplan, and close before the substrate is tooled */
+    for (const ref of ['PKTV-02', 'PKTV-03']) expect(absStart(ref), ref).toBeGreaterThanOrEqual(stageEnd('cpoInterfaces'));
+    /* the chip-package interaction die starts first: it needs a shuttle on the product node */
+    expect(absStart('PKTV-04')).toBeLessThan(stageEnd('cpoInterfaces'));
+    expect(stageEnd('cpoPackageTestVehicle')).toBeLessThanOrEqual(absStart('SGNO-11'));
+    expect(stageEnd('cpoPackageTestVehicle')).toBeLessThanOrEqual(absStart('PKGA-03'));
+    /* a mechanical, a thermal and a chip-package interaction vehicle, for the main package and the engine */
+    const titles = pktv.activities.map((a) => a.title).join(' | ');
+    for (const v of ['(MTV)', '(TTV)', '(CPI)', 'Optical Engine Package']) expect(titles, v).toContain(v);
+  });
+
   it('builds known-good optical engines from sorted dies, and mounts them only once they are known good', () => {
     /* the photonic and electrical dies are sorted and released before they are stacked */
     for (const ref of ['SORT-03', 'SORT-04', 'SORT-05']) expect(absEnd(ref), ref).toBeLessThanOrEqual(absStart('OEB-02'));
