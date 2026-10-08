@@ -284,7 +284,7 @@ export const OBU_WRITE_UPS: CpoWriteUps = {
       'Optical control firmware from DSGN-16',
       'Control algorithms from DSGN-08',
       'Optical source power-up behavior from OBU-01',
-      'Firmware-to-hardware interface definitions from ICD-08',
+      'Firmware-to-hardware interface definitions from ICD-10',
     ],
     rel: {
       'OBU-D5': '<b>Optical monitoring and control firmware release for bring-up.</b> Produced here; system integration and telemetry run on it.',

@@ -7,7 +7,7 @@ export const SARC_WRITE_UPS: CpoWriteUps = {
   'SARC-01': {
     criticalPath: true,
     purpose: [
-      'Architect the <b>switch ASIC</b>: the forwarding pipeline and its table allocation, the shared packet buffer and its partitioning, the traffic manager’s queues, schedulers and congestion signaling, the port-to-slice mapping, and the telemetry hooks — with area, power and memory estimated per block.',
+      'Architect the <b>Switch SoC</b>: the forwarding pipeline and its table allocation, the shared packet buffer and its partitioning, the traffic manager’s queues, schedulers and congestion signaling, the port-to-slice mapping, and the telemetry hooks — with area, power and memory estimated per block.',
       'The switch die is the largest and most power-hungry die in the package, and its buffer is usually its largest block. Its architecture fixes how many SerDes lanes leave it and on which edges, which in turn constrains where the optical engines can sit in SARC-05 — so the specification is released with its beachfront and power estimates, not just its features.',
     ],
     flowNote:
@@ -20,8 +20,8 @@ export const SARC_WRITE_UPS: CpoWriteUps = {
       'Memory compiler density estimates for the candidate process',
     ],
     rel: {
-      'SARC-D1': '<b>Switch ASIC architecture specification — pipeline, packet buffer and traffic manager.</b> Produced here; DSGN-01 writes the microarchitecture against it.',
-      'SARC-D4': '<b>Die partitioning and die-to-die, bridge and interposer decision record.</b> The switch die size and I/O count bound the partitioning options.',
+      'SARC-D1': '<b>Switch SoC architecture specification — pipeline, packet buffer and traffic manager.</b> Produced here; DSGN-01 writes the microarchitecture against it.',
+      'SARC-D4': '<b>Product partitioning record.</b> The Switch SoC size and its die-to-die bandwidth to the I/O die bound the partitioning options.',
       'SARC-D11': '<b>Power, performance, area and cost budget allocation by subsystem.</b> The per-block area and power estimates are the largest input to the roll-up.',
     },
     risks: [
@@ -32,7 +32,7 @@ export const SARC_WRITE_UPS: CpoWriteUps = {
       '<b>Power estimated at typical.</b> Block power is estimated at typical corner and activity, and the roll-up misses power per bit.',
     ],
     roles: [
-      { r: 'Switch ASIC architecture', d: 'Owns the switch ASIC architecture specification' },
+      { r: 'Switch ASIC architecture', d: 'Owns the Switch SoC architecture specification' },
       { r: 'Performance modeling lead', d: 'Buffer and congestion sizing' },
       { r: 'Physical design lead', d: 'Area, floorplan and reticle feasibility' },
       { r: 'SerDes architect', d: 'I/O count and die-edge placement' },
@@ -77,11 +77,11 @@ export const SARC_WRITE_UPS: CpoWriteUps = {
   'SARC-02': {
     criticalPath: true,
     purpose: [
-      'Architect the <b>SerDes and high-speed I/O</b>: lane count, the target lane rate and modulation, equalization and clocking, the host channel reach and loss, and which I/O lives on the switch die versus on separate I/O silicon.',
-      'In a co-packaged switch the SerDes drives a short in-package channel to the optical engines rather than a board trace to a pluggable cage, which changes the equalization and power trade. Choosing that point — and whether a lighter short-reach interface is used toward the optics — is the largest lever on power per bit in the whole architecture.',
+      'Architect the <b>I/O die as its own die</b>: lane count, the target lane rate and modulation, equalization and clocking, the host and in-package channel reach and loss, the die-to-die PHY toward the Switch SoC, and the lane map from switch ports through the I/O die to the optical engines.',
+      'In a co-packaged switch the I/O die drives a short in-package channel to the optical engines rather than a board trace to a pluggable cage, which changes the equalization and power trade. Putting the SerDes on a separate die lets it use the process that suits analog and frees Switch SoC edge for the die-to-die PHY, but it adds a die-to-die link every packet crosses — so the I/O die architecture is the largest lever on power per bit in the whole architecture.',
     ],
     flowNote:
-      'Step 1 fixes lanes, rate and modulation. Step 2 defines equalization and clocking, with step 3 setting host channel reach in parallel. Step 4 decides I/O placement, step 5 estimates power and beachfront, and step 6 releases.',
+      'Step 1 fixes lanes, rate and modulation. Step 2 defines equalization and clocking, with step 3 setting host channel reach in parallel. Step 4 defines the die-to-die PHY and lane map, step 5 estimates power, beachfront and bumps, and step 6 releases.',
     consumes: [
       'System requirements specification from REQ-02',
       'Optical link requirements and FEC scheme from REQ-04',
@@ -90,8 +90,8 @@ export const SARC_WRITE_UPS: CpoWriteUps = {
       'Process node selection status from TRDY-01',
     ],
     rel: {
-      'SARC-D2': '<b>SerDes and high-speed I/O architecture specification.</b> Produced here; DSGN-04 designs the I/O silicon against it.',
-      'SARC-D4': '<b>Die partitioning and die-to-die, bridge and interposer decision record.</b> The I/O placement decision is a direct input to partitioning.',
+      'SARC-D2': '<b>I/O die architecture specification — SerDes, die-to-die PHY and lane mapping.</b> Produced here; DSGN-04 designs the I/O die against it.',
+      'SARC-D4': '<b>Product partitioning record.</b> The I/O die bump count and die-to-die bandwidth are direct inputs to partitioning.',
       'SARC-D11': '<b>Power, performance, area and cost budget allocation by subsystem.</b> SerDes power per lane is a major line of the power roll-up.',
     },
     risks: [
@@ -102,17 +102,17 @@ export const SARC_WRITE_UPS: CpoWriteUps = {
       '<b>FEC misaligned.</b> SerDes and optics budget different FEC schemes.',
     ],
     roles: [
-      { r: 'SerDes and high-speed I/O', d: 'Owns the SerDes and I/O architecture' },
+      { r: 'SerDes and high-speed I/O', d: 'Owns the I/O die architecture' },
       { r: 'SI/PI engineer', d: 'Channel reach and loss analysis' },
       { r: 'Photonics lead', d: 'Electrical interface needs of the optical engine' },
-      { r: 'Switch ASIC architect', d: 'Lane count and die-edge placement' },
-      { r: 'Chief architect', d: 'Approves the I/O placement decision' },
+      { r: 'Switch SoC architect', d: 'Lane count and die-edge placement' },
+      { r: 'Chief architect', d: 'Approves the die-to-die PHY and lane map' },
     ],
     effort: [
       ['Lane rate and modulation', 3],
       ['Equalization and clocking', 4],
       ['Channel reach analysis', 2],
-      ['I/O placement', 2.5],
+      ['Die-to-die PHY and lane map', 2.5],
       ['Power and area estimate', 1.5],
       ['Release', 1],
     ],
@@ -124,7 +124,7 @@ export const SARC_WRITE_UPS: CpoWriteUps = {
     exit: [
       'Lane rate, modulation and FEC agreed by SerDes and photonics',
       'Host and in-package channel loss targets stated in dB with margin',
-      'SerDes power per lane estimated and inside the allocation in the draft roll-up',
+      'I/O die power per lane and die-to-die power estimated and inside the allocation in the draft roll-up',
     ],
     dependsOn: ['REQ-02', 'REQ-04'],
     dependsNote: 'Runs beside the SerDes test chip in FEAS-02 and is revised once its first measurements arrive.',
@@ -197,7 +197,7 @@ export const SARC_WRITE_UPS: CpoWriteUps = {
     ],
     dependsOn: ['REQ-04', 'SARC-02'],
     dependsNote: 'Decided ahead of photonic test vehicle results, so the engine split names the assumptions FEAS-09 must confirm.',
-    feedsInto: ['SARC-04', 'SARC-05', 'ICD-03', 'ICD-04'],
+    feedsInto: ['SARC-04', 'SARC-05', 'ICD-04', 'ICD-06'],
     measuredBy: [
       'Link budget margin per reach class',
       'Optical engine power versus allocation',
@@ -205,7 +205,7 @@ export const SARC_WRITE_UPS: CpoWriteUps = {
     ],
     links: {
       dependsOn: ['REQ-04', 'REQ-02', 'SARC-02'],
-      feedsInto: ['SARC-04', 'SARC-05', 'SARC-06', 'SARC-07', 'SARC-10', 'SARC-11', 'SARC-12', 'ICD-03', 'ICD-04', 'MODL-04', 'DSGN-06'],
+      feedsInto: ['SARC-04', 'SARC-05', 'SARC-06', 'SARC-07', 'SARC-10', 'SARC-11', 'SARC-12', 'ICD-04', 'ICD-06', 'MODL-04', 'DSGN-06'],
       runsWith: ['FEAS-03', 'FEAS-05'],
       revisedBy: ['FEAS-09', 'MODL-04'],
       feedsBackInto: ['REQ-04'],
@@ -215,29 +215,29 @@ export const SARC_WRITE_UPS: CpoWriteUps = {
   'SARC-04': {
     criticalPath: true,
     purpose: [
-      'Decide the <b>die partitioning and the die-to-die, bridge and interposer strategy</b>: whether the switch is monolithic or split into a core and I/O dies, the die-to-die interface and its bandwidth density, whether bridges, an interposer or the substrate alone carry the dense links, and where silicon capacitors sit.',
-      'Partitioning is chosen on yield, cost, power, thermal and supply risk together. The option that looks best on silicon cost can be the worst on assembly yield or supply, so the package partner confirms the chosen stack is buildable before the decision is recorded — with the options it rejected, so a later reversal starts from evidence rather than memory.',
+      'Decide the <b>product partition</b>: four dies — the Switch SoC, the I/O die, the electrical IC and the photonic IC — and two packages. The <b>optical engine package</b> stacks the electrical IC on the photonic IC on an engine substrate with its fiber coupling, and has its own build, test and known-good gate; the <b>main package</b> carries the Switch SoC, the I/O die and known-good optical engines on one substrate with the fiber egress and the external optical source. The die-to-die interface between the Switch SoC and the I/O die, the bridge or interposer that carries it and the silicon capacitors are decided here too.',
+      'Making the optical engine a package of its own is what lets it be tested and binned before it meets a Switch SoC: an engine that fails after main assembly scraps every good die beside it. Partitioning is chosen on yield, cost, power, thermal and supply risk together, so the package and assembly partners confirm both stacks are buildable before the decision is recorded — with the options it rejected, so a later reversal starts from evidence rather than memory.',
     ],
     flowNote:
-      'Step 1 lists the options. Step 2 chooses the die-to-die interface and step 3 the bridge, interposer and capacitor strategy. Step 4 scores the options in parallel with step 3. Step 5 confirms assembly feasibility with the package partner, and step 6 records the decision.',
+      'Step 1 partitions the product into its items. Step 2 chooses the die-to-die interface and step 3 the bridge, interposer and capacitor strategy. Step 4 defines the optical engine package and scores the partition in parallel with step 3. Step 5 confirms both stacks with the partners, and step 6 records the decision.',
     consumes: [
-      'Switch ASIC architecture and area estimate from SARC-01',
-      'SerDes and I/O architecture from SARC-02',
+      'Switch SoC architecture and area estimate from SARC-01',
+      'I/O die architecture from SARC-02',
       'Optical engine architecture from SARC-03',
       'Package technology options from TRDY-06',
       'Package and bridge test vehicle plan from FEAS-07',
     ],
     rel: {
-      'SARC-D4': '<b>Die partitioning and die-to-die, bridge and interposer decision record.</b> Produced here; the package, die-to-die and bridge designs are built against it.',
-      'SARC-D5': '<b>Package and system mechanical architecture — engine placement and fiber egress.</b> The partitioning fixes how many dies the package carries and where.',
-      'SARC-D12': '<b>Architecture convergence and partition freeze package.</b> The partitioning decision is the central item frozen at the review.',
+      'SARC-D4': '<b>Product partitioning record — four dies, optical engine package and main package — with the die-to-die, bridge and interposer decision.</b> Produced here; every die, both packages and the bridge are designed against it.',
+      'SARC-D5': '<b>Main package and system mechanical architecture — engine placement and fiber egress.</b> The partition fixes how many dies and optical engines the main package carries.',
+      'SARC-D12': '<b>Architecture convergence and partition freeze package.</b> The product partition is the central item frozen at the review.',
     },
     risks: [
       '<b>Assembly partner not consulted.</b> The chosen bump pitch or bridge is not in the partner’s qualified process.',
       '<b>Scoring weighted to silicon cost.</b> Compound assembly yield is ignored and the cheapest option costs the most.',
-      '<b>Die-to-die bandwidth short.</b> The interface density does not cover worst-case traffic between core and I/O dies.',
+      '<b>Die-to-die bandwidth short.</b> The interface density does not cover worst-case traffic between the Switch SoC and the I/O die.',
       '<b>Silicon capacitors placed late.</b> The PDN needs them where the bridge already sits.',
-      '<b>Rejected options unrecorded.</b> A later cost review reopens the decision without the evidence.',
+      '<b>Optical engine folded into main assembly.</b> Engines are built on the main package with no gate of their own, so every engine failure scraps the dies beside it.',
     ],
     roles: [
       { r: 'System architecture', d: 'Owns the partitioning decision' },
@@ -247,11 +247,11 @@ export const SARC_WRITE_UPS: CpoWriteUps = {
       { r: 'Supply chain lead', d: 'Supply risk of each option' },
     ],
     effort: [
-      ['Option definition', 2],
+      ['Item partition and ownership', 2],
       ['Die-to-die interface selection', 3],
       ['Bridge, interposer and capacitor strategy', 3],
       ['Option scoring', 2],
-      ['Partner feasibility and decision record', 2],
+      ['Optical engine package and partner feasibility', 2],
     ],
     entry: [
       'Switch, SerDes and optical engine architecture drafts available',
@@ -259,13 +259,13 @@ export const SARC_WRITE_UPS: CpoWriteUps = {
       'Scoring criteria agreed with finance and NPI',
     ],
     exit: [
-      'Partitioning option selected with a weighted score and rejected options recorded',
-      'Die-to-die bandwidth density and bump pitch confirmed buildable in writing by the package partner',
+      'Six items — Switch SoC, I/O die, electrical IC, photonic IC, optical engine package and main package — each with an owner and a boundary, and rejected options recorded',
+      'Die-to-die bump pitch and the optical engine stack confirmed buildable in writing by the package and assembly partners',
       'Silicon capacitor locations agreed with SI/PI',
     ],
     dependsOn: ['SARC-01', 'SARC-02', 'SARC-03'],
     dependsNote: null,
-    feedsInto: ['SARC-05', 'SARC-10', 'ICD-02', 'ICD-05'],
+    feedsInto: ['SARC-05', 'SARC-10', 'ICD-02', 'ICD-07'],
     measuredBy: [
       'Compound yield estimate of the chosen stack',
       'Die-to-die bandwidth margin',
@@ -273,17 +273,17 @@ export const SARC_WRITE_UPS: CpoWriteUps = {
     ],
     links: {
       dependsOn: ['SARC-01', 'SARC-02', 'SARC-03'],
-      feedsInto: ['SARC-05', 'SARC-07', 'SARC-10', 'SARC-11', 'SARC-12', 'ICD-01', 'ICD-02', 'ICD-05', 'DSGN-09', 'FEAS-07'],
+      feedsInto: ['SARC-05', 'SARC-07', 'SARC-10', 'SARC-11', 'SARC-12', 'ICD-01', 'ICD-02', 'ICD-07', 'DSGN-09', 'FEAS-07'],
       runsWith: ['TRDY-06'],
       revisedBy: ['FEAS-09'],
       feedsBackInto: [],
     },
-    terms: ['D2D', 'Bridge', 'Interposer', 'Si capacitor', 'UCIe', 'OSAT'],
+    terms: ['D2D', 'Bridge', 'Interposer', 'Si capacitor', 'UCIe', 'OSAT', 'Optical engine'],
   },
   'SARC-05': {
     criticalPath: true,
     purpose: [
-      'Architect the <b>package and system mechanics</b>: where the optical engines sit around the switch die, how fiber leaves the package and reaches the front panel, the package body, substrate and ball pitch envelope, the front-panel layout, and how engines and optical source are handled and replaced.',
+      'Architect the <b>main package and system mechanics</b>: where the known-good optical engines sit around the Switch SoC and I/O die, how fiber leaves the package and reaches the front panel, the package body, substrate and ball pitch envelope, the front-panel layout, and how engines and optical source are handled and replaced.',
       'Package architecture starts here, in parallel with the silicon, not after GDS. Engine placement trades electrical reach from the SerDes against heat spreading and fiber routing, and fiber egress sets the chassis. A package that cannot route fiber within bend-radius limits is not recoverable by a board respin.',
     ],
     flowNote:
@@ -296,7 +296,7 @@ export const SARC_WRITE_UPS: CpoWriteUps = {
       'Substrate and assembly capability from TRDY-06',
     ],
     rel: {
-      'SARC-D5': '<b>Package and system mechanical architecture — engine placement and fiber egress.</b> Produced here; DSGN-12 and DSGN-13 design the package and fiber assembly against it.',
+      'SARC-D5': '<b>Main package and system mechanical architecture — engine placement and fiber egress.</b> Produced here; DSGN-12 and DSGN-13 design the main package and fiber assembly against it.',
       'SARC-D7': '<b>Thermal architecture and cooling concept.</b> Engine placement and package envelope are the thermal model’s geometry.',
       'SARC-D11': '<b>Power, performance, area and cost budget allocation by subsystem.</b> Package body, layer count and fiber assembly set the package cost line.',
     },
@@ -308,7 +308,7 @@ export const SARC_WRITE_UPS: CpoWriteUps = {
       '<b>Handling ignored.</b> Fiber pigtails are damaged in assembly and board mount because no handling concept exists.',
     ],
     roles: [
-      { r: 'Packaging', d: 'Owns the package and system mechanical architecture' },
+      { r: 'Packaging', d: 'Owns the main package and system mechanical architecture' },
       { r: 'Optical engineer', d: 'Fiber egress and front-panel optics' },
       { r: 'Thermal engineer', d: 'Heat spreading and cooling interface' },
       { r: 'SI/PI engineer', d: 'Electrical reach from SerDes to engines' },
@@ -330,11 +330,11 @@ export const SARC_WRITE_UPS: CpoWriteUps = {
     exit: [
       'Every engine placed within the SerDes channel budget and the thermal limits',
       'Fiber route meets minimum bend radius from package to front panel with margin',
-      'Package envelope and warpage estimate accepted by the assembly partner',
+      'Main package envelope and warpage estimate accepted by the assembly partner',
     ],
     dependsOn: ['SARC-03', 'SARC-04'],
     dependsNote: 'Starts before the partition is final and converges with the thermal concept in SARC-07, which runs alongside it.',
-    feedsInto: ['SARC-07', 'ICD-04', 'ICD-05', 'ICD-07'],
+    feedsInto: ['SARC-07', 'ICD-06', 'ICD-07', 'ICD-09'],
     measuredBy: [
       'Channel length from SerDes to farthest engine',
       'Fiber bend radius margin',
@@ -342,7 +342,7 @@ export const SARC_WRITE_UPS: CpoWriteUps = {
     ],
     links: {
       dependsOn: ['SARC-03', 'SARC-04', 'REQ-07'],
-      feedsInto: ['SARC-07', 'SARC-11', 'SARC-12', 'ICD-04', 'ICD-05', 'ICD-07', 'DSGN-12', 'DSGN-13', 'MODL-07'],
+      feedsInto: ['SARC-07', 'SARC-11', 'SARC-12', 'ICD-06', 'ICD-07', 'ICD-09', 'DSGN-12', 'DSGN-13', 'MODL-07'],
       runsWith: ['SARC-07', 'TRDY-06'],
       revisedBy: ['FEAS-07', 'MODL-07'],
       feedsBackInto: ['REQ-07'],
@@ -358,14 +358,14 @@ export const SARC_WRITE_UPS: CpoWriteUps = {
     flowNote:
       'Step 1 builds the power tree. Step 2 sets the VRM topology, with step 3 allocating the PDN budget in parallel. Step 4 defines sequencing and faults, step 5 clocks and reset, step 6 the network timing architecture that REQ-03 requires, and step 7 releases.',
     consumes: [
-      'Switch ASIC power estimates from SARC-01',
+      'Switch SoC power estimates from SARC-01',
       'SerDes power and clocking architecture from SARC-02',
       'Optical engine and optical source power from SARC-03',
       'System power envelope from REQ-02',
       'VRM and power component supplier data',
     ],
     rel: {
-      'SARC-D6': '<b>Clock, reset, network timing and power architecture with power tree and PDN budget.</b> Produced here; the board design in DSGN-14 and the power ICD in ICD-06 are built from it.',
+      'SARC-D6': '<b>Clock, reset, network timing and power architecture with power tree and PDN budget.</b> Produced here; the board design in DSGN-14 and the power ICD in ICD-08 are built from it.',
       'SARC-D11': '<b>Power, performance, area and cost budget allocation by subsystem.</b> Conversion losses and VRM cost enter the budget roll-up.',
     },
     risks: [
@@ -403,7 +403,7 @@ export const SARC_WRITE_UPS: CpoWriteUps = {
     ],
     dependsOn: ['SARC-01', 'SARC-02', 'SARC-03'],
     dependsNote: null,
-    feedsInto: ['SARC-11', 'ICD-06', 'DSGN-14'],
+    feedsInto: ['SARC-11', 'ICD-08', 'DSGN-14'],
     measuredBy: [
       'Rails in the power tree versus rails in the design',
       'Conversion efficiency at full load',
@@ -411,7 +411,7 @@ export const SARC_WRITE_UPS: CpoWriteUps = {
     ],
     links: {
       dependsOn: ['SARC-01', 'SARC-02', 'SARC-03', 'REQ-02', 'REQ-03'],
-      feedsInto: ['SARC-11', 'SARC-12', 'ICD-06', 'DSGN-03', 'DSGN-14', 'MODL-06'],
+      feedsInto: ['SARC-11', 'SARC-12', 'ICD-08', 'DSGN-03', 'DSGN-14', 'MODL-06'],
       runsWith: ['SARC-07'],
       revisedBy: ['MODL-06', 'MODL-08'],
       feedsBackInto: [],
@@ -434,7 +434,7 @@ export const SARC_WRITE_UPS: CpoWriteUps = {
       'Thermal test vehicle plan from FEAS-07',
     ],
     rel: {
-      'SARC-D7': '<b>Thermal architecture and cooling concept.</b> Produced here; the thermal design in DSGN-15 and the thermal ICD in ICD-07 are built from it.',
+      'SARC-D7': '<b>Thermal architecture and cooling concept.</b> Produced here; the thermal design in DSGN-15 and the thermal ICD in ICD-09 are built from it.',
       'SARC-D11': '<b>Power, performance, area and cost budget allocation by subsystem.</b> Cooling cost and fan or pump power enter the roll-up.',
     },
     risks: [
@@ -470,7 +470,7 @@ export const SARC_WRITE_UPS: CpoWriteUps = {
     ],
     dependsOn: ['SARC-03', 'SARC-04', 'REQ-02'],
     dependsNote: 'Converges with SARC-05 rather than after it: placement and cooling are iterated together.',
-    feedsInto: ['SARC-11', 'ICD-07', 'DSGN-15'],
+    feedsInto: ['SARC-11', 'ICD-09', 'DSGN-15'],
     measuredBy: [
       'Worst-case junction temperature margin per component',
       'Heater power in the thermal budget',
@@ -478,7 +478,7 @@ export const SARC_WRITE_UPS: CpoWriteUps = {
     ],
     links: {
       dependsOn: ['SARC-03', 'SARC-04', 'SARC-05', 'REQ-02'],
-      feedsInto: ['SARC-11', 'SARC-12', 'ICD-07', 'DSGN-15', 'MODL-07'],
+      feedsInto: ['SARC-11', 'SARC-12', 'ICD-09', 'DSGN-15', 'MODL-07'],
       runsWith: ['SARC-06', 'FEAS-07'],
       revisedBy: ['MODL-07', 'FEAS-07'],
       feedsBackInto: [],
@@ -494,7 +494,7 @@ export const SARC_WRITE_UPS: CpoWriteUps = {
     flowNote:
       'Step 1 maps firmware components and step 2 places the management processor. Step 3 architects the SDK and drivers in parallel with step 2. Step 4 defines data paths, step 5 update and compatibility rules, and step 6 releases.',
     consumes: [
-      'Switch ASIC architecture from SARC-01',
+      'Switch SoC architecture from SARC-01',
       'Optical engine architecture and control needs from SARC-03',
       'Telemetry requirements from REQ-03',
       'Security requirements from REQ-06',
@@ -538,7 +538,7 @@ export const SARC_WRITE_UPS: CpoWriteUps = {
     ],
     dependsOn: ['SARC-01', 'SARC-03', 'REQ-03'],
     dependsNote: null,
-    feedsInto: ['SARC-09', 'ICD-08', 'MODL-09'],
+    feedsInto: ['SARC-09', 'ICD-10', 'MODL-09'],
     measuredBy: [
       'Control loops with a timing budget',
       'Management processor load estimate',
@@ -546,7 +546,7 @@ export const SARC_WRITE_UPS: CpoWriteUps = {
     ],
     links: {
       dependsOn: ['SARC-01', 'SARC-03', 'REQ-03', 'REQ-06'],
-      feedsInto: ['SARC-09', 'SARC-12', 'ICD-08', 'MODL-09', 'DSGN-16', 'DSGN-17'],
+      feedsInto: ['SARC-09', 'SARC-12', 'ICD-10', 'MODL-09', 'DSGN-16', 'DSGN-17'],
       runsWith: ['SARC-06'],
       revisedBy: ['SARC-09'],
       feedsBackInto: [],
@@ -605,7 +605,7 @@ export const SARC_WRITE_UPS: CpoWriteUps = {
     ],
     dependsOn: ['REQ-06', 'SARC-08'],
     dependsNote: null,
-    feedsInto: ['SARC-10', 'ICD-08', 'DSGN-10'],
+    feedsInto: ['SARC-10', 'ICD-10', 'DSGN-10'],
     measuredBy: [
       'Threats mapped to controls (%)',
       'Anti-rollback counter capacity versus service life',
@@ -613,7 +613,7 @@ export const SARC_WRITE_UPS: CpoWriteUps = {
     ],
     links: {
       dependsOn: ['REQ-06', 'SARC-08', 'SARC-04'],
-      feedsInto: ['SARC-10', 'SARC-12', 'ICD-08', 'ICD-09', 'DSGN-10', 'SGNO-08'],
+      feedsInto: ['SARC-10', 'SARC-12', 'ICD-10', 'ICD-11', 'DSGN-10', 'SGNO-08'],
       runsWith: ['TRDY-05'],
       revisedBy: [],
       feedsBackInto: ['REQ-06', 'SARC-08'],
@@ -632,7 +632,7 @@ export const SARC_WRITE_UPS: CpoWriteUps = {
       'Manufacturability, test and cost-of-goods targets from REQ-08',
       'Die partitioning from SARC-04',
       'Optical engine architecture from SARC-03',
-      'SerDes and I/O architecture from SARC-02',
+      'I/O die architecture from SARC-02',
       'Key provisioning needs from SARC-09',
     ],
     rel: {
@@ -673,7 +673,7 @@ export const SARC_WRITE_UPS: CpoWriteUps = {
     ],
     dependsOn: ['REQ-08', 'SARC-04', 'SARC-03'],
     dependsNote: null,
-    feedsInto: ['SARC-11', 'ICD-09', 'TINF-01', 'DSGN-11'],
+    feedsInto: ['SARC-11', 'ICD-11', 'TINF-01', 'DSGN-11'],
     measuredBy: [
       'Planned KGD coverage per die',
       'Estimated test time per insertion',
@@ -681,7 +681,7 @@ export const SARC_WRITE_UPS: CpoWriteUps = {
     ],
     links: {
       dependsOn: ['REQ-08', 'SARC-02', 'SARC-03', 'SARC-04'],
-      feedsInto: ['SARC-11', 'SARC-12', 'ICD-09', 'TINF-01', 'DSGN-11'],
+      feedsInto: ['SARC-11', 'SARC-12', 'ICD-11', 'TINF-01', 'DSGN-11'],
       runsWith: ['SARC-09'],
       revisedBy: ['TINF-01'],
       feedsBackInto: ['REQ-08'],
@@ -717,7 +717,7 @@ export const SARC_WRITE_UPS: CpoWriteUps = {
     roles: [
       { r: 'System architecture', d: 'Owns the roll-up and the allocation' },
       { r: 'Finance partner', d: 'Cost-of-goods validation' },
-      { r: 'Switch ASIC architect', d: 'Switch die budget' },
+      { r: 'Switch SoC architect', d: 'Switch die budget' },
       { r: 'Photonics lead', d: 'Optical engine budget' },
       { r: 'Program TPM', d: 'Tracks budget acceptance and trades' },
     ],
@@ -757,8 +757,8 @@ export const SARC_WRITE_UPS: CpoWriteUps = {
   'SARC-12': {
     criticalPath: true,
     purpose: [
-      'Hold the <b>architecture convergence review and freeze the partition</b>: every architecture specification checked against the requirements baseline, cross-thread conflicts closed or logged as risks, and the partition — dies, engines, package, power, thermal, test and security — placed under change control.',
-      'After this gate, a change to the partition costs a substrate, a die-to-die redesign or a new optical engine. The review freezes only what is ready: items still open are listed with the gate they must close by, rather than being frozen at a guess that the interface freeze in ICD-10 then has to live with.',
+      'Hold the <b>architecture convergence review and freeze the partition</b>: every architecture specification checked against the requirements baseline, cross-thread conflicts closed or logged as risks, and the partition — the Switch SoC, the I/O die, the electrical IC, the photonic IC, the optical engine package and the main package, with power, thermal, test and security around them — placed under change control.',
+      'After this gate, a change to the partition costs a substrate, a die-to-die redesign or a new optical engine. The review freezes only what is ready: items still open are listed with the gate they must close by, rather than being frozen at a guess that the interface freeze in ICD-12 then has to live with.',
     ],
     flowNote:
       'Step 1 checks every specification against the baseline. Step 2 closes conflicts between threads. Step 3 holds the review and freezes the partition, and step 4 releases the package under change control.',
@@ -799,11 +799,11 @@ export const SARC_WRITE_UPS: CpoWriteUps = {
     exit: [
       'Every system requirement allocated to at least one architecture element',
       'No open cross-thread conflict without an owner and a closing gate',
-      'Partition freeze approved by the chief engineer and under change control',
+      'Partition into the six items and their interfaces approved by the chief engineer and under change control',
     ],
     dependsOn: ['SARC-01', 'SARC-02', 'SARC-03', 'SARC-04', 'SARC-05', 'SARC-06', 'SARC-07', 'SARC-08', 'SARC-09', 'SARC-10', 'SARC-11'],
     dependsNote: null,
-    feedsInto: ['ICD-10', 'DSGN-01', 'MODL-10'],
+    feedsInto: ['ICD-12', 'DSGN-01', 'MODL-10'],
     measuredBy: [
       'Open architecture items at freeze',
       'Changes to the partition after freeze',
@@ -811,7 +811,7 @@ export const SARC_WRITE_UPS: CpoWriteUps = {
     ],
     links: {
       dependsOn: ['SARC-01', 'SARC-02', 'SARC-03', 'SARC-04', 'SARC-05', 'SARC-06', 'SARC-07', 'SARC-08', 'SARC-09', 'SARC-10', 'SARC-11', 'REQ-09', 'FEAS-10'],
-      feedsInto: ['ICD-10', 'DSGN-01', 'DSGN-12', 'MODL-10', 'FEAS-09'],
+      feedsInto: ['ICD-12', 'DSGN-01', 'DSGN-12', 'MODL-10', 'FEAS-09'],
       runsWith: ['ICD-01'],
       revisedBy: ['FEAS-09'],
       feedsBackInto: ['REQ-09'],

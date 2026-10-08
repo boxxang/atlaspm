@@ -21,7 +21,7 @@ export const ICD_WRITE_UPS: CpoWriteUps = {
     ],
     rel: {
       'ICD-D1': '<b>Interface register with owners, versioning rules and change control board charter.</b> Produced here; every ICD in this stage is registered, versioned and changed under it.',
-      'ICD-D11': '<b>Interface freeze and change control baseline package.</b> The freeze criteria defined here are the checklist the freeze review applies.',
+      'ICD-D13': '<b>Interface freeze and change control baseline package.</b> The freeze criteria defined here are the checklist the freeze review applies.',
     },
     risks: [
       '<b>Partner side unowned.</b> An interface to a supplier has an internal owner but nobody named at the supplier.',
@@ -55,7 +55,7 @@ export const ICD_WRITE_UPS: CpoWriteUps = {
     ],
     dependsOn: ['REQ-09', 'SARC-04'],
     dependsNote: 'Starts before the partition freeze so the register exists when the ICDs begin; interfaces added by SARC-12 are registered as they appear.',
-    feedsInto: ['ICD-02', 'ICD-03', 'ICD-04', 'ICD-05', 'ICD-06', 'ICD-07', 'ICD-08', 'ICD-09', 'ICD-10'],
+    feedsInto: ['ICD-02', 'ICD-03', 'ICD-04', 'ICD-05', 'ICD-06', 'ICD-07', 'ICD-08', 'ICD-09', 'ICD-10', 'ICD-11', 'ICD-12'],
     measuredBy: [
       'Interfaces with owners on both sides (%)',
       'Change requests decided within the service level',
@@ -63,7 +63,7 @@ export const ICD_WRITE_UPS: CpoWriteUps = {
     ],
     links: {
       dependsOn: ['REQ-09', 'SARC-04'],
-      feedsInto: ['ICD-02', 'ICD-03', 'ICD-04', 'ICD-05', 'ICD-06', 'ICD-07', 'ICD-08', 'ICD-09', 'ICD-10', 'PCTL-03', 'SUST-04'],
+      feedsInto: ['ICD-02', 'ICD-03', 'ICD-04', 'ICD-05', 'ICD-06', 'ICD-07', 'ICD-08', 'ICD-09', 'ICD-10', 'ICD-11', 'ICD-12', 'PCTL-03', 'SUST-04'],
       runsWith: ['SARC-12'],
       revisedBy: ['SARC-12'],
       feedsBackInto: [],
@@ -73,21 +73,21 @@ export const ICD_WRITE_UPS: CpoWriteUps = {
   'ICD-02': {
     criticalPath: true,
     purpose: [
-      'Define the <b>die-to-die, switch-to-I/O and host processor electrical interfaces</b>: the die-to-die protocol, lane count, bump pitch, latency and error requirements; the SerDes electrical specification toward the I/O silicon and the optical engines; the host and control-plane processor interface with its link type, address map, DMA and interrupt delivery; the channel loss budget per path; link training, equalization handshakes and lane repair; and the compliance points where each is measured.',
-      'These are the highest-bandwidth boundaries in the system and each is designed by two teams, often at two companies. The ICD states each parameter once, with a tolerance and a measurement point, so that the transmitter team and the receiver team close to the same number — and so CHAR-06 can later show the silicon meets it.',
+      'Define the <b>Switch SoC-to-I/O die die-to-die interface and the host processor interface</b>: the die-to-die protocol, lane count, bump pitch, latency and error requirements; the electrical specification across the bridge with clock forwarding and channel loss limits; the host and control-plane processor interface with its link type, address map, DMA and interrupt delivery; die-to-die training, lane repair and the timing boundary between the two dies; and the compliance points where each is measured.',
+      'With the I/O die split from the Switch SoC, the die-to-die link is the widest boundary in the product and the two dies are designed by different teams, sometimes on different process nodes. The ICD states each parameter once, with a tolerance and a measurement point, so both sides close to the same number — and so CHAR-06 can later show the silicon meets it. The I/O die’s other side, toward the optical engines, is its own ICD in ICD-03.',
     ],
     flowNote:
-      'Step 1 defines the die-to-die interface, step 2 the SerDes electrical specifications and step 3 the host processor interface. Step 4 builds the channel model in parallel with step 3 so the loss limits are checked as they are written. Step 5 defines training and repair, step 6 the compliance points, and step 7 releases.',
+      'Step 1 defines the die-to-die protocol, step 2 its electrical specification across the bridge and step 3 the host processor interface. Step 4 builds the channel model in parallel with step 3 so the loss limits are checked as they are written. Step 5 defines training, repair and the timing boundary, step 6 the compliance points, and step 7 releases.',
     consumes: [
-      'SerDes and high-speed I/O architecture from SARC-02',
+      'I/O die architecture from SARC-02',
       'Die partitioning and die-to-die selection from SARC-04',
       'Interface register and freeze criteria from ICD-01',
       'Package channel estimates from MODL-03',
       'SerDes test chip measurements from FEAS-02',
     ],
     rel: {
-      'ICD-D2': '<b>Die-to-die, switch-to-I/O and host processor electrical interface control document.</b> Produced here; DSGN-04 and DSGN-12 design both sides and the package routing to it.',
-      'ICD-D11': '<b>Interface freeze and change control baseline package.</b> This ICD is baselined at the freeze.',
+      'ICD-D2': '<b>Switch SoC-to-I/O die die-to-die and host processor interface control document.</b> Produced here; DSGN-02, DSGN-04 and DSGN-12 design both dies and the bridge routing to it.',
+      'ICD-D13': '<b>Interface freeze and change control baseline package.</b> This ICD is baselined at the freeze.',
     },
     risks: [
       '<b>Compliance point undefined.</b> Without a pluggable cage there is no natural measurement point, and each side measures somewhere different.',
@@ -100,15 +100,15 @@ export const ICD_WRITE_UPS: CpoWriteUps = {
       { r: 'SerDes and high-speed I/O', d: 'Owns the electrical interface ICD' },
       { r: 'SI/PI engineer', d: 'Channel model and loss budget' },
       { r: 'Packaging engineer', d: 'Bump pitch and in-package routing' },
-      { r: 'Switch ASIC architect', d: 'Die-to-die latency and bandwidth needs' },
+      { r: 'Switch SoC architect', d: 'Die-to-die latency and bandwidth needs' },
       { r: 'Software architect', d: 'Host processor interface, DMA and driver needs' },
     ],
     effort: [
-      ['Die-to-die definition', 2.5],
-      ['SerDes electrical specification', 2],
-      ['Channel model and budget', 2],
-      ['Training and lane repair', 2],
-      ['Compliance points and release', 1.5],
+      ['Die-to-die definition', 2],
+      ['Electrical specification across the bridge', 1.5],
+      ['Channel model and budget', 1.5],
+      ['Training, lane repair and timing boundary', 2],
+      ['Compliance points and release', 1],
       ['Host processor interface', 1],
     ],
     entry: [
@@ -118,12 +118,12 @@ export const ICD_WRITE_UPS: CpoWriteUps = {
     ],
     exit: [
       'Every parameter, including the host processor link, address map and interrupt delivery, stated with a value, tolerance and compliance point',
-      'Channel budget closes with positive margin for every die-to-die and SerDes path',
+      'Channel budget closes with positive margin for every die-to-die and host path',
       'ICD signed by the owner on each side at the frozen maturity level',
     ],
     dependsOn: ['ICD-01', 'SARC-02', 'SARC-04'],
     dependsNote: null,
-    feedsInto: ['ICD-10', 'DSGN-04', 'PSV-07'],
+    feedsInto: ['ICD-12', 'DSGN-04', 'PSV-07'],
     measuredBy: [
       'Parameters with a compliance point (%)',
       'Channel margin at the target BER',
@@ -131,7 +131,7 @@ export const ICD_WRITE_UPS: CpoWriteUps = {
     ],
     links: {
       dependsOn: ['ICD-01', 'SARC-02', 'SARC-04', 'SARC-08'],
-      feedsInto: ['ICD-05', 'ICD-08', 'ICD-10', 'DSGN-04', 'DSGN-12', 'DSGN-17', 'PSV-07', 'CHAR-06'],
+      feedsInto: ['ICD-07', 'ICD-10', 'ICD-12', 'DSGN-04', 'DSGN-12', 'DSGN-17', 'PSV-07', 'CHAR-06'],
       runsWith: ['MODL-03', 'FEAS-02'],
       revisedBy: ['MODL-03', 'SARC-12'],
       feedsBackInto: ['SARC-02'],
@@ -141,71 +141,205 @@ export const ICD_WRITE_UPS: CpoWriteUps = {
   'ICD-03': {
     criticalPath: true,
     purpose: [
-      'Define the <b>electrical-to-photonic and optical source-to-photonic interfaces</b>: driver swing, impedance, bandwidth and interconnect between the electrical IC and photonic IC; the bias, heater and monitor signals between them; the optical power, polarization, wavelength tolerance and coupling from the optical source into the photonic IC; and optical source control and safety shutdown.',
-      'This is the least standardized boundary in the product and usually crosses three suppliers. The electrical and optical budgets depend on each other — modulator efficiency sets driver swing, laser power sets receiver margin — so the ICD allocates one combined budget and has both sides sign it, rather than each side closing its own half.',
+      'Define the <b>electrical interface between the I/O die and the optical engines</b>: which I/O die host lane feeds which engine, lane and fiber, with its polarity and swaps; the host-lane electrical specification into the electrical IC — swing, impedance and equalization range; the package channel and insertion loss budget from I/O die bump to engine pad; reference clock, sideband management and per-engine reset and enable; and link training, lane margining and the loopback points on each side.',
+      'Once the I/O die is a die of its own and the optical engine is a known-good sub-assembly bought in as a unit, this boundary is crossed by two teams and usually two build lines. The lane map in particular is written into the I/O die, the package routing, the engine substrate and the firmware, so it is defined once here and every other document references it rather than restating it.',
     ],
     flowNote:
-      'Step 1 defines the electrical interface and step 2 the control signals. Step 3 defines the optical source interface in parallel with step 2. Step 4 defines optical source control and shutdown, step 5 allocates the combined budget, and step 6 releases.',
+      'Step 1 maps every host lane to an engine and a fiber. Step 2 writes the host-lane electrical specification and step 3 builds the package channel budget beside it. Step 4 defines clock, sideband, reset and enable, step 5 training, margining and loopback, and step 6 releases.',
+    consumes: [
+      'I/O die architecture and lane count from SARC-02',
+      'Optical engine architecture and lane map draft from SARC-03',
+      'Product partitioning and main package floorplan intent from SARC-04',
+      'Package channel estimates from MODL-03',
+      'Interface register and freeze criteria from ICD-01',
+    ],
+    rel: {
+      'ICD-D3': '<b>I/O die-to-optical engine electrical interface control document with lane map and channel budget.</b> Produced here; DSGN-04, DSGN-05 and DSGN-12 design the I/O die transmitter, the electrical IC receiver and the package route to it.',
+      'ICD-D13': '<b>Interface freeze and change control baseline package.</b> This ICD is baselined at the freeze.',
+    },
+    risks: [
+      '<b>Lane map restated.</b> The map is copied into the package, engine and firmware documents and the copies drift apart.',
+      '<b>Equalization ranges mismatched.</b> The I/O die transmitter and the electrical IC receiver each assume the other equalizes the channel.',
+      '<b>Loss budget without the engine substrate.</b> The channel stops at the main package pad and the engine substrate loss is nobody’s.',
+      '<b>No loopback at the boundary.</b> A failing lane cannot be split between the I/O die, the package and the engine.',
+      '<b>Reference clock shared silently.</b> Engines are clocked from the I/O die without a jitter allocation.',
+    ],
+    roles: [
+      { r: 'SerDes and high-speed I/O', d: 'Owns the I/O die-to-optical engine ICD' },
+      { r: 'Analog and mixed-signal lead', d: 'Electrical IC receiver side of the interface' },
+      { r: 'SI/PI engineer', d: 'Package and engine substrate channel model' },
+      { r: 'Packaging engineer', d: 'Host-lane routing and engine pad assignment' },
+      { r: 'Firmware lead', d: 'Lane map, training and margining control' },
+    ],
+    effort: [
+      ['Lane map', 1.5],
+      ['Host-lane electrical specification', 1.5],
+      ['Channel model and budget', 2],
+      ['Clock, sideband, reset and enable', 1],
+      ['Training, margining, loopback and release', 1],
+    ],
+    entry: [
+      'I/O die lane count and optical engine lane map drafted in SARC-02 and SARC-03',
+      'Interface registered with owners on both sides in ICD-01',
+      'First package channel estimates available from MODL-03',
+    ],
+    exit: [
+      'Every host lane mapped to one engine lane and fiber position, with polarity and swaps, and signed by both owners',
+      'Channel budget from I/O die bump to engine pad closes with positive margin at the target BER on every lane',
+      'Loopback and margining points defined on both sides of the boundary and accepted by test and firmware',
+    ],
+    dependsOn: ['ICD-01', 'SARC-02', 'SARC-03'],
+    dependsNote: null,
+    feedsInto: ['ICD-12', 'DSGN-04', 'DSGN-05'],
+    measuredBy: [
+      'Host lanes mapped and signed (%)',
+      'Channel margin per lane at the target BER',
+      'Change requests against the lane map after freeze',
+    ],
+    links: {
+      dependsOn: ['ICD-01', 'SARC-02', 'SARC-03', 'SARC-04'],
+      feedsInto: ['ICD-08', 'ICD-10', 'ICD-12', 'DSGN-04', 'DSGN-05', 'DSGN-12', 'PSV-07', 'CHAR-06'],
+      runsWith: ['ICD-02', 'ICD-04', 'MODL-03'],
+      revisedBy: ['MODL-03', 'SARC-12'],
+      feedsBackInto: ['SARC-03'],
+    },
+    terms: ['ICD', 'SerDes', 'Lane map', 'Host lane', 'BER'],
+  },
+  'ICD-04': {
+    criticalPath: true,
+    purpose: [
+      'Define the <b>interface between the electrical IC and the photonic IC across the 3D stack</b>: driver swing, impedance and bandwidth of every signal crossing the bond; the bond pad map, pitch and through-connections both dies are laid out to; the bias, heater and monitor photodiode signals; and the thermal interface — how much electrical IC heat reaches the photonic IC, the heater crosstalk it causes and the temperature limits of the ring resonators.',
+      'Stacked face to face, the two dies share one pad map and one thermal path, so neither can be laid out or frozen alone. The electrical and thermal budgets depend on each other — modulator efficiency sets driver swing, driver power heats the rings the heaters must hold on wavelength — so the ICD allocates one budget across the bond and has both die owners and the stack design in OESD sign it.',
+    ],
+    flowNote:
+      'Step 1 defines the signal interface and step 2 the bond pad map and through-connections. Step 3 defines the bias, heater and monitor signals in parallel with step 2. Step 4 defines the thermal interface, step 5 allocates the combined electrical and thermal budget, and step 6 releases.',
     consumes: [
       'Optical engine architecture and lane map from SARC-03',
       'Optical link requirements and budget from REQ-04',
       'Interface register from ICD-01',
       'Photonic and electrical IC test vehicle data from FEAS-03 and FEAS-04',
-      'Optical source coupling feasibility from FEAS-05',
+      'Thermal architecture and cooling concept from SARC-07',
     ],
     rel: {
-      'ICD-D3': '<b>Electrical IC-to-photonic IC and optical source-to-photonic IC interface control document.</b> Produced here; DSGN-05, DSGN-06 and DSGN-07 design each side to it.',
-      'ICD-D11': '<b>Interface freeze and change control baseline package.</b> This ICD is baselined at the freeze.',
+      'ICD-D4': '<b>Electrical IC-to-photonic IC stack interface control document — bond pad map, electrical and thermal.</b> Produced here; DSGN-05 and DSGN-06 lay out both dies to the same pad map and budget.',
+      'ICD-D13': '<b>Interface freeze and change control baseline package.</b> This ICD is baselined at the freeze.',
     },
     risks: [
       '<b>Budget closed twice.</b> Electrical and photonic teams each keep margin on their own side and the total does not close.',
+      '<b>Pad map edited on one die.</b> A pad moved on the electrical IC after the photonic IC layout used the old map leaves the stack unbondable.',
       '<b>Heater control underspecified.</b> Range, resolution and settling time are not stated and the wavelength lock cannot hold.',
-      '<b>Polarization assumed.</b> The optical source output polarization and the photonic IC input expectation are not written down.',
-      '<b>Safety shutdown undefined.</b> No hardware path turns the optical source off when a fiber is disconnected.',
-      '<b>Supplier data unverified.</b> Laser power per lane is taken from a data sheet at a different temperature.',
+      '<b>Thermal crosstalk ignored.</b> Driver heat shifts ring resonances by more than the heater range allows.',
+      '<b>Through-connection count short.</b> Power and ground across the bond are not budgeted and the drivers droop under load.',
     ],
     roles: [
-      { r: 'Photonics', d: 'Owns the electrical-to-photonic and optical source ICD' },
+      { r: 'Photonics', d: 'Owns the electrical IC-to-photonic IC stack ICD' },
       { r: 'Analog and mixed-signal lead', d: 'Driver, TIA and bias side of the interface' },
-      { r: 'Optical source lead', d: 'Laser power, polarization and control side' },
-      { r: 'Laser safety officer', d: 'Shutdown path and safety class compliance' },
-      { r: 'Optical source supplier engineer', d: 'Partner-side owner of the optical source interface' },
+      { r: 'Packaging engineer', d: 'Bond pad map, pitch and through-connections' },
+      { r: 'Thermal engineer', d: 'Heat flow through the stack and heater crosstalk' },
+      { r: 'Firmware lead', d: 'Heater control range and settling for the wavelength lock' },
     ],
     effort: [
-      ['Electrical IC-to-photonic IC interface', 3],
-      ['Bias, heater and monitor signals', 2],
-      ['Optical source interface', 3],
-      ['Control and safety shutdown', 1.5],
-      ['Combined budget and release', 2.5],
+      ['Signal interface', 2],
+      ['Bond pad map and through-connections', 2],
+      ['Bias, heater and monitor signals', 1.5],
+      ['Thermal interface', 1.5],
+      ['Combined budget and release', 2],
     ],
     entry: [
       'Optical engine split and lane map released in SARC-03',
-      'Interface registered with owners on both sides including the optical source supplier',
-      'First photonic test vehicle data on modulator efficiency',
+      'Interface registered with owners on both dies and the stack design',
+      'First photonic test vehicle data on modulator efficiency and ring tuning',
     ],
     exit: [
-      'Combined electrical and optical budget closes with a single allocated margin in dB',
-      'Heater range, resolution and settling time stated and accepted by firmware',
-      'Safety shutdown path defined with a response time and signed by the laser safety officer',
+      'Combined electrical and thermal budget closes with a single allocated margin across the bond',
+      'Bond pad map, pitch and through-connections signed by both die owners and packaging',
+      'Heater range, resolution and settling time stated against the worst-case driver heat and accepted by firmware',
     ],
     dependsOn: ['ICD-01', 'SARC-03', 'REQ-04'],
     dependsNote: 'Written alongside the photonic and electrical IC test vehicles; parameters their data changes are revised before freeze.',
-    feedsInto: ['ICD-09', 'ICD-10', 'DSGN-05', 'DSGN-06', 'DSGN-07', 'PSV-07'],
+    feedsInto: ['ICD-11', 'ICD-12', 'DSGN-05', 'DSGN-06', 'PSV-07'],
     measuredBy: [
-      'Combined budget margin in dB',
+      'Combined budget margin across the bond',
+      'Pad map revisions after the first layout used it',
+      'Ring resonance shift from driver heat against heater range',
+    ],
+    links: {
+      dependsOn: ['ICD-01', 'SARC-03', 'REQ-04'],
+      feedsInto: ['ICD-10', 'ICD-11', 'ICD-12', 'DSGN-05', 'DSGN-06', 'DSGN-08', 'MODL-05', 'PSV-07', 'CHAR-06'],
+      runsWith: ['FEAS-03', 'FEAS-04'],
+      revisedBy: ['FEAS-09', 'MODL-04'],
+      feedsBackInto: ['SARC-03'],
+    },
+    terms: ['EIC', 'PIC', 'TIA', 'Bond pad map', 'Heater tuning', 'Link budget'],
+  },
+  'ICD-05': {
+    criticalPath: false,
+    purpose: [
+      'Define the <b>interface between the optical source and the photonic IC</b>: optical power per lane, wavelength grid and tolerance and relative intensity noise delivered to the modulators; polarization state, polarization-maintaining fiber and the coupling from the source module into the photonic IC; source control, bias and monitoring signals; and the eye-safety interlock and safety shutdown path with its response time.',
+      'The optical source is a separate, serviceable module from a separate supplier, and the photonic IC can only modulate what it is given. Laser power sets the receiver margin of every lane, so the power budget from source to modulator is agreed once and signed by both sides, and the safety shutdown is defined as a hardware path with a time, not as a firmware intention.',
+    ],
+    flowNote:
+      'Step 1 defines power, wavelength and noise and step 2 polarization and coupling. Step 3 defines control and monitor signals in parallel with step 2. Step 4 defines the safety interlock and shutdown, step 5 agrees the power budget, and step 6 releases.',
+    consumes: [
+      'Optical engine architecture and source split from SARC-03',
+      'Optical link requirements and wavelength plan from REQ-04',
+      'Optical source coupling feasibility from FEAS-05',
+      'Interface register from ICD-01',
+      'Optical source supplier data and safety classification targets',
+    ],
+    rel: {
+      'ICD-D5': '<b>Optical source-to-photonic IC interface control document with safety shutdown.</b> Produced here; DSGN-06 and DSGN-07 design each side to it.',
+      'ICD-D13': '<b>Interface freeze and change control baseline package.</b> This ICD is baselined at the freeze.',
+    },
+    risks: [
+      '<b>Polarization assumed.</b> The source output polarization and the photonic IC input expectation are not written down.',
+      '<b>Supplier data unverified.</b> Laser power per lane is taken from a data sheet at a different temperature.',
+      '<b>Safety shutdown undefined.</b> No hardware path turns the source off when a fiber is disconnected.',
+      '<b>Noise unallocated.</b> Relative intensity noise is not budgeted and eats receiver margin.',
+      '<b>Coupling loss double-counted or missed.</b> Source-to-chip loss is assumed by neither side or by both.',
+    ],
+    roles: [
+      { r: 'Laser and optical source', d: 'Owns the optical source-to-photonic IC ICD' },
+      { r: 'Photonics lead', d: 'Photonic IC input coupler and modulator side' },
+      { r: 'Optical source supplier engineer', d: 'Partner-side owner of the source module' },
+      { r: 'Laser safety officer', d: 'Shutdown path and safety class compliance' },
+      { r: 'Firmware lead', d: 'Source control, monitoring and interlock handling' },
+    ],
+    effort: [
+      ['Power, wavelength and noise', 1.5],
+      ['Polarization and coupling', 1.5],
+      ['Control and monitor signals', 1],
+      ['Safety interlock and shutdown', 1],
+      ['Power budget and release', 1],
+    ],
+    entry: [
+      'Optical source split released in SARC-03',
+      'Interface registered with owners on both sides including the optical source supplier',
+      'First coupling data from FEAS-05',
+    ],
+    exit: [
+      'Source-to-modulator power budget closes per lane with a single allocated margin',
+      'Polarization and coupling defined and accepted by the photonics and source owners',
+      'Safety shutdown path defined with a response time and signed by the laser safety officer',
+    ],
+    dependsOn: ['ICD-01', 'SARC-03', 'REQ-04'],
+    dependsNote: 'Written alongside the optical source coupling feasibility; parameters its data changes are revised before freeze.',
+    feedsInto: ['ICD-12', 'DSGN-07'],
+    measuredBy: [
+      'Power budget margin per lane',
       'Parameters still assumed from data sheets',
       'Partner sign-off status',
     ],
     links: {
       dependsOn: ['ICD-01', 'SARC-03', 'REQ-04'],
-      feedsInto: ['ICD-08', 'ICD-09', 'ICD-10', 'DSGN-05', 'DSGN-06', 'DSGN-07', 'DSGN-08', 'MODL-05', 'PSV-07', 'CHAR-06'],
-      runsWith: ['FEAS-03', 'FEAS-04', 'FEAS-05'],
+      feedsInto: ['ICD-08', 'ICD-10', 'ICD-12', 'DSGN-06', 'DSGN-07', 'MODL-04', 'PSV-07', 'CHAR-06'],
+      runsWith: ['FEAS-05', 'ICD-04'],
       revisedBy: ['FEAS-09', 'MODL-04'],
       feedsBackInto: ['SARC-03'],
     },
-    terms: ['EIC', 'PIC', 'TIA', 'Optical source', 'Laser safety', 'Link budget'],
+    terms: ['Optical source', 'PIC', 'RIN', 'PM fiber', 'Laser safety', 'Link budget'],
   },
-  'ICD-04': {
+  'ICD-06': {
     criticalPath: true,
     purpose: [
       'Define the <b>photonic-to-fiber and front-panel optical interfaces</b>: coupler type, mode field and alignment tolerance at the photonic IC; fiber array, fiber type, polarization handling and strain relief; the front-panel connector, cleaning access and polarity; insertion loss and reflectance per interface; and the inspection and test points.',
@@ -221,8 +355,8 @@ export const ICD_WRITE_UPS: CpoWriteUps = {
       'Interface register from ICD-01',
     ],
     rel: {
-      'ICD-D4': '<b>Photonic IC-to-fiber and front-panel optical interface control document.</b> Produced here; DSGN-13 and the fiber attach process in TINF-09 are built to it.',
-      'ICD-D11': '<b>Interface freeze and change control baseline package.</b> This ICD is baselined at the freeze.',
+      'ICD-D6': '<b>Photonic IC-to-fiber and front-panel optical interface control document.</b> Produced here; DSGN-13 and the fiber attach process in TINF-09 are built to it.',
+      'ICD-D13': '<b>Interface freeze and change control baseline package.</b> This ICD is baselined at the freeze.',
     },
     risks: [
       '<b>Alignment tolerance optimistic.</b> The coupler tolerance assumes an assembly accuracy the process cannot hold at volume.',
@@ -257,7 +391,7 @@ export const ICD_WRITE_UPS: CpoWriteUps = {
     ],
     dependsOn: ['ICD-01', 'SARC-03', 'SARC-05'],
     dependsNote: null,
-    feedsInto: ['ICD-10', 'DSGN-13', 'TINF-09'],
+    feedsInto: ['ICD-12', 'DSGN-13', 'TINF-09'],
     measuredBy: [
       'Coupling loss allocation versus measured test vehicle result',
       'Alignment tolerance versus process capability',
@@ -265,14 +399,14 @@ export const ICD_WRITE_UPS: CpoWriteUps = {
     ],
     links: {
       dependsOn: ['ICD-01', 'SARC-03', 'SARC-05', 'REQ-04'],
-      feedsInto: ['ICD-07', 'ICD-10', 'DSGN-13', 'TINF-03', 'TINF-09', 'PSV-07', 'CHAR-06'],
+      feedsInto: ['ICD-09', 'ICD-12', 'DSGN-13', 'TINF-03', 'TINF-09', 'PSV-07', 'CHAR-06'],
       runsWith: ['FEAS-06', 'REQ-05'],
       revisedBy: ['FEAS-06', 'FEAS-09'],
       feedsBackInto: ['REQ-04'],
     },
     terms: ['Fiber attach', 'Coupling loss', 'Link budget', 'PIC', 'Lane map'],
   },
-  'ICD-05': {
+  'ICD-07': {
     criticalPath: true,
     purpose: [
       'Define the <b>die-to-package and package-to-board interfaces</b>: bump maps, pitch, underfill and keep-outs per die; how bridges, an interposer and silicon capacitors attach and connect; the package ball map, pin assignment and escape routing; stack-up tolerances, coplanarity and warpage; and the board attach and rework rules.',
@@ -288,8 +422,8 @@ export const ICD_WRITE_UPS: CpoWriteUps = {
       'Interface register from ICD-01',
     ],
     rel: {
-      'ICD-D5': '<b>Die-to-package and package-to-board interface control document with bump and ball maps.</b> Produced here; DSGN-09, DSGN-12 and DSGN-14 design to it.',
-      'ICD-D11': '<b>Interface freeze and change control baseline package.</b> This ICD is baselined at the freeze.',
+      'ICD-D7': '<b>Die-to-package and package-to-board interface control document with bump and ball maps.</b> Produced here; DSGN-09, DSGN-12 and DSGN-14 design to it.',
+      'ICD-D13': '<b>Interface freeze and change control baseline package.</b> This ICD is baselined at the freeze.',
     },
     risks: [
       '<b>Bump maps diverge.</b> Die teams and package design edit separate copies of the bump map.',
@@ -324,7 +458,7 @@ export const ICD_WRITE_UPS: CpoWriteUps = {
     ],
     dependsOn: ['ICD-01', 'SARC-04', 'SARC-05'],
     dependsNote: null,
-    feedsInto: ['ICD-10', 'DSGN-12', 'DSGN-14'],
+    feedsInto: ['ICD-12', 'DSGN-12', 'DSGN-14'],
     measuredBy: [
       'Bump map revisions after freeze',
       'Warpage prediction versus agreed limit',
@@ -332,18 +466,18 @@ export const ICD_WRITE_UPS: CpoWriteUps = {
     ],
     links: {
       dependsOn: ['ICD-01', 'SARC-04', 'SARC-05', 'ICD-02'],
-      feedsInto: ['ICD-10', 'DSGN-09', 'DSGN-12', 'DSGN-14', 'MODL-06', 'CHAR-06'],
+      feedsInto: ['ICD-12', 'DSGN-09', 'DSGN-12', 'DSGN-14', 'MODL-06', 'CHAR-06'],
       runsWith: ['TRDY-06'],
       revisedBy: ['FEAS-07', 'MODL-07'],
       feedsBackInto: ['SARC-05'],
     },
     terms: ['Ball map', 'RDL', 'Bridge', 'Interposer', 'Si capacitor', 'OSAT', 'KOZ'],
   },
-  'ICD-06': {
+  'ICD-08': {
     criticalPath: false,
     purpose: [
       'Define the <b>power, clock and reset interfaces</b>: every rail at the die, package and board boundary with its tolerance, current and transient; the reference clocks with frequency, jitter and termination; reset, power-good and fault signals with timing; the power sequence across dies, engines and optical source; and VRM telemetry and control.',
-      'Power sequencing is written in this ICD and implemented in board hardware, VRM configuration and firmware. When the sequence lives in three places it drifts into three versions, so this ICD is the single source, and the firmware ICD in ICD-08 references it rather than restating it.',
+      'Power sequencing is written in this ICD and implemented in board hardware, VRM configuration and firmware. When the sequence lives in three places it drifts into three versions, so this ICD is the single source, and the firmware ICD in ICD-10 references it rather than restating it.',
     ],
     flowNote:
       'Step 1 defines rails and step 2 reference clocks. Step 3 defines reset and fault signals in parallel with step 2. Step 4 defines the power sequence, step 5 VRM telemetry and control, and step 6 releases.',
@@ -351,12 +485,12 @@ export const ICD_WRITE_UPS: CpoWriteUps = {
       'Clock, reset and power architecture from SARC-06',
       'Power tree and PDN budget from SARC-06',
       'SerDes clocking needs from SARC-02',
-      'Optical source enable and safety requirements from ICD-03',
+      'Optical source enable and safety requirements from ICD-04',
       'Interface register from ICD-01',
     ],
     rel: {
-      'ICD-D6': '<b>Power, clock and reset interface control document.</b> Produced here; DSGN-03 and DSGN-14 implement both sides of it.',
-      'ICD-D11': '<b>Interface freeze and change control baseline package.</b> This ICD is baselined at the freeze.',
+      'ICD-D8': '<b>Power, clock and reset interface control document.</b> Produced here; DSGN-03 and DSGN-14 implement both sides of it.',
+      'ICD-D13': '<b>Interface freeze and change control baseline package.</b> This ICD is baselined at the freeze.',
     },
     risks: [
       '<b>Sequence in three places.</b> Board, VRM and firmware implement different versions of the power sequence.',
@@ -381,7 +515,7 @@ export const ICD_WRITE_UPS: CpoWriteUps = {
     ],
     entry: [
       'Clock, reset and power architecture released in SARC-06',
-      'Optical source safety requirements drafted in ICD-03',
+      'Optical source safety requirements drafted in ICD-04',
       'VRM supplier selected or shortlisted',
     ],
     exit: [
@@ -391,7 +525,7 @@ export const ICD_WRITE_UPS: CpoWriteUps = {
     ],
     dependsOn: ['ICD-01', 'SARC-06'],
     dependsNote: null,
-    feedsInto: ['ICD-08', 'ICD-10', 'DSGN-14'],
+    feedsInto: ['ICD-10', 'ICD-12', 'DSGN-14'],
     measuredBy: [
       'Rails fully specified (%)',
       'Sequencing discrepancies found in review',
@@ -399,14 +533,14 @@ export const ICD_WRITE_UPS: CpoWriteUps = {
     ],
     links: {
       dependsOn: ['ICD-01', 'SARC-06'],
-      feedsInto: ['ICD-08', 'ICD-10', 'DSGN-03', 'DSGN-14', 'MODL-06', 'PON-02'],
-      runsWith: ['ICD-03'],
+      feedsInto: ['ICD-10', 'ICD-12', 'DSGN-03', 'DSGN-14', 'MODL-06', 'PON-02'],
+      runsWith: ['ICD-04'],
       revisedBy: ['MODL-06'],
       feedsBackInto: ['SARC-06'],
     },
     terms: ['VRM', 'PDN', 'PLL', 'POR'],
   },
-  'ICD-07': {
+  'ICD-09': {
     criticalPath: false,
     purpose: [
       'Define the <b>thermal and mechanical interfaces</b>: heat flux and temperature limits at every die, engine and optical source boundary; the lid, thermal interface material and heat sink or cold plate contact; mechanical loads, retention and keep-outs; fiber routing and strain limits through the chassis; and temperature sensor locations and reporting.',
@@ -417,13 +551,13 @@ export const ICD_WRITE_UPS: CpoWriteUps = {
     consumes: [
       'Thermal architecture and cooling concept from SARC-07',
       'Package and mechanical architecture from SARC-05',
-      'Fiber interface definition from ICD-04',
+      'Fiber interface definition from ICD-06',
       'Thermal test vehicle data from FEAS-07',
       'Interface register from ICD-01',
     ],
     rel: {
-      'ICD-D7': '<b>Thermal and mechanical interface control document.</b> Produced here; DSGN-15 and the chassis design are built to it.',
-      'ICD-D11': '<b>Interface freeze and change control baseline package.</b> This ICD is baselined at the freeze.',
+      'ICD-D9': '<b>Thermal and mechanical interface control document.</b> Produced here; DSGN-15 and the chassis design are built to it.',
+      'ICD-D13': '<b>Interface freeze and change control baseline package.</b> This ICD is baselined at the freeze.',
     },
     risks: [
       '<b>Clamping load unspecified.</b> Heat sink retention cracks thin optical dies.',
@@ -458,7 +592,7 @@ export const ICD_WRITE_UPS: CpoWriteUps = {
     ],
     dependsOn: ['ICD-01', 'SARC-07', 'SARC-05'],
     dependsNote: null,
-    feedsInto: ['ICD-10', 'DSGN-15'],
+    feedsInto: ['ICD-12', 'DSGN-15'],
     measuredBy: [
       'Boundaries with heat flux limits (%)',
       'Clamping load margin on the weakest die',
@@ -466,14 +600,14 @@ export const ICD_WRITE_UPS: CpoWriteUps = {
     ],
     links: {
       dependsOn: ['ICD-01', 'SARC-05', 'SARC-07'],
-      feedsInto: ['ICD-10', 'DSGN-15', 'MODL-07', 'CHAR-06'],
-      runsWith: ['ICD-05', 'FEAS-07'],
+      feedsInto: ['ICD-12', 'DSGN-15', 'MODL-07', 'CHAR-06'],
+      runsWith: ['ICD-07', 'FEAS-07'],
       revisedBy: ['MODL-07'],
       feedsBackInto: ['SARC-07'],
     },
     terms: ['TIM', 'KOZ', 'Rjc'],
   },
-  'ICD-08': {
+  'ICD-10': {
     criticalPath: true,
     purpose: [
       'Define the <b>firmware-to-hardware and software-to-firmware interfaces</b>: the register map of every die and engine; how firmware controls link training, optical bias, heater tuning and calibration; interrupt, error and telemetry paths; the firmware-to-software API with its versioning and compatibility rules; and the firmware image, update and security handshake.',
@@ -484,13 +618,13 @@ export const ICD_WRITE_UPS: CpoWriteUps = {
     consumes: [
       'Firmware, software and management architecture from SARC-08',
       'Security architecture from SARC-09',
-      'Electrical-to-photonic control signals from ICD-03',
-      'Power sequence from ICD-06',
+      'Electrical-to-photonic control signals from ICD-04',
+      'Power sequence from ICD-08',
       'Interface register from ICD-01',
     ],
     rel: {
-      'ICD-D8': '<b>Firmware-to-hardware register map and software-to-firmware API specification.</b> Produced here; DSGN-02, DSGN-16 and DSGN-17 build to it and MODL-09 models it.',
-      'ICD-D11': '<b>Interface freeze and change control baseline package.</b> This ICD is baselined at the freeze.',
+      'ICD-D10': '<b>Firmware-to-hardware register map and software-to-firmware API specification.</b> Produced here; DSGN-02, DSGN-16 and DSGN-17 build to it and MODL-09 models it.',
+      'ICD-D13': '<b>Interface freeze and change control baseline package.</b> This ICD is baselined at the freeze.',
     },
     risks: [
       '<b>Register map hand-copied.</b> RTL and firmware headers are edited separately and diverge.',
@@ -516,7 +650,7 @@ export const ICD_WRITE_UPS: CpoWriteUps = {
     entry: [
       'Firmware and security architecture released in SARC-08 and SARC-09',
       'Register map generator selected',
-      'Optical control signals drafted in ICD-03',
+      'Optical control signals drafted in ICD-04',
     ],
     exit: [
       'Register map generated from a single source into RTL, headers and documentation',
@@ -525,22 +659,22 @@ export const ICD_WRITE_UPS: CpoWriteUps = {
     ],
     dependsOn: ['ICD-01', 'SARC-08', 'SARC-09'],
     dependsNote: null,
-    feedsInto: ['ICD-10', 'DSGN-16', 'DSGN-17', 'MODL-09'],
+    feedsInto: ['ICD-12', 'DSGN-16', 'DSGN-17', 'MODL-09'],
     measuredBy: [
       'Register map changes per week after freeze',
       'Error sources with a handler (%)',
       'API calls with a version tag',
     ],
     links: {
-      dependsOn: ['ICD-01', 'SARC-08', 'SARC-09', 'ICD-03', 'ICD-06'],
-      feedsInto: ['ICD-10', 'DSGN-02', 'DSGN-16', 'DSGN-17', 'MODL-09', 'PSV-09', 'CHAR-06'],
+      dependsOn: ['ICD-01', 'SARC-08', 'SARC-09', 'ICD-04', 'ICD-08'],
+      feedsInto: ['ICD-12', 'DSGN-02', 'DSGN-16', 'DSGN-17', 'MODL-09', 'PSV-09', 'CHAR-06'],
       runsWith: [],
       revisedBy: ['PSV-09'],
       feedsBackInto: ['SARC-08'],
     },
     terms: ['Register map', 'SDK', 'Root of trust', 'Calibration', 'Telemetry'],
   },
-  'ICD-09': {
+  'ICD-11': {
     criticalPath: false,
     purpose: [
       'Define the <b>manufacturing, test and calibration data interfaces</b>: tester access and handshake to each die and engine; calibration data content, format and storage on the part; unit identity and genealogy from wafer to system; test data formats and flow; and the data handover between OSAT, module line and system factory.',
@@ -550,14 +684,14 @@ export const ICD_WRITE_UPS: CpoWriteUps = {
       'Step 1 defines tester access and step 2 calibration data. Step 3 defines unit identity and genealogy in parallel with step 2. Step 4 defines test data flow, step 5 the cross-site handover, and step 6 releases.',
     consumes: [
       'DFT, KGD and production test architecture from SARC-10',
-      'Electrical-to-photonic control interface from ICD-03',
+      'Electrical-to-photonic control interface from ICD-04',
       'Key provisioning flow from SARC-09',
       'Manufacturing data system capability from the factories',
       'Interface register from ICD-01',
     ],
     rel: {
-      'ICD-D9': '<b>Manufacturing, test and calibration data interface control document.</b> Produced here; TINF-06, TINF-07 and TINF-10 build test programs, calibration flow and data systems to it.',
-      'ICD-D11': '<b>Interface freeze and change control baseline package.</b> This ICD is baselined at the freeze.',
+      'ICD-D11': '<b>Manufacturing, test and calibration data interface control document.</b> Produced here; TINF-06, TINF-07 and TINF-10 build test programs, calibration flow and data systems to it.',
+      'ICD-D13': '<b>Interface freeze and change control baseline package.</b> This ICD is baselined at the freeze.',
     },
     risks: [
       '<b>Calibration format owned by the test program.</b> Firmware reads a layout that the tester no longer writes.',
@@ -582,7 +716,7 @@ export const ICD_WRITE_UPS: CpoWriteUps = {
     ],
     entry: [
       'Test architecture released in SARC-10',
-      'Calibration parameters drafted in ICD-03',
+      'Calibration parameters drafted in ICD-04',
       'Factory sites identified',
     ],
     exit: [
@@ -590,24 +724,24 @@ export const ICD_WRITE_UPS: CpoWriteUps = {
       'Unit identity carried through every site with no break in genealogy',
       'Test data format accepted by every factory site and the data system',
     ],
-    dependsOn: ['ICD-01', 'SARC-10', 'ICD-03'],
+    dependsOn: ['ICD-01', 'SARC-10', 'ICD-04'],
     dependsNote: null,
-    feedsInto: ['ICD-10', 'TINF-06', 'TINF-07', 'TINF-10'],
+    feedsInto: ['ICD-12', 'TINF-06', 'TINF-07', 'TINF-10'],
     measuredBy: [
       'Calibration parameters with a defined storage location',
       'Sites accepting the data format',
       'Genealogy breaks found in review',
     ],
     links: {
-      dependsOn: ['ICD-01', 'SARC-10', 'ICD-03', 'SARC-09'],
-      feedsInto: ['ICD-10', 'TINF-01', 'TINF-06', 'TINF-07', 'TINF-10'],
-      runsWith: ['ICD-08'],
+      dependsOn: ['ICD-01', 'SARC-10', 'ICD-04', 'SARC-09'],
+      feedsInto: ['ICD-12', 'TINF-01', 'TINF-06', 'TINF-07', 'TINF-10'],
+      runsWith: ['ICD-10'],
       revisedBy: ['TINF-07'],
       feedsBackInto: ['SARC-10'],
     },
     terms: ['Genealogy', 'STDF', 'Calibration', 'OSAT', 'ATE'],
   },
-  'ICD-10': {
+  'ICD-12': {
     criticalPath: true,
     purpose: [
       'Hold the <b>interface freeze</b>: audit every ICD against its freeze criteria, map every interface parameter to how it will be validated — link-level co-simulation in PSV-07 before silicon and interface validation in CHAR-06 after — resolve or waive open conflicts, and baseline every ICD version under the change control board.',
@@ -616,15 +750,15 @@ export const ICD_WRITE_UPS: CpoWriteUps = {
     flowNote:
       'Step 1 audits every ICD. Step 2 builds the validation plan. Step 3 resolves conflicts in parallel with step 2. Step 4 holds the review with both owners of every interface, and step 5 baselines the ICDs and hands control to the change board.',
     consumes: [
-      'Every ICD from ICD-02 to ICD-09',
+      'Every ICD from ICD-02 to ICD-11',
       'Interface register and freeze criteria from ICD-01',
       'Partition freeze package from SARC-12',
       'Requirements traceability matrix from REQ-09',
       'Co-simulation and validation plans from MODL-01 and PSV-01',
     ],
     rel: {
-      'ICD-D10': '<b>Interface validation plan — co-simulation and silicon checks per parameter.</b> Produced here; PSV-07 and CHAR-06 validate against it.',
-      'ICD-D11': '<b>Interface freeze and change control baseline package.</b> Produced and decided here; it closes the stage and fixes every ICD version for detailed design.',
+      'ICD-D12': '<b>Interface validation plan — co-simulation and silicon checks per parameter.</b> Produced here; PSV-07 and CHAR-06 validate against it.',
+      'ICD-D13': '<b>Interface freeze and change control baseline package.</b> Produced and decided here; it closes the stage and fixes every ICD version for detailed design.',
     },
     risks: [
       '<b>Frozen without partners.</b> The review is held without the partner-side owners and the freeze binds only one side.',
@@ -648,7 +782,7 @@ export const ICD_WRITE_UPS: CpoWriteUps = {
       ['Baseline and change control handover', 0.5],
     ],
     entry: [
-      'Every ICD from ICD-D2 to ICD-D9 released at pre-freeze maturity',
+      'Every ICD from ICD-D2 to ICD-D11 released at pre-freeze maturity',
       'Partition freeze approved in SARC-12',
       'Partner-side owners available for the review',
     ],
@@ -657,7 +791,7 @@ export const ICD_WRITE_UPS: CpoWriteUps = {
       '100% of frozen parameters mapped to a co-simulation check in PSV-07 or a silicon check in CHAR-06',
       'ICD versions baselined and signed by both owners of every interface, with change control handed to the change board',
     ],
-    dependsOn: ['ICD-01', 'ICD-02', 'ICD-03', 'ICD-04', 'ICD-05', 'ICD-06', 'ICD-07', 'ICD-08', 'ICD-09', 'SARC-12', 'FEAS-10'],
+    dependsOn: ['ICD-01', 'ICD-02', 'ICD-03', 'ICD-04', 'ICD-05', 'ICD-06', 'ICD-07', 'ICD-08', 'ICD-09', 'ICD-10', 'ICD-11', 'SARC-12', 'FEAS-10'],
     dependsNote: null,
     feedsInto: ['PSV-07', 'CHAR-06', 'DSGN-18', 'SUST-04'],
     measuredBy: [
@@ -666,7 +800,7 @@ export const ICD_WRITE_UPS: CpoWriteUps = {
       'Change requests per month after freeze',
     ],
     links: {
-      dependsOn: ['ICD-01', 'ICD-02', 'ICD-03', 'ICD-04', 'ICD-05', 'ICD-06', 'ICD-07', 'ICD-08', 'ICD-09', 'SARC-12', 'FEAS-10'],
+      dependsOn: ['ICD-01', 'ICD-02', 'ICD-03', 'ICD-04', 'ICD-05', 'ICD-06', 'ICD-07', 'ICD-08', 'ICD-09', 'ICD-10', 'ICD-11', 'SARC-12', 'FEAS-10'],
       feedsInto: ['DSGN-18', 'PSV-07', 'CHAR-06', 'PCTL-03', 'SUST-04', 'MTO-07'],
       runsWith: [],
       revisedBy: ['PSV-07', 'CHAR-06'],

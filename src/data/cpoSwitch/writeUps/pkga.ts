@@ -64,7 +64,7 @@ export const PKGA_WRITE_UPS: CpoWriteUps = {
     links: {
       dependsOn: ['TRDY-10', 'IMPL-07', 'PKGA-02', 'TRDY-07'],
       feedsInto: ['PKGA-03', 'PKGA-04', 'PKGA-05', 'PKGA-07'],
-      runsWith: ['WFAB-05'],
+      runsWith: ['WFAB-06'],
       revisedBy: [],
       feedsBackInto: [],
     },
@@ -144,11 +144,11 @@ export const PKGA_WRITE_UPS: CpoWriteUps = {
     flowNote:
       'Step 1 receives screened die. Steps 2 and 3 attach the bridge and the die in order, step 4 underfills and inspects, step 5 measures warpage and continuity, and step 6 releases the packages to optical assembly.',
     consumes: [
-      'Known-good die released from the die bank in SORT-04',
+      'Known-good die released from the die bank in SORT-06',
       'Assembly process specification from TINF-09',
       'First-build material kit from PKGA-01',
       'Build matrix from PKGA-02',
-      'Bridge and silicon capacitor parts from WFAB-04',
+      'Bridge and silicon capacitor parts from WFAB-05',
     ],
     rel: {
       'PKGA-D3': '<b>Assembled multi-die packages with assembly travelers.</b> Produced here; each unit carries its split and inspection data.',
@@ -184,7 +184,7 @@ export const PKGA_WRITE_UPS: CpoWriteUps = {
       'Warpage measured on every unit and within the fiber attach process window',
       'Die-to-die continuity passing on every lane, or the unit dispositioned on its traveler',
     ],
-    dependsOn: ['SORT-04', 'TINF-09', 'PKGA-01'],
+    dependsOn: ['SORT-06', 'TINF-09', 'PKGA-01'],
     dependsNote: null,
     feedsInto: ['PKGA-04', 'PKGA-06'],
     measuredBy: [
@@ -193,7 +193,7 @@ export const PKGA_WRITE_UPS: CpoWriteUps = {
       'Die-to-die continuity failures',
     ],
     links: {
-      dependsOn: ['SORT-04', 'TINF-09', 'PKGA-01', 'PKGA-02', 'PKGA-14'],
+      dependsOn: ['SORT-06', 'TINF-09', 'PKGA-01', 'PKGA-02', 'PKGA-14'],
       feedsInto: ['PKGA-04', 'PKGA-06'],
       runsWith: ['PKGA-05'],
       revisedBy: [],
@@ -260,7 +260,7 @@ export const PKGA_WRITE_UPS: CpoWriteUps = {
       'Optical engine assembly yield',
     ],
     links: {
-      dependsOn: ['SORT-02', 'TINF-09', 'TINF-03', 'TINF-16', 'PKGA-01', 'PKGA-03', 'PKGA-10'],
+      dependsOn: ['SORT-04', 'TINF-09', 'TINF-03', 'TINF-16', 'PKGA-01', 'PKGA-03', 'PKGA-10'],
       feedsInto: ['PKGA-06', 'OBU-06'],
       runsWith: ['PKGA-05'],
       revisedBy: [],
@@ -609,7 +609,7 @@ export const PKGA_WRITE_UPS: CpoWriteUps = {
       'Step 1 mounts the engines and step 2 measures optical parameters while step 3 checks the electrical IC in parallel. Step 4 bins and releases passing engines, step 5 tracks yield by source and step 6 releases the results.',
     consumes: [
       'Assembled optical engines from step 1 of PKGA-04',
-      'Photonic known-good die data from SORT-02',
+      'Photonic known-good die data from SORT-04',
       'Optical test fixtures and correction tables from TINF-03',
       'Standalone engine bring-up learning from PKGA-12',
       'Engine-level limits from the production test strategy in TINF-01',
@@ -648,7 +648,7 @@ export const PKGA_WRITE_UPS: CpoWriteUps = {
       'Engine yield attributed by photonic wafer, electrical IC lot and assembly step',
       'No engine placed on a package without a passing engine-level record',
     ],
-    dependsOn: ['SORT-02', 'TINF-03', 'PKGA-12'],
+    dependsOn: ['SORT-04', 'TINF-03', 'PKGA-12'],
     dependsNote: 'Runs beside PKGA-04: it tests the engines PKGA-04 assembles in its first step, and releases the passing ones back for placement.',
     feedsInto: ['PKGA-04', 'PKGA-06'],
     measuredBy: [
@@ -657,7 +657,7 @@ export const PKGA_WRITE_UPS: CpoWriteUps = {
       'Engine test time per unit',
     ],
     links: {
-      dependsOn: ['SORT-02', 'TINF-03', 'PKGA-12', 'TINF-01'],
+      dependsOn: ['SORT-04', 'TINF-03', 'PKGA-12', 'TINF-01'],
       feedsInto: ['PKGA-04', 'PKGA-06', 'NPI-05'],
       runsWith: [],
       revisedBy: [],
@@ -741,7 +741,7 @@ export const PKGA_WRITE_UPS: CpoWriteUps = {
     flowNote:
       'Step 1 assembles engines on the evaluation board. Step 2 biases and tunes, step 3 closes loopback and measures BER while step 4 runs the calibration algorithms in parallel. Step 5 sweeps temperature and step 6 releases the report.',
     consumes: [
-      'First photonic and electrical IC die from SORT-02 and SORT-01',
+      'First photonic and electrical IC die from SORT-04 and SORT-01',
       'Optical control, tuning and calibration algorithms from DSGN-08',
       'Optical test fixtures from TINF-03',
       'Bring-up firmware and diagnostics from PKGA-11',
@@ -782,7 +782,7 @@ export const PKGA_WRITE_UPS: CpoWriteUps = {
       'Calibration algorithms converged on the engine with results compared with the models',
       'Engine behavior measured across the operating temperature range and reported to optical bring-up',
     ],
-    dependsOn: ['SORT-02', 'PKGA-11', 'DSGN-08'],
+    dependsOn: ['SORT-04', 'PKGA-11', 'DSGN-08'],
     dependsNote: null,
     feedsInto: ['PKGA-10', 'OBU-02', 'OBU-04'],
     measuredBy: [
@@ -791,7 +791,7 @@ export const PKGA_WRITE_UPS: CpoWriteUps = {
       'Weeks of lead over full-package optical bring-up',
     ],
     links: {
-      dependsOn: ['SORT-02', 'SORT-01', 'PKGA-11', 'DSGN-08', 'TINF-03'],
+      dependsOn: ['SORT-04', 'SORT-01', 'PKGA-11', 'DSGN-08', 'TINF-03'],
       feedsInto: ['PKGA-10', 'OBU-02', 'OBU-04', 'OBU-06'],
       runsWith: [],
       revisedBy: [],
@@ -802,13 +802,13 @@ export const PKGA_WRITE_UPS: CpoWriteUps = {
   'PKGA-13': {
     criticalPath: true,
     purpose: [
-      'Build an <b>electrical-only engineering package</b> — switch and I/O die, bridges and silicon capacitors, with the optical engine sites empty or capped — so electrical power-on and link bring-up can start without waiting on optical assembly and its yield.',
+      'Build an <b>electrical-only engineering package</b> — Switch SoC and I/O die, bridges and silicon capacitors, with the optical engine sites empty or capped — so electrical power-on and link bring-up can start without waiting on optical assembly and its yield.',
       'Fiber attach is the slowest and least predictable step of the full build. Decoupling it lets the program reach first power and first electrical link on packages whose only risk is the silicon and the multi-die assembly, and keeps optical assembly losses off the electrical critical path.',
     ],
     flowNote:
       'Step 1 kits the build and step 2 attaches and reflows. Step 3 underfills and inspects, step 4 screens on the tester and step 5 releases the packages to board mount.',
     consumes: [
-      'Known-good switch and I/O die from SORT-04',
+      'Known-good Switch SoC and I/O die from SORT-06',
       'Daisy-chain dry-run findings from PKGA-14',
       'Substrates and bridges from the first-build kit in PKGA-01',
       'Assembly process specification from TINF-09',
@@ -839,7 +839,7 @@ export const PKGA_WRITE_UPS: CpoWriteUps = {
       ['Release', 0.5],
     ],
     entry: [
-      'Known-good switch and I/O die released',
+      'Known-good Switch SoC and I/O die released',
       'Daisy-chain dry run complete',
       'Die allocation between electrical-only and full builds agreed',
     ],
@@ -848,7 +848,7 @@ export const PKGA_WRITE_UPS: CpoWriteUps = {
       'Warpage measured and within the board mount limit',
       'Packages released to board mount before the full build finishes package test',
     ],
-    dependsOn: ['SORT-04', 'PKGA-14', 'PKGA-01'],
+    dependsOn: ['SORT-06', 'PKGA-14', 'PKGA-01'],
     dependsNote: null,
     feedsInto: ['PKGA-07', 'PON-02', 'PON-05'],
     measuredBy: [
@@ -857,7 +857,7 @@ export const PKGA_WRITE_UPS: CpoWriteUps = {
       'Weeks gained on first power',
     ],
     links: {
-      dependsOn: ['SORT-04', 'PKGA-14', 'PKGA-01', 'TINF-09', 'PKGA-02'],
+      dependsOn: ['SORT-06', 'PKGA-14', 'PKGA-01', 'TINF-09', 'PKGA-02'],
       feedsInto: ['PKGA-07', 'PON-02', 'PON-05'],
       runsWith: ['PKGA-03'],
       revisedBy: [],

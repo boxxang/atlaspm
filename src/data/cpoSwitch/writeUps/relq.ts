@@ -73,14 +73,14 @@ export const RELQ_WRITE_UPS: CpoWriteUps = {
   'RELQ-02': {
     criticalPath: true,
     purpose: [
-      'Qualify the <b>silicon</b> — switch ASIC, I/O and electrical ICs — for operating life, ESD, latch-up and electromigration, with parametric drift tracked at every readpoint.',
+      'Qualify the <b>silicon</b> — Switch SoC, I/O and electrical ICs — for operating life, ESD, latch-up and electromigration, with parametric drift tracked at every readpoint.',
       'The silicon path is well understood, which makes it easy to run on autopilot. The traps are on this product specifically: electrical ICs driving optics at high swing, die-to-die interfaces across a bridge, and a stepping that can change the stressed circuits. Tests are scoped against the delta plan, not rerun blindly.',
     ],
     flowNote:
       'Step 1 builds burn-in boards and programs. Step 2 runs ESD and latch-up. Step 3 runs operating life while step 4 runs storage and early-failure-rate tests in parallel. Step 5 validates electromigration lifetime, and step 6 releases the report.',
     consumes: [
       'Qualification plan and stress matrix from RELQ-01',
-      'Known-good-die released to assembly from SORT-04',
+      'Known-good-die released to assembly from SORT-06',
       'Stepping fix change list from SDBG-05',
       'Production test program for stress readpoints',
       'Electromigration and EM/IR signoff data from SGNO-01',
@@ -121,7 +121,7 @@ export const RELQ_WRITE_UPS: CpoWriteUps = {
       'ESD and latch-up levels met on every die and on the package',
       'Electromigration lifetime at measured current meets the mission profile',
     ],
-    dependsOn: ['RELQ-01', 'SORT-04'],
+    dependsOn: ['RELQ-01', 'SORT-06'],
     dependsNote: 'Results that must be on the shipping silicon are rerun on the production stepping in RELQ-07 under the delta plan.',
     feedsInto: ['RELQ-05', 'RELQ-06'],
     measuredBy: [
@@ -130,7 +130,7 @@ export const RELQ_WRITE_UPS: CpoWriteUps = {
       'Parametric drift at the last readpoint',
     ],
     links: {
-      dependsOn: ['RELQ-01', 'SORT-04', 'SGNO-01'],
+      dependsOn: ['RELQ-01', 'SORT-06', 'SGNO-01'],
       feedsInto: ['RELQ-05', 'RELQ-06', 'RELQ-07'],
       runsWith: ['SDBG-07'],
       revisedBy: ['SDBG-06'],

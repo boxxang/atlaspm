@@ -99,7 +99,7 @@ export const PCTL: CpoStageModule = {
     },
     'PCTL-03': {
       s: [
-        [1, 'Take over the change control baseline from the interface freeze in ICD-10 and publish the board calendar', 2],
+        [1, 'Take over the change control baseline from the interface freeze in ICD-12 and publish the board calendar', 2],
         [2, 'Run the weekly interface change board — impact assessment from both sides of each ICD for every request', 144],
         [3, 'Issue new ICD revisions and notify every design, test and supplier team building to the old revision', 144, 1],
         [4, 'Audit design databases against the current ICD revisions before each tapeout and each build', 10],

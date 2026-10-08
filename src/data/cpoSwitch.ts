@@ -2,7 +2,7 @@
  * /data/cpoSwitch.ts — the CPO Network Switch System template.
  *
  * An end-to-end program for a switch whose optics are co-packaged with the
- * switching silicon: the switch ASIC and the high-speed I/O silicon beside
+ * switching silicon: the Switch SoC and the I/O die beside
  * it, the electrical and photonic ICs of the optical engines, the optical
  * source, the bridge or interposer and silicon capacitors, the advanced
  * package and its fiber, the board, the cooling, the firmware and software,

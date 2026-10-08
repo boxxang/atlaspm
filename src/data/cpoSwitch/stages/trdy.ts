@@ -8,7 +8,7 @@ export const TRDY: CpoStageModule = {
   content: {
     tagline: 'Make sure every process, IP block, tool and supplier the design will need is real, qualified and reserved before the design needs it.',
     description:
-      'Select the foundries and processes for the switch and I/O silicon, the electrical ICs and the photonic ICs, and prove the PDKs, libraries, memory compilers, compact models and co-design EDA flow are mature enough to design on. Qualify the SerDes and third-party IP, the package, substrate and assembly partners, the optical source suppliers, the fiber, connector, board and cooling supply base and the system manufacturing partner, and clear the patent and licensing position. Lock the long-lead materials — substrates, optical sources, fiber assemblies and test hardware — with supply agreements, capacity reservations and second sources. The stage closes on a readiness review that rates every item ready, conditional or not ready, with the supply risks stated.',
+      'Select the foundries and processes for the Switch SoC and I/O die, the electrical ICs and the photonic ICs, and prove the PDKs, libraries, memory compilers, compact models and co-design EDA flow are mature enough to design on. Qualify the SerDes and third-party IP, the package, substrate and assembly partners, the optical source suppliers, the fiber, connector, board and cooling supply base and the system manufacturing partner, and clear the patent and licensing position. Lock the long-lead materials — substrates, optical sources, fiber assemblies and test hardware — with supply agreements, capacity reservations and second sources. The stage closes on a readiness review that rates every item ready, conditional or not ready, with the supply risks stated.',
     activities: [
       'Foundry selection',
       'Photonics foundry and PDK',
@@ -26,7 +26,7 @@ export const TRDY: CpoStageModule = {
       'IP rights and freedom to operate',
     ],
     deliverables: [
-      'Switch and I/O silicon foundry and process selection record',
+      'Switch SoC and I/O die foundry and process selection record',
       'Photonics foundry selection and photonic PDK readiness assessment',
       'Digital PDK, standard cell and memory compiler readiness report',
       'SerDes and high-speed I/O IP readiness and deliverables checklist',
@@ -83,7 +83,7 @@ export const TRDY: CpoStageModule = {
         'Foundry comparison matrix',
         'Shuttle, PDK access and capacity term sheet',
         'Packaging compatibility assessment per process',
-        'Switch and I/O silicon foundry and process selection record',
+        'Switch SoC and I/O die foundry and process selection record',
       ],
       r: [['TRDY-D1', 'produces'], ['TRDY-D3', 'feeds'], ['TRDY-D11', 'feeds']],
     },

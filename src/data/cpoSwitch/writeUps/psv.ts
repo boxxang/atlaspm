@@ -8,14 +8,14 @@ export const PSV_WRITE_UPS: CpoWriteUps = {
     criticalPath: true,
     purpose: [
       'Write one <b>verification plan and coverage model</b> for the whole system: every die — switch, SerDes, electrical IC, photonic IC, bridge — every cross-die interface and the system itself, each feature assigned a method, an owner and a closure threshold.',
-      'Digital verification plans are mature; the gaps in a CPO program sit between them. A plan that covers the switch ASIC thoroughly and the optical path not at all will close on schedule and still let the product fail, so this plan measures analog and optical performance metrics beside functional coverage and names who proves each boundary.',
+      'Digital verification plans are mature; the gaps in a CPO program sit between them. A plan that covers the Switch SoC thoroughly and the optical path not at all will close on schedule and still let the product fail, so this plan measures analog and optical performance metrics beside functional coverage and names who proves each boundary.',
     ],
     flowNote:
       'Step 1 lists the targets. Step 2 defines the coverage model while step 3 assigns methods in parallel. Step 4 sets regression cadence and thresholds, and step 5 releases the plan.',
     consumes: [
       'System requirements specification from REQ-02',
       'Partition freeze and architecture from SARC-12',
-      'Interface definitions from ICD-02 and ICD-03',
+      'Interface definitions from ICD-02 and ICD-04',
       'Microarchitecture specifications from DSGN-01',
       'Modeling plan and accuracy targets from MODL-01',
     ],
@@ -55,7 +55,7 @@ export const PSV_WRITE_UPS: CpoWriteUps = {
     ],
     dependsOn: ['REQ-02', 'SARC-12', 'DSGN-01'],
     dependsNote: null,
-    feedsInto: ['PSV-02', 'PSV-03', 'PSV-04', 'PSV-05', 'PSV-06', 'PSV-07', 'PSV-11'],
+    feedsInto: ['PSV-02', 'PSV-03', 'PSV-04', 'PSV-05', 'PSV-06', 'PSV-07', 'PSV-11', 'PSV-15'],
     measuredBy: [
       'Features with an assigned method and owner',
       'Interfaces with an owner',
@@ -63,7 +63,7 @@ export const PSV_WRITE_UPS: CpoWriteUps = {
     ],
     links: {
       dependsOn: ['REQ-02', 'SARC-12', 'DSGN-01', 'ICD-02', 'MODL-01'],
-      feedsInto: ['PSV-02', 'PSV-03', 'PSV-04', 'PSV-05', 'PSV-06', 'PSV-07', 'PSV-08', 'PSV-09', 'PSV-10', 'PSV-11'],
+      feedsInto: ['PSV-02', 'PSV-03', 'PSV-04', 'PSV-05', 'PSV-06', 'PSV-07', 'PSV-08', 'PSV-09', 'PSV-10', 'PSV-11', 'PSV-15'],
       runsWith: [],
       revisedBy: [],
       feedsBackInto: [],
@@ -73,7 +73,7 @@ export const PSV_WRITE_UPS: CpoWriteUps = {
   'PSV-02': {
     criticalPath: true,
     purpose: [
-      'Verify the switch ASIC <b>block by block and subsystem by subsystem</b> — UVM environments, constrained-random and directed tests, nightly regression and coverage closure for the pipeline, packet buffer, traffic manager and die-to-die logic.',
+      'Verify the Switch SoC <b>block by block and subsystem by subsystem</b> — UVM environments, constrained-random and directed tests, nightly regression and coverage closure for the pipeline, packet buffer, traffic manager and die-to-die logic.',
       'Most bugs are cheapest to find at block level, where stimulus is controllable and failures are easy to debug. The goal is for full-chip simulation to find integration bugs rather than block bugs, so blocks are closed before full-chip regression runs in earnest.',
     ],
     flowNote:
@@ -99,7 +99,7 @@ export const PSV_WRITE_UPS: CpoWriteUps = {
     roles: [
       { r: 'Design verification', d: 'Owns block and subsystem verification' },
       { r: 'RTL designer', d: 'Debugs and fixes block bugs' },
-      { r: 'Switch ASIC architect', d: 'Rules on specification intent' },
+      { r: 'Switch SoC architect', d: 'Rules on specification intent' },
       { r: 'Verification methodology engineer', d: 'Environments and regression infrastructure' },
       { r: 'Program TPM', d: 'Tracks bug and coverage trends' },
     ],
@@ -139,7 +139,7 @@ export const PSV_WRITE_UPS: CpoWriteUps = {
   'PSV-03': {
     criticalPath: true,
     purpose: [
-      'Verify the <b>full switch ASIC</b> as it will be taped out: packet flows end to end, congestion, boot and power-state sequences, with die-to-die, SerDes and management interfaces modelled, and all coverage merged and closed against the plan.',
+      'Verify the <b>full Switch SoC</b> as it will be taped out: packet flows end to end, congestion, boot and power-state sequences, with die-to-die, SerDes and management interfaces modelled, and all coverage merged and closed against the plan.',
       'Full-chip simulation is slow, so it is spent on what only full chip can show: interactions between blocks, clock and reset domains, boot and power states. Its bug rate is the most honest indicator of tapeout readiness on the program.',
     ],
     flowNote:
@@ -152,7 +152,7 @@ export const PSV_WRITE_UPS: CpoWriteUps = {
       'Block closure status from PSV-02',
     ],
     rel: {
-      'PSV-D3': '<b>Full-chip regression and functional coverage closure report.</b> Produced here; it is the switch ASIC’s main functional evidence for tapeout.',
+      'PSV-D3': '<b>Full-chip regression and functional coverage closure report.</b> Produced here; it is the Switch SoC’s main functional evidence for tapeout.',
       'PSV-D11': '<b>Pre-silicon validation closure package.</b> Full-chip coverage and bug trend are scored at closure.',
     },
     risks: [
@@ -272,68 +272,68 @@ export const PSV_WRITE_UPS: CpoWriteUps = {
   'PSV-05': {
     criticalPath: true,
     purpose: [
-      'Verify the <b>electrical IC and SerDes as mixed-signal systems</b>: digital control, calibration logic and analog blocks together, using real-number models correlated to transistor level, with transistor-level spot checks of the driver, TIA and clock recovery.',
-      'Analog blocks are simulated by their designers; what fails in silicon is the loop between the analog and the digital that controls it — a calibration that cannot converge, a power-up that leaves a bias off. Mixed-signal verification exists to find those, and it is only as good as the correlation of its models.',
+      'Verify the <b>I/O die SerDes and die-to-die PHY as mixed-signal systems</b>: adaptation logic, link training state machines, lane repair and the analog blocks together, using real-number models correlated to transistor level, with transistor-level spot checks of the receiver front end, clock recovery and die-to-die PHY.',
+      'The I/O die is its own die with its own tapeout, so its mixed-signal closure is judged on its own: what fails in silicon is the loop between the analog and the digital that controls it — an adaptation that cannot converge, a training sequence that stalls with the Switch SoC on the other side. Mixed-signal verification exists to find those, and it is only as good as the correlation of its models.',
     ],
     flowNote:
-      'Step 1 builds and correlates models. Step 2 builds the testbench. Step 3 runs loops and sequences across corners with step 4 running transistor-level spot checks beside it. Step 5 closes bugs, and step 6 releases the report.',
+      'Step 1 builds and correlates models. Step 2 builds the testbench. Step 3 runs adaptation, training and power-up across corners with step 4 running transistor-level spot checks beside it. Step 5 closes bugs, and step 6 releases the report.',
     consumes: [
       'Verification plan from PSV-01',
-      'SerDes design database from DSGN-04',
-      'Electrical IC design from DSGN-05',
-      'EIC and PIC behavioral models from MODL-05',
-      'Calibration algorithms from DSGN-08',
+      'I/O die design database from DSGN-04',
+      'Switch SoC-to-I/O die die-to-die interface from ICD-02',
+      'I/O die-to-optical engine electrical interface from ICD-03',
+      'Electrical channel and SerDes link models from MODL-03',
     ],
     rel: {
-      'PSV-D5': '<b>Mixed-signal verification report for the electrical IC and SerDes.</b> Produced here; analog signoff and link co-simulation rely on it.',
-      'PSV-D7': '<b>End-to-end link co-simulation margin report.</b> The correlated real-number models are the SerDes and EIC models in the link simulation.',
+      'PSV-D5': '<b>Mixed-signal verification report for the I/O die SerDes and die-to-die PHY.</b> Produced here; I/O die signoff and link co-simulation rely on it.',
+      'PSV-D7': '<b>End-to-end link co-simulation margin report.</b> The correlated real-number models are the SerDes and die-to-die models in the link simulation.',
     },
     risks: [
       '<b>Models uncorrelated.</b> Real-number models are never checked against transistor-level results.',
-      '<b>Power-up untested.</b> Sequences run only from a settled state.',
+      '<b>Training tested against an ideal partner.</b> Die-to-die training is run against a perfect model of the Switch SoC side and never against its real RTL.',
       '<b>Corners skipped.</b> Mixed-signal runs are done at typical only.',
       '<b>Circuit changes not re-verified.</b> Late circuit fixes bypass mixed-signal regression.',
-      '<b>Digital control assumed correct.</b> Calibration logic is verified only against ideal analog.',
+      '<b>Lane repair unexercised.</b> Redundant lanes and repair sequences are never triggered in simulation.',
     ],
     roles: [
-      { r: 'Analog and mixed-signal', d: 'Owns mixed-signal verification of EIC and SerDes' },
+      { r: 'SerDes and high-speed I/O', d: 'Owns mixed-signal verification of the I/O die' },
       { r: 'Mixed-signal verification engineer', d: 'Models, testbench and regression' },
-      { r: 'Analog designer', d: 'Transistor-level references and fixes' },
-      { r: 'SerDes designer', d: 'Adaptation and clock recovery behaviour' },
-      { r: 'Firmware engineer', d: 'Calibration sequences' },
+      { r: 'SerDes designer', d: 'Adaptation, clock recovery and transistor-level references' },
+      { r: 'Die-to-die PHY designer', d: 'Training, lane repair and PHY behaviour' },
+      { r: 'Design verification lead', d: 'Co-simulation against the Switch SoC RTL' },
     ],
     effort: [
-      ['Real-number modeling and correlation', 40],
-      ['Mixed-signal testbench', 20],
-      ['Corner regression', 35],
-      ['Transistor-level spot checks', 25],
+      ['Real-number modeling and correlation', 20],
+      ['Mixed-signal testbench', 10],
+      ['Corner regression', 18],
+      ['Transistor-level spot checks', 12],
     ],
     entry: [
-      'Pre-layout circuit databases from DSGN-04 and DSGN-05',
-      'Behavioral models available from MODL-05',
-      'Mixed-signal metrics defined in the verification plan',
+      'Pre-layout I/O die database from DSGN-04',
+      'Die-to-die and I/O-to-engine interfaces baselined in ICD-02 and ICD-03',
+      'Mixed-signal metrics for the I/O die defined in the verification plan',
     ],
     exit: [
-      'Every real-number model correlated to transistor level within the stated error on its key metrics',
-      'Calibration, control loops and power-up passing at every corner',
-      'Zero open severity-one mixed-signal bugs',
+      'Every SerDes and die-to-die PHY real-number model correlated to transistor level within the stated error on its key metrics',
+      'Adaptation, link training, lane repair and power-up passing at every corner',
+      'Zero open severity-one I/O die mixed-signal bugs',
     ],
-    dependsOn: ['PSV-01', 'DSGN-04', 'DSGN-05'],
+    dependsOn: ['PSV-01', 'DSGN-04'],
     dependsNote: null,
-    feedsInto: ['PSV-07', 'IMPL-04', 'SGNO-03'],
+    feedsInto: ['PSV-07', 'IMPL-03', 'SGNO-02'],
     measuredBy: [
-      'Models correlated',
-      'Corner cases passing',
-      'Mixed-signal bugs open',
+      'I/O die models correlated',
+      'Corner cases passing per lane type',
+      'I/O die mixed-signal bugs open',
     ],
     links: {
-      dependsOn: ['PSV-01', 'DSGN-04', 'DSGN-05', 'MODL-05'],
-      feedsInto: ['PSV-07', 'PSV-11', 'IMPL-04', 'SGNO-02', 'SGNO-03'],
-      runsWith: ['PSV-06'],
+      dependsOn: ['PSV-01', 'DSGN-04', 'MODL-03', 'ICD-02', 'ICD-03'],
+      feedsInto: ['PSV-07', 'PSV-11', 'IMPL-03', 'SGNO-02'],
+      runsWith: ['PSV-15'],
       revisedBy: [],
-      feedsBackInto: ['DSGN-04', 'DSGN-05'],
+      feedsBackInto: ['DSGN-04'],
     },
-    terms: ['RNM', 'AMS', 'EIC', 'TIA', 'SerDes'],
+    terms: ['RNM', 'AMS', 'SerDes', 'D2D', 'PHY'],
   },
   'PSV-06': {
     criticalPath: false,
@@ -441,16 +441,16 @@ export const PSV_WRITE_UPS: CpoWriteUps = {
       ['Margin allocation', 10],
     ],
     entry: [
-      'Interfaces frozen in ICD-10',
+      'Interfaces frozen in ICD-12',
       'Models correlated in MODL-11 and declared ready in MODL-10',
-      'Correlated component models from PSV-05 and PSV-06',
+      'Correlated component models from PSV-05, PSV-06 and PSV-15',
     ],
     exit: [
       'Estimated BER meets the target with the agreed margin at every corner on every lane type',
       'Every model in the link correlated to test-vehicle data in MODL-11 within the stated error, and the report released before the design freeze in DSGN-18',
       'Every margin shortfall allocated to an owner and closed or accepted',
     ],
-    dependsOn: ['PSV-05', 'PSV-06', 'MODL-03', 'MODL-10', 'ICD-10'],
+    dependsOn: ['PSV-05', 'PSV-06', 'PSV-15', 'MODL-03', 'MODL-10', 'ICD-12'],
     dependsNote: null,
     feedsInto: ['DSGN-18', 'PSV-11', 'SGNO-06', 'OBU-06'],
     measuredBy: [
@@ -459,7 +459,7 @@ export const PSV_WRITE_UPS: CpoWriteUps = {
       'Open margin shortfalls',
     ],
     links: {
-      dependsOn: ['PSV-05', 'PSV-06', 'MODL-03', 'MODL-04', 'MODL-06', 'MODL-10', 'MODL-11', 'ICD-10', 'DSGN-12'],
+      dependsOn: ['PSV-05', 'PSV-06', 'PSV-15', 'MODL-03', 'MODL-04', 'MODL-06', 'MODL-10', 'MODL-11', 'ICD-12', 'DSGN-12', 'ICD-03', 'ICD-05'],
       feedsInto: ['DSGN-18', 'PSV-11', 'SGNO-06', 'OBU-06', 'CHAR-07'],
       runsWith: ['PSV-13'],
       revisedBy: [],
@@ -470,7 +470,7 @@ export const PSV_WRITE_UPS: CpoWriteUps = {
   'PSV-08': {
     criticalPath: false,
     purpose: [
-      'Run the switch ASIC on <b>emulation and FPGA prototypes</b>: compile the RTL, bring up clocks, resets and memories, pass real packet traffic through the pipeline, buffer and traffic manager, and boot firmware and SDK for the teams who need hardware before silicon.',
+      'Run the Switch SoC on <b>emulation and FPGA prototypes</b>: compile the RTL, bring up clocks, resets and memories, pass real packet traffic through the pipeline, buffer and traffic manager, and boot firmware and SDK for the teams who need hardware before silicon.',
       'Emulation reaches what simulation cannot — long traffic runs, deep congestion, and firmware running for hours. Its value is highest early, so the platform is brought up on integrated RTL well before freeze and kept current with each RTL drop.',
     ],
     flowNote:
@@ -676,7 +676,7 @@ export const PSV_WRITE_UPS: CpoWriteUps = {
     consumes: [
       'Full-chip coverage and bug trend from PSV-03',
       'Formal, crossing and low-power signoff from PSV-04',
-      'Mixed-signal, optical, security and bridge results from PSV-05, PSV-06, PSV-12 and PSV-13',
+      'I/O die and electrical IC mixed-signal, optical, security and bridge results from PSV-05, PSV-15, PSV-06, PSV-12 and PSV-13',
       'Link margin from PSV-07',
       'Design freeze package from DSGN-18',
     ],
@@ -712,7 +712,7 @@ export const PSV_WRITE_UPS: CpoWriteUps = {
       'Zero open severity-one bugs across all dies',
       'Closure package released to the tapeout readiness review',
     ],
-    dependsOn: ['PSV-02', 'PSV-03', 'PSV-04', 'PSV-05', 'PSV-06', 'PSV-07', 'PSV-08', 'PSV-09', 'PSV-10', 'PSV-12', 'PSV-13', 'PSV-14', 'DSGN-18'],
+    dependsOn: ['PSV-02', 'PSV-03', 'PSV-04', 'PSV-05', 'PSV-06', 'PSV-07', 'PSV-08', 'PSV-09', 'PSV-10', 'PSV-12', 'PSV-13', 'PSV-14', 'PSV-15', 'DSGN-18'],
     dependsNote: null,
     feedsInto: ['SGNO-09', 'MTO-01'],
     measuredBy: [
@@ -721,7 +721,7 @@ export const PSV_WRITE_UPS: CpoWriteUps = {
       'Open bugs at closure',
     ],
     links: {
-      dependsOn: ['PSV-01', 'PSV-02', 'PSV-03', 'PSV-04', 'PSV-05', 'PSV-06', 'PSV-07', 'PSV-08', 'PSV-09', 'PSV-10', 'PSV-12', 'PSV-13', 'PSV-14', 'DSGN-18'],
+      dependsOn: ['PSV-01', 'PSV-02', 'PSV-03', 'PSV-04', 'PSV-05', 'PSV-06', 'PSV-07', 'PSV-08', 'PSV-09', 'PSV-10', 'PSV-12', 'PSV-13', 'PSV-14', 'PSV-15', 'DSGN-18'],
       feedsInto: ['SGNO-09', 'MTO-01'],
       runsWith: [],
       revisedBy: [],
@@ -867,7 +867,7 @@ export const PSV_WRITE_UPS: CpoWriteUps = {
     criticalPath: false,
     purpose: [
       'Use <b>emulation to measure power</b> under real workloads — idle, line-rate traffic, congestion bursts, table updates and power-state transitions — and cut the <b>worst-case current-step vectors</b> that dynamic IR signoff and package and board PDN closure need.',
-      'Vectorless IR analysis guesses at switching activity, and a switch ASIC’s worst di/dt comes from traffic patterns — a burst after idle, every port starting at once — that only emulation can run long enough to find. Without these vectors the PDN is closed against the wrong event, and the system power model stays an estimate.',
+      'Vectorless IR analysis guesses at switching activity, and a Switch SoC’s worst di/dt comes from traffic patterns — a burst after idle, every port starting at once — that only emulation can run long enough to find. Without these vectors the PDN is closed against the wrong event, and the system power model stays an estimate.',
     ],
     flowNote:
       'Step 1 selects workloads. Step 2 captures activity on emulation. Step 3 computes power profiles, step 4 finds the worst current steps and cuts vectors, step 5 hands them to IR and PDN analysis and updates the power model in parallel, and step 6 releases.',
@@ -928,5 +928,71 @@ export const PSV_WRITE_UPS: CpoWriteUps = {
       feedsBackInto: ['MODL-08'],
     },
     terms: ['Emulation', 'EM/IR', 'PDN', 'Power per bit'],
+  },
+  'PSV-15': {
+    criticalPath: true,
+    purpose: [
+      'Verify the <b>electrical IC as a mixed-signal system against the photonic IC it drives</b>: drivers, TIAs, bias generators, monitor receivers and the digital bias, heater and wavelength-lock loops together, using real-number models correlated to transistor level and the photonic behavioral models as the load.',
+      'The electrical IC is verified apart from the I/O die because its failures are different: a bias loop that oscillates with the heater time constant, a TIA that is stable on a resistor and rings on a real photodiode. Only a testbench that carries the photonic models finds those before silicon.',
+    ],
+    flowNote:
+      'Step 1 builds and correlates models. Step 2 builds the testbench with the photonic models. Step 3 runs the control loops and power-up across corners with step 4 running transistor-level spot checks beside it. Step 5 closes bugs, and step 6 releases the report.',
+    consumes: [
+      'Verification plan from PSV-01',
+      'Electrical IC design from DSGN-05',
+      'EIC and PIC behavioral models from MODL-05',
+      'Calibration and tuning algorithms from DSGN-08',
+      'Electrical IC-to-photonic IC stack interface from ICD-04',
+    ],
+    rel: {
+      'PSV-D15': '<b>Mixed-signal verification report for the electrical IC drivers, TIAs and control loops.</b> Produced here; electrical IC signoff relies on it.',
+      'PSV-D7': '<b>End-to-end link co-simulation margin report.</b> The correlated driver and TIA models are the electrical IC models in the link simulation.',
+    },
+    risks: [
+      '<b>Ideal optical load.</b> Drivers and TIAs are verified into resistive loads and not the photonic models.',
+      '<b>Loop interaction missed.</b> Bias, heater and wavelength-lock loops are verified one at a time and never together.',
+      '<b>Power-up untested.</b> Sequences run only from a settled state, so a bias that starts off is never seen.',
+      '<b>Models uncorrelated.</b> Real-number models are never checked against transistor-level results.',
+      '<b>Firmware assumptions unchecked.</b> The loop gains firmware will program are not the ones simulated.',
+    ],
+    roles: [
+      { r: 'Analog and mixed-signal', d: 'Owns mixed-signal verification of the electrical IC' },
+      { r: 'Mixed-signal verification engineer', d: 'Models, testbench and regression' },
+      { r: 'Analog designer', d: 'Transistor-level references and fixes' },
+      { r: 'Photonic device engineer', d: 'Photonic behavioral models used as the load' },
+      { r: 'Firmware engineer', d: 'Control-loop gains and calibration sequences' },
+    ],
+    effort: [
+      ['Real-number modeling and correlation', 20],
+      ['Testbench with photonic models', 10],
+      ['Control-loop and corner regression', 17],
+      ['Transistor-level spot checks', 13],
+    ],
+    entry: [
+      'Pre-layout electrical IC database from DSGN-05',
+      'EIC and PIC behavioral models available from MODL-05',
+      'Electrical IC-to-photonic IC interface baselined in ICD-04',
+    ],
+    exit: [
+      'Every electrical IC real-number model correlated to transistor level within the stated error on its key metrics',
+      'Bias, heater and wavelength-lock loops stable and converging together at every corner with the photonic load',
+      'Zero open severity-one electrical IC mixed-signal bugs',
+    ],
+    dependsOn: ['PSV-01', 'DSGN-05', 'MODL-05'],
+    dependsNote: null,
+    feedsInto: ['PSV-07', 'IMPL-04', 'SGNO-03'],
+    measuredBy: [
+      'Electrical IC models correlated',
+      'Control-loop corner cases passing',
+      'Electrical IC mixed-signal bugs open',
+    ],
+    links: {
+      dependsOn: ['PSV-01', 'DSGN-05', 'MODL-05', 'DSGN-08', 'ICD-04'],
+      feedsInto: ['PSV-07', 'PSV-11', 'IMPL-04', 'SGNO-03'],
+      runsWith: ['PSV-05', 'PSV-06'],
+      revisedBy: [],
+      feedsBackInto: ['DSGN-05'],
+    },
+    terms: ['RNM', 'AMS', 'EIC', 'TIA', 'PIC'],
   },
 };

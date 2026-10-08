@@ -297,7 +297,7 @@ export const PKGA: CpoStageModule = {
     },
     'PKGA-13': {
       s: [
-        [1, 'Kit known-good switch and I/O die with substrates and bridges for the electrical-only build', 0.5],
+        [1, 'Kit known-good Switch SoC and I/O die with substrates and bridges for the electrical-only build', 0.5],
         [2, 'Attach bridges, silicon capacitors and die, and reflow, with optical engine sites left empty or capped', 2],
         [3, 'Underfill, lid and inspect by acoustic imaging and X-ray', 1],
         [4, 'Run package continuity and electrical screening on the tester', 1],

@@ -17,6 +17,6 @@ export const MTO_GLOSSARY: CpoGlossary = {
   'Compound yield': {
     full: 'Compound (multi-die) yield',
     group: 'program',
-    note: 'The yield of a package that needs every one of its dies to be good: the product of the individual die yields and the assembly yield. With a switch die, I/O silicon, several optical engines and a bridge, small per-die losses multiply into a large package loss.',
+    note: 'The yield of a package that needs every one of its dies to be good: the product of the individual die yields and the assembly yield. With a switch die, I/O die, several optical engines and a bridge, small per-die losses multiply into a large package loss.',
   },
 };

@@ -80,7 +80,7 @@ export const MODL_WRITE_UPS: CpoWriteUps = {
     consumes: [
       'Modeling plan from MODL-01',
       'Switching feature, buffering and telemetry requirements from REQ-03',
-      'Switch ASIC pipeline and buffer architecture from SARC-01',
+      'Switch SoC pipeline and buffer architecture from SARC-01',
       'Customer workload traces and traffic patterns',
       'Prior switch performance data',
     ],
@@ -267,7 +267,7 @@ export const MODL_WRITE_UPS: CpoWriteUps = {
     links: {
       dependsOn: ['MODL-01', 'REQ-04', 'FEAS-03', 'FEAS-05', 'FEAS-06'],
       feedsInto: ['MODL-08', 'MODL-10', 'MODL-11', 'DSGN-06', 'DSGN-08', 'PSV-06', 'OBU-06', 'CHAR-03'],
-      runsWith: ['SARC-03', 'ICD-03'],
+      runsWith: ['SARC-03', 'ICD-04'],
       revisedBy: ['FEAS-08'],
       feedsBackInto: [],
     },
@@ -325,7 +325,7 @@ export const MODL_WRITE_UPS: CpoWriteUps = {
       'Library released under version control with accuracy stated per parameter',
     ],
     dependsOn: ['FEAS-04', 'TRDY-09'],
-    dependsNote: 'Runs with the electrical-to-photonic interface definition in ICD-03.',
+    dependsNote: 'Runs with the electrical-to-photonic interface definition in ICD-04.',
     feedsInto: ['PSV-05', 'PSV-07'],
     measuredBy: [
       'Model error against lower-level simulation',
@@ -334,8 +334,8 @@ export const MODL_WRITE_UPS: CpoWriteUps = {
     ],
     links: {
       dependsOn: ['MODL-01', 'FEAS-03', 'FEAS-04', 'TRDY-02', 'TRDY-09'],
-      feedsInto: ['MODL-09', 'MODL-10', 'MODL-11', 'DSGN-05', 'PSV-05', 'PSV-06', 'PSV-07'],
-      runsWith: ['ICD-03'],
+      feedsInto: ['MODL-09', 'MODL-10', 'MODL-11', 'DSGN-05', 'PSV-05', 'PSV-06', 'PSV-07', 'PSV-15'],
+      runsWith: ['ICD-04'],
       revisedBy: [],
       feedsBackInto: [],
     },
@@ -393,7 +393,7 @@ export const MODL_WRITE_UPS: CpoWriteUps = {
       'Model set released with the stack-up version it was built on',
     ],
     dependsOn: ['MODL-01', 'FEAS-07'],
-    dependsNote: 'Runs with the package architecture in SARC-05, the package interfaces in ICD-05 and the channel models in MODL-03.',
+    dependsNote: 'Runs with the package architecture in SARC-05, the package interfaces in ICD-07 and the channel models in MODL-03.',
     feedsInto: ['DSGN-12', 'IMPL-08'],
     measuredBy: [
       'Rails meeting target impedance',
@@ -403,7 +403,7 @@ export const MODL_WRITE_UPS: CpoWriteUps = {
     links: {
       dependsOn: ['MODL-01', 'FEAS-07'],
       feedsInto: ['MODL-08', 'MODL-10', 'DSGN-09', 'DSGN-12', 'DSGN-14', 'IMPL-08'],
-      runsWith: ['SARC-05', 'ICD-05', 'MODL-03'],
+      runsWith: ['SARC-05', 'ICD-07', 'MODL-03'],
       revisedBy: [],
       feedsBackInto: [],
     },
@@ -461,7 +461,7 @@ export const MODL_WRITE_UPS: CpoWriteUps = {
       'Predicted warpage-driven fiber shift within the fiber attach alignment tolerance',
     ],
     dependsOn: ['FEAS-07'],
-    dependsNote: 'Runs with the thermal architecture in SARC-07 and the thermal interfaces in ICD-07.',
+    dependsNote: 'Runs with the thermal architecture in SARC-07 and the thermal interfaces in ICD-09.',
     feedsInto: ['DSGN-15', 'IMPL-09'],
     measuredBy: [
       'Model error against test vehicle',
@@ -471,7 +471,7 @@ export const MODL_WRITE_UPS: CpoWriteUps = {
     links: {
       dependsOn: ['MODL-01', 'FEAS-07'],
       feedsInto: ['MODL-08', 'MODL-10', 'MODL-11', 'DSGN-15', 'IMPL-09', 'SINT-06'],
-      runsWith: ['SARC-07', 'ICD-07'],
+      runsWith: ['SARC-07', 'ICD-09'],
       revisedBy: [],
       feedsBackInto: [],
     },
@@ -595,7 +595,7 @@ export const MODL_WRITE_UPS: CpoWriteUps = {
       'Platform register model matches the current register specification release',
     ],
     dependsOn: ['MODL-01'],
-    dependsNote: 'Runs with the firmware and software architecture in SARC-08 and the firmware interfaces in ICD-08, which define what it models.',
+    dependsNote: 'Runs with the firmware and software architecture in SARC-08 and the firmware interfaces in ICD-10, which define what it models.',
     feedsInto: ['DSGN-16', 'PSV-09'],
     measuredBy: [
       'Firmware features running on the platform',
@@ -605,7 +605,7 @@ export const MODL_WRITE_UPS: CpoWriteUps = {
     links: {
       dependsOn: ['MODL-01', 'MODL-02', 'MODL-05'],
       feedsInto: ['MODL-10', 'DSGN-16', 'DSGN-17', 'PSV-09'],
-      runsWith: ['SARC-08', 'ICD-08'],
+      runsWith: ['SARC-08', 'ICD-10'],
       revisedBy: [],
       feedsBackInto: [],
     },

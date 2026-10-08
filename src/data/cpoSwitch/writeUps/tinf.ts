@@ -14,7 +14,7 @@ export const TINF_WRITE_UPS: CpoWriteUps = {
       'Step 1 maps defect mechanisms to insertions. Step 2 allocates content, while step 3 defines the optical access each insertion needs, because optical content with no access is not content. Step 4 sets the targets and step 5 releases the plan the hardware is ordered against.',
     consumes: [
       'DFT, known-good-die and production test architecture from SARC-10',
-      'Manufacturing, test and calibration data interfaces from ICD-09',
+      'Manufacturing, test and calibration data interfaces from ICD-11',
       'Manufacturability, test and cost-of-goods targets from REQ-08',
       'Optical test access provisions in the photonic IC design from DSGN-06',
       'Yield and escape data from prior switch and optical programs',
@@ -45,7 +45,7 @@ export const TINF_WRITE_UPS: CpoWriteUps = {
     ],
     entry: [
       'Test architecture frozen at the partition freeze',
-      'Test and calibration data interfaces drafted in ICD-09',
+      'Test and calibration data interfaces drafted in ICD-11',
       'Cost-of-goods targets baselined in the requirements',
     ],
     exit: [
@@ -53,7 +53,7 @@ export const TINF_WRITE_UPS: CpoWriteUps = {
       'Coverage, escape-rate and cost targets set for all five insertions',
       'Strategy approved by test, quality and manufacturing and placed under change control',
     ],
-    dependsOn: ['SARC-10', 'ICD-09'],
+    dependsOn: ['SARC-10', 'ICD-11'],
     dependsNote: 'Starts from the frozen test architecture; the hardware orders downstream cannot be placed until this is released.',
     feedsInto: ['TINF-02', 'TINF-03', 'TINF-04', 'TINF-06'],
     measuredBy: [
@@ -62,7 +62,7 @@ export const TINF_WRITE_UPS: CpoWriteUps = {
       'Content moved between insertions after release',
     ],
     links: {
-      dependsOn: ['SARC-10', 'ICD-09', 'REQ-08'],
+      dependsOn: ['SARC-10', 'ICD-11', 'REQ-08'],
       feedsInto: ['TINF-02', 'TINF-03', 'TINF-04', 'TINF-05', 'TINF-06', 'TINF-08', 'TINF-15'],
       runsWith: ['DSGN-11'],
       revisedBy: [],
@@ -121,7 +121,7 @@ export const TINF_WRITE_UPS: CpoWriteUps = {
     ],
     dependsOn: ['TINF-01', 'DSGN-12'],
     dependsNote: 'The order is placed on a bump map still closing in IMPL-07; the risk of a late pad change is carried explicitly.',
-    feedsInto: ['SORT-01', 'TINF-06'],
+    feedsInto: ['SORT-01', 'TINF-06', 'SORT-02', 'SORT-03'],
     measuredBy: [
       'Weeks of margin between card delivery and first wafer out',
       'Contact yield on test wafers',
@@ -129,7 +129,7 @@ export const TINF_WRITE_UPS: CpoWriteUps = {
     ],
     links: {
       dependsOn: ['TINF-01', 'DSGN-12', 'IMPL-07'],
-      feedsInto: ['SORT-01', 'TINF-06', 'TINF-11'],
+      feedsInto: ['SORT-01', 'TINF-06', 'TINF-11', 'SORT-02', 'SORT-03'],
       runsWith: ['TINF-04'],
       revisedBy: [],
       feedsBackInto: [],
@@ -152,7 +152,7 @@ export const TINF_WRITE_UPS: CpoWriteUps = {
       'Optical link budget allocation for test uncertainty from MODL-04',
     ],
     rel: {
-      'TINF-D3': '<b>Optical wafer probe station and optical test fixture set with loss-correction tables.</b> Produced here; SORT-02 and every optical package test run on it.',
+      'TINF-D3': '<b>Optical wafer probe station and optical test fixture set with loss-correction tables.</b> Produced here; SORT-04 and every optical package test run on it.',
       'TINF-D6': '<b>Production test program release.</b> The optical routines are written against this hardware and its correction tables.',
       'TINF-D7': '<b>Factory calibration process specification.</b> Calibration accuracy depends on the fixture loss this activity measures.',
     },
@@ -188,7 +188,7 @@ export const TINF_WRITE_UPS: CpoWriteUps = {
     ],
     dependsOn: ['TINF-01', 'DSGN-06'],
     dependsNote: null,
-    feedsInto: ['SORT-02', 'TINF-06', 'TINF-07'],
+    feedsInto: ['SORT-04', 'TINF-06', 'TINF-07'],
     measuredBy: [
       'Fixture repeatability against the tightest optical limit',
       'Wafer-to-package optical correlation offset',
@@ -196,7 +196,7 @@ export const TINF_WRITE_UPS: CpoWriteUps = {
     ],
     links: {
       dependsOn: ['TINF-01', 'DSGN-06', 'FEAS-03', 'DSGN-13'],
-      feedsInto: ['SORT-02', 'TINF-06', 'TINF-07', 'TINF-11'],
+      feedsInto: ['SORT-04', 'TINF-06', 'TINF-07', 'TINF-11'],
       runsWith: ['TINF-02'],
       revisedBy: [],
       feedsBackInto: ['MODL-04'],
@@ -387,7 +387,7 @@ export const TINF_WRITE_UPS: CpoWriteUps = {
     ],
     dependsOn: ['TINF-01', 'TINF-02', 'TINF-03', 'TINF-04', 'SGNO-07'],
     dependsNote: 'Pattern delivery from SGNO-07 lands late in the window; conversion of preliminary patterns from IMPL-11 starts earlier so only deltas remain.',
-    feedsInto: ['SORT-01', 'SORT-02', 'PKGA-06'],
+    feedsInto: ['SORT-01', 'SORT-04', 'PKGA-06', 'SORT-02', 'SORT-03'],
     measuredBy: [
       'Patterns passing on the tester per insertion',
       'Test time per insertion against the model',
@@ -395,7 +395,7 @@ export const TINF_WRITE_UPS: CpoWriteUps = {
     ],
     links: {
       dependsOn: ['TINF-01', 'TINF-02', 'TINF-03', 'TINF-04', 'TINF-07', 'TINF-13', 'IMPL-11', 'SGNO-07', 'PSV-10'],
-      feedsInto: ['SORT-01', 'SORT-02', 'SORT-03', 'PKGA-06', 'TINF-11'],
+      feedsInto: ['SORT-01', 'SORT-04', 'SORT-05', 'PKGA-06', 'TINF-11', 'SORT-02', 'SORT-03'],
       runsWith: ['TINF-05'],
       revisedBy: [],
       feedsBackInto: [],
@@ -413,7 +413,7 @@ export const TINF_WRITE_UPS: CpoWriteUps = {
     consumes: [
       'Optical control, tuning and calibration algorithms from DSGN-08',
       'Firmware optical control and table read-back design from DSGN-16',
-      'Test and calibration data interfaces from ICD-09',
+      'Test and calibration data interfaces from ICD-11',
       'Optical fixture loss-correction tables from TINF-03',
       'On-part non-volatile storage allocation from the security and fuse design',
     ],
@@ -461,7 +461,7 @@ export const TINF_WRITE_UPS: CpoWriteUps = {
       'Tables traceable end to end',
     ],
     links: {
-      dependsOn: ['DSGN-08', 'TINF-03', 'DSGN-16', 'ICD-09'],
+      dependsOn: ['DSGN-08', 'TINF-03', 'DSGN-16', 'ICD-11'],
       feedsInto: ['TINF-06', 'TINF-10', 'OBU-04', 'NPI-07', 'TINF-11'],
       runsWith: [],
       revisedBy: [],
@@ -612,7 +612,7 @@ export const TINF_WRITE_UPS: CpoWriteUps = {
     flowNote:
       'Step 1 defines the genealogy and step 2 the data model. Step 3 builds the pipeline while step 4 builds dashboards alongside it. Step 5 integrates the execution systems, step 6 proves traceability on a test vehicle lot and step 7 releases the system.',
     consumes: [
-      'Manufacturing, test and calibration data interfaces from ICD-09',
+      'Manufacturing, test and calibration data interfaces from ICD-11',
       'Production test strategy from TINF-01',
       'Calibration data flow from TINF-07',
       'Assembly partner data interfaces',
@@ -644,7 +644,7 @@ export const TINF_WRITE_UPS: CpoWriteUps = {
       ['Traceability proof', 2],
     ],
     entry: [
-      'Data interfaces defined in ICD-09',
+      'Data interfaces defined in ICD-11',
       'Test strategy and insertion list released',
       'Assembly partner agreed to share genealogy data',
     ],
@@ -653,17 +653,17 @@ export const TINF_WRITE_UPS: CpoWriteUps = {
       'Electrical, optical and calibration results queryable per unit serial',
       'Yield dashboards live for every insertion before first silicon',
     ],
-    dependsOn: ['ICD-09', 'TINF-01', 'TINF-07'],
+    dependsOn: ['ICD-11', 'TINF-01', 'TINF-07'],
     dependsNote: null,
-    feedsInto: ['SORT-04', 'NPI-05', 'TINF-11'],
+    feedsInto: ['SORT-06', 'NPI-05', 'TINF-11'],
     measuredBy: [
       'Units with complete genealogy',
       'Time to trace a unit from serial to source lots',
       'Insertions reporting into the system',
     ],
     links: {
-      dependsOn: ['ICD-09', 'TINF-01', 'TINF-07'],
-      feedsInto: ['SORT-04', 'NPI-05', 'TINF-11'],
+      dependsOn: ['ICD-11', 'TINF-01', 'TINF-07'],
+      feedsInto: ['SORT-06', 'NPI-05', 'TINF-11'],
       runsWith: [],
       revisedBy: [],
       feedsBackInto: [],
@@ -719,7 +719,7 @@ export const TINF_WRITE_UPS: CpoWriteUps = {
     ],
     dependsOn: ['TINF-02', 'TINF-03', 'TINF-04', 'TINF-06', 'TINF-07', 'TINF-09'],
     dependsNote: null,
-    feedsInto: ['SORT-01', 'PKGA-06', 'NPI-01'],
+    feedsInto: ['SORT-01', 'PKGA-06', 'NPI-01', 'SORT-02', 'SORT-03'],
     measuredBy: [
       'Insertions rated ready at the review',
       'Open items closed before first wafer out',
@@ -744,7 +744,7 @@ export const TINF_WRITE_UPS: CpoWriteUps = {
         'TINF-16',
         'TINF-17',
       ],
-      feedsInto: ['SORT-01', 'PKGA-06', 'NPI-01'],
+      feedsInto: ['SORT-01', 'PKGA-06', 'NPI-01', 'SORT-02', 'SORT-03'],
       runsWith: [],
       revisedBy: [],
       feedsBackInto: [],
@@ -961,7 +961,7 @@ export const TINF_WRITE_UPS: CpoWriteUps = {
       'Production test strategy from TINF-01',
       'Assembly partner readiness from TRDY-06',
       'Test hardware plans from TINF-02, TINF-03 and TINF-04',
-      'Manufacturing data interfaces from ICD-09',
+      'Manufacturing data interfaces from ICD-11',
       'Subcontractor capability and capacity information',
     ],
     rel: {
@@ -1000,7 +1000,7 @@ export const TINF_WRITE_UPS: CpoWriteUps = {
     ],
     dependsOn: ['TINF-01', 'TRDY-06'],
     dependsNote: null,
-    feedsInto: ['TINF-08', 'TINF-13', 'SORT-01'],
+    feedsInto: ['TINF-08', 'TINF-13', 'SORT-01', 'SORT-02', 'SORT-03'],
     measuredBy: [
       'Sites qualified against insertions needed',
       'Cross-site correlation offset',
@@ -1008,7 +1008,7 @@ export const TINF_WRITE_UPS: CpoWriteUps = {
     ],
     links: {
       dependsOn: ['TINF-01', 'TRDY-06'],
-      feedsInto: ['TINF-08', 'TINF-10', 'TINF-11', 'TINF-13', 'SORT-01'],
+      feedsInto: ['TINF-08', 'TINF-10', 'TINF-11', 'TINF-13', 'SORT-01', 'SORT-02', 'SORT-03'],
       runsWith: ['TINF-02', 'TINF-04'],
       revisedBy: [],
       feedsBackInto: [],

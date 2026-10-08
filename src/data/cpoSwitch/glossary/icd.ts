@@ -29,4 +29,24 @@ export const ICD_GLOSSARY: CpoGlossary = {
     group: 'process',
     note: 'The record linking a finished unit to the wafers, dies, lots, optical engines, optical source and process steps it was built from, carried across every factory site.',
   },
+  'Host lane': {
+    full: 'Host lane',
+    group: 'iface',
+    note: 'One electrical lane between the I/O die and an optical engine, carrying one optical lane’s data. Its position in the lane map ties an I/O die SerDes, a package route, an engine pad and a fiber together.',
+  },
+  'Bond pad map': {
+    full: 'Stack bond pad map',
+    group: 'pkg',
+    note: 'The shared assignment of every pad at the bond between two stacked dies — signal, power, ground and through-connections — with pitch and position. Both dies are laid out to it, so a change on one side is a change on both.',
+  },
+  RIN: {
+    full: 'Relative intensity noise',
+    group: 'design',
+    note: 'Fluctuation of a laser’s optical power relative to its average, in dB per hertz. It adds to receiver noise on every lane the source feeds and is budgeted like any other link impairment.',
+  },
+  'PM fiber': {
+    full: 'Polarization-maintaining fiber',
+    group: 'design',
+    note: 'Fiber that holds the polarization of the light launched into it. Used between an external optical source and a photonic IC whose couplers and modulators accept one polarization only.',
+  },
 };

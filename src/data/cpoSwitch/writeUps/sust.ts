@@ -16,7 +16,7 @@ export const SUST_WRITE_UPS: CpoWriteUps = {
       'Yield model and first Pareto from NPI-05',
       'Yield dashboard and excursion history from RAMP-04',
       'Manufacturing data and genealogy from TINF-10',
-      'Known-good-die screening criteria from SORT-03',
+      'Known-good-die screening criteria from SORT-05',
       'Failure analysis results from SUST-03',
     ],
     rel: {
@@ -68,7 +68,7 @@ export const SUST_WRITE_UPS: CpoWriteUps = {
       feedsInto: ['SUST-02', 'SUST-04', 'SUST-07'],
       runsWith: ['SUST-03'],
       revisedBy: [],
-      feedsBackInto: ['SORT-03', 'TINF-09'],
+      feedsBackInto: ['SORT-05', 'TINF-09'],
     },
     terms: ['KGD', 'Coupling loss', 'Fiber attach', 'SPC'],
   },
@@ -218,7 +218,7 @@ export const SUST_WRITE_UPS: CpoWriteUps = {
       'Step 1 runs the board. Step 2 classifies each change and sets its requalification. Step 3 runs delta qualification, and step 4 notifies customers in parallel within the notice period. Step 5 re-baselines interfaces and configuration, and step 6 releases the log and record.',
     consumes: [
       'Production configuration baseline from RAMP-01',
-      'Change control handed over from the program in PCTL-07, with the interface baseline from ICD-10',
+      'Change control handed over from the program in PCTL-07, with the interface baseline from ICD-12',
       'Qualification report and approval from RELQ-06',
       'Delta qualification plan approach from SDBG-06',
       'Change requests from yield, cost, FA and suppliers',
@@ -259,7 +259,7 @@ export const SUST_WRITE_UPS: CpoWriteUps = {
       'No supplier change found in returns or audits that bypassed the board',
     ],
     dependsOn: ['RAMP-01', 'PCTL-07'],
-    dependsNote: 'The interface change control run by PCTL-03 since the interface freeze in ICD-10 is handed over in PCTL-07 and carries on here against the production baseline.',
+    dependsNote: 'The interface change control run by PCTL-03 since the interface freeze in ICD-12 is handed over in PCTL-07 and carries on here against the production baseline.',
     feedsInto: ['SUST-07'],
     measuredBy: [
       'Changes processed and their requalification status',
@@ -267,7 +267,7 @@ export const SUST_WRITE_UPS: CpoWriteUps = {
       'Unannounced supplier changes discovered',
     ],
     links: {
-      dependsOn: ['RAMP-01', 'PCTL-07', 'PCTL-03', 'ICD-10', 'RELQ-06', 'SDBG-06', 'RAMP-07'],
+      dependsOn: ['RAMP-01', 'PCTL-07', 'PCTL-03', 'ICD-12', 'RELQ-06', 'SDBG-06', 'RAMP-07'],
       feedsInto: ['SUST-07'],
       runsWith: ['SUST-01', 'SUST-03', 'SUST-09'],
       revisedBy: [],

@@ -66,12 +66,12 @@ test.describe('the CPO Network Switch System template', () => {
   test('runs every workstream as a parallel activity inside a stage, with steps and outputs', async ({ page }) => {
     const id = await newProgram(page, 'SwitchTwo');
     await page.goto(`/p/${id}/stage/cpoInterfaces/activity`);
-    await expect(page.locator('[data-act]')).toHaveCount(10);
-    await expect(page.locator('[data-act="ICD-03"]')).toContainText('Photonic');
-    await page.locator('[data-act="ICD-03"]').click();
-    const steps = page.locator('[data-step^="ICD-03:"]');
+    await expect(page.locator('[data-act]')).toHaveCount(12);
+    await expect(page.locator('[data-act="ICD-04"]')).toContainText('Photonic');
+    await page.locator('[data-act="ICD-04"]').click();
+    const steps = page.locator('[data-step^="ICD-04:"]');
     expect(await steps.count()).toBeGreaterThanOrEqual(3);
-    await expect(page.locator('[data-step^="ICD-03:"] [data-col="Output"]').first()).not.toBeEmpty();
+    await expect(page.locator('[data-step^="ICD-04:"] [data-col="Output"]').first()).not.toBeEmpty();
   });
 
   test('opens a write-up with what it needs first, what it delivers and when it is done', async ({ page }) => {
@@ -79,7 +79,7 @@ test.describe('the CPO Network Switch System template', () => {
     await page.goto(`/p/${id}/activity/PCTL-03`);
     await expect(page.locator('.ad-title')).toHaveText('Interface Change Control Board Operation After the Interface Freeze');
     const body = page.locator('body');
-    await expect(body).toContainText('ICD-10');
+    await expect(body).toContainText('ICD-12');
     expect(await page.locator('.ad-steps li').count()).toBeGreaterThanOrEqual(3);
 
     await page.goto(`/p/${id}/activity/DSGN-06`);

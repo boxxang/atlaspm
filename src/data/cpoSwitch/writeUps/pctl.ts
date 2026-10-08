@@ -80,7 +80,7 @@ export const PCTL_WRITE_UPS: CpoWriteUps = {
       'Step 1 sets up the logs and rules. Step 2 is the weekly review cadence, with decision recording in step 3 and escalation in step 4 running alongside it. Step 5 hands open items to sustaining.',
     consumes: [
       'Program risk register from CON-06',
-      'Risks and open items from REQ-09, SARC-12 and ICD-10',
+      'Risks and open items from REQ-09, SARC-12 and ICD-12',
       'Anomaly and issue reports from the bring-up stages',
       'Schedule slips from PCTL-01',
       'Escalation thresholds agreed with the executive sponsor',
@@ -139,13 +139,13 @@ export const PCTL_WRITE_UPS: CpoWriteUps = {
   'PCTL-03': {
     criticalPath: true,
     purpose: [
-      'Operate the <b>interface change control board</b> from the interface freeze in ICD-10 to production release: every change request assessed from both sides of the ICD, new revisions issued and distributed, design databases audited against the current revisions before each tapeout and build, and freeze waivers tracked to closure.',
+      'Operate the <b>interface change control board</b> from the interface freeze in ICD-12 to production release: every change request assessed from both sides of the ICD, new revisions issued and distributed, design databases audited against the current revisions before each tapeout and build, and freeze waivers tracked to closure.',
       'The freeze is only worth what the board does afterwards. Changes after the freeze are normal — silicon findings, supplier process changes, firmware discoveries — but each one has to reach every team and supplier building to the old revision before hardware does, and after production release the same discipline continues under SUST-04.',
     ],
     flowNote:
-      'Step 1 takes over the baseline from ICD-10. Step 2 is the weekly board, with revision distribution in step 3 alongside it. Step 4 audits databases before each tapeout and build, with waiver tracking in step 5 alongside. Step 6 hands everything to sustaining change control.',
+      'Step 1 takes over the baseline from ICD-12. Step 2 is the weekly board, with revision distribution in step 3 alongside it. Step 4 audits databases before each tapeout and build, with waiver tracking in step 5 alongside. Step 6 hands everything to sustaining change control.',
     consumes: [
-      'Interface freeze and change control baseline from ICD-10',
+      'Interface freeze and change control baseline from ICD-12',
       'Interface register and board charter from ICD-01',
       'Change requests from design, test, firmware and supplier teams',
       'Silicon findings from CHAR-06 and the debug board in SDBG-01',
@@ -177,7 +177,7 @@ export const PCTL_WRITE_UPS: CpoWriteUps = {
       ['Waiver tracking and handover', 2],
     ],
     entry: [
-      'Interface freeze approved in ICD-10',
+      'Interface freeze approved in ICD-12',
       'Board charter and membership from ICD-01 in force',
       'Change request tracker populated with the frozen baseline',
     ],
@@ -186,7 +186,7 @@ export const PCTL_WRITE_UPS: CpoWriteUps = {
       'No tapeout or build started against a superseded ICD revision in the pre-release audits',
       'Interface baseline, open change requests and waivers accepted by quality for SUST-04',
     ],
-    dependsOn: ['ICD-10', 'ICD-01'],
+    dependsOn: ['ICD-12', 'ICD-01'],
     dependsNote: null,
     feedsInto: ['SUST-04', 'PCTL-07'],
     measuredBy: [
@@ -195,11 +195,11 @@ export const PCTL_WRITE_UPS: CpoWriteUps = {
       'Builds or tapeouts against a superseded revision',
     ],
     links: {
-      dependsOn: ['ICD-10', 'ICD-01'],
+      dependsOn: ['ICD-12', 'ICD-01'],
       feedsInto: ['PCTL-07', 'SUST-04', 'MTO-07', 'CHAR-06'],
       runsWith: ['PCTL-04'],
       revisedBy: ['CHAR-06'],
-      feedsBackInto: ['ICD-10'],
+      feedsBackInto: ['ICD-12'],
     },
     terms: ['CCB', 'ICD', 'Interface freeze', 'Waiver', 'ECN'],
   },
@@ -214,7 +214,7 @@ export const PCTL_WRITE_UPS: CpoWriteUps = {
     consumes: [
       'Requirements baseline from REQ-09',
       'Partition freeze package from SARC-12',
-      'Interface freeze baseline from ICD-10',
+      'Interface freeze baseline from ICD-12',
       'Build plans and build matrices from the package and NPI stages',
       'Company configuration and document control procedures',
     ],
@@ -262,7 +262,7 @@ export const PCTL_WRITE_UPS: CpoWriteUps = {
       'Configuration items outside version control',
     ],
     links: {
-      dependsOn: ['REQ-09', 'SARC-12', 'ICD-10'],
+      dependsOn: ['REQ-09', 'SARC-12', 'ICD-12'],
       feedsInto: ['PCTL-07', 'MTO-07', 'RAMP-01', 'SUST-04'],
       runsWith: ['PCTL-03'],
       revisedBy: [],

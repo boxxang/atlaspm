@@ -7,7 +7,7 @@ export const TRDY_WRITE_UPS: CpoWriteUps = {
   'TRDY-01': {
     criticalPath: true,
     purpose: [
-      'Select the <b>foundry and process for the switch ASIC and the high-speed I/O silicon</b> on performance, density, SerDes track record, PDK maturity, packaging compatibility, capacity and wafer cost — and name the fallback.',
+      'Select the <b>foundry and process for the Switch SoC and the I/O die</b> on performance, density, SerDes track record, PDK maturity, packaging compatibility, capacity and wafer cost — and name the fallback.',
       'The process choice fixes the libraries, the SerDes IP that exists on it, the die-to-die and bridge options and the wafer cost for the life of the product. It has to be made early enough for the SerDes test chip to run on it, which is why it closes within ten weeks.',
     ],
     flowNote:
@@ -20,7 +20,7 @@ export const TRDY_WRITE_UPS: CpoWriteUps = {
       'Feasibility plan test chip needs from FEAS-01',
     ],
     rel: {
-      'TRDY-D1': '<b>Switch and I/O silicon foundry and process selection record.</b> Produced here; the libraries, IP and test chip all build on it.',
+      'TRDY-D1': '<b>Switch SoC and I/O die foundry and process selection record.</b> Produced here; the libraries, IP and test chip all build on it.',
       'TRDY-D3': '<b>Digital PDK, standard cell and memory compiler readiness report.</b> The selected process decides which PDK and libraries are evaluated.',
       'TRDY-D11': '<b>Technology, IP and supply readiness gate package.</b> The selection and its fallback are the first line of the readiness evidence.',
     },
@@ -143,8 +143,8 @@ export const TRDY_WRITE_UPS: CpoWriteUps = {
   'TRDY-03': {
     criticalPath: false,
     purpose: [
-      'Prove the <b>digital PDK, standard cell libraries and memory compilers</b> are complete and good enough to implement the switch ASIC, by running a reference block through synthesis, place and route and signoff.',
-      'A switch ASIC is dominated by packet buffer and table memories and by wide datapaths at high frequency. A missing multi-bit flop, a memory compiler that cannot reach the buffer size, or a corner without aging views costs weeks in implementation; this activity finds them while the foundry can still fix them.',
+      'Prove the <b>digital PDK, standard cell libraries and memory compilers</b> are complete and good enough to implement the Switch SoC, by running a reference block through synthesis, place and route and signoff.',
+      'A Switch SoC is dominated by packet buffer and table memories and by wide datapaths at high frequency. A missing multi-bit flop, a memory compiler that cannot reach the buffer size, or a corner without aging views costs weeks in implementation; this activity finds them while the foundry can still fix them.',
     ],
     flowNote:
       'Step 1 checks PDK maturity and decks. Step 2 evaluates the libraries while step 3 generates memory instances in parallel. Step 4 runs a reference block end to end, step 5 tracks the gaps to closure, and step 6 releases the report.',
@@ -278,14 +278,14 @@ export const TRDY_WRITE_UPS: CpoWriteUps = {
   'TRDY-05': {
     criticalPath: false,
     purpose: [
-      'Qualify <b>every third-party and internal IP block</b> the switch and I/O silicon will integrate — processor, security, PLL, memory, host interface, die-to-die and internal reuse — and grade each before integration starts.',
+      'Qualify <b>every third-party and internal IP block</b> the Switch SoC and I/O die will integrate — processor, security, PLL, memory, host interface, die-to-die and internal reuse — and grade each before integration starts.',
       'IP that fails late fails expensively: a lint or CDC problem found at full-chip integration blocks everyone. Grading each block on maturity, silicon proof, deliverable quality and licence terms turns the IP list into a risk list the program can act on.',
     ],
     flowNote:
       'Step 1 inventories the IP and step 2 scores it. Step 3 runs the checks on delivered IP while step 4 audits internal reuse in parallel. Step 5 negotiates fixes or replacements and step 6 releases the register.',
     consumes: [
       'Foundry and process selection from TRDY-01',
-      'Switch ASIC architecture block list from SARC-01',
+      'Switch SoC architecture block list from SARC-01',
       'SerDes IP status from TRDY-04',
       'Security architecture IP needs',
       'Internal reuse IP documentation and coverage reports',
@@ -665,7 +665,7 @@ export const TRDY_WRITE_UPS: CpoWriteUps = {
     ],
     dependsOn: ['TRDY-06', 'TRDY-07', 'TRDY-08'],
     dependsNote: null,
-    feedsInto: ['PKGA-01', 'WFAB-05'],
+    feedsInto: ['PKGA-01', 'WFAB-06'],
     measuredBy: [
       'Long-lead items past their order-by date',
       'Capacity reserved against forecast',
@@ -673,7 +673,7 @@ export const TRDY_WRITE_UPS: CpoWriteUps = {
     ],
     links: {
       dependsOn: ['TRDY-06', 'TRDY-07', 'TRDY-08', 'CON-05'],
-      feedsInto: ['TRDY-11', 'PKGA-01', 'WFAB-05', 'TINF-02', 'NPI-06'],
+      feedsInto: ['TRDY-11', 'PKGA-01', 'WFAB-06', 'TINF-02', 'NPI-06'],
       runsWith: [],
       revisedBy: [],
       feedsBackInto: [],

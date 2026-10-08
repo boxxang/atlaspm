@@ -7,21 +7,21 @@ export const MTO_WRITE_UPS: CpoWriteUps = {
   'MTO-01': {
     criticalPath: true,
     purpose: [
-      'Hand the switch ASIC to its foundry: <b>intake accepted, tapeout checklist complete, mask data preparation reviewed and the mask set released</b>, with the first lots started at the priority the schedule needs.',
+      'Hand the Switch SoC to its foundry: <b>intake accepted, tapeout checklist complete, mask data preparation reviewed and the mask set released</b>, with the first lots started at the priority the schedule needs.',
       'The largest mask set in the program is also the most expensive to get wrong. Foundry intake rejects for format, layer mapping or rule-deck revision are routine; what matters is that they are cleared within the slot, and that someone reviews the mask data preparation output on the critical layers rather than assuming the foundry will catch every problem.',
     ],
     flowNote:
       'Step 1 submits the GDS and clears intake rejections, with the checklist completed in parallel in step 2. Step 3 reviews mask data preparation, step 4 approves the reticle and mask order while step 5 confirms the first-lot start alongside it, and step 6 releases the mask set.',
     consumes: [
-      'Switch ASIC final GDS and signoff report from SGNO-01',
+      'Switch SoC final GDS and signoff report from SGNO-01',
       'Final equivalence and DFT signoff from SGNO-07',
       'Security signoff record from SGNO-08',
-      'Go decision for the switch ASIC from SGNO-09',
+      'Go decision for the Switch SoC from SGNO-09',
       'Foundry slot and mask order reservation from the foundry agreement in TRDY-01',
     ],
     rel: {
-      'MTO-D1': '<b>Switch ASIC mask release record and foundry handoff checklist.</b> Produced here; it records the database identifier the foundry accepted and the date masks were released.',
-      'MTO-D7': '<b>Tapeout archive and silicon configuration baseline.</b> The accepted database and mask revision become the switch ASIC entry in the baseline.',
+      'MTO-D1': '<b>Switch SoC mask release record and foundry handoff checklist.</b> Produced here; it records the database identifier the foundry accepted and the date masks were released.',
+      'MTO-D7': '<b>Tapeout archive and silicon configuration baseline.</b> The accepted database and mask revision become the Switch SoC entry in the baseline.',
     },
     risks: [
       '<b>Intake rejection late in the slot.</b> A format or layer-map rejection arrives after the cutoff and the slot moves by weeks.',
@@ -31,7 +31,7 @@ export const MTO_WRITE_UPS: CpoWriteUps = {
       '<b>First-lot priority not secured.</b> The lots start at standard priority and first silicon slips by weeks.',
     ],
     roles: [
-      { r: 'Physical design', d: 'Owns the switch ASIC tapeout submission' },
+      { r: 'Physical design', d: 'Owns the Switch SoC tapeout submission' },
       { r: 'Foundry interface engineer', d: 'Intake checks, checklist and mask data review' },
       { r: 'Technology and foundry manager', d: 'Mask order, slot and lot priority with the foundry' },
       { r: 'Configuration manager', d: 'Confirms the submitted database identifier' },
@@ -45,7 +45,7 @@ export const MTO_WRITE_UPS: CpoWriteUps = {
       ['Lot start and release record', 1],
     ],
     entry: [
-      'Go decision for the switch ASIC recorded in SGNO-09',
+      'Go decision for the Switch SoC recorded in SGNO-09',
       'Final GDS released with its database identifier',
       'Mask slot confirmed by the foundry',
     ],
@@ -74,63 +74,63 @@ export const MTO_WRITE_UPS: CpoWriteUps = {
   'MTO-02': {
     criticalPath: true,
     purpose: [
-      'Tape out the SerDes and high-speed I/O silicon — <b>merged into the switch database where the two share a die, or submitted as its own tapeout where the I/O is a separate die</b> — with the analog-specific checklist items closed.',
+      'Tape out the I/O die — <b>its own mask set, separate from the Switch SoC</b> — with the analog-specific checklist items closed and the die-to-die test structures placed for characterization.',
       'The analog checklist is where I/O tapeouts go wrong quietly: matching-sensitive devices, ESD structures and test structures for characterization need foundry acknowledgement that the digital checklist does not ask for.',
     ],
     flowNote:
-      'Step 1 merges or prepares the database and step 2 submits it to intake, with the analog checklist items closed in parallel in step 3. Step 4 reviews mask data preparation on the analog-critical layers and step 5 releases.',
+      'Step 1 prepares the I/O die database and step 2 submits it to intake, with the analog checklist items closed in parallel in step 3. Step 4 reviews mask data preparation on the analog-critical layers and step 5 releases.',
     consumes: [
-      'I/O silicon signoff report and final GDS from SGNO-02',
-      'Go decision for the I/O silicon from SGNO-09',
-      'Switch ASIC database where the I/O is merged into it, from MTO-01',
+      'I/O die signoff report and final GDS from SGNO-02',
+      'Go decision for the I/O die from SGNO-09',
+      'Die-to-die interface revision confirmed against the Switch SoC tapeout in MTO-01',
       'Foundry analog tapeout checklist',
       'Characterization test structure list from SerDes design',
     ],
     rel: {
-      'MTO-D2': '<b>SerDes and I/O silicon tapeout record.</b> Produced here; it states whether the I/O went as its own mask set or merged into the switch.',
+      'MTO-D2': '<b>I/O die tapeout record.</b> Produced here; it records the I/O die revision, its mask set and the die-to-die interface revision it was taped out against.',
       'MTO-D7': '<b>Tapeout archive and silicon configuration baseline.</b> The I/O revision taped out is recorded in the baseline.',
     },
     risks: [
-      '<b>Merge uses a stale macro.</b> The I/O merged into the switch database is not the revision signed off in SGNO-02.',
+      '<b>Stale database submitted.</b> The I/O die GDS sent to the foundry is not the revision signed off in SGNO-02.',
       '<b>Analog layers not reviewed.</b> Mask data preparation alters a matched structure and nobody checks.',
       '<b>Test structures dropped.</b> Characterization structures are removed for area and the I/O cannot be correlated.',
       '<b>Separate die slot missed.</b> A standalone I/O die tapes out later than the switch and delays the package.',
       '<b>ESD structure change.</b> A foundry-requested ESD change is accepted without rerunning performance.',
     ],
     roles: [
-      { r: 'SerDes and high-speed I/O', d: 'Owns the I/O silicon tapeout' },
-      { r: 'Physical design lead', d: 'Merges the I/O into the switch database' },
+      { r: 'SerDes and high-speed I/O', d: 'Owns the I/O die tapeout' },
+      { r: 'Physical design lead', d: 'Prepares the I/O die tapeout database and reticle frame' },
       { r: 'Foundry interface engineer', d: 'Intake and analog checklist' },
       { r: 'Analog layout designer', d: 'Reviews analog-critical mask data' },
       { r: 'Configuration manager', d: 'Records the revision taped out' },
     ],
     effort: [
-      ['Database merge or preparation', 1],
+      ['Database preparation', 1],
       ['Intake and checklist', 1.5],
       ['Mask data review', 1],
       ['Release record', 0.5],
     ],
     entry: [
-      'I/O silicon signed off in SGNO-02 with a go decision in SGNO-09',
-      'Decision on merged or standalone tapeout recorded',
+      'I/O die signed off in SGNO-02 with a go decision in SGNO-09',
+      'Die-to-die interface revision matched to the Switch SoC tapeout',
       'Analog checklist items listed by the foundry',
     ],
     exit: [
-      'Foundry intake accepts the I/O database or the merged switch database with zero open rejections',
+      'Foundry intake accepts the I/O die database with zero open rejections',
       'Every analog checklist item acknowledged by the foundry',
       'Tapeout record states the I/O revision and the mask set it went on',
     ],
     dependsOn: ['SGNO-02', 'SGNO-09'],
     dependsNote: null,
-    feedsInto: ['WFAB-01', 'MTO-07'],
+    feedsInto: ['WFAB-02', 'MTO-07'],
     measuredBy: [
-      'Intake rejections for the I/O database',
+      'Intake rejections for the I/O die database',
       'Analog checklist items open at submission',
-      'Tapeout date against the switch ASIC tapeout',
+      'Tapeout date against the Switch SoC tapeout',
     ],
     links: {
       dependsOn: ['SGNO-02', 'SGNO-09'],
-      feedsInto: ['WFAB-01', 'MTO-07'],
+      feedsInto: ['WFAB-02', 'MTO-07'],
       runsWith: ['MTO-01'],
       revisedBy: ['SDBG-05'],
       feedsBackInto: [],
@@ -188,7 +188,7 @@ export const MTO_WRITE_UPS: CpoWriteUps = {
     ],
     dependsOn: ['SGNO-03', 'SGNO-09'],
     dependsNote: null,
-    feedsInto: ['WFAB-02', 'MTO-07'],
+    feedsInto: ['WFAB-03', 'MTO-07'],
     measuredBy: [
       'Intake rejections for the electrical IC',
       'Planned good dies against first-build need',
@@ -196,7 +196,7 @@ export const MTO_WRITE_UPS: CpoWriteUps = {
     ],
     links: {
       dependsOn: ['SGNO-03', 'SGNO-09'],
-      feedsInto: ['WFAB-02', 'MTO-07', 'MTO-06'],
+      feedsInto: ['WFAB-03', 'MTO-07', 'MTO-06'],
       runsWith: ['MTO-04'],
       revisedBy: ['SDBG-05'],
       feedsBackInto: [],
@@ -255,7 +255,7 @@ export const MTO_WRITE_UPS: CpoWriteUps = {
     ],
     dependsOn: ['SGNO-04', 'SGNO-09'],
     dependsNote: null,
-    feedsInto: ['WFAB-03', 'MTO-06', 'MTO-07'],
+    feedsInto: ['WFAB-04', 'MTO-06', 'MTO-07'],
     measuredBy: [
       'Intake rejections for the photonic IC',
       'Monitor structure types per reticle',
@@ -263,7 +263,7 @@ export const MTO_WRITE_UPS: CpoWriteUps = {
     ],
     links: {
       dependsOn: ['SGNO-04', 'SGNO-09'],
-      feedsInto: ['WFAB-03', 'MTO-06', 'MTO-07', 'SORT-02'],
+      feedsInto: ['WFAB-04', 'MTO-06', 'MTO-07', 'SORT-04'],
       runsWith: ['MTO-03'],
       revisedBy: ['SDBG-05'],
       feedsBackInto: [],
@@ -321,7 +321,7 @@ export const MTO_WRITE_UPS: CpoWriteUps = {
     ],
     dependsOn: ['SGNO-05', 'SGNO-06', 'SGNO-09'],
     dependsNote: null,
-    feedsInto: ['WFAB-04', 'MTO-07'],
+    feedsInto: ['WFAB-05', 'MTO-07'],
     measuredBy: [
       'Intake rejections',
       'Wafer-out date against the first assembly',
@@ -329,7 +329,7 @@ export const MTO_WRITE_UPS: CpoWriteUps = {
     ],
     links: {
       dependsOn: ['SGNO-05', 'SGNO-06', 'SGNO-09'],
-      feedsInto: ['WFAB-04', 'MTO-07'],
+      feedsInto: ['WFAB-05', 'MTO-07'],
       runsWith: [],
       revisedBy: [],
       feedsBackInto: [],
@@ -387,7 +387,7 @@ export const MTO_WRITE_UPS: CpoWriteUps = {
     ],
     dependsOn: ['SGNO-09', 'TINF-01'],
     dependsNote: 'Needs the build matrix in draft; the matrix itself is finished in PKGA-02 against this plan.',
-    feedsInto: ['WFAB-01', 'WFAB-02', 'WFAB-03', 'WFAB-04', 'PKGA-02'],
+    feedsInto: ['WFAB-01', 'WFAB-03', 'WFAB-04', 'WFAB-05', 'PKGA-02'],
     measuredBy: [
       'Planned good kits against first-build need',
       'Corner lots defined per die',
@@ -395,7 +395,7 @@ export const MTO_WRITE_UPS: CpoWriteUps = {
     ],
     links: {
       dependsOn: ['SGNO-09', 'TINF-01', 'TRDY-10'],
-      feedsInto: ['WFAB-01', 'WFAB-02', 'WFAB-03', 'WFAB-04', 'PKGA-02', 'CHAR-01', 'RELQ-01'],
+      feedsInto: ['WFAB-01', 'WFAB-03', 'WFAB-04', 'WFAB-05', 'PKGA-02', 'CHAR-01', 'RELQ-01'],
       runsWith: ['PKGA-02'],
       revisedBy: [],
       feedsBackInto: [],
@@ -411,8 +411,8 @@ export const MTO_WRITE_UPS: CpoWriteUps = {
     flowNote:
       'Step 1 archives each die and step 2 records the baseline, with a restore test run in parallel in step 3. Step 4 releases the baseline under change control.',
     consumes: [
-      'Switch ASIC mask release record from MTO-01',
-      'I/O silicon, electrical IC and photonic IC tapeout records from MTO-02, MTO-03 and MTO-04',
+      'Switch SoC mask release record from MTO-01',
+      'I/O die, electrical IC and photonic IC tapeout records from MTO-02, MTO-03 and MTO-04',
       'Bridge and capacitor release record from MTO-05',
       'Tapeout readiness decision package from SGNO-09',
       'Configuration management system and baseline template',
@@ -460,7 +460,7 @@ export const MTO_WRITE_UPS: CpoWriteUps = {
     ],
     links: {
       dependsOn: ['MTO-01', 'MTO-02', 'MTO-03', 'MTO-04', 'MTO-05', 'SGNO-09'],
-      feedsInto: ['SDBG-05', 'RAMP-01', 'WFAB-06'],
+      feedsInto: ['SDBG-05', 'RAMP-01', 'WFAB-07'],
       runsWith: ['MTO-06'],
       revisedBy: [],
       feedsBackInto: [],

@@ -7,21 +7,21 @@ export const IMPL_WRITE_UPS: CpoWriteUps = {
   'IMPL-01': {
     criticalPath: true,
     purpose: [
-      'Turn the switch ASIC RTL into <b>a gate-level netlist that meets the PPA budget</b> — synthesized against the signoff libraries, the timing constraints and the low-power intent, with scan and compression inserted — and deliver it to place and route in staged drops whose maturity everyone has agreed in advance.',
+      'Turn the Switch SoC RTL into <b>a gate-level netlist that meets the PPA budget</b> — synthesized against the signoff libraries, the timing constraints and the low-power intent, with scan and compression inserted — and deliver it to place and route in staged drops whose maturity everyone has agreed in advance.',
       'Synthesis is where the RTL first meets the process. Paths that cannot close, memories that do not fit and power that does not add up show up here first, and the value of the activity is in feeding them back to RTL design while the RTL can still change rather than handing place and route a netlist it cannot close.',
     ],
     flowNote:
       'Step 1 fixes the flow and constraints. Step 2 runs trial synthesis on each RTL drop, with step 3 feeding critical paths back to RTL in parallel. Step 4 inserts DFT; step 5 checks equivalence on every drop alongside it. Step 6 delivers the staged drops and step 7 releases the final netlist.',
     consumes: [
-      'Switch ASIC RTL drops from DSGN-02',
+      'Switch SoC RTL drops from DSGN-02',
       'Clock, reset and low-power intent from DSGN-03',
       'Signoff standard-cell libraries and memory compilers from TRDY-03',
       'DFT architecture and scan compression plan from DSGN-11',
       'Area, power and frequency budget from SARC-11',
     ],
     rel: {
-      'IMPL-D1': '<b>Switch ASIC synthesized netlist and QoR report.</b> Produced here; the final drop is the netlist place and route closes and equivalence signs off against.',
-      'IMPL-D2': '<b>Switch ASIC timing-closed place-and-route database.</b> Each staged drop is what the floorplan and early place and route are built on.',
+      'IMPL-D1': '<b>Switch SoC synthesized netlist and QoR report.</b> Produced here; the final drop is the netlist place and route closes and equivalence signs off against.',
+      'IMPL-D2': '<b>Switch SoC timing-closed place-and-route database.</b> Each staged drop is what the floorplan and early place and route are built on.',
       'IMPL-D11': '<b>Scan-stitched netlist and ATPG pattern set with coverage report.</b> Scan inserted at synthesis is the structure DFT stitches and generates patterns for.',
     },
     risks: [
@@ -75,20 +75,20 @@ export const IMPL_WRITE_UPS: CpoWriteUps = {
   'IMPL-02': {
     criticalPath: true,
     purpose: [
-      'Take the switch ASIC from netlist to <b>a routed database that closes timing at every corner and mode</b> — floorplanned around its packet-buffer memories and its SerDes and die-to-die edges, clock trees built, setup and hold closed with variation derates, and the power grid clean for IR drop and electromigration.',
-      'On a large switch die this is the longest pole in the implementation stage and it absorbs whatever float the program has left. The floorplan fixes the die edges the package, the bridge and the I/O silicon are designing against, so the edge assignment has to be agreed early and changed only under change control.',
+      'Take the Switch SoC from netlist to <b>a routed database that closes timing at every corner and mode</b> — floorplanned around its packet-buffer memories and its SerDes and die-to-die edges, clock trees built, setup and hold closed with variation derates, and the power grid clean for IR drop and electromigration.',
+      'On a large switch die this is the longest pole in the implementation stage and it absorbs whatever float the program has left. The floorplan fixes the die edges the package, the bridge and the I/O die are designing against, so the edge assignment has to be agreed early and changed only under change control.',
     ],
     flowNote:
       'Step 1 fixes the floorplan and the die edges. Steps 2 and 3 place and build clocks. Step 4 is the long closure loop, with IR drop and electromigration fixed in parallel in step 5. Step 6 cleans physical verification; step 7 absorbs late ECOs alongside it, and step 8 hands the database to signoff.',
     consumes: [
       'Staged and final netlists from IMPL-01',
-      'Die-to-package interface and bump pitch from ICD-05',
+      'Die-to-package interface and bump pitch from ICD-07',
       'Die-to-die and switch-to-I/O interface placement from ICD-02',
       'Standard cells, memories and technology files from TRDY-03',
       'Timing constraints and the mode and corner list signed off with RTL',
     ],
     rel: {
-      'IMPL-D2': '<b>Switch ASIC timing-closed place-and-route database.</b> Produced here; it is the database signoff runs on and the one that is taped out.',
+      'IMPL-D2': '<b>Switch SoC timing-closed place-and-route database.</b> Produced here; it is the database signoff runs on and the one that is taped out.',
     },
     risks: [
       '<b>Floorplan reopened late.</b> A change to the die edge assignment ripples into the bump map, the bridge and the package.',
@@ -113,7 +113,7 @@ export const IMPL_WRITE_UPS: CpoWriteUps = {
     ],
     entry: [
       'Early netlist drop delivered from IMPL-01',
-      'Die edge assignment agreed with packaging and the I/O silicon team',
+      'Die edge assignment agreed with packaging and the I/O die team',
       'Timing constraints and mode and corner list frozen for closure',
     ],
     exit: [
@@ -121,7 +121,7 @@ export const IMPL_WRITE_UPS: CpoWriteUps = {
       'Static IR drop below the budget on every rail and no electromigration violations open',
       'DRC and LVS clean on the routed database and the database released to SGNO-01',
     ],
-    dependsOn: ['IMPL-01', 'ICD-05', 'ICD-02'],
+    dependsOn: ['IMPL-01', 'ICD-07', 'ICD-02'],
     dependsNote: 'Floorplanning starts on the early netlist drop; closure waits for the final one.',
     feedsInto: ['SGNO-01', 'IMPL-07', 'IMPL-11'],
     measuredBy: [
@@ -130,7 +130,7 @@ export const IMPL_WRITE_UPS: CpoWriteUps = {
       'Open DRC and LVS violations on the routed database',
     ],
     links: {
-      dependsOn: ['IMPL-01', 'ICD-05', 'ICD-02', 'TRDY-03'],
+      dependsOn: ['IMPL-01', 'ICD-07', 'ICD-02', 'TRDY-03'],
       feedsInto: ['SGNO-01', 'IMPL-07', 'IMPL-11', 'IMPL-08', 'IMPL-09'],
       runsWith: ['IMPL-07'],
       revisedBy: ['PSV-10'],
@@ -141,20 +141,20 @@ export const IMPL_WRITE_UPS: CpoWriteUps = {
   'IMPL-03': {
     criticalPath: true,
     purpose: [
-      'Implement the SerDes and high-speed I/O silicon as <b>a mixed custom-analog and digital layout</b> — hand-drawn transmit drivers, receiver front ends, samplers and clock distribution, with the digital equalization and adaptation logic placed and routed around them — and prove on extracted parasitics that jitter, noise and eye margin still meet the link budget.',
-      'Whether the I/O is a separate die or a region of the switch die, its margins are set by layout: a few femtofarads on a sampler node or an unmatched clock route can spend the jitter budget. Post-layout simulation across corners, ESD verification on every pad and electromigration on the high-current nets are what make this layout trustworthy.',
+      'Implement the I/O die as <b>its own die, with a mixed custom-analog and digital layout</b> — hand-drawn transmit drivers, receiver front ends, samplers and clock distribution, with the digital equalization and adaptation logic placed and routed around them — and prove on extracted parasitics that jitter, noise and eye margin still meet the link budget.',
+      'The I/O die has its own top level, bump map and tapeout, and its margins are set by layout: a few femtofarads on a sampler node or an unmatched clock route can spend the jitter budget. Post-layout simulation across corners, ESD verification on every pad and electromigration on the high-current nets are what make this layout trustworthy.',
     ],
     flowNote:
       'Step 1 floorplans against the package bump map. Step 2 lays out the analog front ends while step 3 places the digital control around them in parallel. Step 4 extracts and resimulates, step 5 checks ESD and electromigration, step 6 cleans the top level and step 7 releases it.',
     consumes: [
-      'SerDes and high-speed I/O circuit design and schematics from DSGN-04',
+      'I/O die design database — SerDes, die-to-die PHY and die top level — from DSGN-04',
       'Qualified SerDes IP views from TRDY-04',
-      'Die-to-die and switch-to-I/O interface definitions from ICD-02',
+      'Switch SoC-to-I/O die and I/O die-to-optical engine interfaces from ICD-02 and ICD-03',
       'Electrical channel and SerDes link models from MODL-03',
       'Preliminary package bump map from DSGN-12',
     ],
     rel: {
-      'IMPL-D3': '<b>SerDes and I/O silicon layout database with post-layout jitter and eye results.</b> Produced here; the database and its post-layout results are what analog signoff reviews.',
+      'IMPL-D3': '<b>I/O die layout database with post-layout jitter and eye results.</b> Produced here; the database and its post-layout results are what analog signoff reviews.',
       'IMPL-D7': '<b>Package substrate and RDL layout with closed bump map.</b> The I/O floorplan fixes the lane order and bump positions the package routes to.',
     },
     risks: [
@@ -165,7 +165,7 @@ export const IMPL_WRITE_UPS: CpoWriteUps = {
       '<b>IP view drift.</b> The hard IP delivered for integration is not the version the circuits were simulated with.',
     ],
     roles: [
-      { r: 'SerDes and high-speed I/O', d: 'Owns the I/O silicon implementation and its post-layout performance' },
+      { r: 'SerDes and high-speed I/O', d: 'Owns the I/O die implementation and its post-layout performance' },
       { r: 'Analog layout designer', d: 'Custom layout of the front ends and clocking' },
       { r: 'Digital implementation engineer', d: 'Place and route of the equalization and control logic' },
       { r: 'ESD engineer', d: 'Protection strategy and discharge path verification' },
@@ -179,7 +179,7 @@ export const IMPL_WRITE_UPS: CpoWriteUps = {
       ['ESD, electromigration and top-level verification', 6],
     ],
     entry: [
-      'SerDes circuit design frozen at the design freeze in DSGN-18',
+      'I/O die design frozen at the design freeze in DSGN-18',
       'Hard IP views qualified in TRDY-04',
       'Lane order and bump positions agreed with packaging',
     ],
@@ -188,16 +188,16 @@ export const IMPL_WRITE_UPS: CpoWriteUps = {
       'ESD discharge paths verified on 100 percent of pads with no electromigration violations open',
       'DRC and LVS clean at top level and the database released to SGNO-02',
     ],
-    dependsOn: ['DSGN-04', 'TRDY-04', 'ICD-02'],
+    dependsOn: ['DSGN-04', 'TRDY-04', 'ICD-02', 'ICD-03'],
     dependsNote: null,
     feedsInto: ['SGNO-02', 'IMPL-07', 'IMPL-08'],
     measuredBy: [
       'Post-layout eye margin against target per corner',
-      'Open DRC and LVS violations on the I/O silicon',
+      'Open DRC and LVS violations on the I/O die',
       'Lanes with ESD or electromigration waivers',
     ],
     links: {
-      dependsOn: ['DSGN-04', 'TRDY-04', 'ICD-02', 'MODL-03'],
+      dependsOn: ['DSGN-04', 'TRDY-04', 'ICD-02', 'ICD-03', 'MODL-03'],
       feedsInto: ['SGNO-02', 'IMPL-07', 'IMPL-08'],
       runsWith: ['PSV-05'],
       revisedBy: [],
@@ -215,10 +215,10 @@ export const IMPL_WRITE_UPS: CpoWriteUps = {
       'Step 1 floorplans to the photonic IC pad pitch. Step 2 lays out drivers and TIAs while step 3 lays out bias and control in parallel. Step 4 extracts and resimulates, with Monte Carlo in step 5 alongside. Step 6 checks ESD and reliability and step 7 cleans and releases the layout.',
     consumes: [
       'Electrical IC schematics and design targets from DSGN-05',
-      'Electrical-to-photonic interface and pad pitch from ICD-03',
+      'Electrical-to-photonic interface and pad pitch from ICD-04',
       'Co-design flow and extraction setup from TRDY-09',
       'Behavioral co-simulation models from MODL-05',
-      'Mixed-signal verification status from PSV-05',
+      'Electrical IC mixed-signal verification status from PSV-15',
     ],
     rel: {
       'IMPL-D4': '<b>Electrical IC layout and post-layout simulation report.</b> Produced here; the report is the evidence analog signoff and the link co-simulation are checked against.',
@@ -246,7 +246,7 @@ export const IMPL_WRITE_UPS: CpoWriteUps = {
     ],
     entry: [
       'Electrical IC schematics frozen and pre-layout simulation passing',
-      'Photonic IC pad pitch and pad order agreed in ICD-03',
+      'Photonic IC pad pitch and pad order agreed in ICD-04',
       'Extraction and post-layout simulation flow proven on a test block',
     ],
     exit: [
@@ -254,7 +254,7 @@ export const IMPL_WRITE_UPS: CpoWriteUps = {
       'Lane-to-lane crosstalk below the budget allocated in the link co-simulation',
       'DRC and LVS clean, ESD and electromigration checks passed, layout released to SGNO-03',
     ],
-    dependsOn: ['DSGN-05', 'ICD-03', 'TRDY-09'],
+    dependsOn: ['DSGN-05', 'ICD-04', 'TRDY-09'],
     dependsNote: null,
     feedsInto: ['SGNO-03', 'PSV-07', 'IMPL-07'],
     measuredBy: [
@@ -263,9 +263,9 @@ export const IMPL_WRITE_UPS: CpoWriteUps = {
       'Open DRC and LVS violations',
     ],
     links: {
-      dependsOn: ['DSGN-05', 'ICD-03', 'TRDY-09', 'MODL-05'],
+      dependsOn: ['DSGN-05', 'ICD-04', 'TRDY-09', 'MODL-05'],
       feedsInto: ['SGNO-03', 'PSV-07', 'IMPL-07'],
-      runsWith: ['IMPL-05', 'PSV-05'],
+      runsWith: ['IMPL-05', 'PSV-15'],
       revisedBy: [],
       feedsBackInto: ['DSGN-05'],
     },
@@ -282,8 +282,8 @@ export const IMPL_WRITE_UPS: CpoWriteUps = {
     consumes: [
       'Photonic IC circuit and component design from DSGN-06',
       'Photonic PDK, rule deck and component library from TRDY-02',
-      'Photonic-to-fiber interface and coupler definitions from ICD-04',
-      'Electrical-to-photonic pad array from ICD-03',
+      'Photonic-to-fiber interface and coupler definitions from ICD-06',
+      'Electrical-to-photonic pad array from ICD-04',
       'Electronic-photonic co-design flow from TRDY-09',
     ],
     rel: {
@@ -320,7 +320,7 @@ export const IMPL_WRITE_UPS: CpoWriteUps = {
       'Layout connectivity matches the photonic schematic with no open or unintended optical paths',
       'Routed insertion loss per channel within the allocation in the optical link budget, layout released to SGNO-04',
     ],
-    dependsOn: ['DSGN-06', 'TRDY-02', 'ICD-04'],
+    dependsOn: ['DSGN-06', 'TRDY-02', 'ICD-06'],
     dependsNote: null,
     feedsInto: ['SGNO-04', 'IMPL-07', 'IMPL-09'],
     measuredBy: [
@@ -329,7 +329,7 @@ export const IMPL_WRITE_UPS: CpoWriteUps = {
       'Heater crosstalk-induced detuning against the tuning range',
     ],
     links: {
-      dependsOn: ['DSGN-06', 'TRDY-02', 'ICD-04', 'ICD-03', 'TRDY-09'],
+      dependsOn: ['DSGN-06', 'TRDY-02', 'ICD-06', 'ICD-04', 'TRDY-09'],
       feedsInto: ['SGNO-04', 'IMPL-07', 'IMPL-09', 'TINF-03'],
       runsWith: ['IMPL-04', 'PSV-06'],
       revisedBy: [],
@@ -340,7 +340,7 @@ export const IMPL_WRITE_UPS: CpoWriteUps = {
   'IMPL-06': {
     criticalPath: false,
     purpose: [
-      'Lay out the <b>bridge or interposer and the silicon capacitors</b> — the die-to-die routing between the switch ASIC, the I/O silicon and the electrical ICs, and the capacitor arrays that stabilize the supply at the dies — and check the extracted channels against the die-to-die interface budget.',
+      'Lay out the <b>bridge or interposer and the silicon capacitors</b> — the die-to-die routing between the Switch SoC, the I/O die and the electrical ICs, and the capacitor arrays that stabilize the supply at the dies — and check the extracted channels against the die-to-die interface budget.',
       'These are simple chips with unforgiving edges. The bridge has to match three or four microbump maps it does not own, and its channels set the die-to-die timing and crosstalk the dies were designed to. A change on any die edge lands here first.',
     ],
     flowNote:
@@ -367,7 +367,7 @@ export const IMPL_WRITE_UPS: CpoWriteUps = {
       { r: 'Packaging', d: 'Owns the bridge / interposer and silicon capacitor layouts' },
       { r: 'Layout designer', d: 'Routes the die-to-die links and capacitor arrays' },
       { r: 'SI/PI engineer', d: 'Extracts and checks the die-to-die channels' },
-      { r: 'Physical design lead', d: 'Agrees the switch ASIC microbump map' },
+      { r: 'Physical design lead', d: 'Agrees the Switch SoC microbump map' },
       { r: 'Package design manager', d: 'Approves the release to signoff' },
     ],
     effort: [
@@ -413,7 +413,7 @@ export const IMPL_WRITE_UPS: CpoWriteUps = {
       'Step 1 closes the bump maps. Step 2 places the components with fiber keep-outs. Step 3 routes the substrate and RDL while step 4 routes the ball map to the board in parallel. Step 5 reviews rules with the substrate supplier and step 6 releases the layout.',
     consumes: [
       'Package floorplan and preliminary bump map from DSGN-12',
-      'Die-to-package and package-to-board interfaces from ICD-05',
+      'Die-to-package and package-to-board interfaces from ICD-07',
       'Die floorplans and bump positions from IMPL-02 and IMPL-03',
       'Bridge and capacitor footprints from IMPL-06',
       'Fiber assembly and optical connector constraints from DSGN-13',
@@ -454,7 +454,7 @@ export const IMPL_WRITE_UPS: CpoWriteUps = {
       'No routing or components inside fiber keep-out zones',
       'Substrate supplier manufacturability review signed and layout released to SGNO-06',
     ],
-    dependsOn: ['DSGN-12', 'ICD-05', 'IMPL-02', 'IMPL-03', 'IMPL-06'],
+    dependsOn: ['DSGN-12', 'ICD-07', 'IMPL-02', 'IMPL-03', 'IMPL-06'],
     dependsNote: 'Runs alongside the die implementations: bump positions converge together rather than in sequence.',
     feedsInto: ['IMPL-08', 'IMPL-09', 'IMPL-10', 'SGNO-06'],
     measuredBy: [
@@ -463,7 +463,7 @@ export const IMPL_WRITE_UPS: CpoWriteUps = {
       'Substrate layer count against the cost model',
     ],
     links: {
-      dependsOn: ['DSGN-12', 'ICD-05', 'IMPL-02', 'IMPL-03', 'IMPL-06', 'DSGN-13'],
+      dependsOn: ['DSGN-12', 'ICD-07', 'IMPL-02', 'IMPL-03', 'IMPL-06', 'DSGN-13'],
       feedsInto: ['IMPL-08', 'IMPL-09', 'IMPL-10', 'SGNO-06', 'PKGA-01'],
       runsWith: ['IMPL-05'],
       revisedBy: ['IMPL-09'],
@@ -484,7 +484,7 @@ export const IMPL_WRITE_UPS: CpoWriteUps = {
       'Package SI, PI and PDN planning models from MODL-06',
       'Electrical channel and SerDes link models from MODL-03',
       'Board stackup and preliminary layout from DSGN-14',
-      'Post-layout I/O silicon results from IMPL-03',
+      'Post-layout I/O die results from IMPL-03',
     ],
     rel: {
       'IMPL-D8': '<b>Package and board SI/PI closure report.</b> Produced here; it is the evidence multi-die package signoff builds on.',
@@ -616,7 +616,7 @@ export const IMPL_WRITE_UPS: CpoWriteUps = {
     consumes: [
       'System board and power delivery design from DSGN-14',
       'Package ball map from IMPL-07',
-      'Power, clock and reset interfaces from ICD-06',
+      'Power, clock and reset interfaces from ICD-08',
       'Fiber assembly and front-panel design from DSGN-13',
       'Bring-up and debug access requirements from validation',
     ],
@@ -663,7 +663,7 @@ export const IMPL_WRITE_UPS: CpoWriteUps = {
       'Long-lead parts without confirmed delivery',
     ],
     links: {
-      dependsOn: ['DSGN-14', 'IMPL-07', 'ICD-06'],
+      dependsOn: ['DSGN-14', 'IMPL-07', 'ICD-08'],
       feedsInto: ['PKGA-07', 'PON-02', 'PON-01', 'NPI-02', 'IMPL-13'],
       runsWith: ['IMPL-08'],
       revisedBy: [],
@@ -674,7 +674,7 @@ export const IMPL_WRITE_UPS: CpoWriteUps = {
   'IMPL-11': {
     criticalPath: true,
     purpose: [
-      'Close DFT on the implemented switch ASIC and the other digital content — <b>stitched scan, test-mode timing, and a generated pattern set that meets the coverage target</b> — along with the BIST, loopback and PRBS sequences the SerDes and electrical ICs are tested with.',
+      'Close DFT on the implemented Switch SoC and the other digital content — <b>stitched scan, test-mode timing, and a generated pattern set that meets the coverage target</b> — along with the BIST, loopback and PRBS sequences the SerDes and electrical ICs are tested with.',
       'Coverage shortfalls are cheap to fix with test points while place and route is still open and expensive once the netlist is frozen. Pattern count also sets test time, and test time sets cost.',
     ],
     flowNote:
@@ -746,7 +746,7 @@ export const IMPL_WRITE_UPS: CpoWriteUps = {
     flowNote:
       'Step 1 collects status against the entry criteria and step 2 reviews issues across die boundaries, with the open-issue list recorded in parallel in step 3. Step 4 freezes the databases and assigns signoff runs, and step 5 holds the review and hands them over.',
     consumes: [
-      'Timing-closed switch ASIC database from IMPL-02',
+      'Timing-closed Switch SoC database from IMPL-02',
       'Die layout databases from IMPL-03, IMPL-04, IMPL-05 and IMPL-06',
       'Package layout and closed bump map from IMPL-07',
       'SI/PI and thermal co-analysis reports from IMPL-08 and IMPL-09',

@@ -82,7 +82,7 @@ export const CERT_WRITE_UPS: CpoWriteUps = {
     consumes: [
       'SDK, network software and management plane from SINT-02',
       'Telemetry and health monitoring from SINT-05',
-      'Firmware-to-hardware and software-to-firmware interfaces from ICD-08',
+      'Firmware-to-hardware and software-to-firmware interfaces from ICD-10',
       'Standards and interoperability targets from REQ-05',
       'Switching performance and feature results from CHAR-04',
     ],
@@ -130,7 +130,7 @@ export const CERT_WRITE_UPS: CpoWriteUps = {
       'Days from defect to fixed release',
     ],
     links: {
-      dependsOn: ['SINT-02', 'SINT-05', 'REQ-05', 'ICD-08'],
+      dependsOn: ['SINT-02', 'SINT-05', 'REQ-05', 'ICD-10'],
       feedsInto: ['CERT-03', 'CERT-06', 'RAMP-02'],
       runsWith: ['CHAR-04', 'CHAR-11', 'CERT-05'],
       revisedBy: [],

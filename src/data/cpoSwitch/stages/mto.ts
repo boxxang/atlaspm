@@ -7,11 +7,11 @@ export const MTO: CpoStageModule = {
   content: {
     tagline: 'Hand every die to its own foundry on its own checklist, and plan the wafers before they start.',
     description:
-      'Release each die to the foundry that builds it: the switch ASIC and the SerDes and I/O silicon to the digital foundry, the electrical IC to its analog process, the photonic IC to the photonics foundry and the bridge or interposer and silicon capacitors to theirs — each through that foundry’s intake checks, tapeout checklist and mask data review. Alongside, manufacturing plans the wafer starts, the corner and skew lot splits characterization will need and the engineering lot hold points that keep a metal fix possible, and the program archives every database and freezes the configuration baseline the silicon will be traced back to. The stage closes when every die has been accepted and its masks ordered.',
-    activities: ['Switch ASIC tapeout', 'I/O silicon tapeout', 'EIC tapeout', 'PIC tapeout', 'Bridge and Si capacitor release', 'Wafer start plan', 'Archive and baseline'],
+      'Release each die to the foundry that builds it: the Switch SoC and the I/O die, each as its own tapeout, to the digital foundry, the electrical IC to its analog process, the photonic IC to the photonics foundry and the bridge or interposer and silicon capacitors to theirs — each through that foundry’s intake checks, tapeout checklist and mask data review. Alongside, manufacturing plans the wafer starts, the corner and skew lot splits characterization will need and the engineering lot hold points that keep a metal fix possible, and the program archives every database and freezes the configuration baseline the silicon will be traced back to. The stage closes when every die has been accepted and its masks ordered.',
+    activities: ['Switch SoC tapeout', 'I/O die tapeout', 'EIC tapeout', 'PIC tapeout', 'Bridge and Si capacitor release', 'Wafer start plan', 'Archive and baseline'],
     deliverables: [
-      'Switch ASIC mask release record and foundry handoff checklist',
-      'SerDes and I/O silicon tapeout record',
+      'Switch SoC mask release record and foundry handoff checklist',
+      'I/O die tapeout record',
       'Electrical IC tapeout record and mask order',
       'Photonic IC tapeout record with in-line monitor structures',
       'Bridge / interposer and silicon capacitor mask release record',
@@ -47,37 +47,37 @@ export const MTO: CpoStageModule = {
   steps: {
     'MTO-01': {
       s: [
-        [1, 'Submit the switch ASIC GDS and resolve every foundry intake check rejection', 1],
+        [1, 'Submit the Switch SoC GDS and resolve every foundry intake check rejection', 1],
         [2, 'Complete the foundry tapeout checklist and data transfer form', 0.5, 1],
         [3, 'Review mask data preparation and OPC results on the critical layers with the foundry', 1.5],
         [4, 'Approve the reticle layout, frame and process monitor structures and the mask order', 1],
         [5, 'Confirm the wafer start and hot-lot priority for the first lots', 0.5, 1],
-        [6, 'Release the mask set and record the switch ASIC tapeout', 0.5],
+        [6, 'Release the mask set and record the Switch SoC tapeout', 0.5],
       ],
       o: [
-        'Foundry intake acceptance for the switch ASIC',
+        'Foundry intake acceptance for the Switch SoC',
         'Completed foundry tapeout checklist',
         'Mask data preparation review record',
         'Approved reticle layout and mask order',
         'Confirmed first-lot start and priority',
-        'Switch ASIC mask release record',
+        'Switch SoC mask release record',
       ],
       r: [['MTO-D1', 'produces'], ['MTO-D7', 'feeds']],
     },
     'MTO-02': {
       s: [
-        [1, 'Merge the signed-off I/O silicon into the switch GDS where they share a die, or prepare it as its own tapeout', 1],
+        [1, 'Prepare the signed-off I/O die top-level GDS as its own tapeout, with its reticle frame and process monitors', 1],
         [2, 'Submit to foundry intake and resolve rejections', 1],
         [3, 'Complete the analog checklist items — matching, ESD and test structure placement', 1, 1],
         [4, 'Review mask data preparation on the analog-critical layers', 1],
-        [5, 'Release the I/O silicon mask set or merged macro and record the tapeout', 0.5],
+        [5, 'Release the I/O die mask set and record the tapeout', 0.5],
       ],
       o: [
-        'Merged or standalone I/O silicon database',
-        'Foundry intake acceptance for the I/O silicon',
+        'I/O die tapeout database with reticle frame',
+        'Foundry intake acceptance for the I/O die',
         'Completed analog checklist items',
         'Analog-critical layer mask data review',
-        'SerDes and I/O silicon tapeout record',
+        'I/O die tapeout record',
       ],
       r: [['MTO-D2', 'produces'], ['MTO-D7', 'feeds']],
     },

@@ -84,7 +84,7 @@ export const SDBG_WRITE_UPS: CpoWriteUps = {
       'Reproduced anomalies from SDBG-01',
       'Scan diagnosis patterns and DFT access from the DFT signoff in SGNO-07',
       'Assembly and fiber attach process records from TINF-09',
-      'Photonic wafer-level test data from SORT-02',
+      'Photonic wafer-level test data from SORT-04',
       'Design databases and simulation environments from the design teams',
     ],
     rel: {
@@ -133,11 +133,11 @@ export const SDBG_WRITE_UPS: CpoWriteUps = {
       'FA queue length per lab',
     ],
     links: {
-      dependsOn: ['SDBG-01', 'SGNO-07', 'TINF-09', 'SORT-02'],
+      dependsOn: ['SDBG-01', 'SGNO-07', 'TINF-09', 'SORT-04'],
       feedsInto: ['SDBG-03', 'SDBG-04', 'SUST-03'],
       runsWith: ['SDBG-03'],
       revisedBy: [],
-      feedsBackInto: ['TINF-06', 'SORT-03'],
+      feedsBackInto: ['TINF-06', 'SORT-05'],
     },
     terms: ['FA', 'Optical FA', 'CSAM', 'ATPG'],
   },
@@ -212,7 +212,7 @@ export const SDBG_WRITE_UPS: CpoWriteUps = {
     criticalPath: true,
     purpose: [
       'Take the <b>metal ECO versus full-mask re-spin decision</b>: which dies need a new stepping, whether each fix can be done in metal layers on held wafers or needs base layers or photonic masks, and what each option costs in money, schedule and risk.',
-      'On a multi-die product the decision is per die and the answers interact. A metal ECO on the switch ASIC can land in weeks from held wafers; a photonic mask change or base-layer fix restarts fab and re-opens qualification. The decision records what was fixed, what was contained, and what the program accepted.',
+      'On a multi-die product the decision is per die and the answers interact. A metal ECO on the Switch SoC can land in weeks from held wafers; a photonic mask change or base-layer fix restarts fab and re-opens qualification. The decision records what was fixed, what was contained, and what the program accepted.',
     ],
     flowNote:
       'Step 1 consolidates the must-fix list. Step 2 classifies each fix by the layers it touches, and step 3 prices metal ECO against re-spin while step 4 assesses customer, qualification and ramp impact in parallel. Step 5 holds the review and records the decision.',

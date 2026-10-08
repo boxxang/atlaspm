@@ -14,7 +14,7 @@ export const CHAR_WRITE_UPS: CpoWriteUps = {
       'Step 1 updates the pre-silicon plan against what the engineering lots actually delivered. Step 2 rebuilds the matrix from that inventory rather than from the lot plan. Step 3 allocates units and benches in parallel, because the same corner units are wanted by every workstream. Step 4 sets limits and the data format, and step 5 releases the plan.',
     consumes: [
       'Wafer start plan and lot splits from MTO-06',
-      'Known-good-die bins and wafer acceptance data from SORT-03',
+      'Known-good-die bins and wafer acceptance data from SORT-05',
       'First optical link margin correlation from OBU-06',
       'First electrical link results from PON-05',
       'Post-silicon characterization plan and test content from TINF-14',
@@ -62,7 +62,7 @@ export const CHAR_WRITE_UPS: CpoWriteUps = {
       'Weeks from plan release to first corner data',
     ],
     links: {
-      dependsOn: ['TINF-14', 'PON-05', 'OBU-06', 'MTO-06', 'SORT-03'],
+      dependsOn: ['TINF-14', 'PON-05', 'OBU-06', 'MTO-06', 'SORT-05', 'SORT-02', 'SORT-03'],
       feedsInto: ['CHAR-02', 'CHAR-03', 'CHAR-04', 'CHAR-05', 'CHAR-06', 'CHAR-10', 'CHAR-11', 'CERT-01'],
       runsWith: ['SINT-04'],
       revisedBy: ['SDBG-04'],
@@ -131,7 +131,7 @@ export const CHAR_WRITE_UPS: CpoWriteUps = {
       'Post-FEC error floor demonstrated',
     ],
     links: {
-      dependsOn: ['CHAR-01', 'PON-05', 'MODL-03', 'ICD-02'],
+      dependsOn: ['CHAR-01', 'PON-05', 'MODL-03', 'ICD-02', 'SORT-02', 'WFAB-02'],
       feedsInto: ['CHAR-07', 'CHAR-08', 'CERT-01', 'SDBG-01', 'SDBG-04'],
       runsWith: ['CHAR-03', 'CHAR-05'],
       revisedBy: ['SDBG-05'],
@@ -152,7 +152,7 @@ export const CHAR_WRITE_UPS: CpoWriteUps = {
       'Per-lane calibration flow from OBU-04',
       'Optical link margin correlation from OBU-06',
       'Optical link budget and channel model from MODL-04',
-      'Electrical-to-photonic and optical source interfaces from ICD-03',
+      'Electrical-to-photonic and optical source interfaces from ICD-04',
     ],
     rel: {
       'CHAR-D3': '<b>Optical transmit and receive characterization report across temperature.</b> Produced here; compliance, reliability baselines and the datasheet are drawn from it.',
@@ -200,7 +200,7 @@ export const CHAR_WRITE_UPS: CpoWriteUps = {
       'Heater tuning headroom at the hot corner',
     ],
     links: {
-      dependsOn: ['CHAR-01', 'OBU-04', 'OBU-06', 'MODL-04', 'ICD-03'],
+      dependsOn: ['CHAR-01', 'OBU-04', 'OBU-06', 'MODL-04', 'ICD-04'],
       feedsInto: ['CHAR-05', 'CHAR-07', 'CHAR-08', 'CERT-01', 'RELQ-03', 'SDBG-04'],
       runsWith: ['CHAR-02'],
       revisedBy: ['SDBG-05'],
@@ -237,7 +237,7 @@ export const CHAR_WRITE_UPS: CpoWriteUps = {
     ],
     roles: [
       { r: 'Validation', d: 'Owns performance and feature validation' },
-      { r: 'Switch ASIC architect', d: 'Expected behavior and model comparison' },
+      { r: 'Switch SoC architect', d: 'Expected behavior and model comparison' },
       { r: 'Software engineer', d: 'SDK configuration and feature enablement' },
       { r: 'Design verification engineer', d: 'Reproduction of silicon failures in simulation' },
       { r: 'Product manager', d: 'Feature priority and deferral decisions' },
@@ -348,15 +348,15 @@ export const CHAR_WRITE_UPS: CpoWriteUps = {
     criticalPath: false,
     purpose: [
       'Validate the hardware against <b>every interface control document</b>: die-to-die and switch-to-I/O, electrical-to-photonic and optical source, photonic-to-fiber, die-to-package and package-to-board, power, clock and reset, thermal and mechanical, firmware and software, and the test and calibration data interfaces.',
-      'The interfaces were frozen in ICD-10 so that teams could design in parallel. Silicon is the first time both sides of each interface meet, and a parameter nobody measures stays an assumption. Each one gets a measured value or a written disposition, and discrepancies go back through the change control board that owns the interface.',
+      'The interfaces were frozen in ICD-12 so that teams could design in parallel. Silicon is the first time both sides of each interface meet, and a parameter nobody measures stays an assumption. Each one gets a measured value or a written disposition, and discrepancies go back through the change control board that owns the interface.',
     ],
     flowNote:
       'Step 1 builds the matrix from the frozen documents. Step 2 verifies the silicon-side electrical and optical interfaces while step 3 verifies the system-side power, clock, thermal and mechanical ones in parallel. Step 4 covers the firmware, software and data interfaces, step 5 routes discrepancies to change control, and step 6 releases the matrix.',
     consumes: [
-      'Interface freeze baseline from ICD-10',
-      'Electrical, optical and fiber interface documents from ICD-02, ICD-03 and ICD-04',
-      'Package, power, clock and thermal interface documents from ICD-05, ICD-06 and ICD-07',
-      'Firmware, software and data interface documents from ICD-08 and ICD-09',
+      'Interface freeze baseline from ICD-12',
+      'Electrical, optical and fiber interface documents from ICD-02, ICD-04 and ICD-06',
+      'Package, power, clock and thermal interface documents from ICD-07, ICD-08 and ICD-09',
+      'Firmware, software and data interface documents from ICD-10 and ICD-11',
       'Change control board and interface register from ICD-01',
     ],
     rel: {
@@ -394,7 +394,7 @@ export const CHAR_WRITE_UPS: CpoWriteUps = {
       'Every discrepancy logged with the change control board and an owner',
       'Matrix signed by the owner of each interface',
     ],
-    dependsOn: ['CHAR-01', 'ICD-10'],
+    dependsOn: ['CHAR-01', 'ICD-12'],
     dependsNote: null,
     feedsInto: ['CHAR-08', 'SDBG-01'],
     measuredBy: [
@@ -403,7 +403,7 @@ export const CHAR_WRITE_UPS: CpoWriteUps = {
       'Discrepancies closed through change control',
     ],
     links: {
-      dependsOn: ['CHAR-01', 'ICD-10', 'ICD-02', 'ICD-03', 'ICD-04', 'ICD-05', 'ICD-06', 'ICD-07', 'ICD-08', 'ICD-09'],
+      dependsOn: ['CHAR-01', 'ICD-12', 'ICD-02', 'ICD-04', 'ICD-06', 'ICD-07', 'ICD-08', 'ICD-09', 'ICD-10', 'ICD-11', 'ICD-03', 'ICD-05'],
       feedsInto: ['CHAR-08', 'SDBG-01', 'NPI-07'],
       runsWith: ['CHAR-02', 'CHAR-03'],
       revisedBy: [],
@@ -442,7 +442,7 @@ export const CHAR_WRITE_UPS: CpoWriteUps = {
       { r: 'SI/PI engineer', d: 'Channel, PDN and package model correlation' },
       { r: 'Photonics engineer', d: 'Optical link budget correlation' },
       { r: 'Thermal engineer', d: 'Thermal model correlation' },
-      { r: 'Switch ASIC architect', d: 'Traffic and buffer model correlation' },
+      { r: 'Switch SoC architect', d: 'Traffic and buffer model correlation' },
     ],
     effort: [
       ['Data consolidation', 1],

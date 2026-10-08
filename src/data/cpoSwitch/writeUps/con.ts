@@ -325,7 +325,7 @@ export const CON_WRITE_UPS: CpoWriteUps = {
       dependsOn: ['CON-03'],
       feedsInto: ['CON-06', 'TRDY-10', 'REQ-09'],
       runsWith: ['CON-04'],
-      revisedBy: ['SARC-12', 'ICD-10'],
+      revisedBy: ['SARC-12', 'ICD-12'],
       feedsBackInto: [],
     },
     terms: ['TAT'],

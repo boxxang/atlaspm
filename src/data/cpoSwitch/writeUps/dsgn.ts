@@ -8,20 +8,20 @@ export const DSGN_WRITE_UPS: CpoWriteUps = {
     criticalPath: true,
     purpose: [
       'Turn the frozen switch architecture into <b>block-level microarchitecture specifications</b> — pipeline stages, lookup tables, the shared packet buffer, queuing and traffic manager scheduling, telemetry and counters — precise enough for RTL to be written and verified against them.',
-      'Every later schedule in the switch ASIC hangs on these documents: RTL codes to them, verification writes test plans from them, and physical design sizes the floorplan from their area and memory budgets. A block specified vaguely here is re-specified during RTL, which is the most expensive time to discover what it was supposed to do.',
+      'Every later schedule in the Switch SoC hangs on these documents: RTL codes to them, verification writes test plans from them, and physical design sizes the floorplan from their area and memory budgets. A block specified vaguely here is re-specified during RTL, which is the most expensive time to discover what it was supposed to do.',
     ],
     flowNote:
       'Step 1 fixes block boundaries so owners can work in parallel. Step 2 specifies the pipeline while steps 3 and 4 run beside it for the buffer, traffic manager and telemetry. Step 5 checks the sum against the architecture budget, step 6 walks the specifications with RTL, verification and physical design, and step 7 releases them.',
     consumes: [
-      'Switch ASIC architecture from SARC-01',
+      'Switch SoC architecture from SARC-01',
       'Power, performance, area and cost allocation from SARC-11',
       'Partition freeze decision from SARC-12',
       'Traffic, buffer and congestion performance model results from MODL-02',
       'Die-to-die and switch-to-I/O interface definitions from ICD-02',
     ],
     rel: {
-      'DSGN-D1': '<b>Switch ASIC microarchitecture and block specifications.</b> Produced here and released under change control; RTL, verification and physical design all start from it.',
-      'DSGN-D2': '<b>Switch ASIC frozen RTL and UPF power-intent release.</b> Every block in the frozen RTL traces to a specification in this set.',
+      'DSGN-D1': '<b>Switch SoC microarchitecture and block specifications.</b> Produced here and released under change control; RTL, verification and physical design all start from it.',
+      'DSGN-D2': '<b>Switch SoC frozen RTL and UPF power-intent release.</b> Every block in the frozen RTL traces to a specification in this set.',
     },
     risks: [
       '<b>Buffer sized from a spreadsheet.</b> Packet buffer and queue depths are chosen without the congestion model, and the traffic manager misses its burst absorption target.',
@@ -73,7 +73,7 @@ export const DSGN_WRITE_UPS: CpoWriteUps = {
   'DSGN-02': {
     criticalPath: true,
     purpose: [
-      'Write, integrate and freeze the <b>switch ASIC RTL</b>: every block coded to its specification, integrated into subsystems and a full-chip top with the die-to-die and SerDes wrappers, cleaned of lint and crossing violations, and released with its power intent.',
+      'Write, integrate and freeze the <b>Switch SoC RTL</b>: every block coded to its specification, integrated into subsystems and a full-chip top with the die-to-die and SerDes wrappers, cleaned of lint and crossing violations, and released with its power intent.',
       'The RTL freeze is the date the whole back end is planned around. What decides whether it holds is not the coding rate but the bug rate — so the RTL is integrated early and often, trial synthesis runs from the first integration, and late changes go through change control with their impact on verification and timing written down.',
     ],
     flowNote:
@@ -86,8 +86,8 @@ export const DSGN_WRITE_UPS: CpoWriteUps = {
       'Security and DFT hardware from DSGN-10 and DSGN-11',
     ],
     rel: {
-      'DSGN-D2': '<b>Switch ASIC frozen RTL and UPF power-intent release.</b> Produced here; the released tag is what synthesis, formal and emulation all consume.',
-      'DSGN-D17': '<b>Design freeze decision package — RTL, circuit and photonic.</b> The RTL bug trend, waiver list and release tag are the switch ASIC’s freeze evidence.',
+      'DSGN-D2': '<b>Switch SoC frozen RTL and UPF power-intent release.</b> Produced here; the released tag is what synthesis, formal and emulation all consume.',
+      'DSGN-D17': '<b>Design freeze decision package — RTL, circuit and photonic.</b> The RTL bug trend, waiver list and release tag are the Switch SoC’s freeze evidence.',
     },
     risks: [
       '<b>Integration left late.</b> Blocks are verified alone and the full-chip top first compiles weeks before freeze.',
@@ -98,7 +98,7 @@ export const DSGN_WRITE_UPS: CpoWriteUps = {
     ],
     roles: [
       { r: 'RTL design', d: 'Owns block RTL, integration and the frozen release' },
-      { r: 'Switch ASIC architect', d: 'Rules on specification questions and approves changes' },
+      { r: 'Switch SoC architect', d: 'Rules on specification questions and approves changes' },
       { r: 'Verification lead', d: 'Supplies regression results and bug priorities' },
       { r: 'Synthesis engineer', d: 'Runs trial synthesis and reports timing and area' },
       { r: 'Program TPM', d: 'Tracks bug trend, change requests and freeze readiness' },
@@ -147,13 +147,13 @@ export const DSGN_WRITE_UPS: CpoWriteUps = {
       'Step 1 fixes the clock domains, and step 2 designs the reset architecture beside it. Step 3 designs the power management controller, step 4 writes the UPF against it, step 5 runs power-aware simulation of every transition, and step 6 hands the package to integration.',
     consumes: [
       'Clock, reset and power architecture from SARC-06',
-      'Power, clock and reset interface definitions from ICD-06',
+      'Power, clock and reset interface definitions from ICD-08',
       'Block specifications and their clock needs from DSGN-01',
       'Standard cell library power-management cells from TRDY-03',
       'Board regulator and sequencing constraints from the system board design',
     ],
     rel: {
-      'DSGN-D2': '<b>Switch ASIC frozen RTL and UPF power-intent release.</b> The clock, reset and power-management RTL and the UPF files are released inside it.',
+      'DSGN-D2': '<b>Switch SoC frozen RTL and UPF power-intent release.</b> The clock, reset and power-management RTL and the UPF files are released inside it.',
       'DSGN-D13': '<b>System board schematic and power delivery design.</b> The die’s power states and rail handshakes set the board’s sequencing requirements.',
     },
     risks: [
@@ -178,7 +178,7 @@ export const DSGN_WRITE_UPS: CpoWriteUps = {
     ],
     entry: [
       'Clock, reset and power architecture frozen in SARC-06',
-      'Power, clock and reset interfaces drafted in ICD-06',
+      'Power, clock and reset interfaces drafted in ICD-08',
       'Power-management cells available in the standard cell library',
     ],
     exit: [
@@ -186,7 +186,7 @@ export const DSGN_WRITE_UPS: CpoWriteUps = {
       'Every power-state transition simulated power-aware with no corruption of retained state',
       'Rail sequencing agreed in writing with the board design',
     ],
-    dependsOn: ['SARC-06', 'ICD-06', 'DSGN-01'],
+    dependsOn: ['SARC-06', 'ICD-08', 'DSGN-01'],
     dependsNote: null,
     feedsInto: ['DSGN-02', 'PSV-04', 'DSGN-14'],
     measuredBy: [
@@ -195,7 +195,7 @@ export const DSGN_WRITE_UPS: CpoWriteUps = {
       'Clock and reset crossing violations open',
     ],
     links: {
-      dependsOn: ['SARC-06', 'ICD-06', 'DSGN-01'],
+      dependsOn: ['SARC-06', 'ICD-08', 'DSGN-01'],
       feedsInto: ['DSGN-02', 'DSGN-14', 'PSV-03', 'PSV-04', 'IMPL-01'],
       runsWith: ['DSGN-02'],
       revisedBy: ['PSV-04'],
@@ -206,69 +206,70 @@ export const DSGN_WRITE_UPS: CpoWriteUps = {
   'DSGN-04': {
     criticalPath: true,
     purpose: [
-      'Design the <b>SerDes and high-speed I/O silicon</b> that carries the switch’s bandwidth to the optical engines: transmit drivers and equalization, receive front end and clock recovery, lane-group PLLs, and the adaptation and link-training logic.',
-      'In a co-packaged switch the SerDes drives a millimetre-scale package channel into an electrical IC rather than a board trace into a module, so its equalization and power are set by a channel the program itself designs. The circuit specifications have to be derived from the modeled package and interface — not reused from a pluggable-optics design — or the power-per-bit advantage of CPO is spent in the SerDes.',
+      'Design the <b>I/O die as one die</b>, with its own top level and its own tapeout: transmit drivers and equalization, receive front end and clock recovery, lane-group PLLs, the die-to-die PHY toward the Switch SoC, and the adaptation, link-training, register and DFT logic that ties them into a die with a floorplan and a bump map.',
+      'In a co-packaged switch the I/O die drives a millimetre-scale package channel into an electrical IC on one side and a die-to-die link into the Switch SoC on the other, so both channels are ones the program itself designs. The circuit specifications have to be derived from those modeled channels — not reused from a pluggable-optics design — and the die integrated as a die, not as a macro, or the power-per-bit advantage of CPO is spent in the I/O die.',
     ],
     flowNote:
-      'Step 1 sets circuit specifications from the channel model. Step 2 designs the transmit path while steps 3 and 4 design the receive path and PLLs in parallel. Step 5 implements adaptation and training, step 6 simulates the full lane against the channel, and step 7 releases the database.',
+      'Step 1 sets circuit specifications from the channel models and interfaces. Step 2 designs the transmit path while steps 3 and 4 design the receive path and PLLs in parallel. Step 5 designs the die-to-die PHY, step 6 integrates the die top level, step 7 simulates the lane and the die-to-die link, and step 8 releases the database.',
     consumes: [
-      'High-speed I/O and SerDes architecture from SARC-02',
-      'Die-to-die and switch-to-I/O electrical interface from ICD-02',
+      'I/O die architecture from SARC-02',
+      'Switch SoC-to-I/O die die-to-die interface from ICD-02',
+      'I/O die-to-optical engine electrical interface from ICD-03',
       'Electrical channel and SerDes link models from MODL-03',
       'SerDes test chip results from FEAS-02',
-      'SerDes IP and process readiness from TRDY-04',
     ],
     rel: {
-      'DSGN-D3': '<b>SerDes and high-speed I/O silicon design database.</b> Produced here with its behavioral models, which the link co-simulation and mixed-signal verification both consume.',
-      'DSGN-D17': '<b>Design freeze decision package — RTL, circuit and photonic.</b> Lane simulation margin across corners is the SerDes circuit-freeze evidence.',
+      'DSGN-D3': '<b>I/O die design database — SerDes, die-to-die PHY and die top level.</b> Produced here with its behavioral models, which the link co-simulation and mixed-signal verification both consume.',
+      'DSGN-D17': '<b>Design freeze decision package — RTL, circuit and photonic.</b> Lane and die-to-die simulation margin across corners is the I/O die circuit-freeze evidence.',
     },
     risks: [
       '<b>Test chip lessons not carried in.</b> Issues found on the test chip are fixed in a spreadsheet but not in the product schematics.',
       '<b>Channel model optimistic.</b> The package channel used for specification omits crosstalk or via stubs, and equalization runs out.',
+      '<b>Die treated as a macro.</b> The I/O die top level, bump map and DFT are left to implementation and nobody owns them until signoff.',
+      '<b>Die-to-die PHY mismatched.</b> The I/O die and Switch SoC sides of the die-to-die link are designed to different revisions of ICD-02.',
       '<b>Power per lane creeps.</b> Each margin fix adds power until the lane misses its power-per-bit share.',
-      '<b>Training logic unverified with the analog.</b> Adaptation is verified against an ideal model and cannot converge on the real front end.',
-      '<b>Jitter budget unowned.</b> PLL, supply noise and clock distribution each take the whole budget.',
     ],
     roles: [
-      { r: 'SerDes and high-speed I/O', d: 'Owns the SerDes circuit design and its database' },
+      { r: 'SerDes and high-speed I/O', d: 'Owns the I/O die design and its database' },
       { r: 'Analog circuit designer', d: 'Transmit, receive and PLL circuits' },
+      { r: 'Die-to-die PHY designer', d: 'Die-to-die PHY toward the Switch SoC' },
       { r: 'SI/PI engineer', d: 'Channel models and package interaction' },
-      { r: 'Digital designer', d: 'Adaptation and link-training logic' },
-      { r: 'Mixed-signal verification engineer', d: 'Behavioral models and lane verification' },
+      { r: 'Digital designer', d: 'Die top level, adaptation, training and register logic' },
     ],
     effort: [
-      ['Transmit path', 60],
-      ['Receive path and clock recovery', 80],
-      ['PLL and clocking', 40],
-      ['Adaptation and control logic', 30],
-      ['Lane simulation and release', 30],
+      ['Transmit path', 50],
+      ['Receive path and clock recovery', 65],
+      ['PLL and clocking', 35],
+      ['Die-to-die PHY', 35],
+      ['Die top level and control logic', 30],
+      ['Lane simulation and release', 25],
     ],
     entry: [
-      'Electrical interface drafted in ICD-02 with the channel reach defined',
+      'Die-to-die and I/O-to-engine interfaces drafted in ICD-02 and ICD-03 with channel reach defined',
       'Channel models released from MODL-03',
       'SerDes test chip measurements available from FEAS-02',
     ],
     exit: [
-      'Full-lane pre-layout simulation meets the BER target with the agreed margin at every corner',
-      'Lane power within its power-per-bit allocation at the typical corner',
+      'Full-lane and die-to-die pre-layout simulation meets the BER target with the agreed margin at every corner',
+      'I/O die top-level netlist, floorplan and bump map released and agreed with packaging',
       'Behavioral models released and correlated to the transistor-level design',
     ],
-    dependsOn: ['SARC-02', 'ICD-02', 'MODL-03', 'FEAS-02'],
+    dependsOn: ['SARC-02', 'ICD-02', 'ICD-03', 'MODL-03', 'FEAS-02'],
     dependsNote: null,
     feedsInto: ['IMPL-03', 'PSV-05', 'PSV-07', 'DSGN-18'],
     measuredBy: [
       'Simulated eye margin per corner against target',
-      'Lane power against allocation',
+      'Lane and die-to-die power against allocation',
       'Open circuit issues from test chip lessons',
     ],
     links: {
-      dependsOn: ['SARC-02', 'ICD-02', 'MODL-03', 'FEAS-02', 'TRDY-04'],
+      dependsOn: ['SARC-02', 'ICD-02', 'ICD-03', 'MODL-03', 'FEAS-02', 'TRDY-04'],
       feedsInto: ['IMPL-03', 'PSV-05', 'PSV-07', 'DSGN-16', 'DSGN-18'],
       runsWith: ['DSGN-05', 'DSGN-12'],
       revisedBy: ['PSV-05', 'PSV-07'],
       feedsBackInto: [],
     },
-    terms: ['SerDes', 'PLL', 'BER', 'Power per bit', 'AMS'],
+    terms: ['SerDes', 'PLL', 'BER', 'Power per bit', 'D2D', 'PHY'],
   },
   'DSGN-05': {
     criticalPath: true,
@@ -280,7 +281,7 @@ export const DSGN_WRITE_UPS: CpoWriteUps = {
       'Step 1 derives driver and TIA specifications from the budget. Step 2 designs the drivers while step 3 designs the TIAs beside it. Step 4 designs bias, heater and data-converter circuits with step 5 on the control interface in parallel. Step 6 simulates with optical loads attached, and step 7 releases.',
     consumes: [
       'Optical engine architecture and EIC / PIC split from SARC-03',
-      'Electrical-to-photonic interface definition from ICD-03',
+      'Electrical-to-photonic interface definition from ICD-04',
       'Driver and TIA test vehicle results from FEAS-04',
       'Optical link budget from MODL-04',
       'Modulator and photodetector compact models from DSGN-06',
@@ -311,7 +312,7 @@ export const DSGN_WRITE_UPS: CpoWriteUps = {
       ['Simulation with optical loads', 15],
     ],
     entry: [
-      'Electrical-to-photonic interface drafted in ICD-03',
+      'Electrical-to-photonic interface drafted in ICD-04',
       'Optical link budget released from MODL-04',
       'Driver and TIA test vehicle results available from FEAS-04',
     ],
@@ -320,7 +321,7 @@ export const DSGN_WRITE_UPS: CpoWriteUps = {
       'Receiver sensitivity meets the budget allocation with margin across corners',
       'Bias, heater and monitor ranges signed off by the optical control owner',
     ],
-    dependsOn: ['SARC-03', 'ICD-03', 'FEAS-04', 'MODL-04'],
+    dependsOn: ['SARC-03', 'ICD-04', 'FEAS-04', 'MODL-04'],
     dependsNote: 'Modulator and photodetector models from DSGN-06 mature alongside this work and are exchanged at each iteration.',
     feedsInto: ['IMPL-04', 'PSV-05', 'PSV-07', 'DSGN-08'],
     measuredBy: [
@@ -329,7 +330,7 @@ export const DSGN_WRITE_UPS: CpoWriteUps = {
       'EIC power per lane against allocation',
     ],
     links: {
-      dependsOn: ['SARC-03', 'ICD-03', 'FEAS-04', 'MODL-04'],
+      dependsOn: ['SARC-03', 'ICD-04', 'FEAS-04', 'MODL-04', 'ICD-03'],
       feedsInto: ['IMPL-04', 'PSV-05', 'PSV-07', 'DSGN-08', 'DSGN-18'],
       runsWith: ['DSGN-06', 'MODL-05'],
       revisedBy: ['PSV-05', 'PSV-07'],
@@ -347,8 +348,8 @@ export const DSGN_WRITE_UPS: CpoWriteUps = {
       'Step 1 allocates the loss budget. Step 2 designs modulators to what the EIC can drive, with step 3 designing detectors and monitors in parallel. Step 4 designs multiplexers and tuning while step 5 designs couplers and routing beside it. Step 6 simulates across corners, and step 7 releases the database and models.',
     consumes: [
       'Optical engine architecture from SARC-03',
-      'Electrical-to-photonic and source-to-photonic interfaces from ICD-03',
-      'Photonic-to-fiber interface from ICD-04',
+      'Electrical-to-photonic and source-to-photonic interfaces from ICD-04',
+      'Photonic-to-fiber interface from ICD-06',
       'Photonic PDK and process readiness from TRDY-02',
       'Photonic test vehicle measurements from FEAS-03',
     ],
@@ -380,7 +381,7 @@ export const DSGN_WRITE_UPS: CpoWriteUps = {
     ],
     entry: [
       'Photonic PDK released with test vehicle correlation from TRDY-02 and FEAS-03',
-      'Electrical-to-photonic and photonic-to-fiber interfaces drafted in ICD-03 and ICD-04',
+      'Electrical-to-photonic and photonic-to-fiber interfaces drafted in ICD-04 and ICD-06',
       'Modulator type and wavelength plan selected in the architecture',
     ],
     exit: [
@@ -388,7 +389,7 @@ export const DSGN_WRITE_UPS: CpoWriteUps = {
       'Tuning range covers process spread plus end-of-life drift for every channel',
       'Compact models released for every component used by the EIC and co-simulation teams',
     ],
-    dependsOn: ['SARC-03', 'ICD-03', 'ICD-04', 'TRDY-02', 'FEAS-03'],
+    dependsOn: ['SARC-03', 'ICD-04', 'ICD-06', 'TRDY-02', 'FEAS-03'],
     dependsNote: null,
     feedsInto: ['IMPL-05', 'PSV-06', 'PSV-07', 'DSGN-05', 'DSGN-08'],
     measuredBy: [
@@ -397,7 +398,7 @@ export const DSGN_WRITE_UPS: CpoWriteUps = {
       'Tuning range margin at end of life',
     ],
     links: {
-      dependsOn: ['SARC-03', 'ICD-03', 'ICD-04', 'TRDY-02', 'FEAS-03', 'MODL-04'],
+      dependsOn: ['SARC-03', 'ICD-04', 'ICD-06', 'TRDY-02', 'FEAS-03', 'MODL-04'],
       feedsInto: ['IMPL-05', 'PSV-06', 'PSV-07', 'DSGN-05', 'DSGN-08', 'DSGN-13', 'DSGN-18'],
       runsWith: ['DSGN-05', 'DSGN-07', 'MODL-05'],
       revisedBy: ['PSV-06', 'PSV-07'],
@@ -415,7 +416,7 @@ export const DSGN_WRITE_UPS: CpoWriteUps = {
       'Step 1 sets power and wavelength requirements from the loss allocation. Step 2 decides the architecture and redundancy. Step 3 designs bias and temperature control while step 4 designs the coupling path beside it. Step 5 defines safety and serviceability, step 6 checks life margin, and step 7 releases.',
     consumes: [
       'Optical engine architecture and source split from SARC-03',
-      'Optical source-to-photonic interface from ICD-03',
+      'Optical source-to-photonic interface from ICD-04',
       'Laser coupling feasibility results from FEAS-05',
       'Laser supplier qualification status from TRDY-07',
       'Loss allocation and coupler design from DSGN-06',
@@ -445,7 +446,7 @@ export const DSGN_WRITE_UPS: CpoWriteUps = {
       ['Safety and aging analysis', 13],
     ],
     entry: [
-      'Source-to-photonic interface drafted in ICD-03',
+      'Source-to-photonic interface drafted in ICD-04',
       'Laser coupling feasibility demonstrated in FEAS-05',
       'Candidate laser suppliers identified in TRDY-07',
     ],
@@ -454,7 +455,7 @@ export const DSGN_WRITE_UPS: CpoWriteUps = {
       'Redundancy and serviceability approach approved by system architecture',
       'Laser safety interlock and shutdown path signed off by compliance',
     ],
-    dependsOn: ['SARC-03', 'ICD-03', 'FEAS-05', 'TRDY-07'],
+    dependsOn: ['SARC-03', 'ICD-04', 'FEAS-05', 'TRDY-07'],
     dependsNote: null,
     feedsInto: ['DSGN-08', 'DSGN-12', 'DSGN-14', 'PSV-06'],
     measuredBy: [
@@ -463,7 +464,7 @@ export const DSGN_WRITE_UPS: CpoWriteUps = {
       'Open safety and serviceability actions',
     ],
     links: {
-      dependsOn: ['SARC-03', 'ICD-03', 'FEAS-05', 'TRDY-07'],
+      dependsOn: ['SARC-03', 'ICD-04', 'FEAS-05', 'TRDY-07', 'ICD-05'],
       feedsInto: ['DSGN-08', 'DSGN-12', 'DSGN-14', 'DSGN-15', 'PSV-06', 'DSGN-18'],
       runsWith: ['DSGN-06'],
       revisedBy: [],
@@ -484,7 +485,7 @@ export const DSGN_WRITE_UPS: CpoWriteUps = {
       'Electrical IC bias, heater and monitor design from DSGN-05',
       'Optical source control design from DSGN-07',
       'Virtual platform from MODL-09',
-      'Calibration data interface from ICD-09',
+      'Calibration data interface from ICD-11',
     ],
     rel: {
       'DSGN-D7': '<b>Optical control, tuning and calibration algorithm specification.</b> Produced here; firmware implements it and the factory calibration flow is built from it.',
@@ -513,7 +514,7 @@ export const DSGN_WRITE_UPS: CpoWriteUps = {
     entry: [
       'PIC and EIC behavioral models available from DSGN-05 and DSGN-06',
       'Virtual platform able to run control firmware from MODL-09',
-      'Calibration data interface drafted in ICD-09',
+      'Calibration data interface drafted in ICD-11',
     ],
     exit: [
       'Every loop shown stable with settling time inside its target on the behavioral models',
@@ -531,7 +532,7 @@ export const DSGN_WRITE_UPS: CpoWriteUps = {
     links: {
       dependsOn: ['DSGN-05', 'DSGN-06', 'DSGN-07', 'MODL-09'],
       feedsInto: ['DSGN-16', 'TINF-07', 'PSV-09', 'OBU-04', 'DSGN-18'],
-      runsWith: ['ICD-09'],
+      runsWith: ['ICD-11'],
       revisedBy: ['PSV-09'],
       feedsBackInto: [],
     },
@@ -548,7 +549,7 @@ export const DSGN_WRITE_UPS: CpoWriteUps = {
     consumes: [
       'Die partitioning and bridge strategy from SARC-04',
       'Die-to-die electrical interface from ICD-02',
-      'Die-to-package interface from ICD-05',
+      'Die-to-package interface from ICD-07',
       'Package, bridge and thermal test vehicle results from FEAS-07',
       'Package PDN targets from the package design',
     ],
@@ -586,7 +587,7 @@ export const DSGN_WRITE_UPS: CpoWriteUps = {
       'Silicon capacitors meet the PDN target impedance across the frequency band',
       'Via, bump and keep-out rules signed by the package and assembly partners',
     ],
-    dependsOn: ['SARC-04', 'ICD-02', 'ICD-05', 'FEAS-07'],
+    dependsOn: ['SARC-04', 'ICD-02', 'ICD-07', 'FEAS-07'],
     dependsNote: null,
     feedsInto: ['IMPL-06', 'DSGN-12', 'PSV-07'],
     measuredBy: [
@@ -595,7 +596,7 @@ export const DSGN_WRITE_UPS: CpoWriteUps = {
       'PDN impedance margin',
     ],
     links: {
-      dependsOn: ['SARC-04', 'ICD-02', 'ICD-05', 'FEAS-07'],
+      dependsOn: ['SARC-04', 'ICD-02', 'ICD-07', 'FEAS-07'],
       feedsInto: ['IMPL-06', 'DSGN-12', 'PSV-07', 'DSGN-18'],
       runsWith: ['DSGN-12'],
       revisedBy: [],
@@ -620,7 +621,7 @@ export const DSGN_WRITE_UPS: CpoWriteUps = {
     ],
     rel: {
       'DSGN-D9': '<b>Security hardware design and fuse / OTP map.</b> Produced here; security signoff and manufacturing key provisioning both work from it.',
-      'DSGN-D2': '<b>Switch ASIC frozen RTL and UPF power-intent release.</b> The root of trust, boot ROM and debug lock are integrated into the frozen RTL.',
+      'DSGN-D2': '<b>Switch SoC frozen RTL and UPF power-intent release.</b> The root of trust, boot ROM and debug lock are integrated into the frozen RTL.',
     },
     risks: [
       '<b>Boot ROM bug.</b> A defect in immutable code cannot be patched and forces a re-spin.',
@@ -680,13 +681,13 @@ export const DSGN_WRITE_UPS: CpoWriteUps = {
     consumes: [
       'DFT, known-good-die and production test architecture from SARC-10',
       'Block specifications from DSGN-01',
-      'Test and calibration data interface from ICD-09',
+      'Test and calibration data interface from ICD-11',
       'Production test strategy from TINF-01',
       'EIC and PIC monitor and loopback points from the circuit designs',
     ],
     rel: {
       'DSGN-D10': '<b>DFT design specification and test access map.</b> Produced here; scan closure, pattern generation and the test programs are built from it.',
-      'DSGN-D2': '<b>Switch ASIC frozen RTL and UPF power-intent release.</b> Test controllers, BIST and loopback modes are integrated into the frozen RTL.',
+      'DSGN-D2': '<b>Switch SoC frozen RTL and UPF power-intent release.</b> Test controllers, BIST and loopback modes are integrated into the frozen RTL.',
     },
     risks: [
       '<b>Optical access missing.</b> PIC and EIC paths cannot be tested before assembly, and bad optics reach the package.',
@@ -728,7 +729,7 @@ export const DSGN_WRITE_UPS: CpoWriteUps = {
       'Estimated test time against the cost model',
     ],
     links: {
-      dependsOn: ['SARC-10', 'DSGN-01', 'ICD-09'],
+      dependsOn: ['SARC-10', 'DSGN-01', 'ICD-11'],
       feedsInto: ['DSGN-02', 'IMPL-11', 'PSV-10', 'TINF-06', 'DSGN-18'],
       runsWith: ['TINF-01', 'DSGN-10'],
       revisedBy: [],
@@ -739,14 +740,14 @@ export const DSGN_WRITE_UPS: CpoWriteUps = {
   'DSGN-12': {
     criticalPath: true,
     purpose: [
-      'Design the <b>package and substrate</b>: a floorplan carrying the switch die, I/O dies, bridges, optical engines and capacitors; the bump and microbump maps; die-to-die and switch-to-engine routing on substrate and RDL; the package PDN; and optical engine placement against fiber routing and thermal limits.',
+      'Design the <b>main package and substrate</b>: a floorplan carrying the Switch SoC, the I/O die, bridges, the known-good optical engine sites and capacitors; the bump and microbump maps; die-to-die and switch-to-engine routing on substrate and RDL; the package PDN; and optical engine placement against fiber routing and thermal limits.',
       'The package is the integration point of every die and of the optics, so it is where interface disagreements become physical. The bump maps are the contract between the die teams and the package team; they are frozen early, changed only through the interface change board, and tracked by the TPM like a tapeout.',
     ],
     flowNote:
       'Step 1 builds the floorplan. Step 2 agrees bump maps with each die. Step 3 routes critical paths while steps 4 and 5 design the PDN and place optical engines in parallel. Step 6 runs first-pass analysis with modeling, and step 7 releases the database.',
     consumes: [
       'Package and system mechanical architecture from SARC-05',
-      'Die-to-package and package-to-board interfaces from ICD-05',
+      'Die-to-package and package-to-board interfaces from ICD-07',
       'Bridge / interposer design from DSGN-09',
       'Optical source subsystem design from DSGN-07',
       'Trial die sizes and bump plans from DSGN-21',
@@ -777,7 +778,7 @@ export const DSGN_WRITE_UPS: CpoWriteUps = {
     ],
     entry: [
       'Package mechanical architecture frozen in SARC-05',
-      'Die-to-package interface drafted in ICD-05',
+      'Die-to-package interface drafted in ICD-07',
       'Substrate technology and supplier selected in TRDY-06',
     ],
     exit: [
@@ -785,7 +786,7 @@ export const DSGN_WRITE_UPS: CpoWriteUps = {
       'First-pass SI, PI and warpage results within targets or with owned actions',
       'Optical engine placement meets fiber bend radius and thermal limits',
     ],
-    dependsOn: ['SARC-05', 'ICD-05', 'DSGN-09', 'DSGN-07', 'DSGN-21'],
+    dependsOn: ['SARC-05', 'ICD-07', 'DSGN-09', 'DSGN-07', 'DSGN-21'],
     dependsNote: 'Package models in MODL-06 and MODL-07 are refined from this floorplan and fed back at each iteration.',
     feedsInto: ['IMPL-07', 'IMPL-08', 'TINF-09', 'DSGN-13', 'DSGN-14', 'DSGN-15'],
     measuredBy: [
@@ -794,7 +795,7 @@ export const DSGN_WRITE_UPS: CpoWriteUps = {
       'Warpage against assembly limit',
     ],
     links: {
-      dependsOn: ['SARC-05', 'ICD-05', 'DSGN-09', 'DSGN-07', 'TRDY-06', 'DSGN-21'],
+      dependsOn: ['SARC-05', 'ICD-07', 'DSGN-09', 'DSGN-07', 'TRDY-06', 'DSGN-21', 'ICD-03'],
       feedsInto: ['IMPL-07', 'IMPL-08', 'IMPL-09', 'TINF-09', 'DSGN-13', 'DSGN-14', 'DSGN-15', 'PSV-07', 'PSV-13'],
       runsWith: ['MODL-06', 'MODL-07', 'DSGN-09', 'DSGN-19'],
       revisedBy: [],
@@ -811,7 +812,7 @@ export const DSGN_WRITE_UPS: CpoWriteUps = {
     flowNote:
       'Step 1 derives fiber needs. Step 2 designs attach and routing while step 3 selects connectors in parallel. Step 4 designs management and strain relief, step 5 builds the loss table, step 6 measures mock-ups, and step 7 releases.',
     consumes: [
-      'Photonic-to-fiber and front-panel optical interfaces from ICD-04',
+      'Photonic-to-fiber and front-panel optical interfaces from ICD-06',
       'Package mechanical architecture and fiber egress from SARC-05',
       'Fiber attach test vehicle results from FEAS-06',
       'Package floorplan and engine placement from DSGN-12',
@@ -842,7 +843,7 @@ export const DSGN_WRITE_UPS: CpoWriteUps = {
       ['Mock-ups and loss budget', 7],
     ],
     entry: [
-      'Photonic-to-fiber interface drafted in ICD-04',
+      'Photonic-to-fiber interface drafted in ICD-06',
       'Fiber attach approach proven in FEAS-06',
       'Optical engine positions available from the package floorplan',
     ],
@@ -851,7 +852,7 @@ export const DSGN_WRITE_UPS: CpoWriteUps = {
       'Mock-up assembled and routed with no bend below the minimum radius',
       'Connector and fiber parts released to suppliers with drawings',
     ],
-    dependsOn: ['ICD-04', 'SARC-05', 'FEAS-06', 'DSGN-12'],
+    dependsOn: ['ICD-06', 'SARC-05', 'FEAS-06', 'DSGN-12'],
     dependsNote: null,
     feedsInto: ['TINF-09', 'PKGA-04', 'PSV-07'],
     measuredBy: [
@@ -860,7 +861,7 @@ export const DSGN_WRITE_UPS: CpoWriteUps = {
       'Fiber parts released to suppliers',
     ],
     links: {
-      dependsOn: ['ICD-04', 'SARC-05', 'FEAS-06', 'DSGN-12', 'TRDY-08'],
+      dependsOn: ['ICD-06', 'SARC-05', 'FEAS-06', 'DSGN-12', 'TRDY-08'],
       feedsInto: ['TINF-09', 'PKGA-04', 'PSV-07', 'DSGN-18'],
       runsWith: ['DSGN-15'],
       revisedBy: [],
@@ -878,8 +879,8 @@ export const DSGN_WRITE_UPS: CpoWriteUps = {
       'Step 1 sets stack-up and placement. Step 2 designs the power tree while step 3 designs sequencing and fault response in parallel. Step 4 captures schematics with step 5 designing timing and synchronization distribution beside it. Step 6 runs pre-layout analysis, step 7 checks against pinout and interfaces, and step 8 releases.',
     consumes: [
       'Clock, reset and power architecture from SARC-06',
-      'Power, clock and reset interfaces from ICD-06',
-      'Package-to-board interface from ICD-05',
+      'Power, clock and reset interfaces from ICD-08',
+      'Package-to-board interface from ICD-07',
       'Package pinout and PDN from DSGN-12',
       'Die power states and rail handshakes from DSGN-03',
     ],
@@ -909,7 +910,7 @@ export const DSGN_WRITE_UPS: CpoWriteUps = {
       ['Pre-layout analysis and checks', 16],
     ],
     entry: [
-      'Power, clock and reset interfaces drafted in ICD-06',
+      'Power, clock and reset interfaces drafted in ICD-08',
       'Package pinout from the package floorplan',
       'Rail list and power states from the die designs',
     ],
@@ -918,7 +919,7 @@ export const DSGN_WRITE_UPS: CpoWriteUps = {
       'Schematic checked net by net against the package pinout with zero open mismatches',
       'Sequencing signed by the die, optical source and firmware owners',
     ],
-    dependsOn: ['SARC-06', 'ICD-06', 'ICD-05', 'DSGN-12', 'DSGN-03'],
+    dependsOn: ['SARC-06', 'ICD-08', 'ICD-07', 'DSGN-12', 'DSGN-03'],
     dependsNote: null,
     feedsInto: ['IMPL-10', 'IMPL-08', 'DSGN-16'],
     measuredBy: [
@@ -927,7 +928,7 @@ export const DSGN_WRITE_UPS: CpoWriteUps = {
       'Schematic completion',
     ],
     links: {
-      dependsOn: ['SARC-06', 'ICD-06', 'ICD-05', 'DSGN-12', 'DSGN-03'],
+      dependsOn: ['SARC-06', 'ICD-08', 'ICD-07', 'DSGN-12', 'DSGN-03'],
       feedsInto: ['IMPL-10', 'IMPL-08', 'DSGN-16', 'TINF-05', 'DSGN-18'],
       runsWith: ['MODL-06', 'DSGN-07'],
       revisedBy: [],
@@ -945,7 +946,7 @@ export const DSGN_WRITE_UPS: CpoWriteUps = {
       'Step 1 builds the budget. Step 2 designs lid and interface materials, step 3 the heat sink or cold plate, with step 4 checking optical engine and laser temperatures in parallel. Step 5 simulates the system, step 6 measures a mock-up, and step 7 releases.',
     consumes: [
       'Thermal architecture and cooling concept from SARC-07',
-      'Thermal and mechanical interfaces from ICD-07',
+      'Thermal and mechanical interfaces from ICD-09',
       'System thermal and warpage models from MODL-07',
       'Package floorplan and engine placement from DSGN-12',
       'System power model from MODL-08',
@@ -976,7 +977,7 @@ export const DSGN_WRITE_UPS: CpoWriteUps = {
     ],
     entry: [
       'Cooling concept frozen in SARC-07',
-      'Thermal and mechanical interfaces drafted in ICD-07',
+      'Thermal and mechanical interfaces drafted in ICD-09',
       'Package floorplan with engine placement available',
     ],
     exit: [
@@ -984,7 +985,7 @@ export const DSGN_WRITE_UPS: CpoWriteUps = {
       'Mock-up measurement within the agreed tolerance of simulation',
       'Switch die junction temperature within limit with margin',
     ],
-    dependsOn: ['SARC-07', 'ICD-07', 'DSGN-12'],
+    dependsOn: ['SARC-07', 'ICD-09', 'DSGN-12'],
     dependsNote: 'Thermal models in MODL-07 and the power model in MODL-08 are refined alongside this design.',
     feedsInto: ['IMPL-09', 'DSGN-18'],
     measuredBy: [
@@ -993,7 +994,7 @@ export const DSGN_WRITE_UPS: CpoWriteUps = {
       'Simulation-to-mock-up correlation error',
     ],
     links: {
-      dependsOn: ['SARC-07', 'ICD-07', 'DSGN-12', 'MODL-08'],
+      dependsOn: ['SARC-07', 'ICD-09', 'DSGN-12', 'MODL-08'],
       feedsInto: ['IMPL-09', 'SINT-06', 'DSGN-18'],
       runsWith: ['MODL-07', 'DSGN-13'],
       revisedBy: [],
@@ -1011,7 +1012,7 @@ export const DSGN_WRITE_UPS: CpoWriteUps = {
       'Step 1 builds the pipeline. Step 2 writes boot and initialization while step 3 writes link training beside it. Step 4 writes optical control with step 5 on telemetry and update in parallel. Step 6 runs on virtual platform and emulation, and step 7 releases the image.',
     consumes: [
       'Firmware, software and management architecture from SARC-08',
-      'Firmware-to-hardware interfaces from ICD-08',
+      'Firmware-to-hardware interfaces from ICD-10',
       'Virtual platform from MODL-09',
       'Optical control and calibration algorithms from DSGN-08',
       'Boot ROM and secure boot flow from DSGN-10',
@@ -1043,7 +1044,7 @@ export const DSGN_WRITE_UPS: CpoWriteUps = {
       ['Pre-silicon test and fix', 12],
     ],
     entry: [
-      'Firmware-to-hardware interfaces drafted in ICD-08',
+      'Firmware-to-hardware interfaces drafted in ICD-10',
       'Virtual platform running boot code from MODL-09',
       'Register map generated from the RTL',
     ],
@@ -1052,7 +1053,7 @@ export const DSGN_WRITE_UPS: CpoWriteUps = {
       'Secure update and rollback protection tested end to end',
       'Zero open severity-one firmware defects at release',
     ],
-    dependsOn: ['SARC-08', 'ICD-08', 'MODL-09', 'DSGN-08'],
+    dependsOn: ['SARC-08', 'ICD-10', 'MODL-09', 'DSGN-08'],
     dependsNote: null,
     feedsInto: ['PSV-09', 'PON-03', 'OBU-05'],
     measuredBy: [
@@ -1061,7 +1062,7 @@ export const DSGN_WRITE_UPS: CpoWriteUps = {
       'Weeks of firmware running before tapeout',
     ],
     links: {
-      dependsOn: ['SARC-08', 'ICD-08', 'MODL-09', 'DSGN-08', 'DSGN-10'],
+      dependsOn: ['SARC-08', 'ICD-10', 'MODL-09', 'DSGN-08', 'DSGN-10'],
       feedsInto: ['PSV-09', 'PON-03', 'OBU-05', 'DSGN-18'],
       runsWith: ['DSGN-17', 'PSV-08'],
       revisedBy: ['PSV-09'],
@@ -1079,7 +1080,7 @@ export const DSGN_WRITE_UPS: CpoWriteUps = {
       'Step 1 defines the API. Step 2 writes drivers, step 3 the SDK core, with step 4 writing management and telemetry in parallel. Step 5 integrates with the network operating system, step 6 runs on virtual platform and emulation, and step 7 releases.',
     consumes: [
       'Firmware, software and management architecture from SARC-08',
-      'Software-to-firmware interfaces from ICD-08',
+      'Software-to-firmware interfaces from ICD-10',
       'Virtual platform from MODL-09',
       'Switching feature and telemetry requirements from REQ-03',
       'Firmware interfaces from DSGN-16',
@@ -1098,7 +1099,7 @@ export const DSGN_WRITE_UPS: CpoWriteUps = {
     roles: [
       { r: 'Software', d: 'Owns the SDK, drivers and management software' },
       { r: 'Firmware engineer', d: 'Firmware interfaces and management controller' },
-      { r: 'Switch ASIC architect', d: 'Feature semantics and table formats' },
+      { r: 'Switch SoC architect', d: 'Feature semantics and table formats' },
       { r: 'Customer applications engineer', d: 'Customer API needs' },
       { r: 'Verification engineer', d: 'Emulation access' },
     ],
@@ -1119,7 +1120,7 @@ export const DSGN_WRITE_UPS: CpoWriteUps = {
       'SDK regression passing at or above the agreed rate on emulation',
       'Optical health and telemetry exposed through the management interface',
     ],
-    dependsOn: ['SARC-08', 'ICD-08', 'MODL-09'],
+    dependsOn: ['SARC-08', 'ICD-10', 'MODL-09'],
     dependsNote: null,
     feedsInto: ['PSV-09', 'SINT-02', 'SINT-05'],
     measuredBy: [
@@ -1128,7 +1129,7 @@ export const DSGN_WRITE_UPS: CpoWriteUps = {
       'API changes after release',
     ],
     links: {
-      dependsOn: ['SARC-08', 'ICD-08', 'MODL-09', 'REQ-03'],
+      dependsOn: ['SARC-08', 'ICD-10', 'MODL-09', 'REQ-03'],
       feedsInto: ['PSV-09', 'SINT-02', 'SINT-05', 'DSGN-18'],
       runsWith: ['DSGN-16'],
       revisedBy: ['PSV-09'],
@@ -1164,7 +1165,7 @@ export const DSGN_WRITE_UPS: CpoWriteUps = {
     roles: [
       { r: 'System architecture', d: 'Owns the freeze review and its decision' },
       { r: 'Program TPM', d: 'Criteria scorecard and exception tracking' },
-      { r: 'RTL design lead', d: 'Switch ASIC freeze evidence' },
+      { r: 'RTL design lead', d: 'Switch SoC freeze evidence' },
       { r: 'Photonics lead', d: 'Photonic and electrical IC freeze evidence' },
       { r: 'Verification lead', d: 'Bug trend and coverage status' },
     ],
@@ -1235,7 +1236,7 @@ export const DSGN_WRITE_UPS: CpoWriteUps = {
       'Step 1 selects the attach approach. Step 2 designs the substrate while step 3 extracts interconnect parasitics for the circuit designers in parallel. Step 4 defines the optical ports, with step 5 analyzing thermal and warpage beside it. Step 6 defines engine-level test, and step 7 releases.',
     consumes: [
       'Optical engine architecture and EIC / PIC split from SARC-03',
-      'Electrical-to-photonic interface from ICD-03',
+      'Electrical-to-photonic interface from ICD-04',
       'Package, bridge and thermal test vehicle results from FEAS-07',
       'Electrical IC pad-out and load requirements from DSGN-05',
       'Photonic IC pad-out, coupler and port positions from DSGN-06',
@@ -1266,7 +1267,7 @@ export const DSGN_WRITE_UPS: CpoWriteUps = {
       ['Engine test definition', 10],
     ],
     entry: [
-      'Electrical-to-photonic interface drafted in ICD-03',
+      'Electrical-to-photonic interface drafted in ICD-04',
       'EIC and PIC pad-outs available from DSGN-05 and DSGN-06',
       'Package, bridge and thermal test vehicle results from FEAS-07',
     ],
@@ -1275,7 +1276,7 @@ export const DSGN_WRITE_UPS: CpoWriteUps = {
       'Engine-level test flow defined that screens every lane before package attach',
       'Engine design package signed by packaging, photonics, analog and the assembly partner',
     ],
-    dependsOn: ['SARC-03', 'ICD-03', 'FEAS-07', 'DSGN-05', 'DSGN-06'],
+    dependsOn: ['SARC-03', 'ICD-04', 'FEAS-07', 'DSGN-05', 'DSGN-06'],
     dependsNote: 'The engine footprint is agreed with the package floorplan in DSGN-12 at each iteration.',
     feedsInto: ['DSGN-12', 'TINF-09', 'PKGA-04'],
     measuredBy: [
@@ -1284,7 +1285,7 @@ export const DSGN_WRITE_UPS: CpoWriteUps = {
       'Engine design changes after the package floorplan freeze',
     ],
     links: {
-      dependsOn: ['SARC-03', 'ICD-03', 'FEAS-07', 'DSGN-05', 'DSGN-06'],
+      dependsOn: ['SARC-03', 'ICD-04', 'FEAS-07', 'DSGN-05', 'DSGN-06'],
       feedsInto: ['DSGN-12', 'TINF-09', 'PKGA-04', 'PKGA-10', 'IMPL-07', 'DSGN-18'],
       runsWith: ['DSGN-12', 'DSGN-13'],
       revisedBy: [],
@@ -1302,7 +1303,7 @@ export const DSGN_WRITE_UPS: CpoWriteUps = {
       'Step 1 fixes the module form. Step 2 designs the module package while step 3 designs the optical path to the PICs in parallel. Step 4 designs the integration and interlock, step 5 defines field replacement, step 6 measures mock-ups, and step 7 releases.',
     consumes: [
       'Optical source subsystem design from DSGN-07',
-      'Photonic-to-fiber and front-panel optical interfaces from ICD-04',
+      'Photonic-to-fiber and front-panel optical interfaces from ICD-06',
       'Package and system mechanical architecture from SARC-05',
       'Serviceability requirements from REQ-07',
       'Laser coupling feasibility results from FEAS-05',
@@ -1333,7 +1334,7 @@ export const DSGN_WRITE_UPS: CpoWriteUps = {
     ],
     entry: [
       'Source architecture and redundancy approved in DSGN-07',
-      'Front-panel optical interface drafted in ICD-04',
+      'Front-panel optical interface drafted in ICD-06',
       'Serviceability requirements released in REQ-07',
     ],
     exit: [
@@ -1341,7 +1342,7 @@ export const DSGN_WRITE_UPS: CpoWriteUps = {
       'Field replacement demonstrated on a mock-up inside the replacement time target',
       'Laser safety interlock that works without firmware signed off by compliance',
     ],
-    dependsOn: ['DSGN-07', 'ICD-04', 'SARC-05', 'REQ-07'],
+    dependsOn: ['DSGN-07', 'ICD-06', 'SARC-05', 'REQ-07'],
     dependsNote: null,
     feedsInto: ['DSGN-13', 'DSGN-22', 'TINF-12', 'PKGA-05'],
     measuredBy: [
@@ -1350,7 +1351,7 @@ export const DSGN_WRITE_UPS: CpoWriteUps = {
       'Open serviceability and safety actions',
     ],
     links: {
-      dependsOn: ['DSGN-07', 'ICD-04', 'SARC-05', 'REQ-07', 'FEAS-05'],
+      dependsOn: ['DSGN-07', 'ICD-06', 'SARC-05', 'REQ-07', 'FEAS-05'],
       feedsInto: ['DSGN-13', 'DSGN-22', 'TINF-12', 'PKGA-05', 'CHAR-10', 'DSGN-18'],
       runsWith: ['DSGN-15'],
       revisedBy: [],
@@ -1365,7 +1366,7 @@ export const DSGN_WRITE_UPS: CpoWriteUps = {
       'The package bump map cannot wait for implementation, and the dies cannot know their bump plans without a floorplan. These trials break that deadlock early: they give the package a credible die size and bump plan months before the real floorplans, and they catch a die that will not fit its area or reticle while the architecture can still change.',
     ],
     flowNote:
-      'Step 1 runs trial synthesis. Step 2 floorplans the switch and I/O dies while step 3 floorplans the EIC, PIC and bridge in parallel. Step 4 derives die sizes and bump plans, step 5 iterates them with the package and die teams, and step 6 releases.',
+      'Step 1 runs trial synthesis. Step 2 floorplans the Switch SoC and I/O dies while step 3 floorplans the EIC, PIC and bridge in parallel. Step 4 derives die sizes and bump plans, step 5 iterates them with the package and die teams, and step 6 releases.',
     consumes: [
       'Microarchitecture and memory configuration from DSGN-01',
       'Die partitioning and bridge strategy from SARC-04',
@@ -1409,7 +1410,7 @@ export const DSGN_WRITE_UPS: CpoWriteUps = {
     ],
     dependsOn: ['DSGN-01', 'SARC-04', 'SARC-12', 'TRDY-03'],
     dependsNote: 'Early RTL and circuit sizes arrive from DSGN-02, DSGN-05 and DSGN-06 while the trials run.',
-    feedsInto: ['DSGN-12', 'ICD-05', 'IMPL-02'],
+    feedsInto: ['DSGN-12', 'ICD-07', 'IMPL-02'],
     measuredBy: [
       'Trial die area against allocation per die',
       'Bump plan changes after the package floorplan starts',
@@ -1417,7 +1418,7 @@ export const DSGN_WRITE_UPS: CpoWriteUps = {
     ],
     links: {
       dependsOn: ['DSGN-01', 'SARC-04', 'SARC-12', 'TRDY-03'],
-      feedsInto: ['DSGN-12', 'ICD-05', 'IMPL-02', 'DSGN-09', 'DSGN-18'],
+      feedsInto: ['DSGN-12', 'ICD-07', 'IMPL-02', 'DSGN-09', 'DSGN-18'],
       runsWith: ['DSGN-02', 'DSGN-05', 'DSGN-06'],
       revisedBy: [],
       feedsBackInto: [],
@@ -1437,7 +1438,7 @@ export const DSGN_WRITE_UPS: CpoWriteUps = {
       'Power architecture from SARC-06',
       'Thermal architecture and cooling concept from SARC-07',
       'Serviceability and environmental requirements from REQ-07',
-      'Thermal and mechanical interfaces from ICD-07',
+      'Thermal and mechanical interfaces from ICD-09',
     ],
     rel: {
       'DSGN-D21': '<b>System enclosure, power supply, fan tray and control-plane processor design package.</b> Produced here; system build, box assembly process and certification work from it.',
@@ -1467,7 +1468,7 @@ export const DSGN_WRITE_UPS: CpoWriteUps = {
     entry: [
       'Mechanical, power and cooling architecture frozen in SARC-05, SARC-06 and SARC-07',
       'Serviceability requirements released in REQ-07',
-      'Thermal and mechanical interfaces drafted in ICD-07',
+      'Thermal and mechanical interfaces drafted in ICD-09',
     ],
     exit: [
       'Power supplies carry worst-case system load with the redundancy the requirements set',
@@ -1483,7 +1484,7 @@ export const DSGN_WRITE_UPS: CpoWriteUps = {
       'Long-lead system parts ordered versus plan',
     ],
     links: {
-      dependsOn: ['SARC-05', 'SARC-06', 'SARC-07', 'REQ-07', 'ICD-07'],
+      dependsOn: ['SARC-05', 'SARC-06', 'SARC-07', 'REQ-07', 'ICD-09'],
       feedsInto: ['IMPL-10', 'TINF-17', 'SINT-06', 'CERT-04', 'DSGN-18'],
       runsWith: ['DSGN-14', 'DSGN-15', 'DSGN-20'],
       revisedBy: [],

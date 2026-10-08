@@ -7,21 +7,21 @@ export const WFAB_WRITE_UPS: CpoWriteUps = {
   'WFAB-01': {
     criticalPath: true,
     purpose: [
-      'Track the switch ASIC and I/O silicon wafers through the foundry <b>against committed cycle time, with excursions dispositioned and the engineering lot hold decided on time</b>, so wafer out is predicted weeks ahead rather than discovered on the day.',
+      'Track the Switch SoC wafers through the foundry <b>against committed cycle time, with excursions dispositioned and the engineering lot hold decided on time</b>, so wafer out is predicted weeks ahead rather than discovered on the day.',
       'This is the longest fabrication in the program and usually the first-silicon critical path. The engineering lot hold is the one decision inside it: wafers parked before the upper metals keep a metal fix possible, but only if someone decides to release or hold them before the foundry’s hold window closes.',
     ],
     flowNote:
       'Step 1 confirms starts and priority. Step 2 tracks front-end processing while step 3 reviews in-line excursions in parallel. Step 4 decides the engineering lot hold, step 5 tracks the back end and step 6 receives wafer out with WAT data.',
     consumes: [
-      'Switch ASIC mask release record from MTO-01',
-      'I/O silicon tapeout record from MTO-02',
+      'Switch SoC mask release record from MTO-01',
       'Wafer start plan and lot splits from MTO-06',
       'Foundry committed cycle time and hot-lot agreement',
+      'Engineering lot hold layer agreed with physical design',
       'Late bug reports from emulation and firmware validation in PSV-08 and PSV-09',
     ],
     rel: {
-      'WFAB-D1': '<b>Switch ASIC and I/O silicon lot tracking and wafer-out record.</b> Produced here; it carries lot history, splits, holds and excursions for every wafer.',
-      'WFAB-D6': '<b>Wafer acceptance review and first silicon release record.</b> The lot history and WAT data are the switch ASIC input to wafer acceptance.',
+      'WFAB-D1': '<b>Switch SoC lot tracking and wafer-out record.</b> Produced here; it carries lot history, splits, holds and excursions for every wafer.',
+      'WFAB-D7': '<b>Wafer acceptance review and first silicon release record.</b> The lot history and WAT data are the Switch SoC input to wafer acceptance.',
     },
     risks: [
       '<b>Cycle time slip seen late.</b> Lot position is reported only as done or not done, and a two-week delay shows up at wafer out.',
@@ -38,10 +38,10 @@ export const WFAB_WRITE_UPS: CpoWriteUps = {
       { r: 'Program TPM', d: 'Reports projected wafer out and escalates slips' },
     ],
     effort: [
-      ['Lot tracking', 3],
-      ['Excursion review', 2],
-      ['Engineering lot hold decision', 2],
-      ['Wafer-out and data receipt', 1],
+      ['Lot tracking', 2.5],
+      ['Excursion review', 1.5],
+      ['Engineering lot hold decision', 1.5],
+      ['Wafer-out and data receipt', 0.5],
     ],
     entry: [
       'Masks released and lots started per MTO-06',
@@ -53,18 +53,18 @@ export const WFAB_WRITE_UPS: CpoWriteUps = {
       'Engineering lot hold decision recorded before the hold window closed',
       'Wafer-out date within one week of the committed date or the slip escalated with a recovery plan',
     ],
-    dependsOn: ['MTO-01', 'MTO-02', 'MTO-06'],
+    dependsOn: ['MTO-01', 'MTO-06'],
     dependsNote: 'Lots start as soon as masks are released, which is inside the tapeout stage.',
-    feedsInto: ['WFAB-06', 'SORT-01'],
+    feedsInto: ['WFAB-07', 'SORT-01'],
     measuredBy: [
       'Projected wafer out against commitment, weekly',
       'In-line excursions open',
       'Engineering lots held and their decision dates',
     ],
     links: {
-      dependsOn: ['MTO-01', 'MTO-02', 'MTO-06'],
-      feedsInto: ['WFAB-06', 'SORT-01'],
-      runsWith: ['WFAB-02', 'WFAB-03'],
+      dependsOn: ['MTO-01', 'MTO-06'],
+      feedsInto: ['WFAB-07', 'SORT-01'],
+      runsWith: ['WFAB-02', 'WFAB-04'],
       revisedBy: [],
       feedsBackInto: [],
     },
@@ -73,8 +73,74 @@ export const WFAB_WRITE_UPS: CpoWriteUps = {
   'WFAB-02': {
     criticalPath: false,
     purpose: [
+      'Track the <b>I/O die wafers through their own foundry flow against committed cycle time</b> — its own mask set, its own lots and splits, its own engineering lot hold — with the SerDes device monitors reviewed so the transistors the transmitters and receivers depend on are known to be on target before the wafers reach sort.',
+      'The I/O die is a separate die from the Switch SoC, so it has its own wafer-out date and its own excursions; tracking it inside the Switch SoC lots would hide a slip until the kit for the first package build is short. Its risk is analog: a device shift that costs SerDes margin shows up in the monitors long before it shows up as a failed link.',
+    ],
+    flowNote:
+      'Step 1 confirms starts and splits. Step 2 tracks front-end processing while step 3 reviews in-line excursions and SerDes device monitors in parallel. Step 4 decides the engineering lot hold, step 5 tracks the back end and step 6 receives wafer out with WAT and device data.',
+    consumes: [
+      'I/O die tapeout record from MTO-02',
+      'Wafer start plan and lot splits from MTO-06',
+      'SerDes device parametric targets from DSGN-04',
+      'Foundry committed cycle time for the I/O die process from TRDY-01',
+      'Mixed-signal verification corners from PSV-05',
+    ],
+    rel: {
+      'WFAB-D2': '<b>I/O die lot tracking and wafer-out record with SerDes device monitors.</b> Produced here; it carries lot history, splits, holds and device monitor data for every I/O die wafer.',
+      'WFAB-D7': '<b>Wafer acceptance review and first silicon release record.</b> The I/O die lot history and parametrics are its input to wafer acceptance.',
+    },
+    risks: [
+      '<b>Slip hidden behind the Switch SoC.</b> The I/O die is reported as part of the switch lots and its own delay is seen only at kitting.',
+      '<b>Device shift unreviewed.</b> SerDes device monitors drift and nobody compares them with the transmitter and receiver design corners.',
+      '<b>Hold window missed.</b> The engineering lot passes the planned metal layer before the hold decision is made.',
+      '<b>Too few wafers.</b> Scrap on a small lot leaves too few I/O dies to pair with the Switch SoC dies in the first build.',
+      '<b>Split not run.</b> A requested corner lot is dropped and SerDes characterization loses its slow and fast corners.',
+    ],
+    roles: [
+      { r: 'Technology and foundry', d: 'Owns I/O die lot tracking and the foundry relationship' },
+      { r: 'Foundry customer engineer', d: 'Lot position, excursions and wafer-out notice' },
+      { r: 'SerDes circuit lead', d: 'Interprets device monitors against the SerDes design corners' },
+      { r: 'Manufacturing planner', d: 'I/O die wafer count against the first-build kit plan' },
+      { r: 'Program TPM', d: 'Reports projected I/O die wafer out and escalates slips' },
+    ],
+    effort: [
+      ['Lot tracking', 1.5],
+      ['Excursion and device monitor review', 1.5],
+      ['Engineering lot hold decision', 0.5],
+      ['Wafer-out and data receipt', 0.5],
+    ],
+    entry: [
+      'I/O die masks released and lots started per MTO-06',
+      'Committed cycle time received from the I/O die foundry',
+      'SerDes device parametric targets available from design',
+    ],
+    exit: [
+      'Every I/O die lot out of fab with its split condition confirmed',
+      'Engineering lot hold decision recorded before the hold window closed',
+      'SerDes device monitors within the design window or every deviation dispositioned with the SerDes team',
+    ],
+    dependsOn: ['MTO-02', 'MTO-06'],
+    dependsNote: null,
+    feedsInto: ['WFAB-07', 'SORT-02'],
+    measuredBy: [
+      'Projected I/O die wafer out against commitment, weekly',
+      'SerDes device parameters outside target',
+      'Good I/O die wafers delivered against the kit plan',
+    ],
+    links: {
+      dependsOn: ['MTO-02', 'MTO-06', 'DSGN-04'],
+      feedsInto: ['WFAB-07', 'SORT-02'],
+      runsWith: ['WFAB-01', 'WFAB-03'],
+      revisedBy: [],
+      feedsBackInto: [],
+    },
+    terms: ['WAT', 'Lot split', 'BEOL', 'SerDes'],
+  },
+  'WFAB-03': {
+    criticalPath: false,
+    purpose: [
       'Track the electrical IC wafers through their analog process <b>against cycle time, with device parametric monitors reviewed</b> so the drivers and TIAs are known to be on target before the wafers reach sort.',
-      'Electrical IC fabrication is shorter than the switch ASIC and rarely on the critical path. Its risk is parametric: a device shift that moves driver swing or TIA bandwidth appears in the monitors weeks before it appears as a failed optical link.',
+      'Electrical IC fabrication is shorter than the Switch SoC and rarely on the critical path. Its risk is parametric: a device shift that moves driver swing or TIA bandwidth appears in the monitors weeks before it appears as a failed optical link.',
     ],
     flowNote:
       'Step 1 confirms the starts. Step 2 tracks lots while step 3 reviews in-line and device parametric monitors in parallel. Step 4 receives wafer out with WAT data.',
@@ -86,8 +152,8 @@ export const WFAB_WRITE_UPS: CpoWriteUps = {
       'Device test structure positions from the reticle frame',
     ],
     rel: {
-      'WFAB-D2': '<b>Electrical IC wafer lot and parametric record.</b> Produced here.',
-      'WFAB-D6': '<b>Wafer acceptance review and first silicon release record.</b> The electrical IC parametrics are reviewed in wafer acceptance.',
+      'WFAB-D3': '<b>Electrical IC wafer lot and parametric record.</b> Produced here.',
+      'WFAB-D7': '<b>Wafer acceptance review and first silicon release record.</b> The electrical IC parametrics are reviewed in wafer acceptance.',
     },
     risks: [
       '<b>Parametric shift unnoticed.</b> Device monitors drift and nobody compares them to the driver and TIA design targets.',
@@ -120,7 +186,7 @@ export const WFAB_WRITE_UPS: CpoWriteUps = {
     ],
     dependsOn: ['MTO-03', 'MTO-06'],
     dependsNote: null,
-    feedsInto: ['WFAB-06', 'SORT-01'],
+    feedsInto: ['WFAB-07', 'SORT-03'],
     measuredBy: [
       'Wafer out against commitment',
       'Device parameters outside target',
@@ -128,14 +194,14 @@ export const WFAB_WRITE_UPS: CpoWriteUps = {
     ],
     links: {
       dependsOn: ['MTO-03', 'MTO-06'],
-      feedsInto: ['WFAB-06', 'SORT-01'],
+      feedsInto: ['WFAB-07', 'SORT-03'],
       runsWith: ['WFAB-01'],
       revisedBy: [],
       feedsBackInto: [],
     },
     terms: ['EIC', 'WAT', 'PCM'],
   },
-  'WFAB-03': {
+  'WFAB-04': {
     criticalPath: true,
     purpose: [
       'Track the photonic IC wafers and <b>measure the in-line optical monitors — waveguide propagation loss, ring resonance and coupler efficiency — while the wafers are still in the fab</b>, so a process shift is caught and dispositioned before it becomes a sort failure.',
@@ -151,8 +217,8 @@ export const WFAB_WRITE_UPS: CpoWriteUps = {
       'Photonic IC test vehicle monitor baselines from FEAS-03',
     ],
     rel: {
-      'WFAB-D3': '<b>Photonic IC in-line optical monitor report.</b> Produced here; sort and characterization use it to separate process effects from design.',
-      'WFAB-D6': '<b>Wafer acceptance review and first silicon release record.</b> The optical monitor data is the photonic input to wafer acceptance.',
+      'WFAB-D4': '<b>Photonic IC in-line optical monitor report.</b> Produced here; sort and characterization use it to separate process effects from design.',
+      'WFAB-D7': '<b>Wafer acceptance review and first silicon release record.</b> The optical monitor data is the photonic input to wafer acceptance.',
     },
     risks: [
       '<b>Monitor data not reviewed.</b> In-line loss measurements are collected by the foundry and never compared with the budget.',
@@ -186,7 +252,7 @@ export const WFAB_WRITE_UPS: CpoWriteUps = {
     ],
     dependsOn: ['MTO-04', 'MTO-06'],
     dependsNote: null,
-    feedsInto: ['WFAB-06', 'SORT-02'],
+    feedsInto: ['WFAB-07', 'SORT-04'],
     measuredBy: [
       'Propagation loss per lot against allocation',
       'Ring resonance offset against tuning range',
@@ -194,14 +260,14 @@ export const WFAB_WRITE_UPS: CpoWriteUps = {
     ],
     links: {
       dependsOn: ['MTO-04', 'MTO-06', 'MODL-04'],
-      feedsInto: ['WFAB-06', 'SORT-02', 'CHAR-03'],
+      feedsInto: ['WFAB-07', 'SORT-04', 'CHAR-03'],
       runsWith: ['WFAB-01'],
       revisedBy: [],
       feedsBackInto: ['MODL-04'],
     },
     terms: ['PIC', 'In-line optical monitor', 'Link budget', 'Lot split'],
   },
-  'WFAB-04': {
+  'WFAB-05': {
     criticalPath: false,
     purpose: [
       'Track the <b>bridge or interposer and silicon capacitor wafers</b> through their foundry, review capacitor density and leakage monitors, and plan thinning and dicing so the parts are ready when assembly starts.',
@@ -217,9 +283,9 @@ export const WFAB_WRITE_UPS: CpoWriteUps = {
       'Thinning and bumping requirements from the assembly process in TINF-09',
     ],
     rel: {
-      'WFAB-D4': '<b>Bridge / interposer and silicon capacitor wafer lot record.</b> Produced here.',
-      'WFAB-D5': '<b>First-build material receipt and incoming inspection record.</b> Bridge and capacitor dies join the first-build kit.',
-      'WFAB-D6': '<b>Wafer acceptance review and first silicon release record.</b> Bridge and capacitor WAT data is reviewed in wafer acceptance.',
+      'WFAB-D5': '<b>Bridge / interposer and silicon capacitor wafer lot record.</b> Produced here.',
+      'WFAB-D6': '<b>First-build material receipt and incoming inspection record.</b> Bridge and capacitor dies join the first-build kit.',
+      'WFAB-D7': '<b>Wafer acceptance review and first silicon release record.</b> Bridge and capacitor WAT data is reviewed in wafer acceptance.',
     },
     risks: [
       '<b>Back-end preparation forgotten.</b> Thinning, bumping and dicing are not scheduled and the wafers wait.',
@@ -252,7 +318,7 @@ export const WFAB_WRITE_UPS: CpoWriteUps = {
     ],
     dependsOn: ['MTO-05', 'MTO-06'],
     dependsNote: null,
-    feedsInto: ['WFAB-06', 'PKGA-03'],
+    feedsInto: ['WFAB-07', 'PKGA-03'],
     measuredBy: [
       'Wafer out against commitment',
       'Capacitor density and leakage against target',
@@ -260,14 +326,14 @@ export const WFAB_WRITE_UPS: CpoWriteUps = {
     ],
     links: {
       dependsOn: ['MTO-05', 'MTO-06'],
-      feedsInto: ['WFAB-06', 'PKGA-03'],
-      runsWith: ['WFAB-05'],
+      feedsInto: ['WFAB-07', 'PKGA-03'],
+      runsWith: ['WFAB-06'],
       revisedBy: [],
       feedsBackInto: [],
     },
     terms: ['Bridge', 'Interposer', 'Si capacitor', 'WAT'],
   },
-  'WFAB-05': {
+  'WFAB-06': {
     criticalPath: true,
     purpose: [
       'Make sure <b>everything else the first package build needs — optical sources, fiber assemblies, substrates, lids and thermal materials — arrives and passes incoming inspection</b> before the known-good dies are ready.',
@@ -283,7 +349,7 @@ export const WFAB_WRITE_UPS: CpoWriteUps = {
       'First-build quantities from the build matrix in PKGA-02',
     ],
     rel: {
-      'WFAB-D5': '<b>First-build material receipt and incoming inspection record.</b> Produced here; assembly starts against the kit it describes.',
+      'WFAB-D6': '<b>First-build material receipt and incoming inspection record.</b> Produced here; assembly starts against the kit it describes.',
     },
     risks: [
       '<b>Substrates late.</b> Tooling release slipped and substrate delivery lands after the known-good dies.',
@@ -333,7 +399,7 @@ export const WFAB_WRITE_UPS: CpoWriteUps = {
     },
     terms: ['Optical source', 'Fiber attach', 'Warpage', 'TIM', 'BOM'],
   },
-  'WFAB-06': {
+  'WFAB-07': {
     criticalPath: true,
     purpose: [
       'Accept the wafers from every foundry and <b>release first silicon to sort</b> — WAT and process control monitor data reviewed against the acceptance limits and against the corners the lot splits were meant to hit, out-of-limit wafers dispositioned and traceability confirmed.',
@@ -342,14 +408,14 @@ export const WFAB_WRITE_UPS: CpoWriteUps = {
     flowNote:
       'Step 1 collects the data and step 2 compares it to limits and split targets, with out-of-limit wafers dispositioned in parallel in step 3. Step 4 confirms shipment and traceability and step 5 holds the release review.',
     consumes: [
-      'Switch ASIC and I/O silicon wafer-out record from WFAB-01',
-      'Electrical IC parametric record from WFAB-02',
-      'Photonic IC in-line optical monitor report from WFAB-03',
-      'Bridge and capacitor wafer lot record from WFAB-04',
-      'Wafer start plan and split targets from MTO-06',
+      'Switch SoC wafer-out record from WFAB-01',
+      'I/O die wafer-out record and SerDes device monitors from WFAB-02',
+      'Electrical IC parametric record from WFAB-03',
+      'Photonic IC in-line optical monitor report from WFAB-04',
+      'Bridge and capacitor wafer lot record from WFAB-05',
     ],
     rel: {
-      'WFAB-D6': '<b>Wafer acceptance review and first silicon release record.</b> Produced here; it closes the First Silicon gate.',
+      'WFAB-D7': '<b>Wafer acceptance review and first silicon release record.</b> Produced here; it closes the First Silicon gate.',
     },
     risks: [
       '<b>Limits without targets.</b> Wafers pass the foundry limits but missed the split corners and nobody notices.',
@@ -372,7 +438,7 @@ export const WFAB_WRITE_UPS: CpoWriteUps = {
       ['Traceability and release', 1],
     ],
     entry: [
-      'Wafers out of fab for at least the switch ASIC and photonic IC',
+      'Wafers out of fab for at least the Switch SoC, the I/O die and the photonic IC',
       'Acceptance limits and split targets agreed',
       'Manufacturing data system ready to receive lot data',
     ],
@@ -381,18 +447,18 @@ export const WFAB_WRITE_UPS: CpoWriteUps = {
       'Split wafers confirmed at their intended corner or relabelled',
       'Traceability from wafer to lot history confirmed in the manufacturing data system',
     ],
-    dependsOn: ['WFAB-01', 'WFAB-02', 'WFAB-03', 'WFAB-04'],
+    dependsOn: ['WFAB-01', 'WFAB-02', 'WFAB-03', 'WFAB-04', 'WFAB-05'],
     dependsNote: 'The first silicon gate: every die’s fabrication feeds it.',
-    feedsInto: ['SORT-01', 'SORT-02'],
+    feedsInto: ['SORT-01', 'SORT-02', 'SORT-03', 'SORT-04'],
     measuredBy: [
       'Wafers released against wafers out',
       'Split wafers on target',
       'Wafers with traceability gaps',
     ],
     links: {
-      dependsOn: ['WFAB-01', 'WFAB-02', 'WFAB-03', 'WFAB-04', 'MTO-06', 'TINF-10'],
-      feedsInto: ['SORT-01', 'SORT-02', 'CHAR-01'],
-      runsWith: ['WFAB-05'],
+      dependsOn: ['WFAB-01', 'WFAB-02', 'WFAB-03', 'WFAB-04', 'WFAB-05', 'MTO-06', 'TINF-10'],
+      feedsInto: ['SORT-01', 'SORT-02', 'SORT-03', 'SORT-04', 'CHAR-01'],
+      runsWith: ['WFAB-06'],
       revisedBy: [],
       feedsBackInto: [],
     },

@@ -155,7 +155,7 @@ export const REQ_WRITE_UPS: CpoWriteUps = {
       'Traffic pattern assumptions for the target network tiers',
     ],
     rel: {
-      'REQ-D3': '<b>Switching feature, packet buffer, network timing and telemetry requirements.</b> Produced here; the switch ASIC architecture in SARC-01 is built against it.',
+      'REQ-D3': '<b>Switching feature, packet buffer, network timing and telemetry requirements.</b> Produced here; the Switch SoC architecture in SARC-01 is built against it.',
       'REQ-D2': '<b>CPO switch system requirements specification.</b> Latency and telemetry export rates are carried up into the system specification.',
     },
     risks: [
@@ -258,7 +258,7 @@ export const REQ_WRITE_UPS: CpoWriteUps = {
     ],
     dependsOn: ['REQ-01', 'CON-03'],
     dependsNote: 'Written before feasibility data exists, so every allocation names the assumption FEAS-03, FEAS-05 and FEAS-06 must confirm.',
-    feedsInto: ['SARC-03', 'ICD-03', 'ICD-04', 'REQ-09'],
+    feedsInto: ['SARC-03', 'ICD-04', 'ICD-06', 'REQ-09'],
     measuredBy: [
       'Link budget margin per reach class (dB)',
       'Budget allocations still assumed rather than measured',
@@ -266,7 +266,7 @@ export const REQ_WRITE_UPS: CpoWriteUps = {
     ],
     links: {
       dependsOn: ['REQ-01', 'CON-03'],
-      feedsInto: ['SARC-02', 'SARC-03', 'ICD-03', 'ICD-04', 'REQ-09', 'MODL-04', 'FEAS-03'],
+      feedsInto: ['SARC-02', 'SARC-03', 'ICD-04', 'ICD-06', 'REQ-09', 'MODL-04', 'FEAS-03'],
       runsWith: ['REQ-02', 'FEAS-01'],
       revisedBy: ['FEAS-09', 'MODL-04'],
       feedsBackInto: [],
@@ -333,7 +333,7 @@ export const REQ_WRITE_UPS: CpoWriteUps = {
     ],
     links: {
       dependsOn: ['REQ-01', 'CON-02'],
-      feedsInto: ['REQ-09', 'ICD-04', 'CERT-01', 'CERT-02', 'CERT-03', 'CERT-04'],
+      feedsInto: ['REQ-09', 'ICD-06', 'CERT-01', 'CERT-02', 'CERT-03', 'CERT-04'],
       runsWith: ['REQ-04'],
       revisedBy: ['CERT-06'],
       feedsBackInto: [],

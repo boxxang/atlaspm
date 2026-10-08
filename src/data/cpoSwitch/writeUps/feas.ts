@@ -592,7 +592,7 @@ export const FEAS_WRITE_UPS: CpoWriteUps = {
       'Decision approved by engineering and program leadership',
     ],
     dependsOn: ['FEAS-02', 'FEAS-03', 'FEAS-05', 'FEAS-07', 'FEAS-08'],
-    dependsNote: 'Confirms the interim down-select in FEAS-10 that the partition freeze in SARC-12 and the interface freeze in ICD-10 were taken on; a reversal here reopens them through change control.',
+    dependsNote: 'Confirms the interim down-select in FEAS-10 that the partition freeze in SARC-12 and the interface freeze in ICD-12 were taken on; a reversal here reopens them through change control.',
     feedsInto: ['TRDY-11', 'DSGN-06'],
     measuredBy: [
       'Technologies selected without conditions',
@@ -604,14 +604,14 @@ export const FEAS_WRITE_UPS: CpoWriteUps = {
       feedsInto: ['TRDY-11', 'MODL-10', 'DSGN-06', 'DSGN-07', 'DSGN-18'],
       runsWith: [],
       revisedBy: [],
-      feedsBackInto: ['SARC-12', 'ICD-10', 'CON-02'],
+      feedsBackInto: ['SARC-12', 'ICD-12', 'CON-02'],
     },
     terms: ['CPO', 'KPI'],
   },
   'FEAS-10': {
     criticalPath: true,
     purpose: [
-      'Take an <b>interim go, conditional or fallback call per technology on the early data</b>, so the partition freeze in SARC-12 and the interface freeze in ICD-10 are taken on named technologies with named fallbacks rather than on hope.',
+      'Take an <b>interim go, conditional or fallback call per technology on the early data</b>, so the partition freeze in SARC-12 and the interface freeze in ICD-12 are taken on named technologies with named fallbacks rather than on hope.',
       'At this point little silicon is back: the evidence is foundry process data, supplier source samples, the first fiber attach coupons and pre-silicon results of the test chips. The record states the confidence behind each call and which fallback the architecture must keep open until the final selection in FEAS-09.',
     ],
     flowNote:
@@ -657,8 +657,8 @@ export const FEAS_WRITE_UPS: CpoWriteUps = {
       'Record released at least six weeks before the partition freeze review',
     ],
     dependsOn: ['FEAS-01', 'FEAS-05', 'FEAS-06'],
-    dependsNote: 'Deliberately depends on no architecture or interface work: the partition freeze in SARC-12 and the interface freeze in ICD-10 depend on it.',
-    feedsInto: ['FEAS-09', 'SARC-12', 'ICD-10'],
+    dependsNote: 'Deliberately depends on no architecture or interface work: the partition freeze in SARC-12 and the interface freeze in ICD-12 depend on it.',
+    feedsInto: ['FEAS-09', 'SARC-12', 'ICD-12'],
     measuredBy: [
       'Interim calls later reversed by FEAS-09',
       'Technologies with no early data',
@@ -666,7 +666,7 @@ export const FEAS_WRITE_UPS: CpoWriteUps = {
     ],
     links: {
       dependsOn: ['FEAS-01', 'FEAS-02', 'FEAS-03', 'FEAS-05', 'FEAS-06', 'FEAS-07', 'TRDY-02', 'TRDY-12'],
-      feedsInto: ['FEAS-09', 'SARC-12', 'ICD-10', 'TRDY-11'],
+      feedsInto: ['FEAS-09', 'SARC-12', 'ICD-12', 'TRDY-11'],
       runsWith: ['MODL-04', 'TRDY-14'],
       revisedBy: [],
       feedsBackInto: [],

@@ -7,11 +7,13 @@ export const ICD: CpoStageModule = {
   content: {
     tagline: 'Write down every boundary in the system once, give it two owners and one version, and freeze it before design commits.',
     description:
-      'Define and control every interface in the co-packaged optics switch: die-to-die and SerDes electrical links, switch-to-I/O, electrical IC to photonic IC, optical source to photonic IC, photonic IC to fiber and front panel, die to package and package to board, power, clock and reset, thermal and mechanical boundaries, firmware to hardware and software to firmware, and the manufacturing, test and calibration data that crosses company boundaries. Each interface control document has an owner on both sides, a version and freeze criteria, and every parameter is mapped to how it will be validated — in co-simulation in PSV-07 and on silicon in CHAR-06. The stage closes on an interface freeze that baselines every ICD and hands later changes to the change control board, which PCTL-03 operates until it hands over to SUST-04.',
+      'Define and control every interface in the co-packaged optics switch, with the four product boundaries kept apart because different teams own each side: Switch SoC to I/O die over the die-to-die link, I/O die to optical engine over the electrical host lanes, electrical IC to photonic IC across the 3D stack bond for both signals and heat, and photonic IC to fiber and front panel — plus optical source to photonic IC, die to package and package to board, power, clock and reset, thermal and mechanical boundaries, firmware to hardware and software to firmware, and the manufacturing, test and calibration data that crosses company boundaries. Each interface control document has an owner on both sides, a version and freeze criteria, and every parameter is mapped to how it will be validated — in co-simulation in PSV-07 and on silicon in CHAR-06. The stage closes on an interface freeze that baselines every ICD and hands later changes to the change control board, which PCTL-03 operates until it hands over to SUST-04.',
     activities: [
       'Register and change board',
-      'Die-to-die, SerDes, host',
-      'Electrical and laser to photonic',
+      'Switch to I/O die, host',
+      'I/O die to optical engine',
+      'EIC to PIC stack',
+      'Optical source to PIC',
       'Photonic to fiber',
       'Die, package and board',
       'Power, clock, reset',
@@ -22,8 +24,10 @@ export const ICD: CpoStageModule = {
     ],
     deliverables: [
       'Interface register with owners, versioning rules and change control board charter',
-      'Die-to-die, switch-to-I/O and host processor electrical interface control document',
-      'Electrical IC-to-photonic IC and optical source-to-photonic IC interface control document',
+      'Switch SoC-to-I/O die die-to-die and host processor interface control document',
+      'I/O die-to-optical engine electrical interface control document with lane map and channel budget',
+      'Electrical IC-to-photonic IC stack interface control document — bond pad map, electrical and thermal',
+      'Optical source-to-photonic IC interface control document with safety shutdown',
       'Photonic IC-to-fiber and front-panel optical interface control document',
       'Die-to-package and package-to-board interface control document with bump and ball maps',
       'Power, clock and reset interface control document',
@@ -33,9 +37,9 @@ export const ICD: CpoStageModule = {
       'Interface validation plan — co-simulation and silicon checks per parameter',
       'Interface freeze and change control baseline package',
     ],
-    deliverableFrom: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 9],
-    deliverableWeek: [4, 18, 20, 20, 22, 20, 22, 24, 24, 26, 28],
-    engineeringEffort: [2, 11, 12, 8, 10, 6, 6, 10, 6, 4],
+    deliverableFrom: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 11],
+    deliverableWeek: [4, 18, 20, 20, 20, 20, 22, 20, 22, 24, 24, 26, 28],
+    engineeringEffort: [2, 9, 7, 9, 6, 8, 10, 6, 6, 10, 6, 4],
     risks: [
       'An interface owned by one side only, so the other side learns of changes at integration',
       'Optical interfaces frozen on supplier data sheets before the coupling test vehicle has measured anything',
@@ -92,49 +96,87 @@ export const ICD: CpoStageModule = {
         'Versioning, maturity and freeze criteria rules',
         'Interface register and change control board charter released',
       ],
-      r: [['ICD-D1', 'produces'], ['ICD-D11', 'feeds']],
+      r: [['ICD-D1', 'produces'], ['ICD-D13', 'feeds']],
     },
     'ICD-02': {
       s: [
-        [1, 'Define the die-to-die protocol, lane count, bump pitch, latency and bit-error requirements', 3],
-        [2, 'Define the switch-to-I/O and host-side SerDes electrical specifications and channel loss limits', 3],
+        [1, 'Define the Switch SoC-to-I/O die die-to-die protocol, lane count, bump pitch, latency and bit-error requirements', 3],
+        [2, 'Define the die-to-die electrical specification across the bridge — signaling, clock forwarding and channel loss limits', 3],
         [3, 'Define the host and control-plane processor interface — link type, lane count, address map, DMA and interrupt delivery', 2],
-        [4, 'Build the channel model and loss budget for each die-to-die, SerDes and host path', 3, 1],
-        [5, 'Define link training, equalization handshakes and lane-repair behavior across the interface', 3],
+        [4, 'Build the channel model and loss budget for the die-to-die and host paths', 3, 1],
+        [5, 'Define die-to-die link training, lane repair and the timing boundary between the two dies', 3],
         [6, 'Specify the electrical compliance points and test access used to validate the interface', 2],
-        [7, 'Release the die-to-die, switch-to-I/O and host processor electrical ICD', 1],
+        [7, 'Release the Switch SoC-to-I/O die die-to-die and host processor ICD', 1],
       ],
       o: [
         'Die-to-die protocol and physical parameter table',
-        'Switch-to-I/O and host SerDes electrical specification',
+        'Die-to-die electrical specification across the bridge',
         'Host processor interface definition with address map and interrupt delivery',
         'Channel model and loss budget per path',
-        'Link training, equalization and lane-repair sequence',
+        'Die-to-die link training, lane repair and timing boundary definition',
         'Compliance point and test access definition',
-        'Die-to-die, switch-to-I/O and host processor electrical ICD released',
+        'Switch SoC-to-I/O die die-to-die and host processor ICD released',
       ],
-      r: [['ICD-D2', 'produces'], ['ICD-D11', 'feeds']],
+      r: [['ICD-D2', 'produces'], ['ICD-D13', 'feeds']],
     },
     'ICD-03': {
       s: [
-        [1, 'Define the electrical IC-to-photonic IC interface — driver swing, impedance, bandwidth and interconnect type', 3],
-        [2, 'Define bias, heater and monitor photodiode signals between electrical IC and photonic IC', 2.5],
-        [3, 'Define the optical source-to-photonic IC interface — power per lane, polarization, wavelength tolerance and coupling', 3, 1],
-        [4, 'Define optical source control, monitoring and safety shutdown signals', 2.5],
-        [5, 'Allocate the combined electrical and optical budget across the interface and agree it with both sides', 3],
-        [6, 'Release the electrical-to-photonic and optical source-to-photonic ICD', 1],
+        [1, 'Map every I/O die host lane to an optical engine, lane and fiber position, with polarity and lane swaps', 2.5],
+        [2, 'Define the electrical host-lane specification between the I/O die and the electrical IC — swing, impedance, equalization range', 3],
+        [3, 'Build the package channel model and insertion loss budget from I/O die bump to engine pad', 3, 1],
+        [4, 'Define reference clock, sideband management and per-engine reset and enable signals', 2.5],
+        [5, 'Define link training, lane margining and loopback points across the boundary', 2.5],
+        [6, 'Release the I/O die-to-optical engine electrical ICD', 1],
       ],
       o: [
-        'Electrical IC-to-photonic IC electrical parameter table',
-        'Bias, heater and monitor signal definition',
-        'Optical source-to-photonic IC optical parameter table',
-        'Optical source control and safety shutdown definition',
-        'Agreed cross-interface electrical and optical budget',
-        'Electrical-to-photonic and optical source-to-photonic ICD released',
+        'Host lane-to-engine-to-fiber map with polarity and swaps',
+        'Host-lane electrical specification table',
+        'Package channel model and loss budget per lane',
+        'Reference clock, sideband, reset and enable definition',
+        'Link training, margining and loopback point definition',
+        'I/O die-to-optical engine electrical ICD released',
       ],
-      r: [['ICD-D3', 'produces'], ['ICD-D11', 'feeds']],
+      r: [['ICD-D3', 'produces'], ['ICD-D13', 'feeds']],
     },
     'ICD-04': {
+      s: [
+        [1, 'Define the electrical IC-to-photonic IC signal interface — driver swing, impedance, bandwidth and the bond interconnect it crosses', 3],
+        [2, 'Define the stack bond pad map, pitch and through-connections shared by the two dies, with power and ground per lane group', 3],
+        [3, 'Define bias, heater and monitor photodiode signals between electrical IC and photonic IC', 2.5, 1],
+        [4, 'Define the thermal interface through the stack — electrical IC heat into the photonic IC, heater crosstalk and the temperature limits of the rings', 3],
+        [5, 'Allocate the electrical and thermal budget across the bond and agree it with both die owners and the stack design', 3],
+        [6, 'Release the electrical IC-to-photonic IC stack ICD', 1],
+      ],
+      o: [
+        'Electrical IC-to-photonic IC signal parameter table',
+        'Stack bond pad map, pitch and through-connection definition',
+        'Bias, heater and monitor signal definition',
+        'Stack thermal interface and heater crosstalk limits',
+        'Agreed cross-bond electrical and thermal budget',
+        'Electrical IC-to-photonic IC stack ICD released',
+      ],
+      r: [['ICD-D4', 'produces'], ['ICD-D13', 'feeds']],
+    },
+    'ICD-05': {
+      s: [
+        [1, 'Define optical power per lane, wavelength grid and tolerance, and relative intensity noise delivered to the photonic IC', 3],
+        [2, 'Define polarization state, polarization-maintaining fiber and the coupling from the source module into the photonic IC', 3],
+        [3, 'Define source module control, bias and monitoring signals and how firmware reads them', 2, 1],
+        [4, 'Define the eye-safety interlock and safety shutdown path, with its response time', 2.5],
+        [5, 'Agree the optical power budget from source to modulator with both sides', 2.5],
+        [6, 'Release the optical source-to-photonic IC ICD', 1],
+      ],
+      o: [
+        'Optical power, wavelength and noise parameter table',
+        'Polarization and source-to-photonic coupling definition',
+        'Source control, bias and monitor signal definition',
+        'Safety interlock and shutdown path definition',
+        'Agreed source-to-modulator optical power budget',
+        'Optical source-to-photonic IC ICD released',
+      ],
+      r: [['ICD-D5', 'produces'], ['ICD-D13', 'feeds']],
+    },
+    'ICD-06': {
       s: [
         [1, 'Define photonic IC-to-fiber coupling — coupler type, mode field, alignment tolerance and coupling loss', 3],
         [2, 'Define the fiber array, fiber type, polarization handling and strain relief', 2.5],
@@ -151,9 +193,9 @@ export const ICD: CpoStageModule = {
         'Optical inspection and test point list',
         'Photonic-to-fiber and front-panel optical ICD released',
       ],
-      r: [['ICD-D4', 'produces'], ['ICD-D11', 'feeds']],
+      r: [['ICD-D6', 'produces'], ['ICD-D13', 'feeds']],
     },
-    'ICD-05': {
+    'ICD-07': {
       s: [
         [1, 'Define the die-to-package interface — bump maps, pitch, underfill and keep-out zones per die', 3],
         [2, 'Define bridge, interposer and silicon capacitor attach and their electrical interfaces', 3],
@@ -170,9 +212,9 @@ export const ICD: CpoStageModule = {
         'Board attach and rework rules',
         'Die-to-package and package-to-board ICD released',
       ],
-      r: [['ICD-D5', 'produces'], ['ICD-D11', 'feeds']],
+      r: [['ICD-D7', 'produces'], ['ICD-D13', 'feeds']],
     },
-    'ICD-06': {
+    'ICD-08': {
       s: [
         [1, 'Define every rail at the die, package and board boundary — voltage, tolerance, current and transient', 3],
         [2, 'Define reference clock interfaces — frequency, jitter, termination and distribution', 2.5],
@@ -189,9 +231,9 @@ export const ICD: CpoStageModule = {
         'VRM telemetry and control definition',
         'Power, clock and reset ICD released',
       ],
-      r: [['ICD-D6', 'produces'], ['ICD-D11', 'feeds']],
+      r: [['ICD-D8', 'produces'], ['ICD-D13', 'feeds']],
     },
-    'ICD-07': {
+    'ICD-09': {
       s: [
         [1, 'Define heat flux and temperature limits at every die, engine and optical source boundary', 3],
         [2, 'Define the lid, thermal interface material and heat sink or cold plate contact interface', 2.5],
@@ -208,9 +250,9 @@ export const ICD: CpoStageModule = {
         'Temperature sensor map and reporting definition',
         'Thermal and mechanical ICD released',
       ],
-      r: [['ICD-D7', 'produces'], ['ICD-D11', 'feeds']],
+      r: [['ICD-D9', 'produces'], ['ICD-D13', 'feeds']],
     },
-    'ICD-08': {
+    'ICD-10': {
       s: [
         [1, 'Define the register map of every die and optical engine visible to firmware', 3],
         [2, 'Define firmware control of link training, optical bias, heater tuning and calibration', 3],
@@ -227,9 +269,9 @@ export const ICD: CpoStageModule = {
         'Firmware image, update and security handshake definition',
         'Firmware and software interface specification released',
       ],
-      r: [['ICD-D8', 'produces'], ['ICD-D11', 'feeds']],
+      r: [['ICD-D10', 'produces'], ['ICD-D13', 'feeds']],
     },
-    'ICD-09': {
+    'ICD-11': {
       s: [
         [1, 'Define test access and the handshake between testers and each die and optical engine', 2.5],
         [2, 'Define calibration data content, format and storage location on the part', 2.5],
@@ -246,9 +288,9 @@ export const ICD: CpoStageModule = {
         'Cross-site data handover definition',
         'Manufacturing, test and calibration data ICD released',
       ],
-      r: [['ICD-D9', 'produces'], ['ICD-D11', 'feeds']],
+      r: [['ICD-D11', 'produces'], ['ICD-D13', 'feeds']],
     },
-    'ICD-10': {
+    'ICD-12': {
       s: [
         [1, 'Audit every ICD against its freeze criteria and the requirements it traces to', 1.5],
         [2, 'Map each interface parameter to its validation — pre-silicon co-simulation and post-silicon measurement', 1.5],
@@ -263,7 +305,7 @@ export const ICD: CpoStageModule = {
         'Interface freeze review decision record',
         'Interface freeze and change control baseline package',
       ],
-      r: [['ICD-D10', 'produces'], ['ICD-D11', 'produces']],
+      r: [['ICD-D12', 'produces'], ['ICD-D13', 'produces']],
     },
   },
 };

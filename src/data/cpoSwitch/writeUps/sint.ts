@@ -32,7 +32,7 @@ export const SINT_WRITE_UPS: CpoWriteUps = {
     ],
     roles: [
       { r: 'Validation', d: 'Owns datapath and forwarding bring-up' },
-      { r: 'Switch ASIC architect', d: 'Expected behavior and debug' },
+      { r: 'Switch SoC architect', d: 'Expected behavior and debug' },
       { r: 'Software engineer', d: 'SDK initialization' },
       { r: 'Design verification engineer', d: 'Reuse of emulation tests' },
       { r: 'Silicon debug lead', d: 'Receives datapath anomalies' },
@@ -82,7 +82,7 @@ export const SINT_WRITE_UPS: CpoWriteUps = {
       'SDK, drivers, management and telemetry software from DSGN-17',
       'Firmware and software pre-silicon validation from PSV-09',
       'Bring-up firmware image from PON-03',
-      'Firmware-to-software interfaces from ICD-08',
+      'Firmware-to-software interfaces from ICD-10',
       'Network operating system integration requirements from customers',
     ],
     rel: {
@@ -232,7 +232,7 @@ export const SINT_WRITE_UPS: CpoWriteUps = {
     ],
     roles: [
       { r: 'Validation', d: 'Owns first end-to-end traffic' },
-      { r: 'Switch ASIC architect', d: 'Expected loss and congestion behavior' },
+      { r: 'Switch SoC architect', d: 'Expected loss and congestion behavior' },
       { r: 'Software engineer', d: 'Configuration through the integrated build' },
       { r: 'Traffic test engineer', d: 'Generator and analyzer setup' },
       { r: 'Program TPM', d: 'Declares the milestone with its scope' },
