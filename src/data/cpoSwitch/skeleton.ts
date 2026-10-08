@@ -202,7 +202,7 @@ export const CPO_SKELETON: readonly CpoStageSkeleton[] = [
       a('PCTL-04', 'Configuration Management — Design Databases, Firmware, Test Programs and Bills of Materials', 'Program management', [10, 198], 'program'),
       a('PCTL-05', 'Supplier and Partner Program Reviews', 'Supply chain', [0, 198], 'program'),
       a('PCTL-06', 'Cost-of-Goods and Budget Tracking Against Target', 'Program management', [16, 198], 'program'),
-      a('PCTL-07', 'Change Control Handover to Sustaining', 'Quality', [190, 198], 'program'),
+      a('PCTL-07', 'Change Control Handover to Sustaining', 'Quality', [194, 198], 'program'),
     ],
   },
 
@@ -404,7 +404,7 @@ export const CPO_SKELETON: readonly CpoStageSkeleton[] = [
       a('SGNO-10', 'Tapeout Wave 2 Readiness Review — Switch SoC, I/O Die, Bridge and Silicon Capacitors', 'Program management', [12, 16], 'program'),
       a('SGNO-11', 'Main Package and Engine Substrate and RDL Tooling Release to Suppliers', 'Packaging', [8, 16], 'package'),
       a('SGNO-12', 'Optical Engine Stack Cross-Die Signoff — Bond Pad Alignment, Coupler Placement and Engine Substrate Check', 'Packaging', [0, 9], 'oe'),
-      a('SGNO-13', 'End-to-End Link Budget Signoff on Extracted Views — I/O Die, Main Package, Engine Substrate, Electrical IC, Photonic IC and Fiber', 'SI/PI', [2, 9], 'system'),
+      a('SGNO-13', 'End-to-End Link Budget Signoff on Extracted Views — I/O Die, Main Package, Engine Substrate, Electrical IC, Photonic IC and Fiber', 'SI/PI', [2, 15], 'system'),
     ],
   },
 
@@ -683,7 +683,7 @@ export const CPO_SKELETON: readonly CpoStageSkeleton[] = [
       a('RELQ-05', 'System-Level Reliability, Environmental Testing and Failure-Rate Prediction', 'Reliability', [28, 50], 'system'),
       a('RELQ-06', 'Qualification Report and Approval', 'Quality', [58, 64], 'program'),
       a('RELQ-07', 'Delta Qualification on the Production Stepping', 'Reliability', [48, 62], 'switch'),
-      a('RELQ-08', 'Optical Engine Stack Qualification — Bond Interface, Coupling Stability and Thermal Cycling', 'Reliability', [2, 28], 'oe'),
+      a('RELQ-08', 'Optical Engine Stack Qualification — Bond Interface, Coupling Stability and Thermal Cycling', 'Reliability', [4, 30], 'oe'),
     ],
   },
   {

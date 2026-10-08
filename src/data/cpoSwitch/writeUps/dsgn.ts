@@ -1063,7 +1063,7 @@ export const DSGN_WRITE_UPS: CpoWriteUps = {
     ],
     links: {
       dependsOn: ['SARC-08', 'ICD-10', 'MODL-09', 'DSGN-08', 'DSGN-10'],
-      feedsInto: ['PSV-09', 'PON-03', 'OBU-05', 'DSGN-18'],
+      feedsInto: ['PSV-09', 'PON-03', 'OBU-05', 'DSGN-18', 'OEB-06'],
       runsWith: ['DSGN-17', 'PSV-08'],
       revisedBy: ['PSV-09'],
       feedsBackInto: [],

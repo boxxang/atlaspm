@@ -122,13 +122,15 @@ export const OEB: CpoStageModule = {
     'OEB-04': {
       s: [
         [1, 'Load substrate-attached engines in the active alignment station with their pre-attach optical data', 0.5],
-        [2, 'Actively align and attach the fiber array or coupler block and cure', 1.5],
-        [3, 'Measure coupling loss per lane after cure and after the final engine thermal step', 1],
-        [4, 'Inspect and clean every fiber end face to the handling standard and log the result', 0.5, 1],
-        [5, 'Release fiber-attached engines to engine-level test with their per-lane coupling loss record', 0.5],
+        [2, 'Clean and inspect the photonic IC edge-coupler facets after stacking, underfill and substrate attach, and reject damaged facets', 0.5],
+        [3, 'Actively align and attach the fiber array or coupler block and cure', 1.5],
+        [4, 'Measure coupling loss per lane after cure and after the final engine thermal step', 1],
+        [5, 'Inspect and clean every fiber end face to the handling standard and log the result', 0.5, 1],
+        [6, 'Release fiber-attached engines to engine-level test with their per-lane coupling loss record', 0.5],
       ],
       o: [
         'Engines loaded with pre-attach optical data',
+        'Facet clean and inspection record per engine',
         'Fiber arrays aligned, attached and cured',
         'Per-lane coupling loss after cure and thermal steps',
         'End-face inspection log per fiber',

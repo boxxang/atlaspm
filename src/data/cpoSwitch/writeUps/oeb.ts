@@ -210,7 +210,7 @@ export const OEB_WRITE_UPS: CpoWriteUps = {
       'Coupling loss is spent once and never recovered. A tenth of a decibel lost to alignment drift during cure comes straight out of the link margin, so this step records the loss of every lane on every engine — the first real data the optical budget sees, and the number engine test, the main package and optical bring-up all read.',
     ],
     flowNote:
-      'Step 1 loads the engines, step 2 aligns and attaches the fiber and step 3 measures loss after cure and after the final engine thermal step, while step 4 inspects and cleans every end face. Step 5 releases the engines with their record.',
+      'Step 1 loads the engines and step 2 cleans and inspects the edge-coupler facets, which have been through stacking, underfill and substrate attach since dicing. Step 3 aligns and attaches the fiber and step 4 measures loss after cure and after the final engine thermal step, while step 5 inspects and cleans every end face. Step 6 releases the engines with their record.',
     consumes: [
       'Substrate-attached engines from OEB-03',
       'Fiber coupling and alignment structure design from OESD-03',
@@ -347,7 +347,7 @@ export const OEB_WRITE_UPS: CpoWriteUps = {
       'First tested engines from OEB-05',
       'Optical control, tuning and calibration algorithms from DSGN-08',
       'Optical test fixtures from TINF-03',
-      'Bring-up firmware and diagnostics from PKGA-10',
+      'Optical control firmware and bench diagnostics from DSGN-16',
       'Photonic and electrical IC models from MODL-05',
     ],
     rel: {
@@ -385,7 +385,7 @@ export const OEB_WRITE_UPS: CpoWriteUps = {
       'Calibration algorithms converged on the engine with results compared with the models',
       'Engine behavior measured across the operating temperature range and reported to optical bring-up',
     ],
-    dependsOn: ['OEB-05', 'PKGA-10', 'DSGN-08'],
+    dependsOn: ['OEB-05', 'DSGN-16', 'DSGN-08'],
     dependsNote: null,
     feedsInto: ['OBU-02', 'OBU-03', 'OBU-04'],
     measuredBy: [
@@ -394,7 +394,7 @@ export const OEB_WRITE_UPS: CpoWriteUps = {
       'Weeks of lead over system optical bring-up',
     ],
     links: {
-      dependsOn: ['OEB-05', 'PKGA-10', 'DSGN-08', 'TINF-03', 'MODL-05'],
+      dependsOn: ['OEB-05', 'DSGN-16', 'DSGN-08', 'TINF-03', 'MODL-05'],
       feedsInto: ['OBU-02', 'OBU-03', 'OBU-04', 'OBU-06', 'OEB-07', 'OEB-09'],
       runsWith: [],
       revisedBy: [],

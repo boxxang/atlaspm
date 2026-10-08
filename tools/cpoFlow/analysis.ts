@@ -171,9 +171,10 @@ export const deliverableUse = () =>
 /**
  * The critical path by the dependency logic alone: a forward pass that starts
  * every activity as early as its waits allow — after a finish-to-start
- * predecessor finishes; for an overlap, no earlier than the template's lead
- * after the predecessor starts, and for a finish-to-finish one also late
- * enough to finish after it — with each activity keeping its template length. The schedule's padding falls out; what is left is the
+ * predecessor finishes; for an overlap, no earlier than a positive lead the
+ * template gives it after the predecessor starts (and, for finish-to-finish,
+ * late enough to finish after it) — with each activity keeping its template
+ * length. The schedule's padding falls out; what is left is the
  * chain of waits the production date cannot be earlier than.
  */
 export const cpm = () => {
@@ -191,11 +192,14 @@ export const cpm = () => {
     for (const x of predecessorsOf(y)) {
       const k = edgeKind(x, y);
       const ex = visit(x);
-      /* an overlap keeps the lead the template gives it: the consumer starts no
-         sooner after the producer starts than it does in the template — the
-         first lot has to come through before the next step can begin */
-      const lead = ex + (absStart(y) - absStart(x));
-      const t = k === 'FS' ? ex + dur(x) : k === 'FF' ? Math.max(ex + dur(x) - dur(y), lead) : lead;
+      /* an overlap keeps a positive lead the template gives it — the first lot
+         has to come through one step before the next can begin. Where the
+         template starts the consumer first, it only has to finish after its
+         producer has started. The template's own dates always satisfy these,
+         so the logic can only come out earlier, never later. */
+      const lead = absStart(y) - absStart(x);
+      const start = lead > 0 ? ex + lead : ex - dur(y);
+      const t = k === 'FS' ? ex + dur(x) : k === 'FF' ? Math.max(ex + dur(x) - dur(y), start) : start;
       if (t > best || (t === best && driver === null)) {
         best = Math.max(best, t);
         driver = x;
@@ -240,7 +244,9 @@ export const cpm = () => {
         const lsy = lfy - dur(y);
         const lead = absStart(y) - absStart(x);
         const k = edgeKind(x, y);
-        const t = k === 'FS' ? lsy : k === 'FF' ? Math.min(lfy, lsy - lead + dur(x)) : lsy - lead + dur(x);
+        /* the forward pass's start bound, solved for the producer's finish */
+        const startBound = lead > 0 ? lsy - lead + dur(x) : lsy + dur(y) + dur(x);
+        const t = k === 'FS' ? lsy : k === 'FF' ? Math.min(lfy, startBound) : startBound;
         best = best === undefined ? t : Math.min(best, t);
       }
       if (best !== undefined) lf.set(x, best);

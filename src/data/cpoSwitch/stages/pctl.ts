@@ -173,10 +173,10 @@ export const PCTL: CpoStageModule = {
     },
     'PCTL-07': {
       s: [
-        [1, 'Audit open change requests, waivers, risks and configuration baselines for handover', 2],
-        [2, 'Transfer change control procedures, board membership and tools to quality in sustaining', 2],
+        [1, 'Audit open change requests, waivers, risks and configuration baselines for handover', 1],
+        [2, 'Transfer change control procedures, board membership and tools to quality in sustaining', 1.5, 1],
         [3, 'Hold the handover review with program, quality and sustaining owners', 1.5],
-        [4, 'Release the change control handover package', 1],
+        [4, 'Release the change control handover package', 0.5],
       ],
       o: [
         'Handover audit of open items and baselines',

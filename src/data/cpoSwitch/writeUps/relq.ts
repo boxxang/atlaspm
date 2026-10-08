@@ -527,7 +527,7 @@ export const RELQ_WRITE_UPS: CpoWriteUps = {
       'Every failure dispositioned with bond or coupling root cause and the report approved',
     ],
     dependsOn: ['RELQ-01', 'OEB-09', 'OEB-05', 'OESD-07'],
-    dependsNote: 'Stressing starts in week 144 on the first known-good engines out of the optical engine build, before the main package is qualified and while the first package build is still being assembled — the stack is the newest reliability risk in the product, so it gets the longest head start.',
+    dependsNote: 'Stressing starts in week 146, as the qualification plan is released, on the first known-good engines out of the optical engine build, before the main package is qualified and while the first package build is still being assembled — the stack is the newest reliability risk in the product, so it gets the longest head start.',
     feedsInto: ['RELQ-06'],
     measuredBy: [
       'Engines through each stress readpoint versus plan',

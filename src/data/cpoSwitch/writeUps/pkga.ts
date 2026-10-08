@@ -449,7 +449,7 @@ export const PKGA_WRITE_UPS: CpoWriteUps = {
       'Systems delivered to each bring-up lab per the allocation in the build matrix',
       'Known-issue list for every unit and board released with the systems',
     ],
-    dependsOn: ['IMPL-10', 'PKGA-06'],
+    dependsOn: ['IMPL-10', 'PKGA-06', 'PKGA-11'],
     dependsNote: 'Board work in steps 1 to 3 starts before package test finishes; mounting waits for binned units.',
     feedsInto: ['PON-01', 'PON-02'],
     measuredBy: [
@@ -659,7 +659,7 @@ export const PKGA_WRITE_UPS: CpoWriteUps = {
     ],
     links: {
       dependsOn: ['PSV-09', 'DSGN-16', 'DSGN-17', 'MTO-01', 'PSV-08'],
-      feedsInto: ['PON-03', 'SINT-01', 'SINT-02', 'OBU-05', 'PKGA-09', 'OEB-06'],
+      feedsInto: ['PON-03', 'SINT-01', 'SINT-02', 'OBU-05', 'PKGA-09'],
       runsWith: [],
       revisedBy: [],
       feedsBackInto: [],

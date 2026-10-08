@@ -808,7 +808,7 @@ export const SGNO_WRITE_UPS: CpoWriteUps = {
       'Every piece of the link signs off on its own, and the co-simulation in PSV-07 ran on pre-layout models of all of them. Nothing else puts the extracted package, engine substrate and both optical engine dies in one channel before the masks are ordered, so a lane can be clean in every report and still short of margin end to end. This check feeds both readiness reviews, because wave 1 commits the optical dies and wave 2 commits the I/O die and package on the other side of the same lanes.',
     ],
     flowNote:
-      'Step 1 collects every extracted view and step 2 assembles the per-lane channel. Step 3 simulates the electrical side while step 4 computes the optical budget in parallel. Step 5 compares each lane with the budget and returns short lanes to their owners, and step 6 releases the report to both readiness reviews.',
+      'The check runs in two passes. Steps 1 to 5 run on the final optical engine dies and engine substrate with interim I/O die and package extractions: step 1 collects the views and step 2 assembles the channel, step 3 simulates the electrical side while step 4 computes the optical budget in parallel, and step 5 releases the wave 1 signoff by week 97. Steps 6 to 8 re-extract with the final I/O die, main package and SI / PI closure views, re-run every lane and release the final report to the wave 2 review by week 103.',
     consumes: [
       'I/O die post-layout SerDes and bump models from IMPL-03',
       'Electrical IC and photonic IC post-layout models from IMPL-04 and IMPL-05',
@@ -852,7 +852,7 @@ export const SGNO_WRITE_UPS: CpoWriteUps = {
       'Report released to the wave 1 and wave 2 readiness reviews',
     ],
     dependsOn: ['IMPL-03', 'IMPL-04', 'IMPL-05', 'IMPL-07', 'IMPL-08', 'OESD-02'],
-    dependsNote: 'It runs on the views as layout closes, so it starts before the last layout has finished and ends on the final ones.',
+    dependsNote: 'Two passes: the wave 1 pass closes on the final electrical IC, photonic IC and engine substrate views with interim I/O die and package extractions, and the final pass re-runs every lane on the final I/O die, main package and SI / PI closure views from IMPL-03, IMPL-07 and IMPL-08 before the wave 2 review.',
     feedsInto: ['SGNO-09', 'SGNO-10'],
     measuredBy: [
       'Lanes in margin end to end',

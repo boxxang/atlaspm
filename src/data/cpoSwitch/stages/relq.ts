@@ -22,7 +22,7 @@ export const RELQ: CpoStageModule = {
       'Optical engine stack qualification report — bond interface, coupling stability and thermal cycling',
     ],
     deliverableFrom: [0, 1, 2, 3, 4, 5, 6, 5, 7],
-    deliverableWeek: [4, 46, 50, 48, 50, 64, 62, 64, 28],
+    deliverableWeek: [4, 46, 50, 48, 50, 64, 62, 64, 30],
     engineeringEffort: [4, 18, 30, 26, 20, 5, 14, 16],
     risks: [
       'Optical source aging too slow to finish before production release, leaving lifetime extrapolated from short data',

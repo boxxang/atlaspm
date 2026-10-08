@@ -136,7 +136,7 @@ export const SORT: CpoStageModule = {
     'SORT-05': {
       s: [
         [1, 'Set interim electrical and photonic IC known-good limits from the first-lot data and the engine link budget', 0.5],
-        [2, 'Dice the photonic wafers with edge-coupler facet preparation and inspection, and singulate the electrical IC wafers', 1],
+        [2, 'Dice the photonic wafers with first edge-coupler facet preparation, and singulate the electrical IC wafers', 1],
         [3, 'Set aside electrical and photonic IC dies across the bins for die-level characterization and reliability', 0.5, 1],
         [4, 'Pair photonic and electrical IC dies by bin into stack kits per the optical engine build matrix', 0.5],
         [5, 'Pick and pack the paired dies with per-die traceability and reconcile the kits against the engine build plan', 0.5],
@@ -144,7 +144,7 @@ export const SORT: CpoStageModule = {
       ],
       o: [
         'Interim electrical and photonic IC known-good limits',
-        'Diced photonic dies with inspected edge-coupler facets and singulated electrical ICs',
+        'Diced photonic dies with prepared edge-coupler facets and singulated electrical ICs',
         'Characterization and reliability die set-aside list',
         'Bin-paired stack kits',
         'Packed, traceable and reconciled stack kits',

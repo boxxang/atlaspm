@@ -182,7 +182,7 @@ export const PKGA: CpoStageModule = {
         [1, 'Receive fabricated validation boards and inspect them', 1],
         [2, 'Assemble board components and run board-level electrical checks without the package', 3],
         [3, 'Bring up board rails and the management controller on a thermal or dummy package', 3],
-        [4, 'Mount packaged units on validation boards with their thermal solution', 2],
+        [4, 'Mount the electrical-only packages from PKGA-11 first, then fully built units as package test releases them, with their thermal solution', 2],
         [5, 'Integrate fiber routing, front-panel connectors and cooling into bring-up systems', 2],
         [6, 'Allocate systems to bring-up labs and release them with the known-issue list', 1],
       ],

@@ -83,20 +83,30 @@ build, and the weeks are set so that it is the critical path:
   - **finish-to-finish** where the two overlap and the producer finishes first;
   - **start-to-start on an interim output** where the producer outlasts the
     consumer.
-- An overlap also keeps the template's lead from the producer's start to
-  the consumer's start, because the first lot has to come through one step
-  before the next can begin.
+- An overlap keeps a **positive** lead the template gives it, from the
+  producer's start to the consumer's start, because the first lot has to come
+  through one step before the next can begin.
+- Where the template starts the consumer first, the consumer only has to
+  finish after its producer has started. The template's own dates always
+  satisfy every constraint, so the logic can come out earlier than the
+  template but never later.
 - A forward pass gives each activity its earliest start. A backward pass from
   an end activity gives its **total float** against that end; zero float means
   it is on a critical path.
 
-The first version of this model let an overlapping step start the moment
-its predecessor finished. That collapsed the serial engine build (stacking,
-substrate attach, fiber attach, test — the same units in sequence) to almost
-nothing, and showed the program finishing 19 weeks early. The independent
-review (V7, #1) caught it. Keeping the lead fixes it: the logic now finishes
-at the template's dates, W148 for the first build and W218 for production,
-so the template carries no hidden padding on these paths.
+**How the model got here.** It took three versions:
+
+1. The first version let an overlapping step start as soon as its
+   predecessor finished. That collapsed the serial engine build (stacking,
+   substrate attach, fiber attach and test, run on the same units in
+   sequence) to almost nothing, and showed the program finishing 19 weeks
+   early. The first review caught this (V7, #1).
+2. The second version kept every lead, negative ones included. That forced
+   zero float onto almost every overlapping chain, so the result was true by
+   construction. The second review caught this (#3).
+3. The current version keeps only positive leads. The logic finishes the first
+   build at W148, the template's date, and production at W216, two weeks
+   before the template's W218.
 
 **Into the first package build** (PKGA-06), the driving chain is:
 
@@ -109,43 +119,47 @@ so the template carries no hidden padding on these paths.
 | **OEB-02 stacking → OEB-03 → OEB-04 → OEB-05 engine test → OEB-09 KG-OE** | FS / FF |
 | **PKGA-04 OE mounting → PKGA-06 package test** | FS |
 
-**Total float**
+**Total float** (weeks; the appendix has every activity)
 
-| Path | Into the first package build | Into production release |
+| Path | Into the first package build (W148) | Into production release (W218) |
 |---|---|---|
-| OE: OTO-02 → WFAB-04/08 → SORT-04/05 → OEB-02…09 → PKGA-04 | **0** | **0** |
-| Switch SoC: WFAB-01 → SORT-01 → SORT-07 → PKGA-03 | **2 weeks** | 0, through the first electrical link |
-| I/O die: MTO-02 → WFAB-02 → SORT-02 | **4 weeks** | 2 weeks |
+| OE: OTO-02 → WFAB-04/08 → SORT-04/05 → OEB-02…09 → PKGA-04 → PKGA-06 | **0** | 2 |
+| Switch SoC: MTO-01 → WFAB-01 → SORT-01 → SORT-07 → PKGA-03 | **2** | **0**, through the electrical-only build, the first electrical link and the stepping |
+| I/O die: MTO-02 → WFAB-02 → SORT-02 | **4** | 2 |
 
-Unit tests check this. The test "sets the first package build by the photonic
-IC and optical engine path" asserts:
+The unit test "sets the first package build by the photonic IC and optical
+engine path" checks three things:
 
-- the OE path has zero float into both PKGA-06 and RAMP-07;
-- the Switch SoC and I/O die fab and die attach have positive float into the
-  build;
-- the chain into PKGA-06 runs through OTO-02, WFAB-04, SORT-04, OEB-02, OEB-09
-  and PKGA-04.
+- the OE path has zero float into PKGA-06;
+- the Switch SoC and I/O die tapeout, fab and die attach have positive float
+  into PKGA-06;
+- the OE path stays within four weeks of critical into production, and the
+  chain into PKGA-06 runs through OTO-02, WFAB-04, SORT-04, OEB-02, OEB-09 and
+  PKGA-04.
 
-**Into production release** (RAMP-07), the OE path is critical, and so is a
-second chain:
+**Into production release, the Switch SoC is critical, not the optics.**
 
-- **The chain.** It runs from Switch SoC tapeout (MTO-01) through the
-  bring-up firmware on the final netlist (PKGA-10) and the bring-up labs
-  (PKGA-09). From there it goes through power-on on the electrical-only build
-  (PON), anomaly triage and containment (SDBG-01/03), and the NPI builds
-  (EVT → golden units → PVT → readiness). It ends at the release review.
-- **Why.** Production is gated by the NPI cadence and the production stepping
-  as much as by first optics. That is the right reading for a first-of-a-kind
-  switch.
-- **No change needed.** The template has no padding on that chain either, so
-  any slip on it moves production one for one.
+- **The chain.** It runs Switch SoC tapeout (MTO-01) → fab → sort → die bank
+  → electrical-only build (PKGA-11) → first power-on (PON-02) and anomaly
+  intake (PON-06). It continues through triage and containment (SDBG-01/03),
+  then the NPI builds: EVT, golden units and factory calibration, PVT and the
+  readiness review. It ends with the ramp plan and the release review.
+- **The OE path has 2 weeks of float** to production.
+- **Why.** Production is gated by the electrical silicon's learning loop —
+  power-on, anomalies, containment, and the NPI builds — more than by first
+  optics.
+- **The intended axis holds up to the first build.** After that, the
+  Switch SoC learning loop is critical. That is the right reading for a
+  first-of-a-kind switch, so no schedule change is made. The 2 weeks the logic
+  finishes ahead of the template (W216 against W218) are the only padding on
+  the path to release.
 
 **Thin slack.** Two weeks on the Switch SoC path into the first build is
-thin. A Switch SoC fab slip of more than two weeks makes the electrical
-silicon critical again. The alternative would be to push wave 2 earlier,
-into the signoff of a design six weeks less mature. The electrical-only
-build (PKGA-11) and the daisy-chain dry run (PKGA-12) protect the schedule:
-neither waits on an OE, and power-on starts on PKGA-11.
+thin. A Switch SoC slip of more than two weeks moves the first package build,
+and every Switch SoC slip moves production. The alternative would be to push
+wave 2 earlier, into the signoff of a design six weeks less mature. The
+electrical-only build (PKGA-11) and the daisy-chain dry run (PKGA-12) protect
+the schedule: neither waits on an OE, and power-on starts on PKGA-11.
 
 **Program length:** W262 → W266 (+4). Production release W214 → W218 (+4).
 
@@ -232,7 +246,7 @@ deliberate:
      assembly;
    - the wave 2 review closes before wave 2 tapes out;
    - a post-layout end-to-end link signoff (SGNO-13) was added;
-   - OE qualification starts at W144;
+   - OE qualification starts at W146;
    - bridge fab follows its mask release;
    - PCTL runs to production release.
 
@@ -354,7 +368,7 @@ Known-Good Optical Engines Ready.
 | EIC/PIC KGD release to KG-OE | 14 weeks (W126–140): stack 4, substrate 3, fiber 4, test 5, overlapped | 10–16 weeks for a first engineering lot of a stacked engine with active fiber alignment | OK |
 | KGD to first package build | 16 weeks (W132–148) | 4–8 weeks for a 2.5D package alone | Long by design. The engines are the pacing input, and the Switch SoC/I/O die attach finishes at W138. |
 | First silicon to first package build | 26 weeks | 16–30 weeks for a co-packaged first build | OK |
-| OE qualification (RELQ-08) | 26 weeks (W144–170), starting on the first known-good engines | 3–6 months: temperature cycling, damp heat and biased operating life with coupling-loss read points | OK |
+| OE qualification (RELQ-08) | 26 weeks (W146–172), starting on the first known-good engines | 3–6 months: temperature cycling, damp heat and biased operating life with coupling-loss read points | OK |
 | Qualification stage | 64 weeks (W142–206): the plan and OE qual start early, while silicon and system qual keep their weeks, followed by delta qual on the production stepping | 6–12 months for the silicon and system qualification itself | OK |
 
 **Owner load** (the full table is in the appendix)
@@ -387,36 +401,55 @@ done.
 
 | # | Severity | Finding | Done |
 |---|---|---|---|
-| 1 | High | The critical-path model let serial steps on the same units (stacking → substrate → fiber → test) overlap to nothing. It understated the OE path and showed 19 weeks of padding that does not exist. | **Fixed.** Overlaps now keep the template's lead (first lot through), and total float comes from a backward pass. The logic now finishes at the template's dates. V5 was rewritten. |
+| 1 | High | The critical-path model let serial steps on the same units (stacking → substrate → fiber → test) overlap to nothing. It understated the OE path and showed 19 weeks of padding that does not exist. | **Fixed.** Overlaps now keep the template's positive lead (first lot through), and total float comes from a backward pass. The second review corrected the rule again (see below). V5 was rewritten. |
 | 2 | High | No post-fab step: bumping, thinning, through-via reveal, dicing, facet prep. The bonding format is not stated. | **Fixed.** New WFAB-08 (PIC bumping, through-oxide-via reveal and bond-surface prep, W117–120); the PIC fab is now 15 weeks. Switch SoC and I/O die bumping is stated to run in-line at the foundry back end. SORT-05 now dices the PIC and prepares edge-coupler facets. OESD-01 records the bonding format decision (die-to-die at the assembly partner, or EIC dies to PIC wafers) and where thinning, reveal and dicing sit in each. |
-| 3 | High | The electrical-only build did not pull power-on earlier: PON waited on full-build package test. | **Fixed.** PON starts at W140 on PKGA-11 units. PON-02 no longer waits on PKGA-06. The first electrical link is at W150; optical bring-up still waits for the full build. |
+| 3 | High | The electrical-only build did not pull power-on earlier: PON waited on full-build package test. | **Fixed** (finished in the second review). PON starts at W140 on PKGA-11 units, and no PON activity waits on PKGA-06, directly or through PKGA-07: PKGA-07 boards the electrical-only packages first. The first electrical link is at W150; optical bring-up still waits for the full build. |
 | 4 | High | The owner-load text contradicted the appendix, and TRDY-15 was moved to Supply chain only to improve the number. | **Fixed.** TRDY-15 is back with Packaging. V6 now reports the real peak (8 activities, W34–44) as a staffing flag. |
 | 5 | High | The bond pad map had two owners (ICD-04 and OESD-01), and OESD-01 was still changing it after the interface freeze. | **Fixed.** ICD-04 owns the pad map and signal assignment; changes after the freeze go through PCTL-03. OESD-01 consumes ICD-D4 and does only the physical bond-interface design. |
 | 6 | High | The OE stack design froze after the EIC/PIC layouts it was meant to constrain, so the "hand-off" was an overlap. | **Fixed.** OESD now runs W30–66, and the freeze (OESD-07) ends at W66, when IMPL-04/05 start: a finish-to-start relation. OESD-07 no longer depends on layout. SGNO-12 is the post-layout cross-die check. |
 | 7 | Medium | Wave 2 taped out before its readiness review closed. | **Fixed.** SGNO-10 now runs W100–104 and SGNO ends at W104, when MTO starts. |
-| 8 | Medium | Only the Switch SoC had a stepping path. A PIC or EIC re-spin, which forces an OE rebuild, was not planned. | **Partly fixed.** SDBG-04 decides per die. SDBG-05/07 cover the die that changes, and an optical-die change plans an OE rebuild lane through OEB (SDBG-07 now depends on OEB-01). No separate per-die stepping activities were added: SDBG is not part of this change, and the decision and its lanes now cover every die. |
+| 8 | Medium | Only the Switch SoC had a stepping path. A PIC or EIC re-spin, which forces an OE rebuild, was not planned. | **Not fixed — risk accepted** (re-classified in the second review). A PIC or EIC re-spin decided at SDBG-04 adds about 15 weeks of PIC fab, 3 of post-fab, about 6 of sort and KGD and about 14 of engine rebuild: production would move by roughly 16–20 weeks. No rebuild lane is scheduled, because the template plans the likely case. What is in place: SDBG-04 decides per die, and SDBG-05/07 describe re-spinning whichever die changes. For an optical die, they describe re-entering the engine build through OEB (SDBG-07 links to OEB-01). The time that would cost is not in the schedule. |
 | 9 | Medium | Verification and DFT covered the Switch SoC only. | **Fixed in scope.** DSGN-11, IMPL-11, PSV-03, PSV-04 and PSV-10 now name the I/O die controller logic (full-chip simulation, formal/CDC, gate-level simulation, ATPG) and the EIC's scan and test access. Item tags are unchanged, since the primary owner is still the Switch SoC team. |
-| 10 | Medium | No end-to-end link signoff on post-layout (extracted) views before tapeout. | **Fixed.** New SGNO-13 (W90–97) checks the extracted budget from the I/O die through the main package, engine substrate, EIC and PIC to the fiber. It feeds both wave reviews. |
+| 10 | Medium | No end-to-end link signoff on post-layout (extracted) views before tapeout. | **Fixed.** New SGNO-13 (W90–103, two passes: wave 1 on final EIC/PIC/engine-substrate views by W97, then wave 2 on the final I/O die and package views by W103) checks the extracted budget from the I/O die through the main package, engine substrate, EIC and PIC to the fiber. It feeds both wave reviews. |
 | 11 | Medium | Fiber is attached before mounting, with no retest after mounting and no screen before committing a main package. | **Fixed.** OESD-03 decides between a pigtail and a detachable connector, with reflow, underfill and board heat as the criteria. OEB-05 adds an engine stress screen (temperature cycles with a coupling-loss re-read). PKGA-06's optical test is the retest after mounting, with OEB-08/TINF-16 handling replacement and rework. |
-| 12 | Medium | The external laser was integrated in the package build, and package test depended on it. | **Fixed.** PKGA-06 runs optical test on a lab reference laser and depends only on PKGA-04. PKGA-05 connects the front-panel source modules on the validation systems and feeds PKGA-07. |
-| 13 | Medium | OE qualification started 24 weeks after known-good engines existed. | **Fixed.** RELQ now starts at W142. RELQ-08 runs W144–170 on the first known-good engines; the other RELQ activities keep their weeks. |
+| 12 | Medium | The external laser was integrated in the package build, and package test depended on it. | **Fixed.** PKGA-06 runs optical test on a lab reference laser and no longer depends on PKGA-05; among the build steps it waits on PKGA-04. PKGA-05 connects the front-panel source modules on the validation systems and feeds PKGA-07. |
+| 13 | Medium | OE qualification started 24 weeks after known-good engines existed. | **Fixed.** RELQ now starts at W142. RELQ-08 runs W146–172 on the first known-good engines, right after the qualification plan (RELQ-01, W142–146); the other RELQ activities keep their weeks. |
 | 14 | Medium | No early EIC/PIC die-level learning, and no defined source of dies for CHAR-12/13. | **Partly fixed.** SORT-05 now sets aside EIC and PIC dies for characterization and reliability before the rest go to OEB. CHAR-12/13 stay at W162–176: corner characterization needs the corner lots and the CHAR infrastructure. Early die data comes from wafer sort (SORT-03/04) and engine test (OEB-05/06). |
 | 15 | Medium | Many named inputs were linked only by `runsWith`, which the critical-path model ignores; some were real precedence. | **Fixed.** 73 were promoted to dependencies. 15 stay, each because a dependency would loop or reach forward (V3 lists them). |
 | 16 | Medium | PCTL was not shifted, so its handover ended before production release. | **Fixed.** PCTL now runs W20–218, and the PCTL-07 handover runs alongside RAMP-07 (W214–218). |
 | 17 | Medium | Bridge fab started before its mask release, and the bridge type was unstated. | **Fixed.** WFAB-05 now starts at W111, after MTO-03 (finish-to-start). SARC-04 states that the bridge is a silicon bridge or interposer placed at main package assembly, not embedded in the substrate, so the substrate and the dry run do not wait for bridge dies. |
 | 18 | Medium | The top-level `dependsOn` and `links.dependsOn` lists disagree in most write-ups. | **Not changed — by design.** The top-level list is the short list of hard prerequisites the write-up page leads with; `links` is the full graph. An existing unit test requires every top-level entry to appear in `links`, so the two cannot contradict each other. The analysis merges both. |
-| 19 | Low | The Switch SoC schedule is aggressive, and silicon qualification (RELQ-02) runs on the first stepping. | **Not changed — noted.** The 14-week hot-lot fab and 66 weeks from RTL to tapeout are at the short end. V5 shows that a Switch SoC slip of more than two weeks moves the first build. RELQ-07 repeats qualification on the production stepping, so RELQ-02 on first silicon is the early read, not the final one. |
+| 19 | Low | The Switch SoC schedule is aggressive, and silicon qualification (RELQ-02) runs on the first stepping. | **Not changed — noted.** The 14-week hot-lot fab and 66 weeks from RTL to tapeout are at the short end. V5 shows that a Switch SoC slip of more than two weeks moves the first build, and every Switch SoC slip moves production. RELQ-07 repeats qualification on the production stepping, so RELQ-02 on first silicon is the early read, not the final one. |
 | 20 | Low | Tag, owner and wording slips. | **Fixed:** SORT-03 is now owned by Test engineering. OEB-07 now depends on SORT-05, not SORT-06. The V3 table now includes FEAS-03 → FEAS-05/06. The OESD-01 hand-off is relabelled. The optical-source track names WFAB-06 as shared with the main package. **Not changed:** TINF-02 and RELQ-03 keep a single primary tag, since an activity carries one item. The First Package Build gate closes on PKGA-07, which produces PKGA-D8, "First package build release to bring-up". RELQ-D8 and RELQ-08 share a number only by coincidence. |
 
-**Re-run after the fixes.**
+### Second review
+
+The fixes were reviewed again by a fresh agent with the same inputs. It
+confirmed against the data that most fixes are in place: #2, #4, #6, #7, #13
+and #17, the stage table, the major gate spacing, both path narratives, and
+the V6 durations and owner peak. It raised 12 more findings:
+
+| # | Severity | Finding | Done |
+|---|---|---|---|
+| 1 | High | Power-on still waited on full-build package test, through PKGA-07 (boards) and PON-06. | **Fixed.** See #3 above: PKGA-07 boards the electrical-only packages first; PON-01/02/06 depend on PKGA-11, and PKGA-07 is `runsWith` only. |
+| 2 | High | V5 said the Switch SoC path had 2 weeks of float, but MTO-01 had 0. The cause was OEB-06 depending on the Switch SoC's final-netlist firmware (PKGA-10). | **Fixed.** OEB-06 depends on the optical control firmware and algorithms (DSGN-16, DSGN-08). MTO-01 now has 2 weeks of float into the build, as the table says. |
+| 3 | High | The lead rule also enforced negative leads, so zero float was nearly true by construction. | **Fixed.** Only positive leads are kept, and the template's dates always satisfy the constraints. With the honest rule, production is set by the Switch SoC learning loop and the OE path has 2 weeks of float to it. V5 now says so. |
+| 4 | Medium | SGNO-13 ended before the final I/O die and package views existed. | **Fixed.** It runs in two passes, W90–97 and W97–103 (see #10). |
+| 5 | Medium | #8 was overstated as "partly fixed". | **Accepted.** #8 is now "not fixed — risk accepted", with the re-spin cost stated. |
+| 6 | Medium | The bonding format was left open, while the schedule assumed die-to-die (dicing before stacking, facets exposed through assembly). | **Fixed.** The freeze (OESD-07) confirms die-to-die bonding at the assembly partner and records the die-to-wafer alternative, under which the PIC is not diced before stacking. Final facet clean and inspection moved to OEB-04, right before fiber attach. |
+| 7 | Medium | The EIC had no post-fab step. | **Fixed.** WFAB-03 states that the EIC bond pads or microbumps are finished in-line at the foundry back end, inside the fab window. |
+| 8 | Low | The PCTL-07 weeks in the report did not match its window. | **Fixed.** The window is now [194,198], W214–218, alongside RAMP-07. |
+| 9 | Low | The claim that PKGA-06 "depends only on PKGA-04" was wrong. | **Fixed:** reworded in #12 above. |
+| 10 | Low | V5 measures to PKGA-06, but the gate closer is PKGA-07. | **Noted.** Both end at W148. PKGA-07's extra inputs, PKGA-05 and PKGA-11, end earlier or at the same week, so the result is the same. |
+| 11 | Low | RELQ-08 started before the plan it depends on (RELQ-01). | **Fixed.** RELQ-08 now runs W146–172, finish-to-start after RELQ-01. |
+| 12 | Low | The Implementation Complete gate (W100) closes after wave 1 tapes out (W98). | **Noted.** That gate is the wave 2 dies' implementation (IMPL-01/02/03/06/07). EIC and PIC implementation (IMPL-04/05) ended at W90, and wave 1 goes on its own review (SGNO-09). |
+
+**Re-run after both reviews.**
 
 - Unit tests: 2,941 passed.
-- `tests/e2e/cpoSwitch.spec.ts`: 5 of 5 passed.
-- Critical path:
-  - The OE path has zero float into both the first package build and
-    production release.
-  - The Switch SoC path has 2 weeks into the build and the I/O die path 4.
-  - The program end is unchanged at W266.
+- Playwright: the full suite, 264 of 264.
+- `npm run typecheck` and `npm run lint` are clean.
+- No further findings remained to fix.
 
 ## V8 — in the app
 
@@ -1128,7 +1161,7 @@ New activities with no predecessor in the baseline (26):
 | Known-good optical engines | OEB-07 (W135–139), OEB-08 (W136–140), OEB-09 (W138–140) |
 | Main package mounting | PKGA-04 (W140–143) |
 | Optical bring-up | OBU-02 (W151–155), OBU-03 (W153–158) |
-| Optical engine qualification | RELQ-08 (W144–170) |
+| Optical engine qualification | RELQ-08 (W146–172) |
 
 **Main package**
 
@@ -1179,7 +1212,7 @@ New activities with no predecessor in the baseline (26):
 
 ### V3 — producer → consumer
 
-Inputs named in a write-up's consumes list whose producer is not among its dependencies: 15
+Inputs named in a write-up's consumes list whose producer is not among its dependencies: 18
 - SARC-05 consumes from SARC-07
 - SARC-10 consumes from SARC-09
 - PCTL-05 consumes from PCTL-01
@@ -1190,13 +1223,16 @@ Inputs named in a write-up's consumes list whose producer is not among its depen
 - SGNO-07 consumes from TINF-06
 - SGNO-11 consumes from PKGA-02
 - PKGA-02 consumes from MTO-04
+- PON-01 consumes from PKGA-07
 - PON-01 consumes from PON-06
+- PON-02 consumes from PKGA-07
+- PON-06 consumes from PKGA-07
 - RELQ-01 consumes from SDBG-04
 - RELQ-01 consumes from NPI-01
 - NPI-03 consumes from CERT-06
 - SUST-05 consumes from SUST-03
 
-Dependencies where the producer finishes after the consumer (start-to-start on an interim output): 88
+Dependencies where the producer finishes after the consumer (start-to-start on an interim output): 86
 
 | Producer (ends) | Consumer (ends) |
 | --- | --- |
@@ -1262,7 +1298,7 @@ Dependencies where the producer finishes after the consumer (start-to-start on a
 | IMPL-02 (W98) | IMPL-06 (W92) |
 | IMPL-03 (W94) | IMPL-06 (W92) |
 | IMPL-02 (W98) | IMPL-07 (W96) |
-| IMPL-08 (W98) | SGNO-13 (W97) |
+| SGNO-13 (W103) | SGNO-09 (W98) |
 | PKGA-02 (W112) | MTO-03 (W111) |
 | PKGA-02 (W112) | MTO-04 (W110) |
 | OEB-06 (W140) | OEB-07 (W139) |
@@ -1273,8 +1309,6 @@ Dependencies where the producer finishes after the consumer (start-to-start on a
 | TINF-03 (W102) | TINF-15 (W96) |
 | TINF-04 (W106) | TINF-15 (W96) |
 | PKGA-09 (W148) | PON-01 (W142) |
-| PKGA-07 (W148) | PON-01 (W142) |
-| PKGA-07 (W148) | PON-02 (W143) |
 | PKGA-09 (W148) | PON-02 (W143) |
 | SDBG-01 (W184) | SDBG-02 (W178) |
 | SDBG-01 (W184) | SDBG-03 (W176) |
@@ -1318,7 +1352,7 @@ Deliverables whose producer feeds nothing downstream: 2
 | SORT | Known-Good-Die Ready | W132 | SORT-07 | OEB-02 |
 | OEB | Known-Good Optical Engines Ready ★ | W140 | OEB-09 | — |
 | TINF | Test & Manufacturing Infrastructure Ready | W114 | TINF-11 | IMPL-11, OTO-02, OTO-03, MTO-04, WFAB-05, WFAB-07, PKGA-02 |
-| PKGA | First Package Build ★ | W148 | PKGA-07 | MTO-03, MTO-04, WFAB-05, WFAB-06, SORT-07, OEB-01, OEB-06, OEB-08, PON-01, PON-02, PON-03, PON-04, PON-05, PON-06 |
+| PKGA | First Package Build ★ | W148 | PKGA-07 | MTO-03, MTO-04, WFAB-05, WFAB-06, SORT-07, OEB-01, OEB-08, PON-01, PON-02, PON-03, PON-04, PON-05, PON-06 |
 | PON | First Electrical Link | W150 | PON-05 | SDBG-01 |
 | OBU | First Optical Link | W160 | OBU-03 | SINT-03, SINT-05, SINT-07 |
 | SINT | First End-to-End Traffic | W166 | SINT-04 | CHAR-04, CHAR-05, CHAR-11 |
@@ -1341,7 +1375,7 @@ Deliverables whose producer feeds nothing downstream: 2
 
 ### V5 — critical path by dependency logic
 
-Into RAMP-07 (Production Release Decision Review): logic finish W218, template finish W218
+Into RAMP-07 (Production Release Decision Review): logic finish W216, template finish W218
 
 | Activity | Item | Logic weeks | Template weeks | Wait |
 | --- | --- | --- | --- | --- |
@@ -1356,19 +1390,20 @@ Into RAMP-07 (Production Release Decision Review): logic finish W218, template f
 | IMPL-11 Scan Stitching, DFT Closure and Test Pattern Generation | switch | W74–100 | W74–100 | FF |
 | SGNO-07 Final Equivalence, DFT Signoff and Pattern Delivery | switch | W92–104 | W92–104 | FF |
 | MTO-01 Switch SoC Tapeout and Mask Release | switch | W104–108 | W104–108 | FS |
-| PKGA-10 Bring-Up Firmware, SDK and Diagnostics Readiness on the Final Netlist | system | W100–136 | W100–136 | FF |
-| PKGA-09 Bring-Up Lab, Debug Infrastructure and Station Readiness | system | W124–148 | W124–148 | FF |
-| PON-01 Bring-Up Plan Execution and Daily Bring-Up Stand-Up | system | W140–142 | W140–142 | SS |
-| PON-02 First Power-On, Power Sequencing and Rail Verification | system | W140–143 | W140–143 | FF |
-| PON-06 Silicon Anomaly Intake and Triage Start | system | W142–148 | W142–148 | FF |
-| SDBG-01 Anomaly Tracking, Reproduction and Triage Board | system | W144–184 | W144–184 | FF |
-| SDBG-03 Containment — Firmware Workaround and Test Screen Assessment | system | W148–176 | W148–176 | SS |
-| NPI-02 Engineering Validation Build | system | W156–166 | W156–166 | SS |
-| NPI-07 Golden Units, Factory Calibration and Test Correlation | system | W166–198 | W166–198 | FS |
-| NPI-04 Production Validation and Pilot Build on the Production Line | system | W190–202 | W190–202 | FF |
-| NPI-08 Production Readiness Review | program | W200–206 | W200–206 | FF |
-| RAMP-03 Volume Ramp Plan and Build Schedule | program | W206–214 | W206–214 | FS |
-| RAMP-07 Production Release Decision Review | program | W214–218 | W214–218 | FS |
+| WFAB-01 Switch SoC Wafer Fabrication | switch | W108–122 | W108–122 | FS |
+| SORT-01 Switch SoC Electrical Wafer Sort Bring-Up | switch | W122–128 | W122–128 | FS |
+| SORT-07 Die Bank, Inventory and Known-Good-Die Release to Main Package Assembly | package | W128–132 | W128–132 | FS |
+| PKGA-11 Electrical-Only Engineering Package Build — Switch and I/O Dies Without Optical Engines | package | W132–138 | W132–138 | FS |
+| PON-02 First Power-On, Power Sequencing and Rail Verification | system | W138–141 | W140–143 | FS |
+| PON-06 Silicon Anomaly Intake and Triage Start | system | W140–146 | W142–148 | FF |
+| SDBG-01 Anomaly Tracking, Reproduction and Triage Board | system | W142–182 | W144–184 | FF |
+| SDBG-03 Containment — Firmware Workaround and Test Screen Assessment | system | W146–174 | W148–176 | SS |
+| NPI-02 Engineering Validation Build | system | W154–164 | W156–166 | SS |
+| NPI-07 Golden Units, Factory Calibration and Test Correlation | system | W164–196 | W166–198 | FS |
+| NPI-04 Production Validation and Pilot Build on the Production Line | system | W188–200 | W190–202 | FF |
+| NPI-08 Production Readiness Review | program | W198–204 | W200–206 | FF |
+| RAMP-03 Volume Ramp Plan and Build Schedule | program | W204–212 | W206–214 | FS |
+| RAMP-07 Production Release Decision Review | program | W212–216 | W214–218 | FS |
 
 Into PKGA-06 (Package-Level Test and First-Build Yield Analysis): logic finish W148, template finish W148
 
@@ -1401,20 +1436,20 @@ Total float, in weeks, into the first package build (PKGA-06) and into productio
 
 | Path | Activity | Into PKGA-06 | Into RAMP-07 |
 | --- | --- | --- | --- |
-| Optical engine | OTO-02 Photonic IC Tapeout and Mask Release | 0 | 0 |
-| Optical engine | WFAB-04 Photonic IC Wafer Fabrication and In-Line Optical Monitoring | 0 | 0 |
-| Optical engine | WFAB-08 Photonic IC Bumping, Through-Oxide-Via Reveal and Bond-Surface Preparation | 0 | 0 |
-| Optical engine | SORT-04 Photonic IC Wafer-Level Optical Test | 0 | 0 |
-| Optical engine | SORT-05 Electrical IC and Photonic IC Known-Good-Die Release to the Optical Engine Build | 0 | 0 |
-| Optical engine | OEB-02 Electrical-IC-on-Photonic-IC 3D Stacking and Bond Inspection | 0 | 0 |
-| Optical engine | OEB-05 Optical Engine-Level Electrical and Optical Test and Yield Tracking | 0 | 0 |
-| Optical engine | OEB-09 Known-Good Optical Engine Readiness Review | 0 | 0 |
-| Optical engine | PKGA-04 Known-Good Optical Engine Mounting, Fiber Egress Routing and Strain Relief on the Main Package | 0 | 0 |
-| Switch SoC | MTO-01 Switch SoC Tapeout and Mask Release | 0 | 0 |
+| Optical engine | OTO-02 Photonic IC Tapeout and Mask Release | 0 | 2 |
+| Optical engine | WFAB-04 Photonic IC Wafer Fabrication and In-Line Optical Monitoring | 0 | 2 |
+| Optical engine | WFAB-08 Photonic IC Bumping, Through-Oxide-Via Reveal and Bond-Surface Preparation | 0 | 2 |
+| Optical engine | SORT-04 Photonic IC Wafer-Level Optical Test | 0 | 2 |
+| Optical engine | SORT-05 Electrical IC and Photonic IC Known-Good-Die Release to the Optical Engine Build | 0 | 2 |
+| Optical engine | OEB-02 Electrical-IC-on-Photonic-IC 3D Stacking and Bond Inspection | 0 | 2 |
+| Optical engine | OEB-05 Optical Engine-Level Electrical and Optical Test and Yield Tracking | 0 | 2 |
+| Optical engine | OEB-09 Known-Good Optical Engine Readiness Review | 0 | 2 |
+| Optical engine | PKGA-04 Known-Good Optical Engine Mounting, Fiber Egress Routing and Strain Relief on the Main Package | 0 | 2 |
+| Switch SoC | MTO-01 Switch SoC Tapeout and Mask Release | 2 | 0 |
 | Switch SoC | WFAB-01 Switch SoC Wafer Fabrication | 2 | 0 |
 | Switch SoC | SORT-01 Switch SoC Electrical Wafer Sort Bring-Up | 2 | 0 |
 | Switch SoC | SORT-07 Die Bank, Inventory and Known-Good-Die Release to Main Package Assembly | 2 | 0 |
-| Switch SoC | PKGA-03 Switch SoC and I/O Die Attach, Bridge Attach and Multi-Die Assembly | 2 | 2 |
+| Switch SoC | PKGA-03 Switch SoC and I/O Die Attach, Bridge Attach and Multi-Die Assembly | 2 | 4 |
 | I/O die | MTO-02 I/O Die Tapeout and Mask Release | 4 | 2 |
 | I/O die | WFAB-02 I/O Die Wafer Fabrication | 4 | 2 |
 | I/O die | SORT-02 I/O Die Electrical Wafer Sort Bring-Up — SerDes Loopback, PRBS and Die-to-Die PHY Tests | 4 | 2 |
@@ -1432,10 +1467,10 @@ Program length: before W262, after W266.
 | Design verification | 7 | 6 | W76–80 | PSV-02, PSV-03, PSV-04, PSV-08, PSV-10, PSV-14 |
 | System architecture | 19 | 5 | W54–56 | PCTL-03, FEAS-09, MODL-10, MODL-11, PSV-07 |
 | Photonics | 21 | 5 | W22–24 | SARC-03, ICD-04, FEAS-03, TRDY-02, MODL-04 |
+| Reliability | 11 | 5 | W170–172 | RELQ-02, RELQ-03, RELQ-04, RELQ-05, RELQ-08 |
 | SerDes and high-speed I/O | 12 | 5 | W36–38 | ICD-02, ICD-03, FEAS-02, TRDY-04, DSGN-04 |
 | Quality | 9 | 5 | W214–218 | PCTL-07, RAMP-06, SUST-03, SUST-04, SUST-08 |
 | Compliance and interoperability | 6 | 4 | W170–182 | CERT-01, CERT-03, CERT-04, CERT-07 |
-| Reliability | 11 | 4 | W166–188 | RELQ-02, RELQ-03, RELQ-04, RELQ-08 |
 | Laser and optical source | 9 | 4 | W38–40 | ICD-05, FEAS-05, TRDY-07, DSGN-07 |
 | Supply chain | 9 | 4 | W28–48 | PCTL-05, TRDY-08, TRDY-10, TRDY-13 |
 | Validation | 16 | 4 | W144–145 | PKGA-09, PON-04, PON-06, SDBG-01 |
@@ -1447,7 +1482,7 @@ Program length: before W262, after W266.
 | Technology and foundry | 6 | 3 | W108–114 | WFAB-01, WFAB-02, WFAB-03 |
 | Physical design | 8 | 3 | W96–98 | IMPL-02, IMPL-12, SGNO-01 |
 | RTL design | 3 | 3 | W40–44 | TRDY-05, DSGN-02, DSGN-03 |
-| SI/PI | 6 | 3 | W92–97 | IMPL-08, SGNO-06, SGNO-13 |
+| SI/PI | 6 | 3 | W92–98 | IMPL-08, SGNO-06, SGNO-13 |
 | Switch SoC architecture | 4 | 2 | W10–15 | REQ-03, SARC-01 |
 | Security | 7 | 2 | W56–72 | DSGN-10, PSV-12 |
 | Software | 8 | 2 | W26–30 | SARC-08, MODL-09 |

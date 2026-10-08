@@ -410,7 +410,7 @@ export const PCTL_WRITE_UPS: CpoWriteUps = {
       'Program controls that stop at release leave sustaining with documents but no open-item list, no board and no history. The handover transfers the running system — the change board keeps meeting under SUST-04 the week after, with the same records.',
     ],
     flowNote:
-      'Step 1 audits open items and baselines. Step 2 transfers procedures, membership and tools. Step 3 holds the handover review, and step 4 releases the package.',
+      'Step 1 audits open items and baselines while step 2 transfers procedures, membership and tools in parallel. Step 3 holds the handover review alongside the production release decision, and step 4 releases the package.',
     consumes: [
       'Interface change log and open requests from PCTL-03',
       'Production configuration baseline from PCTL-04',

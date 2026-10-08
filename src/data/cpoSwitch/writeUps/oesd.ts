@@ -412,7 +412,7 @@ export const OESD_WRITE_UPS: CpoWriteUps = {
       'The freeze closes in week 66, before electrical and photonic IC layout starts, so the pad map, coupler placement and keep-outs are drawn once rather than redrawn. A freeze after layout starts is a freeze in name only: any change it records is a change to two layouts already in progress. The cross-die stack signoff in SGNO-12 then checks the finished layouts against what is frozen here.',
     ],
     flowNote:
-      'Step 1 collects the evidence. Step 2 checks pad map and keep-outs against the interface and floorplans while step 3 reviews exceptions in parallel. Step 4 holds the review and step 5 releases the package to layout, cross-die signoff and the wave 1 readiness review.',
+      'Step 1 collects the evidence. Step 2 checks pad map and keep-outs against the interface and floorplans while step 3 reviews exceptions in parallel. Step 4 confirms the bonding format from the OESD-01 decision, step 5 holds the review and step 6 releases the package to layout, cross-die signoff and the wave 1 readiness review.',
     consumes: [
       'Bond interface specification from OESD-01',
       'Optical engine sub-assembly design from OESD-02',
@@ -450,7 +450,7 @@ export const OESD_WRITE_UPS: CpoWriteUps = {
     exit: [
       'Every freeze criterion scored pass or an exception with an owner and a date',
       'Pad map and coupler keep-outs match the stack interface and the electrical and photonic IC floorplans',
-      'Freeze decision recorded by week 66, before electrical and photonic IC layout starts',
+      'Freeze decision recorded by week 66, before electrical and photonic IC layout starts, with the bonding format confirmed as die-to-die and the die-to-wafer alternative recorded',
     ],
     dependsOn: ['OESD-01', 'OESD-02', 'OESD-03', 'OESD-04', 'OESD-05', 'OESD-06'],
     dependsNote: null,

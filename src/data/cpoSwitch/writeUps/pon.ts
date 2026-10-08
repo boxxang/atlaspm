@@ -52,7 +52,7 @@ export const PON_WRITE_UPS: CpoWriteUps = {
       'Daily status published every working day against the pass criteria from the first power-on',
       'Every deviation raised in the stand-up entered in the anomaly register within one day',
     ],
-    dependsOn: ['PKGA-09', 'PKGA-11', 'PKGA-07'],
+    dependsOn: ['PKGA-09', 'PKGA-11'],
     dependsNote: 'The plan and the stations are ready before this starts; this activity runs them, it does not write them.',
     feedsInto: ['PON-02', 'PON-03', 'PON-04', 'PON-05'],
     measuredBy: [
@@ -61,9 +61,9 @@ export const PON_WRITE_UPS: CpoWriteUps = {
       'Hours from observation to anomaly entry',
     ],
     links: {
-      dependsOn: ['PKGA-09', 'PKGA-07', 'PKGA-10', 'PKGA-11', 'PKGA-02'],
+      dependsOn: ['PKGA-09', 'PKGA-10', 'PKGA-11', 'PKGA-02'],
       feedsInto: ['PON-02', 'PON-03', 'PON-04', 'PON-05', 'PON-06'],
-      runsWith: ['PON-06'],
+      runsWith: ['PON-06', 'PKGA-07'],
       revisedBy: [],
       feedsBackInto: [],
     },
@@ -117,7 +117,7 @@ export const PON_WRITE_UPS: CpoWriteUps = {
       'Power-up and power-down sequencing verified against the specification',
       'Idle current per rail recorded and within the stated tolerance of the model or logged as an anomaly',
     ],
-    dependsOn: ['PON-01', 'PKGA-11', 'PKGA-07'],
+    dependsOn: ['PON-01', 'PKGA-11'],
     dependsNote: null,
     feedsInto: ['PON-03', 'PON-04', 'PON-06'],
     measuredBy: [
@@ -126,9 +126,9 @@ export const PON_WRITE_UPS: CpoWriteUps = {
       'Idle current error against the model',
     ],
     links: {
-      dependsOn: ['PON-01', 'PKGA-07', 'PKGA-11', 'PKGA-09', 'DSGN-14', 'MODL-08'],
+      dependsOn: ['PON-01', 'PKGA-11', 'PKGA-09', 'DSGN-14', 'MODL-08'],
       feedsInto: ['PON-03', 'PON-04', 'PON-06', 'OBU-01'],
-      runsWith: [],
+      runsWith: ['PKGA-07'],
       revisedBy: [],
       feedsBackInto: ['MODL-08'],
     },
@@ -342,7 +342,7 @@ export const PON_WRITE_UPS: CpoWriteUps = {
       'Step 1 sets up intake. Step 2 logs deviations throughout bring-up while step 3 reproduces each on a second unit in parallel. Step 4 triages and hands off, and step 5 releases the register to silicon debug.',
     consumes: [
       'Deviations from power-on, boot, register access and link training in PON-02 to PON-05',
-      'Package test results and failing units from PKGA-06',
+      'Electrical-only package build record and continuity screen from PKGA-11',
       'Known-issue list from PKGA-07',
       'Anomaly tracking process from the program',
       'Unit genealogy from the manufacturing data system in TINF-10',
@@ -389,9 +389,9 @@ export const PON_WRITE_UPS: CpoWriteUps = {
       'Days from observation to debug board handoff',
     ],
     links: {
-      dependsOn: ['PON-02', 'PON-03', 'PON-04', 'PON-05', 'PKGA-06', 'PKGA-07', 'TINF-10'],
+      dependsOn: ['PON-02', 'PON-03', 'PON-04', 'PON-05', 'TINF-10', 'PKGA-11'],
       feedsInto: ['SDBG-01', 'SDBG-02', 'SDBG-03'],
-      runsWith: [],
+      runsWith: ['PKGA-07'],
       revisedBy: [],
       feedsBackInto: [],
     },

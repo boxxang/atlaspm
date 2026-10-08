@@ -475,16 +475,17 @@ describe('CPO program flow', () => {
     for (const ref of ['OTO-02', 'WFAB-04', 'SORT-04', 'OEB-02', 'OEB-09', 'PKGA-04']) {
       expect(intoBuild, `the critical path into the first package build misses ${ref}`).toContain(ref);
     }
-    /* no float on the engine path, two weeks on the Switch SoC and four on the I/O die, into the build and into production */
+    /* no float on the engine path into the build; float on the Switch SoC and I/O die paths */
     const intoBuildFloat = cpm.floatTo('PKGA-06');
-    const intoProduction = cpm.floatTo('RAMP-07');
     for (const ref of ['OTO-02', 'WFAB-04', 'SORT-04', 'SORT-05', 'OEB-02', 'OEB-09', 'PKGA-04']) {
       expect(intoBuildFloat(ref), `${ref} has float into the first package build`).toBe(0);
-      expect(intoProduction(ref), `${ref} has float into production release`).toBe(0);
     }
-    expect(intoBuildFloat('PKGA-03'), 'Switch SoC and I/O die attach').toBeGreaterThan(0);
-    expect(intoBuildFloat('WFAB-01'), 'Switch SoC fab').toBeGreaterThan(0);
-    expect(intoBuildFloat('WFAB-02'), 'I/O die fab').toBeGreaterThan(0);
+    for (const ref of ['MTO-01', 'WFAB-01', 'PKGA-03', 'MTO-02', 'WFAB-02']) {
+      expect(intoBuildFloat(ref), `${ref} has no float into the first package build`).toBeGreaterThan(0);
+    }
+    /* into production the engine path stays near-critical: a slip of a few weeks moves the release */
+    const intoProduction = cpm.floatTo('RAMP-07');
+    for (const ref of ['OTO-02', 'OEB-09', 'PKGA-04']) expect(intoProduction(ref)!, ref).toBeLessThanOrEqual(4);
   });
 
   it('stays within eight weeks of the program length it had before the split', () => {

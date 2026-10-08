@@ -139,7 +139,7 @@ export const WFAB_WRITE_UPS: CpoWriteUps = {
   'WFAB-03': {
     criticalPath: false,
     purpose: [
-      'Track the electrical IC wafers through their analog process <b>against cycle time, with device parametric monitors reviewed</b> so the drivers and TIAs are known to be on target before the wafers reach sort.',
+      'Track the electrical IC wafers through their analog process <b>against cycle time, with device parametric monitors reviewed</b> so the drivers and TIAs are known to be on target before the wafers reach sort. The bond pads or microbumps the electrical IC is stacked by are finished in-line at the foundry back end inside this window, so the electrical IC needs no separate post-fab step before sort.',
       'Electrical IC fabrication is shorter than the Switch SoC and rarely on the critical path. Its risk is parametric: a device shift that moves driver swing or TIA bandwidth appears in the monitors weeks before it appears as a failed optical link.',
     ],
     flowNote:

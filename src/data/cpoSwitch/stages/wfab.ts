@@ -89,7 +89,7 @@ export const WFAB: CpoStageModule = {
     'WFAB-03': {
       s: [
         [1, 'Confirm electrical IC lot starts and split assignments', 0.5],
-        [2, 'Track lots through the analog process and back-end bond-pad finishing against committed cycle time', 8],
+        [2, 'Track lots through the analog process and the in-line back-end finish of the bond pads or microbumps the stack bonds to, against committed cycle time', 8],
         [3, 'Review in-line excursions and device parametric monitors', 3, 1],
         [4, 'Accept the lots on WAT data and release the wafers to sort', 0.5],
       ],
