@@ -1,0 +1,7552 @@
+{
+ "takenFrom": "74ef9a8",
+ "programWeeks": 262,
+ "stages": [
+  {
+   "key": "cpoConcept",
+   "prefix": "CON",
+   "start": 0,
+   "dur": 10,
+   "gate": "cpoProgramGo"
+  },
+  {
+   "key": "cpoRequirements",
+   "prefix": "REQ",
+   "start": 4,
+   "dur": 16,
+   "gate": "cpoRequirementsBaseline"
+  },
+  {
+   "key": "cpoArchitecture",
+   "prefix": "SARC",
+   "start": 10,
+   "dur": 26,
+   "gate": "cpoPartitionFreeze"
+  },
+  {
+   "key": "cpoInterfaces",
+   "prefix": "ICD",
+   "start": 20,
+   "dur": 28,
+   "gate": "cpoInterfaceFreeze"
+  },
+  {
+   "key": "cpoProgramControl",
+   "prefix": "PCTL",
+   "start": 20,
+   "dur": 190,
+   "gate": "cpoChangeControlHandover"
+  },
+  {
+   "key": "cpoFeasibility",
+   "prefix": "FEAS",
+   "start": 6,
+   "dur": 50,
+   "gate": "cpoFeasibilityProven"
+  },
+  {
+   "key": "cpoReadiness",
+   "prefix": "TRDY",
+   "start": 8,
+   "dur": 52,
+   "gate": "cpoTechReady"
+  },
+  {
+   "key": "cpoModeling",
+   "prefix": "MODL",
+   "start": 16,
+   "dur": 40,
+   "gate": "cpoModelsReady"
+  },
+  {
+   "key": "cpoDesign",
+   "prefix": "DSGN",
+   "start": 32,
+   "dur": 52,
+   "gate": "cpoDesignFreeze"
+  },
+  {
+   "key": "cpoPresilicon",
+   "prefix": "PSV",
+   "start": 36,
+   "dur": 56,
+   "gate": "cpoPresiliconDone"
+  },
+  {
+   "key": "cpoImplementation",
+   "prefix": "IMPL",
+   "start": 64,
+   "dur": 36,
+   "gate": "cpoImplementationComplete"
+  },
+  {
+   "key": "cpoSignoff",
+   "prefix": "SGNO",
+   "start": 88,
+   "dur": 18,
+   "gate": "cpoTapeoutReady"
+  },
+  {
+   "key": "cpoTapeout",
+   "prefix": "MTO",
+   "start": 104,
+   "dur": 8,
+   "gate": "cpoTapeoutAll"
+  },
+  {
+   "key": "cpoFabrication",
+   "prefix": "WFAB",
+   "start": 108,
+   "dur": 14,
+   "gate": "cpoFirstSilicon"
+  },
+  {
+   "key": "cpoSort",
+   "prefix": "SORT",
+   "start": 122,
+   "dur": 10,
+   "gate": "cpoKgdReady"
+  },
+  {
+   "key": "cpoTestInfra",
+   "prefix": "TINF",
+   "start": 50,
+   "dur": 68,
+   "gate": "cpoTestInfraReady"
+  },
+  {
+   "key": "cpoAssembly",
+   "prefix": "PKGA",
+   "start": 100,
+   "dur": 44,
+   "gate": "cpoFirstPackageBuild"
+  },
+  {
+   "key": "cpoPowerOn",
+   "prefix": "PON",
+   "start": 140,
+   "dur": 10,
+   "gate": "cpoFirstElectricalLink"
+  },
+  {
+   "key": "cpoOpticalBringup",
+   "prefix": "OBU",
+   "start": 146,
+   "dur": 10,
+   "gate": "cpoFirstOpticalLink"
+  },
+  {
+   "key": "cpoSystemIntegration",
+   "prefix": "SINT",
+   "start": 150,
+   "dur": 12,
+   "gate": "cpoFirstTraffic"
+  },
+  {
+   "key": "cpoCharacterization",
+   "prefix": "CHAR",
+   "start": 156,
+   "dur": 20,
+   "gate": "cpoFullBandwidth"
+  },
+  {
+   "key": "cpoDebug",
+   "prefix": "SDBG",
+   "start": 140,
+   "dur": 46,
+   "gate": "cpoProductionStepping"
+  },
+  {
+   "key": "cpoCompliance",
+   "prefix": "CERT",
+   "start": 162,
+   "dur": 24,
+   "gate": "cpoComplianceComplete"
+  },
+  {
+   "key": "cpoQualification",
+   "prefix": "RELQ",
+   "start": 160,
+   "dur": 42,
+   "gate": "cpoQualComplete"
+  },
+  {
+   "key": "cpoNpi",
+   "prefix": "NPI",
+   "start": 148,
+   "dur": 54,
+   "gate": "cpoPvtComplete"
+  },
+  {
+   "key": "cpoRamp",
+   "prefix": "RAMP",
+   "start": 200,
+   "dur": 14,
+   "gate": "cpoProductionRelease"
+  },
+  {
+   "key": "cpoSustaining",
+   "prefix": "SUST",
+   "start": 210,
+   "dur": 52,
+   "gate": "cpoSustainingHandover"
+  }
+ ],
+ "activities": [
+  {
+   "ref": "CON-01",
+   "title": "Market and Customer Requirements Capture",
+   "owner": "Product management",
+   "start": 0,
+   "end": 4,
+   "dependsOn": [],
+   "deliverables": [
+    [
+     "CON-D1",
+     "produces"
+    ],
+    [
+     "CON-D3",
+     "feeds"
+    ]
+   ]
+  },
+  {
+   "ref": "CON-02",
+   "title": "Competitive and Technology Landscape Assessment",
+   "owner": "Product management",
+   "start": 0,
+   "end": 4,
+   "dependsOn": [],
+   "deliverables": [
+    [
+     "CON-D2",
+     "produces"
+    ],
+    [
+     "CON-D3",
+     "feeds"
+    ]
+   ]
+  },
+  {
+   "ref": "CON-03",
+   "title": "Product Concept — Bandwidth, Port Configuration, Power per Bit and Form Factor",
+   "owner": "System architecture",
+   "start": 2,
+   "end": 7,
+   "dependsOn": [
+    "CON-01",
+    "CON-02"
+   ],
+   "deliverables": [
+    [
+     "CON-D3",
+     "produces"
+    ],
+    [
+     "CON-D4",
+     "feeds"
+    ]
+   ]
+  },
+  {
+   "ref": "CON-04",
+   "title": "Business Case, Cost Model and Pricing Targets",
+   "owner": "Product management",
+   "start": 3,
+   "end": 8,
+   "dependsOn": [
+    "CON-03",
+    "CON-01"
+   ],
+   "deliverables": [
+    [
+     "CON-D4",
+     "produces"
+    ],
+    [
+     "CON-D6",
+     "feeds"
+    ]
+   ]
+  },
+  {
+   "ref": "CON-05",
+   "title": "Program Plan — Schedule, Resources, Budget and Partners",
+   "owner": "Program management",
+   "start": 4,
+   "end": 9,
+   "dependsOn": [
+    "CON-03"
+   ],
+   "deliverables": [
+    [
+     "CON-D5",
+     "produces"
+    ],
+    [
+     "CON-D6",
+     "feeds"
+    ]
+   ]
+  },
+  {
+   "ref": "CON-06",
+   "title": "Program Risk Assessment and Go / No-Go Review",
+   "owner": "Program management",
+   "start": 7,
+   "end": 10,
+   "dependsOn": [
+    "CON-03",
+    "CON-04",
+    "CON-05",
+    "CON-02"
+   ],
+   "deliverables": [
+    [
+     "CON-D6",
+     "produces"
+    ]
+   ]
+  },
+  {
+   "ref": "REQ-01",
+   "title": "Product Requirements Document",
+   "owner": "Product management",
+   "start": 4,
+   "end": 10,
+   "dependsOn": [
+    "CON-01",
+    "CON-03",
+    "CON-06"
+   ],
+   "deliverables": [
+    [
+     "REQ-D1",
+     "produces"
+    ],
+    [
+     "REQ-D2",
+     "feeds"
+    ],
+    [
+     "REQ-D9",
+     "feeds"
+    ]
+   ]
+  },
+  {
+   "ref": "REQ-02",
+   "title": "System Requirements Specification",
+   "owner": "System architecture",
+   "start": 6,
+   "end": 14,
+   "dependsOn": [
+    "REQ-01",
+    "CON-03"
+   ],
+   "deliverables": [
+    [
+     "REQ-D2",
+     "produces"
+    ],
+    [
+     "REQ-D9",
+     "feeds"
+    ]
+   ]
+  },
+  {
+   "ref": "REQ-03",
+   "title": "Switching Feature, Buffering and Telemetry Requirements",
+   "owner": "Switch ASIC architecture",
+   "start": 7,
+   "end": 15,
+   "dependsOn": [
+    "REQ-01",
+    "CON-01"
+   ],
+   "deliverables": [
+    [
+     "REQ-D3",
+     "produces"
+    ],
+    [
+     "REQ-D2",
+     "informs"
+    ]
+   ]
+  },
+  {
+   "ref": "REQ-04",
+   "title": "Optical Link Requirements — Reach, Wavelength Plan, Budget and BER",
+   "owner": "Photonics",
+   "start": 7,
+   "end": 15,
+   "dependsOn": [
+    "REQ-01",
+    "CON-03"
+   ],
+   "deliverables": [
+    [
+     "REQ-D4",
+     "produces"
+    ],
+    [
+     "REQ-D2",
+     "feeds"
+    ]
+   ]
+  },
+  {
+   "ref": "REQ-05",
+   "title": "Standards, Compliance and Interoperability Targets",
+   "owner": "Compliance and interoperability",
+   "start": 8,
+   "end": 16,
+   "dependsOn": [
+    "REQ-01",
+    "CON-02"
+   ],
+   "deliverables": [
+    [
+     "REQ-D5",
+     "produces"
+    ],
+    [
+     "REQ-D2",
+     "informs"
+    ]
+   ]
+  },
+  {
+   "ref": "REQ-06",
+   "title": "Product Security Requirements and Threat Model",
+   "owner": "Security",
+   "start": 9,
+   "end": 16,
+   "dependsOn": [
+    "REQ-01",
+    "REQ-02"
+   ],
+   "deliverables": [
+    [
+     "REQ-D6",
+     "produces"
+    ],
+    [
+     "REQ-D2",
+     "informs"
+    ]
+   ]
+  },
+  {
+   "ref": "REQ-07",
+   "title": "Reliability, Serviceability and Environmental Requirements",
+   "owner": "Reliability",
+   "start": 9,
+   "end": 17,
+   "dependsOn": [
+    "REQ-01",
+    "REQ-02"
+   ],
+   "deliverables": [
+    [
+     "REQ-D7",
+     "produces"
+    ],
+    [
+     "REQ-D2",
+     "informs"
+    ]
+   ]
+  },
+  {
+   "ref": "REQ-08",
+   "title": "Manufacturability, Test, Supply and Cost-of-Goods Targets",
+   "owner": "Manufacturing and NPI",
+   "start": 10,
+   "end": 18,
+   "dependsOn": [
+    "REQ-01",
+    "CON-04"
+   ],
+   "deliverables": [
+    [
+     "REQ-D8",
+     "produces"
+    ],
+    [
+     "REQ-D2",
+     "informs"
+    ]
+   ]
+  },
+  {
+   "ref": "REQ-09",
+   "title": "Requirements Traceability and Baseline Review",
+   "owner": "Program management",
+   "start": 16,
+   "end": 20,
+   "dependsOn": [
+    "REQ-01",
+    "REQ-02",
+    "REQ-03",
+    "REQ-04",
+    "REQ-05",
+    "REQ-06",
+    "REQ-07",
+    "REQ-08",
+    "CON-05"
+   ],
+   "deliverables": [
+    [
+     "REQ-D9",
+     "produces"
+    ],
+    [
+     "REQ-D10",
+     "produces"
+    ]
+   ]
+  },
+  {
+   "ref": "SARC-01",
+   "title": "Switch ASIC Architecture — Pipeline, Packet Buffer, Traffic Management",
+   "owner": "Switch ASIC architecture",
+   "start": 10,
+   "end": 24,
+   "dependsOn": [
+    "REQ-02",
+    "REQ-03"
+   ],
+   "deliverables": [
+    [
+     "SARC-D1",
+     "produces"
+    ],
+    [
+     "SARC-D4",
+     "feeds"
+    ],
+    [
+     "SARC-D11",
+     "feeds"
+    ]
+   ]
+  },
+  {
+   "ref": "SARC-02",
+   "title": "High-Speed I/O and SerDes Architecture",
+   "owner": "SerDes and high-speed I/O",
+   "start": 10,
+   "end": 22,
+   "dependsOn": [
+    "REQ-02",
+    "REQ-04"
+   ],
+   "deliverables": [
+    [
+     "SARC-D2",
+     "produces"
+    ],
+    [
+     "SARC-D4",
+     "feeds"
+    ],
+    [
+     "SARC-D11",
+     "feeds"
+    ]
+   ]
+  },
+  {
+   "ref": "SARC-03",
+   "title": "Optical Engine Architecture — Electrical IC, Photonic IC and Optical Source Split",
+   "owner": "Photonics",
+   "start": 12,
+   "end": 24,
+   "dependsOn": [
+    "REQ-04",
+    "REQ-02",
+    "SARC-02"
+   ],
+   "deliverables": [
+    [
+     "SARC-D3",
+     "produces"
+    ],
+    [
+     "SARC-D4",
+     "feeds"
+    ],
+    [
+     "SARC-D11",
+     "feeds"
+    ]
+   ]
+  },
+  {
+   "ref": "SARC-04",
+   "title": "Die Partitioning, Die-to-Die and Bridge / Interposer Strategy",
+   "owner": "System architecture",
+   "start": 14,
+   "end": 26,
+   "dependsOn": [
+    "SARC-01",
+    "SARC-02",
+    "SARC-03"
+   ],
+   "deliverables": [
+    [
+     "SARC-D4",
+     "produces"
+    ],
+    [
+     "SARC-D5",
+     "feeds"
+    ],
+    [
+     "SARC-D12",
+     "feeds"
+    ]
+   ]
+  },
+  {
+   "ref": "SARC-05",
+   "title": "Package and System Mechanical Architecture — Optical Engine Placement and Fiber Egress",
+   "owner": "Packaging",
+   "start": 16,
+   "end": 28,
+   "dependsOn": [
+    "SARC-03",
+    "SARC-04",
+    "REQ-07"
+   ],
+   "deliverables": [
+    [
+     "SARC-D5",
+     "produces"
+    ],
+    [
+     "SARC-D7",
+     "feeds"
+    ],
+    [
+     "SARC-D11",
+     "feeds"
+    ]
+   ]
+  },
+  {
+   "ref": "SARC-06",
+   "title": "Clock, Reset and Power Architecture",
+   "owner": "Board and system hardware",
+   "start": 16,
+   "end": 28,
+   "dependsOn": [
+    "SARC-01",
+    "SARC-02",
+    "SARC-03",
+    "REQ-02",
+    "REQ-03"
+   ],
+   "deliverables": [
+    [
+     "SARC-D6",
+     "produces"
+    ],
+    [
+     "SARC-D11",
+     "feeds"
+    ]
+   ]
+  },
+  {
+   "ref": "SARC-07",
+   "title": "Thermal Architecture and Cooling Concept",
+   "owner": "Thermal and mechanical",
+   "start": 16,
+   "end": 28,
+   "dependsOn": [
+    "SARC-03",
+    "SARC-04",
+    "SARC-05",
+    "REQ-02"
+   ],
+   "deliverables": [
+    [
+     "SARC-D7",
+     "produces"
+    ],
+    [
+     "SARC-D11",
+     "feeds"
+    ]
+   ]
+  },
+  {
+   "ref": "SARC-08",
+   "title": "Firmware, Software and Management Architecture",
+   "owner": "Software",
+   "start": 16,
+   "end": 30,
+   "dependsOn": [
+    "SARC-01",
+    "SARC-03",
+    "REQ-03",
+    "REQ-06"
+   ],
+   "deliverables": [
+    [
+     "SARC-D8",
+     "produces"
+    ],
+    [
+     "SARC-D9",
+     "feeds"
+    ]
+   ]
+  },
+  {
+   "ref": "SARC-09",
+   "title": "Security Architecture — Root of Trust, Boot, Debug and Keys",
+   "owner": "Security",
+   "start": 18,
+   "end": 30,
+   "dependsOn": [
+    "REQ-06",
+    "SARC-08",
+    "SARC-04"
+   ],
+   "deliverables": [
+    [
+     "SARC-D9",
+     "produces"
+    ],
+    [
+     "SARC-D10",
+     "informs"
+    ]
+   ]
+  },
+  {
+   "ref": "SARC-10",
+   "title": "DFT, Known-Good-Die and Production Test Architecture",
+   "owner": "DFT",
+   "start": 18,
+   "end": 32,
+   "dependsOn": [
+    "REQ-08",
+    "SARC-02",
+    "SARC-03",
+    "SARC-04"
+   ],
+   "deliverables": [
+    [
+     "SARC-D10",
+     "produces"
+    ],
+    [
+     "SARC-D11",
+     "feeds"
+    ]
+   ]
+  },
+  {
+   "ref": "SARC-11",
+   "title": "Power, Performance, Area and Cost Budget Allocation",
+   "owner": "System architecture",
+   "start": 24,
+   "end": 32,
+   "dependsOn": [
+    "SARC-01",
+    "SARC-02",
+    "SARC-03",
+    "SARC-04",
+    "SARC-05",
+    "SARC-06",
+    "SARC-07",
+    "SARC-10",
+    "REQ-08"
+   ],
+   "deliverables": [
+    [
+     "SARC-D11",
+     "produces"
+    ],
+    [
+     "SARC-D12",
+     "feeds"
+    ]
+   ]
+  },
+  {
+   "ref": "SARC-12",
+   "title": "Architecture Convergence Review and Partition Freeze",
+   "owner": "System architecture",
+   "start": 32,
+   "end": 36,
+   "dependsOn": [
+    "SARC-01",
+    "SARC-02",
+    "SARC-03",
+    "SARC-04",
+    "SARC-05",
+    "SARC-06",
+    "SARC-07",
+    "SARC-08",
+    "SARC-09",
+    "SARC-10",
+    "SARC-11",
+    "REQ-09",
+    "FEAS-10"
+   ],
+   "deliverables": [
+    [
+     "SARC-D12",
+     "produces"
+    ]
+   ]
+  },
+  {
+   "ref": "ICD-01",
+   "title": "Interface Register, Ownership and Change Control Board",
+   "owner": "Program management",
+   "start": 20,
+   "end": 24,
+   "dependsOn": [
+    "REQ-09",
+    "SARC-04"
+   ],
+   "deliverables": [
+    [
+     "ICD-D1",
+     "produces"
+    ],
+    [
+     "ICD-D11",
+     "feeds"
+    ]
+   ]
+  },
+  {
+   "ref": "ICD-02",
+   "title": "Die-to-Die, Switch-to-I/O and Host Processor Electrical Interfaces",
+   "owner": "SerDes and high-speed I/O",
+   "start": 22,
+   "end": 38,
+   "dependsOn": [
+    "ICD-01",
+    "SARC-02",
+    "SARC-04",
+    "SARC-08"
+   ],
+   "deliverables": [
+    [
+     "ICD-D2",
+     "produces"
+    ],
+    [
+     "ICD-D11",
+     "feeds"
+    ]
+   ]
+  },
+  {
+   "ref": "ICD-03",
+   "title": "Electrical-to-Photonic and Optical Source-to-Photonic Interfaces",
+   "owner": "Photonics",
+   "start": 22,
+   "end": 40,
+   "dependsOn": [
+    "ICD-01",
+    "SARC-03",
+    "REQ-04"
+   ],
+   "deliverables": [
+    [
+     "ICD-D3",
+     "produces"
+    ],
+    [
+     "ICD-D11",
+     "feeds"
+    ]
+   ]
+  },
+  {
+   "ref": "ICD-04",
+   "title": "Photonic-to-Fiber and Front-Panel Optical Interfaces",
+   "owner": "Optical engineering",
+   "start": 24,
+   "end": 40,
+   "dependsOn": [
+    "ICD-01",
+    "SARC-03",
+    "SARC-05",
+    "REQ-04"
+   ],
+   "deliverables": [
+    [
+     "ICD-D4",
+     "produces"
+    ],
+    [
+     "ICD-D11",
+     "feeds"
+    ]
+   ]
+  },
+  {
+   "ref": "ICD-05",
+   "title": "Die-to-Package and Package-to-Board Interfaces",
+   "owner": "Packaging",
+   "start": 24,
+   "end": 42,
+   "dependsOn": [
+    "ICD-01",
+    "SARC-04",
+    "SARC-05",
+    "ICD-02"
+   ],
+   "deliverables": [
+    [
+     "ICD-D5",
+     "produces"
+    ],
+    [
+     "ICD-D11",
+     "feeds"
+    ]
+   ]
+  },
+  {
+   "ref": "ICD-06",
+   "title": "Power, Clock and Reset Interfaces",
+   "owner": "Board and system hardware",
+   "start": 24,
+   "end": 40,
+   "dependsOn": [
+    "ICD-01",
+    "SARC-06"
+   ],
+   "deliverables": [
+    [
+     "ICD-D6",
+     "produces"
+    ],
+    [
+     "ICD-D11",
+     "feeds"
+    ]
+   ]
+  },
+  {
+   "ref": "ICD-07",
+   "title": "Thermal and Mechanical Interfaces",
+   "owner": "Thermal and mechanical",
+   "start": 26,
+   "end": 42,
+   "dependsOn": [
+    "ICD-01",
+    "SARC-05",
+    "SARC-07"
+   ],
+   "deliverables": [
+    [
+     "ICD-D7",
+     "produces"
+    ],
+    [
+     "ICD-D11",
+     "feeds"
+    ]
+   ]
+  },
+  {
+   "ref": "ICD-08",
+   "title": "Firmware-to-Hardware and Software-to-Firmware Interfaces",
+   "owner": "Firmware",
+   "start": 26,
+   "end": 44,
+   "dependsOn": [
+    "ICD-01",
+    "SARC-08",
+    "SARC-09",
+    "ICD-03",
+    "ICD-06"
+   ],
+   "deliverables": [
+    [
+     "ICD-D8",
+     "produces"
+    ],
+    [
+     "ICD-D11",
+     "feeds"
+    ]
+   ]
+  },
+  {
+   "ref": "ICD-09",
+   "title": "Manufacturing, Test and Calibration Data Interfaces",
+   "owner": "Test engineering",
+   "start": 28,
+   "end": 44,
+   "dependsOn": [
+    "ICD-01",
+    "SARC-10",
+    "ICD-03",
+    "SARC-09"
+   ],
+   "deliverables": [
+    [
+     "ICD-D9",
+     "produces"
+    ],
+    [
+     "ICD-D11",
+     "feeds"
+    ]
+   ]
+  },
+  {
+   "ref": "ICD-10",
+   "title": "Interface Freeze Review and Change Control Baseline",
+   "owner": "System architecture",
+   "start": 42,
+   "end": 48,
+   "dependsOn": [
+    "ICD-01",
+    "ICD-02",
+    "ICD-03",
+    "ICD-04",
+    "ICD-05",
+    "ICD-06",
+    "ICD-07",
+    "ICD-08",
+    "ICD-09",
+    "SARC-12",
+    "FEAS-10"
+   ],
+   "deliverables": [
+    [
+     "ICD-D10",
+     "produces"
+    ],
+    [
+     "ICD-D11",
+     "produces"
+    ]
+   ]
+  },
+  {
+   "ref": "PCTL-01",
+   "title": "Integrated Master Schedule and Cross-Workstream Dependency Tracking",
+   "owner": "Program management",
+   "start": 20,
+   "end": 210,
+   "dependsOn": [
+    "CON-05",
+    "REQ-09"
+   ],
+   "deliverables": [
+    [
+     "PCTL-D1",
+     "produces"
+    ],
+    [
+     "PCTL-D7",
+     "feeds"
+    ]
+   ]
+  },
+  {
+   "ref": "PCTL-02",
+   "title": "Program Risk, Issue and Decision Log Management",
+   "owner": "Program management",
+   "start": 20,
+   "end": 210,
+   "dependsOn": [
+    "CON-06"
+   ],
+   "deliverables": [
+    [
+     "PCTL-D2",
+     "produces"
+    ],
+    [
+     "PCTL-D7",
+     "feeds"
+    ]
+   ]
+  },
+  {
+   "ref": "PCTL-03",
+   "title": "Interface Change Control Board Operation After the Interface Freeze",
+   "owner": "System architecture",
+   "start": 48,
+   "end": 210,
+   "dependsOn": [
+    "ICD-10",
+    "ICD-01"
+   ],
+   "deliverables": [
+    [
+     "PCTL-D3",
+     "produces"
+    ],
+    [
+     "PCTL-D7",
+     "feeds"
+    ]
+   ]
+  },
+  {
+   "ref": "PCTL-04",
+   "title": "Configuration Management — Design Databases, Firmware, Test Programs and Bills of Materials",
+   "owner": "Program management",
+   "start": 30,
+   "end": 210,
+   "dependsOn": [
+    "REQ-09",
+    "SARC-12",
+    "ICD-10"
+   ],
+   "deliverables": [
+    [
+     "PCTL-D4",
+     "produces"
+    ],
+    [
+     "PCTL-D7",
+     "feeds"
+    ]
+   ]
+  },
+  {
+   "ref": "PCTL-05",
+   "title": "Supplier and Partner Program Reviews",
+   "owner": "Supply chain",
+   "start": 20,
+   "end": 210,
+   "dependsOn": [
+    "CON-05",
+    "REQ-08"
+   ],
+   "deliverables": [
+    [
+     "PCTL-D5",
+     "produces"
+    ],
+    [
+     "PCTL-D7",
+     "feeds"
+    ]
+   ]
+  },
+  {
+   "ref": "PCTL-06",
+   "title": "Cost-of-Goods and Budget Tracking Against Target",
+   "owner": "Program management",
+   "start": 36,
+   "end": 210,
+   "dependsOn": [
+    "CON-04",
+    "SARC-11",
+    "REQ-08"
+   ],
+   "deliverables": [
+    [
+     "PCTL-D6",
+     "produces"
+    ],
+    [
+     "PCTL-D7",
+     "feeds"
+    ]
+   ]
+  },
+  {
+   "ref": "PCTL-07",
+   "title": "Change Control Handover to Sustaining",
+   "owner": "Quality",
+   "start": 202,
+   "end": 210,
+   "dependsOn": [
+    "PCTL-01",
+    "PCTL-02",
+    "PCTL-03",
+    "PCTL-04",
+    "PCTL-05",
+    "PCTL-06"
+   ],
+   "deliverables": [
+    [
+     "PCTL-D7",
+     "produces"
+    ]
+   ]
+  },
+  {
+   "ref": "FEAS-01",
+   "title": "Feasibility Plan and Test Vehicle Strategy",
+   "owner": "System architecture",
+   "start": 6,
+   "end": 10,
+   "dependsOn": [
+    "CON-06",
+    "CON-02",
+    "CON-03"
+   ],
+   "deliverables": [
+    [
+     "FEAS-D1",
+     "produces"
+    ],
+    [
+     "FEAS-D9",
+     "informs"
+    ]
+   ]
+  },
+  {
+   "ref": "FEAS-02",
+   "title": "SerDes and High-Speed I/O Test Chip",
+   "owner": "SerDes and high-speed I/O",
+   "start": 9,
+   "end": 46,
+   "dependsOn": [
+    "FEAS-01"
+   ],
+   "deliverables": [
+    [
+     "FEAS-D2",
+     "produces"
+    ],
+    [
+     "FEAS-D8",
+     "feeds"
+    ],
+    [
+     "FEAS-D9",
+     "feeds"
+    ]
+   ]
+  },
+  {
+   "ref": "FEAS-03",
+   "title": "Photonic IC Test Vehicle — Modulators, Detectors, Waveguides, Couplers",
+   "owner": "Photonics",
+   "start": 9,
+   "end": 46,
+   "dependsOn": [
+    "FEAS-01",
+    "CON-03",
+    "TRDY-02"
+   ],
+   "deliverables": [
+    [
+     "FEAS-D3",
+     "produces"
+    ],
+    [
+     "FEAS-D5",
+     "feeds"
+    ],
+    [
+     "FEAS-D8",
+     "feeds"
+    ],
+    [
+     "FEAS-D9",
+     "feeds"
+    ]
+   ]
+  },
+  {
+   "ref": "FEAS-04",
+   "title": "Electrical IC Test Vehicle — Drivers and Transimpedance Amplifiers",
+   "owner": "Analog and mixed-signal",
+   "start": 10,
+   "end": 46,
+   "dependsOn": [
+    "FEAS-01",
+    "TRDY-12"
+   ],
+   "deliverables": [
+    [
+     "FEAS-D4",
+     "produces"
+    ],
+    [
+     "FEAS-D8",
+     "feeds"
+    ],
+    [
+     "FEAS-D9",
+     "feeds"
+    ]
+   ]
+  },
+  {
+   "ref": "FEAS-05",
+   "title": "Optical Source and Laser Coupling Feasibility",
+   "owner": "Laser and optical source",
+   "start": 10,
+   "end": 42,
+   "dependsOn": [
+    "FEAS-01",
+    "FEAS-03"
+   ],
+   "deliverables": [
+    [
+     "FEAS-D5",
+     "produces"
+    ],
+    [
+     "FEAS-D8",
+     "feeds"
+    ],
+    [
+     "FEAS-D9",
+     "feeds"
+    ]
+   ]
+  },
+  {
+   "ref": "FEAS-06",
+   "title": "Fiber Attach and Optical Coupling Test Vehicle",
+   "owner": "Optical engineering",
+   "start": 12,
+   "end": 44,
+   "dependsOn": [
+    "FEAS-01",
+    "FEAS-03"
+   ],
+   "deliverables": [
+    [
+     "FEAS-D6",
+     "produces"
+    ],
+    [
+     "FEAS-D8",
+     "feeds"
+    ],
+    [
+     "FEAS-D9",
+     "feeds"
+    ]
+   ]
+  },
+  {
+   "ref": "FEAS-07",
+   "title": "Package, Bridge and Thermal Test Vehicle",
+   "owner": "Packaging",
+   "start": 12,
+   "end": 50,
+   "dependsOn": [
+    "FEAS-01",
+    "CON-03"
+   ],
+   "deliverables": [
+    [
+     "FEAS-D7",
+     "produces"
+    ],
+    [
+     "FEAS-D9",
+     "feeds"
+    ]
+   ]
+  },
+  {
+   "ref": "FEAS-08",
+   "title": "End-to-End Optical Link Feasibility Demonstration",
+   "owner": "Validation",
+   "start": 42,
+   "end": 54,
+   "dependsOn": [
+    "FEAS-02",
+    "FEAS-03",
+    "FEAS-04",
+    "FEAS-05",
+    "FEAS-06"
+   ],
+   "deliverables": [
+    [
+     "FEAS-D8",
+     "produces"
+    ],
+    [
+     "FEAS-D9",
+     "feeds"
+    ]
+   ]
+  },
+  {
+   "ref": "FEAS-09",
+   "title": "Feasibility Review and Technology Selection Decision",
+   "owner": "System architecture",
+   "start": 50,
+   "end": 56,
+   "dependsOn": [
+    "FEAS-01",
+    "FEAS-02",
+    "FEAS-03",
+    "FEAS-04",
+    "FEAS-05",
+    "FEAS-06",
+    "FEAS-07",
+    "FEAS-08",
+    "FEAS-10",
+    "FEAS-11",
+    "TRDY-02",
+    "TRDY-07"
+   ],
+   "deliverables": [
+    [
+     "FEAS-D9",
+     "produces"
+    ]
+   ]
+  },
+  {
+   "ref": "FEAS-10",
+   "title": "Interim Technology Down-Select Before the Partition Freeze",
+   "owner": "System architecture",
+   "start": 24,
+   "end": 30,
+   "dependsOn": [
+    "FEAS-01",
+    "FEAS-02",
+    "FEAS-03",
+    "FEAS-05",
+    "FEAS-06",
+    "FEAS-07",
+    "TRDY-02",
+    "TRDY-12"
+   ],
+   "deliverables": [
+    [
+     "FEAS-D10",
+     "produces"
+    ],
+    [
+     "FEAS-D9",
+     "informs"
+    ]
+   ]
+  },
+  {
+   "ref": "FEAS-11",
+   "title": "Early Optical Source and Fiber-Attach Reliability Screening on Test Vehicles",
+   "owner": "Reliability",
+   "start": 36,
+   "end": 56,
+   "dependsOn": [
+    "FEAS-01",
+    "FEAS-05",
+    "FEAS-06"
+   ],
+   "deliverables": [
+    [
+     "FEAS-D11",
+     "produces"
+    ],
+    [
+     "FEAS-D9",
+     "feeds"
+    ]
+   ]
+  },
+  {
+   "ref": "TRDY-01",
+   "title": "Silicon Process and Foundry Selection for the Switch and I/O Silicon",
+   "owner": "Technology and foundry",
+   "start": 8,
+   "end": 18,
+   "dependsOn": [
+    "CON-06",
+    "CON-03",
+    "CON-04"
+   ],
+   "deliverables": [
+    [
+     "TRDY-D1",
+     "produces"
+    ],
+    [
+     "TRDY-D3",
+     "feeds"
+    ],
+    [
+     "TRDY-D11",
+     "feeds"
+    ]
+   ]
+  },
+  {
+   "ref": "TRDY-02",
+   "title": "Photonics Process, Foundry and Photonic PDK Readiness",
+   "owner": "Photonics",
+   "start": 8,
+   "end": 32,
+   "dependsOn": [
+    "FEAS-01",
+    "CON-06"
+   ],
+   "deliverables": [
+    [
+     "TRDY-D2",
+     "produces"
+    ],
+    [
+     "TRDY-D9",
+     "feeds"
+    ],
+    [
+     "TRDY-D11",
+     "feeds"
+    ]
+   ]
+  },
+  {
+   "ref": "TRDY-03",
+   "title": "Digital PDK, Standard Cells and Memory Compilers",
+   "owner": "Physical design",
+   "start": 12,
+   "end": 38,
+   "dependsOn": [
+    "TRDY-01"
+   ],
+   "deliverables": [
+    [
+     "TRDY-D3",
+     "produces"
+    ],
+    [
+     "TRDY-D11",
+     "feeds"
+    ]
+   ]
+  },
+  {
+   "ref": "TRDY-04",
+   "title": "SerDes and High-Speed I/O IP Readiness",
+   "owner": "SerDes and high-speed I/O",
+   "start": 12,
+   "end": 44,
+   "dependsOn": [
+    "TRDY-01",
+    "FEAS-01"
+   ],
+   "deliverables": [
+    [
+     "TRDY-D4",
+     "produces"
+    ],
+    [
+     "TRDY-D5",
+     "feeds"
+    ],
+    [
+     "TRDY-D11",
+     "feeds"
+    ]
+   ]
+  },
+  {
+   "ref": "TRDY-05",
+   "title": "Third-Party and Internal IP Qualification",
+   "owner": "RTL design",
+   "start": 14,
+   "end": 44,
+   "dependsOn": [
+    "TRDY-01"
+   ],
+   "deliverables": [
+    [
+     "TRDY-D5",
+     "produces"
+    ],
+    [
+     "TRDY-D11",
+     "feeds"
+    ]
+   ]
+  },
+  {
+   "ref": "TRDY-06",
+   "title": "Package Technology, Substrate and Assembly Partner Readiness",
+   "owner": "Packaging",
+   "start": 12,
+   "end": 40,
+   "dependsOn": [
+    "TRDY-01",
+    "FEAS-01",
+    "FEAS-07"
+   ],
+   "deliverables": [
+    [
+     "TRDY-D6",
+     "produces"
+    ],
+    [
+     "TRDY-D10",
+     "feeds"
+    ],
+    [
+     "TRDY-D11",
+     "feeds"
+    ]
+   ]
+  },
+  {
+   "ref": "TRDY-07",
+   "title": "Optical Source and Laser Supplier Qualification",
+   "owner": "Laser and optical source",
+   "start": 14,
+   "end": 48,
+   "dependsOn": [
+    "FEAS-01",
+    "FEAS-05"
+   ],
+   "deliverables": [
+    [
+     "TRDY-D7",
+     "produces"
+    ],
+    [
+     "TRDY-D10",
+     "feeds"
+    ],
+    [
+     "TRDY-D11",
+     "feeds"
+    ]
+   ]
+  },
+  {
+   "ref": "TRDY-08",
+   "title": "Fiber, Connector, Passive, PCB and Cooling Supplier Readiness",
+   "owner": "Supply chain",
+   "start": 16,
+   "end": 48,
+   "dependsOn": [
+    "CON-05",
+    "FEAS-06"
+   ],
+   "deliverables": [
+    [
+     "TRDY-D8",
+     "produces"
+    ],
+    [
+     "TRDY-D10",
+     "feeds"
+    ],
+    [
+     "TRDY-D11",
+     "feeds"
+    ]
+   ]
+  },
+  {
+   "ref": "TRDY-09",
+   "title": "Electronic-Photonic Co-Design Flow and EDA Readiness",
+   "owner": "Design methodology and CAD",
+   "start": 12,
+   "end": 36,
+   "dependsOn": [
+    "TRDY-02"
+   ],
+   "deliverables": [
+    [
+     "TRDY-D9",
+     "produces"
+    ],
+    [
+     "TRDY-D11",
+     "feeds"
+    ]
+   ]
+  },
+  {
+   "ref": "TRDY-10",
+   "title": "Long-Lead Material Plan and Supply Agreements",
+   "owner": "Supply chain",
+   "start": 18,
+   "end": 52,
+   "dependsOn": [
+    "TRDY-06",
+    "TRDY-07",
+    "TRDY-08",
+    "CON-05"
+   ],
+   "deliverables": [
+    [
+     "TRDY-D10",
+     "produces"
+    ],
+    [
+     "TRDY-D11",
+     "feeds"
+    ]
+   ]
+  },
+  {
+   "ref": "TRDY-11",
+   "title": "Technology, IP and Supply Readiness Review",
+   "owner": "Program management",
+   "start": 52,
+   "end": 60,
+   "dependsOn": [
+    "TRDY-01",
+    "TRDY-02",
+    "TRDY-03",
+    "TRDY-04",
+    "TRDY-05",
+    "TRDY-06",
+    "TRDY-07",
+    "TRDY-08",
+    "TRDY-09",
+    "TRDY-10",
+    "TRDY-12",
+    "TRDY-13",
+    "TRDY-14",
+    "FEAS-09"
+   ],
+   "deliverables": [
+    [
+     "TRDY-D11",
+     "produces"
+    ]
+   ]
+  },
+  {
+   "ref": "TRDY-12",
+   "title": "Electrical IC Process and Foundry Selection",
+   "owner": "Technology and foundry",
+   "start": 8,
+   "end": 20,
+   "dependsOn": [
+    "CON-03",
+    "CON-06",
+    "FEAS-01"
+   ],
+   "deliverables": [
+    [
+     "TRDY-D12",
+     "produces"
+    ],
+    [
+     "TRDY-D11",
+     "feeds"
+    ]
+   ]
+  },
+  {
+   "ref": "TRDY-13",
+   "title": "System Manufacturing Partner Selection and Line Readiness",
+   "owner": "Supply chain",
+   "start": 28,
+   "end": 60,
+   "dependsOn": [
+    "TRDY-06",
+    "TRDY-08",
+    "CON-05"
+   ],
+   "deliverables": [
+    [
+     "TRDY-D13",
+     "produces"
+    ],
+    [
+     "TRDY-D10",
+     "feeds"
+    ],
+    [
+     "TRDY-D11",
+     "feeds"
+    ]
+   ]
+  },
+  {
+   "ref": "TRDY-14",
+   "title": "IP Rights, Freedom-to-Operate and Licensing Clearance",
+   "owner": "Product management",
+   "start": 12,
+   "end": 48,
+   "dependsOn": [
+    "CON-02",
+    "FEAS-01"
+   ],
+   "deliverables": [
+    [
+     "TRDY-D14",
+     "produces"
+    ],
+    [
+     "TRDY-D11",
+     "feeds"
+    ]
+   ]
+  },
+  {
+   "ref": "MODL-01",
+   "title": "Modeling Plan and Model Accuracy Targets",
+   "owner": "System architecture",
+   "start": 16,
+   "end": 20,
+   "dependsOn": [
+    "REQ-02",
+    "FEAS-01"
+   ],
+   "deliverables": [
+    [
+     "MODL-D1",
+     "produces"
+    ],
+    [
+     "MODL-D10",
+     "informs"
+    ]
+   ]
+  },
+  {
+   "ref": "MODL-02",
+   "title": "Network Traffic, Buffer and Congestion Performance Model",
+   "owner": "Switch ASIC architecture",
+   "start": 18,
+   "end": 40,
+   "dependsOn": [
+    "MODL-01",
+    "REQ-03"
+   ],
+   "deliverables": [
+    [
+     "MODL-D2",
+     "produces"
+    ],
+    [
+     "MODL-D8",
+     "feeds"
+    ],
+    [
+     "MODL-D10",
+     "feeds"
+    ]
+   ]
+  },
+  {
+   "ref": "MODL-03",
+   "title": "Electrical Channel and SerDes Link Models",
+   "owner": "SI/PI",
+   "start": 20,
+   "end": 42,
+   "dependsOn": [
+    "MODL-01",
+    "TRDY-04",
+    "FEAS-02"
+   ],
+   "deliverables": [
+    [
+     "MODL-D3",
+     "produces"
+    ],
+    [
+     "MODL-D6",
+     "informs"
+    ],
+    [
+     "MODL-D10",
+     "feeds"
+    ]
+   ]
+  },
+  {
+   "ref": "MODL-04",
+   "title": "Optical Link Budget and Optical Channel Model",
+   "owner": "Photonics",
+   "start": 20,
+   "end": 44,
+   "dependsOn": [
+    "MODL-01",
+    "REQ-04",
+    "FEAS-03",
+    "FEAS-05",
+    "FEAS-06"
+   ],
+   "deliverables": [
+    [
+     "MODL-D4",
+     "produces"
+    ],
+    [
+     "MODL-D8",
+     "feeds"
+    ],
+    [
+     "MODL-D10",
+     "feeds"
+    ]
+   ]
+  },
+  {
+   "ref": "MODL-05",
+   "title": "Electrical IC and Photonic IC Behavioral Co-Simulation Models",
+   "owner": "Analog and mixed-signal",
+   "start": 22,
+   "end": 46,
+   "dependsOn": [
+    "MODL-01",
+    "FEAS-03",
+    "FEAS-04",
+    "TRDY-02",
+    "TRDY-09"
+   ],
+   "deliverables": [
+    [
+     "MODL-D5",
+     "produces"
+    ],
+    [
+     "MODL-D4",
+     "informs"
+    ],
+    [
+     "MODL-D10",
+     "feeds"
+    ]
+   ]
+  },
+  {
+   "ref": "MODL-06",
+   "title": "Package Signal Integrity, Power Integrity and PDN Models",
+   "owner": "SI/PI",
+   "start": 24,
+   "end": 48,
+   "dependsOn": [
+    "MODL-01",
+    "FEAS-07"
+   ],
+   "deliverables": [
+    [
+     "MODL-D6",
+     "produces"
+    ],
+    [
+     "MODL-D3",
+     "informs"
+    ],
+    [
+     "MODL-D10",
+     "feeds"
+    ]
+   ]
+  },
+  {
+   "ref": "MODL-07",
+   "title": "System Thermal, Mechanical and Warpage Models",
+   "owner": "Thermal and mechanical",
+   "start": 24,
+   "end": 48,
+   "dependsOn": [
+    "MODL-01",
+    "FEAS-07"
+   ],
+   "deliverables": [
+    [
+     "MODL-D7",
+     "produces"
+    ],
+    [
+     "MODL-D8",
+     "feeds"
+    ],
+    [
+     "MODL-D10",
+     "feeds"
+    ]
+   ]
+  },
+  {
+   "ref": "MODL-08",
+   "title": "System Power Model and Power-per-Bit Estimate",
+   "owner": "System architecture",
+   "start": 26,
+   "end": 48,
+   "dependsOn": [
+    "MODL-02",
+    "MODL-03",
+    "MODL-04",
+    "MODL-06",
+    "MODL-07"
+   ],
+   "deliverables": [
+    [
+     "MODL-D8",
+     "produces"
+    ],
+    [
+     "MODL-D10",
+     "feeds"
+    ]
+   ]
+  },
+  {
+   "ref": "MODL-09",
+   "title": "Virtual Platform and End-to-End System Model for Firmware and Software",
+   "owner": "Software",
+   "start": 26,
+   "end": 52,
+   "dependsOn": [
+    "MODL-01",
+    "MODL-02",
+    "MODL-05"
+   ],
+   "deliverables": [
+    [
+     "MODL-D9",
+     "produces"
+    ],
+    [
+     "MODL-D10",
+     "feeds"
+    ]
+   ]
+  },
+  {
+   "ref": "MODL-10",
+   "title": "Model Correlation Plan and Model Readiness Review",
+   "owner": "System architecture",
+   "start": 50,
+   "end": 56,
+   "dependsOn": [
+    "MODL-01",
+    "MODL-02",
+    "MODL-03",
+    "MODL-04",
+    "MODL-05",
+    "MODL-06",
+    "MODL-07",
+    "MODL-08",
+    "MODL-09",
+    "MODL-11",
+    "FEAS-08"
+   ],
+   "deliverables": [
+    [
+     "MODL-D10",
+     "produces"
+    ]
+   ]
+  },
+  {
+   "ref": "MODL-11",
+   "title": "Test-Vehicle-to-Model Correlation",
+   "owner": "System architecture",
+   "start": 44,
+   "end": 56,
+   "dependsOn": [
+    "FEAS-02",
+    "FEAS-03",
+    "FEAS-04",
+    "FEAS-07",
+    "MODL-01",
+    "MODL-03",
+    "MODL-04",
+    "MODL-05",
+    "MODL-07"
+   ],
+   "deliverables": [
+    [
+     "MODL-D11",
+     "produces"
+    ],
+    [
+     "MODL-D10",
+     "feeds"
+    ]
+   ]
+  },
+  {
+   "ref": "DSGN-01",
+   "title": "Switch ASIC Microarchitecture and Block Specifications",
+   "owner": "Switch ASIC architecture",
+   "start": 32,
+   "end": 44,
+   "dependsOn": [
+    "SARC-01",
+    "SARC-11",
+    "SARC-12",
+    "MODL-02",
+    "ICD-02"
+   ],
+   "deliverables": [
+    [
+     "DSGN-D1",
+     "produces"
+    ],
+    [
+     "DSGN-D2",
+     "feeds"
+    ]
+   ]
+  },
+  {
+   "ref": "DSGN-02",
+   "title": "Switch ASIC RTL Development and Integration",
+   "owner": "RTL design",
+   "start": 38,
+   "end": 76,
+   "dependsOn": [
+    "DSGN-01",
+    "TRDY-05",
+    "TRDY-03"
+   ],
+   "deliverables": [
+    [
+     "DSGN-D2",
+     "produces"
+    ],
+    [
+     "DSGN-D17",
+     "feeds"
+    ]
+   ]
+  },
+  {
+   "ref": "DSGN-03",
+   "title": "Clock, Reset, Power Management and Low-Power Intent",
+   "owner": "RTL design",
+   "start": 40,
+   "end": 66,
+   "dependsOn": [
+    "SARC-06",
+    "ICD-06",
+    "DSGN-01"
+   ],
+   "deliverables": [
+    [
+     "DSGN-D2",
+     "feeds"
+    ],
+    [
+     "DSGN-D13",
+     "informs"
+    ]
+   ]
+  },
+  {
+   "ref": "DSGN-04",
+   "title": "High-Speed I/O and SerDes Silicon Design",
+   "owner": "SerDes and high-speed I/O",
+   "start": 36,
+   "end": 76,
+   "dependsOn": [
+    "SARC-02",
+    "ICD-02",
+    "MODL-03",
+    "FEAS-02",
+    "TRDY-04"
+   ],
+   "deliverables": [
+    [
+     "DSGN-D3",
+     "produces"
+    ],
+    [
+     "DSGN-D17",
+     "feeds"
+    ]
+   ]
+  },
+  {
+   "ref": "DSGN-05",
+   "title": "Electrical IC Circuit Design — Drivers, TIAs, Bias and Control",
+   "owner": "Analog and mixed-signal",
+   "start": 36,
+   "end": 76,
+   "dependsOn": [
+    "SARC-03",
+    "ICD-03",
+    "FEAS-04",
+    "MODL-04"
+   ],
+   "deliverables": [
+    [
+     "DSGN-D4",
+     "produces"
+    ],
+    [
+     "DSGN-D7",
+     "feeds"
+    ]
+   ]
+  },
+  {
+   "ref": "DSGN-06",
+   "title": "Photonic IC Design — Modulators, Detectors, Multiplexing, Heaters and Monitors",
+   "owner": "Photonics",
+   "start": 36,
+   "end": 78,
+   "dependsOn": [
+    "SARC-03",
+    "ICD-03",
+    "ICD-04",
+    "TRDY-02",
+    "FEAS-03",
+    "MODL-04"
+   ],
+   "deliverables": [
+    [
+     "DSGN-D5",
+     "produces"
+    ],
+    [
+     "DSGN-D17",
+     "feeds"
+    ]
+   ]
+  },
+  {
+   "ref": "DSGN-07",
+   "title": "Optical Source Subsystem Design",
+   "owner": "Laser and optical source",
+   "start": 38,
+   "end": 76,
+   "dependsOn": [
+    "SARC-03",
+    "ICD-03",
+    "FEAS-05",
+    "TRDY-07"
+   ],
+   "deliverables": [
+    [
+     "DSGN-D6",
+     "produces"
+    ],
+    [
+     "DSGN-D5",
+     "feeds"
+    ]
+   ]
+  },
+  {
+   "ref": "DSGN-08",
+   "title": "Optical Control, Tuning and Calibration Algorithms",
+   "owner": "Photonics",
+   "start": 42,
+   "end": 76,
+   "dependsOn": [
+    "DSGN-05",
+    "DSGN-06",
+    "DSGN-07",
+    "MODL-09"
+   ],
+   "deliverables": [
+    [
+     "DSGN-D7",
+     "produces"
+    ],
+    [
+     "DSGN-D15",
+     "feeds"
+    ]
+   ]
+  },
+  {
+   "ref": "DSGN-09",
+   "title": "Bridge / Interposer and Silicon Capacitor Design",
+   "owner": "Packaging",
+   "start": 40,
+   "end": 72,
+   "dependsOn": [
+    "SARC-04",
+    "ICD-02",
+    "ICD-05",
+    "FEAS-07"
+   ],
+   "deliverables": [
+    [
+     "DSGN-D8",
+     "produces"
+    ],
+    [
+     "DSGN-D11",
+     "feeds"
+    ]
+   ]
+  },
+  {
+   "ref": "DSGN-10",
+   "title": "Security Hardware — Root of Trust, Boot ROM, Fuses and Debug Lock",
+   "owner": "Security",
+   "start": 42,
+   "end": 72,
+   "dependsOn": [
+    "SARC-09",
+    "REQ-06",
+    "DSGN-01"
+   ],
+   "deliverables": [
+    [
+     "DSGN-D9",
+     "produces"
+    ],
+    [
+     "DSGN-D2",
+     "feeds"
+    ]
+   ]
+  },
+  {
+   "ref": "DSGN-11",
+   "title": "DFT Design — Scan, Memory BIST, JTAG, Loopback, PRBS and Analog / Optical Test Access",
+   "owner": "DFT",
+   "start": 42,
+   "end": 80,
+   "dependsOn": [
+    "SARC-10",
+    "DSGN-01",
+    "ICD-09"
+   ],
+   "deliverables": [
+    [
+     "DSGN-D10",
+     "produces"
+    ],
+    [
+     "DSGN-D2",
+     "feeds"
+    ]
+   ]
+  },
+  {
+   "ref": "DSGN-12",
+   "title": "Package and Substrate Design — Floorplan, Bump Map and Die-to-Die Routing",
+   "owner": "Packaging",
+   "start": 42,
+   "end": 80,
+   "dependsOn": [
+    "SARC-05",
+    "ICD-05",
+    "DSGN-09",
+    "DSGN-07",
+    "TRDY-06",
+    "DSGN-21"
+   ],
+   "deliverables": [
+    [
+     "DSGN-D11",
+     "produces"
+    ],
+    [
+     "DSGN-D17",
+     "feeds"
+    ]
+   ]
+  },
+  {
+   "ref": "DSGN-13",
+   "title": "Fiber Assembly, Optical Connector and Front-Panel Design",
+   "owner": "Optical engineering",
+   "start": 44,
+   "end": 80,
+   "dependsOn": [
+    "ICD-04",
+    "SARC-05",
+    "FEAS-06",
+    "DSGN-12",
+    "TRDY-08"
+   ],
+   "deliverables": [
+    [
+     "DSGN-D12",
+     "produces"
+    ],
+    [
+     "DSGN-D11",
+     "informs"
+    ]
+   ]
+  },
+  {
+   "ref": "DSGN-14",
+   "title": "System Board, Voltage Regulation and Power Delivery Design",
+   "owner": "Board and system hardware",
+   "start": 46,
+   "end": 82,
+   "dependsOn": [
+    "SARC-06",
+    "ICD-06",
+    "ICD-05",
+    "DSGN-12",
+    "DSGN-03"
+   ],
+   "deliverables": [
+    [
+     "DSGN-D13",
+     "produces"
+    ],
+    [
+     "DSGN-D17",
+     "feeds"
+    ]
+   ]
+  },
+  {
+   "ref": "DSGN-15",
+   "title": "Thermal Solution and Cooling Design",
+   "owner": "Thermal and mechanical",
+   "start": 46,
+   "end": 80,
+   "dependsOn": [
+    "SARC-07",
+    "ICD-07",
+    "DSGN-12",
+    "MODL-08"
+   ],
+   "deliverables": [
+    [
+     "DSGN-D14",
+     "produces"
+    ],
+    [
+     "DSGN-D17",
+     "feeds"
+    ]
+   ]
+  },
+  {
+   "ref": "DSGN-16",
+   "title": "Firmware Development — Boot, Initialization, Link Training and Optical Control",
+   "owner": "Firmware",
+   "start": 44,
+   "end": 84,
+   "dependsOn": [
+    "SARC-08",
+    "ICD-08",
+    "MODL-09",
+    "DSGN-08",
+    "DSGN-10"
+   ],
+   "deliverables": [
+    [
+     "DSGN-D15",
+     "produces"
+    ],
+    [
+     "DSGN-D17",
+     "feeds"
+    ]
+   ]
+  },
+  {
+   "ref": "DSGN-17",
+   "title": "SDK, Drivers, Management and Telemetry Software Development",
+   "owner": "Software",
+   "start": 46,
+   "end": 84,
+   "dependsOn": [
+    "SARC-08",
+    "ICD-08",
+    "MODL-09",
+    "REQ-03"
+   ],
+   "deliverables": [
+    [
+     "DSGN-D16",
+     "produces"
+    ],
+    [
+     "DSGN-D17",
+     "feeds"
+    ]
+   ]
+  },
+  {
+   "ref": "DSGN-18",
+   "title": "Design Freeze Review — RTL, Circuit and Photonic Freeze",
+   "owner": "System architecture",
+   "start": 78,
+   "end": 84,
+   "dependsOn": [
+    "DSGN-02",
+    "DSGN-03",
+    "DSGN-04",
+    "DSGN-05",
+    "DSGN-06",
+    "DSGN-07",
+    "DSGN-08",
+    "DSGN-09",
+    "DSGN-10",
+    "DSGN-11",
+    "DSGN-12",
+    "DSGN-13",
+    "DSGN-14",
+    "DSGN-15",
+    "DSGN-16",
+    "DSGN-17",
+    "DSGN-19",
+    "DSGN-20",
+    "DSGN-21",
+    "DSGN-22",
+    "PSV-02",
+    "PSV-04",
+    "PSV-07"
+   ],
+   "deliverables": [
+    [
+     "DSGN-D17",
+     "produces"
+    ]
+   ]
+  },
+  {
+   "ref": "DSGN-19",
+   "title": "Optical Engine Sub-Assembly Design — Electrical-to-Photonic Attach and Engine Substrate",
+   "owner": "Packaging",
+   "start": 42,
+   "end": 78,
+   "dependsOn": [
+    "SARC-03",
+    "ICD-03",
+    "FEAS-07",
+    "DSGN-05",
+    "DSGN-06"
+   ],
+   "deliverables": [
+    [
+     "DSGN-D18",
+     "produces"
+    ],
+    [
+     "DSGN-D11",
+     "feeds"
+    ]
+   ]
+  },
+  {
+   "ref": "DSGN-20",
+   "title": "Optical Source Module Packaging, Serviceability and Front-Panel Integration",
+   "owner": "Laser and optical source",
+   "start": 44,
+   "end": 78,
+   "dependsOn": [
+    "DSGN-07",
+    "ICD-04",
+    "SARC-05",
+    "REQ-07",
+    "FEAS-05"
+   ],
+   "deliverables": [
+    [
+     "DSGN-D19",
+     "produces"
+    ],
+    [
+     "DSGN-D6",
+     "feeds"
+    ]
+   ]
+  },
+  {
+   "ref": "DSGN-21",
+   "title": "Early Die Floorplan, Die Size and Bump Plan Trials for Every Die",
+   "owner": "Physical design",
+   "start": 36,
+   "end": 54,
+   "dependsOn": [
+    "DSGN-01",
+    "SARC-04",
+    "SARC-12",
+    "TRDY-03"
+   ],
+   "deliverables": [
+    [
+     "DSGN-D20",
+     "produces"
+    ],
+    [
+     "DSGN-D11",
+     "feeds"
+    ]
+   ]
+  },
+  {
+   "ref": "DSGN-22",
+   "title": "System Enclosure, Power Supplies, Fan Trays and Control-Plane Processor Design",
+   "owner": "Board and system hardware",
+   "start": 46,
+   "end": 82,
+   "dependsOn": [
+    "SARC-05",
+    "SARC-06",
+    "SARC-07",
+    "REQ-07",
+    "ICD-07"
+   ],
+   "deliverables": [
+    [
+     "DSGN-D21",
+     "produces"
+    ],
+    [
+     "DSGN-D17",
+     "feeds"
+    ]
+   ]
+  },
+  {
+   "ref": "PSV-01",
+   "title": "Verification Plan and Coverage Model Across Every Die and the System",
+   "owner": "Design verification",
+   "start": 36,
+   "end": 42,
+   "dependsOn": [
+    "REQ-02",
+    "SARC-12",
+    "DSGN-01",
+    "ICD-02",
+    "MODL-01"
+   ],
+   "deliverables": [
+    [
+     "PSV-D1",
+     "produces"
+    ],
+    [
+     "PSV-D11",
+     "feeds"
+    ]
+   ]
+  },
+  {
+   "ref": "PSV-02",
+   "title": "Block and Subsystem Verification and Regression",
+   "owner": "Design verification",
+   "start": 40,
+   "end": 80,
+   "dependsOn": [
+    "PSV-01",
+    "DSGN-01",
+    "DSGN-02"
+   ],
+   "deliverables": [
+    [
+     "PSV-D2",
+     "produces"
+    ],
+    [
+     "PSV-D3",
+     "feeds"
+    ]
+   ]
+  },
+  {
+   "ref": "PSV-03",
+   "title": "Full-Chip Simulation and Regression",
+   "owner": "Design verification",
+   "start": 52,
+   "end": 88,
+   "dependsOn": [
+    "PSV-01",
+    "PSV-02",
+    "DSGN-02",
+    "DSGN-03",
+    "DSGN-04"
+   ],
+   "deliverables": [
+    [
+     "PSV-D3",
+     "produces"
+    ],
+    [
+     "PSV-D11",
+     "feeds"
+    ]
+   ]
+  },
+  {
+   "ref": "PSV-04",
+   "title": "Formal, CDC / RDC and Low-Power Verification",
+   "owner": "Design verification",
+   "start": 46,
+   "end": 84,
+   "dependsOn": [
+    "PSV-01",
+    "DSGN-02",
+    "DSGN-03",
+    "DSGN-10"
+   ],
+   "deliverables": [
+    [
+     "PSV-D4",
+     "produces"
+    ],
+    [
+     "PSV-D11",
+     "feeds"
+    ]
+   ]
+  },
+  {
+   "ref": "PSV-05",
+   "title": "Mixed-Signal Verification of the Electrical IC and SerDes",
+   "owner": "Analog and mixed-signal",
+   "start": 46,
+   "end": 84,
+   "dependsOn": [
+    "PSV-01",
+    "DSGN-04",
+    "DSGN-05",
+    "MODL-05"
+   ],
+   "deliverables": [
+    [
+     "PSV-D5",
+     "produces"
+    ],
+    [
+     "PSV-D7",
+     "feeds"
+    ]
+   ]
+  },
+  {
+   "ref": "PSV-06",
+   "title": "Photonic IC and Optical Link Simulation Against the Budget",
+   "owner": "Photonics",
+   "start": 46,
+   "end": 82,
+   "dependsOn": [
+    "DSGN-06",
+    "DSGN-07",
+    "MODL-04",
+    "PSV-01",
+    "MODL-11"
+   ],
+   "deliverables": [
+    [
+     "PSV-D6",
+     "produces"
+    ],
+    [
+     "PSV-D7",
+     "feeds"
+    ]
+   ]
+  },
+  {
+   "ref": "PSV-07",
+   "title": "Link-Level Co-Simulation — Switch, SerDes, Electrical IC, Photonic IC and Fiber",
+   "owner": "System architecture",
+   "start": 54,
+   "end": 78,
+   "dependsOn": [
+    "PSV-05",
+    "PSV-06",
+    "MODL-03",
+    "MODL-04",
+    "MODL-06",
+    "MODL-10",
+    "MODL-11",
+    "ICD-10",
+    "DSGN-12"
+   ],
+   "deliverables": [
+    [
+     "PSV-D7",
+     "produces"
+    ],
+    [
+     "PSV-D11",
+     "feeds"
+    ]
+   ]
+  },
+  {
+   "ref": "PSV-08",
+   "title": "Emulation and FPGA Prototyping of the Switch ASIC",
+   "owner": "Design verification",
+   "start": 50,
+   "end": 86,
+   "dependsOn": [
+    "PSV-01",
+    "DSGN-02",
+    "MODL-09"
+   ],
+   "deliverables": [
+    [
+     "PSV-D8",
+     "produces"
+    ],
+    [
+     "PSV-D9",
+     "feeds"
+    ]
+   ]
+  },
+  {
+   "ref": "PSV-09",
+   "title": "Firmware and Software Pre-Silicon Validation",
+   "owner": "Firmware",
+   "start": 56,
+   "end": 90,
+   "dependsOn": [
+    "PSV-08",
+    "DSGN-16",
+    "DSGN-17",
+    "MODL-09"
+   ],
+   "deliverables": [
+    [
+     "PSV-D9",
+     "produces"
+    ],
+    [
+     "PSV-D11",
+     "feeds"
+    ]
+   ]
+  },
+  {
+   "ref": "PSV-10",
+   "title": "Gate-Level Simulation and Test Pattern Simulation",
+   "owner": "Design verification",
+   "start": 76,
+   "end": 92,
+   "dependsOn": [
+    "PSV-03",
+    "DSGN-11",
+    "IMPL-01"
+   ],
+   "deliverables": [
+    [
+     "PSV-D10",
+     "produces"
+    ],
+    [
+     "PSV-D11",
+     "feeds"
+    ]
+   ]
+  },
+  {
+   "ref": "PSV-11",
+   "title": "Pre-Silicon Validation Closure Review",
+   "owner": "Program management",
+   "start": 86,
+   "end": 92,
+   "dependsOn": [
+    "PSV-01",
+    "PSV-02",
+    "PSV-03",
+    "PSV-04",
+    "PSV-05",
+    "PSV-06",
+    "PSV-07",
+    "PSV-08",
+    "PSV-09",
+    "PSV-10",
+    "PSV-12",
+    "PSV-13",
+    "PSV-14",
+    "DSGN-18"
+   ],
+   "deliverables": [
+    [
+     "PSV-D11",
+     "produces"
+    ]
+   ]
+  },
+  {
+   "ref": "PSV-12",
+   "title": "Pre-Silicon Security Verification — Boot ROM, Fuses, Debug Lock and Key Handling",
+   "owner": "Security",
+   "start": 56,
+   "end": 88,
+   "dependsOn": [
+    "DSGN-10",
+    "REQ-06",
+    "SARC-09",
+    "PSV-01",
+    "DSGN-02"
+   ],
+   "deliverables": [
+    [
+     "PSV-D12",
+     "produces"
+    ],
+    [
+     "PSV-D11",
+     "feeds"
+    ]
+   ]
+  },
+  {
+   "ref": "PSV-13",
+   "title": "Bridge / Interposer and Silicon Capacitor Verification",
+   "owner": "Packaging",
+   "start": 56,
+   "end": 84,
+   "dependsOn": [
+    "DSGN-09",
+    "DSGN-12",
+    "PSV-01",
+    "ICD-02"
+   ],
+   "deliverables": [
+    [
+     "PSV-D13",
+     "produces"
+    ],
+    [
+     "PSV-D7",
+     "feeds"
+    ]
+   ]
+  },
+  {
+   "ref": "PSV-14",
+   "title": "Emulation-Based Power Analysis and Worst-Case Current-Step Vectors",
+   "owner": "Design verification",
+   "start": 66,
+   "end": 86,
+   "dependsOn": [
+    "PSV-08",
+    "DSGN-02",
+    "DSGN-03",
+    "MODL-08"
+   ],
+   "deliverables": [
+    [
+     "PSV-D14",
+     "produces"
+    ],
+    [
+     "PSV-D11",
+     "feeds"
+    ]
+   ]
+  },
+  {
+   "ref": "IMPL-01",
+   "title": "Switch ASIC Synthesis and Netlist Drops",
+   "owner": "Physical design",
+   "start": 64,
+   "end": 84,
+   "dependsOn": [
+    "DSGN-02",
+    "DSGN-03",
+    "TRDY-03",
+    "DSGN-11",
+    "SARC-11"
+   ],
+   "deliverables": [
+    [
+     "IMPL-D1",
+     "produces"
+    ],
+    [
+     "IMPL-D2",
+     "feeds"
+    ],
+    [
+     "IMPL-D11",
+     "feeds"
+    ]
+   ]
+  },
+  {
+   "ref": "IMPL-02",
+   "title": "Switch ASIC Floorplan, Place and Route and Timing Closure",
+   "owner": "Physical design",
+   "start": 68,
+   "end": 98,
+   "dependsOn": [
+    "IMPL-01",
+    "ICD-05",
+    "ICD-02",
+    "TRDY-03"
+   ],
+   "deliverables": [
+    [
+     "IMPL-D2",
+     "produces"
+    ]
+   ]
+  },
+  {
+   "ref": "IMPL-03",
+   "title": "High-Speed I/O and SerDes Silicon Physical Implementation",
+   "owner": "SerDes and high-speed I/O",
+   "start": 66,
+   "end": 94,
+   "dependsOn": [
+    "DSGN-04",
+    "TRDY-04",
+    "ICD-02",
+    "MODL-03"
+   ],
+   "deliverables": [
+    [
+     "IMPL-D3",
+     "produces"
+    ],
+    [
+     "IMPL-D7",
+     "feeds"
+    ]
+   ]
+  },
+  {
+   "ref": "IMPL-04",
+   "title": "Electrical IC Layout, Extraction and Post-Layout Simulation",
+   "owner": "Analog and mixed-signal",
+   "start": 66,
+   "end": 92,
+   "dependsOn": [
+    "DSGN-05",
+    "ICD-03",
+    "TRDY-09",
+    "MODL-05"
+   ],
+   "deliverables": [
+    [
+     "IMPL-D4",
+     "produces"
+    ]
+   ]
+  },
+  {
+   "ref": "IMPL-05",
+   "title": "Photonic IC Layout and Optical Design Rule Closure",
+   "owner": "Photonics",
+   "start": 66,
+   "end": 92,
+   "dependsOn": [
+    "DSGN-06",
+    "TRDY-02",
+    "ICD-04",
+    "ICD-03",
+    "TRDY-09"
+   ],
+   "deliverables": [
+    [
+     "IMPL-D5",
+     "produces"
+    ]
+   ]
+  },
+  {
+   "ref": "IMPL-06",
+   "title": "Bridge / Interposer and Silicon Capacitor Layout",
+   "owner": "Packaging",
+   "start": 68,
+   "end": 92,
+   "dependsOn": [
+    "DSGN-09",
+    "ICD-02",
+    "TRDY-06"
+   ],
+   "deliverables": [
+    [
+     "IMPL-D6",
+     "produces"
+    ],
+    [
+     "IMPL-D7",
+     "feeds"
+    ]
+   ]
+  },
+  {
+   "ref": "IMPL-07",
+   "title": "Package Layout, Substrate and RDL Routing and Bump Map Closure",
+   "owner": "Packaging",
+   "start": 68,
+   "end": 96,
+   "dependsOn": [
+    "DSGN-12",
+    "ICD-05",
+    "IMPL-02",
+    "IMPL-03",
+    "IMPL-06",
+    "DSGN-13"
+   ],
+   "deliverables": [
+    [
+     "IMPL-D7",
+     "produces"
+    ],
+    [
+     "IMPL-D8",
+     "feeds"
+    ],
+    [
+     "IMPL-D10",
+     "feeds"
+    ]
+   ]
+  },
+  {
+   "ref": "IMPL-08",
+   "title": "Package and Board Signal and Power Integrity Closure",
+   "owner": "SI/PI",
+   "start": 74,
+   "end": 98,
+   "dependsOn": [
+    "IMPL-07",
+    "MODL-06",
+    "MODL-03",
+    "DSGN-14"
+   ],
+   "deliverables": [
+    [
+     "IMPL-D8",
+     "produces"
+    ],
+    [
+     "IMPL-D10",
+     "informs"
+    ]
+   ]
+  },
+  {
+   "ref": "IMPL-09",
+   "title": "Thermal, Mechanical and Warpage Co-Analysis on the Layout",
+   "owner": "Thermal and mechanical",
+   "start": 74,
+   "end": 98,
+   "dependsOn": [
+    "IMPL-07",
+    "MODL-07",
+    "DSGN-15",
+    "IMPL-05"
+   ],
+   "deliverables": [
+    [
+     "IMPL-D9",
+     "produces"
+    ],
+    [
+     "IMPL-D7",
+     "informs"
+    ]
+   ]
+  },
+  {
+   "ref": "IMPL-10",
+   "title": "Validation, Reference and Production System Board Layout and Fabrication Release",
+   "owner": "Board and system hardware",
+   "start": 72,
+   "end": 100,
+   "dependsOn": [
+    "DSGN-14",
+    "IMPL-07",
+    "ICD-06"
+   ],
+   "deliverables": [
+    [
+     "IMPL-D10",
+     "produces"
+    ]
+   ]
+  },
+  {
+   "ref": "IMPL-11",
+   "title": "Scan Stitching, DFT Closure and Test Pattern Generation",
+   "owner": "DFT",
+   "start": 74,
+   "end": 100,
+   "dependsOn": [
+    "IMPL-01",
+    "DSGN-11",
+    "SARC-10",
+    "TINF-01"
+   ],
+   "deliverables": [
+    [
+     "IMPL-D11",
+     "produces"
+    ]
+   ]
+  },
+  {
+   "ref": "IMPL-12",
+   "title": "Implementation Completion Review and Database Handoff to Signoff",
+   "owner": "Physical design",
+   "start": 96,
+   "end": 100,
+   "dependsOn": [
+    "IMPL-01",
+    "IMPL-02",
+    "IMPL-03",
+    "IMPL-04",
+    "IMPL-05",
+    "IMPL-06",
+    "IMPL-07",
+    "IMPL-08",
+    "IMPL-09",
+    "IMPL-10",
+    "IMPL-11"
+   ],
+   "deliverables": [
+    [
+     "IMPL-D12",
+     "produces"
+    ]
+   ]
+  },
+  {
+   "ref": "IMPL-13",
+   "title": "Customer Design-In Kit and Engineering Sample Plan",
+   "owner": "Product management",
+   "start": 72,
+   "end": 100,
+   "dependsOn": [
+    "IMPL-10",
+    "IMPL-08",
+    "IMPL-09",
+    "MODL-04",
+    "REQ-01"
+   ],
+   "deliverables": [
+    [
+     "IMPL-D13",
+     "produces"
+    ],
+    [
+     "IMPL-D14",
+     "produces"
+    ]
+   ]
+  },
+  {
+   "ref": "SGNO-01",
+   "title": "Switch ASIC Timing, EM / IR and Physical Verification Signoff",
+   "owner": "Physical design",
+   "start": 88,
+   "end": 102,
+   "dependsOn": [
+    "IMPL-02",
+    "IMPL-11",
+    "TRDY-03"
+   ],
+   "deliverables": [
+    [
+     "SGNO-D1",
+     "produces"
+    ],
+    [
+     "SGNO-D8",
+     "feeds"
+    ],
+    [
+     "SGNO-D11",
+     "feeds"
+    ]
+   ]
+  },
+  {
+   "ref": "SGNO-02",
+   "title": "High-Speed I/O and SerDes Silicon Signoff",
+   "owner": "SerDes and high-speed I/O",
+   "start": 88,
+   "end": 102,
+   "dependsOn": [
+    "IMPL-03",
+    "TRDY-04",
+    "IMPL-08"
+   ],
+   "deliverables": [
+    [
+     "SGNO-D2",
+     "produces"
+    ],
+    [
+     "SGNO-D6",
+     "feeds"
+    ],
+    [
+     "SGNO-D11",
+     "feeds"
+    ]
+   ]
+  },
+  {
+   "ref": "SGNO-03",
+   "title": "Electrical IC Analog Signoff",
+   "owner": "Analog and mixed-signal",
+   "start": 88,
+   "end": 102,
+   "dependsOn": [
+    "IMPL-04",
+    "PSV-05",
+    "PSV-07"
+   ],
+   "deliverables": [
+    [
+     "SGNO-D3",
+     "produces"
+    ],
+    [
+     "SGNO-D11",
+     "feeds"
+    ]
+   ]
+  },
+  {
+   "ref": "SGNO-04",
+   "title": "Photonic IC Signoff — Optical Rules, Connectivity and Performance",
+   "owner": "Photonics",
+   "start": 88,
+   "end": 102,
+   "dependsOn": [
+    "IMPL-05",
+    "PSV-06",
+    "TRDY-02",
+    "MODL-04"
+   ],
+   "deliverables": [
+    [
+     "SGNO-D4",
+     "produces"
+    ],
+    [
+     "SGNO-D11",
+     "feeds"
+    ]
+   ]
+  },
+  {
+   "ref": "SGNO-05",
+   "title": "Bridge / Interposer and Silicon Capacitor Signoff",
+   "owner": "Packaging",
+   "start": 90,
+   "end": 102,
+   "dependsOn": [
+    "IMPL-06",
+    "MODL-06"
+   ],
+   "deliverables": [
+    [
+     "SGNO-D5",
+     "produces"
+    ],
+    [
+     "SGNO-D6",
+     "feeds"
+    ]
+   ]
+  },
+  {
+   "ref": "SGNO-06",
+   "title": "Multi-Die Package Signoff — Die-to-Die Timing, SI / PI and Thermal",
+   "owner": "SI/PI",
+   "start": 92,
+   "end": 104,
+   "dependsOn": [
+    "IMPL-07",
+    "IMPL-08",
+    "IMPL-09",
+    "SGNO-05",
+    "SGNO-01",
+    "SGNO-02"
+   ],
+   "deliverables": [
+    [
+     "SGNO-D6",
+     "produces"
+    ],
+    [
+     "SGNO-D7",
+     "gates"
+    ],
+    [
+     "SGNO-D11",
+     "feeds"
+    ]
+   ]
+  },
+  {
+   "ref": "SGNO-07",
+   "title": "Final Equivalence, DFT Signoff and Pattern Delivery",
+   "owner": "DFT",
+   "start": 92,
+   "end": 104,
+   "dependsOn": [
+    "IMPL-11",
+    "SGNO-01",
+    "PSV-10"
+   ],
+   "deliverables": [
+    [
+     "SGNO-D8",
+     "produces"
+    ],
+    [
+     "SGNO-D9",
+     "produces"
+    ],
+    [
+     "SGNO-D11",
+     "feeds"
+    ]
+   ]
+  },
+  {
+   "ref": "SGNO-08",
+   "title": "Security Signoff — Keys, Fuses and Debug Lock",
+   "owner": "Security",
+   "start": 94,
+   "end": 104,
+   "dependsOn": [
+    "DSGN-10",
+    "IMPL-11",
+    "SARC-09"
+   ],
+   "deliverables": [
+    [
+     "SGNO-D10",
+     "produces"
+    ],
+    [
+     "SGNO-D11",
+     "gates"
+    ]
+   ]
+  },
+  {
+   "ref": "SGNO-09",
+   "title": "Tapeout Readiness Review Across Every Die",
+   "owner": "Program management",
+   "start": 102,
+   "end": 106,
+   "dependsOn": [
+    "SGNO-01",
+    "SGNO-02",
+    "SGNO-03",
+    "SGNO-04",
+    "SGNO-05",
+    "SGNO-06",
+    "SGNO-07",
+    "SGNO-08",
+    "SGNO-10",
+    "PSV-11"
+   ],
+   "deliverables": [
+    [
+     "SGNO-D11",
+     "produces"
+    ]
+   ]
+  },
+  {
+   "ref": "SGNO-10",
+   "title": "Substrate and RDL Tooling Release to Suppliers",
+   "owner": "Packaging",
+   "start": 98,
+   "end": 106,
+   "dependsOn": [
+    "SGNO-06",
+    "IMPL-07",
+    "TRDY-06"
+   ],
+   "deliverables": [
+    [
+     "SGNO-D7",
+     "produces"
+    ],
+    [
+     "SGNO-D11",
+     "feeds"
+    ]
+   ]
+  },
+  {
+   "ref": "MTO-01",
+   "title": "Switch ASIC Tapeout and Mask Release",
+   "owner": "Physical design",
+   "start": 104,
+   "end": 108,
+   "dependsOn": [
+    "SGNO-01",
+    "SGNO-07",
+    "SGNO-08",
+    "SGNO-09"
+   ],
+   "deliverables": [
+    [
+     "MTO-D1",
+     "produces"
+    ],
+    [
+     "MTO-D7",
+     "feeds"
+    ]
+   ]
+  },
+  {
+   "ref": "MTO-02",
+   "title": "High-Speed I/O and SerDes Silicon Tapeout",
+   "owner": "SerDes and high-speed I/O",
+   "start": 104,
+   "end": 108,
+   "dependsOn": [
+    "SGNO-02",
+    "SGNO-09"
+   ],
+   "deliverables": [
+    [
+     "MTO-D2",
+     "produces"
+    ],
+    [
+     "MTO-D7",
+     "feeds"
+    ]
+   ]
+  },
+  {
+   "ref": "MTO-03",
+   "title": "Electrical IC Tapeout",
+   "owner": "Analog and mixed-signal",
+   "start": 104,
+   "end": 108,
+   "dependsOn": [
+    "SGNO-03",
+    "SGNO-09"
+   ],
+   "deliverables": [
+    [
+     "MTO-D3",
+     "produces"
+    ],
+    [
+     "MTO-D7",
+     "feeds"
+    ]
+   ]
+  },
+  {
+   "ref": "MTO-04",
+   "title": "Photonic IC Tapeout",
+   "owner": "Photonics",
+   "start": 104,
+   "end": 108,
+   "dependsOn": [
+    "SGNO-04",
+    "SGNO-09"
+   ],
+   "deliverables": [
+    [
+     "MTO-D4",
+     "produces"
+    ],
+    [
+     "MTO-D6",
+     "informs"
+    ],
+    [
+     "MTO-D7",
+     "feeds"
+    ]
+   ]
+  },
+  {
+   "ref": "MTO-05",
+   "title": "Bridge / Interposer and Silicon Capacitor Release",
+   "owner": "Packaging",
+   "start": 105,
+   "end": 111,
+   "dependsOn": [
+    "SGNO-05",
+    "SGNO-06",
+    "SGNO-09"
+   ],
+   "deliverables": [
+    [
+     "MTO-D5",
+     "produces"
+    ],
+    [
+     "MTO-D7",
+     "feeds"
+    ]
+   ]
+  },
+  {
+   "ref": "MTO-06",
+   "title": "Wafer Start Plan, Lot Splits and Engineering Lot Strategy",
+   "owner": "Manufacturing and NPI",
+   "start": 104,
+   "end": 110,
+   "dependsOn": [
+    "SGNO-09",
+    "TINF-01",
+    "TRDY-10"
+   ],
+   "deliverables": [
+    [
+     "MTO-D6",
+     "produces"
+    ]
+   ]
+  },
+  {
+   "ref": "MTO-07",
+   "title": "Tapeout Archive and Configuration Baseline",
+   "owner": "Program management",
+   "start": 108,
+   "end": 112,
+   "dependsOn": [
+    "MTO-01",
+    "MTO-02",
+    "MTO-03",
+    "MTO-04",
+    "MTO-05",
+    "SGNO-09"
+   ],
+   "deliverables": [
+    [
+     "MTO-D7",
+     "produces"
+    ]
+   ]
+  },
+  {
+   "ref": "WFAB-01",
+   "title": "Switch ASIC and I/O Silicon Wafer Fabrication",
+   "owner": "Technology and foundry",
+   "start": 108,
+   "end": 122,
+   "dependsOn": [
+    "MTO-01",
+    "MTO-02",
+    "MTO-06"
+   ],
+   "deliverables": [
+    [
+     "WFAB-D1",
+     "produces"
+    ],
+    [
+     "WFAB-D6",
+     "feeds"
+    ]
+   ]
+  },
+  {
+   "ref": "WFAB-02",
+   "title": "Electrical IC Wafer Fabrication",
+   "owner": "Technology and foundry",
+   "start": 108,
+   "end": 120,
+   "dependsOn": [
+    "MTO-03",
+    "MTO-06"
+   ],
+   "deliverables": [
+    [
+     "WFAB-D2",
+     "produces"
+    ],
+    [
+     "WFAB-D6",
+     "feeds"
+    ]
+   ]
+  },
+  {
+   "ref": "WFAB-03",
+   "title": "Photonic IC Wafer Fabrication and In-Line Optical Monitoring",
+   "owner": "Photonics",
+   "start": 108,
+   "end": 122,
+   "dependsOn": [
+    "MTO-04",
+    "MTO-06",
+    "MODL-04"
+   ],
+   "deliverables": [
+    [
+     "WFAB-D3",
+     "produces"
+    ],
+    [
+     "WFAB-D6",
+     "feeds"
+    ]
+   ]
+  },
+  {
+   "ref": "WFAB-04",
+   "title": "Bridge / Interposer and Silicon Capacitor Fabrication",
+   "owner": "Packaging",
+   "start": 108,
+   "end": 120,
+   "dependsOn": [
+    "MTO-05",
+    "MTO-06"
+   ],
+   "deliverables": [
+    [
+     "WFAB-D4",
+     "produces"
+    ],
+    [
+     "WFAB-D5",
+     "informs"
+    ],
+    [
+     "WFAB-D6",
+     "feeds"
+    ]
+   ]
+  },
+  {
+   "ref": "WFAB-05",
+   "title": "Optical Source, Fiber and Substrate Material Arrival for the First Build",
+   "owner": "Supply chain",
+   "start": 108,
+   "end": 122,
+   "dependsOn": [
+    "SGNO-10",
+    "TRDY-10",
+    "TRDY-07",
+    "TRDY-08"
+   ],
+   "deliverables": [
+    [
+     "WFAB-D5",
+     "produces"
+    ]
+   ]
+  },
+  {
+   "ref": "WFAB-06",
+   "title": "Wafer Acceptance and First Silicon Release",
+   "owner": "Manufacturing and NPI",
+   "start": 116,
+   "end": 122,
+   "dependsOn": [
+    "WFAB-01",
+    "WFAB-02",
+    "WFAB-03",
+    "WFAB-04",
+    "MTO-06",
+    "TINF-10"
+   ],
+   "deliverables": [
+    [
+     "WFAB-D6",
+     "produces"
+    ]
+   ]
+  },
+  {
+   "ref": "SORT-01",
+   "title": "Electrical Wafer Sort Bring-Up for the Switch, I/O and Electrical ICs",
+   "owner": "Test engineering",
+   "start": 122,
+   "end": 128,
+   "dependsOn": [
+    "WFAB-06",
+    "TINF-02",
+    "TINF-06",
+    "SGNO-07",
+    "WFAB-01",
+    "WFAB-02"
+   ],
+   "deliverables": [
+    [
+     "SORT-D1",
+     "produces"
+    ],
+    [
+     "SORT-D3",
+     "feeds"
+    ]
+   ]
+  },
+  {
+   "ref": "SORT-02",
+   "title": "Photonic IC Wafer-Level Optical Test",
+   "owner": "Photonics",
+   "start": 122,
+   "end": 129,
+   "dependsOn": [
+    "WFAB-06",
+    "WFAB-03",
+    "TINF-03",
+    "TINF-07"
+   ],
+   "deliverables": [
+    [
+     "SORT-D2",
+     "produces"
+    ],
+    [
+     "SORT-D3",
+     "feeds"
+    ]
+   ]
+  },
+  {
+   "ref": "SORT-03",
+   "title": "Known-Good-Die Screening Criteria, Binning and Correlation",
+   "owner": "Test engineering",
+   "start": 125,
+   "end": 131,
+   "dependsOn": [
+    "SORT-01",
+    "SORT-02",
+    "TINF-01",
+    "SARC-10"
+   ],
+   "deliverables": [
+    [
+     "SORT-D3",
+     "produces"
+    ],
+    [
+     "SORT-D4",
+     "produces"
+    ],
+    [
+     "SORT-D5",
+     "feeds"
+    ]
+   ]
+  },
+  {
+   "ref": "SORT-04",
+   "title": "Die Bank, Inventory and Known-Good-Die Release to Assembly",
+   "owner": "Manufacturing and NPI",
+   "start": 128,
+   "end": 132,
+   "dependsOn": [
+    "SORT-01",
+    "SORT-02",
+    "SORT-03",
+    "PKGA-02",
+    "TINF-10"
+   ],
+   "deliverables": [
+    [
+     "SORT-D5",
+     "produces"
+    ]
+   ]
+  },
+  {
+   "ref": "TINF-01",
+   "title": "Production Test Strategy and Coverage Plan — Wafer, Die, Package, Module and System",
+   "owner": "Test engineering",
+   "start": 50,
+   "end": 58,
+   "dependsOn": [
+    "SARC-10",
+    "ICD-09",
+    "REQ-08"
+   ],
+   "deliverables": [
+    [
+     "TINF-D1",
+     "produces"
+    ],
+    [
+     "TINF-D8",
+     "feeds"
+    ]
+   ]
+  },
+  {
+   "ref": "TINF-02",
+   "title": "Probe Cards and Electrical Wafer Sort Hardware",
+   "owner": "Test engineering",
+   "start": 60,
+   "end": 100,
+   "dependsOn": [
+    "TINF-01",
+    "DSGN-12",
+    "IMPL-07"
+   ],
+   "deliverables": [
+    [
+     "TINF-D2",
+     "produces"
+    ],
+    [
+     "TINF-D6",
+     "feeds"
+    ]
+   ]
+  },
+  {
+   "ref": "TINF-03",
+   "title": "Optical Wafer Probe and Optical Test Fixtures",
+   "owner": "Optical engineering",
+   "start": 62,
+   "end": 106,
+   "dependsOn": [
+    "TINF-01",
+    "DSGN-06",
+    "FEAS-03",
+    "DSGN-13"
+   ],
+   "deliverables": [
+    [
+     "TINF-D3",
+     "produces"
+    ],
+    [
+     "TINF-D6",
+     "feeds"
+    ],
+    [
+     "TINF-D7",
+     "feeds"
+    ]
+   ]
+  },
+  {
+   "ref": "TINF-04",
+   "title": "Load Boards, Sockets and Final Test Hardware",
+   "owner": "Test engineering",
+   "start": 66,
+   "end": 110,
+   "dependsOn": [
+    "TINF-01",
+    "IMPL-07",
+    "DSGN-13"
+   ],
+   "deliverables": [
+    [
+     "TINF-D4",
+     "produces"
+    ],
+    [
+     "TINF-D6",
+     "feeds"
+    ]
+   ]
+  },
+  {
+   "ref": "TINF-05",
+   "title": "System-Level Test Platform",
+   "owner": "Test engineering",
+   "start": 70,
+   "end": 114,
+   "dependsOn": [
+    "TINF-01",
+    "IMPL-10",
+    "DSGN-14",
+    "DSGN-17"
+   ],
+   "deliverables": [
+    [
+     "TINF-D5",
+     "produces"
+    ],
+    [
+     "TINF-D8",
+     "feeds"
+    ]
+   ]
+  },
+  {
+   "ref": "TINF-06",
+   "title": "Production Test Programs — Electrical, Optical and Calibration",
+   "owner": "Test engineering",
+   "start": 70,
+   "end": 116,
+   "dependsOn": [
+    "TINF-01",
+    "TINF-02",
+    "TINF-03",
+    "TINF-04",
+    "TINF-07",
+    "TINF-13",
+    "IMPL-11",
+    "SGNO-07",
+    "PSV-10"
+   ],
+   "deliverables": [
+    [
+     "TINF-D6",
+     "produces"
+    ],
+    [
+     "TINF-D11",
+     "feeds"
+    ]
+   ]
+  },
+  {
+   "ref": "TINF-07",
+   "title": "Factory Calibration Process and Calibration Data Flow",
+   "owner": "Photonics",
+   "start": 74,
+   "end": 114,
+   "dependsOn": [
+    "DSGN-08",
+    "TINF-03",
+    "DSGN-16",
+    "ICD-09"
+   ],
+   "deliverables": [
+    [
+     "TINF-D7",
+     "produces"
+    ],
+    [
+     "TINF-D6",
+     "feeds"
+    ]
+   ]
+  },
+  {
+   "ref": "TINF-08",
+   "title": "Tester Capacity, Test Time and Test Cost Model",
+   "owner": "Manufacturing and NPI",
+   "start": 80,
+   "end": 110,
+   "dependsOn": [
+    "TINF-01",
+    "TINF-06",
+    "TINF-07",
+    "REQ-08"
+   ],
+   "deliverables": [
+    [
+     "TINF-D8",
+     "produces"
+    ],
+    [
+     "TINF-D11",
+     "feeds"
+    ]
+   ]
+  },
+  {
+   "ref": "TINF-09",
+   "title": "Assembly, Optical Alignment and Fiber Attach Process Development",
+   "owner": "Packaging",
+   "start": 58,
+   "end": 110,
+   "dependsOn": [
+    "FEAS-06",
+    "FEAS-07",
+    "TRDY-06",
+    "DSGN-12"
+   ],
+   "deliverables": [
+    [
+     "TINF-D9",
+     "produces"
+    ],
+    [
+     "TINF-D11",
+     "feeds"
+    ]
+   ]
+  },
+  {
+   "ref": "TINF-10",
+   "title": "Manufacturing Data, Traceability and Yield Infrastructure",
+   "owner": "Manufacturing and NPI",
+   "start": 70,
+   "end": 114,
+   "dependsOn": [
+    "ICD-09",
+    "TINF-01",
+    "TINF-07"
+   ],
+   "deliverables": [
+    [
+     "TINF-D10",
+     "produces"
+    ],
+    [
+     "TINF-D7",
+     "feeds"
+    ]
+   ]
+  },
+  {
+   "ref": "TINF-11",
+   "title": "Test and Manufacturing Readiness Review",
+   "owner": "Manufacturing and NPI",
+   "start": 112,
+   "end": 118,
+   "dependsOn": [
+    "TINF-01",
+    "TINF-02",
+    "TINF-03",
+    "TINF-04",
+    "TINF-05",
+    "TINF-06",
+    "TINF-07",
+    "TINF-08",
+    "TINF-09",
+    "TINF-10",
+    "TINF-12",
+    "TINF-13",
+    "TINF-14",
+    "TINF-15",
+    "TINF-16",
+    "TINF-17"
+   ],
+   "deliverables": [
+    [
+     "TINF-D11",
+     "produces"
+    ]
+   ]
+  },
+  {
+   "ref": "TINF-12",
+   "title": "Optical Source Module Burn-In and Incoming Screening Stations",
+   "owner": "Laser and optical source",
+   "start": 74,
+   "end": 110,
+   "dependsOn": [
+    "TRDY-07",
+    "TINF-01",
+    "DSGN-07"
+   ],
+   "deliverables": [
+    [
+     "TINF-D12",
+     "produces"
+    ],
+    [
+     "TINF-D11",
+     "feeds"
+    ]
+   ]
+  },
+  {
+   "ref": "TINF-13",
+   "title": "Secure Key and Fuse Provisioning Infrastructure",
+   "owner": "Security",
+   "start": 80,
+   "end": 114,
+   "dependsOn": [
+    "SARC-09",
+    "DSGN-10",
+    "TINF-15",
+    "TINF-01"
+   ],
+   "deliverables": [
+    [
+     "TINF-D13",
+     "produces"
+    ],
+    [
+     "TINF-D6",
+     "feeds"
+    ]
+   ]
+  },
+  {
+   "ref": "TINF-14",
+   "title": "Post-Silicon Validation, Characterization and Qualification Plans and Test Content",
+   "owner": "Validation",
+   "start": 90,
+   "end": 108,
+   "dependsOn": [
+    "PSV-08",
+    "PSV-01",
+    "REQ-07",
+    "TINF-01"
+   ],
+   "deliverables": [
+    [
+     "TINF-D14",
+     "produces"
+    ],
+    [
+     "TINF-D11",
+     "feeds"
+    ]
+   ]
+  },
+  {
+   "ref": "TINF-15",
+   "title": "Test Site Strategy and Test Subcontractor Qualification",
+   "owner": "Test engineering",
+   "start": 66,
+   "end": 100,
+   "dependsOn": [
+    "TINF-01",
+    "TRDY-06"
+   ],
+   "deliverables": [
+    [
+     "TINF-D15",
+     "produces"
+    ],
+    [
+     "TINF-D8",
+     "feeds"
+    ]
+   ]
+  },
+  {
+   "ref": "TINF-16",
+   "title": "Rework, Repair and Scrap Policy — Optical Engine, Fiber Attach and Optical Source",
+   "owner": "Manufacturing and NPI",
+   "start": 80,
+   "end": 112,
+   "dependsOn": [
+    "TINF-09",
+    "TINF-01",
+    "REQ-07"
+   ],
+   "deliverables": [
+    [
+     "TINF-D16",
+     "produces"
+    ],
+    [
+     "TINF-D9",
+     "informs"
+    ]
+   ]
+  },
+  {
+   "ref": "TINF-17",
+   "title": "System Board Assembly and Box Build Process — In-Circuit Test, Run-In and Final System Test",
+   "owner": "Manufacturing and NPI",
+   "start": 74,
+   "end": 114,
+   "dependsOn": [
+    "DSGN-14",
+    "IMPL-10",
+    "DSGN-13",
+    "TINF-05",
+    "TINF-01"
+   ],
+   "deliverables": [
+    [
+     "TINF-D17",
+     "produces"
+    ],
+    [
+     "TINF-D11",
+     "feeds"
+    ]
+   ]
+  },
+  {
+   "ref": "PKGA-01",
+   "title": "Substrate, Bridge and Component Procurement for the First Builds",
+   "owner": "Supply chain",
+   "start": 100,
+   "end": 126,
+   "dependsOn": [
+    "TRDY-10",
+    "IMPL-07",
+    "PKGA-02",
+    "TRDY-07"
+   ],
+   "deliverables": [
+    [
+     "PKGA-D1",
+     "produces"
+    ],
+    [
+     "PKGA-D3",
+     "feeds"
+    ]
+   ]
+  },
+  {
+   "ref": "PKGA-02",
+   "title": "Engineering Build Plan and Build Matrix",
+   "owner": "Manufacturing and NPI",
+   "start": 104,
+   "end": 112,
+   "dependsOn": [
+    "TINF-09",
+    "IMPL-07"
+   ],
+   "deliverables": [
+    [
+     "PKGA-D2",
+     "produces"
+    ],
+    [
+     "PKGA-D1",
+     "feeds"
+    ]
+   ]
+  },
+  {
+   "ref": "PKGA-03",
+   "title": "Die Attach, Bridge Attach and Multi-Die Assembly",
+   "owner": "Packaging",
+   "start": 132,
+   "end": 138,
+   "dependsOn": [
+    "SORT-04",
+    "TINF-09",
+    "PKGA-01",
+    "PKGA-02",
+    "PKGA-14"
+   ],
+   "deliverables": [
+    [
+     "PKGA-D3",
+     "produces"
+    ],
+    [
+     "PKGA-D6",
+     "feeds"
+    ]
+   ]
+  },
+  {
+   "ref": "PKGA-04",
+   "title": "Optical Engine Assembly, Fiber Alignment and Attach",
+   "owner": "Optical engineering",
+   "start": 134,
+   "end": 142,
+   "dependsOn": [
+    "SORT-02",
+    "TINF-09",
+    "TINF-03",
+    "TINF-16",
+    "PKGA-01",
+    "PKGA-03",
+    "PKGA-10"
+   ],
+   "deliverables": [
+    [
+     "PKGA-D4",
+     "produces"
+    ],
+    [
+     "PKGA-D6",
+     "feeds"
+    ]
+   ]
+  },
+  {
+   "ref": "PKGA-05",
+   "title": "Optical Source Module Integration",
+   "owner": "Laser and optical source",
+   "start": 134,
+   "end": 142,
+   "dependsOn": [
+    "PKGA-01",
+    "PKGA-02",
+    "DSGN-07",
+    "TINF-12"
+   ],
+   "deliverables": [
+    [
+     "PKGA-D5",
+     "produces"
+    ],
+    [
+     "PKGA-D6",
+     "feeds"
+    ]
+   ]
+  },
+  {
+   "ref": "PKGA-06",
+   "title": "Package-Level Test and First-Build Yield Analysis",
+   "owner": "Test engineering",
+   "start": 138,
+   "end": 144,
+   "dependsOn": [
+    "TINF-04",
+    "TINF-06",
+    "TINF-11",
+    "PKGA-03",
+    "PKGA-04",
+    "PKGA-05",
+    "PKGA-10"
+   ],
+   "deliverables": [
+    [
+     "PKGA-D6",
+     "produces"
+    ],
+    [
+     "PKGA-D8",
+     "feeds"
+    ]
+   ]
+  },
+  {
+   "ref": "PKGA-07",
+   "title": "Validation Board and System Assembly",
+   "owner": "Board and system hardware",
+   "start": 128,
+   "end": 144,
+   "dependsOn": [
+    "IMPL-10",
+    "PKGA-06",
+    "PKGA-02",
+    "PKGA-13",
+    "DSGN-15",
+    "TINF-17"
+   ],
+   "deliverables": [
+    [
+     "PKGA-D7",
+     "produces"
+    ],
+    [
+     "PKGA-D8",
+     "produces"
+    ]
+   ]
+  },
+  {
+   "ref": "PKGA-08",
+   "title": "Pre-Qualification Reliability Stress on First-Build Units",
+   "owner": "Reliability",
+   "start": 140,
+   "end": 144,
+   "dependsOn": [
+    "PKGA-06",
+    "PKGA-02",
+    "TINF-14"
+   ],
+   "deliverables": [
+    [
+     "PKGA-D9",
+     "produces"
+    ],
+    [
+     "PKGA-D6",
+     "informs"
+    ]
+   ]
+  },
+  {
+   "ref": "PKGA-09",
+   "title": "Bring-Up Lab, Debug Infrastructure and Station Readiness",
+   "owner": "Validation",
+   "start": 124,
+   "end": 144,
+   "dependsOn": [
+    "TINF-14",
+    "PKGA-11",
+    "IMPL-10",
+    "PKGA-02"
+   ],
+   "deliverables": [
+    [
+     "PKGA-D10",
+     "produces"
+    ],
+    [
+     "PKGA-D8",
+     "feeds"
+    ]
+   ]
+  },
+  {
+   "ref": "PKGA-10",
+   "title": "Optical Engine-Level Test and Yield Tracking",
+   "owner": "Optical engineering",
+   "start": 134,
+   "end": 142,
+   "dependsOn": [
+    "SORT-02",
+    "TINF-03",
+    "PKGA-12",
+    "TINF-01"
+   ],
+   "deliverables": [
+    [
+     "PKGA-D11",
+     "produces"
+    ],
+    [
+     "PKGA-D4",
+     "feeds"
+    ]
+   ]
+  },
+  {
+   "ref": "PKGA-11",
+   "title": "Bring-Up Firmware, SDK and Diagnostics Readiness on the Final Netlist",
+   "owner": "Firmware",
+   "start": 100,
+   "end": 136,
+   "dependsOn": [
+    "PSV-09",
+    "DSGN-16",
+    "DSGN-17",
+    "MTO-01",
+    "PSV-08"
+   ],
+   "deliverables": [
+    [
+     "PKGA-D12",
+     "produces"
+    ],
+    [
+     "PKGA-D10",
+     "feeds"
+    ]
+   ]
+  },
+  {
+   "ref": "PKGA-12",
+   "title": "Optical Engine Standalone Bring-Up on an Engine Evaluation Board",
+   "owner": "Photonics",
+   "start": 122,
+   "end": 140,
+   "dependsOn": [
+    "SORT-02",
+    "SORT-01",
+    "PKGA-11",
+    "DSGN-08",
+    "TINF-03"
+   ],
+   "deliverables": [
+    [
+     "PKGA-D13",
+     "produces"
+    ],
+    [
+     "PKGA-D11",
+     "informs"
+    ]
+   ]
+  },
+  {
+   "ref": "PKGA-13",
+   "title": "Electrical-Only Engineering Package Build — Switch and I/O Dies Without Optical Engines",
+   "owner": "Packaging",
+   "start": 132,
+   "end": 138,
+   "dependsOn": [
+    "SORT-04",
+    "PKGA-14",
+    "PKGA-01",
+    "TINF-09",
+    "PKGA-02"
+   ],
+   "deliverables": [
+    [
+     "PKGA-D14",
+     "produces"
+    ],
+    [
+     "PKGA-D7",
+     "feeds"
+    ]
+   ]
+  },
+  {
+   "ref": "PKGA-14",
+   "title": "Mechanical and Daisy-Chain Dry-Run Build on the Product Substrate",
+   "owner": "Packaging",
+   "start": 124,
+   "end": 130,
+   "dependsOn": [
+    "PKGA-01",
+    "TINF-09",
+    "IMPL-07"
+   ],
+   "deliverables": [
+    [
+     "PKGA-D15",
+     "produces"
+    ],
+    [
+     "PKGA-D3",
+     "informs"
+    ]
+   ]
+  },
+  {
+   "ref": "PON-01",
+   "title": "Bring-Up Plan Execution and Daily Bring-Up Stand-Up",
+   "owner": "Validation",
+   "start": 140,
+   "end": 142,
+   "dependsOn": [
+    "PKGA-09",
+    "PKGA-07",
+    "PKGA-11"
+   ],
+   "deliverables": [
+    [
+     "PON-D1",
+     "produces"
+    ],
+    [
+     "PON-D2",
+     "feeds"
+    ]
+   ]
+  },
+  {
+   "ref": "PON-02",
+   "title": "First Power-On, Power Sequencing and Rail Verification",
+   "owner": "Board and system hardware",
+   "start": 140,
+   "end": 143,
+   "dependsOn": [
+    "PON-01",
+    "PKGA-07",
+    "PKGA-13",
+    "PKGA-09",
+    "DSGN-14"
+   ],
+   "deliverables": [
+    [
+     "PON-D2",
+     "produces"
+    ],
+    [
+     "PON-D6",
+     "feeds"
+    ]
+   ]
+  },
+  {
+   "ref": "PON-03",
+   "title": "Boot, Debug Access and Firmware Bring-Up",
+   "owner": "Firmware",
+   "start": 141,
+   "end": 145,
+   "dependsOn": [
+    "PON-02",
+    "DSGN-16",
+    "PSV-09",
+    "DSGN-10",
+    "PKGA-11"
+   ],
+   "deliverables": [
+    [
+     "PON-D3",
+     "produces"
+    ],
+    [
+     "PON-D6",
+     "feeds"
+    ]
+   ]
+  },
+  {
+   "ref": "PON-04",
+   "title": "Clock, Reset and Register Access Bring-Up",
+   "owner": "Validation",
+   "start": 142,
+   "end": 145,
+   "dependsOn": [
+    "PON-02",
+    "PON-03",
+    "DSGN-03"
+   ],
+   "deliverables": [
+    [
+     "PON-D4",
+     "produces"
+    ],
+    [
+     "PON-D5",
+     "feeds"
+    ]
+   ]
+  },
+  {
+   "ref": "PON-05",
+   "title": "Die-to-Die and SerDes Link Training — First Electrical Link",
+   "owner": "SerDes and high-speed I/O",
+   "start": 143,
+   "end": 148,
+   "dependsOn": [
+    "PON-03",
+    "PON-04",
+    "MODL-03",
+    "PON-01"
+   ],
+   "deliverables": [
+    [
+     "PON-D5",
+     "produces"
+    ],
+    [
+     "PON-D6",
+     "feeds"
+    ]
+   ]
+  },
+  {
+   "ref": "PON-06",
+   "title": "Silicon Anomaly Intake and Triage Start",
+   "owner": "Validation",
+   "start": 142,
+   "end": 148,
+   "dependsOn": [
+    "PON-02",
+    "PON-03",
+    "PON-04",
+    "PON-05",
+    "PKGA-06"
+   ],
+   "deliverables": [
+    [
+     "PON-D6",
+     "produces"
+    ]
+   ]
+  },
+  {
+   "ref": "OBU-01",
+   "title": "Optical Source Power-Up and Optical Power Verification",
+   "owner": "Laser and optical source",
+   "start": 146,
+   "end": 149,
+   "dependsOn": [
+    "PKGA-05",
+    "PON-02",
+    "DSGN-07",
+    "PKGA-09"
+   ],
+   "deliverables": [
+    [
+     "OBU-D1",
+     "produces"
+    ],
+    [
+     "OBU-D6",
+     "feeds"
+    ]
+   ]
+  },
+  {
+   "ref": "OBU-02",
+   "title": "Electrical and Photonic IC Bias, Heater Tuning and Wavelength Lock",
+   "owner": "Photonics",
+   "start": 147,
+   "end": 151,
+   "dependsOn": [
+    "OBU-01",
+    "PON-04",
+    "DSGN-08",
+    "PKGA-12"
+   ],
+   "deliverables": [
+    [
+     "OBU-D2",
+     "produces"
+    ],
+    [
+     "OBU-D3",
+     "feeds"
+    ]
+   ]
+  },
+  {
+   "ref": "OBU-03",
+   "title": "Optical Loopback and First Optical Link",
+   "owner": "Photonics",
+   "start": 149,
+   "end": 154,
+   "dependsOn": [
+    "OBU-02",
+    "PON-05",
+    "OBU-01"
+   ],
+   "deliverables": [
+    [
+     "OBU-D3",
+     "produces"
+    ],
+    [
+     "OBU-D6",
+     "feeds"
+    ]
+   ]
+  },
+  {
+   "ref": "OBU-04",
+   "title": "Per-Lane Calibration Flow Bring-Up",
+   "owner": "Photonics",
+   "start": 149,
+   "end": 155,
+   "dependsOn": [
+    "TINF-07",
+    "OBU-02",
+    "PON-03"
+   ],
+   "deliverables": [
+    [
+     "OBU-D4",
+     "produces"
+    ],
+    [
+     "OBU-D3",
+     "feeds"
+    ]
+   ]
+  },
+  {
+   "ref": "OBU-05",
+   "title": "Optical Monitoring and Control Firmware Bring-Up",
+   "owner": "Firmware",
+   "start": 148,
+   "end": 155,
+   "dependsOn": [
+    "PON-03",
+    "DSGN-16",
+    "OBU-01",
+    "PKGA-11"
+   ],
+   "deliverables": [
+    [
+     "OBU-D5",
+     "produces"
+    ],
+    [
+     "OBU-D4",
+     "feeds"
+    ]
+   ]
+  },
+  {
+   "ref": "OBU-06",
+   "title": "Optical Link Margin Correlation Against the Budget",
+   "owner": "Validation",
+   "start": 151,
+   "end": 156,
+   "dependsOn": [
+    "OBU-01",
+    "OBU-03",
+    "PKGA-04",
+    "MODL-04"
+   ],
+   "deliverables": [
+    [
+     "OBU-D6",
+     "produces"
+    ]
+   ]
+  },
+  {
+   "ref": "SINT-01",
+   "title": "Switch Datapath and Forwarding Bring-Up",
+   "owner": "Validation",
+   "start": 150,
+   "end": 155,
+   "dependsOn": [
+    "PON-04",
+    "PON-05",
+    "DSGN-17",
+    "PSV-08"
+   ],
+   "deliverables": [
+    [
+     "SINT-D1",
+     "produces"
+    ],
+    [
+     "SINT-D4",
+     "feeds"
+    ]
+   ]
+  },
+  {
+   "ref": "SINT-02",
+   "title": "SDK, Network Software and Management Plane Integration",
+   "owner": "Software",
+   "start": 150,
+   "end": 158,
+   "dependsOn": [
+    "DSGN-17",
+    "PSV-09",
+    "PON-03",
+    "PKGA-11"
+   ],
+   "deliverables": [
+    [
+     "SINT-D2",
+     "produces"
+    ],
+    [
+     "SINT-D4",
+     "feeds"
+    ]
+   ]
+  },
+  {
+   "ref": "SINT-03",
+   "title": "Port Bring-Up Across Every Optical and Electrical Port",
+   "owner": "Validation",
+   "start": 152,
+   "end": 159,
+   "dependsOn": [
+    "OBU-03",
+    "OBU-04",
+    "OBU-05",
+    "PON-05",
+    "SINT-02"
+   ],
+   "deliverables": [
+    [
+     "SINT-D3",
+     "produces"
+    ],
+    [
+     "SINT-D4",
+     "feeds"
+    ]
+   ]
+  },
+  {
+   "ref": "SINT-04",
+   "title": "First End-to-End Traffic at Line Rate",
+   "owner": "Validation",
+   "start": 155,
+   "end": 160,
+   "dependsOn": [
+    "SINT-01",
+    "SINT-02",
+    "SINT-03"
+   ],
+   "deliverables": [
+    [
+     "SINT-D4",
+     "produces"
+    ],
+    [
+     "SINT-D6",
+     "feeds"
+    ]
+   ]
+  },
+  {
+   "ref": "SINT-05",
+   "title": "Telemetry, Diagnostics and Health Monitoring Bring-Up",
+   "owner": "Software",
+   "start": 154,
+   "end": 162,
+   "dependsOn": [
+    "SINT-02",
+    "OBU-05",
+    "DSGN-17"
+   ],
+   "deliverables": [
+    [
+     "SINT-D5",
+     "produces"
+    ],
+    [
+     "SINT-D2",
+     "feeds"
+    ]
+   ]
+  },
+  {
+   "ref": "SINT-06",
+   "title": "Thermal and Power Behavior Under Traffic",
+   "owner": "Thermal and mechanical",
+   "start": 156,
+   "end": 162,
+   "dependsOn": [
+    "SINT-04",
+    "MODL-07",
+    "MODL-08"
+   ],
+   "deliverables": [
+    [
+     "SINT-D6",
+     "produces"
+    ]
+   ]
+  },
+  {
+   "ref": "SINT-07",
+   "title": "Laser Safety Classification and EMC Pre-Compliance on First-Build Hardware",
+   "owner": "Compliance and interoperability",
+   "start": 152,
+   "end": 162,
+   "dependsOn": [
+    "OBU-01",
+    "SINT-04",
+    "REQ-05"
+   ],
+   "deliverables": [
+    [
+     "SINT-D7",
+     "produces"
+    ]
+   ]
+  },
+  {
+   "ref": "CHAR-01",
+   "title": "Characterization Plan and Corner / Lot Matrix",
+   "owner": "Validation",
+   "start": 156,
+   "end": 159,
+   "dependsOn": [
+    "TINF-14",
+    "PON-05",
+    "OBU-06",
+    "MTO-06",
+    "SORT-03"
+   ],
+   "deliverables": [
+    [
+     "CHAR-D1",
+     "produces"
+    ],
+    [
+     "CHAR-D8",
+     "feeds"
+    ]
+   ]
+  },
+  {
+   "ref": "CHAR-02",
+   "title": "Electrical Link and SerDes Characterization",
+   "owner": "SerDes and high-speed I/O",
+   "start": 158,
+   "end": 172,
+   "dependsOn": [
+    "CHAR-01",
+    "PON-05",
+    "MODL-03",
+    "ICD-02"
+   ],
+   "deliverables": [
+    [
+     "CHAR-D2",
+     "produces"
+    ],
+    [
+     "CHAR-D7",
+     "feeds"
+    ],
+    [
+     "CHAR-D8",
+     "feeds"
+    ]
+   ]
+  },
+  {
+   "ref": "CHAR-03",
+   "title": "Optical Transmit and Receive Characterization Across Temperature",
+   "owner": "Photonics",
+   "start": 158,
+   "end": 172,
+   "dependsOn": [
+    "CHAR-01",
+    "OBU-04",
+    "OBU-06",
+    "MODL-04",
+    "ICD-03"
+   ],
+   "deliverables": [
+    [
+     "CHAR-D3",
+     "produces"
+    ],
+    [
+     "CHAR-D5",
+     "feeds"
+    ],
+    [
+     "CHAR-D7",
+     "feeds"
+    ]
+   ]
+  },
+  {
+   "ref": "CHAR-04",
+   "title": "Switching Performance and Feature Validation",
+   "owner": "Validation",
+   "start": 160,
+   "end": 174,
+   "dependsOn": [
+    "CHAR-01",
+    "SINT-04",
+    "SINT-02",
+    "MODL-02"
+   ],
+   "deliverables": [
+    [
+     "CHAR-D4",
+     "produces"
+    ],
+    [
+     "CHAR-D7",
+     "feeds"
+    ],
+    [
+     "CHAR-D8",
+     "feeds"
+    ]
+   ]
+  },
+  {
+   "ref": "CHAR-05",
+   "title": "Power and Power-per-Bit Characterization",
+   "owner": "SI/PI",
+   "start": 160,
+   "end": 172,
+   "dependsOn": [
+    "CHAR-01",
+    "MODL-08",
+    "MODL-06"
+   ],
+   "deliverables": [
+    [
+     "CHAR-D5",
+     "produces"
+    ],
+    [
+     "CHAR-D7",
+     "feeds"
+    ],
+    [
+     "CHAR-D8",
+     "feeds"
+    ]
+   ]
+  },
+  {
+   "ref": "CHAR-06",
+   "title": "Interface Validation Against the Interface Control Documents",
+   "owner": "System architecture",
+   "start": 162,
+   "end": 174,
+   "dependsOn": [
+    "CHAR-01",
+    "ICD-10",
+    "ICD-02",
+    "ICD-03",
+    "ICD-04",
+    "ICD-05",
+    "ICD-06",
+    "ICD-07",
+    "ICD-08",
+    "ICD-09"
+   ],
+   "deliverables": [
+    [
+     "CHAR-D6",
+     "produces"
+    ],
+    [
+     "CHAR-D8",
+     "feeds"
+    ]
+   ]
+  },
+  {
+   "ref": "CHAR-07",
+   "title": "Silicon-to-Model Correlation",
+   "owner": "System architecture",
+   "start": 168,
+   "end": 176,
+   "dependsOn": [
+    "CHAR-02",
+    "CHAR-03",
+    "CHAR-04",
+    "CHAR-05",
+    "MODL-10"
+   ],
+   "deliverables": [
+    [
+     "CHAR-D7",
+     "produces"
+    ],
+    [
+     "CHAR-D8",
+     "feeds"
+    ]
+   ]
+  },
+  {
+   "ref": "CHAR-08",
+   "title": "Full-Bandwidth, All-Port System Demonstration",
+   "owner": "Validation",
+   "start": 170,
+   "end": 176,
+   "dependsOn": [
+    "CHAR-02",
+    "CHAR-03",
+    "CHAR-04",
+    "CHAR-05",
+    "CHAR-06",
+    "CHAR-07",
+    "CHAR-10",
+    "CHAR-11"
+   ],
+   "deliverables": [
+    [
+     "CHAR-D8",
+     "produces"
+    ]
+   ]
+  },
+  {
+   "ref": "CHAR-09",
+   "title": "Datasheet, Application Notes and Design-In Collateral",
+   "owner": "Product management",
+   "start": 168,
+   "end": 176,
+   "dependsOn": [
+    "CHAR-02",
+    "CHAR-03",
+    "CHAR-04",
+    "CHAR-05",
+    "CHAR-07",
+    "IMPL-13"
+   ],
+   "deliverables": [
+    [
+     "CHAR-D9",
+     "produces"
+    ],
+    [
+     "CHAR-D8",
+     "feeds"
+    ]
+   ]
+  },
+  {
+   "ref": "CHAR-10",
+   "title": "Serviceability and Field-Replacement Validation",
+   "owner": "Laser and optical source",
+   "start": 164,
+   "end": 176,
+   "dependsOn": [
+    "CHAR-01",
+    "DSGN-20",
+    "REQ-07",
+    "TINF-16",
+    "SINT-07"
+   ],
+   "deliverables": [
+    [
+     "CHAR-D10",
+     "produces"
+    ],
+    [
+     "CHAR-D9",
+     "feeds"
+    ],
+    [
+     "CHAR-D8",
+     "feeds"
+    ]
+   ]
+  },
+  {
+   "ref": "CHAR-11",
+   "title": "Firmware and Software System Test — Scale, Stability, Warm Restart, Upgrade and Fault Recovery",
+   "owner": "Software",
+   "start": 160,
+   "end": 176,
+   "dependsOn": [
+    "CHAR-01",
+    "SINT-02",
+    "SINT-05",
+    "DSGN-17"
+   ],
+   "deliverables": [
+    [
+     "CHAR-D11",
+     "produces"
+    ],
+    [
+     "CHAR-D8",
+     "feeds"
+    ]
+   ]
+  },
+  {
+   "ref": "SDBG-01",
+   "title": "Anomaly Tracking, Reproduction and Triage Board",
+   "owner": "Validation",
+   "start": 140,
+   "end": 180,
+   "dependsOn": [
+    "PON-01",
+    "TINF-10"
+   ],
+   "deliverables": [
+    [
+     "SDBG-D1",
+     "produces"
+    ],
+    [
+     "SDBG-D4",
+     "feeds"
+    ],
+    [
+     "SDBG-D8",
+     "feeds"
+    ]
+   ]
+  },
+  {
+   "ref": "SDBG-02",
+   "title": "Root Cause and Failure Analysis Across Silicon, Photonics and Package",
+   "owner": "Quality",
+   "start": 142,
+   "end": 174,
+   "dependsOn": [
+    "SDBG-01",
+    "SGNO-07",
+    "TINF-09",
+    "SORT-02"
+   ],
+   "deliverables": [
+    [
+     "SDBG-D2",
+     "produces"
+    ],
+    [
+     "SDBG-D3",
+     "feeds"
+    ],
+    [
+     "SDBG-D4",
+     "feeds"
+    ]
+   ]
+  },
+  {
+   "ref": "SDBG-03",
+   "title": "Containment — Firmware Workaround and Test Screen Assessment",
+   "owner": "Firmware",
+   "start": 144,
+   "end": 172,
+   "dependsOn": [
+    "SDBG-01",
+    "SDBG-02",
+    "DSGN-16"
+   ],
+   "deliverables": [
+    [
+     "SDBG-D3",
+     "produces"
+    ],
+    [
+     "SDBG-D4",
+     "feeds"
+    ]
+   ]
+  },
+  {
+   "ref": "SDBG-04",
+   "title": "Metal ECO Versus Full-Mask Re-Spin Decision",
+   "owner": "Program management",
+   "start": 152,
+   "end": 164,
+   "dependsOn": [
+    "SDBG-01",
+    "SDBG-02",
+    "SDBG-03",
+    "CHAR-02",
+    "CHAR-03",
+    "CHAR-04"
+   ],
+   "deliverables": [
+    [
+     "SDBG-D4",
+     "produces"
+    ],
+    [
+     "SDBG-D5",
+     "feeds"
+    ],
+    [
+     "SDBG-D8",
+     "feeds"
+    ]
+   ]
+  },
+  {
+   "ref": "SDBG-05",
+   "title": "Stepping Implementation and Tapeout",
+   "owner": "Physical design",
+   "start": 154,
+   "end": 164,
+   "dependsOn": [
+    "SDBG-04",
+    "MTO-07",
+    "SGNO-09"
+   ],
+   "deliverables": [
+    [
+     "SDBG-D5",
+     "produces"
+    ],
+    [
+     "SDBG-D6",
+     "feeds"
+    ],
+    [
+     "SDBG-D7",
+     "feeds"
+    ]
+   ]
+  },
+  {
+   "ref": "SDBG-06",
+   "title": "Stepping Regression and Delta Qualification Plan",
+   "owner": "Validation",
+   "start": 174,
+   "end": 186,
+   "dependsOn": [
+    "SDBG-01",
+    "SDBG-02",
+    "SDBG-03",
+    "SDBG-04",
+    "SDBG-05",
+    "SDBG-07",
+    "RELQ-01",
+    "CHAR-08"
+   ],
+   "deliverables": [
+    [
+     "SDBG-D7",
+     "produces"
+    ],
+    [
+     "SDBG-D8",
+     "produces"
+    ]
+   ]
+  },
+  {
+   "ref": "SDBG-07",
+   "title": "Stepping Silicon Fabrication, Build and Validation",
+   "owner": "Validation",
+   "start": 164,
+   "end": 184,
+   "dependsOn": [
+    "SDBG-05",
+    "SDBG-04",
+    "SDBG-01"
+   ],
+   "deliverables": [
+    [
+     "SDBG-D6",
+     "produces"
+    ],
+    [
+     "SDBG-D7",
+     "feeds"
+    ],
+    [
+     "SDBG-D8",
+     "feeds"
+    ]
+   ]
+  },
+  {
+   "ref": "SDBG-08",
+   "title": "Production Stepping Cut-In to NPI Builds and Qualification Lots",
+   "owner": "Manufacturing and NPI",
+   "start": 176,
+   "end": 186,
+   "dependsOn": [
+    "SDBG-04",
+    "SDBG-06",
+    "SDBG-07",
+    "NPI-01"
+   ],
+   "deliverables": [
+    [
+     "SDBG-D9",
+     "produces"
+    ],
+    [
+     "SDBG-D8",
+     "feeds"
+    ]
+   ]
+  },
+  {
+   "ref": "CERT-01",
+   "title": "Electrical and Optical Standards Compliance Testing",
+   "owner": "Compliance and interoperability",
+   "start": 162,
+   "end": 178,
+   "dependsOn": [
+    "CHAR-01",
+    "CHAR-02",
+    "CHAR-03",
+    "REQ-05"
+   ],
+   "deliverables": [
+    [
+     "CERT-D1",
+     "produces"
+    ],
+    [
+     "CERT-D8",
+     "feeds"
+    ]
+   ]
+  },
+  {
+   "ref": "CERT-02",
+   "title": "Protocol and Management Interface Conformance",
+   "owner": "Software",
+   "start": 164,
+   "end": 178,
+   "dependsOn": [
+    "SINT-02",
+    "SINT-05",
+    "REQ-05",
+    "ICD-08"
+   ],
+   "deliverables": [
+    [
+     "CERT-D2",
+     "produces"
+    ],
+    [
+     "CERT-D8",
+     "feeds"
+    ]
+   ]
+  },
+  {
+   "ref": "CERT-03",
+   "title": "Multi-Vendor and Customer Interoperability Testing",
+   "owner": "Compliance and interoperability",
+   "start": 166,
+   "end": 184,
+   "dependsOn": [
+    "CERT-01",
+    "CERT-02",
+    "CHAR-04"
+   ],
+   "deliverables": [
+    [
+     "CERT-D3",
+     "produces"
+    ],
+    [
+     "CERT-D7",
+     "feeds"
+    ],
+    [
+     "CERT-D8",
+     "feeds"
+    ]
+   ]
+  },
+  {
+   "ref": "CERT-04",
+   "title": "Laser Safety, EMC and Regulatory Certification",
+   "owner": "Compliance and interoperability",
+   "start": 164,
+   "end": 182,
+   "dependsOn": [
+    "REQ-05",
+    "DSGN-07",
+    "NPI-03",
+    "SINT-07"
+   ],
+   "deliverables": [
+    [
+     "CERT-D4",
+     "produces"
+    ],
+    [
+     "CERT-D5",
+     "produces"
+    ],
+    [
+     "CERT-D8",
+     "feeds"
+    ]
+   ]
+  },
+  {
+   "ref": "CERT-05",
+   "title": "Security Validation — Secure Boot, Authentication, Rollback and Penetration Testing",
+   "owner": "Security",
+   "start": 166,
+   "end": 182,
+   "dependsOn": [
+    "REQ-06",
+    "SARC-09",
+    "DSGN-10",
+    "SGNO-08",
+    "TINF-13"
+   ],
+   "deliverables": [
+    [
+     "CERT-D6",
+     "produces"
+    ],
+    [
+     "CERT-D8",
+     "feeds"
+    ]
+   ]
+  },
+  {
+   "ref": "CERT-06",
+   "title": "Customer Qualification and Early-Access Program",
+   "owner": "Product management",
+   "start": 170,
+   "end": 186,
+   "dependsOn": [
+    "CERT-01",
+    "CERT-02",
+    "CERT-03",
+    "CERT-04",
+    "CERT-05",
+    "CERT-07",
+    "CHAR-08",
+    "CHAR-09"
+   ],
+   "deliverables": [
+    [
+     "CERT-D7",
+     "produces"
+    ],
+    [
+     "CERT-D8",
+     "produces"
+    ]
+   ]
+  },
+  {
+   "ref": "CERT-07",
+   "title": "Material Compliance, Material Declarations and Export Classification",
+   "owner": "Compliance and interoperability",
+   "start": 162,
+   "end": 182,
+   "dependsOn": [
+    "REQ-05",
+    "SARC-09",
+    "TRDY-10"
+   ],
+   "deliverables": [
+    [
+     "CERT-D9",
+     "produces"
+    ],
+    [
+     "CERT-D8",
+     "feeds"
+    ]
+   ]
+  },
+  {
+   "ref": "RELQ-01",
+   "title": "Qualification Plan — Silicon, Photonics, Optical Source, Package, Board and System",
+   "owner": "Reliability",
+   "start": 160,
+   "end": 164,
+   "dependsOn": [
+    "REQ-07",
+    "TINF-14",
+    "SDBG-04",
+    "NPI-01",
+    "TRDY-07",
+    "DSGN-18"
+   ],
+   "deliverables": [
+    [
+     "RELQ-D1",
+     "produces"
+    ],
+    [
+     "RELQ-D6",
+     "feeds"
+    ]
+   ]
+  },
+  {
+   "ref": "RELQ-02",
+   "title": "Silicon Reliability — Lifetime, ESD, Latch-Up and Electromigration",
+   "owner": "Reliability",
+   "start": 162,
+   "end": 184,
+   "dependsOn": [
+    "RELQ-01",
+    "SORT-04",
+    "SGNO-01"
+   ],
+   "deliverables": [
+    [
+     "RELQ-D2",
+     "produces"
+    ],
+    [
+     "RELQ-D5",
+     "feeds"
+    ],
+    [
+     "RELQ-D6",
+     "feeds"
+    ]
+   ]
+  },
+  {
+   "ref": "RELQ-03",
+   "title": "Photonic and Optical Source Reliability — Aging, Humidity and Temperature Cycling",
+   "owner": "Reliability",
+   "start": 162,
+   "end": 188,
+   "dependsOn": [
+    "RELQ-01",
+    "CHAR-03",
+    "FEAS-11",
+    "PKGA-08",
+    "TRDY-07"
+   ],
+   "deliverables": [
+    [
+     "RELQ-D3",
+     "produces"
+    ],
+    [
+     "RELQ-D5",
+     "feeds"
+    ],
+    [
+     "RELQ-D6",
+     "feeds"
+    ]
+   ]
+  },
+  {
+   "ref": "RELQ-04",
+   "title": "Package and Fiber Attach Reliability — Board-Level, Mechanical and Fiber Retention",
+   "owner": "Reliability",
+   "start": 162,
+   "end": 186,
+   "dependsOn": [
+    "RELQ-01",
+    "PKGA-04",
+    "TINF-09",
+    "TINF-16",
+    "MODL-07"
+   ],
+   "deliverables": [
+    [
+     "RELQ-D4",
+     "produces"
+    ],
+    [
+     "RELQ-D5",
+     "feeds"
+    ],
+    [
+     "RELQ-D6",
+     "feeds"
+    ]
+   ]
+  },
+  {
+   "ref": "RELQ-05",
+   "title": "System-Level Reliability, Environmental Testing and Failure-Rate Prediction",
+   "owner": "Reliability",
+   "start": 166,
+   "end": 188,
+   "dependsOn": [
+    "RELQ-01",
+    "RELQ-02",
+    "RELQ-03",
+    "RELQ-04"
+   ],
+   "deliverables": [
+    [
+     "RELQ-D5",
+     "produces"
+    ],
+    [
+     "RELQ-D6",
+     "feeds"
+    ]
+   ]
+  },
+  {
+   "ref": "RELQ-06",
+   "title": "Qualification Report and Approval",
+   "owner": "Quality",
+   "start": 196,
+   "end": 202,
+   "dependsOn": [
+    "RELQ-01",
+    "RELQ-02",
+    "RELQ-03",
+    "RELQ-04",
+    "RELQ-05",
+    "RELQ-07",
+    "SDBG-06"
+   ],
+   "deliverables": [
+    [
+     "RELQ-D6",
+     "produces"
+    ],
+    [
+     "RELQ-D8",
+     "produces"
+    ]
+   ]
+  },
+  {
+   "ref": "RELQ-07",
+   "title": "Delta Qualification on the Production Stepping",
+   "owner": "Reliability",
+   "start": 186,
+   "end": 200,
+   "dependsOn": [
+    "SDBG-06",
+    "SDBG-07",
+    "SDBG-08",
+    "RELQ-01",
+    "RELQ-02"
+   ],
+   "deliverables": [
+    [
+     "RELQ-D7",
+     "produces"
+    ],
+    [
+     "RELQ-D6",
+     "feeds"
+    ]
+   ]
+  },
+  {
+   "ref": "NPI-01",
+   "title": "NPI Plan, Build Strategy and Golden Unit Definition",
+   "owner": "Manufacturing and NPI",
+   "start": 148,
+   "end": 154,
+   "dependsOn": [
+    "TINF-11",
+    "PKGA-06",
+    "REQ-08",
+    "MTO-06"
+   ],
+   "deliverables": [
+    [
+     "NPI-D1",
+     "produces"
+    ],
+    [
+     "NPI-D2",
+     "feeds"
+    ],
+    [
+     "NPI-D7",
+     "feeds"
+    ]
+   ]
+  },
+  {
+   "ref": "NPI-02",
+   "title": "Engineering Validation Build",
+   "owner": "Manufacturing and NPI",
+   "start": 152,
+   "end": 162,
+   "dependsOn": [
+    "NPI-01",
+    "SORT-04",
+    "PKGA-06",
+    "TINF-06",
+    "SDBG-03"
+   ],
+   "deliverables": [
+    [
+     "NPI-D2",
+     "produces"
+    ],
+    [
+     "NPI-D5",
+     "feeds"
+    ]
+   ]
+  },
+  {
+   "ref": "NPI-03",
+   "title": "Design Validation and Qualification Build",
+   "owner": "Manufacturing and NPI",
+   "start": 162,
+   "end": 174,
+   "dependsOn": [
+    "NPI-02",
+    "NPI-01",
+    "RELQ-01",
+    "SDBG-04"
+   ],
+   "deliverables": [
+    [
+     "NPI-D3",
+     "produces"
+    ],
+    [
+     "NPI-D5",
+     "feeds"
+    ],
+    [
+     "NPI-D8",
+     "feeds"
+    ]
+   ]
+  },
+  {
+   "ref": "NPI-04",
+   "title": "Production Validation and Pilot Build on the Production Line",
+   "owner": "Manufacturing and NPI",
+   "start": 186,
+   "end": 198,
+   "dependsOn": [
+    "NPI-03",
+    "NPI-01",
+    "NPI-07",
+    "NPI-09",
+    "SDBG-08",
+    "TINF-10",
+    "TINF-17",
+    "TRDY-13"
+   ],
+   "deliverables": [
+    [
+     "NPI-D4",
+     "produces"
+    ],
+    [
+     "NPI-D5",
+     "feeds"
+    ],
+    [
+     "NPI-D8",
+     "feeds"
+    ]
+   ]
+  },
+  {
+   "ref": "NPI-05",
+   "title": "Process Window, Yield Model and First Yield Pareto",
+   "owner": "Manufacturing and NPI",
+   "start": 156,
+   "end": 198,
+   "dependsOn": [
+    "NPI-01",
+    "NPI-02",
+    "TINF-09",
+    "TINF-10",
+    "PKGA-06"
+   ],
+   "deliverables": [
+    [
+     "NPI-D5",
+     "produces"
+    ],
+    [
+     "NPI-D8",
+     "feeds"
+    ]
+   ]
+  },
+  {
+   "ref": "NPI-06",
+   "title": "Volume Capacity Plan and Second-Source Qualification",
+   "owner": "Supply chain",
+   "start": 154,
+   "end": 192,
+   "dependsOn": [
+    "NPI-01",
+    "TRDY-10",
+    "TINF-08",
+    "REQ-08"
+   ],
+   "deliverables": [
+    [
+     "NPI-D6",
+     "produces"
+    ],
+    [
+     "NPI-D8",
+     "feeds"
+    ]
+   ]
+  },
+  {
+   "ref": "NPI-07",
+   "title": "Golden Units, Factory Calibration and Test Correlation",
+   "owner": "Test engineering",
+   "start": 162,
+   "end": 194,
+   "dependsOn": [
+    "NPI-01",
+    "NPI-02",
+    "TINF-06",
+    "TINF-07",
+    "OBU-06"
+   ],
+   "deliverables": [
+    [
+     "NPI-D7",
+     "produces"
+    ],
+    [
+     "NPI-D8",
+     "feeds"
+    ]
+   ]
+  },
+  {
+   "ref": "NPI-08",
+   "title": "Production Readiness Review",
+   "owner": "Manufacturing and NPI",
+   "start": 196,
+   "end": 202,
+   "dependsOn": [
+    "NPI-02",
+    "NPI-03",
+    "NPI-04",
+    "NPI-05",
+    "NPI-06",
+    "NPI-07",
+    "NPI-09",
+    "RELQ-06",
+    "CERT-03"
+   ],
+   "deliverables": [
+    [
+     "NPI-D8",
+     "produces"
+    ]
+   ]
+  },
+  {
+   "ref": "NPI-09",
+   "title": "Supplier Production Qualification, Process FMEA and Control Plan",
+   "owner": "Quality",
+   "start": 156,
+   "end": 192,
+   "dependsOn": [
+    "NPI-01",
+    "TRDY-13",
+    "TRDY-07",
+    "TRDY-08",
+    "TINF-09",
+    "TINF-16"
+   ],
+   "deliverables": [
+    [
+     "NPI-D9",
+     "produces"
+    ],
+    [
+     "NPI-D8",
+     "feeds"
+    ]
+   ]
+  },
+  {
+   "ref": "RAMP-01",
+   "title": "Production Release Package and Configuration Baseline",
+   "owner": "Quality",
+   "start": 200,
+   "end": 206,
+   "dependsOn": [
+    "NPI-08",
+    "NPI-04",
+    "NPI-07",
+    "RELQ-06",
+    "RAMP-02",
+    "MTO-07"
+   ],
+   "deliverables": [
+    [
+     "RAMP-D1",
+     "produces"
+    ],
+    [
+     "RAMP-D2",
+     "produces"
+    ],
+    [
+     "RAMP-D4",
+     "feeds"
+    ],
+    [
+     "RAMP-D8",
+     "feeds"
+    ]
+   ]
+  },
+  {
+   "ref": "RAMP-02",
+   "title": "Production Firmware and Software Release with Secure Update",
+   "owner": "Firmware",
+   "start": 200,
+   "end": 206,
+   "dependsOn": [
+    "CERT-05",
+    "SGNO-08",
+    "DSGN-16",
+    "DSGN-17",
+    "SINT-02"
+   ],
+   "deliverables": [
+    [
+     "RAMP-D3",
+     "produces"
+    ],
+    [
+     "RAMP-D1",
+     "feeds"
+    ]
+   ]
+  },
+  {
+   "ref": "RAMP-03",
+   "title": "Volume Ramp Plan and Build Schedule",
+   "owner": "Manufacturing and NPI",
+   "start": 202,
+   "end": 210,
+   "dependsOn": [
+    "NPI-08",
+    "NPI-06",
+    "NPI-04",
+    "RAMP-01"
+   ],
+   "deliverables": [
+    [
+     "RAMP-D4",
+     "produces"
+    ],
+    [
+     "RAMP-D6",
+     "feeds"
+    ]
+   ]
+  },
+  {
+   "ref": "RAMP-04",
+   "title": "Yield Dashboard and Line Monitoring",
+   "owner": "Manufacturing and NPI",
+   "start": 204,
+   "end": 214,
+   "dependsOn": [
+    "NPI-05",
+    "TINF-10",
+    "RAMP-03"
+   ],
+   "deliverables": [
+    [
+     "RAMP-D5",
+     "produces"
+    ],
+    [
+     "RAMP-D7",
+     "informs"
+    ]
+   ]
+  },
+  {
+   "ref": "RAMP-05",
+   "title": "Supply and Inventory Ramp",
+   "owner": "Supply chain",
+   "start": 202,
+   "end": 214,
+   "dependsOn": [
+    "RAMP-03",
+    "NPI-06",
+    "TRDY-10"
+   ],
+   "deliverables": [
+    [
+     "RAMP-D6",
+     "produces"
+    ],
+    [
+     "RAMP-D4",
+     "feeds"
+    ]
+   ]
+  },
+  {
+   "ref": "RAMP-06",
+   "title": "Customer Shipments and Outgoing Quality Monitoring",
+   "owner": "Quality",
+   "start": 208,
+   "end": 214,
+   "dependsOn": [
+    "RAMP-01",
+    "RAMP-02",
+    "RAMP-03",
+    "RAMP-04",
+    "RAMP-05",
+    "CERT-06"
+   ],
+   "deliverables": [
+    [
+     "RAMP-D7",
+     "produces"
+    ],
+    [
+     "RAMP-D8",
+     "feeds"
+    ]
+   ]
+  },
+  {
+   "ref": "RAMP-07",
+   "title": "Production Release Decision Review",
+   "owner": "Program management",
+   "start": 210,
+   "end": 214,
+   "dependsOn": [
+    "RAMP-01",
+    "RAMP-02",
+    "RAMP-03",
+    "RAMP-04",
+    "RAMP-05",
+    "RAMP-06",
+    "RELQ-06",
+    "NPI-08",
+    "CERT-01",
+    "CERT-03",
+    "CERT-04",
+    "CERT-06"
+   ],
+   "deliverables": [
+    [
+     "RAMP-D8",
+     "produces"
+    ]
+   ]
+  },
+  {
+   "ref": "SUST-01",
+   "title": "Yield Improvement and Defect Pareto Reduction",
+   "owner": "Manufacturing and NPI",
+   "start": 210,
+   "end": 250,
+   "dependsOn": [
+    "NPI-05",
+    "RAMP-04",
+    "TINF-10"
+   ],
+   "deliverables": [
+    [
+     "SUST-D1",
+     "produces"
+    ],
+    [
+     "SUST-D2",
+     "informs"
+    ]
+   ]
+  },
+  {
+   "ref": "SUST-02",
+   "title": "Test Time and Cost-of-Goods Reduction",
+   "owner": "Test engineering",
+   "start": 214,
+   "end": 254,
+   "dependsOn": [
+    "TINF-08",
+    "TINF-06",
+    "NPI-07",
+    "SUST-01"
+   ],
+   "deliverables": [
+    [
+     "SUST-D2",
+     "produces"
+    ]
+   ]
+  },
+  {
+   "ref": "SUST-03",
+   "title": "Failure Analysis and Return Material Authorization Process",
+   "owner": "Quality",
+   "start": 210,
+   "end": 262,
+   "dependsOn": [
+    "RAMP-06",
+    "SDBG-02",
+    "TINF-10"
+   ],
+   "deliverables": [
+    [
+     "SUST-D3",
+     "produces"
+    ],
+    [
+     "SUST-D6",
+     "informs"
+    ]
+   ]
+  },
+  {
+   "ref": "SUST-04",
+   "title": "Change Control — Product, Process, Supplier and Material Changes",
+   "owner": "Quality",
+   "start": 210,
+   "end": 262,
+   "dependsOn": [
+    "RAMP-01",
+    "PCTL-07",
+    "PCTL-03",
+    "ICD-10",
+    "RELQ-06",
+    "SDBG-06",
+    "RAMP-07"
+   ],
+   "deliverables": [
+    [
+     "SUST-D4",
+     "produces"
+    ]
+   ]
+  },
+  {
+   "ref": "SUST-05",
+   "title": "Firmware and Software Maintenance, Security Updates and Field Telemetry",
+   "owner": "Software",
+   "start": 210,
+   "end": 262,
+   "dependsOn": [
+    "RAMP-02",
+    "SINT-05",
+    "CERT-05"
+   ],
+   "deliverables": [
+    [
+     "SUST-D5",
+     "produces"
+    ],
+    [
+     "SUST-D6",
+     "feeds"
+    ]
+   ]
+  },
+  {
+   "ref": "SUST-06",
+   "title": "Field Reliability Monitoring and Optical Aging Tracking",
+   "owner": "Reliability",
+   "start": 218,
+   "end": 262,
+   "dependsOn": [
+    "RELQ-05",
+    "RELQ-03",
+    "RAMP-04",
+    "SUST-03",
+    "SUST-05"
+   ],
+   "deliverables": [
+    [
+     "SUST-D6",
+     "produces"
+    ],
+    [
+     "SUST-D7",
+     "informs"
+    ]
+   ]
+  },
+  {
+   "ref": "SUST-07",
+   "title": "End-of-Life Planning and Sustaining Handover",
+   "owner": "Program management",
+   "start": 250,
+   "end": 262,
+   "dependsOn": [
+    "SUST-01",
+    "SUST-02",
+    "SUST-03",
+    "SUST-04",
+    "SUST-05",
+    "SUST-06",
+    "SUST-08",
+    "SUST-09",
+    "RAMP-05"
+   ],
+   "deliverables": [
+    [
+     "SUST-D7",
+     "produces"
+    ],
+    [
+     "SUST-D8",
+     "produces"
+    ]
+   ]
+  },
+  {
+   "ref": "SUST-08",
+   "title": "Field Service, Spares and Repair Logistics",
+   "owner": "Quality",
+   "start": 210,
+   "end": 262,
+   "dependsOn": [
+    "RAMP-06",
+    "CHAR-10",
+    "TINF-16",
+    "RAMP-07"
+   ],
+   "deliverables": [
+    [
+     "SUST-D9",
+     "produces"
+    ],
+    [
+     "SUST-D7",
+     "informs"
+    ]
+   ]
+  },
+  {
+   "ref": "SUST-09",
+   "title": "Supply Continuity — Supplier Scorecards, Capacity, Second Sources and Obsolescence",
+   "owner": "Supply chain",
+   "start": 210,
+   "end": 262,
+   "dependsOn": [
+    "NPI-06",
+    "NPI-09",
+    "RAMP-05",
+    "PCTL-05"
+   ],
+   "deliverables": [
+    [
+     "SUST-D10",
+     "produces"
+    ],
+    [
+     "SUST-D7",
+     "feeds"
+    ]
+   ]
+  }
+ ],
+ "deliverables": [
+  {
+   "ref": "CON-D1",
+   "title": "Market requirements document"
+  },
+  {
+   "ref": "CON-D2",
+   "title": "Competitive and technology landscape assessment"
+  },
+  {
+   "ref": "CON-D3",
+   "title": "Product concept brief — bandwidth, ports, power per bit, form factor"
+  },
+  {
+   "ref": "CON-D4",
+   "title": "Business case and cost-of-goods model"
+  },
+  {
+   "ref": "CON-D5",
+   "title": "Program plan — schedule, resources, budget and partners"
+  },
+  {
+   "ref": "CON-D6",
+   "title": "Program go / no-go decision package"
+  },
+  {
+   "ref": "REQ-D1",
+   "title": "CPO switch product requirements document"
+  },
+  {
+   "ref": "REQ-D2",
+   "title": "CPO switch system requirements specification"
+  },
+  {
+   "ref": "REQ-D3",
+   "title": "Switching feature, packet buffer, network timing and telemetry requirements"
+  },
+  {
+   "ref": "REQ-D4",
+   "title": "Optical link requirements — reach classes, wavelength plan, link budget and BER"
+  },
+  {
+   "ref": "REQ-D5",
+   "title": "Standards compliance and interoperability target matrix"
+  },
+  {
+   "ref": "REQ-D6",
+   "title": "Product security requirements and threat model"
+  },
+  {
+   "ref": "REQ-D7",
+   "title": "Reliability, serviceability and environmental requirements"
+  },
+  {
+   "ref": "REQ-D8",
+   "title": "Manufacturability, test-cost, supply and cost-of-goods target sheet"
+  },
+  {
+   "ref": "REQ-D9",
+   "title": "Requirements traceability matrix — need to verification method"
+  },
+  {
+   "ref": "REQ-D10",
+   "title": "Requirements baseline review package"
+  },
+  {
+   "ref": "SARC-D1",
+   "title": "Switch ASIC architecture specification — pipeline, packet buffer and traffic manager"
+  },
+  {
+   "ref": "SARC-D2",
+   "title": "SerDes and high-speed I/O architecture specification"
+  },
+  {
+   "ref": "SARC-D3",
+   "title": "Optical engine architecture and SerDes-to-fiber lane map"
+  },
+  {
+   "ref": "SARC-D4",
+   "title": "Die partitioning and die-to-die, bridge and interposer decision record"
+  },
+  {
+   "ref": "SARC-D5",
+   "title": "Package and system mechanical architecture — engine placement and fiber egress"
+  },
+  {
+   "ref": "SARC-D6",
+   "title": "Clock, reset, network timing and power architecture with power tree and PDN budget"
+  },
+  {
+   "ref": "SARC-D7",
+   "title": "Thermal architecture and cooling concept"
+  },
+  {
+   "ref": "SARC-D8",
+   "title": "Firmware, software and management architecture specification"
+  },
+  {
+   "ref": "SARC-D9",
+   "title": "Security architecture — root of trust, boot chain, debug and key hierarchy"
+  },
+  {
+   "ref": "SARC-D10",
+   "title": "DFT, known-good-die and production test architecture"
+  },
+  {
+   "ref": "SARC-D11",
+   "title": "Power, performance, area and cost budget allocation by subsystem"
+  },
+  {
+   "ref": "SARC-D12",
+   "title": "Architecture convergence and partition freeze package"
+  },
+  {
+   "ref": "ICD-D1",
+   "title": "Interface register with owners, versioning rules and change control board charter"
+  },
+  {
+   "ref": "ICD-D2",
+   "title": "Die-to-die, switch-to-I/O and host processor electrical interface control document"
+  },
+  {
+   "ref": "ICD-D3",
+   "title": "Electrical IC-to-photonic IC and optical source-to-photonic IC interface control document"
+  },
+  {
+   "ref": "ICD-D4",
+   "title": "Photonic IC-to-fiber and front-panel optical interface control document"
+  },
+  {
+   "ref": "ICD-D5",
+   "title": "Die-to-package and package-to-board interface control document with bump and ball maps"
+  },
+  {
+   "ref": "ICD-D6",
+   "title": "Power, clock and reset interface control document"
+  },
+  {
+   "ref": "ICD-D7",
+   "title": "Thermal and mechanical interface control document"
+  },
+  {
+   "ref": "ICD-D8",
+   "title": "Firmware-to-hardware register map and software-to-firmware API specification"
+  },
+  {
+   "ref": "ICD-D9",
+   "title": "Manufacturing, test and calibration data interface control document"
+  },
+  {
+   "ref": "ICD-D10",
+   "title": "Interface validation plan — co-simulation and silicon checks per parameter"
+  },
+  {
+   "ref": "ICD-D11",
+   "title": "Interface freeze and change control baseline package"
+  },
+  {
+   "ref": "PCTL-D1",
+   "title": "Integrated master schedule and cross-workstream dependency register"
+  },
+  {
+   "ref": "PCTL-D2",
+   "title": "Program risk, issue and decision log"
+  },
+  {
+   "ref": "PCTL-D3",
+   "title": "Interface change request log and ICD revision history"
+  },
+  {
+   "ref": "PCTL-D4",
+   "title": "Configuration baseline index — design databases, firmware, test programs and BOMs"
+  },
+  {
+   "ref": "PCTL-D5",
+   "title": "Supplier and partner program review record and scorecards"
+  },
+  {
+   "ref": "PCTL-D6",
+   "title": "Cost-of-goods and program budget tracking report"
+  },
+  {
+   "ref": "PCTL-D7",
+   "title": "Change control handover package to sustaining"
+  },
+  {
+   "ref": "FEAS-D1",
+   "title": "Feasibility plan and test vehicle charter"
+  },
+  {
+   "ref": "FEAS-D2",
+   "title": "SerDes test chip characterization report"
+  },
+  {
+   "ref": "FEAS-D3",
+   "title": "Photonic IC test vehicle characterization report"
+  },
+  {
+   "ref": "FEAS-D4",
+   "title": "Electrical IC driver and TIA test vehicle report"
+  },
+  {
+   "ref": "FEAS-D5",
+   "title": "Optical source and laser-to-PIC coupling feasibility report"
+  },
+  {
+   "ref": "FEAS-D6",
+   "title": "Fiber attach alignment tolerance and coupling loss report"
+  },
+  {
+   "ref": "FEAS-D7",
+   "title": "Package, bridge and thermal test vehicle report — warpage, bump yield, thermal"
+  },
+  {
+   "ref": "FEAS-D8",
+   "title": "End-to-end optical link feasibility demonstration report"
+  },
+  {
+   "ref": "FEAS-D9",
+   "title": "Technology selection decision and go / no-go record"
+  },
+  {
+   "ref": "FEAS-D10",
+   "title": "Interim technology down-select record for the partition freeze"
+  },
+  {
+   "ref": "FEAS-D11",
+   "title": "Early optical source and fiber attach reliability screening report"
+  },
+  {
+   "ref": "TRDY-D1",
+   "title": "Switch and I/O silicon foundry and process selection record"
+  },
+  {
+   "ref": "TRDY-D2",
+   "title": "Photonics foundry selection and photonic PDK readiness assessment"
+  },
+  {
+   "ref": "TRDY-D3",
+   "title": "Digital PDK, standard cell and memory compiler readiness report"
+  },
+  {
+   "ref": "TRDY-D4",
+   "title": "SerDes and high-speed I/O IP readiness and deliverables checklist"
+  },
+  {
+   "ref": "TRDY-D5",
+   "title": "Third-party and internal IP qualification register"
+  },
+  {
+   "ref": "TRDY-D6",
+   "title": "Package technology, substrate and OSAT readiness assessment"
+  },
+  {
+   "ref": "TRDY-D7",
+   "title": "Optical source supplier qualification report"
+  },
+  {
+   "ref": "TRDY-D8",
+   "title": "Fiber, connector, passive, PCB and cooling approved supplier list"
+  },
+  {
+   "ref": "TRDY-D9",
+   "title": "Electronic-photonic co-design flow release"
+  },
+  {
+   "ref": "TRDY-D10",
+   "title": "Long-lead material plan and executed supply agreements"
+  },
+  {
+   "ref": "TRDY-D11",
+   "title": "Technology, IP and supply readiness gate package"
+  },
+  {
+   "ref": "TRDY-D12",
+   "title": "Electrical IC process and foundry selection record"
+  },
+  {
+   "ref": "TRDY-D13",
+   "title": "System manufacturing partner selection and line readiness plan"
+  },
+  {
+   "ref": "TRDY-D14",
+   "title": "Freedom-to-operate opinion and licensing clearance record"
+  },
+  {
+   "ref": "MODL-D1",
+   "title": "Modeling plan with model accuracy targets"
+  },
+  {
+   "ref": "MODL-D2",
+   "title": "Network traffic, buffer and congestion performance model"
+  },
+  {
+   "ref": "MODL-D3",
+   "title": "Electrical channel models and SerDes link model release"
+  },
+  {
+   "ref": "MODL-D4",
+   "title": "Optical link budget and optical channel model"
+  },
+  {
+   "ref": "MODL-D5",
+   "title": "Electrical and photonic IC behavioural co-simulation model library"
+  },
+  {
+   "ref": "MODL-D6",
+   "title": "Package SI, PI and PDN model set"
+  },
+  {
+   "ref": "MODL-D7",
+   "title": "Thermal, mechanical and warpage model release"
+  },
+  {
+   "ref": "MODL-D8",
+   "title": "System power model and power-per-bit estimate"
+  },
+  {
+   "ref": "MODL-D9",
+   "title": "Virtual platform release for firmware and software"
+  },
+  {
+   "ref": "MODL-D10",
+   "title": "Model correlation plan and model readiness gate package"
+  },
+  {
+   "ref": "MODL-D11",
+   "title": "Test-vehicle-correlated model set and residual error report"
+  },
+  {
+   "ref": "DSGN-D1",
+   "title": "Switch ASIC microarchitecture and block specifications"
+  },
+  {
+   "ref": "DSGN-D2",
+   "title": "Switch ASIC frozen RTL and UPF power-intent release"
+  },
+  {
+   "ref": "DSGN-D3",
+   "title": "SerDes and high-speed I/O silicon design database"
+  },
+  {
+   "ref": "DSGN-D4",
+   "title": "Electrical IC schematic database and pre-layout simulation report"
+  },
+  {
+   "ref": "DSGN-D5",
+   "title": "Photonic IC design database and optical loss allocation"
+  },
+  {
+   "ref": "DSGN-D6",
+   "title": "Optical source subsystem design specification"
+  },
+  {
+   "ref": "DSGN-D7",
+   "title": "Optical control, tuning and calibration algorithm specification"
+  },
+  {
+   "ref": "DSGN-D8",
+   "title": "Bridge / interposer and silicon capacitor design database"
+  },
+  {
+   "ref": "DSGN-D9",
+   "title": "Security hardware design and fuse / OTP map"
+  },
+  {
+   "ref": "DSGN-D10",
+   "title": "DFT design specification and test access map"
+  },
+  {
+   "ref": "DSGN-D11",
+   "title": "Package and substrate design database — floorplan, bump map and die-to-die routing"
+  },
+  {
+   "ref": "DSGN-D12",
+   "title": "Fiber assembly, optical connector and front-panel design package"
+  },
+  {
+   "ref": "DSGN-D13",
+   "title": "System board schematic and power delivery design"
+  },
+  {
+   "ref": "DSGN-D14",
+   "title": "Thermal solution and cooling design package"
+  },
+  {
+   "ref": "DSGN-D15",
+   "title": "Pre-silicon firmware image — boot, initialization, link training and optical control"
+  },
+  {
+   "ref": "DSGN-D16",
+   "title": "Pre-silicon SDK, driver and management software release"
+  },
+  {
+   "ref": "DSGN-D17",
+   "title": "Design freeze decision package — RTL, circuit and photonic"
+  },
+  {
+   "ref": "DSGN-D18",
+   "title": "Optical engine sub-assembly design package — electrical-to-photonic attach and engine substrate"
+  },
+  {
+   "ref": "DSGN-D19",
+   "title": "Optical source module packaging and serviceability design package"
+  },
+  {
+   "ref": "DSGN-D20",
+   "title": "Early die floorplan, die size and bump plan trial report for every die"
+  },
+  {
+   "ref": "DSGN-D21",
+   "title": "System enclosure, power supply, fan tray and control-plane processor design package"
+  },
+  {
+   "ref": "PSV-D1",
+   "title": "Verification plan and coverage model across every die and the system"
+  },
+  {
+   "ref": "PSV-D2",
+   "title": "Block and subsystem verification closure report"
+  },
+  {
+   "ref": "PSV-D3",
+   "title": "Full-chip regression and functional coverage closure report"
+  },
+  {
+   "ref": "PSV-D4",
+   "title": "Formal, CDC / RDC and low-power verification signoff report"
+  },
+  {
+   "ref": "PSV-D5",
+   "title": "Mixed-signal verification report for the electrical IC and SerDes"
+  },
+  {
+   "ref": "PSV-D6",
+   "title": "Photonic IC and optical link simulation report against the budget"
+  },
+  {
+   "ref": "PSV-D7",
+   "title": "End-to-end link co-simulation margin report"
+  },
+  {
+   "ref": "PSV-D8",
+   "title": "Emulation and FPGA prototype platform with traffic validation results"
+  },
+  {
+   "ref": "PSV-D9",
+   "title": "Pre-silicon firmware and software validation report"
+  },
+  {
+   "ref": "PSV-D10",
+   "title": "Gate-level and test pattern simulation report"
+  },
+  {
+   "ref": "PSV-D11",
+   "title": "Pre-silicon validation closure package"
+  },
+  {
+   "ref": "PSV-D12",
+   "title": "Pre-silicon security verification report — boot ROM, fuses, debug lock and keys"
+  },
+  {
+   "ref": "PSV-D13",
+   "title": "Bridge / interposer and silicon capacitor verification report"
+  },
+  {
+   "ref": "PSV-D14",
+   "title": "Emulated power profiles and worst-case current-step vector set"
+  },
+  {
+   "ref": "IMPL-D1",
+   "title": "Switch ASIC synthesized netlist and QoR report"
+  },
+  {
+   "ref": "IMPL-D2",
+   "title": "Switch ASIC timing-closed place-and-route database"
+  },
+  {
+   "ref": "IMPL-D3",
+   "title": "SerDes and I/O silicon layout database with post-layout jitter and eye results"
+  },
+  {
+   "ref": "IMPL-D4",
+   "title": "Electrical IC layout and post-layout simulation report"
+  },
+  {
+   "ref": "IMPL-D5",
+   "title": "Photonic IC layout with optical design rule closure record"
+  },
+  {
+   "ref": "IMPL-D6",
+   "title": "Bridge / interposer and silicon capacitor layout databases"
+  },
+  {
+   "ref": "IMPL-D7",
+   "title": "Package substrate and RDL layout with closed bump map"
+  },
+  {
+   "ref": "IMPL-D8",
+   "title": "Package and board SI/PI closure report"
+  },
+  {
+   "ref": "IMPL-D9",
+   "title": "Thermal, mechanical and warpage co-analysis report on the layout"
+  },
+  {
+   "ref": "IMPL-D10",
+   "title": "Validation, reference and production system board fabrication release package"
+  },
+  {
+   "ref": "IMPL-D11",
+   "title": "Scan-stitched netlist and ATPG pattern set with coverage report"
+  },
+  {
+   "ref": "IMPL-D12",
+   "title": "Implementation completion review record and signoff database handoff"
+  },
+  {
+   "ref": "IMPL-D13",
+   "title": "Customer design-in kit — reference board files, simulation, thermal and mechanical models"
+  },
+  {
+   "ref": "IMPL-D14",
+   "title": "Engineering sample plan and customer allocation"
+  },
+  {
+   "ref": "SGNO-D1",
+   "title": "Switch ASIC signoff report — timing, EM / IR and physical verification"
+  },
+  {
+   "ref": "SGNO-D2",
+   "title": "SerDes and I/O silicon signoff report"
+  },
+  {
+   "ref": "SGNO-D3",
+   "title": "Electrical IC analog signoff report"
+  },
+  {
+   "ref": "SGNO-D4",
+   "title": "Photonic IC signoff report — optical rules, connectivity and loss budget"
+  },
+  {
+   "ref": "SGNO-D5",
+   "title": "Bridge / interposer and silicon capacitor signoff report"
+  },
+  {
+   "ref": "SGNO-D6",
+   "title": "Multi-die package signoff report — die-to-die timing, SI / PI and thermal"
+  },
+  {
+   "ref": "SGNO-D7",
+   "title": "Substrate and RDL tooling release to the substrate and assembly suppliers"
+  },
+  {
+   "ref": "SGNO-D8",
+   "title": "Final equivalence and DFT signoff report"
+  },
+  {
+   "ref": "SGNO-D9",
+   "title": "Production test pattern delivery package"
+  },
+  {
+   "ref": "SGNO-D10",
+   "title": "Security signoff record — keys, fuse map and debug lock"
+  },
+  {
+   "ref": "SGNO-D11",
+   "title": "Tapeout readiness decision package across every die"
+  },
+  {
+   "ref": "MTO-D1",
+   "title": "Switch ASIC mask release record and foundry handoff checklist"
+  },
+  {
+   "ref": "MTO-D2",
+   "title": "SerDes and I/O silicon tapeout record"
+  },
+  {
+   "ref": "MTO-D3",
+   "title": "Electrical IC tapeout record and mask order"
+  },
+  {
+   "ref": "MTO-D4",
+   "title": "Photonic IC tapeout record with in-line monitor structures"
+  },
+  {
+   "ref": "MTO-D5",
+   "title": "Bridge / interposer and silicon capacitor mask release record"
+  },
+  {
+   "ref": "MTO-D6",
+   "title": "Wafer start plan with lot splits and engineering lot strategy"
+  },
+  {
+   "ref": "MTO-D7",
+   "title": "Tapeout archive and silicon configuration baseline"
+  },
+  {
+   "ref": "WFAB-D1",
+   "title": "Switch ASIC and I/O silicon lot tracking and wafer-out record"
+  },
+  {
+   "ref": "WFAB-D2",
+   "title": "Electrical IC wafer lot and parametric record"
+  },
+  {
+   "ref": "WFAB-D3",
+   "title": "Photonic IC in-line optical monitor report"
+  },
+  {
+   "ref": "WFAB-D4",
+   "title": "Bridge / interposer and silicon capacitor wafer lot record"
+  },
+  {
+   "ref": "WFAB-D5",
+   "title": "First-build material receipt and incoming inspection record"
+  },
+  {
+   "ref": "WFAB-D6",
+   "title": "Wafer acceptance review and first silicon release record"
+  },
+  {
+   "ref": "SORT-D1",
+   "title": "Electrical wafer sort program release and first-lot sort data"
+  },
+  {
+   "ref": "SORT-D2",
+   "title": "Photonic IC wafer-level optical test results and wafer maps"
+  },
+  {
+   "ref": "SORT-D3",
+   "title": "Known-good-die screening specification and bin definitions"
+  },
+  {
+   "ref": "SORT-D4",
+   "title": "Sort correlation and compound yield report"
+  },
+  {
+   "ref": "SORT-D5",
+   "title": "Die bank inventory and known-good-die release to assembly"
+  },
+  {
+   "ref": "TINF-D1",
+   "title": "Production test strategy and per-insertion coverage plan"
+  },
+  {
+   "ref": "TINF-D2",
+   "title": "Electrical probe card and wafer sort hardware set"
+  },
+  {
+   "ref": "TINF-D3",
+   "title": "Optical wafer probe station and optical test fixture set with loss-correction tables"
+  },
+  {
+   "ref": "TINF-D4",
+   "title": "Package and final test load boards and sockets"
+  },
+  {
+   "ref": "TINF-D5",
+   "title": "System-level test platform and rack configuration"
+  },
+  {
+   "ref": "TINF-D6",
+   "title": "Production test program release — wafer sort, final test and system-level test"
+  },
+  {
+   "ref": "TINF-D7",
+   "title": "Factory calibration process specification and per-lane calibration data flow"
+  },
+  {
+   "ref": "TINF-D8",
+   "title": "Tester capacity, test time and test cost model"
+  },
+  {
+   "ref": "TINF-D9",
+   "title": "Assembly, optical alignment and fiber attach process specification"
+  },
+  {
+   "ref": "TINF-D10",
+   "title": "Manufacturing traceability, data and yield system"
+  },
+  {
+   "ref": "TINF-D11",
+   "title": "Test and manufacturing readiness review package"
+  },
+  {
+   "ref": "TINF-D12",
+   "title": "Optical source burn-in and incoming screening stations with screening limits"
+  },
+  {
+   "ref": "TINF-D13",
+   "title": "Secure key and fuse provisioning infrastructure and custody procedures"
+  },
+  {
+   "ref": "TINF-D14",
+   "title": "Post-silicon validation plan, characterization corner and skew-lot matrix, and qualification sample plan"
+  },
+  {
+   "ref": "TINF-D15",
+   "title": "Test site plan and test subcontractor qualification report"
+  },
+  {
+   "ref": "TINF-D16",
+   "title": "Rework, repair and scrap policy for optical engines, fiber attach and optical sources"
+  },
+  {
+   "ref": "TINF-D17",
+   "title": "System board assembly and box build process specification — in-circuit test, run-in and final system test"
+  },
+  {
+   "ref": "PKGA-D1",
+   "title": "First-build material kit — substrates, bridges, optical source modules, fiber assemblies and passives"
+  },
+  {
+   "ref": "PKGA-D2",
+   "title": "Engineering build plan and split-condition build matrix"
+  },
+  {
+   "ref": "PKGA-D3",
+   "title": "Assembled multi-die packages with assembly travelers"
+  },
+  {
+   "ref": "PKGA-D4",
+   "title": "Optical engine and fiber attach build record with per-lane coupling loss"
+  },
+  {
+   "ref": "PKGA-D5",
+   "title": "Optical source integration record with delivered optical power per lane"
+  },
+  {
+   "ref": "PKGA-D6",
+   "title": "First-build package test results and yield analysis report"
+  },
+  {
+   "ref": "PKGA-D7",
+   "title": "Assembled validation boards and bring-up systems"
+  },
+  {
+   "ref": "PKGA-D8",
+   "title": "First package build release to bring-up — unit allocation and known-issue list"
+  },
+  {
+   "ref": "PKGA-D9",
+   "title": "Pre-qualification stress results on first-build units"
+  },
+  {
+   "ref": "PKGA-D10",
+   "title": "Bring-up plan, lab readiness certificate and debug station inventory"
+  },
+  {
+   "ref": "PKGA-D11",
+   "title": "Optical engine-level test results and engine yield tracker"
+  },
+  {
+   "ref": "PKGA-D12",
+   "title": "Bring-up firmware, SDK and diagnostics release validated on the final netlist"
+  },
+  {
+   "ref": "PKGA-D13",
+   "title": "Optical engine standalone bring-up report from the engine evaluation board"
+  },
+  {
+   "ref": "PKGA-D14",
+   "title": "Electrical-only engineering packages for early power-on"
+  },
+  {
+   "ref": "PKGA-D15",
+   "title": "Daisy-chain dry-run build report on the product substrate"
+  },
+  {
+   "ref": "PON-D1",
+   "title": "Bring-up execution tracker and daily status record"
+  },
+  {
+   "ref": "PON-D2",
+   "title": "First power-on and rail verification report"
+  },
+  {
+   "ref": "PON-D3",
+   "title": "Bring-up firmware image and first boot log"
+  },
+  {
+   "ref": "PON-D4",
+   "title": "Clock, reset and register access verification record"
+  },
+  {
+   "ref": "PON-D5",
+   "title": "First electrical link report — die-to-die and SerDes training, loopback and PRBS results"
+  },
+  {
+   "ref": "PON-D6",
+   "title": "Initial silicon anomaly register and triage record"
+  },
+  {
+   "ref": "OBU-D1",
+   "title": "Optical source power-up and laser safety interlock verification report"
+  },
+  {
+   "ref": "OBU-D2",
+   "title": "Bias, heater tuning and wavelength lock bring-up record per lane"
+  },
+  {
+   "ref": "OBU-D3",
+   "title": "First optical link report — optical loopback, BER and link-up per lane"
+  },
+  {
+   "ref": "OBU-D4",
+   "title": "Per-lane calibration flow bring-up report with first-silicon calibration tables"
+  },
+  {
+   "ref": "OBU-D5",
+   "title": "Optical monitoring and control firmware release for bring-up"
+  },
+  {
+   "ref": "OBU-D6",
+   "title": "Optical link margin versus budget correlation report"
+  },
+  {
+   "ref": "SINT-D1",
+   "title": "Switch datapath and forwarding bring-up report"
+  },
+  {
+   "ref": "SINT-D2",
+   "title": "Integrated SDK, network OS and management plane build for bring-up systems"
+  },
+  {
+   "ref": "SINT-D3",
+   "title": "Port bring-up matrix — link status, BER and error statistics for every optical and electrical port"
+  },
+  {
+   "ref": "SINT-D4",
+   "title": "First end-to-end traffic at line rate report"
+  },
+  {
+   "ref": "SINT-D5",
+   "title": "Telemetry, diagnostics and health monitoring bring-up release"
+  },
+  {
+   "ref": "SINT-D6",
+   "title": "System thermal and power behavior under traffic report"
+  },
+  {
+   "ref": "SINT-D7",
+   "title": "Laser safety classification assessment and EMC pre-compliance report on first-build hardware"
+  },
+  {
+   "ref": "CHAR-D1",
+   "title": "Characterization plan and corner lot matrix"
+  },
+  {
+   "ref": "CHAR-D2",
+   "title": "Electrical link and SerDes characterization report"
+  },
+  {
+   "ref": "CHAR-D3",
+   "title": "Optical transmit and receive characterization report across temperature"
+  },
+  {
+   "ref": "CHAR-D4",
+   "title": "Switching performance and feature validation report"
+  },
+  {
+   "ref": "CHAR-D5",
+   "title": "Power and power-per-bit characterization report"
+  },
+  {
+   "ref": "CHAR-D6",
+   "title": "Interface validation matrix against every interface control document"
+  },
+  {
+   "ref": "CHAR-D7",
+   "title": "Silicon-to-model correlation report and corrected model set"
+  },
+  {
+   "ref": "CHAR-D8",
+   "title": "Full-bandwidth demonstration record and characterization gate package"
+  },
+  {
+   "ref": "CHAR-D9",
+   "title": "Product datasheet, application notes and design-in guide"
+  },
+  {
+   "ref": "CHAR-D10",
+   "title": "Serviceability and field-replacement validation report"
+  },
+  {
+   "ref": "CHAR-D11",
+   "title": "Firmware and software system test report"
+  },
+  {
+   "ref": "SDBG-D1",
+   "title": "Silicon anomaly database and triage board record"
+  },
+  {
+   "ref": "SDBG-D2",
+   "title": "Root cause and failure analysis reports — silicon, photonics and package"
+  },
+  {
+   "ref": "SDBG-D3",
+   "title": "Firmware workaround and test screen containment plan"
+  },
+  {
+   "ref": "SDBG-D4",
+   "title": "Metal ECO versus full-mask re-spin decision record"
+  },
+  {
+   "ref": "SDBG-D5",
+   "title": "Stepping tapeout database and fix change list"
+  },
+  {
+   "ref": "SDBG-D6",
+   "title": "New-stepping silicon validation report"
+  },
+  {
+   "ref": "SDBG-D7",
+   "title": "Stepping regression results and delta qualification plan"
+  },
+  {
+   "ref": "SDBG-D8",
+   "title": "Production stepping decision package"
+  },
+  {
+   "ref": "SDBG-D9",
+   "title": "Stepping cut-in map and conditional-release criteria"
+  },
+  {
+   "ref": "CERT-D1",
+   "title": "Electrical and optical standards compliance test report"
+  },
+  {
+   "ref": "CERT-D2",
+   "title": "Protocol and management interface conformance report"
+  },
+  {
+   "ref": "CERT-D3",
+   "title": "Multi-vendor interoperability matrix and plugfest results"
+  },
+  {
+   "ref": "CERT-D4",
+   "title": "Laser safety classification and certification file"
+  },
+  {
+   "ref": "CERT-D5",
+   "title": "EMC, electrical safety and regional regulatory certificates"
+  },
+  {
+   "ref": "CERT-D6",
+   "title": "Security validation and penetration test report"
+  },
+  {
+   "ref": "CERT-D7",
+   "title": "Early-access customer feedback and qualification status log"
+  },
+  {
+   "ref": "CERT-D8",
+   "title": "Compliance and interoperability completion package"
+  },
+  {
+   "ref": "CERT-D9",
+   "title": "Material compliance, material declaration and export classification file"
+  },
+  {
+   "ref": "RELQ-D1",
+   "title": "Reliability qualification plan and stress matrix"
+  },
+  {
+   "ref": "RELQ-D2",
+   "title": "Silicon reliability qualification report — lifetime, ESD, latch-up and electromigration"
+  },
+  {
+   "ref": "RELQ-D3",
+   "title": "Photonic IC and optical source reliability report with lifetime drift models"
+  },
+  {
+   "ref": "RELQ-D4",
+   "title": "Package, board-level and fiber attach reliability report"
+  },
+  {
+   "ref": "RELQ-D5",
+   "title": "System environmental reliability and failure-rate prediction report"
+  },
+  {
+   "ref": "RELQ-D6",
+   "title": "Product qualification report and approval record"
+  },
+  {
+   "ref": "RELQ-D7",
+   "title": "Production stepping delta qualification report"
+  },
+  {
+   "ref": "RELQ-D8",
+   "title": "Production burn-in and system run-in decision with reduction criteria"
+  },
+  {
+   "ref": "NPI-D1",
+   "title": "NPI plan and build strategy — EVT, DVT and PVT"
+  },
+  {
+   "ref": "NPI-D2",
+   "title": "EVT engineering validation build report"
+  },
+  {
+   "ref": "NPI-D3",
+   "title": "DVT build report and qualification sample record"
+  },
+  {
+   "ref": "NPI-D4",
+   "title": "PVT pilot-line build report with line yield and throughput"
+  },
+  {
+   "ref": "NPI-D5",
+   "title": "Process window report and CPO yield model with first yield Pareto"
+  },
+  {
+   "ref": "NPI-D6",
+   "title": "Volume capacity plan and second-source qualification record"
+  },
+  {
+   "ref": "NPI-D7",
+   "title": "Golden unit set and cross-site test and calibration correlation report"
+  },
+  {
+   "ref": "NPI-D8",
+   "title": "Production readiness review package and PVT exit decision"
+  },
+  {
+   "ref": "NPI-D9",
+   "title": "Supplier production qualification record, process FMEA and control plan"
+  },
+  {
+   "ref": "RAMP-D1",
+   "title": "CPO production release package and configuration baseline"
+  },
+  {
+   "ref": "RAMP-D2",
+   "title": "Production configuration audit against the PVT build"
+  },
+  {
+   "ref": "RAMP-D3",
+   "title": "Signed production firmware and software release with rollback protection"
+  },
+  {
+   "ref": "RAMP-D4",
+   "title": "Volume ramp plan and build schedule"
+  },
+  {
+   "ref": "RAMP-D5",
+   "title": "Production yield dashboard and SPC control plan"
+  },
+  {
+   "ref": "RAMP-D6",
+   "title": "Supply and inventory ramp plan with long-lead buffers"
+  },
+  {
+   "ref": "RAMP-D7",
+   "title": "Outgoing quality report and early-shipment DPPM baseline"
+  },
+  {
+   "ref": "RAMP-D8",
+   "title": "Production release decision record and gate package"
+  },
+  {
+   "ref": "SUST-D1",
+   "title": "Yield improvement record and defect Pareto trend"
+  },
+  {
+   "ref": "SUST-D2",
+   "title": "Test time and cost-of-goods reduction report"
+  },
+  {
+   "ref": "SUST-D3",
+   "title": "RMA and field failure analysis report with corrective actions"
+  },
+  {
+   "ref": "SUST-D4",
+   "title": "Product change notification and requalification record"
+  },
+  {
+   "ref": "SUST-D5",
+   "title": "Firmware and software maintenance release record with security advisories"
+  },
+  {
+   "ref": "SUST-D6",
+   "title": "Field reliability and optical aging trend report"
+  },
+  {
+   "ref": "SUST-D7",
+   "title": "End-of-life plan with last-time-buy forecast"
+  },
+  {
+   "ref": "SUST-D8",
+   "title": "Sustaining handover package"
+  },
+  {
+   "ref": "SUST-D9",
+   "title": "Field service, spares and depot repair record"
+  },
+  {
+   "ref": "SUST-D10",
+   "title": "Supplier scorecards and supply continuity record"
+  }
+ ]
+}

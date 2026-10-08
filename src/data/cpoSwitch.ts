@@ -19,7 +19,7 @@
  * invariants as the other templates — see tests/unit/cpoSwitch.test.ts.
  */
 import type { ActivityStepEntry } from './activitySteps';
-import { CPO_SKELETON, type CpoStageSkeleton } from './cpoSwitch/skeleton';
+import { CPO_SKELETON, type CpoItem, type CpoStageSkeleton } from './cpoSwitch/skeleton';
 import type { CpoStageModule } from './cpoSwitch/types';
 import { CPO_STAGE_MODULES } from './cpoSwitch/stages';
 import type { JourneyStage, MilestoneDef, ProfileStageDef, ScheduleProfile } from './types';
@@ -37,10 +37,13 @@ const STAGE_NUMBER_BASE = 100;
 
 const moduleOf = (s: CpoStageSkeleton): CpoStageModule | undefined => CPO_STAGE_MODULES[s.prefix];
 
+/** An activity entry, plus the item it is work on — what an item filter reads. */
+export type CpoActivityEntry = ActivityStepEntry & { item: CpoItem };
+
 /** Every activity, in stage order and, inside a stage, in the order it runs them. */
-export const CPO_ACTIVITIES: Record<string, ActivityStepEntry> = Object.fromEntries(
+export const CPO_ACTIVITIES: Record<string, CpoActivityEntry> = Object.fromEntries(
   CPO_SKELETON.flatMap((st) =>
-    st.activities.map((sk): [string, ActivityStepEntry] => {
+    st.activities.map((sk): [string, CpoActivityEntry] => {
       const steps = moduleOf(st)?.steps[sk.ref];
       const o = steps?.o ?? [];
       return [
@@ -53,6 +56,7 @@ export const CPO_ACTIVITIES: Record<string, ActivityStepEntry> = Object.fromEntr
           ob: o.map((_, i) => i + 1),
           r: steps?.r ?? [],
           ro: sk.owner,
+          item: sk.item,
         },
       ];
     }),

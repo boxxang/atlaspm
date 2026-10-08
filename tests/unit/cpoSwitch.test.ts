@@ -9,7 +9,7 @@ import {
   CPO_SKELETON,
   CPO_STAGES,
 } from '@/data/cpoSwitch';
-import { CPO_OWNERS } from '@/data/cpoSwitch/skeleton';
+import { CPO_ITEMS, CPO_OWNERS } from '@/data/cpoSwitch/skeleton';
 import { CPO_GLOSSARY } from '@/data/cpoSwitch/glossary';
 import { CPO_WRITE_UPS, cpoDetail } from '@/data/cpoSwitchDetails';
 import { deliverableRefs } from '@/lib/deliverableRefs';
@@ -94,6 +94,15 @@ describe('CPO skeleton', () => {
       });
     }
     expect(new Set(CPO_SKELETON.map((s) => s.gate.id)).size).toBe(CPO_SKELETON.length);
+  });
+
+  it('tags every activity with the item it is work on, and carries the tag to its entry', () => {
+    for (const s of CPO_SKELETON) {
+      for (const a of s.activities) {
+        expect(CPO_ITEMS as readonly string[], a.ref).toContain(a.item);
+        expect(CPO_ACTIVITIES[a.ref].item, a.ref).toBe(a.item);
+      }
+    }
   });
 
   it('is a fourth built-in profile, ordered by start, one gate per stage', () => {
