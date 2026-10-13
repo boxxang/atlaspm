@@ -528,7 +528,7 @@ export const UTVP_WRITE_UPS: UcieWriteUps = {
     ],
     links: {
       dependsOn: ['UTVP-01', 'UCHN-02', 'UCHN-03', 'UTEC-04', 'UTEC-05'],
-      feedsInto: ['UTVP-02', 'UTVP-07', 'UFAB-03'],
+      feedsInto: ['UTVP-02', 'UTVP-07', 'UFAB-03', 'UCHN-08', 'UCHR-08'],
       runsWith: [],
       revisedBy: [],
       feedsBackInto: [],

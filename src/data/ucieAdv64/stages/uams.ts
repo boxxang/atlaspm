@@ -114,7 +114,7 @@ export const UAMS: UcieStageModule = {
     'UAMS-04': {
       s: [
         [1, 'Collect extracted channel models for each supported package type and the bump pitch extremes', 2],
-        [2, 'Build the link model — TX model, channel, RX model and clock path — per lane', 3],
+        [2, 'Build the link model per lane — TX model with its output impedance and pad loading, channel, RX model with its input loading, and clock path — from the schematic pad loading of the bump interface', 3],
         [3, 'Compute timing and voltage margin at 64 GT/s per lane and package type, including crosstalk, with and without receiver termination where the choice exists', 4],
         [4, 'Find the worst lanes and their aggressors and feed the results to bump map and routing', 2, 1],
         [5, 'Compute margin with supply noise from the power delivery analysis', 2],

@@ -407,11 +407,11 @@ export const UARC_WRITE_UPS: UcieWriteUps = {
   'UARC-07': {
     criticalPath: true,
     purpose: [
-      'Architect the <b>Electrical PHY</b>: transmit driver topology, swing and equalization, receive front-end and sampler topology with offset calibration, receiver termination and equalization per package type and reach, transmit swing within the die-to-die voltage compatibility rules, bias, reference and supply regulation, and ESD protection that meets its targets without closing the eye.',
-      'Advanced-package channels are short, but at 64 GT/s their loss and crosstalk still matter, and every femtofarad of ESD and bump capacitance costs eye. These topology choices set the energy per bit more than any later optimization will.',
+      'Architect the <b>Electrical PHY</b>: transmit driver topology, swing and equalization, receive front-end and sampler topology with offset calibration, receiver termination and equalization per package type and reach, transmit swing within the die-to-die voltage compatibility rules, bias, reference and supply regulation, and ESD protection that meets its targets without closing the eye — with a <b>per-bump loading budget</b> in numbers, pad and protection capacitance and driver output impedance, held within the loads the specification assumes.',
+      'Advanced-package channels are short, but at 64 GT/s their loss and crosstalk still matter, and every femtofarad of ESD and bump capacitance costs eye. These topology choices set the energy per bit more than any later optimization will, and the loading budget is what circuit design, link margin and the final channel review all check the die against.',
     ],
     flowNote:
-      'Step 1 chooses the transmit topology and step 2 the receive topology, while step 3 decides termination and equalization in parallel. Step 4 defines bias and regulation, step 5 ESD, and step 6 releases.',
+      'Step 1 chooses the transmit topology and step 2 the receive topology, while step 3 decides termination and equalization in parallel. Step 4 defines bias and regulation, step 5 ESD and the per-bump loading budget, and step 6 releases.',
     consumes: [
       'Clocking architecture and timing budget from UARC-06',
       'Electrical PHY requirements from UREQ-08',
@@ -452,7 +452,7 @@ export const UARC_WRITE_UPS: UcieWriteUps = {
     exit: [
       'Transmit and receive topologies chosen with feasibility simulation results',
       'Termination and equalization decision recorded per supported package type, and transmit swing checked against the voltage compatibility rules',
-      'ESD loading estimated within the timing budget',
+      'Per-bump loading budget — pad and protection capacitance and driver output impedance — released in numbers within the specification’s loads',
     ],
     dependsOn: ['UARC-06', 'UREQ-08'],
     dependsNote: null,
@@ -464,7 +464,7 @@ export const UARC_WRITE_UPS: UcieWriteUps = {
     ],
     links: {
       dependsOn: ['UARC-06', 'UREQ-08', 'UREQ-03', 'UREQ-02'],
-      feedsInto: ['UARC-10', 'UARC-11', 'UARC-12', 'UAFE-01', 'UAFE-02', 'UAFE-03', 'UAFE-05', 'UAFE-06'],
+      feedsInto: ['UARC-10', 'UARC-11', 'UARC-12', 'UAFE-01', 'UAFE-02', 'UAFE-03', 'UAFE-05', 'UAFE-06', 'UAMS-04'],
       runsWith: ['UARC-03'],
       revisedBy: [],
       feedsBackInto: [],

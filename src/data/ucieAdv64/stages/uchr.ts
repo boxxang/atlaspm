@@ -188,7 +188,7 @@ export const UCHR: UcieStageModule = {
     'UCHR-08': {
       s: [
         [1, 'Measure the test vehicle channel structures on each package variant and derive voltage transfer and crosstalk', 3],
-        [2, 'Compare the measurements with the extracted channel models', 2],
+        [2, 'Compare the measurements with the extracted channels of the test vehicle’s bridge and interposer as taped out', 2],
         [3, 'De-embed board and fixture contributions from the link margins', 1.5, 1],
         [4, 'Update the channel model and release the correlation report', 2],
       ],

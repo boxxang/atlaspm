@@ -474,14 +474,14 @@ export const UCHR_WRITE_UPS: UcieWriteUps = {
   'UCHR-08': {
     criticalPath: false,
     purpose: [
-      'Correlate the <b>test vehicle channel</b>: measure its channel structures — insertion loss, crosstalk and return loss — compare them with the extracted models, de-embed board and fixture contributions from the link margins, and update the channel model.',
+      'Correlate the <b>test vehicle channel</b>: measure its channel structures — insertion loss, crosstalk and return loss — compare them with the extraction of the test vehicle’s own bridge and interposer as taped out, de-embed board and fixture contributions from the link margins, and update the channel model.',
       'The channel models in the release are what licensees design their packages against. Correlating them on the test vehicle’s real silicon bridge or interposer is the only evidence that those models describe a manufactured channel and not just a drawing.',
     ],
     flowNote:
       'Step 1 measures the channel structures. Step 2 compares them with the extraction while step 3 de-embeds board and fixture from the link margins in parallel. Step 4 updates the model and releases the report.',
     consumes: [
       'Test vehicle channel correlation plan from UCHN-07',
-      'Package channel extraction and SI simulation from UCHN-04',
+      'Extracted bridge and interposer channels of the test vehicle as built from UTVP-08, by the extraction method of UCHN-04',
       'Test vehicle package design with channel structures from UTVP-01',
       'Per-lane margin data from UCHR-02',
       'Characterization plan from UCHR-01',
@@ -520,7 +520,7 @@ export const UCHR_WRITE_UPS: UcieWriteUps = {
       'Link margins de-embedded from board and fixture contributions',
       'Channel model updated with each change recorded and justified',
     ],
-    dependsOn: ['UCHN-07', 'UCHN-04', 'UTVP-01'],
+    dependsOn: ['UCHN-07', 'UTVP-08', 'UTVP-01'],
     dependsNote: 'The plan and the extraction were written before tapeout; the measurement is the first time they meet a manufactured channel.',
     feedsInto: ['UCHR-09'],
     measuredBy: [
@@ -529,7 +529,7 @@ export const UCHR_WRITE_UPS: UcieWriteUps = {
       'Model changes made',
     ],
     links: {
-      dependsOn: ['UCHN-07', 'UCHN-04', 'UTVP-01', 'UCHR-02', 'UCHR-01'],
+      dependsOn: ['UCHN-07', 'UCHN-04', 'UTVP-08', 'UTVP-01', 'UCHR-02', 'UCHR-01'],
       feedsInto: ['UCHR-09', 'UCHR-10', 'UGA-03'],
       runsWith: [],
       revisedBy: [],

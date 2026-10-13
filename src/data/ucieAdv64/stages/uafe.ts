@@ -161,9 +161,9 @@ export const UAFE: UcieStageModule = {
       s: [
         [1, 'Set the protection target per bump from the customer requirement and the assembly environment', 2],
         [2, 'Design the protection devices and clamps for signal and supply bumps', 5],
-        [3, 'Budget the protection capacitance against the receiver and driver bandwidth', 2, 1],
+        [3, 'Hold the pad and protection capacitance per bump within the loading budget the architecture set, against the receiver and driver bandwidth', 2, 1],
         [4, 'Design the bump interface — pad, protection and routing to the front-end', 4],
-        [5, 'Simulate protection discharge paths and the loading on the 64 GT/s signal', 3],
+        [5, 'Simulate protection discharge paths and the loading on the 64 GT/s signal, and hand the schematic pad loading per bump to link margin simulation', 3],
         [6, 'Release the ESD and bump interface database with the protection rating analysis', 1],
       ],
       o: [
@@ -171,7 +171,7 @@ export const UAFE: UcieStageModule = {
         'Protection device and clamp design',
         'Capacitance budget per bump',
         'Bump interface design',
-        'Discharge path and signal loading results',
+        'Discharge path results and schematic pad loading per bump',
         'ESD and bump interface circuit database with protection rating analysis',
       ],
       r: [['UAFE-D6', 'produces'], ['UAFE-D8', 'feeds']],

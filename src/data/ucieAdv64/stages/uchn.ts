@@ -7,7 +7,7 @@ export const UCHN: UcieStageModule = {
   content: {
     tagline: 'Specify the channel the PHY promises to work over, freeze the bump map early, and prove both on real package routes.',
     description:
-      'Define the package channel the PHY is specified against — voltage transfer function loss and crosstalk judged against an eye mask, as the specification states short die-to-die channels, plus skew — for silicon bridge, silicon interposer and RDL interposer routes at the agreed bump pitch and the short Advanced package reach — and derive the bump and routing rules that meet it. The bump map and channel specification are frozen early, under change control, because the electrical PHY layout and the test chip top level are drawn to them. Channels are then extracted and simulated at 64 GT/s with the transmitter and receiver models, the power delivery network is sized against the noise of all lanes switching together, customer channel guidelines, a reference package design and a channel compliance kit — behavioral transmitter and receiver models with the transfer-function flow and the eye mask — are written so licensees can sign off their own channels, and the measurement plan that will correlate the test vehicle’s channels with their models is prepared. The stage closes when the final macro and package channels are shown to meet the specification.',
+      'Define the package channel the PHY is specified against — voltage transfer function loss and crosstalk judged against an eye mask, as the specification states short die-to-die channels, plus skew — for silicon bridge, silicon interposer and RDL interposer routes at the agreed bump pitch and the short Advanced package reach — and derive the bump and routing rules that meet it. The bump map and channel specification are frozen early, under change control, because the electrical PHY layout and the test chip top level are drawn to them. Reference channel layouts are drawn for each package type, then extracted and simulated at 64 GT/s with the specification’s reference transmitter and receiver loads, the power delivery network is sized against the noise of all lanes switching together, customer channel guidelines, a reference package design and a channel compliance kit — behavioral transmitter and receiver models with the transfer-function flow and the eye mask — are written so licensees can sign off their own channels, and the measurement plan that will correlate the test vehicle’s channels with their models is prepared. The stage closes when the reference and test vehicle channels are shown to meet the specification and the final macro’s post-layout pad loading stays within the loads it assumes.',
     activities: [
       'Channel specification',
       'Bump and routing rules',
@@ -27,9 +27,10 @@ export const UCHN: UcieStageModule = {
       'Customer channel guidelines, reference package design and channel compliance kit',
       'Test vehicle channel correlation plan',
       'Channel specification compliance record',
+      'Reference channel layouts for bridge, silicon interposer and RDL interposer packages',
     ],
-    deliverableFrom: [0, 1, 2, 3, 4, 5, 6, 7],
-    deliverableWeek: [10, 16, 20, 36, 38, 48, 50, 54],
+    deliverableFrom: [0, 1, 2, 3, 4, 5, 6, 7, 1],
+    deliverableWeek: [10, 16, 20, 36, 38, 48, 50, 54, 16],
     engineeringEffort: [5, 6, 2, 10, 8, 6, 3, 1],
     risks: [
       'Crosstalk between densely routed lanes, not loss, limits 64 GT/s on fine-pitch routes, and a specification that bounds loss alone would pass channels that fail the eye mask',
@@ -77,17 +78,17 @@ export const UCHN: UcieStageModule = {
         [1, 'Derive routing rules — layer use, width, spacing and shielding — for each package type from the channel limits', 3],
         [2, 'Define bump rules — signal-to-ground ratio, return path and power bump placement — for the module', 3],
         [3, 'Check the rules against each package partner’s design rules and assembly constraints', 2, 1],
-        [4, 'Route sample lanes on each package type and confirm they meet the channel specification', 3],
+        [4, 'Draw reference channel layouts on the bridge, the silicon interposer and the RDL interposer — a representative lane group at the longest supported reach, with its shielding — as extractable databases, and confirm they meet the channel specification', 3],
         [5, 'Release the bump and routing design rules', 1],
       ],
       o: [
         'Routing rules per package type',
         'Bump rules for signal, ground and power',
         'Rule check against package partner rules',
-        'Sample routes meeting the channel specification',
+        'Reference channel layouts per package type meeting the channel specification',
         'Bump and routing design rules',
       ],
-      r: [['UCHN-D2', 'produces'], ['UCHN-D3', 'feeds']],
+      r: [['UCHN-D2', 'produces'], ['UCHN-D9', 'produces'], ['UCHN-D3', 'feeds']],
     },
     'UCHN-03': {
       s: [
@@ -106,11 +107,11 @@ export const UCHN: UcieStageModule = {
     },
     'UCHN-04': {
       s: [
-        [1, 'Extract the test vehicle and reference package channels as multi-port network models', 4],
-        [2, 'Compute transfer-function loss and crosstalk and simulate the eye against the mask at 64 GT/s with behavioral transmitter and receiver models', 6],
+        [1, 'Extract the reference channel layouts of each package type as multi-port network models', 4],
+        [2, 'Compute transfer-function loss and crosstalk with the specification’s reference transmitter and receiver loads and check the eye against the mask at 64 GT/s', 6],
         [3, 'Sweep reach, routing layer and pitch to find where the channel limits bind', 4, 1],
         [4, 'Hand channel models to link margin simulation and to the release channel models', 2],
-        [5, 'Rerun on the latest macro floorplan and package layout and update the margins', 5],
+        [5, 'Rerun with the bump field of the macro floorplan and update the margins', 5],
         [6, 'Release the channel extraction and SI simulation report', 1],
       ],
       o: [
@@ -118,7 +119,7 @@ export const UCHN: UcieStageModule = {
         'Eye and crosstalk results at 64 GT/s',
         'Reach, layer and pitch sensitivity sweep',
         'Channel models handed to link margin and release',
-        'Margins on the latest layouts',
+        'Margins on the macro floorplan’s bump field',
         'Package channel extraction and SI simulation report',
       ],
       r: [['UCHN-D4', 'produces'], ['UCHN-D8', 'feeds']],
@@ -143,7 +144,7 @@ export const UCHN: UcieStageModule = {
     'UCHN-06': {
       s: [
         [1, 'Write channel guidelines for each package type — routing, layer use, shielding and reach', 5],
-        [2, 'Build a reference package design for the macro with its channel models', 6],
+        [2, 'Build a reference package design for the macro from the reference channel layouts, with its channel models', 6],
         [3, 'Package the channel compliance kit — behavioral transmitter and receiver models, the transfer-function flow, the eye mask and a checking script', 3, 1],
         [4, 'Add power delivery guidelines and decoupling recommendations', 2, 1],
         [5, 'Review the guidelines and the kit with early-access customers and package partners', 3],
@@ -178,12 +179,12 @@ export const UCHN: UcieStageModule = {
     },
     'UCHN-08': {
       s: [
-        [1, 'Recheck the final macro layout and package channels against the channel specification', 1.5],
+        [1, 'Recheck the reference and test vehicle channels against the channel specification, and confirm the final macro’s post-layout pad loading stays within the loads the specification assumes', 1.5],
         [2, 'Review margins, waivers and open items with the PHY and package teams', 1],
         [3, 'Record the channel specification compliance decision', 1],
       ],
       o: [
-        'Final channel check against the specification',
+        'Final channel and pad loading check against the specification',
         'Reviewed margins and waivers',
         'Channel specification compliance record',
       ],

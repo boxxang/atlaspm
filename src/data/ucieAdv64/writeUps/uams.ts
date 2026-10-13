@@ -63,7 +63,7 @@ export const UAMS_WRITE_UPS: UcieWriteUps = {
     ],
     links: {
       dependsOn: ['UAFE-02', 'UAFE-03', 'UAFE-04', 'UAFE-07', 'UFND-04', 'UAFE-10', 'UAFE-12'],
-      feedsInto: ['UAMS-02', 'UAMS-03', 'UAMS-04', 'UAMS-05', 'UAMS-06', 'UPRE-02'],
+      feedsInto: ['UAMS-02', 'UAMS-03', 'UAMS-04', 'UAMS-05', 'UAMS-06', 'UPRE-02', 'UCHN-06'],
       runsWith: [],
       revisedBy: ['UAMS-06'],
       feedsBackInto: [],
@@ -207,7 +207,7 @@ export const UAMS_WRITE_UPS: UcieWriteUps = {
   'UAMS-04': {
     criticalPath: true,
     purpose: [
-      'Compute <b>link margin with package channel models</b>: extracted channels for each supported package type at both ends of the bump pitch range, a per-lane link model of TX, channel, RX and clock path, timing and voltage margin at 64 GT/s with crosstalk and supply noise — with and without receiver termination where the package type and reach leave the choice open — and the worst lanes and their aggressors fed back to bump map and routing.',
+      'Compute <b>link margin with package channel models</b>: extracted channels for each supported package type at both ends of the bump pitch range, a per-lane link model of TX, channel, RX and clock path with the die’s own pad loading from the bump interface design, timing and voltage margin at 64 GT/s with crosstalk and supply noise — with and without receiver termination where the package type and reach leave the choice open — and the worst lanes and their aggressors fed back to bump map and routing.',
       'A fine-pitch advanced package puts the lanes of a module millimeters apart at most, and crosstalk between them is as large a term as loss. The margin that matters is the worst lane in the worst package, and finding which lane that is gives bump map and routing something concrete to fix while they still can.',
     ],
     flowNote:
@@ -216,8 +216,8 @@ export const UAMS_WRITE_UPS: UcieWriteUps = {
       'Behavioral model set from UAMS-01',
       'Extracted package channel models from UCHN-04',
       'Power delivery and supply noise analysis from UCHN-05',
-      'Channel specification from UCHN-01',
-      'Bump and routing design rules from UCHN-02',
+      'Channel specification and bump and routing design rules from UCHN-01 and UCHN-02',
+      'Schematic pad loading per bump from UAFE-06, against the loading budget in UARC-07',
     ],
     rel: {
       'UAMS-D4': '<b>Link margin report with package channel models across the bump pitch range.</b> Produced here; the customer channel guidelines are written against it.',
@@ -226,7 +226,7 @@ export const UAMS_WRITE_UPS: UcieWriteUps = {
     risks: [
       '<b>One package.</b> Margin is computed on a silicon interposer and the RDL interposer customers see less.',
       '<b>Crosstalk omitted.</b> Lanes are simulated in isolation and the worst aggressor pattern is never applied.',
-      '<b>Clock path idealized.</b> The forwarded clock is not routed through the channel model with the data.',
+      '<b>Loads idealized.</b> The link model carries the specification’s reference loads instead of the die’s own pad and protection capacitance, and the margin is the channel’s, not the PHY’s.',
       '<b>No feedback.</b> Worst lanes are reported after the bump map has frozen.',
       '<b>Supply noise ignored.</b> Margin is quoted on a quiet supply.',
     ],
@@ -246,7 +246,7 @@ export const UAMS_WRITE_UPS: UcieWriteUps = {
     ],
     entry: [
       'Extracted channel models available from UCHN-04',
-      'Behavioral models released in UAMS-01',
+      'Behavioral models released in UAMS-01 and schematic pad loading from UAFE-06',
       'Supply noise estimates from UCHN-05',
     ],
     exit: [
@@ -254,7 +254,7 @@ export const UAMS_WRITE_UPS: UcieWriteUps = {
       'Worst lanes and aggressor patterns delivered to bump map and routing before the bump map freeze in layout',
       'Margin with supply noise meets target or the shortfall is a recorded design change',
     ],
-    dependsOn: ['UAMS-01', 'UCHN-04', 'UCHN-05', 'UCHN-01'],
+    dependsOn: ['UAMS-01', 'UCHN-04', 'UCHN-05', 'UCHN-01', 'UAFE-06'],
     dependsNote: null,
     feedsInto: ['UAMS-05', 'UAMS-07', 'UAMS-08', 'UCHN-06'],
     measuredBy: [
@@ -263,7 +263,7 @@ export const UAMS_WRITE_UPS: UcieWriteUps = {
       'Worst-lane fixes adopted in the bump map',
     ],
     links: {
-      dependsOn: ['UAMS-01', 'UCHN-04', 'UCHN-05', 'UCHN-01', 'UCHN-02'],
+      dependsOn: ['UAMS-01', 'UCHN-04', 'UCHN-05', 'UCHN-01', 'UCHN-02', 'UAFE-06', 'UARC-07'],
       feedsInto: ['UAMS-05', 'UAMS-07', 'UAMS-08', 'UCHN-06', 'ULAY-04'],
       runsWith: [],
       revisedBy: [],

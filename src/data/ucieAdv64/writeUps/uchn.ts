@@ -74,11 +74,11 @@ export const UCHN_WRITE_UPS: UcieWriteUps = {
   'UCHN-02': {
     criticalPath: true,
     purpose: [
-      'Turn the channel limits into <b>bump and routing design rules</b>: layer use, width, spacing and shielding for each package type, and the module’s signal-to-ground ratio, return paths and power bump placement — checked against every package partner’s own rules.',
+      'Turn the channel limits into <b>bump and routing design rules</b>: layer use, width, spacing and shielding for each package type, and the module’s signal-to-ground ratio, return paths and power bump placement — checked against every package partner’s own rules — and draw a <b>reference channel layout</b> on each package type that proves them and gives extraction a real route to work on.',
       'At fine pitch, the ground bumps between signal lanes are what keep crosstalk in budget, and every one of them costs shoreline. The rules decide that trade once, so the bump map and every customer route inherit the same answer.',
     ],
     flowNote:
-      'Step 1 derives routing rules and step 2 bump rules. Step 3 checks them against partner rules in parallel, step 4 confirms them on sample routes and step 5 releases the rules.',
+      'Step 1 derives routing rules and step 2 bump rules. Step 3 checks them against partner rules in parallel, step 4 draws the reference channel layouts that confirm them and step 5 releases the rules.',
     consumes: [
       'Channel specification from UCHN-01',
       'Package partner design rules and assembly constraints from UTEC-04',
@@ -89,12 +89,13 @@ export const UCHN_WRITE_UPS: UcieWriteUps = {
     rel: {
       'UCHN-D2': '<b>Bump and routing design rules for bridge, interposer and RDL packages.</b> Produced here; the bump map, the test vehicle and customer guidelines follow them.',
       'UCHN-D3': '<b>Frozen bump map and channel specification under change control.</b> The rules are the basis of the frozen bump map.',
+      'UCHN-D9': '<b>Reference channel layouts for bridge, silicon interposer and RDL interposer packages.</b> Produced here; channel extraction runs on them before any test vehicle or customer package exists, and the reference package design starts from them.',
     },
     risks: [
       '<b>Too few grounds.</b> The signal-to-ground ratio is set for density and crosstalk exceeds the limit.',
       '<b>Partner conflict.</b> A rule meets the channel but violates a partner’s design rules.',
       '<b>Power bumps squeezed.</b> Power bumps are placed after signals and supply noise rises.',
-      '<b>Untested rules.</b> Rules are written but never routed on a sample.',
+      '<b>Untested rules.</b> Rules are written but never drawn as a layout extraction can read, so the first real channel is the test vehicle’s.',
       '<b>Repair lanes ignored.</b> Redundant lanes are not given the same routing quality as primary lanes.',
     ],
     roles: [
@@ -108,7 +109,7 @@ export const UCHN_WRITE_UPS: UcieWriteUps = {
       ['Routing rules', 1.5],
       ['Bump rules', 1.5],
       ['Partner rule check', 1],
-      ['Sample routing', 1.5],
+      ['Reference channel layouts', 1.5],
       ['Release', 0.5],
     ],
     entry: [
@@ -117,7 +118,7 @@ export const UCHN_WRITE_UPS: UcieWriteUps = {
       'Lane repair scheme drafted in UARC-04',
     ],
     exit: [
-      'Routing rules per package type meet the channel specification on sample routes',
+      'Reference channel layouts for every package type, the RDL interposer included, meet the channel specification',
       'Bump rules define signal, ground and power placement for the whole module including redundant lanes',
       'No rule conflicts with any supported partner’s design rules',
     ],
@@ -125,13 +126,13 @@ export const UCHN_WRITE_UPS: UcieWriteUps = {
     dependsNote: null,
     feedsInto: ['UCHN-03'],
     measuredBy: [
-      'Sample routes meeting the channel specification',
+      'Reference channel layouts meeting the channel specification',
       'Signal-to-ground bump ratio',
       'Partner rule conflicts open',
     ],
     links: {
       dependsOn: ['UCHN-01', 'UTEC-04', 'UARC-09', 'UARC-04'],
-      feedsInto: ['UCHN-03', 'UCHN-06'],
+      feedsInto: ['UCHN-03', 'UCHN-04', 'UCHN-06'],
       runsWith: [],
       revisedBy: [],
       feedsBackInto: [],
@@ -205,16 +206,16 @@ export const UCHN_WRITE_UPS: UcieWriteUps = {
   'UCHN-04': {
     criticalPath: true,
     purpose: [
-      'Extract the <b>reference package channels</b> for each supported package type as multi-port network models, reduce them to transfer-function loss and crosstalk, and simulate the eye against the mask at 64 GT/s with behavioral transmitter and receiver models, sweeping reach, routing layer and pitch to find where the limits bind, and rerun on the latest macro floorplan and package layout.',
+      'Extract the <b>reference channel layouts</b> of each supported package type as multi-port network models, reduce them to transfer-function loss and crosstalk with the specification’s reference transmitter and receiver loads, and check the eye against the mask at 64 GT/s, sweeping reach, routing layer and pitch to find where the limits bind, and rerun with the bump field of the macro floorplan.',
       'These channel models feed three consumers: link margin simulation, the customer release models and, after silicon, the correlation with measured channels. One extraction method used for all three is what lets them be compared.',
     ],
     flowNote:
       'Step 1 extracts the channels, step 2 simulates eye and crosstalk while step 3 sweeps sensitivities in parallel. Step 4 hands the models on, step 5 reruns on the latest layouts and step 6 releases the report.',
     consumes: [
       'Frozen bump map and channel specification from UCHN-03',
-      'Channel specification limits from UCHN-01',
-      'Behavioral transmitter and receiver models from UAMS-01',
-      'Bump and routing design rules per package type from UCHN-02',
+      'Channel specification limits and the reference transmitter and receiver loads from UCHN-01',
+      'Reference channel layouts and routing rules per package type from UCHN-02',
+      'Package stack-ups and material properties per partner from UTEC-04',
       'Macro floorplan and bump field from ULAY-01',
     ],
     rel: {
@@ -223,7 +224,7 @@ export const UCHN_WRITE_UPS: UcieWriteUps = {
     },
     risks: [
       '<b>Coupling cut off.</b> Extraction drops coupling to neighbours beyond a few lanes.',
-      '<b>Ideal models.</b> Transmitter and receiver models are ideal and the margins optimistic.',
+      '<b>Wrong loads.</b> The channel is judged with the IP’s own transmitter and receiver rather than the specification’s reference loads, and passes a channel a licensee’s compliance check would fail.',
       '<b>Never rerun.</b> Results from early floorplans are never updated with later layouts.',
       '<b>Port mismatch.</b> Model ports do not match the bump names the release uses.',
       '<b>Sweeps skipped.</b> The reach limit per package type is never found.',
@@ -231,7 +232,7 @@ export const UCHN_WRITE_UPS: UcieWriteUps = {
     roles: [
       { r: 'SI/PI', d: 'Owns extraction and SI simulation' },
       { r: 'Package engineer', d: 'Package layouts for extraction' },
-      { r: 'Mixed-signal verification engineer', d: 'Transmitter and receiver models' },
+      { r: 'Mixed-signal verification engineer', d: 'Takes the channel models into link margin' },
       { r: 'Customer engineering engineer', d: 'Release model format' },
       { r: 'SI/PI lead', d: 'Approves the report' },
     ],
@@ -245,24 +246,24 @@ export const UCHN_WRITE_UPS: UcieWriteUps = {
     ],
     entry: [
       'Bump map frozen in UCHN-03',
-      'Behavioral models available from UAMS-01',
-      'Reference package stack-ups and routing rules available from UCHN-02',
+      'Reference channel layouts released in UCHN-02',
+      'Partner stack-ups and material properties available from UTEC-04',
     ],
     exit: [
       'Every supported package type simulated at 64 GT/s with eye and crosstalk results',
-      'Latest macro floorplan and test vehicle package layout rerun and margins updated',
+      'Rerun with the macro floorplan’s bump field and margins updated',
       'Channel models delivered to link margin and release in the agreed format',
     ],
-    dependsOn: ['UCHN-03', 'UAMS-01'],
-    dependsNote: 'Runs first on draft layouts and again on the latest macro floorplan and package layout; the compliance review rechecks the final macro layout once it exists.',
+    dependsOn: ['UCHN-03', 'UCHN-02'],
+    dependsNote: 'Runs first on the reference channel layouts and again with the macro floorplan’s bump field. The test vehicle’s bridge and interposer channels are extracted at their own signoff, and the compliance review checks them with the final macro’s pad loading.',
     feedsInto: ['UCHN-08', 'UAMS-04', 'UPRE-05'],
     measuredBy: [
       'Eye margin at 64 GT/s per package type',
       'Crosstalk margin on the worst lane',
-      'Rerun on the latest layouts completed',
+      'Rerun on the macro floorplan’s bump field completed',
     ],
     links: {
-      dependsOn: ['UCHN-03', 'UCHN-01', 'UAMS-01', 'UCHN-02', 'ULAY-01'],
+      dependsOn: ['UCHN-03', 'UCHN-01', 'UCHN-02', 'UTEC-04', 'ULAY-01'],
       feedsInto: ['UCHN-06', 'UCHN-07', 'UCHN-08', 'UAMS-04', 'UPRE-05'],
       runsWith: ['UCHN-05'],
       revisedBy: [],
@@ -344,13 +345,13 @@ export const UCHN_WRITE_UPS: UcieWriteUps = {
       'Customers design the package, not the IP team. Guidelines they can follow without a call, with a reference design they can copy, are what turn a channel specification into packages that actually meet it.',
     ],
     flowNote:
-      'Step 1 writes the guidelines and step 2 builds the reference design, with the channel compliance kit packaged in step 3 and power delivery guidance added in step 4 alongside. Step 5 reviews the guidelines and the kit with customers and partners, and step 6 releases.',
+      'Step 1 writes the guidelines and step 2 builds the reference design from the reference channel layouts, with the channel compliance kit packaged in step 3 and power delivery guidance added in step 4 alongside. Step 5 reviews the guidelines and the kit with customers and partners, and step 6 releases.',
     consumes: [
       'Channel extraction and SI results from UCHN-04',
       'PDN and PI analysis from UCHN-05',
-      'Bump and routing design rules from UCHN-02',
-      'Early-access customer package plans',
-      'Package partner feedback',
+      'Bump and routing design rules and reference channel layouts from UCHN-02',
+      'Behavioral transmitter and receiver models for the kit from UAMS-01',
+      'Early-access customer package plans and package partner feedback',
     ],
     rel: {
       'UCHN-D6': '<b>Customer channel guidelines, reference package design and channel compliance kit.</b> Produced here; the kit is the primary customer channel model in the v0.9 release, and the guidelines are used in customer integration reviews.',
@@ -397,7 +398,7 @@ export const UCHN_WRITE_UPS: UcieWriteUps = {
       'Customer comments resolved',
     ],
     links: {
-      dependsOn: ['UCHN-04', 'UCHN-05', 'UCHN-02'],
+      dependsOn: ['UCHN-04', 'UCHN-05', 'UCHN-02', 'UAMS-01'],
       feedsInto: ['UPRE-05', 'UPRE-06', 'UCUS-01'],
       runsWith: [],
       revisedBy: [],
@@ -473,23 +474,23 @@ export const UCHN_WRITE_UPS: UcieWriteUps = {
   'UCHN-08': {
     criticalPath: true,
     purpose: [
-      'Hold the <b>channel specification compliance review</b>: check the final macro and package channels and their supply noise against the specification, review margins and waivers with the PHY and package teams, and record the decision that closes the Channel Spec Met gate.',
+      'Hold the <b>channel specification compliance review</b>: check the reference channels and the test vehicle’s extracted bridge and interposer channels and their supply noise against the specification, confirm the final macro’s post-layout pad loading stays within the loads the specification assumes, review margins and waivers with the PHY and package teams, and record the decision that closes the Channel Spec Met gate.',
       'Hard macro signoff and the v0.9 release both assume the channel is met. A recorded decision with its waivers is what lets them proceed on evidence rather than on the absence of complaints.',
     ],
     flowNote:
       'Step 1 checks the final channels, step 2 reviews margins and waivers and step 3 records the decision.',
     consumes: [
       'Channel specification from UCHN-01',
-      'Final PHY macro layout and bump field from ULAY-04',
-      'Channel results from UCHN-04',
-      'PDN and PI results from UCHN-05',
+      'Final PHY macro layout from ULAY-04 and its post-layout pad loading from ULAY-05',
+      'Channel and PDN results from UCHN-04 and UCHN-05',
+      'Extracted test vehicle bridge and interposer channels from UTVP-08',
       'Customer guidelines and correlation plan from UCHN-06 and UCHN-07',
     ],
     rel: {
       'UCHN-D8': '<b>Channel specification compliance record.</b> Produced here; closes the Channel Spec Met gate and feeds hard macro signoff.',
     },
     risks: [
-      '<b>Draft results.</b> The decision is taken on results from draft layouts instead of the final macro.',
+      '<b>Draft results.</b> The decision is taken on reference channels and budgets alone, without the test vehicle’s extracted channels or the final macro’s pad loading.',
       '<b>Unbounded waivers.</b> Waivers are granted without a margin figure.',
       '<b>Supply noise skipped.</b> PI results are not part of the review.',
       '<b>Signoff unaware.</b> Hard macro signoff proceeds without the record.',
@@ -503,21 +504,21 @@ export const UCHN_WRITE_UPS: UcieWriteUps = {
       { r: 'IP architect', d: 'Approves the decision' },
     ],
     effort: [
-      ['Final channel check', 0.5],
+      ['Final channel and pad loading check', 0.5],
       ['Margin and waiver review', 0.25],
       ['Decision record', 0.25],
     ],
     entry: [
-      'Final macro layout complete in ULAY-04 and channel results released in UCHN-04',
-      'PDN report released in UCHN-05',
-      'Reviewers available',
+      'Final macro layout complete in ULAY-04, with its post-layout pad loading from ULAY-05',
+      'Channel results released in UCHN-04 and the PDN report in UCHN-05',
+      'Test vehicle bridge and interposer channels extracted in UTVP-08',
     ],
     exit: [
-      'Every supported package type meets the channel specification or has a waiver with its margin',
-      'Supply noise within budget on every PHY supply',
+      'Every supported package type meets the channel specification on its reference and test vehicle channels, or has a waiver with its margin',
+      'Post-layout pad loading within the loads the specification assumes, and supply noise within budget on every PHY supply',
       'Compliance decision recorded and passed to hard macro signoff',
     ],
-    dependsOn: ['UCHN-01', 'UCHN-04', 'UCHN-05', 'ULAY-04'],
+    dependsOn: ['UCHN-01', 'UCHN-04', 'UCHN-05', 'ULAY-04', 'ULAY-05', 'UTVP-08'],
     dependsNote: null,
     feedsInto: ['USGN-06', 'USGN-07', 'UPRE-05'],
     measuredBy: [
@@ -526,7 +527,7 @@ export const UCHN_WRITE_UPS: UcieWriteUps = {
       'Review date against plan',
     ],
     links: {
-      dependsOn: ['UCHN-01', 'UCHN-02', 'UCHN-03', 'UCHN-04', 'UCHN-05', 'UCHN-06', 'UCHN-07', 'ULAY-04'],
+      dependsOn: ['UCHN-01', 'UCHN-02', 'UCHN-03', 'UCHN-04', 'UCHN-05', 'UCHN-06', 'UCHN-07', 'ULAY-04', 'ULAY-05', 'UTVP-08'],
       feedsInto: ['USGN-06', 'USGN-07', 'UPRE-05'],
       runsWith: [],
       revisedBy: [],

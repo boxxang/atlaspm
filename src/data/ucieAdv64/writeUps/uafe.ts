@@ -81,7 +81,7 @@ export const UAFE_WRITE_UPS: UcieWriteUps = {
     consumes: [
       'Frozen Electrical PHY architecture from UARC-12',
       'Selected TX topology and feasibility results from UAFE-01',
-      'Channel specification and loss assumptions from UCHN-01',
+      'Channel specification, loss assumptions and representative channel models from UCHN-01',
       'Device models from UTEC-02',
       'Foundation I/O and ESD cells from UFND-01',
     ],
@@ -148,9 +148,9 @@ export const UAFE_WRITE_UPS: UcieWriteUps = {
     consumes: [
       'Frozen Electrical PHY architecture from UARC-12',
       'Selected RX topology and feasibility results from UAFE-01',
-      'Channel specification from UCHN-01',
+      'Channel specification and representative channel models from UCHN-01',
       'Device models and mismatch data from UTEC-02',
-      'ESD capacitance budget per bump from UAFE-06',
+      'Per-bump loading budget from UARC-07, held in the bump interface design in UAFE-06',
     ],
     rel: {
       'UAFE-D3': '<b>RX front-end and sampler schematic database and simulation report.</b> Produced here; RX layout and the RX behavioral model start from it.',
@@ -196,7 +196,7 @@ export const UAFE_WRITE_UPS: UcieWriteUps = {
       'Receive eye margin per corner',
     ],
     links: {
-      dependsOn: ['UARC-12', 'UAFE-01', 'UCHN-01', 'UTEC-02', 'UAFE-06'],
+      dependsOn: ['UARC-12', 'UAFE-01', 'UCHN-01', 'UTEC-02', 'UAFE-06', 'UARC-07'],
       feedsInto: ['UAFE-07', 'UAFE-08', 'UAFE-09', 'UAMS-01', 'ULAY-02', 'ULAY-03'],
       runsWith: ['UAFE-02', 'UAFE-04'],
       revisedBy: [],
@@ -340,17 +340,17 @@ export const UAFE_WRITE_UPS: UcieWriteUps = {
   'UAFE-06': {
     criticalPath: false,
     purpose: [
-      'Design the <b>ESD protection and bump interface</b>: set the protection target per bump, design the protection devices and clamps for signal and supply bumps, budget their capacitance against the receiver and driver bandwidth, and design the path from bump to front-end.',
+      'Design the <b>ESD protection and bump interface</b>: set the protection target per bump, design the protection devices and clamps for signal and supply bumps, hold their capacitance within the per-bump loading budget set in the architecture, design the path from bump to front-end, and hand the schematic pad loading to link margin simulation.',
       'Fine-pitch bumps in an advanced package see a gentler assembly environment than a package ball, which is what lets die-to-die protection be smaller — but only to the level the customer’s assembly flow actually guarantees. The target is set from that flow, then defended against every request to shrink it further.',
     ],
     flowNote:
-      'Step 1 sets the protection target and step 2 designs the devices and clamps, with the capacitance budget set alongside in step 3. Step 4 designs the bump interface, step 5 simulates discharge paths and signal loading, and step 6 releases.',
+      'Step 1 sets the protection target and step 2 designs the devices and clamps, with the capacitance held to the loading budget alongside in step 3. Step 4 designs the bump interface, step 5 simulates discharge paths and signal loading and hands the pad loading to link margin, and step 6 releases.',
     consumes: [
       'Frozen architecture from UARC-12',
       'ESD targets from the Electrical PHY requirements in UREQ-08',
       'Process and metal stack from UTEC-01',
       'Foundation ESD cells from UFND-01',
-      'Bump map concept from UARC-09',
+      'Bump map concept from UARC-09 and the per-bump loading budget from UARC-07',
     ],
     rel: {
       'UAFE-D6': '<b>ESD and bump interface circuit database with protection rating analysis.</b> Produced here; ESD signoff checks the layout against it.',
@@ -383,7 +383,7 @@ export const UAFE_WRITE_UPS: UcieWriteUps = {
     ],
     exit: [
       'Every signal and supply bump has a simulated discharge path within the device limits',
-      'Protection capacitance per bump within the budget agreed with RX and TX design',
+      'Pad and protection capacitance per bump within the architecture’s loading budget, and handed to link margin simulation',
       'Protection rating analysis released for ESD signoff',
     ],
     dependsOn: ['UARC-12', 'UREQ-08', 'UTEC-01'],
@@ -395,8 +395,8 @@ export const UAFE_WRITE_UPS: UcieWriteUps = {
       'Simulated clamp voltage against device limits',
     ],
     links: {
-      dependsOn: ['UARC-12', 'UREQ-08', 'UTEC-01', 'UFND-01', 'UARC-09'],
-      feedsInto: ['UAFE-08', 'UAFE-09', 'ULAY-02'],
+      dependsOn: ['UARC-12', 'UREQ-08', 'UTEC-01', 'UFND-01', 'UARC-09', 'UARC-07'],
+      feedsInto: ['UAFE-08', 'UAFE-09', 'ULAY-02', 'UAMS-04'],
       runsWith: [],
       revisedBy: [],
       feedsBackInto: ['UAFE-03'],

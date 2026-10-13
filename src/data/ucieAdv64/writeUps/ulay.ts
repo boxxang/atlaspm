@@ -275,11 +275,11 @@ export const ULAY_WRITE_UPS: UcieWriteUps = {
   'ULAY-05': {
     criticalPath: true,
     purpose: [
-      'Prove the margin survived layout: extract the <b>full macro</b> with coupling between blocks and lanes, re-run the PVT corner testbenches at 64 GT/s and Monte Carlo on the sampler and phase paths with parasitics, compare post-layout with schematic margins and fix the blocks that lost too much.',
+      'Prove the margin survived layout: extract the <b>full macro</b> with coupling between blocks and lanes, re-run the PVT corner testbenches at 64 GT/s and Monte Carlo on the sampler and phase paths with parasitics, compare post-layout with schematic margins and fix the blocks that lost too much, and extract the <b>post-layout pad loading</b> per lane for the channel compliance review.',
       'Schematic margin is a promise; post-layout margin is the delivery. The comparison block by block shows where layout consumed more than its allowance, which is the only way to fix it before signoff rather than explain it after silicon.',
     ],
     flowNote:
-      'Step 1 extracts the full macro. Step 2 re-runs the corners while step 3 re-runs Monte Carlo in parallel. Step 4 compares margins and drives fixes, and step 5 releases the report.',
+      'Step 1 extracts the full macro. Step 2 re-runs the corners while step 3 re-runs Monte Carlo in parallel. Step 4 compares margins and drives fixes while step 5 extracts the pad loading beside it, and step 6 releases the report.',
     consumes: [
       'Block layouts from ULAY-02',
       'Parasitic control record and extraction comparison from ULAY-03',
@@ -309,7 +309,8 @@ export const ULAY_WRITE_UPS: UcieWriteUps = {
       ['Full-macro extraction', 1.1],
       ['Post-layout corners', 1.7],
       ['Post-layout Monte Carlo', 1.1],
-      ['Comparison, fixes and release', 1.1],
+      ['Comparison, fixes and release', 0.9],
+      ['Post-layout pad loading', 0.2],
     ],
     entry: [
       'Macro assembled in ULAY-04',
@@ -331,7 +332,7 @@ export const ULAY_WRITE_UPS: UcieWriteUps = {
     ],
     links: {
       dependsOn: ['ULAY-02', 'ULAY-03', 'ULAY-04', 'UAFE-08', 'UFND-04'],
-      feedsInto: ['ULAY-06', 'ULAY-07', 'USGN-02', 'USGN-04', 'USGN-07'],
+      feedsInto: ['ULAY-06', 'ULAY-07', 'USGN-02', 'USGN-04', 'USGN-07', 'UCHN-08'],
       runsWith: [],
       revisedBy: [],
       feedsBackInto: ['ULAY-02'],

@@ -174,7 +174,7 @@ export const UARC: UcieStageModule = {
         [2, 'Choose the receive front-end and sampler topology with offset calibration', 1.5],
         [3, 'Decide receiver termination per package type and reach and whether receive equalization is needed, from early channel estimates', 1, 1],
         [4, 'Define bias, reference and supply regulation for the lanes', 1.5],
-        [5, 'Define ESD protection that meets targets without closing the eye at 64 GT/s', 1],
+        [5, 'Define ESD protection that meets targets without closing the eye at 64 GT/s, and set the per-bump loading budget — pad and protection capacitance and driver output impedance — within the loads the specification assumes', 1],
         [6, 'Release the electrical PHY architecture specification', 1],
       ],
       o: [
@@ -182,7 +182,7 @@ export const UARC: UcieStageModule = {
         'Receive front-end and sampler topology choice',
         'Termination and equalization decision per package type',
         'Bias, reference and regulation scheme',
-        'ESD protection scheme',
+        'ESD protection scheme and per-bump loading budget',
         'Electrical PHY architecture specification — TX, RX, termination, equalization, bias and ESD',
       ],
       r: [['UARC-D7', 'produces'], ['UARC-D11', 'feeds']],
