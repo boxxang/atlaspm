@@ -14,8 +14,8 @@ export const USGN_WRITE_UPS: UcieWriteUps = {
       'Step 1 loads the final netlist, parasitics and constraints. Step 2 runs every corner while step 3 closes the boundary budgets beside it. Step 4 fixes the remaining violations, step 5 checks test and low-power modes in parallel, and step 6 releases the report.',
     consumes: [
       'Timing-closed digital database from UDPD-05',
-      'Hardened digital macro and its abstract from UDPD-06',
-      'Digital timing closure decision from UDPD-07',
+      'Hardened digital macro and its abstract from UDPD-06, and the timing closure decision from UDPD-07',
+      'Post-layout Electrical PHY interface timing models from ULAY-06',
       'Gate-level simulation results and timing exceptions confirmed in UDV-10',
       'Latency and area budget allocation from UARC-11',
     ],
@@ -63,7 +63,7 @@ export const USGN_WRITE_UPS: UcieWriteUps = {
       'Signoff runs needed to converge after the final changes',
     ],
     links: {
-      dependsOn: ['UDPD-05', 'UDPD-06', 'UDPD-07', 'UDV-10', 'UARC-11'],
+      dependsOn: ['UDPD-05', 'UDPD-06', 'UDPD-07', 'UDV-10', 'UARC-11', 'ULAY-06'],
       feedsInto: ['USGN-06', 'USGN-07', 'UTCI-05', 'UPRE-04'],
       runsWith: ['USGN-02'],
       revisedBy: [],
@@ -413,10 +413,10 @@ export const USGN_WRITE_UPS: UcieWriteUps = {
       'Step 1 collects the reports against the checklist. Step 2 reviews waivers and risks, step 3 records the decision and its conditions, and step 4 authorizes the macro to its consumers.',
     consumes: [
       'Static timing signoff report from USGN-01',
-      'EM and IR drop and physical verification reports from USGN-02 and USGN-03',
-      'ESD, latch-up and aging reports from USGN-04 and USGN-05',
+      'EM and IR drop, physical verification, ESD, latch-up and aging reports from USGN-02, USGN-03, USGN-04 and USGN-05',
+      'Post-layout power model from ULAY-06 against the PPA targets in UREQ-02 and the budgets in UARC-11',
       'Post-layout margin from ULAY-05 and channel specification compliance from UCHN-08',
-      'Integration check from USGN-06 and timing-annotated gate-level results from USGN-08',
+      'Integration check from USGN-06, and timing-annotated gate-level results and final ATPG coverage from USGN-08',
     ],
     rel: {
       'USGN-D7': '<b>Hard macro signoff decision record and release authorization.</b> Produced here; it closes the Hard Macro Signoff gate.',
@@ -446,7 +446,7 @@ export const USGN_WRITE_UPS: UcieWriteUps = {
       'Test chip and release consumers identified with their database needs',
     ],
     exit: [
-      'Signoff decision recorded with every waiver and its owner',
+      'Signoff decision recorded with every waiver and its owner, and post-layout power, area and latency stated against target',
       'One database revision named for the test chip, the tapeout and the v0.9 release',
       'Conditions carried into the tapeout checklist and the release notes',
     ],
@@ -459,7 +459,7 @@ export const USGN_WRITE_UPS: UcieWriteUps = {
       'Database revisions in use downstream (target one)',
     ],
     links: {
-      dependsOn: ['USGN-01', 'USGN-02', 'USGN-03', 'USGN-04', 'USGN-05', 'USGN-06', 'USGN-08', 'ULAY-07', 'ULAY-05', 'UDPD-07', 'UDV-12', 'UAMS-08', 'UCHN-08'],
+      dependsOn: ['USGN-01', 'USGN-02', 'USGN-03', 'USGN-04', 'USGN-05', 'USGN-06', 'USGN-08', 'ULAY-07', 'ULAY-05', 'UDPD-07', 'UDV-12', 'UAMS-08', 'UCHN-08', 'ULAY-06', 'UREQ-02', 'UARC-11'],
       feedsInto: ['UTCI-05', 'UTCI-06', 'UTPO-01', 'UTPO-04', 'UPRE-04', 'UPRE-08'],
       runsWith: [],
       revisedBy: [],
@@ -470,11 +470,11 @@ export const USGN_WRITE_UPS: UcieWriteUps = {
   'USGN-08': {
     criticalPath: false,
     purpose: [
-      'Run <b>timing-annotated gate-level simulation on the signoff netlist</b> of the digital hard macro: link training, mainband traffic, retry, reset, low-power entry and exit, clock-domain crossings and the at-speed test patterns, with delays back-annotated from the final parasitics at the fast and slow corners.',
-      'Functional gate-level simulation runs on the netlist before timing closes; this run is the one that sees the real delays. It catches what static timing cannot — a wrong timing exception, an asynchronous path that only fails with real skew, a reset that releases in the wrong order — on the database the test chip and the v0.9 release will carry.',
+      'Run <b>timing-annotated gate-level simulation on the signoff netlist</b> of the digital hard macro: link training, mainband traffic, retry, reset, low-power entry and exit, clock-domain crossings and the at-speed test patterns, with delays back-annotated from the final parasitics at the fast and slow corners — and generate the <b>final scan and ATPG patterns</b> on that netlist, with their coverage against target.',
+      'Functional gate-level simulation runs on the netlist before timing closes; this run is the one that sees the real delays. It catches what static timing cannot — a wrong timing exception, an asynchronous path that only fails with real skew, a reset that releases in the wrong order — on the database the test chip and the v0.9 release will carry. The patterns sort, package test and licensees use come from the same netlist, not from the trial run on pre-freeze RTL.',
     ],
     flowNote:
-      'Step 1 back-annotates the signoff netlist. Step 2 runs training, traffic and retry while step 3 runs reset, low-power and crossing scenarios beside it. Step 4 runs the at-speed patterns, step 5 triages every mismatch and step 6 releases the report.',
+      'Step 1 back-annotates the signoff netlist. Step 2 runs training, traffic and retry while step 3 runs reset, low-power and crossing scenarios beside it. Step 4 generates the final ATPG patterns and coverage alongside, step 5 runs them at speed, step 6 triages every mismatch and step 7 releases the report and the patterns.',
     consumes: [
       'Timing-closed digital database and final parasitics from UDPD-05',
       'Hardened digital macro netlist from UDPD-06',
@@ -501,11 +501,12 @@ export const USGN_WRITE_UPS: UcieWriteUps = {
       { r: 'Signoff manager', d: 'Takes the result into the signoff review' },
     ],
     effort: [
-      ['Back-annotation setup', 0.3],
-      ['Training, traffic and retry scenarios', 0.7],
-      ['Reset, low-power and crossing scenarios', 0.4],
+      ['Back-annotation setup', 0.2],
+      ['Training, traffic and retry scenarios', 0.6],
+      ['Reset, low-power and crossing scenarios', 0.3],
+      ['Final ATPG patterns and coverage', 0.4],
       ['At-speed patterns', 0.3],
-      ['Triage and report', 0.3],
+      ['Triage, report and pattern release', 0.2],
     ],
     entry: [
       'Final parasitics and the hardened netlist available from UDPD-05 and UDPD-06',
@@ -515,7 +516,7 @@ export const USGN_WRITE_UPS: UcieWriteUps = {
     exit: [
       'Every annotated scenario run at the fast and slow corners with zero unexplained mismatches',
       'Every timing exception exercised by at least one annotated scenario or justified in writing',
-      'Report generated on the same netlist revision named in the signoff decision',
+      'Report and final patterns generated on the same netlist revision named in the signoff decision, with coverage at target or each shortfall waived',
     ],
     dependsOn: ['UDPD-05', 'UDPD-06', 'UDV-10', 'USGN-01'],
     dependsNote: 'Runs beside static timing signoff and re-runs on the final delays once timing converges.',
@@ -527,7 +528,7 @@ export const USGN_WRITE_UPS: UcieWriteUps = {
     ],
     links: {
       dependsOn: ['UDPD-05', 'UDPD-06', 'UDPD-08', 'UDV-10', 'USGN-01'],
-      feedsInto: ['USGN-07', 'UPRE-04'],
+      feedsInto: ['USGN-07', 'UPRE-04', 'UTVP-04', 'UFAB-02'],
       runsWith: ['USGN-01'],
       revisedBy: [],
       feedsBackInto: [],

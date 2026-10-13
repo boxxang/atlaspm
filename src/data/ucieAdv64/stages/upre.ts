@@ -29,9 +29,10 @@ export const UPRE: UcieStageModule = {
       'v0.9 release QA record and release notes',
       'v0.9 release decision record and licensee distribution list',
       'v0.5 release sign-off record — QA result, entitlement check and distribution list',
+      'v0.9 datasheet — signoff power, area and latency, and link margin per package type',
     ],
-    deliverableFrom: [0, 1, 2, 3, 4, 5, 6, 7, 8],
-    deliverableWeek: [4, 8, 20, 24, 24, 24, 25, 26, 9],
+    deliverableFrom: [0, 1, 2, 3, 4, 5, 6, 7, 8, 5],
+    deliverableWeek: [4, 8, 20, 24, 24, 24, 25, 26, 9, 24],
     engineeringEffort: [3, 8, 6, 7, 6, 8, 2.5, 1.5, 1.5],
     risks: [
       'A v0.9 view set that does not match the signed-off database, so a customer’s signoff passes against something that will not be built',
@@ -88,8 +89,8 @@ export const UPRE: UcieStageModule = {
     'UPRE-02': {
       s: [
         [1, 'Collect the frozen D2D Adapter, Logical PHY and sideband RTL with its register map, configuration parameters, timing constraints and power intent', 1],
-        [2, 'Package the Electrical PHY behavioral models and a customer integration testbench with the verification IP hookup, so customers simulate link training end to end', 1.5],
-        [3, 'Add a placeholder outline and abstract, the preliminary bump map and preliminary power and area', 1, 1],
+        [2, 'Package the Electrical PHY behavioral models as corrected against the transistor-level circuits, with their remaining error listed as a v0.5 limitation, and a customer integration testbench with the verification IP hookup, so customers simulate link training end to end', 1.5],
+        [3, 'Add a placeholder outline and abstract, the preliminary bump map, and preliminary power and area from the circuit freeze review', 1, 1],
         [4, 'Add the lint and CDC waiver reports and a verification status report on the frozen RTL', 0.5, 1],
         [5, 'Write the preliminary integration guide — FDI and RDI signals, clocks and resets, power domains and the macro outline', 2],
         [6, 'Run the v0.5 package through a clean compile and a smoke simulation through link-up, and hand it to sign-off', 1],
@@ -126,7 +127,7 @@ export const UPRE: UcieStageModule = {
         [1, 'Stream out the signed-off GDS of the hard macros and compare it with the signoff database', 0.5],
         [2, 'Generate and check the LEF abstract — pins, blockages, bump locations and orientation variants', 1],
         [3, 'Release the CDL netlist, the gate-level netlist with SDF from the timing-annotated simulation, and the timing constraints and power intent', 1, 1],
-        [4, 'Package the DFT collateral — test models, scan and ATPG patterns and test integration notes', 1, 1],
+        [4, 'Package the DFT collateral — test models, the final scan and ATPG patterns with their coverage, and test integration notes', 1, 1],
         [5, 'Generate Liberty timing and power libraries across the supported corners and validate them against signoff timing', 1.5],
         [6, 'Assemble the signoff summary reports and the EM and aging mission profile, and run view-consistency checks across every view', 1],
       ],
@@ -159,11 +160,12 @@ export const UPRE: UcieStageModule = {
       s: [
         [1, 'Expand the integration guide with final FDI and RDI timing, clocking and reset sequencing', 3],
         [2, 'Write macro placement and bump map rules for silicon bridge, silicon interposer and RDL interposer packages', 3],
-        [3, 'Write power delivery, decoupling and supply noise requirements for the PHY', 2, 1],
+        [3, 'Write power delivery, decoupling and supply noise requirements for the PHY from the static and dynamic IR drop results of EM and IR drop signoff, and its supply impedance and decoupling assumptions', 2, 1],
         [4, 'Release the training firmware and register programming sequences, and the DFT test integration notes', 2, 1],
         [5, 'Write application notes on channel design, lane repair, register programming and bring-up', 4],
         [6, 'Fold in early-access feedback and review the documents with design and customer engineering', 2],
-        [7, 'Release the integration guide and application notes for v0.9', 1],
+        [7, 'Write the v0.9 datasheet from the signoff power, area and latency figures and the post-layout link margin per package type', 2, 1],
+        [8, 'Release the integration guide, application notes and datasheet for v0.9', 1],
       ],
       o: [
         'Interface timing and sequencing chapters',
@@ -172,9 +174,10 @@ export const UPRE: UcieStageModule = {
         'Training firmware, register sequences and test integration notes',
         'Application notes',
         'Reviewed documents with feedback folded in',
+        'v0.9 datasheet with signoff power, area, latency and link margin per package type',
         'Integration guide and application notes for the v0.9 release, with training firmware and register programming sequences',
       ],
-      r: [['UPRE-D6', 'produces'], ['UPRE-D7', 'feeds']],
+      r: [['UPRE-D6', 'produces'], ['UPRE-D10', 'produces'], ['UPRE-D7', 'feeds']],
     },
     'UPRE-07': {
       s: [

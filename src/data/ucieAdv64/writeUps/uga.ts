@@ -17,7 +17,7 @@ export const UGA_WRITE_UPS: UcieWriteUps = {
       'Measurement-to-simulation correlation from UCHR-09',
       'Compliance results from UCMP-05',
       'Reliability report from URLQ-05',
-      'v0.9 datasheet and release record from UPRE-08',
+      'v0.9 datasheet from UPRE-06 and the release record from UPRE-08',
     ],
     rel: {
       'UGA-D1': '<b>Silicon data rollup — measured results mapped to every datasheet parameter and prediction.</b> Produced here.',
@@ -62,7 +62,7 @@ export const UGA_WRITE_UPS: UcieWriteUps = {
       'Days from the last silicon result to rollup release',
     ],
     links: {
-      dependsOn: ['UCHR-10', 'UCHR-09', 'UCMP-05', 'URLQ-05', 'UPRE-08'],
+      dependsOn: ['UCHR-10', 'UCHR-09', 'UCMP-05', 'URLQ-05', 'UPRE-08', 'UPRE-06'],
       feedsInto: ['UGA-02', 'UGA-03', 'UGA-05'],
       runsWith: [],
       revisedBy: [],

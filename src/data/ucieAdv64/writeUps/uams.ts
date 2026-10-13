@@ -397,7 +397,7 @@ export const UAMS_WRITE_UPS: UcieWriteUps = {
     ],
     links: {
       dependsOn: ['UAMS-01', 'UAFE-08', 'UAFE-09', 'UAFE-02', 'UAFE-03'],
-      feedsInto: ['UAMS-08', 'UPRE-05'],
+      feedsInto: ['UAMS-08', 'UPRE-05', 'UPRE-02'],
       runsWith: [],
       revisedBy: [],
       feedsBackInto: ['UAMS-01'],

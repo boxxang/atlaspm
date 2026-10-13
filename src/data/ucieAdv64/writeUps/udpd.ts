@@ -278,7 +278,7 @@ export const UDPD_WRITE_UPS: UcieWriteUps = {
       'Step 1 runs every corner and mode and step 2 closes the analog boundary, with fixes applied in parallel in step 3. Step 4 releases the report.',
     consumes: [
       'Placed and routed database from UDPD-04',
-      'Early front-end timing models and abstracts released by ULAY-06, refreshed as the layout closes',
+      'Early front-end abstracts and interface timing models from the placed blocks in ULAY-02',
       'Clocking architecture from UARC-06',
       'Constraints from UDPD-01',
       'Implementation flow from UFND-03',
@@ -309,7 +309,7 @@ export const UDPD_WRITE_UPS: UcieWriteUps = {
     ],
     entry: [
       'Routed database released from UDPD-04',
-      'Early front-end timing models available from ULAY-06',
+      'Early front-end timing models available from ULAY-02',
       'Corner and mode set agreed with signoff',
     ],
     exit: [
@@ -317,7 +317,7 @@ export const UDPD_WRITE_UPS: UcieWriteUps = {
       'Every arc to and from the front-end closed against its timing models',
       'Timing report released with the netlist revision',
     ],
-    dependsOn: ['UDPD-04', 'ULAY-06'],
+    dependsOn: ['UDPD-04', 'ULAY-02'],
     dependsNote: 'The front-end’s early timing models arrive while its layout is still closing; the boundary is closed on them first and re-timed on each refresh, so the final models change numbers, not arcs.',
     feedsInto: ['UDPD-06', 'UDPD-07'],
     measuredBy: [
@@ -326,7 +326,7 @@ export const UDPD_WRITE_UPS: UcieWriteUps = {
       'Violations remaining',
     ],
     links: {
-      dependsOn: ['UDPD-04', 'ULAY-06', 'UARC-06', 'UDPD-01', 'UFND-03', 'UDPD-08'],
+      dependsOn: ['UDPD-04', 'ULAY-02', 'UARC-06', 'UDPD-01', 'UFND-03', 'UDPD-08'],
       feedsInto: ['UDPD-06', 'UDPD-07', 'USGN-01'],
       runsWith: [],
       revisedBy: [],

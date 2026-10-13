@@ -364,7 +364,7 @@ export const UCIE_SKELETON: readonly UcieStageSkeleton[] = [
       a('USGN-05', 'Aging and Reliability Verification', 'Reliability', [2, 8], 'afe'),
       a('USGN-06', 'Hard Macro Integration Checks — Abstracts, Models and Bump Map Consistency', 'Physical design', [3, 8], 'channel'),
       a('USGN-07', 'Hard Macro Signoff Review', 'Program management', [8, 10], 'program'),
-      a('USGN-08', 'Timing-Annotated Gate-Level Simulation on the Signoff Netlist', 'Design verification', [1, 8], 'adapter'),
+      a('USGN-08', 'Timing-Annotated Gate-Level Simulation and Final ATPG on the Signoff Netlist', 'Design verification', [1, 8], 'adapter'),
     ],
   },
 
@@ -491,7 +491,7 @@ export const UCIE_SKELETON: readonly UcieStageSkeleton[] = [
       a('UCHR-01', 'Characterization Plan and Corner Matrix', 'Validation', [0, 2], 'afe'),
       a('UCHR-02', 'Eye Margin and Timing Margin per Lane', 'Validation', [2, 12], 'afe'),
       a('UCHR-03', 'BER Measurement at 64 GT/s', 'Validation', [4, 14], 'afe'),
-      a('UCHR-04', 'Energy per Bit Measurement', 'Validation', [4, 12], 'afe'),
+      a('UCHR-04', 'Energy per Bit and Latency Measurement', 'Validation', [4, 12], 'afe'),
       a('UCHR-05', 'PVT Shmoo — Voltage, Temperature and Process Splits', 'Validation', [6, 16], 'afe'),
       a('UCHR-06', 'Lane Repair and Lane Reversal on Silicon', 'Validation', [6, 14], 'logicalPhy'),
       a('UCHR-07', 'Runtime Recalibration and Low-Power State Behavior on Silicon', 'Validation', [8, 16], 'logicalPhy'),

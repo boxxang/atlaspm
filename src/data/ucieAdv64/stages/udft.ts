@@ -112,7 +112,7 @@ export const UDFT: UcieStageModule = {
         [1, 'Define near-end digital, far-end and analog loopback points with the analog team', 2],
         [2, 'Implement the digital loopback controls and the far-end loopback through the partner die', 4],
         [3, 'Implement the controls for the analog loopback path in the front-end', 3, 1],
-        [4, 'Check that the analog loopback path does not load the receive path in normal operation', 2],
+        [4, 'Check on the RX schematic that the analog loopback path does not load the receive path in normal operation', 2],
         [5, 'Write loopback test descriptions for sort, package test and bring-up', 3],
       ],
       o: [

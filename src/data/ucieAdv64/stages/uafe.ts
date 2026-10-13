@@ -107,7 +107,7 @@ export const UAFE: UcieStageModule = {
         [1, 'Design the receiver front-end for bandwidth and input-referred noise at the end of the channel', 4],
         [2, 'Design the sampler and its regeneration time against the 64 GT/s unit interval', 4],
         [3, 'Design per-lane offset calibration and its range', 3, 1],
-        [4, 'Design the deserializer interface and the valid and track receive paths', 3],
+        [4, 'Design the deserializer interface, the valid and track receive paths, and the analog loopback path from the transmitter with its isolation in normal operation', 3],
         [5, 'Simulate the receive path with the TX model and channel model at every corner', 5],
         [6, 'Release the RX front-end and sampler schematic database and simulation report', 1],
       ],
@@ -178,7 +178,7 @@ export const UAFE: UcieStageModule = {
     },
     'UAFE-07': {
       s: [
-        [1, 'List every analog setting training and recalibration must drive — impedance, equalization, offset, phase', 2],
+        [1, 'List every analog setting training, recalibration and test must drive — impedance, equalization, offset, phase and the analog loopback enable', 2],
         [2, 'Define code ranges, step sizes and settling times for each setting', 4],
         [3, 'Define status and measurement outputs the Logical PHY reads during training', 3, 1],
         [4, 'Agree the control interface and sequencing with RTL design', 4],

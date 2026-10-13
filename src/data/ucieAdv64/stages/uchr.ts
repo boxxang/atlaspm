@@ -13,7 +13,7 @@ export const UCHR: UcieStageModule = {
       'Plan and corner matrix',
       'Eye and timing margin',
       'BER at 64 GT/s',
-      'Energy per bit',
+      'Energy per bit and latency',
       'PVT shmoo',
       'Repair and reversal',
       'Recalibration and low power',
@@ -124,12 +124,14 @@ export const UCHR: UcieStageModule = {
         [1, 'Separate PHY supply currents from test chip logic and board loads', 1.5],
         [2, 'Measure active power per module at 64 GT/s and the lower supported rates', 3],
         [3, 'Measure idle, L1 and L2 power and the energy spent entering and leaving them', 2, 1],
-        [4, 'Compute energy per bit at nominal and worst-case supply and release the report', 1.5],
+        [4, 'Measure latency per Flit format and the Raw format with far-end loopback and the traffic checker’s timestamps, and derive the FDI-to-bump latency against target', 2, 1],
+        [5, 'Compute energy per bit at nominal and worst-case supply and release the report with the latency results', 1.5],
       ],
       o: [
         'PHY-only supply current isolation',
         'Active power per module across data rates',
         'Idle and low-power state power with transition energy',
+        'FDI-to-bump latency per format against target',
         'Energy-per-bit measurement report across data rates and supplies',
       ],
       r: [['UCHR-D4', 'produces'], ['UCHR-D9', 'feeds']],
@@ -174,7 +176,7 @@ export const UCHR: UcieStageModule = {
         [2, 'Step the supply within its range under traffic and confirm recalibration follows', 2],
         [3, 'Cycle L1 and L2 entry and exit and measure exit latency and first-traffic errors', 2, 1],
         [4, 'Force a PHYRETRAIN under traffic and record the interruption', 1],
-        [5, 'Release the recalibration and low-power results', 1],
+        [5, 'Judge the results against the low-power and recalibration requirements and release them', 1],
       ],
       o: [
         'Recalibration and margin log across a temperature ramp',
@@ -202,7 +204,7 @@ export const UCHR: UcieStageModule = {
     },
     'UCHR-09': {
       s: [
-        [1, 'Place measured margins, BER and energy per bit against the predicted distributions', 1.5],
+        [1, 'Place measured margins and BER against the predicted distributions, and energy per bit against the v0.9 datasheet figure', 1.5],
         [2, 'Explain each deviation as model, channel, process split or measurement', 1.5],
         [3, 'Re-run the mixed-signal models with the measured channel and silicon corners', 1.5, 1],
         [4, 'Agree model updates for the production release and release the correlation report', 2],

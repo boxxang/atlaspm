@@ -140,11 +140,11 @@ export const UAFE_WRITE_UPS: UcieWriteUps = {
   'UAFE-03': {
     criticalPath: true,
     purpose: [
-      'Design the <b>RX front-end and sampler</b>: front-end bandwidth and noise at the end of the channel, a sampler that regenerates inside the 64 GT/s unit interval, per-lane offset calibration, and the deserializer interface with the valid and track receive paths.',
+      'Design the <b>RX front-end and sampler</b>: front-end bandwidth and noise at the end of the channel, a sampler that regenerates inside the 64 GT/s unit interval, per-lane offset calibration, the deserializer interface with the valid and track receive paths, and the <b>analog loopback path</b> with its isolation.',
       'The sampler is where the timing budget meets mismatch. Offset that a calibration loop cannot cancel is lost margin on every lane forever, so the calibration range is designed against the Monte Carlo spread, not the nominal device.',
     ],
     flowNote:
-      'Step 1 designs the front-end and step 2 the sampler, with offset calibration designed alongside in step 3. Step 4 adds the deserializer and the valid and track paths, step 5 simulates the whole receive path with the TX and channel models, and step 6 releases.',
+      'Step 1 designs the front-end and step 2 the sampler, with offset calibration designed alongside in step 3. Step 4 adds the deserializer, the valid and track paths and the analog loopback path, step 5 simulates the whole receive path with the TX and channel models, and step 6 releases.',
     consumes: [
       'Frozen Electrical PHY architecture from UARC-12 and the selected RX topology from UAFE-01',
       'TX driver model for the receive-path simulation from UAFE-02',
@@ -174,7 +174,7 @@ export const UAFE_WRITE_UPS: UcieWriteUps = {
       ['Front-end design', 3.9],
       ['Sampler design', 3.8],
       ['Offset calibration', 2.4],
-      ['Deserializer, valid and track', 2],
+      ['Deserializer, valid and track, analog loopback', 2],
       ['Receive path simulation and release', 2.4],
     ],
     entry: [
@@ -197,7 +197,7 @@ export const UAFE_WRITE_UPS: UcieWriteUps = {
     ],
     links: {
       dependsOn: ['UARC-12', 'UAFE-01', 'UCHN-01', 'UTEC-02', 'UAFE-06', 'UARC-07', 'UAFE-02'],
-      feedsInto: ['UAFE-07', 'UAFE-08', 'UAFE-09', 'UAMS-01', 'ULAY-02', 'ULAY-03'],
+      feedsInto: ['UAFE-07', 'UAFE-08', 'UAFE-09', 'UAMS-01', 'ULAY-02', 'ULAY-03', 'UDFT-04'],
       runsWith: ['UAFE-02', 'UAFE-04'],
       revisedBy: [],
       feedsBackInto: [],

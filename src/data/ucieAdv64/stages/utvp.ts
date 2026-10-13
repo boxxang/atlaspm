@@ -113,7 +113,7 @@ export const UTVP: UcieStageModule = {
         [2, 'Design the fine-pitch probe card and the ATE load board', 6],
         [3, 'Develop the sort program — scan, BIST, PRBS loopback and supply checks', 8, 1],
         [4, 'Fabricate and verify the probe card and the load board', 10],
-        [5, 'Debug the sort program on the tester with correlation units', 3],
+        [5, 'Load the final ATPG patterns from signoff and debug the sort program on the tester with correlation units', 3],
         [6, 'Release the ATE hardware and the sort program', 1],
       ],
       o: [

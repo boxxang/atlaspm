@@ -62,7 +62,7 @@ export const UTCI: UcieStageModule = {
     },
     'UTCI-02': {
       s: [
-        [1, 'Design an FDI-side traffic generator and checker that sustains full bandwidth in each mode', 3],
+        [1, 'Design an FDI-side traffic generator and checker that sustains full bandwidth in each mode and timestamps traffic so latency through the PHY can be measured', 3],
         [2, 'Add register access over the sideband and a separate debug path that does not need the link', 2, 1],
         [3, 'Integrate the PHY’s PRBS, loopback, BIST, analog test bus and observation lane controls into the test chip control plane', 2],
         [4, 'Add clock, reset, power and calibration controls for bring-up and characterization', 2, 1],

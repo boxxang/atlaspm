@@ -8,7 +8,7 @@ export const USGN: UcieStageModule = {
     tagline: 'Sign the PHY off as a macro other people will drop into their own SoCs, not just as a block that works on our test chip.',
     description:
       'Close timing, power integrity, physical verification, ESD and latch-up, aging and a timing-annotated gate-level simulation on the final databases of the digital hard macro and the Electrical PHY, then check that what ships as abstracts, Liberty models and bump maps matches the layout bit for bit. A die-to-die PHY at 64 GT/s is signed off twice over: once as silicon that has to meet its own timing and electromigration limits, and once as an IP whose views a licensee will trust without seeing the layout. The stage closes two weeks before the test chip database is released, on a signoff review that also takes the verification sign-off, the link margin review, the post-layout margin and the channel specification compliance into account, and releases the macro to test chip signoff, to tapeout and to the v0.9 release.',
-    activities: ['Static timing', 'EM and IR', 'DRC, LVS, antenna', 'ESD and latch-up', 'Aging and reliability', 'Macro integration checks', 'Signoff review', 'Timing-annotated GLS'],
+    activities: ['Static timing', 'EM and IR', 'DRC, LVS, antenna', 'ESD and latch-up', 'Aging and reliability', 'Macro integration checks', 'Signoff review', 'Timing-annotated GLS and final ATPG'],
     deliverables: [
       'Hard macro static timing signoff report across corners, modes and on-chip variation',
       'PHY macro EM and IR drop signoff report with current-density and supply-droop maps',
@@ -51,7 +51,7 @@ export const USGN: UcieStageModule = {
         [1, 'Load the final digital hard macro netlist, parasitics and constraints for every corner and mode', 0.5],
         [2, 'Run timing across corners with on-chip variation and the 64 GT/s interface clocks', 2],
         [3, 'Close the macro-boundary budgets to the FDI and to the Electrical PHY with interface margins', 1.5, 1],
-        [4, 'Fix remaining violations with engineering changes and re-run to convergence', 2.5],
+        [4, 'Fix remaining violations with engineering changes and re-run to convergence, rechecking the Electrical PHY boundary on its post-layout timing models', 2.5],
         [5, 'Check timing in the test and low-power modes', 1, 1],
         [6, 'Release the static timing signoff report', 0.5],
       ],
@@ -154,7 +154,7 @@ export const USGN: UcieStageModule = {
     },
     'USGN-07': {
       s: [
-        [1, 'Collect every signoff report, the timing-annotated simulation, the post-layout margin and the channel compliance against the signoff checklist', 0.5],
+        [1, 'Collect every signoff report, the timing-annotated simulation and final ATPG coverage, the post-layout margin, the channel compliance, and post-layout energy per bit, area and latency against the PPA targets and budgets, against the signoff checklist', 0.5],
         [2, 'Review open waivers and residual risks with design, layout, reliability and customer engineering', 0.5],
         [3, 'Decide signoff and record the conditions the release and the test chip carry', 0.5],
         [4, 'Authorize the macro for test chip signoff, tapeout and the v0.9 release', 0.5],
@@ -172,15 +172,17 @@ export const USGN: UcieStageModule = {
         [1, 'Back-annotate the signed-off netlist with delays extracted from the final parasitics at the fast and slow corners', 1],
         [2, 'Run link training, mainband traffic and retry scenarios through the annotated adapter and logical PHY netlist', 2.5],
         [3, 'Run reset, low-power entry and exit and clock-domain crossing scenarios with timing annotation', 1.5, 1],
-        [4, 'Run the scan and built-in test patterns at speed on the annotated netlist', 1.5],
-        [5, 'Triage every mismatch against the static timing exceptions and close or waive it', 1],
-        [6, 'Release the timing-annotated gate-level simulation report', 0.5],
+        [4, 'Generate the final scan and ATPG patterns on the signoff netlist with every ECO merged, and report stuck-at and transition coverage against the targets set in DFT planning', 2.5, 1],
+        [5, 'Run the final scan patterns and the built-in tests at speed on the annotated netlist', 1.5],
+        [6, 'Triage every mismatch against the static timing exceptions and close or waive it', 1],
+        [7, 'Release the timing-annotated gate-level simulation report, and the final patterns and coverage report to sort, package test and the release', 0.5],
       ],
       o: [
         'Delay-annotated signoff netlist at the fast and slow corners',
         'Annotated training, traffic and retry results',
         'Annotated reset, low-power and crossing results',
-        'At-speed pattern results on the annotated netlist',
+        'Final scan and ATPG patterns with stuck-at and transition coverage against target',
+        'At-speed results of the final patterns on the annotated netlist',
         'Mismatch triage against the timing exceptions',
         'Timing-annotated gate-level simulation report on the signoff netlist',
       ],

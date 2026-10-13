@@ -215,7 +215,7 @@ export const UTVP_WRITE_UPS: UcieWriteUps = {
       'Step 1 defines the test content. Step 2 designs the probe card and load board while step 3 develops the sort program in parallel. Step 4 fabricates and verifies the hardware, step 5 debugs the program and step 6 releases it.',
     consumes: [
       'Integrated test chip top level and pad map from UTCI-03',
-      'Scan insertion plan and ATPG patterns from UDFT-02',
+      'Scan insertion plan from UDFT-02 and the final ATPG patterns on the signoff netlist from USGN-08',
       'BIST and built-in lane test from UDFT-05',
       'Test vehicle package design from UTVP-01',
       'Test chip control plane from UTCI-02',
@@ -264,7 +264,7 @@ export const UTVP_WRITE_UPS: UcieWriteUps = {
       'Sort program debug issues open',
     ],
     links: {
-      dependsOn: ['UTCI-03', 'UDFT-02', 'UDFT-05', 'UTVP-01', 'UTCI-02'],
+      dependsOn: ['UTCI-03', 'UDFT-02', 'UDFT-05', 'UTVP-01', 'UTCI-02', 'USGN-08'],
       feedsInto: ['UTVP-07', 'UFAB-02'],
       runsWith: ['UTVP-03'],
       revisedBy: [],

@@ -81,7 +81,7 @@ export const UFAB_WRITE_UPS: UcieWriteUps = {
       'Test chip wafers and wafer-out record from UFAB-01',
       'ATE load board, probe card and sort program from UTVP-04',
       'Lot plan with process splits from UTPO-03',
-      'Scan and ATPG patterns from UDFT-02',
+      'Final scan and ATPG patterns on the signoff netlist from USGN-08',
       'BIST and built-in lane test from UDFT-05',
     ],
     rel: {
@@ -127,7 +127,7 @@ export const UFAB_WRITE_UPS: UcieWriteUps = {
       'Probe contact retest rate',
     ],
     links: {
-      dependsOn: ['UFAB-01', 'UTVP-04', 'UTPO-03', 'UDFT-02', 'UDFT-05'],
+      dependsOn: ['UFAB-01', 'UTVP-04', 'UTPO-03', 'USGN-08', 'UDFT-05'],
       feedsInto: ['UFAB-03'],
       runsWith: [],
       revisedBy: [],

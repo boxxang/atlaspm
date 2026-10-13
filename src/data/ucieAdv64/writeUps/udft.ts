@@ -213,7 +213,7 @@ export const UDFT_WRITE_UPS: UcieWriteUps = {
       'DFT specification from UDFT-01',
       'Logical PHY datapath from URTL-04',
       'Electrical PHY architecture from UARC-07',
-      'Front-end calibration and loopback hooks from UAFE-07',
+      'Analog loopback path from the RX design in UAFE-03 and its control hooks from UAFE-07',
       'Partner die behavior from the test chip plan',
     ],
     rel: {
@@ -259,7 +259,7 @@ export const UDFT_WRITE_UPS: UcieWriteUps = {
       'Test descriptions complete per use',
     ],
     links: {
-      dependsOn: ['UDFT-01', 'URTL-04', 'UARC-07', 'UAFE-07'],
+      dependsOn: ['UDFT-01', 'URTL-04', 'UARC-07', 'UAFE-07', 'UAFE-03'],
       feedsInto: ['UDFT-08', 'UAMS-02', 'UTCI-02'],
       runsWith: [],
       revisedBy: [],

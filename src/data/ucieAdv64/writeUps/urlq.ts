@@ -118,7 +118,7 @@ export const URLQ_WRITE_UPS: UcieWriteUps = {
     exit: [
       'Planned stress hours completed on every unit of every leg',
       'Per-lane margin and BER recorded at every read point',
-      'Drift and failures analyzed with the acceleration model and its basis stated',
+      'Drift and failures analyzed with the acceleration model and its basis stated, and end-of-life drift compared with the signoff aging prediction',
     ],
     dependsOn: ['URLQ-01', 'UBUP-06', 'USGN-05', 'UTVP-09'],
     dependsNote: 'Stress starts in week 106, the week after the first link-up review allocates units, once each unit has its time-zero screen; its hours set the end of the stage.',
@@ -315,10 +315,10 @@ export const URLQ_WRITE_UPS: UcieWriteUps = {
     ],
     exit: [
       'Report states units, hours or cycles and read points for every stress leg',
-      'Every failure and drift beyond threshold listed with its mechanism',
+      'Every failure and drift beyond threshold listed with its mechanism, and measured drift stated against the signoff aging prediction',
       'Report reviewed by design and quality and released',
     ],
-    dependsOn: ['URLQ-01', 'URLQ-02', 'URLQ-03', 'URLQ-04'],
+    dependsOn: ['URLQ-01', 'URLQ-02', 'URLQ-03', 'URLQ-04', 'USGN-05'],
     dependsNote: null,
     feedsInto: ['URLQ-06'],
     measuredBy: [

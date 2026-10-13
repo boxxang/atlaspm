@@ -207,17 +207,17 @@ export const UCHR_WRITE_UPS: UcieWriteUps = {
   'UCHR-04': {
     criticalPath: false,
     purpose: [
-      'Measure <b>energy per bit</b>: PHY supply currents isolated from test chip logic and board loads, active power per module at 64 GT/s and the lower rates, idle, L1 and L2 power with the energy of entering and leaving them, and energy per bit at nominal and worst-case supply.',
+      'Measure <b>energy per bit</b>: PHY supply currents isolated from test chip logic and board loads, active power per module at 64 GT/s and the lower rates, idle, L1 and L2 power with the energy of entering and leaving them, and energy per bit at nominal and worst-case supply — and the <b>FDI-to-bump latency</b> per Flit format and Raw format against its target.',
       'Energy per bit is the number a die-to-die PHY is chosen on, and it is easy to flatter. Isolating the PHY’s own rails and quoting the worst-case supply alongside the nominal one is what makes it a number a licensee can put in a power budget.',
     ],
     flowNote:
-      'Step 1 isolates the PHY supply currents. Step 2 measures active power across rates while step 3 measures idle and low-power states in parallel. Step 4 computes energy per bit and releases the report.',
+      'Step 1 isolates the PHY supply currents. Step 2 measures active power across rates while step 3 measures idle and low-power states and step 4 measures latency in parallel. Step 5 computes energy per bit and releases the report.',
     consumes: [
       'Characterization plan from UCHR-01',
-      'PPA targets for energy per bit from UREQ-02',
+      'PPA targets for energy per bit and latency from UREQ-02',
       'Power models of the Electrical PHY from ULAY-06',
-      'Power-on rail current record from UBUP-01',
-      'Low-power state control from URTL-08',
+      'Power-on rail current record from UBUP-01 and low-power state control from URTL-08',
+      'Timestamping traffic generator and checker from UTCI-02',
     ],
     rel: {
       'UCHR-D4': '<b>Energy-per-bit measurement report across data rates and supplies.</b> Produced here; the release’s power figures come from it.',
@@ -240,7 +240,8 @@ export const UCHR_WRITE_UPS: UcieWriteUps = {
     effort: [
       ['Rail isolation', 0.8],
       ['Active power across rates', 1],
-      ['Idle and low-power states', 0.6],
+      ['Idle and low-power states', 0.4],
+      ['Latency', 0.2],
       ['Energy per bit and report', 0.6],
     ],
     entry: [
@@ -251,7 +252,7 @@ export const UCHR_WRITE_UPS: UcieWriteUps = {
     exit: [
       'Energy per bit reported at 64 GT/s and each lower supported rate at nominal and worst-case supply',
       'Idle, L1 and L2 power reported with entry and exit energy',
-      'Measured power compared with the power model per block',
+      'Measured power compared with the power model per block, and latency per format against target',
     ],
     dependsOn: ['UCHR-01', 'UREQ-02', 'ULAY-06'],
     dependsNote: null,
@@ -262,7 +263,7 @@ export const UCHR_WRITE_UPS: UcieWriteUps = {
       'Rates and supplies covered',
     ],
     links: {
-      dependsOn: ['UCHR-01', 'UREQ-02', 'ULAY-06', 'UBUP-01', 'URTL-08'],
+      dependsOn: ['UCHR-01', 'UREQ-02', 'ULAY-06', 'UBUP-01', 'URTL-08', 'UTCI-02'],
       feedsInto: ['UCHR-09', 'UCHR-10', 'UGA-02'],
       runsWith: ['UCHR-07'],
       revisedBy: [],
@@ -414,8 +415,8 @@ export const UCHR_WRITE_UPS: UcieWriteUps = {
       'Step 1 ramps temperature and step 2 steps supply under traffic, with L1 and L2 cycled in parallel in step 3. Step 4 forces a PHYRETRAIN and step 5 releases the results.',
     consumes: [
       'Characterization plan from UCHR-01',
-      'Runtime recalibration logic from URTL-06',
-      'Low-power state control from URTL-08',
+      'Runtime recalibration logic from URTL-06 and low-power state control from URTL-08',
+      'L1 and L2 exit latency and recalibration traffic-impact targets from UREQ-06',
       'First link-up and data transfer record from UBUP-04',
       'Thermal forcing from UTVP-05',
     ],
@@ -450,8 +451,8 @@ export const UCHR_WRITE_UPS: UcieWriteUps = {
       'Low-power state entry and exit controllable from lab automation',
     ],
     exit: [
-      'Link kept active across a full junction temperature ramp with every recalibration event and its interruption logged',
-      'L1 and L2 entry and exit cycled with exit latency and first-traffic errors recorded',
+      'Link kept active across a full junction temperature ramp with every recalibration event and its interruption logged and judged against the UREQ-06 traffic-impact limit',
+      'L1 and L2 entry and exit cycled with exit latency and first-traffic errors recorded and judged against the UREQ-06 targets',
       'A forced PHYRETRAIN under traffic recovered, with its duration recorded',
     ],
     dependsOn: ['UCHR-01', 'URTL-06', 'URTL-08'],
@@ -463,7 +464,7 @@ export const UCHR_WRITE_UPS: UcieWriteUps = {
       'Errors after low-power exit',
     ],
     links: {
-      dependsOn: ['UCHR-01', 'URTL-06', 'URTL-08', 'UBUP-04', 'UTVP-05'],
+      dependsOn: ['UCHR-01', 'URTL-06', 'URTL-08', 'UBUP-04', 'UTVP-05', 'UREQ-06'],
       feedsInto: ['UCHR-10', 'UGA-02'],
       runsWith: ['UCHR-04'],
       revisedBy: [],
@@ -547,7 +548,7 @@ export const UCHR_WRITE_UPS: UcieWriteUps = {
       'Step 1 places measurements against predictions and step 2 explains deviations, with models re-run on measured conditions in parallel in step 3. Step 4 agrees model updates and releases the report.',
     consumes: [
       'Margin predictions and silicon measurement plan from UAMS-07, reissued on post-layout models in UPRE-05',
-      'PVT and Monte Carlo link margin statistics from UAMS-05',
+      'PVT and Monte Carlo statistics from UAMS-05 and the v0.9 datasheet figures from UPRE-06',
       'Package channel extraction from UCHN-04',
       'Per-lane margins from UCHR-02, BER from UCHR-03, energy per bit from UCHR-04 and shmoos from UCHR-05',
       'Corrected test vehicle channel model from UCHR-08',
@@ -595,7 +596,7 @@ export const UCHR_WRITE_UPS: UcieWriteUps = {
       'Model updates delivered to the release',
     ],
     links: {
-      dependsOn: ['UAMS-07', 'UAMS-05', 'UCHN-04', 'UCHR-02', 'UCHR-03', 'UCHR-04', 'UCHR-05', 'UCHR-08', 'UCHR-11', 'UPRE-05'],
+      dependsOn: ['UAMS-07', 'UAMS-05', 'UCHN-04', 'UCHR-02', 'UCHR-03', 'UCHR-04', 'UCHR-05', 'UCHR-08', 'UCHR-11', 'UPRE-05', 'UPRE-06'],
       feedsInto: ['UCHR-10', 'UGA-01', 'UGA-03'],
       runsWith: [],
       revisedBy: [],

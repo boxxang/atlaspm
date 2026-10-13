@@ -66,7 +66,7 @@ export const URLQ: UcieStageModule = {
         [1, 'Screen every stress unit through the package final test program and record its time-zero margin and BER', 1.5],
         [2, 'Run operating life stress on the dynamic stress boards at elevated temperature and voltage with the link exercised at 64 GT/s', 12],
         [3, 'Re-measure per-lane margin and BER at each read point and log drift', 3, 1],
-        [4, 'Analyze drift and failures and compute the acceleration and lifetime estimate', 3],
+        [4, 'Analyze drift and failures, compute the acceleration and lifetime estimate, and compare the drift extrapolated to end of life with the signoff aging simulation and its calibration range coverage', 3],
         [5, 'Release the operating life stress results', 1],
       ],
       o: [
@@ -113,7 +113,7 @@ export const URLQ: UcieStageModule = {
     'URLQ-05': {
       s: [
         [1, 'Collect stress results by leg, unit and read point', 1],
-        [2, 'State what was stressed, for how long, on how many units from how many lots, and what moved', 1.5],
+        [2, 'State what was stressed, for how long, on how many units from how many lots, what moved, and how the measured drift compares with the signoff aging prediction', 1.5],
         [3, 'Review findings with design and quality and release the report', 1.5],
       ],
       o: [

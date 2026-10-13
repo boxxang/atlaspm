@@ -81,9 +81,9 @@ export const UPRE_WRITE_UPS: UcieWriteUps = {
     flowNote:
       'Step 1 collects the frozen RTL with its constraints and power intent and step 2 packages the behavioral models and integration testbench, while step 3 adds the placeholder views and step 4 the waiver and verification status reports in parallel. Step 5 writes the preliminary integration guide and step 6 runs the package through a smoke simulation and hands it to sign-off.',
     consumes: [
-      'Frozen RTL and RTL freeze record from URTL-10',
-      'Lint, CDC and RDC reports with their waivers from URTL-09',
-      'Electrical PHY behavioral models from UAMS-01',
+      'Frozen RTL from URTL-10, with its lint, CDC and RDC waiver reports from URTL-09',
+      'Electrical PHY behavioral models from UAMS-01 as corrected in UAMS-06, with the remaining error per block',
+      'Preliminary power and area from the circuit freeze review in UAFE-09',
       'Frozen bump map and channel specification from UCHN-03',
       'Post-silicon test plan and verification status from UDV-11',
     ],
@@ -116,7 +116,7 @@ export const UPRE_WRITE_UPS: UcieWriteUps = {
     ],
     entry: [
       'RTL freeze recorded in URTL-10',
-      'Behavioral models validated in UAMS-01',
+      'Behavioral models corrected against the circuits in UAMS-06',
       'Release structure and checklist approved in UPRE-01',
     ],
     exit: [
@@ -133,7 +133,7 @@ export const UPRE_WRITE_UPS: UcieWriteUps = {
       'Checklist items released against items planned',
     ],
     links: {
-      dependsOn: ['URTL-10', 'URTL-09', 'URTL-01', 'UAMS-01', 'UPRE-01', 'UDV-11', 'UCHN-03'],
+      dependsOn: ['URTL-10', 'URTL-09', 'URTL-01', 'UAMS-01', 'UPRE-01', 'UDV-11', 'UCHN-03', 'UAMS-06', 'UAFE-09'],
       feedsInto: ['UPRE-03', 'UPRE-06', 'UPRE-07', 'UPRE-09', 'UCUS-01', 'UCUS-03'],
       runsWith: [],
       revisedBy: ['UPRE-03'],
@@ -220,7 +220,7 @@ export const UPRE_WRITE_UPS: UcieWriteUps = {
       'Digital hard macro abstract from UDPD-06',
       'Electrical PHY abstract, timing and power models from ULAY-06',
       'Gate-level netlist and SDF from the timing-annotated simulation in USGN-08',
-      'Scan and ATPG patterns from UDFT-02',
+      'Final scan and ATPG patterns with their coverage from USGN-08',
     ],
     rel: {
       'UPRE-D4': '<b>Hard macro physical and implementation views — GDS, LEF, Liberty, CDL, gate-level netlist with SDF, constraints, power intent, DFT collateral and signoff summaries.</b> Produced here from the signed-off database.',
@@ -258,7 +258,7 @@ export const UPRE_WRITE_UPS: UcieWriteUps = {
       'Liberty and SDF timing within agreed tolerance of signoff timing on every arc and corner',
       'Zero pin, layer or boundary mismatches between GDS, LEF, Liberty and netlist, and the mission profile stated in the signoff summary',
     ],
-    dependsOn: ['USGN-07', 'UDPD-06', 'ULAY-06', 'USGN-08', 'UDFT-02'],
+    dependsOn: ['USGN-07', 'UDPD-06', 'ULAY-06', 'USGN-08'],
     dependsNote: 'The views can be generated as soon as layout settles, but only views from the signed-off database are released.',
     feedsInto: ['UPRE-07', 'UCUS-02'],
     measuredBy: [
@@ -267,7 +267,7 @@ export const UPRE_WRITE_UPS: UcieWriteUps = {
       'Liberty-to-signoff timing deviation',
     ],
     links: {
-      dependsOn: ['USGN-07', 'UDPD-06', 'ULAY-06', 'USGN-03', 'USGN-01', 'USGN-08', 'UDFT-02', 'USGN-02', 'USGN-05'],
+      dependsOn: ['USGN-07', 'UDPD-06', 'ULAY-06', 'USGN-03', 'USGN-01', 'USGN-08', 'USGN-02', 'USGN-05'],
       feedsInto: ['UPRE-07', 'UPRE-08', 'UCUS-02'],
       runsWith: ['UPRE-05'],
       revisedBy: [],
@@ -345,19 +345,20 @@ export const UPRE_WRITE_UPS: UcieWriteUps = {
   'UPRE-06': {
     criticalPath: false,
     purpose: [
-      'Write the <b>integration guide and application notes</b> a customer designs to: final FDI and RDI timing, clocking and reset sequencing; macro placement and bump map rules for silicon bridge, silicon interposer and RDL interposer packages; power delivery, decoupling and supply noise requirements; the training firmware and register programming sequences and the DFT test integration notes; and application notes on channel design, lane repair, register programming and bring-up.',
+      'Write the <b>integration guide and application notes</b> a customer designs to: final FDI and RDI timing, clocking and reset sequencing; macro placement and bump map rules for silicon bridge, silicon interposer and RDL interposer packages; power delivery, decoupling and supply noise requirements; the training firmware and register programming sequences and the DFT test integration notes; and application notes on channel design, lane repair, register programming and bring-up — with the <b>v0.9 datasheet</b> written from signoff figures.',
       'Most customer issues on a die-to-die PHY are integration questions the guide did not answer. Writing it alongside the views, with early-access feedback folded in, turns the questions the first customers asked into answers every later customer reads before asking.',
     ],
     flowNote:
-      'Step 1 finalizes interface timing and sequencing and step 2 writes placement and bump map rules. Step 3 writes power requirements and step 4 releases the training firmware, register sequences and test integration notes in parallel, step 5 writes the application notes, step 6 folds in feedback and step 7 releases.',
+      'Step 1 finalizes interface timing and sequencing and step 2 writes placement and bump map rules. Step 3 writes power requirements from the signoff supply assumptions and step 4 releases the training firmware, register sequences and test integration notes in parallel, step 5 writes the application notes, step 6 folds in feedback while step 7 writes the datasheet beside it, and step 8 releases.',
     consumes: [
-      'v0.5 preliminary integration guide from UPRE-02',
-      'Early-access feedback and change requests from UPRE-03',
-      'Customer channel guidelines and reference design from UCHN-06',
-      'Link training state machine and its tables from URTL-05',
-      'DFT freeze package and test access plan from UDFT-08',
+      'v0.5 preliminary integration guide from UPRE-02, with early-access feedback and change requests from UPRE-03',
+      'Customer channel guidelines from UCHN-06 and the post-layout link margin per package type from UPRE-05',
+      'Link training state machine from URTL-05 and the DFT freeze package from UDFT-08',
+      'IR drop results and supply impedance and decoupling assumptions from EM and IR drop signoff in USGN-02',
+      'Signoff power, area and timing from USGN-07, with the post-layout power model from ULAY-06',
     ],
     rel: {
+      'UPRE-D10': '<b>v0.9 datasheet — signoff power, area and latency, and link margin per package type.</b> Produced here; the production release maps every silicon result to its parameters.',
       'UPRE-D6': '<b>Integration guide and application notes for the v0.9 release.</b> Produced here.',
       'UPRE-D7': '<b>v0.9 release QA record and release notes.</b> Document review results go into the QA record.',
     },
@@ -381,7 +382,7 @@ export const UPRE_WRITE_UPS: UcieWriteUps = {
       ['Power delivery requirements', 1],
       ['Firmware, register sequences and test notes', 1.2],
       ['Application notes', 1.6],
-      ['Review and release', 0.7],
+      ['Datasheet, review and release', 0.7],
     ],
     entry: [
       'v0.5 guide released in UPRE-02',
@@ -402,7 +403,7 @@ export const UPRE_WRITE_UPS: UcieWriteUps = {
       'Review findings open',
     ],
     links: {
-      dependsOn: ['UPRE-02', 'UPRE-03', 'UCHN-06', 'UARC-09', 'UPRE-01', 'URTL-05', 'UDFT-08'],
+      dependsOn: ['UPRE-02', 'UPRE-03', 'UCHN-06', 'UARC-09', 'UPRE-01', 'URTL-05', 'UDFT-08', 'UPRE-05', 'USGN-02', 'USGN-07', 'ULAY-06'],
       feedsInto: ['UPRE-07', 'UPRE-08', 'UCUS-03', 'UGA-03'],
       runsWith: [],
       revisedBy: [],
