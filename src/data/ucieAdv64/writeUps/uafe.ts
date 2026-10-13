@@ -1,5 +1,5 @@
 /**
- * UAFE — Electrical PHY Circuit Design, written up.
+ * UAFE — Electrical PHY Circuits to Circuit Freeze, written up.
  */
 import type { UcieWriteUps } from '../types';
 

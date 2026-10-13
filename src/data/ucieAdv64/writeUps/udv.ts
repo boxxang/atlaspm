@@ -1,5 +1,5 @@
 /**
- * UDV — Digital Verification, written up.
+ * UDV — Protocol & Training Verification Sign-Off, written up.
  */
 import type { UcieWriteUps } from '../types';
 

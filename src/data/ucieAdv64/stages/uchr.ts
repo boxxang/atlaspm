@@ -1,5 +1,5 @@
 /**
- * UCHR — Silicon Characterization. Weeks 102–122; closes on Characterization
+ * UCHR — Silicon Characterization & Model Correlation. Weeks 102–122; closes on Characterization
  * Report.
  */
 import type { UcieStageModule } from '../types';

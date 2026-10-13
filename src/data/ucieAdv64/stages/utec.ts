@@ -1,5 +1,5 @@
 /**
- * UTEC — Process & Package Technology. Weeks 6–20; closes on Technology Selected.
+ * UTEC — Process & Package Selection. Weeks 6–20; closes on Technology Selected.
  */
 import type { UcieStageModule } from '../types';
 

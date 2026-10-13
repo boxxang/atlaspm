@@ -1,5 +1,5 @@
 /**
- * UAFE — Electrical PHY Circuit Design. Weeks 18–50; closes on Circuit Freeze.
+ * UAFE — Electrical PHY Circuits to Circuit Freeze. Weeks 18–50; closes on Circuit Freeze.
  */
 import type { UcieStageModule } from '../types';
 

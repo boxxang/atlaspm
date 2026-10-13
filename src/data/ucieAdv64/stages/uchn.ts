@@ -1,5 +1,5 @@
 /**
- * UCHN — Package Channel & SI/PI. Weeks 16–70; closes on Channel Spec Met.
+ * UCHN — Channel Specification & Bump Map Co-Design. Weeks 16–70; closes on Channel Spec Met.
  */
 import type { UcieStageModule } from '../types';
 

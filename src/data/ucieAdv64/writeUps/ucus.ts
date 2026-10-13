@@ -1,5 +1,5 @@
 /**
- * UCUS — Customer Integration Support & Sustaining, written up.
+ * UCUS — Licensee Integration Support & Sustaining, written up.
  */
 import type { UcieWriteUps } from '../types';
 

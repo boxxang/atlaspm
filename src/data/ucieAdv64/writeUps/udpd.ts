@@ -1,5 +1,5 @@
 /**
- * UDPD — Digital Implementation, written up.
+ * UDPD — Digital Hardening & Timing Closure, written up.
  */
 import type { UcieWriteUps } from '../types';
 

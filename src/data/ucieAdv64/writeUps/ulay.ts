@@ -1,5 +1,5 @@
 /**
- * ULAY — Electrical PHY Layout & Macro Assembly, written up.
+ * ULAY — Hard Macro Layout & Assembly, written up.
  */
 import type { UcieWriteUps } from '../types';
 

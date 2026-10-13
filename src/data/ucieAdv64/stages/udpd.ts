@@ -1,5 +1,5 @@
 /**
- * UDPD — Digital Implementation. Weeks 46–66; closes on Digital Timing Closure.
+ * UDPD — Digital Hardening & Timing Closure. Weeks 46–66; closes on Digital Timing Closure.
  */
 import type { UcieStageModule } from '../types';
 

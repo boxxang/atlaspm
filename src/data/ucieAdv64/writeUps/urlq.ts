@@ -1,5 +1,5 @@
 /**
- * URLQ — Reliability & Silicon-Proven, written up.
+ * URLQ — Reliability Qualification for Silicon-Proven, written up.
  */
 import type { UcieWriteUps } from '../types';
 

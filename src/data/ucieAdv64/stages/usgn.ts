@@ -1,5 +1,5 @@
 /**
- * USGN — Hard Macro Signoff. Weeks 62–72; closes on Hard Macro Signoff.
+ * USGN — Hard Macro Signoff for Tapeout & v0.9. Weeks 62–72; closes on Hard Macro Signoff.
  */
 import type { UcieStageModule } from '../types';
 

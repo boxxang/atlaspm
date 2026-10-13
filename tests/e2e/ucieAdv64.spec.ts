@@ -86,7 +86,7 @@ test.describe('the UCIe Advanced 64G Die-to-Die PHY IP template', () => {
     await page.waitForURL(/\/templates\/ucieAdv64\/flowchart$/);
     const frame = page.frameLocator('iframe.flowframe');
     await expect(frame.locator('h1')).toContainText('UCIe Advanced 64G Die-to-Die PHY IP');
-    for (const t of ['Electrical PHY Circuit Design', 'Package Channel & SI/PI', 'Production Release']) {
+    for (const t of ['Implementation Architecture & Partitioning', 'Electrical PHY Circuits to Circuit Freeze', 'Channel Specification & Bump Map Co-Design', 'Production Release on Silicon Data']) {
       await expect(frame.getByText(t).first(), t).toBeVisible();
     }
     await page.locator('[data-back-templates]').click();

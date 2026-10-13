@@ -1,5 +1,5 @@
 /**
- * URTL — Adapter & Logical PHY RTL, written up.
+ * URTL — Adapter & Logical PHY RTL to RTL Freeze, written up.
  */
 import type { UcieWriteUps } from '../types';
 

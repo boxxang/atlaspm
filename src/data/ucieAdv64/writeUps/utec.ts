@@ -1,5 +1,5 @@
 /**
- * UTEC — Process & Package Technology, written up.
+ * UTEC — Process & Package Selection, written up.
  */
 import type { UcieWriteUps } from '../types';
 

@@ -1,5 +1,5 @@
 /**
- * USGN — Hard Macro Signoff, written up.
+ * USGN — Hard Macro Signoff for Tapeout & v0.9, written up.
  */
 import type { UcieWriteUps } from '../types';
 

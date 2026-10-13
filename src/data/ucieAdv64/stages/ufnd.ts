@@ -1,5 +1,5 @@
 /**
- * UFND — Foundation IP & Design Environment. Weeks 8–22; closes on Design
+ * UFND — Design Readiness — Foundation IP, Flows & VIP. Weeks 8–22; closes on Design
  * Kickoff Ready.
  */
 import type { UcieStageModule } from '../types';

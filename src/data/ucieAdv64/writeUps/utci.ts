@@ -1,5 +1,5 @@
 /**
- * UTCI — Test Chip Integration, written up.
+ * UTCI — Test Chip Build for Silicon Proof, written up.
  */
 import type { UcieWriteUps } from '../types';
 

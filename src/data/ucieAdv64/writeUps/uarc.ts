@@ -1,5 +1,5 @@
 /**
- * UARC — IP Architecture, written up.
+ * UARC — Implementation Architecture & Partitioning, written up.
  */
 import type { UcieWriteUps } from '../types';
 

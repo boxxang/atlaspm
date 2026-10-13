@@ -1,5 +1,5 @@
 /**
- * UAMS — Mixed-Signal Verification & Link Margin, written up.
+ * UAMS — Link Margin Proof Before Layout, written up.
  */
 import type { UcieWriteUps } from '../types';
 

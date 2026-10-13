@@ -1,5 +1,5 @@
 /**
- * UDFT — DFT, Test & Debug Features, written up.
+ * UDFT — Test, Lane Repair & Debug Hooks, written up.
  */
 import type { UcieWriteUps } from '../types';
 

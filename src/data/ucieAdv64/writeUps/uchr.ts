@@ -1,5 +1,5 @@
 /**
- * UCHR — Silicon Characterization, written up.
+ * UCHR — Silicon Characterization & Model Correlation, written up.
  */
 import type { UcieWriteUps } from '../types';
 

@@ -1,5 +1,5 @@
 /**
- * UDFT — DFT, Test & Debug Features. Weeks 26–52; closes on DFT Freeze.
+ * UDFT — Test, Lane Repair & Debug Hooks. Weeks 26–52; closes on DFT Freeze.
  */
 import type { UcieStageModule } from '../types';
 

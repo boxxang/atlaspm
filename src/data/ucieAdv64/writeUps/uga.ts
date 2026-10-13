@@ -1,5 +1,5 @@
 /**
- * UGA — Production Release, written up.
+ * UGA — Production Release on Silicon Data, written up.
  */
 import type { UcieWriteUps } from '../types';
 

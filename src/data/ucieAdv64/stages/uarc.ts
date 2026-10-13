@@ -1,5 +1,5 @@
 /**
- * UARC — IP Architecture. Weeks 10–22; closes on Architecture Freeze.
+ * UARC — Implementation Architecture & Partitioning. Weeks 10–22; closes on Architecture Freeze.
  */
 import type { UcieStageModule } from '../types';
 

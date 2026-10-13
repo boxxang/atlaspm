@@ -1,5 +1,5 @@
 /**
- * UCMP — Compliance & Interoperability. Weeks 110–126; closes on Compliance
+ * UCMP — Compliance & Interop Proof. Weeks 110–126; closes on Compliance
  * Pass.
  */
 import type { UcieStageModule } from '../types';

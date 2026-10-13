@@ -1,5 +1,5 @@
 /**
- * UPRE — Pre-Silicon Releases — v0.5 & v0.9. Weeks 52–78; closes on v0.9 Release.
+ * UPRE — Early Licensee Releases — v0.5 & v0.9. Weeks 52–78; closes on v0.9 Release.
  */
 import type { UcieStageModule } from '../types';
 

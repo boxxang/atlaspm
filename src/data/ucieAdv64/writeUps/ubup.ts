@@ -1,5 +1,5 @@
 /**
- * UBUP — Silicon Bring-Up, written up.
+ * UBUP — Bring-Up to First Link-Up, written up.
  */
 import type { UcieWriteUps } from '../types';
 

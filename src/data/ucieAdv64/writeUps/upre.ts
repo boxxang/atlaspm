@@ -1,5 +1,5 @@
 /**
- * UPRE — Pre-Silicon Releases — v0.5 & v0.9, written up.
+ * UPRE — Early Licensee Releases — v0.5 & v0.9, written up.
  */
 import type { UcieWriteUps } from '../types';
 

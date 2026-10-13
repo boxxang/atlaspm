@@ -1,5 +1,5 @@
 /**
- * UCON — IP Concept & Business Case. Weeks 0–8; closes on IP Program Go.
+ * UCON — Business Justification and Program Go Decision. Weeks 0–8; closes on IP Program Go.
  */
 import type { UcieStageModule } from '../types';
 

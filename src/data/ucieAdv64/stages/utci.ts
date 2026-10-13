@@ -1,5 +1,5 @@
 /**
- * UTCI — Test Chip Integration. Weeks 48–74; closes on Test Chip Ready.
+ * UTCI — Test Chip Build for Silicon Proof. Weeks 48–74; closes on Test Chip Ready.
  */
 import type { UcieStageModule } from '../types';
 

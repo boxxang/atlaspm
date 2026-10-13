@@ -1,5 +1,5 @@
 /**
- * ULAY — Electrical PHY Layout & Macro Assembly. Weeks 44–68; closes on
+ * ULAY — Hard Macro Layout & Assembly. Weeks 44–68; closes on
  * Layout Complete.
  */
 import type { UcieStageModule } from '../types';

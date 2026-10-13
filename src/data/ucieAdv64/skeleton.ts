@@ -107,7 +107,7 @@ export const UCIE_SKELETON: readonly UcieStageSkeleton[] = [
   {
     key: 'ucieConcept',
     prefix: 'UCON',
-    title: 'IP Concept & Business Case',
+    title: 'Business Justification and Program Go Decision',
     band: 'define',
     start: 0,
     dur: 8,
@@ -124,7 +124,7 @@ export const UCIE_SKELETON: readonly UcieStageSkeleton[] = [
   {
     key: 'ucieRequirements',
     prefix: 'UREQ',
-    title: 'IP Requirements',
+    title: 'Feature Scope & PPA Targets',
     band: 'define',
     start: 4,
     dur: 10,
@@ -144,7 +144,7 @@ export const UCIE_SKELETON: readonly UcieStageSkeleton[] = [
   {
     key: 'ucieArchitecture',
     prefix: 'UARC',
-    title: 'IP Architecture',
+    title: 'Implementation Architecture & Partitioning',
     band: 'define',
     start: 10,
     dur: 12,
@@ -169,7 +169,7 @@ export const UCIE_SKELETON: readonly UcieStageSkeleton[] = [
   {
     key: 'ucieTechnology',
     prefix: 'UTEC',
-    title: 'Process & Package Technology',
+    title: 'Process & Package Selection',
     band: 'enable',
     start: 6,
     dur: 14,
@@ -187,7 +187,7 @@ export const UCIE_SKELETON: readonly UcieStageSkeleton[] = [
   {
     key: 'ucieFoundation',
     prefix: 'UFND',
-    title: 'Foundation IP & Design Environment',
+    title: 'Design Readiness — Foundation IP, Flows & VIP',
     band: 'enable',
     start: 8,
     dur: 14,
@@ -207,7 +207,7 @@ export const UCIE_SKELETON: readonly UcieStageSkeleton[] = [
   {
     key: 'ucieAfe',
     prefix: 'UAFE',
-    title: 'Electrical PHY Circuit Design',
+    title: 'Electrical PHY Circuits to Circuit Freeze',
     band: 'designVerify',
     start: 18,
     dur: 32,
@@ -230,7 +230,7 @@ export const UCIE_SKELETON: readonly UcieStageSkeleton[] = [
   {
     key: 'ucieRtl',
     prefix: 'URTL',
-    title: 'Adapter & Logical PHY RTL',
+    title: 'Adapter & Logical PHY RTL to RTL Freeze',
     band: 'designVerify',
     start: 20,
     dur: 32,
@@ -251,7 +251,7 @@ export const UCIE_SKELETON: readonly UcieStageSkeleton[] = [
   {
     key: 'ucieDft',
     prefix: 'UDFT',
-    title: 'DFT, Test & Debug Features',
+    title: 'Test, Lane Repair & Debug Hooks',
     band: 'designVerify',
     start: 26,
     dur: 26,
@@ -270,7 +270,7 @@ export const UCIE_SKELETON: readonly UcieStageSkeleton[] = [
   {
     key: 'ucieDv',
     prefix: 'UDV',
-    title: 'Digital Verification',
+    title: 'Protocol & Training Verification Sign-Off',
     band: 'designVerify',
     start: 22,
     dur: 38,
@@ -293,7 +293,7 @@ export const UCIE_SKELETON: readonly UcieStageSkeleton[] = [
   {
     key: 'ucieAms',
     prefix: 'UAMS',
-    title: 'Mixed-Signal Verification & Link Margin',
+    title: 'Link Margin Proof Before Layout',
     band: 'designVerify',
     start: 34,
     dur: 26,
@@ -314,7 +314,7 @@ export const UCIE_SKELETON: readonly UcieStageSkeleton[] = [
   {
     key: 'ucieDigitalPd',
     prefix: 'UDPD',
-    title: 'Digital Implementation',
+    title: 'Digital Hardening & Timing Closure',
     band: 'implement',
     start: 46,
     dur: 20,
@@ -333,7 +333,7 @@ export const UCIE_SKELETON: readonly UcieStageSkeleton[] = [
   {
     key: 'ucieLayout',
     prefix: 'ULAY',
-    title: 'Electrical PHY Layout & Macro Assembly',
+    title: 'Hard Macro Layout & Assembly',
     band: 'implement',
     start: 44,
     dur: 24,
@@ -351,7 +351,7 @@ export const UCIE_SKELETON: readonly UcieStageSkeleton[] = [
   {
     key: 'ucieSignoff',
     prefix: 'USGN',
-    title: 'Hard Macro Signoff',
+    title: 'Hard Macro Signoff for Tapeout & v0.9',
     band: 'implement',
     start: 62,
     dur: 10,
@@ -372,7 +372,7 @@ export const UCIE_SKELETON: readonly UcieStageSkeleton[] = [
   {
     key: 'ucieChannel',
     prefix: 'UCHN',
-    title: 'Package Channel & SI/PI',
+    title: 'Channel Specification & Bump Map Co-Design',
     band: 'integrate',
     start: 16,
     dur: 54,
@@ -391,7 +391,7 @@ export const UCIE_SKELETON: readonly UcieStageSkeleton[] = [
   {
     key: 'ucieTestChip',
     prefix: 'UTCI',
-    title: 'Test Chip Integration',
+    title: 'Test Chip Build for Silicon Proof',
     band: 'integrate',
     start: 48,
     dur: 26,
@@ -408,7 +408,7 @@ export const UCIE_SKELETON: readonly UcieStageSkeleton[] = [
   {
     key: 'ucieTestVehicle',
     prefix: 'UTVP',
-    title: 'Test Vehicle, Boards & Lab Preparation',
+    title: 'Silicon-Ready Hardware — Test Vehicle, Boards & Lab',
     band: 'integrate',
     start: 50,
     dur: 42,
@@ -446,7 +446,7 @@ export const UCIE_SKELETON: readonly UcieStageSkeleton[] = [
   {
     key: 'ucieFab',
     prefix: 'UFAB',
-    title: 'Fabrication, Sort & Assembly',
+    title: 'Fab, Sort & Assembly to Silicon in Hand',
     band: 'manufacture',
     start: 76,
     dur: 22,
@@ -464,7 +464,7 @@ export const UCIE_SKELETON: readonly UcieStageSkeleton[] = [
   {
     key: 'ucieBringup',
     prefix: 'UBUP',
-    title: 'Silicon Bring-Up',
+    title: 'Bring-Up to First Link-Up',
     band: 'siliconValidation',
     start: 98,
     dur: 8,
@@ -482,7 +482,7 @@ export const UCIE_SKELETON: readonly UcieStageSkeleton[] = [
   {
     key: 'ucieCharacterization',
     prefix: 'UCHR',
-    title: 'Silicon Characterization',
+    title: 'Silicon Characterization & Model Correlation',
     band: 'siliconValidation',
     start: 102,
     dur: 20,
@@ -504,7 +504,7 @@ export const UCIE_SKELETON: readonly UcieStageSkeleton[] = [
   {
     key: 'ucieCompliance',
     prefix: 'UCMP',
-    title: 'Compliance & Interoperability',
+    title: 'Compliance & Interop Proof',
     band: 'siliconValidation',
     start: 110,
     dur: 16,
@@ -520,7 +520,7 @@ export const UCIE_SKELETON: readonly UcieStageSkeleton[] = [
   {
     key: 'ucieReliability',
     prefix: 'URLQ',
-    title: 'Reliability & Silicon-Proven',
+    title: 'Reliability Qualification for Silicon-Proven',
     band: 'siliconValidation',
     start: 102,
     dur: 26,
@@ -539,7 +539,7 @@ export const UCIE_SKELETON: readonly UcieStageSkeleton[] = [
   {
     key: 'uciePreSilicon',
     prefix: 'UPRE',
-    title: 'Pre-Silicon Releases — v0.5 & v0.9',
+    title: 'Early Licensee Releases — v0.5 & v0.9',
     band: 'ipRelease',
     start: 52,
     dur: 26,
@@ -559,7 +559,7 @@ export const UCIE_SKELETON: readonly UcieStageSkeleton[] = [
   {
     key: 'ucieGa',
     prefix: 'UGA',
-    title: 'Production Release',
+    title: 'Production Release on Silicon Data',
     band: 'ipRelease',
     start: 120,
     dur: 12,
@@ -575,7 +575,7 @@ export const UCIE_SKELETON: readonly UcieStageSkeleton[] = [
   {
     key: 'ucieCustomer',
     prefix: 'UCUS',
-    title: 'Customer Integration Support & Sustaining',
+    title: 'Licensee Integration Support & Sustaining',
     band: 'ipRelease',
     start: 56,
     dur: 84,

@@ -1,5 +1,5 @@
 /**
- * URLQ — Reliability & Silicon-Proven. Weeks 102–128; closes on
+ * URLQ — Reliability Qualification for Silicon-Proven. Weeks 102–128; closes on
  * Silicon-Proven.
  */
 import type { UcieStageModule } from '../types';

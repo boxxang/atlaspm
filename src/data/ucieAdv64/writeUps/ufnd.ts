@@ -1,5 +1,5 @@
 /**
- * UFND — Foundation IP & Design Environment, written up.
+ * UFND — Design Readiness — Foundation IP, Flows & VIP, written up.
  */
 import type { UcieWriteUps } from '../types';
 

@@ -1,5 +1,5 @@
 /**
- * UREQ — IP Requirements. Weeks 4–14; closes on Requirements Baseline.
+ * UREQ — Feature Scope & PPA Targets. Weeks 4–14; closes on Requirements Baseline.
  */
 import type { UcieStageModule } from '../types';
 

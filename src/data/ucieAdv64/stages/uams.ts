@@ -1,5 +1,5 @@
 /**
- * UAMS — Mixed-Signal Verification & Link Margin. Weeks 34–60; closes on Link
+ * UAMS — Link Margin Proof Before Layout. Weeks 34–60; closes on Link
  * Margin Review.
  */
 import type { UcieStageModule } from '../types';

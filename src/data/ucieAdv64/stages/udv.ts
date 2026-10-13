@@ -1,5 +1,5 @@
 /**
- * UDV — Digital Verification. Weeks 22–60; closes on Verification Closure.
+ * UDV — Protocol & Training Verification Sign-Off. Weeks 22–60; closes on Verification Closure.
  */
 import type { UcieStageModule } from '../types';
 

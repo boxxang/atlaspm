@@ -1,5 +1,5 @@
 /**
- * UBUP — Silicon Bring-Up. Weeks 98–106; closes on First Link-up.
+ * UBUP — Bring-Up to First Link-Up. Weeks 98–106; closes on First Link-up.
  */
 import type { UcieStageModule } from '../types';
 

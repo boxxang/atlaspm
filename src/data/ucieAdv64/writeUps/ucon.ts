@@ -1,5 +1,5 @@
 /**
- * UCON — IP Concept & Business Case, written up.
+ * UCON — Business Justification and Program Go Decision, written up.
  */
 import type { UcieWriteUps } from '../types';
 

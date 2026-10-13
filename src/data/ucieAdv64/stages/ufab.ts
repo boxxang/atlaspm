@@ -1,5 +1,5 @@
 /**
- * UFAB — Fabrication, Sort & Assembly. Weeks 76–98; closes on Silicon in Hand.
+ * UFAB — Fab, Sort & Assembly to Silicon in Hand. Weeks 76–98; closes on Silicon in Hand.
  */
 import type { UcieStageModule } from '../types';
 

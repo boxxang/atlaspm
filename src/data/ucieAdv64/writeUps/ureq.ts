@@ -1,5 +1,5 @@
 /**
- * UREQ — IP Requirements, written up.
+ * UREQ — Feature Scope & PPA Targets, written up.
  */
 import type { UcieWriteUps } from '../types';
 

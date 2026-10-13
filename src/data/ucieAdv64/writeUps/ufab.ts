@@ -1,5 +1,5 @@
 /**
- * UFAB — Fabrication, Sort & Assembly, written up.
+ * UFAB — Fab, Sort & Assembly to Silicon in Hand, written up.
  */
 import type { UcieWriteUps } from '../types';
 

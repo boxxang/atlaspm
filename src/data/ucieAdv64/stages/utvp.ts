@@ -1,5 +1,5 @@
 /**
- * UTVP — Test Vehicle, Boards & Lab Preparation. Weeks 50–92; closes on
+ * UTVP — Silicon-Ready Hardware — Test Vehicle, Boards & Lab. Weeks 50–92; closes on
  * Hardware Ready.
  */
 import type { UcieStageModule } from '../types';

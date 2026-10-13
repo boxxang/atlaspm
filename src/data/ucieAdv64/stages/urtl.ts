@@ -1,5 +1,5 @@
 /**
- * URTL — Adapter & Logical PHY RTL. Weeks 20–52; closes on RTL Freeze.
+ * URTL — Adapter & Logical PHY RTL to RTL Freeze. Weeks 20–52; closes on RTL Freeze.
  */
 import type { UcieStageModule } from '../types';
 

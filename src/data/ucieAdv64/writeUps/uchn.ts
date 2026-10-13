@@ -1,5 +1,5 @@
 /**
- * UCHN — Package Channel & SI/PI, written up.
+ * UCHN — Channel Specification & Bump Map Co-Design, written up.
  */
 import type { UcieWriteUps } from '../types';
 

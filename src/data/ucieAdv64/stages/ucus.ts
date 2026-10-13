@@ -1,5 +1,5 @@
 /**
- * UCUS — Customer Integration Support & Sustaining. Weeks 56–140; closes on
+ * UCUS — Licensee Integration Support & Sustaining. Weeks 56–140; closes on
  * Sustaining Handover.
  */
 import type { UcieStageModule } from '../types';

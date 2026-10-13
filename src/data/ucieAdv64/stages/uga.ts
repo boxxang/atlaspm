@@ -1,5 +1,5 @@
 /**
- * UGA — Production Release. Weeks 120–132; closes on IP Production Release.
+ * UGA — Production Release on Silicon Data. Weeks 120–132; closes on IP Production Release.
  */
 import type { UcieStageModule } from '../types';
 

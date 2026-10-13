@@ -1,5 +1,5 @@
 /**
- * UTVP — Test Vehicle, Boards & Lab Preparation, written up.
+ * UTVP — Silicon-Ready Hardware — Test Vehicle, Boards & Lab, written up.
  */
 import type { UcieWriteUps } from '../types';
 

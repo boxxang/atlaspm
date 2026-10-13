@@ -1,5 +1,5 @@
 /**
- * UCMP — Compliance & Interoperability, written up.
+ * UCMP — Compliance & Interop Proof, written up.
  */
 import type { UcieWriteUps } from '../types';
 
