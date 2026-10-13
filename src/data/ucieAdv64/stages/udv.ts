@@ -39,7 +39,7 @@ export const UDV: UcieStageModule = {
     ],
     deliverableFrom: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 10, 11],
     deliverableWeek: [6, 12, 30, 30, 30, 32, 32, 30, 34, 36, 36, 36, 38],
-    engineeringEffort: [4, 10, 24, 16, 16, 10, 14, 10, 8, 10, 8, 2],
+    engineeringEffort: [2, 5.5, 12.5, 8.5, 8.5, 5.5, 7.5, 5.5, 4, 5.5, 4, 1],
     risks: [
       'Link training verified only against the verification IP’s interpretation of the specification, so a shared misreading reaches silicon',
       'Lane repair and lane reversal exercised on clean channels only, missing the multi-fault cases an advanced package produces',

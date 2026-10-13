@@ -20,7 +20,7 @@ export const USGN: UcieStageModule = {
     ],
     deliverableFrom: [0, 1, 2, 3, 4, 5, 6],
     deliverableWeek: [8, 8, 9, 9, 10, 10, 12],
-    engineeringEffort: [10, 8, 8, 5, 5, 4, 2],
+    engineeringEffort: [6, 4, 4, 2.5, 2.5, 2, 1],
     risks: [
       'Timing closed on the macro alone, with interface budgets that no customer floorplan can meet once the macro is placed at a die edge',
       'IR drop at 64 GT/s activity closing only because the analysis assumed a cleaner supply than a customer package will deliver',

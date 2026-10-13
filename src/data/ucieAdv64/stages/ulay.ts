@@ -29,7 +29,7 @@ export const ULAY: UcieStageModule = {
     ],
     deliverableFrom: [0, 1, 2, 3, 4, 5, 6],
     deliverableWeek: [6, 16, 18, 20, 22, 22, 24],
-    engineeringEffort: [5, 14, 6, 8, 7, 4, 1],
+    engineeringEffort: [3.5, 10, 4.5, 5.5, 5, 3, 0.5],
     risks: [
       'Clock-path parasitics adding skew across the module that phase adjustment cannot remove lane by lane',
       'Bump map implemented after the macro outline is fixed, forcing analog blocks to move under the bumps late',

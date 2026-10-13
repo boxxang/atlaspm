@@ -35,7 +35,7 @@ export const UCHR: UcieStageModule = {
     ],
     deliverableFrom: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
     deliverableWeek: [2, 12, 14, 12, 16, 14, 16, 16, 18, 20],
-    engineeringEffort: [2, 8, 8, 4, 8, 5, 5, 4, 6, 2],
+    engineeringEffort: [1.5, 5, 5.5, 3, 5.5, 3.5, 3.5, 3, 4, 1.5],
     risks: [
       'BER measured over too short a time to support any statement about the target, so the release quotes a number it cannot defend',
       'Silicon disagrees with the mixed-signal models and the release ships the models anyway because the correlation work started too late',

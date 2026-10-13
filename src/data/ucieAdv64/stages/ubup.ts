@@ -19,7 +19,7 @@ export const UBUP: UcieStageModule = {
     ],
     deliverableFrom: [0, 1, 2, 3, 4, 5],
     deliverableWeek: [1, 3, 5, 7, 8, 8],
-    engineeringEffort: [2, 3, 4, 4, 5, 1],
+    engineeringEffort: [1, 1.5, 2, 2, 3, 0.5],
     risks: [
       'Mainband training fails on first silicon and the cause cannot be separated between the analog front-end, the training logic, the package and the board',
       'Bring-up runs on the lab’s own scripts rather than the pre-silicon test plan, so the silicon cannot be compared with what was predicted',

@@ -34,7 +34,7 @@ export const URTL: UcieStageModule = {
     ],
     deliverableFrom: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
     deliverableWeek: [6, 22, 24, 22, 24, 26, 24, 26, 30, 32],
-    engineeringEffort: [6, 30, 22, 24, 26, 22, 16, 12, 10, 3],
+    engineeringEffort: [1.5, 9, 6.5, 7, 7.5, 6.5, 4.5, 3.5, 3, 1],
     risks: [
       'The training state machine is written before the analog calibration hooks are settled, and MBTRAIN cannot drive the front-end the circuit team built',
       'Retry buffer sized for nominal round-trip latency, so a long package channel or a slow Adapter clock stalls the link at full load',

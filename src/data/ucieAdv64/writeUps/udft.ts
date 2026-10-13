@@ -38,9 +38,9 @@ export const UDFT_WRITE_UPS: UcieWriteUps = {
       { r: 'Validation lead', d: 'Lab bring-up use cases' },
     ],
     effort: [
-      ['Feature list per block and use', 1],
-      ['Access paths', 1],
-      ['Test modes and review', 1],
+      ['Feature list per block and use', 0.5],
+      ['Access paths', 0.5],
+      ['Test modes and review', 0.5],
     ],
     entry: [
       'DFT and debug strategy frozen in UARC-12',
@@ -103,10 +103,10 @@ export const UDFT_WRITE_UPS: UcieWriteUps = {
       { r: 'Customer engineering lead', d: 'Licensee scan integration' },
     ],
     effort: [
-      ['Chain structure and compression', 2.5],
-      ['Coverage targets', 1.5],
-      ['Test and observe points', 2.5],
-      ['Trial insertion and release', 3.5],
+      ['Chain structure and compression', 1.5],
+      ['Coverage targets', 0.9],
+      ['Test and observe points', 1.5],
+      ['Trial insertion and release', 2.1],
     ],
     entry: [
       'DFT specification released in UDFT-01',
@@ -169,10 +169,10 @@ export const UDFT_WRITE_UPS: UcieWriteUps = {
       { r: 'Verification engineer', d: 'Error injection tests' },
     ],
     effort: [
-      ['Pattern selection', 1],
-      ['Generators', 2.5],
-      ['Per-lane checkers', 2.5],
-      ['Control and tests', 2],
+      ['Pattern selection', 0.6],
+      ['Generators', 1.4],
+      ['Per-lane checkers', 1.4],
+      ['Control and tests', 1.1],
     ],
     entry: [
       'DFT specification released in UDFT-01',
@@ -235,10 +235,10 @@ export const UDFT_WRITE_UPS: UcieWriteUps = {
       { r: 'Validation engineer', d: 'Bring-up use' },
     ],
     effort: [
-      ['Loopback point definition', 1.5],
-      ['Digital and far-end loopback', 3],
-      ['Analog loopback controls', 1.5],
-      ['Loading check and test descriptions', 2],
+      ['Loopback point definition', 0.8],
+      ['Digital and far-end loopback', 1.8],
+      ['Analog loopback controls', 0.8],
+      ['Loading check and test descriptions', 1.1],
     ],
     entry: [
       'DFT specification released in UDFT-01',
@@ -259,9 +259,9 @@ export const UDFT_WRITE_UPS: UcieWriteUps = {
       'Test descriptions complete per use',
     ],
     links: {
-      dependsOn: ['UDFT-01', 'URTL-04', 'UARC-07'],
+      dependsOn: ['UDFT-01', 'URTL-04', 'UARC-07', 'UAFE-07'],
       feedsInto: ['UDFT-08', 'UAMS-02', 'UTCI-02'],
-      runsWith: ['UAFE-07'],
+      runsWith: [],
       revisedBy: [],
       feedsBackInto: [],
     },
@@ -301,10 +301,10 @@ export const UDFT_WRITE_UPS: UcieWriteUps = {
       { r: 'Verification engineer', d: 'Open and marginal lane injection' },
     ],
     effort: [
-      ['Lane test definition', 2],
-      ['Lane test sequence and classification', 3.5],
-      ['Repair map output', 2],
-      ['Logic and memory BIST and tests', 2.5],
+      ['Lane test definition', 1.1],
+      ['Lane test sequence and classification', 1.9],
+      ['Repair map output', 1.1],
+      ['Logic and memory BIST and tests', 1.4],
     ],
     entry: [
       'Per-lane PRBS available from UDFT-03',
@@ -367,10 +367,10 @@ export const UDFT_WRITE_UPS: UcieWriteUps = {
       { r: 'Customer engineering lead', d: 'Mission-mode use by licensees' },
     ],
     effort: [
-      ['Sweep definition', 1.5],
-      ['Sweep control', 3],
-      ['Readout', 2.5],
-      ['Mission-mode specification and release', 2],
+      ['Sweep definition', 0.8],
+      ['Sweep control', 1.7],
+      ['Readout', 1.4],
+      ['Mission-mode specification and release', 1.1],
     ],
     entry: [
       'PRBS checkers available from UDFT-03',
@@ -391,9 +391,9 @@ export const UDFT_WRITE_UPS: UcieWriteUps = {
       'Neighbor disturbance in simulation',
     ],
     links: {
-      dependsOn: ['UDFT-01', 'UDFT-03', 'URTL-05', 'UARC-10'],
+      dependsOn: ['UDFT-01', 'UDFT-03', 'URTL-05', 'UARC-10', 'UAFE-07'],
       feedsInto: ['UDFT-08', 'UAMS-07', 'UCHR-02'],
-      runsWith: ['UAFE-07'],
+      runsWith: [],
       revisedBy: [],
       feedsBackInto: [],
     },
@@ -433,10 +433,10 @@ export const UDFT_WRITE_UPS: UcieWriteUps = {
       { r: 'Technical writer', d: 'Debug user guide' },
     ],
     effort: [
-      ['Debug signal list', 1],
-      ['Snapshots', 2],
-      ['Trace buffer', 1.5],
-      ['Sideband access and user guide', 2.5],
+      ['Debug signal list', 0.6],
+      ['Snapshots', 1.1],
+      ['Trace buffer', 0.9],
+      ['Sideband access and user guide', 1.4],
     ],
     entry: [
       'DFT specification released in UDFT-01',
@@ -498,9 +498,9 @@ export const UDFT_WRITE_UPS: UcieWriteUps = {
       { r: 'Program manager', d: 'Approves the freeze' },
     ],
     effort: [
-      ['Feature check', 1],
-      ['Coverage confirmation', 0.5],
-      ['Freeze review', 0.5],
+      ['Feature check', 0.6],
+      ['Coverage confirmation', 0.2],
+      ['Freeze review', 0.2],
     ],
     entry: [
       'Every DFT feature implemented',

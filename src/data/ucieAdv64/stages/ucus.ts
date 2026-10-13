@@ -19,7 +19,7 @@ export const UCUS: UcieStageModule = {
     ],
     deliverableFrom: [0, 1, 2, 3, 4],
     deliverableWeek: [60, 72, 80, 80, 84],
-    engineeringEffort: [30, 36, 14, 24, 2],
+    engineeringEffort: [22.5, 27.5, 10.5, 18, 1.5],
     risks: [
       'A licensee’s package channel exceeds the channel guidelines and is found only when their link margin simulation fails at SoC signoff',
       'Customer ECOs released as one-off patches that never reach the main release, so licensees diverge',

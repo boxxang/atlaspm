@@ -38,10 +38,10 @@ export const UDPD_WRITE_UPS: UcieWriteUps = {
       { r: 'CAD engineer', d: 'Synthesis flow support' },
     ],
     effort: [
-      ['Constraints', 1.5],
-      ['Synthesis trials', 1.5],
-      ['Feedback to RTL', 0.5],
-      ['Release', 0.5],
+      ['Constraints', 1.1],
+      ['Synthesis trials', 1.1],
+      ['Feedback to RTL', 0.4],
+      ['Release', 0.4],
     ],
     entry: [
       'Clocking architecture frozen in UARC-12',
@@ -104,10 +104,10 @@ export const UDPD_WRITE_UPS: UcieWriteUps = {
       { r: 'CAD engineer', d: 'Equivalence checking' },
     ],
     effort: [
-      ['Final synthesis', 1.5],
-      ['Scan insertion', 0.75],
-      ['Equivalence check', 0.5],
-      ['Release', 0.25],
+      ['Final synthesis', 1],
+      ['Scan insertion', 0.5],
+      ['Equivalence check', 0.3],
+      ['Release', 0.2],
     ],
     entry: [
       'RTL frozen in URTL-10',
@@ -170,10 +170,10 @@ export const UDPD_WRITE_UPS: UcieWriteUps = {
       { r: 'RTL design lead', d: 'Datapath grouping per lane' },
     ],
     effort: [
-      ['Outline and pins', 1.5],
-      ['Datapath and memory placement', 1.5],
-      ['Power grid', 0.75],
-      ['Release', 0.25],
+      ['Outline and pins', 1.1],
+      ['Datapath and memory placement', 1.1],
+      ['Power grid', 0.6],
+      ['Release', 0.2],
     ],
     entry: [
       'Bump map frozen in UCHN-03',
@@ -236,10 +236,10 @@ export const UDPD_WRITE_UPS: UcieWriteUps = {
       { r: 'Analog layout engineer', d: 'Boundary routing constraints' },
     ],
     effort: [
-      ['Placement and optimization', 1.5],
-      ['Clock tree synthesis', 1.5],
-      ['Routing and rule fixes', 2.5],
-      ['Release', 0.5],
+      ['Placement and optimization', 1],
+      ['Clock tree synthesis', 1],
+      ['Routing and rule fixes', 1.7],
+      ['Release', 0.3],
     ],
     entry: [
       'Netlist released from UDPD-02',
@@ -302,10 +302,10 @@ export const UDPD_WRITE_UPS: UcieWriteUps = {
       { r: 'CAD engineer', d: 'Timing flow support' },
     ],
     effort: [
-      ['Corner and mode runs', 1.5],
-      ['Analog boundary closure', 2],
-      ['Timing fixes', 2],
-      ['Report', 0.5],
+      ['Corner and mode runs', 1.1],
+      ['Analog boundary closure', 1.5],
+      ['Timing fixes', 1.5],
+      ['Report', 0.4],
     ],
     entry: [
       'Routed database released from UDPD-04',
@@ -368,9 +368,9 @@ export const UDPD_WRITE_UPS: UcieWriteUps = {
       { r: 'Signoff engineer', d: 'View checks' },
     ],
     effort: [
-      ['Boundary finalization', 1],
-      ['View generation', 2],
-      ['View checks and hand-off', 1],
+      ['Boundary finalization', 0.8],
+      ['View generation', 1.4],
+      ['View checks and hand-off', 0.8],
     ],
     entry: [
       'Timing closed in UDPD-05',
@@ -432,9 +432,9 @@ export const UDPD_WRITE_UPS: UcieWriteUps = {
       { r: 'Program manager', d: 'Approves the gate' },
     ],
     effort: [
-      ['Evidence collection', 0.25],
-      ['Residual review', 0.5],
-      ['Decision record', 0.25],
+      ['Evidence collection', 0.1],
+      ['Residual review', 0.3],
+      ['Decision record', 0.1],
     ],
     entry: [
       'Timing closure report released from UDPD-05',

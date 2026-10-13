@@ -38,10 +38,10 @@ export const UBUP_WRITE_UPS: UcieWriteUps = {
       { r: 'Validation lead', d: 'Approves moving to sideband bring-up' },
     ],
     effort: [
-      ['Unit inspection and impedance checks', 0.5],
-      ['Sequenced power-up and current logging', 0.75],
-      ['Clock, reset and sensor checks', 0.25],
-      ['Repeat on the first units and record', 0.5],
+      ['Unit inspection and impedance checks', 0.2],
+      ['Sequenced power-up and current logging', 0.5],
+      ['Clock, reset and sensor checks', 0.1],
+      ['Repeat on the first units and record', 0.2],
     ],
     entry: [
       'First samples received and booked in from UFAB-05',
@@ -104,11 +104,11 @@ export const UBUP_WRITE_UPS: UcieWriteUps = {
       { r: 'Validation lead', d: 'Approves moving to mainband training' },
     ],
     effort: [
-      ['Sideband initialization and capture', 0.75],
-      ['Register read and write on both dies', 0.75],
-      ['Sideband clock margin sweep', 0.5],
-      ['Manageability and firmware download', 0.5],
-      ['Log and release', 0.5],
+      ['Sideband initialization and capture', 0.5],
+      ['Register read and write on both dies', 0.4],
+      ['Sideband clock margin sweep', 0.2],
+      ['Manageability and firmware download', 0.2],
+      ['Log and release', 0.2],
     ],
     entry: [
       'Units powered in the documented sequence in UBUP-01',
@@ -171,11 +171,11 @@ export const UBUP_WRITE_UPS: UcieWriteUps = {
       { r: 'Validation lead', d: 'Approves first link-up attempts' },
     ],
     effort: [
-      ['Low-speed MBINIT', 0.75],
-      ['Lane test, repair and reversal readback', 0.5],
-      ['MBTRAIN at 64 GT/s', 1.5],
-      ['Training traces on failing units', 0.5],
-      ['Log and release', 0.75],
+      ['Low-speed MBINIT', 0.4],
+      ['Lane test, repair and reversal readback', 0.2],
+      ['MBTRAIN at 64 GT/s', 0.8],
+      ['Training traces on failing units', 0.2],
+      ['Log and release', 0.4],
     ],
     entry: [
       'Sideband up and registers accessible on the units under test from UBUP-02',
@@ -238,10 +238,10 @@ export const UBUP_WRITE_UPS: UcieWriteUps = {
       { r: 'Validation lead', d: 'Declares first link-up' },
     ],
     effort: [
-      ['Link to active state', 0.5],
-      ['Per-lane PRBS in Raw mode', 1.5],
-      ['Flit traffic with CRC and retry', 1.25],
-      ['Record and release', 0.75],
+      ['Link to active state', 0.2],
+      ['Per-lane PRBS in Raw mode', 0.8],
+      ['Flit traffic with CRC and retry', 0.6],
+      ['Record and release', 0.4],
     ],
     entry: [
       'At least one unit trained through MBTRAIN at 64 GT/s in UBUP-03',
@@ -304,11 +304,11 @@ export const UBUP_WRITE_UPS: UcieWriteUps = {
       { r: 'Characterization lead', d: 'Agrees changes to the corner matrix' },
     ],
     effort: [
-      ['Mapping results to the plan', 1],
-      ['Margin comparison with predictions', 1.5],
-      ['Deviation bucketing and issues', 1],
-      ['Corner matrix agreement', 0.75],
-      ['Release', 0.75],
+      ['Mapping results to the plan', 0.6],
+      ['Margin comparison with predictions', 1],
+      ['Deviation bucketing and issues', 0.6],
+      ['Corner matrix agreement', 0.4],
+      ['Release', 0.4],
     ],
     entry: [
       'Post-silicon test plan released in UDV-11',
@@ -370,9 +370,9 @@ export const UBUP_WRITE_UPS: UcieWriteUps = {
       { r: 'Program manager', d: 'Approves the First Link-up gate' },
     ],
     effort: [
-      ['Collecting records', 0.25],
-      ['Issue and workaround review', 0.5],
-      ['Decision record', 0.25],
+      ['Collecting records', 0.1],
+      ['Issue and workaround review', 0.3],
+      ['Decision record', 0.1],
     ],
     entry: [
       'Records from UBUP-01 to UBUP-05 released',

@@ -28,7 +28,7 @@ export const UDPD: UcieStageModule = {
     ],
     deliverableFrom: [0, 1, 2, 3, 4, 5, 6],
     deliverableWeek: [6, 10, 12, 16, 18, 20, 20],
-    engineeringEffort: [4, 3, 4, 6, 6, 4, 1],
+    engineeringEffort: [3, 2, 3, 4, 4.5, 3, 0.5],
     risks: [
       'Timing arcs at the boundary with the analog front-end left to the last iteration, so the macro closes internally and fails at assembly',
       'Lane datapaths placed without regard to the bump columns, adding routing skew the deskew range was never budgeted for',

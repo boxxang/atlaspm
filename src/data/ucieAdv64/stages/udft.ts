@@ -30,7 +30,7 @@ export const UDFT: UcieStageModule = {
     ],
     deliverableFrom: [0, 1, 2, 3, 4, 5, 6, 7],
     deliverableWeek: [4, 18, 16, 18, 20, 20, 22, 26],
-    engineeringEffort: [3, 10, 8, 8, 10, 9, 7, 2],
+    engineeringEffort: [1.5, 6, 4.5, 4.5, 5.5, 5, 4, 1],
     risks: [
       'The built-in lane test cannot tell a marginal microbump from a good one, so assembled parts ship with lanes that fail in the field instead of being repaired',
       'Margining logic steps too coarsely at 64 GT/s, so silicon eye margins cannot be compared with the simulated ones',

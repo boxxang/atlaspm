@@ -38,11 +38,11 @@ export const USGN_WRITE_UPS: UcieWriteUps = {
       { r: 'Signoff manager', d: 'Approves the timing report for the signoff review' },
     ],
     effort: [
-      ['Signoff setup', 1],
-      ['Corner and mode timing', 3],
-      ['Boundary budget closure', 2],
-      ['Timing fixes', 3],
-      ['Report and release', 1],
+      ['Signoff setup', 0.6],
+      ['Corner and mode timing', 1.7],
+      ['Boundary budget closure', 1.2],
+      ['Timing fixes', 1.9],
+      ['Report and release', 0.6],
     ],
     entry: [
       'Final hardened netlist and parasitics released by UDPD-06',
@@ -105,11 +105,11 @@ export const USGN_WRITE_UPS: UcieWriteUps = {
       { r: 'Reliability engineer', d: 'Sets the electromigration temperature and lifetime' },
     ],
     effort: [
-      ['Activity vectors', 1.5],
-      ['IR drop analysis', 2.5],
-      ['Electromigration analysis', 2],
-      ['Hot-spot fixes', 1.5],
-      ['Report', 0.5],
+      ['Activity vectors', 0.7],
+      ['IR drop analysis', 1.4],
+      ['Electromigration analysis', 1],
+      ['Hot-spot fixes', 0.7],
+      ['Report', 0.2],
     ],
     entry: [
       'Extracted views of every Electrical PHY block available from ULAY-05',
@@ -172,11 +172,11 @@ export const USGN_WRITE_UPS: UcieWriteUps = {
       { r: 'Design methodology engineer', d: 'Owns the decks and the run configuration' },
     ],
     effort: [
-      ['Database merge', 0.5],
-      ['DRC and density', 2.5],
-      ['LVS', 2],
-      ['Antenna', 1],
-      ['Waiver review and report', 2],
+      ['Database merge', 0.2],
+      ['DRC and density', 1.3],
+      ['LVS', 1],
+      ['Antenna', 0.5],
+      ['Waiver review and report', 1],
     ],
     entry: [
       'Layout completion confirmed in ULAY-07',
@@ -239,10 +239,10 @@ export const USGN_WRITE_UPS: UcieWriteUps = {
       { r: 'Physical design lead', d: 'Confirms the digital side of the boundary' },
     ],
     effort: [
-      ['Discharge path tracing', 1.5],
-      ['Clamp sizing', 1],
-      ['Latch-up checks', 1.5],
-      ['Review and fixes', 1],
+      ['Discharge path tracing', 0.7],
+      ['Clamp sizing', 0.5],
+      ['Latch-up checks', 0.8],
+      ['Review and fixes', 0.5],
     ],
     entry: [
       'ESD design and clamp placement released from UAFE-06',
@@ -305,10 +305,10 @@ export const USGN_WRITE_UPS: UcieWriteUps = {
       { r: 'Customer engineering lead', d: 'Validates the mission profile with licensees' },
     ],
     effort: [
-      ['Mission profile', 0.5],
-      ['Device aging simulation', 2.5],
-      ['Interconnect lifetime', 1],
-      ['Calibration coverage', 1],
+      ['Mission profile', 0.2],
+      ['Device aging simulation', 1.3],
+      ['Interconnect lifetime', 0.5],
+      ['Calibration coverage', 0.5],
     ],
     entry: [
       'Circuit freeze reached and PVT results available from UAFE-08',
@@ -371,10 +371,10 @@ export const USGN_WRITE_UPS: UcieWriteUps = {
       { r: 'Technical writer', d: 'Aligns the integration guide with the checked views' },
     ],
     effort: [
-      ['View regeneration', 0.5],
-      ['View-to-layout comparison', 1.5],
-      ['Liberty correlation', 1],
-      ['Trial integration', 1],
+      ['View regeneration', 0.2],
+      ['View-to-layout comparison', 0.8],
+      ['Liberty correlation', 0.5],
+      ['Trial integration', 0.5],
     ],
     entry: [
       'Signed-off or signoff-candidate databases for both macros',
@@ -436,9 +436,9 @@ export const USGN_WRITE_UPS: UcieWriteUps = {
       { r: 'Customer engineering lead', d: 'Confirms the views are releasable' },
     ],
     effort: [
-      ['Report collection', 0.5],
-      ['Waiver and risk review', 1],
-      ['Decision and authorization', 0.5],
+      ['Report collection', 0.2],
+      ['Waiver and risk review', 0.6],
+      ['Decision and authorization', 0.2],
     ],
     entry: [
       'Every signoff report in USGN-01 to USGN-06 released or in final run',
@@ -450,7 +450,7 @@ export const USGN_WRITE_UPS: UcieWriteUps = {
       'One database revision named for the test chip, the tapeout and the v0.9 release',
       'Conditions carried into the tapeout checklist and the release notes',
     ],
-    dependsOn: ['USGN-01', 'USGN-02', 'USGN-03', 'USGN-04', 'USGN-05', 'USGN-06'],
+    dependsOn: ['USGN-01', 'USGN-02', 'USGN-03', 'USGN-04', 'USGN-05', 'USGN-06', 'UDV-12', 'UAMS-08'],
     dependsNote: null,
     feedsInto: ['UTCI-05', 'UTPO-01', 'UTPO-04', 'UPRE-08'],
     measuredBy: [
@@ -459,7 +459,7 @@ export const USGN_WRITE_UPS: UcieWriteUps = {
       'Database revisions in use downstream (target one)',
     ],
     links: {
-      dependsOn: ['USGN-01', 'USGN-02', 'USGN-03', 'USGN-04', 'USGN-05', 'USGN-06', 'ULAY-07', 'UDPD-07'],
+      dependsOn: ['USGN-01', 'USGN-02', 'USGN-03', 'USGN-04', 'USGN-05', 'USGN-06', 'ULAY-07', 'UDPD-07', 'UDV-12', 'UAMS-08'],
       feedsInto: ['UTCI-05', 'UTCI-06', 'UTPO-01', 'UTPO-04', 'UPRE-04', 'UPRE-08'],
       runsWith: [],
       revisedBy: [],

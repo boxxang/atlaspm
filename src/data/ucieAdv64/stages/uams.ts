@@ -31,7 +31,7 @@ export const UAMS: UcieStageModule = {
     ],
     deliverableFrom: [0, 1, 2, 3, 4, 5, 6, 7],
     deliverableWeek: [6, 18, 20, 22, 22, 22, 24, 26],
-    engineeringEffort: [8, 14, 12, 10, 8, 6, 5, 2],
+    engineeringEffort: [5.5, 9.5, 8.5, 7, 5.5, 4, 3.5, 1.5],
     risks: [
       'Behavioral models that agree with the circuits at nominal and diverge at the corners, so the margin report is optimistic exactly where it matters',
       'Link margin computed on a channel model of one package type while customers integrate on another',

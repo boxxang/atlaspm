@@ -19,7 +19,7 @@ export const UTCI: UcieStageModule = {
     ],
     deliverableFrom: [0, 1, 2, 3, 4, 5],
     deliverableWeek: [4, 12, 18, 22, 26, 26],
-    engineeringEffort: [3, 8, 8, 6, 8, 1],
+    engineeringEffort: [2.5, 6, 6, 4.5, 6, 1],
     risks: [
       'A test chip that cannot exercise a feature the datasheet claims, discovered when characterization starts',
       'Test chip signoff waiting on the hard macro signoff and absorbing all of its slip before the shuttle date',

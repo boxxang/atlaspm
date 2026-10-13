@@ -38,10 +38,10 @@ export const UPRE_WRITE_UPS: UcieWriteUps = {
       { r: 'IP program manager', d: 'Approves the release definition' },
     ],
     effort: [
-      ['Package structure', 0.5],
-      ['Deliverable checklist', 1],
-      ['Release QA procedure', 1],
-      ['Distribution setup and approval', 0.5],
+      ['Package structure', 0.3],
+      ['Deliverable checklist', 0.7],
+      ['Release QA procedure', 0.7],
+      ['Distribution setup and approval', 0.3],
     ],
     entry: [
       'Customer integration requirements baselined in UREQ-04',
@@ -104,11 +104,11 @@ export const UPRE_WRITE_UPS: UcieWriteUps = {
       { r: 'Quality engineer', d: 'Runs v0.5 release QA' },
     ],
     effort: [
-      ['RTL and register map bundle', 2],
-      ['Behavioral model kit', 2.5],
-      ['Preliminary integration guide', 3],
-      ['Release QA and smoke simulation', 2],
-      ['Release and notes', 0.5],
+      ['RTL and register map bundle', 1.4],
+      ['Behavioral model kit', 1.8],
+      ['Preliminary integration guide', 2.1],
+      ['Release QA and smoke simulation', 1.4],
+      ['Release and notes', 0.3],
     ],
     entry: [
       'RTL freeze recorded in URTL-10',
@@ -171,10 +171,10 @@ export const UPRE_WRITE_UPS: UcieWriteUps = {
       { r: 'Product manager', d: 'Chooses early-access customers and arbitrates deferrals' },
     ],
     effort: [
-      ['Customer selection and scoping', 1],
-      ['Onboarding', 2],
-      ['Integration working sessions', 3],
-      ['Triage and closure', 2],
+      ['Customer selection and scoping', 0.8],
+      ['Onboarding', 1.5],
+      ['Integration working sessions', 2.2],
+      ['Triage and closure', 1.5],
     ],
     entry: [
       'v0.5 released from UPRE-02',
@@ -237,10 +237,10 @@ export const UPRE_WRITE_UPS: UcieWriteUps = {
       { r: 'Quality engineer', d: 'Accepts the views into the release' },
     ],
     effort: [
-      ['GDS stream-out and check', 1],
-      ['LEF abstracts', 1.5],
-      ['Liberty generation and validation', 2.5],
-      ['Consistency checks', 1],
+      ['GDS stream-out and check', 0.8],
+      ['LEF abstracts', 1.1],
+      ['Liberty generation and validation', 1.8],
+      ['Consistency checks', 0.8],
     ],
     entry: [
       'Hard macro signoff review held in USGN-07',
@@ -303,10 +303,10 @@ export const UPRE_WRITE_UPS: UcieWriteUps = {
       { r: 'Technical writer', d: 'Model usage notes and validity range' },
     ],
     effort: [
-      ['Channel model build', 3],
-      ['Correlation', 2],
-      ['Timing and power models', 2],
-      ['Validation and release', 1],
+      ['Channel model build', 2.2],
+      ['Correlation', 1.5],
+      ['Timing and power models', 1.5],
+      ['Validation and release', 0.8],
     ],
     entry: [
       'Post-layout simulation results available from ULAY-05',
@@ -369,11 +369,11 @@ export const UPRE_WRITE_UPS: UcieWriteUps = {
       { r: 'Packaging engineer', d: 'Placement and bump rules per package type' },
     ],
     effort: [
-      ['Interface and sequencing chapters', 2.5],
-      ['Placement and bump map rules', 2.5],
-      ['Power delivery requirements', 1.5],
-      ['Application notes', 2.5],
-      ['Review and release', 1],
+      ['Interface and sequencing chapters', 1.7],
+      ['Placement and bump map rules', 1.8],
+      ['Power delivery requirements', 1],
+      ['Application notes', 1.8],
+      ['Review and release', 0.7],
     ],
     entry: [
       'v0.5 guide released in UPRE-02',
@@ -436,10 +436,10 @@ export const UPRE_WRITE_UPS: UcieWriteUps = {
       { r: 'Technical writer', d: 'Release notes' },
     ],
     effort: [
-      ['Checklist QA', 1],
-      ['Sanity flows', 1],
-      ['Release notes', 0.5],
-      ['Finding closure', 0.5],
+      ['Checklist QA', 0.7],
+      ['Sanity flows', 0.7],
+      ['Release notes', 0.3],
+      ['Finding closure', 0.3],
     ],
     entry: [
       'All v0.9 deliverables delivered to the release area',
@@ -501,10 +501,10 @@ export const UPRE_WRITE_UPS: UcieWriteUps = {
       { r: 'Product manager', d: 'Approves the release and its waivers' },
     ],
     effort: [
-      ['Criteria review', 0.5],
-      ['Waiver assessment', 0.5],
-      ['Decision', 0.5],
-      ['Distribution', 0.5],
+      ['Criteria review', 0.3],
+      ['Waiver assessment', 0.4],
+      ['Decision', 0.4],
+      ['Distribution', 0.4],
     ],
     entry: [
       'Hard macro signoff review held in USGN-07',

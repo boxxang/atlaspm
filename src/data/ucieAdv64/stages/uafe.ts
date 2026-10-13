@@ -32,7 +32,7 @@ export const UAFE: UcieStageModule = {
     ],
     deliverableFrom: [0, 1, 2, 3, 4, 5, 6, 7, 8],
     deliverableWeek: [6, 24, 24, 26, 24, 22, 26, 28, 32],
-    engineeringEffort: [6, 30, 30, 34, 14, 10, 12, 16, 3],
+    engineeringEffort: [3, 14.5, 14.5, 16.5, 6.5, 4.5, 6, 8, 1.5],
     risks: [
       'Timing margin at 64 GT/s consumed by clock-path jitter and duty-cycle error before the data path is counted',
       'ESD capacitance on every bump eats the receiver bandwidth the channel budget assumed',

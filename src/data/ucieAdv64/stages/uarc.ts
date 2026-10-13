@@ -38,7 +38,7 @@ export const UARC: UcieStageModule = {
     ],
     deliverableFrom: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11],
     deliverableWeek: [5, 8, 8, 8, 9, 8, 9, 9, 9, 10, 10, 12],
-    engineeringEffort: [3, 4, 4, 2, 3, 4, 5, 2, 2, 2, 1, 1],
+    engineeringEffort: [1.5, 2, 2, 1, 1.5, 2, 4, 1, 1, 1, 0.5, 0.5],
     risks: [
       'The 64 GT/s timing budget split between clocking, transmit and receive on assumptions the process models have not confirmed',
       'Bump map concept frozen before the channel team has modeled crosstalk between adjacent lanes at the chosen pitch',

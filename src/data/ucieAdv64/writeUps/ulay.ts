@@ -38,10 +38,10 @@ export const ULAY_WRITE_UPS: UcieWriteUps = {
       { r: 'IP architect', d: 'Approves the outline against the shoreline target' },
     ],
     effort: [
-      ['Outline', 1.5],
-      ['Block placement', 1.5],
-      ['Supply and shielding plan', 1],
-      ['Digital region and release', 1],
+      ['Outline', 1.1],
+      ['Block placement', 1],
+      ['Supply and shielding plan', 0.7],
+      ['Digital region and release', 0.7],
     ],
     entry: [
       'Bump map concept available from UARC-09',
@@ -104,11 +104,11 @@ export const ULAY_WRITE_UPS: UcieWriteUps = {
       { r: 'Analog layout lead', d: 'Approves the block release' },
     ],
     effort: [
-      ['TX and serializer', 3.5],
-      ['RX, sampler and deserializer', 3.5],
-      ['Clocking and spine', 3.5],
-      ['Bias, regulation and ESD', 2],
-      ['Block checks and release', 1.5],
+      ['TX and serializer', 2.5],
+      ['RX, sampler and deserializer', 2.5],
+      ['Clocking and spine', 2.5],
+      ['Bias, regulation and ESD', 1.4],
+      ['Block checks and release', 1.1],
     ],
     entry: [
       'Schematics frozen in UAFE-09',
@@ -171,10 +171,10 @@ export const ULAY_WRITE_UPS: UcieWriteUps = {
       { r: 'Mixed-signal verification engineer', d: 'Uses the comparison to prioritize post-layout simulation' },
     ],
     effort: [
-      ['Matching', 1.5],
-      ['Shielding', 1.5],
-      ['Routing balance', 1],
-      ['Extraction comparison and record', 2],
+      ['Matching', 1.1],
+      ['Shielding', 1.1],
+      ['Routing balance', 0.8],
+      ['Extraction comparison and record', 1.5],
     ],
     entry: [
       'Block layouts drawn in ULAY-02',
@@ -237,11 +237,11 @@ export const ULAY_WRITE_UPS: UcieWriteUps = {
       { r: 'Analog layout lead', d: 'Approves the assembled macro' },
     ],
     effort: [
-      ['Bump map implementation', 2],
-      ['Bump-to-lane routing', 2],
-      ['Digital macro integration', 1.5],
-      ['Power grid', 1.5],
-      ['Macro checks and release', 1],
+      ['Bump map implementation', 1.4],
+      ['Bump-to-lane routing', 1.4],
+      ['Digital macro integration', 1],
+      ['Power grid', 1],
+      ['Macro checks and release', 0.7],
     ],
     entry: [
       'Bump map and channel specification frozen in UCHN-03',
@@ -304,10 +304,10 @@ export const ULAY_WRITE_UPS: UcieWriteUps = {
       { r: 'Analog design lead', d: 'Accepts the post-layout margins' },
     ],
     effort: [
-      ['Full-macro extraction', 1.5],
-      ['Post-layout corners', 2.5],
-      ['Post-layout Monte Carlo', 1.5],
-      ['Comparison, fixes and release', 1.5],
+      ['Full-macro extraction', 1.1],
+      ['Post-layout corners', 1.7],
+      ['Post-layout Monte Carlo', 1.1],
+      ['Comparison, fixes and release', 1.1],
     ],
     entry: [
       'Macro assembled in ULAY-04',
@@ -370,10 +370,10 @@ export const ULAY_WRITE_UPS: UcieWriteUps = {
       { r: 'Customer engineer', d: 'Checks the views against what licensees need' },
     ],
     effort: [
-      ['Abstract', 1],
-      ['Interface timing', 1.5],
-      ['Power model', 0.5],
-      ['Consistency check and release', 1],
+      ['Abstract', 0.8],
+      ['Interface timing', 1],
+      ['Power model', 0.4],
+      ['Consistency check and release', 0.8],
     ],
     entry: [
       'Macro assembled in ULAY-04',
@@ -434,9 +434,9 @@ export const ULAY_WRITE_UPS: UcieWriteUps = {
       { r: 'Program manager', d: 'Records the release against the schedule' },
     ],
     effort: [
-      ['Collection', 0.25],
-      ['Review', 0.5],
-      ['Release', 0.25],
+      ['Collection', 0.1],
+      ['Review', 0.3],
+      ['Release', 0.1],
     ],
     entry: [
       'Post-layout report released in ULAY-05',

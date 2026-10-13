@@ -30,7 +30,7 @@ export const UPRE: UcieStageModule = {
     ],
     deliverableFrom: [0, 1, 2, 3, 4, 5, 6, 7],
     deliverableWeek: [4, 8, 20, 24, 24, 24, 25, 26],
-    engineeringEffort: [3, 10, 8, 6, 8, 10, 3, 2],
+    engineeringEffort: [2, 7, 6, 4.5, 6, 7, 2, 1.5],
     risks: [
       'A v0.9 view set that does not match the signed-off database, so a customer’s signoff passes against something that will not be built',
       'Early-access customers integrating to the preliminary guide and building in assumptions v0.9 changes',
