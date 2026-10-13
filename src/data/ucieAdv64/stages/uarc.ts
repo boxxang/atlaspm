@@ -1,0 +1,268 @@
+/**
+ * UARC — IP Architecture. Weeks 10–22; closes on Architecture Freeze.
+ */
+import type { UcieStageModule } from '../types';
+
+export const UARC: UcieStageModule = {
+  content: {
+    tagline: 'Decide how every bit crosses from one die to the other at 64 GT/s, and freeze it before circuits and RTL commit.',
+    description:
+      'Split the IP into the D2D Adapter, the Logical PHY, the sideband and the Electrical PHY, and define the interfaces between them — the FDI above, the RDI between adapter and PHY, and the configuration and register interface. The adapter architecture fixes CRC, retry, Flit formats, Raw and Streaming mode handling and arbitration; the logical PHY fixes lane mapping, scrambling, the link training sequence through SBINIT, MBINIT, MBTRAIN and LINKINIT, retraining and runtime recalibration, and the lane repair, reversal and deskew scheme. The clocking architecture sets the PLL or DLL, the forwarded clock and phase adjustment, and splits the 64 GT/s timing budget; the electrical PHY architecture chooses transmit and receive topologies, equalization, bias and ESD. Low-power states, the bump map concept and module floorplan, the DFT and debug strategy and the power, area and latency budget complete it. The stage closes on an architecture freeze that both the circuit and the RTL teams design against.',
+    activities: [
+      'Partition and interfaces',
+      'Adapter architecture',
+      'Logical PHY architecture',
+      'Repair, reversal, deskew',
+      'Sideband architecture',
+      'Clocking and timing budget',
+      'Electrical PHY architecture',
+      'Low-power states',
+      'Bump map and floorplan',
+      'DFT and debug strategy',
+      'PPA budget allocation',
+      'Architecture freeze',
+    ],
+    deliverables: [
+      'IP partitioning and interface specification — FDI, RDI and register interface',
+      'D2D Adapter architecture specification — CRC, retry, Flit formats and modes',
+      'Logical PHY architecture specification — lane mapping, training and runtime recalibration',
+      'Lane repair, lane reversal and deskew specification',
+      'Sideband and manageability architecture specification',
+      'Clocking architecture and 64 GT/s timing budget',
+      'Electrical PHY architecture specification — TX, RX, equalization, bias and ESD',
+      'Low-power state and power management architecture',
+      'Bump map concept and module floorplan',
+      'DFT and debug strategy — scan, BIST, PRBS, loopback and margining',
+      'Power, area and latency budget per block',
+      'Architecture freeze decision package',
+    ],
+    deliverableFrom: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11],
+    deliverableWeek: [5, 8, 8, 8, 9, 8, 9, 9, 9, 10, 10, 12],
+    engineeringEffort: [3, 4, 4, 2, 3, 4, 5, 2, 2, 2, 1, 1],
+    risks: [
+      'The 64 GT/s timing budget split between clocking, transmit and receive on assumptions the process models have not confirmed',
+      'Bump map concept frozen before the channel team has modeled crosstalk between adjacent lanes at the chosen pitch',
+    ],
+    potentialRisks: [
+      'RDI exposed to customers who bring their own adapter, but specified only as an internal interface',
+      'Runtime recalibration architected as a full retrain, so traffic stops for longer than the requirement allows',
+      'Lane repair limited to data lanes, leaving clock, valid and track bumps as single points of failure',
+      'Low-power exit latency driven by DLL relock time that the clocking architecture never budgeted',
+      'DFT strategy that cannot measure per-lane margin on silicon, so characterization has no way to compare with simulation',
+      'Architecture freeze declared with open questions recorded as assumptions nobody owns',
+    ],
+    leader: { name: 'Anika Rasmussen', short: 'A. Rasmussen', phone: '+1 (408) 555-0603', email: 'anika.rasmussen@example.com' },
+    collaboration: ['IP architecture', 'Analog and mixed-signal', 'RTL design', 'Design verification', 'DFT', 'Packaging', 'SI/PI', 'Customer engineering'],
+    tools: ['Architecture specification templates and document control', 'Link budget and timing budget spreadsheet models', 'High-level behavioral and transaction-level models', 'Bump map planning tool'],
+    programView: [
+      'Architecture specifications released against plan',
+      'Open architecture questions and their owners',
+      'Timing budget closure with margin at 64 GT/s',
+      'Requirements covered by an architecture decision',
+    ],
+    perspective:
+      'A die-to-die PHY lives on margins measured in picoseconds and bumps measured in micrometers. Freeze the budget split and the bump map with the channel team in the room, and make every feature — repair, recalibration, low power — show where its time and its area come from.',
+  },
+  steps: {
+    'UARC-01': {
+      s: [
+        [1, 'Partition the IP into D2D Adapter, Logical PHY, sideband and Electrical PHY with block ownership', 1],
+        [2, 'Define the FDI boundary to the customer’s Protocol Layer in each supported mode', 1.5],
+        [3, 'Define the RDI between adapter and PHY, including its exposure to customers who bring their own adapter', 1, 1],
+        [4, 'Define the configuration and register interface and the register address map structure', 1.5],
+        [5, 'Release the partitioning and interface specification', 1],
+      ],
+      o: [
+        'Block partition with owners',
+        'FDI interface definition per mode',
+        'RDI interface definition',
+        'Configuration and register interface definition',
+        'IP partitioning and interface specification — FDI, RDI and register interface',
+      ],
+      r: [['UARC-D1', 'produces'], ['UARC-D12', 'feeds']],
+    },
+    'UARC-02': {
+      s: [
+        [1, 'Define the Flit formats the adapter carries and how the FDI maps onto them', 1],
+        [2, 'Architect CRC generation and checking and the retry protocol with its buffer sizing', 1.5],
+        [3, 'Architect Raw mode, including continuous transmission, and Streaming protocol handling', 1.5, 1],
+        [4, 'Architect arbitration and multiplexing between protocol stacks on one link', 1],
+        [5, 'Estimate adapter latency per mode against the latency target', 1],
+        [6, 'Release the adapter architecture specification', 0.5],
+      ],
+      o: [
+        'Flit format and FDI mapping definition',
+        'CRC and retry architecture with buffer sizing',
+        'Raw and Streaming mode architecture',
+        'Arbitration and multiplexing architecture',
+        'Adapter latency estimate per mode',
+        'D2D Adapter architecture specification — CRC, retry, Flit formats and modes',
+      ],
+      r: [['UARC-D2', 'produces'], ['UARC-D11', 'feeds']],
+    },
+    'UARC-03': {
+      s: [
+        [1, 'Define lane mapping and scrambling for the x64 module and its redundant lanes', 1],
+        [2, 'Define the training sequence through SBINIT, MBINIT, MBTRAIN and LINKINIT to ACTIVE', 1.5],
+        [3, 'Define PHYRETRAIN triggers, TRAINERROR handling and the speed and width fallback rules', 1, 1],
+        [4, 'Architect runtime recalibration so timing and voltage are retuned with minimal traffic impact', 1.5],
+        [5, 'Release the logical PHY architecture specification', 1],
+      ],
+      o: [
+        'Lane mapping and scrambling definition',
+        'Training sequence definition',
+        'Retrain, error and fallback rules',
+        'Runtime recalibration architecture',
+        'Logical PHY architecture specification — lane mapping, training and runtime recalibration',
+      ],
+      r: [['UARC-D3', 'produces'], ['UARC-D11', 'feeds']],
+    },
+    'UARC-04': {
+      s: [
+        [1, 'Define how failed data, clock, valid and track lanes are detected during MBINIT', 1],
+        [2, 'Define the lane repair remapping onto redundant lanes and its limits per module', 1.5],
+        [3, 'Define lane reversal detection and correction for mirrored die placement', 1, 1],
+        [4, 'Define the deskew method and its range across the module', 1],
+        [5, 'Release the lane repair, reversal and deskew specification', 0.5],
+      ],
+      o: [
+        'Failed lane detection method',
+        'Lane repair remapping definition',
+        'Lane reversal definition',
+        'Deskew method and range',
+        'Lane repair, lane reversal and deskew specification',
+      ],
+      r: [['UARC-D4', 'produces'], ['UARC-D3', 'feeds']],
+    },
+    'UARC-05': {
+      s: [
+        [1, 'Define the sideband message set, packet formats and flow control', 1.5],
+        [2, 'Define register access over sideband for both local and remote die', 1],
+        [3, 'Architect early firmware download and priority sideband packets', 1.5, 1],
+        [4, 'Define the sideband clocking and its redundancy', 1],
+        [5, 'Release the sideband and manageability architecture specification', 1],
+      ],
+      o: [
+        'Sideband message and packet definition',
+        'Register access over sideband definition',
+        'Firmware download and priority packet architecture',
+        'Sideband clocking and redundancy definition',
+        'Sideband and manageability architecture specification',
+      ],
+      r: [['UARC-D5', 'produces'], ['UARC-D12', 'feeds']],
+    },
+    'UARC-06': {
+      s: [
+        [1, 'Choose the clock generation — PLL or DLL — and the frequency plan for 64 GT/s and the fallback speeds', 1.5],
+        [2, 'Define the forwarded clock scheme and how the receiver aligns its sampling phase to it', 1.5],
+        [3, 'Split the unit-interval timing budget between transmit jitter, channel, receive sampling and margin', 2],
+        [4, 'Define phase adjustment range and resolution for training and recalibration', 1, 1],
+        [5, 'Release the clocking architecture and timing budget', 1],
+      ],
+      o: [
+        'Clock generation and frequency plan',
+        'Forwarded clock and phase alignment scheme',
+        'Unit-interval timing budget split',
+        'Phase adjustment range and resolution',
+        'Clocking architecture and 64 GT/s timing budget',
+      ],
+      r: [['UARC-D6', 'produces'], ['UARC-D7', 'feeds']],
+    },
+    'UARC-07': {
+      s: [
+        [1, 'Choose the transmit driver topology, output swing and any transmit equalization', 1.5],
+        [2, 'Choose the receive front-end and sampler topology with offset calibration', 1.5],
+        [3, 'Decide equalization needs from early channel estimates for each package type', 1, 1],
+        [4, 'Define bias, reference and supply regulation for the lanes', 1.5],
+        [5, 'Define ESD protection that meets targets without closing the eye at 64 GT/s', 1],
+        [6, 'Release the electrical PHY architecture specification', 1],
+      ],
+      o: [
+        'Transmit driver topology choice',
+        'Receive front-end and sampler topology choice',
+        'Equalization decision per package type',
+        'Bias, reference and regulation scheme',
+        'ESD protection scheme',
+        'Electrical PHY architecture specification — TX, RX, equalization, bias and ESD',
+      ],
+      r: [['UARC-D7', 'produces'], ['UARC-D11', 'feeds']],
+    },
+    'UARC-08': {
+      s: [
+        [1, 'Define L1 and L2 entry and exit sequences across adapter, logical PHY and clocking', 1.5],
+        [2, 'Define which circuits power down in each state and what stays on', 1],
+        [3, 'Budget exit latency against the requirement, including clock relock', 1, 1],
+        [4, 'Release the low-power state architecture', 1],
+      ],
+      o: [
+        'Low-power entry and exit sequences',
+        'Power-down map per state',
+        'Exit latency budget',
+        'Low-power state and power management architecture',
+      ],
+      r: [['UARC-D8', 'produces'], ['UARC-D11', 'feeds']],
+    },
+    'UARC-09': {
+      s: [
+        [1, 'Draft the bump map concept for the x64 module with redundant lanes, clocks, valid, track and sideband', 1.5],
+        [2, 'Place power and ground bumps for supply integrity at 64 GT/s', 1],
+        [3, 'Check the concept against the supported bump pitch range and customer orientations', 1, 1],
+        [4, 'Draft the module floorplan — lane placement, clocking and the module’s die-edge depth', 1.5],
+        [5, 'Release the bump map concept and module floorplan', 1],
+      ],
+      o: [
+        'Bump map concept',
+        'Power and ground bump placement',
+        'Pitch and orientation compatibility check',
+        'Module floorplan draft',
+        'Bump map concept and module floorplan',
+      ],
+      r: [['UARC-D9', 'produces'], ['UARC-D12', 'feeds']],
+    },
+    'UARC-10': {
+      s: [
+        [1, 'Define scan and ATPG strategy for the adapter and logical PHY', 1],
+        [2, 'Define BIST, PRBS generation and checking and loopback modes for the lanes', 1.5],
+        [3, 'Define per-lane eye and margin measurement for characterization and customer use', 1.5, 1],
+        [4, 'Define debug access — register snapshots, trace and sideband debug', 1],
+        [5, 'Release the DFT and debug strategy', 1],
+      ],
+      o: [
+        'Scan and ATPG strategy',
+        'BIST, PRBS and loopback definition',
+        'Per-lane margining definition',
+        'Debug access definition',
+        'DFT and debug strategy — scan, BIST, PRBS, loopback and margining',
+      ],
+      r: [['UARC-D10', 'produces'], ['UARC-D12', 'feeds']],
+    },
+    'UARC-11': {
+      s: [
+        [1, 'Allocate the energy-per-bit target across transmit, receive, clocking and digital', 1],
+        [2, 'Allocate area and shoreline across the electrical PHY, logical PHY and adapter', 1],
+        [3, 'Allocate latency across adapter, logical PHY and electrical PHY per mode', 1, 1],
+        [4, 'Release the budget per block with margin held at the IP level', 1],
+      ],
+      o: [
+        'Power budget per block',
+        'Area and shoreline budget per block',
+        'Latency budget per block and mode',
+        'Power, area and latency budget per block',
+      ],
+      r: [['UARC-D11', 'produces'], ['UARC-D12', 'feeds']],
+    },
+    'UARC-12': {
+      s: [
+        [1, 'Review every architecture specification against the requirements baseline', 0.5],
+        [2, 'Close or assign every open architecture question with circuit, RTL and channel leads', 1],
+        [3, 'Freeze the specifications under change control and record the decision', 0.5],
+      ],
+      o: [
+        'Requirements coverage review record',
+        'Open question closure list with owners',
+        'Architecture freeze decision package',
+      ],
+      r: [['UARC-D12', 'produces']],
+    },
+  },
+};

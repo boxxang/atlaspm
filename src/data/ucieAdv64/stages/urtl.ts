@@ -1,0 +1,238 @@
+/**
+ * URTL — Adapter & Logical PHY RTL. Weeks 20–52; closes on RTL Freeze.
+ */
+import type { UcieStageModule } from '../types';
+
+export const URTL: UcieStageModule = {
+  content: {
+    tagline: 'Write the digital half of the PHY once, against a frozen architecture, so verification and the customer’s RTL drop see the same design.',
+    description:
+      'Turn the frozen architecture into synthesizable RTL for everything above the analog front-end: the D2D Adapter with its CRC generation and checking, retry buffer, arbitration and multiplexing, the Flit, Raw and Streaming mode datapaths behind the FDI, the Logical PHY with lane mapping, scrambling and deskew across a x64 Advanced module, the link training state machine from SBINIT through MBINIT, MBTRAIN and LINKINIT to ACTIVE, PHYRETRAIN and TRAINERROR, lane repair, lane reversal and runtime recalibration, the sideband controller with register access, manageability, early firmware download and priority sideband packets, and L1 and L2 power state control. At 64 GT/s the Logical PHY runs on wide words at a fraction of the line rate, so datapath width, pipeline depth and the timing of the training handshakes against the analog calibration hooks are settled here, not in implementation. The stage closes on an RTL freeze that lint, CDC and RDC are clean on and that the v0.5 release and final synthesis both take.',
+    activities: [
+      'Guidelines, specs, register map',
+      'D2D Adapter — CRC, retry, arbitration',
+      'Flit, Raw, Streaming and FDI',
+      'Logical PHY datapath',
+      'Link training state machine',
+      'Repair, reversal, recalibration',
+      'Sideband controller',
+      'L1 and L2 control',
+      'Lint, CDC and RDC',
+      'RTL freeze review',
+    ],
+    deliverables: [
+      'RTL coding guidelines, block specifications and register map',
+      'D2D Adapter RTL — CRC generation and checking, retry buffer and arbitration',
+      'Flit, Raw and Streaming mode datapath RTL with the FDI',
+      'Logical PHY datapath RTL — lane mapping, scrambling and deskew',
+      'Link training state machine RTL with state, timeout and transition tables',
+      'Lane repair, lane reversal and runtime recalibration RTL',
+      'Sideband controller and manageability RTL',
+      'Low-power state control RTL with power intent',
+      'Lint, CDC and RDC clean reports with reviewed waivers',
+      'RTL freeze package and freeze decision record',
+    ],
+    deliverableFrom: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+    deliverableWeek: [6, 22, 24, 22, 24, 26, 24, 26, 30, 32],
+    engineeringEffort: [6, 30, 22, 24, 26, 22, 16, 12, 10, 3],
+    risks: [
+      'The training state machine is written before the analog calibration hooks are settled, and MBTRAIN cannot drive the front-end the circuit team built',
+      'Retry buffer sized for nominal round-trip latency, so a long package channel or a slow Adapter clock stalls the link at full load',
+    ],
+    potentialRisks: [
+      'Register map changed after the v0.5 drop, so every early-access customer’s software sees a different map at v0.9',
+      'Lane reversal and lane repair implemented as separate muxes, so a reversed module with a repaired lane maps the spare to the wrong position',
+      'Runtime recalibration that pauses the mainband longer than the protocol tolerates, discovered only in mixed-signal simulation',
+      'Clock domain crossings between the sideband, the Adapter and the PHY word clock left to lint instead of designed, so CDC waivers pile up at freeze',
+      'Low-power entry and exit sequenced differently in RTL and in the power intent, so the gate-level design and the RTL disagree on what is powered',
+      'Raw mode treated as a bypass rather than a mode, so continuous transmission breaks the first time retry logic is clock-gated',
+    ],
+    leader: { name: 'Priya Natarajan', short: 'P. Natarajan', phone: '+1 (408) 555-0611', email: 'priya.natarajan@example.com' },
+    collaboration: ['IP architecture', 'Design verification', 'Analog and mixed-signal', 'DFT', 'Physical design', 'Customer engineering'],
+    tools: ['RTL simulator and waveform debugger', 'Lint and structural checking', 'Clock and reset domain crossing analysis', 'Register map generator', 'Power intent checker', 'Revision control and continuous integration'],
+    programView: [
+      'Blocks at code-complete against the RTL plan',
+      'Open lint, CDC and RDC violations and waivers',
+      'Register map changes since the last customer drop',
+      'Training states implemented and passing directed tests',
+    ],
+    perspective:
+      'A die-to-die PHY’s digital logic is small next to an SoC, but every customer integrates it and nobody can patch it in their silicon. Freeze it once, with the register map and the FDI behavior written down, and treat every change after v0.5 as a change to somebody else’s chip.',
+  },
+  steps: {
+    'URTL-01': {
+      s: [
+        [1, 'Set RTL coding, reset, clocking and naming guidelines for every block of the IP', 1],
+        [2, 'Write block specifications for the Adapter, Logical PHY, sideband controller and power control from the frozen architecture', 2],
+        [3, 'Define the register map — capability, control, status, error log and debug registers — with access rules from FDI and sideband', 1.5, 1],
+        [4, 'Generate register RTL, headers and documentation views from one register source', 1],
+        [5, 'Review guidelines, specifications and register map with verification, DFT and customer engineering', 1],
+      ],
+      o: [
+        'RTL coding, reset and clocking guidelines',
+        'Block specifications for every digital block',
+        'Register map with access rules',
+        'Generated register RTL, headers and documentation views',
+        'RTL coding guidelines, block specifications and register map',
+      ],
+      r: [['URTL-D1', 'produces'], ['URTL-D10', 'feeds']],
+    },
+    'URTL-02': {
+      s: [
+        [1, 'Implement CRC generation on transmitted Flits and CRC checking on received Flits at the Adapter word width', 4],
+        [2, 'Implement the retry buffer and replay control sized to the worst-case round trip through the PHY and package channel', 5],
+        [3, 'Implement arbitration and multiplexing between protocol stacks and the Adapter’s own messages', 3, 1],
+        [4, 'Implement Adapter link state handling and its handshakes with the Logical PHY over the RDI', 4],
+        [5, 'Implement error detection, logging and escalation to the register map', 3],
+        [6, 'Pass block-level directed tests for CRC, replay and arbitration', 2],
+      ],
+      o: [
+        'CRC generator and checker RTL',
+        'Retry buffer and replay control RTL',
+        'Arbitration and multiplexing RTL',
+        'Adapter link state and RDI handshake RTL',
+        'Error detection and logging RTL',
+        'D2D Adapter RTL — CRC generation and checking, retry buffer and arbitration',
+      ],
+      r: [['URTL-D2', 'produces'], ['URTL-D10', 'feeds']],
+    },
+    'URTL-03': {
+      s: [
+        [1, 'Implement Flit packing and unpacking for each Flit format the requirements select', 5],
+        [2, 'Implement Raw mode as a first-class mode, including continuous transmission without Adapter framing', 4],
+        [3, 'Implement Streaming mode for a user-defined protocol over the Adapter', 3, 1],
+        [4, 'Implement the FDI — data, valid and flow control, state and sideband handshakes — at the documented clock ratio', 5],
+        [5, 'Pass directed tests for each mode across the FDI with a protocol stub', 3],
+      ],
+      o: [
+        'Flit packing and unpacking RTL per format',
+        'Raw mode datapath with continuous transmission',
+        'Streaming mode datapath',
+        'FDI implementation at its documented clock ratio',
+        'Flit, Raw and Streaming mode datapath RTL with the FDI',
+      ],
+      r: [['URTL-D3', 'produces'], ['URTL-D10', 'feeds']],
+    },
+    'URTL-04': {
+      s: [
+        [1, 'Implement the transmit and receive datapath at the PHY word width that carries 64 GT/s at a feasible digital clock', 5],
+        [2, 'Implement lane mapping for the x64 module, the redundant lanes and both module orientations', 4],
+        [3, 'Implement scrambling and descrambling with the seeds and resets the specification defines', 3, 1],
+        [4, 'Implement per-lane deskew and word alignment against the forwarded clock and the valid signal', 5],
+        [5, 'Implement the digital side of the interface to the analog front-end, including per-lane control and status', 3],
+        [6, 'Pass directed tests for mapping, scrambling and deskew with lane-to-lane skew injected', 2],
+      ],
+      o: [
+        'Transmit and receive word datapath',
+        'Lane mapping RTL with redundant lanes and both orientations',
+        'Scrambler and descrambler RTL',
+        'Deskew and word alignment RTL',
+        'Analog front-end control and status interface RTL',
+        'Logical PHY datapath RTL — lane mapping, scrambling and deskew',
+      ],
+      r: [['URTL-D4', 'produces'], ['URTL-D10', 'feeds']],
+    },
+    'URTL-05': {
+      s: [
+        [1, 'Implement SBINIT and the sideband message exchange that starts training', 3],
+        [2, 'Implement MBINIT — parameter exchange, clock and lane checks, repair and reversal detection', 5],
+        [3, 'Implement MBTRAIN — voltage and timing centering steps, speed negotiation and degrade to a lower speed or width', 6],
+        [4, 'Implement LINKINIT, ACTIVE, PHYRETRAIN and TRAINERROR with every timeout and exit condition', 4],
+        [5, 'Wire the training steps to the analog calibration hooks and margin readouts', 3, 1],
+        [6, 'Publish state, timeout and transition tables and pass directed training tests against a behavioral front-end', 2],
+      ],
+      o: [
+        'SBINIT and sideband training exchange RTL',
+        'MBINIT RTL with repair and reversal detection',
+        'MBTRAIN RTL with centering, speed negotiation and degrade',
+        'LINKINIT, ACTIVE, PHYRETRAIN and TRAINERROR RTL',
+        'Training-to-analog calibration hook connections',
+        'Link training state machine RTL with state, timeout and transition tables',
+      ],
+      r: [['URTL-D5', 'produces'], ['URTL-D10', 'feeds']],
+    },
+    'URTL-06': {
+      s: [
+        [1, 'Implement lane repair — failed-lane detection results applied to the redundant lanes for data, clock, valid and track', 5],
+        [2, 'Implement lane reversal so a reversed module maps correctly, including with repaired lanes', 4],
+        [3, 'Implement runtime recalibration — trigger, scheduling against traffic and the parameter update path to the front-end', 6],
+        [4, 'Expose repair maps, reversal state and recalibration results in the register map', 2, 1],
+        [5, 'Pass directed tests for repair, reversal and recalibration, alone and combined', 3],
+      ],
+      o: [
+        'Lane repair RTL for data, clock, valid and track',
+        'Lane reversal RTL combined with repair',
+        'Runtime recalibration RTL with traffic scheduling',
+        'Repair, reversal and recalibration status registers',
+        'Lane repair, lane reversal and runtime recalibration RTL',
+      ],
+      r: [['URTL-D6', 'produces'], ['URTL-D10', 'feeds']],
+    },
+    'URTL-07': {
+      s: [
+        [1, 'Implement the sideband transmitter, receiver and message framing', 4],
+        [2, 'Implement register access over the sideband, local and remote', 4],
+        [3, 'Implement manageability, early firmware download and priority sideband packets', 5],
+        [4, 'Implement the redundant sideband path and its selection', 2, 1],
+        [5, 'Pass directed tests for message ordering, priority and remote register access', 3],
+      ],
+      o: [
+        'Sideband transmitter, receiver and framing RTL',
+        'Local and remote register access RTL',
+        'Manageability, firmware download and priority packet RTL',
+        'Redundant sideband selection RTL',
+        'Sideband controller and manageability RTL',
+      ],
+      r: [['URTL-D7', 'produces'], ['URTL-D10', 'feeds']],
+    },
+    'URTL-08': {
+      s: [
+        [1, 'Implement the L1 and L2 entry and exit handshakes between Adapter, Logical PHY and the front-end', 5],
+        [2, 'Implement clock gating and power-domain isolation control for each state', 4],
+        [3, 'Write the power intent that matches the RTL’s power states and isolation', 3, 1],
+        [4, 'Measure entry and exit latency in simulation against the requirement', 2],
+        [5, 'Pass directed tests for every entry, exit and abort path', 2],
+      ],
+      o: [
+        'L1 and L2 entry and exit RTL',
+        'Clock gating and isolation control RTL',
+        'Power intent matching the RTL',
+        'Simulated entry and exit latency',
+        'Low-power state control RTL with power intent',
+      ],
+      r: [['URTL-D8', 'produces'], ['URTL-D10', 'feeds']],
+    },
+    'URTL-09': {
+      s: [
+        [1, 'Run lint on every block and drive violations to zero or reviewed waivers', 4],
+        [2, 'Run CDC analysis across sideband, Adapter, PHY word and front-end clock domains and fix unsynchronized crossings', 5],
+        [3, 'Run RDC analysis on every reset domain and fix reset sequencing issues', 3, 1],
+        [4, 'Check the RTL against the power intent and resolve mismatches', 2],
+        [5, 'Review and sign the waiver list with verification and physical design', 2],
+      ],
+      o: [
+        'Clean lint report with waivers',
+        'Clean CDC report',
+        'Clean RDC report',
+        'Power intent consistency report',
+        'Lint, CDC and RDC clean reports with reviewed waivers',
+      ],
+      r: [['URTL-D9', 'produces'], ['URTL-D10', 'feeds']],
+    },
+    'URTL-10': {
+      s: [
+        [1, 'Check every block against its specification and the requirements traceability matrix', 1],
+        [2, 'Review verification status, open bugs and their risk to the frozen RTL', 1],
+        [3, 'Confirm lint, CDC and RDC are clean and the register map is final for v0.5', 1, 1],
+        [4, 'Hold the RTL freeze review, tag the database and record the decision', 1],
+      ],
+      o: [
+        'Specification and traceability check',
+        'Verification status and open bug risk assessment',
+        'Confirmed clean checks and final register map',
+        'RTL freeze package and freeze decision record',
+      ],
+      r: [['URTL-D10', 'produces']],
+    },
+  },
+};

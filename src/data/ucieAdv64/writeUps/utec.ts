@@ -1,0 +1,401 @@
+/**
+ * UTEC — Process & Package Technology, written up.
+ */
+import type { UcieWriteUps } from '../types';
+
+export const UTEC_WRITE_UPS: UcieWriteUps = {
+  'UTEC-01': {
+    criticalPath: true,
+    purpose: [
+      'Choose the <b>process node and metal stack</b> the PHY is designed on: a node whose transistors can drive and sample 64 GT/s with margin, and a stack that suits both the macro’s own routing and bump layer and the stacks customers will integrate it into.',
+      'For an IP program the stack matters as much as the node. A hard macro drawn on a stack no customer uses has to be re-laid out for each of them, so the selection weighs customer adoption beside raw device speed.',
+    ],
+    flowNote:
+      'Step 1 short-lists nodes on speed, while step 2 compares metal stacks in parallel. Step 3 checks device and passive availability, step 4 weighs the options and step 5 issues the selection memo.',
+    consumes: [
+      'Electrical PHY requirements from UREQ-08',
+      'PPA targets from UREQ-02',
+      'Customer integration requirements, including metal stacks, from UREQ-04',
+      'IP roadmap position from UCON-04',
+      'Foundry process roadmaps and device offerings',
+    ],
+    rel: {
+      'UTEC-D1': '<b>Process node and metal stack selection memo.</b> Produced here; every circuit, library and flow decision that follows is made on this node and stack.',
+      'UTEC-D6': '<b>Technology risk register and technology selection decision record.</b> The node and stack choice and its open risks enter the selection review.',
+    },
+    risks: [
+      '<b>Speed without margin.</b> The node meets 64 GT/s only at the typical corner and the slow corner closes nothing.',
+      '<b>Stack mismatch.</b> The chosen stack differs from customer stacks and each customer needs a new layout.',
+      '<b>Missing devices.</b> A precision resistor or thick-oxide device the ESD and bias circuits need is not offered.',
+      '<b>Late roadmap change.</b> The node’s planned stack options change after the selection.',
+      '<b>Cost blind spot.</b> The node is chosen on performance alone and the test chip budget cannot afford it.',
+    ],
+    roles: [
+      { r: 'Technology and foundry', d: 'Owns the node and stack selection' },
+      { r: 'Analog and mixed-signal lead', d: 'Device speed and passive requirements' },
+      { r: 'Physical design lead', d: 'Routing layers and digital density' },
+      { r: 'Customer engineering lead', d: 'Customer stack and node plans' },
+      { r: 'Product manager', d: 'Approves the trade-off against adoption' },
+    ],
+    effort: [
+      ['Node survey', 1],
+      ['Metal stack comparison', 1],
+      ['Device availability check', 0.5],
+      ['Trade-off and memo', 1.5],
+    ],
+    entry: [
+      'Electrical PHY requirements drafted in UREQ-08',
+      'Customer integration requirements drafted in UREQ-04',
+      'Foundry roadmaps and device lists received',
+    ],
+    exit: [
+      'One node and one primary metal stack selected, with any alternative customer stacks listed',
+      'Every device the circuit architecture needs confirmed as offered on the node',
+      'Selection memo approved by circuit, physical design and product leads',
+    ],
+    dependsOn: ['UREQ-08', 'UREQ-04'],
+    dependsNote: null,
+    feedsInto: ['UTEC-02', 'UTEC-05', 'UTEC-06'],
+    measuredBy: [
+      'Simulated speed margin of reference circuits at the slow corner',
+      'Share of target customers whose stack is supported',
+      'Open device availability questions',
+    ],
+    links: {
+      dependsOn: ['UREQ-08', 'UREQ-02', 'UREQ-04', 'UCON-04'],
+      feedsInto: ['UTEC-02', 'UTEC-05', 'UTEC-06', 'UFND-01', 'UFND-02'],
+      runsWith: ['UTEC-03'],
+      revisedBy: [],
+      feedsBackInto: [],
+    },
+    terms: ['PDK', 'BEOL', 'Metal stack'],
+  },
+  'UTEC-02': {
+    criticalPath: true,
+    purpose: [
+      'Judge whether the <b>PDK and its device models are mature enough</b> to design 64 GT/s circuits against: high-frequency model accuracy, corner coverage and the aging, self-heating and electromigration models reliability signoff will need.',
+      'An early PDK is the norm on a new node, and the danger is not immaturity itself but not knowing where it is immature. Running a small set of reference circuits across corners exposes the gaps early enough to plan margin or wait for the next model release.',
+    ],
+    flowNote:
+      'Step 1 reviews the release level. Step 2 checks high-frequency device accuracy while step 3 checks reliability models in parallel. Step 4 runs reference circuits and step 5 releases the report.',
+    consumes: [
+      'Process node and metal stack selection from UTEC-01',
+      'Electrical PHY requirements from UREQ-08',
+      'PDK release notes and the planned model update schedule',
+      'Reference circuit set prepared by the circuit team',
+      'Reliability model needs from the reliability team',
+    ],
+    rel: {
+      'UTEC-D2': '<b>PDK maturity assessment and device model readiness report for 64 GT/s circuits.</b> Produced here; circuit design plans its margins on the gaps it lists.',
+      'UTEC-D6': '<b>Technology risk register and technology selection decision record.</b> Model gaps become scored technology risks.',
+    },
+    risks: [
+      '<b>Optimistic parasitics.</b> Models under-predict capacitance and circuits close in simulation but not on silicon.',
+      '<b>Corner holes.</b> Corners customers will run are not modeled at all.',
+      '<b>No aging model.</b> Reliability signoff later runs on estimates.',
+      '<b>Model churn.</b> A new model release mid-design moves results the team has already closed.',
+      '<b>Unowned gaps.</b> Gaps are listed but no one tracks them to the next PDK release.',
+    ],
+    roles: [
+      { r: 'Technology and foundry', d: 'Owns the PDK maturity assessment' },
+      { r: 'Analog design engineer', d: 'Runs the reference circuits' },
+      { r: 'Reliability engineer', d: 'Checks aging and electromigration models' },
+      { r: 'Design methodology engineer', d: 'Confirms the PDK installs cleanly in the flows' },
+      { r: 'Analog and mixed-signal lead', d: 'Accepts the margin plan for the gaps' },
+    ],
+    effort: [
+      ['PDK release review', 0.5],
+      ['High-frequency model checks', 1],
+      ['Reliability model checks', 0.5],
+      ['Reference circuit runs', 1],
+    ],
+    entry: [
+      'Node selected in UTEC-01',
+      'Latest PDK release installed',
+      'Reference circuit set agreed with the circuit team',
+    ],
+    exit: [
+      'Reference circuits simulated at every corner the PHY will be signed off at',
+      'Every model gap listed with an owner and the release expected to close it',
+      'Margin plan for open gaps agreed with the circuit lead',
+    ],
+    dependsOn: ['UTEC-01'],
+    dependsNote: null,
+    feedsInto: ['UTEC-06', 'UFND-04'],
+    measuredBy: [
+      'Model gaps open and their target release',
+      'Reference circuit delay spread across corners',
+      'Reliability models available against those signoff needs',
+    ],
+    links: {
+      dependsOn: ['UTEC-01', 'UREQ-08'],
+      feedsInto: ['UTEC-06', 'UFND-04', 'UAFE-01'],
+      runsWith: [],
+      revisedBy: [],
+      feedsBackInto: [],
+    },
+    terms: ['PDK', 'PVT', 'Device model'],
+  },
+  'UTEC-03': {
+    criticalPath: true,
+    purpose: [
+      'Agree which <b>UCIe Advanced package technologies</b> the macro supports — silicon bridge, silicon interposer, RDL interposer — and the <b>bump pitch range</b> it is designed for within the Advanced package range of roughly 25 to 55 micrometers, with a reference pitch for the test vehicle.',
+      'Bump pitch sets how many lanes fit on each millimeter of die edge, and so the shoreline bandwidth customers compare. A finer pitch buys density but narrows the packages and assembly lines that can build it; the agreement is the trade the whole IP will be sold on.',
+    ],
+    flowNote:
+      'Step 1 maps package types to pitch and routing density and step 2 estimates shoreline bandwidth. Step 3 agrees the pitch range and reference pitch while step 4 checks assembly yield data in parallel. Step 5 releases the agreement.',
+    consumes: [
+      'Supported package technologies and bump pitch range from UREQ-03',
+      'Shoreline bandwidth and energy targets from UREQ-02',
+      'Package partner capability roadmaps',
+      'Microbump and assembly yield data from package partners',
+      'Customer package plans gathered by product management',
+    ],
+    rel: {
+      'UTEC-D3': '<b>Package technology and bump pitch agreement — bridge, interposer and RDL options.</b> Produced here; the bump map concept and the channel specification are drawn to it.',
+      'UTEC-D6': '<b>Technology risk register and technology selection decision record.</b> Pitch and package risks enter the selection review.',
+    },
+    risks: [
+      '<b>Pitch too fine.</b> The chosen pitch is available from one assembly line only.',
+      '<b>Pitch too coarse.</b> Shoreline bandwidth falls short of what competing IP offers.',
+      '<b>RDL loss unknown.</b> RDL interposer support is promised before its loss at 64 GT/s is known.',
+      '<b>Yield blind spot.</b> Microbump yield at the pitch is assumed rather than measured.',
+      '<b>Reference mismatch.</b> The test vehicle pitch differs from what most customers will build.',
+    ],
+    roles: [
+      { r: 'Packaging', d: 'Owns the package technology and pitch agreement' },
+      { r: 'SI/PI engineer', d: 'Routing density and loss per package type' },
+      { r: 'IP architect', d: 'Shoreline bandwidth and module count' },
+      { r: 'Package partner liaison', d: 'Partner capability and yield data' },
+      { r: 'Product manager', d: 'Approves the supported package list' },
+    ],
+    effort: [
+      ['Package type mapping', 1],
+      ['Shoreline estimates', 1],
+      ['Pitch agreement', 1],
+      ['Assembly yield check', 0.5],
+      ['Release', 0.5],
+    ],
+    entry: [
+      'Package technologies and pitch range drafted in UREQ-03',
+      'Package partners engaged under agreement',
+      'Shoreline targets drafted in UREQ-02',
+    ],
+    exit: [
+      'Supported package types and bump pitch range agreed and signed by packaging and product management',
+      'Reference pitch for the test vehicle chosen',
+      'Assembly yield data on file for each supported pitch',
+    ],
+    dependsOn: ['UREQ-03', 'UREQ-02'],
+    dependsNote: null,
+    feedsInto: ['UTEC-04', 'UTEC-06', 'UCHN-01', 'UARC-09'],
+    measuredBy: [
+      'Shoreline bandwidth per millimeter at the reference pitch',
+      'Number of assembly lines able to build each supported pitch',
+      'Package types supported against the customer list',
+    ],
+    links: {
+      dependsOn: ['UREQ-03', 'UREQ-02'],
+      feedsInto: ['UTEC-04', 'UTEC-06', 'UCHN-01', 'UARC-09'],
+      runsWith: ['UTEC-01'],
+      revisedBy: [],
+      feedsBackInto: [],
+    },
+    terms: ['Bump pitch', 'Silicon bridge', 'Silicon interposer', 'RDL interposer', 'Shoreline', 'UCIe-A'],
+  },
+  'UTEC-04': {
+    criticalPath: false,
+    purpose: [
+      'Collect each package partner’s <b>design rules and assembly constraints</b> — line width and spacing, layer count, via structures, die thickness, keep-outs, underfill flow, warpage — and translate them into constraints on the macro’s bump map and die edge.',
+      'The macro is drawn once and assembled by several partners. Rules that differ between them have to be met by the macro on its most restrictive partner, or customers inherit an assembly problem that no one designed for.',
+    ],
+    flowNote:
+      'Step 1 collects design rules while step 2 collects assembly constraints in parallel. Step 3 translates them into macro constraints, step 4 reviews them and step 5 releases the rule set.',
+    consumes: [
+      'Package technology and bump pitch agreement from UTEC-03',
+      'Package partner design rule manuals',
+      'Assembly constraints from each package partner',
+      'Macro floorplan intent from the architecture team',
+      'Draft channel limits from the SI/PI team',
+    ],
+    rel: {
+      'UTEC-D4': '<b>Package partner design rule set and assembly constraint summary.</b> Produced here; the bump and routing rules are derived from it.',
+      'UTEC-D6': '<b>Technology risk register and technology selection decision record.</b> Rule conflicts between partners enter the risk register.',
+    },
+    risks: [
+      '<b>Draft rules.</b> Rules are collected at draft revision and change after the bump map is drawn.',
+      '<b>Most-restrictive missed.</b> The macro meets one partner’s rules and violates another’s.',
+      '<b>Warpage ignored.</b> Die thickness and warpage limits are not carried into the die edge keep-outs.',
+      '<b>Underfill flow.</b> Bump density at the die edge blocks underfill flow on one partner’s process.',
+      '<b>Open questions linger.</b> Questions to partners stay unanswered into layout.',
+    ],
+    roles: [
+      { r: 'Packaging', d: 'Owns the rule set and constraint summary' },
+      { r: 'Package partner liaison', d: 'Obtains rules and answers' },
+      { r: 'SI/PI engineer', d: 'Checks rules against channel needs' },
+      { r: 'Analog layout lead', d: 'Checks constraints against the macro edge' },
+      { r: 'Packaging lead', d: 'Approves the constraint summary' },
+    ],
+    effort: [
+      ['Rule collection', 1],
+      ['Assembly constraints', 0.5],
+      ['Translation to macro constraints', 1],
+      ['Review and release', 0.5],
+    ],
+    entry: [
+      'Package types and pitch agreed in UTEC-03',
+      'Partner rule manuals received',
+      'Macro floorplan intent available',
+    ],
+    exit: [
+      'Rules collected from every supported partner at a stated revision',
+      'Macro bump map and die edge constraints written for the most restrictive partner',
+      'Every open question logged with the partner and a due date',
+    ],
+    dependsOn: ['UTEC-03'],
+    dependsNote: null,
+    feedsInto: ['UTEC-06', 'UCHN-02'],
+    measuredBy: [
+      'Partners with rules collected at a stated revision',
+      'Open partner questions',
+      'Rule conflicts between partners resolved',
+    ],
+    links: {
+      dependsOn: ['UTEC-03'],
+      feedsInto: ['UTEC-06', 'UCHN-02'],
+      runsWith: [],
+      revisedBy: [],
+      feedsBackInto: [],
+    },
+    terms: ['Microbump', 'Bump map', 'Package design rules'],
+  },
+  'UTEC-05': {
+    criticalPath: false,
+    purpose: [
+      'Reserve the <b>shuttle or dedicated run</b> the test chip goes on, sized for the two-die test vehicle, loopback parts and reliability lots, at a tapeout date the hard macro signoff plan can actually meet.',
+      'Shuttle dates are fixed by the foundry, not the program. Reserving early with a fallback date is what keeps a late signoff from turning into a three-month wait for the next run.',
+    ],
+    flowNote:
+      'Step 1 surveys run options and step 2 sizes the test chip. Step 3 aligns the date with signoff and reserves a slot with a fallback, and step 4 releases the plan.',
+    consumes: [
+      'Process node selection from UTEC-01',
+      'Program plan and test chip budget from UCON-05',
+      'Foundry shuttle calendars',
+      'Test chip area estimate from the architecture team',
+      'Reliability lot needs from the reliability team',
+    ],
+    rel: {
+      'UTEC-D5': '<b>Test chip shuttle and fab slot reservation plan.</b> Produced here; the tapeout date the program works back from.',
+      'UTEC-D6': '<b>Technology risk register and technology selection decision record.</b> Slot and date risks enter the selection review.',
+    },
+    risks: [
+      '<b>Date before plan.</b> The slot is booked before the signoff plan is credible.',
+      '<b>No fallback.</b> A missed shuttle has no reserved next run.',
+      '<b>Undersized.</b> The die area booked cannot hold two PHY instances and their test logic.',
+      '<b>Too few parts.</b> Wafer count does not cover characterization, compliance and reliability lots.',
+      '<b>Corner splits forgotten.</b> No process split is requested and characterization lacks corner material.',
+    ],
+    roles: [
+      { r: 'Technology and foundry', d: 'Owns the slot reservation' },
+      { r: 'Test chip integration lead', d: 'Test chip area and die count' },
+      { r: 'Reliability engineer', d: 'Parts needed for qualification' },
+      { r: 'Program manager', d: 'Aligns the date with the signoff plan' },
+      { r: 'Validation lead', d: 'Parts needed for bring-up and characterization' },
+    ],
+    effort: [
+      ['Run option survey', 0.5],
+      ['Test chip sizing', 0.5],
+      ['Slot reservation', 0.5],
+    ],
+    entry: [
+      'Node selected in UTEC-01',
+      'Program plan approved in UCON-05',
+      'Shuttle calendar received from the foundry',
+    ],
+    exit: [
+      'Primary slot reserved and a fallback run identified',
+      'Die area and wafer count cover bring-up, characterization, compliance and reliability',
+      'Tapeout date agreed with the program plan',
+    ],
+    dependsOn: ['UTEC-01'],
+    dependsNote: null,
+    feedsInto: ['UTEC-06', 'UTCI-01', 'UTPO-03'],
+    measuredBy: [
+      'Weeks of margin between planned signoff and the slot',
+      'Parts planned against parts needed',
+      'Fallback run date',
+    ],
+    links: {
+      dependsOn: ['UTEC-01', 'UCON-05'],
+      feedsInto: ['UTEC-06', 'UTCI-01', 'UTPO-03'],
+      runsWith: [],
+      revisedBy: [],
+      feedsBackInto: [],
+    },
+    terms: ['MPW', 'Test chip', 'Shuttle'],
+  },
+  'UTEC-06': {
+    criticalPath: true,
+    purpose: [
+      'Bring the process, PDK, package and fab slot findings into one <b>technology risk register</b> and hold the <b>technology selection review</b> that records each choice with its open risks.',
+      'The architecture freeze is built on these choices. A decision recorded with its risks and owners can be revisited deliberately; one that only exists in meeting notes gets re-argued every time a circuit misses its target.',
+    ],
+    flowNote:
+      'Step 1 consolidates the findings and step 2 scores the risks. Step 3 holds the review and step 4 releases the decision record.',
+    consumes: [
+      'Process node and metal stack selection from UTEC-01',
+      'PDK and model readiness report from UTEC-02',
+      'Package technology and bump pitch agreement from UTEC-03',
+      'Package partner rules and constraints from UTEC-04',
+      'Shuttle and fab slot plan from UTEC-05',
+    ],
+    rel: {
+      'UTEC-D6': '<b>Technology risk register and technology selection decision record.</b> Produced here; closes the Technology Selected gate.',
+    },
+    risks: [
+      '<b>Risks unscored.</b> The register lists risks without likelihood and impact, so nothing is prioritized.',
+      '<b>Decision without owners.</b> Open risks have no owner or date.',
+      '<b>Selection reopened.</b> The review closes without the leads’ sign-off and choices are reopened later.',
+      '<b>Customer view missing.</b> Product management is absent and adoption risks are not weighed.',
+      '<b>Slot treated as fixed.</b> The review does not ask whether the slot still fits the plan.',
+    ],
+    roles: [
+      { r: 'Technology and foundry', d: 'Owns the risk register and runs the review' },
+      { r: 'Analog and mixed-signal lead', d: 'Circuit risk view' },
+      { r: 'Packaging lead', d: 'Package risk view' },
+      { r: 'Program manager', d: 'Schedule risk view' },
+      { r: 'Product manager', d: 'Approves the selection' },
+    ],
+    effort: [
+      ['Risk register', 0.5],
+      ['Risk scoring', 0.5],
+      ['Review and decision', 0.5],
+    ],
+    entry: [
+      'Selection memos from UTEC-01 to UTEC-05 released',
+      'Risk owners identified',
+      'Reviewers available',
+    ],
+    exit: [
+      'Every technology choice recorded with its alternatives considered',
+      'Every open risk scored and assigned an owner and date',
+      'Selection signed by circuit, packaging, program and product leads',
+    ],
+    dependsOn: ['UTEC-01', 'UTEC-02', 'UTEC-03', 'UTEC-04', 'UTEC-05'],
+    dependsNote: null,
+    feedsInto: ['UFND-07', 'UARC-12'],
+    measuredBy: [
+      'Open high-severity technology risks',
+      'Choices signed against choices planned',
+      'Review date against plan',
+    ],
+    links: {
+      dependsOn: ['UTEC-01', 'UTEC-02', 'UTEC-03', 'UTEC-04', 'UTEC-05'],
+      feedsInto: ['UFND-07', 'UARC-12'],
+      runsWith: [],
+      revisedBy: [],
+      feedsBackInto: [],
+    },
+    terms: ['PDK', 'MPW'],
+  },
+};

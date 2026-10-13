@@ -1,0 +1,402 @@
+/**
+ * URLQ — Reliability & Silicon-Proven, written up.
+ */
+import type { UcieWriteUps } from '../types';
+
+export const URLQ_WRITE_UPS: UcieWriteUps = {
+  'URLQ-01': {
+    criticalPath: false,
+    purpose: [
+      'Write the <b>reliability qualification plan</b>: stress legs, conditions and durations from the reliability targets and the aging analysis done at signoff, sample sizes per leg, units selected with their lane repair state known, read points that re-measure margin and BER, and stress boards and chambers confirmed.',
+      'Reliability stress is long and starts the moment units are available, so its plan cannot wait for bring-up to finish. Reading back margin rather than pass or fail is the choice that makes the results useful to licensees who will carry them into their own qualification.',
+    ],
+    flowNote:
+      'Step 1 sets stress legs and durations and step 2 sample sizes and units, with read points defined in parallel in step 3. Step 4 confirms boards and chambers and releases the plan.',
+    consumes: [
+      'Aging and reliability verification from USGN-05',
+      'ESD and latch-up verification from USGN-04',
+      'Electrical PHY ESD targets and operating range from UREQ-08',
+      'Power-on record and rail currents from UBUP-01',
+      'Assembled test vehicles from UFAB-03',
+    ],
+    rel: {
+      'URLQ-D1': '<b>Reliability qualification plan with stress conditions, sample sizes and read points.</b> Produced here; every stress leg runs from it.',
+      'URLQ-D5': '<b>Reliability report.</b> The report states coverage against this plan.',
+    },
+    risks: [
+      '<b>Plan after silicon.</b> The plan is written after units arrive and stress starts late.',
+      '<b>Pass or fail read points.</b> Read points record function only and miss margin drift.',
+      '<b>Unknown repair state.</b> Units with repaired lanes enter stress without being identified.',
+      '<b>Samples too small.</b> Sample sizes cannot support any lifetime statement.',
+      '<b>Targets misaligned.</b> Stress conditions differ from the targets the release will claim.',
+    ],
+    roles: [
+      { r: 'Reliability', d: 'Owns the reliability qualification plan' },
+      { r: 'Analog and mixed-signal designer', d: 'Aging mechanisms and ESD structures' },
+      { r: 'Validation engineer', d: 'Read-point measurements' },
+      { r: 'Quality engineer', d: 'Sample sizes and acceptance' },
+      { r: 'Reliability manager', d: 'Approves the plan' },
+    ],
+    effort: [
+      ['Stress legs and conditions', 0.5],
+      ['Sample sizes and units', 0.5],
+      ['Read point definitions', 0.25],
+      ['Boards, chambers and release', 0.25],
+    ],
+    entry: [
+      'Aging and ESD verification results from signoff available',
+      'Reliability targets baselined in the requirements',
+      'Assembled units identified with their sort and repair data',
+    ],
+    exit: [
+      'Every stress leg defined with its condition, duration, sample size and read points',
+      'Units selected for each leg with their lane repair state recorded',
+      'Stress boards and chambers confirmed available for the planned start dates',
+    ],
+    dependsOn: ['USGN-05', 'USGN-04', 'UREQ-08'],
+    dependsNote: null,
+    feedsInto: ['URLQ-02', 'URLQ-03', 'URLQ-04', 'URLQ-05'],
+    measuredBy: [
+      'Stress legs defined against targets',
+      'Units allocated per leg',
+      'Days from first samples to stress start',
+    ],
+    links: {
+      dependsOn: ['USGN-05', 'USGN-04', 'UREQ-08', 'UBUP-01', 'UFAB-03'],
+      feedsInto: ['URLQ-02', 'URLQ-03', 'URLQ-04', 'URLQ-05', 'URLQ-06'],
+      runsWith: [],
+      revisedBy: [],
+      feedsBackInto: [],
+    },
+    terms: ['HTOL', 'Read point', 'ESD', 'Latch-up'],
+  },
+  'URLQ-02': {
+    criticalPath: true,
+    purpose: [
+      'Run <b>high-temperature operating life stress with the link exercised at 64 GT/s</b>: time-zero margin and BER on every unit, stress at elevated temperature and voltage, per-lane margin and BER re-measured at each read point, and drift and failures analyzed into an acceleration and lifetime estimate.',
+      'A die-to-die PHY wears in its drivers, samplers and clock paths while it switches, so stressing it idle misses the mechanisms that matter. Reading margin at every read point turns a pass count into a drift curve a licensee can extrapolate.',
+    ],
+    flowNote:
+      'Step 1 records time-zero data. Step 2 runs the stress while step 3 re-measures at each read point in parallel. Step 4 analyzes drift and lifetime and step 5 releases the results.',
+    consumes: [
+      'Reliability qualification plan from URLQ-01',
+      'Unit allocation from the first link-up review in UBUP-06',
+      'Aging and reliability verification from USGN-05',
+      'ATE load board and test programs for read points from UTVP-04',
+      'Per-lane margin baseline method from UCHR-02',
+    ],
+    rel: {
+      'URLQ-D2': '<b>Operating life stress results with per-lane margin and BER read points.</b> Produced here; the lifetime statement in the release comes from it.',
+      'URLQ-D5': '<b>Reliability report.</b> Operating life results are the report’s largest section.',
+    },
+    risks: [
+      '<b>Idle stress.</b> The link is not exercised and switching-driven wear is missed.',
+      '<b>Read points slip.</b> Read points are skipped when the lab is busy and drift is under-sampled.',
+      '<b>Board failures counted.</b> Stress board faults are recorded as device failures.',
+      '<b>Drift ignored.</b> Margin drift inside the pass limit is not reported.',
+      '<b>Acceleration assumed.</b> Lifetime is extrapolated with an acceleration model not tied to the mechanisms seen.',
+    ],
+    roles: [
+      { r: 'Reliability', d: 'Owns operating life stress' },
+      { r: 'Validation engineer', d: 'Read-point margin and BER measurements' },
+      { r: 'Analog and mixed-signal designer', d: 'Drift mechanisms in the front-end' },
+      { r: 'Test engineering', d: 'Read-point test programs' },
+      { r: 'Reliability manager', d: 'Accepts the results' },
+    ],
+    effort: [
+      ['Time-zero measurements', 0.75],
+      ['Stress execution', 2.5],
+      ['Read-point measurements', 1.5],
+      ['Drift and lifetime analysis', 0.75],
+      ['Release', 0.5],
+    ],
+    entry: [
+      'Plan released in URLQ-01',
+      'Stress boards exercising the link at 64 GT/s proven on one unit',
+      'Time-zero method agreed with characterization',
+    ],
+    exit: [
+      'Planned stress hours completed on every unit of every leg',
+      'Per-lane margin and BER recorded at every read point',
+      'Drift and failures analyzed with the acceleration model and its basis stated',
+    ],
+    dependsOn: ['URLQ-01', 'UBUP-06', 'USGN-05'],
+    dependsNote: 'Stress starts as soon as the first link-up review allocates units, because its hours set the end of the stage.',
+    feedsInto: ['URLQ-05'],
+    measuredBy: [
+      'Stress hours completed',
+      'Units drifted beyond the planned threshold',
+      'Failures per leg',
+    ],
+    links: {
+      dependsOn: ['URLQ-01', 'UBUP-06', 'USGN-05', 'UTVP-04', 'UCHR-02'],
+      feedsInto: ['URLQ-05', 'URLQ-06'],
+      runsWith: ['URLQ-04'],
+      revisedBy: [],
+      feedsBackInto: [],
+    },
+    terms: ['HTOL', 'Read point', 'Acceleration factor', 'BER', 'Eye margin'],
+  },
+  'URLQ-03': {
+    criticalPath: false,
+    purpose: [
+      'Qualify <b>ESD and latch-up</b>: charged-device and contact ESD on every bump class of the PHY, latch-up on its supplies and I/O at the specified temperature, link function and leakage re-checked after each stress, and failures analyzed.',
+      'Fine-pitch die-to-die bumps carry far lighter ESD protection than package pins, because heavy protection would cost bandwidth. The levels the integration guide promises — and the handling assumptions behind them — have to be shown on silicon before licensees build them into their assembly flows.',
+    ],
+    flowNote:
+      'Step 1 tests ESD per bump class and step 2 latch-up, with function and leakage re-checked in parallel in step 3. Step 4 analyzes failures and releases the results.',
+    consumes: [
+      'Reliability qualification plan from URLQ-01',
+      'ESD and latch-up verification from USGN-04',
+      'ESD protection and bump interface design from UAFE-06',
+      'Known-good dies from wafer sort in UFAB-02',
+      'Electrical PHY ESD targets from UREQ-08',
+    ],
+    rel: {
+      'URLQ-D3': '<b>ESD and latch-up qualification results.</b> Produced here; the integration guide’s ESD statement is checked against it.',
+      'URLQ-D5': '<b>Reliability report.</b> ESD and latch-up results are a section of the report.',
+    },
+    risks: [
+      '<b>Wrong level tested.</b> ESD is tested at a level other than the one the integration guide states.',
+      '<b>Bump classes skipped.</b> Clock or sideband bumps are not tested separately from data.',
+      '<b>Function not re-checked.</b> Parts pass leakage after stress but the link no longer trains.',
+      '<b>Latch-up at room only.</b> Latch-up is tested cold and the specified temperature is skipped.',
+      '<b>Handling assumptions missing.</b> The assembly handling limits behind the ESD level are not stated.',
+    ],
+    roles: [
+      { r: 'Reliability', d: 'Owns ESD and latch-up qualification' },
+      { r: 'Analog and mixed-signal designer', d: 'ESD structures and failure analysis' },
+      { r: 'Validation engineer', d: 'Post-stress link function checks' },
+      { r: 'Customer engineering lead', d: 'ESD statement in the integration guide' },
+      { r: 'Reliability manager', d: 'Accepts the results' },
+    ],
+    effort: [
+      ['ESD per bump class', 1],
+      ['Latch-up', 0.75],
+      ['Post-stress checks', 0.5],
+      ['Analysis and release', 0.75],
+    ],
+    entry: [
+      'Plan released in URLQ-01',
+      'Units and dies for destructive testing allocated',
+      'ESD targets stated in the integration guide',
+    ],
+    exit: [
+      'Every PHY bump class tested at the stated ESD level with the result recorded',
+      'Latch-up tested at the specified temperature on every PHY supply and I/O',
+      'Link training and leakage re-checked after every stress',
+    ],
+    dependsOn: ['URLQ-01', 'USGN-04', 'UAFE-06'],
+    dependsNote: null,
+    feedsInto: ['URLQ-05'],
+    measuredBy: [
+      'Bump classes passed',
+      'Latch-up margin',
+      'Post-stress function failures',
+    ],
+    links: {
+      dependsOn: ['URLQ-01', 'USGN-04', 'UAFE-06', 'UFAB-02', 'UREQ-08'],
+      feedsInto: ['URLQ-05', 'UGA-03'],
+      runsWith: [],
+      revisedBy: [],
+      feedsBackInto: [],
+    },
+    terms: ['ESD', 'Latch-up', 'CDM', 'KGD'],
+  },
+  'URLQ-04': {
+    criticalPath: true,
+    purpose: [
+      'Run <b>temperature cycling and package-level reliability on the advanced-package test vehicle</b>: time-zero lane repair state and margins recorded, cycling run, the link retrained at each read point with newly repaired lanes and margin change logged, and failing or newly repaired bump sites cross-sectioned.',
+      'Fine-pitch bumps and the bridge or interposer under them are where an advanced package fails first. Because the PHY repairs around an open bump, a link that still trains proves little — counting repairs at every read point is what shows the package holding.',
+    ],
+    flowNote:
+      'Step 1 records time-zero repair state and margins. Step 2 runs cycling while step 3 retrains and logs repairs at each read point in parallel. Step 4 cross-sections affected sites and step 5 releases the results.',
+    consumes: [
+      'Reliability qualification plan from URLQ-01',
+      'Assembled advanced-package test vehicles from UFAB-03',
+      'Test vehicle package design from UTVP-01',
+      'Bump and routing design rules from UCHN-02',
+      'Lane repair state from mainband training in UBUP-03',
+    ],
+    rel: {
+      'URLQ-D4': '<b>Temperature cycling and package-level reliability results with lane repair tracking.</b> Produced here; the package reliability statement in the release comes from it.',
+      'URLQ-D5': '<b>Reliability report.</b> Package-level results are a section of the report.',
+    },
+    risks: [
+      '<b>Repair hides failure.</b> The link still trains after cycling and newly repaired lanes are not counted.',
+      '<b>No time-zero state.</b> Repairs present before stress are counted as stress failures.',
+      '<b>One package type.</b> Cycling on one technology is read as covering all supported packages.',
+      '<b>Cross-sections skipped.</b> Failures are not physically analyzed and the mechanism is unknown.',
+      '<b>Board joints fail first.</b> Board-level failures interrupt cycling of the package.',
+    ],
+    roles: [
+      { r: 'Reliability', d: 'Owns temperature cycling and package-level reliability' },
+      { r: 'Packaging engineer', d: 'Bump and bridge or interposer failure mechanisms' },
+      { r: 'Validation engineer', d: 'Retraining and repair logging at read points' },
+      { r: 'Failure analysis engineer', d: 'Cross-sections of bump sites' },
+      { r: 'Reliability manager', d: 'Accepts the results' },
+    ],
+    effort: [
+      ['Time-zero state', 0.75],
+      ['Cycling execution', 2],
+      ['Read-point retraining and repair logging', 1],
+      ['Cross-sections', 0.75],
+      ['Release', 0.5],
+    ],
+    entry: [
+      'Plan released in URLQ-01',
+      'Test vehicles assembled with time-zero repair state readable',
+      'Failure analysis capacity booked for cross-sections',
+    ],
+    exit: [
+      'Planned cycles completed on every unit with retraining at every read point',
+      'Newly repaired lanes per unit per read point recorded against time zero',
+      'Every failing or newly repaired bump site cross-sectioned and its mechanism stated',
+    ],
+    dependsOn: ['URLQ-01', 'UFAB-03', 'UTVP-01'],
+    dependsNote: null,
+    feedsInto: ['URLQ-05'],
+    measuredBy: [
+      'Cycles completed',
+      'Newly repaired lanes per unit',
+      'Bump failures by mechanism',
+    ],
+    links: {
+      dependsOn: ['URLQ-01', 'UFAB-03', 'UTVP-01', 'UCHN-02', 'UBUP-03'],
+      feedsInto: ['URLQ-05', 'URLQ-06', 'UGA-03'],
+      runsWith: ['URLQ-02'],
+      revisedBy: [],
+      feedsBackInto: ['UCHN-06'],
+    },
+    terms: ['Temperature cycling', 'Read point', 'Lane repair', 'Microbump', 'Silicon bridge', 'Silicon interposer'],
+  },
+  'URLQ-05': {
+    criticalPath: true,
+    purpose: [
+      'Write the <b>reliability report</b>: results collected by leg, unit and read point, a plain statement of what was stressed, for how long and on how many units, and what moved, reviewed with design and quality before release.',
+      'Licensees will copy this report’s numbers into their own qualification files. Stating coverage and drift as plainly as pass counts is what keeps the report from claiming more than the stress showed.',
+    ],
+    flowNote:
+      'Step 1 collects results. Step 2 states coverage and drift. Step 3 reviews the findings and releases the report.',
+    consumes: [
+      'Reliability qualification plan from URLQ-01',
+      'Operating life stress results from URLQ-02',
+      'ESD and latch-up results from URLQ-03',
+      'Temperature cycling and package-level results from URLQ-04',
+      'Aging analysis from signoff in USGN-05',
+    ],
+    rel: {
+      'URLQ-D5': '<b>Reliability report.</b> Produced here; it goes into the GA release and the silicon-proven decision.',
+      'URLQ-D6': '<b>Silicon-proven decision record.</b> The report is the reliability evidence the decision weighs.',
+    },
+    risks: [
+      '<b>Coverage overstated.</b> The report implies more units or hours than were run.',
+      '<b>Drift omitted.</b> Margin drift inside limits is left out of the summary.',
+      '<b>Mechanisms missing.</b> Failures are counted without their mechanism.',
+      '<b>Signoff not compared.</b> Aging predictions from signoff are never compared with stress results.',
+      '<b>Late report.</b> The report misses the GA rollup.',
+    ],
+    roles: [
+      { r: 'Reliability', d: 'Owns the reliability report' },
+      { r: 'Quality engineer', d: 'Review of coverage and acceptance' },
+      { r: 'Analog and mixed-signal lead', d: 'Review of front-end findings' },
+      { r: 'Packaging lead', d: 'Review of package findings' },
+      { r: 'Reliability manager', d: 'Approves the report' },
+    ],
+    effort: [
+      ['Results collection', 0.5],
+      ['Coverage and drift statements', 0.75],
+      ['Review and release', 0.75],
+    ],
+    entry: [
+      'Stress legs completed or at their final read point',
+      'Failure analysis complete on every failure',
+      'Signoff aging predictions available for comparison',
+    ],
+    exit: [
+      'Report states units, hours or cycles and read points for every stress leg',
+      'Every failure and drift beyond threshold listed with its mechanism',
+      'Report reviewed by design and quality and released',
+    ],
+    dependsOn: ['URLQ-01', 'URLQ-02', 'URLQ-03', 'URLQ-04'],
+    dependsNote: null,
+    feedsInto: ['URLQ-06'],
+    measuredBy: [
+      'Stress legs reported complete',
+      'Findings with a mechanism',
+      'Days from final read point to release',
+    ],
+    links: {
+      dependsOn: ['URLQ-01', 'URLQ-02', 'URLQ-03', 'URLQ-04', 'USGN-05'],
+      feedsInto: ['URLQ-06', 'UGA-03'],
+      runsWith: [],
+      revisedBy: [],
+      feedsBackInto: [],
+    },
+    terms: ['HTOL', 'FIT'],
+  },
+  'URLQ-06': {
+    criticalPath: true,
+    purpose: [
+      'Take the <b>silicon-proven decision</b>: the reliability report weighed with the characterization report and the compliance results, open findings reviewed with any conditions attached to the claim, and the decision recorded.',
+      'Silicon-proven is the claim licensees buy on, and the GA release rests on it. Making it once, on all three bodies of evidence and with its conditions written down, is what keeps it from being a marketing label applied at first link-up.',
+    ],
+    flowNote:
+      'Step 1 weighs reliability with characterization and compliance. Step 2 reviews open findings and conditions. Step 3 records the decision.',
+    consumes: [
+      'Reliability qualification plan from URLQ-01',
+      'Operating life, ESD and cycling results from URLQ-02, URLQ-03 and URLQ-04',
+      'Reliability report from URLQ-05',
+      'Characterization report from UCHR-10',
+      'Compliance results summary from UCMP-05',
+    ],
+    rel: {
+      'URLQ-D6': '<b>Silicon-proven decision record.</b> Produced here; it closes the Silicon-Proven gate the GA release depends on.',
+    },
+    risks: [
+      '<b>Claim on partial evidence.</b> Silicon-proven is declared before reliability completes.',
+      '<b>Conditions dropped.</b> Conditions on the claim are not carried into the release notes.',
+      '<b>Characterization ignored.</b> A missed target in characterization is not weighed in the decision.',
+      '<b>Compliance waivers unseen.</b> Waivers from compliance are not considered.',
+      '<b>No owner for findings.</b> Open findings have no owner after the decision.',
+    ],
+    roles: [
+      { r: 'Quality', d: 'Owns the silicon-proven decision' },
+      { r: 'Reliability manager', d: 'Presents the reliability evidence' },
+      { r: 'Validation lead', d: 'Presents the characterization evidence' },
+      { r: 'Compliance lead', d: 'Presents the compliance evidence' },
+      { r: 'Program manager', d: 'Approves the Silicon-Proven gate' },
+    ],
+    effort: [
+      ['Weighing the evidence', 0.5],
+      ['Findings and conditions review', 0.25],
+      ['Decision record', 0.25],
+    ],
+    entry: [
+      'Reliability report released in URLQ-05',
+      'Characterization report released in UCHR-10',
+      'Compliance results summary released in UCMP-05',
+    ],
+    exit: [
+      'Silicon-proven decision recorded against the reliability, characterization and compliance evidence',
+      'Every condition on the claim written for the GA release notes',
+      'Every open finding assigned an owner and a disposition',
+    ],
+    dependsOn: ['URLQ-01', 'URLQ-02', 'URLQ-03', 'URLQ-04', 'URLQ-05', 'UCHR-10', 'UCMP-05'],
+    dependsNote: null,
+    feedsInto: ['UGA-05'],
+    measuredBy: [
+      'Conditions attached to the claim',
+      'Open findings at the gate',
+      'Evidence items reviewed',
+    ],
+    links: {
+      dependsOn: ['URLQ-01', 'URLQ-02', 'URLQ-03', 'URLQ-04', 'URLQ-05', 'UCHR-10', 'UCMP-05'],
+      feedsInto: ['UGA-03', 'UGA-05'],
+      runsWith: [],
+      revisedBy: [],
+      feedsBackInto: [],
+    },
+    terms: ['GA', 'Compliance'],
+  },
+};

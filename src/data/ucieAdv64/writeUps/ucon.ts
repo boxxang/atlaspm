@@ -1,0 +1,402 @@
+/**
+ * UCON — IP Concept & Business Case, written up.
+ */
+import type { UcieWriteUps } from '../types';
+
+export const UCON_WRITE_UPS: UcieWriteUps = {
+  'UCON-01': {
+    criticalPath: true,
+    purpose: [
+      'Capture which customers need a <b>64 GT/s die-to-die PHY for advanced packages</b>, on which SoCs, chiplets, processes and package types, and what bandwidth density, energy per bit and latency would make them license it.',
+      'Die-to-die demand is easy to overstate: many teams are interested in UCIe, fewer have a package type, a process and a tapeout date committed. Recording the commitment behind each need is what lets the program choose a first process and package that real designs will use.',
+    ],
+    flowNote:
+      'Step 1 names the customers and their designs. Step 2 interviews them while step 3 maps their processes, packages and schedules in parallel. Step 4 ranks the needs and releases the brief.',
+    consumes: [
+      'Company IP strategy and product line plan',
+      'Account team pipeline of chiplet and multi-die SoC designs',
+      'Customer feedback on earlier die-to-die and SerDes IP',
+      'Industry roadmaps for advanced packaging and chiplet ecosystems',
+      'Lessons learned from previous interface IP programs',
+    ],
+    rel: {
+      'UCON-D1': '<b>Market and customer requirements brief.</b> Produced here; every requirement in UREQ traces back to a need ranked in it.',
+      'UCON-D3': '<b>IP business case.</b> The named opportunities and their timing are the revenue side of the case.',
+    },
+    risks: [
+      '<b>Interest counted as demand.</b> Customers interested in UCIe are counted without a design, process and package committed.',
+      '<b>Package type left open.</b> Needs are captured without saying whether the customer uses a bridge, a silicon interposer or an RDL interposer.',
+      '<b>Bandwidth without shoreline.</b> Customers give total bandwidth but not the die edge they can spare, so the density target is guessed.',
+      '<b>One lead customer.</b> The brief is shaped by one account whose package and process nobody else uses.',
+      '<b>Schedule mismatch.</b> Customer tapeout dates fall before the IP can reach v0.9, and the brief does not say so.',
+    ],
+    roles: [
+      { r: 'Product management', d: 'Owns the customer requirements brief and its ranking' },
+      { r: 'Customer engineering lead', d: 'Runs customer interviews and captures technical context' },
+      { r: 'IP architect', d: 'Translates needs into measurable PHY parameters' },
+      { r: 'Account manager', d: 'Access to lead customers and their schedules' },
+      { r: 'Program manager', d: 'Keeps the brief under change control after release' },
+    ],
+    effort: [
+      ['Customer and design identification', 0.5],
+      ['Customer interviews', 2],
+      ['Process, package and schedule mapping', 1],
+      ['Ranking and release', 0.5],
+    ],
+    entry: [
+      'Executive sponsor has asked for a die-to-die PHY assessment',
+      'Account team pipeline of multi-die designs available',
+      'At least three candidate lead customers identified',
+    ],
+    exit: [
+      'At least five customer designs recorded with process, package type and tapeout date',
+      'Each need ranked and quantified with a unit and target value',
+      'Brief released under version control and signed by product management',
+    ],
+    dependsOn: [],
+    dependsNote: 'The first activity of the program; its inputs are external.',
+    feedsInto: ['UCON-03', 'UCON-04', 'UCON-06', 'UREQ-01'],
+    measuredBy: [
+      'Customer designs captured with a committed package type',
+      'Needs quantified against needs captured',
+      'Days from kickoff to brief release',
+    ],
+    links: {
+      dependsOn: [],
+      feedsInto: ['UCON-03', 'UCON-04', 'UCON-06', 'UREQ-01', 'UREQ-02', 'UREQ-03'],
+      runsWith: ['UCON-02'],
+      revisedBy: [],
+      feedsBackInto: [],
+    },
+    terms: ['UCIe', 'UCIe-A', 'Shoreline', 'Energy per bit', 'Silicon bridge', 'Silicon interposer', 'RDL interposer'],
+  },
+  'UCON-02': {
+    criticalPath: false,
+    purpose: [
+      'Map the <b>competing die-to-die PHY offerings</b> — speeds, package types, processes, silicon status and published density and power — and decide where this IP must lead and where parity is enough.',
+      'Customers compare die-to-die PHYs on a handful of numbers: bandwidth per millimeter of shoreline, energy per bit, latency and whether silicon exists on their process. Knowing which of these competitors already claim decides which the architecture must win.',
+    ],
+    flowNote:
+      'Step 1 collects public data on competing offerings. Step 2 compares their metrics with customer needs, step 3 chooses where to differentiate, and step 4 releases the matrix.',
+    consumes: [
+      'Public product briefs and conference papers on die-to-die PHYs',
+      'Customer statements about alternatives they are evaluating',
+      'Standards consortium member and compliance listings',
+      'Internal data on earlier die-to-die and SerDes IP',
+      'Analyst coverage of chiplet interconnect IP',
+    ],
+    rel: {
+      'UCON-D2': '<b>Competitive landscape and differentiation matrix.</b> Produced here; the PPA targets in UREQ-02 are set against it.',
+      'UCON-D3': '<b>IP business case.</b> Competitor positioning bounds the price the case can assume.',
+    },
+    risks: [
+      '<b>Marketing numbers compared as measured.</b> Competitor claims under different conditions are compared with our simulated targets.',
+      '<b>Parity everywhere.</b> No metric is chosen to lead on, so the IP has nothing to win with.',
+      '<b>Silicon status ignored.</b> A competitor with silicon on the customer’s process is treated as equal to one with slides.',
+      '<b>In-house builds missed.</b> Customers building their own PHY are not counted as competition.',
+      '<b>Stale snapshot.</b> The matrix is not refreshed before the architecture freeze.',
+    ],
+    roles: [
+      { r: 'Product management', d: 'Owns the landscape and the differentiation choice' },
+      { r: 'IP architect', d: 'Normalizes technical metrics for comparison' },
+      { r: 'Analog lead', d: 'Judges whether published energy-per-bit figures are comparable' },
+      { r: 'Customer engineering lead', d: 'Reports what customers are evaluating' },
+      { r: 'Business analyst', d: 'Tracks competitor silicon and licensing status' },
+    ],
+    effort: [
+      ['Data collection', 1],
+      ['Metric normalization and comparison', 1],
+      ['Differentiation decision and release', 1],
+    ],
+    entry: [
+      'Customer needs list available in draft from UCON-01',
+      'Sources for public competitor data identified',
+      'Comparison metrics agreed with IP architecture',
+    ],
+    exit: [
+      'Every competitor offering compared on bandwidth density, energy per bit, latency, package types and silicon status',
+      'At least one metric chosen to lead on, with a target margin over the best competitor',
+      'Matrix released and dated',
+    ],
+    dependsOn: [],
+    dependsNote: 'Runs from public and customer sources alongside the customer interviews.',
+    feedsInto: ['UCON-03', 'UCON-04', 'UREQ-02'],
+    measuredBy: [
+      'Competitors covered against those named by customers',
+      'Metrics normalized to common conditions',
+      'Differentiation targets defined',
+    ],
+    links: {
+      dependsOn: [],
+      feedsInto: ['UCON-03', 'UCON-04', 'UCON-06', 'UREQ-02'],
+      runsWith: ['UCON-01'],
+      revisedBy: [],
+      feedsBackInto: [],
+    },
+    terms: ['UCIe', 'D2D', 'PHY', 'Shoreline', 'Energy per bit'],
+  },
+  'UCON-03': {
+    criticalPath: true,
+    purpose: [
+      'Build the <b>business case and the licensing and pricing model</b> — addressable market, development and support cost including the test chip and test vehicle, license and royalty terms, support tiers and price.',
+      'A die-to-die PHY is licensed into many designs but supported design by design: each customer integration needs floorplan, bump map, power and channel reviews. A business case that prices the license and forgets the support cost of a first-generation 64 GT/s PHY will look better than the program it funds.',
+    ],
+    flowNote:
+      'Step 1 sizes the market and step 2 models cost, while step 3 defines the licensing model in parallel. Step 4 sets the price and computes the case, and step 5 releases it.',
+    consumes: [
+      'Ranked customer needs and named opportunities from UCON-01',
+      'Competitive landscape and differentiation matrix from UCON-02',
+      'Finance standard cost rates and hurdle rates',
+      'Shuttle, package and lab hardware price estimates',
+      'Support effort data from earlier interface IP programs',
+    ],
+    rel: {
+      'UCON-D3': '<b>IP business case with licensing and pricing model.</b> Produced here; the go / no-go turns on it.',
+      'UCON-D6': '<b>Go / no-go decision package.</b> The case and its sensitivities are its financial section.',
+    },
+    risks: [
+      '<b>Support cost omitted.</b> Customer integration support is left out and every license loses money.',
+      '<b>Test chip cost underestimated.</b> Shuttle, package and board costs for an advanced-package test vehicle are taken from a standard-package program.',
+      '<b>Price set by competitor list.</b> The price matches a competitor without the volume or support terms behind it.',
+      '<b>Timing optimistic.</b> Revenue starts at v0.9 although customers will wait for silicon-proven GA.',
+      '<b>No sensitivity.</b> The case is a single number with no view of what slips or lost designs do to it.',
+    ],
+    roles: [
+      { r: 'Product management', d: 'Owns the business case and pricing' },
+      { r: 'Finance partner', d: 'Cost rates, hurdle rate and approval of the model' },
+      { r: 'Program manager', d: 'Development cost and schedule inputs' },
+      { r: 'Customer engineering lead', d: 'Support cost per customer integration' },
+      { r: 'Legal and licensing counsel', d: 'License and royalty terms' },
+    ],
+    effort: [
+      ['Market sizing', 0.5],
+      ['Cost model', 1],
+      ['Licensing model', 0.5],
+      ['Pricing and case', 0.5],
+      ['Release', 0.5],
+    ],
+    entry: [
+      'Customer opportunities ranked in UCON-01',
+      'Competitive matrix drafted in UCON-02',
+      'Finance cost rates for the fiscal year available',
+    ],
+    exit: [
+      'Business case shows net present value and payback with stated assumptions',
+      'Sensitivity to a two-quarter slip and to losing the top customer computed',
+      'Licensing model with support tiers reviewed by legal',
+    ],
+    dependsOn: ['UCON-01', 'UCON-02'],
+    dependsNote: null,
+    feedsInto: ['UCON-05', 'UCON-06'],
+    measuredBy: [
+      'Net present value against the hurdle',
+      'Support cost per integration assumed',
+      'Sensitivities computed',
+    ],
+    links: {
+      dependsOn: ['UCON-01', 'UCON-02'],
+      feedsInto: ['UCON-05', 'UCON-06'],
+      runsWith: ['UCON-04'],
+      revisedBy: [],
+      feedsBackInto: [],
+    },
+    terms: ['Business case', 'Test chip', 'Test vehicle', 'GA'],
+  },
+  'UCON-04': {
+    criticalPath: false,
+    purpose: [
+      'Place the <b>64 GT/s Advanced package PHY on the die-to-die IP roadmap</b>: beside the existing speed grades, with the processes and package types it will be ported to and the blocks that must be reusable across those derivatives.',
+      'Most of the value of a new PHY architecture comes from its later ports and speed grades. Deciding now which blocks are process-specific — the analog front-end and clocking — and which must stay portable — the adapter and logical PHY RTL — shapes the architecture before it freezes.',
+    ],
+    flowNote:
+      'Step 1 places the IP beside existing grades. Step 2 plans the ports, step 3 splits reusable from process-specific blocks, and step 4 releases the plan.',
+    consumes: [
+      'Ranked customer processes and package types from UCON-01',
+      'Competitive positioning from UCON-02',
+      'Existing die-to-die and SerDes IP roadmap',
+      'Foundry process roadmaps under non-disclosure',
+      'Package technology roadmaps from package partners',
+    ],
+    rel: {
+      'UCON-D4': '<b>IP roadmap position and derivative plan.</b> Produced here; the architecture keeps the reusable blocks portable because of it.',
+      'UCON-D6': '<b>Go / no-go decision package.</b> The roadmap shows what the program enables after the first release.',
+    },
+    risks: [
+      '<b>Ports promised before silicon.</b> Derivatives are committed before the first generation is silicon-proven.',
+      '<b>Process-specific RTL.</b> Logic that should be portable is written around one process’s cells and memories.',
+      '<b>Speed grades overlap.</b> The new IP cannibalizes an existing grade without a migration story.',
+      '<b>Package types multiply.</b> Every package type is promised at once and none gets characterized properly.',
+      '<b>Roadmap not refreshed.</b> The plan is not revisited at architecture freeze.',
+    ],
+    roles: [
+      { r: 'Product management', d: 'Owns the roadmap position and derivative plan' },
+      { r: 'IP architect', d: 'Defines the reusable and process-specific split' },
+      { r: 'Technology and foundry manager', d: 'Process availability for ports' },
+      { r: 'Packaging lead', d: 'Package technology roadmap' },
+      { r: 'Program manager', d: 'Derivative effort assumptions' },
+    ],
+    effort: [
+      ['Roadmap placement', 0.5],
+      ['Port planning', 0.5],
+      ['Reuse split', 0.5],
+      ['Release', 0.5],
+    ],
+    entry: [
+      'Customer process and package map drafted',
+      'Existing IP roadmap available',
+      'Process roadmaps received under non-disclosure',
+    ],
+    exit: [
+      'Roadmap places the IP against every existing die-to-die speed grade',
+      'Port plan names processes and package types with target quarters',
+      'Reusable and process-specific blocks listed and agreed with IP architecture',
+    ],
+    dependsOn: ['UCON-01', 'UCON-02'],
+    dependsNote: null,
+    feedsInto: ['UCON-06', 'UREQ-01'],
+    measuredBy: [
+      'Derivatives planned with a named first customer',
+      'Blocks classified reusable or process-specific',
+      'Roadmap review sign-off date',
+    ],
+    links: {
+      dependsOn: ['UCON-01', 'UCON-02'],
+      feedsInto: ['UCON-06', 'UREQ-01', 'UARC-01'],
+      runsWith: ['UCON-03'],
+      revisedBy: [],
+      feedsBackInto: [],
+    },
+    terms: ['IP roadmap', 'UCIe-A', 'AFE', 'Hard macro'],
+  },
+  'UCON-05': {
+    criticalPath: true,
+    purpose: [
+      'Plan the program: an <b>integrated schedule to GA</b>, staffing by function, the test chip, test vehicle, board and shuttle budget, and the partners whose commitments the plan depends on.',
+      'An IP program has two products on one schedule — the release packages customers receive and the test chip that proves them. The plan has to show both, and the long-lead items behind the test chip — the shuttle slot, the advanced-package test vehicle and the boards — have to be visible from kickoff.',
+    ],
+    flowNote:
+      'Step 1 builds the schedule and step 2 the staffing plan, with the hardware budget in parallel in step 3. Step 4 names the partners and step 5 releases the plan.',
+    consumes: [
+      'IP business case and cost model from UCON-03',
+      'Roadmap position and derivative plan from UCON-04',
+      'Resource availability by function',
+      'Shuttle calendar and lead times from the foundry',
+      'Package and assembly partner lead times',
+    ],
+    rel: {
+      'UCON-D5': '<b>IP program plan.</b> Produced here; the integrated schedule is what every stage is planned against.',
+      'UCON-D6': '<b>Go / no-go decision package.</b> The plan is its schedule and resource section.',
+    },
+    risks: [
+      '<b>Shuttle slot not reserved.</b> The test chip date in the plan has no shuttle behind it.',
+      '<b>Test vehicle lead time missed.</b> Advanced-package substrate and assembly lead times are not in the schedule.',
+      '<b>Staffing assumed.</b> Analog and layout headcount is assumed available while committed to another program.',
+      '<b>Release dates disconnected.</b> v0.5 and v0.9 dates are set by customers rather than by RTL freeze and signoff.',
+      '<b>Partners not engaged.</b> The package partner has not agreed to build the test vehicle.',
+    ],
+    roles: [
+      { r: 'Program management', d: 'Owns the program plan' },
+      { r: 'Engineering managers', d: 'Staffing by function' },
+      { r: 'Technology and foundry manager', d: 'Shuttle and process schedule' },
+      { r: 'Packaging lead', d: 'Test vehicle lead times and partner' },
+      { r: 'Product manager', d: 'Customer release date expectations' },
+    ],
+    effort: [
+      ['Schedule', 1],
+      ['Staffing plan', 0.5],
+      ['Hardware budget', 0.5],
+      ['Partners', 0.5],
+      ['Release', 0.5],
+    ],
+    entry: [
+      'Business case drafted in UCON-03',
+      'Roadmap position drafted in UCON-04',
+      'Functional managers available for staffing input',
+    ],
+    exit: [
+      'Integrated schedule shows v0.5, v0.9, tapeout, first link-up and GA with dependencies',
+      'Every function staffed by name or by approved requisition',
+      'Shuttle slot and package partner committed in writing or listed as a go condition',
+    ],
+    dependsOn: ['UCON-03', 'UCON-04'],
+    dependsNote: null,
+    feedsInto: ['UCON-06'],
+    measuredBy: [
+      'Planned headcount against approved',
+      'Long-lead items with a committed date',
+      'Partners committed against needed',
+    ],
+    links: {
+      dependsOn: ['UCON-03', 'UCON-04'],
+      feedsInto: ['UCON-06', 'UTEC-05', 'UFND-06'],
+      runsWith: [],
+      revisedBy: [],
+      feedsBackInto: [],
+    },
+    terms: ['Test chip', 'Test vehicle', 'MPW', 'GA'],
+  },
+  'UCON-06': {
+    criticalPath: true,
+    purpose: [
+      'Decide <b>go or no-go</b> on a new die-to-die PHY architecture on a new process: assess the program risks, assemble the decision package and record the decision with its conditions.',
+      'The commitment made here is large and long — about two and a half years to GA, a test chip and an advanced-package test vehicle. The review must decide on the evidence that the bandwidth density and energy targets are reachable, not on the momentum of the plan.',
+    ],
+    flowNote:
+      'Step 1 assesses the risks, step 2 assembles the package from the brief, the business case, the roadmap and the plan, and step 3 holds the review and records the decision.',
+    consumes: [
+      'Market and customer requirements brief from UCON-01',
+      'Competitive differentiation matrix from UCON-02',
+      'IP business case from UCON-03',
+      'Roadmap position from UCON-04',
+      'IP program plan from UCON-05',
+    ],
+    rel: {
+      'UCON-D6': '<b>IP program go / no-go decision package.</b> Produced here; the decision and its conditions open the requirements stage.',
+    },
+    risks: [
+      '<b>Feasibility unchallenged.</b> Nobody asks whether 64 GT/s fits the energy target on the chosen process.',
+      '<b>Conditions untracked.</b> A conditional go is recorded but its conditions have no owner.',
+      '<b>Sunk-cost momentum.</b> Early exploration is counted as a reason to continue.',
+      '<b>Decision makers absent.</b> The sponsors who own the budget are not in the review.',
+      '<b>Kill criteria missing.</b> No criteria are set for stopping the program later.',
+    ],
+    roles: [
+      { r: 'Program management', d: 'Owns the review and the decision record' },
+      { r: 'Executive sponsor', d: 'Makes the go / no-go decision' },
+      { r: 'Product manager', d: 'Presents market and business case' },
+      { r: 'IP architect', d: 'Presents technical feasibility' },
+      { r: 'Finance partner', d: 'Confirms the investment' },
+    ],
+    effort: [
+      ['Risk assessment', 0.25],
+      ['Decision package', 0.25],
+      ['Review and record', 0.5],
+    ],
+    entry: [
+      'All five concept deliverables released',
+      'Executive sponsors scheduled',
+      'Risk register drafted',
+    ],
+    exit: [
+      'Decision recorded as go, conditional go or no-go with sponsor signatures',
+      'Every condition has an owner and a due date',
+      'Kill criteria for later gates recorded',
+    ],
+    dependsOn: ['UCON-01', 'UCON-02', 'UCON-03', 'UCON-04', 'UCON-05'],
+    dependsNote: null,
+    feedsInto: ['UREQ-01', 'UREQ-09'],
+    measuredBy: [
+      'Decision recorded by the planned week',
+      'Conditions closed by their due dates',
+      'Risks with a named mitigation',
+    ],
+    links: {
+      dependsOn: ['UCON-01', 'UCON-02', 'UCON-03', 'UCON-04', 'UCON-05'],
+      feedsInto: ['UREQ-01', 'UREQ-09'],
+      runsWith: [],
+      revisedBy: [],
+      feedsBackInto: [],
+    },
+    terms: ['Business case', 'GA', 'Test chip'],
+  },
+};
