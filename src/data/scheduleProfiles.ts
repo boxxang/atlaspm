@@ -142,8 +142,10 @@ export const milestoneDefs = [
  * workstreams that must exist before design can start — technology selection,
  * PDK, IP readiness, custom IP, test chip. `platform` is what a part sold with
  * its own toolchain ships beside the silicon — compiler, SDK, evaluation kit,
- * early access — and only the Embedded SoC template runs it; a band no stage
- * sits under is not drawn.
+ * early access — and only the Embedded SoC template runs it. `siliconValidation`
+ * and `ipRelease` are an IP program's: proving the IP on a test chip, and
+ * releasing it to the customers who integrate it — only the UCIe PHY IP
+ * template runs them. A band no stage sits under is not drawn.
  */
 export const lifecyclePhases = [
   { id: 'define',       label: 'Define' },
@@ -154,6 +156,8 @@ export const lifecyclePhases = [
   { id: 'integrate',    label: 'Integrate' },
   { id: 'platform',     label: 'Developer Platform & Ecosystem' },
   { id: 'validateRamp', label: 'Validate & Ramp' },
+  { id: 'siliconValidation', label: 'Silicon Validation' },
+  { id: 'ipRelease', label: 'IP Release & Enablement' },
 ] satisfies readonly LifecyclePhase[];
 
 /** Which band each built-in stage sits under. */
