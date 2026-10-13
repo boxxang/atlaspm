@@ -129,7 +129,7 @@ export const UDPD_WRITE_UPS: UcieWriteUps = {
     ],
     links: {
       dependsOn: ['URTL-10', 'UDPD-01', 'UDFT-08', 'UDFT-02', 'URTL-09', 'UFND-02'],
-      feedsInto: ['UDPD-04', 'UDV-10'],
+      feedsInto: ['UDPD-04', 'UDV-10', 'UDPD-03'],
       runsWith: ['UDPD-03'],
       revisedBy: ['UDV-10'],
       feedsBackInto: [],
@@ -194,7 +194,7 @@ export const UDPD_WRITE_UPS: UcieWriteUps = {
       'Abutment errors with the front-end',
     ],
     links: {
-      dependsOn: ['UARC-09', 'UCHN-03', 'ULAY-01', 'UDPD-01', 'UFND-02'],
+      dependsOn: ['UARC-09', 'UCHN-03', 'ULAY-01', 'UDPD-01', 'UFND-02', 'UDPD-02'],
       feedsInto: ['UDPD-04', 'UDPD-06', 'ULAY-04'],
       runsWith: ['UDPD-02'],
       revisedBy: [],

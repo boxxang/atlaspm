@@ -6,6 +6,10 @@ import { UCIE_GLOSSARY } from '@/data/ucieAdv64/glossary';
 import { UCIE_WRITE_UPS, ucieDetail } from '@/data/ucieAdv64Details';
 import { deliverableStep, producersOf } from '@/lib/deliverableStatus';
 import { parseRich, type RichNode } from '@/lib/activityRefs';
+import { computeSchedule } from '@/lib/schedule';
+import { BUILTIN_PROFILES } from '@/data/builtins';
+import { UCIE_COUNTDOWN_KEYS, UCIE_MILESTONES, UCIE_PROFILE } from '@/data/ucieAdv64';
+import * as Flow from '../../tools/ucieFlow/analysis';
 
 /**
  * The UCIe Advanced 64G Die-to-Die PHY IP template: an IP program from
@@ -286,5 +290,113 @@ describe('UCIe dependency integrity', () => {
       const named = [...new Set(w.consumes.flatMap((c) => c.match(/\b[A-Z]{2,5}-\d{2}\b/g) ?? []))];
       for (const x of named) if (x !== y) expect(linked.has(x), `${y} consumes from ${x} without a link`).toBe(true);
     }
+  });
+});
+
+/* ---------------- the template as a built-in, and its flow rules ---------------- */
+
+const dependsOnAll = (y: string, xs: string[]) => {
+  const up = Flow.upstreamOf(y);
+  for (const x of xs) expect(up.has(x), `${y} does not wait on ${x}`).toBe(true);
+};
+
+describe('UCIe as a built-in', () => {
+  it('is the fifth built-in, offered, ordered by start, one gate per stage', () => {
+    expect(BUILTIN_PROFILES.map((p) => p.id)).toContain('ucieAdv64');
+    expect(UCIE_PROFILE.label).toBe('UCIe Advanced 64G Die-to-Die PHY IP');
+    expect(UCIE_PROFILE.builtin && UCIE_PROFILE.template).toBe(true);
+    const starts = UCIE_PROFILE.stages.map((s) => s.startOffsetWeeks);
+    expect([...starts].sort((a, b) => a - b)).toEqual(starts);
+    expect(UCIE_MILESTONES).toHaveLength(UCIE_SKELETON.length);
+    expect(UCIE_MILESTONES.filter((m) => m.major).map((m) => m.id)).toEqual(
+      expect.arrayContaining(['ucieArchitectureFreeze', 'ucieHardMacroSignoff', 'ucieTapeout', 'ucieSiliconProven', 'ucieIpGa']),
+    );
+  });
+
+  it('dates its countdowns in order — tapeout, silicon in hand, GA — and runs about 128 weeks to GA', () => {
+    const sch = computeSchedule(new Date(2027, 0, 4), UCIE_PROFILE, {});
+    expect(sch.tapeout!.getTime()).toBeLessThan(sch.firstSilicon!.getTime());
+    expect(sch.firstSilicon!.getTime()).toBeLessThan(sch.production!.getTime());
+    expect(UCIE_COUNTDOWN_KEYS).toEqual({ tapeout: 'ucieTapeout', firstSilicon: 'ucieFab', production: 'ucieGa' });
+    const ga = stageEnd('ucieGa');
+    expect(ga).toBeGreaterThanOrEqual(124);
+    expect(ga).toBeLessThanOrEqual(132);
+  });
+
+  it('gives every block a track from definition through design to silicon or release', () => {
+    const IN = (keys: string[]) => (item: string) =>
+      UCIE_SKELETON.filter((s) => keys.includes(s.key)).flatMap((s) => s.activities.filter((a) => a.item === item));
+    const define = IN(['ucieRequirements', 'ucieArchitecture', 'ucieTechnology']);
+    const build = IN(['ucieAfe', 'ucieRtl', 'ucieDft', 'ucieDv', 'ucieAms', 'ucieDigitalPd', 'ucieLayout', 'ucieSignoff', 'ucieChannel', 'ucieTestChip', 'ucieTestVehicle', 'ucieTapeout', 'ucieFab']);
+    const prove = IN(['ucieBringup', 'ucieCharacterization', 'ucieCompliance', 'ucieReliability', 'uciePreSilicon', 'ucieGa']);
+    for (const item of ['adapter', 'logicalPhy', 'afe', 'channel', 'testchip', 'program']) {
+      if (item !== 'testchip') expect(define(item).length, `${item} is not defined`).toBeGreaterThan(0);
+      expect(build(item).length, `${item} is not built`).toBeGreaterThan(0);
+      if (item !== 'testchip') expect(prove(item).length, `${item} is not proven or released`).toBeGreaterThan(0);
+    }
+  });
+});
+
+describe('UCIe flow rules', () => {
+  it('freezes before it builds: architecture before design, RTL and circuits before implementation, signoff before tapeout', () => {
+    for (const ref of ['UAFE-02', 'UAFE-03', 'UAFE-04', 'UAFE-05', 'UAFE-06', 'UAFE-07', 'URTL-02', 'URTL-03', 'URTL-04', 'URTL-05', 'URTL-06', 'URTL-07', 'URTL-08']) {
+      dependsOnAll(ref, ['UARC-12']);
+      expect(absStart(ref), ref).toBeGreaterThanOrEqual(stageEnd('ucieArchitecture'));
+    }
+    for (const ref of ['UDPD-02', 'UDPD-03', 'UDPD-04', 'UDPD-05', 'UDPD-06', 'UDPD-07']) {
+      dependsOnAll(ref, ['URTL-10']);
+      expect(absStart(ref), ref).toBeGreaterThanOrEqual(stageEnd('ucieRtl'));
+    }
+    for (const ref of ['ULAY-02', 'ULAY-03', 'ULAY-04', 'ULAY-05', 'ULAY-06', 'ULAY-07']) {
+      dependsOnAll(ref, ['UAFE-09']);
+      expect(absStart(ref), ref).toBeGreaterThanOrEqual(stageEnd('ucieAfe'));
+    }
+    dependsOnAll('UTCI-05', ['USGN-07']);
+    expect(absEnd('UTCI-05')).toBeGreaterThanOrEqual(stageEnd('ucieSignoff'));
+    dependsOnAll('UTPO-04', ['USGN-07', 'UTCI-06']);
+    expect(absStart('UTPO-04')).toBeGreaterThanOrEqual(stageEnd('ucieSignoff'));
+  });
+
+  it('co-designs the channel: it starts before the architecture freezes, and freezes the bump map before layout and the test chip use it', () => {
+    expect(UCIE_SKELETON.find((s) => s.key === 'ucieChannel')!.start).toBeLessThan(stageEnd('ucieArchitecture'));
+    for (const ref of ['ULAY-04', 'UTCI-03']) {
+      dependsOnAll(ref, ['UCHN-03']);
+      expect(absEnd('UCHN-03'), ref).toBeLessThanOrEqual(absStart(ref));
+    }
+  });
+
+  it('has the test vehicle, boards, ATE and lab ready before the silicon is in hand', () => {
+    for (const a of UCIE_SKELETON.find((s) => s.key === 'ucieTestVehicle')!.activities) {
+      expect(absEnd(a.ref), a.ref).toBeLessThanOrEqual(stageEnd('ucieFab'));
+    }
+  });
+
+  it('releases to customers in step: v0.5 after RTL freeze, v0.9 after signoff, GA on every silicon result, support from v0.5 past GA', () => {
+    dependsOnAll('UPRE-02', ['URTL-10']);
+    expect(absStart('UPRE-02')).toBeGreaterThanOrEqual(stageEnd('ucieRtl'));
+    dependsOnAll('UPRE-08', ['USGN-07']);
+    expect(absStart('UPRE-08')).toBeGreaterThanOrEqual(stageEnd('ucieSignoff'));
+    for (const x of ['UCHR-10', 'UCMP-05', 'URLQ-06']) expect(Flow.predecessorsOf('UGA-05'), `GA approval waits on ${x}`).toContain(x);
+    const customer = UCIE_SKELETON.find((s) => s.key === 'ucieCustomer')!;
+    expect(customer.start).toBeGreaterThanOrEqual(absStart('UPRE-02'));
+    expect(stageEnd('ucieCustomer')).toBeGreaterThan(stageEnd('ucieGa'));
+    dependsOnAll('UCUS-01', ['UPRE-02']);
+  });
+
+  it('carries the pre-silicon test plan and margin predictions into bring-up and characterization, and correlates them', () => {
+    for (const ref of ['UBUP-05', 'UTVP-06']) dependsOnAll(ref, ['UDV-11', 'UAMS-07']);
+    dependsOnAll('UCHR-01', ['UDV-11']);
+    expect(UCIE_ACTIVITY_TITLES['UCHR-09']).toMatch(/Correlation/);
+    dependsOnAll('UCHR-09', ['UAMS-07', 'UCHR-02', 'UCHR-03']);
+  });
+
+  it('closes every gate on an activity of its own stage, at the stage’s end, and leaves nothing isolated', () => {
+    for (const s of UCIE_SKELETON) {
+      const ref = Flow.GATE_CLOSERS[s.key];
+      const a = s.activities.find((x) => x.ref === ref);
+      expect(a, `${s.key} has no gate closer`).toBeTruthy();
+      expect(a!.w[1], `${ref} ends ${s.dur - a!.w[1]} weeks before the ${s.gate.label} gate`).toBeGreaterThanOrEqual(s.dur - 2);
+    }
+    expect(Flow.isolated()).toEqual([]);
   });
 });
