@@ -275,11 +275,11 @@ export const ULAY_WRITE_UPS: UcieWriteUps = {
   'ULAY-05': {
     criticalPath: true,
     purpose: [
-      'Prove the margin survived layout: extract the <b>full macro</b> with coupling between blocks and lanes, re-run the PVT corner testbenches at 64 GT/s and Monte Carlo on the sampler and phase paths with parasitics, compare post-layout with schematic margins and fix the blocks that lost too much, and extract the <b>post-layout pad loading</b> per lane for the channel compliance review.',
+      'Prove the margin survived layout: extract the <b>blocks</b> with coupling between them and the lanes, and then the <b>assembled macro</b> with its bump routing and power grid, re-run the PVT corner testbenches at 64 GT/s and Monte Carlo on the sampler and phase paths with parasitics, compare post-layout with schematic margins and fix the blocks that lost too much, and from the assembled macro extract the <b>post-layout pad loading</b> per lane for the channel compliance review.',
       'Schematic margin is a promise; post-layout margin is the delivery. The comparison block by block shows where layout consumed more than its allowance, which is the only way to fix it before signoff rather than explain it after silicon.',
     ],
     flowNote:
-      'Step 1 extracts the full macro. Step 2 re-runs the corners while step 3 re-runs Monte Carlo in parallel. Step 4 compares margins and drives fixes while step 5 extracts the pad loading beside it, and step 6 releases the report.',
+      'Step 1 extracts the blocks. Step 2 re-runs the corners while step 3 re-runs Monte Carlo in parallel. Step 4 compares margins and drives fixes, step 5 re-extracts the assembled macro, reruns the worst corners and extracts the pad loading, and step 6 releases the report.',
     consumes: [
       'Block layouts from ULAY-02',
       'Parasitic control record and extraction comparison from ULAY-03',
@@ -292,7 +292,7 @@ export const ULAY_WRITE_UPS: UcieWriteUps = {
       'ULAY-D7': '<b>Layout completion review record.</b> Post-layout margins are the first thing the review checks.',
     },
     risks: [
-      '<b>Blocks only.</b> Extraction misses coupling across the macro.',
+      '<b>Blocks only.</b> Margins are signed off on block extractions and never rerun on the assembled macro with its bump routing and grid.',
       '<b>Typical corner.</b> Post-layout runs only at typical to save time.',
       '<b>Monte Carlo skipped.</b> Mismatch is assumed unchanged by layout.',
       '<b>Fixes untested.</b> Layout fixes are made without re-extracting.',
@@ -306,11 +306,11 @@ export const ULAY_WRITE_UPS: UcieWriteUps = {
       { r: 'Analog design lead', d: 'Accepts the post-layout margins' },
     ],
     effort: [
-      ['Full-macro extraction', 1.1],
+      ['Block extraction', 1.1],
       ['Post-layout corners', 1.7],
       ['Post-layout Monte Carlo', 1.1],
-      ['Comparison, fixes and release', 0.9],
-      ['Post-layout pad loading', 0.2],
+      ['Comparison and fixes', 0.7],
+      ['Assembled-macro rerun, pad loading and release', 0.4],
     ],
     entry: [
       'Macro assembled in ULAY-04',

@@ -13,9 +13,9 @@ export const UTVP_WRITE_UPS: UcieWriteUps = {
     flowNote:
       'Step 1 defines the variants with placement and channel lengths, while step 2 mates the partner die’s bump map beside it. Step 3 routes the bridge and interposer channels while step 4 designs the substrates in parallel. Step 5 runs SI and PI checks per variant and step 6 releases the databases.',
     consumes: [
-      'Test chip architecture and configurations from UTCI-01',
-      'Bump and routing design rules from UCHN-02',
-      'Frozen bump map and channel specification from UCHN-03',
+      'Test chip architecture, die outline and full bump plan from UTCI-01',
+      'Frozen bump map, channel specification and routing rules from UCHN-03 and UCHN-02',
+      'Package power delivery analysis from UCHN-05',
       'Selected package technology, bump pitch and package partner rules from UTEC-03 and UTEC-04',
       'Partner die bump map and shared test vehicle agreement from UTEC-07',
     ],
@@ -64,7 +64,7 @@ export const UTVP_WRITE_UPS: UcieWriteUps = {
       'Database revisions after release',
     ],
     links: {
-      dependsOn: ['UTCI-01', 'UCHN-02', 'UCHN-03', 'UTEC-03', 'UTEC-04', 'UTEC-07'],
+      dependsOn: ['UTCI-01', 'UCHN-02', 'UCHN-03', 'UTEC-03', 'UTEC-04', 'UTEC-07', 'UCHN-05'],
       feedsInto: ['UTVP-02', 'UTVP-03', 'UTVP-04', 'UTVP-08', 'UFAB-03'],
       runsWith: [],
       revisedBy: [],
@@ -147,10 +147,10 @@ export const UTVP_WRITE_UPS: UcieWriteUps = {
     flowNote:
       'Step 1 designs the schematics. Step 2 lays out the board while step 3 designs the socket in parallel. Step 4 fabricates and tests the bare boards, step 5 brings them up without silicon and step 6 releases them.',
     consumes: [
-      'Test chip architecture and control needs from UTCI-01',
+      'Test chip architecture and control needs from UTCI-01, with its register and control plane from UTCI-02',
       'Test vehicle package footprint from UTVP-01',
       'Supply and operating range requirements from UREQ-08',
-      'Test chip register and control plane from UTCI-02',
+      'On-board channel measurement structures from UCHN-07',
       'Package power delivery analysis from UCHN-05',
     ],
     rel: {
@@ -197,7 +197,7 @@ export const UTVP_WRITE_UPS: UcieWriteUps = {
       'Board revisions needed before release',
     ],
     links: {
-      dependsOn: ['UTCI-01', 'UTVP-01', 'UREQ-08', 'UTCI-02', 'UCHN-05'],
+      dependsOn: ['UTCI-01', 'UTVP-01', 'UREQ-08', 'UTCI-02', 'UCHN-05', 'UCHN-07'],
       feedsInto: ['UTVP-05', 'UTVP-07', 'UFAB-04'],
       runsWith: ['UTVP-04'],
       revisedBy: [],
@@ -348,7 +348,7 @@ export const UTVP_WRITE_UPS: UcieWriteUps = {
       'Step 1 orders the bring-up steps. Step 2 attaches expected values while step 3 writes programs in parallel. Step 4 dry-runs the plan on simulation and step 5 releases it.',
     consumes: [
       'Post-silicon test plan handed off from UDV-11',
-      'Margin predictions and silicon measurement plan from UAMS-07',
+      'Margin predictions and silicon measurement plan from UAMS-07, reissued on post-layout models in UPRE-05',
       'Test chip register and control plane from UTCI-02',
       'Lab automation from UTVP-05',
       'Test vehicle channel correlation plan from UCHN-07',
@@ -396,7 +396,7 @@ export const UTVP_WRITE_UPS: UcieWriteUps = {
       'Plan items traced to the pre-silicon test plan',
     ],
     links: {
-      dependsOn: ['UDV-11', 'UAMS-07', 'UTCI-02', 'UTVP-05', 'UCHN-07'],
+      dependsOn: ['UDV-11', 'UAMS-07', 'UTCI-02', 'UTVP-05', 'UCHN-07', 'UPRE-05'],
       feedsInto: ['UTVP-07', 'UBUP-05', 'UCHR-01'],
       runsWith: [],
       revisedBy: [],
@@ -478,10 +478,10 @@ export const UTVP_WRITE_UPS: UcieWriteUps = {
       'Step 1 completes the physical design. Step 2 runs DRC, LVS and the via rules while step 3 extracts the passive channels beside it. Step 4 reviews the databases with the partner and the foundry while step 5 confirms the slot, and step 6 tapes out.',
     consumes: [
       'Bridge and interposer channel routing from UTVP-01',
-      'Frozen bump map and channel specification from UCHN-03',
-      'Bump and routing design rules from UCHN-02',
-      'Package partner design rules and assembly constraints from UTEC-04',
-      'Bridge and interposer fab slot booked in UTEC-05',
+      'Frozen bump map, channel specification and routing rules from UCHN-03 and UCHN-02',
+      'Channel measurement and de-embedding structures from UCHN-07',
+      'Package partner design rules from UTEC-04 and the fab slot booked in UTEC-05',
+      'Test chip die outline and full bump plan from UTCI-01',
     ],
     rel: {
       'UTVP-D8': '<b>Bridge and interposer signoff report and tapeout record.</b> Produced here.',
@@ -527,7 +527,7 @@ export const UTVP_WRITE_UPS: UcieWriteUps = {
       'Extracted channel margin against the specification',
     ],
     links: {
-      dependsOn: ['UTVP-01', 'UCHN-02', 'UCHN-03', 'UTEC-04', 'UTEC-05'],
+      dependsOn: ['UTVP-01', 'UCHN-02', 'UCHN-03', 'UTEC-04', 'UTEC-05', 'UCHN-07', 'UTCI-01'],
       feedsInto: ['UTVP-02', 'UTVP-07', 'UFAB-03', 'UCHN-08', 'UCHR-08'],
       runsWith: [],
       revisedBy: [],

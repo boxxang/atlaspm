@@ -146,8 +146,8 @@ export const UAFE_WRITE_UPS: UcieWriteUps = {
     flowNote:
       'Step 1 designs the front-end and step 2 the sampler, with offset calibration designed alongside in step 3. Step 4 adds the deserializer and the valid and track paths, step 5 simulates the whole receive path with the TX and channel models, and step 6 releases.',
     consumes: [
-      'Frozen Electrical PHY architecture from UARC-12',
-      'Selected RX topology and feasibility results from UAFE-01',
+      'Frozen Electrical PHY architecture from UARC-12 and the selected RX topology from UAFE-01',
+      'TX driver model for the receive-path simulation from UAFE-02',
       'Channel specification and representative channel models from UCHN-01',
       'Device models and mismatch data from UTEC-02',
       'Per-bump loading budget from UARC-07, held in the bump interface design in UAFE-06',
@@ -196,7 +196,7 @@ export const UAFE_WRITE_UPS: UcieWriteUps = {
       'Receive eye margin per corner',
     ],
     links: {
-      dependsOn: ['UARC-12', 'UAFE-01', 'UCHN-01', 'UTEC-02', 'UAFE-06', 'UARC-07'],
+      dependsOn: ['UARC-12', 'UAFE-01', 'UCHN-01', 'UTEC-02', 'UAFE-06', 'UARC-07', 'UAFE-02'],
       feedsInto: ['UAFE-07', 'UAFE-08', 'UAFE-09', 'UAMS-01', 'ULAY-02', 'ULAY-03'],
       runsWith: ['UAFE-02', 'UAFE-04'],
       revisedBy: [],

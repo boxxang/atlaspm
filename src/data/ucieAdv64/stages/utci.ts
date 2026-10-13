@@ -48,7 +48,7 @@ export const UTCI: UcieStageModule = {
     'UTCI-01': {
       s: [
         [1, 'List every datasheet claim and compliance test the test chip must be able to demonstrate', 1],
-        [2, 'Define the two-die link with two modules per die across the advanced-package test vehicle, and the loopback configurations', 1.5],
+        [2, 'Define the two-die link with two modules per die across the advanced-package test vehicle, the loopback configurations, and the die outline and full bump plan — PHY modules, power and control — the package is drawn to', 1.5],
         [3, 'Define traffic sources, checkers, clock and reset control, debug access and a probe-able observation path for bench calibration', 1, 1],
         [4, 'Release the architecture specification with its test coverage map', 0.5],
       ],
@@ -82,7 +82,7 @@ export const UTCI: UcieStageModule = {
     'UTCI-03': {
       s: [
         [1, 'Place two PHY modules at the die edge in the orientation the test vehicle channel requires', 2],
-        [2, 'Implement the bump map from the frozen channel specification and the pad ring for power and control', 3],
+        [2, 'Implement the bump plan from the architecture — the frozen module bump map and the power and control pads — so the die matches the package drawn to it', 3],
         [3, 'Build the top-level power grid for the PHY and the traffic logic', 2, 1],
         [4, 'Integrate the hardened digital macro and the Electrical PHY macro at top level', 3],
         [5, 'Release the integrated top level for verification and implementation', 1],

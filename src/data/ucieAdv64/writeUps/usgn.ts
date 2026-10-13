@@ -131,7 +131,7 @@ export const USGN_WRITE_UPS: UcieWriteUps = {
     ],
     links: {
       dependsOn: ['ULAY-05', 'ULAY-06', 'UDPD-06', 'UCHN-05', 'UREQ-08'],
-      feedsInto: ['USGN-07', 'UPRE-06'],
+      feedsInto: ['USGN-07', 'UPRE-06', 'UCHN-08'],
       runsWith: ['USGN-01'],
       revisedBy: [],
       feedsBackInto: [],

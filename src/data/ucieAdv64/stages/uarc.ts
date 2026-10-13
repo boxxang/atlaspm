@@ -172,7 +172,7 @@ export const UARC: UcieStageModule = {
       s: [
         [1, 'Choose the transmit driver topology, output swing within the die-to-die voltage compatibility rules and any transmit equalization', 1.5],
         [2, 'Choose the receive front-end and sampler topology with offset calibration', 1.5],
-        [3, 'Decide receiver termination per package type and reach and whether receive equalization is needed, from early channel estimates', 1, 1],
+        [3, 'Decide receiver termination per package type and reach and whether receive equalization is needed, from the reach per package type and the channel losses of earlier die-to-die PHY packages, as a preliminary decision the channel specification confirms', 1, 1],
         [4, 'Define bias, reference and supply regulation for the lanes', 1.5],
         [5, 'Define ESD protection that meets targets without closing the eye at 64 GT/s, and set the per-bump loading budget — pad and protection capacitance and driver output impedance — within the loads the specification assumes', 1],
         [6, 'Release the electrical PHY architecture specification', 1],

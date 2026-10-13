@@ -107,7 +107,7 @@ export const UTEC: UcieStageModule = {
     },
     'UTEC-04': {
       s: [
-        [1, 'Collect each package partner’s design rules for line width, spacing, layer count and via structures', 2],
+        [1, 'Collect each package partner’s design rules for line width, spacing, layer count and via structures, and the stack-ups with dielectric and metal material properties per layer', 2],
         [2, 'Collect assembly constraints — die thickness, keep-outs, underfill flow and warpage limits', 1.5, 1],
         [3, 'Translate the rules into constraints on the macro bump map and the die edge', 2],
         [4, 'Review the constraints with the channel and layout teams and log open questions with the partners', 1.5],

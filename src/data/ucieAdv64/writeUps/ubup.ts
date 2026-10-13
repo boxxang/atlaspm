@@ -280,7 +280,7 @@ export const UBUP_WRITE_UPS: UcieWriteUps = {
       'Step 1 maps results to the test plan. Step 2 compares margins with predictions while step 3 buckets deviations and opens issues in parallel. Step 4 agrees corner-matrix changes with characterization and step 5 releases the comparison.',
     consumes: [
       'Post-silicon test plan from verification closure in UDV-11',
-      'Margin predictions and silicon measurement plan from UAMS-07',
+      'Margin predictions and silicon measurement plan from UAMS-07, reissued on post-layout models in UPRE-05',
       'PVT and Monte Carlo link margin statistics from UAMS-05',
       'Per-lane training results from UBUP-03',
       'Bring-up plan and test programs from UTVP-06',
@@ -329,7 +329,7 @@ export const UBUP_WRITE_UPS: UcieWriteUps = {
       'Deviations by bucket',
     ],
     links: {
-      dependsOn: ['UDV-11', 'UAMS-07', 'UAMS-05', 'UBUP-03', 'UTVP-06'],
+      dependsOn: ['UDV-11', 'UAMS-07', 'UAMS-05', 'UBUP-03', 'UTVP-06', 'UPRE-05'],
       feedsInto: ['UBUP-06', 'UCHR-01', 'UCHR-09'],
       runsWith: ['UBUP-04'],
       revisedBy: [],

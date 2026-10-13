@@ -546,7 +546,7 @@ export const UCHR_WRITE_UPS: UcieWriteUps = {
     flowNote:
       'Step 1 places measurements against predictions and step 2 explains deviations, with models re-run on measured conditions in parallel in step 3. Step 4 agrees model updates and releases the report.',
     consumes: [
-      'Margin predictions and silicon measurement plan from UAMS-07',
+      'Margin predictions and silicon measurement plan from UAMS-07, reissued on post-layout models in UPRE-05',
       'PVT and Monte Carlo link margin statistics from UAMS-05',
       'Package channel extraction from UCHN-04',
       'Per-lane margins from UCHR-02, BER from UCHR-03, energy per bit from UCHR-04 and shmoos from UCHR-05',
@@ -595,7 +595,7 @@ export const UCHR_WRITE_UPS: UcieWriteUps = {
       'Model updates delivered to the release',
     ],
     links: {
-      dependsOn: ['UAMS-07', 'UAMS-05', 'UCHN-04', 'UCHR-02', 'UCHR-03', 'UCHR-04', 'UCHR-05', 'UCHR-08', 'UCHR-11'],
+      dependsOn: ['UAMS-07', 'UAMS-05', 'UCHN-04', 'UCHR-02', 'UCHR-03', 'UCHR-04', 'UCHR-05', 'UCHR-08', 'UCHR-11', 'UPRE-05'],
       feedsInto: ['UCHR-10', 'UGA-01', 'UGA-03'],
       runsWith: [],
       revisedBy: [],

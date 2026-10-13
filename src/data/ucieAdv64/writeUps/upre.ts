@@ -282,13 +282,13 @@ export const UPRE_WRITE_UPS: UcieWriteUps = {
       'UCIe Advanced channels are short, single-ended and forwarded-clocked, and they are judged by transfer function and eye mask rather than by a SerDes-style model of an equalizing receiver. A customer’s bridge or interposer is signed off with this kit, not with this team’s circuits, so a kit that is optimistic outside its range moves the risk into the customer’s package.',
     ],
     flowNote:
-      'Step 1 builds the behavioral models. Step 2 correlates the kit with post-layout margin while step 3 packages timing and power models in parallel, and step 4 runs the kit on a customer-style channel and releases it.',
+      'Step 1 builds the behavioral models. Step 2 reruns link margin on the post-layout models, correlates the kit and reissues the margin predictions while step 3 packages timing and power models in parallel, and step 4 runs the kit on a customer-style channel and releases it.',
     consumes: [
       'Post-layout extraction and simulation results from ULAY-05',
       'Package channel extraction and SI results from UCHN-04',
-      'Customer channel guidelines and reference design from UCHN-06',
-      'Final channel specification compliance decision from UCHN-08',
-      'Link margin simulation with package channels from UAMS-04',
+      'Reference design from UCHN-06 and the channel compliance decision from UCHN-08',
+      'Link margin setup from UAMS-04 and the margin predictions from UAMS-07',
+      'Extracted test vehicle bridge and interposer channels from UTVP-08',
     ],
     rel: {
       'UPRE-D5': '<b>Channel compliance kit — behavioral TX and RX models, transfer-function flow, eye mask and checker — with timing and power models.</b> Produced here with its validity range.',
@@ -311,7 +311,7 @@ export const UPRE_WRITE_UPS: UcieWriteUps = {
     effort: [
       ['Behavioral TX and RX models', 1.5],
       ['Transfer-function flow, eye mask and checker', 1.5],
-      ['Correlation', 1.2],
+      ['Post-layout link margin, correlation and predictions', 1.2],
       ['Timing and power models', 1],
       ['Customer-style validation and release', 0.8],
     ],
@@ -334,8 +334,8 @@ export const UPRE_WRITE_UPS: UcieWriteUps = {
       'Customer channels judged with the kit',
     ],
     links: {
-      dependsOn: ['ULAY-05', 'ULAY-06', 'UCHN-04', 'UCHN-06', 'UCHN-08', 'UAMS-04'],
-      feedsInto: ['UPRE-07', 'UPRE-08', 'UCUS-01', 'UCUS-02'],
+      dependsOn: ['ULAY-05', 'ULAY-06', 'UCHN-04', 'UCHN-06', 'UCHN-08', 'UAMS-04', 'UAMS-07', 'UTVP-08'],
+      feedsInto: ['UPRE-07', 'UPRE-08', 'UCUS-01', 'UCUS-02', 'UTVP-06', 'UBUP-05', 'UCHR-09'],
       runsWith: ['UPRE-04'],
       revisedBy: [],
       feedsBackInto: [],

@@ -417,7 +417,7 @@ export const UARC_WRITE_UPS: UcieWriteUps = {
       'Electrical PHY requirements from UREQ-08',
       'Package and bump pitch matrix from UREQ-03',
       'Energy-per-bit target from UREQ-02',
-      'Early channel estimates per package type',
+      'Reach per package type from UREQ-03, with channel losses from earlier die-to-die PHY packages',
     ],
     rel: {
       'UARC-D7': '<b>Electrical PHY architecture specification.</b> Produced here; UAFE-02 to UAFE-06 design to it.',
@@ -447,7 +447,7 @@ export const UARC_WRITE_UPS: UcieWriteUps = {
     entry: [
       'Timing budget drafted in UARC-06',
       'Electrical requirements released in UREQ-08',
-      'Early channel estimates available',
+      'Reach per package type set in UREQ-03',
     ],
     exit: [
       'Transmit and receive topologies chosen with feasibility simulation results',

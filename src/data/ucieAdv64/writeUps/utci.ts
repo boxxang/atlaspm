@@ -63,7 +63,7 @@ export const UTCI_WRITE_UPS: UcieWriteUps = {
     ],
     links: {
       dependsOn: ['UARC-10', 'UTEC-05', 'UREQ-07', 'UREQ-03', 'UARC-01'],
-      feedsInto: ['UTCI-02', 'UTCI-03', 'UTCI-06', 'UTVP-01', 'UTVP-03'],
+      feedsInto: ['UTCI-02', 'UTCI-03', 'UTCI-06', 'UTVP-01', 'UTVP-03', 'UTVP-08'],
       runsWith: [],
       revisedBy: [],
       feedsBackInto: [],

@@ -262,7 +262,7 @@ export const UTEC_WRITE_UPS: UcieWriteUps = {
     ],
     links: {
       dependsOn: ['UTEC-03'],
-      feedsInto: ['UTEC-06', 'UCHN-02'],
+      feedsInto: ['UTEC-06', 'UCHN-01', 'UCHN-02', 'UCHN-04'],
       runsWith: [],
       revisedBy: [],
       feedsBackInto: [],

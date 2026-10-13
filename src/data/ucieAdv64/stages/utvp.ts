@@ -54,8 +54,8 @@ export const UTVP: UcieStageModule = {
       s: [
         [1, 'Define the variants — bridge, interposer, reversed orientation and partner die — with die placement and channel lengths for each', 2],
         [2, 'Place the partner die on the bump map agreed with the partner and check the mating against both bump maps', 1.5, 1],
-        [3, 'Route the die-to-die channels on the bridge and on the interposer to the frozen channel rules and hand the routing to their signoff', 4],
-        [4, 'Design the substrate stack-ups, power delivery and breakout to the board for every variant', 3, 1],
+        [3, 'Route the die-to-die channels on the bridge and on the interposer to the frozen channel rules, place the channel measurement structures the correlation plan specifies, and hand the routing to their signoff', 4],
+        [4, 'Design the substrate stack-ups, power delivery to the PDN analysis and breakout to the board for every variant, from the test chip die outline and bump plan', 3, 1],
         [5, 'Run SI and PI checks of each variant’s channel against the channel specification', 3],
         [6, 'Release the package design databases to the substrate supplier and the assembly partner', 1],
       ],
@@ -91,7 +91,7 @@ export const UTVP: UcieStageModule = {
     'UTVP-03': {
       s: [
         [1, 'Design schematics for supplies, clocks, control access and instrument connections', 4],
-        [2, 'Lay out the board with a separately measurable supply for each PHY domain', 6],
+        [2, 'Lay out the board with a separately measurable supply for each PHY domain and the on-board measurement structures the correlation plan specifies', 6],
         [3, 'Design the socket or direct-mount option for the test vehicle', 3, 1],
         [4, 'Fabricate the boards and run bare-board tests', 8],
         [5, 'Bring the boards up without silicon — supplies, clocks and controller', 3],
@@ -175,7 +175,7 @@ export const UTVP: UcieStageModule = {
     },
     'UTVP-08': {
       s: [
-        [1, 'Take the bridge and interposer routing from the package design and complete their physical design with the power and test structures', 3],
+        [1, 'Take the bridge and interposer routing from the package design and complete their physical design with the power and test structures and the channel measurement and de-embedding structures the correlation plan specifies', 3],
         [2, 'Run DRC, LVS and the through-silicon via and microbump rules on the interposer and the bridge', 3],
         [3, 'Extract the passive channels and confirm them against the channel specification', 2, 1],
         [4, 'Review the databases with the assembly partner and the foundry that builds them', 2],

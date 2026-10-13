@@ -127,7 +127,7 @@ export const UCHN: UcieStageModule = {
     'UCHN-05': {
       s: [
         [1, 'Define supply domains and target impedance for the transmitter, receiver and clocking supplies', 3],
-        [2, 'Model the package and die power delivery network with bump, decoupling and plane parasitics', 5],
+        [2, 'Model the package and die power delivery network from the partners’ plane and decoupling options and a die grid estimate, with bump, decoupling and plane parasitics', 5],
         [3, 'Simulate supply noise from all lanes switching together and its effect on jitter', 5],
         [4, 'Size on-die and package decoupling and update the power bump allocation', 3, 1],
         [5, 'Release the PDN and PI analysis report', 1],
@@ -163,7 +163,7 @@ export const UCHN: UcieStageModule = {
     'UCHN-07': {
       s: [
         [1, 'Define which test vehicle channels are measured and how — loss, crosstalk and eye on each lane', 3],
-        [2, 'Specify the on-package and on-board structures channel measurement needs', 3],
+        [2, 'Specify the on-package, bridge, interposer and on-board measurement and de-embedding structures and hand them to the test vehicle package, bridge and interposer, and board designs', 3, 1],
         [3, 'Plan de-embedding of probe, board and fixture effects', 3, 1],
         [4, 'Define the correlation criteria between measured and simulated channels', 2],
         [5, 'Release the test vehicle channel correlation plan', 1],
@@ -179,7 +179,7 @@ export const UCHN: UcieStageModule = {
     },
     'UCHN-08': {
       s: [
-        [1, 'Recheck the reference and test vehicle channels against the channel specification, and confirm the final macro’s post-layout pad loading stays within the loads the specification assumes', 1.5],
+        [1, 'Recheck the reference and test vehicle channels against the channel specification, confirm the final macro’s post-layout pad loading stays within the loads the specification assumes, and check the post-layout supply droop', 1.5],
         [2, 'Review margins, waivers and open items with the PHY and package teams', 1],
         [3, 'Record the channel specification compliance decision', 1],
       ],

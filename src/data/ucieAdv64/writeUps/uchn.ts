@@ -17,7 +17,7 @@ export const UCHN_WRITE_UPS: UcieWriteUps = {
       'Package technology and bump pitch agreement from UTEC-03',
       'Bump map concept and module floorplan from UARC-09',
       'Draft transmitter and receiver budgets from UARC-07',
-      'Package partner stack-ups and material data',
+      'Package partner stack-ups and material properties from UTEC-04',
     ],
     rel: {
       'UCHN-D1': '<b>Channel specification — voltage transfer function loss, crosstalk, reach and eye mask per package type.</b> Produced here; circuit budgets, the customer channel compliance kit and customer guidelines are written against it.',
@@ -63,7 +63,7 @@ export const UCHN_WRITE_UPS: UcieWriteUps = {
       'Package types covered',
     ],
     links: {
-      dependsOn: ['UREQ-03', 'UTEC-03', 'UARC-09', 'UARC-07'],
+      dependsOn: ['UREQ-03', 'UTEC-03', 'UARC-09', 'UARC-07', 'UTEC-04'],
       feedsInto: ['UCHN-02', 'UCHN-03', 'UCHN-04', 'UAMS-04'],
       runsWith: ['UARC-06'],
       revisedBy: [],
@@ -84,7 +84,7 @@ export const UCHN_WRITE_UPS: UcieWriteUps = {
       'Package partner design rules and assembly constraints from UTEC-04',
       'Bump map concept from UARC-09',
       'Lane repair redundancy scheme from UARC-04',
-      'Package stack-ups per partner',
+      'Package stack-ups and material properties per partner from UTEC-04',
     ],
     rel: {
       'UCHN-D2': '<b>Bump and routing design rules for bridge, interposer and RDL packages.</b> Produced here; the bump map, the test vehicle and customer guidelines follow them.',
@@ -413,7 +413,7 @@ export const UCHN_WRITE_UPS: UcieWriteUps = {
       'Correlation after silicon is only possible if the structures to measure it were built into the test vehicle. This plan reaches the test vehicle design before its package and board are released.',
     ],
     flowNote:
-      'Step 1 defines what is measured and step 2 the structures needed. Step 3 plans de-embedding in parallel, step 4 sets the correlation criteria and step 5 releases the plan.',
+      'Step 1 defines what is measured while step 2 specifies the structures and hands them to the test vehicle designs, with de-embedding planned in step 3 alongside. Step 4 sets the correlation criteria and step 5 releases the plan.',
     consumes: [
       'Channel extraction and models from UCHN-04',
       'Test vehicle package design from UTVP-01',
@@ -464,7 +464,7 @@ export const UCHN_WRITE_UPS: UcieWriteUps = {
     ],
     links: {
       dependsOn: ['UCHN-04', 'UTVP-01', 'UCHN-01'],
-      feedsInto: ['UCHN-08', 'UCHR-08'],
+      feedsInto: ['UCHN-08', 'UCHR-08', 'UTVP-08', 'UTVP-03'],
       runsWith: [],
       revisedBy: [],
       feedsBackInto: ['UTVP-01'],
@@ -480,11 +480,11 @@ export const UCHN_WRITE_UPS: UcieWriteUps = {
     flowNote:
       'Step 1 checks the final channels, step 2 reviews margins and waivers and step 3 records the decision.',
     consumes: [
-      'Channel specification from UCHN-01',
+      'Channel specification from UCHN-01, with the guidelines and correlation plan from UCHN-06 and UCHN-07',
       'Final PHY macro layout from ULAY-04 and its post-layout pad loading from ULAY-05',
       'Channel and PDN results from UCHN-04 and UCHN-05',
       'Extracted test vehicle bridge and interposer channels from UTVP-08',
-      'Customer guidelines and correlation plan from UCHN-06 and UCHN-07',
+      'Post-layout dynamic droop per supply from EM and IR drop signoff in USGN-02',
     ],
     rel: {
       'UCHN-D8': '<b>Channel specification compliance record.</b> Produced here; closes the Channel Spec Met gate and feeds hard macro signoff.',
@@ -527,7 +527,7 @@ export const UCHN_WRITE_UPS: UcieWriteUps = {
       'Review date against plan',
     ],
     links: {
-      dependsOn: ['UCHN-01', 'UCHN-02', 'UCHN-03', 'UCHN-04', 'UCHN-05', 'UCHN-06', 'UCHN-07', 'ULAY-04', 'ULAY-05', 'UTVP-08'],
+      dependsOn: ['UCHN-01', 'UCHN-02', 'UCHN-03', 'UCHN-04', 'UCHN-05', 'UCHN-06', 'UCHN-07', 'ULAY-04', 'ULAY-05', 'UTVP-08', 'USGN-02'],
       feedsInto: ['USGN-06', 'USGN-07', 'UPRE-05'],
       runsWith: [],
       revisedBy: [],
