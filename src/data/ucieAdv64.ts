@@ -4,7 +4,7 @@
  * An IP program rather than a chip program: a die-to-die PHY for UCIe
  * Advanced packages at 64 GT/s — D2D Adapter, Logical PHY and sideband,
  * Electrical PHY, bumps and channel — proven on a test chip and released to
- * the customers who integrate it, from concept to general availability and
+ * the customers who integrate it, from concept to production release and
  * sustaining.
  *
  * Built the way the CPO template is (see /data/cpoSwitch): the skeleton fixes
@@ -105,7 +105,7 @@ export const UCIE_MILESTONES: readonly MilestoneDef[] = UCIE_SKELETON.map((st) =
 
 /**
  * The stages whose ends the countdowns read. An IP program has no production:
- * its third date is general availability, read under the shared key.
+ * its third date is production release, read under the shared key.
  */
 export const UCIE_COUNTDOWN_KEYS = {
   tapeout: 'ucieTapeout',

@@ -7,8 +7,8 @@ export const UPRE_WRITE_UPS: UcieWriteUps = {
   'UPRE-01': {
     criticalPath: false,
     purpose: [
-      'Define <b>what a release is, and who may receive it</b>, before the first one ships: the directory structure of the release package, the deliverable checklist for v0.5, v0.9 and GA, the release QA procedure every package passes, the export classification of the release contents and the licensee entitlements each view is mapped to, and the configuration management, version tagging and entitlement-controlled distribution that put the right files in the right licensee’s hands.',
-      'An IP vendor is judged on its release packages as much as on its circuits. Settling the structure and the checklist once, against the customer integration requirements, means v0.5, v0.9 and GA are the same package growing rather than three different deliveries, and customers learn where to look only once.',
+      'Define <b>what a release is, and who may receive it</b>, before the first one ships: the directory structure of the release package, the deliverable checklist for v0.5, v0.9 and production release, the release QA procedure every package passes, the export classification of the release contents and the licensee entitlements each view is mapped to, and the configuration management, version tagging and entitlement-controlled distribution that put the right files in the right licensee’s hands.',
+      'An IP vendor is judged on its release packages as much as on its circuits. Settling the structure and the checklist once, against the customer integration requirements, means v0.5, v0.9 and production release are the same package growing rather than three different deliveries, and customers learn where to look only once.',
     ],
     flowNote:
       'Step 1 defines the package structure and step 2 the deliverable checklist per release. Step 3 defines release QA while step 4 classifies the contents for export control and step 5 sets up tagging and controlled distribution in parallel, and step 6 approves the set.',

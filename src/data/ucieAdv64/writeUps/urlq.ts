@@ -286,7 +286,7 @@ export const URLQ_WRITE_UPS: UcieWriteUps = {
       'Aging analysis from signoff in USGN-05',
     ],
     rel: {
-      'URLQ-D5': '<b>Reliability report.</b> Produced here; it goes into the GA release and the silicon-proven decision.',
+      'URLQ-D5': '<b>Reliability report.</b> Produced here; it goes into the production release and the silicon-proven decision.',
       'URLQ-D6': '<b>Silicon-proven decision record.</b> The report is the reliability evidence the decision weighs.',
     },
     risks: [
@@ -294,7 +294,7 @@ export const URLQ_WRITE_UPS: UcieWriteUps = {
       '<b>Drift omitted.</b> Margin drift inside limits is left out of the summary.',
       '<b>Mechanisms missing.</b> Failures are counted without their mechanism.',
       '<b>Signoff not compared.</b> Aging predictions from signoff are never compared with stress results.',
-      '<b>Late report.</b> The report misses the GA rollup.',
+      '<b>Late report.</b> The report misses the production release rollup.',
     ],
     roles: [
       { r: 'Reliability', d: 'Owns the reliability report' },
@@ -339,7 +339,7 @@ export const URLQ_WRITE_UPS: UcieWriteUps = {
     criticalPath: true,
     purpose: [
       'Take the <b>silicon-proven decision</b>: the reliability report weighed with the characterization report and the compliance results, open findings reviewed with any conditions attached to the claim, and the decision recorded.',
-      'Silicon-proven is the claim licensees buy on, and the GA release rests on it. Making it once, on all three bodies of evidence and with its conditions written down, is what keeps it from being a marketing label applied at first link-up.',
+      'Silicon-proven is the claim licensees buy on, and the production release rests on it. Making it once, on all three bodies of evidence and with its conditions written down, is what keeps it from being a marketing label applied at first link-up.',
     ],
     flowNote:
       'Step 1 weighs reliability with characterization and compliance. Step 2 reviews open findings and conditions. Step 3 records the decision.',
@@ -351,7 +351,7 @@ export const URLQ_WRITE_UPS: UcieWriteUps = {
       'Compliance results summary from UCMP-05',
     ],
     rel: {
-      'URLQ-D6': '<b>Silicon-proven decision record.</b> Produced here; it closes the Silicon-Proven gate the GA release depends on.',
+      'URLQ-D6': '<b>Silicon-proven decision record.</b> Produced here; it closes the Silicon-Proven gate the production release depends on.',
     },
     risks: [
       '<b>Claim on partial evidence.</b> Silicon-proven is declared before reliability completes.',
@@ -379,7 +379,7 @@ export const URLQ_WRITE_UPS: UcieWriteUps = {
     ],
     exit: [
       'Silicon-proven decision recorded against the reliability, characterization and compliance evidence, with the lots and sample counts behind it',
-      'Every condition on the claim written for the GA release notes',
+      'Every condition on the claim written for the production release notes',
       'Every open finding assigned an owner and a disposition',
     ],
     dependsOn: ['URLQ-01', 'URLQ-02', 'URLQ-03', 'URLQ-04', 'URLQ-05', 'UCHR-10', 'UCMP-05'],
@@ -397,6 +397,6 @@ export const URLQ_WRITE_UPS: UcieWriteUps = {
       revisedBy: [],
       feedsBackInto: [],
     },
-    terms: ['GA', 'Compliance'],
+    terms: ['Production release', 'Compliance'],
   },
 };

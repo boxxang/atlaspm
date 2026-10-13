@@ -8,7 +8,7 @@ export const UCHR: UcieStageModule = {
   content: {
     tagline: 'Measure every lane at 64 GT/s across voltage, temperature and process, and hold each number against what was simulated.',
     description:
-      'Turn a link that works into data a licensee can design with. Per-lane eye and timing margin from the on-die margining functions — the die-to-die bumps never reach a pin, so nothing on them can be probed and the bench only calibrates the margining through the test chip’s observation path — BER at 64 GT/s measured long enough to say something about the target the specification sets, energy per bit across data rates and supplies, and voltage and temperature shmoos on the process split lots. The PHY’s own mechanisms are proven on silicon rather than in simulation: lane repair and lane reversal on deliberately mapped-out lanes and the reversed-orientation test vehicle variant, runtime recalibration while the die heats and cools, L1 and L2 entry and exit, and the PLL’s jitter, supply sensitivity and relock. The test vehicle channel is measured and correlated with its extracted model, and every result is placed next to the mixed-signal predictions so the models customers receive in the release are corrected by silicon. Results are reported per package type built — bridge and interposer variants — with any type supported only by simulation labelled as such. The stage closes on a reviewed characterization report that the GA release and the customer silicon report are built from.',
+      'Turn a link that works into data a licensee can design with. Per-lane eye and timing margin from the on-die margining functions — the die-to-die bumps never reach a pin, so nothing on them can be probed and the bench only calibrates the margining through the test chip’s observation path — BER at 64 GT/s measured long enough to say something about the target the specification sets, energy per bit across data rates and supplies, and voltage and temperature shmoos on the process split lots. The PHY’s own mechanisms are proven on silicon rather than in simulation: lane repair and lane reversal on deliberately mapped-out lanes and the reversed-orientation test vehicle variant, runtime recalibration while the die heats and cools, L1 and L2 entry and exit, and the PLL’s jitter, supply sensitivity and relock. The test vehicle channel is measured and correlated with its extracted model, and every result is placed next to the mixed-signal predictions so the models customers receive in the release are corrected by silicon. Results are reported per package type built — bridge and interposer variants — with any type supported only by simulation labelled as such. The stage closes on a reviewed characterization report that the production release and the customer silicon report are built from.',
     activities: [
       'Plan and corner matrix',
       'Eye and timing margin',
@@ -64,7 +64,7 @@ export const UCHR: UcieStageModule = {
       'Lanes characterized against the corner matrix',
       'BER test hours accumulated at 64 GT/s',
       'Measurements outside the predicted distribution, open and explained',
-      'Model updates agreed for the GA release',
+      'Model updates agreed for the production release',
     ],
     perspective:
       'A licensee cannot measure this IP before they buy it; they will design their package and their power budget from these numbers. Characterize the worst lane at the worst corner rather than the best lane at room temperature, and write down how long each BER number was measured for.',
@@ -205,7 +205,7 @@ export const UCHR: UcieStageModule = {
         [1, 'Place measured margins, BER and energy per bit against the predicted distributions', 1.5],
         [2, 'Explain each deviation as model, channel, process split or measurement', 1.5],
         [3, 'Re-run the mixed-signal models with the measured channel and silicon corners', 1.5, 1],
-        [4, 'Agree model updates for the GA release and release the correlation report', 2],
+        [4, 'Agree model updates for the production release and release the correlation report', 2],
       ],
       o: [
         'Measurements against predicted distributions',

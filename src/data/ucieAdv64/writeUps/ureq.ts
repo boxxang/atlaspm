@@ -75,7 +75,7 @@ export const UREQ_WRITE_UPS: UcieWriteUps = {
     criticalPath: true,
     purpose: [
       'Set the <b>PPA targets</b> customers will compare: bandwidth per millimeter of shoreline, energy per bit at 64 GT/s, area and shoreline per module, and FDI-to-bump latency for each Flit format and the Raw format.',
-      'These are the numbers on the datasheet and the ones the link margin review, the characterization and the GA silicon report are judged against. Each needs its measurement conditions written next to it, or simulation and silicon will quietly measure different things.',
+      'These are the numbers on the datasheet and the ones the link margin review, the characterization and the production release silicon report are judged against. Each needs its measurement conditions written next to it, or simulation and silicon will quietly measure different things.',
     ],
     flowNote:
       'Step 1 derives bandwidth density. Step 2 sets energy per bit while step 3 sets area and shoreline in parallel. Step 4 sets latency and step 5 releases the sheet.',
@@ -141,11 +141,11 @@ export const UREQ_WRITE_UPS: UcieWriteUps = {
   'UREQ-03': {
     criticalPath: true,
     purpose: [
-      'Agree the <b>package technologies and bump pitch range</b> the IP supports — silicon bridge, silicon interposer and RDL interposer, within the Advanced package range of roughly 25 to 55 micrometers — and the channel reach each needs, and which types will be silicon-proven at GA on test vehicle variants rather than supported by simulation only.',
+      'Agree the <b>package technologies and bump pitch range</b> the IP supports — silicon bridge, silicon interposer and RDL interposer, within the Advanced package range of roughly 25 to 55 micrometers — and the channel reach each needs, and which types will be silicon-proven at production release on test vehicle variants rather than supported by simulation only.',
       'The bump map, the module floorplan, the channel model and the test vehicle are all drawn for these choices. A range left wide open means the bump map is designed for none of them; a range too narrow loses the customers on the other package types.',
     ],
     flowNote:
-      'Step 1 lists the customers’ package technologies. Step 2 agrees the bump pitch range while step 3 records reach needs in parallel. Step 4 decides which types are silicon-proven at GA and step 5 releases the matrix.',
+      'Step 1 lists the customers’ package technologies. Step 2 agrees the bump pitch range while step 3 records reach needs in parallel. Step 4 decides which types are silicon-proven at production release and step 5 releases the matrix.',
     consumes: [
       'Customer package types from UCON-01',
       'Feature selection matrix from UREQ-01',
@@ -162,7 +162,7 @@ export const UREQ_WRITE_UPS: UcieWriteUps = {
       '<b>RDL channel assumed silicon-like.</b> RDL interposer loss is assumed equal to silicon and the reach fails.',
       '<b>Partner capability unconfirmed.</b> A pitch is committed that no package partner builds in volume.',
       '<b>Reach unstated.</b> Customers’ die spacing is not recorded and the channel is designed for the wrong length.',
-      '<b>Claim wider than the silicon.</b> Three package types are advertised at GA while the test vehicle proves fewer, and the rest are never labelled as simulation only.',
+      '<b>Claim wider than the silicon.</b> Three package types are advertised at production release while the test vehicle proves fewer, and the rest are never labelled as simulation only.',
     ],
     roles: [
       { r: 'Packaging', d: 'Owns the package technology and bump pitch matrix' },
@@ -185,7 +185,7 @@ export const UREQ_WRITE_UPS: UcieWriteUps = {
     exit: [
       'Supported package technologies listed with the customers that use each',
       'Bump pitch range agreed and inside the specification’s Advanced range',
-      'Required reach per package type recorded, and each type marked silicon-proven at GA or supported by simulation only',
+      'Required reach per package type recorded, and each type marked silicon-proven at production release or supported by simulation only',
     ],
     dependsOn: ['UREQ-01', 'UCON-01'],
     dependsNote: null,
@@ -539,7 +539,7 @@ export const UREQ_WRITE_UPS: UcieWriteUps = {
     criticalPath: true,
     purpose: [
       'Trace every requirement to a <b>customer need and to the activity and test that will prove it</b>, resolve the conflicts between PPA, feature and integration requirements, and place the baseline under change control.',
-      'A requirement without a verification owner is a wish. Tying each to the margin review, the verification plan, the characterization plan or the compliance plan now is what lets the GA review later check the IP against what was promised.',
+      'A requirement without a verification owner is a wish. Tying each to the margin review, the verification plan, the characterization plan or the compliance plan now is what lets the production release review later check the IP against what was promised.',
     ],
     flowNote:
       'Step 1 builds the traceability matrix. Step 2 resolves conflicts and step 3 holds the baseline review.',

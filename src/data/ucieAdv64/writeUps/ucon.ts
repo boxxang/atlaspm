@@ -158,7 +158,7 @@ export const UCON_WRITE_UPS: UcieWriteUps = {
       '<b>Support cost omitted.</b> Customer integration support is left out and every license loses money.',
       '<b>Test chip cost underestimated.</b> Shuttle, package and board costs for an advanced-package test vehicle are taken from a standard-package program.',
       '<b>Price set by competitor list.</b> The price matches a competitor without the volume or support terms behind it.',
-      '<b>Timing optimistic.</b> Revenue starts at v0.9 although customers will wait for silicon-proven GA.',
+      '<b>Timing optimistic.</b> Revenue starts at v0.9 although customers will wait for silicon-proven production release.',
       '<b>No sensitivity.</b> The case is a single number with no view of what slips or lost designs do to it.',
     ],
     roles: [
@@ -200,7 +200,7 @@ export const UCON_WRITE_UPS: UcieWriteUps = {
       revisedBy: [],
       feedsBackInto: [],
     },
-    terms: ['Business case', 'Test chip', 'Test vehicle', 'GA'],
+    terms: ['Business case', 'Test chip', 'Test vehicle', 'Production release'],
   },
   'UCON-04': {
     criticalPath: false,
@@ -271,7 +271,7 @@ export const UCON_WRITE_UPS: UcieWriteUps = {
   'UCON-05': {
     criticalPath: true,
     purpose: [
-      'Plan the program: an <b>integrated schedule to GA</b>, staffing by function, the test chip, test vehicle, board and shuttle budget, and the partners whose commitments the plan depends on.',
+      'Plan the program: an <b>integrated schedule to production release</b>, staffing by function, the test chip, test vehicle, board and shuttle budget, and the partners whose commitments the plan depends on.',
       'An IP program has two products on one schedule — the release packages customers receive and the test chip that proves them. The plan has to show both, and the long-lead items behind the test chip — the shuttle slot, the advanced-package test vehicle and the boards — have to be visible from kickoff.',
     ],
     flowNote:
@@ -314,7 +314,7 @@ export const UCON_WRITE_UPS: UcieWriteUps = {
       'Functional managers available for staffing input',
     ],
     exit: [
-      'Integrated schedule shows v0.5, v0.9, tapeout, first link-up and GA with dependencies',
+      'Integrated schedule shows v0.5, v0.9, tapeout, first link-up and production release with dependencies',
       'Every function staffed by name or by approved requisition',
       'Shuttle slot and package partner committed in writing or listed as a go condition',
     ],
@@ -333,13 +333,13 @@ export const UCON_WRITE_UPS: UcieWriteUps = {
       revisedBy: [],
       feedsBackInto: [],
     },
-    terms: ['Test chip', 'Test vehicle', 'MPW', 'GA'],
+    terms: ['Test chip', 'Test vehicle', 'MPW', 'Production release'],
   },
   'UCON-06': {
     criticalPath: true,
     purpose: [
       'Decide <b>go or no-go</b> on a new die-to-die PHY architecture on a new process: assess the program risks, assemble the decision package and record the decision with its conditions.',
-      'The commitment made here is large and long — about two and a half years to GA, a test chip and an advanced-package test vehicle. The review must decide on the evidence that the bandwidth density and energy targets are reachable, not on the momentum of the plan.',
+      'The commitment made here is large and long — about two and a half years to production release, a test chip and an advanced-package test vehicle. The review must decide on the evidence that the bandwidth density and energy targets are reachable, not on the momentum of the plan.',
     ],
     flowNote:
       'Step 1 assesses the risks, step 2 assembles the package from the brief, the business case, the roadmap and the plan, and step 3 holds the review and records the decision.',
@@ -397,6 +397,6 @@ export const UCON_WRITE_UPS: UcieWriteUps = {
       revisedBy: [],
       feedsBackInto: [],
     },
-    terms: ['Business case', 'GA', 'Test chip'],
+    terms: ['Business case', 'Production release', 'Test chip'],
   },
 };

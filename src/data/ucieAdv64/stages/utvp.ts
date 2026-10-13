@@ -47,7 +47,7 @@ export const UTVP: UcieStageModule = {
       'Bring-up plan steps with expected values',
     ],
     perspective:
-      'Silicon arrives on a date nobody can move; the hardware around it arrives on dates the program can. Treat every long-lead item as if it were on the critical path, because the week silicon spends waiting for a package or a probe card is a week the GA date loses.',
+      'Silicon arrives on a date nobody can move; the hardware around it arrives on dates the program can. Treat every long-lead item as if it were on the critical path, because the week silicon spends waiting for a package or a probe card is a week the production release date loses.',
   },
   steps: {
     'UTVP-01': {

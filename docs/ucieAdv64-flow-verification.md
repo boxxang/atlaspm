@@ -1,7 +1,9 @@
 # UCIe Advanced 64G Die-to-Die PHY IP — template verification
 
+_The final release was renamed from “GA” to “Production release” after this report was written; stage, gate and activity identifiers (ucieGa, ucieIpGa, UGA-nn) are unchanged so existing programs keep resolving._
+
 This report covers the new built-in template `ucieAdv64` ("UCIe Advanced 64G Die-to-Die PHY IP"). It is a new-development PHY IP
-for UCIe Advanced packages at 64 GT/s, proven on a test chip and released to licensees as v0.5, v0.9 and GA.
+for UCIe Advanced packages at 64 GT/s, proven on a test chip and released to licensees as v0.5, v0.9 and production release.
 
 **Sources.**
 
@@ -18,7 +20,7 @@ for UCIe Advanced packages at 64 GT/s, proven on a test chip and released to lic
 | Steps | 972, one output each |
 | Key deliverables | 200, one producer each |
 | Glossary | 115 UCIe and IP-development terms that no other template defines |
-| Kickoff → GA | W132 (the test requires 124–132) |
+| Kickoff → production release | W132 (the test requires 124–132) |
 | Kickoff → sustaining handover | W140 |
 | Engineering effort | 867 man-months |
 
@@ -31,7 +33,7 @@ for UCIe Advanced packages at 64 GT/s, proven on a test chip and released to lic
 | USGN | Shortened to W62–72, ending at its review | Leaves two weeks between hard macro signoff and the database release. Review V7b #1. |
 | UFAB | Lengthened to W76–98 (22 weeks) | Wafer fab with bumping takes 14 weeks and assembling every package variant takes 6. Reviews V7a #4 and V7b #14. |
 | UBUP, UCHR, UCMP, URLQ | Moved 2 weeks later | They follow first silicon. |
-| UGA | W120–132 | The rollup and GA QA now come after compliance and the silicon-proven decision. Review V7b #3. |
+| UGA | W120–132 | The rollup and production release QA now come after compliance and the silicon-proven decision. Review V7b #3. |
 
 **Prefixes.** All 25 prefixes (UCON … UCUS) were checked against every stage, activity and deliverable prefix of the four existing templates, and none collides. A unit test holds this.
 
@@ -44,7 +46,7 @@ for UCIe Advanced packages at 64 GT/s, proven on a test chip and released to lic
 - an overlap keeps any positive lead the template gives it;
 - total float comes from a backward pass.
 
-**Into GA approval (UGA-05).** The logic finishes at W132, the same as the template. The template carries no padding.
+**Into production release approval (UGA-05).** The logic finishes at W132, the same as the template. The template carries no padding.
 
 | Segment | Driving chain |
 |---|---|
@@ -56,11 +58,11 @@ for UCIe Advanced packages at 64 GT/s, proven on a test chip and released to lic
 | Fab and assembly | UFAB-01 → UFAB-02 → UFAB-03 → UFAB-05 **silicon in hand (W98)** |
 | Bring-up | UBUP-01 → 02 → 03 → 04 → UBUP-06 **first link-up (W106)** |
 | Reliability | URLQ-02 HTOL (W106–124) → URLQ-05 |
-| GA | UGA-01 → UGA-03 → UGA-04 → **UGA-05 GA (W132)** |
+| Production release | UGA-01 → UGA-03 → UGA-04 → **UGA-05 production release (W132)** |
 
-**Against the brief's intended spine.** The brief's path was UREQ → UARC → UAFE/URTL → UDV/UAMS → USGN → UTCI → UTPO → UFAB → UBUP → UCHR/UCMP/URLQ → UGA. In the computed path, float (in weeks) on each spine gate into GA is:
+**Against the brief's intended spine.** The brief's path was UREQ → UARC → UAFE/URTL → UDV/UAMS → USGN → UTCI → UTPO → UFAB → UBUP → UCHR/UCMP/URLQ → UGA. In the computed path, float (in weeks) on each spine gate into production release is:
 
-| Gate | Float into GA |
+| Gate | Float into production release |
 |---|---|
 | UREQ-09, UARC-12 | 0 |
 | UAFE-09, URTL-10 | 0 — the electrical PHY and the RTL are both critical |
@@ -147,7 +149,7 @@ A unit test ("gives every block a track …") holds that each block is defined, 
 
 - **UAFE-07 ↔ UAFE-12:** the calibration hooks and the sensors are designed together.
 - **UDPD-06 ↔ ULAY-06:** the digital and analog abstracts are exchanged both ways during macro assembly.
-- **UCUS-06 → UGA-04:** errata keep running after GA. GA consumes the errata log frozen at the cut-off, not the activity's end.
+- **UCUS-06 → UGA-04:** errata keep running after production release. Production release consumes the errata log frozen at the cut-off, not the activity's end.
 
 **Every hand-off the brief named exists and is tested.** For each one, the consumer waits on the producer and starts after it.
 
@@ -163,8 +165,8 @@ A unit test ("gives every block a track …") holds that each block is defined, 
 | Margin predictions → measurement-to-simulation correlation | UAMS-07 → UCHR-09 | W58 → W114 |
 | RTL freeze → v0.5 | URTL-10 → UPRE-02 | W52 → W54 |
 | Hard macro signoff → v0.9 | USGN-07 → UPRE-08 | W72 → W76 |
-| Characterization, compliance and reliability results → GA | UCHR-10, UCMP-05, URLQ-06 → UGA-05 | W122, W126, W128 → W131 |
-| v0.5 → customer support | UPRE-02 → UCUS-01 | W60 → W56 onward (support starts from the v0.5 drop; it ends past GA, at W140) |
+| Characterization, compliance and reliability results → production release | UCHR-10, UCMP-05, URLQ-06 → UGA-05 | W122, W126, W128 → W131 |
+| v0.5 → customer support | UPRE-02 → UCUS-01 | W60 → W56 onward (support starts from the v0.5 drop; it ends past production release, at W140) |
 
 ## V4 — gates and their exit criteria
 
@@ -217,10 +219,10 @@ The two-week spikes in physical design and verification come from overlapping wi
 |---|---|
 | Templates (`1-templates.jpg`) | The fifth built-in, with 25 stages and a flowchart, listed beside the other four, which are unchanged. |
 | Overview (`2-overview.jpg`) | The tapeout countdown reads the test chip tapeout. The effort and schedule panels show the template's stages. |
-| Timeline (`3-timeline.jpg`) | All 25 stages under their bands, including **Silicon Validation** and **IP Release & Enablement**. Major gates: Architecture Freeze, Hard Macro Signoff, Tapeout, Silicon-Proven, IP GA. |
+| Timeline (`3-timeline.jpg`) | All 25 stages under their bands, including **Silicon Validation** and **IP Release & Enablement**. Major gates: Architecture Freeze, Hard Macro Signoff, Tapeout, Silicon-Proven, IP Production Release. |
 | Stages (`4-stages.jpg`) | Grouped by band, in start order. |
 | Activity URTL-05 (`5-activity-URTL-05.jpg`) | Steps, deliverable tag, needs-first and connection links, and the glossary terms SBINIT, MBINIT, MBTRAIN, LINKINIT, PHYRETRAIN and TRAINERROR. |
-| Flowchart (`6-flowchart-top.jpg`, `7-flowchart-merge.jpg`) | The digital, electrical PHY, channel and test vehicle, and release workstreams are labelled. They join at the test chip tapeout and again at silicon validation and GA. |
+| Flowchart (`6-flowchart-top.jpg`, `7-flowchart-merge.jpg`) | The digital, electrical PHY, channel and test vehicle, and release workstreams are labelled. They join at the test chip tapeout and again at silicon validation and production release. |
 | Other templates | Their timelines do not show the new bands. The e2e test "leaves the other templates' timelines without the new bands" checks the Typical SoC and CPO templates. The band pickers list the new bands, as intended. |
 
 The V8 screenshots were taken before the review fixes. After the fixes, the e2e suite was run again and passed in full.
@@ -271,7 +273,7 @@ The following are written generically, because public sources either do not stat
 
 **Proposed fix.** This was not implemented; it is beyond this template's scope.
 
-- Add an optional `countdownLabels` to the built-in profile data, e.g. `{ firstSilicon: 'Silicon in Hand', production: 'IP GA' }` for `ucieAdv64`.
+- Add an optional `countdownLabels` to the built-in profile data, e.g. `{ firstSilicon: 'Silicon in Hand', production: 'IP Production Release' }` for `ucieAdv64`.
 - Look the labels up by the program's `profileId` where `buildSummaryDraft` is called. The call site already has the program, so this is a few lines.
 - Default to the current labels for every other template.
 
@@ -287,7 +289,7 @@ Two agents that had not written any of the content reviewed the template. One re
 |---|---|---|---|
 | 1 | H | Electrical compliance was planned like a SerDes bench test. The die-to-die bumps of an Advanced package cannot be probed. | **Fixed.** UCMP now tests against a reference die on a known-good bridge or interposer. The tests are driven over the sideband using on-die margining, BER, lane skew and TX equalization. The compliance control registers and injection hooks are designed into URTL-01/02 and UDFT-07, and UDV-09 verifies them. |
 | 2 | H | The interop partner was arranged after silicon. | **Fixed.** New UTEC-07 (W14–20) secures the partner and reference die and a mated bump map before the bump map freezes (W36). UTVP-01 builds the partner die into the test vehicle. A unit test holds the order. |
-| 3 | H | One test vehicle backed claims for three package types, and the reversed build was never made. | **Fixed.** UREQ-03 decides which package types are silicon-proven at GA and which are supported by simulation only. UTVP-01 and UFAB-03 build bridge, interposer, reversed-orientation and partner variants. UCHR and UGA report results per package type. |
+| 3 | H | One test vehicle backed claims for three package types, and the reversed build was never made. | **Fixed.** UREQ-03 decides which package types are silicon-proven at production release and which are supported by simulation only. UTVP-01 and UFAB-03 build bridge, interposer, reversed-orientation and partner variants. UCHR and UGA report results per package type. |
 | 4 | H | The interposer or bridge was treated as a purchase. | **Fixed.** New UTVP-08 signs off and tapes out the bridge and interposer (W54–68), with its slot booked in UTEC-05. UFAB-03 assembly is now 6 weeks. |
 | 5 | H | No one owned the PLL, and "PLL or DLL" were offered as alternatives. | **Fixed.** UREQ-08 and UARC-06 decide that the PLL sits inside the macro, with a reference-clock jitter specification. A PLL generates the clock and a DLL places phases. New UAFE-10 designs the PLL, ULAY-02 lays it out and new UCHR-11 characterizes it. |
 | 6 | H/M | Width degrade was applied to the Advanced package. | **Fixed.** Advanced now repairs a lane onto a redundant lane, then degrades speed, then goes to TRAINERROR. This changed the glossary and UARC-03, URTL-05, UDV-03/05 and UAMS-03. |
@@ -296,7 +298,7 @@ Two agents that had not written any of the content reviewed the template. One re
 | 9 | M | The revision's open-drain throttle / emergency shutdown and a hard-macro test wrapper were missing. | **Fixed.** UREQ-01 decides whether each is in scope. URTL-08 handles the throttle and shutdown, and UDFT-02 adds the wrapper. |
 | 10 | M | On-die sensors were used but never designed. | **Fixed.** New UAFE-12. UARC-03 triggers recalibration from the sensors, and UAMS-03 verifies the triggers. |
 | 11 | M | The sideband's electrical side had no owner. | **Fixed.** New UAFE-11 covers the sideband TX, RX, redundant path and always-on supply, and ULAY-02 lays them out. |
-| 12 | M | The schedule assumed first silicon works. | **Fixed** as a decision with a mask and slot option. New UBUP-07 is the respin or metal-fix decision, and UTEC-05 holds the mask and slot option. GA is not re-planned for a respin; see V7b #4. |
+| 12 | M | The schedule assumed first silicon works. | **Fixed** as a decision with a mask and slot option. New UBUP-07 is the respin or metal-fix decision, and UTEC-05 holds the mask and slot option. Production release is not re-planned for a respin; see V7b #4. |
 | 13 | M | Multi-module support was in the requirements only. | **Fixed.** Multi-module striping, module alignment and synchronized training are added in URTL-03/04/05 and verified in UDV-07. The test chip carries two modules. |
 | 14 | M | CDM on assembled microbumps cannot be done. | **Fixed.** URLQ-03 qualifies the die-to-die bumps at die or wafer level on test structures. Package-level ESD applies to external pins only. |
 | 15 | L/M | Formats and protocols were mixed. | **Fixed.** Flit and Raw formats are now kept apart from the protocols (PCIe, CXL and streaming are negotiated at the FDI). This changed UREQ-01, URTL-03, UDV-07 and the glossary. The UAFE tagline's "few millimeters" is also removed. |
@@ -307,8 +309,8 @@ Two agents that had not written any of the content reviewed the template. One re
 |---|---|---|---|
 | 1 | H | Test chip signoff and tapeout overlapped hard macro signoff, and one dependency pointed backwards. | **Fixed.** USGN now closes at W72, two weeks before the database release (W74–76). UTCI-05 integrates signoff-candidate macros, makes a trial database submission and runs a delta check after USGN-07. UTCI-06 no longer depends on the W88 bring-up plan. A unit test holds the 2-week gap. |
 | 2 | H | The bridge or interposer was a purchase, and one test vehicle covered three packages. | **Fixed.** See V7a #3 and #4. The backward dependency from UCHN-04 to UTVP-01 is removed. |
-| 3 | H | The GA rollup consumed results that arrive after it. | **Fixed.** GA now runs W120–132: rollup at W126–129, QA after the silicon-proven decision, approval at W131–132. UGA-03 consumes the ECO log frozen at the GA cut-off. A unit test holds "GA QA after silicon-proven". |
-| 4 | H | There was no respin path, and qualification rested on one lot. | **Partly fixed.** UBUP-07 is the respin decision, UTPO-03 offers a corner or engineering lot, and URLQ-06 states the lot and sample count. A respin branch is not scheduled: GA would move by several months, and the brief's 124–132-week window assumes first-pass silicon. |
+| 3 | H | The production release rollup consumed results that arrive after it. | **Fixed.** production release now runs W120–132: rollup at W126–129, QA after the silicon-proven decision, approval at W131–132. UGA-03 consumes the ECO log frozen at the production release cut-off. A unit test holds "production release QA after silicon-proven". |
+| 4 | H | There was no respin path, and qualification rested on one lot. | **Partly fixed.** UBUP-07 is the respin decision, UTPO-03 offers a corner or engineering lot, and URLQ-06 states the lot and sample count. A respin branch is not scheduled: production release would move by several months, and the brief's 124–132-week window assumes first-pass silicon. |
 | 5 | H | There was no stress hardware, and HTOL started before first link-up. | **Fixed.** New UTVP-09 provides stress boards, sockets and a package final test program. HTOL (URLQ-02) starts at W106, after time-zero screening. A unit test holds this. |
 | 6 | H | The interop partner was arranged too late. | **Fixed.** See V7a #2. |
 | 7 | M-H | The RTL freeze and DV sign-off were not measurable, there was no ECO path, and gate-level simulation could not have SDF. | **Fixed.** URTL-10 and UDV-12 now have measurable criteria. New UDPD-08 is the functional ECO. New USGN-08 runs timing-annotated gate-level simulation and feeds USGN-07. |
@@ -318,15 +320,15 @@ Two agents that had not written any of the content reviewed the template. One re
 | 11 | M | v0.9 was missing signoff collateral. | **Fixed.** v0.9 now adds SDC, UPF, a gate-level netlist with SDF, CDL, DFT collateral, training firmware and programming sequences, signoff summaries, a mission profile and the channel compliance kit. |
 | 12 | M | Release governance was missing. | **Fixed.** UPRE-01 covers export classification and entitlement. New UCUS-06 covers errata and patch releases, and new UCUS-07 covers variant and porting requests. |
 | 13 | M | Licensees saw no silicon data for 50 weeks. | **Fixed.** New UCUS-08 gives early silicon briefs under NDA (W108–118), which UCUS-02 consumes. |
-| 14 | M | 20 weeks for fab and assembly was aggressive. | **Fixed.** It is now 22 weeks, with bumping and package final test explicit. The brief's GA window does not allow 24–26 weeks without dropping something else; that is noted as a risk. |
+| 14 | M | 20 weeks for fab and assembly was aggressive. | **Fixed.** It is now 22 weeks, with bumping and package final test explicit. The brief's production release window does not allow 24–26 weeks without dropping something else; that is noted as a risk. |
 | 15 | L | Architecture and program management effort were thin, and there was no ECO reserve. | **Partly fixed.** Architecture effort rose from 18 to 32 man-months and concept from 9 to 12. Program management stays on its activities rather than a standing 1 FTE: the template counts engineering effort per activity, and standing overhead is outside that model. ECO effort sits in UDPD-08 and UCUS-06. |
 
 ### Not applied, and why
 
 | Finding | Why it was not applied |
 |---|---|
-| A scheduled respin branch (V7b #4, V7a #12) | The decision point and the mask option are in the plan, but the dates assume first-pass silicon, as the brief's 124–132-week GA window does. |
-| 24–26 weeks for fab and assembly (V7b #14) | 22 weeks are planned. 26 would push GA to W136, outside the brief's window. |
+| A scheduled respin branch (V7b #4, V7a #12) | The decision point and the mask option are in the plan, but the dates assume first-pass silicon, as the brief's 124–132-week production release window does. |
+| 24–26 weeks for fab and assembly (V7b #14) | 22 weeks are planned. 26 would push production release to W136, outside the brief's window. |
 | Program management as a standing 1 FTE (V7b #15) | Outside the template's per-activity effort model. |
 
 ## Appendix — generated tables
@@ -466,8 +468,8 @@ Regenerate with `npx tsx tools/ucieFlow/report.ts`.
 | UPRE | Release package QA | UPRE-07 v0.9 Release Package QA | covered |
 | UGA | Final release package with silicon data | UGA-01 Silicon Data Rollup into the Release Package; UGA-03 Final Release Package — Views, Models and Documents Updated to Silicon | covered |
 | UGA | Silicon report and characterization summary | UGA-02 Silicon Report and Characterization Summary | covered |
-| UGA | Release QA | UGA-04 GA Release QA | covered |
-| UGA | GA approval | UGA-05 GA Approval Review | covered |
+| UGA | Release QA | UGA-04 Production Release QA | covered |
+| UGA | Production release approval | UGA-05 Production Release Approval Review | covered |
 | UCUS | Customer integration reviews — floorplan, bump, power, channel | UCUS-01 Customer Integration Reviews — Floorplan, Bump Map, Power and Channel | covered |
 | UCUS | SoC-level signoff support | UCUS-02 SoC-Level Signoff Support | covered |
 | UCUS | Documentation and FAQ | UCUS-03 Documentation, FAQ and Knowledge Base | covered |
@@ -490,7 +492,7 @@ Regenerate with `npx tsx tools/ucieFlow/report.ts`.
 
 Required items: 150; missing: 0.
 
-### V2 — each block, from definition to GA
+### V2 — each block, from definition to production release
 
 **adapter**
 
@@ -620,16 +622,16 @@ Deliverables whose producer feeds nothing downstream: UCUS-D5 (UCUS-05)
 | UTPO | Tapeout ★ | W76 | UTPO-04 Database Release and Foundry Handoff | Foundry intake acceptance received in writing · Submitted database checksum identical to the checked database · Data preparation on the PHY layers reviewed and approved |
 | UFAB | Silicon in Hand | W98 | UFAB-05 First Samples Received in the Lab | Every received unit logged with wafer, split, assembly and board serial · Units allocated to bring-up, characterization, compliance and reliability per plan · First units handed to bring-up with silicon in hand recorded |
 | UBUP | First Link-up | W106 | UBUP-06 First Link-Up Review | First link-up declared on named units with the link active at 64 GT/s · Every open issue and workaround has an owner and a decision on whether it blocks characterization · Units allocated to characterization, compliance and reliability, with repaired lanes identified |
-| UCHR | Characterization Report | W122 | UCHR-10 Characterization Report Review | Every PPA target reported as met or missed with the measured value, its conditions and the package type it was measured on · Every open deviation listed with an owner and its effect on the release · Report released and handed to the GA rollup |
-| UCMP | Compliance Pass | W126 | UCMP-05 Compliance Results Review | Every requirement in scope recorded as passed, failed or waived with a reason · Every waiver approved with its effect on the release stated · Compliance pass decision recorded and handed to the GA review |
-| URLQ | Silicon-Proven ★ | W128 | URLQ-06 Silicon-Proven Decision Review | Silicon-proven decision recorded against the reliability, characterization and compliance evidence, with the lots and sample counts behind it · Every condition on the claim written for the GA release notes · Every open finding assigned an owner and a disposition |
+| UCHR | Characterization Report | W122 | UCHR-10 Characterization Report Review | Every PPA target reported as met or missed with the measured value, its conditions and the package type it was measured on · Every open deviation listed with an owner and its effect on the release · Report released and handed to the production release rollup |
+| UCMP | Compliance Pass | W126 | UCMP-05 Compliance Results Review | Every requirement in scope recorded as passed, failed or waived with a reason · Every waiver approved with its effect on the release stated · Compliance pass decision recorded and handed to the production release review |
+| URLQ | Silicon-Proven ★ | W128 | URLQ-06 Silicon-Proven Decision Review | Silicon-proven decision recorded against the reliability, characterization and compliance evidence, with the lots and sample counts behind it · Every condition on the claim written for the production release notes · Every open finding assigned an owner and a disposition |
 | UPRE | v0.9 Release | W78 | UPRE-08 v0.9 Release Decision | Every v0.9 release criterion recorded as met or waived with customer impact · Go or no-go decision recorded with attendees · v0.9 delivered to every entitled licensee |
-| UGA | IP GA ★ | W132 | UGA-05 GA Approval Review | Characterization, compliance and reliability each recorded as passed against the GA criteria · GA decision recorded with any conditions and the open errata it accepts · GA package published to every licensee |
+| UGA | IP Production Release ★ | W132 | UGA-05 Production Release Approval Review | Characterization, compliance and reliability each recorded as passed against the production release criteria · Production release decision recorded with any conditions and the open errata it accepts · Production release package published to every licensee |
 | UCUS | Sustaining Handover | W140 | UCUS-05 Sustaining Handover Review | Every open issue and customer commitment has a named owner in sustaining · Every release rebuilt successfully from the handed-over archive · Support model with staffing and response targets signed by sustaining and product management |
 
 ### V5 — critical path
 
-Into GA approval (UGA-05): logic finish W132, template finish W132.
+Into production release approval (UGA-05): logic finish W132, template finish W132.
 
 | Activity | Item | Logic weeks | Template weeks | Wait |
 | --- | --- | --- | --- | --- |
@@ -666,12 +668,12 @@ Into GA approval (UGA-05): logic finish W132, template finish W132.
 | UGA-01 Silicon Data Rollup into the Release Package | program | W126–129 | W126–129 | FS |
 | UGA-02 Silicon Report and Characterization Summary | afe | W124–129 | W124–129 | FF |
 | UGA-03 Final Release Package — Views, Models and Documents Updated to Silicon | program | W125–130 | W125–130 | FF |
-| UGA-04 GA Release QA | program | W129–131 | W129–131 | FF |
-| UGA-05 GA Approval Review | program | W131–132 | W131–132 | FS |
+| UGA-04 Production Release QA | program | W129–131 | W129–131 | FF |
+| UGA-05 Production Release Approval Review | program | W131–132 | W131–132 | FS |
 
-The planned spine, stage by stage, with total float into GA approval:
+The planned spine, stage by stage, with total float into production release approval:
 
-| Stage | Gate activity | Weeks | Float into GA (weeks) |
+| Stage | Gate activity | Weeks | Float into production release (weeks) |
 | --- | --- | --- | --- |
 | ucieRequirements | UREQ-09 Requirements Traceability Matrix and Requirements Baseline Review | W11–14 | 0 |
 | ucieArchitecture | UARC-12 Architecture Review and Architecture Freeze | W20–22 | 0 |
@@ -687,11 +689,11 @@ The planned spine, stage by stage, with total float into GA approval:
 | ucieCharacterization | UCHR-10 Characterization Report Review | W118–122 | 2 |
 | ucieCompliance | UCMP-05 Compliance Results Review | W123–126 | 3 |
 | ucieReliability | URLQ-06 Silicon-Proven Decision Review | W126–128 | 1 |
-| ucieGa | UGA-05 GA Approval Review | W131–132 | 0 |
+| ucieGa | UGA-05 Production Release Approval Review | W131–132 | 0 |
 
 Float on the channel and the test vehicle:
 
-| Activity | Weeks | Float into GA | Float into tapeout (UTPO-04) | Float into silicon in hand (UFAB-05) |
+| Activity | Weeks | Float into production release | Float into tapeout (UTPO-04) | Float into silicon in hand (UFAB-05) |
 | --- | --- | --- | --- | --- |
 | UCHN-01 Channel Specification — Voltage Transfer Function Loss, Crosstalk, Reach and Eye Mask | W16–26 | 0 | 0 | 0 |
 | UCHN-02 Bump and Routing Design Rules for Bridge, Interposer and RDL Packages | W20–32 | 0 | 0 | 0 |

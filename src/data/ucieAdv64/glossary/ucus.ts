@@ -22,6 +22,6 @@ export const UCUS_GLOSSARY: UcieGlossary = {
   'Early silicon brief': {
     full: 'Early silicon brief',
     group: 'ip',
-    note: 'A preliminary summary of test chip results shared under NDA with licensees before GA, marked as preliminary, so customers in signoff can weigh silicon evidence before it is final.',
+    note: 'A preliminary summary of test chip results shared under NDA with licensees before production release, marked as preliminary, so customers in signoff can weigh silicon evidence before it is final.',
   },
 };

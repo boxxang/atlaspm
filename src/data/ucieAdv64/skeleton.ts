@@ -7,7 +7,7 @@
  * macros, models, views and documents — that customers integrate into their
  * own SoCs, for UCIe Advanced packages (silicon bridge, silicon interposer,
  * RDL interposer) at 64 GT/s. A test chip on a test vehicle is how the IP is
- * proven, and the program ends at general availability with customers
+ * proven, and the program ends at production release with customers
  * already integrating. The scope runs from the FDI down through the D2D
  * Adapter, the Logical PHY and sideband, the Electrical PHY and the bumps and
  * channel; the Protocol Layer above the FDI is the customer's.
@@ -16,7 +16,7 @@
  * workstream reaches together, and the digital, analog, channel, test chip
  * and release workstreams run as parallel activities inside them. The
  * scenario is new development — a new architecture on a new process — about
- * 128 weeks from kickoff to GA. Every week is data here, so a feature upgrade
+ * 128 weeks from kickoff to production release. Every week is data here, so a feature upgrade
  * or a port can be a profile with shorter design stages rather than new code.
  *
  * Weeks are from kickoff; activity windows are weeks from their stage's
@@ -559,17 +559,17 @@ export const UCIE_SKELETON: readonly UcieStageSkeleton[] = [
   {
     key: 'ucieGa',
     prefix: 'UGA',
-    title: 'General Availability Release',
+    title: 'Production Release',
     band: 'ipRelease',
     start: 120,
     dur: 12,
-    gate: { id: 'ucieIpGa', label: 'IP GA', major: true },
+    gate: { id: 'ucieIpGa', label: 'IP Production Release', major: true },
     activities: [
       a('UGA-01', 'Silicon Data Rollup into the Release Package', 'Customer engineering', [6, 9], 'program'),
       a('UGA-02', 'Silicon Report and Characterization Summary', 'Validation', [4, 9], 'afe'),
       a('UGA-03', 'Final Release Package — Views, Models and Documents Updated to Silicon', 'Technical documentation', [5, 10], 'program'),
-      a('UGA-04', 'GA Release QA', 'Quality', [9, 11], 'program'),
-      a('UGA-05', 'GA Approval Review', 'Program management', [11, 12], 'program'),
+      a('UGA-04', 'Production Release QA', 'Quality', [9, 11], 'program'),
+      a('UGA-05', 'Production Release Approval Review', 'Program management', [11, 12], 'program'),
     ],
   },
   {

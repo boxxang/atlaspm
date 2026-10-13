@@ -69,7 +69,7 @@ export const UPRE: UcieStageModule = {
     'UPRE-01': {
       s: [
         [1, 'Define the release package structure — directories, views, models, scripts and documents per release level', 1],
-        [2, 'Write the deliverable checklist for v0.5, v0.9 and GA against the customer integration requirements', 1],
+        [2, 'Write the deliverable checklist for v0.5, v0.9 and production release against the customer integration requirements', 1],
         [3, 'Define the release QA procedure — file integrity, view consistency, model sanity runs and document review', 1],
         [4, 'Classify the release contents for export control and map each view to the licensee entitlements that may receive it', 1, 1],
         [5, 'Set up release configuration management, version tagging and entitlement-controlled distribution', 0.5, 1],

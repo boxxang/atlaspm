@@ -8,7 +8,7 @@ export const UTCI_WRITE_UPS: UcieWriteUps = {
     criticalPath: true,
     purpose: [
       'Define the <b>test chip architecture</b> from the claims it has to prove: a two-die link with two modules per die across the advanced-package test vehicle for the real channel and multi-module operation, loopback configurations for single-die and wafer-level testing, traffic sources and checkers, clock and reset control, debug access and a probe-able observation path for bench calibration — written down as a coverage map from every datasheet claim and compliance test to the configuration that demonstrates it.',
-      'A test chip is designed backwards from the GA report. Every number the program will publish — eye margin per lane, BER at 64 GT/s, energy per bit, lane repair, runtime recalibration — needs a configuration that can produce it at full rate, and a chip that can only loop back on itself never proves the die-to-die channel.',
+      'A test chip is designed backwards from the production release report. Every number the program will publish — eye margin per lane, BER at 64 GT/s, energy per bit, lane repair, runtime recalibration — needs a configuration that can produce it at full rate, and a chip that can only loop back on itself never proves the die-to-die channel.',
     ],
     flowNote:
       'Step 1 lists the claims and tests to cover. Step 2 defines the two-die and loopback configurations while step 3 defines traffic, control and debug in parallel. Step 4 releases the specification with the coverage map.',

@@ -42,7 +42,7 @@ export const UTCI: UcieStageModule = {
       'Test chip signoff readiness versus hard macro signoff',
     ],
     perspective:
-      'The test chip is a measurement instrument with a PHY inside it. Design it backwards from the characterization report and the compliance tests: if a number has to be in the GA report, the chip needs a way to produce it at full rate, on the real channel, with visibility when it fails.',
+      'The test chip is a measurement instrument with a PHY inside it. Design it backwards from the characterization report and the compliance tests: if a number has to be in the production release report, the chip needs a way to produce it at full rate, on the real channel, with visibility when it fails.',
   },
   steps: {
     'UTCI-01': {

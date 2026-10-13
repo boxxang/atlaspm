@@ -6,7 +6,7 @@
  * fed from the template itself so the chart cannot drift from it, with this
  * program's layout: four workstreams — digital, electrical PHY, channel and
  * test vehicle, and the customer releases — drawn side by side, joining at
- * the test chip tapeout and again at silicon validation and GA.
+ * the test chip tapeout and again at silicon validation and production release.
  */
 import { readFileSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
@@ -172,7 +172,7 @@ const CFG = {
   /* drawn even though a longer route reaches the same stage */
   keep: ['ucieSignoff>ucieTapeout', 'ucieTestVehicle>ucieBringup', 'ucieRtl>uciePreSilicon'],
   siliconNote:
-    '<b>Spine</b> (bold) from concept to GA through the electrical PHY — circuit design, link margin, layout, hard macro signoff, the test chip, silicon and characterization. <b>Feeds</b> (dashed) show where the other workstreams join it: technology and foundation IP → architecture and circuits, the channel → link margin, digital implementation → signoff, the test vehicle and boards → bring-up, reliability, compliance and customer integration → GA.',
+    '<b>Spine</b> (bold) from concept to production release through the electrical PHY — circuit design, link margin, layout, hard macro signoff, the test chip, silicon and characterization. <b>Feeds</b> (dashed) show where the other workstreams join it: technology and foundation IP → architecture and circuits, the channel → link margin, digital implementation → signoff, the test vehicle and boards → bring-up, reliability, compliance and customer integration → production release.',
   second: {
     label: 'Channel, test vehicle &amp; release path',
     nodes: [
@@ -189,7 +189,7 @@ const CFG = {
       'ucieBringup',
       'ucieGa',
     ],
-    note: 'Package technology → channel specification and bump map → test chip and test vehicle → tapeout, fab and bring-up; and the releases: v0.5 from the RTL freeze, v0.9 from hard macro signoff, customer integration from v0.5, GA from silicon.',
+    note: 'Package technology → channel specification and bump map → test chip and test vehicle → tapeout, fab and bring-up; and the releases: v0.5 from the RTL freeze, v0.9 from hard macro signoff, customer integration from v0.5, production release from silicon.',
   },
   tags: STREAM,
   tagStyle: {
@@ -202,8 +202,8 @@ const CFG = {
   origin: {},
   originDefault: '',
   statExtra: [],
-  endTitle: 'IP GA',
-  endNote: `v0.5 at W${STAGES.find((s) => s.key === 'uciePreSilicon')!.start + 8} · Architecture Freeze at W${at('ucieArchitecture')} · Hard Macro Signoff at W${at('ucieSignoff')} · Tapeout at W${at('ucieTapeout')} · Silicon in Hand at W${at('ucieFab')} · Silicon-Proven at W${at('ucieReliability')} · GA at W${at('ucieGa')}`,
+  endTitle: 'IP Production Release',
+  endNote: `v0.5 at W${STAGES.find((s) => s.key === 'uciePreSilicon')!.start + 8} · Architecture Freeze at W${at('ucieArchitecture')} · Hard Macro Signoff at W${at('ucieSignoff')} · Tapeout at W${at('ucieTapeout')} · Silicon in Hand at W${at('ucieFab')} · Silicon-Proven at W${at('ucieReliability')} · production release at W${at('ucieGa')}`,
 };
 
 if (!CFG.keep.every((k) => EDGES.some(([a, z]) => `${a}>${z}` === k))) throw new Error('A kept link is not a link.');
@@ -249,7 +249,7 @@ swap(
 );
 out = out.replace(
   /<p>The full development flow of AtlasPM’s built-in <b>Typical SoC<\/b> template:[^<]*(<[^>]+>[^<]*)*?<\/p>/,
-  '<p>The full development flow of AtlasPM’s built-in <b>UCIe Advanced 64G Die-to-Die PHY IP</b> template: a die-to-die PHY for UCIe Advanced packages at 64 GT/s — D2D Adapter, Logical PHY and sideband, Electrical PHY, bumps and channel — newly developed, proven on a test chip on an advanced-package test vehicle, and released to the customers who integrate it, from concept to GA. Four workstreams run side by side — digital, electrical PHY, channel and test vehicle, and the customer releases — and join at the test chip tapeout, at silicon validation and at GA. Stages flow top to bottom by start week; columns are the lifecycle bands. Click any stage for its activities, deliverables and links.</p>',
+  '<p>The full development flow of AtlasPM’s built-in <b>UCIe Advanced 64G Die-to-Die PHY IP</b> template: a die-to-die PHY for UCIe Advanced packages at 64 GT/s — D2D Adapter, Logical PHY and sideband, Electrical PHY, bumps and channel — newly developed, proven on a test chip on an advanced-package test vehicle, and released to the customers who integrate it, from concept to production release. Four workstreams run side by side — digital, electrical PHY, channel and test vehicle, and the customer releases — and join at the test chip tapeout, at silicon validation and at production release. Stages flow top to bottom by start week; columns are the lifecycle bands. Click any stage for its activities, deliverables and links.</p>',
 );
 swap('<button data-mode="silicon" aria-pressed="false">Silicon path</button>', '<button data-mode="silicon" aria-pressed="false">Electrical PHY path</button>');
 swap('<button data-mode="platform" aria-pressed="false">Package &amp; test path</button>', '<button data-mode="platform" aria-pressed="false">Channel, test vehicle &amp; release path</button>');

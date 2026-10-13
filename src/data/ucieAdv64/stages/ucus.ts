@@ -8,7 +8,7 @@ export const UCUS: UcieStageModule = {
   content: {
     tagline: 'Carry every licensee from the first v0.5 simulation to a signed-off SoC, and hand the IP to sustaining with nothing open.',
     description:
-      'A die-to-die PHY is only proven when it works in other people’s chips. From the v0.5 release onward, customer engineering reviews each licensee’s integration — floorplan and macro placement, bump map and package routing, power delivery and decoupling, and their extracted channels and link margin — against the integration guide and channel guidelines. After v0.9 it supports their SoC-level signoff: timing at the macro boundary, EM/IR and power, physical verification of the macro in their database, and link simulation with the released models. A knowledge base and FAQ grow from the questions customers ask, and every customer issue is reproduced in the reference environment, root-caused and closed by a workaround, a document change or an ECO. Errata are published and patch releases go out with their own QA and a notification to every affected licensee; requests for variants and ports — another metal stack, orientation, module count, bump pitch or package type — are evaluated and decided rather than accepted ad hoc; and once the test chip links up, licensees still in SoC signoff receive early silicon briefs under NDA instead of waiting for GA. The stage runs past GA and closes when the support model, the issue tracker, the knowledge base and the release archive are handed to sustaining.',
+      'A die-to-die PHY is only proven when it works in other people’s chips. From the v0.5 release onward, customer engineering reviews each licensee’s integration — floorplan and macro placement, bump map and package routing, power delivery and decoupling, and their extracted channels and link margin — against the integration guide and channel guidelines. After v0.9 it supports their SoC-level signoff: timing at the macro boundary, EM/IR and power, physical verification of the macro in their database, and link simulation with the released models. A knowledge base and FAQ grow from the questions customers ask, and every customer issue is reproduced in the reference environment, root-caused and closed by a workaround, a document change or an ECO. Errata are published and patch releases go out with their own QA and a notification to every affected licensee; requests for variants and ports — another metal stack, orientation, module count, bump pitch or package type — are evaluated and decided rather than accepted ad hoc; and once the test chip links up, licensees still in SoC signoff receive early silicon briefs under NDA instead of waiting for production release. The stage runs past production release and closes when the support model, the issue tracker, the knowledge base and the release archive are handed to sustaining.',
     activities: ['Integration reviews', 'SoC signoff support', 'Documentation and FAQ', 'Issues and ECOs', 'Sustaining handover', 'Errata and patch releases', 'Variant and porting requests', 'Early silicon briefs'],
     deliverables: [
       'Customer integration review records — floorplan, bump map, power and channel',
@@ -34,7 +34,7 @@ export const UCUS: UcieStageModule = {
       'Customer signoff run with an older release than the one supported',
       'Sustaining handed over with open severe issues and no owner for them',
       'Knowledge base answers drifting from the integration guide as each is updated separately',
-      'Licensees taping out SoCs during the months between v0.9 and GA with no silicon data at all',
+      'Licensees taping out SoCs during the months between v0.9 and production release with no silicon data at all',
       'A variant promised to one customer that needs new views the release structure cannot carry',
     ],
     leader: { name: 'Elena Okonkwo', short: 'E. Okonkwo', phone: '+1 (408) 555-0663', email: 'elena.okonkwo@example.com' },
@@ -141,7 +141,7 @@ export const UCUS: UcieStageModule = {
         [2, 'Turn confirmed issues and silicon findings into errata entries with workarounds and the releases they affect', 20],
         [3, 'Build patch releases on the v0.9 line with their own release QA and release notes', 20, 1],
         [4, 'Notify every affected licensee of each erratum and patch and record the acknowledgement', 10, 1],
-        [5, 'Keep the errata list consistent with the knowledge base and carry it into the GA release notes', 20],
+        [5, 'Keep the errata list consistent with the knowledge base and carry it into the production release notes', 20],
         [6, 'Hand the errata list and patch history to sustaining', 4],
       ],
       o: [
@@ -149,7 +149,7 @@ export const UCUS: UcieStageModule = {
         'Errata entries with workarounds',
         'QA-passed patch releases with release notes',
         'Licensee notification and acknowledgement record',
-        'Errata list carried into the GA release notes',
+        'Errata list carried into the production release notes',
         'Errata list, patch releases and licensee notification record',
       ],
       r: [['UCUS-D6', 'produces'], ['UCUS-D3', 'feeds']],

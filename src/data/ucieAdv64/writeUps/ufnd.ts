@@ -159,7 +159,7 @@ export const UFND_WRITE_UPS: UcieWriteUps = {
     },
     risks: [
       '<b>Untested flow.</b> The flow is installed but no block has been closed through it.',
-      '<b>Version drift.</b> Tool versions change between v0.9 and GA and the views cannot be reproduced.',
+      '<b>Version drift.</b> Tool versions change between v0.9 and production release and the views cannot be reproduced.',
       '<b>Abstract gaps.</b> Abstracts omit blockages a customer router needs.',
       '<b>Signoff mismatch.</b> The flow’s signoff settings differ from what customers will run.',
       '<b>Undocumented scripts.</b> One engineer knows the flow and leaves.',

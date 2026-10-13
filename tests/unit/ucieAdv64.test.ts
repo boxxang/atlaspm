@@ -13,7 +13,7 @@ import * as Flow from '../../tools/ucieFlow/analysis';
 
 /**
  * The UCIe Advanced 64G Die-to-Die PHY IP template: an IP program from
- * concept to general availability, staged by lifecycle, with the adapter,
+ * concept to production release, staged by lifecycle, with the adapter,
  * logical PHY, electrical PHY, channel, test chip and release workstreams
  * running as parallel activities inside the stages.
  */
@@ -313,7 +313,7 @@ describe('UCIe as a built-in', () => {
     );
   });
 
-  it('dates its countdowns in order — tapeout, silicon in hand, GA — and runs about 128 weeks to GA', () => {
+  it('dates its countdowns in order — tapeout, silicon in hand, production release — and runs about 128 weeks to production release', () => {
     const sch = computeSchedule(new Date(2027, 0, 4), UCIE_PROFILE, {});
     expect(sch.tapeout!.getTime()).toBeLessThan(sch.firstSilicon!.getTime());
     expect(sch.firstSilicon!.getTime()).toBeLessThan(sch.production!.getTime());
@@ -371,19 +371,19 @@ describe('UCIe flow rules', () => {
     }
   });
 
-  it('releases to customers in step: v0.5 after RTL freeze, v0.9 after signoff, GA on every silicon result, support from v0.5 past GA', () => {
+  it('releases to customers in step: v0.5 after RTL freeze, v0.9 after signoff, production release on every silicon result, support from v0.5 past production release', () => {
     dependsOnAll('UPRE-02', ['URTL-10']);
     expect(absStart('UPRE-02')).toBeGreaterThanOrEqual(stageEnd('ucieRtl'));
     dependsOnAll('UPRE-08', ['USGN-07']);
     expect(absStart('UPRE-08')).toBeGreaterThanOrEqual(stageEnd('ucieSignoff'));
-    for (const x of ['UCHR-10', 'UCMP-05', 'URLQ-06']) expect(Flow.predecessorsOf('UGA-05'), `GA approval waits on ${x}`).toContain(x);
+    for (const x of ['UCHR-10', 'UCMP-05', 'URLQ-06']) expect(Flow.predecessorsOf('UGA-05'), `Production release approval waits on ${x}`).toContain(x);
     const customer = UCIE_SKELETON.find((s) => s.key === 'ucieCustomer')!;
     expect(customer.start).toBeGreaterThanOrEqual(absStart('UPRE-02'));
     expect(stageEnd('ucieCustomer')).toBeGreaterThan(stageEnd('ucieGa'));
     dependsOnAll('UCUS-01', ['UPRE-02']);
   });
 
-  it('holds what the reviews added: a partner before the bump map, hardware before stress, GA after silicon-proven, a margin before tapeout', () => {
+  it('holds what the reviews added: a partner before the bump map, hardware before stress, production release after silicon-proven, a margin before tapeout', () => {
     expect(absEnd('UTEC-07')).toBeLessThanOrEqual(absStart('UCHN-03'));
     dependsOnAll('UCHN-03', ['UTEC-07']);
     expect(absEnd('UTVP-08')).toBeLessThanOrEqual(absStart('UFAB-03'));

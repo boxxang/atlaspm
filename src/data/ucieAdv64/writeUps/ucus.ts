@@ -91,7 +91,7 @@ export const UCUS_WRITE_UPS: UcieWriteUps = {
       'UCUS-D2': '<b>SoC-level signoff support reports per licensee.</b> Produced here.',
     },
     risks: [
-      '<b>Older release.</b> A licensee signs off against v0.5 views rather than v0.9 or GA.',
+      '<b>Older release.</b> A licensee signs off against v0.5 views rather than v0.9 or production release.',
       '<b>Corners skipped.</b> Boundary timing is run at fewer corners than the Liberty libraries provide.',
       '<b>Deck mismatch.</b> The customer’s physical verification deck flags the macro for rules it was not built to.',
       '<b>Kit misuse.</b> The channel compliance kit is run on a package beyond its stated validity range.',
@@ -151,7 +151,7 @@ export const UCUS_WRITE_UPS: UcieWriteUps = {
       'v0.5 release package from UPRE-02',
       'Integration review findings from UCUS-01',
       'Customer issues and their dispositions from UCUS-04',
-      'GA release package and errata from UGA-03',
+      'Production release package and errata from UGA-03',
     ],
     rel: {
       'UCUS-D3': '<b>Customer documentation set — FAQ and knowledge base.</b> Produced here.',
@@ -275,7 +275,7 @@ export const UCUS_WRITE_UPS: UcieWriteUps = {
     criticalPath: false,
     purpose: [
       'Hand the IP to <b>sustaining</b>: review the open issues, ECOs, errata, pending variant requests and customer commitments, agree the sustaining support model with its staffing and response targets, and hand over the issue tracker, the knowledge base and the release archive with an owner for each.',
-      'Development engineers move to the next speed grade after GA; licensees are still taping out on this one. The handover is only complete when every open commitment has a named owner in sustaining and nothing depends on someone remembering it.',
+      'Development engineers move to the next speed grade after production release; licensees are still taping out on this one. The handover is only complete when every open commitment has a named owner in sustaining and nothing depends on someone remembering it.',
     ],
     flowNote:
       'Step 1 reviews open issues and commitments and step 2 agrees the support model. Step 3 hands over the tracker, knowledge base and archive, and step 4 records the decision.',
@@ -283,7 +283,7 @@ export const UCUS_WRITE_UPS: UcieWriteUps = {
       'Customer issue and ECO log from UCUS-04',
       'SoC-level signoff support status from UCUS-02',
       'Customer documentation set from UCUS-03',
-      'GA approval decision from UGA-05',
+      'Production release approval decision from UGA-05',
       'Errata list and patch history from UCUS-06',
     ],
     rel: {
@@ -310,7 +310,7 @@ export const UCUS_WRITE_UPS: UcieWriteUps = {
       ['Decision record', 0.4],
     ],
     entry: [
-      'IP GA declared in UGA-05',
+      'IP Production Release declared in UGA-05',
       'Issue and ECO log current in UCUS-04',
       'Sustaining team named',
     ],
@@ -334,16 +334,16 @@ export const UCUS_WRITE_UPS: UcieWriteUps = {
       revisedBy: [],
       feedsBackInto: [],
     },
-    terms: ['GA', 'Release package', 'Knowledge base'],
+    terms: ['Production release', 'Release package', 'Knowledge base'],
   },
   'UCUS-06': {
     criticalPath: false,
     purpose: [
-      'Run the <b>errata and patch process</b> from v0.9 onward: an errata format with severity, workaround and the releases each entry affects; confirmed customer issues and silicon findings turned into errata entries; patch releases on the v0.9 line built with their own release QA and release notes; every affected licensee notified of each erratum and patch with the acknowledgement recorded; and the errata list kept consistent with the knowledge base and carried into the GA release notes.',
-      'Licensees sign off and tape out on v0.9 and its patches long before GA, so a defect found in the meantime has to reach every one of them in a known form. An erratum emailed to the customer who reported it, or a patch shipped without QA, leaves the installed base split between people who know and people who do not.',
+      'Run the <b>errata and patch process</b> from v0.9 onward: an errata format with severity, workaround and the releases each entry affects; confirmed customer issues and silicon findings turned into errata entries; patch releases on the v0.9 line built with their own release QA and release notes; every affected licensee notified of each erratum and patch with the acknowledgement recorded; and the errata list kept consistent with the knowledge base and carried into the production release notes.',
+      'Licensees sign off and tape out on v0.9 and its patches long before production release, so a defect found in the meantime has to reach every one of them in a known form. An erratum emailed to the customer who reported it, or a patch shipped without QA, leaves the installed base split between people who know and people who do not.',
     ],
     flowNote:
-      'Step 1 sets up the errata process. Step 2 turns confirmed issues into errata while step 3 builds patch releases and step 4 notifies licensees in parallel. Step 5 keeps the errata consistent and carries them into GA, and step 6 hands the list to sustaining.',
+      'Step 1 sets up the errata process. Step 2 turns confirmed issues into errata while step 3 builds patch releases and step 4 notifies licensees in parallel. Step 5 keeps the errata consistent and carries them into production release, and step 6 hands the list to sustaining.',
     consumes: [
       'v0.9 release decision and distribution list from UPRE-08',
       'Confirmed customer issues and dispositions from UCUS-04',
@@ -360,7 +360,7 @@ export const UCUS_WRITE_UPS: UcieWriteUps = {
       '<b>Patch without QA.</b> A patch release ships with views nobody read into a tool.',
       '<b>Notification unconfirmed.</b> Licensees are told but nobody records that they read it.',
       '<b>Errata drift.</b> The errata list and the knowledge base describe the same issue differently.',
-      '<b>Patch line forks.</b> Patches diverge from the main line and are not merged into GA.',
+      '<b>Patch line forks.</b> Patches diverge from the main line and are not merged into production release.',
     ],
     roles: [
       { r: 'Customer engineering', d: 'Owns the errata list, patch releases and notifications' },
@@ -383,7 +383,7 @@ export const UCUS_WRITE_UPS: UcieWriteUps = {
     ],
     exit: [
       'Every confirmed issue in the errata list with a workaround or a stated none and the releases it affects',
-      'Every patch release QA-passed and merged into the GA package or the first post-GA patch',
+      'Every patch release QA-passed and merged into the production release package or the first post-release patch',
       'Every affected licensee notified of every erratum and patch with acknowledgement recorded',
     ],
     dependsOn: ['UPRE-08', 'UCUS-04'],
@@ -472,8 +472,8 @@ export const UCUS_WRITE_UPS: UcieWriteUps = {
   'UCUS-08': {
     criticalPath: false,
     purpose: [
-      'Give licensees <b>silicon data before GA</b>: an early silicon brief once the test chip links up — first link-up, training behavior and the first margins against the pre-silicon predictions — and a preliminary characterization drop with margins, BER and energy per bit so far, each scoped with product management, released under NDA to entitled licensees with its own QA and marked as preliminary.',
-      'Licensees in SoC signoff tape out during the months between v0.9 and GA. Telling them early whether silicon matches the models — and what does not — lets them take a decision on evidence rather than on a promise, and the questions they send back sharpen what characterization measures next.',
+      'Give licensees <b>silicon data before production release</b>: an early silicon brief once the test chip links up — first link-up, training behavior and the first margins against the pre-silicon predictions — and a preliminary characterization drop with margins, BER and energy per bit so far, each scoped with product management, released under NDA to entitled licensees with its own QA and marked as preliminary.',
+      'Licensees in SoC signoff tape out during the months between v0.9 and production release. Telling them early whether silicon matches the models — and what does not — lets them take a decision on evidence rather than on a promise, and the questions they send back sharpen what characterization measures next.',
     ],
     flowNote:
       'Step 1 agrees the content and recipients. Step 2 writes the early silicon brief and step 3 releases it, step 4 prepares the preliminary characterization drop and step 5 releases it, while step 6 collects licensee questions in parallel.',

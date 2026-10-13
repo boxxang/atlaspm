@@ -165,10 +165,10 @@ export const CORE_GLOSSARY: UcieGlossary = {
     group: 'ip',
     note: 'An IP block delivered as fixed layout with its abstract, timing and power views, which the customer places rather than re-implements.',
   },
-  GA: {
-    full: 'General availability',
+  'Production release': {
+    full: 'Production release',
     group: 'program',
-    note: 'The release at which an IP is supported for production use by any licensee, backed by silicon data and complete deliverables.',
+    note: 'The release at which an IP is supported for production use by any licensee, backed by silicon data and complete deliverables — what some vendors call general availability.',
   },
   Liberty: {
     full: 'Liberty timing and power library',

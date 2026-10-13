@@ -157,7 +157,7 @@ export const REQUIRED: { stage: string; what: string; refs: string[] }[] = [
   { stage: 'UGA', what: 'Final release package with silicon data', refs: ['UGA-01', 'UGA-03'] },
   { stage: 'UGA', what: 'Silicon report and characterization summary', refs: ['UGA-02'] },
   { stage: 'UGA', what: 'Release QA', refs: ['UGA-04'] },
-  { stage: 'UGA', what: 'GA approval', refs: ['UGA-05'] },
+  { stage: 'UGA', what: 'Production release approval', refs: ['UGA-05'] },
 
   { stage: 'UCUS', what: 'Customer integration reviews — floorplan, bump, power, channel', refs: ['UCUS-01'] },
   { stage: 'UCUS', what: 'SoC-level signoff support', refs: ['UCUS-02'] },

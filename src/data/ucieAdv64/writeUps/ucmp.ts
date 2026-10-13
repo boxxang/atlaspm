@@ -86,7 +86,7 @@ export const UCMP_WRITE_UPS: UcieWriteUps = {
       'Reference die units and assembled variants from UTVP-02',
     ],
     rel: {
-      'UCMP-D2': '<b>Electrical compliance test results at 64 GT/s against the reference die.</b> Produced here; the GA release and the silicon report quote it.',
+      'UCMP-D2': '<b>Electrical compliance test results at 64 GT/s against the reference die.</b> Produced here; the production release and the silicon report quote it.',
       'UCMP-D5': '<b>Compliance results summary and compliance pass record.</b> Electrical results and waivers are a section of the summary.',
     },
     risks: [
@@ -220,11 +220,11 @@ export const UCMP_WRITE_UPS: UcieWriteUps = {
       'Training and protocol compliance results from UCMP-03',
     ],
     rel: {
-      'UCMP-D4': '<b>Interoperability test report with the partner die.</b> Produced here; the GA release and customer engineering cite it.',
+      'UCMP-D4': '<b>Interoperability test report with the partner die.</b> Produced here; the production release and customer engineering cite it.',
       'UCMP-D5': '<b>Compliance results summary and compliance pass record.</b> Interoperability results are a section of the summary.',
     },
     risks: [
-      '<b>Partner silicon late.</b> The partner’s die arrives after the window and interoperability slips past GA.',
+      '<b>Partner silicon late.</b> The partner’s die arrives after the window and interoperability slips past production release.',
       '<b>Self-interop only.</b> The only links run are between two copies of this IP.',
       '<b>One-way training.</b> The link trains only when this IP initiates.',
       '<b>Recovery untested.</b> Errors are not injected across the partner link, so joint recovery is unknown.',
@@ -294,7 +294,7 @@ export const UCMP_WRITE_UPS: UcieWriteUps = {
       '<b>Pass on partial coverage.</b> The pass is declared with requirements still untested.',
       '<b>Failures deferred silently.</b> Open failures are moved to sustaining without a decision.',
       '<b>Customer view missing.</b> The summary is not usable by customer engineering.',
-      '<b>No link to GA.</b> The GA review does not see which waivers apply to the release.',
+      '<b>No link to production release.</b> The production release review does not see which waivers apply to the release.',
     ],
     roles: [
       { r: 'Compliance and interoperability', d: 'Owns the compliance results review' },
@@ -316,7 +316,7 @@ export const UCMP_WRITE_UPS: UcieWriteUps = {
     exit: [
       'Every requirement in scope recorded as passed, failed or waived with a reason',
       'Every waiver approved with its effect on the release stated',
-      'Compliance pass decision recorded and handed to the GA review',
+      'Compliance pass decision recorded and handed to the production release review',
     ],
     dependsOn: ['UCMP-01', 'UCMP-02', 'UCMP-03', 'UCMP-04'],
     dependsNote: null,
@@ -333,6 +333,6 @@ export const UCMP_WRITE_UPS: UcieWriteUps = {
       revisedBy: [],
       feedsBackInto: [],
     },
-    terms: ['Compliance', 'GA'],
+    terms: ['Compliance', 'Production release'],
   },
 };

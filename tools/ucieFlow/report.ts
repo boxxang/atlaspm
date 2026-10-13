@@ -34,7 +34,7 @@ p(`Required items: ${REQUIRED.length}; missing: ${missing}.`);
 
 /* ---------------- V2 ---------------- */
 p();
-p('### V2 — each block, from definition to GA');
+p('### V2 — each block, from definition to production release');
 const PHASE: Record<string, string> = {
   define: 'Define',
   enable: 'Enable',
@@ -94,20 +94,20 @@ p();
 p('### V5 — critical path');
 const c = A.cpm();
 p();
-p(`Into GA approval (UGA-05): logic finish W${c.ef('UGA-05')}, template finish W${A.absEnd('UGA-05')}.`);
+p(`Into production release approval (UGA-05): logic finish W${c.ef('UGA-05')}, template finish W${A.absEnd('UGA-05')}.`);
 p();
 head(['Activity', 'Item', 'Logic weeks', 'Template weeks', 'Wait']);
 for (const s of c.chainTo('UGA-05')) row([`${s.ref} ${UCIE_ACTIVITY_TITLES[s.ref]}`, UCIE_ACTIVITIES[s.ref].item, `W${s.es}–${s.ef}`, wk(s.ref), s.kind ?? '—']);
 const f = c.floatTo('UGA-05');
 p();
-p('The planned spine, stage by stage, with total float into GA approval:');
+p('The planned spine, stage by stage, with total float into production release approval:');
 p();
-head(['Stage', 'Gate activity', 'Weeks', 'Float into GA (weeks)']);
+head(['Stage', 'Gate activity', 'Weeks', 'Float into production release (weeks)']);
 for (const s of A.SPINE) for (const r of s.refs) row([s.stage, `${r} ${UCIE_ACTIVITY_TITLES[r]}`, wk(r), f(r) ?? '—']);
 p();
 p('Float on the channel and the test vehicle:');
 p();
-head(['Activity', 'Weeks', 'Float into GA', 'Float into tapeout (UTPO-04)', 'Float into silicon in hand (UFAB-05)']);
+head(['Activity', 'Weeks', 'Float into production release', 'Float into tapeout (UTPO-04)', 'Float into silicon in hand (UFAB-05)']);
 const fTo = c.floatTo('UTPO-04');
 const fFab = c.floatTo('UFAB-05');
 for (const st of ['ucieChannel', 'ucieTestVehicle']) {

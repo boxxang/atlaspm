@@ -8,7 +8,7 @@ export const UTVP_WRITE_UPS: UcieWriteUps = {
     criticalPath: true,
     purpose: [
       'Design the <b>test vehicle package variants</b>: two test chips on a silicon bridge build and on a silicon interposer build, each routed to the frozen channel rules; a reversed-orientation build so lane reversal is proven on hardware; and a build that mates the test chip with the interoperability partner’s die on the bump map both sides agreed. Design the substrate stack-ups, power delivery and breakout for each, check every channel against the specification, and hand the bridge and interposer routing to their own signoff.',
-      'The test vehicle is the only real channel the PHY will see before a licensee builds one, and one build cannot stand behind three package claims. Each variant is a claim the GA report will make — a package type proven on silicon, a reversal that works on real wiring, interoperability with another vendor’s die — and a variant not built here is a claim GA can only make by simulation.',
+      'The test vehicle is the only real channel the PHY will see before a licensee builds one, and one build cannot stand behind three package claims. Each variant is a claim the production release report will make — a package type proven on silicon, a reversal that works on real wiring, interoperability with another vendor’s die — and a variant not built here is a claim production release can only make by simulation.',
     ],
     flowNote:
       'Step 1 defines the variants with placement and channel lengths, while step 2 mates the partner die’s bump map beside it. Step 3 routes the bridge and interposer channels while step 4 designs the substrates in parallel. Step 5 runs SI and PI checks per variant and step 6 releases the databases.',
@@ -96,7 +96,7 @@ export const UTVP_WRITE_UPS: UcieWriteUps = {
       '<b>Queries unanswered.</b> A supplier query sits for weeks and the slot is lost.',
       '<b>Quantity too low.</b> Too few substrates are ordered for assembly yield loss and reliability units.',
       '<b>Inspection skipped.</b> Warped or defective substrates reach assembly and consume known-good dies.',
-      '<b>Partner dies late.</b> The partner’s known-good dies arrive untested or after assembly starts, and the interop build slips past GA.',
+      '<b>Partner dies late.</b> The partner’s known-good dies arrive untested or after assembly starts, and the interop build slips past production release.',
     ],
     roles: [
       { r: 'Packaging', d: 'Owns substrate and interposer procurement' },
@@ -408,7 +408,7 @@ export const UTVP_WRITE_UPS: UcieWriteUps = {
     criticalPath: true,
     purpose: [
       'Hold the <b>hardware readiness review</b>: check every item — package material per variant, the bridge and interposer, the partner’s known-good dies and the mated bump maps, boards, probe card, load board, sort program, reliability stress boards and the package final test program, lab stations, bring-up plan — against the silicon-in-hand date, confirm them against the final test chip database, and record open items with owners.',
-      'This is the last chance to find that a long-lead item will miss silicon while there is still time to work around it — a second substrate source, a borrowed instrument, a manual fallback. After silicon arrives, every missing item is a day of the GA schedule.',
+      'This is the last chance to find that a long-lead item will miss silicon while there is still time to work around it — a second substrate source, a borrowed instrument, a manual fallback. After silicon arrives, every missing item is a day of the production release schedule.',
     ],
     flowNote:
       'Step 1 checks status against the silicon date. Step 2 confirms consistency with the final database and step 3 holds the review and records open items.',

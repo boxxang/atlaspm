@@ -487,7 +487,7 @@ export const UCHR_WRITE_UPS: UcieWriteUps = {
       'Characterization plan from UCHR-01',
     ],
     rel: {
-      'UCHR-D8': '<b>Test vehicle channel correlation report.</b> Produced here; channel guidelines in the GA release are revised from it.',
+      'UCHR-D8': '<b>Test vehicle channel correlation report.</b> Produced here; channel guidelines in the production release are revised from it.',
       'UCHR-D9': '<b>Measurement-to-simulation correlation report with model updates.</b> The corrected channel model is used to re-run the link predictions.',
     },
     risks: [
@@ -540,7 +540,7 @@ export const UCHR_WRITE_UPS: UcieWriteUps = {
   'UCHR-09': {
     criticalPath: true,
     purpose: [
-      'Correlate <b>measurement with simulation</b>: measured margins, BER and energy per bit placed against the predicted distributions, each deviation explained as model, channel, process split or measurement, the mixed-signal models re-run with the measured channel and silicon corners, and model updates agreed for the GA release.',
+      'Correlate <b>measurement with simulation</b>: measured margins, BER and energy per bit placed against the predicted distributions, each deviation explained as model, channel, process split or measurement, the mixed-signal models re-run with the measured channel and silicon corners, and model updates agreed for the production release.',
       'Pre-silicon verification made predictions so that silicon could check them. Closing that loop is what turns the models customers receive from design intent into silicon-backed models, and it tells the next derivative which models it can reuse.',
     ],
     flowNote:
@@ -553,14 +553,14 @@ export const UCHR_WRITE_UPS: UcieWriteUps = {
       'Corrected test vehicle channel model from UCHR-08',
     ],
     rel: {
-      'UCHR-D9': '<b>Measurement-to-simulation correlation report with model updates.</b> Produced here; the GA release’s models are updated from it.',
+      'UCHR-D9': '<b>Measurement-to-simulation correlation report with model updates.</b> Produced here; the production release’s models are updated from it.',
       'UCHR-D10': '<b>Characterization report.</b> The correlation is a section of the report and the basis of its conclusions.',
     },
     risks: [
       '<b>Typical against distribution.</b> Measurements are compared with a typical prediction and every unit looks off.',
       '<b>Models fitted, not explained.</b> Models are tuned to match without a physical reason.',
       '<b>Channel left out.</b> Deviations are attributed to circuits that are really channel differences.',
-      '<b>Late correlation.</b> Correlation starts after the report and model updates miss the GA release.',
+      '<b>Late correlation.</b> Correlation starts after the report and model updates miss the production release.',
       '<b>Release models unchanged.</b> Agreed updates never reach the release package.',
     ],
     roles: [
@@ -584,7 +584,7 @@ export const UCHR_WRITE_UPS: UcieWriteUps = {
     exit: [
       'Every measured quantity placed against its predicted distribution, with deviations beyond the spread explained',
       'Models re-run with the measured channel and silicon corners and the residual error recorded',
-      'Model updates for the GA release agreed and assigned',
+      'Model updates for the production release agreed and assigned',
     ],
     dependsOn: ['UAMS-07', 'UCHR-02', 'UCHR-03', 'UCHR-08'],
     dependsNote: 'This is the activity the pre-silicon margin predictions were written for.',
@@ -607,7 +607,7 @@ export const UCHR_WRITE_UPS: UcieWriteUps = {
     criticalPath: true,
     purpose: [
       'Review and release the <b>characterization report</b>: every result assembled against the plan and the PPA targets per package type built, with types supported only by simulation labelled, reviewed with design and customer engineering together with open deviations and agreed model updates.',
-      'This report is the evidence behind the GA release and the silicon report licensees receive. Reviewing it before release, rather than letting each section publish itself, is what keeps the numbers consistent across margin, BER, power and range.',
+      'This report is the evidence behind the production release and the silicon report licensees receive. Reviewing it before release, rather than letting each section publish itself, is what keeps the numbers consistent across margin, BER, power and range.',
     ],
     flowNote:
       'Step 1 assembles the results against plan and targets. Step 2 reviews them with design and customer engineering. Step 3 releases the report.',
@@ -619,14 +619,14 @@ export const UCHR_WRITE_UPS: UcieWriteUps = {
       'Measurement-to-simulation correlation from UCHR-09',
     ],
     rel: {
-      'UCHR-D10': '<b>Characterization report with results per package type.</b> Produced here; it closes the Characterization Report gate and feeds the GA release.',
+      'UCHR-D10': '<b>Characterization report with results per package type.</b> Produced here; it closes the Characterization Report gate and feeds the production release.',
     },
     risks: [
       '<b>Sections inconsistent.</b> Margin, BER and power sections are measured on different units without saying so.',
       '<b>Targets missed silently.</b> A missed target is reported as a number without a comparison.',
       '<b>Open deviations dropped.</b> Unexplained deviations disappear from the final report.',
       '<b>One variant read as all.</b> Results from one package variant are presented as covering every supported package type.',
-      '<b>Late release.</b> The report slips and the GA rollup works from drafts.',
+      '<b>Late release.</b> The report slips and the production release rollup works from drafts.',
     ],
     roles: [
       { r: 'Validation', d: 'Owns the characterization report' },
@@ -648,7 +648,7 @@ export const UCHR_WRITE_UPS: UcieWriteUps = {
     exit: [
       'Every PPA target reported as met or missed with the measured value, its conditions and the package type it was measured on',
       'Every open deviation listed with an owner and its effect on the release',
-      'Report released and handed to the GA rollup',
+      'Report released and handed to the production release rollup',
     ],
     dependsOn: ['UCHR-01', 'UCHR-02', 'UCHR-03', 'UCHR-04', 'UCHR-05', 'UCHR-06', 'UCHR-07', 'UCHR-08', 'UCHR-09', 'UCHR-11'],
     dependsNote: null,
@@ -665,7 +665,7 @@ export const UCHR_WRITE_UPS: UcieWriteUps = {
       revisedBy: [],
       feedsBackInto: [],
     },
-    terms: ['GA', 'Release package'],
+    terms: ['Production release', 'Release package'],
   },
   'UCHR-11': {
     criticalPath: false,

@@ -3,7 +3,7 @@ import { expect, test, type Page } from './fixtures';
 /**
  * The UCIe Advanced 64G Die-to-Die PHY IP template, through the screens.
  *
- * A fifth built-in, and the first IP program: it ends at general availability
+ * A fifth built-in, and the first IP program: it ends at production release
  * rather than production, and runs two bands no other template has — Silicon
  * Validation and IP Release & Enablement.
  */
@@ -47,7 +47,7 @@ test.describe('the UCIe Advanced 64G Die-to-Die PHY IP template', () => {
     for (const band of ['Silicon Validation', 'IP Release & Enablement']) {
       await expect(page.locator('.tl-ph').filter({ hasText: band }).first(), band).toBeVisible();
     }
-    for (const gate of ['Architecture Freeze', 'Hard Macro Signoff', 'Tapeout', 'Silicon in Hand', 'Silicon-Proven', 'v0.9 Release', 'IP GA']) {
+    for (const gate of ['Architecture Freeze', 'Hard Macro Signoff', 'Tapeout', 'Silicon in Hand', 'Silicon-Proven', 'v0.9 Release', 'IP Production Release']) {
       await expect(page.getByText(gate).first(), gate).toBeVisible();
     }
   });
@@ -86,7 +86,7 @@ test.describe('the UCIe Advanced 64G Die-to-Die PHY IP template', () => {
     await page.waitForURL(/\/templates\/ucieAdv64\/flowchart$/);
     const frame = page.frameLocator('iframe.flowframe');
     await expect(frame.locator('h1')).toContainText('UCIe Advanced 64G Die-to-Die PHY IP');
-    for (const t of ['Electrical PHY Circuit Design', 'Package Channel & SI/PI', 'General Availability Release']) {
+    for (const t of ['Electrical PHY Circuit Design', 'Package Channel & SI/PI', 'Production Release']) {
       await expect(frame.getByText(t).first(), t).toBeVisible();
     }
     await page.locator('[data-back-templates]').click();
