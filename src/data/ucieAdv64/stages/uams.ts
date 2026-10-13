@@ -8,7 +8,7 @@ export const UAMS: UcieStageModule = {
   content: {
     tagline: 'Prove the analog and the logic train together over a real channel, and predict the margin silicon will show.',
     description:
-      'Join the Electrical PHY and the Logical PHY in one simulation. Behavioral models of the TX, RX and clocking are built from the circuits and validated against them, then co-simulated with the training, recalibration and lane-management RTL so that MBINIT and MBTRAIN converge on analog behavior rather than on ideal switches. The same models run with extracted package channel models across the bump pitch range to compute link margin at 64 GT/s, and across PVT corners and Monte Carlo mismatch to turn single margins into distributions. The stage ends by writing down what silicon should show — margin predictions per lane and corner and the measurement plan that will check them — and holding the link margin review that says the design has enough.',
+      'Join the Electrical PHY and the Logical PHY in one simulation. Behavioral models of the TX, RX, PLL and clocking and of the on-die sensors are built from the circuits and validated against them, then co-simulated with the training, recalibration and lane-management RTL so that MBINIT and MBTRAIN converge on analog behavior rather than on ideal switches, and recalibration fires on the sensor thresholds it will see on silicon. The same models run with extracted package channel models across the bump pitch range, with and without receiver termination where the package type allows the choice, to compute link margin at 64 GT/s, and across PVT corners and Monte Carlo mismatch to turn single margins into distributions. The stage ends by writing down what silicon should show — margin predictions per lane and corner and the measurement plan that will check them — and holding the link margin review that says the design has enough.',
     activities: [
       'Behavioral models',
       'Mixed-signal co-simulation',
@@ -59,14 +59,14 @@ export const UAMS: UcieStageModule = {
     'UAMS-01': {
       s: [
         [1, 'Define the model set, the abstraction per block and the accuracy each must hold', 1],
-        [2, 'Build behavioral models of the TX driver, RX front-end and sampler and clocking from the schematics', 3],
+        [2, 'Build behavioral models of the TX driver, RX front-end and sampler, PLL and clocking, and the sensors from the schematics', 3],
         [3, 'Model the calibration and training controls exactly as the register specification defines them', 1.5, 1],
         [4, 'Write the model validation plan — which metrics, which corners, which tolerance', 1],
         [5, 'Release the behavioral model set with its validation plan', 1],
       ],
       o: [
         'Model set and accuracy targets',
-        'Behavioral models of TX, RX and clocking',
+        'Behavioral models of TX, RX, PLL, clocking and sensors',
         'Calibration and training controls modeled to the specification',
         'Model validation plan',
         'Electrical PHY behavioral model set with its validation plan',
@@ -96,16 +96,16 @@ export const UAMS: UcieStageModule = {
       s: [
         [1, 'Run sideband initialization and the mainband initialization sequence with analog models', 3],
         [2, 'Run mainband training — voltage and timing centering — and check convergence per lane', 4],
-        [3, 'Run speed and width fallback when lanes fail training', 3, 1],
-        [4, 'Run runtime recalibration under temperature and voltage drift', 3],
+        [3, 'Run lane repair onto redundant lanes and speed fallback when lanes fail training, and the transition to training error beyond repair', 3, 1],
+        [4, 'Run runtime recalibration triggered by the modeled temperature and voltage sensor thresholds under drift', 3],
         [5, 'Run retrain and training-error entry and exit', 2],
         [6, 'Release the training co-simulation report', 1],
       ],
       o: [
         'Sideband and mainband initialization results',
         'Training convergence per lane',
-        'Speed and width fallback results',
-        'Runtime recalibration results under drift',
+        'Lane repair, speed fallback and training-error results',
+        'Sensor-triggered runtime recalibration results under drift',
         'Retrain and training-error results',
         'Link training co-simulation report with analog models in the loop',
       ],
@@ -115,7 +115,7 @@ export const UAMS: UcieStageModule = {
       s: [
         [1, 'Collect extracted channel models for each supported package type and the bump pitch extremes', 2],
         [2, 'Build the link model — TX model, channel, RX model and clock path — per lane', 3],
-        [3, 'Compute timing and voltage margin at 64 GT/s per lane and package type, including crosstalk', 4],
+        [3, 'Compute timing and voltage margin at 64 GT/s per lane and package type, including crosstalk, with and without receiver termination where the choice exists', 4],
         [4, 'Find the worst lanes and their aggressors and feed the results to bump map and routing', 2, 1],
         [5, 'Compute margin with supply noise from the power delivery analysis', 2],
         [6, 'Release the link margin report', 1],
@@ -180,13 +180,13 @@ export const UAMS: UcieStageModule = {
     'UAMS-08': {
       s: [
         [1, 'Collect the co-simulation, training, link margin, statistics and correlation reports', 1],
-        [2, 'Review worst-case and statistical margin against target per package type', 1.5],
+        [2, 'Review eye height and width at the target BER and the Monte Carlo yield against the agreed pass thresholds, per package type', 1.5],
         [3, 'Record design changes required and the margin carried into layout', 0.5, 1],
-        [4, 'Hold the link margin review and record the decision', 1],
+        [4, 'Hold the link margin review and record the pass or fail decision per package type', 1],
       ],
       o: [
         'Collected margin evidence',
-        'Margin review against target per package',
+        'Eye and yield review against the agreed thresholds per package',
         'Required changes and carried margin',
         'Link margin review decision record',
       ],

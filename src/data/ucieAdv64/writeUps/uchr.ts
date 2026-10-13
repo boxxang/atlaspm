@@ -73,8 +73,8 @@ export const UCHR_WRITE_UPS: UcieWriteUps = {
   'UCHR-02': {
     criticalPath: true,
     purpose: [
-      'Measure <b>voltage and timing margin on every lane of every module</b> with the on-die margining functions, calibrated first against a bench measurement on reference lanes, at nominal conditions and across the corner matrix, and flag outlier lanes.',
-      'Per-lane margin is the most direct picture of the analog front-end and channel together. Measuring every lane rather than a sample is what reveals the lanes at the module edges and over package discontinuities that a customer’s worst case will sit on.',
+      'Measure <b>voltage and timing margin on every lane of every module</b> with the on-die margining functions, calibrated first against a bench measurement taken through the test chip’s observation path, at nominal conditions and across the corner matrix, and flag outlier lanes.',
+      'Per-lane margin is the most direct picture of the analog front-end and channel together. The die-to-die bumps sit under the other die and never reach a pin, so there is nothing to probe: the on-die margining is the measurement, and the bench only calibrates its steps. Measuring every lane rather than a sample is what reveals the lanes at the module edges that a customer’s worst case will sit on.',
     ],
     flowNote:
       'Step 1 calibrates the on-die margining. Steps 2 and 3 sweep every lane at nominal and then at the corner matrix, with spread and outliers computed in parallel in step 4. Step 5 releases the data set.',
@@ -83,14 +83,14 @@ export const UCHR_WRITE_UPS: UcieWriteUps = {
       'Eye and lane margining functions from UDFT-06',
       'First link-up decision and unit allocation from UBUP-06',
       'Mainband training log with per-lane centering from UBUP-03',
-      'Lab automation from UTVP-05',
+      'Probe-able observation path for bench calibration from UTCI-02',
     ],
     rel: {
       'UCHR-D2': '<b>Per-lane eye and timing margin data set.</b> Produced here; it is the base data for the release’s margin summary.',
       'UCHR-D9': '<b>Measurement-to-simulation correlation report with model updates.</b> Measured margins are the first quantity correlated with prediction.',
     },
     risks: [
-      '<b>Uncalibrated margining.</b> On-die margin steps are read as picoseconds and millivolts without a bench check.',
+      '<b>Uncalibrated margining.</b> On-die margin steps are read as picoseconds and millivolts without a bench check through the observation path.',
       '<b>Sampled lanes only.</b> A few lanes per module are measured and the worst lane is missed.',
       '<b>Margining disturbs the link.</b> The margin sweep itself causes retrains that are logged as failures.',
       '<b>Temperature not controlled.</b> Junction temperature drifts during long sweeps and corners blur.',
@@ -116,7 +116,7 @@ export const UCHR_WRITE_UPS: UcieWriteUps = {
       'Units allocated at the first link-up review in UBUP-06',
     ],
     exit: [
-      'On-die margining calibrated against bench measurement on at least two reference lanes',
+      'On-die margining calibrated through the observation path on at least two lanes',
       'Voltage and timing margin recorded for every lane of every allocated module at every planned corner',
       'Every outlier lane explained or opened as an issue',
     ],
@@ -129,7 +129,7 @@ export const UCHR_WRITE_UPS: UcieWriteUps = {
       'Outlier lanes open',
     ],
     links: {
-      dependsOn: ['UCHR-01', 'UDFT-06', 'UBUP-06', 'UBUP-03', 'UTVP-05'],
+      dependsOn: ['UCHR-01', 'UDFT-06', 'UBUP-06', 'UBUP-03', 'UTVP-05', 'UTCI-02', 'UDFT-07'],
       feedsInto: ['UCHR-05', 'UCHR-08', 'UCHR-09', 'UCHR-10', 'UGA-02'],
       runsWith: ['UCHR-03'],
       revisedBy: [],
@@ -340,7 +340,7 @@ export const UCHR_WRITE_UPS: UcieWriteUps = {
   'UCHR-06': {
     criticalPath: false,
     purpose: [
-      'Prove <b>lane repair and lane reversal on silicon</b>: lane failures forced through test modes on data, clock, valid and track lanes and on module-edge lanes, the reversed-orientation build, and margin and BER on repaired and reversed links compared with unrepaired ones.',
+      'Prove <b>lane repair and lane reversal on silicon</b>: lane failures forced through test modes on data, clock, valid and track lanes and on module-edge lanes, the reversed-orientation test vehicle variant, and margin and BER on repaired and reversed links compared with unrepaired ones.',
       'Repair exists because fine-pitch bumps do not all connect, and reversal because customers place dies both ways round. Neither can be trusted from simulation alone, and a repaired lane that trains but loses margin is a finding customers must know about.',
     ],
     flowNote:
@@ -350,7 +350,7 @@ export const UCHR_WRITE_UPS: UcieWriteUps = {
       'Lane repair, reversal and recalibration logic from URTL-06',
       'BIST and built-in lane test for bump repair from UDFT-05',
       'Mainband training log with applied repairs from UBUP-03',
-      'Reversed-orientation test vehicle build from UTVP-01',
+      'Reversed-orientation test vehicle variant designed in UTVP-01 and assembled in UFAB-03',
     ],
     rel: {
       'UCHR-D6': '<b>Lane repair and lane reversal silicon results.</b> Produced here; the integration guide’s repair and orientation sections cite it.',
@@ -359,7 +359,7 @@ export const UCHR_WRITE_UPS: UcieWriteUps = {
     risks: [
       '<b>Only natural failures.</b> Repair is shown only on lanes that happened to fail, never on a chosen lane.',
       '<b>Clock and valid untested.</b> Data-lane repair works but clock, valid and track repair is never exercised.',
-      '<b>No reversed build.</b> All test vehicles are assembled one way and reversal is unproven.',
+      '<b>No reversed build.</b> The reversed-orientation variant slips out of the assembly lot and reversal stays unproven.',
       '<b>Margin cost unknown.</b> Repaired links train but their margin and BER are not compared.',
       '<b>Test mode differs from field.</b> Failures forced through test modes behave differently from a real open bump.',
     ],
@@ -396,7 +396,7 @@ export const UCHR_WRITE_UPS: UcieWriteUps = {
       'Reversed units trained',
     ],
     links: {
-      dependsOn: ['UCHR-01', 'URTL-06', 'UDFT-05', 'UBUP-03', 'UTVP-01'],
+      dependsOn: ['UCHR-01', 'URTL-06', 'UDFT-05', 'UBUP-03', 'UTVP-01', 'UFAB-03'],
       feedsInto: ['UCHR-10', 'UCMP-03'],
       runsWith: [],
       revisedBy: [],
@@ -595,7 +595,7 @@ export const UCHR_WRITE_UPS: UcieWriteUps = {
       'Model updates delivered to the release',
     ],
     links: {
-      dependsOn: ['UAMS-07', 'UAMS-05', 'UCHN-04', 'UCHR-02', 'UCHR-03', 'UCHR-04', 'UCHR-05', 'UCHR-08'],
+      dependsOn: ['UAMS-07', 'UAMS-05', 'UCHN-04', 'UCHR-02', 'UCHR-03', 'UCHR-04', 'UCHR-05', 'UCHR-08', 'UCHR-11'],
       feedsInto: ['UCHR-10', 'UGA-01', 'UGA-03'],
       runsWith: [],
       revisedBy: [],
@@ -606,26 +606,26 @@ export const UCHR_WRITE_UPS: UcieWriteUps = {
   'UCHR-10': {
     criticalPath: true,
     purpose: [
-      'Review and release the <b>characterization report</b>: every result assembled against the plan and the PPA targets, reviewed with design and customer engineering together with open deviations and agreed model updates.',
+      'Review and release the <b>characterization report</b>: every result assembled against the plan and the PPA targets per package type built, with types supported only by simulation labelled, reviewed with design and customer engineering together with open deviations and agreed model updates.',
       'This report is the evidence behind the GA release and the silicon report licensees receive. Reviewing it before release, rather than letting each section publish itself, is what keeps the numbers consistent across margin, BER, power and range.',
     ],
     flowNote:
       'Step 1 assembles the results against plan and targets. Step 2 reviews them with design and customer engineering. Step 3 releases the report.',
     consumes: [
-      'Characterization plan from UCHR-01',
+      'PLL jitter and relock results from UCHR-11',
       'Margin, BER and energy results from UCHR-02, UCHR-03 and UCHR-04',
       'Shmoo, repair and recalibration results from UCHR-05, UCHR-06 and UCHR-07',
       'Channel correlation from UCHR-08',
       'Measurement-to-simulation correlation from UCHR-09',
     ],
     rel: {
-      'UCHR-D10': '<b>Characterization report.</b> Produced here; it closes the Characterization Report gate and feeds the GA release.',
+      'UCHR-D10': '<b>Characterization report with results per package type.</b> Produced here; it closes the Characterization Report gate and feeds the GA release.',
     },
     risks: [
       '<b>Sections inconsistent.</b> Margin, BER and power sections are measured on different units without saying so.',
       '<b>Targets missed silently.</b> A missed target is reported as a number without a comparison.',
       '<b>Open deviations dropped.</b> Unexplained deviations disappear from the final report.',
-      '<b>Customer view absent.</b> The report is written for the design team and is unusable for the silicon report.',
+      '<b>One variant read as all.</b> Results from one package variant are presented as covering every supported package type.',
       '<b>Late release.</b> The report slips and the GA rollup works from drafts.',
     ],
     roles: [
@@ -646,11 +646,11 @@ export const UCHR_WRITE_UPS: UcieWriteUps = {
       'Design and customer engineering reviewers named',
     ],
     exit: [
-      'Every PPA target reported as met or missed with the measured value and its conditions',
+      'Every PPA target reported as met or missed with the measured value, its conditions and the package type it was measured on',
       'Every open deviation listed with an owner and its effect on the release',
       'Report released and handed to the GA rollup',
     ],
-    dependsOn: ['UCHR-01', 'UCHR-02', 'UCHR-03', 'UCHR-04', 'UCHR-05', 'UCHR-06', 'UCHR-07', 'UCHR-08', 'UCHR-09'],
+    dependsOn: ['UCHR-01', 'UCHR-02', 'UCHR-03', 'UCHR-04', 'UCHR-05', 'UCHR-06', 'UCHR-07', 'UCHR-08', 'UCHR-09', 'UCHR-11'],
     dependsNote: null,
     feedsInto: ['UGA-02', 'UGA-05'],
     measuredBy: [
@@ -659,12 +659,80 @@ export const UCHR_WRITE_UPS: UcieWriteUps = {
       'Days from final measurement to release',
     ],
     links: {
-      dependsOn: ['UCHR-01', 'UCHR-02', 'UCHR-03', 'UCHR-04', 'UCHR-05', 'UCHR-06', 'UCHR-07', 'UCHR-08', 'UCHR-09'],
+      dependsOn: ['UCHR-01', 'UCHR-02', 'UCHR-03', 'UCHR-04', 'UCHR-05', 'UCHR-06', 'UCHR-07', 'UCHR-08', 'UCHR-09', 'UCHR-11', 'UBUP-07'],
       feedsInto: ['UGA-01', 'UGA-02', 'UGA-05', 'UCUS-04'],
       runsWith: [],
       revisedBy: [],
       feedsBackInto: [],
     },
     terms: ['GA', 'Release package'],
+  },
+  'UCHR-11': {
+    criticalPath: false,
+    purpose: [
+      'Characterize the <b>PLL on silicon</b>: lock and output jitter at nominal conditions, jitter and lane margin against noise injected on the PLL and clock supplies, jitter transfer from the reference clock across its specification, and relock time with first-traffic errors on exit from L1 and L2 across temperature.',
+      'The PLL generates the clock every lane is launched and sampled with, so its jitter is spent in every lane’s margin, and its relock time decides how quickly a customer can come out of a low-power state. Licensees size their reference clock and supply filtering from these numbers, which is why they are measured rather than quoted from simulation.',
+    ],
+    flowNote:
+      'Step 1 measures lock and jitter at nominal. Step 2 injects supply noise while step 3 sweeps the reference clock in parallel. Step 4 measures relock from L1 and L2 and step 5 compares with simulation and releases the results.',
+    consumes: [
+      'PLL design and its jitter simulations from UAFE-10',
+      'Reference clock jitter specification from UREQ-08',
+      'Eye and lane margining functions from UDFT-06',
+      'Probe-able observation path from UTCI-02',
+      'Characterization plan and corner matrix from UCHR-01',
+    ],
+    rel: {
+      'UCHR-D11': '<b>PLL jitter, supply sensitivity and relock characterization results.</b> Produced here; the integration guide’s reference clock and supply filtering sections are built from it.',
+      'UCHR-D9': '<b>Measurement-to-simulation correlation report with model updates.</b> PLL jitter is correlated with the design simulation.',
+      'UCHR-D10': '<b>Characterization report with results per package type.</b> The PLL results are a section of the report.',
+    },
+    risks: [
+      '<b>Jitter read through the margin only.</b> PLL jitter is inferred from lane margin and cannot be separated from channel and receiver effects.',
+      '<b>Clean supplies only.</b> Jitter is measured on lab supplies and the customer’s noisier rails are never represented.',
+      '<b>Reference clock assumed ideal.</b> The reference clock is a lab source far cleaner than the specification allows.',
+      '<b>Relock at room temperature.</b> Relock time is measured warm and the cold-start case is missed.',
+      '<b>Observation path limits.</b> The observation path adds its own jitter and is not calibrated out.',
+    ],
+    roles: [
+      { r: 'Validation', d: 'Owns PLL characterization' },
+      { r: 'Analog and mixed-signal designer', d: 'PLL design intent and jitter simulation' },
+      { r: 'DFT engineer', d: 'Margining and observation path access' },
+      { r: 'Board and lab hardware engineer', d: 'Supply noise injection and reference clock sources' },
+      { r: 'Characterization lead', d: 'Accepts the PLL results' },
+    ],
+    effort: [
+      ['Lock and jitter at nominal', 0.6],
+      ['Supply noise sensitivity', 0.8],
+      ['Reference clock jitter transfer', 0.6],
+      ['Relock from low-power states', 0.6],
+      ['Correlation and release', 0.4],
+    ],
+    entry: [
+      'Units allocated at the first link-up review in UBUP-06',
+      'Supply noise injection and reference clock sources ready on the evaluation board',
+      'PLL simulation results available from UAFE-10',
+    ],
+    exit: [
+      'PLL jitter recorded at nominal and against injected supply noise at the planned levels',
+      'Relock time and first-traffic errors recorded for L1 and L2 exit at the temperature extremes',
+      'Every measured value compared with its simulated value and deviations opened as issues',
+    ],
+    dependsOn: ['UCHR-01', 'UAFE-10', 'UBUP-06'],
+    dependsNote: null,
+    feedsInto: ['UCHR-09', 'UCHR-10'],
+    measuredBy: [
+      'Measured jitter against the specified budget',
+      'Lane margin lost per unit of injected supply noise',
+      'Relock time against the low-power exit latency the requirements set',
+    ],
+    links: {
+      dependsOn: ['UCHR-01', 'UAFE-10', 'UBUP-06', 'UREQ-08', 'UDFT-06', 'UTCI-02'],
+      feedsInto: ['UCHR-09', 'UCHR-10', 'UGA-02'],
+      runsWith: ['UCHR-07'],
+      revisedBy: [],
+      feedsBackInto: [],
+    },
+    terms: ['PLL', 'Relock time', 'Margining'],
   },
 };

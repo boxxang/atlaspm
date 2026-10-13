@@ -14,4 +14,9 @@ export const UCHR_GLOSSARY: UcieGlossary = {
     group: 'test',
     note: 'How sure a measurement is that the true error rate is below a target, given how many bits were sent and how many errors were seen. Without it a short error-free run proves very little.',
   },
+  'Relock time': {
+    full: 'PLL relock time',
+    group: 'design',
+    note: 'How long the PLL takes to lock again after it was stopped for a low-power state. It sets how fast a link can return from L1 or L2 to carrying traffic.',
+  },
 };

@@ -7,7 +7,7 @@ export const UTCI_WRITE_UPS: UcieWriteUps = {
   'UTCI-01': {
     criticalPath: true,
     purpose: [
-      'Define the <b>test chip architecture</b> from the claims it has to prove: a two-die link across the advanced-package test vehicle for the real channel, loopback configurations for single-die and wafer-level testing, traffic sources and checkers, clock and reset control, and debug access — written down as a coverage map from every datasheet claim and compliance test to the configuration that demonstrates it.',
+      'Define the <b>test chip architecture</b> from the claims it has to prove: a two-die link with two modules per die across the advanced-package test vehicle for the real channel and multi-module operation, loopback configurations for single-die and wafer-level testing, traffic sources and checkers, clock and reset control, debug access and a probe-able observation path for bench calibration — written down as a coverage map from every datasheet claim and compliance test to the configuration that demonstrates it.',
       'A test chip is designed backwards from the GA report. Every number the program will publish — eye margin per lane, BER at 64 GT/s, energy per bit, lane repair, runtime recalibration — needs a configuration that can produce it at full rate, and a chip that can only loop back on itself never proves the die-to-die channel.',
     ],
     flowNote:
@@ -73,7 +73,7 @@ export const UTCI_WRITE_UPS: UcieWriteUps = {
   'UTCI-02': {
     criticalPath: false,
     purpose: [
-      'Design the <b>test chip wrapper and test logic</b>: an FDI-side traffic generator and checker that sustains full bandwidth in every mode, register access over the sideband with a separate debug path, the PHY’s PRBS, loopback and BIST controls in one control plane, and clock, reset, power and calibration controls for bring-up.',
+      'Design the <b>test chip wrapper and test logic</b>: an FDI-side traffic generator and checker that sustains full bandwidth in every mode, register access over the sideband with a separate debug path, the PHY’s PRBS, loopback and BIST controls in one control plane, clock, reset, power and calibration controls for bring-up, an on-die analog test bus with a probe-able observation lane, and a register map frozen for the bring-up software.',
       'At 64 GT/s on a x64 module the FDI carries several terabits per second. A traffic generator that cannot keep up means the link is only ever run in PRBS mode, and the Adapter’s CRC, retry and Flit handling are never proven on silicon at speed.',
     ],
     flowNote:
@@ -274,11 +274,11 @@ export const UTCI_WRITE_UPS: UcieWriteUps = {
   'UTCI-05': {
     criticalPath: true,
     purpose: [
-      'Implement and <b>sign off the test chip</b> around the signed-off macros: implement the top level, close timing on the traffic and control logic, run full-chip EM, IR drop, DRC and LVS, and confirm the macros are exactly the revision the hard macro signoff authorized.',
-      'Test chip signoff is where the hard macro signoff’s slip lands. The top level is prepared on the signoff-candidate macros so that, when the macro decision is recorded, only a final run on the authorized revision stands between it and tapeout.',
+      'Implement and <b>sign off the test chip</b>: implement the top level on the signoff-candidate macros, put a trial database through the foundry intake checks, close timing on the traffic and control logic, run full-chip EM, IR drop, DRC and LVS, then drop in the macro revision the hard macro signoff authorized and delta-check what changed.',
+      'Test chip signoff is where the hard macro signoff’s slip lands. Starting on candidate macros and clearing the foundry intake early leaves only the drop-in and its delta checks between the signoff decision at week 72 and the database release at week 74.',
     ],
     flowNote:
-      'Step 1 implements the top level. Step 2 closes timing while step 3 runs full-chip EM, IR, DRC and LVS in parallel. Step 4 confirms the macro revisions against the signoff record and step 5 releases the database.',
+      'Step 1 implements the top level while step 2 clears a trial database through the foundry intake beside it. Step 3 closes timing while step 4 runs full-chip EM, IR, DRC and LVS in parallel. Step 5 drops in the signed-off macro revision and delta-checks it, and step 6 releases the database.',
     consumes: [
       'Integrated test chip top level from UTCI-03',
       'Test chip top-level verification report from UTCI-04',
@@ -300,29 +300,30 @@ export const UTCI_WRITE_UPS: UcieWriteUps = {
     roles: [
       { r: 'Physical design', d: 'Owns test chip implementation and signoff' },
       { r: 'Test chip integration lead', d: 'Approves top-level changes' },
-      { r: 'Configuration manager', d: 'Confirms macro revisions against the signoff record' },
+      { r: 'Configuration manager', d: 'Confirms the dropped-in macro revision against the signoff record' },
       { r: 'Analog layout lead', d: 'Reviews full-chip interactions with the Electrical PHY' },
       { r: 'Program manager', d: 'Tracks signoff against the shuttle date' },
     ],
     effort: [
-      ['Top-level implementation', 2.2],
+      ['Top-level implementation', 2],
+      ['Trial foundry intake', 0.5],
       ['Timing closure', 1.1],
-      ['Full-chip EM, IR, DRC and LVS', 1.5],
-      ['Revision confirmation', 0.4],
-      ['Release', 0.8],
+      ['Full-chip EM, IR, DRC and LVS', 1.4],
+      ['Macro drop-in and delta checks', 0.6],
+      ['Release', 0.4],
     ],
     entry: [
-      'Hard macro signoff decision recorded in USGN-07',
+      'Integrated top level and signoff-candidate macros available from UTCI-03',
       'Top-level verification report released in UTCI-04',
-      'Shuttle database deadline confirmed',
+      'Shuttle database deadline and the foundry intake check list confirmed',
     ],
     exit: [
-      'Full-chip DRC and LVS clean or waived with foundry acceptance',
+      'Trial database accepted by the foundry intake checks before the final submission',
       'Top-level timing met at the frequency the traffic logic needs for full bandwidth',
-      'Macro revisions in the database match the signoff record exactly',
+      'Macro revisions in the database match the signoff record exactly, with full-chip DRC and LVS clean after the drop-in',
     ],
     dependsOn: ['UTCI-03', 'UTCI-04', 'USGN-07'],
-    dependsNote: 'Implementation runs on signoff-candidate macros; the final run waits for the hard macro signoff decision in USGN-07.',
+    dependsNote: 'Implementation runs on signoff-candidate macros from week 64; only the drop-in and its delta checks wait for the hard macro signoff decision in USGN-07 at week 72.',
     feedsInto: ['UTCI-06', 'UTPO-02', 'UTPO-04'],
     measuredBy: [
       'Days between hard macro signoff and test chip signoff',
@@ -341,7 +342,7 @@ export const UTCI_WRITE_UPS: UcieWriteUps = {
   'UTCI-06': {
     criticalPath: true,
     purpose: [
-      'Hold the <b>test chip readiness review</b>: check the coverage map, the verification report and the signoff report together, confirm the test vehicle, boards and bring-up plan match the database, and record the decision that releases the test chip to tapeout.',
+      'Hold the <b>test chip readiness review</b>: check the coverage map, the verification report and the signoff report together, confirm the test vehicle and the bring-up software are being built to the frozen register map, pinout and bump map, and record the decision that releases the test chip to tapeout.',
       'Readiness is not only that the chip is clean but that the lab can use it. A chip whose bump map no longer matches the test vehicle substrate on order, or whose register map differs from the bring-up scripts, fails on the day silicon arrives.',
     ],
     flowNote:
@@ -351,7 +352,7 @@ export const UTCI_WRITE_UPS: UcieWriteUps = {
       'Test chip top-level verification report from UTCI-04',
       'Test chip signoff report and database from UTCI-05',
       'Hard macro signoff decision record from USGN-07',
-      'Bring-up plan and test programs from UTVP-06',
+      'Frozen test chip register map and pinout from UTCI-02',
     ],
     rel: {
       'UTCI-D6': '<b>Test chip readiness decision record.</b> Produced here; it closes the Test Chip Ready gate.',
@@ -378,7 +379,7 @@ export const UTCI_WRITE_UPS: UcieWriteUps = {
     entry: [
       'Test chip signoff report released in UTCI-05',
       'Coverage map and verification report current',
-      'Bring-up plan draft available from UTVP-06',
+      'Test chip register map frozen in UTCI-02',
     ],
     exit: [
       'Every coverage-map item traced to a feature present in the final database',
@@ -394,7 +395,7 @@ export const UTCI_WRITE_UPS: UcieWriteUps = {
       'Readiness date against the shuttle date',
     ],
     links: {
-      dependsOn: ['UTCI-01', 'UTCI-02', 'UTCI-03', 'UTCI-04', 'UTCI-05', 'USGN-07', 'UTVP-06'],
+      dependsOn: ['UTCI-01', 'UTCI-02', 'UTCI-03', 'UTCI-04', 'UTCI-05', 'USGN-07'],
       feedsInto: ['UTPO-01'],
       runsWith: [],
       revisedBy: [],

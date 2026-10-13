@@ -1,5 +1,5 @@
 /**
- * UBUP — Silicon Bring-Up. Weeks 96–104; closes on First Link-up.
+ * UBUP — Silicon Bring-Up. Weeks 98–106; closes on First Link-up.
  */
 import type { UcieStageModule } from '../types';
 
@@ -7,8 +7,8 @@ export const UBUP: UcieStageModule = {
   content: {
     tagline: 'Two dies on one package, one sideband message at a time, until the 64 GT/s mainband carries data.',
     description:
-      'Take the first assembled test vehicles from the dock to a working link in eight weeks. Power the two test chip dies up rail by rail against the sequencing the integration guide promises customers, bring the sideband up and read the registers through it, then train the mainband — MBINIT with its lane, clock, valid and track checks and repair detection, then MBTRAIN at 64 GT/s — until LINKINIT hands an active link to the test logic and data moves across the advanced package. Every step is run against the post-silicon test plan written in verification and the margin predictions from mixed-signal simulation, so the first silicon numbers are compared with what the design team said they would be, not read in isolation. The stage closes on first link-up: an active link carrying PRBS and Flit traffic, with the open issues triaged.',
-    activities: ['Power-on', 'Sideband link-up', 'Mainband training', 'First link-up', 'Plan and predictions', 'First link-up review'],
+      'Take the first assembled test vehicles from the dock to a working link in eight weeks. Power the two test chip dies up rail by rail against the sequencing the integration guide promises customers, bring the sideband up and read the registers through it, then train the mainband — MBINIT with its lane, clock, valid and track checks and repair detection, then MBTRAIN at 64 GT/s — until LINKINIT hands an active link to the test logic and data moves across the advanced package. Every step is run against the post-silicon test plan written in verification and the margin predictions from mixed-signal simulation, so the first silicon numbers are compared with what the design team said they would be, not read in isolation. The stage closes on first link-up: an active link carrying PRBS and Flit traffic, with the open issues triaged — and with the program’s decision on whether those issues are lived with, fixed in metal, or need a respin.',
+    activities: ['Power-on', 'Sideband link-up', 'Mainband training', 'First link-up', 'Plan and predictions', 'First link-up review', 'Respin decision'],
     deliverables: [
       'Power-on and supply sequencing record with rail currents per die',
       'Sideband link-up and register access log',
@@ -16,10 +16,11 @@ export const UBUP: UcieStageModule = {
       'First link-up and basic data transfer record at 64 GT/s',
       'Bring-up results against the pre-silicon test plan and margin predictions',
       'First link-up decision record and open-issue list',
+      'Respin or metal-fix decision record with its effect on the GA date',
     ],
-    deliverableFrom: [0, 1, 2, 3, 4, 5],
-    deliverableWeek: [1, 3, 5, 7, 8, 8],
-    engineeringEffort: [1, 1.5, 2, 2, 3, 0.5],
+    deliverableFrom: [0, 1, 2, 3, 4, 5, 6],
+    deliverableWeek: [1, 3, 5, 7, 8, 8, 8],
+    engineeringEffort: [1, 1.5, 2, 2, 3, 0.5, 1],
     risks: [
       'Mainband training fails on first silicon and the cause cannot be separated between the analog front-end, the training logic, the package and the board',
       'Bring-up runs on the lab’s own scripts rather than the pre-silicon test plan, so the silicon cannot be compared with what was predicted',
@@ -30,6 +31,7 @@ export const UBUP: UcieStageModule = {
       'Lane repair triggered silently on the first parts, masking a bump or assembly defect the reliability units will also carry',
       'Too few assembled units to separate a die problem from a package or board problem by swapping parts',
       'Debug visibility limited to the sideband, so a training hang in the mainband leaves no trace of the state it stopped in',
+      'A silicon bug found at first link-up with no decision on a metal fix or respin, so the GA date silently assumes the workaround holds',
     ],
     leader: { name: 'Mariana Okonkwo', short: 'M. Okonkwo', phone: '+1 (408) 555-0661', email: 'mariana.okonkwo@example.com' },
     collaboration: ['Validation', 'Board and lab hardware', 'Analog and mixed-signal', 'RTL design', 'Design verification', 'Test chip integration', 'Packaging'],
@@ -137,6 +139,21 @@ export const UBUP: UcieStageModule = {
         'First link-up decision record and open-issue list',
       ],
       r: [['UBUP-D6', 'produces']],
+    },
+    'UBUP-07': {
+      s: [
+        [1, 'Classify every open silicon issue by what closes it — a documented workaround, a register or firmware change, a metal fix or a full respin', 0.5],
+        [2, 'Estimate the schedule and cost of a metal fix through the reserved mask and slot option, and of a full respin', 0.5, 1],
+        [3, 'Weigh each option against what GA can claim — a workaround carried in the errata or fixed silicon', 0.5],
+        [4, 'Record the respin or metal-fix decision with its effect on the GA date and on licensees', 0.5],
+      ],
+      o: [
+        'Open silicon issues classified by the fix each needs',
+        'Schedule and cost estimate for a metal fix and for a respin',
+        'Options weighed against the GA claim',
+        'Respin or metal-fix decision record with its effect on the GA date',
+      ],
+      r: [['UBUP-D7', 'produces'], ['UBUP-D6', 'informs']],
     },
   },
 };

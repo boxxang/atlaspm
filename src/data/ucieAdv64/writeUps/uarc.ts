@@ -25,7 +25,7 @@ export const UARC_WRITE_UPS: UcieWriteUps = {
     },
     risks: [
       '<b>RDI treated as internal.</b> A customer bringing their own adapter finds the RDI under-specified.',
-      '<b>FDI modes conflated.</b> One FDI definition is written for Flit mode and Raw mode customers find gaps.',
+      '<b>Formats and protocols conflated.</b> One FDI definition is written for a Flit format and customers on the Raw format or a streaming protocol find gaps.',
       '<b>Register map fragmented.</b> Each block defines its own registers and the customer sees no single map.',
       '<b>Ownership gaps.</b> Signals between adapter and logical PHY have no owner and change silently.',
       '<b>Partition by team.</b> Blocks follow team boundaries rather than function and the interfaces carry the cost.',
@@ -38,11 +38,11 @@ export const UARC_WRITE_UPS: UcieWriteUps = {
       { r: 'Customer engineering lead', d: 'Customer integration view of the FDI' },
     ],
     effort: [
-      ['Partition', 0.2],
-      ['FDI', 0.7],
-      ['RDI', 0.2],
-      ['Register interface', 0.2],
-      ['Release', 0.2],
+      ['Partition', 0.4],
+      ['FDI', 1.4],
+      ['RDI', 0.4],
+      ['Register interface', 0.4],
+      ['Release', 0.4],
     ],
     entry: [
       'Feature selection matrix released in UREQ-01',
@@ -74,11 +74,11 @@ export const UARC_WRITE_UPS: UcieWriteUps = {
   'UARC-02': {
     criticalPath: true,
     purpose: [
-      'Architect the <b>D2D Adapter</b>: the Flit formats and how the FDI maps onto them, CRC generation and checking, the retry protocol and its buffer, Raw mode with continuous transmission, Streaming protocol handling, and arbitration and multiplexing between protocol stacks.',
+      'Architect the <b>D2D Adapter</b>: the Flit formats and how the FDI maps onto them, CRC generation and checking, the retry protocol and its buffer, the Raw format with continuous transmission, negotiation of the PCIe and CXL formats at the FDI, streaming protocol carriage, multi-module aggregation, and arbitration and multiplexing between protocol stacks.',
       'At 64 GT/s the retry buffer must cover the round trip of a much faster link, and every cycle the adapter adds is latency the customer’s protocol sees. Sizing the buffer and the pipeline here, against the reliability and latency targets, avoids discovering in synthesis that one of them cannot be met.',
     ],
     flowNote:
-      'Step 1 defines Flit formats. Step 2 architects CRC and retry while step 3 architects Raw and Streaming modes in parallel. Step 4 architects arbitration, step 5 estimates latency and step 6 releases.',
+      'Step 1 defines Flit formats. Step 2 architects CRC and retry while step 3 architects the Raw format, protocol negotiation and multi-module aggregation in parallel. Step 4 architects arbitration, step 5 estimates latency and step 6 releases.',
     consumes: [
       'Partition and FDI definition from UARC-01',
       'Link reliability targets from UREQ-05',
@@ -92,8 +92,8 @@ export const UARC_WRITE_UPS: UcieWriteUps = {
     },
     risks: [
       '<b>Retry buffer undersized.</b> The buffer covers the round trip at a lower speed and stalls at 64 GT/s.',
-      '<b>Raw mode error path missing.</b> Continuous transmission in Raw mode leaves error reporting undefined.',
-      '<b>Latency per mode unestimated.</b> The adapter pipeline is designed for Flit mode and Raw mode latency is a surprise.',
+      '<b>Raw format error path missing.</b> Continuous transmission over the Raw format leaves error reporting undefined.',
+      '<b>Latency per format unestimated.</b> The adapter pipeline is designed for one Flit format and Raw format latency is a surprise.',
       '<b>Arbitration starvation.</b> Multiplexed stacks can starve each other under load.',
       '<b>CRC placement wrong.</b> CRC is computed late in the pipeline and retry latency grows.',
     ],
@@ -105,11 +105,11 @@ export const UARC_WRITE_UPS: UcieWriteUps = {
       { r: 'Customer engineering lead', d: 'Protocol stacks customers will multiplex' },
     ],
     effort: [
-      ['Flit formats', 0.2],
-      ['CRC and retry', 0.9],
-      ['Raw and Streaming modes', 0.5],
-      ['Arbitration and latency', 0.2],
-      ['Release', 0.2],
+      ['Flit formats', 0.3],
+      ['CRC and retry', 1.3],
+      ['Raw format, protocols and modules', 0.8],
+      ['Arbitration and latency', 0.3],
+      ['Release', 0.3],
     ],
     entry: [
       'FDI defined in UARC-01',
@@ -118,8 +118,8 @@ export const UARC_WRITE_UPS: UcieWriteUps = {
     ],
     exit: [
       'Retry buffer depth sized for the 64 GT/s round trip with stated margin',
-      'Adapter latency estimated per mode within the latency budget',
-      'Raw mode error behavior defined',
+      'Adapter latency estimated per format within the latency budget',
+      'Raw format error behavior and multi-module aggregation defined',
     ],
     dependsOn: ['UARC-01', 'UREQ-05'],
     dependsNote: null,
@@ -141,7 +141,7 @@ export const UARC_WRITE_UPS: UcieWriteUps = {
   'UARC-03': {
     criticalPath: true,
     purpose: [
-      'Architect the <b>Logical PHY</b>: lane mapping and scrambling for the x64 module and its redundant lanes, the training sequence through SBINIT, MBINIT, MBTRAIN and LINKINIT to ACTIVE, PHYRETRAIN triggers, TRAINERROR handling, fallback rules, and runtime recalibration.',
+      'Architect the <b>Logical PHY</b>: lane mapping and scrambling for the x64 module and its redundant lanes, the training sequence through SBINIT, MBINIT, MBTRAIN and LINKINIT to ACTIVE, PHYRETRAIN triggers, TRAINERROR handling, speed fallback with repair onto redundant lanes rather than width degrade, and runtime recalibration triggered by on-die temperature and voltage sensors.',
       'Training is where the logical PHY meets the analog front-end: every MBTRAIN step moves a phase or a voltage the AFE must provide. Architecting training and runtime recalibration with the analog hooks in view is what keeps the state machine and the circuits from being designed against different assumptions.',
     ],
     flowNote:
@@ -160,7 +160,7 @@ export const UARC_WRITE_UPS: UcieWriteUps = {
     risks: [
       '<b>Training needs unknown to the AFE.</b> MBTRAIN steps require phase or voltage controls the circuits do not provide.',
       '<b>Recalibration as retrain.</b> Runtime recalibration is a full retrain and stops traffic too long.',
-      '<b>Fallback incomplete.</b> Width and speed fallback is not defined for every failure.',
+      '<b>Width degrade assumed.</b> A Standard-package width fallback is carried into the Advanced design instead of repair onto redundant lanes and TRAINERROR beyond it.',
       '<b>TRAINERROR dead end.</b> The exit path from training errors is not defined and links hang.',
       '<b>Scrambling misaligned.</b> Scrambling and lane mapping interact with repair and break remapped lanes.',
     ],
@@ -172,11 +172,11 @@ export const UARC_WRITE_UPS: UcieWriteUps = {
       { r: 'Validation lead', d: 'Training observability on silicon' },
     ],
     effort: [
-      ['Lane mapping and scrambling', 0.2],
-      ['Training sequence', 0.9],
-      ['Retrain, error and fallback', 0.2],
-      ['Runtime recalibration', 0.5],
-      ['Release', 0.2],
+      ['Lane mapping and scrambling', 0.3],
+      ['Training sequence', 1.3],
+      ['Retrain, error and fallback', 0.3],
+      ['Runtime recalibration', 0.8],
+      ['Release', 0.3],
     ],
     entry: [
       'RDI defined in UARC-01',
@@ -185,12 +185,12 @@ export const UARC_WRITE_UPS: UcieWriteUps = {
     ],
     exit: [
       'Training sequence defined state by state with entry, exit and timeout conditions',
-      'Runtime recalibration traffic impact estimated within the requirement',
+      'Runtime recalibration traffic impact estimated within the requirement, with its sensor triggers listed',
       'Every analog control used by training listed for the electrical PHY',
     ],
     dependsOn: ['UARC-01', 'UREQ-05', 'UREQ-06'],
     dependsNote: null,
-    feedsInto: ['UARC-04', 'UARC-08', 'UARC-10', 'UARC-11', 'UARC-12', 'URTL-04', 'URTL-05'],
+    feedsInto: ['UARC-04', 'UARC-08', 'UARC-10', 'UARC-11', 'UARC-12', 'URTL-04', 'URTL-05', 'UAFE-12'],
     measuredBy: [
       'Training states fully defined',
       'Analog controls listed and agreed',
@@ -198,7 +198,7 @@ export const UARC_WRITE_UPS: UcieWriteUps = {
     ],
     links: {
       dependsOn: ['UARC-01', 'UREQ-05', 'UREQ-06', 'UREQ-01'],
-      feedsInto: ['UARC-04', 'UARC-08', 'UARC-10', 'UARC-11', 'UARC-12', 'URTL-04', 'URTL-05', 'UDV-03', 'UAMS-03'],
+      feedsInto: ['UARC-04', 'UARC-08', 'UARC-10', 'UARC-11', 'UARC-12', 'URTL-04', 'URTL-05', 'UDV-03', 'UAMS-03', 'UAFE-12'],
       runsWith: ['UARC-02', 'UARC-07'],
       revisedBy: [],
       feedsBackInto: [],
@@ -239,10 +239,10 @@ export const UARC_WRITE_UPS: UcieWriteUps = {
       { r: 'Verification lead', d: 'Repair and reversal verification plan' },
     ],
     effort: [
-      ['Detection', 0.4],
-      ['Repair', 0.2],
-      ['Reversal', 0.2],
-      ['Deskew and release', 0.2],
+      ['Detection', 0.8],
+      ['Repair', 0.4],
+      ['Reversal', 0.4],
+      ['Deskew and release', 0.4],
     ],
     entry: [
       'Training sequence drafted in UARC-03',
@@ -274,7 +274,7 @@ export const UARC_WRITE_UPS: UcieWriteUps = {
   'UARC-05': {
     criticalPath: false,
     purpose: [
-      'Architect the <b>sideband</b>: message set, packet formats and flow control, register access to the local and remote die, early firmware download, priority sideband packets, and the sideband clocking and its redundancy.',
+      'Architect the <b>sideband</b>: message set, packet formats and flow control, register access to the local and remote die, early firmware download, priority sideband packets, the sideband clocking and its redundant path, and the always-on supply the sideband needs in L2 — with the sideband transmitter and receiver circuits assigned to the electrical PHY team.',
       'The sideband comes up first and is the only way to see a link that will not train. Its message set and register access decide how training is debugged in the lab and how customer firmware manages the link in the field.',
     ],
     flowNote:
@@ -294,7 +294,7 @@ export const UARC_WRITE_UPS: UcieWriteUps = {
       '<b>No debug path.</b> The sideband cannot read training state on a link that fails MBTRAIN.',
       '<b>Firmware download unsized.</b> Download time is not budgeted against boot.',
       '<b>Priority packets starved.</b> Priority packets wait behind bulk register traffic.',
-      '<b>Sideband single point of failure.</b> No redundancy for sideband bumps.',
+      '<b>Sideband circuits unowned.</b> The digital sideband is specified but nobody designs its transmitter, receiver, redundant path or always-on supply.',
       '<b>Remote access unsecured.</b> Remote register access has no access control.',
     ],
     roles: [
@@ -305,10 +305,10 @@ export const UARC_WRITE_UPS: UcieWriteUps = {
       { r: 'Security reviewer', d: 'Access control on remote register access' },
     ],
     effort: [
-      ['Messages and packets', 0.6],
-      ['Register access', 0.2],
-      ['Firmware download and priority packets', 0.2],
-      ['Clocking, redundancy and release', 0.5],
+      ['Messages and packets', 1.1],
+      ['Register access', 0.3],
+      ['Firmware download and priority packets', 0.3],
+      ['Clocking, redundancy and release', 0.8],
     ],
     entry: [
       'Register interface defined in UARC-01',
@@ -317,12 +317,12 @@ export const UARC_WRITE_UPS: UcieWriteUps = {
     ],
     exit: [
       'Sideband message set and packet formats defined',
-      'Training state readable over sideband on a failed link',
+      'Training state readable over sideband on a failed link, and the sideband circuits and always-on supply assigned to UAFE-11',
       'Firmware download time estimated against boot budget',
     ],
     dependsOn: ['UARC-01', 'UREQ-06'],
     dependsNote: null,
-    feedsInto: ['UARC-12', 'URTL-07'],
+    feedsInto: ['UARC-12', 'URTL-07', 'UAFE-11'],
     measuredBy: [
       'Message types defined',
       'Debug registers reachable over sideband',
@@ -330,7 +330,7 @@ export const UARC_WRITE_UPS: UcieWriteUps = {
     ],
     links: {
       dependsOn: ['UARC-01', 'UREQ-06'],
-      feedsInto: ['UARC-12', 'URTL-07', 'UDV-08'],
+      feedsInto: ['UARC-12', 'URTL-07', 'UDV-08', 'UAFE-11'],
       runsWith: ['UARC-03'],
       revisedBy: [],
       feedsBackInto: [],
@@ -340,11 +340,11 @@ export const UARC_WRITE_UPS: UcieWriteUps = {
   'UARC-06': {
     criticalPath: true,
     purpose: [
-      'Architect the <b>clocking</b>: PLL or DLL and the frequency plan for 64 GT/s and the fallback speeds, the forwarded clock and how the receiver aligns its sampling phase to it, phase adjustment range and resolution, and the split of the unit-interval timing budget.',
+      'Architect the <b>clocking</b>: the PLL that generates the high-speed clock and the DLL that places sampling phases — two roles, not alternatives — the frequency plan for 64 GT/s and the fallback speeds, the forwarded clock and how the receiver aligns its sampling phase to it, phase adjustment range and resolution, and the split of the unit-interval timing budget.',
       'At 64 GT/s a unit interval is a few tens of picoseconds, and transmit jitter, channel effects, receiver sampling and margin all have to fit inside it. The forwarded clock removes much of the jitter a recovered clock would carry, but only if the budget says who owns what remains.',
     ],
     flowNote:
-      'Step 1 chooses clock generation. Step 2 defines the forwarded clock scheme, step 3 splits the timing budget while step 4 defines phase adjustment in parallel, and step 5 releases.',
+      'Step 1 assigns the PLL and DLL roles. Step 2 defines the forwarded clock scheme, step 3 splits the timing budget while step 4 defines phase adjustment in parallel, and step 5 releases.',
     consumes: [
       'Electrical PHY requirements from UREQ-08',
       'Feature selection and fallback speeds from UREQ-01',
@@ -353,7 +353,7 @@ export const UARC_WRITE_UPS: UcieWriteUps = {
       'Process jitter and device data',
     ],
     rel: {
-      'UARC-D6': '<b>Clocking architecture and 64 GT/s timing budget.</b> Produced here; UAFE-04 designs to it.',
+      'UARC-D6': '<b>Clocking architecture and 64 GT/s timing budget.</b> Produced here; UAFE-10 designs the PLL and UAFE-04 the distribution and phase placement to it.',
       'UARC-D7': '<b>Electrical PHY architecture specification.</b> The transmit and receive budgets come from this split.',
     },
     risks: [
@@ -365,17 +365,17 @@ export const UARC_WRITE_UPS: UcieWriteUps = {
     ],
     roles: [
       { r: 'Analog and mixed-signal', d: 'Owns the clocking architecture and timing budget' },
-      { r: 'Clocking designer', d: 'PLL or DLL and phase adjustment feasibility' },
+      { r: 'Clocking designer', d: 'PLL, DLL and phase adjustment feasibility' },
       { r: 'SI/PI engineer', d: 'Channel and supply contributions to the budget' },
       { r: 'Logical PHY lead', d: 'Phase controls used by training' },
       { r: 'Technology and foundry engineer', d: 'Device jitter data' },
     ],
     effort: [
-      ['Clock generation and frequency plan', 0.6],
-      ['Forwarded clock scheme', 0.5],
-      ['Timing budget split', 0.5],
-      ['Phase adjustment', 0.2],
-      ['Release', 0.2],
+      ['Clock generation and frequency plan', 0.9],
+      ['Forwarded clock scheme', 0.9],
+      ['Timing budget split', 0.9],
+      ['Phase adjustment', 0.4],
+      ['Release', 0.4],
     ],
     entry: [
       'Electrical requirements released in UREQ-08',
@@ -384,12 +384,12 @@ export const UARC_WRITE_UPS: UcieWriteUps = {
     ],
     exit: [
       'Unit-interval budget split with an owner for every component and margin stated',
-      'Frequency plan produces every supported speed',
+      'PLL and DLL roles assigned, and the frequency plan produces every supported speed',
       'Phase adjustment range and resolution meet training needs',
     ],
     dependsOn: ['UREQ-08', 'UREQ-01'],
     dependsNote: null,
-    feedsInto: ['UARC-07', 'UARC-08', 'UARC-11', 'UARC-12', 'UAFE-04'],
+    feedsInto: ['UARC-07', 'UARC-08', 'UARC-11', 'UARC-12', 'UAFE-04', 'UAFE-10'],
     measuredBy: [
       'Timing budget margin at 64 GT/s',
       'Supported speeds produced by the frequency plan',
@@ -397,7 +397,7 @@ export const UARC_WRITE_UPS: UcieWriteUps = {
     ],
     links: {
       dependsOn: ['UREQ-08', 'UREQ-01', 'UREQ-02'],
-      feedsInto: ['UARC-07', 'UARC-08', 'UARC-11', 'UARC-12', 'UAFE-04', 'UFND-01', 'UAMS-01'],
+      feedsInto: ['UARC-07', 'UARC-08', 'UARC-11', 'UARC-12', 'UAFE-04', 'UAFE-10', 'UFND-01', 'UAMS-01'],
       runsWith: [],
       revisedBy: [],
       feedsBackInto: [],
@@ -407,11 +407,11 @@ export const UARC_WRITE_UPS: UcieWriteUps = {
   'UARC-07': {
     criticalPath: true,
     purpose: [
-      'Architect the <b>Electrical PHY</b>: transmit driver topology, swing and equalization, receive front-end and sampler topology with offset calibration, equalization needs per package type, bias, reference and supply regulation, and ESD protection that meets its targets without closing the eye.',
+      'Architect the <b>Electrical PHY</b>: transmit driver topology, swing and equalization, receive front-end and sampler topology with offset calibration, receiver termination and equalization per package type and reach, transmit swing within the die-to-die voltage compatibility rules, bias, reference and supply regulation, and ESD protection that meets its targets without closing the eye.',
       'Advanced-package channels are short, but at 64 GT/s their loss and crosstalk still matter, and every femtofarad of ESD and bump capacitance costs eye. These topology choices set the energy per bit more than any later optimization will.',
     ],
     flowNote:
-      'Step 1 chooses the transmit topology and step 2 the receive topology, while step 3 decides equalization in parallel. Step 4 defines bias and regulation, step 5 ESD, and step 6 releases.',
+      'Step 1 chooses the transmit topology and step 2 the receive topology, while step 3 decides termination and equalization in parallel. Step 4 defines bias and regulation, step 5 ESD, and step 6 releases.',
     consumes: [
       'Clocking architecture and timing budget from UARC-06',
       'Electrical PHY requirements from UREQ-08',
@@ -425,7 +425,7 @@ export const UARC_WRITE_UPS: UcieWriteUps = {
     },
     risks: [
       '<b>ESD closes the eye.</b> Protection sized for standard I/O loads the lane.',
-      '<b>Equalization skipped.</b> Equalization is dropped for short channels and RDL interposer customers fail.',
+      '<b>Termination undecided.</b> Lanes are left unterminated at 64 GT/s without a reach study, or terminated everywhere at a power cost the short channels did not need.',
       '<b>Offset calibration missing.</b> Sampler offset is not calibrated and eats the voltage margin.',
       '<b>Regulation noise.</b> Supply regulation adds noise inside the timing budget.',
       '<b>Topology unverified.</b> Topology is chosen without a feasibility simulation on the new process.',
@@ -438,11 +438,11 @@ export const UARC_WRITE_UPS: UcieWriteUps = {
       { r: 'SI/PI engineer', d: 'Channel estimates per package type' },
     ],
     effort: [
-      ['Transmit topology', 0.8],
-      ['Receive topology', 0.8],
-      ['Equalization', 0.8],
-      ['Bias and regulation', 0.8],
-      ['ESD and release', 0.8],
+      ['Transmit topology', 1],
+      ['Receive topology', 1],
+      ['Termination and equalization', 1],
+      ['Bias and regulation', 1],
+      ['ESD and release', 1],
     ],
     entry: [
       'Timing budget drafted in UARC-06',
@@ -451,7 +451,7 @@ export const UARC_WRITE_UPS: UcieWriteUps = {
     ],
     exit: [
       'Transmit and receive topologies chosen with feasibility simulation results',
-      'Equalization decision recorded per supported package type',
+      'Termination and equalization decision recorded per supported package type, and transmit swing checked against the voltage compatibility rules',
       'ESD loading estimated within the timing budget',
     ],
     dependsOn: ['UARC-06', 'UREQ-08'],
@@ -469,7 +469,7 @@ export const UARC_WRITE_UPS: UcieWriteUps = {
       revisedBy: [],
       feedsBackInto: [],
     },
-    terms: ['AFE', 'Equalization', 'ESD', 'Energy per bit'],
+    terms: ['AFE', 'Equalization', 'ESD', 'Energy per bit', 'Termination'],
   },
   'UARC-08': {
     criticalPath: false,
@@ -505,10 +505,10 @@ export const UARC_WRITE_UPS: UcieWriteUps = {
       { r: 'Verification lead', d: 'Entry and exit verification plan' },
     ],
     effort: [
-      ['Sequences', 0.4],
-      ['Power-down map', 0.2],
-      ['Exit latency budget', 0.2],
-      ['Release', 0.2],
+      ['Sequences', 0.8],
+      ['Power-down map', 0.4],
+      ['Exit latency budget', 0.4],
+      ['Release', 0.4],
     ],
     entry: [
       'Training sequence drafted in UARC-03',
@@ -571,11 +571,11 @@ export const UARC_WRITE_UPS: UcieWriteUps = {
       { r: 'Customer engineering lead', d: 'Customer floorplan fit' },
     ],
     effort: [
-      ['Bump map draft', 0.4],
-      ['Power and ground', 0.2],
-      ['Pitch and orientation check', 0.1],
-      ['Module floorplan', 0.2],
-      ['Release', 0.1],
+      ['Bump map draft', 0.8],
+      ['Power and ground', 0.4],
+      ['Pitch and orientation check', 0.2],
+      ['Module floorplan', 0.4],
+      ['Release', 0.2],
     ],
     entry: [
       'Bump pitch range agreed in UREQ-03',
@@ -597,7 +597,7 @@ export const UARC_WRITE_UPS: UcieWriteUps = {
     ],
     links: {
       dependsOn: ['UREQ-03', 'UREQ-04', 'UARC-01', 'UARC-04'],
-      feedsInto: ['UARC-12', 'UCHN-02', 'UCHN-03', 'UTEC-04'],
+      feedsInto: ['UARC-12', 'UCHN-02', 'UCHN-03', 'UTEC-04', 'UTEC-07'],
       runsWith: ['UCHN-01'],
       revisedBy: [],
       feedsBackInto: [],
@@ -638,10 +638,10 @@ export const UARC_WRITE_UPS: UcieWriteUps = {
       { r: 'Compliance engineer', d: 'Compliance test modes' },
     ],
     effort: [
-      ['Scan and ATPG', 0.4],
-      ['BIST, PRBS and loopback', 0.2],
-      ['Margining', 0.2],
-      ['Debug access and release', 0.2],
+      ['Scan and ATPG', 1],
+      ['BIST, PRBS and loopback', 0.5],
+      ['Margining', 0.5],
+      ['Debug access and release', 0.5],
     ],
     entry: [
       'Logical and electrical PHY architectures drafted',
@@ -704,10 +704,10 @@ export const UARC_WRITE_UPS: UcieWriteUps = {
       { r: 'Program manager', d: 'Tracks budget against estimates' },
     ],
     effort: [
-      ['Power allocation', 0.2],
-      ['Area and shoreline', 0.1],
-      ['Latency', 0.1],
-      ['Release', 0.1],
+      ['Power allocation', 0.6],
+      ['Area and shoreline', 0.3],
+      ['Latency', 0.3],
+      ['Release', 0.3],
     ],
     entry: [
       'PPA targets released in UREQ-02',
@@ -769,9 +769,9 @@ export const UARC_WRITE_UPS: UcieWriteUps = {
       { r: 'Program manager', d: 'Records the decision and change control' },
     ],
     effort: [
-      ['Coverage review', 0.1],
-      ['Open question closure', 0.3],
-      ['Freeze and record', 0.1],
+      ['Coverage review', 0.4],
+      ['Open question closure', 1.2],
+      ['Freeze and record', 0.4],
     ],
     entry: [
       'All architecture specifications UARC-D1 to UARC-D11 released',

@@ -1,5 +1,5 @@
 /**
- * UCHR — Silicon Characterization. Weeks 100–120; closes on Characterization
+ * UCHR — Silicon Characterization. Weeks 102–122; closes on Characterization
  * Report.
  */
 import type { UcieStageModule } from '../types';
@@ -8,7 +8,7 @@ export const UCHR: UcieStageModule = {
   content: {
     tagline: 'Measure every lane at 64 GT/s across voltage, temperature and process, and hold each number against what was simulated.',
     description:
-      'Turn a link that works into data a licensee can design with. Per-lane eye and timing margin from the on-die margining functions, BER at 64 GT/s measured long enough to say something about the target the specification sets, energy per bit across data rates and supplies, and voltage and temperature shmoos on the process split lots. The PHY’s own mechanisms are proven on silicon rather than in simulation: lane repair and lane reversal on deliberately mapped-out lanes and reversed builds, runtime recalibration while the die heats and cools, L1 and L2 entry and exit. The test vehicle channel is measured and correlated with its extracted model, and every result is placed next to the mixed-signal predictions so the models customers receive in the release are corrected by silicon. The stage closes on a reviewed characterization report that the GA release and the customer silicon report are built from.',
+      'Turn a link that works into data a licensee can design with. Per-lane eye and timing margin from the on-die margining functions — the die-to-die bumps never reach a pin, so nothing on them can be probed and the bench only calibrates the margining through the test chip’s observation path — BER at 64 GT/s measured long enough to say something about the target the specification sets, energy per bit across data rates and supplies, and voltage and temperature shmoos on the process split lots. The PHY’s own mechanisms are proven on silicon rather than in simulation: lane repair and lane reversal on deliberately mapped-out lanes and the reversed-orientation test vehicle variant, runtime recalibration while the die heats and cools, L1 and L2 entry and exit, and the PLL’s jitter, supply sensitivity and relock. The test vehicle channel is measured and correlated with its extracted model, and every result is placed next to the mixed-signal predictions so the models customers receive in the release are corrected by silicon. Results are reported per package type built — bridge and interposer variants — with any type supported only by simulation labelled as such. The stage closes on a reviewed characterization report that the GA release and the customer silicon report are built from.',
     activities: [
       'Plan and corner matrix',
       'Eye and timing margin',
@@ -20,6 +20,7 @@ export const UCHR: UcieStageModule = {
       'Channel correlation',
       'Measurement to simulation',
       'Report review',
+      'PLL jitter and relock',
     ],
     deliverables: [
       'Characterization plan and corner matrix',
@@ -31,11 +32,12 @@ export const UCHR: UcieStageModule = {
       'Runtime recalibration and low-power state silicon results',
       'Test vehicle channel correlation report',
       'Measurement-to-simulation correlation report with model updates',
-      'Characterization report',
+      'Characterization report with results per package type',
+      'PLL jitter, supply sensitivity and relock characterization results',
     ],
-    deliverableFrom: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
-    deliverableWeek: [2, 12, 14, 12, 16, 14, 16, 16, 18, 20],
-    engineeringEffort: [1.5, 5, 5.5, 3, 5.5, 3.5, 3.5, 3, 4, 1.5],
+    deliverableFrom: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+    deliverableWeek: [2, 12, 14, 12, 16, 14, 16, 16, 18, 20, 14],
+    engineeringEffort: [1.5, 5, 5.5, 3, 5.5, 3.5, 3.5, 3, 4, 1.5, 3],
     risks: [
       'BER measured over too short a time to support any statement about the target, so the release quotes a number it cannot defend',
       'Silicon disagrees with the mixed-signal models and the release ships the models anyway because the correlation work started too late',
@@ -47,6 +49,7 @@ export const UCHR: UcieStageModule = {
       'Lane repair proven only on lanes the firmware chose, never on a deliberately failed lane',
       'Energy per bit quoted at the best operating point while customers run at the worst-case supply',
       'Runtime recalibration exercised at a fixed temperature, so drift tracking is never shown',
+      'Results from one package variant presented as if they covered every package type the release supports',
     ],
     leader: { name: 'Henrik Adeyemi', short: 'H. Adeyemi', phone: '+1 (408) 555-0662', email: 'henrik.adeyemi@example.com' },
     collaboration: ['Validation', 'Analog and mixed-signal', 'Mixed-signal verification', 'SI/PI', 'RTL design', 'Board and lab hardware', 'Customer engineering'],
@@ -84,14 +87,14 @@ export const UCHR: UcieStageModule = {
     },
     'UCHR-02': {
       s: [
-        [1, 'Calibrate the on-die eye margining against a bench measurement on reference lanes', 1],
+        [1, 'Calibrate the on-die eye margining against a bench measurement taken through the test chip’s probe-able observation path', 1],
         [2, 'Sweep voltage and timing margin on every lane of every module at nominal conditions', 3],
         [3, 'Repeat the sweep at the corner matrix supplies and temperatures', 4],
         [4, 'Compute margin spread per lane, module and unit and flag outlier lanes', 1, 1],
         [5, 'Release the per-lane margin data set', 1],
       ],
       o: [
-        'On-die margining calibrated against bench measurement',
+        'On-die margining calibrated through the observation path',
         'Nominal per-lane voltage and timing margins',
         'Per-lane margins across the corner matrix',
         'Margin spread and outlier lanes',
@@ -152,14 +155,14 @@ export const UCHR: UcieStageModule = {
       s: [
         [1, 'Force lane failures through test modes and confirm training maps each onto a redundant lane', 2],
         [2, 'Repeat with failures on clock, valid and track lanes and on lanes at the module edges', 2],
-        [3, 'Run the reversed-orientation build and confirm lane reversal is detected and undone', 1.5, 1],
+        [3, 'Run the reversed-orientation test vehicle variant and confirm lane reversal is detected and undone', 1.5, 1],
         [4, 'Measure margin and BER on repaired and reversed links against unrepaired ones', 2],
         [5, 'Release the lane repair and reversal results', 1],
       ],
       o: [
         'Forced data-lane failures repaired by training',
         'Clock, valid, track and edge-lane repair results',
-        'Lane reversal detection on the reversed build',
+        'Lane reversal detection on the reversed-orientation variant',
         'Margins and BER on repaired and reversed links',
         'Lane repair and lane reversal silicon results',
       ],
@@ -184,13 +187,13 @@ export const UCHR: UcieStageModule = {
     },
     'UCHR-08': {
       s: [
-        [1, 'Measure test vehicle channel structures — insertion loss, crosstalk and return loss', 3],
+        [1, 'Measure the test vehicle channel structures on each package variant and derive voltage transfer and crosstalk', 3],
         [2, 'Compare the measurements with the extracted channel models', 2],
         [3, 'De-embed board and fixture contributions from the link margins', 1.5, 1],
         [4, 'Update the channel model and release the correlation report', 2],
       ],
       o: [
-        'Measured channel structures on the test vehicle',
+        'Measured channel structures per package variant',
         'Measured against extracted channel comparison',
         'De-embedded link margins',
         'Test vehicle channel correlation report',
@@ -214,16 +217,33 @@ export const UCHR: UcieStageModule = {
     },
     'UCHR-10': {
       s: [
-        [1, 'Assemble the characterization results against the plan and the PPA targets', 1.5],
+        [1, 'Assemble the results against the plan and the PPA targets per package type, labelling types supported by simulation only', 1.5],
         [2, 'Review results, open deviations and model updates with design and customer engineering', 1.5],
         [3, 'Release the characterization report', 1],
       ],
       o: [
-        'Results assembled against plan and targets',
+        'Results assembled per package type against plan and targets',
         'Review record with open deviations',
-        'Characterization report',
+        'Characterization report with results per package type',
       ],
       r: [['UCHR-D10', 'produces']],
+    },
+    'UCHR-11': {
+      s: [
+        [1, 'Measure PLL lock and output jitter at nominal conditions with the on-die margining and through the observation path', 2],
+        [2, 'Inject noise on the PLL and clock supplies and record jitter and lane margin against it', 2],
+        [3, 'Sweep the reference clock within its specification and record jitter transfer to the forwarded clock', 2, 1],
+        [4, 'Measure relock time and first-traffic errors on exit from L1 and L2 across temperature', 2],
+        [5, 'Compare with the PLL design simulations and release the PLL characterization results', 1],
+      ],
+      o: [
+        'PLL lock and jitter at nominal conditions',
+        'Jitter and lane margin against supply noise',
+        'Jitter transfer from the reference clock',
+        'Relock time and first-traffic errors from L1 and L2',
+        'PLL jitter, supply sensitivity and relock characterization results',
+      ],
+      r: [['UCHR-D11', 'produces'], ['UCHR-D9', 'feeds'], ['UCHR-D10', 'feeds']],
     },
   },
 };

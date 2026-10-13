@@ -48,12 +48,14 @@ export const UTPO: UcieStageModule = {
         [1, 'Walk the tapeout checklist against every signoff report', 0.5],
         [2, 'Review and accept each open waiver with its owner and its disclosure to licensees', 0.5],
         [3, 'Confirm the release deliverables the tapeout database must also produce', 0.5, 1],
-        [4, 'Sign the checklist and hand it to database release', 0.5],
+        [4, 'Confirm the foundry has re-committed the shuttle slot and the trial database cleared its intake checks', 0.5, 1],
+        [5, 'Sign the checklist and hand it to database release', 0.5],
       ],
       o: [
         'Checklist walked against the signoff reports',
         'Accepted waiver list with owners and disclosure',
         'Release deliverables traced to the tapeout database',
+        'Shuttle slot re-commitment and trial intake confirmation',
         'Signed tapeout checklist',
       ],
       r: [['UTPO-D1', 'produces'], ['UTPO-D4', 'gates']],
@@ -74,13 +76,13 @@ export const UTPO: UcieStageModule = {
     'UTPO-03': {
       s: [
         [1, 'Confirm the shuttle slot and die count with the foundry', 0.5],
-        [2, 'Define the lot plan with process splits for characterization', 1],
+        [2, 'Define the lot plan with process splits, and take a corner or engineering lot option where the shuttle cannot carry splits', 1],
         [3, 'Approve the mask order and the reticle placement on the shuttle', 1],
         [4, 'Record the confirmation of slot, masks and lots', 0.5],
       ],
       o: [
         'Confirmed shuttle slot and die count',
-        'Lot plan with process splits',
+        'Lot plan with process splits or a corner-lot option',
         'Approved mask order and reticle placement',
         'Mask set, shuttle slot and lot plan confirmation',
       ],

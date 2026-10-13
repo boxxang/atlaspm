@@ -43,7 +43,7 @@ export const CORE_GLOSSARY: UcieGlossary = {
   MBTRAIN: {
     full: 'Mainband Training',
     group: 'iface',
-    note: 'The training state that tunes the mainband at the target speed — voltage and timing centering, speed negotiation and, where needed, falling back to a lower speed or width.',
+    note: 'The training state that tunes the mainband at the target speed — voltage and timing centering and speed negotiation. On an Advanced package a failing lane is repaired onto a redundant lane and the link may fall back to a lower speed; width degrade is a Standard package mechanism.',
   },
   LINKINIT: {
     full: 'Link Initialization',
@@ -76,14 +76,14 @@ export const CORE_GLOSSARY: UcieGlossary = {
     note: 'The D2D Adapter’s replay of Flits that failed CRC, from a retry buffer, so that an occasional bit error never reaches the protocol.',
   },
   'Raw mode': {
-    full: 'Raw mode',
+    full: 'Raw format',
     group: 'iface',
-    note: 'A UCIe mode in which the Adapter passes the protocol’s data straight through without its own CRC and retry — used when the protocol brings its own, or for continuous streams.',
+    note: 'A UCIe Flit format choice in which the Adapter passes the protocol’s data straight through without its own CRC and retry — used when the protocol brings its own, or for continuous streams. A format, not a protocol: a streaming protocol can run over it.',
   },
   'Streaming mode': {
-    full: 'Streaming protocol mode',
+    full: 'Streaming protocol',
     group: 'iface',
-    note: 'Carrying a user-defined protocol over UCIe with the Adapter’s Flit formats, rather than one of the standard protocols.',
+    note: 'Carrying a user-defined protocol over UCIe rather than one of the standard protocols. A protocol, not a format: it can use the Raw format or one of the Adapter’s Flit formats.',
   },
   Sideband: {
     full: 'Sideband',
@@ -219,5 +219,30 @@ export const CORE_GLOSSARY: UcieGlossary = {
     full: 'IP release package',
     group: 'ip',
     note: 'Everything a licensee receives at a release: RTL or views, models, constraints, scripts, documents and the release notes and QA record that say what each is.',
+  },
+  VTF: {
+    full: 'Voltage Transfer Function',
+    group: 'iface',
+    note: 'How UCIe specifies a short die-to-die channel: the ratio of received to transmitted voltage with the driver and receiver loads included, and the crosstalk the same way, judged against an eye mask rather than with S-parameters alone.',
+  },
+  'Eye mask': {
+    full: 'Eye mask',
+    group: 'iface',
+    note: 'The region of the received eye that must stay open at the sampling point for a channel and its transmitter and receiver to be compliant.',
+  },
+  'Reference die': {
+    full: 'Reference die',
+    group: 'test',
+    note: 'A known-good UCIe die on a known-good bridge or interposer that a device under test links to for compliance testing; the tests run over the sideband using the dies’ own margining, BER and skew measurement.',
+  },
+  'Channel compliance kit': {
+    full: 'Channel compliance kit',
+    group: 'ip',
+    note: 'What a licensee needs to sign off their own die-to-die channel: behavioral transmitter and receiver models, the transfer-function and crosstalk flow, the eye mask and a script that checks the result.',
+  },
+  'Termination': {
+    full: 'Receiver termination',
+    group: 'design',
+    note: 'A resistive load at the receiver that controls reflections. Short Advanced-package lanes can run unterminated at lower speeds; whether the highest speeds need it sets swing, power and pad loading.',
   },
 };

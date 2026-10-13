@@ -7,11 +7,11 @@ export const UFAB_WRITE_UPS: UcieWriteUps = {
   'UFAB-01': {
     criticalPath: true,
     purpose: [
-      'Track the <b>test chip wafers through the foundry</b> against the committed cycle time and the planned process splits: confirm starts and priority, follow the lots through front-end and back-end processing, review in-line excursions and process monitor data on the PHY’s critical devices, and receive the wafers with each split condition confirmed.',
+      'Track the <b>test chip wafers through the foundry</b> against the committed cycle time and the planned process splits: confirm starts and priority, follow the lots through front-end and back-end processing and through wafer bumping of the fine-pitch microbumps, review in-line excursions and process monitor data on the PHY’s critical devices, and receive the wafers with each split condition confirmed.',
       'Shuttle wafers share their run with other customers, so the program has little leverage on the schedule and must see a slip early. The process monitor data matters as much as the date: it is what tells characterization later whether a margin shortfall is the design or the wafer.',
     ],
     flowNote:
-      'Step 1 confirms starts and splits. Step 2 tracks the lots while step 3 reviews excursions and process monitors in parallel. Step 4 receives the wafers and step 5 releases the record.',
+      'Step 1 confirms starts and splits. Step 2 tracks the lots and step 3 the wafer bumping, while step 4 reviews excursions and process monitors in parallel. Step 5 receives the bumped wafers and step 6 releases the record.',
     consumes: [
       'Tapeout database release record from UTPO-04',
       'Mask, shuttle slot and lot plan confirmation from UTPO-03',
@@ -76,7 +76,7 @@ export const UFAB_WRITE_UPS: UcieWriteUps = {
       'Every test vehicle needs two good dies, so a sort escape costs both of them and the package. Allocation matters as well: the best dies are tempting for bring-up, but characterization needs dies from every split, and reliability needs its own.',
     ],
     flowNote:
-      'Step 1 verifies probe contact. Step 2 sorts every wafer, step 3 selects and allocates known-good dies and step 4 releases the maps and list.',
+      'Step 1 verifies probe contact. Step 2 sorts every wafer while step 3 selects and allocates known-good dies to each variant beside it, and step 4 releases the maps and list.',
     consumes: [
       'Test chip wafers and wafer-out record from UFAB-01',
       'ATE load board, probe card and sort program from UTVP-04',
@@ -138,27 +138,27 @@ export const UFAB_WRITE_UPS: UcieWriteUps = {
   'UFAB-03': {
     criticalPath: true,
     purpose: [
-      'Assemble the <b>two-die test vehicles</b>: kit known-good die pairs with substrates and bridges or interposers, assemble them with the assembly partner, inspect with X-ray and acoustic microscopy, and release each assembly with its traveler.',
+      'Assemble <b>every test vehicle variant</b> — the bridge build, the interposer build, the reversed-orientation build and the build with the interoperability partner’s die: kit known-good dies with their package material, assemble with the assembly partner, inspect with X-ray and acoustic microscopy, screen every unit on the package final test program at time zero, and release each assembly with its traveler and test result.',
       'Fine-pitch die-to-die bumps are where assembly defects hide: a marginal joint may still connect and simply degrade a lane that lane repair then quietly replaces. Inspection data and travelers let characterization tell a repaired lane caused by assembly from one caused by the PHY.',
     ],
     flowNote:
-      'Step 1 kits the dies and material. Step 2 assembles the test vehicles while step 3 inspects them in parallel, and step 4 releases them with travelers.',
+      'Step 1 kits the dies and material per variant. Step 2 assembles the test vehicles while step 3 inspects them in parallel. Step 4 screens every unit at time zero and step 5 releases them with travelers and results.',
     consumes: [
       'Known-good-die list and allocation from UFAB-02',
-      'Received substrates and bridges or interposers from UTVP-02',
-      'Test vehicle package design from UTVP-01',
+      'Received substrates, bridges, interposers and partner dies from UTVP-02',
+      'Test vehicle package designs per variant from UTVP-01',
+      'Package final test program from UTVP-09',
       'Package partner assembly constraints from UTEC-04',
-      'Assembly partner line slot',
     ],
     rel: {
-      'UFAB-D3': '<b>Assembled two-die test vehicles with assembly travelers and inspection records.</b> Produced here.',
+      'UFAB-D3': '<b>Assembled test vehicles for every variant with travelers, inspection records and package final test results.</b> Produced here.',
       'UFAB-D4': '<b>Evaluation boards with test vehicles mounted and inspected.</b> Only inspected assemblies are mounted.',
     },
     risks: [
       '<b>Marginal joints.</b> Bumps that connect weakly degrade lanes and are masked by lane repair.',
       '<b>Warpage.</b> Assembly warpage on the interposer stresses the die-to-die bumps.',
       '<b>Underfill voids.</b> Voids under the bridge region go undetected.',
-      '<b>Yield below plan.</b> Too few good assemblies for all uses.',
+      '<b>Yield below plan.</b> Too few good assemblies of each variant for all uses, and the interposer or partner-die build is the one cut.',
       '<b>Travelers missing.</b> Assembly conditions are not recorded per unit.',
     ],
     roles: [
@@ -170,22 +170,23 @@ export const UFAB_WRITE_UPS: UcieWriteUps = {
     ],
     effort: [
       ['Kitting', 0.5],
-      ['Assembly', 1.5],
+      ['Assembly of every variant', 2],
       ['Inspection', 0.5],
-      ['Release', 0.5],
+      ['Time-zero final test', 0.6],
+      ['Release', 0.4],
     ],
     entry: [
       'Known-good dies allocated in UFAB-02',
-      'Package material received in UTVP-02',
+      'Package material and partner dies received in UTVP-02, and the package final test program released in UTVP-09',
       'Assembly line slot booked',
     ],
     exit: [
       'Every assembly inspected with X-ray and acoustic microscopy and its result recorded',
       'Assemblies released with travelers naming wafer, die position and assembly conditions',
-      'Good assemblies available for every planned use',
+      'Every unit screened at time zero, with good assemblies of every variant available for every planned use',
     ],
-    dependsOn: ['UFAB-02', 'UTVP-02'],
-    dependsNote: null,
+    dependsOn: ['UFAB-02', 'UTVP-02', 'UTVP-09'],
+    dependsNote: 'Assembly of the six-week variant set starts at week 91 as the first known-good dies come off sort, and ends at week 97.',
     feedsInto: ['UFAB-04'],
     measuredBy: [
       'Assembly yield',
@@ -193,8 +194,8 @@ export const UFAB_WRITE_UPS: UcieWriteUps = {
       'Assemblies with complete travelers',
     ],
     links: {
-      dependsOn: ['UFAB-02', 'UTVP-02', 'UTVP-01', 'UTEC-04'],
-      feedsInto: ['UFAB-04', 'URLQ-04'],
+      dependsOn: ['UFAB-02', 'UTVP-02', 'UTVP-01', 'UTVP-09', 'UTEC-04'],
+      feedsInto: ['UFAB-04', 'URLQ-02', 'URLQ-04'],
       runsWith: [],
       revisedBy: [],
       feedsBackInto: [],

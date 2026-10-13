@@ -73,20 +73,21 @@ export const ULAY_WRITE_UPS: UcieWriteUps = {
   'ULAY-02': {
     criticalPath: true,
     purpose: [
-      'Lay out the <b>TX, RX and clocking</b> to the frozen schematics: driver and serializer per lane, receive front-end, sampler and deserializer per lane, the forwarded clock receiver, DLL, phase adjustment and clock spine, and bias, regulation and ESD at the bumps — each design-rule and connectivity clean at block level.',
+      'Lay out the <b>TX, RX, clocking, PLL and sideband I/O</b> to the frozen schematics: driver and serializer per lane, receive front-end, sampler and deserializer per lane, the forwarded clock receiver, DLL, phase adjustment and clock spine, the PLL with its isolated supply, the sideband transmitter and receiver in their always-on domain, and bias, regulation, sensors and ESD at the bumps — each design-rule and connectivity clean at block level, with early abstracts and interface timing models released from the placed blocks for digital timing closure.',
       'Sixty-four lanes are drawn once and placed many times, so a lane cell that is wrong is wrong everywhere. Block-level checks close before the lanes are arrayed, and the clocking is drawn alongside rather than after, because its routing shapes everything around it.',
     ],
     flowNote:
-      'Step 1 lays out the TX and step 2 the RX, with clocking laid out alongside in step 3. Step 4 lays out bias, regulation and ESD, step 5 runs block-level checks and step 6 releases.',
+      'Step 1 lays out the TX and step 2 the RX, with clocking, the PLL and sideband I/O laid out alongside in steps 3 and 4, and early abstracts and timing models generated from the placed blocks in step 5. Step 6 lays out bias, regulation, sensors and ESD, step 7 runs block-level checks and step 8 releases.',
     consumes: [
       'Circuit freeze package and frozen schematics from UAFE-09',
       'Layout floorplan from ULAY-01',
       'TX driver database from UAFE-02',
       'RX front-end and sampler database from UAFE-03',
-      'Clocking database from UAFE-04',
+      'Clocking, PLL and sideband I/O databases from UAFE-04, UAFE-10 and UAFE-11',
     ],
     rel: {
-      'ULAY-D2': '<b>TX, RX and clocking layout database.</b> Produced here.',
+      'ULAY-D2': '<b>TX, RX, clocking, PLL and sideband I/O layout database.</b> Produced here.',
+      'ULAY-D8': '<b>Early electrical PHY abstract and interface timing models for digital timing closure.</b> Produced here from the placed blocks around week 56, so UDPD-05 closes timing against the real analog interface instead of a guess; the final models follow in ULAY-06.',
       'ULAY-D4': '<b>Assembled PHY hard macro layout with the implemented bump map.</b> The block layouts are what the macro is assembled from.',
     },
     risks: [
@@ -98,7 +99,7 @@ export const ULAY_WRITE_UPS: UcieWriteUps = {
     ],
     roles: [
       { r: 'Analog layout', d: 'Owns the block layouts' },
-      { r: 'Layout designer', d: 'TX, RX and clocking cells' },
+      { r: 'Layout designer', d: 'TX, RX, clocking, PLL and sideband cells' },
       { r: 'Analog designer', d: 'Reviews critical layout against the schematics' },
       { r: 'ESD engineer', d: 'Protection placement at the bumps' },
       { r: 'Analog layout lead', d: 'Approves the block release' },
@@ -106,8 +107,9 @@ export const ULAY_WRITE_UPS: UcieWriteUps = {
     effort: [
       ['TX and serializer', 2.5],
       ['RX, sampler and deserializer', 2.5],
-      ['Clocking and spine', 2.5],
-      ['Bias, regulation and ESD', 1.4],
+      ['Clocking, spine, PLL and sideband I/O', 4],
+      ['Early abstracts and timing models', 1],
+      ['Bias, regulation, sensors and ESD', 1.4],
       ['Block checks and release', 1.1],
     ],
     entry: [
@@ -120,22 +122,22 @@ export const ULAY_WRITE_UPS: UcieWriteUps = {
       'Every block design-rule and connectivity clean',
       'Lane cells reviewed by circuit design before arraying',
     ],
-    dependsOn: ['UAFE-09', 'ULAY-01', 'UAFE-02', 'UAFE-03', 'UAFE-04'],
+    dependsOn: ['UAFE-09', 'ULAY-01', 'UAFE-02', 'UAFE-03', 'UAFE-04', 'UAFE-10', 'UAFE-11'],
     dependsNote: null,
-    feedsInto: ['ULAY-03', 'ULAY-04', 'ULAY-05'],
+    feedsInto: ['ULAY-03', 'ULAY-04', 'ULAY-05', 'UDPD-05'],
     measuredBy: [
       'Blocks drawn against plan',
       'Rule check errors per block at release',
       'Redraws caused by schematic changes',
     ],
     links: {
-      dependsOn: ['UAFE-09', 'ULAY-01', 'UAFE-02', 'UAFE-03', 'UAFE-04', 'UAFE-05', 'UAFE-06'],
-      feedsInto: ['ULAY-03', 'ULAY-04', 'ULAY-05'],
+      dependsOn: ['UAFE-09', 'ULAY-01', 'UAFE-02', 'UAFE-03', 'UAFE-04', 'UAFE-05', 'UAFE-06', 'UAFE-10', 'UAFE-11', 'UAFE-12'],
+      feedsInto: ['ULAY-03', 'ULAY-04', 'ULAY-05', 'UDPD-05'],
       runsWith: [],
       revisedBy: [],
       feedsBackInto: [],
     },
-    terms: ['DRC', 'LVS', 'Forwarded clock', 'Sampler'],
+    terms: ['DRC', 'LVS', 'Forwarded clock', 'Sampler', 'PLL', 'Sideband'],
   },
   'ULAY-03': {
     criticalPath: false,
@@ -321,7 +323,7 @@ export const ULAY_WRITE_UPS: UcieWriteUps = {
     ],
     dependsOn: ['ULAY-02', 'ULAY-03', 'ULAY-04', 'UAFE-08'],
     dependsNote: null,
-    feedsInto: ['ULAY-07', 'USGN-02', 'USGN-04'],
+    feedsInto: ['ULAY-07', 'USGN-02', 'USGN-04', 'USGN-07'],
     measuredBy: [
       'Post-layout margin loss per block against allowance',
       'Corners simulated post-layout',
@@ -329,7 +331,7 @@ export const ULAY_WRITE_UPS: UcieWriteUps = {
     ],
     links: {
       dependsOn: ['ULAY-02', 'ULAY-03', 'ULAY-04', 'UAFE-08', 'UFND-04'],
-      feedsInto: ['ULAY-06', 'ULAY-07', 'USGN-02', 'USGN-04'],
+      feedsInto: ['ULAY-06', 'ULAY-07', 'USGN-02', 'USGN-04', 'USGN-07'],
       runsWith: [],
       revisedBy: [],
       feedsBackInto: ['ULAY-02'],

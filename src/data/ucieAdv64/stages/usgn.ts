@@ -1,5 +1,5 @@
 /**
- * USGN — Hard Macro Signoff. Weeks 62–74; closes on Hard Macro Signoff.
+ * USGN — Hard Macro Signoff. Weeks 62–72; closes on Hard Macro Signoff.
  */
 import type { UcieStageModule } from '../types';
 
@@ -7,8 +7,8 @@ export const USGN: UcieStageModule = {
   content: {
     tagline: 'Sign the PHY off as a macro other people will drop into their own SoCs, not just as a block that works on our test chip.',
     description:
-      'Close timing, power integrity, physical verification, ESD and latch-up, and aging on the final databases of the digital hard macro and the Electrical PHY, then check that what ships as abstracts, Liberty models and bump maps matches the layout bit for bit. A die-to-die PHY at 64 GT/s is signed off twice over: once as silicon that has to meet its own timing and electromigration limits, and once as an IP whose views a licensee will trust without seeing the layout. The stage closes on a signoff review that releases the macro to test chip signoff, to tapeout and to the v0.9 release.',
-    activities: ['Static timing', 'EM and IR', 'DRC, LVS, antenna', 'ESD and latch-up', 'Aging and reliability', 'Macro integration checks', 'Signoff review'],
+      'Close timing, power integrity, physical verification, ESD and latch-up, aging and a timing-annotated gate-level simulation on the final databases of the digital hard macro and the Electrical PHY, then check that what ships as abstracts, Liberty models and bump maps matches the layout bit for bit. A die-to-die PHY at 64 GT/s is signed off twice over: once as silicon that has to meet its own timing and electromigration limits, and once as an IP whose views a licensee will trust without seeing the layout. The stage closes two weeks before the test chip database is released, on a signoff review that also takes the verification sign-off, the link margin review, the post-layout margin and the channel specification compliance into account, and releases the macro to test chip signoff, to tapeout and to the v0.9 release.',
+    activities: ['Static timing', 'EM and IR', 'DRC, LVS, antenna', 'ESD and latch-up', 'Aging and reliability', 'Macro integration checks', 'Signoff review', 'Timing-annotated GLS'],
     deliverables: [
       'Hard macro static timing signoff report across corners, modes and on-chip variation',
       'PHY macro EM and IR drop signoff report with current-density and supply-droop maps',
@@ -17,10 +17,11 @@ export const USGN: UcieStageModule = {
       'Aging and reliability verification report — device aging and interconnect lifetime',
       'Hard macro integration check report — abstracts, Liberty models and bump map against the layout',
       'Hard macro signoff decision record and release authorization',
+      'Timing-annotated gate-level simulation report on the signoff netlist',
     ],
-    deliverableFrom: [0, 1, 2, 3, 4, 5, 6],
-    deliverableWeek: [8, 8, 9, 9, 10, 10, 12],
-    engineeringEffort: [6, 4, 4, 2.5, 2.5, 2, 1],
+    deliverableFrom: [0, 1, 2, 3, 4, 5, 6, 7],
+    deliverableWeek: [7, 7, 8, 8, 8, 8, 10, 8],
+    engineeringEffort: [6, 4, 4, 2.5, 2.5, 2, 1, 2],
     risks: [
       'Timing closed on the macro alone, with interface budgets that no customer floorplan can meet once the macro is placed at a die edge',
       'IR drop at 64 GT/s activity closing only because the analysis assumed a cleaner supply than a customer package will deliver',
@@ -139,7 +140,7 @@ export const USGN: UcieStageModule = {
         [1, 'Regenerate the abstracts, Liberty models and bump map from the signed-off databases', 1],
         [2, 'Compare pins, blockages and bump coordinates in the views against the layout', 1.5],
         [3, 'Check the Liberty timing and power against the signoff timing and power results', 1.5, 1],
-        [4, 'Place the macro in a reference die floorplan and run a trial integration', 2],
+        [4, 'Place the macro in a reference die floorplan and run a trial integration', 1.5],
         [5, 'Release the integration check report', 1],
       ],
       o: [
@@ -153,7 +154,7 @@ export const USGN: UcieStageModule = {
     },
     'USGN-07': {
       s: [
-        [1, 'Collect every signoff report and the integration check against the signoff checklist', 0.5],
+        [1, 'Collect every signoff report, the timing-annotated simulation, the post-layout margin and the channel compliance against the signoff checklist', 0.5],
         [2, 'Review open waivers and residual risks with design, layout, reliability and customer engineering', 0.5],
         [3, 'Decide signoff and record the conditions the release and the test chip carry', 0.5],
         [4, 'Authorize the macro for test chip signoff, tapeout and the v0.9 release', 0.5],
@@ -165,6 +166,25 @@ export const USGN: UcieStageModule = {
         'Hard macro signoff decision record and release authorization',
       ],
       r: [['USGN-D7', 'produces']],
+    },
+    'USGN-08': {
+      s: [
+        [1, 'Back-annotate the signed-off netlist with delays extracted from the final parasitics at the fast and slow corners', 1],
+        [2, 'Run link training, mainband traffic and retry scenarios through the annotated adapter and logical PHY netlist', 2.5],
+        [3, 'Run reset, low-power entry and exit and clock-domain crossing scenarios with timing annotation', 1.5, 1],
+        [4, 'Run the scan and built-in test patterns at speed on the annotated netlist', 1.5],
+        [5, 'Triage every mismatch against the static timing exceptions and close or waive it', 1],
+        [6, 'Release the timing-annotated gate-level simulation report', 0.5],
+      ],
+      o: [
+        'Delay-annotated signoff netlist at the fast and slow corners',
+        'Annotated training, traffic and retry results',
+        'Annotated reset, low-power and crossing results',
+        'At-speed pattern results on the annotated netlist',
+        'Mismatch triage against the timing exceptions',
+        'Timing-annotated gate-level simulation report on the signoff netlist',
+      ],
+      r: [['USGN-D8', 'produces'], ['USGN-D7', 'feeds']],
     },
   },
 };

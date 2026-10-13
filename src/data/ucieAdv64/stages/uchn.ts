@@ -7,7 +7,7 @@ export const UCHN: UcieStageModule = {
   content: {
     tagline: 'Specify the channel the PHY promises to work over, freeze the bump map early, and prove both on real package routes.',
     description:
-      'Define the package channel the PHY is specified against — insertion loss, crosstalk, reflections and skew for silicon bridge, silicon interposer and RDL interposer routes at the agreed bump pitch and the short Advanced package reach — and derive the bump and routing rules that meet it. The bump map and channel specification are frozen early, under change control, because the electrical PHY layout and the test chip top level are drawn to them. Channels are then extracted and simulated at 64 GT/s with the transmitter and receiver models, the power delivery network is sized against the noise of all lanes switching together, customer channel guidelines and a reference package design are written, and the measurement plan that will correlate the test vehicle’s channels with their models is prepared. The stage closes when the final macro and package channels are shown to meet the specification.',
+      'Define the package channel the PHY is specified against — voltage transfer function loss and crosstalk judged against an eye mask, as the specification states short die-to-die channels, plus skew — for silicon bridge, silicon interposer and RDL interposer routes at the agreed bump pitch and the short Advanced package reach — and derive the bump and routing rules that meet it. The bump map and channel specification are frozen early, under change control, because the electrical PHY layout and the test chip top level are drawn to them. Channels are then extracted and simulated at 64 GT/s with the transmitter and receiver models, the power delivery network is sized against the noise of all lanes switching together, customer channel guidelines, a reference package design and a channel compliance kit — behavioral transmitter and receiver models with the transfer-function flow and the eye mask — are written so licensees can sign off their own channels, and the measurement plan that will correlate the test vehicle’s channels with their models is prepared. The stage closes when the final macro and package channels are shown to meet the specification.',
     activities: [
       'Channel specification',
       'Bump and routing rules',
@@ -19,12 +19,12 @@ export const UCHN: UcieStageModule = {
       'Channel specification review',
     ],
     deliverables: [
-      'Channel specification — insertion loss, crosstalk and reach limits per package type',
+      'Channel specification — voltage transfer function loss, crosstalk, reach and eye mask per package type',
       'Bump and routing design rules for bridge, interposer and RDL packages',
       'Frozen bump map and channel specification under change control',
       'Package channel extraction and SI simulation report',
       'Power delivery network and PI analysis report',
-      'Customer channel guidelines and reference package design',
+      'Customer channel guidelines, reference package design and channel compliance kit',
       'Test vehicle channel correlation plan',
       'Channel specification compliance record',
     ],
@@ -32,7 +32,7 @@ export const UCHN: UcieStageModule = {
     deliverableWeek: [10, 16, 20, 36, 38, 48, 50, 54],
     engineeringEffort: [5, 6, 2, 10, 8, 6, 3, 1],
     risks: [
-      'Crosstalk between densely routed lanes, not loss, limits 64 GT/s on fine-pitch routes, and the channel specification only bounds loss',
+      'Crosstalk between densely routed lanes, not loss, limits 64 GT/s on fine-pitch routes, and a specification that bounds loss alone would pass channels that fail the eye mask',
       'The bump map changes after the freeze and both the electrical PHY layout and the test chip top level are redrawn',
     ],
     potentialRisks: [
@@ -57,16 +57,16 @@ export const UCHN: UcieStageModule = {
   steps: {
     'UCHN-01': {
       s: [
-        [1, 'Define the channel parameters the PHY is specified against — insertion loss, crosstalk, reflections and skew', 2],
+        [1, 'Define the channel parameters the PHY is specified against — voltage transfer function loss and crosstalk with the driver and receiver loads, and skew', 2],
         [2, 'Model representative channels on silicon bridge, silicon interposer and RDL interposer at the reference bump pitch', 3],
-        [3, 'Set loss and crosstalk limits at 64 GT/s that leave the transmitter and receiver budgets their margin', 2],
+        [3, 'Set transfer-function loss and crosstalk limits and the eye mask at 64 GT/s that leave the transmitter and receiver budgets their margin', 2],
         [4, 'Agree the reach the IP supports for each package type with architecture and product management', 1.5],
         [5, 'Release the channel specification', 0.5],
       ],
       o: [
-        'Channel parameter definitions',
+        'Channel parameter definitions in transfer-function terms',
         'Representative channel models per package type',
-        'Loss and crosstalk limits at 64 GT/s',
+        'Transfer-function loss and crosstalk limits and eye mask at 64 GT/s',
         'Supported reach per package type',
         'Channel specification',
       ],
@@ -91,7 +91,7 @@ export const UCHN: UcieStageModule = {
     },
     'UCHN-03': {
       s: [
-        [1, 'Reconcile the bump map concept with the routing rules, the macro floorplan and the redundant lanes for repair', 1.5],
+        [1, 'Reconcile the bump map concept with the routing rules, the macro floorplan, the redundant lanes for repair and the interoperability partner’s mated bump map', 1.5],
         [2, 'Close open items with the layout, test chip and package teams', 1],
         [3, 'Hold the bump map and channel specification freeze review', 1],
         [4, 'Release the frozen bump map and channel specification under change control', 0.5],
@@ -107,7 +107,7 @@ export const UCHN: UcieStageModule = {
     'UCHN-04': {
       s: [
         [1, 'Extract the test vehicle and reference package channels as multi-port network models', 4],
-        [2, 'Simulate eye opening and crosstalk at 64 GT/s with behavioral transmitter and receiver models', 6],
+        [2, 'Compute transfer-function loss and crosstalk and simulate the eye against the mask at 64 GT/s with behavioral transmitter and receiver models', 6],
         [3, 'Sweep reach, routing layer and pitch to find where the channel limits bind', 4, 1],
         [4, 'Hand channel models to link margin simulation and to the release channel models', 2],
         [5, 'Rerun on the latest macro floorplan and package layout and update the margins', 5],
@@ -144,16 +144,18 @@ export const UCHN: UcieStageModule = {
       s: [
         [1, 'Write channel guidelines for each package type — routing, layer use, shielding and reach', 5],
         [2, 'Build a reference package design for the macro with its channel models', 6],
-        [3, 'Add power delivery guidelines and decoupling recommendations', 3, 1],
-        [4, 'Review the guidelines with early-access customers and package partners', 3],
-        [5, 'Release the customer channel guidelines and reference design', 1],
+        [3, 'Package the channel compliance kit — behavioral transmitter and receiver models, the transfer-function flow, the eye mask and a checking script', 3, 1],
+        [4, 'Add power delivery guidelines and decoupling recommendations', 2, 1],
+        [5, 'Review the guidelines and the kit with early-access customers and package partners', 3],
+        [6, 'Release the customer channel guidelines, reference design and channel compliance kit', 1],
       ],
       o: [
         'Channel guidelines per package type',
         'Reference package design with channel models',
+        'Channel compliance kit',
         'Power delivery guidelines',
         'Customer and partner review comments resolved',
-        'Customer channel guidelines and reference package design',
+        'Customer channel guidelines, reference package design and channel compliance kit',
       ],
       r: [['UCHN-D6', 'produces']],
     },

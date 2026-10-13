@@ -383,6 +383,19 @@ describe('UCIe flow rules', () => {
     dependsOnAll('UCUS-01', ['UPRE-02']);
   });
 
+  it('holds what the reviews added: a partner before the bump map, hardware before stress, GA after silicon-proven, a margin before tapeout', () => {
+    expect(absEnd('UTEC-07')).toBeLessThanOrEqual(absStart('UCHN-03'));
+    dependsOnAll('UCHN-03', ['UTEC-07']);
+    expect(absEnd('UTVP-08')).toBeLessThanOrEqual(absStart('UFAB-03'));
+    dependsOnAll('URLQ-02', ['UTVP-09']);
+    expect(absStart('URLQ-02')).toBeGreaterThanOrEqual(absEnd('UBUP-04'));
+    dependsOnAll('UGA-04', ['URLQ-06']);
+    expect(absStart('UGA-04')).toBeGreaterThanOrEqual(absEnd('URLQ-06'));
+    expect(absStart('UTPO-04') - absEnd('USGN-07'), 'weeks between hard macro signoff and database release').toBeGreaterThanOrEqual(2);
+    dependsOnAll('USGN-07', ['USGN-08', 'UCHN-08', 'UDV-12', 'UAMS-08']);
+    dependsOnAll('UBUP-07', ['UBUP-04']);
+  });
+
   it('carries the pre-silicon test plan and margin predictions into bring-up and characterization, and correlates them', () => {
     for (const ref of ['UBUP-05', 'UTVP-06']) dependsOnAll(ref, ['UDV-11', 'UAMS-07']);
     dependsOnAll('UCHR-01', ['UDV-11']);

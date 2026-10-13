@@ -1,5 +1,5 @@
 /**
- * URLQ — Reliability & Silicon-Proven. Weeks 100–126; closes on
+ * URLQ — Reliability & Silicon-Proven. Weeks 102–128; closes on
  * Silicon-Proven.
  */
 import type { UcieStageModule } from '../types';
@@ -8,7 +8,7 @@ export const URLQ: UcieStageModule = {
   content: {
     tagline: 'Stress the PHY until its margins move, and only then call it silicon-proven.',
     description:
-      'Qualify the hard macro’s reliability on test chip silicon so licensees can rely on it in their own products. High-temperature operating life stress runs with the link exercised at 64 GT/s and read points that re-measure per-lane margin and BER, so wear-out shows as margin drift rather than as a pass or fail count. ESD and latch-up qualification checks the bump-level protection the front-end was designed with against the targets the integration guide states, and temperature cycling on the advanced-package test vehicle shows the fine-pitch bumps and the bridge or interposer holding — with lane repair counts tracked so a bump that opens under stress is seen even when the link repairs around it. The reliability report states what was stressed, for how long, on how many units and what moved, and the silicon-proven decision weighs it together with characterization and compliance. Silicon-Proven is the claim the GA release rests on.',
+      'Qualify the hard macro’s reliability on test chip silicon so licensees can rely on it in their own products. High-temperature operating life stress starts after the first link-up, on units screened through the package final test program for their time-zero data, runs on dynamic stress boards with the link exercised at 64 GT/s, and uses read points that re-measure per-lane margin and BER, so wear-out shows as margin drift rather than as a pass or fail count. ESD on the die-to-die bumps is qualified at die or wafer level on test structures and probe pads — assembled microbumps sit under the other die and cannot be zapped — while package-level ESD covers only the external pins, and latch-up is tested on the PHY supplies; and temperature cycling on the advanced-package test vehicle shows the fine-pitch bumps and the bridge or interposer holding — with lane repair counts tracked so a bump that opens under stress is seen even when the link repairs around it. The reliability report states what was stressed, for how long, on how many units from how many lots, and what moved, and the silicon-proven decision weighs it together with characterization and compliance. Silicon-Proven is the claim the GA release rests on.',
     activities: ['Reliability plan', 'Operating life stress', 'ESD and latch-up', 'Temperature cycling', 'Reliability report', 'Silicon-proven decision'],
     deliverables: [
       'Reliability qualification plan with stress conditions, sample sizes and read points',
@@ -30,7 +30,8 @@ export const URLQ: UcieStageModule = {
       'Read points that only check pass or fail, so slow margin drift is invisible',
       'ESD targets tested at a different level from the one the integration guide promises customers',
       'Test vehicle package differs from the package technologies licensees use, limiting what the cycling results say',
-      'Stress boards not ready when silicon arrives, delaying the start of operating life stress',
+      'Stress boards and sockets not ready when silicon arrives, delaying the start of operating life stress',
+      'The silicon-proven claim resting on one shuttle lot without saying so',
     ],
     leader: { name: 'Priya Castellanos', short: 'P. Castellanos', phone: '+1 (408) 555-0664', email: 'priya.castellanos@example.com' },
     collaboration: ['Reliability', 'Quality', 'Validation', 'Analog and mixed-signal', 'Packaging', 'Test engineering'],
@@ -50,7 +51,7 @@ export const URLQ: UcieStageModule = {
         [1, 'Set the stress legs, conditions and durations from the reliability targets and the aging analysis', 0.5],
         [2, 'Set sample sizes per leg and select units with known lane repair state', 0.5],
         [3, 'Define read points that re-measure per-lane margin and BER, not only pass or fail', 0.5, 1],
-        [4, 'Confirm stress boards and chambers and release the plan', 1],
+        [4, 'Confirm the stress boards, sockets and package final test program and release the plan', 1],
       ],
       o: [
         'Stress legs with conditions and durations',
@@ -62,14 +63,14 @@ export const URLQ: UcieStageModule = {
     },
     'URLQ-02': {
       s: [
-        [1, 'Measure the time-zero margin and BER of every stressed unit', 1.5],
-        [2, 'Run operating life stress at elevated temperature and voltage with the link exercised at 64 GT/s', 12],
+        [1, 'Screen every stress unit through the package final test program and record its time-zero margin and BER', 1.5],
+        [2, 'Run operating life stress on the dynamic stress boards at elevated temperature and voltage with the link exercised at 64 GT/s', 12],
         [3, 'Re-measure per-lane margin and BER at each read point and log drift', 3, 1],
         [4, 'Analyze drift and failures and compute the acceleration and lifetime estimate', 3],
         [5, 'Release the operating life stress results', 1],
       ],
       o: [
-        'Time-zero margin and BER per stressed unit',
+        'Screened units with time-zero margin and BER',
         'Completed operating life stress hours with link exercise',
         'Per-lane drift at each read point',
         'Drift and failure analysis with lifetime estimate',
@@ -79,13 +80,13 @@ export const URLQ: UcieStageModule = {
     },
     'URLQ-03': {
       s: [
-        [1, 'Test charged-device and contact ESD on every bump class of the PHY', 3],
+        [1, 'Test ESD on every die-to-die bump class at die or wafer level, on test structures and probe pads, and on the external pins at package level', 3],
         [2, 'Test latch-up on the PHY supplies and I/O at the specified temperature', 2],
         [3, 'Re-check link function and leakage after each stress', 1.5, 1],
         [4, 'Analyze failures and release the ESD and latch-up results', 2],
       ],
       o: [
-        'ESD results per bump class',
+        'Die-level ESD results per bump class and package-level results on external pins',
         'Latch-up results on supplies and I/O',
         'Post-stress function and leakage checks',
         'ESD and latch-up qualification results',
@@ -112,7 +113,7 @@ export const URLQ: UcieStageModule = {
     'URLQ-05': {
       s: [
         [1, 'Collect stress results by leg, unit and read point', 1],
-        [2, 'State what was stressed, for how long and on how many units, and what moved', 1.5],
+        [2, 'State what was stressed, for how long, on how many units from how many lots, and what moved', 1.5],
         [3, 'Review findings with design and quality and release the report', 1.5],
       ],
       o: [
@@ -126,7 +127,7 @@ export const URLQ: UcieStageModule = {
       s: [
         [1, 'Weigh the reliability report with the characterization report and compliance results', 1],
         [2, 'Review open findings and the conditions attached to the claim', 0.5],
-        [3, 'Record the silicon-proven decision and its conditions', 0.5],
+        [3, 'Record the silicon-proven decision with the lots and sample counts behind it and its conditions', 0.5],
       ],
       o: [
         'Combined reliability, characterization and compliance view',

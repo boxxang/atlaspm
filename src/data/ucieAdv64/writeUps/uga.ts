@@ -7,7 +7,7 @@ export const UGA_WRITE_UPS: UcieWriteUps = {
   'UGA-01': {
     criticalPath: true,
     purpose: [
-      'Roll the <b>silicon results up against the datasheet</b>: gather the characterization, compliance and reliability results with their test conditions and sample counts, map each to the datasheet parameter and the pre-silicon prediction it replaces, and agree for every parameter that missed its target whether the datasheet changes, an erratum is written or a fix is planned.',
+      'Roll the <b>silicon results up against the datasheet</b> once they have all reported: gather the characterization, compliance and reliability results with their test conditions, package types and sample counts, map each to the datasheet parameter and the pre-silicon prediction it replaces, and agree for every parameter that missed its target whether the datasheet changes, an erratum is written or a fix is planned.',
       'Silicon validation produces hundreds of measurements in three stages’ reports; the release needs one answer per datasheet parameter. The rollup is that join, and it is where a missed target becomes a deliberate decision rather than a number nobody carried across.',
     ],
     flowNote:
@@ -27,7 +27,7 @@ export const UGA_WRITE_UPS: UcieWriteUps = {
       '<b>Parameters unmapped.</b> Some datasheet parameters have no measurement and keep their pre-silicon value silently.',
       '<b>Conditions lost.</b> Results are quoted without the voltage, temperature and channel they were taken at.',
       '<b>Misses argued away.</b> A parameter that missed target is redefined rather than dispositioned.',
-      '<b>Late results.</b> Reliability or compliance data arrives after the rollup closes.',
+      '<b>Package type blurred.</b> Results from one test vehicle variant are quoted for a package type it does not represent.',
       '<b>Small samples.</b> A parameter is quoted from a handful of parts as if it were a distribution.',
     ],
     roles: [
@@ -45,7 +45,7 @@ export const UGA_WRITE_UPS: UcieWriteUps = {
     ],
     entry: [
       'Characterization report reviewed in UCHR-10',
-      'Compliance and reliability results drafted in UCMP-05 and URLQ-05',
+      'Compliance results reviewed in UCMP-05 and the reliability report issued in URLQ-05',
       'v0.9 datasheet available from UPRE-08',
     ],
     exit: [
@@ -54,7 +54,7 @@ export const UGA_WRITE_UPS: UcieWriteUps = {
       'Rollup released to documentation and the silicon report',
     ],
     dependsOn: ['UCHR-10', 'UCMP-05', 'URLQ-05', 'UPRE-08'],
-    dependsNote: 'The rollup starts on the characterization report and takes compliance and reliability results as they close.',
+    dependsNote: 'The rollup waits for all three silicon results to report — characterization, compliance and the reliability report — so nothing it states is provisional.',
     feedsInto: ['UGA-02', 'UGA-03'],
     measuredBy: [
       'Datasheet parameters with measured data',
@@ -73,11 +73,11 @@ export const UGA_WRITE_UPS: UcieWriteUps = {
   'UGA-02': {
     criticalPath: false,
     purpose: [
-      'Write the <b>silicon report licensees read</b>: eye margin, BER, energy per bit and PVT shmoo across lanes and corners; lane repair, lane reversal, runtime recalibration and low-power behavior on silicon; compliance, interoperability and reliability; and the measurement-to-simulation correlation with a description of the test vehicle channel the data was taken on.',
+      'Write the <b>silicon report licensees read</b>: eye margin, BER, energy per bit, PLL jitter and PVT shmoo across lanes, corners and package types; lane repair, lane reversal, runtime recalibration and low-power behavior on silicon; compliance, interoperability and reliability with the lot and sample counts behind them; and the measurement-to-simulation correlation with a description of each test vehicle channel — with every package type the test vehicle did not build labelled as supported by simulation only.',
       'Licensees decide whether to commit a production SoC on this report. It has to show distributions rather than best lanes, and it has to say what channel produced the data, because a customer’s bridge or interposer will not be the test vehicle’s.',
     ],
     flowNote:
-      'Step 1 summarizes electrical performance while step 2 summarizes link features in parallel. Step 3 adds compliance, interoperability and reliability, step 4 the correlation and channel description, and step 5 releases the report.',
+      'Step 1 summarizes electrical performance per package type while step 2 summarizes link features in parallel. Step 3 adds compliance, interoperability and reliability, step 4 the correlation, channel descriptions and simulation-only labels, and step 5 releases the report.',
     consumes: [
       'Silicon data rollup from UGA-01',
       'Characterization report from UCHR-10',
@@ -91,7 +91,7 @@ export const UGA_WRITE_UPS: UcieWriteUps = {
     },
     risks: [
       '<b>Best-lane reporting.</b> Margins are quoted from the best lane or part rather than the distribution.',
-      '<b>Channel undefined.</b> Results are shown without the test vehicle channel they depend on.',
+      '<b>Simulated shown as measured.</b> A package type the test vehicle never built appears beside measured ones without a label.',
       '<b>Correlation omitted.</b> Licensees cannot tell how far to trust the models for their own channels.',
       '<b>Feature behavior missing.</b> Lane repair and recalibration behavior are not shown, only data rate results.',
       '<b>Report and rollup disagree.</b> Numbers are copied by hand and drift from the rollup.',
@@ -117,7 +117,7 @@ export const UGA_WRITE_UPS: UcieWriteUps = {
     ],
     exit: [
       'Every electrical result shown as a distribution across lanes, parts and corners',
-      'Test vehicle channel described with its measured loss and crosstalk',
+      'Every package type marked as measured on a named test vehicle variant or as supported by simulation only',
       'Report numbers generated from the rollup data with no hand-copied values',
     ],
     dependsOn: ['UGA-01', 'UCHR-10', 'UCHR-09'],
@@ -129,7 +129,7 @@ export const UGA_WRITE_UPS: UcieWriteUps = {
       'Review findings open',
     ],
     links: {
-      dependsOn: ['UGA-01', 'UCHR-10', 'UCHR-09', 'UCMP-05', 'URLQ-05'],
+      dependsOn: ['UGA-01', 'UCHR-10', 'UCHR-09', 'UCMP-05', 'URLQ-05', 'UCHR-11'],
       feedsInto: ['UGA-03', 'UGA-04', 'UGA-05'],
       runsWith: [],
       revisedBy: [],
@@ -140,16 +140,16 @@ export const UGA_WRITE_UPS: UcieWriteUps = {
   'UGA-03': {
     criticalPath: true,
     purpose: [
-      'Build the <b>GA release package</b>: the datasheet, integration guide and application notes updated to measured silicon; timing, power and channel models updated where silicon correlation moved them; every fix and ECO released to customers since v0.9 folded in; and the package rebuilt with GA version tags against the final deliverable checklist.',
-      'GA is the package licensees will tape out production silicon against, possibly years later. It must contain everything any one customer received as a patch since v0.9, so the GA baseline is the same for everyone.',
+      'Build the <b>GA release package</b>: the datasheet, integration guide and application notes updated to measured silicon; the channel compliance kit, timing and power models updated where silicon correlation moved them; every fix and ECO in the customer ECO log as frozen at the GA cut-off folded in; and the package rebuilt with GA version tags against the final deliverable checklist.',
+      'GA is the package licensees will tape out production silicon against, possibly years later. It must contain everything any one customer received as a patch up to the cut-off, so the GA baseline is the same for everyone; fixes after the cut-off go into the first post-GA patch rather than holding GA.',
     ],
     flowNote:
-      'Step 1 updates the documents while step 2 updates the models in parallel. Step 3 folds in post-v0.9 fixes, step 4 rebuilds and tags the package and step 5 hands it to release QA.',
+      'Step 1 updates the documents while step 2 updates the kit and models in parallel. Step 3 folds in the ECO log fixes up to the cut-off, step 4 rebuilds and tags the package and step 5 hands it to release QA.',
     consumes: [
       'Silicon data rollup from UGA-01',
       'Silicon report from UGA-02',
       'v0.9 release package and decision from UPRE-08',
-      'Customer fixes and ECOs since v0.9 from UCUS-04',
+      'Customer ECO log frozen at the GA cut-off',
       'v0.9 integration guide and application notes from UPRE-06',
     ],
     rel: {
@@ -157,7 +157,7 @@ export const UGA_WRITE_UPS: UcieWriteUps = {
       'UGA-D4': '<b>GA release QA record, release notes and errata.</b> The rebuilt package is what GA QA checks.',
     },
     risks: [
-      '<b>Patches left out.</b> A fix released to one customer after v0.9 is missing from GA.',
+      '<b>Patches left out.</b> A fix released to one customer before the cut-off is missing from GA.',
       '<b>Models frozen at v0.9.</b> Silicon correlation moved a model and the release keeps the old one.',
       '<b>Documents half-updated.</b> The datasheet changes but the integration guide still quotes pre-silicon values.',
       '<b>Tagging error.</b> A file keeps its v0.9 tag and customers cannot tell which version they hold.',
@@ -178,35 +178,35 @@ export const UGA_WRITE_UPS: UcieWriteUps = {
     ],
     entry: [
       'Silicon data rollup released from UGA-01',
-      'Post-v0.9 fix and ECO list current in UCUS-04',
+      'ECO log frozen at the GA cut-off and handed over by customer engineering',
       'Final deliverable checklist from the release definition',
     ],
     exit: [
-      'Every fix and ECO released since v0.9 present in the GA package',
+      'Every fix and ECO in the log frozen at the GA cut-off present in the GA package',
       'Every document value that silicon measured updated to the measured value',
       'Every file in the package carries the GA version tag',
     ],
-    dependsOn: ['UGA-01', 'UGA-02', 'UPRE-08', 'UCUS-04'],
+    dependsOn: ['UGA-01', 'UGA-02', 'UPRE-08'],
     dependsNote: null,
     feedsInto: ['UGA-04'],
     measuredBy: [
-      'Post-v0.9 fixes merged against released',
+      'Fixes in the frozen ECO log merged against released',
       'Document values updated to silicon',
       'Files carrying the GA tag',
     ],
     links: {
-      dependsOn: ['UGA-01', 'UGA-02', 'UPRE-08', 'UCUS-04', 'UPRE-06'],
+      dependsOn: ['UGA-01', 'UGA-02', 'UPRE-08', 'UPRE-06'],
       feedsInto: ['UGA-04', 'UGA-05', 'UCUS-03'],
-      runsWith: [],
+      runsWith: ['UCUS-04', 'UCUS-06'],
       revisedBy: [],
       feedsBackInto: [],
     },
-    terms: ['Release package', 'GA', 'ECO', 'IBIS-AMI', 'Integration guide'],
+    terms: ['Release package', 'GA', 'ECO', 'Channel compliance kit', 'Integration guide'],
   },
   'UGA-04': {
     criticalPath: true,
     purpose: [
-      'Run <b>release QA on the GA package</b> with the same checklist and sanity flows as v0.9, re-run on every view and model whether or not it changed, write the GA release notes and the errata with their workarounds, and close or waive every finding with its customer impact.',
+      'Run <b>release QA on the GA package</b> after the silicon-proven decision, with the same checklist and sanity flows as v0.9, re-run on every view and model whether or not it changed, write the GA release notes and the errata with their workarounds from the errata process, and close or waive every finding with its customer impact.',
       'A GA package is mostly unchanged files with a few critical updates, which is exactly when a stale file slips through. Re-running every sanity flow, not only on changed files, is what keeps the GA baseline trustworthy.',
     ],
     flowNote:
@@ -215,8 +215,8 @@ export const UGA_WRITE_UPS: UcieWriteUps = {
       'GA release package from UGA-03',
       'Silicon report from UGA-02',
       'Release QA procedure and v0.9 QA record from UPRE-07',
-      'Errata and workarounds from customer issue handling',
-      'Sanity flow environments',
+      'Silicon-proven decision and its lot and sample basis from URLQ-06',
+      'Errata and workarounds from the errata and patch process in UCUS-06',
     ],
     rel: {
       'UGA-D4': '<b>GA release QA record, release notes and errata.</b> Produced here.',
@@ -243,7 +243,7 @@ export const UGA_WRITE_UPS: UcieWriteUps = {
       ['Finding closure', 0.5],
     ],
     entry: [
-      'GA package handed over from UGA-03',
+      'GA package handed over from UGA-03 and the silicon-proven decision recorded in URLQ-06',
       'QA procedure from UPRE-07 in force',
       'Errata list current',
     ],
@@ -252,8 +252,8 @@ export const UGA_WRITE_UPS: UcieWriteUps = {
       'Every known silicon issue listed in the errata with a tested workaround or a stated none',
       'Every QA finding closed or waived with a customer impact statement',
     ],
-    dependsOn: ['UGA-03', 'UGA-02', 'UPRE-07'],
-    dependsNote: null,
+    dependsOn: ['UGA-03', 'UGA-02', 'UPRE-07', 'URLQ-06'],
+    dependsNote: 'GA QA starts only after the silicon-proven decision, so the package it checks is the one GA will stand on.',
     feedsInto: ['UGA-05'],
     measuredBy: [
       'QA findings found and closed',
@@ -261,9 +261,9 @@ export const UGA_WRITE_UPS: UcieWriteUps = {
       'Sanity flows passed',
     ],
     links: {
-      dependsOn: ['UGA-03', 'UGA-02', 'UPRE-07'],
+      dependsOn: ['UGA-03', 'UGA-02', 'UPRE-07', 'URLQ-06'],
       feedsInto: ['UGA-05'],
-      runsWith: [],
+      runsWith: ['UCUS-06'],
       revisedBy: [],
       feedsBackInto: [],
     },
@@ -292,7 +292,7 @@ export const UGA_WRITE_UPS: UcieWriteUps = {
       '<b>Conditions unstated.</b> GA is granted with restrictions nobody writes down.',
       '<b>Open issues ignored.</b> A severe customer issue is open at GA without a workaround.',
       '<b>Criteria moved.</b> The GA criteria are relaxed in the review to fit the results.',
-      '<b>Publication partial.</b> Some licensees are not notified of GA.',
+      '<b>Publication partial.</b> Some entitled licensees are not notified of GA.',
     ],
     roles: [
       { r: 'Program management', d: 'Owns the GA decision review' },

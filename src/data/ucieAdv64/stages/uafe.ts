@@ -5,9 +5,9 @@ import type { UcieStageModule } from '../types';
 
 export const UAFE: UcieStageModule = {
   content: {
-    tagline: 'Design the analog front-end that moves 64 GT/s across a few millimeters of package wiring, and freeze it once.',
+    tagline: 'Design the analog front-end that moves 64 GT/s across the short reach of an Advanced package, and freeze it once.',
     description:
-      'Turn the frozen Electrical PHY architecture into transistor-level circuits on the selected process: the TX driver with its impedance, swing and equalization control; the RX front-end and sampler with offset calibration; the forwarded-clock distribution, DLL and phase adjustment that place every sampling edge inside a fraction of a unit interval; the bias, reference and supply regulation; and the ESD protection behind every fine-pitch bump. Topology exploration starts before the architecture freezes so the freeze is informed by simulation, but the circuits themselves are drawn against the frozen architecture. Every block exposes the calibration and training hooks the Logical PHY drives, and the whole front-end is simulated across PVT corners and Monte Carlo mismatch at 64 GT/s before the circuit freeze hands it to layout.',
+      'Turn the frozen Electrical PHY architecture into transistor-level circuits on the selected process: the TX driver with its impedance, swing and equalization control; the RX front-end and sampler with offset calibration; the PLL that generates the high-speed clock from the reference clock, and the forwarded-clock distribution, DLL and phase adjustment that place every sampling edge inside a fraction of a unit interval; the bias, reference and supply regulation; the ESD protection behind every fine-pitch bump; the sideband transmitter and receiver with their redundant path and always-on supply; and the on-die temperature and voltage sensors that trigger runtime recalibration. Topology exploration starts before the architecture freezes so the freeze is informed by simulation, but the circuits themselves are drawn against the frozen architecture. Every block exposes the calibration and training hooks the Logical PHY drives, and the whole front-end is simulated across PVT corners and Monte Carlo mismatch at 64 GT/s, with a statistical margin checkpoint at the freeze itself, before the circuit freeze hands it to layout.',
     activities: [
       'Topology exploration',
       'TX driver',
@@ -18,6 +18,9 @@ export const UAFE: UcieStageModule = {
       'Calibration hooks',
       'PVT and Monte Carlo',
       'Circuit freeze',
+      'PLL',
+      'Sideband I/O',
+      'Temperature and voltage sensors',
     ],
     deliverables: [
       'Electrical PHY circuit topology selection report with feasibility simulations',
@@ -29,10 +32,13 @@ export const UAFE: UcieStageModule = {
       'Analog calibration and training control register specification',
       'Electrical PHY PVT corner and Monte Carlo simulation report at 64 GT/s',
       'Circuit freeze decision package',
+      'PLL schematic database with jitter, supply sensitivity and relock analysis',
+      'Sideband I/O circuit database — transmitter, receiver, redundant path and always-on supply',
+      'On-die temperature and voltage sensor circuit database with recalibration trigger thresholds',
     ],
-    deliverableFrom: [0, 1, 2, 3, 4, 5, 6, 7, 8],
-    deliverableWeek: [6, 24, 24, 26, 24, 22, 26, 28, 32],
-    engineeringEffort: [3, 14.5, 14.5, 16.5, 6.5, 4.5, 6, 8, 1.5],
+    deliverableFrom: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11],
+    deliverableWeek: [6, 24, 24, 26, 24, 22, 26, 28, 32, 26, 22, 22],
+    engineeringEffort: [3, 14.5, 14.5, 16.5, 6.5, 4.5, 6, 8, 1.5, 9, 4, 3],
     risks: [
       'Timing margin at 64 GT/s consumed by clock-path jitter and duty-cycle error before the data path is counted',
       'ESD capacitance on every bump eats the receiver bandwidth the channel budget assumed',
@@ -42,6 +48,7 @@ export const UAFE: UcieStageModule = {
       'Calibration ranges sized for typical silicon leave the slow-slow and fast-fast corners outside what training can correct',
       'Supply noise from the TX drivers couples into the clock distribution because the regulation and decoupling were sized per block, not for the whole module',
       'Topology chosen before the bump pitch is settled forces a redesign of the driver strength or the ESD structure when the package rules arrive',
+      'PLL relock time on exit from a low-power state longer than the state machine allows, found only when the link is brought out of L1 on silicon',
       'Circuit freeze declared on schematic simulation alone, leaving the layout parasitics to close a margin that was never there',
     ],
     leader: { name: 'Mireille Okonkwo', short: 'M. Okonkwo', phone: '+1 (408) 555-0611', email: 'mireille.okonkwo@example.com' },
@@ -116,11 +123,11 @@ export const UAFE: UcieStageModule = {
     },
     'UAFE-04': {
       s: [
-        [1, 'Allocate the 64 GT/s timing budget to the forwarded clock path, the DLL and phase adjustment', 2],
+        [1, 'Allocate the 64 GT/s timing budget to the PLL output, the forwarded clock path, the DLL and phase adjustment', 2],
         [2, 'Design the forwarded clock transmitter and receiver and the clock distribution across the module', 5],
         [3, 'Design the DLL and its lock behavior', 5],
         [4, 'Design phase adjustment and its resolution for per-lane sampling', 4, 1],
-        [5, 'Simulate jitter, duty-cycle error and skew from clock source to every sampler', 5],
+        [5, 'Simulate jitter, duty-cycle error and skew from the PLL output to every sampler', 5],
         [6, 'Release the clocking schematic database', 1],
       ],
       o: [
@@ -207,18 +214,81 @@ export const UAFE: UcieStageModule = {
     },
     'UAFE-09': {
       s: [
-        [1, 'Collect every block database, simulation report and open issue', 1],
+        [1, 'Collect every block database — including the PLL, sideband I/O and sensors — with its simulation report and open issues', 1],
         [2, 'Review margins, calibration coverage, power and area against the architecture budgets', 1.5],
         [3, 'Record waivers and the issues carried into layout', 0.5, 1],
-        [4, 'Hold the circuit freeze review and freeze the schematics', 1],
+        [4, 'Check the statistical margin at the worst Monte Carlo sample against the allowance kept for layout parasitics', 0.5],
+        [5, 'Hold the circuit freeze review and freeze the schematics', 1],
       ],
       o: [
         'Collected circuit databases and reports',
         'Margin and budget review record',
         'Waiver and carried-issue list',
+        'Pre-freeze statistical margin checkpoint',
         'Circuit freeze decision package',
       ],
       r: [['UAFE-D9', 'produces']],
+    },
+    'UAFE-10': {
+      s: [
+        [1, 'Set the PLL output frequency plan, reference clock input and jitter budget from the clocking architecture', 2],
+        [2, 'Design the oscillator and its tuning range across process and temperature for the 64 GT/s clock', 5],
+        [3, 'Design the loop — phase detector, charge pump or digital filter and divider — for the jitter transfer the budget allows', 4],
+        [4, 'Design supply regulation and isolation for the oscillator against driver switching noise', 3, 1],
+        [5, 'Design lock detection and fast relock for exit from low-power states', 3],
+        [6, 'Simulate jitter, supply sensitivity and relock time across corners and Monte Carlo', 4],
+        [7, 'Release the PLL schematic database with its jitter, supply sensitivity and relock analysis', 1],
+      ],
+      o: [
+        'PLL frequency plan, reference input and jitter budget',
+        'Oscillator design with tuning range',
+        'Loop design meeting the jitter transfer target',
+        'Oscillator supply regulation and isolation',
+        'Lock detection and fast relock design',
+        'Jitter, supply sensitivity and relock results across corners',
+        'PLL schematic database with jitter, supply sensitivity and relock analysis',
+      ],
+      r: [['UAFE-D10', 'produces'], ['UAFE-D8', 'feeds'], ['UAFE-D9', 'feeds']],
+    },
+    'UAFE-11': {
+      s: [
+        [1, 'Set the sideband electrical targets — data rate, drive, receiver threshold and reach — from the sideband architecture', 2],
+        [2, 'Design the sideband transmitter and receiver for the data and clock lanes', 4],
+        [3, 'Design the redundant sideband path and its selection', 2, 1],
+        [4, 'Design the always-on supply domain that keeps the sideband alive while the mainband is powered down', 4],
+        [5, 'Design ESD protection for the sideband bumps within the bump interface', 2],
+        [6, 'Simulate the sideband across corners, supply states and the redundant path', 3],
+        [7, 'Release the sideband I/O circuit database', 1],
+      ],
+      o: [
+        'Sideband electrical targets',
+        'Sideband transmitter and receiver design',
+        'Redundant sideband path design',
+        'Always-on supply domain design',
+        'Sideband ESD protection',
+        'Sideband simulation results across corners and supply states',
+        'Sideband I/O circuit database — transmitter, receiver, redundant path and always-on supply',
+      ],
+      r: [['UAFE-D11', 'produces'], ['UAFE-D9', 'feeds']],
+    },
+    'UAFE-12': {
+      s: [
+        [1, 'Set what the sensors must resolve — junction temperature and local supply — and how fast, from the recalibration architecture', 2],
+        [2, 'Design the temperature sensor and its calibration', 4],
+        [3, 'Design the supply voltage monitor at the clock and sampler domains', 3, 1],
+        [4, 'Define the digital readout and the drift thresholds that trigger runtime recalibration', 3],
+        [5, 'Simulate sensor accuracy across process and the readout under supply noise', 3],
+        [6, 'Release the sensor circuit database with the recalibration trigger thresholds', 1],
+      ],
+      o: [
+        'Sensor resolution and update-rate targets',
+        'Temperature sensor design with calibration',
+        'Supply voltage monitor design',
+        'Digital readout and recalibration trigger thresholds',
+        'Sensor accuracy results across process',
+        'On-die temperature and voltage sensor circuit database with recalibration trigger thresholds',
+      ],
+      r: [['UAFE-D12', 'produces'], ['UAFE-D7', 'feeds'], ['UAFE-D9', 'feeds']],
     },
   },
 };

@@ -29,4 +29,9 @@ export const URTL_GLOSSARY: UcieGlossary = {
     group: 'iface',
     note: 'The low-power states a UCIe link enters when idle: L1 keeps enough state for a fast exit back to active, L2 powers down more and exits more slowly. Entry and exit are handshakes between both dies.',
   },
+  'Multi-module striping': {
+    full: 'Multi-module striping',
+    group: 'iface',
+    note: 'Spreading Flits across two or more UCIe modules that a licensee aggregates for bandwidth, and keeping them in order across the modules’ separate lanes, skew and retrains.',
+  },
 };

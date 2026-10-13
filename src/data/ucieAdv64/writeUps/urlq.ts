@@ -7,7 +7,7 @@ export const URLQ_WRITE_UPS: UcieWriteUps = {
   'URLQ-01': {
     criticalPath: false,
     purpose: [
-      'Write the <b>reliability qualification plan</b>: stress legs, conditions and durations from the reliability targets and the aging analysis done at signoff, sample sizes per leg, units selected with their lane repair state known, read points that re-measure margin and BER, and stress boards and chambers confirmed.',
+      'Write the <b>reliability qualification plan</b>: stress legs, conditions and durations from the reliability targets and the aging analysis done at signoff, sample sizes per leg, units selected with their lane repair state known, read points that re-measure margin and BER, and the dynamic stress boards, sockets and package final test program confirmed.',
       'Reliability stress is long and starts the moment units are available, so its plan cannot wait for bring-up to finish. Reading back margin rather than pass or fail is the choice that makes the results useful to licensees who will carry them into their own qualification.',
     ],
     flowNote:
@@ -16,7 +16,7 @@ export const URLQ_WRITE_UPS: UcieWriteUps = {
       'Aging and reliability verification from USGN-05',
       'ESD and latch-up verification from USGN-04',
       'Electrical PHY ESD targets and operating range from UREQ-08',
-      'Power-on record and rail currents from UBUP-01',
+      'Reliability stress boards, sockets and package final test program from UTVP-09',
       'Assembled test vehicles from UFAB-03',
     ],
     rel: {
@@ -41,7 +41,7 @@ export const URLQ_WRITE_UPS: UcieWriteUps = {
       ['Stress legs and conditions', 0.5],
       ['Sample sizes and units', 0.5],
       ['Read point definitions', 0.25],
-      ['Boards, chambers and release', 0.25],
+      ['Boards, sockets, test program and release', 0.25],
     ],
     entry: [
       'Aging and ESD verification results from signoff available',
@@ -51,7 +51,7 @@ export const URLQ_WRITE_UPS: UcieWriteUps = {
     exit: [
       'Every stress leg defined with its condition, duration, sample size and read points',
       'Units selected for each leg with their lane repair state recorded',
-      'Stress boards and chambers confirmed available for the planned start dates',
+      'Stress boards, sockets and the package final test program from UTVP-09 confirmed for the planned start dates',
     ],
     dependsOn: ['USGN-05', 'USGN-04', 'UREQ-08'],
     dependsNote: null,
@@ -62,7 +62,7 @@ export const URLQ_WRITE_UPS: UcieWriteUps = {
       'Days from first samples to stress start',
     ],
     links: {
-      dependsOn: ['USGN-05', 'USGN-04', 'UREQ-08', 'UBUP-01', 'UFAB-03'],
+      dependsOn: ['USGN-05', 'USGN-04', 'UREQ-08', 'UBUP-01', 'UFAB-03', 'UTVP-09'],
       feedsInto: ['URLQ-02', 'URLQ-03', 'URLQ-04', 'URLQ-05', 'URLQ-06'],
       runsWith: [],
       revisedBy: [],
@@ -73,7 +73,7 @@ export const URLQ_WRITE_UPS: UcieWriteUps = {
   'URLQ-02': {
     criticalPath: true,
     purpose: [
-      'Run <b>high-temperature operating life stress with the link exercised at 64 GT/s</b>: time-zero margin and BER on every unit, stress at elevated temperature and voltage, per-lane margin and BER re-measured at each read point, and drift and failures analyzed into an acceleration and lifetime estimate.',
+      'Run <b>high-temperature operating life stress with the link exercised at 64 GT/s</b>: every unit screened through the package final test program for its time-zero margin and BER after the first link-up, stress on dynamic stress boards at elevated temperature and voltage, per-lane margin and BER re-measured at each read point, and drift and failures analyzed into an acceleration and lifetime estimate.',
       'A die-to-die PHY wears in its drivers, samplers and clock paths while it switches, so stressing it idle misses the mechanisms that matter. Reading margin at every read point turns a pass count into a drift curve a licensee can extrapolate.',
     ],
     flowNote:
@@ -82,7 +82,7 @@ export const URLQ_WRITE_UPS: UcieWriteUps = {
       'Reliability qualification plan from URLQ-01',
       'Unit allocation from the first link-up review in UBUP-06',
       'Aging and reliability verification from USGN-05',
-      'ATE load board and test programs for read points from UTVP-04',
+      'Dynamic stress boards, sockets and package final test program from UTVP-09',
       'Per-lane margin baseline method from UCHR-02',
     ],
     rel: {
@@ -92,7 +92,7 @@ export const URLQ_WRITE_UPS: UcieWriteUps = {
     risks: [
       '<b>Idle stress.</b> The link is not exercised and switching-driven wear is missed.',
       '<b>Read points slip.</b> Read points are skipped when the lab is busy and drift is under-sampled.',
-      '<b>Board failures counted.</b> Stress board faults are recorded as device failures.',
+      '<b>Unscreened units.</b> Units enter stress without a time-zero screen and early failures are mistaken for wear-out.',
       '<b>Drift ignored.</b> Margin drift inside the pass limit is not reported.',
       '<b>Acceleration assumed.</b> Lifetime is extrapolated with an acceleration model not tied to the mechanisms seen.',
     ],
@@ -112,7 +112,7 @@ export const URLQ_WRITE_UPS: UcieWriteUps = {
     ],
     entry: [
       'Plan released in URLQ-01',
-      'Stress boards exercising the link at 64 GT/s proven on one unit',
+      'Dynamic stress boards from UTVP-09 exercising the link at 64 GT/s proven on one unit',
       'Time-zero method agreed with characterization',
     ],
     exit: [
@@ -120,8 +120,8 @@ export const URLQ_WRITE_UPS: UcieWriteUps = {
       'Per-lane margin and BER recorded at every read point',
       'Drift and failures analyzed with the acceleration model and its basis stated',
     ],
-    dependsOn: ['URLQ-01', 'UBUP-06', 'USGN-05'],
-    dependsNote: 'Stress starts as soon as the first link-up review allocates units, because its hours set the end of the stage.',
+    dependsOn: ['URLQ-01', 'UBUP-06', 'USGN-05', 'UTVP-09'],
+    dependsNote: 'Stress starts in week 106, the week after the first link-up review allocates units, once each unit has its time-zero screen; its hours set the end of the stage.',
     feedsInto: ['URLQ-05'],
     measuredBy: [
       'Stress hours completed',
@@ -129,7 +129,7 @@ export const URLQ_WRITE_UPS: UcieWriteUps = {
       'Failures per leg',
     ],
     links: {
-      dependsOn: ['URLQ-01', 'UBUP-06', 'USGN-05', 'UTVP-04', 'UCHR-02'],
+      dependsOn: ['URLQ-01', 'UBUP-06', 'USGN-05', 'UTVP-04', 'UTVP-09', 'UCHR-02'],
       feedsInto: ['URLQ-05', 'URLQ-06'],
       runsWith: ['URLQ-04'],
       revisedBy: [],
@@ -140,8 +140,8 @@ export const URLQ_WRITE_UPS: UcieWriteUps = {
   'URLQ-03': {
     criticalPath: false,
     purpose: [
-      'Qualify <b>ESD and latch-up</b>: charged-device and contact ESD on every bump class of the PHY, latch-up on its supplies and I/O at the specified temperature, link function and leakage re-checked after each stress, and failures analyzed.',
-      'Fine-pitch die-to-die bumps carry far lighter ESD protection than package pins, because heavy protection would cost bandwidth. The levels the integration guide promises — and the handling assumptions behind them — have to be shown on silicon before licensees build them into their assembly flows.',
+      'Qualify <b>ESD and latch-up</b>: ESD on every die-to-die bump class at die or wafer level on test structures and probe pads, package-level ESD on the external pins only, latch-up on the PHY supplies and I/O at the specified temperature, link function and leakage re-checked after each stress, and failures analyzed.',
+      'Fine-pitch die-to-die bumps carry far lighter ESD protection than package pins, because heavy protection would cost bandwidth. Once assembled those bumps sit under the other die and cannot be reached by a tester, so their protection is qualified before assembly; the levels the integration guide promises — and the assembly handling limits behind them — are what licensees build into their assembly flows.',
     ],
     flowNote:
       'Step 1 tests ESD per bump class and step 2 latch-up, with function and leakage re-checked in parallel in step 3. Step 4 analyzes failures and releases the results.',
@@ -158,7 +158,7 @@ export const URLQ_WRITE_UPS: UcieWriteUps = {
     },
     risks: [
       '<b>Wrong level tested.</b> ESD is tested at a level other than the one the integration guide states.',
-      '<b>Bump classes skipped.</b> Clock or sideband bumps are not tested separately from data.',
+      '<b>Assembled bumps zapped.</b> Die-to-die bumps are claimed tested at package level, where no tester can reach them.',
       '<b>Function not re-checked.</b> Parts pass leakage after stress but the link no longer trains.',
       '<b>Latch-up at room only.</b> Latch-up is tested cold and the specified temperature is skipped.',
       '<b>Handling assumptions missing.</b> The assembly handling limits behind the ESD level are not stated.',
@@ -182,7 +182,7 @@ export const URLQ_WRITE_UPS: UcieWriteUps = {
       'ESD targets stated in the integration guide',
     ],
     exit: [
-      'Every PHY bump class tested at the stated ESD level with the result recorded',
+      'Every die-to-die bump class tested at die or wafer level at the stated ESD level, and external pins at package level',
       'Latch-up tested at the specified temperature on every PHY supply and I/O',
       'Link training and leakage re-checked after every stress',
     ],
@@ -344,7 +344,7 @@ export const URLQ_WRITE_UPS: UcieWriteUps = {
     flowNote:
       'Step 1 weighs reliability with characterization and compliance. Step 2 reviews open findings and conditions. Step 3 records the decision.',
     consumes: [
-      'Reliability qualification plan from URLQ-01',
+      'Respin or metal-fix decision from UBUP-07',
       'Operating life, ESD and cycling results from URLQ-02, URLQ-03 and URLQ-04',
       'Reliability report from URLQ-05',
       'Characterization report from UCHR-10',
@@ -358,7 +358,7 @@ export const URLQ_WRITE_UPS: UcieWriteUps = {
       '<b>Conditions dropped.</b> Conditions on the claim are not carried into the release notes.',
       '<b>Characterization ignored.</b> A missed target in characterization is not weighed in the decision.',
       '<b>Compliance waivers unseen.</b> Waivers from compliance are not considered.',
-      '<b>No owner for findings.</b> Open findings have no owner after the decision.',
+      '<b>One lot, unstated.</b> The claim rests on a single shuttle lot and the release does not say so.',
     ],
     roles: [
       { r: 'Quality', d: 'Owns the silicon-proven decision' },
@@ -378,7 +378,7 @@ export const URLQ_WRITE_UPS: UcieWriteUps = {
       'Compliance results summary released in UCMP-05',
     ],
     exit: [
-      'Silicon-proven decision recorded against the reliability, characterization and compliance evidence',
+      'Silicon-proven decision recorded against the reliability, characterization and compliance evidence, with the lots and sample counts behind it',
       'Every condition on the claim written for the GA release notes',
       'Every open finding assigned an owner and a disposition',
     ],
@@ -391,8 +391,8 @@ export const URLQ_WRITE_UPS: UcieWriteUps = {
       'Evidence items reviewed',
     ],
     links: {
-      dependsOn: ['URLQ-01', 'URLQ-02', 'URLQ-03', 'URLQ-04', 'URLQ-05', 'UCHR-10', 'UCMP-05'],
-      feedsInto: ['UGA-03', 'UGA-05'],
+      dependsOn: ['URLQ-01', 'URLQ-02', 'URLQ-03', 'URLQ-04', 'URLQ-05', 'UCHR-10', 'UCMP-05', 'UBUP-07'],
+      feedsInto: ['UGA-03', 'UGA-04', 'UGA-05'],
       runsWith: [],
       revisedBy: [],
       feedsBackInto: [],

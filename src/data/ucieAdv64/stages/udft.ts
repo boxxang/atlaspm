@@ -7,7 +7,7 @@ export const UDFT: UcieStageModule = {
   content: {
     tagline: 'Build the features that prove the PHY on the tester, in the lab and in the customer’s package — before there is anything to test.',
     description:
-      'Design the test and debug logic the IP carries into every customer’s chip: the test access plan, scan insertion rules and ATPG coverage targets for the digital hard macro, per-lane PRBS generators and checkers, near-end, far-end and analog loopback modes, BIST and the built-in lane test that finds bad microbumps after assembly and hands the result to lane repair, eye and lane margining that sweeps sampling time and voltage per lane at 64 GT/s, and debug access through registers, snapshots, trace and the sideband. These features serve three customers at once — the IP team on its own test chip, test engineering at wafer sort and package test, and the licensee who has to test the PHY inside their SoC without the IP team in the room. The stage closes on a DFT freeze, together with the RTL freeze, with every feature specified, implemented and covered by verification.',
+      'Design the test and debug logic the IP carries into every customer’s chip: the test access plan, scan insertion rules and ATPG coverage targets for the digital hard macro, per-lane PRBS generators and checkers, near-end, far-end and analog loopback modes, BIST and the built-in lane test that finds bad microbumps after assembly and hands the result to lane repair, eye and lane margining that sweeps sampling time and voltage per lane at 64 GT/s, with a probe-able observation path and on-die analog test bus to calibrate it on the bench, a hard-macro test wrapper the licensee’s SoC test access can reach, the compliance hooks a reference-die test drives over the sideband — there is nothing to probe on assembled die-to-die bumps — and debug access through registers, snapshots, trace and the sideband. These features serve three customers at once — the IP team on its own test chip, test engineering at wafer sort and package test, and the licensee who has to test the PHY inside their SoC without the IP team in the room. The stage closes on a DFT freeze, together with the RTL freeze, with every feature specified, implemented and covered by verification.',
     activities: [
       'DFT spec and access plan',
       'Scan and ATPG targets',
@@ -20,7 +20,7 @@ export const UDFT: UcieStageModule = {
     ],
     deliverables: [
       'DFT specification and test access plan',
-      'Scan insertion plan and ATPG coverage targets',
+      'Scan insertion plan, test wrapper and ATPG coverage targets',
       'Per-lane PRBS generator and checker RTL',
       'Loopback mode RTL and loopback test descriptions',
       'BIST and built-in lane test RTL with repair map output',
@@ -58,7 +58,7 @@ export const UDFT: UcieStageModule = {
   steps: {
     'UDFT-01': {
       s: [
-        [1, 'Turn the DFT and debug strategy into a feature list per block and per use — test chip, wafer sort, package test and licensee SoC', 1],
+        [1, 'Turn the DFT and debug strategy into a feature list per block and per use — test chip, wafer sort, package test, reference-die compliance and licensee SoC', 1],
         [2, 'Define the test access path for each feature from the scan port, the register map and the sideband', 1],
         [3, 'Define the test modes, their entry and exit and their effect on functional state', 1, 1],
         [4, 'Release the DFT specification and test access plan after review with test engineering and customer engineering', 1],
@@ -76,15 +76,17 @@ export const UDFT: UcieStageModule = {
         [1, 'Define scan chain structure, compression and clocking for the digital hard macro', 3],
         [2, 'Set stuck-at and transition fault coverage targets per block', 2],
         [3, 'Define test points and observe points for logic that scan cannot reach, including the front-end control interface', 3, 1],
-        [4, 'Run trial scan insertion and ATPG on the current RTL to project coverage', 5],
-        [5, 'Release the scan insertion plan and ATPG coverage targets', 2],
+        [4, 'Define the hard-macro test wrapper an SoC test access network reaches — wrapper cells, control and the test modes it exposes', 2],
+        [5, 'Run trial scan insertion and ATPG on the current RTL to project coverage', 5],
+        [6, 'Release the scan insertion plan, the wrapper definition and the ATPG coverage targets', 2],
       ],
       o: [
         'Scan chain structure and compression scheme',
         'Fault coverage targets per block',
         'Test and observe points for unreachable logic',
+        'Hard-macro test wrapper definition',
         'Projected coverage from trial insertion',
-        'Scan insertion plan and ATPG coverage targets',
+        'Scan insertion plan, test wrapper and ATPG coverage targets',
       ],
       r: [['UDFT-D2', 'produces'], ['UDFT-D8', 'feeds']],
     },
@@ -145,13 +147,15 @@ export const UDFT: UcieStageModule = {
         [2, 'Implement per-lane eye sweep control using the front-end’s phase and reference adjustments', 4],
         [3, 'Implement margin readout per lane, with error counts at each sweep point', 3],
         [4, 'Specify how margins are read in mission mode without disturbing traffic on other lanes', 2, 1],
-        [5, 'Release the margining logic and the margin readout specification', 2],
+        [5, 'Add a probe-able observation path and an on-die analog test bus so the margining can be calibrated on the bench', 2],
+        [6, 'Release the margining logic and the margin readout specification', 2],
       ],
       o: [
         'Margining sweep definition',
         'Per-lane eye sweep control RTL',
         'Per-lane margin readout RTL',
         'Mission-mode margining specification',
+        'Observation path and analog test bus',
         'Eye and lane margining logic and margin readout specification',
       ],
       r: [['UDFT-D6', 'produces'], ['UDFT-D8', 'feeds']],
@@ -162,13 +166,15 @@ export const UDFT: UcieStageModule = {
         [2, 'Implement register snapshots captured on error or on a trigger', 3],
         [3, 'Implement a trace buffer for training and state-machine history', 3, 1],
         [4, 'Make debug readable over the sideband so a link that never trains can still be diagnosed', 3],
-        [5, 'Write the debug user guide for the lab and for licensees', 2],
+        [5, 'Support compliance testing against a reference die — compliance control registers, margining, BER and skew results reachable over the sideband', 3],
+        [6, 'Write the debug and compliance-access user guide for the lab and for licensees', 2],
       ],
       o: [
         'Debug signal list',
         'Register snapshot logic',
         'Training and state trace buffer',
         'Sideband debug access',
+        'Compliance access over the sideband',
         'Debug access logic and debug user guide',
       ],
       r: [['UDFT-D7', 'produces'], ['UDFT-D8', 'feeds']],

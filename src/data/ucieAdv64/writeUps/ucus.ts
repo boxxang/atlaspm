@@ -7,16 +7,16 @@ export const UCUS_WRITE_UPS: UcieWriteUps = {
   'UCUS-01': {
     criticalPath: false,
     purpose: [
-      'Review <b>each licensee’s integration of the PHY</b> from v0.5 onward: an integration kickoff on package type, die orientation, module count and schedule, then reviews of their floorplan and macro placement, their bump map and package routing against the channel guidelines, their power delivery and decoupling against the PHY requirements, and their extracted channel and link margin with the released models.',
+      'Review <b>each licensee’s integration of the PHY</b> from v0.5 onward: an integration kickoff on package type, die orientation, module count and schedule, then reviews of their floorplan and macro placement, their bump map and package routing against the channel guidelines, their power delivery and decoupling against the PHY requirements, and their extracted channel judged with the channel compliance kit once v0.9 releases it.',
       'At 64 GT/s on a bridge or interposer, the IP’s margin is spent in the customer’s package as much as in this team’s circuits. Reviewing the customer’s actual floorplan, bump map and extraction — not a summary slide — is what catches a channel that will not close while it can still be redrawn.',
     ],
     flowNote:
       'Step 1 holds the kickoff and step 2 reviews floorplan and placement while step 3 reviews bump map and routing in parallel. Step 4 reviews power delivery, step 5 the channel and link margin, and step 6 closes the findings.',
     consumes: [
-      'v0.5 release and preliminary integration guide from UPRE-02',
+      'v0.5 release, preliminary integration guide and sign-off record from UPRE-02 and UPRE-09',
       'Early-access feedback and customer list from UPRE-03',
       'Customer channel guidelines and reference design from UCHN-06',
-      'Bump map concept and module floorplan from UARC-09',
+      'Channel compliance kit for judging licensee channels from UPRE-05',
       'Licensee floorplans, bump maps and package extractions',
     ],
     rel: {
@@ -55,16 +55,16 @@ export const UCUS_WRITE_UPS: UcieWriteUps = {
       'Every licensee channel shown within the channel guidelines or a deviation agreed with SI/PI',
       'Every review finding closed or carried into signoff support with an owner',
     ],
-    dependsOn: ['UPRE-02', 'UPRE-03', 'UCHN-06'],
+    dependsOn: ['UPRE-02', 'UPRE-09', 'UPRE-03', 'UCHN-06'],
     dependsNote: 'Customer support starts with v0.5: there is nothing to integrate before it.',
     feedsInto: ['UCUS-02', 'UCUS-04'],
     measuredBy: [
       'Licensees reviewed against licensees integrating',
       'Review findings open and their age',
-      'Licensee channels outside the guidelines',
+      'Licensee channels judged with the channel compliance kit',
     ],
     links: {
-      dependsOn: ['UPRE-02', 'UPRE-03', 'UCHN-06', 'UARC-09'],
+      dependsOn: ['UPRE-02', 'UPRE-09', 'UPRE-03', 'UCHN-06', 'UARC-09', 'UPRE-05'],
       feedsInto: ['UCUS-02', 'UCUS-03', 'UCUS-04', 'UCUS-05'],
       runsWith: [],
       revisedBy: [],
@@ -75,7 +75,7 @@ export const UCUS_WRITE_UPS: UcieWriteUps = {
   'UCUS-02': {
     criticalPath: false,
     purpose: [
-      'Support each licensee’s <b>SoC-level signoff with the PHY inside it</b>: timing at the hard macro boundary with the released Liberty libraries, EM/IR and power signoff with the PHY power models, physical verification of the macro in their database, and SoC-level link simulation with the channel models on their final package — then review their results and confirm the PHY is integrated as specified.',
+      'Support each licensee’s <b>SoC-level signoff with the PHY inside it</b>: timing at the hard macro boundary with the released Liberty libraries, EM/IR and power signoff with the PHY power models and the mission profile, physical verification of the macro in their database, and their final package channel judged with the channel compliance kit — informed by the early silicon briefs once the test chip links up — then review their results and confirm the PHY is integrated as specified.',
       'A licensee’s signoff is the first time the macro is checked inside a database this team does not own, with tools and decks configured by someone else. Most failures here are integration mismatches — a corner not run, an abstract read in the wrong orientation, a model used outside its range — and each one is cheaper to find together than after the customer’s tapeout.',
     ],
     flowNote:
@@ -83,8 +83,8 @@ export const UCUS_WRITE_UPS: UcieWriteUps = {
     consumes: [
       'Customer integration review records from UCUS-01',
       'v0.9 release and decision from UPRE-08',
-      'Physical views from UPRE-04',
-      'Channel, timing and power models from UPRE-05',
+      'Early silicon briefs and the preliminary characterization drop from UCUS-08',
+      'Channel compliance kit, timing and power models from UPRE-05',
       'Licensee signoff databases and reports',
     ],
     rel: {
@@ -94,7 +94,7 @@ export const UCUS_WRITE_UPS: UcieWriteUps = {
       '<b>Older release.</b> A licensee signs off against v0.5 views rather than v0.9 or GA.',
       '<b>Corners skipped.</b> Boundary timing is run at fewer corners than the Liberty libraries provide.',
       '<b>Deck mismatch.</b> The customer’s physical verification deck flags the macro for rules it was not built to.',
-      '<b>Model misuse.</b> Channel models are used on a package beyond their stated validity range.',
+      '<b>Kit misuse.</b> The channel compliance kit is run on a package beyond its stated validity range.',
       '<b>Signoff waived by the customer.</b> The licensee waives a PHY violation without telling this team.',
     ],
     roles: [
@@ -121,7 +121,7 @@ export const UCUS_WRITE_UPS: UcieWriteUps = {
       'Every PHY-related signoff violation closed or its waiver agreed in writing',
       'Licensee confirmed signing off against the current supported release',
     ],
-    dependsOn: ['UCUS-01', 'UPRE-08', 'UPRE-04', 'UPRE-05'],
+    dependsOn: ['UCUS-01', 'UPRE-08', 'UPRE-05', 'UCUS-08'],
     dependsNote: null,
     feedsInto: ['UCUS-04', 'UCUS-05'],
     measuredBy: [
@@ -130,13 +130,13 @@ export const UCUS_WRITE_UPS: UcieWriteUps = {
       'Licensees on the current release',
     ],
     links: {
-      dependsOn: ['UCUS-01', 'UPRE-08', 'UPRE-04', 'UPRE-05'],
+      dependsOn: ['UCUS-01', 'UPRE-08', 'UPRE-04', 'UPRE-05', 'UCUS-08'],
       feedsInto: ['UCUS-04', 'UCUS-05'],
       runsWith: [],
       revisedBy: [],
       feedsBackInto: [],
     },
-    terms: ['Signoff', 'Liberty', 'EM/IR', 'IBIS-AMI', 'Hard macro', 'Abstract'],
+    terms: ['Signoff', 'Liberty', 'EM/IR', 'Channel compliance kit', 'Hard macro', 'Abstract', 'Mission profile'],
   },
   'UCUS-03': {
     criticalPath: false,
@@ -264,7 +264,7 @@ export const UCUS_WRITE_UPS: UcieWriteUps = {
     ],
     links: {
       dependsOn: ['UCUS-01', 'UPRE-08', 'UPRE-03'],
-      feedsInto: ['UCUS-03', 'UCUS-05', 'UGA-03'],
+      feedsInto: ['UCUS-03', 'UCUS-05', 'UCUS-06', 'UGA-03'],
       runsWith: [],
       revisedBy: [],
       feedsBackInto: [],
@@ -274,7 +274,7 @@ export const UCUS_WRITE_UPS: UcieWriteUps = {
   'UCUS-05': {
     criticalPath: false,
     purpose: [
-      'Hand the IP to <b>sustaining</b>: review the open issues, ECOs and customer commitments, agree the sustaining support model with its staffing and response targets, and hand over the issue tracker, the knowledge base and the release archive with an owner for each.',
+      'Hand the IP to <b>sustaining</b>: review the open issues, ECOs, errata, pending variant requests and customer commitments, agree the sustaining support model with its staffing and response targets, and hand over the issue tracker, the knowledge base and the release archive with an owner for each.',
       'Development engineers move to the next speed grade after GA; licensees are still taping out on this one. The handover is only complete when every open commitment has a named owner in sustaining and nothing depends on someone remembering it.',
     ],
     flowNote:
@@ -284,7 +284,7 @@ export const UCUS_WRITE_UPS: UcieWriteUps = {
       'SoC-level signoff support status from UCUS-02',
       'Customer documentation set from UCUS-03',
       'GA approval decision from UGA-05',
-      'Integration review records from UCUS-01',
+      'Errata list and patch history from UCUS-06',
     ],
     rel: {
       'UCUS-D5': '<b>Sustaining handover package and support model.</b> Produced here; it closes the stage.',
@@ -319,7 +319,7 @@ export const UCUS_WRITE_UPS: UcieWriteUps = {
       'Every release rebuilt successfully from the handed-over archive',
       'Support model with staffing and response targets signed by sustaining and product management',
     ],
-    dependsOn: ['UCUS-01', 'UCUS-02', 'UCUS-03', 'UCUS-04', 'UGA-05'],
+    dependsOn: ['UCUS-01', 'UCUS-02', 'UCUS-03', 'UCUS-04', 'UCUS-06', 'UGA-05'],
     dependsNote: null,
     feedsInto: [],
     measuredBy: [
@@ -328,12 +328,212 @@ export const UCUS_WRITE_UPS: UcieWriteUps = {
       'Releases rebuilt from the archive',
     ],
     links: {
-      dependsOn: ['UCUS-01', 'UCUS-02', 'UCUS-03', 'UCUS-04', 'UGA-05'],
+      dependsOn: ['UCUS-01', 'UCUS-02', 'UCUS-03', 'UCUS-04', 'UCUS-06', 'UCUS-07', 'UCUS-08', 'UGA-05'],
       feedsInto: [],
       runsWith: [],
       revisedBy: [],
       feedsBackInto: [],
     },
     terms: ['GA', 'Release package', 'Knowledge base'],
+  },
+  'UCUS-06': {
+    criticalPath: false,
+    purpose: [
+      'Run the <b>errata and patch process</b> from v0.9 onward: an errata format with severity, workaround and the releases each entry affects; confirmed customer issues and silicon findings turned into errata entries; patch releases on the v0.9 line built with their own release QA and release notes; every affected licensee notified of each erratum and patch with the acknowledgement recorded; and the errata list kept consistent with the knowledge base and carried into the GA release notes.',
+      'Licensees sign off and tape out on v0.9 and its patches long before GA, so a defect found in the meantime has to reach every one of them in a known form. An erratum emailed to the customer who reported it, or a patch shipped without QA, leaves the installed base split between people who know and people who do not.',
+    ],
+    flowNote:
+      'Step 1 sets up the errata process. Step 2 turns confirmed issues into errata while step 3 builds patch releases and step 4 notifies licensees in parallel. Step 5 keeps the errata consistent and carries them into GA, and step 6 hands the list to sustaining.',
+    consumes: [
+      'v0.9 release decision and distribution list from UPRE-08',
+      'Confirmed customer issues and dispositions from UCUS-04',
+      'Release QA procedure from UPRE-01',
+      'First link-up results and silicon findings from UBUP-06',
+      'Licensee entitlements and contacts',
+    ],
+    rel: {
+      'UCUS-D6': '<b>Errata list, patch releases and licensee notification record.</b> Produced here.',
+      'UCUS-D3': '<b>Customer documentation set — FAQ and knowledge base.</b> Every erratum and its workaround is reflected in the knowledge base.',
+    },
+    risks: [
+      '<b>Errata by email.</b> A known issue reaches only the licensee who reported it.',
+      '<b>Patch without QA.</b> A patch release ships with views nobody read into a tool.',
+      '<b>Notification unconfirmed.</b> Licensees are told but nobody records that they read it.',
+      '<b>Errata drift.</b> The errata list and the knowledge base describe the same issue differently.',
+      '<b>Patch line forks.</b> Patches diverge from the main line and are not merged into GA.',
+    ],
+    roles: [
+      { r: 'Customer engineering', d: 'Owns the errata list, patch releases and notifications' },
+      { r: 'Quality engineer', d: 'Release QA on every patch' },
+      { r: 'Validation engineer', d: 'Confirms silicon findings behind errata' },
+      { r: 'Technical writer', d: 'Errata entries and patch release notes' },
+      { r: 'Product manager', d: 'Approves errata severity and notification scope' },
+    ],
+    effort: [
+      ['Errata process setup', 0.4],
+      ['Errata entries and workarounds', 2.6],
+      ['Patch releases with QA', 3],
+      ['Licensee notification', 1.2],
+      ['Consistency and handover', 0.8],
+    ],
+    entry: [
+      'v0.9 distributed from UPRE-08',
+      'Issue tracker live in UCUS-04',
+      'Licensee notification list current with entitlements',
+    ],
+    exit: [
+      'Every confirmed issue in the errata list with a workaround or a stated none and the releases it affects',
+      'Every patch release QA-passed and merged into the GA package or the first post-GA patch',
+      'Every affected licensee notified of every erratum and patch with acknowledgement recorded',
+    ],
+    dependsOn: ['UPRE-08', 'UCUS-04'],
+    dependsNote: 'Errata and patches start with v0.9, the first release licensees sign off against.',
+    feedsInto: ['UGA-04', 'UCUS-05'],
+    measuredBy: [
+      'Errata entries with tested workarounds',
+      'Patch releases QA-passed',
+      'Licensee notifications acknowledged',
+    ],
+    links: {
+      dependsOn: ['UPRE-08', 'UCUS-04', 'UPRE-01', 'UBUP-06'],
+      feedsInto: ['UGA-03', 'UGA-04', 'UCUS-03', 'UCUS-05'],
+      runsWith: [],
+      revisedBy: [],
+      feedsBackInto: [],
+    },
+    terms: ['Errata', 'Patch release', 'Release notes', 'Licensee'],
+  },
+  'UCUS-07': {
+    criticalPath: false,
+    purpose: [
+      'Evaluate <b>customer requests for variants and ports</b> through one intake: each request — another metal stack, a new orientation, a different module count, bump pitch or package type — assessed for its engineering impact on the macro, the views and the channel compliance kit, costed in schedule and new signoff, and decided with product management as accepted, deferred to the roadmap or declined.',
+      'Every variant can mean a new GDS, a new set of views and a new signoff, and a promise made to one customer in a review meeting becomes a program nobody planned. Running every request through the same evaluation keeps the release structure carrying what was decided rather than what was asked.',
+    ],
+    flowNote:
+      'Step 1 sets up the intake and criteria. Step 2 evaluates each request while step 3 estimates cost and schedule in parallel, step 4 decides each one with product management, and step 5 hands open requests and roadmap decisions on.',
+    consumes: [
+      'Early-access feedback and change requests from UPRE-03',
+      'Customer integration requirements from UREQ-04',
+      'IP roadmap and derivative plan from UCON-04',
+      'Process node and metal stack decisions from UTEC-01',
+      'Integration review findings from UCUS-01',
+    ],
+    rel: {
+      'UCUS-D7': '<b>Variant and porting request evaluations with decisions.</b> Produced here.',
+    },
+    risks: [
+      '<b>Promised in the room.</b> A variant is agreed in a customer review before anyone sizes it.',
+      '<b>Hidden cost.</b> A metal stack change is treated as a view update when it needs a new signoff.',
+      '<b>No roadmap link.</b> Deferred requests are never seen by the next IP generation.',
+      '<b>Kit forgotten.</b> A new package type is accepted without a channel compliance kit update.',
+      '<b>Requests lost.</b> Requests arrive by email and some are never answered.',
+    ],
+    roles: [
+      { r: 'Product management', d: 'Owns the request intake and every decision' },
+      { r: 'IP architect', d: 'Engineering impact of each request' },
+      { r: 'Physical design engineer', d: 'New views and signoff a variant needs' },
+      { r: 'Customer engineering lead', d: 'Brings requests and returns decisions to licensees' },
+      { r: 'IP program manager', d: 'Schedule and resource estimate' },
+    ],
+    effort: [
+      ['Intake setup', 0.2],
+      ['Engineering impact evaluation', 1.8],
+      ['Cost and schedule estimates', 0.8],
+      ['Decisions', 0.9],
+      ['Handover', 0.3],
+    ],
+    entry: [
+      'Early-access licensees integrating on v0.5',
+      'Request intake and criteria agreed with product management',
+      'IP roadmap available from UCON-04',
+    ],
+    exit: [
+      'Every request recorded with an engineering impact, an estimate and a decision',
+      'Every accepted variant has the views, signoff and kit update it needs planned with an owner',
+      'Every deferred request entered in the IP roadmap',
+    ],
+    dependsOn: ['UPRE-03', 'UREQ-04', 'UCON-04'],
+    dependsNote: null,
+    feedsInto: ['UCUS-05'],
+    measuredBy: [
+      'Requests received, decided and open',
+      'Days from request to decision',
+      'Accepted variants delivered against plan',
+    ],
+    links: {
+      dependsOn: ['UPRE-03', 'UREQ-04', 'UCON-04', 'UTEC-01', 'UCUS-01'],
+      feedsInto: ['UCUS-05'],
+      runsWith: [],
+      revisedBy: [],
+      feedsBackInto: [],
+    },
+    terms: ['Porting request', 'Licensee', 'Channel compliance kit', 'Bump pitch'],
+  },
+  'UCUS-08': {
+    criticalPath: false,
+    purpose: [
+      'Give licensees <b>silicon data before GA</b>: an early silicon brief once the test chip links up — first link-up, training behavior and the first margins against the pre-silicon predictions — and a preliminary characterization drop with margins, BER and energy per bit so far, each scoped with product management, released under NDA to entitled licensees with its own QA and marked as preliminary.',
+      'Licensees in SoC signoff tape out during the months between v0.9 and GA. Telling them early whether silicon matches the models — and what does not — lets them take a decision on evidence rather than on a promise, and the questions they send back sharpen what characterization measures next.',
+    ],
+    flowNote:
+      'Step 1 agrees the content and recipients. Step 2 writes the early silicon brief and step 3 releases it, step 4 prepares the preliminary characterization drop and step 5 releases it, while step 6 collects licensee questions in parallel.',
+    consumes: [
+      'First link-up results from UBUP-06',
+      'Results against the pre-silicon plan and margin predictions from UBUP-05',
+      'Eye and timing margins per lane from UCHR-02',
+      'BER measurements at 64 GT/s from UCHR-03',
+      'Release QA procedure and entitlement map from UPRE-01',
+    ],
+    rel: {
+      'UCUS-D8': '<b>Early silicon data briefs and preliminary characterization drop for licensees.</b> Produced here.',
+      'UCUS-D2': '<b>SoC-level signoff support reports per licensee.</b> Licensees in signoff weigh their margins against the early silicon data.',
+    },
+    risks: [
+      '<b>Preliminary read as final.</b> Early numbers are quoted later as datasheet values.',
+      '<b>Best lanes only.</b> The first brief shows the lanes that worked and not the spread.',
+      '<b>Outside entitlement.</b> Data reaches a party not covered by an NDA.',
+      '<b>Too late to help.</b> The brief arrives after the licensees who needed it have taped out.',
+      '<b>Questions unanswered.</b> Licensee questions on the data never reach validation.',
+    ],
+    roles: [
+      { r: 'Customer engineering', d: 'Owns the early silicon briefs and their release' },
+      { r: 'Validation lead', d: 'First link-up and characterization data' },
+      { r: 'Product manager', d: 'Content scope and NDA recipients' },
+      { r: 'Quality engineer', d: 'Release QA on each brief' },
+      { r: 'Mixed-signal verification engineer', d: 'Comparison against the pre-silicon predictions' },
+    ],
+    effort: [
+      ['Scope and recipients', 0.3],
+      ['Early silicon brief', 0.8],
+      ['Preliminary characterization drop', 1.3],
+      ['QA and release', 0.4],
+      ['Licensee questions', 0.2],
+    ],
+    entry: [
+      'First link-up recorded in UBUP-06',
+      'Recipients and NDA scope agreed with product management',
+      'Release QA procedure from UPRE-01 in force',
+    ],
+    exit: [
+      'Early silicon brief released to every entitled licensee in SoC signoff within weeks of first link-up',
+      'Preliminary characterization drop released with test conditions and marked preliminary',
+      'Every licensee question on the data routed with an owner',
+    ],
+    dependsOn: ['UBUP-06', 'UBUP-05', 'UCHR-02'],
+    dependsNote: 'The first brief waits for first link-up; the preliminary drop takes characterization results as they come in.',
+    feedsInto: ['UCUS-02', 'UCUS-05'],
+    measuredBy: [
+      'Weeks from first link-up to the first brief',
+      'Licensees in signoff who received the briefs',
+      'Licensee questions answered',
+    ],
+    links: {
+      dependsOn: ['UBUP-06', 'UBUP-05', 'UCHR-02', 'UCHR-03', 'UPRE-01'],
+      feedsInto: ['UCUS-02', 'UCUS-05', 'UGA-01'],
+      runsWith: [],
+      revisedBy: [],
+      feedsBackInto: [],
+    },
+    terms: ['Early silicon brief', 'NDA', 'Eye margin', 'BER', 'Licensee'],
   },
 };

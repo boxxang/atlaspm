@@ -7,11 +7,11 @@ export const UTPO_WRITE_UPS: UcieWriteUps = {
   'UTPO-01': {
     criticalPath: true,
     purpose: [
-      'Walk the <b>tapeout checklist</b> against every signoff report, accept each open waiver with its owner and decide how it is disclosed to licensees, confirm the release deliverables the tapeout database must also produce, and sign the checklist that database release waits on.',
+      'Walk the <b>tapeout checklist</b> against every signoff report, accept each open waiver with its owner and decide how it is disclosed to licensees, confirm the release deliverables the tapeout database must also produce, confirm the foundry has re-committed the shuttle slot and that the trial database cleared its intake checks, and sign the checklist that database release waits on.',
       'For an IP program the tapeout checklist has a second reader: a waiver accepted for the test chip is a fact about the released macro too. Recording here which waivers the v0.9 release must disclose keeps the test chip and the product telling the same story.',
     ],
     flowNote:
-      'Step 1 walks the checklist. Step 2 reviews waivers while step 3 traces release deliverables in parallel, and step 4 signs the checklist.',
+      'Step 1 walks the checklist. Step 2 reviews waivers while step 3 traces release deliverables and step 4 confirms the shuttle re-commitment in parallel, and step 5 signs the checklist.',
     consumes: [
       'Hard macro signoff decision record from USGN-07',
       'Test chip readiness decision from UTCI-06',
@@ -138,7 +138,7 @@ export const UTPO_WRITE_UPS: UcieWriteUps = {
   'UTPO-03': {
     criticalPath: false,
     purpose: [
-      'Confirm the <b>mask set, shuttle slot and lot plan</b> with the foundry: the slot and die count, a lot plan with process splits so characterization can separate PHY margin from process position, and the mask order and reticle placement.',
+      'Confirm the <b>mask set, shuttle slot and lot plan</b> with the foundry: the slot and die count, a lot plan with process splits so characterization can separate PHY margin from process position — or, where a shared shuttle cannot carry splits, a corner or engineering lot option — and the mask order and reticle placement.',
       'A die-to-die PHY’s timing margin moves with the process. A lot plan without splits leaves characterization able to say how this silicon behaves but not how the IP will behave at the process corners licensees will see.',
     ],
     flowNote:

@@ -7,11 +7,11 @@ export const UREQ_WRITE_UPS: UcieWriteUps = {
   'UREQ-01': {
     criticalPath: true,
     purpose: [
-      'Choose <b>the UCIe revision that defines 64 GT/s</b> as the target and decide which of its options the IP supports: the x64 Advanced module, how many modules a customer may stack, Flit, Streaming and Raw modes at the FDI, and the lower speeds it must still train at.',
+      'Choose <b>the UCIe revision that defines 64 GT/s</b> as the target and decide which of its options the IP supports: the x64 Advanced module and multi-module operation, the Flit formats — Raw, 68B and 256B — kept apart from the protocols negotiated at the FDI, the lower speeds it must still train at, and whether the open-drain fast-throttle and emergency-shutdown signal and a hard-macro test wrapper are in.',
       'Everything downstream — the adapter, the training state machine, the verification plan and the compliance plan — is sized by this matrix. An option left undecided here is carried by every block as if it were required, so each one is marked in, out, or later with a reason.',
     ],
     flowNote:
-      'Step 1 fixes the target revision. Step 2 decides the module configuration while step 3 decides FDI mode support in parallel. Step 4 sets the fallback speeds and step 5 releases the matrix.',
+      'Step 1 fixes the target revision. Step 2 decides the module configuration while step 3 decides format and protocol support in parallel. Step 4 sets the fallback speeds while step 5 records the throttle, shutdown and test wrapper decisions, and step 6 releases the matrix.',
     consumes: [
       'Ranked customer needs from UCON-01',
       'Roadmap position and derivative plan from UCON-04',
@@ -25,9 +25,9 @@ export const UREQ_WRITE_UPS: UcieWriteUps = {
     },
     risks: [
       '<b>Every option required.</b> Optional features are all marked in and the logical PHY and its verification balloon.',
-      '<b>Raw mode underestimated.</b> Continuous transmission in Raw mode is accepted without seeing what it removes from the adapter’s error handling.',
+      '<b>Formats and protocols conflated.</b> Raw, 68B and 256B formats are treated as protocols and the Adapter’s negotiation of the PCIe and CXL formats at the FDI is never specified.',
       '<b>Fallback speeds missed.</b> The lower speeds needed to train and interoperate are not listed, and the clocking cannot reach them.',
-      '<b>Module stacking unbounded.</b> No limit on modules per die is set and the sideband and clocking scale is unknown.',
+      '<b>Module count unbounded.</b> No limit on modules side by side on a die edge is set and the adapter striping, sideband and clocking scale is unknown.',
       '<b>Revision churn.</b> Errata published during design are not tracked against the matrix.',
     ],
     roles: [
@@ -40,8 +40,8 @@ export const UREQ_WRITE_UPS: UcieWriteUps = {
     effort: [
       ['Revision and options review', 1],
       ['Module configuration', 0.5],
-      ['FDI mode decisions', 0.5],
-      ['Fallback speeds', 0.5],
+      ['Format and protocol decisions', 0.5],
+      ['Fallback speeds and option decisions', 0.5],
       ['Release', 0.5],
     ],
     entry: [
@@ -50,8 +50,8 @@ export const UREQ_WRITE_UPS: UcieWriteUps = {
       'Specification text available to the architecture team',
     ],
     exit: [
-      'Every option of the target revision marked in, out or later with a reason',
-      'Module configuration and maximum modules per die stated',
+      'Every option of the target revision marked in, out or later with a reason, including fast throttle, emergency shutdown and the test wrapper',
+      'Module configuration, maximum modules per die edge and the Flit formats and protocols supported stated',
       'Supported speeds and fallback rules listed',
     ],
     dependsOn: ['UCON-01', 'UCON-04'],
@@ -74,7 +74,7 @@ export const UREQ_WRITE_UPS: UcieWriteUps = {
   'UREQ-02': {
     criticalPath: true,
     purpose: [
-      'Set the <b>PPA targets</b> customers will compare: bandwidth per millimeter of shoreline, energy per bit at 64 GT/s, area and shoreline per module, and FDI-to-bump latency in each mode.',
+      'Set the <b>PPA targets</b> customers will compare: bandwidth per millimeter of shoreline, energy per bit at 64 GT/s, area and shoreline per module, and FDI-to-bump latency for each Flit format and the Raw format.',
       'These are the numbers on the datasheet and the ones the link margin review, the characterization and the GA silicon report are judged against. Each needs its measurement conditions written next to it, or simulation and silicon will quietly measure different things.',
     ],
     flowNote:
@@ -93,7 +93,7 @@ export const UREQ_WRITE_UPS: UcieWriteUps = {
     risks: [
       '<b>Conditions omitted.</b> Energy per bit is set without the supply, temperature, activity and channel it is measured at.',
       '<b>Sideband and redundancy excluded.</b> Shoreline counts only data lanes and the real module is wider.',
-      '<b>Latency per mode missing.</b> One latency number is set and Raw and Flit modes cannot both meet it.',
+      '<b>Latency per format missing.</b> One latency number is set and the Raw format and the Flit formats cannot both meet it.',
       '<b>Targets beyond the process.</b> Energy targets are taken from competitor claims on a more advanced process.',
       '<b>No margin.</b> Targets equal the competitor’s claims, leaving no room for silicon to fall short.',
     ],
@@ -141,11 +141,11 @@ export const UREQ_WRITE_UPS: UcieWriteUps = {
   'UREQ-03': {
     criticalPath: true,
     purpose: [
-      'Agree the <b>package technologies and bump pitch range</b> the IP supports — silicon bridge, silicon interposer and RDL interposer, within the Advanced package range of roughly 25 to 55 micrometers — and the channel reach each needs.',
+      'Agree the <b>package technologies and bump pitch range</b> the IP supports — silicon bridge, silicon interposer and RDL interposer, within the Advanced package range of roughly 25 to 55 micrometers — and the channel reach each needs, and which types will be silicon-proven at GA on test vehicle variants rather than supported by simulation only.',
       'The bump map, the module floorplan, the channel model and the test vehicle are all drawn for these choices. A range left wide open means the bump map is designed for none of them; a range too narrow loses the customers on the other package types.',
     ],
     flowNote:
-      'Step 1 lists the customers’ package technologies. Step 2 agrees the bump pitch range while step 3 records reach needs in parallel. Step 4 releases the matrix.',
+      'Step 1 lists the customers’ package technologies. Step 2 agrees the bump pitch range while step 3 records reach needs in parallel. Step 4 decides which types are silicon-proven at GA and step 5 releases the matrix.',
     consumes: [
       'Customer package types from UCON-01',
       'Feature selection matrix from UREQ-01',
@@ -162,7 +162,7 @@ export const UREQ_WRITE_UPS: UcieWriteUps = {
       '<b>RDL channel assumed silicon-like.</b> RDL interposer loss is assumed equal to silicon and the reach fails.',
       '<b>Partner capability unconfirmed.</b> A pitch is committed that no package partner builds in volume.',
       '<b>Reach unstated.</b> Customers’ die spacing is not recorded and the channel is designed for the wrong length.',
-      '<b>Test vehicle mismatch.</b> The test vehicle package is not one of the supported types.',
+      '<b>Claim wider than the silicon.</b> Three package types are advertised at GA while the test vehicle proves fewer, and the rest are never labelled as simulation only.',
     ],
     roles: [
       { r: 'Packaging', d: 'Owns the package technology and bump pitch matrix' },
@@ -175,7 +175,7 @@ export const UREQ_WRITE_UPS: UcieWriteUps = {
       ['Package technology list', 0.5],
       ['Bump pitch agreement', 0.5],
       ['Reach needs', 0.5],
-      ['Release', 0.5],
+      ['Silicon-proven scope and release', 0.5],
     ],
     entry: [
       'Customer package types captured in UCON-01',
@@ -185,11 +185,11 @@ export const UREQ_WRITE_UPS: UcieWriteUps = {
     exit: [
       'Supported package technologies listed with the customers that use each',
       'Bump pitch range agreed and inside the specification’s Advanced range',
-      'Required reach per package type recorded',
+      'Required reach per package type recorded, and each type marked silicon-proven at GA or supported by simulation only',
     ],
     dependsOn: ['UREQ-01', 'UCON-01'],
     dependsNote: null,
-    feedsInto: ['UREQ-09', 'UARC-09', 'UTEC-03', 'UCHN-01'],
+    feedsInto: ['UREQ-09', 'UARC-09', 'UTEC-03', 'UCHN-01', 'UTVP-01'],
     measuredBy: [
       'Customer designs covered by the supported matrix',
       'Pitches confirmed by a package partner',
@@ -197,7 +197,7 @@ export const UREQ_WRITE_UPS: UcieWriteUps = {
     ],
     links: {
       dependsOn: ['UREQ-01', 'UCON-01'],
-      feedsInto: ['UREQ-09', 'UARC-09', 'UTEC-03', 'UCHN-01'],
+      feedsInto: ['UREQ-09', 'UARC-09', 'UTEC-03', 'UCHN-01', 'UTVP-01'],
       runsWith: ['UREQ-02'],
       revisedBy: [],
       feedsBackInto: [],
@@ -207,7 +207,7 @@ export const UREQ_WRITE_UPS: UcieWriteUps = {
   'UREQ-04': {
     criticalPath: false,
     purpose: [
-      'Capture the <b>customer integration constraints</b> a hard macro must live with: metal stacks and the layers it may use, macro orientation and die-edge placement, module stacking, power domains and supplies, and the test access the customer’s test flow expects.',
+      'Capture the <b>customer integration constraints</b> a hard macro must live with: metal stacks and the layers it may use, macro orientation and die-edge placement, how many modules sit side by side on a die edge, power domains and supplies, and the test access the customer’s test flow expects.',
       'A PHY that is excellent in isolation but uses a metal layer a customer has reserved, or expects a supply the SoC does not have, is redesigned at integration. Collecting these constraints across customers now is what lets the macro be built once.',
     ],
     flowNote:
@@ -251,7 +251,7 @@ export const UREQ_WRITE_UPS: UcieWriteUps = {
     ],
     exit: [
       'Metal stacks of at least the top three customers captured with allowed layers',
-      'Required orientations and module stacking listed',
+      'Required orientations and modules per die edge listed',
       'Supplies, power domains and test access expectations recorded per customer',
     ],
     dependsOn: ['UREQ-01', 'UCON-01'],
@@ -295,7 +295,7 @@ export const UREQ_WRITE_UPS: UcieWriteUps = {
       '<b>Retry latency ignored.</b> Retry buffer depth is set by bandwidth alone and the protocol sees latency spikes.',
       '<b>Repair coverage partial.</b> Clock, valid and track lanes are not repairable and one bump kills a module.',
       '<b>Bump yield optimistic.</b> Coverage is based on a bump yield the package partner has not demonstrated.',
-      '<b>Raw mode left out.</b> Targets assume CRC and retry, and Raw mode customers have no stated error behavior.',
+      '<b>Raw format left out.</b> Targets assume CRC and retry, and customers on the Raw format have no stated error behavior.',
     ],
     roles: [
       { r: 'IP architecture', d: 'Owns the link reliability targets' },
@@ -317,7 +317,7 @@ export const UREQ_WRITE_UPS: UcieWriteUps = {
     ],
     exit: [
       'Raw BER target stated as the specification’s requirement for 64 GT/s with a measurement or extrapolation method',
-      'Retry latency budget stated at the FDI for each mode',
+      'Retry latency budget stated at the FDI for each Flit format',
       'Repairable lanes and tolerated failed bumps per module stated',
     ],
     dependsOn: ['UREQ-01'],
@@ -406,7 +406,7 @@ export const UREQ_WRITE_UPS: UcieWriteUps = {
   'UREQ-07': {
     criticalPath: false,
     purpose: [
-      'Plan <b>compliance and interoperability</b>: which compliance tests the target revision defines for the electrical and logical layers, which other UCIe dies or test platforms the IP must link with, and whether the equipment and program to test at 64 GT/s will exist when silicon does.',
+      'Plan <b>compliance and interoperability</b>: which compliance tests the target revision defines for the electrical and logical layers, which partner die the IP must link with — one that sits on the same bridge or interposer with a mated bump map, secured early through UTEC-07 — and whether the equipment and program to test at 64 GT/s will exist when silicon does.',
       'Customers increasingly ask for compliance results and a proven partner list before they license. Planning them at requirements time lets the test chip carry the access compliance needs and lets the program book partners and equipment early.',
     ],
     flowNote:
@@ -424,7 +424,7 @@ export const UREQ_WRITE_UPS: UcieWriteUps = {
     },
     risks: [
       '<b>No program at 64 GT/s.</b> Compliance testing at the new speed is planned against equipment that does not yet exist.',
-      '<b>No partner die.</b> Interoperability targets name partners without an agreement to exchange silicon.',
+      '<b>No partner die.</b> Interoperability targets name partners without an agreement to exchange silicon early enough to mate bump maps on a shared test vehicle.',
       '<b>Test access missing.</b> The test chip lacks the access compliance tests need.',
       '<b>Logical tests ignored.</b> Only electrical compliance is planned and training compliance is not.',
       '<b>Customer expectation unknown.</b> Which results customers require before licensing is not asked.',
@@ -454,7 +454,7 @@ export const UREQ_WRITE_UPS: UcieWriteUps = {
     ],
     dependsOn: ['UREQ-01'],
     dependsNote: null,
-    feedsInto: ['UREQ-09', 'UARC-10', 'UCMP-01'],
+    feedsInto: ['UREQ-09', 'UARC-10', 'UTEC-07', 'UCMP-01'],
     measuredBy: [
       'Compliance tests with a planned setup',
       'Interoperability partners committed',
@@ -462,7 +462,7 @@ export const UREQ_WRITE_UPS: UcieWriteUps = {
     ],
     links: {
       dependsOn: ['UREQ-01'],
-      feedsInto: ['UREQ-09', 'UARC-10', 'UCMP-01'],
+      feedsInto: ['UREQ-09', 'UARC-10', 'UTEC-07', 'UCMP-01'],
       runsWith: [],
       revisedBy: [],
       feedsBackInto: [],
@@ -472,11 +472,11 @@ export const UREQ_WRITE_UPS: UcieWriteUps = {
   'UREQ-08': {
     criticalPath: true,
     purpose: [
-      'Set the <b>Electrical PHY requirements</b>: supply voltages, tolerances and noise limits for the transmit, receive and clocking circuits, the reference clock and jitter allowed at the PHY, ESD and latch-up targets for fine-pitch bumps, and the temperature and voltage range signoff must cover.',
+      'Set the <b>Electrical PHY requirements</b>: supply voltages, tolerances and noise limits for the transmit, receive and clocking circuits; PLL ownership — a PLL inside the macro generates the high-speed clock — and the reference clock jitter specification; receiver termination per package type and reach, optional receiver equalization and transmit swing; voltage compatibility with another vendor’s die; ESD and latch-up targets for fine-pitch bumps; and the temperature and voltage range signoff must cover.',
       'At 64 GT/s the analog front-end has little margin to give: supply noise becomes timing jitter, and fine-pitch bumps leave less room for ESD protection that does not load the lanes. These limits bound every AFE design choice and every signoff corner.',
     ],
     flowNote:
-      'Step 1 sets supply and noise limits. Step 2 sets clocking inputs while step 3 sets ESD targets in parallel. Step 4 sets the operating range and step 5 releases the requirements.',
+      'Step 1 sets supply and noise limits. Step 2 decides PLL ownership and the reference clock while step 3 decides termination and receiver equalization in parallel. Step 4 sets voltage compatibility while step 5 sets ESD targets, step 6 sets the operating range and step 7 releases the requirements.',
     consumes: [
       'Feature selection matrix from UREQ-01',
       'PPA targets from UREQ-02',
@@ -492,7 +492,7 @@ export const UREQ_WRITE_UPS: UcieWriteUps = {
       '<b>Supply noise underestimated.</b> Noise limits are copied from a lower-speed PHY and timing closes on paper only.',
       '<b>ESD over-protected.</b> ESD targets are set for standard I/O and the protection capacitance closes the eye.',
       '<b>Reference clock assumed clean.</b> Jitter allowed at the PHY input is not agreed with customers.',
-      '<b>Corners missing.</b> Low-voltage, high-temperature corners customers run are left out of signoff.',
+      '<b>Voltage compatibility unchecked.</b> Another vendor’s transmitter swing exceeds what this receiver’s supply tolerates and interoperability damages a die.',
       '<b>Assembly ESD ignored.</b> Handling during advanced-package assembly is not considered.',
     ],
     roles: [
@@ -504,9 +504,9 @@ export const UREQ_WRITE_UPS: UcieWriteUps = {
     ],
     effort: [
       ['Supplies and noise', 0.5],
-      ['Clocking inputs', 0.5],
-      ['ESD targets', 0.5],
-      ['Operating range and release', 0.5],
+      ['PLL and reference clock', 0.5],
+      ['Termination and voltage compatibility', 0.5],
+      ['ESD targets, operating range and release', 0.5],
     ],
     entry: [
       'Speeds decided in UREQ-01',
@@ -515,8 +515,8 @@ export const UREQ_WRITE_UPS: UcieWriteUps = {
     ],
     exit: [
       'Supply voltage, tolerance and noise limit stated per circuit domain',
-      'Reference clock frequency and allowed jitter agreed',
-      'ESD targets and signoff corners listed',
+      'PLL ownership decided, and reference clock frequency and jitter specification agreed',
+      'Termination, receiver equalization, voltage compatibility rules, ESD targets and signoff corners listed',
     ],
     dependsOn: ['UREQ-01', 'UREQ-02'],
     dependsNote: null,
@@ -533,7 +533,7 @@ export const UREQ_WRITE_UPS: UcieWriteUps = {
       revisedBy: [],
       feedsBackInto: [],
     },
-    terms: ['AFE', 'ESD', 'Latch-up', 'PVT', 'Forwarded clock'],
+    terms: ['AFE', 'ESD', 'Latch-up', 'PVT', 'Forwarded clock', 'PLL', 'Termination'],
   },
   'UREQ-09': {
     criticalPath: true,

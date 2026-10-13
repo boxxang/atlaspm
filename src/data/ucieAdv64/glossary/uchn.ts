@@ -7,7 +7,7 @@ export const UCHN_GLOSSARY: UcieGlossary = {
   'Insertion loss': {
     full: 'Insertion loss',
     group: 'pkg',
-    note: 'How much of a signal’s amplitude the channel loses between transmitter and receiver, rising with frequency and length — the first limit on reach at 64 GT/s.',
+    note: 'How much of a signal’s amplitude the channel loses between transmitter and receiver, rising with frequency and length. Short die-to-die channels are specified by voltage transfer function and crosstalk against an eye mask; insertion loss is one input to that, not the limit by itself.',
   },
   Crosstalk: {
     full: 'Crosstalk',

@@ -19,7 +19,7 @@ export const UCON: UcieStageModule = {
     ],
     deliverableFrom: [0, 1, 2, 3, 4, 5],
     deliverableWeek: [4, 4, 6, 6, 7, 8],
-    engineeringEffort: [3, 1.5, 1.5, 1, 1.5, 0.5],
+    engineeringEffort: [3.5, 2, 2, 1.5, 2, 1],
     risks: [
       'Customer demand captured as interest in "UCIe" rather than as a package type, process and bandwidth a customer will commit a design to',
       'Business case assumes design wins on processes the program cannot port to in time',

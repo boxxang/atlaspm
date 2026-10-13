@@ -7,16 +7,16 @@ export const UAMS_WRITE_UPS: UcieWriteUps = {
   'UAMS-01': {
     criticalPath: false,
     purpose: [
-      'Build the <b>behavioral models</b> of the Electrical PHY — TX driver, RX front-end and sampler, clocking — from the circuits, with the calibration and training controls modeled exactly as the analog control register specification defines them, and write the validation plan that says how accurate each model must be and how that is checked.',
+      'Build the <b>behavioral models</b> of the Electrical PHY — TX driver, RX front-end and sampler, PLL and clocking, and the on-die temperature and voltage sensors — from the circuits, with the calibration and training controls modeled exactly as the analog control register specification defines them, and write the validation plan that says how accurate each model must be and how that is checked.',
       'Every later result in this stage runs on these models, and nothing runs at transistor level for a full training sequence. A model that is fast but wrong at the corner makes the whole margin report optimistic, so the accuracy target and the validation plan are written before the models are trusted.',
     ],
     flowNote:
-      'Step 1 sets the model set and accuracy. Step 2 builds the TX, RX and clocking models while step 3 models the controls in parallel. Step 4 writes the validation plan and step 5 releases.',
+      'Step 1 sets the model set and accuracy. Step 2 builds the TX, RX, PLL, clocking and sensor models while step 3 models the controls in parallel. Step 4 writes the validation plan and step 5 releases.',
     consumes: [
       'TX driver schematic database from UAFE-02',
       'RX front-end and sampler database from UAFE-03',
-      'Clocking database from UAFE-04',
-      'Analog calibration and training control register specification from UAFE-07',
+      'Clocking and PLL databases from UAFE-04 and UAFE-10',
+      'Analog control register specification and sensor thresholds from UAFE-07 and UAFE-12',
       'Mixed-signal modeling and simulation flow from UFND-04',
     ],
     rel: {
@@ -53,7 +53,7 @@ export const UAMS_WRITE_UPS: UcieWriteUps = {
       'Accuracy target per metric and corner written into the validation plan',
       'Model set released to co-simulation and link margin',
     ],
-    dependsOn: ['UAFE-02', 'UAFE-03', 'UAFE-04', 'UAFE-07'],
+    dependsOn: ['UAFE-02', 'UAFE-03', 'UAFE-04', 'UAFE-07', 'UAFE-10', 'UAFE-12'],
     dependsNote: null,
     feedsInto: ['UAMS-02', 'UAMS-03', 'UAMS-04', 'UAMS-06'],
     measuredBy: [
@@ -62,7 +62,7 @@ export const UAMS_WRITE_UPS: UcieWriteUps = {
       'Metrics with a stated tolerance',
     ],
     links: {
-      dependsOn: ['UAFE-02', 'UAFE-03', 'UAFE-04', 'UAFE-07', 'UFND-04'],
+      dependsOn: ['UAFE-02', 'UAFE-03', 'UAFE-04', 'UAFE-07', 'UFND-04', 'UAFE-10', 'UAFE-12'],
       feedsInto: ['UAMS-02', 'UAMS-03', 'UAMS-04', 'UAMS-05', 'UAMS-06', 'UPRE-02'],
       runsWith: [],
       revisedBy: ['UAMS-06'],
@@ -140,15 +140,15 @@ export const UAMS_WRITE_UPS: UcieWriteUps = {
   'UAMS-03': {
     criticalPath: true,
     purpose: [
-      'Run <b>link training with analog models in the loop</b>: sideband and mainband initialization, mainband training with voltage and timing centering per lane, speed and width fallback, runtime recalibration under temperature and voltage drift, and retrain and training-error entry and exit.',
+      'Run <b>link training with analog models in the loop</b>: sideband and mainband initialization, mainband training with voltage and timing centering per lane, lane repair onto redundant lanes and speed fallback — with the move to training error when repair runs out, since an Advanced package does not degrade width — runtime recalibration triggered by the modeled temperature and voltage sensors under drift, and retrain and training-error entry and exit.',
       'Training that converges against ideal switches can stall against real ones — a phase step that overshoots, an offset code that settles late, a lane that never opens. Running SBINIT through PHYRETRAIN on the analog models is the only pre-silicon evidence that the training algorithm fits the circuits it tunes.',
     ],
     flowNote:
-      'Step 1 runs initialization and step 2 runs mainband training per lane, with speed and width fallback run alongside in step 3. Step 4 runs runtime recalibration under drift, step 5 retrain and training error, and step 6 releases the report.',
+      'Step 1 runs initialization and step 2 runs mainband training per lane, with lane repair and speed fallback run alongside in step 3. Step 4 runs sensor-triggered runtime recalibration under drift, step 5 retrain and training error, and step 6 releases the report.',
     consumes: [
       'Behavioral model set from UAMS-01',
       'Link training state machine RTL from URTL-05',
-      'Analog calibration and training control specification from UAFE-07',
+      'Analog control specification and sensor trigger thresholds from UAFE-07 and UAFE-12',
       'Co-simulation bench and regression from UAMS-02',
       'Training and recalibration architecture from UARC-03',
     ],
@@ -159,7 +159,7 @@ export const UAMS_WRITE_UPS: UcieWriteUps = {
     risks: [
       '<b>Shortened sequences.</b> Training runs are cut short to save time and late-converging lanes are missed.',
       '<b>No drift.</b> Recalibration is simulated at constant temperature and never shows it tracks.',
-      '<b>Fallback unexercised.</b> Speed and width fallback paths are not triggered by real failing lanes.',
+      '<b>Repair unexercised.</b> Lane repair and speed fallback are not triggered by real failing lanes, and the move to training error beyond repair is never seen.',
       '<b>Error exit untested.</b> TRAINERROR is entered but the exit back to SBINIT is never run.',
       '<b>Corner blind.</b> Training is run at the typical corner only.',
     ],
@@ -173,7 +173,7 @@ export const UAMS_WRITE_UPS: UcieWriteUps = {
     effort: [
       ['Initialization scenarios', 1.4],
       ['Mainband training per lane', 2.9],
-      ['Speed and width fallback', 1.4],
+      ['Lane repair and speed fallback', 1.4],
       ['Runtime recalibration under drift', 1.4],
       ['Retrain, training error and report', 1.4],
     ],
@@ -184,10 +184,10 @@ export const UAMS_WRITE_UPS: UcieWriteUps = {
     ],
     exit: [
       'Training converges on every lane at every simulated corner within the training time budget',
-      'Runtime recalibration holds margin across the simulated temperature and voltage drift',
-      'Fallback, retrain and training-error paths each exercised and passing',
+      'Runtime recalibration fires on the modeled sensor thresholds and holds margin across the simulated temperature and voltage drift',
+      'Lane repair, speed fallback, retrain and training-error paths each exercised and passing',
     ],
-    dependsOn: ['UAMS-01', 'URTL-05', 'UAFE-07', 'UAMS-02'],
+    dependsOn: ['UAMS-01', 'URTL-05', 'UAFE-07', 'UAMS-02', 'UAFE-12'],
     dependsNote: null,
     feedsInto: ['UAMS-07', 'UAMS-08'],
     measuredBy: [
@@ -196,7 +196,7 @@ export const UAMS_WRITE_UPS: UcieWriteUps = {
       'Training paths exercised against paths specified',
     ],
     links: {
-      dependsOn: ['UAMS-01', 'URTL-05', 'UAFE-07', 'UAMS-02', 'UARC-03'],
+      dependsOn: ['UAMS-01', 'URTL-05', 'UAFE-07', 'UAMS-02', 'UARC-03', 'UAFE-12'],
       feedsInto: ['UAMS-07', 'UAMS-08', 'UTVP-06'],
       runsWith: ['UDV-03'],
       revisedBy: [],
@@ -207,7 +207,7 @@ export const UAMS_WRITE_UPS: UcieWriteUps = {
   'UAMS-04': {
     criticalPath: true,
     purpose: [
-      'Compute <b>link margin with package channel models</b>: extracted channels for each supported package type at both ends of the bump pitch range, a per-lane link model of TX, channel, RX and clock path, timing and voltage margin at 64 GT/s with crosstalk and supply noise, and the worst lanes and their aggressors fed back to bump map and routing.',
+      'Compute <b>link margin with package channel models</b>: extracted channels for each supported package type at both ends of the bump pitch range, a per-lane link model of TX, channel, RX and clock path, timing and voltage margin at 64 GT/s with crosstalk and supply noise — with and without receiver termination where the package type and reach leave the choice open — and the worst lanes and their aggressors fed back to bump map and routing.',
       'A fine-pitch advanced package puts the lanes of a module millimeters apart at most, and crosstalk between them is as large a term as loss. The margin that matters is the worst lane in the worst package, and finding which lane that is gives bump map and routing something concrete to fix while they still can.',
     ],
     flowNote:
@@ -473,7 +473,7 @@ export const UAMS_WRITE_UPS: UcieWriteUps = {
   'UAMS-08': {
     criticalPath: true,
     purpose: [
-      'Hold the <b>link margin review</b>: collect the co-simulation, training, link margin, statistical and correlation reports, review worst-case and statistical margin against target per package type, record the design changes required and the margin carried into layout, and decide.',
+      'Hold the <b>link margin review</b>: collect the co-simulation, training, link margin, statistical and correlation reports, review eye height and width at the target BER and the Monte Carlo yield against the agreed pass thresholds per package type, record the design changes required and the margin carried into layout, and decide pass or fail per package type.',
       'This review is the last point where a margin shortfall is fixed in the design rather than in a customer guideline. The decision is per package type: a design can pass on a silicon interposer and need a channel restriction on an RDL interposer, and the review says so explicitly.',
     ],
     flowNote:
@@ -513,7 +513,7 @@ export const UAMS_WRITE_UPS: UcieWriteUps = {
       'Layout still able to take changes',
     ],
     exit: [
-      'Margin decision recorded per supported package type',
+      'Eye height and width at the target BER and Monte Carlo yield meet the agreed thresholds for every supported package type, or the shortfall is recorded with the restriction it imposes',
       'Required design changes owned and dated in layout',
       'No open co-simulation failure without a disposition',
     ],

@@ -7,7 +7,7 @@ export const UDV: UcieStageModule = {
   content: {
     tagline: 'Prove the Adapter and Logical PHY against the specification before a customer integrates a single line of it.',
     description:
-      'Verify the digital half of the PHY — the D2D Adapter, the Logical PHY, the sideband controller and the register map — in a UVM environment built around qualified UCIe verification IP. Link training is exercised through every state from SBINIT to ACTIVE and back through PHYRETRAIN, L1, L2 and TRAINERROR; CRC and retry are hammered with injected errors; lane repair, lane reversal and deskew are driven with the bump faults and skews an advanced package actually produces; Raw, Streaming and Flit modes and the FDI and RDI boundaries are checked against the protocols customers will put on top. Gate-level simulation and DFT patterns close the loop with the netlist, coverage closes against a plan written from the requirements, and the stage hands its scenarios to bring-up as a post-silicon test plan. It closes on a verification sign-off the v0.9 release and the test chip can rely on.',
+      'Verify the digital half of the PHY — the D2D Adapter, the Logical PHY, the sideband controller and the register map — in a UVM environment built around qualified UCIe verification IP. Link training is exercised through every state from SBINIT to ACTIVE and back through PHYRETRAIN, L1, L2 and TRAINERROR; CRC and retry are hammered with injected errors; lane repair, lane reversal and deskew are driven with the bump faults and skews an advanced package actually produces, with faults beyond the repair capacity ending in TRAINERROR because an Advanced package has no width degrade; the Flit formats and the Raw format, the protocols negotiated over them, multi-module striping and the FDI and RDI boundaries are checked against the traffic customers will put on top, and the compliance control registers a reference-die test drives are verified with the compliance scenarios. Functional gate-level simulation and DFT patterns close the loop with the netlist (timing-annotated runs follow in signoff), coverage closes against a plan written from the requirements, and the stage hands its scenarios to bring-up as a post-silicon test plan. It closes on a verification sign-off judged against stated criteria — agreed coverage reached, no open high-priority bug, compliance scenarios passing and the post-freeze ECO log closed — that the v0.9 release and the test chip can rely on.',
     activities: [
       'Plan and coverage model',
       'UVM environment and VIP',
@@ -15,7 +15,7 @@ export const UDV: UcieStageModule = {
       'Errors, CRC and retry',
       'Lane repair, reversal, deskew',
       'Low-power entry and exit',
-      'Raw, Streaming and Flit modes',
+      'Flit formats, Raw, protocols, modules',
       'Sideband and registers',
       'Compliance scenarios',
       'Gate-level and DFT patterns',
@@ -29,7 +29,7 @@ export const UDV: UcieStageModule = {
       'Error injection, CRC and retry verification report',
       'Lane repair, lane reversal and deskew verification report',
       'Low-power state entry and exit verification report',
-      'Raw, Streaming and Flit mode verification report',
+      'Flit format, Raw format, protocol negotiation and multi-module verification report',
       'Sideband, register map and manageability verification report',
       'Compliance scenario regression results',
       'Gate-level simulation and DFT pattern verification report',
@@ -49,7 +49,7 @@ export const UDV: UcieStageModule = {
       'Verification IP release lagging the specification revision the IP targets, leaving 64 GT/s features without a reference model',
       'Regression wall-clock time growing faster than compute, so late RTL fixes ship with partial reruns',
       'Gate-level simulation started after the netlist is frozen, so timing-related reset and clock-domain bugs surface at signoff',
-      'Raw mode verified with one stimulus profile while customers stream protocols with different backpressure behavior',
+      'The Raw format verified with one stimulus profile while customers stream protocols with different backpressure behavior',
       'Post-silicon test plan written after tapeout, so the test chip lacks the observability the plan assumes',
       'Register map changes not propagated to the testbench model, hiding mismatches until firmware runs on silicon',
     ],
@@ -114,7 +114,7 @@ export const UDV: UcieStageModule = {
         [2, 'Exercise PHYRETRAIN entries from every cause, and TRAINERROR entry and recovery', 4],
         [3, 'Run constrained-random training with partner timing, parameter and speed variations', 6],
         [4, 'Add formal properties on the training state machine — reachability, no deadlock and legal transitions', 4, 1],
-        [5, 'Verify speed and width degradation paths when training at 64 GT/s fails', 3],
+        [5, 'Verify speed degrade when training at 64 GT/s fails, and TRAINERROR when faults exceed what repair can fix', 3],
         [6, 'Debug, close and report the training coverage', 4],
       ],
       o: [
@@ -122,7 +122,7 @@ export const UDV: UcieStageModule = {
         'Retrain and training-error tests from every cause',
         'Constrained-random training regression',
         'Formal proofs on the training state machine',
-        'Speed and width fallback tests',
+        'Speed fallback and training-error tests',
         'Link training and state machine verification report',
       ],
       r: [['UDV-D3', 'produces'], ['UDV-D11', 'feeds']],
@@ -150,7 +150,7 @@ export const UDV: UcieStageModule = {
         [2, 'Verify lane repair onto the redundant lanes for every single-fault and supported multi-fault case', 5],
         [3, 'Verify lane reversal detection and remapping with and without faults present', 3],
         [4, 'Verify deskew across the skew range the channel specification allows', 4, 1],
-        [5, 'Verify width degradation when faults exceed the repair capacity', 3],
+        [5, 'Verify that faults beyond the repair capacity end in TRAINERROR with the faults logged, since an Advanced package has no width degrade', 3],
         [6, 'Close coverage and report', 3],
       ],
       o: [
@@ -158,7 +158,7 @@ export const UDV: UcieStageModule = {
         'Lane repair results per fault pattern',
         'Lane reversal results with fault combinations',
         'Deskew verification across the allowed skew range',
-        'Width degradation verification',
+        'Beyond-repair fault handling verification',
         'Lane repair, lane reversal and deskew verification report',
       ],
       r: [['UDV-D5', 'produces'], ['UDV-D11', 'feeds']],
@@ -183,17 +183,19 @@ export const UDV: UcieStageModule = {
     'UDV-07': {
       s: [
         [1, 'Verify Flit formats and Flit packing through the Adapter for each supported protocol mapping', 5],
-        [2, 'Verify Raw mode pass-through, including continuous transmission without idle insertion', 4],
-        [3, 'Verify Streaming mode with user-defined protocol stimulus and backpressure profiles', 4],
-        [4, 'Verify the FDI and RDI handshakes and the arbitration and multiplexing between protocol stacks', 4],
-        [5, 'Close mode coverage and report', 2],
+        [2, 'Verify Raw format pass-through, including continuous transmission without idle insertion', 4],
+        [3, 'Verify protocol negotiation — the standard protocols and a streaming protocol over the Raw format or a Flit format, under backpressure', 3],
+        [4, 'Verify multi-module striping, ordering and alignment, including one module retraining under traffic', 4, 1],
+        [5, 'Verify the FDI and RDI handshakes and the arbitration and multiplexing between protocol stacks', 4],
+        [6, 'Close format, protocol and module coverage and report', 2],
       ],
       o: [
         'Flit format and packing results per mapping',
-        'Raw mode and continuous transmission results',
-        'Streaming mode results under backpressure',
+        'Raw format and continuous transmission results',
+        'Protocol negotiation results under backpressure',
+        'Multi-module striping and alignment results',
         'FDI, RDI and arbitration verification results',
-        'Raw, Streaming and Flit mode verification report',
+        'Flit format, Raw format, protocol negotiation and multi-module verification report',
       ],
       r: [['UDV-D7', 'produces'], ['UDV-D11', 'feeds']],
     },
@@ -218,12 +220,14 @@ export const UDV: UcieStageModule = {
       s: [
         [1, 'Map the compliance and interoperability targets to simulation scenarios', 2],
         [2, 'Build the compliance scenario suite on the verification IP’s compliance sequences', 4],
-        [3, 'Run the suite on every RTL release and triage failures with the architecture team', 5],
-        [4, 'Release compliance regression results and the open-issue list', 2],
+        [3, 'Verify the compliance control registers and injection hooks — test and NOP Flit injection, link-state request injection and retry injection — as a reference die would drive them', 3, 1],
+        [4, 'Run the suite on every RTL release and triage failures with the architecture team', 5],
+        [5, 'Release compliance regression results and the open-issue list', 2],
       ],
       o: [
         'Compliance target-to-scenario map',
         'Compliance scenario suite',
+        'Compliance register and injection hook results',
         'Compliance regression results per RTL release',
         'Compliance scenario regression results',
       ],
@@ -232,14 +236,14 @@ export const UDV: UcieStageModule = {
     'UDV-10': {
       s: [
         [1, 'Bring up gate-level simulation on the synthesized netlist with zero delay and reset sequences', 2],
-        [2, 'Run timing-annotated gate-level simulation on training, retry and low-power tests', 3],
+        [2, 'Run functional gate-level simulation of training, retry and low-power tests on the netlist; timing-annotated runs follow on the signoff netlist', 3],
         [3, 'Simulate scan, PRBS, BIST and loopback patterns on the netlist', 3, 1],
         [4, 'Check X-propagation and reset behavior at the analog boundary', 2],
         [5, 'Release the gate-level and DFT pattern verification report', 1],
       ],
       o: [
         'Zero-delay gate-level simulation on the netlist',
-        'Timing-annotated gate-level results',
+        'Functional gate-level results',
         'DFT pattern simulation results',
         'Reset and X-propagation checks at the analog boundary',
         'Gate-level simulation and DFT pattern verification report',
@@ -266,7 +270,7 @@ export const UDV: UcieStageModule = {
     'UDV-12': {
       s: [
         [1, 'Collect the verification reports, coverage closure and open bug list', 1],
-        [2, 'Review residual risk per feature with architecture, RTL and DFT', 1.5],
+        [2, 'Judge sign-off against the criteria — agreed functional and code coverage, no open high-priority bug, compliance scenarios passing, post-freeze ECO log closed — and the residual risk per feature', 1.5],
         [3, 'Hold the verification sign-off review and record the decision', 1],
       ],
       o: [

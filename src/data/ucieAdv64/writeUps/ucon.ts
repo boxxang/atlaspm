@@ -38,10 +38,10 @@ export const UCON_WRITE_UPS: UcieWriteUps = {
       { r: 'Program manager', d: 'Keeps the brief under change control after release' },
     ],
     effort: [
-      ['Customer and design identification', 0.4],
-      ['Customer interviews', 1.4],
-      ['Process, package and schedule mapping', 0.8],
-      ['Ranking and release', 0.4],
+      ['Customer and design identification', 0.5],
+      ['Customer interviews', 1.6],
+      ['Process, package and schedule mapping', 0.9],
+      ['Ranking and release', 0.5],
     ],
     entry: [
       'Executive sponsor has asked for a die-to-die PHY assessment',
@@ -104,9 +104,9 @@ export const UCON_WRITE_UPS: UcieWriteUps = {
       { r: 'Business analyst', d: 'Tracks competitor silicon and licensing status' },
     ],
     effort: [
-      ['Data collection', 0.5],
-      ['Metric normalization and comparison', 0.5],
-      ['Differentiation decision and release', 0.5],
+      ['Data collection', 0.6],
+      ['Metric normalization and comparison', 0.7],
+      ['Differentiation decision and release', 0.7],
     ],
     entry: [
       'Customer needs list available in draft from UCON-01',
@@ -169,11 +169,11 @@ export const UCON_WRITE_UPS: UcieWriteUps = {
       { r: 'Legal and licensing counsel', d: 'License and royalty terms' },
     ],
     effort: [
-      ['Market sizing', 0.2],
-      ['Cost model', 0.7],
-      ['Licensing model', 0.2],
-      ['Pricing and case', 0.2],
-      ['Release', 0.2],
+      ['Market sizing', 0.3],
+      ['Cost model', 0.8],
+      ['Licensing model', 0.3],
+      ['Pricing and case', 0.3],
+      ['Release', 0.3],
     ],
     entry: [
       'Customer opportunities ranked in UCON-01',
@@ -236,10 +236,10 @@ export const UCON_WRITE_UPS: UcieWriteUps = {
       { r: 'Program manager', d: 'Derivative effort assumptions' },
     ],
     effort: [
-      ['Roadmap placement', 0.4],
-      ['Port planning', 0.2],
-      ['Reuse split', 0.2],
-      ['Release', 0.2],
+      ['Roadmap placement', 0.6],
+      ['Port planning', 0.3],
+      ['Reuse split', 0.3],
+      ['Release', 0.3],
     ],
     entry: [
       'Customer process and package map drafted',
@@ -302,11 +302,11 @@ export const UCON_WRITE_UPS: UcieWriteUps = {
       { r: 'Product manager', d: 'Customer release date expectations' },
     ],
     effort: [
-      ['Schedule', 0.7],
-      ['Staffing plan', 0.2],
-      ['Hardware budget', 0.2],
-      ['Partners', 0.2],
-      ['Release', 0.2],
+      ['Schedule', 0.8],
+      ['Staffing plan', 0.3],
+      ['Hardware budget', 0.3],
+      ['Partners', 0.3],
+      ['Release', 0.3],
     ],
     entry: [
       'Business case drafted in UCON-03',
@@ -368,9 +368,9 @@ export const UCON_WRITE_UPS: UcieWriteUps = {
       { r: 'Finance partner', d: 'Confirms the investment' },
     ],
     effort: [
-      ['Risk assessment', 0.1],
-      ['Decision package', 0.1],
-      ['Review and record', 0.3],
+      ['Risk assessment', 0.2],
+      ['Decision package', 0.2],
+      ['Review and record', 0.6],
     ],
     entry: [
       'All five concept deliverables released',

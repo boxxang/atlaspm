@@ -407,16 +407,16 @@ export const USGN_WRITE_UPS: UcieWriteUps = {
     criticalPath: true,
     purpose: [
       'Hold the <b>hard macro signoff review</b>: collect every signoff report and the integration check, review open waivers and residual risks with design, layout, reliability and customer engineering, and authorize the macro for test chip signoff, tapeout and the v0.9 release.',
-      'This is the gate three other workstreams wait on, and it is the last moment a known issue can be fixed before both a mask set and a customer release depend on it. The decision records the conditions each consumer inherits, so the test chip and the release cannot quietly carry different versions of the same macro.',
+      'This is the gate three other workstreams wait on, and it is the last moment a known issue can be fixed before both a mask set and a customer release depend on it. It closes two weeks before the test chip database is released, and it does not close on physical signoff alone: the verification sign-off, the link margin review, the post-layout margin and the channel specification compliance are all inputs, so a macro that is clean but marginal does not reach the mask shop.',
     ],
     flowNote:
       'Step 1 collects the reports against the checklist. Step 2 reviews waivers and risks, step 3 records the decision and its conditions, and step 4 authorizes the macro to its consumers.',
     consumes: [
       'Static timing signoff report from USGN-01',
-      'EM and IR drop signoff report from USGN-02',
-      'Physical verification report from USGN-03',
+      'EM and IR drop and physical verification reports from USGN-02 and USGN-03',
       'ESD, latch-up and aging reports from USGN-04 and USGN-05',
-      'Integration check report from USGN-06',
+      'Post-layout margin from ULAY-05 and channel specification compliance from UCHN-08',
+      'Integration check from USGN-06 and timing-annotated gate-level results from USGN-08',
     ],
     rel: {
       'USGN-D7': '<b>Hard macro signoff decision record and release authorization.</b> Produced here; it closes the Hard Macro Signoff gate.',
@@ -441,7 +441,7 @@ export const USGN_WRITE_UPS: UcieWriteUps = {
       ['Decision and authorization', 0.2],
     ],
     entry: [
-      'Every signoff report in USGN-01 to USGN-06 released or in final run',
+      'Every signoff report in USGN-01 to USGN-06 and USGN-08 released or in final run',
       'Waiver list complete with owners',
       'Test chip and release consumers identified with their database needs',
     ],
@@ -450,8 +450,8 @@ export const USGN_WRITE_UPS: UcieWriteUps = {
       'One database revision named for the test chip, the tapeout and the v0.9 release',
       'Conditions carried into the tapeout checklist and the release notes',
     ],
-    dependsOn: ['USGN-01', 'USGN-02', 'USGN-03', 'USGN-04', 'USGN-05', 'USGN-06', 'UDV-12', 'UAMS-08'],
-    dependsNote: null,
+    dependsOn: ['USGN-01', 'USGN-02', 'USGN-03', 'USGN-04', 'USGN-05', 'USGN-06', 'USGN-08', 'UDV-12', 'UAMS-08', 'UCHN-08', 'ULAY-05'],
+    dependsNote: 'The review closes at week 72, two weeks before the test chip database release at week 74, so a condition it raises can still reach the database.',
     feedsInto: ['UTCI-05', 'UTPO-01', 'UTPO-04', 'UPRE-08'],
     measuredBy: [
       'Waivers open at the decision',
@@ -459,12 +459,79 @@ export const USGN_WRITE_UPS: UcieWriteUps = {
       'Database revisions in use downstream (target one)',
     ],
     links: {
-      dependsOn: ['USGN-01', 'USGN-02', 'USGN-03', 'USGN-04', 'USGN-05', 'USGN-06', 'ULAY-07', 'UDPD-07', 'UDV-12', 'UAMS-08'],
+      dependsOn: ['USGN-01', 'USGN-02', 'USGN-03', 'USGN-04', 'USGN-05', 'USGN-06', 'USGN-08', 'ULAY-07', 'ULAY-05', 'UDPD-07', 'UDV-12', 'UAMS-08', 'UCHN-08'],
       feedsInto: ['UTCI-05', 'UTCI-06', 'UTPO-01', 'UTPO-04', 'UPRE-04', 'UPRE-08'],
       runsWith: [],
       revisedBy: [],
       feedsBackInto: [],
     },
     terms: ['Signoff', 'Waiver', 'Hard macro', 'Release package'],
+  },
+  'USGN-08': {
+    criticalPath: false,
+    purpose: [
+      'Run <b>timing-annotated gate-level simulation on the signoff netlist</b> of the digital hard macro: link training, mainband traffic, retry, reset, low-power entry and exit, clock-domain crossings and the at-speed test patterns, with delays back-annotated from the final parasitics at the fast and slow corners.',
+      'Functional gate-level simulation runs on the netlist before timing closes; this run is the one that sees the real delays. It catches what static timing cannot — a wrong timing exception, an asynchronous path that only fails with real skew, a reset that releases in the wrong order — on the database the test chip and the v0.9 release will carry.',
+    ],
+    flowNote:
+      'Step 1 back-annotates the signoff netlist. Step 2 runs training, traffic and retry while step 3 runs reset, low-power and crossing scenarios beside it. Step 4 runs the at-speed patterns, step 5 triages every mismatch and step 6 releases the report.',
+    consumes: [
+      'Timing-closed digital database and final parasitics from UDPD-05',
+      'Hardened digital macro netlist from UDPD-06',
+      'Functional gate-level regression and its tests from UDV-10',
+      'Static timing exceptions and corner results from USGN-01',
+      'Post-freeze functional changes merged in UDPD-08',
+    ],
+    rel: {
+      'USGN-D8': '<b>Timing-annotated gate-level simulation report on the signoff netlist.</b> Produced here; the annotated netlist and its results go to licensees with the v0.9 release.',
+      'USGN-D7': '<b>Hard macro signoff decision record and release authorization.</b> A clean annotated run, or every mismatch closed, is a condition of signoff.',
+    },
+    risks: [
+      '<b>Annotated on a stale netlist.</b> The run uses a database one revision before the final engineering change and passes on code that will not ship.',
+      '<b>Only one corner.</b> The slow corner is annotated and the hold-time failures that only appear fast are never simulated.',
+      '<b>Exceptions taken on trust.</b> A false path declared in static timing hides a real path the simulation would have exercised.',
+      '<b>Too short to train.</b> Scenarios are cut to fit runtime and never reach the active state at 64 GT/s clocking.',
+      '<b>Mismatches waived in bulk.</b> Unknown-value propagation warnings are suppressed as a class rather than closed one by one.',
+    ],
+    roles: [
+      { r: 'Design verification', d: 'Owns the timing-annotated gate-level run' },
+      { r: 'Physical design engineer', d: 'Provides the annotated netlist and the delay files' },
+      { r: 'RTL design lead', d: 'Judges each mismatch against the design intent' },
+      { r: 'DFT engineer', d: 'Runs the at-speed patterns on the annotated netlist' },
+      { r: 'Signoff manager', d: 'Takes the result into the signoff review' },
+    ],
+    effort: [
+      ['Back-annotation setup', 0.3],
+      ['Training, traffic and retry scenarios', 0.7],
+      ['Reset, low-power and crossing scenarios', 0.4],
+      ['At-speed patterns', 0.3],
+      ['Triage and report', 0.3],
+    ],
+    entry: [
+      'Final parasitics and the hardened netlist available from UDPD-05 and UDPD-06',
+      'Functional gate-level regression passing in UDV-10',
+      'Static timing exceptions listed by USGN-01',
+    ],
+    exit: [
+      'Every annotated scenario run at the fast and slow corners with zero unexplained mismatches',
+      'Every timing exception exercised by at least one annotated scenario or justified in writing',
+      'Report generated on the same netlist revision named in the signoff decision',
+    ],
+    dependsOn: ['UDPD-05', 'UDPD-06', 'UDV-10', 'USGN-01'],
+    dependsNote: 'Runs beside static timing signoff and re-runs on the final delays once timing converges.',
+    feedsInto: ['USGN-07'],
+    measuredBy: [
+      'Annotated scenarios passing per corner',
+      'Mismatches open against the signoff date',
+      'Timing exceptions covered by an annotated scenario',
+    ],
+    links: {
+      dependsOn: ['UDPD-05', 'UDPD-06', 'UDPD-08', 'UDV-10', 'USGN-01'],
+      feedsInto: ['USGN-07', 'UPRE-04'],
+      runsWith: ['USGN-01'],
+      revisedBy: [],
+      feedsBackInto: [],
+    },
+    terms: ['GLS', 'SDF', 'STA', 'Signoff'],
   },
 };

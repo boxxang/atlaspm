@@ -7,7 +7,7 @@ export const UDPD: UcieStageModule = {
   content: {
     tagline: 'Harden the Adapter and Logical PHY into a macro that meets timing beside the analog front-end, at every corner a customer will run.',
     description:
-      'Turn the frozen Adapter and Logical PHY RTL into a digital hard macro that sits against the Electrical PHY at the die edge. Synthesis trials on pre-freeze RTL set the constraints and find the long paths early; after the RTL freeze, final synthesis inserts scan and releases the netlist to gate-level simulation. Floorplanning places the lane datapaths so each lines up with its bump column, with a power grid sized for the switching current of a 64-lane module; place and route and multi-corner, multi-mode timing closure then meet the clock frequencies the 64 GT/s datapath needs, including the timing arcs into and out of the analog front-end. The stage closes when the hardened macro, its abstract and its timing and power views are ready for hard macro signoff and for the test chip.',
+      'Turn the frozen Adapter and Logical PHY RTL into a digital hard macro that sits against the Electrical PHY at the die edge. Synthesis trials on pre-freeze RTL set the constraints and find the long paths early; after the RTL freeze, final synthesis inserts scan and releases the netlist to gate-level simulation, and every bug verification still finds after the freeze is fixed as a controlled functional ECO in both the RTL and the netlist, with equivalence re-proven. Floorplanning places the lane datapaths so each lines up with its bump column, with a power grid sized for the switching current of a 64-lane module; place and route and multi-corner, multi-mode timing closure then meet the clock frequencies the 64 GT/s datapath needs, including the timing arcs into and out of the analog front-end. The stage closes when the hardened macro, its abstract and its timing and power views are ready for hard macro signoff and for the test chip.',
     activities: [
       'Synthesis trials',
       'Final synthesis and netlist',
@@ -16,6 +16,7 @@ export const UDPD: UcieStageModule = {
       'Timing closure',
       'Macro hardening and views',
       'Timing closure review',
+      'Post-freeze functional ECO',
     ],
     deliverables: [
       'Synthesis trial results and timing constraint set',
@@ -25,10 +26,11 @@ export const UDPD: UcieStageModule = {
       'Multi-corner multi-mode timing closure report',
       'Digital hard macro database with abstract, timing and power views',
       'Digital timing closure review record',
+      'Functional ECO log with the ECO-updated netlist and equivalence results',
     ],
-    deliverableFrom: [0, 1, 2, 3, 4, 5, 6],
-    deliverableWeek: [6, 10, 12, 16, 18, 20, 20],
-    engineeringEffort: [3, 2, 3, 4, 4.5, 3, 0.5],
+    deliverableFrom: [0, 1, 2, 3, 4, 5, 6, 7],
+    deliverableWeek: [6, 10, 12, 16, 18, 20, 20, 18],
+    engineeringEffort: [3, 2, 3, 4, 4.5, 3, 0.5, 2.5],
     risks: [
       'Timing arcs at the boundary with the analog front-end left to the last iteration, so the macro closes internally and fails at assembly',
       'Lane datapaths placed without regard to the bump columns, adding routing skew the deskew range was never budgeted for',
@@ -36,7 +38,7 @@ export const UDPD: UcieStageModule = {
     potentialRisks: [
       'Constraints written before the clocking architecture settles, so closure targets the wrong generated clocks',
       'Power grid sized for average current rather than all 64 lanes toggling, leaving IR drop to be found at signoff',
-      'Late RTL fixes after the freeze forcing a re-synthesis that resets placement and timing work',
+      'Late RTL fixes after the freeze forcing a re-synthesis that resets placement and timing work instead of a scoped functional ECO',
       'Retry buffer memories placed far from the Adapter logic, turning a timing-easy block into the critical path',
       'Macro aspect ratio fixed before the bump map, so the hardened block does not fit the shoreline it was meant to',
     ],
@@ -157,7 +159,26 @@ export const UDPD: UcieStageModule = {
         'Residual violation and waiver review',
         'Digital timing closure review record',
       ],
-      r: [['UDPD-D7', 'produces']],
+      r: [['UDPD-D7', 'produces'], ['UDPD-D8', 'informs']],
+    },
+    'UDPD-08': {
+      s: [
+        [1, 'Triage each post-freeze bug from verification and gate-level simulation for an ECO fix or a documented waiver', 1],
+        [2, 'Implement each fix in the RTL and as a netlist ECO with spare cells or a scoped re-synthesis', 3],
+        [3, 'Re-prove logical equivalence between the fixed RTL and the ECO netlist', 1, 1],
+        [4, 'Rerun the affected regressions and gate-level tests on the ECO netlist with verification', 2],
+        [5, 'Fold the ECO into place and route and timing closure without reopening closed paths', 2],
+        [6, 'Release the ECO log and the updated netlist', 1],
+      ],
+      o: [
+        'Post-freeze bug triage with fix or waiver per bug',
+        'RTL fixes and matching netlist ECOs',
+        'RTL-to-ECO-netlist equivalence result',
+        'Regression and gate-level results on the ECO netlist',
+        'ECO folded into the routed and timed database',
+        'Functional ECO log with the ECO-updated netlist and equivalence results',
+      ],
+      r: [['UDPD-D8', 'produces'], ['UDPD-D5', 'feeds'], ['UDPD-D7', 'feeds']],
     },
   },
 };

@@ -158,7 +158,7 @@ export const UDV_WRITE_UPS: UcieWriteUps = {
     },
     risks: [
       '<b>Partner too polite.</b> The verification IP partner always responds in the same order, hiding races.',
-      '<b>Fallback untested.</b> Speed and width degradation is never exercised because training always converges in simulation.',
+      '<b>Fallback untested.</b> Speed degrade and the TRAINERROR path are never exercised because training always converges in simulation.',
       '<b>Deadlock missed.</b> A rare combination of sideband timeout and retrain leaves the machine stuck.',
       '<b>TRAINERROR exit.</b> Recovery from training error relies on a reset path the testbench never takes.',
       '<b>Spec ambiguity.</b> The RTL and the verification IP read an ambiguous rule the same wrong way.',
@@ -186,7 +186,7 @@ export const UDV_WRITE_UPS: UcieWriteUps = {
     exit: [
       'Every training state and legal transition reached in simulation',
       'Formal proofs of no deadlock and legal transitions complete on the state machine',
-      'Speed and width fallback verified from every training failure cause',
+      'Speed fallback and TRAINERROR entry verified from every training failure cause',
     ],
     dependsOn: ['UDV-02', 'URTL-05'],
     dependsNote: null,
@@ -279,7 +279,7 @@ export const UDV_WRITE_UPS: UcieWriteUps = {
       'Fine-pitch bumps do not all connect, and a die-to-die PHY is only as good as its repair. A repair that works for one fault but mis-maps two, or a reversal that breaks when combined with a repaired lane, turns an assembly defect into a dead package at the customer.',
     ],
     flowNote:
-      'Step 1 builds the bump fault models. Step 2 verifies repair, step 3 reversal and step 4 deskew in parallel. Step 5 verifies width degradation and step 6 closes and reports.',
+      'Step 1 builds the bump fault models. Step 2 verifies repair, step 3 reversal and step 4 deskew in parallel. Step 5 verifies that faults beyond the repair capacity end in TRAINERROR, and step 6 closes and reports.',
     consumes: [
       'Testbench with lane fault injection from UDV-02',
       'Lane repair, reversal and recalibration RTL from URTL-06',
@@ -296,7 +296,7 @@ export const UDV_WRITE_UPS: UcieWriteUps = {
       '<b>Clock and track faults.</b> Repair of non-data lanes is assumed rather than tested.',
       '<b>Reversal with repair.</b> A repaired lane is remapped wrongly when the module is also reversed.',
       '<b>Skew range.</b> Deskew is verified only inside a nominal range narrower than the channel allows.',
-      '<b>Degradation path.</b> Faults beyond repair capacity hang training instead of reducing width.',
+      '<b>Beyond repair.</b> Faults beyond the repair capacity hang training instead of reaching TRAINERROR with the faults logged.',
     ],
     roles: [
       { r: 'Design verification', d: 'Owns repair, reversal and deskew verification' },
@@ -310,7 +310,7 @@ export const UDV_WRITE_UPS: UcieWriteUps = {
       ['Lane repair', 2.7],
       ['Lane reversal', 1.6],
       ['Deskew', 1.3],
-      ['Width degradation', 0.8],
+      ['Beyond-repair fault handling', 0.8],
       ['Closure and report', 0.8],
     ],
     entry: [
@@ -410,58 +410,58 @@ export const UDV_WRITE_UPS: UcieWriteUps = {
   'UDV-07': {
     criticalPath: false,
     purpose: [
-      'Verify the <b>Adapter’s modes</b>: Flit formats and packing for each protocol mapping, Raw mode pass-through including continuous transmission without idle insertion, Streaming mode under user-defined stimulus and backpressure, and the FDI and RDI handshakes with arbitration and multiplexing between protocol stacks.',
-      'The Protocol Layer is the customer’s, so this is the boundary where integration problems appear. Every mode customers will select has to be exercised with the traffic shapes their controllers produce, not the convenient ones the testbench defaults to.',
+      'Verify the <b>Adapter’s formats and protocols</b>: Flit formats and packing for each protocol mapping, Raw format pass-through including continuous transmission without idle insertion, negotiation of the standard protocols and a streaming protocol over the Raw format or a Flit format, <b>multi-module striping</b> and alignment, and the FDI and RDI handshakes with arbitration and multiplexing between protocol stacks.',
+      'The Protocol Layer is the customer’s, so this is the boundary where integration problems appear. Formats and protocols are separate choices a licensee combines, and every combination customers will select — on one module or several — has to be exercised with the traffic shapes their controllers produce, not the convenient ones the testbench defaults to.',
     ],
     flowNote:
-      'Step 1 verifies Flit formats, step 2 Raw mode and step 3 Streaming mode. Step 4 verifies the FDI, RDI and arbitration, and step 5 closes and reports.',
+      'Step 1 verifies Flit formats, step 2 the Raw format and step 3 protocol negotiation, with multi-module striping verified in parallel in step 4. Step 5 verifies the FDI, RDI and arbitration, and step 6 closes and reports.',
     consumes: [
       'Testbench from UDV-02',
-      'Flit, Raw and Streaming mode RTL from URTL-03',
+      'Flit format, Raw format, protocol negotiation and striping RTL from URTL-03',
       'Adapter RTL with arbitration from URTL-02',
       'Interface architecture from UARC-01',
-      'Mode selection from UREQ-01',
+      'Format, protocol and module count selection from UREQ-01',
     ],
     rel: {
-      'UDV-D7': '<b>Raw, Streaming and Flit mode verification report.</b> Produced here.',
+      'UDV-D7': '<b>Flit format, Raw format, protocol negotiation and multi-module verification report.</b> Produced here.',
       'UDV-D11': '<b>Coverage closure report with waiver list.</b> Mode coverage feeds the closure.',
     },
     risks: [
       '<b>One traffic shape.</b> Backpressure profiles differ from customers’ controllers.',
-      '<b>Continuous Raw mode.</b> Continuous transmission is not run long enough to expose buffer drift.',
+      '<b>Continuous Raw format.</b> Continuous transmission is not run long enough to expose buffer drift.',
       '<b>Multiplexing.</b> Arbitration between two protocol stacks starves one.',
       '<b>RDI exposure.</b> Customers using their own adapter hit RDI behavior never tested.',
       '<b>Mapping gaps.</b> A Flit format for a supported mapping is not exercised.',
     ],
     roles: [
-      { r: 'Design verification', d: 'Owns mode verification' },
-      { r: 'RTL designer', d: 'Flit and mode fixes' },
+      { r: 'Design verification', d: 'Owns format, protocol and module verification' },
+      { r: 'RTL designer', d: 'Format and striping fixes' },
       { r: 'Customer engineer', d: 'Customer protocol traffic profiles' },
-      { r: 'IP architect', d: 'Mode and mapping intent' },
+      { r: 'IP architect', d: 'Format, protocol and mapping intent' },
       { r: 'Verification IP specialist', d: 'Protocol stimulus configuration' },
     ],
     effort: [
       ['Flit formats and packing', 2.2],
-      ['Raw mode', 1.6],
-      ['Streaming mode', 1.6],
+      ['Raw format', 1.6],
+      ['Protocol negotiation and multi-module striping', 1.6],
       ['FDI, RDI and arbitration', 1.6],
       ['Closure and report', 0.5],
     ],
     entry: [
       'Testbench released in UDV-02',
-      'Mode RTL feature-complete in URTL-03',
-      'Supported modes fixed in UREQ-01',
+      'Format and protocol RTL feature-complete in URTL-03',
+      'Supported formats, protocols and module count fixed in UREQ-01',
     ],
     exit: [
       'Every supported Flit format and mapping exercised with data checked end to end',
-      'Raw mode continuous transmission run without data loss over long streams',
+      'Raw format continuous transmission run without data loss over long streams, and striped traffic kept in order on two modules',
       'FDI and RDI handshakes verified under backpressure and arbitration',
     ],
     dependsOn: ['UDV-02', 'URTL-03'],
     dependsNote: null,
     feedsInto: ['UDV-11'],
     measuredBy: [
-      'Modes and mappings covered',
+      'Formats, protocols and mappings covered',
       'Backpressure profiles exercised',
       'Open interface bugs',
     ],
@@ -544,16 +544,16 @@ export const UDV_WRITE_UPS: UcieWriteUps = {
   'UDV-09': {
     criticalPath: false,
     purpose: [
-      'Turn the <b>compliance and interoperability targets</b> into a simulation suite built on the verification IP’s compliance sequences, run it on every RTL release, and triage each failure with the architecture team before silicon makes it expensive.',
+      'Turn the <b>compliance and interoperability targets</b> into a simulation suite built on the verification IP’s compliance sequences, verify the <b>compliance control registers and injection hooks</b> a reference die drives over the sideband, run it all on every RTL release, and triage each failure with the architecture team before silicon makes it expensive.',
       'Compliance testing on silicon is scheduled months after tapeout and its failures cannot be fixed by a metal change if they are in the state machine. Running the same scenarios in simulation is the cheapest insurance the program can buy for the compliance gate.',
     ],
     flowNote:
-      'Step 1 maps targets to scenarios, step 2 builds the suite, step 3 runs it on every release and step 4 releases the results.',
+      'Step 1 maps targets to scenarios and step 2 builds the suite, with the compliance registers and injection hooks verified in parallel in step 3. Step 4 runs it on every release and step 5 releases the results.',
     consumes: [
       'Compliance and interoperability targets from UREQ-07',
       'Testbench with verification IP from UDV-02',
-      'Training verification results from UDV-03',
-      'Mode verification results from UDV-07',
+      'Compliance control registers and injection hooks from URTL-02',
+      'Format and protocol verification results from UDV-07',
       'Verification IP compliance sequences from UFND-05',
     ],
     rel: {
@@ -587,7 +587,7 @@ export const UDV_WRITE_UPS: UcieWriteUps = {
     ],
     exit: [
       'Every compliance target mapped to a scenario or justified as silicon-only',
-      'Suite passing on the frozen RTL',
+      'Suite and every compliance register and injection hook passing on the frozen RTL',
       'Open compliance issues resolved or tracked to the silicon plan',
     ],
     dependsOn: ['UREQ-07', 'UDV-02'],
@@ -599,7 +599,7 @@ export const UDV_WRITE_UPS: UcieWriteUps = {
       'Open compliance issues',
     ],
     links: {
-      dependsOn: ['UREQ-07', 'UDV-02', 'UDV-03', 'UDV-07', 'UFND-05'],
+      dependsOn: ['UREQ-07', 'UDV-02', 'UDV-03', 'UDV-07', 'UFND-05', 'URTL-02'],
       feedsInto: ['UDV-11', 'UDV-12', 'UCMP-01'],
       runsWith: [],
       revisedBy: [],
@@ -610,11 +610,11 @@ export const UDV_WRITE_UPS: UcieWriteUps = {
   'UDV-10': {
     criticalPath: true,
     purpose: [
-      'Verify the <b>synthesized netlist</b> in gate-level simulation — reset and training at zero delay, then timing-annotated runs of training, retry and low-power tests — and simulate the scan, PRBS, BIST and loopback patterns on it, with X-propagation and reset behavior checked at the analog boundary.',
+      'Verify the <b>synthesized netlist</b> in functional gate-level simulation — reset, training, retry and low-power tests at zero or unit delay; the timing-annotated runs follow on the signoff netlist once timing has closed — and simulate the scan, PRBS, BIST and loopback patterns on it, with X-propagation and reset behavior checked at the analog boundary.',
       'RTL simulation cannot see what synthesis and scan insertion change: uninitialized flops at the analog boundary, reset sequencing across clock domains, timing-dependent behavior in the training logic. Gate-level simulation catches them before signoff, when a fix is still a netlist edit rather than a respin of the test chip.',
     ],
     flowNote:
-      'Step 1 brings up zero-delay simulation and step 2 runs timing-annotated tests, with DFT patterns simulated in parallel in step 3. Step 4 checks the analog boundary and step 5 releases the report.',
+      'Step 1 brings up zero-delay simulation and step 2 runs functional gate-level tests, with DFT patterns simulated in parallel in step 3. Step 4 checks the analog boundary and step 5 releases the report.',
     consumes: [
       'Scan-inserted netlist from UDPD-02',
       'DFT freeze and test access plan from UDFT-08',
@@ -642,7 +642,7 @@ export const UDV_WRITE_UPS: UcieWriteUps = {
     ],
     effort: [
       ['Zero-delay bring-up', 1.1],
-      ['Timing-annotated runs', 1.6],
+      ['Functional gate-level runs', 1.6],
       ['DFT pattern simulation', 1.7],
       ['Analog boundary checks', 0.8],
       ['Report', 0.3],
@@ -653,7 +653,7 @@ export const UDV_WRITE_UPS: UcieWriteUps = {
       'Patterns available from UDFT-02',
     ],
     exit: [
-      'Training, retry and low-power tests pass on the timing-annotated netlist',
+      'Training, retry and low-power tests pass on the released netlist in functional gate-level simulation',
       'Scan, PRBS, BIST and loopback patterns pass on the released netlist',
       'No unresolved X-propagation at the analog boundary',
     ],
@@ -667,7 +667,7 @@ export const UDV_WRITE_UPS: UcieWriteUps = {
     ],
     links: {
       dependsOn: ['UDPD-02', 'UDFT-08', 'UDFT-02', 'UDFT-03', 'UDFT-05', 'UDPD-01'],
-      feedsInto: ['UDV-11', 'UDV-12', 'USGN-01'],
+      feedsInto: ['UDV-11', 'UDV-12', 'USGN-01', 'USGN-08', 'UDPD-08'],
       runsWith: [],
       revisedBy: [],
       feedsBackInto: ['UDPD-02'],
@@ -745,7 +745,7 @@ export const UDV_WRITE_UPS: UcieWriteUps = {
   'UDV-12': {
     criticalPath: true,
     purpose: [
-      'Hold the <b>verification sign-off review</b>: collect every verification report, the coverage closure and the open bug list, review the residual risk per feature with architecture, RTL and DFT, and record the decision the hard macro signoff, the test chip and the v0.9 release rely on.',
+      'Hold the <b>verification sign-off review</b>: collect every verification report, the coverage closure and the open bug list, judge them against stated criteria — agreed functional and code coverage, no open high-priority bug, compliance scenarios passing, the post-freeze ECO log closed — review the residual risk per feature with architecture, RTL and DFT, and record the decision the hard macro signoff, the test chip and the v0.9 release rely on.',
       'Sign-off is a statement to customers as much as to the program: the v0.9 release goes out on it. It has to name what is not verified as clearly as what is, so that the residual risk is carried by a decision rather than discovered by a licensee.',
     ],
     flowNote:
@@ -785,8 +785,8 @@ export const UDV_WRITE_UPS: UcieWriteUps = {
       'Gate-level results released in UDV-10',
     ],
     exit: [
-      'Every open bug dispositioned as fixed, waived with justification or deferred with a release note',
-      'Residual risk per feature accepted by architecture',
+      'Agreed functional and code coverage reached, no open high-priority bug, and every other bug fixed, waived with justification or deferred with a release note',
+      'Compliance scenarios passing, the post-freeze ECO log closed, and the residual risk per feature accepted by architecture',
       'Sign-off decision recorded against the frozen RTL revision',
     ],
     dependsOn: ['UDV-11', 'URTL-10'],
@@ -798,7 +798,7 @@ export const UDV_WRITE_UPS: UcieWriteUps = {
       'Sign-off date against plan',
     ],
     links: {
-      dependsOn: ['UDV-01', 'UDV-02', 'UDV-03', 'UDV-04', 'UDV-05', 'UDV-06', 'UDV-07', 'UDV-08', 'UDV-09', 'UDV-10', 'UDV-11', 'URTL-10', 'UDFT-08'],
+      dependsOn: ['UDV-01', 'UDV-02', 'UDV-03', 'UDV-04', 'UDV-05', 'UDV-06', 'UDV-07', 'UDV-08', 'UDV-09', 'UDV-10', 'UDV-11', 'URTL-10', 'UDFT-08', 'UDPD-08'],
       feedsInto: ['USGN-07', 'UPRE-08', 'UTCI-04'],
       runsWith: [],
       revisedBy: [],

@@ -401,4 +401,70 @@ export const UBUP_WRITE_UPS: UcieWriteUps = {
     },
     terms: ['Test chip', 'LINKINIT'],
   },
+  'UBUP-07': {
+    criticalPath: true,
+    purpose: [
+      'Decide, on the first silicon, <b>whether the open issues are lived with, fixed in metal or need a full respin</b>: classify every issue by what closes it, estimate a metal fix through the mask and slot option reserved at technology selection and a full respin, weigh both against what GA can honestly claim, and record the decision.',
+      'This is new architecture on a new process, and the plan to this point assumes first silicon works. A metal fix or respin costs several months; deciding it late costs more, because characterization, compliance and reliability would otherwise spend weeks on silicon that is about to be replaced. The decision makes the schedule consequence explicit instead of letting GA quietly depend on a workaround.',
+    ],
+    flowNote:
+      'Step 1 classifies the open issues while step 2 estimates a metal fix and a respin in parallel. Step 3 weighs the options against the GA claim and step 4 records the decision and its effect on the GA date.',
+    consumes: [
+      'Open-issue list and first link-up decision from UBUP-06',
+      'Bring-up results against plan and predictions from UBUP-05',
+      'Mainband training log from UBUP-03',
+      'Reserved mask and slot option for a respin from UTEC-05',
+      'Lot plan and engineering lot option from UTPO-03',
+    ],
+    rel: {
+      'UBUP-D7': '<b>Respin or metal-fix decision record with its effect on the GA date.</b> Produced here; characterization, reliability and the GA plan read which silicon they are qualifying.',
+      'UBUP-D6': '<b>First link-up decision record and open-issue list.</b> The decision adds to every open issue whether it is fixed in silicon or carried in the errata.',
+    },
+    risks: [
+      '<b>Decision deferred.</b> Nobody calls it at first link-up, and the fix is decided after characterization has run on silicon that is replaced.',
+      '<b>Workaround cost hidden.</b> A register workaround is accepted without asking whether every licensee can apply it in their own firmware.',
+      '<b>Option expired.</b> The reserved mask and slot option lapses because its deadline was not tracked.',
+      '<b>Qualification on the wrong silicon.</b> Reliability continues on silicon a metal fix will change, and its results do not carry over.',
+      '<b>GA date unchanged on paper.</b> The fix is approved but the GA plan and the licensees are not told.',
+    ],
+    roles: [
+      { r: 'Program management', d: 'Owns the respin or metal-fix decision and its schedule effect' },
+      { r: 'Analog and mixed-signal lead', d: 'Root cause and fix options in the front-end' },
+      { r: 'RTL design lead', d: 'Root cause and fix options in the Adapter and Logical PHY' },
+      { r: 'Technology and foundry engineer', d: 'Mask option, slot and cycle time for a fix' },
+      { r: 'Product manager', d: 'What the GA claim and the licensees can accept' },
+    ],
+    effort: [
+      ['Issue classification', 0.3],
+      ['Metal fix and respin estimates', 0.3],
+      ['Options against the GA claim', 0.2],
+      ['Decision record', 0.2],
+    ],
+    entry: [
+      'First link-up review held in UBUP-06 with an owner per open issue',
+      'Mask and slot option terms known from UTEC-05',
+      'Bring-up deviations bucketed by cause in UBUP-05',
+    ],
+    exit: [
+      'Every open silicon issue assigned a closing action — workaround, register or firmware change, metal fix or respin',
+      'A recorded decision with the new GA date if the decision is a metal fix or respin',
+      'Characterization, compliance and reliability told which silicon they qualify',
+    ],
+    dependsOn: ['UBUP-06', 'UBUP-05', 'UBUP-03'],
+    dependsNote: 'Taken in the last two weeks of bring-up, beside the first link-up review, so the answer is known before characterization commits its units.',
+    feedsInto: ['UCHR-10', 'URLQ-06', 'UGA-01'],
+    measuredBy: [
+      'Open issues with a closing action',
+      'Days from first link-up to the fix decision',
+      'GA date change recorded and communicated',
+    ],
+    links: {
+      dependsOn: ['UBUP-06', 'UBUP-05', 'UBUP-03', 'UBUP-04', 'UBUP-01', 'UBUP-02', 'UTEC-05', 'UTPO-03'],
+      feedsInto: ['UCHR-10', 'URLQ-06', 'UGA-01', 'UCUS-06'],
+      runsWith: [],
+      revisedBy: [],
+      feedsBackInto: [],
+    },
+    terms: ['Errata', 'Metal ECO', 'Test chip'],
+  },
 };

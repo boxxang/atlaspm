@@ -72,11 +72,11 @@ export const UDFT_WRITE_UPS: UcieWriteUps = {
   'UDFT-02': {
     criticalPath: false,
     purpose: [
-      'Plan <b>scan insertion and ATPG coverage</b> for the digital hard macro: chain structure, compression and test clocking, stuck-at and transition fault coverage targets per block, test and observe points for logic scan cannot reach — including the control interface to the analog front-end — and a trial insertion that projects coverage before the netlist is final.',
+      'Plan <b>scan insertion and ATPG coverage</b> for the digital hard macro: chain structure, compression and test clocking, stuck-at and transition fault coverage targets per block, test and observe points for logic scan cannot reach — including the control interface to the analog front-end — a <b>hard-macro test wrapper</b> the licensee’s SoC test access can reach, and a trial insertion that projects coverage before the netlist is final.',
       'The digital macro is hardened by the IP team but tested by every licensee’s tester. Coverage that holds only with the IP team’s compression settings, or that leaves the front-end control logic unobserved, becomes the licensee’s yield problem.',
     ],
     flowNote:
-      'Step 1 defines chains and compression and step 2 sets coverage targets, while step 3 adds test and observe points in parallel. Step 4 runs a trial insertion and ATPG and step 5 releases the plan.',
+      'Step 1 defines chains and compression and step 2 sets coverage targets, while step 3 adds test and observe points in parallel. Step 4 defines the hard-macro test wrapper, step 5 runs a trial insertion and ATPG and step 6 releases the plan.',
     consumes: [
       'DFT specification from UDFT-01',
       'D2D Adapter RTL from URTL-02',
@@ -85,7 +85,7 @@ export const UDFT_WRITE_UPS: UcieWriteUps = {
       'Coverage expectations stated by licensees',
     ],
     rel: {
-      'UDFT-D2': '<b>Scan insertion plan and ATPG coverage targets.</b> Produced here; synthesis inserts scan to it and gate-level simulation verifies the patterns.',
+      'UDFT-D2': '<b>Scan insertion plan, test wrapper and ATPG coverage targets.</b> Produced here; synthesis inserts scan to it and gate-level simulation verifies the patterns.',
       'UDFT-D8': '<b>DFT freeze package and freeze decision record.</b> Projected coverage is a freeze criterion.',
     },
     risks: [
@@ -114,7 +114,7 @@ export const UDFT_WRITE_UPS: UcieWriteUps = {
       'Digital implementation flow ready from UFND-03',
     ],
     exit: [
-      'Coverage targets set per block for stuck-at and transition faults',
+      'Coverage targets set per block for stuck-at and transition faults, and the test wrapper defined for SoC test access',
       'Trial ATPG projects coverage at or above target on current RTL',
       'Front-end control interface covered by test or observe points',
     ],
@@ -336,11 +336,11 @@ export const UDFT_WRITE_UPS: UcieWriteUps = {
   'UDFT-06': {
     criticalPath: false,
     purpose: [
-      'Build <b>eye and lane margining</b>: a sweep of sampling phase and reference voltage per lane in steps fine enough to resolve a 64 GT/s eye, a readout of error counts at every sweep point, and a specification of how margins are read in mission mode without disturbing traffic on other lanes.',
+      'Build <b>eye and lane margining</b>: a sweep of sampling phase and reference voltage per lane in steps fine enough to resolve a 64 GT/s eye, a readout of error counts at every sweep point, a specification of how margins are read in mission mode without disturbing traffic on other lanes, and a <b>probe-able observation path</b> with an on-die analog test bus so the margining can be calibrated on the bench.',
       'Margining is how silicon is compared with simulation, and how a licensee checks a link in their own package. If the step is too coarse the measured eye cannot be laid over the simulated one, and the correlation at the end of the program has nothing to correlate.',
     ],
     flowNote:
-      'Step 1 defines the sweep, step 2 builds the sweep control and step 3 the readout. Step 4 specifies mission-mode margining in parallel and step 5 releases the logic and the readout specification.',
+      'Step 1 defines the sweep, step 2 builds the sweep control and step 3 the readout. Step 4 specifies mission-mode margining in parallel, step 5 adds the observation path and analog test bus, and step 6 releases the logic and the readout specification.',
     consumes: [
       'DFT specification from UDFT-01',
       'PRBS checkers from UDFT-03',
@@ -380,7 +380,7 @@ export const UDFT_WRITE_UPS: UcieWriteUps = {
     exit: [
       'Sweep step and range resolve the simulated 64 GT/s eye',
       'Readout units defined in time and voltage',
-      'Mission-mode margining specified without disturbing neighboring lanes',
+      'Mission-mode margining specified without disturbing neighboring lanes, and the observation path defined for bench calibration',
     ],
     dependsOn: ['UDFT-03', 'URTL-05'],
     dependsNote: null,
@@ -392,7 +392,7 @@ export const UDFT_WRITE_UPS: UcieWriteUps = {
     ],
     links: {
       dependsOn: ['UDFT-01', 'UDFT-03', 'URTL-05', 'UARC-10', 'UAFE-07'],
-      feedsInto: ['UDFT-08', 'UAMS-07', 'UCHR-02'],
+      feedsInto: ['UDFT-08', 'UAMS-07', 'UCHR-02', 'UTCI-02'],
       runsWith: [],
       revisedBy: [],
       feedsBackInto: [],
@@ -402,17 +402,17 @@ export const UDFT_WRITE_UPS: UcieWriteUps = {
   'UDFT-07': {
     criticalPath: false,
     purpose: [
-      'Build <b>debug access</b>: the signals worth observing — training state, lane status, error logs and recalibration history — register snapshots captured on error or trigger, a trace buffer for training and state history, and all of it readable over the sideband, with a debug user guide for the lab and for licensees.',
+      'Build <b>debug access</b>: the signals worth observing — training state, lane status, error logs and recalibration history — register snapshots captured on error or trigger, a trace buffer for training and state history, all of it readable over the sideband, and the <b>compliance access</b> a reference-die test needs — compliance control registers, margining, BER and skew results driven over the sideband — with a user guide for the lab and for licensees.',
       'The failure that matters most is the link that never trains, and in that case the mainband is not there to read anything over. Sideband debug access and a training trace are what let a licensee send the IP team something better than “it does not link up”.',
     ],
     flowNote:
-      'Step 1 lists the debug signals and step 2 builds snapshots, while step 3 builds the trace buffer in parallel. Step 4 makes everything readable over the sideband and step 5 writes the debug user guide.',
+      'Step 1 lists the debug signals and step 2 builds snapshots, while step 3 builds the trace buffer in parallel. Step 4 makes everything readable over the sideband, step 5 adds the compliance access and step 6 writes the user guide.',
     consumes: [
       'DFT specification from UDFT-01',
       'Sideband controller from URTL-07',
       'Training states from URTL-05',
       'Register map from URTL-01',
-      'Lab debug needs from validation',
+      'Compliance control registers and injection hooks from URTL-02',
     ],
     rel: {
       'UDFT-D7': '<b>Debug access logic and debug user guide.</b> Produced here; bring-up and licensee support use it.',
@@ -446,19 +446,19 @@ export const UDFT_WRITE_UPS: UcieWriteUps = {
     exit: [
       'Training trace and snapshots readable over the sideband with the mainband down',
       'Trace depth covers the full training sequence',
-      'Debug user guide reviewed by validation and customer engineering',
+      'Compliance tests drivable over the sideband, and the user guide reviewed by validation, compliance and customer engineering',
     ],
     dependsOn: ['UDFT-01', 'URTL-07'],
     dependsNote: null,
-    feedsInto: ['UDFT-08', 'UBUP-02', 'UTVP-06'],
+    feedsInto: ['UDFT-08', 'UBUP-02', 'UTVP-06', 'UCMP-02'],
     measuredBy: [
       'Debug signals observable over the sideband',
       'Trace depth against training sequence length',
       'Debug guide review comments closed',
     ],
     links: {
-      dependsOn: ['UDFT-01', 'URTL-01', 'URTL-05', 'URTL-07'],
-      feedsInto: ['UDFT-08', 'UBUP-02', 'UTVP-06'],
+      dependsOn: ['UDFT-01', 'URTL-01', 'URTL-02', 'URTL-05', 'URTL-07'],
+      feedsInto: ['UDFT-08', 'UBUP-02', 'UTVP-06', 'UCMP-02', 'UCMP-03'],
       runsWith: [],
       revisedBy: [],
       feedsBackInto: [],

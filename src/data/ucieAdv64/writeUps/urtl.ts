@@ -7,7 +7,7 @@ export const URTL_WRITE_UPS: UcieWriteUps = {
   'URTL-01': {
     criticalPath: false,
     purpose: [
-      'Set the <b>rules, specifications and register map</b> every digital block is written to: coding, reset and clocking guidelines, a block specification for the Adapter, the Logical PHY, the sideband controller and power control, and one register source that generates the RTL, the headers and the documentation views.',
+      'Set the <b>rules, specifications and register map</b> every digital block is written to: coding, reset and clocking guidelines, a block specification for the Adapter, the Logical PHY, the sideband controller and power control, and one register source that generates the RTL, the headers and the documentation views — including the compliance control registers a reference-die test drives over the sideband.',
       'The register map is the first thing a licensee’s software touches and the hardest thing to change after the v0.5 release. Generating every view of it from one source is what keeps the RTL, the verification model and the integration guide from describing three different maps.',
     ],
     flowNote:
@@ -73,7 +73,7 @@ export const URTL_WRITE_UPS: UcieWriteUps = {
   'URTL-02': {
     criticalPath: true,
     purpose: [
-      'Write the <b>D2D Adapter</b>: CRC generation on every transmitted Flit and checking on every received one, the retry buffer and replay control that hide an occasional bit error from the protocol, arbitration and multiplexing between protocol stacks and the Adapter’s own messages, Adapter link state handling across the RDI, and error logging into the register map.',
+      'Write the <b>D2D Adapter</b>: CRC generation on every transmitted Flit and checking on every received one, the retry buffer and replay control that hide an occasional bit error from the protocol, arbitration and multiplexing between protocol stacks and the Adapter’s own messages, Adapter link state handling across the RDI, error logging into the register map, and the compliance injection hooks — test and NOP Flit injection, link-state request injection and retry injection — that compliance testing against a reference die relies on.',
       'At 64 GT/s the retry buffer has to cover the full round trip — Adapter pipeline, PHY word path, both front-ends and the package channel — at the Adapter’s word width. Sizing it to the worst case rather than the typical one is the difference between a link that stalls under load and one that does not.',
     ],
     flowNote:
@@ -140,58 +140,58 @@ export const URTL_WRITE_UPS: UcieWriteUps = {
   'URTL-03': {
     criticalPath: false,
     purpose: [
-      'Write the <b>datapaths behind the FDI</b>: Flit packing and unpacking for each Flit format the requirements select, Raw mode as a mode of its own with continuous transmission, Streaming mode for a user-defined protocol, and the FDI itself — data, valid, flow control, state and sideband handshakes — at the clock ratio the integration guide will document.',
-      'The FDI is the line between this IP and the licensee’s protocol controller, so its behavior is a contract rather than an implementation detail. Raw mode in particular cannot be a bypass bolted onto the Flit path: continuous transmission has to survive clock gating, retrains and power states like any other mode.',
+      'Write the <b>datapaths behind the FDI</b>: Flit packing and unpacking for each Flit format the requirements select, the Raw format as a format of its own with continuous transmission, negotiation of the protocols that run over them — standard protocols or a streaming protocol — and the FDI itself at the clock ratio the integration guide will document, plus <b>multi-module striping</b> for licensees who aggregate modules.',
+      'Formats and protocols are separate choices: a streaming protocol can run over the Raw format or a Flit format, and the Adapter still negotiates the standard protocols even though their controllers are the licensee’s. The FDI is the line between this IP and that controller, so its behavior is a contract; the Raw format in particular cannot be a bypass, because continuous transmission has to survive clock gating, retrains and power states.',
     ],
     flowNote:
-      'Step 1 builds Flit packing and step 2 Raw mode, while step 3 adds Streaming mode in parallel. Step 4 implements the FDI at its documented clock ratio and step 5 passes directed tests per mode against a protocol stub.',
+      'Step 1 builds Flit packing and step 2 the Raw format, while step 3 adds protocol negotiation in parallel. Step 4 implements the FDI with multi-module striping alongside in step 5, and step 6 passes directed tests per format and protocol, on one module and on two.',
     consumes: [
-      'Flit formats and mode selection from UREQ-01',
+      'Flit formats, protocol support and module count from UREQ-01',
       'D2D Adapter architecture and FDI definition from UARC-02 and UARC-01',
       'Adapter RTL from URTL-02',
       'Block specifications from URTL-01',
       'Architecture freeze record from UARC-12',
     ],
     rel: {
-      'URTL-D3': '<b>Flit, Raw and Streaming mode datapath RTL with the FDI.</b> Produced here; it is the interface the v0.5 release hands to licensees.',
+      'URTL-D3': '<b>Flit format, Raw format and protocol negotiation RTL with the FDI and multi-module striping.</b> Produced here; it is the interface the v0.5 release hands to licensees.',
       'URTL-D10': '<b>RTL freeze package and freeze decision record.</b> FDI behavior is frozen with it.',
     },
     risks: [
-      '<b>Raw mode as a bypass.</b> Continuous transmission breaks when retry logic it does not use is clock-gated.',
+      '<b>Raw format as a bypass.</b> Continuous transmission breaks when retry logic it does not use is clock-gated.',
       '<b>Clock ratio assumed.</b> The FDI assumes one protocol clock ratio and a licensee’s controller needs another.',
       '<b>Flow control off by one.</b> Credit or valid handling loses or duplicates data at back-pressure boundaries.',
       '<b>Format selection untested.</b> A Flit format the requirements list is implemented but never exercised.',
-      '<b>Streaming undefined.</b> Streaming mode behavior under errors is left to the licensee to discover.',
+      '<b>Modules out of order.</b> Flits striped across two modules arrive reordered after one module retrains.',
     ],
     roles: [
       { r: 'RTL design', d: 'Owns the mode datapaths and the FDI' },
-      { r: 'IP architect', d: 'Mode definitions and FDI behavior' },
+      { r: 'IP architect', d: 'Format, protocol and FDI behavior' },
       { r: 'Verification engineer', d: 'Protocol stub and mode tests' },
       { r: 'Customer engineering lead', d: 'FDI clock ratios licensees need' },
       { r: 'Technical writer', d: 'FDI behavior for the integration guide' },
     ],
     effort: [
       ['Flit packing and unpacking', 1.7],
-      ['Raw mode', 1.5],
-      ['Streaming mode', 0.9],
+      ['Raw format', 1.5],
+      ['Protocol negotiation and multi-module striping', 0.9],
       ['FDI', 1.8],
       ['Directed mode tests', 0.6],
     ],
     entry: [
-      'Flit formats and modes selected in UREQ-01',
+      'Flit formats, protocols and module count selected in UREQ-01',
       'Adapter core RTL available from URTL-02',
       'FDI clock ratios agreed with customer engineering',
     ],
     exit: [
-      'Every selected Flit format, Raw mode and Streaming mode passes directed tests across the FDI',
-      'Raw mode continuous transmission survives clock gating and retrain in simulation',
+      'Every selected Flit format, the Raw format and every negotiated protocol pass directed tests across the FDI on one module and on two',
+      'Raw format continuous transmission survives clock gating and retrain in simulation',
       'FDI behavior and clock ratios documented for the v0.5 integration guide',
     ],
     dependsOn: ['URTL-02', 'UREQ-01'],
     dependsNote: null,
     feedsInto: ['URTL-09', 'UDV-07', 'UPRE-02'],
     measuredBy: [
-      'Modes passing directed tests',
+      'Formats and protocols passing directed tests',
       'FDI clock ratios supported against those requested',
       'Open FDI behavior questions',
     ],
@@ -202,12 +202,12 @@ export const URTL_WRITE_UPS: UcieWriteUps = {
       revisedBy: [],
       feedsBackInto: [],
     },
-    terms: ['Flit', 'Raw mode', 'Streaming mode', 'FDI', 'Clock gating'],
+    terms: ['Flit', 'Raw mode', 'Streaming mode', 'FDI', 'Clock gating', 'Multi-module striping'],
   },
   'URTL-04': {
     criticalPath: true,
     purpose: [
-      'Write the <b>Logical PHY datapath</b>: the transmit and receive word path at a width that carries 64 GT/s per lane at a digital clock the process can close, lane mapping for the x64 Advanced module with its redundant lanes and both module orientations, scrambling and descrambling, per-lane deskew and word alignment against the forwarded clock and valid, and the control and status interface to the analog front-end.',
+      'Write the <b>Logical PHY datapath</b>: the transmit and receive word path at a width that carries 64 GT/s per lane at a digital clock the process can close, lane mapping for the x64 Advanced module with its redundant lanes and both module orientations, scrambling and descrambling, per-lane deskew and word alignment against the forwarded clock and valid, alignment between modules when they are aggregated, and the control and status interface to the analog front-end.',
       'Datapath width and pipeline depth set the latency the requirements promised and the timing physical design has to close. They are chosen here against the frozen latency budget; changing them after the freeze moves both the synthesis and the timing models licensees already hold.',
     ],
     flowNote:
@@ -274,7 +274,7 @@ export const URTL_WRITE_UPS: UcieWriteUps = {
   'URTL-05': {
     criticalPath: true,
     purpose: [
-      'Write the <b>link training state machine</b>: SBINIT and the sideband exchange that starts it, MBINIT with parameter exchange, clock and lane checks and repair and reversal detection, MBTRAIN with voltage and timing centering, speed negotiation and degrade to a lower speed or width, then LINKINIT, ACTIVE, PHYRETRAIN and TRAINERROR — every state, timeout and exit condition.',
+      'Write the <b>link training state machine</b>: SBINIT and the sideband exchange that starts it, MBINIT with parameter exchange, clock and lane checks and repair and reversal detection, MBTRAIN with voltage and timing centering, speed negotiation and degrade to a lower speed, then LINKINIT, ACTIVE, PHYRETRAIN and TRAINERROR — every state, timeout and exit condition, synchronized across modules. On an Advanced package a failing lane is repaired onto a redundant lane; there is no width degrade, and faults beyond the repair capacity end in TRAINERROR.',
       'Training is where the digital and analog halves of the PHY meet. Each MBTRAIN step drives a calibration hook in the front-end and reads a margin back, so the state machine is wired to the hooks the circuit team actually built and its tables are published for mixed-signal verification and for bring-up.',
     ],
     flowNote:
@@ -293,7 +293,7 @@ export const URTL_WRITE_UPS: UcieWriteUps = {
     risks: [
       '<b>Hooks out of step.</b> MBTRAIN drives calibration controls the front-end no longer has.',
       '<b>Timeouts unset.</b> A state waits forever when the partner die never answers on the sideband.',
-      '<b>Degrade untested.</b> Falling back to a lower speed or width is implemented but never exercised before silicon.',
+      '<b>Degrade untested.</b> Falling back to a lower speed, or to TRAINERROR when repair runs out, is implemented but never exercised before silicon.',
       '<b>Retrain storms.</b> PHYRETRAIN triggers repeatedly on a marginal lane instead of repairing it.',
       '<b>TRAINERROR exit.</b> The way out of TRAINERROR differs from the partner implementation’s and the link never recovers.',
     ],
@@ -473,7 +473,7 @@ export const URTL_WRITE_UPS: UcieWriteUps = {
   'URTL-08': {
     criticalPath: false,
     purpose: [
-      'Write <b>low-power state control</b>: L1 and L2 entry and exit handshakes between the Adapter, the Logical PHY and the front-end, clock gating and power-domain isolation for each state, and the power intent that describes exactly what the RTL powers down.',
+      'Write <b>low-power state control</b>: L1 and L2 entry and exit handshakes between the Adapter, the Logical PHY and the front-end, clock gating and power-domain isolation for each state, the power intent that describes exactly what the RTL powers down, and the fast-throttle and emergency-shutdown handling on the open-drain signal where the requirements include it.',
       'Power states are where an IP and its licensee’s chip most often disagree, because the licensee’s power intent has to wrap this one. Writing the power intent with the RTL, and measuring entry and exit latency before freeze, is what lets the integration guide state numbers instead of hopes.',
     ],
     flowNote:
@@ -507,7 +507,7 @@ export const URTL_WRITE_UPS: UcieWriteUps = {
       ['Entry and exit handshakes', 1.1],
       ['Clock gating and isolation', 0.9],
       ['Power intent', 0.9],
-      ['Latency measurement and tests', 0.6],
+      ['Latency, throttle handling and tests', 0.6],
     ],
     entry: [
       'Low-power architecture frozen in UARC-12',
@@ -515,7 +515,7 @@ export const URTL_WRITE_UPS: UcieWriteUps = {
       'Front-end power-down sequence agreed with the analog team',
     ],
     exit: [
-      'Every L1 and L2 entry, exit and abort path passes directed tests',
+      'Every L1 and L2 entry, exit and abort path and the throttle and emergency-shutdown response pass directed tests',
       'Simulated entry and exit latency within the requirement',
       'Power intent checked consistent with the RTL',
     ],
@@ -605,7 +605,7 @@ export const URTL_WRITE_UPS: UcieWriteUps = {
   'URTL-10': {
     criticalPath: true,
     purpose: [
-      'Hold the <b>RTL freeze</b>: every block checked against its specification and the requirements traceability matrix, verification status and open bugs judged for risk, lint, CDC and RDC confirmed clean, the register map confirmed final for the v0.5 release — and the database tagged.',
+      'Hold the <b>RTL freeze</b> against stated criteria: every block checked against its specification and the requirements traceability matrix, verification judged against the agreed functional coverage, open high-priority bugs and the bug-arrival trend, lint, CDC and RDC confirmed clean, the register map confirmed final for the v0.5 release — and the database tagged.',
       'RTL freeze is the input to final synthesis and to the first customer release at once. After it, every change is an ECO with a cost on both sides of the license, so the review weighs open bugs against that cost rather than against the calendar.',
     ],
     flowNote:
@@ -645,8 +645,8 @@ export const URTL_WRITE_UPS: UcieWriteUps = {
       'Register map changes since the last review listed',
     ],
     exit: [
-      'Every requirement traced to implemented RTL',
-      'Open bugs each have an owner, a severity and a fix release',
+      'Every requirement traced to implemented RTL and the agreed functional coverage reached',
+      'No open high-priority bug, a falling bug-arrival rate, and every remaining bug with an owner, a severity and a fix release',
       'Database tagged and rebuilt from the tag into the same netlist',
     ],
     dependsOn: ['URTL-09', 'URTL-05', 'URTL-06'],

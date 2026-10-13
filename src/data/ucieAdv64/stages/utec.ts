@@ -7,7 +7,7 @@ export const UTEC: UcieStageModule = {
   content: {
     tagline: 'Pick the node, the metal stack and the package pitches the PHY will live on — before a single circuit is drawn.',
     description:
-      'Choose the process node and metal stack the PHY is designed on, judge whether the PDK and its device models are mature enough to design 64 GT/s transmit, receive and clocking circuits against, and agree with the package partners which UCIe Advanced package technologies — silicon bridge, silicon interposer and RDL interposer — the macro supports and at what bump pitch within the Advanced package range. The partners’ design rules and assembly constraints are turned into constraints on the bump map and die edge, and a shuttle or dedicated run is reserved for the test chip at a date the signoff plan can meet. The stage closes when every choice is recorded with its open risks in a technology selection decision the architecture freeze can build on.',
+      'Choose the process node and metal stack the PHY is designed on, judge whether the PDK and its device models are mature enough to design 64 GT/s transmit, receive and clocking circuits against, and agree with the package partners which UCIe Advanced package technologies — silicon bridge, silicon interposer and RDL interposer — the macro supports and at what bump pitch within the Advanced package range. The partners’ design rules and assembly constraints are turned into constraints on the bump map and die edge, and a shuttle or dedicated run is reserved for the test chip at a date the signoff plan can meet, with the bridge and interposer tapeout slot for the test vehicle and a mask or slot option for a respin. An interoperability partner is secured now, while there is still time to mate its bump map with the test chip on a shared test vehicle. The stage closes when every choice is recorded with its open risks in a technology selection decision the architecture freeze can build on.',
     activities: [
       'Process and metal stack',
       'PDK and device models',
@@ -15,6 +15,7 @@ export const UTEC: UcieStageModule = {
       'Package partner rules',
       'Shuttle and fab slots',
       'Technology selection review',
+      'Interoperability partner',
     ],
     deliverables: [
       'Process node and metal stack selection memo',
@@ -23,10 +24,11 @@ export const UTEC: UcieStageModule = {
       'Package partner design rule set and assembly constraint summary',
       'Test chip shuttle and fab slot reservation plan',
       'Technology risk register and technology selection decision record',
+      'Interoperability partner agreement with mated bump map requirements and known-good partner die supply',
     ],
-    deliverableFrom: [0, 1, 2, 3, 4, 5],
-    deliverableWeek: [6, 8, 10, 12, 12, 14],
-    engineeringEffort: [4, 3, 4, 3, 1.5, 1.5],
+    deliverableFrom: [0, 1, 2, 3, 4, 5, 6],
+    deliverableWeek: [6, 8, 10, 12, 12, 14, 14],
+    engineeringEffort: [4, 3, 4, 3, 1.5, 1.5, 2],
     risks: [
       'Device models on an early PDK under-predict parasitics, so circuits that close in simulation miss 64 GT/s on silicon',
       'A bump pitch agreed with one package partner does not route on another, narrowing the customers the IP can serve',
@@ -37,6 +39,7 @@ export const UTEC: UcieStageModule = {
       'Shuttle date fixed before the signoff plan is credible, forcing either a rushed signoff or a missed slot',
       'Package partner rules still at draft revision when the bump map concept is drawn',
       'RDL interposer support promised without loss data at 64 GT/s over the reach customers need',
+      'Interoperability partner found only after silicon, when its die can no longer share the test vehicle',
     ],
     leader: { name: 'Priya Raman', short: 'P. Raman', phone: '+1 (408) 555-0611', email: 'priya.raman@example.com' },
     collaboration: ['Technology and foundry', 'Packaging', 'Analog and mixed-signal', 'SI/PI', 'Product management', 'Program management'],
@@ -124,12 +127,14 @@ export const UTEC: UcieStageModule = {
         [1, 'Survey shuttle and dedicated-run options on the selected node with their tapeout dates', 1.5],
         [2, 'Size the test chip area and die count for the two-die test vehicle, loopback parts and reliability lots', 1.5],
         [3, 'Align the tapeout date with planned hard macro signoff and reserve a slot with a fallback', 1.5],
-        [4, 'Release the shuttle and fab slot reservation plan', 0.5],
+        [4, 'Book the bridge and interposer tapeout slot for the test vehicle, and a mask and slot option for a metal fix or respin', 1],
+        [5, 'Release the shuttle and fab slot reservation plan', 0.5],
       ],
       o: [
         'Shuttle and dedicated-run option list',
         'Test chip area and die count estimate',
         'Reserved slot and fallback date',
+        'Bridge and interposer slot and respin option',
         'Test chip shuttle and fab slot reservation plan',
       ],
       r: [['UTEC-D5', 'produces'], ['UTEC-D6', 'feeds']],
@@ -148,6 +153,23 @@ export const UTEC: UcieStageModule = {
         'Technology risk register and technology selection decision record',
       ],
       r: [['UTEC-D6', 'produces']],
+    },
+    'UTEC-07': {
+      s: [
+        [1, 'Shortlist partner dies or a reference die with a UCIe Advanced interface that can sit on the same bridge or interposer as the test chip', 1],
+        [2, 'Agree the exchange — silicon, bump map, sideband settings and test access — under an interoperability agreement', 1.5],
+        [3, 'Mate the bump maps and module orientation of the two dies for a shared test vehicle', 1.5, 1],
+        [4, 'Agree known-good die supply and delivery dates for the partner die ahead of test vehicle assembly', 1],
+        [5, 'Release the interoperability partner agreement and mated bump map requirements', 1],
+      ],
+      o: [
+        'Partner and reference die shortlist',
+        'Signed interoperability exchange terms',
+        'Mated bump map and orientation requirements',
+        'Partner known-good die supply plan',
+        'Interoperability partner agreement with mated bump map requirements and known-good partner die supply',
+      ],
+      r: [['UTEC-D7', 'produces'], ['UTEC-D6', 'feeds']],
     },
   },
 };

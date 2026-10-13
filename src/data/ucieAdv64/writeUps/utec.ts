@@ -196,7 +196,7 @@ export const UTEC_WRITE_UPS: UcieWriteUps = {
     ],
     links: {
       dependsOn: ['UREQ-03', 'UREQ-02'],
-      feedsInto: ['UTEC-04', 'UTEC-06', 'UCHN-01', 'UARC-09'],
+      feedsInto: ['UTEC-04', 'UTEC-06', 'UCHN-01', 'UARC-09', 'UTEC-07'],
       runsWith: ['UTEC-01'],
       revisedBy: [],
       feedsBackInto: [],
@@ -272,11 +272,11 @@ export const UTEC_WRITE_UPS: UcieWriteUps = {
   'UTEC-05': {
     criticalPath: false,
     purpose: [
-      'Reserve the <b>shuttle or dedicated run</b> the test chip goes on, sized for the two-die test vehicle, loopback parts and reliability lots, at a tapeout date the hard macro signoff plan can actually meet.',
+      'Reserve the <b>shuttle or dedicated run</b> the test chip goes on, sized for the two-die test vehicle, loopback parts and reliability lots, at a tapeout date the hard macro signoff plan can actually meet — together with the bridge and interposer tapeout slot the test vehicle needs and a mask or slot option for a metal fix or respin.',
       'Shuttle dates are fixed by the foundry, not the program. Reserving early with a fallback date is what keeps a late signoff from turning into a three-month wait for the next run.',
     ],
     flowNote:
-      'Step 1 surveys run options and step 2 sizes the test chip. Step 3 aligns the date with signoff and reserves a slot with a fallback, and step 4 releases the plan.',
+      'Step 1 surveys run options and step 2 sizes the test chip. Step 3 aligns the date with signoff and reserves a slot with a fallback, step 4 books the bridge and interposer slot and the respin option, and step 5 releases the plan.',
     consumes: [
       'Process node selection from UTEC-01',
       'Program plan and test chip budget from UCON-05',
@@ -290,7 +290,7 @@ export const UTEC_WRITE_UPS: UcieWriteUps = {
     },
     risks: [
       '<b>Date before plan.</b> The slot is booked before the signoff plan is credible.',
-      '<b>No fallback.</b> A missed shuttle has no reserved next run.',
+      '<b>No respin option.</b> A first-silicon bug needing a metal fix or respin waits months for the next slot because no option was held.',
       '<b>Undersized.</b> The die area booked cannot hold two PHY instances and their test logic.',
       '<b>Too few parts.</b> Wafer count does not cover characterization, compliance and reliability lots.',
       '<b>Corner splits forgotten.</b> No process split is requested and characterization lacks corner material.',
@@ -303,9 +303,10 @@ export const UTEC_WRITE_UPS: UcieWriteUps = {
       { r: 'Validation lead', d: 'Parts needed for bring-up and characterization' },
     ],
     effort: [
-      ['Run option survey', 0.5],
-      ['Test chip sizing', 0.5],
-      ['Slot reservation', 0.5],
+      ['Run option survey', 0.4],
+      ['Test chip sizing', 0.4],
+      ['Slot reservation', 0.4],
+      ['Bridge slot and respin option', 0.3],
     ],
     entry: [
       'Node selected in UTEC-01',
@@ -313,13 +314,13 @@ export const UTEC_WRITE_UPS: UcieWriteUps = {
       'Shuttle calendar received from the foundry',
     ],
     exit: [
-      'Primary slot reserved and a fallback run identified',
+      'Primary slot reserved, a fallback run identified, the bridge and interposer slot booked and a respin option held',
       'Die area and wafer count cover bring-up, characterization, compliance and reliability',
       'Tapeout date agreed with the program plan',
     ],
     dependsOn: ['UTEC-01'],
     dependsNote: null,
-    feedsInto: ['UTEC-06', 'UTCI-01', 'UTPO-03'],
+    feedsInto: ['UTEC-06', 'UTCI-01', 'UTPO-03', 'UTVP-08'],
     measuredBy: [
       'Weeks of margin between planned signoff and the slot',
       'Parts planned against parts needed',
@@ -327,7 +328,7 @@ export const UTEC_WRITE_UPS: UcieWriteUps = {
     ],
     links: {
       dependsOn: ['UTEC-01', 'UCON-05'],
-      feedsInto: ['UTEC-06', 'UTCI-01', 'UTPO-03'],
+      feedsInto: ['UTEC-06', 'UTCI-01', 'UTPO-03', 'UTVP-08'],
       runsWith: [],
       revisedBy: [],
       feedsBackInto: [],
@@ -372,7 +373,7 @@ export const UTEC_WRITE_UPS: UcieWriteUps = {
       ['Review and decision', 0.5],
     ],
     entry: [
-      'Selection memos from UTEC-01 to UTEC-05 released',
+      'Selection memos from UTEC-01 to UTEC-05 and the partner agreement from UTEC-07 released',
       'Risk owners identified',
       'Reviewers available',
     ],
@@ -381,7 +382,7 @@ export const UTEC_WRITE_UPS: UcieWriteUps = {
       'Every open risk scored and assigned an owner and date',
       'Selection signed by circuit, packaging, program and product leads',
     ],
-    dependsOn: ['UTEC-01', 'UTEC-02', 'UTEC-03', 'UTEC-04', 'UTEC-05'],
+    dependsOn: ['UTEC-01', 'UTEC-02', 'UTEC-03', 'UTEC-04', 'UTEC-05', 'UTEC-07'],
     dependsNote: null,
     feedsInto: ['UFND-07', 'UARC-12'],
     measuredBy: [
@@ -390,12 +391,79 @@ export const UTEC_WRITE_UPS: UcieWriteUps = {
       'Review date against plan',
     ],
     links: {
-      dependsOn: ['UTEC-01', 'UTEC-02', 'UTEC-03', 'UTEC-04', 'UTEC-05'],
+      dependsOn: ['UTEC-01', 'UTEC-02', 'UTEC-03', 'UTEC-04', 'UTEC-05', 'UTEC-07'],
       feedsInto: ['UFND-07', 'UARC-12'],
       runsWith: [],
       revisedBy: [],
       feedsBackInto: [],
     },
     terms: ['PDK', 'MPW'],
+  },
+  'UTEC-07': {
+    criticalPath: false,
+    purpose: [
+      'Secure an <b>interoperability partner</b> early: a partner or reference die with a UCIe Advanced interface that can sit on the same bridge or interposer as the test chip, an exchange agreement for silicon, bump map, sideband settings and test access, mated bump maps and orientation for a shared test vehicle, and known-good partner die supply.',
+      'On an Advanced package the partner die is not a cable away — it has to share the bridge or interposer, so its bump map has to mate with the test chip’s before the bump map freezes and before the test vehicle is drawn. A partner found after silicon arrives cannot be on the test vehicle at all.',
+    ],
+    flowNote:
+      'Step 1 shortlists partner dies. Step 2 agrees the exchange while step 3 mates the bump maps in parallel. Step 4 agrees known-good die supply and step 5 releases the agreement.',
+    consumes: [
+      'Interoperability targets from UREQ-07',
+      'Supported package technologies and bump pitches from UREQ-03',
+      'Package technology and bump pitch agreement from UTEC-03',
+      'Bump map concept and module floorplan from UARC-09',
+      'Partner die interface descriptions under non-disclosure',
+    ],
+    rel: {
+      'UTEC-D7': '<b>Interoperability partner agreement with mated bump map requirements.</b> Produced here; UCHN-03, UTVP-01 and UCMP-04 build on it.',
+      'UTEC-D6': '<b>Technology risk register and technology selection decision record.</b> Partner availability is a selection risk.',
+    },
+    risks: [
+      '<b>Partner too late.</b> The agreement is signed after the bump map freeze and the partner die cannot share the test vehicle.',
+      '<b>Bump maps that do not mate.</b> Pitch or orientation differ and the shared test vehicle needs a costly redistribution layer.',
+      '<b>No known-good partner dies.</b> The partner supplies untested dies and assembly yield on the shared vehicle collapses.',
+      '<b>Exchange without test access.</b> The agreement covers silicon but not the sideband settings and registers interop testing needs.',
+      '<b>Single partner.</b> One partner slips and no other die is available for interoperability.',
+    ],
+    roles: [
+      { r: 'Compliance and interoperability', d: 'Owns the partner agreement and the interop plan' },
+      { r: 'Packaging lead', d: 'Mated bump map and shared test vehicle feasibility' },
+      { r: 'Business development manager', d: 'Negotiates the exchange agreement' },
+      { r: 'Test chip lead', d: 'Test access and sideband settings on both dies' },
+      { r: 'Program manager', d: 'Partner die delivery against the assembly plan' },
+    ],
+    effort: [
+      ['Partner shortlist', 0.3],
+      ['Exchange agreement', 0.5],
+      ['Mated bump map', 0.6],
+      ['Known-good die supply', 0.3],
+      ['Release', 0.3],
+    ],
+    entry: [
+      'Interoperability targets released in UREQ-07',
+      'Package technologies agreed in UTEC-03',
+      'At least one candidate partner willing to exchange silicon',
+    ],
+    exit: [
+      'Interoperability agreement signed with at least one partner, covering silicon, bump map, sideband settings and test access',
+      'Mated bump map and orientation requirements recorded for the shared test vehicle',
+      'Known-good partner die quantity and delivery date agreed ahead of test vehicle assembly',
+    ],
+    dependsOn: ['UREQ-07', 'UTEC-03'],
+    dependsNote: 'Signed before the bump map freeze in UCHN-03, so the partner die can share the test vehicle.',
+    feedsInto: ['UTEC-06', 'UCHN-03', 'UTVP-01', 'UCMP-01', 'UCMP-04'],
+    measuredBy: [
+      'Partners with a signed agreement',
+      'Bump map mating issues open',
+      'Partner known-good dies committed against the assembly plan',
+    ],
+    links: {
+      dependsOn: ['UREQ-07', 'UTEC-03', 'UREQ-03', 'UARC-09'],
+      feedsInto: ['UTEC-06', 'UCHN-03', 'UTVP-01', 'UCMP-01', 'UCMP-04'],
+      runsWith: [],
+      revisedBy: [],
+      feedsBackInto: [],
+    },
+    terms: ['Interoperability', 'Reference die', 'Bump pitch', 'KGD', 'Test vehicle'],
   },
 };

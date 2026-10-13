@@ -1,5 +1,5 @@
 /**
- * UGA — General Availability Release. Weeks 116–128; closes on IP GA.
+ * UGA — General Availability Release. Weeks 120–132; closes on IP GA.
  */
 import type { UcieStageModule } from '../types';
 
@@ -7,7 +7,7 @@ export const UGA: UcieStageModule = {
   content: {
     tagline: 'Turn silicon results into a release any licensee can build production silicon on.',
     description:
-      'General availability is the release backed by silicon. The characterization, compliance and reliability results from the test chip are rolled up against every datasheet parameter and every pre-silicon prediction they replace; a silicon report summarizes eye margin, BER, energy per bit, PVT behavior, lane repair and reversal, runtime recalibration and low-power behavior, compliance, interoperability and reliability for licensees; and the release package — views, models, datasheet, integration guide and application notes — is updated to what silicon showed and to the fixes made since v0.9. The package passes the same release QA as v0.9, release notes and errata are written, and the GA decision is taken against the silicon-proven verdict, the compliance results and the open issues. The stage closes on IP GA.',
+      'General availability is the release backed by silicon, and it waits for all of it: the rollup starts only once characterization, compliance and the reliability report have reported, and GA release QA runs after the silicon-proven decision. The characterization, compliance and reliability results from the test chip are rolled up against every datasheet parameter and every pre-silicon prediction they replace, stated per package type with the package types supported by simulation only labelled as such; a silicon report summarizes eye margin, BER, energy per bit, PVT behavior, lane repair and reversal, runtime recalibration and low-power behavior, compliance, interoperability and reliability for licensees; and the release package — views, models, datasheet, integration guide and application notes — is updated to what silicon showed and to the fixes in the customer ECO log as it stands at the GA cut-off. The package passes the same release QA as v0.9, release notes and errata are written, and the GA decision is taken against the silicon-proven verdict, the compliance results and the open issues. The stage closes on IP GA.',
     activities: ['Silicon data rollup', 'Silicon report', 'Final release package', 'GA release QA', 'GA approval'],
     deliverables: [
       'Silicon data rollup — measured results mapped to every datasheet parameter and prediction',
@@ -17,7 +17,7 @@ export const UGA: UcieStageModule = {
       'GA approval decision record',
     ],
     deliverableFrom: [0, 1, 2, 3, 4],
-    deliverableWeek: [6, 8, 10, 11, 12],
+    deliverableWeek: [9, 9, 10, 11, 12],
     engineeringEffort: [4, 6, 8, 3, 2],
     risks: [
       'A datasheet parameter silicon missed is published unchanged because nobody mapped measurements to parameters',
@@ -29,6 +29,7 @@ export const UGA: UcieStageModule = {
       'Fixes made for one customer since v0.9 missing from the GA package other licensees receive',
       'Silicon report quoting best-lane results rather than the distribution across lanes and corners',
       'GA package re-tagged without re-running release QA on the changed files',
+      'A package type the test vehicle never built presented in the silicon report as if it were measured',
       'GA criteria never written, so the approval review has nothing to decide against',
     ],
     leader: { name: 'Marcus Feld', short: 'M. Feld', phone: '+1 (408) 555-0662', email: 'marcus.feld@example.com' },
@@ -46,10 +47,10 @@ export const UGA: UcieStageModule = {
   steps: {
     'UGA-01': {
       s: [
-        [1, 'Gather the characterization, compliance and reliability results with their test conditions and sample counts', 1.5],
-        [2, 'Map each measured result to the datasheet parameter and the pre-silicon prediction it replaces', 2],
-        [3, 'Flag parameters that miss target and agree a datasheet change, an erratum or a fix for each', 1.5],
-        [4, 'Release the silicon data rollup to documentation and the silicon report', 1],
+        [1, 'Gather the reported characterization, compliance and reliability results with their test conditions, package types and sample counts', 0.5],
+        [2, 'Map each measured result to the datasheet parameter and the pre-silicon prediction it replaces, per package type', 1],
+        [3, 'Flag parameters that miss target and agree a datasheet change, an erratum or a fix for each', 1],
+        [4, 'Release the silicon data rollup to documentation and the silicon report', 0.5],
       ],
       o: [
         'Collected silicon results with test conditions',
@@ -61,10 +62,10 @@ export const UGA: UcieStageModule = {
     },
     'UGA-02': {
       s: [
-        [1, 'Summarize eye margin, BER, energy per bit and PVT shmoo results across lanes and corners', 2],
+        [1, 'Summarize eye margin, BER, energy per bit, PLL jitter and PVT shmoo results across lanes, corners and package types', 1.5],
         [2, 'Summarize lane repair, lane reversal, runtime recalibration and low-power behavior on silicon', 1, 1],
-        [3, 'Summarize compliance, interoperability and reliability results', 1],
-        [4, 'Add the measurement-to-simulation correlation and describe the test vehicle channel used', 1.5],
+        [3, 'Summarize compliance, interoperability and reliability results with the lot and sample counts behind them', 1],
+        [4, 'Add the measurement-to-simulation correlation, describe each test vehicle channel and label package types supported by simulation only', 1],
         [5, 'Review and release the silicon report for licensees', 1],
       ],
       o: [
@@ -78,16 +79,16 @@ export const UGA: UcieStageModule = {
     },
     'UGA-03': {
       s: [
-        [1, 'Update the datasheet, integration guide and application notes to measured silicon', 2],
-        [2, 'Update the timing, power and channel models where silicon correlation moved them', 1.5, 1],
-        [3, 'Fold in the fixes and ECOs released to customers since v0.9', 1.5],
+        [1, 'Update the datasheet, integration guide and application notes to measured silicon', 1.5],
+        [2, 'Update the channel compliance kit, timing and power models where silicon correlation moved them', 1, 1],
+        [3, 'Fold in every fix and ECO in the customer ECO log frozen at the GA cut-off', 1],
         [4, 'Rebuild the release package with GA version tags against the final deliverable checklist', 1.5],
         [5, 'Hand the GA package to release QA', 0.5],
       ],
       o: [
         'Documents updated to silicon',
         'Models updated to silicon correlation',
-        'Post-v0.9 fixes merged',
+        'ECO log fixes merged up to the GA cut-off',
         'GA-tagged release package',
         'GA release package — views, models and documents updated to silicon',
       ],
@@ -95,9 +96,9 @@ export const UGA: UcieStageModule = {
     },
     'UGA-04': {
       s: [
-        [1, 'Run the release QA checklist on the GA package', 1],
+        [1, 'Run the release QA checklist on the GA package once the silicon-proven decision is recorded', 0.5],
         [2, 'Re-run the sanity flows on every view and model', 1, 1],
-        [3, 'Write the GA release notes and errata with workarounds', 1],
+        [3, 'Write the GA release notes and errata with workarounds from the errata process', 0.5],
         [4, 'Close or waive every QA finding with its customer impact', 0.5],
       ],
       o: [
@@ -110,10 +111,10 @@ export const UGA: UcieStageModule = {
     },
     'UGA-05': {
       s: [
-        [1, 'Review the silicon-proven verdict, characterization, compliance and QA results against the GA criteria', 0.5],
-        [2, 'Review open errata and customer issues and their workarounds', 0.5],
-        [3, 'Decide GA and record the decision with any conditions', 0.5],
-        [4, 'Announce GA and publish the package to every licensee', 0.5],
+        [1, 'Review the silicon-proven verdict, characterization, compliance and QA results against the GA criteria', 0.25],
+        [2, 'Review open errata and customer issues and their workarounds', 0.25],
+        [3, 'Decide GA and record the decision with any conditions', 0.25],
+        [4, 'Announce GA and publish the package to every entitled licensee', 0.25],
       ],
       o: [
         'GA criteria review',

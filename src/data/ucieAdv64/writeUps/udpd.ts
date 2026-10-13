@@ -278,7 +278,7 @@ export const UDPD_WRITE_UPS: UcieWriteUps = {
       'Step 1 runs every corner and mode and step 2 closes the analog boundary, with fixes applied in parallel in step 3. Step 4 releases the report.',
     consumes: [
       'Placed and routed database from UDPD-04',
-      'Front-end timing models from ULAY-06',
+      'Early front-end timing models and abstracts released by ULAY-06, refreshed as the layout closes',
       'Clocking architecture from UARC-06',
       'Constraints from UDPD-01',
       'Implementation flow from UFND-03',
@@ -309,7 +309,7 @@ export const UDPD_WRITE_UPS: UcieWriteUps = {
     ],
     entry: [
       'Routed database released from UDPD-04',
-      'Front-end timing models available from ULAY-06',
+      'Early front-end timing models available from ULAY-06',
       'Corner and mode set agreed with signoff',
     ],
     exit: [
@@ -318,7 +318,7 @@ export const UDPD_WRITE_UPS: UcieWriteUps = {
       'Timing report released with the netlist revision',
     ],
     dependsOn: ['UDPD-04', 'ULAY-06'],
-    dependsNote: 'Front-end timing models arrive near the end; the boundary is first closed on preliminary models.',
+    dependsNote: 'The front-end’s early timing models arrive while its layout is still closing; the boundary is closed on them first and re-timed on each refresh, so the final models change numbers, not arcs.',
     feedsInto: ['UDPD-06', 'UDPD-07'],
     measuredBy: [
       'Worst negative slack per corner',
@@ -326,7 +326,7 @@ export const UDPD_WRITE_UPS: UcieWriteUps = {
       'Violations remaining',
     ],
     links: {
-      dependsOn: ['UDPD-04', 'ULAY-06', 'UARC-06', 'UDPD-01', 'UFND-03'],
+      dependsOn: ['UDPD-04', 'ULAY-06', 'UARC-06', 'UDPD-01', 'UFND-03', 'UDPD-08'],
       feedsInto: ['UDPD-06', 'UDPD-07', 'USGN-01'],
       runsWith: [],
       revisedBy: [],
@@ -412,10 +412,11 @@ export const UDPD_WRITE_UPS: UcieWriteUps = {
       'Hardened macro and views from UDPD-06',
       'Final netlist from UDPD-02',
       'Placed and routed database from UDPD-04',
-      'Floorplan and power grid from UDPD-03',
+      'Functional ECO log from UDPD-08',
     ],
     rel: {
       'UDPD-D7': '<b>Digital timing closure review record.</b> Produced here; it closes the Digital Timing Closure gate.',
+      'UDPD-D8': '<b>Functional ECO log with the ECO-updated netlist and equivalence results.</b> The review confirms every post-freeze fix is in the database it closes.',
     },
     risks: [
       '<b>Waivers unexplained.</b> Waivers lack a customer-facing reason.',
@@ -442,11 +443,11 @@ export const UDPD_WRITE_UPS: UcieWriteUps = {
       'Signoff team available for the review',
     ],
     exit: [
-      'Every residual violation fixed or waived with a written reason',
+      'Every residual violation fixed or waived with a written reason, and every post-freeze ECO in the reviewed database',
       'Hand-off to signoff accepted by the signoff engineer',
       'Decision recorded against the database revision',
     ],
-    dependsOn: ['UDPD-05', 'UDPD-06'],
+    dependsOn: ['UDPD-05', 'UDPD-06', 'UDPD-08'],
     dependsNote: null,
     feedsInto: ['USGN-01', 'USGN-07'],
     measuredBy: [
@@ -455,12 +456,80 @@ export const UDPD_WRITE_UPS: UcieWriteUps = {
       'Review date against plan',
     ],
     links: {
-      dependsOn: ['UDPD-01', 'UDPD-02', 'UDPD-03', 'UDPD-04', 'UDPD-05', 'UDPD-06'],
+      dependsOn: ['UDPD-01', 'UDPD-02', 'UDPD-03', 'UDPD-04', 'UDPD-05', 'UDPD-06', 'UDPD-08'],
       feedsInto: ['USGN-01', 'USGN-07'],
       runsWith: [],
       revisedBy: [],
       feedsBackInto: [],
     },
     terms: ['Timing closure', 'Signoff'],
+  },
+  'UDPD-08': {
+    criticalPath: false,
+    purpose: [
+      'Fix every bug that verification finds <b>after the RTL freeze</b> as a controlled <b>functional ECO</b>: triage it to a fix or a written waiver, change the RTL and the netlist together with spare cells or a scoped re-synthesis, re-prove equivalence, and fold the change into place and route without reopening paths that already close.',
+      'Verification keeps finding bugs for weeks after the freeze and after the netlist is released, and without a path for them the choice is a full re-synthesis that resets implementation or a known bug in the hard macro. A scoped ECO with equivalence re-proven keeps the RTL, the netlist and the database telling the same story into signoff and into the v0.9 release.',
+    ],
+    flowNote:
+      'Step 1 triages each post-freeze bug. Step 2 implements the fix in the RTL and the netlist, with equivalence re-proven in parallel in step 3. Step 4 reruns the affected regressions, step 5 folds the ECO into the routed database and step 6 releases the log and netlist.',
+    consumes: [
+      'Released netlist from UDPD-02',
+      'Post-freeze bugs from link training and state machine verification in UDV-03',
+      'Post-freeze bugs from error injection and retry verification in UDV-04',
+      'Gate-level simulation failures from UDV-10',
+      'Frozen RTL and change control from URTL-10',
+    ],
+    rel: {
+      'UDPD-D8': '<b>Functional ECO log with the ECO-updated netlist and equivalence results.</b> Produced here; signoff and the v0.9 release take the netlist it names.',
+      'UDPD-D5': '<b>Multi-corner multi-mode timing closure report.</b> Each ECO is timed before closure is reported.',
+      'UDPD-D7': '<b>Digital timing closure review record.</b> The review checks the ECO log is closed.',
+    },
+    risks: [
+      '<b>RTL and netlist diverge.</b> A fix is made in the netlist only and the next synthesis loses it.',
+      '<b>Equivalence skipped.</b> An ECO is released without re-proving equivalence and hides a second bug.',
+      '<b>Spare cells exhausted.</b> Too few spare cells were left and a fix forces re-synthesis.',
+      '<b>Closed paths reopened.</b> The ECO is routed through timing-critical regions.',
+      '<b>Waivers untracked.</b> A bug waived instead of fixed never reaches the integration guide.',
+    ],
+    roles: [
+      { r: 'Physical design', d: 'Owns the functional ECO flow' },
+      { r: 'RTL design lead', d: 'Writes the RTL fix and approves the change' },
+      { r: 'Verification engineer', d: 'Reproduces the bug and confirms the fix' },
+      { r: 'Formal verification engineer', d: 'Re-proves equivalence' },
+      { r: 'Program manager', d: 'Approves fixes and waivers after the freeze' },
+    ],
+    effort: [
+      ['Bug triage', 0.3],
+      ['RTL and netlist ECO', 1],
+      ['Equivalence', 0.3],
+      ['Regression on the ECO netlist', 0.5],
+      ['Place and route fold-in', 0.4],
+    ],
+    entry: [
+      'Netlist released from UDPD-02 with spare cells placed',
+      'Post-freeze change control in force from URTL-10',
+      'Bug tracker shared between verification and implementation',
+    ],
+    exit: [
+      'Every post-freeze bug closed as fixed in RTL and netlist or waived with a written reason',
+      'Equivalence proven between the final RTL and the ECO netlist',
+      'ECO log and netlist released with the database revision signoff will use',
+    ],
+    dependsOn: ['UDPD-02', 'URTL-10', 'UDV-10'],
+    dependsNote: 'Bugs arrive while the ECO window is open; the last ECO lands before timing closure ends so signoff starts on one netlist.',
+    feedsInto: ['UDPD-05', 'UDPD-07'],
+    measuredBy: [
+      'Post-freeze bugs open against fixed',
+      'ECOs released without an equivalence failure',
+      'Spare cells used against those placed',
+    ],
+    links: {
+      dependsOn: ['UDPD-02', 'URTL-10', 'UDV-03', 'UDV-04', 'UDV-10'],
+      feedsInto: ['UDPD-05', 'UDPD-07', 'UDV-12', 'USGN-01'],
+      runsWith: [],
+      revisedBy: [],
+      feedsBackInto: ['URTL-10'],
+    },
+    terms: ['ECO', 'Netlist hand-off', 'Timing closure'],
   },
 };
