@@ -135,13 +135,14 @@ for (const sk of UCIE_SKELETON) {
       }
     });
 
-    it('relates every activity to its own deliverables, and names a producer for each', () => {
+    it('relates every activity to deliverables, producing only its own stage’s, and names a producer for each', () => {
       for (const ref of refs) {
         const a = UCIE_ACTIVITIES[ref];
         expect(a.r.length, `${ref} relates to no deliverable`).toBeGreaterThan(0);
         for (const [dref, rel] of a.r) {
           expect(UCIE_DELIVERABLES[dref], `${ref} → ${dref}`).toBeTruthy();
-          expect(dref.split('-')[0], `${ref} → ${dref}`).toBe(sk.prefix);
+          /* an activity produces only its own stage's deliverables; it may feed another stage's */
+          if (rel === 'produces') expect(dref.split('-')[0], `${ref} → ${dref}`).toBe(sk.prefix);
           expect(['produces', 'feeds', 'informs', 'gates'], `${ref} → ${dref}`).toContain(rel);
         }
       }

@@ -48,13 +48,11 @@ export const UBUP: UcieStageModule = {
   steps: {
     'UBUP-01': {
       s: [
-        [1, 'Inspect the assembled test vehicles and boards and check rail impedances before power is applied', 0.25],
-        [2, 'Apply the supplies in the documented sequence on one unit and log rail currents against the power model', 0.25],
-        [3, 'Check the reference clock, resets and the die temperature sensors on both dies', 0.25, 1],
-        [4, 'Repeat on the first units and release the power-on and sequencing record', 0.5],
+        [1, 'Apply the supplies in the documented sequence on one unit and log rail currents against the power model', 0.25],
+        [2, 'Check the reference clock, resets and the die temperature sensors on both dies', 0.25, 1],
+        [3, 'Repeat on the first units and release the power-on and sequencing record', 0.5],
       ],
       o: [
-        'Pre-power inspection and rail impedance check',
         'First-unit rail current log against the power model',
         'Reference clock, reset and temperature sensor check',
         'Power-on and supply sequencing record with rail currents per die',

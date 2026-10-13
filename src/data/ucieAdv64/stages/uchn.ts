@@ -157,7 +157,7 @@ export const UCHN: UcieStageModule = {
         'Customer and partner review comments resolved',
         'Customer channel guidelines, reference package design and channel compliance kit',
       ],
-      r: [['UCHN-D6', 'produces']],
+      r: [['UCHN-D6', 'produces'], ['UPRE-D5', 'feeds']],
     },
     'UCHN-07': {
       s: [

@@ -19,7 +19,7 @@ export const URLQ: UcieStageModule = {
       'Silicon-proven decision record',
     ],
     deliverableFrom: [0, 1, 2, 3, 4, 5],
-    deliverableWeek: [2, 20, 10, 22, 24, 26],
+    deliverableWeek: [2, 22, 10, 22, 24, 26],
     engineeringEffort: [1.5, 6, 3, 5, 2, 1],
     risks: [
       'Stress run with the link idle, so wear-out of the front-end under 64 GT/s switching is never exercised',

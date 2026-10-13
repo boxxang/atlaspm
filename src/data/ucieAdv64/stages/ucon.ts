@@ -108,7 +108,7 @@ export const UCON: UcieStageModule = {
     },
     'UCON-05': {
       s: [
-        [1, 'Build the integrated schedule from kickoff through test chip, silicon validation and production release', 1],
+        [1, 'Build the integrated schedule from kickoff through test chip, silicon validation and production release, with a metal-fix scenario and its effect on the production release date', 1],
         [2, 'Plan staffing by function — architecture, analog, digital, verification, layout, test and customer engineering', 1],
         [3, 'Budget the test chip, test vehicle, boards, lab equipment and shuttle slots', 1, 1],
         [4, 'Identify partners — foundry, package and assembly partner, test house — and their commitments', 1],

@@ -302,10 +302,10 @@ export const UGA_WRITE_UPS: UcieWriteUps = {
       { r: 'Customer engineering lead', d: 'Presents open issues and publishes the release' },
     ],
     effort: [
-      ['Evidence review', 0.5],
-      ['Errata and issue review', 0.5],
-      ['Decision', 0.5],
-      ['Publication', 0.5],
+      ['Evidence review', 0.2],
+      ['Errata and issue review', 0.1],
+      ['Decision', 0.1],
+      ['Publication', 0.1],
     ],
     entry: [
       'Silicon-proven decision recorded in URLQ-06',

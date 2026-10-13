@@ -74,7 +74,7 @@ export const UCHR: UcieStageModule = {
       s: [
         [1, 'Turn the PPA targets and the agreed bring-up deviations into the parameters to characterize', 0.5],
         [2, 'Build the corner matrix — supplies, temperatures, process split lots, data rates and units', 0.5],
-        [3, 'Allocate units and modules per corner and reserve units for reliability and compliance', 0.5, 1],
+        [3, 'Allocate characterization units and modules to each corner', 0.5, 1],
         [4, 'Set test durations and pass criteria per measurement and release the plan', 1],
       ],
       o: [

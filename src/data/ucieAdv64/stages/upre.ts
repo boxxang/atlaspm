@@ -143,14 +143,12 @@ export const UPRE: UcieStageModule = {
     'UPRE-05': {
       s: [
         [1, 'Build behavioral TX and RX models from post-layout simulation for the channel compliance kit', 2],
-        [2, 'Package the transfer-function and crosstalk flow with the eye mask and a checker that judges a customer channel', 2, 1],
-        [3, 'Correlate the kit with the post-layout link margin simulation on the reference channels and the final channel specification', 2],
-        [4, 'Package timing models and power models — static, dynamic and per low-power state — and an IBIS-AMI model where a licensee asks for one', 1.5, 1],
-        [5, 'Run the kit on a customer-style channel, document its validity range and release the model set', 2],
+        [2, 'Correlate the kit with the post-layout link margin simulation on the reference channels and the final channel specification', 2],
+        [3, 'Package timing models and power models — static, dynamic and per low-power state — and an IBIS-AMI model where a licensee asks for one', 1.5, 1],
+        [4, 'Run the kit on a customer-style channel, document its validity range and release the model set', 2],
       ],
       o: [
         'Behavioral TX and RX models',
-        'Transfer-function flow, eye mask and channel checker',
         'Kit-to-post-layout correlation results',
         'Timing and power model set',
         'Channel compliance kit — behavioral TX and RX models, transfer-function flow, eye mask and checker — with timing and power models',

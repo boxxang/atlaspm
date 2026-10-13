@@ -354,6 +354,7 @@ export const UCHN_WRITE_UPS: UcieWriteUps = {
     ],
     rel: {
       'UCHN-D6': '<b>Customer channel guidelines, reference package design and channel compliance kit.</b> Produced here; the kit is the primary customer channel model in the v0.9 release, and the guidelines are used in customer integration reviews.',
+      'UPRE-D5': '<b>Channel compliance kit and models in the v0.9 release.</b> The kit packaged here is what UPRE-05 releases to licensees, with the timing and power models beside it.',
     },
     risks: [
       '<b>Test vehicle only.</b> Guidelines describe the test vehicle stack-up rather than customer packages.',

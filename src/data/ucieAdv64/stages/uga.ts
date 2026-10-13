@@ -18,7 +18,7 @@ export const UGA: UcieStageModule = {
     ],
     deliverableFrom: [0, 1, 2, 3, 4],
     deliverableWeek: [9, 9, 10, 11, 12],
-    engineeringEffort: [4, 6, 8, 3, 2],
+    engineeringEffort: [4, 6, 8, 3, 0.5],
     risks: [
       'A datasheet parameter silicon missed is published unchanged because nobody mapped measurements to parameters',
       'Production release declared before compliance or reliability results are final, so the silicon-proven claim does not hold',

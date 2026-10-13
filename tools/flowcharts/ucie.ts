@@ -82,6 +82,8 @@ const EDGES: [string, string][] = [
   ['ucieChannel', 'ucieLayout'],
   ['ucieChannel', 'ucieTestVehicle'],
   ['ucieChannel', 'ucieTestChip'],
+  /* the channel compliance kit, handed to the v0.9 release */
+  ['ucieChannel', 'uciePreSilicon'],
   ['ucieAfe', 'ucieAms'],
   ['ucieAfe', 'ucieLayout'],
   ['ucieRtl', 'ucieDv'],
