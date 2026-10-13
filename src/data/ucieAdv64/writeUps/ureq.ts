@@ -145,7 +145,7 @@ export const UREQ_WRITE_UPS: UcieWriteUps = {
       'The bump map, the module floorplan, the channel model and the test vehicle are all drawn for these choices. A range left wide open means the bump map is designed for none of them; a range too narrow loses the customers on the other package types.',
     ],
     flowNote:
-      'Step 1 lists the customers’ package technologies. Step 2 agrees the bump pitch range while step 3 records reach needs in parallel. Step 4 decides which types are silicon-proven at production release and step 5 releases the matrix.',
+      'Step 1 lists the customers’ package technologies. Step 2 records the bump pitches customers plan while step 3 records reach needs in parallel. Step 4 decides which types are silicon-proven at production release and step 5 releases the matrix.',
     consumes: [
       'Customer package types from UCON-01',
       'Feature selection matrix from UREQ-01',
@@ -476,7 +476,7 @@ export const UREQ_WRITE_UPS: UcieWriteUps = {
       'At 64 GT/s the analog front-end has little margin to give: supply noise becomes timing jitter, and fine-pitch bumps leave less room for ESD protection that does not load the lanes. These limits bound every AFE design choice and every signoff corner.',
     ],
     flowNote:
-      'Step 1 sets supply and noise limits. Step 2 decides PLL ownership and the reference clock while step 3 decides termination and receiver equalization in parallel. Step 4 sets voltage compatibility while step 5 sets ESD targets, step 6 sets the operating range and step 7 releases the requirements.',
+      'Step 1 sets supply and noise limits. Step 2 decides PLL ownership and the reference clock. Step 3 sets voltage compatibility while step 4 sets ESD targets in parallel, step 5 sets the operating range and step 6 releases the requirements.',
     consumes: [
       'Feature selection matrix from UREQ-01',
       'PPA targets from UREQ-02',
@@ -542,7 +542,7 @@ export const UREQ_WRITE_UPS: UcieWriteUps = {
       'A requirement without a verification owner is a wish. Tying each to the margin review, the verification plan, the characterization plan or the compliance plan now is what lets the production release review later check the IP against what was promised.',
     ],
     flowNote:
-      'Step 1 builds the traceability matrix. Step 2 resolves conflicts and step 3 holds the baseline review.',
+      'Step 1 builds the traceability matrix. Step 2 resolves conflicts while step 3 names the owner of specification errata and ECNs in parallel, and step 4 holds the baseline review.',
     consumes: [
       'Feature selection matrix from UREQ-01',
       'PPA targets from UREQ-02',

@@ -343,7 +343,7 @@ export const UCUS_WRITE_UPS: UcieWriteUps = {
       'Licensees sign off and tape out on v0.9 and its patches long before production release, so a defect found in the meantime has to reach every one of them in a known form. An erratum emailed to the customer who reported it, or a patch shipped without QA, leaves the installed base split between people who know and people who do not.',
     ],
     flowNote:
-      'Step 1 sets up the errata process. Step 2 turns confirmed issues into errata while step 3 builds patch releases and step 4 notifies licensees in parallel. Step 5 keeps the errata consistent and carries them into production release, and step 6 hands the list to sustaining.',
+      'Step 1 sets up the errata process. Step 2 turns confirmed issues into errata while step 3 builds patch releases and step 4 notifies licensees in parallel. Step 5 hands the errata list and patch history to sustaining.',
     consumes: [
       'v0.9 release decision and distribution list from UPRE-08',
       'Confirmed customer issues and dispositions from UCUS-04',

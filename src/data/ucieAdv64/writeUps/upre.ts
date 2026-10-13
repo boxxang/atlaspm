@@ -282,7 +282,7 @@ export const UPRE_WRITE_UPS: UcieWriteUps = {
       'UCIe Advanced channels are short, single-ended and forwarded-clocked, and they are judged by transfer function and eye mask rather than by a SerDes-style model of an equalizing receiver. A customer’s bridge or interposer is signed off with this kit, not with this team’s circuits, so a kit that is optimistic outside its range moves the risk into the customer’s package.',
     ],
     flowNote:
-      'Step 1 builds the behavioral models while step 2 packages the transfer-function flow, eye mask and checker in parallel. Step 3 correlates the kit with post-layout margin, step 4 packages timing and power models in parallel, and step 5 runs the kit on a customer-style channel and releases it.',
+      'Step 1 builds the behavioral models. Step 2 correlates the kit with post-layout margin while step 3 packages timing and power models in parallel, and step 4 runs the kit on a customer-style channel and releases it.',
     consumes: [
       'Post-layout extraction and simulation results from ULAY-05',
       'Package channel extraction and SI results from UCHN-04',

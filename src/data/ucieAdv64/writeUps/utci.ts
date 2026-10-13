@@ -77,7 +77,7 @@ export const UTCI_WRITE_UPS: UcieWriteUps = {
       'At 64 GT/s on a x64 module the FDI carries several terabits per second. A traffic generator that cannot keep up means the link is only ever run in PRBS mode, and the Adapter’s CRC, retry and Flit handling are never proven on silicon at speed.',
     ],
     flowNote:
-      'Step 1 designs the traffic generator and checker while step 2 adds register and debug access in parallel. Step 3 integrates the PHY test controls while step 4 adds bring-up controls in parallel, and step 5 lints, cleans CDC and releases.',
+      'Step 1 designs the traffic generator and checker while step 2 adds register and debug access in parallel. Step 3 integrates the PHY test controls, the analog test bus and the observation lane while step 4 adds bring-up controls in parallel, step 5 lints, cleans CDC and releases, and step 6 freezes the register map.',
     consumes: [
       'Test chip architecture specification from UTCI-01',
       'PRBS generators and checkers from UDFT-03',

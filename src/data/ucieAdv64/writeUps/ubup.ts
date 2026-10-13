@@ -11,7 +11,7 @@ export const UBUP_WRITE_UPS: UcieWriteUps = {
       'A die-to-die PHY is powered by the customer’s SoC, not by its own board, so the first thing silicon proves is that the documented supply sequence works. A unit that only comes up with a different order or an extra delay is a finding for the integration guide, not a lab trick to forget.',
     ],
     flowNote:
-      'Step 1 inspects the units and checks rail impedances. Step 2 powers one unit in the documented order, with clocks, resets and sensors checked in parallel in step 3. Step 4 repeats on the first units and releases the record.',
+      'Step 1 powers one unit in the documented order, with clocks, resets and sensors checked in parallel in step 2. Step 3 repeats on the first units and releases the record.',
     consumes: [
       'First samples received in the lab from UFAB-05',
       'Assembled and inspected evaluation boards from UFAB-04',

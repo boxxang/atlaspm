@@ -11,7 +11,7 @@ export const UTPO_WRITE_UPS: UcieWriteUps = {
       'For an IP program the tapeout checklist has a second reader: a waiver accepted for the test chip is a fact about the released macro too. Recording here which waivers the v0.9 release must disclose keeps the test chip and the product telling the same story.',
     ],
     flowNote:
-      'Step 1 walks the checklist. Step 2 reviews waivers while step 3 traces release deliverables and step 4 confirms the shuttle re-commitment in parallel, and step 5 signs the checklist.',
+      'Step 1 walks the checklist. Step 2 reviews waivers while step 3 traces release deliverables in parallel, and step 4 signs the checklist.',
     consumes: [
       'Hard macro signoff decision record from USGN-07',
       'Test chip readiness decision from UTCI-06',
