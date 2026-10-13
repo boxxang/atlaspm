@@ -408,7 +408,7 @@ export const UBUP_WRITE_UPS: UcieWriteUps = {
       'This is new architecture on a new process, and the plan to this point assumes first silicon works. A metal fix or respin costs several months; deciding it late costs more, because characterization, compliance and reliability would otherwise spend weeks on silicon that is about to be replaced. The decision makes the schedule consequence explicit instead of letting production release quietly depend on a workaround.',
     ],
     flowNote:
-      'Step 1 classifies the open issues while step 2 estimates a metal fix and a respin in parallel. Step 3 weighs the options against the production release claim and step 4 records the decision and its effect on the production release date.',
+      'Step 1 classifies the open issues while step 2 estimates a metal fix and a respin in parallel. Step 3 weighs the options against the production release claim, step 4 re-baselines the program plan for the chosen path and step 5 records the decision and its effect on the production release date.',
     consumes: [
       'Open-issue list and first link-up decision from UBUP-06',
       'Bring-up results against plan and predictions from UBUP-05',
@@ -459,7 +459,7 @@ export const UBUP_WRITE_UPS: UcieWriteUps = {
       'Production release date change recorded and communicated',
     ],
     links: {
-      dependsOn: ['UBUP-06', 'UBUP-05', 'UBUP-03', 'UBUP-04', 'UBUP-01', 'UBUP-02', 'UTEC-05', 'UTPO-03'],
+      dependsOn: ['UBUP-06', 'UBUP-05', 'UBUP-03', 'UBUP-04', 'UBUP-01', 'UBUP-02', 'UTEC-05', 'UTPO-03', 'UCON-05', 'UARC-12'],
       feedsInto: ['UCHR-10', 'URLQ-06', 'UGA-01', 'UCUS-06'],
       runsWith: [],
       revisedBy: [],

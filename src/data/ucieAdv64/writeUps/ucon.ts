@@ -271,11 +271,11 @@ export const UCON_WRITE_UPS: UcieWriteUps = {
   'UCON-05': {
     criticalPath: true,
     purpose: [
-      'Plan the program: an <b>integrated schedule to production release</b>, staffing by function, the test chip, test vehicle, board and shuttle budget, and the partners whose commitments the plan depends on.',
+      'Plan the program for the go decision: a <b>preliminary integrated schedule to production release</b>, staffing by function, the test chip, test vehicle, board and shuttle budget, and the partners whose commitments the plan depends on.',
       'An IP program has two products on one schedule — the release packages customers receive and the test chip that proves them. The plan has to show both, and the long-lead items behind the test chip — the shuttle slot, the advanced-package test vehicle and the boards — have to be visible from kickoff.',
     ],
     flowNote:
-      'Step 1 builds the schedule and step 2 the staffing plan, with the hardware budget in parallel in step 3. Step 4 names the partners and step 5 releases the plan.',
+      'Step 1 builds the schedule and step 2 the staffing plan, with the hardware budget in parallel in step 3. Step 4 names the partners and step 5 releases the preliminary plan for the go decision.',
     consumes: [
       'IP business case and cost model from UCON-03',
       'Roadmap position and derivative plan from UCON-04',
@@ -284,7 +284,7 @@ export const UCON_WRITE_UPS: UcieWriteUps = {
       'Package and assembly partner lead times',
     ],
     rel: {
-      'UCON-D5': '<b>IP program plan.</b> Produced here; the integrated schedule is what every stage is planned against.',
+      'UCON-D5': '<b>Preliminary IP program plan.</b> Produced here; it is the plan the go decision is taken on, re-baselined at the architecture freeze in UARC-12 and again at the respin or metal-fix decision in UBUP-07.',
       'UCON-D6': '<b>Go / no-go decision package.</b> The plan is its schedule and resource section.',
     },
     risks: [
@@ -328,7 +328,7 @@ export const UCON_WRITE_UPS: UcieWriteUps = {
     ],
     links: {
       dependsOn: ['UCON-03', 'UCON-04'],
-      feedsInto: ['UCON-06', 'UTEC-05', 'UFND-06'],
+      feedsInto: ['UCON-06', 'UTEC-05', 'UFND-06', 'UARC-12', 'UBUP-07'],
       runsWith: [],
       revisedBy: [],
       feedsBackInto: [],
@@ -348,7 +348,7 @@ export const UCON_WRITE_UPS: UcieWriteUps = {
       'Competitive differentiation matrix from UCON-02',
       'IP business case from UCON-03',
       'Roadmap position from UCON-04',
-      'IP program plan from UCON-05',
+      'Preliminary IP program plan from UCON-05',
     ],
     rel: {
       'UCON-D6': '<b>IP program go / no-go decision package.</b> Produced here; the decision and its conditions open the requirements stage.',

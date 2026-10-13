@@ -743,7 +743,7 @@ export const UARC_WRITE_UPS: UcieWriteUps = {
       'This freeze is what the AFE and RTL teams start their main design from. A freeze with open questions recorded as assumptions moves the questions into design, where they cost far more to settle.',
     ],
     flowNote:
-      'Step 1 reviews coverage of the requirements. Step 2 closes or assigns open questions and step 3 freezes the specifications.',
+      'Step 1 reviews coverage of the requirements. Step 2 closes or assigns open questions while step 3 re-baselines the program plan on the frozen architecture in parallel, and step 4 freezes the specifications.',
     consumes: [
       'Partitioning and interface specification from UARC-01',
       'Adapter, logical PHY and repair specifications from UARC-02, UARC-03 and UARC-04',
@@ -752,7 +752,7 @@ export const UARC_WRITE_UPS: UcieWriteUps = {
       'Requirements baseline from UREQ-09',
     ],
     rel: {
-      'UARC-D12': '<b>Architecture freeze decision package.</b> Produced here; it is the Architecture Freeze gate.',
+      'UARC-D12': '<b>Architecture freeze decision package with the re-baselined program plan.</b> Produced here; it is the Architecture Freeze gate, and the program plan every later stage is held to.',
     },
     risks: [
       '<b>Open questions frozen.</b> Questions are recorded as assumptions without owners.',
@@ -792,7 +792,7 @@ export const UARC_WRITE_UPS: UcieWriteUps = {
       'Freeze date against plan',
     ],
     links: {
-      dependsOn: ['UARC-01', 'UARC-02', 'UARC-03', 'UARC-04', 'UARC-05', 'UARC-06', 'UARC-07', 'UARC-08', 'UARC-09', 'UARC-10', 'UARC-11', 'UREQ-09'],
+      dependsOn: ['UARC-01', 'UARC-02', 'UARC-03', 'UARC-04', 'UARC-05', 'UARC-06', 'UARC-07', 'UARC-08', 'UARC-09', 'UARC-10', 'UARC-11', 'UREQ-09', 'UCON-05'],
       feedsInto: ['UAFE-02', 'UAFE-03', 'UAFE-04', 'URTL-02', 'URTL-04', 'URTL-05', 'UDFT-01', 'UDV-01', 'UCHN-03'],
       runsWith: [],
       revisedBy: [],
