@@ -453,6 +453,8 @@ test.describe('the program list', () => {
         'custom:embeddedSoc',
         'cpoSwitch',
         'custom:cpoSwitch',
+        'ucieAdv64',
+        'custom:ucieAdv64',
       ]);
 
       await page.locator('.pf-profile').selectOption('typicalSoC');

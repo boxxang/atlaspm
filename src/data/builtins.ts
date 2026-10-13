@@ -39,6 +39,16 @@ import {
 } from './cpoSwitch';
 import { CPO_GLOSSARY } from './cpoSwitch/glossary';
 import {
+  UCIE_ACTIVITIES,
+  UCIE_ACTIVITY_TITLES,
+  UCIE_COUNTDOWN_KEYS,
+  UCIE_DELIVERABLES,
+  UCIE_MILESTONES,
+  UCIE_PROFILE,
+  UCIE_STAGES,
+} from './ucieAdv64';
+import { UCIE_GLOSSARY } from './ucieAdv64/glossary';
+import {
   COUNTDOWN_STAGES as EMBEDDED_COUNTDOWN_STAGES,
   EMBEDDED_DERIVED_ACTIVITIES,
   EMBEDDED_DERIVED_ACTIVITY_TITLES,
@@ -70,9 +80,9 @@ import type { JourneyStage, MilestoneDef, ScheduleProfile } from './types';
  * Production — under every key any template gives them.
  */
 export const COUNTDOWN_STAGES: Readonly<Record<'tapeout' | 'firstSilicon' | 'production', readonly string[]>> = {
-  tapeout: [...EMBEDDED_COUNTDOWN_STAGES.tapeout, CPO_COUNTDOWN_KEYS.tapeout],
-  firstSilicon: [...EMBEDDED_COUNTDOWN_STAGES.firstSilicon, CPO_COUNTDOWN_KEYS.firstSilicon],
-  production: [...EMBEDDED_COUNTDOWN_STAGES.production, CPO_COUNTDOWN_KEYS.production],
+  tapeout: [...EMBEDDED_COUNTDOWN_STAGES.tapeout, CPO_COUNTDOWN_KEYS.tapeout, UCIE_COUNTDOWN_KEYS.tapeout],
+  firstSilicon: [...EMBEDDED_COUNTDOWN_STAGES.firstSilicon, CPO_COUNTDOWN_KEYS.firstSilicon, UCIE_COUNTDOWN_KEYS.firstSilicon],
+  production: [...EMBEDDED_COUNTDOWN_STAGES.production, CPO_COUNTDOWN_KEYS.production, UCIE_COUNTDOWN_KEYS.production],
 };
 
 /** Every template the app ships, in the order the pickers list them. */
@@ -81,6 +91,7 @@ export const BUILTIN_PROFILES: readonly ScheduleProfile[] = [
   THREE_DIC_PROFILE,
   EMBEDDED_PROFILE,
   CPO_PROFILE,
+  UCIE_PROFILE,
 ];
 
 /**
@@ -97,6 +108,7 @@ export const ALL_ACTIVITIES: Record<string, ActivityStepEntry> = {
   ...EMBEDDED_DERIVED_ACTIVITIES,
   ...EMBEDDED_ACTIVITIES,
   ...CPO_ACTIVITIES,
+  ...UCIE_ACTIVITIES,
 };
 
 /** Their titles, from the same sources. */
@@ -107,6 +119,7 @@ export const ALL_ACTIVITY_TITLES: Record<string, string> = {
   ...EMBEDDED_DERIVED_ACTIVITY_TITLES,
   ...EMBEDDED_ACTIVITY_TITLES,
   ...CPO_ACTIVITY_TITLES,
+  ...UCIE_ACTIVITY_TITLES,
 };
 
 /** Every stage's content, by the key a profile stage points at with `baseKey`. */
@@ -117,6 +130,7 @@ export const ALL_STAGE_CONTENT: readonly JourneyStage[] = [
   ...EMBEDDED_DERIVED_STAGES,
   ...EMBEDDED_STAGES,
   ...CPO_STAGES,
+  ...UCIE_STAGES,
 ];
 
 /** The checkpoints of both templates; a profile keeps the ones it runs. */
@@ -125,6 +139,7 @@ export const ALL_MILESTONES: readonly MilestoneDef[] = [
   ...THREE_DIC_MILESTONES,
   ...EMBEDDED_MILESTONES,
   ...CPO_MILESTONES,
+  ...UCIE_MILESTONES,
 ];
 
 /** The content a stage shows, or undefined for one nobody has written up. */
@@ -142,6 +157,7 @@ export const ALL_DELIVERABLE_TITLES: Record<string, string> = {
   ...EMBEDDED_DERIVED_DELIVERABLES,
   ...EMBEDDED_DELIVERABLES,
   ...CPO_DELIVERABLES,
+  ...UCIE_DELIVERABLES,
 };
 
 /** The terms a write-up may offer to explain, from both corpora. */
@@ -151,6 +167,8 @@ export const ALL_GLOSSARY: Record<string, GlossaryTerm> = {
   ...activityGlossary,
   ...THREE_DIC_GLOSSARY,
   ...EMBEDDED_GLOSSARY,
+  /* last: the UCIe terms no other corpus defines */
+  ...UCIE_GLOSSARY,
 };
 
 /**
@@ -168,6 +186,7 @@ export const ALL_WRITTEN_ACTIVITIES: readonly string[] = [
   ...Object.keys(EMBEDDED_DERIVED_ACTIVITIES),
   ...Object.keys(EMBEDDED_ACTIVITIES),
   ...Object.keys(CPO_ACTIVITIES),
+  ...Object.keys(UCIE_ACTIVITIES),
 ];
 
 const WRITTEN = new Set(ALL_WRITTEN_ACTIVITIES);

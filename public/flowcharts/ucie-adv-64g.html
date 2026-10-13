@@ -1,0 +1,582 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>UCIe Advanced 64G PHY IP Flow</title>
+<style>
+:root {
+  --bg: #ffffff;
+  --surface: #f8f8fa;
+  --card: #ffffff;
+  --line: #e4e4e9;
+  --line-strong: #c9c9d3;
+  --text: #1c1c24;
+  --muted: #6b6b7b;
+  --faint: #9a9aa8;
+  --accent: #5b5bd6;
+  --accent-soft: #ededfc;
+  --risk: #e5484d;
+  --edge: #b9b9c6;
+  --shadow: 0 1px 2px rgba(20,20,40,.06), 0 2px 8px rgba(20,20,40,.04);
+  --b-define: #5b5bd6;
+  --b-enable: #0f8f84;
+  --b-designVerify: #2b6cd4;
+  --b-implement: #7a4bd0;
+  --b-manufacture: #b8680d;
+  --b-integrate: #0b8aa8;
+  --b-validateRamp: #2f8f46;
+  --b-platform: #c9357a;
+  --b-siliconValidation: #2f8f46;
+  --b-ipRelease: #c9357a;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; background: var(--bg); color: var(--text); }
+body { font-size: 14px; line-height: 1.45; }
+.wrap { max-width: 1480px; margin: 0 auto; padding: 28px 16px 64px; }
+header h1 { font-size: 24px; margin: 0 0 4px; letter-spacing: -.01em; }
+header p { margin: 0; color: var(--muted); max-width: 820px; }
+.stats { display: flex; flex-wrap: wrap; gap: 10px; margin: 18px 0 20px; }
+.stat { border: 1px solid var(--line); border-radius: 8px; padding: 8px 14px; background: var(--surface); }
+.stat b { display: block; font-size: 18px; font-variant-numeric: tabular-nums; }
+.stat span { color: var(--muted); font-size: 12px; }
+
+/* major milestone strip */
+.strip { border: 1px solid var(--line); border-radius: 10px; padding: 14px 18px 10px; margin-bottom: 18px; }
+.strip h2, .section-h { font-size: 12px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); margin: 0 0 10px; font-weight: 600; }
+.axis { position: relative; height: 128px; margin: 0 10px; }
+.axis .rail { position: absolute; left: 0; right: 0; top: 62px; height: 2px; background: var(--line-strong); }
+.axis .tick { position: absolute; top: 68px; font-size: 11px; color: var(--faint); transform: translateX(-50%); font-variant-numeric: tabular-nums; }
+.axis .tick::before { content: ""; position: absolute; left: 50%; top: -8px; width: 1px; height: 5px; background: var(--line-strong); }
+.ms { position: absolute; top: 56px; transform: translateX(-50%); cursor: pointer; }
+.ms i { display: block; width: 12px; height: 12px; background: var(--accent); transform: rotate(45deg); margin: 1px auto 0; border: 2px solid #fff; box-shadow: 0 0 0 1px var(--accent); }
+.ms span { position: absolute; left: 50%; transform: translateX(-50%); white-space: nowrap; font-size: 11.5px; font-weight: 600; }
+.ms span::before { content: ""; position: absolute; left: 50%; width: 1px; background: var(--line-strong); }
+.ms.up span { bottom: 20px; }
+.ms.up.l2 span { bottom: 42px; }
+.ms.down span { top: 30px; }
+.ms.down.l2 span { top: 50px; }
+.ms.end span { left: auto; right: -6px; transform: none; }
+.ms span em { font-style: normal; color: var(--muted); font-weight: 400; margin-left: 4px; }
+
+/* toolbar */
+.toolbar { display: flex; flex-wrap: wrap; gap: 8px 12px; align-items: center; margin-bottom: 12px; }
+.toolbar .hint { flex: 1 1 380px; }
+.seg { display: inline-flex; border: 1px solid var(--line-strong); border-radius: 8px; overflow: hidden; }
+.seg button { border: 0; background: var(--card); padding: 6px 12px; font: inherit; font-size: 13px; color: var(--text); cursor: pointer; }
+.seg button + button { border-left: 1px solid var(--line-strong); }
+.seg button[aria-pressed="true"] { background: var(--accent); color: #fff; }
+.hint { color: var(--muted); font-size: 12.5px; }
+
+/* flowchart */
+.scroller { overflow: auto; max-height: calc(100vh - 90px); min-height: 420px; overscroll-behavior: contain; border: 1px solid var(--line); border-radius: 10px; background: var(--surface); }
+.chart { position: relative; min-width: 1272px; }
+.grid { position: relative; z-index: 1; display: grid; grid-template-columns: 56px repeat(7, minmax(128px, 1fr)); column-gap: 40px; padding: 0 40px 20px 0; }
+.lanehead { position: sticky; top: 0; z-index: 6; box-shadow: 20px 0 0 var(--surface), -20px 0 0 var(--surface), 20px 1px 0 var(--line), -20px 1px 0 var(--line); padding: 12px 6px 10px; font-size: 11.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; background: var(--surface); border-bottom: 1px solid var(--line); }
+.lanehead::before { content: ""; display: block; width: 22px; height: 3px; border-radius: 2px; background: var(--c); margin-bottom: 6px; }
+.lanebg { position: absolute; top: 0; bottom: 0; z-index: 0; border-left: 1px dashed var(--line); }
+.rowlabel { padding-top: 54px; padding-left: 12px; font-size: 11px; color: var(--faint); font-variant-numeric: tabular-nums; font-weight: 600; }
+.cell { display: flex; flex-direction: column; gap: 22px; padding-top: 50px; }
+svg.edges { position: absolute; inset: 0; z-index: 0; pointer-events: none; overflow: visible; }
+.nodes-layer { position: relative; z-index: 4; }
+
+.node { position: relative; z-index: 4; background: var(--card); border: 1px solid var(--line); border-left: 4px solid var(--c); border-radius: 8px; padding: 8px 10px 9px; box-shadow: var(--shadow); cursor: pointer; transition: opacity .15s, box-shadow .15s, transform .15s; text-align: left; font: inherit; color: inherit; width: 100%; }
+.node:hover { box-shadow: 0 2px 4px rgba(20,20,40,.08), 0 6px 18px rgba(20,20,40,.08); }
+.node:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.node .code { font-size: 10.5px; font-weight: 700; color: var(--c); letter-spacing: .03em; }
+.node .ttl { display: block; font-weight: 600; font-size: 13px; line-height: 1.3; margin: 1px 0 5px; }
+.node .wk { font-size: 11px; color: var(--muted); font-variant-numeric: tabular-nums; }
+.node .bar { height: 3px; background: var(--line); border-radius: 2px; margin: 5px 0 6px; position: relative; overflow: hidden; }
+.node .bar i { position: absolute; top: 0; bottom: 0; background: var(--c); opacity: .7; border-radius: 2px; }
+.node .mst { display: flex; gap: 5px; align-items: flex-start; font-size: 11px; color: var(--muted); line-height: 1.3; }
+.node .mst::before { content: ""; flex: none; width: 7px; height: 7px; margin-top: 3px; transform: rotate(45deg); border: 1.5px solid var(--muted); }
+.node .mst.major { color: var(--accent); font-weight: 600; }
+.node .mst.major::before { background: var(--accent); border-color: var(--accent); }
+.node .tag { float: right; font-size: 9.5px; font-weight: 700; color: var(--b-platform); background: #fbeaf2; border-radius: 4px; padding: 0 5px; letter-spacing: .02em; }
+.chart.focus .node { opacity: .28; }
+.chart.focus .node.on { opacity: 1; }
+.chart.focus .node.sel { box-shadow: 0 0 0 2px var(--accent), var(--shadow); }
+.endnode { grid-column: 2 / -1; margin-top: 40px; border: 1px solid var(--accent); background: var(--accent-soft); border-radius: 10px; padding: 12px 16px; display: flex; flex-wrap: wrap; gap: 6px 22px; align-items: center; position: relative; z-index: 4; }
+.endnode b { font-size: 14px; }
+.endnode span { font-size: 12.5px; color: var(--muted); }
+
+path.e { fill: none; stroke: var(--edge); stroke-width: 1.4; transition: opacity .15s; }
+path.e { stroke-linejoin: round; }
+.chart.focus path.e.on.spine { stroke-width: 3.2; }
+.chart.focus path.e.on.rib { stroke-dasharray: 5 4; }
+.chart.focus.path-mode path.e:not(.on) { opacity: 0; }
+.chart.focus .node.spine { box-shadow: 0 0 0 1.5px var(--accent), var(--shadow); }
+.chart.focus path.e.on:not(.spine) { stroke-width: 1.6; }
+.chart:not(.focus) path.e:hover { stroke: var(--muted); }
+.chart.focus path.e { opacity: .12; }
+.chart.focus path.e.on { opacity: 1; stroke: var(--accent); stroke-width: 2.2; }
+.chart.focus path.e.on.in { stroke: #8a8aa0; }
+
+/* legend */
+.legend { display: flex; flex-wrap: wrap; gap: 6px 18px; margin: 12px 2px 0; font-size: 12px; color: var(--muted); }
+.legend span { display: inline-flex; align-items: center; gap: 6px; }
+.legend .sw { width: 10px; height: 10px; border-radius: 3px; background: var(--c); }
+
+/* drawer */
+.drawer { position: fixed; top: 0; right: 0; bottom: 0; width: min(460px, 100vw); background: var(--card); border-left: 1px solid var(--line); box-shadow: -8px 0 30px rgba(20,20,40,.08); z-index: 20; transform: translateX(105%); transition: transform .2s ease; display: flex; flex-direction: column; }
+.drawer.open { transform: none; }
+.drawer .dh { padding: 18px 20px 14px; border-bottom: 1px solid var(--line); border-top: 4px solid var(--c); }
+.drawer .dh .code { font-size: 11px; font-weight: 700; color: var(--c); letter-spacing: .04em; }
+.drawer .dh h3 { margin: 2px 0 4px; font-size: 18px; line-height: 1.3; }
+.drawer .dh p { margin: 0; color: var(--muted); font-style: italic; }
+.drawer .x { position: absolute; top: 14px; right: 14px; border: 1px solid var(--line); background: var(--card); border-radius: 6px; width: 30px; height: 30px; font-size: 16px; cursor: pointer; color: var(--muted); }
+.drawer .db { overflow-y: auto; padding: 14px 20px 30px; }
+.facts { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 16px; }
+.facts div { background: var(--surface); border-radius: 8px; padding: 7px 10px; }
+.facts b { display: block; font-size: 14px; font-variant-numeric: tabular-nums; }
+.facts span { font-size: 11px; color: var(--muted); }
+.drawer h4 { font-size: 11.5px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); margin: 18px 0 6px; }
+.drawer ol, .drawer ul { margin: 0; padding-left: 20px; }
+.drawer li { margin: 3px 0; }
+.drawer .msbox { display: flex; gap: 8px; align-items: center; background: var(--accent-soft); border-radius: 8px; padding: 8px 12px; font-weight: 600; }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.chip { border: 1px solid var(--line-strong); background: var(--card); border-left: 3px solid var(--c); border-radius: 6px; padding: 3px 9px; font: inherit; font-size: 12.5px; cursor: pointer; color: var(--text); }
+.chip:hover { background: var(--surface); }
+.none { color: var(--faint); font-size: 12.5px; }
+
+/* sequence table */
+.seq { margin-top: 30px; }
+table { width: 100%; border-collapse: collapse; font-size: 13px; }
+th, td { text-align: left; padding: 7px 8px; border-bottom: 1px solid var(--line); vertical-align: top; }
+th { font-size: 11px; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); font-weight: 600; }
+td.n { color: var(--faint); font-variant-numeric: tabular-nums; width: 32px; }
+td.w { font-variant-numeric: tabular-nums; white-space: nowrap; color: var(--muted); }
+td .dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: var(--c); margin-right: 7px; }
+tr.clk { cursor: pointer; }
+tr.clk:hover td { background: var(--surface); }
+.tblwrap { overflow-x: auto; }
+.gantt { position: relative; height: 8px; min-width: 160px; background: var(--surface); border-radius: 4px; margin-top: 5px; }
+.gantt i { position: absolute; top: 0; bottom: 0; border-radius: 4px; background: var(--c); opacity: .75; }
+footer { margin-top: 26px; color: var(--faint); font-size: 12px; }
+@media (max-width: 720px) {
+  header h1 { font-size: 20px; }
+  .ms span { display: none; }
+  .ms.lbl span { display: block; }
+  .hide-sm { display: none; }
+}
+.e-dec { transition: opacity .15s; }
+.chart.focus .e-dec { opacity: .12; }
+.chart.focus .e-dec.on { opacity: 1; }
+.chart.focus.path-mode .e-dec:not(.on) { opacity: 0; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>UCIe Advanced 64G Die-to-Die PHY IP — Program Flowchart</h1>
+    <p>The full development flow of AtlasPM’s built-in <b>UCIe Advanced 64G Die-to-Die PHY IP</b> template: a die-to-die PHY for UCIe Advanced packages at 64 GT/s — D2D Adapter, Logical PHY and sideband, Electrical PHY, bumps and channel — newly developed, proven on a test chip on an advanced-package test vehicle, and released to the customers who integrate it, from concept to GA. Four workstreams run side by side — digital, electrical PHY, channel and test vehicle, and the customer releases — and join at the test chip tapeout, at silicon validation and at GA. Stages flow top to bottom by start week; columns are the lifecycle bands. Click any stage for its activities, deliverables and links.</p>
+  </header>
+
+  <div class="stats" id="stats"></div>
+
+  <section class="strip">
+    <h2>Major milestones · weeks from kickoff</h2>
+    <div class="axis" id="axis"></div>
+  </section>
+
+  <div class="toolbar">
+    <div class="seg" role="group" aria-label="Highlight">
+      <button data-mode="all" aria-pressed="true">All links</button>
+      <button data-mode="silicon" aria-pressed="false">Electrical PHY path</button>
+      <button data-mode="platform" aria-pressed="false">Channel, test vehicle &amp; release path</button>
+    </div>
+    <span class="hint" id="modeNote"></span>
+  </div>
+
+  <div class="scroller">
+    <div class="chart" id="chart">
+      <svg class="edges" id="edges"></svg>
+      <div class="grid" id="grid"></div>
+    </div>
+  </div>
+  <div class="legend" id="legend"></div>
+
+  <section class="seq">
+    <h2 class="section-h">Stage sequence · ordered by start</h2>
+    <div class="tblwrap"><table id="seq"></table></div>
+  </section>
+
+  <footer>Source: <code>src/data/ucieAdv64/skeleton.ts</code> and the stage modules beside it — the <code>ucieAdv64</code> profile’s baselines, gates and stage content. Links between stages summarise the hand-offs between lifecycle gates; each activity’s own dependencies are on its write-up page in the app.</footer>
+</div>
+
+<aside class="drawer" id="drawer" aria-hidden="true">
+  <button class="x" id="dclose" aria-label="Close">×</button>
+  <div class="dh" id="dhead"></div>
+  <div class="db" id="dbody"></div>
+</aside>
+
+<script>
+const STAGES = [{"key":"ucieConcept","order":0,"title":"IP Concept & Business Case","short":"UCON","phase":"define","start":0,"dur":8,"tagline":"Decide which die-to-die PHY customers will license, at what price, before anyone designs one.","activities":["Market and Customer Requirements Capture — Chiplet Interconnect Demand, Target SoCs and Package Types","Competitive Die-to-Die PHY IP Landscape and Differentiation Analysis","Business Case, Licensing and Pricing Model","IP Roadmap Position — Speed Grades, Process Nodes and Derivatives","Program Plan — Schedule, Resources, Test Chip Budget and Partners","Program Risk Assessment and IP Program Go / No-Go Review"],"deliverables":["Market and customer requirements brief — target SoCs, package types and bandwidth needs","Competitive die-to-die PHY IP landscape and differentiation matrix","IP business case with licensing and pricing model","IP roadmap position and derivative plan — speed grades, processes and ports","IP program plan — schedule, staffing, test chip budget and partners","IP program go / no-go decision package"],"milestones":[{"label":"IP Program Go","major":false}]},{"key":"ucieRequirements","order":1,"title":"IP Requirements","short":"UREQ","phase":"define","start":4,"dur":10,"tagline":"Turn customer needs into numbers the PHY can be designed, verified and measured against.","activities":["Target UCIe Revision and Feature Selection — 64 GT/s, x64 Advanced Module, Module Count and Raw, Streaming and Flit Modes","PPA Targets — Shoreline Bandwidth Density, Energy per Bit, Area and Latency","Supported Package Technologies and Bump Pitch Range — Silicon Bridge, Silicon Interposer and RDL Interposer","Customer Integration Requirements — Metal Stack, Macro Orientation, Power Domains and Test Access","Link Reliability Targets — BER, CRC and Retry, and Lane Repair Coverage","Sideband, Manageability and Low-Power State Requirements","Compliance and Interoperability Targets","Electrical PHY Requirements — Supplies, Clocking Inputs, ESD Targets and Operating Range","Requirements Traceability Matrix and Requirements Baseline Review"],"deliverables":["Target UCIe revision and feature selection matrix — speed, module, mode and option support","PPA target sheet — bandwidth density, energy per bit, area and latency","Supported package technology and bump pitch matrix","Customer integration requirements — metal stack, orientation, power domains and test access","Link reliability targets — BER, CRC and retry, and lane repair coverage","Sideband, manageability and low-power state requirements","Compliance and interoperability target plan","Electrical PHY requirements — supplies, clocking inputs, ESD and operating range","Requirements traceability matrix and requirements baseline"],"milestones":[{"label":"Requirements Baseline","major":false}]},{"key":"ucieTechnology","order":2,"title":"Process & Package Technology","short":"UTEC","phase":"enable","start":6,"dur":14,"tagline":"Pick the node, the metal stack and the package pitches the PHY will live on — before a single circuit is drawn.","activities":["Process Node and Metal Stack Selection","PDK Maturity and Device Model Readiness for 64 GT/s Circuits","Package Technology Selection and Bump Pitch Agreement — Bridge, Interposer and RDL","Package Partner Design Rules and Assembly Constraints","Test Chip Shuttle and Fab Slot Planning","Technology Risk Assessment and Technology Selection Review"],"deliverables":["Process node and metal stack selection memo","PDK maturity assessment and device model readiness report for 64 GT/s circuits","Package technology and bump pitch agreement — bridge, interposer and RDL options","Package partner design rule set and assembly constraint summary","Test chip shuttle and fab slot reservation plan","Technology risk register and technology selection decision record"],"milestones":[{"label":"Technology Selected","major":false}]},{"key":"ucieFoundation","order":3,"title":"Foundation IP & Design Environment","short":"UFND","phase":"enable","start":8,"dur":14,"tagline":"Have the blocks, libraries, flows and verification IP in place the day circuit and RTL design start.","activities":["Foundation IP Sourcing — PLL or DLL, ESD and I/O Cells","Standard Cells, Memories and Retry Buffer Memory Compilers","Digital Implementation Flow Readiness","Analog and Mixed-Signal Flow Readiness — Simulation, Extraction and Reliability Checks","UCIe Verification IP Acquisition and Qualification","Design and Verification Environment — Repositories, Regression and Configuration Management","Design Kickoff Readiness Review"],"deliverables":["Foundation IP sourcing plan — PLL or DLL, ESD and I/O cells","Standard cell, memory and retry buffer memory compiler readiness report","Digital implementation flow qualified on the selected node","Analog and mixed-signal flow qualified for simulation, extraction and reliability checks","UCIe verification IP qualification report","Design and verification environment with regression and release tagging","Design kickoff readiness record"],"milestones":[{"label":"Design Kickoff Ready","major":false}]},{"key":"ucieArchitecture","order":4,"title":"IP Architecture","short":"UARC","phase":"define","start":10,"dur":12,"tagline":"Decide how every bit crosses from one die to the other at 64 GT/s, and freeze it before circuits and RTL commit.","activities":["IP Partitioning and Interfaces — Adapter, Logical PHY, Electrical PHY, Sideband, FDI, RDI and Register Interface","D2D Adapter Architecture — CRC, Retry, Flit Formats, Raw Mode and Arbitration","Logical PHY Architecture — Lane Mapping, Scrambling, Link Training and Runtime Recalibration","Lane Repair, Lane Reversal and Deskew Scheme","Sideband Architecture — Messages, Register Access, Manageability and Firmware Download","Clocking Architecture — PLL and DLL, Forwarded Clock, Phase Adjustment and the 64 GT/s Timing Budget","Electrical PHY Architecture — TX and RX Topology, Equalization, Bias and ESD","Low-Power States and Power Management Architecture","Bump Map Concept and Module Floorplan","DFT and Debug Strategy — Scan, BIST, PRBS, Loopback and Margining","Power, Area and Latency Budget Allocation","Architecture Review and Architecture Freeze"],"deliverables":["IP partitioning and interface specification — FDI, RDI and register interface","D2D Adapter architecture specification — CRC, retry, Flit formats and modes","Logical PHY architecture specification — lane mapping, training and runtime recalibration","Lane repair, lane reversal and deskew specification","Sideband and manageability architecture specification","Clocking architecture and 64 GT/s timing budget","Electrical PHY architecture specification — TX, RX, equalization, bias and ESD","Low-power state and power management architecture","Bump map concept and module floorplan","DFT and debug strategy — scan, BIST, PRBS, loopback and margining","Power, area and latency budget per block","Architecture freeze decision package"],"milestones":[{"label":"Architecture Freeze","major":true}]},{"key":"ucieChannel","order":5,"title":"Package Channel & SI/PI","short":"UCHN","phase":"integrate","start":16,"dur":54,"tagline":"Specify the channel the PHY promises to work over, freeze the bump map early, and prove both on real package routes.","activities":["Channel Specification — Insertion Loss, Crosstalk and Reach","Bump and Routing Design Rules for Bridge, Interposer and RDL Packages","Bump Map and Channel Specification Freeze","Package Channel Extraction and SI Simulation","Power Delivery Network and PI Analysis","Customer Channel Guidelines and Reference Design","Test Vehicle Channel Correlation Plan","Channel Specification Compliance Review"],"deliverables":["Channel specification — insertion loss, crosstalk and reach limits per package type","Bump and routing design rules for bridge, interposer and RDL packages","Frozen bump map and channel specification under change control","Package channel extraction and SI simulation report","Power delivery network and PI analysis report","Customer channel guidelines and reference package design","Test vehicle channel correlation plan","Channel specification compliance record"],"milestones":[{"label":"Channel Spec Met","major":false}]},{"key":"ucieAfe","order":6,"title":"Electrical PHY Circuit Design","short":"UAFE","phase":"designVerify","start":18,"dur":32,"tagline":"Design the analog front-end that moves 64 GT/s across a few millimeters of package wiring, and freeze it once.","activities":["Circuit Topology Exploration and Feasibility Simulations","TX Driver Design — Output Swing, Impedance, Equalization and Duty-Cycle Control","RX Front-End and Sampler Design — Gain, Offset Calibration and Sampling Phase","Clock Distribution, DLL and Phase Adjustment Design","Bias, Reference and Supply Regulation Design","ESD Protection and Bump Interface Design","Calibration and Training Hooks in the Analog Front-End","PVT Corner and Monte Carlo Simulation at 64 GT/s","Circuit Review and Circuit Freeze"],"deliverables":["Electrical PHY circuit topology selection report with feasibility simulations","TX driver schematic database and simulation report","RX front-end and sampler schematic database and simulation report","Clocking schematic database — clock distribution, DLL and phase adjustment","Bias, reference and supply regulation schematic database","ESD and bump interface circuit database with protection rating analysis","Analog calibration and training control register specification","Electrical PHY PVT corner and Monte Carlo simulation report at 64 GT/s","Circuit freeze decision package"],"milestones":[{"label":"Circuit Freeze","major":false}]},{"key":"ucieRtl","order":7,"title":"Adapter & Logical PHY RTL","short":"URTL","phase":"designVerify","start":20,"dur":32,"tagline":"Write the digital half of the PHY once, against a frozen architecture, so verification and the customer’s RTL drop see the same design.","activities":["RTL Coding Guidelines, Block Specifications and Register Map","D2D Adapter RTL — CRC, Retry Buffer, Arbitration and Multiplexing","Flit Handling, Raw and Streaming Modes and the FDI","Logical PHY RTL — Lane Mapping, Scrambling and Deskew","Link Training State Machine — SBINIT, MBINIT, MBTRAIN, LINKINIT, ACTIVE, PHYRETRAIN and TRAINERROR","Lane Repair, Lane Reversal and Runtime Recalibration Logic","Sideband Controller and Manageability Logic","Low-Power State Control — L1 and L2 Entry and Exit","Lint, CDC and RDC Clean-Up","RTL Freeze Review"],"deliverables":["RTL coding guidelines, block specifications and register map","D2D Adapter RTL — CRC generation and checking, retry buffer and arbitration","Flit, Raw and Streaming mode datapath RTL with the FDI","Logical PHY datapath RTL — lane mapping, scrambling and deskew","Link training state machine RTL with state, timeout and transition tables","Lane repair, lane reversal and runtime recalibration RTL","Sideband controller and manageability RTL","Low-power state control RTL with power intent","Lint, CDC and RDC clean reports with reviewed waivers","RTL freeze package and freeze decision record"],"milestones":[{"label":"RTL Freeze","major":false}]},{"key":"ucieDv","order":8,"title":"Digital Verification","short":"UDV","phase":"designVerify","start":22,"dur":38,"tagline":"Prove the Adapter and Logical PHY against the specification before a customer integrates a single line of it.","activities":["Verification Plan and Coverage Model","UVM Environment and Verification IP Integration","Link Training and State Machine Verification","Error Injection, CRC and Retry Verification","Lane Repair, Lane Reversal and Deskew Verification","Low-Power Entry and Exit Verification","Raw, Streaming and Flit Mode Verification","Sideband, Register and Manageability Verification","Compliance Scenario Verification","Gate-Level Simulation and DFT Pattern Verification","Coverage Closure and Post-Silicon Test Plan Hand-Off","Verification Sign-Off Review"],"deliverables":["Digital verification plan and coverage model","UVM testbench release with integrated UCIe verification IP","Link training and state machine verification report","Error injection, CRC and retry verification report","Lane repair, lane reversal and deskew verification report","Low-power state entry and exit verification report","Raw, Streaming and Flit mode verification report","Sideband, register map and manageability verification report","Compliance scenario regression results","Gate-level simulation and DFT pattern verification report","Coverage closure report with waiver list","Post-silicon test plan for bring-up and characterization","Digital verification sign-off package"],"milestones":[{"label":"Verification Closure","major":false}]},{"key":"ucieDft","order":9,"title":"DFT, Test & Debug Features","short":"UDFT","phase":"designVerify","start":26,"dur":26,"tagline":"Build the features that prove the PHY on the tester, in the lab and in the customer’s package — before there is anything to test.","activities":["DFT Specification and Test Access Plan","Scan Insertion Plan and ATPG Coverage Targets","PRBS Generators and Checkers per Lane","Loopback Modes — Near-End, Far-End and Analog","BIST and Built-In Lane Test for Bump Repair","Eye and Lane Margining Functions","Debug Access — Register Snapshots, Trace and Sideband Debug","DFT Review and DFT Freeze"],"deliverables":["DFT specification and test access plan","Scan insertion plan and ATPG coverage targets","Per-lane PRBS generator and checker RTL","Loopback mode RTL and loopback test descriptions","BIST and built-in lane test RTL with repair map output","Eye and lane margining logic and margin readout specification","Debug access logic and debug user guide","DFT freeze package and freeze decision record"],"milestones":[{"label":"DFT Freeze","major":false}]},{"key":"ucieAms","order":10,"title":"Mixed-Signal Verification & Link Margin","short":"UAMS","phase":"designVerify","start":34,"dur":26,"tagline":"Prove the analog and the logic train together over a real channel, and predict the margin silicon will show.","activities":["Electrical PHY Behavioral Models and Model Validation Plan","Mixed-Signal Co-Simulation of the Electrical PHY with the Logical PHY RTL","Link Training with Analog Models in the Loop","Link Margin Simulation with Package Channel Models","PVT and Monte Carlo Link Margin Statistics","Model-to-Circuit Correlation","Margin Predictions and Silicon Measurement Plan Hand-Off","Link Margin Review"],"deliverables":["Electrical PHY behavioral model set with its validation plan","Mixed-signal co-simulation regression and results","Link training co-simulation report with analog models in the loop","Link margin report with package channel models across the bump pitch range","Statistical link margin report across PVT corners and Monte Carlo","Behavioral model to transistor-level correlation report","Silicon margin predictions and measurement plan","Link margin review decision record"],"milestones":[{"label":"Link Margin Review","major":false}]},{"key":"ucieLayout","order":11,"title":"Electrical PHY Layout & Macro Assembly","short":"ULAY","phase":"implement","start":44,"dur":24,"tagline":"Draw the analog so it still meets 64 GT/s after the wires are counted, and assemble the PHY into one macro on its bumps.","activities":["Electrical PHY Layout Floorplan and Critical-Block Placement","TX, RX and Clocking Layout","Matching, Shielding and Parasitic Control","Bump Map Implementation and PHY Macro Assembly","Post-Layout Extraction and Simulation","Abstract, Timing and Power Model Generation","Layout Completion Review"],"deliverables":["Electrical PHY layout floorplan with critical-block placement","TX, RX and clocking layout database","Matching, shielding and parasitic control record with extraction comparison","Assembled PHY hard macro layout with the implemented bump map","Post-layout simulation report across corners at 64 GT/s","PHY hard macro abstract, timing and power models","Layout completion review record"],"milestones":[{"label":"Layout Complete","major":false}]},{"key":"ucieDigitalPd","order":12,"title":"Digital Implementation","short":"UDPD","phase":"implement","start":46,"dur":20,"tagline":"Harden the Adapter and Logical PHY into a macro that meets timing beside the analog front-end, at every corner a customer will run.","activities":["Synthesis Trials and Constraints on Pre-Freeze RTL","Final Synthesis and Netlist Release","Digital Floorplan and Power Grid","Place and Route","Timing Closure Across Corners and Modes","Digital Hard Macro Hardening and Abstract Generation","Digital Timing Closure Review"],"deliverables":["Synthesis trial results and timing constraint set","Scan-inserted synthesis netlist release","Digital floorplan and power grid database","Placed and routed digital database","Multi-corner multi-mode timing closure report","Digital hard macro database with abstract, timing and power views","Digital timing closure review record"],"milestones":[{"label":"Digital Timing Closure","major":false}]},{"key":"ucieTestChip","order":13,"title":"Test Chip Integration","short":"UTCI","phase":"integrate","start":48,"dur":26,"tagline":"Build the chip whose only job is to prove the IP — and make sure every claim in the datasheet has a test on it.","activities":["Test Chip Architecture — Two-Die Link and Loopback Configurations","Test Chip Wrapper, Pattern Generators and Test Logic","Test Chip Top-Level Integration — PHY Macros, Pads, Bumps and Power","Test Chip Verification — Top-Level Simulation and Connectivity","Test Chip Physical Design and Signoff","Test Chip Readiness Review"],"deliverables":["Test chip architecture specification — two-die link, loopback configurations and test coverage map","Test chip wrapper, traffic generators, checkers and register map","Integrated test chip top level — macro placement, pad ring, bumps and power","Test chip top-level verification and connectivity report","Test chip signoff report and final tapeout database","Test chip readiness decision record"],"milestones":[{"label":"Test Chip Ready","major":false}]},{"key":"ucieTestVehicle","order":14,"title":"Test Vehicle, Boards & Lab Preparation","short":"UTVP","phase":"integrate","start":50,"dur":42,"tagline":"Everything silicon will need on the day it arrives — package, substrate, boards, tester and lab — ordered and proven before it does.","activities":["Test Vehicle Package Design — Two Dies on the Advanced Package","Substrate and Bridge or Interposer Procurement","Evaluation Board Design and Fabrication","ATE Load Board and Probe Card","Lab Equipment and Automation Readiness","Bring-Up Plan and Test Programs from the Pre-Silicon Test Plan","Hardware Readiness Review"],"deliverables":["Test vehicle package design database — die placement, die-to-die channel routing and substrate stack-up","Received test vehicle substrates and bridges or interposers with incoming inspection records","Evaluation boards fabricated, bare-board tested and powered without silicon","ATE load board, fine-pitch probe card and debugged wafer sort program","Lab station readiness record with measurement automation","Silicon bring-up plan and test programs with expected values from the margin predictions","Hardware readiness decision record"],"milestones":[{"label":"Hardware Ready","major":false}]},{"key":"uciePreSilicon","order":15,"title":"Pre-Silicon Releases — v0.5 & v0.9","short":"UPRE","phase":"ipRelease","start":52,"dur":26,"tagline":"Put the IP in licensees’ hands twice before silicon: frozen RTL to start integrating, signed-off views to finish.","activities":["Release Package Structure and Release QA Process","v0.5 Release — RTL, Behavioral Models and Preliminary Integration Guide","Early-Access Customer Onboarding and Feedback","Physical Views — GDS, LEF and Liberty","Timing, Power and Channel Models — IBIS-AMI or Equivalent","Integration Guide and Application Notes","v0.9 Release Package QA","v0.9 Release Decision"],"deliverables":["Release package structure, deliverable checklist and release QA procedure","v0.5 release package — RTL, behavioral models and preliminary integration guide","Early-access customer feedback log and change requests","Hard macro physical views — GDS, LEF abstract and Liberty timing and power libraries","IBIS-AMI or equivalent channel models with timing and power models","Integration guide and application notes for the v0.9 release","v0.9 release QA record and release notes","v0.9 release decision record and licensee distribution list"],"milestones":[{"label":"v0.9 Release","major":false}]},{"key":"ucieCustomer","order":16,"title":"Customer Integration Support & Sustaining","short":"UCUS","phase":"ipRelease","start":56,"dur":84,"tagline":"Carry every licensee from the first v0.5 simulation to a signed-off SoC, and hand the IP to sustaining with nothing open.","activities":["Customer Integration Reviews — Floorplan, Bump Map, Power and Channel","SoC-Level Signoff Support","Documentation, FAQ and Knowledge Base","Customer Issue Tracking and ECO Handling","Sustaining Handover Review"],"deliverables":["Customer integration review records — floorplan, bump map, power and channel","SoC-level signoff support reports per licensee","Customer documentation set — FAQ and knowledge base","Customer issue and ECO log with patch releases","Sustaining handover package and support model"],"milestones":[{"label":"Sustaining Handover","major":false}]},{"key":"ucieSignoff","order":17,"title":"Hard Macro Signoff","short":"USGN","phase":"implement","start":62,"dur":12,"tagline":"Sign the PHY off as a macro other people will drop into their own SoCs, not just as a block that works on our test chip.","activities":["Static Timing Signoff","EM and IR Drop Signoff","Physical Verification — DRC, LVS and Antenna","ESD and Latch-Up Verification","Aging and Reliability Verification","Hard Macro Integration Checks — Abstracts, Models and Bump Map Consistency","Hard Macro Signoff Review"],"deliverables":["Hard macro static timing signoff report across corners, modes and on-chip variation","PHY macro EM and IR drop signoff report with current-density and supply-droop maps","Hard macro physical verification report — DRC, LVS and antenna clean or waived","ESD and latch-up verification report for every bump and supply domain","Aging and reliability verification report — device aging and interconnect lifetime","Hard macro integration check report — abstracts, Liberty models and bump map against the layout","Hard macro signoff decision record and release authorization"],"milestones":[{"label":"Hard Macro Signoff","major":true}]},{"key":"ucieTapeout","order":18,"title":"Test Chip Tapeout","short":"UTPO","phase":"manufacture","start":72,"dur":4,"tagline":"Four weeks of checklists that decide whether the next twenty prove the IP or just prove the test chip.","activities":["Tapeout Checklist — Signoff Waivers and Deliverable Completeness","Full-Chip Final Checks — DRC, LVS and Density on the Test Chip","Mask, Shuttle and Lot Confirmation","Database Release and Foundry Handoff","Tapeout Archive and Configuration Baseline"],"deliverables":["Signed tapeout checklist with the accepted waiver list","Full-chip final DRC, LVS and density report on the tapeout database","Mask set, shuttle slot and lot plan confirmation from the foundry","Tapeout database release record with foundry intake acceptance","Tapeout archive and configuration baseline for the test chip and the PHY macros"],"milestones":[{"label":"Tapeout","major":true}]},{"key":"ucieFab","order":19,"title":"Fabrication, Sort & Assembly","short":"UFAB","phase":"manufacture","start":76,"dur":20,"tagline":"From the shuttle to the lab bench: wafers, known-good dies, two-die test vehicles and boards, tracked as one chain.","activities":["Wafer Fabrication Tracking","Wafer Sort and Known-Good-Die Selection","Test Vehicle Package Assembly","Board Assembly and Inspection","First Samples Received in the Lab"],"deliverables":["Test chip wafer-out record with process monitor data and split confirmation","Wafer sort maps and known-good-die list with allocation by use","Assembled two-die test vehicles with assembly travelers and inspection records","Evaluation boards with test vehicles mounted and inspected","First samples receipt and lab allocation record"],"milestones":[{"label":"Silicon in Hand","major":false}]},{"key":"ucieBringup","order":20,"title":"Silicon Bring-Up","short":"UBUP","phase":"siliconValidation","start":96,"dur":8,"tagline":"Two dies on one package, one sideband message at a time, until the 64 GT/s mainband carries data.","activities":["Power-On and Supply Sequencing","Sideband Link-Up and Register Access","Mainband Training — MBINIT and MBTRAIN","First Link-Up and Basic Data Transfer","Bring-Up Against the Pre-Silicon Test Plan and Margin Predictions","First Link-Up Review"],"deliverables":["Power-on and supply sequencing record with rail currents per die","Sideband link-up and register access log","Mainband training log with per-lane MBINIT and MBTRAIN results","First link-up and basic data transfer record at 64 GT/s","Bring-up results against the pre-silicon test plan and margin predictions","First link-up decision record and open-issue list"],"milestones":[{"label":"First Link-up","major":false}]},{"key":"ucieCharacterization","order":21,"title":"Silicon Characterization","short":"UCHR","phase":"siliconValidation","start":100,"dur":20,"tagline":"Measure every lane at 64 GT/s across voltage, temperature and process, and hold each number against what was simulated.","activities":["Characterization Plan and Corner Matrix","Eye Margin and Timing Margin per Lane","BER Measurement at 64 GT/s","Energy per Bit Measurement","PVT Shmoo — Voltage, Temperature and Process Splits","Lane Repair and Lane Reversal on Silicon","Runtime Recalibration and Low-Power State Behavior on Silicon","Package Channel Correlation on the Test Vehicle","Measurement-to-Simulation Correlation","Characterization Report Review"],"deliverables":["Characterization plan and corner matrix","Per-lane eye and timing margin data set","BER measurement report at 64 GT/s with confidence levels","Energy-per-bit measurement report across data rates and supplies","PVT shmoo plots and operating-range summary","Lane repair and lane reversal silicon results","Runtime recalibration and low-power state silicon results","Test vehicle channel correlation report","Measurement-to-simulation correlation report with model updates","Characterization report"],"milestones":[{"label":"Characterization Report","major":false}]},{"key":"ucieReliability","order":22,"title":"Reliability & Silicon-Proven","short":"URLQ","phase":"siliconValidation","start":100,"dur":26,"tagline":"Stress the PHY until its margins move, and only then call it silicon-proven.","activities":["Reliability Qualification Plan","High-Temperature Operating Life Stress","ESD and Latch-Up Qualification","Temperature Cycling and Package-Level Reliability on the Test Vehicle","Reliability Report","Silicon-Proven Decision Review"],"deliverables":["Reliability qualification plan with stress conditions, sample sizes and read points","Operating life stress results with per-lane margin and BER read points","ESD and latch-up qualification results","Temperature cycling and package-level reliability results with lane repair tracking","Reliability report","Silicon-proven decision record"],"milestones":[{"label":"Silicon-Proven","major":true}]},{"key":"ucieCompliance","order":23,"title":"Compliance & Interoperability","short":"UCMP","phase":"siliconValidation","start":108,"dur":16,"tagline":"Pass the specification’s own tests at 64 GT/s, then train and carry traffic with someone else’s UCIe die.","activities":["Compliance Test Plan and Test Setup","Electrical Compliance Testing","Link Training and Protocol Compliance Testing","Interoperability with Other UCIe Dies","Compliance Results Review"],"deliverables":["Compliance test plan and test setup record","Electrical compliance test results at 64 GT/s","Link training and protocol compliance test results","Interoperability test report with partner dies","Compliance results summary and compliance pass record"],"milestones":[{"label":"Compliance Pass","major":false}]},{"key":"ucieGa","order":24,"title":"General Availability Release","short":"UGA","phase":"ipRelease","start":116,"dur":12,"tagline":"Turn silicon results into a release any licensee can build production silicon on.","activities":["Silicon Data Rollup into the Release Package","Silicon Report and Characterization Summary","Final Release Package — Views, Models and Documents Updated to Silicon","GA Release QA","GA Approval Review"],"deliverables":["Silicon data rollup — measured results mapped to every datasheet parameter and prediction","Silicon report and characterization summary for licensees","GA release package — views, models and documents updated to silicon","GA release QA record, release notes and errata","GA approval decision record"],"milestones":[{"label":"IP GA","major":true}]}];
+const CFG = {"rows":[["ucieConcept"],["ucieRequirements","ucieTechnology"],["ucieFoundation"],["ucieArchitecture"],["ucieChannel"],["ucieAfe"],["ucieRtl"],["ucieDv"],["ucieDft"],["ucieAms"],["ucieLayout"],["ucieDigitalPd","ucieTestVehicle"],["ucieSignoff","ucieTestChip","uciePreSilicon"],["ucieTapeout","ucieCustomer"],["ucieFab"],["ucieBringup"],["ucieCharacterization"],["ucieReliability"],["ucieCompliance"],["ucieGa"]],"edges":[["ucieConcept","ucieRequirements"],["ucieConcept","ucieTechnology"],["ucieRequirements","ucieArchitecture"],["ucieTechnology","ucieFoundation"],["ucieTechnology","ucieArchitecture"],["ucieTechnology","ucieChannel"],["ucieArchitecture","ucieChannel"],["ucieArchitecture","ucieAfe"],["ucieArchitecture","ucieRtl"],["ucieArchitecture","ucieDv"],["ucieArchitecture","ucieDft"],["ucieFoundation","ucieAfe"],["ucieFoundation","ucieRtl"],["ucieFoundation","ucieDv"],["ucieChannel","ucieAms"],["ucieChannel","ucieLayout"],["ucieChannel","ucieTestVehicle"],["ucieChannel","ucieTestChip"],["ucieAfe","ucieAms"],["ucieAfe","ucieLayout"],["ucieRtl","ucieDv"],["ucieRtl","ucieDft"],["ucieRtl","ucieDigitalPd"],["ucieRtl","uciePreSilicon"],["ucieDft","ucieDigitalPd"],["ucieDft","ucieTestChip"],["ucieDv","ucieSignoff"],["ucieDv","ucieTestVehicle"],["ucieAms","ucieLayout"],["ucieAms","ucieSignoff"],["ucieAms","ucieTestVehicle"],["ucieLayout","ucieSignoff"],["ucieDigitalPd","ucieSignoff"],["ucieSignoff","ucieTestChip"],["ucieSignoff","uciePreSilicon"],["ucieTestChip","ucieTapeout"],["ucieSignoff","ucieTapeout"],["uciePreSilicon","ucieCustomer"],["ucieTapeout","ucieFab"],["ucieTestVehicle","ucieFab"],["ucieTestVehicle","ucieBringup"],["ucieFab","ucieBringup"],["ucieFab","ucieReliability"],["ucieBringup","ucieCharacterization"],["ucieBringup","ucieCompliance"],["ucieCharacterization","ucieGa"],["ucieReliability","ucieGa"],["ucieCompliance","ucieGa"],["ucieCustomer","ucieGa"]],"spine":["ucieConcept","ucieRequirements","ucieArchitecture","ucieAfe","ucieAms","ucieLayout","ucieSignoff","ucieTestChip","ucieTapeout","ucieFab","ucieBringup","ucieCharacterization","ucieGa"],"ribs":[["ucieTechnology","ucieArchitecture"],["ucieFoundation","ucieAfe"],["ucieChannel","ucieAms"],["ucieDigitalPd","ucieSignoff"],["ucieTestVehicle","ucieBringup"],["ucieReliability","ucieGa"],["ucieCompliance","ucieGa"],["ucieCustomer","ucieGa"]],"keep":["ucieSignoff>ucieTapeout","ucieTestVehicle>ucieBringup","ucieRtl>uciePreSilicon"],"siliconNote":"<b>Spine</b> (bold) from concept to GA through the electrical PHY — circuit design, link margin, layout, hard macro signoff, the test chip, silicon and characterization. <b>Feeds</b> (dashed) show where the other workstreams join it: technology and foundation IP → architecture and circuits, the channel → link margin, digital implementation → signoff, the test vehicle and boards → bring-up, reliability, compliance and customer integration → GA.","second":{"label":"Channel, test vehicle &amp; release path","nodes":["ucieTechnology","ucieChannel","ucieTestVehicle","ucieTestChip","ucieRtl","ucieSignoff","uciePreSilicon","ucieCustomer","ucieTapeout","ucieFab","ucieBringup","ucieGa"],"note":"Package technology → channel specification and bump map → test chip and test vehicle → tapeout, fab and bring-up; and the releases: v0.5 from the RTL freeze, v0.9 from hard macro signoff, customer integration from v0.5, GA from silicon."},"tags":{"ucieRtl":"Digital","ucieDft":"Digital","ucieDv":"Digital","ucieDigitalPd":"Digital","ucieAfe":"Electrical PHY","ucieAms":"Electrical PHY","ucieLayout":"Electrical PHY","ucieChannel":"Channel","ucieTestChip":"Test vehicle","ucieTestVehicle":"Test vehicle","uciePreSilicon":"Release","ucieGa":"Release","ucieCustomer":"Release"},"tagStyle":{"Digital":["#2b6cd4","#e8f0fc"],"Electrical PHY":["#7a4bd0","#f1ebfb"],"Channel":["#0b8aa8","#e6f5f9"],"Test vehicle":["#b8680d","#fbf1e4"],"Release":["#c9357a","#fbeaf2"]},"origin":{},"originDefault":"","statExtra":[],"endTitle":"IP GA","endNote":"v0.5 at W60 · Architecture Freeze at W22 · Hard Macro Signoff at W74 · Tapeout at W76 · Silicon in Hand at W96 · Silicon-Proven at W126 · GA at W128"};
+
+const ALL_BANDS = [
+  { id: 'define', label: 'Define' },
+  { id: 'enable', label: 'Technology & IP Enablement' },
+  { id: 'designVerify', label: 'Design & Verify' },
+  { id: 'implement', label: 'Implement' },
+  { id: 'manufacture', label: 'Manufacture' },
+  { id: 'integrate', label: 'Integrate' },
+  { id: 'validateRamp', label: 'Validate & Ramp' },
+  { id: 'platform', label: 'Developer Platform & Ecosystem' },
+  { id: 'siliconValidation', label: 'Silicon Validation' },
+  { id: 'ipRelease', label: 'IP Release & Enablement' },
+];
+/* a band no stage sits under is not drawn */
+const BANDS = ALL_BANDS.filter(b => STAGES.some(s => s.phase === b.id));
+
+const ROWS = CFG.rows;
+const EDGES = CFG.edges;
+
+/* The silicon path: the spine a die travels from spec to mass production,
+   and the work that lands on it — each feed drawn as the one link by which it
+   joins the spine, so the view stays a spine with ribs rather than a web. */
+const SILICON_SPINE = CFG.spine;
+const SILICON_RIBS = CFG.ribs;
+const SILICON_FEEDS = SILICON_RIBS.map(r => r[0]);
+const SPINE_EDGES = new Set(SILICON_SPINE.slice(1).map((k, i) => SILICON_SPINE[i] + '>' + k));
+const PATHS = {
+  silicon: [...SILICON_SPINE, ...SILICON_FEEDS],
+  platform: CFG.second.nodes,
+};
+const PATH_EDGES = {
+  silicon: [...SPINE_EDGES, ...SILICON_RIBS.map(([a, z]) => a + '>' + z)],
+  platform: EDGES.filter(([a, z]) => CFG.second.nodes.includes(a) && CFG.second.nodes.includes(z)).map(([a, z]) => a + '>' + z),
+};
+
+/* Stages this template adds to, or derives from, the Typical SoC flow. */
+const TAG = CFG.tags;
+const originOf = k => CFG.origin[k] ?? CFG.originDefault;
+
+const byKey = Object.fromEntries(STAGES.map(s => [s.key, s]));
+const band = id => BANDS.find(b => b.id === id);
+const color = id => `var(--b-${id})`;
+const END = Math.max(...STAGES.map(s => s.start + s.dur));
+const endOf = s => s.start + s.dur;
+const esc = t => String(t).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const preds = k => EDGES.filter(e => e[1] === k).map(e => e[0]);
+const succs = k => EDGES.filter(e => e[0] === k).map(e => e[1]);
+
+/* ---- stats ---- */
+const majors = STAGES.flatMap(s => s.milestones.filter(m => m.major).map(m => ({ ...m, key: s.key, wk: endOf(s) }))).sort((a, b) => a.wk - b.wk);
+document.getElementById('stats').innerHTML = [
+  [STAGES.length, 'stages'],
+  ...CFG.statExtra,
+  [STAGES.reduce((n, s) => n + s.activities.length, 0), 'activities'],
+  [STAGES.reduce((n, s) => n + s.deliverables.length, 0), 'deliverables'],
+  [STAGES.reduce((n, s) => n + s.milestones.length, 0), 'milestones'],
+  [END + ' wk', '≈ ' + (END / 52).toFixed(1) + ' years kickoff → sustaining handover'],
+].map(([b, s]) => `<div class="stat"><b>${b}</b><span>${s}</span></div>`).join('');
+
+/* ---- milestone strip ---- */
+(function () {
+  const ax = document.getElementById('axis');
+  let h = '<div class="rail"></div>';
+  for (let w = 0; w <= END; w += 13) h += `<div class="tick" style="left:${w / END * 100}%">W${w}</div>`;
+  majors.forEach((m, i) => {
+    const up = i % 2 === 0, l2 = i % 4 >= 2, end = m.wk / END > 0.9;
+    h += `<div class="ms ${up ? 'up' : 'down'}${l2 ? ' l2' : ''}${end ? ' end' : ''}" style="left:${m.wk / END * 100}%" data-k="${m.key}" title="${esc(m.label)} — W${m.wk}"><i></i><span>${esc(m.label)}<em>W${m.wk}</em></span></div>`;
+  });
+  ax.innerHTML = h;
+  ax.querySelectorAll('.ms').forEach(el => el.addEventListener('click', () => select(el.dataset.k)));
+})();
+
+/* ---- grid ---- */
+const grid = document.getElementById('grid');
+let html = '<div class="lanehead" style="--c:var(--faint)">Start</div>' +
+  BANDS.map(b => `<div class="lanehead" style="--c:${color(b.id)}">${esc(b.label)}</div>`).join('');
+ROWS.forEach((row, r) => {
+  const starts = row.map(k => byKey[k].start);
+  const lo = Math.min(...starts), hi = Math.max(...starts);
+  html += `<div class="rowlabel" style="grid-row:${r + 2}">W${lo}${hi !== lo ? '–' + hi : ''}</div>`;
+  BANDS.forEach((b, c) => {
+    const ks = row.filter(k => byKey[k].phase === b.id).sort((a, z) => byKey[a].start - byKey[z].start);
+    html += `<div class="cell" style="grid-row:${r + 2};grid-column:${c + 2}">` + ks.map(nodeHtml).join('') + '</div>';
+  });
+});
+html += `<div class="endnode" style="grid-row:${ROWS.length + 2}"><b>◆ W${END} — ${CFG.endTitle}</b><span>${CFG.endNote}</span></div>`;
+grid.innerHTML = html;
+
+function nodeHtml(k) {
+  const s = byKey[k];
+  const ms = s.milestones.map(m => `<div class="mst${m.major ? ' major' : ''}">${esc(m.label)}</div>`).join('');
+  return `<button class="node" id="n-${k}" data-k="${k}" style="--c:${color(s.phase)}">
+    <span class="code">${esc(s.short)}</span>${TAG[k] ? `<span class="tag" style="color:${CFG.tagStyle[TAG[k]][0]};background:${CFG.tagStyle[TAG[k]][1]}">${esc(TAG[k])}</span>` : ''}
+    <span class="ttl">${esc(s.title)}</span>
+    <span class="wk">W${s.start}–W${endOf(s)} · ${s.dur} wk</span>
+    <div class="bar"><i style="left:${s.start / END * 100}%;width:${s.dur / END * 100}%"></i></div>
+    ${ms}
+  </button>`;
+}
+
+/* ---- edges: shared ---- */
+const chart = document.getElementById('chart');
+const svg = document.getElementById('edges');
+const ROW_OF = {};
+ROWS.forEach((row, r) => row.forEach(k => { ROW_OF[k] = r; }));
+const LANE_OF = k => BANDS.findIndex(b => b.id === byKey[k].phase);
+
+/* transitive reduction: drop a→z when z is reachable from a another way,
+   except on the silicon spine, which reads as one unbroken line */
+const DRAWN = EDGES.filter(([a, z]) => {
+  if (SPINE_EDGES.has(a + '>' + z) || (CFG.keep || []).includes(a + '>' + z)) return true;
+  const seen = new Set(), stack = succs(a).filter(x => x !== z);
+  while (stack.length) {
+    const k = stack.pop();
+    if (k === z) return false;
+    if (seen.has(k)) continue;
+    seen.add(k); stack.push(...succs(k));
+  }
+  return true;
+});
+
+const cssVar = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+const bandOf = k => byKey[k].phase;
+
+function measure() {
+  const cr = chart.getBoundingClientRect();
+  svg.setAttribute('width', cr.width);
+  svg.setAttribute('height', cr.height);
+  const rel = el => { const r = el.getBoundingClientRect(); return { l: r.left - cr.left, r: r.right - cr.left, t: r.top - cr.top, b: r.bottom - cr.top }; };
+  const B = Object.fromEntries(STAGES.map(s => [s.key, rel(document.getElementById('n-' + s.key))]));
+  Object.values(B).forEach(b => { b.cx = (b.l + b.r) / 2; });
+  const heads = [...grid.querySelectorAll('.lanehead')].slice(1).map(rel);
+  const gap = heads[1].l - heads[0].r;
+  const gutterX = g => g < heads.length ? heads[g].l - gap / 2 : heads[heads.length - 1].r + gap / 2;
+  const rowBottom = ROWS.map(row => Math.max(...row.map(k => B[k].b)));
+  const rowTop = ROWS.map(row => Math.min(...row.map(k => B[k].t)));
+  return {
+    B, gap, gutterX, rowBottom, rowTop,
+    chanY: r => (rowBottom[r] + rowTop[r + 1]) / 2,
+    chanH: r => rowTop[r + 1] - rowBottom[r],
+  };
+}
+
+function roundPath(pts, r) {
+  let d = `M${pts[0][0]},${pts[0][1]}`;
+  for (let i = 1; i < pts.length - 1; i++) {
+    const [x0, y0] = pts[i - 1], [x1, y1] = pts[i], [x2, y2] = pts[i + 1];
+    const l1 = Math.hypot(x1 - x0, y1 - y0), l2 = Math.hypot(x2 - x1, y2 - y1);
+    const rr = Math.min(r, l1 / 2, l2 / 2);
+    if (rr < 0.5) { d += ` L${x1},${y1}`; continue; }
+    d += ` L${x1 - (x1 - x0) / l1 * rr},${y1 - (y1 - y0) / l1 * rr} Q${x1},${y1} ${x1 + (x2 - x1) / l2 * rr},${y1 + (y2 - y1) / l2 * rr}`;
+  }
+  const [xn, yn] = pts[pts.length - 1];
+  return d + ` L${xn},${yn}`;
+}
+/* corners cut at 45°, as on a metro map */
+function chamferPath(pts, c) {
+  let d = `M${pts[0][0]},${pts[0][1]}`;
+  for (let i = 1; i < pts.length - 1; i++) {
+    const [x0, y0] = pts[i - 1], [x1, y1] = pts[i], [x2, y2] = pts[i + 1];
+    const l1 = Math.hypot(x1 - x0, y1 - y0), l2 = Math.hypot(x2 - x1, y2 - y1);
+    const cc = Math.min(c, l1 / 2, l2 / 2);
+    if (cc < 0.5) { d += ` L${x1},${y1}`; continue; }
+    d += ` L${x1 - (x1 - x0) / l1 * cc},${y1 - (y1 - y0) / l1 * cc} L${x1 + (x2 - x1) / l2 * cc},${y1 + (y2 - y1) / l2 * cc}`;
+  }
+  const [xn, yn] = pts[pts.length - 1];
+  return d + ` L${xn},${yn}`;
+}
+const clean = pts => pts.filter((q, j) => j === 0 || Math.abs(q[0] - pts[j - 1][0]) > 0.1 || Math.abs(q[1] - pts[j - 1][1]) > 0.1);
+
+function markers() {
+  const m = (id, fill, s = 7) => `<marker id="${id}" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="${s}" markerHeight="${s}" orient="auto-start-reverse"><path d="M0,1 L9,5 L0,9 z" fill="${fill}"/></marker>`;
+  return '<defs>' + m('ah', '#a9a9b8') + m('ahA', '#5b5bd6', 6) +
+    BANDS.map(b => m('ah-' + b.id, cssVar('--b-' + b.id), 5.5)).join('') + '</defs>';
+}
+/* one link: applyMode highlights it by data-a / data-z and restores data-m */
+const edgePath = (a, z, d, { cls = '', stroke = null, marker = 'url(#ah)' } = {}) =>
+  `<path class="e ${cls}" data-a="${a}" data-z="${z}" data-m="${marker}" d="${d}"${stroke ? ` style="--lc:${stroke}"` : ''}${marker ? ` marker-end="${marker}"` : ''}/>`;
+
+/* spread ports along a card edge, ordered by where the other end is */
+const group = pairs => pairs.reduce((m, [k, i]) => ((m[k] = m[k] || []).push(i), m), {});
+function spreadX(b, list, i, keyOf, inset = 0.25) {
+  const sorted = list.slice().sort((x, y) => keyOf(x) - keyOf(y)), n = sorted.length;
+  return b.l + (b.r - b.l) * (n === 1 ? 0.5 : inset + (1 - 2 * inset) * sorted.indexOf(i) / (n - 1));
+}
+
+/*
+ * Orthogonal routes through the empty space: the channel under a row, the
+ * gutter beside a lane, the channel over the target's row. With `bundle`,
+ * every link from one source shares its exit, trunk and slots, so they read as
+ * one line that forks; without it each link has lanes of its own.
+ */
+function orthoRoutes(M, edges, { bundle }) {
+  const { B } = M;
+  const info = edges.map(([a, z]) => ({ a, z, ra: ROW_OF[a], rz: ROW_OF[z], la: LANE_OF(a), lz: LANE_OF(z) }));
+  /* the trunk gutter: on the side of the far targets */
+  const trunk = {};
+  info.forEach((e, i) => {
+    if (e.rz <= e.ra + 1) return;
+    const key = bundle ? e.a : i;
+    if (trunk[key] !== undefined) return;
+    const far = info.filter((f, j) => (bundle ? f.a === e.a : j === i) && f.rz > f.ra + 1);
+    const mean = far.reduce((s, f) => s + B[f.z].cx, 0) / far.length;
+    trunk[key] = mean >= B[e.a].cx ? e.la + 1 : e.la;
+  });
+  const slots = {};
+  const use = (t, key, order) => { (slots[t] = slots[t] || new Map()); if (!slots[t].has(key)) slots[t].set(key, order); };
+  info.forEach((e, i) => {
+    if (e.ra === e.rz) return;
+    const key = bundle ? e.a : i;
+    use('c' + e.ra, key, B[e.a].cx);
+    if (e.rz > e.ra + 1) {
+      use('g' + trunk[key], key, e.ra);
+      use('c' + (e.rz - 1), key, M.gutterX(trunk[key]));
+    }
+  });
+  const slotOf = (t, key, room) => {
+    const m = slots[t], keys = [...m.keys()].sort((x, y) => m.get(x) - m.get(y)), n = keys.length;
+    return (keys.indexOf(key) - (n - 1) / 2) * Math.min(7, (room - 16) / Math.max(1, n - 1));
+  };
+  /* ports */
+  const downs = info.map((e, i) => i).filter(i => info[i].ra !== info[i].rz);
+  const outs = group(downs.map(i => [info[i].a, i])), ins = group(downs.map(i => [info[i].z, i]));
+  const approachX = i => { const e = info[i], key = bundle ? e.a : i; return e.rz > e.ra + 1 ? M.gutterX(trunk[key]) : B[e.a].cx; };
+  return info.map((e, i) => {
+    const A = B[e.a], Z = B[e.z];
+    if (e.ra === e.rz) {
+      const right = Z.cx > A.cx, y = (Math.max(A.t, Z.t) + Math.min(A.b, Z.b)) / 2;
+      return [[right ? A.r : A.l, y], [right ? Z.l : Z.r, y]];
+    }
+    const key = bundle ? e.a : i;
+    const sx = bundle ? A.cx : spreadX(A, outs[e.a], i, j => B[info[j].z].cx);
+    const ex = spreadX(Z, ins[e.z], i, approachX);
+    const y1 = M.chanY(e.ra) + slotOf('c' + e.ra, key, M.chanH(e.ra));
+    if (e.rz === e.ra + 1) return clean([[sx, A.b], [sx, y1], [ex, y1], [ex, Z.t]]);
+    const gx = M.gutterX(trunk[key]) + slotOf('g' + trunk[key], key, M.gap);
+    const y2 = M.chanY(e.rz - 1) + slotOf('c' + (e.rz - 1), key, M.chanH(e.rz - 1));
+    return clean([[sx, A.b], [sx, y1], [gx, y1], [gx, y2], [ex, y2], [ex, Z.t]]);
+  });
+}
+
+/* redraw only when the chart's size really changes, once per frame */
+let drawnSize = '', pending = 0;
+function watchSize() {
+  new ResizeObserver(() => {
+    const size = chart.clientWidth + 'x' + chart.clientHeight;
+    if (size === drawnSize || pending) return;
+    pending = requestAnimationFrame(() => { pending = 0; drawnSize = chart.clientWidth + 'x' + chart.clientHeight; drawEdges(); });
+  }).observe(chart);
+}
+
+/* v1 — Bus: orthogonal, bundled by source. Each stage has one exit and one
+   trunk that forks to everything it feeds. */
+function drawEdges() {
+  const M = measure();
+  const routes = orthoRoutes(M, DRAWN, { bundle: true });
+  svg.innerHTML = markers() + DRAWN.map(([a, z], i) => edgePath(a, z, roundPath(routes[i], 6))).join('');
+  applyMode();
+}
+
+/* ---- modes & selection ---- */
+let mode = 'all', selected = null;
+const MODE_NOTE = {
+  all: 'Click a stage to trace what feeds it and what it unblocks.',
+  silicon: CFG.siliconNote,
+  platform: CFG.second.note,
+};
+document.querySelectorAll('.seg button').forEach(b => b.addEventListener('click', () => {
+  mode = b.dataset.mode;
+  document.querySelectorAll('.seg button').forEach(x => x.setAttribute('aria-pressed', x === b));
+  selected = null; closeDrawer(); applyMode();
+}));
+function applyMode() {
+  const nodes = chart.querySelectorAll('.node'), paths = svg.querySelectorAll('.e, .e-dec');
+  nodes.forEach(n => n.classList.remove('on', 'sel', 'spine'));
+  document.getElementById('modeNote').innerHTML = MODE_NOTE[selected ? 'all' : mode];
+  chart.classList.toggle('path-mode', !selected && mode !== 'all');
+  paths.forEach(p => { p.classList.remove('on', 'in', 'path', 'spine', 'rib'); if (p.dataset.m) p.setAttribute('marker-end', p.dataset.m); });
+  if (selected) {
+    chart.classList.add('focus');
+    const lit = new Set([selected, ...preds(selected), ...succs(selected)]);
+    nodes.forEach(n => lit.has(n.dataset.k) && n.classList.add('on'));
+    document.getElementById('n-' + selected).classList.add('sel');
+    paths.forEach(p => {
+      if (p.dataset.a === selected || p.dataset.z === selected) {
+        p.classList.add('on'); if (p.dataset.z === selected) p.classList.add('in');
+        if (p.dataset.a === selected) p.dataset.m && p.setAttribute('marker-end', 'url(#ahA)');
+      }
+    });
+  } else if (mode !== 'all') {
+    chart.classList.add('focus');
+    const lit = new Set(PATHS[mode]), pe = new Set(PATH_EDGES[mode]);
+    nodes.forEach(n => lit.has(n.dataset.k) && n.classList.add('on'));
+    if (mode === 'silicon') nodes.forEach(n => SILICON_SPINE.includes(n.dataset.k) && n.classList.add('spine'));
+    paths.forEach(p => {
+      const id = p.dataset.a + '>' + p.dataset.z;
+      if (pe.has(id)) { p.classList.add('on'); p.dataset.m && p.setAttribute('marker-end', 'url(#ahA)'); }
+      if (mode === 'silicon' && SPINE_EDGES.has(id)) p.classList.add('spine');
+      else if (mode === 'silicon' && pe.has(id)) p.classList.add('rib');
+    });
+    /* drawn last so the spine sits on top of the links that feed it */
+    paths.forEach(p => p.classList.contains('spine') && svg.appendChild(p));
+  } else {
+    chart.classList.remove('focus');
+  }
+}
+
+const drawer = document.getElementById('drawer');
+function chip(k) {
+  const s = byKey[k];
+  return `<button class="chip" data-k="${k}" style="--c:${color(s.phase)}">${esc(s.title)}</button>`;
+}
+function select(k) {
+  selected = k;
+  const s = byKey[k];
+  drawer.style.setProperty('--c', color(s.phase));
+  document.getElementById('dhead').innerHTML =
+    `<div class="code">${esc(s.short)} · ${esc(band(s.phase).label)}${originOf(k) ? ' · ' + esc(originOf(k)) : ''}</div>
+     <h3>${esc(s.title)}</h3><p>${esc(s.tagline || '')}</p>`;
+  const p = preds(k), z = succs(k);
+  document.getElementById('dbody').innerHTML =
+    `<div class="facts"><div><b>W${s.start}</b><span>starts</span></div><div><b>W${endOf(s)}</b><span>ends</span></div><div><b>${s.dur} wk</b><span>duration</span></div></div>` +
+    s.milestones.map(m => `<div class="msbox">◆ ${esc(m.label)}${m.major ? ' <span class="hint">· major</span>' : ''}<span class="hint" style="margin-left:auto">W${endOf(s)}</span></div>`).join('') +
+    `<h4>Fed by</h4>${p.length ? '<div class="chips">' + p.map(chip).join('') + '</div>' : '<div class="none">Program kickoff</div>'}` +
+    `<h4>Unblocks</h4>${z.length ? '<div class="chips">' + z.map(chip).join('') + '</div>' : '<div class="none">Program close — production &amp; launch</div>'}` +
+    `<h4>Activities (${s.activities.length})</h4><ol>${s.activities.map(a => `<li>${esc(a)}</li>`).join('')}</ol>` +
+    `<h4>Deliverables (${s.deliverables.length})</h4><ul>${s.deliverables.map(a => `<li>${esc(a)}</li>`).join('')}</ul>`;
+  document.getElementById('dbody').scrollTop = 0;
+  document.getElementById('dbody').querySelectorAll('.chip').forEach(c => c.addEventListener('click', () => select(c.dataset.k)));
+  drawer.classList.add('open'); drawer.setAttribute('aria-hidden', 'false');
+  applyMode();
+  const n = document.getElementById('n-' + k);
+  n.scrollIntoView({ block: 'nearest', inline: 'nearest', behavior: 'smooth' });
+}
+function closeDrawer() {
+  drawer.classList.remove('open'); drawer.setAttribute('aria-hidden', 'true');
+  selected = null; applyMode();
+}
+document.getElementById('dclose').addEventListener('click', closeDrawer);
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeDrawer(); });
+chart.addEventListener('click', e => {
+  const n = e.target.closest('.node');
+  if (n) select(n.dataset.k); else if (selected) closeDrawer();
+});
+
+/* ---- sequence table ---- */
+document.getElementById('seq').innerHTML =
+  '<thead><tr><th>#</th><th>Stage</th><th class="hide-sm">Band</th><th>Weeks</th><th>Milestone</th></tr></thead><tbody>' +
+  [...STAGES].sort((a, b) => a.start - b.start || a.order - b.order).map((s, i) =>
+    `<tr class="clk" data-k="${s.key}" style="--c:${color(s.phase)}"><td class="n">${i + 1}</td>
+      <td><span class="dot"></span><b>${esc(s.title)}</b><div class="gantt"><i style="left:${s.start / END * 100}%;width:${s.dur / END * 100}%"></i></div></td>
+      <td class="hide-sm">${esc(band(s.phase).label)}</td>
+      <td class="w">W${s.start}–W${endOf(s)}<br>${s.dur} wk</td>
+      <td>${s.milestones.map(m => m.major ? `<b style="color:var(--accent)">◆ ${esc(m.label)}</b>` : esc(m.label)).join('')}</td></tr>`).join('') +
+  '</tbody>';
+document.querySelectorAll('#seq tr.clk').forEach(tr => tr.addEventListener('click', () => select(tr.dataset.k)));
+
+/* ---- legend ---- */
+document.getElementById('legend').innerHTML =
+  BANDS.map(b => `<span style="--c:${color(b.id)}"><i class="sw"></i>${esc(b.label)}</span>`).join('') +
+  '<span><i class="sw" style="--c:var(--accent);transform:rotate(45deg);width:8px;height:8px"></i>Major milestone</span>';
+
+watchSize();
+</script>
+</body>
+</html>

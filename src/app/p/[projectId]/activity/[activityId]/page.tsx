@@ -5,6 +5,7 @@ import { cpoDetail } from '@/data/cpoSwitchDetails';
 import { embeddedDetail } from '@/data/embeddedSocDetails';
 import { threeDicDetail } from '@/data/threeDicDetails';
 import { topDieDetail } from '@/data/threeDicTopDieDetails';
+import { ucieDetail } from '@/data/ucieAdv64Details';
 import { getProjectState } from '@/lib/queries';
 
 /**
@@ -22,7 +23,7 @@ export default async function ActivityPage({
 }: PageProps<'/p/[projectId]/activity/[activityId]'>) {
   const { projectId, activityId } = await params;
   const id = decodeURIComponent(activityId).toUpperCase();
-  const detail = activityDetail(id) ?? threeDicDetail(id) ?? topDieDetail(id) ?? embeddedDetail(id) ?? cpoDetail(id);
+  const detail = activityDetail(id) ?? threeDicDetail(id) ?? topDieDetail(id) ?? embeddedDetail(id) ?? cpoDetail(id) ?? ucieDetail(id);
   if (!detail) notFound();
 
   const project = await getProjectState(projectId);
