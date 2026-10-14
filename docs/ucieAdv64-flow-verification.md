@@ -368,7 +368,7 @@ Regenerate with `npx tsx tools/ucieFlow/report.ts`.
 | UFND | Foundation IP — PLL / DLL, ESD / IO | UFND-01 Foundation IP Sourcing — PLL or DLL, ESD and I/O Cells | covered |
 | UFND | Standard cells and memories | UFND-02 Standard Cells, Memories and Retry Buffer Memory Compilers | covered |
 | UFND | EDA and AMS flow readiness | UFND-03 Digital Implementation Flow Readiness; UFND-04 Analog and Mixed-Signal Flow Readiness — Simulation, Extraction and Reliability Checks | covered |
-| UFND | UCIe verification IP | UFND-05 UCIe Verification IP Acquisition and Qualification | covered |
+| UFND | UCIe verification IP | UFND-05 UCIe Verification IP Acquisition and Qualification for Internal RTL Verification | covered |
 | UFND | Design and verification environment | UFND-06 Design and Verification Environment — Repositories, Regression and Configuration Management | covered |
 | UAFE | TX driver | UAFE-02 TX Driver Design — Output Swing, Impedance, Equalization and Duty-Cycle Control | covered |
 | UAFE | RX front-end and sampler | UAFE-03 RX Front-End and Sampler Design — Gain, Offset Calibration and Sampling Phase | covered |

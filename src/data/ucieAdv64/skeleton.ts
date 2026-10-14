@@ -197,7 +197,7 @@ export const UCIE_SKELETON: readonly UcieStageSkeleton[] = [
       a('UFND-02', 'Standard Cells, Memories and Retry Buffer Memory Compilers', 'Physical design', [0, 8], 'adapter'),
       a('UFND-03', 'Digital Implementation Flow Readiness', 'Design methodology and CAD', [2, 10], 'adapter'),
       a('UFND-04', 'Analog and Mixed-Signal Flow Readiness — Simulation, Extraction and Reliability Checks', 'Design methodology and CAD', [2, 10], 'afe'),
-      a('UFND-05', 'UCIe Verification IP Acquisition and Qualification', 'Design verification', [2, 10], 'adapter'),
+      a('UFND-05', 'UCIe Verification IP Acquisition and Qualification for Internal RTL Verification', 'Design verification', [2, 10], 'adapter'),
       a('UFND-06', 'Design and Verification Environment — Repositories, Regression and Configuration Management', 'Design methodology and CAD', [4, 12], 'program'),
       a('UFND-07', 'Design Kickoff Readiness Review', 'Program management', [12, 14], 'program'),
     ],
